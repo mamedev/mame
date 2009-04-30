@@ -283,146 +283,84 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( ninjaw_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0bffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(SMH_RAM)	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(TC0220IOC_portreg_r, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READ8(TC0220IOC_port_r, 0x00ff)
-	AM_RANGE(0x220000, 0x220003) AM_READ(ninjaw_sound_r)
-	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_READ(TC0100SCN_ctrl_word_0_r)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_READ(TC0100SCN_word_1_r)	/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_READ(TC0100SCN_ctrl_word_1_r)
-	AM_RANGE(0x300000, 0x313fff) AM_READ(TC0100SCN_word_2_r)	/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_READ(TC0100SCN_ctrl_word_2_r)
-	AM_RANGE(0x340000, 0x340007) AM_READ(TC0110PCR_word_r)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READ(TC0110PCR_word_1_r)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READ(TC0110PCR_word_2_r)	/* palette (3rd screen) */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ninjaw_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0bffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE8(TC0220IOC_port_w, 0x00ff)
+static ADDRESS_MAP_START( ninjaw_master_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM														/* main ram */
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_WRITE(ninjaw_sound_w)
+	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_WRITE(TC0100SCN_word_1_w)	/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_WRITE(TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x300000, 0x313fff) AM_WRITE(TC0100SCN_word_2_w)	/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_WRITE(TC0100SCN_ctrl_word_2_w)
-	AM_RANGE(0x340000, 0x340007) AM_WRITE(TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_WRITE(TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_WRITE(TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r,TC0100SCN_ctrl_word_1_w)
+	AM_RANGE(0x300000, 0x313fff) AM_READWRITE(TC0100SCN_word_2_r,TC0100SCN_word_2_w)		/* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_2_r,TC0100SCN_ctrl_word_2_w)
+	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
 ADDRESS_MAP_END
 
 // NB there could be conflicts between which cpu writes what to the
 // palette, as our interleaving won't match the original board.
 
-static ADDRESS_MAP_START( ninjaw_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(TC0220IOC_portreg_r, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READ8(TC0220IOC_port_r, 0x00ff)
-	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
-	AM_RANGE(0x340000, 0x340007) AM_READ(TC0110PCR_word_r)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READ(TC0110PCR_word_1_r)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READ(TC0110PCR_word_2_r)	/* palette (3rd screen) */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ninjaw_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE8(TC0220IOC_port_w, 0x00ff)
+static ADDRESS_MAP_START( ninjaw_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM	/* main ram */
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
-	AM_RANGE(0x340000, 0x340007) AM_WRITE(TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_WRITE(TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_WRITE(TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( darius2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0bffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(SMH_RAM)	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(TC0220IOC_portreg_r, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READ8(TC0220IOC_port_r, 0x00ff)
-	AM_RANGE(0x220000, 0x220003) AM_READ(ninjaw_sound_r)
-	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_READ(TC0100SCN_ctrl_word_0_r)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_READ(TC0100SCN_word_1_r)	/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_READ(TC0100SCN_ctrl_word_1_r)
-	AM_RANGE(0x300000, 0x313fff) AM_READ(TC0100SCN_word_2_r)	/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_READ(TC0100SCN_ctrl_word_2_r)
-	AM_RANGE(0x340000, 0x340007) AM_READ(TC0110PCR_word_r)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_READ(TC0110PCR_word_1_r)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_READ(TC0110PCR_word_2_r)	/* palette (3rd screen) */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0bffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE8(TC0220IOC_port_w, 0x00ff)
+static ADDRESS_MAP_START( darius2_master_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM							/* main ram */
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_WRITE(ninjaw_sound_w)
+	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_WRITE(TC0100SCN_word_1_w)	/* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_WRITE(TC0100SCN_ctrl_word_1_w)
-	AM_RANGE(0x300000, 0x313fff) AM_WRITE(TC0100SCN_word_2_w)	/* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_WRITE(TC0100SCN_ctrl_word_2_w)
-	AM_RANGE(0x340000, 0x340007) AM_WRITE(TC0110PCR_step1_word_w)		/* palette (1st screen) */
-	AM_RANGE(0x350000, 0x350007) AM_WRITE(TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x360000, 0x360007) AM_WRITE(TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
+	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_READWRITE(TC0100SCN_word_1_r,TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r,TC0100SCN_ctrl_word_1_w)
+	AM_RANGE(0x300000, 0x313fff) AM_READWRITE(TC0100SCN_word_2_r,TC0100SCN_word_2_w)		/* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_2_r,TC0100SCN_ctrl_word_2_w)
+	AM_RANGE(0x340000, 0x340007) AM_READWRITE(TC0110PCR_word_r,TC0110PCR_step1_word_w)		/* palette (1st screen) */
+	AM_RANGE(0x350000, 0x350007) AM_READWRITE(TC0110PCR_word_1_r,TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
+	AM_RANGE(0x360000, 0x360007) AM_READWRITE(TC0110PCR_word_2_r,TC0110PCR_step1_word_2_w)	/* palette (3rd screen) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius2_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)	/* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(TC0220IOC_portreg_r, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_READ8(TC0220IOC_port_r, 0x00ff)
-	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius2_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(TC0220IOC_portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE8(TC0220IOC_port_w, 0x00ff)
+static ADDRESS_MAP_START( darius2_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM														/* main ram */
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(TC0220IOC_portreg_r,TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(TC0220IOC_port_r,TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 ADDRESS_MAP_END
 
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(10))
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+static ADDRESS_MAP_START( ninjaw_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(10)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r,ym2610_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r,taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(ninjaw_pancontrol) /* pan */
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
@@ -626,14 +564,14 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_readmem,ninjaw_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_master_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 16/4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map,0)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_cpub_readmem,ninjaw_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_slave_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* CPU slices */
@@ -699,14 +637,14 @@ static MACHINE_DRIVER_START( darius2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius2_readmem,darius2_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius2_master_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map,0)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius2_cpub_readmem,darius2_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius2_slave_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* CPU slices */

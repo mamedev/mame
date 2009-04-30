@@ -268,39 +268,22 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 	musobana_inputport = data;
 }
 
+#define TMP68301_REGS \
+	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w) \
+	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w) \
+	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w) \
+	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w) \
+	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
 
-static ADDRESS_MAP_START( niyanpai_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_READ(niyanpai_palette_r)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_READ(SMH_RAM)				// palette work ram?
+static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0bf800, 0x0bffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM	// palette work ram?
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-
-	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READ(tmp68301_address_decoder_r)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READ(tmp68301_interrupt_controller_r)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READ(tmp68301_parallel_interface_r)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READ(tmp68301_serial_interface_r)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_READ(tmp68301_timer_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( niyanpai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_WRITE(niyanpai_palette_w)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_WRITE(SMH_RAM)			// palette work ram?
-
-	AM_RANGE(0x0bf800, 0x0bffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
@@ -308,60 +291,35 @@ static ADDRESS_MAP_START( niyanpai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
+	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
-
+	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
 	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
 	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
-
+	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
 	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
 	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 
+	AM_RANGE(0x280200, 0x280201) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_WRITE(tmp68301_address_decoder_w)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_WRITE(tmp68301_interrupt_controller_w)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_WRITE(tmp68301_parallel_interface_w)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_WRITE(tmp68301_serial_interface_w)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_WRITE(tmp68301_timer_w)
+	TMP68301_REGS
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( musobana_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_READ(niyanpai_palette_r)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_READ(SMH_RAM)				// palette work ram?
+	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM				// palette work ram?
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0bf800, 0x0bffff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-
-	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
-	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READ(tmp68301_address_decoder_r)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READ(tmp68301_interrupt_controller_r)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READ(tmp68301_parallel_interface_r)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READ(tmp68301_serial_interface_r)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_READ(tmp68301_timer_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( musobana_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_WRITE(niyanpai_palette_w)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_WRITE(SMH_RAM)			// palette work ram?
-
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0bf800, 0x0bffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
@@ -369,62 +327,38 @@ static ADDRESS_MAP_START( musobana_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
+	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
 
+	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
 	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
 	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
 
+	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
 	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
 	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
-
 	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
-
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_WRITE(tmp68301_address_decoder_w)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_WRITE(tmp68301_interrupt_controller_w)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_WRITE(tmp68301_parallel_interface_w)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_WRITE(tmp68301_serial_interface_w)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_WRITE(tmp68301_timer_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mhhonban_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x060000, 0x0608ff) AM_READ(niyanpai_palette_r)
-	AM_RANGE(0x060900, 0x0611ff) AM_READ(SMH_RAM)				// palette work ram?
-	AM_RANGE(0x07f800, 0x07ffff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0bf000, 0x0bffff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
 
 	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READ(tmp68301_address_decoder_r)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READ(tmp68301_interrupt_controller_r)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READ(tmp68301_parallel_interface_r)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READ(tmp68301_serial_interface_r)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_READ(tmp68301_timer_r)
+	TMP68301_REGS
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mhhonban_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
-	AM_RANGE(0x060000, 0x0608ff) AM_WRITE(niyanpai_palette_w)
-	AM_RANGE(0x060900, 0x0611ff) AM_WRITE(SMH_RAM)			// palette work ram?
-	AM_RANGE(0x07f800, 0x07ffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x060000, 0x0608ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x060900, 0x0611ff) AM_RAM				// palette work ram?
+	AM_RANGE(0x07f800, 0x07ffff) AM_RAM
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0bf000, 0x0bffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
@@ -432,12 +366,15 @@ static ADDRESS_MAP_START( mhhonban_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
+	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
 
+	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
 	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
 	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
 
+	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
 	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
 	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
 
@@ -445,26 +382,21 @@ static ADDRESS_MAP_START( mhhonban_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_WRITE(tmp68301_address_decoder_w)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_WRITE(tmp68301_interrupt_controller_w)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_WRITE(tmp68301_parallel_interface_w)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_WRITE(tmp68301_serial_interface_w)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_WRITE(tmp68301_timer_w)
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
+	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
+
+	TMP68301_REGS
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1))
+static ADDRESS_MAP_START( niyanpai_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( niyanpai_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
@@ -848,13 +780,13 @@ static MACHINE_DRIVER_START( niyanpai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
-	MDRV_CPU_PROGRAM_MAP(niyanpai_readmem,niyanpai_writemem)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_map,0)
 	MDRV_CPU_VBLANK_INT("screen", niyanpai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map, 0)
+	MDRV_CPU_IO_MAP(niyanpai_sound_io_map,0)
 
 	MDRV_Z80CTC_ADD("ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf)
 
@@ -892,7 +824,7 @@ static MACHINE_DRIVER_START( musobana )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(musobana_readmem, musobana_writemem)
+	MDRV_CPU_PROGRAM_MAP(musobana_map, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mhhonban )
@@ -900,7 +832,7 @@ static MACHINE_DRIVER_START( mhhonban )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mhhonban_readmem, mhhonban_writemem)
+	MDRV_CPU_PROGRAM_MAP(mhhonban_map, 0)
 MACHINE_DRIVER_END
 
 
