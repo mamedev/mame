@@ -16,19 +16,18 @@
 
 /*----------- defined in machine/atari.c -----------*/
 
-extern const pia6821_interface atari_pia_interface;
 extern const pia6821_interface a600xl_pia_interface;
-extern const pia6821_interface a800xl_pia_interface;
 
+/* These handlers are needed by MESS Atari 8bit drivers (for their custom pia_interface) */
+READ8_DEVICE_HANDLER(atari_pia_pa_r);
+READ8_DEVICE_HANDLER(atari_pia_pb_r);
+WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w);
 
-void atari_machine_start(running_machine *machine);	// this is needed in MESS as well for other Atari 8bits systems
+/* This is needed in MESS as well for Atari 8bit drivers */
+void atari_machine_start(running_machine *machine);	
 
 MACHINE_START( a600xl );
 
-WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w);
-
-READ8_HANDLER ( atari_serin_r );
-WRITE8_HANDLER ( atari_serout_w );
 void atari_interrupt_cb(const device_config *device, int mask);
 
 void a800_handle_keyboard(running_machine *machine);
