@@ -131,7 +131,7 @@ Notes (couriersud)
 static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
 {
 	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
-	cpu_set_input_line(device->machine->cpu[0], 0, !data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
@@ -475,7 +475,7 @@ static READ8_HANDLER( m10_a700_r )
 static READ8_HANDLER( m11_a700_r )
 {
    	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
-	//cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	//cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
 	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
@@ -491,7 +491,7 @@ static READ8_HANDLER( m11_a700_r )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -499,16 +499,16 @@ static TIMER_CALLBACK( interrupt_callback )
 {
     if (param==0)
     {
-	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	    cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	    timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
     }
     if (param==1)
     {
-	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	    cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
     	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
     }
     if (param==-1)
-	    cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	    cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 }
 

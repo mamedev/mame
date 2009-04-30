@@ -22,11 +22,11 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
- 	if (space->machine->cpu[2] != NULL)
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+ 	if (cputag_get_cpu(space->machine, "mcu") != NULL)
 	{
 		// mexico 86, knight boy
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -318,8 +318,8 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	}
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
-		cpu_set_input_line_vector(space->machine->cpu[0],0,mexico86_protection_ram[0]);
-		cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, mexico86_protection_ram[0]);
+		cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

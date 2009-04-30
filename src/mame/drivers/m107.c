@@ -75,14 +75,14 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	if (scanline == m107_raster_irq_position)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_2);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_0);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -119,19 +119,19 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpu_set_input_line_vector(machine->cpu[1],0,0x18);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "soundcpu"), 0, 0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpu_set_input_line_vector(machine->cpu[1],0,0x19);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "soundcpu"), 0, 0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m107_soundlatch_w )
 {
-	timer_call_after_resynch(space->machine, NULL, V30_ASSERT,setvector_callback);
+	timer_call_after_resynch(space->machine, NULL, V30_ASSERT, setvector_callback);
 	soundlatch_w(space, 0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
 }
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M107_IRQ_3);
+	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/
@@ -629,13 +629,13 @@ static DRIVER_INIT( firebarr )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
+	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
+	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
-	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
+	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	m107_irq_vectorbase=0x20;
+	m107_irq_vectorbase = 0x20;
 	m107_spritesystem = 1;
 }
 
@@ -643,13 +643,13 @@ static DRIVER_INIT( dsoccr94 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
+	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
+	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
-	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
+	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	m107_irq_vectorbase=0x80;
+	m107_irq_vectorbase = 0x80;
 	m107_spritesystem = 0;
 }
 
@@ -657,14 +657,14 @@ static DRIVER_INIT( wpksoc )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
+	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
+	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
-	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
+	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 
-	m107_irq_vectorbase=0x80;
+	m107_irq_vectorbase = 0x80;
 	m107_spritesystem = 0;
 }
 

@@ -128,7 +128,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	sound_cpu_busy = 1;
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )

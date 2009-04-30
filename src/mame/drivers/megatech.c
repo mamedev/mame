@@ -308,7 +308,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
+	const address_space *io = cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_IO);
 	const device_config *sn = devtag_get_device(machine, "sn");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
@@ -331,24 +331,24 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
 	sms_rom = auto_alloc_array(machine, UINT8, 0x400000);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
 	memory_set_bankptr(machine,  5, sms_rom );
 
 	memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_alloc_array(machine, UINT8, 0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
 	memory_set_bankptr(machine,  6, sms_mainram );
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
 	memory_set_bankptr(machine,  7, sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
 
 	megatech_set_genz80_as_sms_standard_ports(machine);
 //  smsgg_backupram = NULL;
@@ -363,10 +363,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 
 	printf("game 0 selected\n");
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 	devtag_reset(machine, "ym");
 
 	sprintf(tempname, "game%d", gameno);
@@ -392,8 +392,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -402,8 +402,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -412,10 +412,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+	//  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+	//  cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);

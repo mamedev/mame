@@ -59,12 +59,12 @@ VIDEO_UPDATE( metlclsh );
 
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
-	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
-	cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -96,17 +96,17 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
-	cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
-	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
@@ -262,7 +262,7 @@ GFXDECODE_END
 
 static void metlclsh_irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],M6809_IRQ_LINE,linestate);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -431,4 +431,3 @@ ROM_START( metlclsh )
 ROM_END
 
 GAME( 1985, metlclsh, 0, metlclsh, metlclsh, 0, ROT0, "Data East", "Metal Clash (Japan)", 0 )
-

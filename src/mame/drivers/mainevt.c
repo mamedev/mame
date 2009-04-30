@@ -91,7 +91,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )

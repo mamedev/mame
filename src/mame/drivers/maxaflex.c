@@ -79,14 +79,14 @@ static WRITE8_HANDLER( mcu_portB_w )
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cpu_set_input_line(space->machine->cpu[1], M6805_IRQ_LINE, CLEAR_LINE );
+		cputag_set_input_line(space->machine, "mcu", M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	sound_global_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( mcu_timer_proc )
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(machine->cpu[1], M68705_INT_TIMER);
+			generic_pulse_irq_line(cputag_get_cpu(machine, "mcu"), M68705_INT_TIMER);
 		}
 	}
 }
@@ -226,7 +226,7 @@ static MACHINE_RESET(supervisor_board)
 static INPUT_CHANGED( coin_inserted )
 {
 	if (!newval)
-		cpu_set_input_line(field->port->machine->cpu[1], M6805_IRQ_LINE, HOLD_LINE );
+		cputag_set_input_line(field->port->machine, "mcu", M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(void)
@@ -542,4 +542,3 @@ GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First S
 GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)", 0 )
 GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)", 0 )
 GAME( 1984, mf_bdash, maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 )
-

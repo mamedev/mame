@@ -155,7 +155,7 @@ static READ16_HANDLER( metro_irq_cause_r )
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
@@ -170,9 +170,9 @@ static void update_irq_state(running_machine *machine)
 		int i = 0;
 		for (i = 0; i < 8; i++)
 			if (irq & (1 << i))
-				irq_level[metro_irq_levels[i]&7] = 1;
+				irq_level[metro_irq_levels[i] & 7] = 1;
 		for (i = 0; i < 8; i++)
-			cpu_set_input_line(machine->cpu[0], i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -181,7 +181,7 @@ static void update_irq_state(running_machine *machine)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], irq_line, state);
+		cputag_set_input_line(machine, "maincpu", irq_line, state);
 	}
 }
 
@@ -190,13 +190,13 @@ static void update_irq_state(running_machine *machine)
 static IRQ_CALLBACK(metro_irq_callback)
 {
 //  logerror("%s: irq callback returns %04X\n",cpuexec_describe_context(device->machine),metro_irq_vectors[int_level]);
-	return metro_irq_vectors[irqline]&0xff;
+	return metro_irq_vectors[irqline] & 0xff;
 }
 
 static MACHINE_RESET( metro )
 {
 	if (irq_line == -1)
-		cpu_set_irq_callback(machine->cpu[0], metro_irq_callback);
+		cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), metro_irq_callback);
 }
 
 
@@ -321,7 +321,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 
 static void ymf278b_interrupt(const device_config *device, int active)
 {
-	cpu_set_input_line(device->machine->cpu[0], 2, active);
+	cputag_set_input_line(device->machine, "maincpu", 2, active);
 }
 
 /***************************************************************************
@@ -337,7 +337,7 @@ static int porta, portb, busy_sndcpu;
 
 static int metro_io_callback(const device_config *device, int ioline, int state)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT8 data = 0;
 
@@ -360,7 +360,7 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_int(space->cpu);
 		busy_sndcpu = 1;
 	}
@@ -512,7 +512,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 static void metro_sound_irq_handler(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -1927,8 +1927,8 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
-	soundlatch_w(space, offset, data>>8);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data >> 8);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -1942,7 +1942,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 
 static void blzntrnd_irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -4646,7 +4646,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 
 		default:
 			// timer
-			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);
+			cputag_set_input_line(device->machine, "maincpu", H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
@@ -4718,7 +4718,7 @@ static void metro_common(void)
 
 static DRIVER_INIT( metro )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common();
 
@@ -4743,7 +4743,7 @@ for (i = 0;i < (0x20000*3)/2;i++)
 
 static DRIVER_INIT( daitorid )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common();
 

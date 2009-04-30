@@ -465,7 +465,7 @@ static MACHINE_RESET( m1 )
 
 static void duart_irq_handler(const device_config *device, UINT8 state)
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
 }
 
@@ -707,7 +707,7 @@ static UINT8 m1_duart_r (const device_config *device)
 static WRITE8_DEVICE_HANDLER( m1_meter_w )
 {
 	int i;
-	UINT64 cycles  = cpu_get_total_cycles(device->machine->cpu[0]);
+	UINT64 cycles  = cputag_get_total_cycles(device->machine, "maincpu");
 
 	for (i=0; i<8; i++)
 	if ( data & (1 << i) )	Mechmtr_update(i, cycles, data & (1 << i) );

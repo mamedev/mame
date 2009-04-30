@@ -245,7 +245,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpu_set_input_line(space->machine->cpu[0],2,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 2, HOLD_LINE);
 }
 
 
@@ -372,7 +372,7 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(device->machine->cpu[1], 4, HOLD_LINE);
+		cputag_set_input_line(device->machine, "soundcpu", 4, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( oki_status_r )
@@ -1387,7 +1387,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpu_set_input_line(space->machine->cpu[0],4,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 4, HOLD_LINE);
 }
 
 /*************************************
@@ -1609,7 +1609,7 @@ MACHINE_DRIVER_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -3758,13 +3758,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
-	memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
 }
 
 static DRIVER_INIT( phantasm )
@@ -3809,7 +3809,7 @@ static DRIVER_INIT( soldamj )
 	astyanax_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 static DRIVER_INIT( soldam )
@@ -3817,7 +3817,7 @@ static DRIVER_INIT( soldam )
 	phantasm_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 
@@ -3841,7 +3841,7 @@ static DRIVER_INIT( monkelf )
 	UINT16 *ROM = (UINT16*)memory_region(machine, "maincpu");
 	ROM[0x00744/2] = 0x4e71;
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
 
 	megasys1_ram += 0x10000/2;
 
@@ -3885,4 +3885,3 @@ GAME( 1993, chimerab, 0,        system_C,          chimerab, chimerab, ROT0,   "
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
 GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
-

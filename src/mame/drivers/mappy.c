@@ -703,15 +703,15 @@ static WRITE8_HANDLER( superpac_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(space->machine->cpu[1],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(space->machine->cpu[0],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -727,7 +727,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -745,21 +745,21 @@ static WRITE8_HANDLER( phozon_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			cpu_interrupt_enable(space->machine->cpu[1],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			cpu_interrupt_enable(space->machine->cpu[0],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			cpu_interrupt_enable(space->machine->cpu[2],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub2"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub2", 0, CLEAR_LINE);
 			break;
 
 		case 0x06:
@@ -772,11 +772,11 @@ static WRITE8_HANDLER( phozon_latch_w )
 			break;
 
 		case 0x0a:
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -791,15 +791,15 @@ static WRITE8_HANDLER( mappy_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(space->machine->cpu[1],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "sub"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(space->machine->cpu[0],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
@@ -816,7 +816,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -830,7 +830,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 
 static MACHINE_RESET( superpac )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -840,7 +840,7 @@ static MACHINE_RESET( superpac )
 
 static MACHINE_RESET( phozon )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -850,7 +850,7 @@ static MACHINE_RESET( phozon )
 
 static MACHINE_RESET( mappy )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -861,10 +861,10 @@ static MACHINE_RESET( mappy )
 static INTERRUPT_GEN( mappy_interrupt_1 )
 {
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
-						// so don't replace with cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
-	namcoio_set_irq_line(device->machine,0,PULSE_LINE);
-	namcoio_set_irq_line(device->machine,1,PULSE_LINE);
+	namcoio_set_irq_line(device->machine, 0, PULSE_LINE);
+	namcoio_set_irq_line(device->machine, 1, PULSE_LINE);
 }
 
 
@@ -2133,7 +2133,7 @@ static DRIVER_INIT( grobda )
        the DAC might be built-in after all.
       */
     const device_config *dac = devtag_get_device(machine, "dac");
-	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
+	memory_install_write8_device_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 
 	DRIVER_INIT_CALL(58_56);
 }
@@ -2141,7 +2141,7 @@ static DRIVER_INIT( grobda )
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, (write8_space_func)SMH_NOP);
 	DRIVER_INIT_CALL(58_56);
 }
 

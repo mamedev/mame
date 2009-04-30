@@ -254,14 +254,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	if (scanline == m92_raster_irq_position)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_2);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_0);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -329,14 +329,14 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpu_set_input_line_vector(machine->cpu[1], 0, 0x18);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "soundcpu"), 0, 0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpu_set_input_line_vector(machine->cpu[1], 0, 0x19);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "soundcpu"), 0, 0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m92_soundlatch_w )
@@ -364,7 +364,7 @@ static WRITE16_HANDLER( m92_sound_irq_ack_w )
 static WRITE16_HANDLER( m92_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M92_IRQ_3);
+	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, M92_IRQ_3);
 }
 
 /*****************************************************************************/
@@ -910,7 +910,7 @@ static const ym2151_interface ym2151_config =
 
 void m92_sprite_interrupt(running_machine *machine)
 {
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_1);
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_DRIVER_START( m92 )
@@ -1968,21 +1968,21 @@ static void init_m92(running_machine *machine, int hasbanks)
 
 	if (hasbanks)
 	{
-		memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
+		memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 		bankaddress = 0xa0000; /* Initial bank */
 		set_m92_bank(machine);
 
 		/* Mirror used by In The Hunt for protection */
-		memcpy(RAM+0xc0000,RAM+0x00000,0x10000);
-		memory_set_bankptr(machine, 2,&RAM[0xc0000]);
+		memcpy(RAM + 0xc0000, RAM + 0x00000, 0x10000);
+		memory_set_bankptr(machine, 2, &RAM[0xc0000]);
 	}
 
 	RAM = memory_region(machine, "soundcpu");
-	memcpy(RAM+0xffff0, RAM+0x1fff0, 0x10); /* Sound cpu Start vector */
+	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	m92_game_kludge=0;
-	m92_irq_vectorbase=0x80;
-	m92_sprite_buffer_busy=1;
+	m92_game_kludge = 0;
+	m92_irq_vectorbase = 0x80;
+	m92_sprite_buffer_busy = 1;
 
 	setvector_callback(machine, NULL, VECTOR_INIT);
 }
@@ -2015,13 +2015,13 @@ static DRIVER_INIT( uccops )
 static DRIVER_INIT( rtypeleo )
 {
 	init_m92(machine, 1);
-	m92_irq_vectorbase=0x20;
+	m92_irq_vectorbase = 0x20;
 }
 
 static DRIVER_INIT( rtypelej )
 {
 	init_m92(machine, 1);
-	m92_irq_vectorbase=0x20;
+	m92_irq_vectorbase = 0x20;
 }
 
 static DRIVER_INIT( majtitl2 )
@@ -2029,9 +2029,9 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
-	m92_game_kludge=2;
+	m92_game_kludge = 2;
 }
 
 static DRIVER_INIT( kaiteids )
@@ -2048,10 +2048,10 @@ static DRIVER_INIT( inthunt )
 static DRIVER_INIT( lethalth )
 {
 	init_m92(machine, 0);
-	m92_irq_vectorbase=0x20;
+	m92_irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0, (write16_space_func)SMH_NOP);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0, (write16_space_func)SMH_NOP);
 }
 
 static DRIVER_INIT( nbbatman )
@@ -2060,13 +2060,13 @@ static DRIVER_INIT( nbbatman )
 
 	init_m92(machine, 1);
 
-	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
+	memcpy(RAM + 0x80000, RAM + 0x100000, 0x20000);
 }
 
 static DRIVER_INIT( ssoldier )
 {
 	init_m92(machine, 1);
-	m92_irq_vectorbase=0x20;
+	m92_irq_vectorbase = 0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
 }
@@ -2074,7 +2074,7 @@ static DRIVER_INIT( ssoldier )
 static DRIVER_INIT( psoldier )
 {
 	init_m92(machine, 1);
-	m92_irq_vectorbase=0x20;
+	m92_irq_vectorbase = 0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
 }
@@ -2088,7 +2088,7 @@ static DRIVER_INIT( gunforc2 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	init_m92(machine, 1);
-	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
+	memcpy(RAM + 0x80000, RAM + 0x100000, 0x20000);
 }
 
 /***************************************************************************/

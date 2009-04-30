@@ -75,13 +75,13 @@ static WRITE8_DEVICE_HANDLER( megazone_portB_w )
 
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "daccpu", 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "daccpu", 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 

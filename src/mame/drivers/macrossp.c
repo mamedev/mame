@@ -354,9 +354,9 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(space->cpu),data,mem_mask);
-		soundlatch_word_w(space,0,data >> 16,0xffff);
+		soundlatch_word_w(space, 0, data >> 16, 0xffff);
 		sndpending = 1;
-		cpu_set_input_line(space->machine->cpu[1],2,HOLD_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 	}
@@ -366,7 +366,7 @@ static READ16_HANDLER( macrossp_soundcmd_r )
 {
 //  logerror("%06x read soundcmd\n",cpu_get_pc(space->cpu));
 	sndpending = 0;
-	return soundlatch_word_r(space,offset,mem_mask);
+	return soundlatch_word_r(space, offset, mem_mask);
 }
 
 static INT32 fade_effect,old_fade;
@@ -590,7 +590,7 @@ static void irqhandler(const device_config *device, int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpu_set_input_line(device->cpu[1],1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(device, "audiocpu", 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -763,13 +763,13 @@ static WRITE32_HANDLER( quizmoon_speedup_w )
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
 #endif
 }
 

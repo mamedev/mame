@@ -151,7 +151,7 @@ UINT16* mcatadv_vidregs;
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -422,7 +422,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( const device_config *device, int irq )
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym2610_interface mcatadv_ym2610_interface =
 {
@@ -670,4 +670,3 @@ GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv, ROT0,   "Wintechno", "
 GAME( 1993, nost,     0,       nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL )
 GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL )
 GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL )
-

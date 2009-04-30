@@ -49,13 +49,13 @@ static WRITE16_HANDLER( magmax_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		sound_latch = (data & 0xff) << 1;
-		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( magmax_sound_irq_ack )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 	return 0;
 }
 

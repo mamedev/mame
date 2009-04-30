@@ -732,7 +732,8 @@ static READ8_HANDLER(at_page8_r)
 {
 	UINT8 data = at_pages[offset % 0x10];
 
-	switch(offset % 8) {
+	switch(offset % 8) 
+	{
 	case 1:
 		data = dma_offset[(offset / 8) & 1][2];
 		break;
@@ -754,7 +755,8 @@ static WRITE8_HANDLER(at_page8_w)
 {
 	at_pages[offset % 0x10] = data;
 
-	switch(offset % 8) {
+	switch(offset % 8) 
+	{
 	case 1:
 		dma_offset[(offset / 8) & 1][2] = data;
 		break;
@@ -773,7 +775,7 @@ static WRITE8_HANDLER(at_page8_w)
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -783,7 +785,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -955,10 +957,10 @@ static MACHINE_RESET(mediagx)
 {
 	UINT8 *rom = memory_region(machine, "bios");
 
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	dacl = auto_alloc_array(machine, INT16, 65536);
 	dacr = auto_alloc_array(machine, INT16, 65536);
@@ -978,12 +980,14 @@ static MACHINE_RESET(mediagx)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( mediagx_pic8259_1_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+static PIC8259_SET_INT_LINE( mediagx_pic8259_1_set_int_line ) 
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
-static PIC8259_SET_INT_LINE( mediagx_pic8259_2_set_int_line ) {
+static PIC8259_SET_INT_LINE( mediagx_pic8259_2_set_int_line ) 
+{
 	pic8259_set_irq_line( mediagx_devices.pic8259_1, 2, interrupt);
 }
 
@@ -1079,7 +1083,7 @@ MACHINE_DRIVER_END
 
 static void set_gate_a20(running_machine *machine, int a20)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine *machine, int state)
@@ -1092,7 +1096,8 @@ static void ide_interrupt(const device_config *device, int state)
 	pic8259_set_irq_line(mediagx_devices.pic8259_2, 6, state);
 }
 
-static int mediagx_get_out2(running_machine *machine) {
+static int mediagx_get_out2(running_machine *machine) 
+{
 	return pit8253_get_output( mediagx_devices.pit8254, 2 );
 }
 
@@ -1101,7 +1106,8 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
-static void mediagx_set_keyb_int(running_machine *machine, int state) {
+static void mediagx_set_keyb_int(running_machine *machine, int state) 
+{
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
 
@@ -1178,7 +1184,7 @@ static void install_speedups(running_machine *machine, speedup_entry *entries, i
 	speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
+		memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
 
 #ifdef MAME_DEBUG
 	add_exit_callback(machine, report_speedups);

@@ -1315,7 +1315,7 @@ INPUT_PORTS_END
 static void  segac2_irq2_interrupt(const device_config *device, int state)
 {
 	//printf("sound irq %d\n", state);
-	cpu_set_input_line(device->machine->cpu[0], 2, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
@@ -1826,12 +1826,11 @@ static void segac2_common_init(running_machine* machine, int (*func)(int in))
 	prot_func = func;
 
 	genvdp_use_cram = 0;
-	genesis_has_z80 = 0;
 	genesis_always_irq6 = 1;
 	genesis_other_hacks = 0;
 
 	if (upd != NULL)
-		memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), upd, 0x880000, 0x880001, 0, 0x13fefe, segac2_upd7759_w);
+		memory_install_write16_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), upd, 0x880000, 0x880001, 0, 0x13fefe, segac2_upd7759_w);
 }
 
 
@@ -2088,7 +2087,7 @@ static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(machine, NULL);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x800001, 0, 0, (write16_space_func)SMH_NOP);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x800000, 0x800001, 0, 0, (write16_space_func)SMH_NOP);
 }
 
 static DRIVER_INIT( borench )
@@ -2176,36 +2175,36 @@ static DRIVER_INIT( pclub )
 {
 	segac2_common_init(machine, prot_func_pclub);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv2 )
 {
 	segac2_common_init(machine, prot_func_pclubjv2);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv4 )
 {
 	segac2_common_init(machine, prot_func_pclubjv4);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv5 )
 {
 	segac2_common_init(machine, prot_func_pclubjv5);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 

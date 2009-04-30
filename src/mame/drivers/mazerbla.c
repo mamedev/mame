@@ -284,7 +284,7 @@ static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 {
 	zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	cpu_set_input_line(space->machine->cpu[0], 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	cputag_set_input_line(space->machine, "maincpu", 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
@@ -292,8 +292,8 @@ static READ8_HANDLER( cfb_zpu_int_req_clr )
 	zpu_int_vector |= 2;
 
 	/* clear the INT line when there are no more interrupt requests */
-	if (zpu_int_vector==0xff)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	if (zpu_int_vector == 0xff)
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -1002,7 +1002,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1041,11 +1041,11 @@ static INTERRUPT_GEN( sound_interrupt )
 
 static WRITE8_HANDLER( sound_int_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 }
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
@@ -1362,7 +1362,7 @@ static MACHINE_RESET( mazerbla )
 {
 	game_id = MAZERBLA;
 	zpu_int_vector = 0xff;
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
 
 
@@ -1371,7 +1371,7 @@ static MACHINE_RESET( greatgun )
 	UINT8 *rom = memory_region(machine, "sub2");
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 
 
 //patch VCU test
@@ -1614,5 +1614,3 @@ ROM_END
 GAME( 1983, mazerbla, 0,        mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS |GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1983, mzrblzra, mazerbla, mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS |GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1983, greatgun, 0,        greatgun,  greatgun, 0, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-
-

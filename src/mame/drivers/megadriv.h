@@ -54,6 +54,5 @@ extern int segac2_bg_pal_lookup[4];
 extern int segac2_sp_pal_lookup[4];
 
 extern int genvdp_use_cram;
-extern int genesis_has_z80;
 extern int genesis_always_irq6;
 extern int genesis_other_hacks;

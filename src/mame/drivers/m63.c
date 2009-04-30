@@ -323,7 +323,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, ASSERT_LINE);
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
@@ -333,15 +333,15 @@ static WRITE8_HANDLER( snddata_w )
 	const device_config *ay2 = devtag_get_device(space->machine, "ay2");
 
 	if ((p2 & 0xf0) == 0xe0)
-		ay8910_address_w(ay1,0,offset);
+		ay8910_address_w(ay1, 0, offset);
 	else if ((p2 & 0xf0) == 0xa0)
-		ay8910_data_w(ay1,0,offset);
+		ay8910_data_w(ay1, 0, offset);
 	else if (ay2 != NULL && (p1 & 0xe0) == 0x60)
-		ay8910_address_w(ay2,0,offset);
+		ay8910_address_w(ay2, 0, offset);
 	else if (ay2 != NULL && (p1 & 0xe0) == 0x40)
-		 ay8910_data_w(ay2,0,offset);
+		 ay8910_data_w(ay2, 0, offset);
 	else if ((p2 & 0xf0) == 0x70 )
-		sound_status=offset;
+		sound_status = offset;
 }
 
 static WRITE8_HANDLER( p1_w )
@@ -352,9 +352,9 @@ static WRITE8_HANDLER( p1_w )
 static WRITE8_HANDLER( p2_w )
 {
 	p2 = data;
-	if((p2&0xf0)==0x50)
+	if((p2 & 0xf0) == 0x50)
 	{
-		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -375,10 +375,10 @@ static READ8_HANDLER( irq_r )
 
 static READ8_HANDLER( snddata_r )
 {
-	switch(p2&0xf0)
+	switch(p2 & 0xf0)
 	{
-		case 0x60:	return soundlatch_r(space,0); ;
-		case 0x70:	return memory_region(space->machine, "user1")[((p1&0x1f)<<8)|offset];
+		case 0x60:	return soundlatch_r(space, 0); ;
+		case 0x70:	return memory_region(space->machine, "user1")[((p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
 }
@@ -687,7 +687,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
@@ -856,7 +856,7 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb10.6f",      0x8000, 0x2000, CRC(6b47efba) SHA1(cb55c7a9d5afe748c1c88f87dd1909e106932798) )
 	ROM_LOAD( "fb09.7f",      0xa000, 0x2000, CRC(be69e087) SHA1(be95ecafa494cb0787ee18eb3ecea4ad545a6ae3) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* 8039 */
 	ROM_LOAD( "fb07.0b",      0x0000, 0x1000, CRC(50432dbd) SHA1(35a2218ed243bde47dbe06b5a11a65502ba734ea) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

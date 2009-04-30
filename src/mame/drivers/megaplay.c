@@ -633,7 +633,7 @@ static READ8_HANDLER( megaplay_bios_6404_r )
 static WRITE8_HANDLER( megaplay_bios_6404_w )
 {
 	if(((bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	bios_6404 = data;
 
 //  logerror("BIOS: 0x6404 write: 0x%02x\n",data);
@@ -1000,14 +1000,14 @@ static DRIVER_INIT (megaplay)
 	megplay_stat(machine);
 
 	/* for now ... */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
 	memory_set_bankptr(machine, 7, &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
 }
 
 /*

@@ -411,7 +411,7 @@ static MACHINE_RESET( magicard )
 static INTERRUPT_GEN( magicard_irq )
 {
 //  if(input_code_pressed(KEYCODE_Z))
-//      cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+//      cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE);
 //  magicram[0x2004/2]^=0xffff;
 }
 
