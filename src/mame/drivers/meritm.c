@@ -1125,7 +1125,7 @@ ROM_START( pitbossm )
 ROM_END
 
 
-ROM_START( pbst30 )
+ROM_START( pbst30 ) /* Dallas DS1204V security key at U1 labeled 9234-10 U1-RO1 C1994 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9234-10-01_u9-r0",  0x00000, 0x10000, CRC(96f39c9a) SHA1(df698e94a5204cf050ceadc5c257ca5f68171114) )
 	ROM_LOAD( "5",  0x10000, 0x10000, BAD_DUMP CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // taken from pitbossm
@@ -1141,7 +1141,7 @@ ROM_START( pbst30 )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
 
-ROM_START( pbst30b )
+ROM_START( pbst30b ) /* Dallas DS1204V security key at U1 labeled 9234-01 U1-RO1 C1993 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9234-00-01_u9-r0a",  0x00000, 0x10000, CRC(5f058f95) SHA1(98382935340a076bdb1b20c7f16c25b6084599fe) )
 	ROM_LOAD( "5",  0x10000, 0x10000, BAD_DUMP CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // taken from pitbossm
