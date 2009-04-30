@@ -6170,6 +6170,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( karnovr )	/* 0066 (c) 1994 Data East Corporation */
 	DRIVER( gururin )	/* 0067 (c) 1994 Face */
 	DRIVER( pspikes2 )	/* 0068 (c) 1994 Video System Co. */
+				/* Super Volley '94 was once released in Mar.1994, and recalled. Then released as Power Spikes 2 (with some tweaks). */
 	DRIVER( fatfury3 )	/* 0069 (c) 1995 SNK */
 	DRIVER( zupapa )	/* 0070 Zupapa - released in 2001, 1994 prototype probably exists */
 				/* 0071 Bang Bang Busters (prototype) 1994 Visco */
@@ -6227,6 +6228,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kof96h )	/* 0214 (c) 1996 SNK */
 	DRIVER( ssideki4 )	/* 0215 (c) 1996 SNK */
 	DRIVER( kizuna )	/* 0216 (c) 1996 SNK */
+				/*  Fu-un Super Tag Battle Special Version (4-player battle available) exists */
 	DRIVER( ninjamas )	/* 0217 (c) 1996 ADK / SNK */
 	DRIVER( ragnagrd )	/* 0218 (c) 1996 Saurus */
 	DRIVER( pgoal )		/* 0219 (c) 1996 Saurus */
@@ -6351,13 +6353,13 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Hyper NeoGeo 64 uses a 3 digit rom code? */
 
  	DRIVER( hng64 )
-	DRIVER( roadedge ) 	/* 001 Roads Edge / Round Trip RV */
-	DRIVER( sams64 )	/* 002 Samurai Shodown 64 / Samurai Spirits 64 */
-	DRIVER( xrally )	/* 003 Xtreme Rally / Off Beat Racer! */
-	DRIVER( bbust2 )	/* 004 Beast Busters: Second Nightmare */
-	DRIVER( sams64_2 )	/* 005 Samurai Shodown: Warrior's Rage / Samurai Spirits: Asura Zanmaden */
-	DRIVER( fatfurwa )	/* 006 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition */
-	DRIVER( buriki )	/* 007 Buriki One (c) 1999 SNK */
+	DRIVER( roadedge ) 	/* 001 1997/09/10 Roads Edge / Round Trip RV */
+	DRIVER( sams64 )	/* 002 1997/12/19 Samurai Shodown 64 / Samurai Spirits 64 */
+	DRIVER( xrally )	/* 003 1998/05/13 Xtreme Rally / Off Beat Racer! */
+	DRIVER( bbust2 )	/* 004 1998/09/11 Beast Busters: Second Nightmare */
+	DRIVER( sams64_2 )	/* 005 1998/10/16 Samurai Shodown: Warrior's Rage / Samurai Spirits: Asura Zanmaden */
+	DRIVER( fatfurwa )	/* 006 1999/01/28 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition */
+	DRIVER( buriki )	/* 007 1999/05/21 Buriki One */
 
 	/* Alpha Denshi games */
 	DRIVER( shougi )
