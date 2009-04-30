@@ -85,7 +85,7 @@ static INTERRUPT_GEN( iqblock_interrupt )
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( extrarom_r )
@@ -441,7 +441,7 @@ static DRIVER_INIT( iqblock )
 	paletteram_2       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
 	iqblock_video_type=1;
 }
 
@@ -463,7 +463,7 @@ static DRIVER_INIT( grndtour )
 	paletteram_2       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
 	iqblock_video_type=0;
 }
 
@@ -471,4 +471,3 @@ static DRIVER_INIT( grndtour )
 
 GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock,  ROT0, "IGS", "IQ-Block", 0 )
 GAME( 1993, grndtour, 0, iqblock,  iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 )
-

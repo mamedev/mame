@@ -108,7 +108,7 @@ VIDEO_START( lethalj )
 
 static TIMER_CALLBACK( gen_ext1_int )
 {
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
@@ -170,7 +170,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 
 	/* clear the IRQ on offset 0 */
 	else if (offset == 0)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

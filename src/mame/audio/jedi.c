@@ -60,7 +60,7 @@ static SOUND_RESET( jedi )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 WRITE8_HANDLER( jedi_audio_reset_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

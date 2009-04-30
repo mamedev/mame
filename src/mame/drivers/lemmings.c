@@ -76,12 +76,12 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 static WRITE16_HANDLER( lemmings_sound_w )
 {
 	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1],1,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],1,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 1, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -239,7 +239,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
 static const ym2151_interface ym2151_config =

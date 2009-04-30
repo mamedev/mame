@@ -46,7 +46,7 @@ static INTERRUPT_GEN( ironhors_interrupt )
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "soundcpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
@@ -390,7 +390,7 @@ static INTERRUPT_GEN( farwest_interrupt )
 
 static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
-	return soundlatch_r(cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM),0);
+	return soundlatch_r(cputag_get_address_space(device->machine, "soundcpu", ADDRESS_SPACE_PROGRAM),0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

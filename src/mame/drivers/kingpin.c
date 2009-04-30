@@ -127,7 +127,7 @@ static INTERRUPT_GEN( kingpin_video_interrupt )
 
 static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0],0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 static const TMS9928a_interface tms9928a_interface =

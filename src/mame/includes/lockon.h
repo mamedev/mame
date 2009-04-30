@@ -14,14 +14,6 @@
 #define VBEND				0
 #define VTOTAL				280
 
-enum
-{
-	MAIN_CPU = 0,
-	GROUND_CPU,
-	OBJECT_CPU,
-	SOUND_CPU
-};
-
 /*----------- defined in drivers/lockon.c -----------*/
 extern UINT8  lockon_ctrl_reg;
 extern UINT32 lockon_main_inten;

@@ -180,7 +180,7 @@ static TIMER_CALLBACK( scanline_callback )
     if (scanline == 224) irvg_vblank=1;
     logerror("SCANLINE CALLBACK %d\n",scanline);
     /* set the IRQ line state based on the 32V line state */
-    cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+    cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
@@ -208,8 +208,8 @@ MACHINE_RESET( irobot )
 	/* set an initial timer to go off on scanline 0 */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 
-	irobot_rom_banksel_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
-	irobot_out0_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
+	irobot_rom_banksel_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
+	irobot_out0_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_combase = comRAM[0];
 	irobot_combase_mb = comRAM[1];
 	irobot_outx = 0;
@@ -457,7 +457,7 @@ static TIMER_CALLBACK( irmb_done_callback )
 {
     logerror("mb done. ");
 	irmb_running = 0;
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -861,7 +861,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0);
 	}
 #else
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 #endif
 	irmb_running=1;
 }

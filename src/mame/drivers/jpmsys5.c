@@ -81,7 +81,7 @@ enum int_levels
 
 static void tms_interrupt(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INT_TMS34061, state);
+	cputag_set_input_line(machine, "maincpu", INT_TMS34061, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -460,7 +460,7 @@ INPUT_PORTS_END
 
 static void ptm_irq(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -480,7 +480,7 @@ static const ptm6840_interface ptm_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( acia_irq )
 {
-	cpu_set_input_line(device->machine->cpu[0], INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Clocks are incorrect */

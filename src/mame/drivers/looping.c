@@ -314,34 +314,34 @@ static INTERRUPT_GEN( looping_interrupt )
 static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
-		cpu_set_input_line_and_vector(space->machine->cpu[0], 0, ASSERT_LINE, 4);
+		cputag_set_input_line_and_vector(space->machine, "maincpu", 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
-		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 
 static void looping_spcint(const device_config *device, int state)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, state, 6);
+	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, state, 6);
 }
 
 
 static WRITE8_HANDLER( looping_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, ASSERT_LINE, 4);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, ASSERT_LINE, 4);
 }
 
 
@@ -794,7 +794,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7000, 0x7007, 0, 0, protection_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7000, 0x7007, 0, 0, protection_r);
 }
 
 
@@ -808,4 +808,3 @@ static DRIVER_INIT( looping )
 GAME( 1982, looping,  0,        looping, looping, looping, ROT90, "Venture Line", "Looping (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, loopinga, looping,  looping, looping, looping, ROT90, "Venture Line", "Looping (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, skybump,  0,        looping, skybump, looping, ROT90, "Venture Line", "Sky Bumper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-

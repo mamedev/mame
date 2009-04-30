@@ -242,7 +242,7 @@ static WRITE8_DEVICE_HANDLER( hopper_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 {
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_w(space,0, data);

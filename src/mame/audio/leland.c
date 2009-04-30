@@ -759,7 +759,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i80186.intr.poll_status = 0x8000 | new_vector;
 	if (!i80186.intr.pending)
-		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 	i80186.intr.pending = 1;
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(machine)), new_vector);
 }
@@ -1695,14 +1695,14 @@ WRITE8_HANDLER( leland_80186_control_w )
 	}
 
 	/* /RESET */
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	if (data & 0x20)
@@ -1777,8 +1777,8 @@ static READ16_HANDLER( main_to_sound_comm_r )
 static TIMER_CALLBACK( delayed_response_r )
 {
 	int checkpc = param;
-	int pc = cpu_get_reg(machine->cpu[0], Z80_PC);
-	int oldaf = cpu_get_reg(machine->cpu[0], Z80_AF);
+	int pc = cpu_get_reg(cputag_get_cpu(machine, "master"), Z80_PC);
+	int oldaf = cpu_get_reg(cputag_get_cpu(machine, "master"), Z80_AF);
 
 	/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
        synchronizing on the write to this register from the slave side does nothing.
@@ -1791,7 +1791,7 @@ static TIMER_CALLBACK( delayed_response_r )
 		if (LOG_COMM) logerror("(Updated sound response latch to %02X)\n", sound_response);
 
 		oldaf = (oldaf & 0x00ff) | (sound_response << 8);
-		cpu_set_reg(machine->cpu[0], Z80_AF, oldaf);
+		cpu_set_reg(cputag_get_cpu(machine, "master"), Z80_AF, oldaf);
 	}
 	else
 		logerror("ERROR: delayed_response_r - current PC = %04X, checkPC = %04X\n", pc, checkpc);

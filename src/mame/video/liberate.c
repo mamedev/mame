@@ -12,106 +12,111 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 
-static int background_color,background_disable;
+static int background_color, background_disable;
 static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 
 #if 0
 void debug_print(bitmap_t *bitmap)
 {
-	int i,j;
-	char buf[20*16];
+	int i, j;
+	char buf[20 * 16];
 	char *bufptr = buf;
-	for (i = 0;i < 16;i+=2)
-		bufptr += sprintf(bufptr,"%04X",deco16_io_ram[i+1]|(deco16_io_ram[i]<<8));
-	ui_draw_text(buf, 10, 6*6);
+	for (i = 0; i < 16; i += 2)
+		bufptr += sprintf(bufptr, "%04X", deco16_io_ram[i + 1] | (deco16_io_ram[i] << 8));
+	ui_draw_text(buf, 10, 6 * 6);
 }
 #endif
 
 static TILEMAP_MAPPER( back_scan )
 {
 	/* logical (col,row) -> memory offset */
-	return ((row & 0xf)) + ((15-(col &0xf))<<4) + ((row&0x10)<<5) + ((col&0x10)<<4);
+	return ((row & 0xf)) + ((15 - (col & 0xf)) << 4) + ((row & 0x10) << 5) + ((col & 0x10) << 4);
 }
 
 static TILEMAP_MAPPER( fix_scan )
 {
 	/* logical (col,row) -> memory offset */
-	return (row & 0x1f) + ((31-(col &0x1f))<<5);
+	return (row & 0x1f) + ((31 - (col & 0x1f)) << 5);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
 {
 	const UINT8 *RAM = memory_region(machine, "user1");
-	int tile,bank;
+	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
-	if (tile_index&0x100) {
-		if (tile_index&0x200)
-			tile_index=(tile_index&0xff)+(deco16_io_ram[5]<<8); /* Bottom right */
+	if (tile_index & 0x100) 
+	{
+		if (tile_index & 0x200)
+			tile_index = (tile_index & 0xff) + (deco16_io_ram[5] << 8); /* Bottom right */
 		else
-			tile_index=(tile_index&0xff)+(deco16_io_ram[4]<<8); /* Bottom left */
-	} else {
-			if (tile_index&0x200)
-			tile_index=(tile_index&0xff)+(deco16_io_ram[3]<<8); /* Top right */
+			tile_index = (tile_index & 0xff) + (deco16_io_ram[4] << 8); /* Bottom left */
+	} 
+	else 
+	{
+		if (tile_index & 0x200)
+			tile_index = (tile_index & 0xff) + (deco16_io_ram[3] << 8); /* Top right */
 		else
-			tile_index=(tile_index&0xff)+(deco16_io_ram[2]<<8); /* Top left */
+			tile_index = (tile_index & 0xff) + (deco16_io_ram[2] << 8); /* Top left */
 	}
 
-	tile=RAM[tile_index];
-	if (tile>0x7f) bank=3; else bank=2;
-	SET_TILE_INFO(bank,tile&0x7f,background_color,0);
+	tile = RAM[tile_index];
+	if (tile > 0x7f) bank = 3; else bank = 2;
+	SET_TILE_INFO(bank, tile & 0x7f, background_color, 0);
 }
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	int tile,color;
+	int tile, color;
 
-	tile=videoram[tile_index+0x400]+((videoram[tile_index]&0x7)<<8);
-	color=(videoram[tile_index]&0x70)>>4;
+	tile = videoram[tile_index + 0x400] + ((videoram[tile_index] & 0x7) << 8);
+	color = (videoram[tile_index] & 0x70) >> 4;
 
-//if (tile&0x300) tile-=0x000;
-//else if(tile&0x200) tile-=0x100;
-//else if (tile&0x100) tile-=0x100;
-//else tile+=0x200;
+//if (tile & 0x300) tile -= 0x000;
+//else if(tile & 0x200) tile -= 0x100;
+//else if (tile & 0x100) tile -= 0x100;
+//else tile += 0x200;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
 /***************************************************************************/
 
 WRITE8_HANDLER( deco16_io_w )
 {
-	deco16_io_ram[offset]=data;
-	if (offset>1 && offset<6)
+	deco16_io_ram[offset] = data;
+	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(background_tilemap);
 
-	switch (offset) {
+	switch (offset) 
+	{
 		case 6: /* Background colour */
-			if (((data>>4)&3)!=background_color) {
-				background_color=(data>>4)&3;
+			if (((data >> 4) & 3) != background_color) 
+			{
+				background_color = (data >> 4) & 3;
 				tilemap_mark_all_tiles_dirty(background_tilemap);
 			}
-			background_disable=data&0x4;
-			flip_screen_set(space->machine, data&0x1);
+			background_disable = data & 0x4;
+			flip_screen_set(space->machine, data & 0x1);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cpu_set_input_line(space->machine->cpu[0],DECO16_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(space,0,data);
-			cpu_set_input_line(space->machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
+			soundlatch_w(space, 0, data);
+			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
 
 WRITE8_HANDLER( liberate_videoram_w )
 {
-	videoram[offset]=data;
-	tilemap_mark_tile_dirty(fix_tilemap,offset&0x3ff);
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fix_tilemap, offset & 0x3ff);
 }
 
 /***************************************************************************/
@@ -214,7 +219,8 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		if (multi && fy==0) sy-=16;
 
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			sy=240-sy;
 			sx=240-sx;
 			if (fy)
@@ -224,7 +230,8 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 		}
-		else {
+		else 
+		{
 			if (fy)
 				sy2=sy-16;
 			else
@@ -275,14 +282,16 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 			sy2=sy-16;
 		}
-		else {
+		else 
+		{
 			sy2=sy+16;
 		}
 
@@ -331,14 +340,16 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 			sy2=sy-16;
 		}
-		else {
+		else 
+		{
 			sy2=sy+16;
 		}
 
@@ -382,7 +393,8 @@ VIDEO_UPDATE( prosport )
 
 	prosport_draw_sprites(screen->machine,bitmap,cliprect);
 
-	for (offs = 0;offs < 0x400;offs++) {
+	for (offs = 0;offs < 0x400;offs++) 
+	{
 		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
 
 		tile+=((deco16_io_ram[0]&0x30)<<6);

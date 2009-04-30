@@ -40,7 +40,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
 	else
-		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "iremsound", 0, ASSERT_LINE);
 }
 
 
@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "iremsound", 0, CLEAR_LINE);
 }
 
 
@@ -191,13 +191,13 @@ static void adpcm_int(const device_config *device)
 {
 	const device_config *msm2 = devtag_get_device(device->machine, "msm2");
 
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (msm2 != NULL)
 	{
-		msm5205_vclk_w(msm2,1);
-		msm5205_vclk_w(msm2,0);
+		msm5205_vclk_w(msm2, 1);
+		msm5205_vclk_w(msm2, 0);
 	}
 }
 

@@ -67,7 +67,7 @@ static WRITE32_HANDLER( soundr3k_w )
 		sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			cpu_set_input_line(space->machine->cpu[1], 1, HOLD_LINE );
+			cputag_set_input_line(space->machine, "soundcpu", 1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_BITS_0_15 )
@@ -141,7 +141,7 @@ static WRITE32_HANDLER( eeprom_w )
 	eeprom_write_bit( ( data & 0x01 ) ? 1 : 0 );
 	eeprom_set_clock_line( ( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
 	eeprom_set_cs_line( ( data & 0x02 ) ? CLEAR_LINE : ASSERT_LINE );
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 /* PCM RAM */

@@ -2495,7 +2495,7 @@ MACHINE_DRIVER_END
 
 static void sound_irq(const device_config *device, int state)
 {
-//   cpu_set_input_line(machine->cpu[0], 3, state);
+//   cputag_set_input_line(machine, "maincpu", 3, state);
 }
 
 static const ics2115_interface vbowl_ics2115_interface = {

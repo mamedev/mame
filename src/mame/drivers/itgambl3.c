@@ -210,7 +210,7 @@ GFXDECODE_END
 static MACHINE_RESET( itgambl3 )
 {
 	/* stop the CPU, we have no code for it anyway */
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 /* default 444 palette for debug purpose*/

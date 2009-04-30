@@ -409,7 +409,7 @@ MACHINE_RESET( leland )
 		memory_set_bankptr(machine, 3, &slave_base[0x10000]);
 
 	/* if we have an I80186 CPU, reset it */
-	if (machine->cpu[2] != NULL && cpu_get_type(machine->cpu[2]) == CPU_I80186)
+	if (cputag_get_cpu(machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(machine, "audiocpu")) == CPU_I80186)
 		leland_80186_sound_init();
 }
 
@@ -474,7 +474,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	scanline += 16;
@@ -489,7 +489,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	int scanline = param;
 
 	/* interrupts generated according to the interrupt control register */
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
@@ -1158,13 +1158,13 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x01:	/* /GIN1 */
 			result = input_port_read(space->machine, "IN1");
-			if (cpu_get_reg(space->machine->cpu[1], Z80_HALT))
+			if (cpu_get_reg(cputag_get_cpu(space->machine, "slave"), Z80_HALT))
 				result ^= 0x01;
 			break;
 
 		case 0x02:	/* /GIN2 */
 		case 0x12:
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "master", INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 0x03:	/* /IGID */
@@ -1195,10 +1195,10 @@ WRITE8_HANDLER( leland_master_output_w )
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			wcol_enable = (data & 0x02);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(space->cpu),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
@@ -1238,7 +1238,7 @@ READ8_HANDLER( ataxx_master_input_r )
 
 		case 0x07:	/* /SLVBLK */
 			result = input_port_read(space->machine, "IN1");
-			if (cpu_get_reg(space->machine->cpu[1], Z80_HALT))
+			if (cpu_get_reg(cputag_get_cpu(space->machine, "slave"), Z80_HALT))
 				result ^= 0x01;
 			break;
 
@@ -1270,9 +1270,9 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x05:	/* /SLV0 */
-			cpu_set_input_line(space->machine->cpu[1], 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x08:	/*  */

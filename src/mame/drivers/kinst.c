@@ -190,12 +190,12 @@ static MACHINE_START( kinst )
 	}
 
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->cpu[0], 0x08000000, 0x087fffff, FALSE, rambase2);
-	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x0007ffff, FALSE, rambase);
-	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x08000000, 0x087fffff, FALSE, rambase2);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x0007ffff, FALSE, rambase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 
@@ -254,7 +254,7 @@ static VIDEO_UPDATE( kinst )
 
 static TIMER_CALLBACK( irq0_stop )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -267,7 +267,7 @@ static INTERRUPT_GEN( irq0_start )
 
 static void ide_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 1, state);
+	cputag_set_input_line(device->machine, "maincpu", 1, state);
 }
 
 

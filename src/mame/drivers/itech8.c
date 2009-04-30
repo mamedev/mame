@@ -592,7 +592,7 @@ static const via6522_interface via_interface =
 
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
-	cpu_type main_cpu_type = cpu_get_type(machine->cpu[0]);
+	cpu_type main_cpu_type = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
 
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
@@ -603,16 +603,16 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -643,13 +643,13 @@ static INTERRUPT_GEN( generate_nmi )
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -671,13 +671,13 @@ static MACHINE_START( sstrike )
 
 static MACHINE_RESET( itech8 )
 {
-	cpu_type main_cpu_type = cpu_get_type(machine->cpu[0]);
+	cpu_type main_cpu_type = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
 
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, 1, &memory_region(machine, "maincpu")[0x4000]);
-		device_reset(machine->cpu[0]);
+		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 
 	/* reset the ticket dispenser */
@@ -793,7 +793,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data & 0x80);
+	ticket_dispenser_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, data & 0x80);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -808,7 +808,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -831,7 +831,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -2660,25 +2660,25 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0, (write8_space_func)SMH_UNMAP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0, (write8_space_func)SMH_UNMAP);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 }
 
 
@@ -2713,15 +2713,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
-	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
-	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
-	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
-	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
+	memory_install_read_port_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
+	memory_install_read_port_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
+	memory_install_read_port_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
+	memory_install_read_port_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
+	memory_install_read_port_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
 }
 
 

@@ -308,13 +308,13 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 
 void jaguar_gpu_suspend(running_machine *machine)
 {
-	cpu_suspend(machine->cpu[1], SUSPEND_REASON_SPIN, 1);
+	cputag_suspend(machine, "gpu", SUSPEND_REASON_SPIN, 1);
 }
 
 
 void jaguar_gpu_resume(running_machine *machine)
 {
-	cpu_resume(machine->cpu[1], SUSPEND_REASON_SPIN);
+	cputag_resume(machine, "gpu", SUSPEND_REASON_SPIN);
 }
 
 
@@ -328,9 +328,9 @@ void jaguar_gpu_resume(running_machine *machine)
 static void update_cpu_irq(running_machine *machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -479,7 +479,7 @@ static void jaguar_set_palette(UINT16 vmode)
 
 static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "gpu", ADDRESS_SPACE_PROGRAM);
 	return (UINT8 *)memory_get_read_ptr(space, offset);
 }
 

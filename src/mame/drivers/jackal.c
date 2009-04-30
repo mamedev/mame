@@ -243,7 +243,7 @@ static INTERRUPT_GEN( jackal_interrupt )
 	if (irq_enable)
 	{
 		cpu_set_input_line(device, 0, HOLD_LINE);
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

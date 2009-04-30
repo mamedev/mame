@@ -128,8 +128,8 @@ static TIMER_CALLBACK( generate_interrupt )
 	int scanline = param;
 
 	/* IRQ is set by /32V */
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* set up for the next */
 	scanline += 32;
@@ -141,7 +141,7 @@ static TIMER_CALLBACK( generate_interrupt )
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 

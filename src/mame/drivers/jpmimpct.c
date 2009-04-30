@@ -155,8 +155,8 @@ static struct
 
 static void update_irqs(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, tms_irq ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 5, duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -197,12 +197,12 @@ static MACHINE_RESET( jpmimpct )
 
 static WRITE16_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(space->machine->cpu[1], offset, data);
+	tms34010_host_w(cputag_get_cpu(space->machine, "dsp"), offset, data);
 }
 
 static READ16_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(space->machine->cpu[1], offset);
+	return tms34010_host_r(cputag_get_cpu(space->machine, "dsp"), offset);
 }
 
 

@@ -318,7 +318,7 @@ static WRITE64_HANDLER(unk4_w)
 		if (data & 0x800000)
 		{
 			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag, cpu_get_pc(space->cpu));
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		unk20004 = (UINT32)(data);
@@ -413,7 +413,7 @@ static WRITE64_HANDLER(reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 			unk3 = 0;
 		}
 	}
@@ -1075,7 +1075,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((space->cpu != space->machine->cpu[0]) ? 0x80000000 : 0);
+		r = (UINT64)((space->cpu != cputag_get_cpu(space->machine, "maincpu")) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

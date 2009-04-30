@@ -44,38 +44,46 @@ static UINT8 *video_shared;
 static UINT8 *sprite_shared;
 int kingofb_nmi_enable = 0;
 
-static READ8_HANDLER( video_shared_r ) {
+static READ8_HANDLER( video_shared_r ) 
+{
 	return video_shared[offset];
 }
 
-static WRITE8_HANDLER( video_shared_w ) {
+static WRITE8_HANDLER( video_shared_w ) 
+{
 	video_shared[offset] = data;
 }
 
-static READ8_HANDLER( sprite_shared_r ) {
+static READ8_HANDLER( sprite_shared_r ) 
+{
 	return sprite_shared[offset];
 }
 
-static WRITE8_HANDLER( sprite_shared_w ) {
+static WRITE8_HANDLER( sprite_shared_w ) 
+{
 	sprite_shared[offset] = data;
 }
 
-static WRITE8_HANDLER( video_interrupt_w ) {
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
+static WRITE8_HANDLER( video_interrupt_w ) 
+{
+	cputag_set_input_line_and_vector(space->machine, "video", 0, HOLD_LINE, 0xff );
 }
 
-static WRITE8_HANDLER( sprite_interrupt_w ) {
-	cpu_set_input_line_and_vector(space->machine->cpu[2], 0, HOLD_LINE, 0xff );
+static WRITE8_HANDLER( sprite_interrupt_w ) 
+{
+	cputag_set_input_line_and_vector(space->machine, "sprite", 0, HOLD_LINE, 0xff );
 }
 
-static WRITE8_HANDLER( scroll_interrupt_w ) {
+static WRITE8_HANDLER( scroll_interrupt_w ) 
+{
 	sprite_interrupt_w( space, offset, data );
 	*kingofb_scroll_y = data;
 }
 
-static WRITE8_HANDLER( sound_command_w ) {
+static WRITE8_HANDLER( sound_command_w ) 
+{
 	soundlatch_w( space, 0, data );
-	cpu_set_input_line_and_vector(space->machine->cpu[3], 0, HOLD_LINE, 0xff );
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
 }
 
 
@@ -534,7 +542,8 @@ static const ay8910_interface ay8910_config =
 	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
 };
 
-static INTERRUPT_GEN( kingofb_interrupt ) {
+static INTERRUPT_GEN( kingofb_interrupt ) 
+{
 
 	if ( kingofb_nmi_enable )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -889,4 +898,3 @@ GAME( 1985, ringking, kingofb, ringking, ringking, 0,        ROT90, "Data East U
 GAME( 1985, ringkin2, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 2)", 0 )
 GAME( 1985, ringkin3, kingofb, kingofb,  kingofb,  ringkin3, ROT90, "Data East USA", "Ring King (US set 3)", 0 )
 GAME( 1985, ringkinw, kingofb, kingofb,  kingofb,  ringkinw, ROT90, "Woodplace", "Ring King (US, Woodplace license)", 0 )
-

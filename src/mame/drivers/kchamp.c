@@ -112,29 +112,34 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( control_w ) {
+static WRITE8_HANDLER( control_w ) 
+{
 	nmi_enable = data & 1;
 }
 
-static WRITE8_HANDLER( sound_reset_w ) {
+static WRITE8_HANDLER( sound_reset_w ) 
+{
 	if ( !( data & 1 ) )
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_w ) {
+static WRITE8_DEVICE_HANDLER( sound_control_w ) 
+{
 	msm5205_reset_w( device, !( data & 1 ) );
 	sound_nmi_enable = ( ( data >> 1 ) & 1 );
 }
 
-static WRITE8_HANDLER( sound_command_w ) {
+static WRITE8_HANDLER( sound_command_w ) 
+{
 	soundlatch_w( space, 0, data );
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
 }
 
 static int msm_data = 0;
 static int msm_play_lo_nibble = 1;
 
-static WRITE8_HANDLER( sound_msm_w ) {
+static WRITE8_HANDLER( sound_msm_w ) 
+{
 	msm_data = data;
 	msm_play_lo_nibble = 1;
 }
@@ -190,12 +195,14 @@ static ADDRESS_MAP_START( kc_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe2ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( sound_reset_r ) {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+static READ8_HANDLER( sound_reset_r ) 
+{
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER( kc_sound_control_w ) {
+static WRITE8_HANDLER( kc_sound_control_w ) 
+{
 	if ( offset == 0 )
 		sound_nmi_enable = ( ( data >> 7 ) & 1 );
 //  else
@@ -371,13 +378,15 @@ GFXDECODE_END
 
 
 
-static INTERRUPT_GEN( kc_interrupt ) {
+static INTERRUPT_GEN( kc_interrupt ) 
+{
 
 	if ( nmi_enable )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint(const device_config *device) {
+static void msmint(const device_config *device) 
+{
 
 	static int counter = 0;
 
@@ -388,9 +397,11 @@ static void msmint(const device_config *device) {
 
 	msm_play_lo_nibble ^= 1;
 
-	if ( !( counter ^= 1 ) ) {
-		if ( sound_nmi_enable ) {
-			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	if ( !( counter ^= 1 ) ) 
+	{
+		if ( sound_nmi_enable ) 
+		{
+			cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -405,7 +416,8 @@ static const msm5205_interface msm_interface =
 * 1 Player Version  *
 ********************/
 
-static INTERRUPT_GEN( sound_int ) {
+static INTERRUPT_GEN( sound_int ) 
+{
 
 	if ( sound_nmi_enable )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);

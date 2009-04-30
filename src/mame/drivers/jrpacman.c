@@ -106,8 +106,8 @@
 
 static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(space->machine->cpu[0], 0, data);
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, data);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

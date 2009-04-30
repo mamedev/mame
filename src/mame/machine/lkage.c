@@ -68,7 +68,7 @@ WRITE8_HANDLER( lkage_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -116,7 +116,7 @@ WRITE8_HANDLER( lkage_mcu_w )
 logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
 	from_main = data;
 	main_sent = 1;
-	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( lkage_mcu_r )

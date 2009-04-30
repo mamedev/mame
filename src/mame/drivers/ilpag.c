@@ -242,7 +242,7 @@ static READ16_HANDLER( test_r )
 static WRITE16_HANDLER( irq_callback_w )
 {
 //  popmessage("%02x",data);
-	cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE );
+	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE );
 }
 
 static WRITE16_HANDLER( sound_write_w )

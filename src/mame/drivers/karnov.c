@@ -65,7 +65,8 @@ static int microcontroller_id,coin_mask;
 static void karnov_i8751_w(running_machine *machine, int data)
 {
 	/* Pending coin operations may cause protection commands to be queued */
-	if (i8751_needs_ack) {
+	if (i8751_needs_ack) 
+	{
 		i8751_command_queue=data;
 		return;
 	}
@@ -88,14 +89,15 @@ static void karnov_i8751_w(running_machine *machine, int data)
 
 //  if (!i8751_return && data!=0x300) logerror("%s - Unknown Write %02x intel\n",cpuexec_describe_context(machine),data);
 
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE); /* Signal main cpu task is complete */
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
 static void wndrplnt_i8751_w(running_machine *machine, int data)
 {
 	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
-	if (i8751_needs_ack) {
+	if (i8751_needs_ack) 
+	{
 		i8751_command_queue=data;
 		return;
 	}
@@ -108,8 +110,10 @@ static void wndrplnt_i8751_w(running_machine *machine, int data)
 
 	/* The game writes many values in the 0x600 range, but only a specific mask
     matters for the return value */
-	if ((data&0x600)==0x600) {
-		switch (data&0x18) {
+	if ((data&0x600)==0x600) 
+	{
+		switch (data&0x18) 
+		{
 			case 0x00: 	i8751_return=0x4d53; break;
 			case 0x08:	i8751_return=0x4b54; break;
 			case 0x10: 	i8751_return=0x5453; break;
@@ -142,7 +146,7 @@ static void wndrplnt_i8751_w(running_machine *machine, int data)
 	if (data==0x501) i8751_return=0x6bf8;
 	if (data==0x500) i8751_return=0x4e75;
 
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE); /* Signal main cpu task is complete */
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -151,7 +155,8 @@ static void chelnov_i8751_w(running_machine *machine, int data)
 	static int level;
 
 	/* Pending coin operations may cause protection commands to be queued */
-	if (i8751_needs_ack) {
+	if (i8751_needs_ack) 
+	{
 		i8751_command_queue=data;
 		return;
 	}
@@ -167,18 +172,23 @@ static void chelnov_i8751_w(running_machine *machine, int data)
 	if (data>=0x6000 && data<0x8000) i8751_return=1;  /* patched */
 	if ((data&0xf000)==0x1000) level=1; /* Level 1 */
 	if ((data&0xf000)==0x2000) level++; /* Level Increment */
-	if ((data&0xf000)==0x3000) {        /* Sprite table mapping */
+	if ((data&0xf000)==0x3000) 
+	{        /* Sprite table mapping */
 		int b=data&0xff;
-		switch (level) {
+		switch (level) 
+		{
 			case 1: /* Level 1, Sprite mapping tables */
-				if (microcontroller_id==CHELNOV) { /* USA */
+				if (microcontroller_id==CHELNOV) 
+				{ /* USA */
 					if (b<2) i8751_return=0;
 					else if (b<6) i8751_return=1;
 					else if (b<0xb) i8751_return=2;
 					else if (b<0xf) i8751_return=3;
 					else if (b<0x13) i8751_return=4;
 					else i8751_return=5;
-				} else { /* Japan, World */
+				} 
+				else 
+				{ /* Japan, World */
 					if (b<3) i8751_return=0;
 					else if (b<8) i8751_return=1;
 					else if (b<0xc) i8751_return=2;
@@ -252,7 +262,7 @@ static void chelnov_i8751_w(running_machine *machine, int data)
 
 //  logerror("%s - Unknown Write %02x intel\n",cpuexec_describe_context(machine),data);
 
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE); /* Signal main cpu task is complete */
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -261,23 +271,30 @@ static void chelnov_i8751_w(running_machine *machine, int data)
 static WRITE16_HANDLER( karnov_control_w )
 {
 	/* Mnemonics filled in from the schematics, brackets are my comments */
-	switch (offset<<1) {
+	switch (offset<<1) 
+	{
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			cpu_set_input_line(space->machine->cpu[0],6,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 
-			if (i8751_needs_ack) {
+			if (i8751_needs_ack) 
+			{
 				/* If a command and coin insert happen at once, then the i8751 will queue the
                     coin command until the previous command is ACK'd */
-				if (i8751_coin_pending) {
+				if (i8751_coin_pending) 
+				{
 					i8751_return=i8751_coin_pending;
-					cpu_set_input_line(space->machine->cpu[0],6,HOLD_LINE);
+					cputag_set_input_line(space->machine, "maincpu", 6, HOLD_LINE);
 					i8751_coin_pending=0;
-				} else if (i8751_command_queue) {
+				} 
+				else if (i8751_command_queue) 
+				{
 					/* Pending control command - just write it back as SECREQ */
 					i8751_needs_ack=0;
 					karnov_control_w(space,3,i8751_command_queue,0xffff);
 					i8751_command_queue=0;
-				} else {
+				} 
+				else 
+				{
 					i8751_needs_ack=0;
 				}
 			}
@@ -285,7 +302,7 @@ static WRITE16_HANDLER( karnov_control_w )
 
 		case 2: /* SONREQ (Sound CPU byte) */
 			soundlatch_w(space,0,data&0xff);
-			cpu_set_input_line (space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line (space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
@@ -316,7 +333,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			cpu_set_input_line(space->machine->cpu[0],7,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 7, CLEAR_LINE);
 			break;
 	}
 }
@@ -325,7 +342,8 @@ static WRITE16_HANDLER( karnov_control_w )
 
 static READ16_HANDLER( karnov_control_r )
 {
-	switch (offset<<1) {
+	switch (offset<<1) 
+	{
 		case 0:
 			return input_port_read(space->machine, "P1_P2");
 		case 2: /* Start buttons & VBL */
@@ -673,11 +691,15 @@ static INTERRUPT_GEN( karnov_interrupt )
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (input_port_read(device->machine, "FAKE") == coin_mask) latch=1;
-	if (input_port_read(device->machine, "FAKE") != coin_mask && latch) {
-		if (i8751_needs_ack) {
+	if (input_port_read(device->machine, "FAKE") != coin_mask && latch) 
+	{
+		if (i8751_needs_ack) 
+		{
 			/* i8751 is busy - queue the command */
 			i8751_coin_pending=input_port_read(device->machine, "FAKE") | 0x8000;
-		} else {
+		} 
+		else 
+		{
 			i8751_return=input_port_read(device->machine, "FAKE") | 0x8000;
 			cpu_set_input_line(device,6,HOLD_LINE);
 			i8751_needs_ack=1;
@@ -690,7 +712,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* IRQ */
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
 }
 
 static const ym3526_interface ym3526_config =

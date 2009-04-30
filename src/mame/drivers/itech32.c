@@ -426,14 +426,17 @@ void itech32_update_interrupts(running_machine *machine, int vint, int xint, int
 	if (xint != -1) xint_state = xint;
 	if (qint != -1) qint_state = qint;
 
-	if (is_drivedge) {
-		cpu_set_input_line(machine->cpu[0], 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
-	} else {
-		cpu_set_input_line(machine->cpu[0], 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 3, qint_state ? ASSERT_LINE : CLEAR_LINE);
+	if (is_drivedge) 
+	{
+		cputag_set_input_line(machine, "maincpu", 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
+	} 
+	else 
+	{
+		cputag_set_input_line(machine, "maincpu", 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -475,8 +478,8 @@ static MACHINE_RESET( drivedge )
 {
 	MACHINE_RESET_CALL(itech32);
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine, 0);
 	STOP_TMS_SPINNING(machine, 1);
 }
@@ -667,7 +670,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
 	sound_int_state = 1;
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -693,7 +696,7 @@ static WRITE32_HANDLER( sound_data32_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
 	sound_int_state = 0;
 	return sound_data;
 }
@@ -720,7 +723,7 @@ static READ8_HANDLER( sound_data_buffer_r )
 
 static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 controls the fan light */
@@ -745,7 +748,7 @@ static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 
 static WRITE8_DEVICE_HANDLER( pia_portb_out )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 4 controls the ticket dispenser */
@@ -792,7 +795,7 @@ static const via6522_interface drivedge_via_interface =
 
 static WRITE8_HANDLER( firq_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -805,8 +808,8 @@ static WRITE8_HANDLER( firq_clear_w )
 
 static WRITE32_HANDLER( tms_reset_assert_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -815,12 +818,12 @@ static WRITE32_HANDLER( tms_reset_clear_w )
 	/* kludge to prevent crash on first boot */
 	if ((tms1_ram[0] & 0xff000000) == 0)
 	{
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp1", INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(space->machine, 0);
 	}
 	if ((tms2_ram[0] & 0xff000000) == 0)
 	{
-		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(space->machine, 1);
 	}
 }
@@ -3917,8 +3920,8 @@ static DRIVER_INIT( drivedge )
 	itech32_planes = 1;
 	is_drivedge = 1;
 
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms1_speedup_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms2_speedup_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "dsp1", ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms1_speedup_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "dsp2", ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms2_speedup_r);
 }
 
 
@@ -3934,10 +3937,10 @@ static DRIVER_INIT( wcbowl )
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x680000, 0x680001, 0, 0, trackball_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680001, 0, 0, trackball_r);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x578000, 0x57ffff, 0, 0, (read16_space_func)SMH_NOP);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0, wcbowl_prot_result_r, (write16_space_func)SMH_NOP);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x578000, 0x57ffff, 0, 0, (read16_space_func)SMH_NOP);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0, wcbowl_prot_result_r, (write16_space_func)SMH_NOP);
 }
 
 
@@ -3950,8 +3953,8 @@ static void init_sftm_common(running_machine *machine, int prot_addr)
 
 	itech020_prot_address = prot_addr;
 
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
 }
 
 
@@ -3981,10 +3984,10 @@ static void init_shuffle_bowl_common(running_machine *machine, int prot_addr)
 
 	itech020_prot_address = prot_addr;
 
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
 }
 
 
@@ -4003,7 +4006,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 static void install_timekeeper(running_machine *machine)
 {
 	const device_config *device = devtag_get_device(machine, "m48t02");
-	memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
+	memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
 }
 
 static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
@@ -4034,7 +4037,7 @@ static DRIVER_INIT( gt3d )
         Hacked versions of this PCB have been found with GT97
         through GTClassic. This is _NOT_ a factory modification
     */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_8bit_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_8bit_r);
 	init_gt_common(machine);
 }
 
@@ -4047,8 +4050,8 @@ static DRIVER_INIT( aama )
         board share the same sound CPU code and sample ROMs.
         This board has all versions of GT for it, GT3D through GTClassic
     */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
 	init_gt_common(machine);
 }
 
@@ -4072,7 +4075,7 @@ static DRIVER_INIT( s_ver )
         board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
         Trackball info is read through 200202 (actually 200203).
     */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200200, 0x200203, 0, 0, trackball32_4bit_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200200, 0x200203, 0, 0, trackball32_4bit_r);
 	init_gt_common(machine);
 }
 
@@ -4086,7 +4089,7 @@ static DRIVER_INIT( gt3dl )
         Player 1 trackball read through 200003
         Player 2 trackball read through 200002
     */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_4bit_combined_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_4bit_combined_r);
 	init_gt_common(machine);
 }
 
@@ -4094,7 +4097,7 @@ static DRIVER_INIT( gt3dl )
 static DRIVER_INIT( gtclassp )
 {
 	/* a little extra protection */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:

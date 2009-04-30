@@ -66,20 +66,20 @@ static WRITE16_HANDLER( adrst_w )
 	lockon_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	cpu_set_input_line(space->machine->cpu[GROUND_CPU], INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(space->machine->cpu[OBJECT_CPU], INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(space->machine->cpu[SOUND_CPU],  INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "ground", INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "object", INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ16_HANDLER( main_gnd_r )
 {
-	const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *gndspace = cputag_get_address_space(space->machine, "ground", ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(gndspace, V30_GND_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
-	const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *gndspace = cputag_get_address_space(space->machine, "ground", ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
@@ -89,13 +89,13 @@ static WRITE16_HANDLER( main_gnd_w )
 
 static READ16_HANDLER( main_obj_r )
 {
-	const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *objspace = cputag_get_address_space(space->machine, "object", ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(objspace, V30_OBJ_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
-	const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *objspace = cputag_get_address_space(space->machine, "object", ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 0), data);
@@ -107,8 +107,8 @@ static WRITE16_HANDLER( tst_w )
 {
 	if (offset < 0x800)
 	{
-		const address_space *gndspace = cpu_get_address_space(space->machine->cpu[GROUND_CPU], ADDRESS_SPACE_PROGRAM);
-		const address_space *objspace = cpu_get_address_space(space->machine->cpu[OBJECT_CPU], ADDRESS_SPACE_PROGRAM);
+		const address_space *gndspace = cputag_get_address_space(space->machine, "ground", ADDRESS_SPACE_PROGRAM);
+		const address_space *objspace = cputag_get_address_space(space->machine, "object", ADDRESS_SPACE_PROGRAM);
 
 		if (ACCESSING_BITS_0_7)
 			memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
@@ -124,13 +124,13 @@ static WRITE16_HANDLER( tst_w )
 
 static READ16_HANDLER( main_z80_r )
 {
-	const address_space *sndspace = cpu_get_address_space(space->machine->cpu[SOUND_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *sndspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	return 0xff00 | memory_read_byte(sndspace, offset);
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
-	const address_space *sndspace = cpu_get_address_space(space->machine->cpu[SOUND_CPU], ADDRESS_SPACE_PROGRAM);
+	const address_space *sndspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(sndspace, offset, data);
 }
 
@@ -425,7 +425,7 @@ static WRITE8_HANDLER( sound_vol )
 
 static void ym2203_irq(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[SOUND_CPU], 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_out_b )

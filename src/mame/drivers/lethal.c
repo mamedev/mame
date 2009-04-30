@@ -259,7 +259,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -269,7 +269,7 @@ static READ8_HANDLER( sound_status_r )
 
 static void sound_nmi(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )
@@ -588,7 +588,7 @@ static MACHINE_RESET( lethalen )
 	memory_set_bankptr(machine, 1, &prgrom[0x10000]);
 	memory_set_bankptr(machine, 2, &prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static const gfx_layout lethal_6bpp =

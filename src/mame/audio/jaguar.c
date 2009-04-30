@@ -191,13 +191,13 @@ static TIMER_CALLBACK( serial_callback );
 
 void jaguar_dsp_suspend(running_machine *machine)
 {
-	cpu_suspend(machine->cpu[2], SUSPEND_REASON_SPIN, 1);
+	cputag_suspend(machine, "audiocpu", SUSPEND_REASON_SPIN, 1);
 }
 
 
 void jaguar_dsp_resume(running_machine *machine)
 {
-	cpu_resume(machine->cpu[2], SUSPEND_REASON_SPIN);
+	cputag_resume(machine, "audiocpu", SUSPEND_REASON_SPIN);
 }
 
 
@@ -212,11 +212,11 @@ static void update_gpu_irq(running_machine *machine)
 {
 	if (gpu_irq_state & dsp_regs[JINTCTRL] & 0x1f)
 	{
-		cpu_set_input_line(machine->cpu[1], 1, ASSERT_LINE);
+		cputag_set_input_line(machine, "gpu", 1, ASSERT_LINE);
 		jaguar_gpu_resume(machine);
 	}
 	else
-		cpu_set_input_line(machine->cpu[1], 1, CLEAR_LINE);
+		cputag_set_input_line(machine, "gpu", 1, CLEAR_LINE);
 }
 
 
@@ -270,7 +270,7 @@ void cojag_sound_init(running_machine *machine)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
 #endif
 }
 
@@ -362,11 +362,11 @@ WRITE32_HANDLER( jaguar_jerry_regs32_w )
 static WRITE32_HANDLER( dsp_flags_w )
 {
 	/* write the data through */
-	jaguardsp_ctrl_w(space->machine->cpu[2], offset, data, mem_mask);
+	jaguardsp_ctrl_w(cputag_get_cpu(space->machine, "audiocpu"), offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (space->cpu == space->machine->cpu[2] && ACCESSING_BITS_8_15 && (data & 0x400))
+	if (space->cpu == cputag_get_cpu(space->machine, "audiocpu") && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
 		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( dsp_flags_w )
 static TIMER_CALLBACK( serial_chunky_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
 	jaguar_dsp_resume(machine);
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
@@ -412,7 +412,7 @@ static TIMER_CALLBACK( serial_chunky_callback )
 static TIMER_CALLBACK( serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
 	jaguar_dsp_resume(machine);
 }
 
@@ -468,5 +468,3 @@ WRITE32_HANDLER( jaguar_serial_w )
 			break;
 	}
 }
-
-

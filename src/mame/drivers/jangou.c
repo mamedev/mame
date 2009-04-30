@@ -269,12 +269,12 @@ static READ8_DEVICE_HANDLER( input_system_r )
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "cpu1", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "cpu1", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -292,7 +292,7 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 
 	/* Trigger an IRQ for every 8 shifted bits */
 	if ((++cvsd_shift_cnt & 7) == 0)
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "cpu1", 0, HOLD_LINE);
 }
 
 
@@ -311,7 +311,7 @@ static void jngolady_vclk_cb(const device_config *device)
 	else
 	{
 		msm5205_data_w(device, adpcm_byte & 0xf);
-		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "cpu1", 0, HOLD_LINE);
 	}
 
 	msm5205_vclk_toggle ^= 1;
@@ -333,7 +333,7 @@ static READ8_HANDLER( master_com_r )
 
 static WRITE8_HANDLER( master_com_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "nsc", 0, HOLD_LINE);
 	nsc_latch = data;
 }
 
@@ -1026,7 +1026,7 @@ static READ8_HANDLER( jngolady_rng_r )
 
 static DRIVER_INIT( jngolady )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
+	memory_install_read8_handler(cputag_get_address_space(machine, "nsc", ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
 }
 
 static DRIVER_INIT (luckygrl)

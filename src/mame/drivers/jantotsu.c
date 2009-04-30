@@ -380,7 +380,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( jantotsu_irq )
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static MACHINE_RESET( jantotsu )
