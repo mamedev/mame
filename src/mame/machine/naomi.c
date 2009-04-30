@@ -23,7 +23,7 @@ static READ64_HANDLER( naomi_bios_idle_skip_r )
 
 DRIVER_INIT(naomi)
 {
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 }
 
@@ -37,7 +37,7 @@ static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 
 DRIVER_INIT( ggxxsla )
 {
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 
@@ -52,7 +52,7 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 
 DRIVER_INIT( ggxx )
 {
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 
@@ -69,6 +69,6 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 
 DRIVER_INIT( ggxxrl )
 {
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }

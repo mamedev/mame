@@ -1535,7 +1535,7 @@ static const mips3_config config =
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( irq_start )
@@ -1561,12 +1561,12 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_START(hyperneo)
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(machine->cpu[0], 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 
@@ -1579,8 +1579,8 @@ static MACHINE_RESET(hyperneo)
 	UINT8 *RAM = (UINT8*)hng64_soundram;
 	memory_set_bankptr(machine, 1,&RAM[0x1e0000]);
 	memory_set_bankptr(machine, 2,&RAM[0x001000]); // where..
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 
 	/* Comm CPU */
@@ -1595,10 +1595,10 @@ static MACHINE_RESET(hyperneo)
 		hng64_com_virtual_mem[i] = rom[i] ;
 
 	KL5C80_virtual_mem_sync();
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "comm", ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	cputag_set_input_line(machine, "comm", INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 
 

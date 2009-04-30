@@ -242,7 +242,7 @@ int level;
 	}
 
 	level=dc_compute_interrupt_level(machine);
-	sh4_set_irln_input(machine->cpu[0], 15-level);
+	sh4_set_irln_input(cputag_get_cpu(machine, "maincpu"), 15-level);
 }
 
 /******************************************************
@@ -407,7 +407,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
-			sh4_dma_ddt(space->machine->cpu[0],&ddtdata);
+			sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 			#if DEBUG_SYSCTRL
 			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE0])
@@ -516,7 +516,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					sh4_dma_ddt(space->machine->cpu[0], &ddtdata);
+					sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"), &ddtdata);
 
 					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
@@ -548,7 +548,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								sh4_dma_ddt(space->machine->cpu[0],&ddtdata);
+								sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 								chk=0;
 								for (a=1;a < length;a++)
 								{
@@ -576,7 +576,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								sh4_dma_ddt(space->machine->cpu[0],&ddtdata);
+								sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
@@ -777,7 +777,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					sh4_dma_ddt(space->machine->cpu[0],&ddtdata);
+					sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 
 					if (endflag)
 					{
@@ -899,7 +899,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
  			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
-			sh4_dma_ddt(space->machine->cpu[0], &ddtdata);
+			sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"), &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 			dc_update_interrupt_status(space->machine);
@@ -1090,7 +1090,7 @@ MACHINE_START( dc )
 MACHINE_RESET( dc )
 {
 	/* halt the ARM7 */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
@@ -1129,12 +1129,12 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		}
     }
 
