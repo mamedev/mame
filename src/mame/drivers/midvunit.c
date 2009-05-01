@@ -74,7 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	timer[0] = timer_alloc(machine, NULL, NULL);
 	timer[1] = timer_alloc(machine, NULL, NULL);
@@ -87,7 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	timer[0] = timer_alloc(machine, NULL, NULL);
 	timer[1] = timer_alloc(machine, NULL, NULL);
@@ -135,7 +135,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else
@@ -146,7 +146,7 @@ static READ32_HANDLER( midvunit_adc_r )
 
 static TIMER_CALLBACK( adc_ready )
 {
-	cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 }
 
 
@@ -292,7 +292,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			timer_rate = (double)(cpu_get_clock(space->machine->cpu[0]) * 0.5);
+			timer_rate = (double)(cputag_get_clock(space->machine, "maincpu") * 0.5);
 		else
 			timer_rate = 10000000.;
 	}
@@ -1530,7 +1530,7 @@ static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 	adc_shift = 24;
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
 static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
@@ -1543,21 +1543,21 @@ static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(machine, 450);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
 
 	/* install strange protection device */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
 
 	/* speedups */
 	if (speedup)
-		generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
+		generic_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
@@ -1571,15 +1571,15 @@ static DRIVER_INIT( offroadc )
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(machine, 230, 94);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
 }
 
 
@@ -1604,7 +1604,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
 }
 
 

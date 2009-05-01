@@ -79,7 +79,7 @@ static VIDEO_UPDATE(mirax)
 	//audio tester
 	if(input_code_pressed_once(KEYCODE_Q))
 	{
-		cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(screen->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 #endif
 	return 0;
@@ -112,7 +112,7 @@ static WRITE8_HANDLER(audio_w)
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
 {
-	if(cpu_get_previouspc(device->machine->cpu[0])==0x309)
+	if(cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu"))==0x309)
 	{
 		ay8910_address_w(device,0,nAyCtrl);
 		ay8910_data_w(device,0,nAyData);

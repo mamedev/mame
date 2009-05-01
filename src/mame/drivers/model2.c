@@ -302,7 +302,7 @@ static TIMER_CALLBACK( model2_timer_cb )
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
@@ -848,7 +848,7 @@ static int to_68k;
 
 static int snd_68k_ready_r(const address_space *space)
 {
-	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
+	int sr = cpu_get_reg(cputag_get_cpu(space->machine, "audiocpu"), M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
@@ -868,7 +868,7 @@ static void snd_latch_to_68k_w(const address_space *space, int data)
 
 	to_68k = data;
 
-	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 
 	// give the 68k time to notice
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
@@ -1724,10 +1724,10 @@ static void scsp_irq(const device_config *device, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(device->machine->cpu[1], irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
 	}
 	else
-		cpu_set_input_line(device->machine->cpu[1], -irq, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
@@ -4407,7 +4407,7 @@ ROM_END
 
 static DRIVER_INIT( genprot )
 {
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 }
 
@@ -4415,7 +4415,7 @@ static DRIVER_INIT( pltkids )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
 
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -4426,7 +4426,7 @@ static DRIVER_INIT( zerogun )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
 
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -4435,14 +4435,14 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
 static DRIVER_INIT( sgt24h )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
 
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
@@ -4453,7 +4453,7 @@ static DRIVER_INIT( doa )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
 
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;

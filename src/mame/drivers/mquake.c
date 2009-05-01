@@ -38,11 +38,11 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_BANK(1));
+		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_BANK(1));
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
+		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
 }
 
 

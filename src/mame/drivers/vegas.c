@@ -543,11 +543,11 @@ static MACHINE_START( vegas )
 		dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->cpu[0], 0x00000000, ramsize - 1, FALSE, rambase);
-	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE, rombase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, ramsize - 1, FALSE, rambase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, rombase);
 
 	/* register for save states */
 	state_save_register_global(machine, nile_irq_state);
@@ -922,12 +922,12 @@ static void update_nile_irqs(running_machine *machine)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");
@@ -1557,7 +1557,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
+		memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -1677,9 +1677,9 @@ static void remap_dynamic_addresses(running_machine *machine)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].mread != NULL || dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
-			_memory_install_device_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_device_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 	}
 
 	if (LOG_DYNAMIC)
@@ -2479,10 +2479,10 @@ static DRIVER_INIT( gauntleg )
 	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->cpu[0], 0x80015430, 0x8CC38060, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x80015464, 0x3C09801E, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800C8890, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2492,10 +2492,10 @@ static DRIVER_INIT( gauntdl )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x800D4038, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
 }
 
 
@@ -2505,7 +2505,7 @@ static DRIVER_INIT( warfa )
 	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->cpu[0], 0x8009436C, 0x0C031663, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
 }
 
 
@@ -2515,10 +2515,10 @@ static DRIVER_INIT( tenthdeg )
 	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine->cpu[0], 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x8005E674, 0x3C028017, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine->cpu[0], 0x80015930, 0x8FC20244, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
+	mips3drc_add_hotspot(cputag_get_cpu(machine, "maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
 }
 
 

@@ -169,7 +169,7 @@ static void moo_objdma(int type)
 static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x800)
-		cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(moo_interrupt)
@@ -215,7 +215,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )

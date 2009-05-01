@@ -319,7 +319,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( clock_r )
 {
 	/* 2.4kHz (divide 2.5MHz by 1024) */
-	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x400) ? 0 : 1;
+	return (cputag_get_total_cycles(field->port->machine, "alpha") & 0x400) ? 0 : 1;
 }
 
 

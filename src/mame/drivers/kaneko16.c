@@ -270,7 +270,7 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data & 0xff00) >> 8 );
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

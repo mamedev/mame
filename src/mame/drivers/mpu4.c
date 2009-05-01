@@ -437,7 +437,7 @@ static MACHINE_RESET( mpu4 )
 		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, 1,0);
-		device_reset(machine->cpu[0]);
+		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 
 }
@@ -464,12 +464,12 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 
 	if (!serial_card_connected)
 	{
-		cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", combined_state));
 	}
 }

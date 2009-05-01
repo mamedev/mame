@@ -223,8 +223,8 @@ static READ32_HANDLER( ms32_read_inputs3 )
 
 static WRITE32_HANDLER( ms32_sound_w )
 {
-	soundlatch_w(space,0, data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_w(space, 0, data & 0xff);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
@@ -237,7 +237,7 @@ static READ32_HANDLER( ms32_sound_r )
 
 static WRITE32_HANDLER( reset_sub_w )
 {
-	if(data) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 
@@ -1106,14 +1106,14 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
 {
 	irqreq |= (1<<level);
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(ms32_interrupt)
@@ -1156,7 +1156,7 @@ static INTERRUPT_GEN(ms32_interrupt)
 
 static READ8_HANDLER( latch_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,0)^0xff;
 }
 

@@ -666,8 +666,8 @@ static READ8_HANDLER( jansou_6405_r )
 
 static WRITE8_HANDLER( jansou_sound_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

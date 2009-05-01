@@ -690,7 +690,7 @@ static void irq_raise(running_machine *machine, int level)
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	last_irq = level;
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -713,8 +713,8 @@ static IRQ_CALLBACK(irq_callback)
 
 static void irq_init(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
 
 static INTERRUPT_GEN(model1_interrupt)
@@ -730,7 +730,7 @@ static INTERRUPT_GEN(model1_interrupt)
 		// if the FIFO has something in it, signal the 68k too
 		if (fifo_rptr != fifo_wptr)
 		{
-			cpu_set_input_line(device->machine->cpu[1], 2, HOLD_LINE);
+			cputag_set_input_line(device->machine, "audiocpu", 2, HOLD_LINE);
 		}
 	}
 }
@@ -839,7 +839,7 @@ static WRITE16_HANDLER(mr2_w)
 
 static READ16_HANDLER( snd_68k_ready_r )
 {
-	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
+	int sr = cpu_get_reg(cputag_get_cpu(space->machine, "audiocpu"), M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
@@ -857,7 +857,7 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
-	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 	// give the 68k time to reply
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }

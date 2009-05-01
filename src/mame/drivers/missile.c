@@ -405,7 +405,7 @@ static TIMER_CALLBACK( clock_irq )
 
 	/* assert the IRQ if not already asserted */
 	irq_state = (~curv >> 5) & 1;
-	cpu_set_input_line(machine->cpu[0], 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	video_screen_update_partial(machine->primary_screen, v_to_scanline(curv));
@@ -435,9 +435,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		cpu_set_clock(machine->cpu[0], MASTER_CLOCK/16);
+		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/16);
 	else
-		cpu_set_clock(machine->cpu[0], MASTER_CLOCK/8);
+		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -477,7 +477,7 @@ static MACHINE_START( missile )
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), missile_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), missile_direct_handler);
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
@@ -499,7 +499,7 @@ static MACHINE_START( missile )
 
 static MACHINE_RESET( missile )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	irq_state = 0;
 }
 
@@ -706,7 +706,7 @@ static WRITE8_HANDLER( missile_w )
 	{
 		if (irq_state)
 		{
-			cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			irq_state = 0;
 		}
 	}

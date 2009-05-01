@@ -215,7 +215,7 @@ static void multigam3_mmc3_scanline_cb( const device_config *device, int scanlin
 		if ( --multigam3_mmc3_scanline_counter == -1 )
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(device->machine->cpu[0], 0);
+			generic_pulse_irq_line(cputag_get_cpu(device->machine, "maincpu"), 0);
 		}
 	}
 }
@@ -368,7 +368,7 @@ static void multigam_init_smb3(running_machine *machine)
 	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
 	memcpy(&dst[0xc000], &src[0xa0000 + 0x3c000], 0x4000);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
 
 	memory_set_bankptr(machine, 1, multigmc_mmc3_6000_ram);
 
@@ -535,7 +535,7 @@ static PALETTE_INIT( multigam )
 
 static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */
@@ -575,7 +575,7 @@ static MACHINE_RESET( multigam )
 
 static MACHINE_RESET( multigm3 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* reset the ppu */
 	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
@@ -703,7 +703,7 @@ ROM_END
 
 static DRIVER_INIT( multigam )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	multigam_switch_prg_rom( space, 0x0, 0x01 );
 }
 
@@ -718,7 +718,7 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 
 static DRIVER_INIT(multigm3)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 

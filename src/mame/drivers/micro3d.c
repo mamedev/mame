@@ -151,7 +151,7 @@ static INTERRUPT_GEN( micro3d_vblank )
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 3, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 3, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -163,7 +163,7 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 	else
 	{
 		m68681_tx0 = data;
-		cpu_set_input_line(device->machine->cpu[2], MCS51_RX_LINE, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", MCS51_RX_LINE, HOLD_LINE);
 	}
 };
 
@@ -196,7 +196,7 @@ static UINT8 duart_input_r(const device_config *device)
 */
 static void duart_output_w(const device_config *device, UINT8 data)
 {
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -336,7 +336,7 @@ static void m68901_int_gen(running_machine *machine, int source)
 
 	if (m68901_base[IMASK_REG] & (bit << 8))              // If interrupt is not masked by MFD, trigger a 68k INT
 	{
-		cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 		//    logerror("M68901 interrupt %d serviced.\n",source);
 	}
 }
@@ -480,12 +480,12 @@ static READ16_HANDLER( ti_uart_r )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(space->machine->cpu[1], offset);
+	return tms34010_host_r(cputag_get_cpu(space->machine, "vgb"), offset);
 }
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(space->machine->cpu[1], offset, data);
+	tms34010_host_w(cputag_get_cpu(space->machine, "vgb"), offset, data);
 }
 
 
@@ -640,7 +640,7 @@ static const duart68681_config micro3d_duart68681_config =
 static MACHINE_RESET( micro3d )
 {
 	/* TODO: Check. Also do this for the other CPUs? */
-//  cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+//  cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	creg = 0;
 	ti_uart[STATUS] = 1;
@@ -692,8 +692,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( micro3d )
 {
-	i8051_set_serial_tx_callback(machine->cpu[2], data_from_i8031);
-	i8051_set_serial_rx_callback(machine->cpu[2], data_to_i8031);
+	i8051_set_serial_tx_callback(cputag_get_cpu(machine, "audiocpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(cputag_get_cpu(machine, "audiocpu"), data_to_i8031);
 
 	duart68681 = devtag_get_device( machine, "duart68681" );
 }

@@ -87,47 +87,55 @@ GFXDECODE_END
 
 /*******************************************************/
 
-static WRITE8_HANDLER( mrflea_main_w ){
+static WRITE8_HANDLER( mrflea_main_w )
+{
 	mrflea_status |= 0x01; // pending command to main CPU
 	mrflea_main = data;
 }
 
-static WRITE8_HANDLER( mrflea_io_w ){
+static WRITE8_HANDLER( mrflea_io_w )
+{
 	mrflea_status |= 0x08; // pending command to IO CPU
 	mrflea_io = data;
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE );
 }
 
-static READ8_HANDLER( mrflea_main_r ){
+static READ8_HANDLER( mrflea_main_r )
+{
 	mrflea_status &= ~0x01; // main CPU command read
 	return mrflea_main;
 }
 
-static READ8_HANDLER( mrflea_io_r ){
+static READ8_HANDLER( mrflea_io_r )
+{
 	mrflea_status &= ~0x08; // IO CPU command read
 	return mrflea_io;
 }
 
 /*******************************************************/
 
-static READ8_HANDLER( mrflea_main_status_r ){
+static READ8_HANDLER( mrflea_main_status_r )
+{
 	/*  0x01: main CPU command pending
         0x08: io cpu ready */
 	return mrflea_status^0x08;
 }
 
-static READ8_HANDLER( mrflea_io_status_r ){
+static READ8_HANDLER( mrflea_io_status_r )
+{
 	/*  0x08: IO CPU command pending
         0x01: main cpu ready */
 	return mrflea_status^0x01;
 }
 
-static INTERRUPT_GEN( mrflea_slave_interrupt ){
+static INTERRUPT_GEN( mrflea_slave_interrupt )
+{
 	if( cpu_getiloops(device)==0 || (mrflea_status&0x08) )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( mrflea_interrupt_type_r ){
+static READ8_HANDLER( mrflea_interrupt_type_r )
+{
 /* there are two interrupt types:
     1. triggered (in response to sound command)
     2. heartbeat (for music timing)
@@ -158,7 +166,8 @@ ADDRESS_MAP_END
 
 /*******************************************************/
 
-static WRITE8_HANDLER( mrflea_select1_w ){
+static WRITE8_HANDLER( mrflea_select1_w )
+{
 	mrflea_select1 = data;
 }
 
@@ -167,7 +176,8 @@ static READ8_HANDLER( mrflea_input1_r )
 	return 0x00;
 }
 
-static WRITE8_HANDLER( mrflea_data1_w ){
+static WRITE8_HANDLER( mrflea_data1_w )
+{
 }
 
 static ADDRESS_MAP_START( mrflea_slave_map, ADDRESS_SPACE_PROGRAM, 8 )

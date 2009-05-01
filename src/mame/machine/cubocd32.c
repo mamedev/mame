@@ -356,7 +356,7 @@ static void akiko_set_cd_status( running_machine *machine, UINT32 status )
 	if ( akiko.cdrom_status[0] & akiko.cdrom_status[1] )
 	{
 		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 
@@ -524,7 +524,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 	if ( param == 0x05 )
 	{
-		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		if (LOG_AKIKO_CD) logerror( "AKIKO: Completing Command %d\n", param );
 
 		resp[0] = 0x06;

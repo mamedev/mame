@@ -388,9 +388,9 @@ static UINT16 *model3_soundram;
 static void update_irq_state(running_machine *machine)
 {
 	if ((irq_enable & irq_state) || scsi_irq_state)
-		cpu_set_input_line(machine->cpu[0], PPC_IRQ, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", PPC_IRQ, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], PPC_IRQ, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", PPC_IRQ, CLEAR_LINE);
 }
 
 void model3_set_irq_line(running_machine *machine, UINT8 bit, int state)
@@ -768,7 +768,7 @@ static WRITE64_HANDLER(scsi_w)
 
 static UINT32 scsi_fetch(running_machine *machine, UINT32 dsp)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 result;
 	result = memory_read_dword(space, dsp);
 	return FLIPENDIAN_INT32(result);
@@ -873,7 +873,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 
 static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
@@ -897,7 +897,7 @@ static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(machine->cpu[0]));
+			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
 			break;
 	}
 }
@@ -981,10 +981,10 @@ static void model3_exit(running_machine *machine)
 static void configure_fast_ram(running_machine *machine)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x00000000, 0x007fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, work_ram);
 }
 
 static MACHINE_START(model3_10)
@@ -4309,10 +4309,10 @@ static void scsp_irq(const device_config *device, int irq)
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(device->machine->cpu[1], irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
 	}
 	else
-		cpu_set_input_line(device->machine->cpu[1], -irq, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
@@ -4558,35 +4558,35 @@ static DRIVER_INIT( model3_10 )
 {
 	interleave_vroms(machine);
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
 }
 
 static DRIVER_INIT( model3_15 )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
 }
 
 static DRIVER_INIT( model3_20 )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
 }
 
 static DRIVER_INIT( lostwsga )
@@ -4595,7 +4595,7 @@ static DRIVER_INIT( lostwsga )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
 
 	rom[0x7374f0/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 }
@@ -4606,7 +4606,7 @@ static DRIVER_INIT( scud )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
 	rom[(0x71275c^4)/4] = 0x60000000;
 	rom[(0x71277c^4)/4] = 0x60000000;
@@ -4618,7 +4618,7 @@ static DRIVER_INIT( scudp )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
 
 	rom[(0x713724^4)/4] = 0x60000000;
 	rom[(0x713744^4)/4] = 0x60000000;
@@ -4634,7 +4634,7 @@ static DRIVER_INIT( lemans24 )
 	UINT32 *rom = (UINT32*)memory_region(machine, "user1");
 	DRIVER_INIT_CALL(model3_15);
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
 
 	rom[(0x73fe38^4)/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 
@@ -4665,15 +4665,15 @@ static DRIVER_INIT( vs215 )
 	rom[(0x70e710^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
 }
 
 static DRIVER_INIT( vs29815 )
@@ -4684,15 +4684,15 @@ static DRIVER_INIT( vs29815 )
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
 }
 
 static DRIVER_INIT( bass )
@@ -4703,27 +4703,27 @@ static DRIVER_INIT( bass )
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
 }
 
 static DRIVER_INIT( getbass )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
 }
 
 static DRIVER_INIT( vs2 )
@@ -4772,7 +4772,7 @@ static DRIVER_INIT( harley )
 	UINT32 *rom = (UINT32*)memory_region(machine, "user1");
 	DRIVER_INIT_CALL(model3_20);
 
-	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0000000, 0xc00fffff, 0, 0, network_r, network_w );
+	memory_install_readwrite64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0000000, 0xc00fffff, 0, 0, network_r, network_w );
 
 	rom[(0x50e8d4^4)/4] = 0x60000000;
 	rom[(0x50e8f4^4)/4] = 0x60000000;
@@ -4840,7 +4840,7 @@ static DRIVER_INIT( daytona2 )
 	UINT32 *rom = (UINT32*)memory_region(machine, "user1");
 	DRIVER_INIT_CALL(model3_20);
 
-	memory_install_write64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
+	memory_install_write64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	rom[(0x6063c4^4)/4] = 0x60000000;
@@ -4853,7 +4853,7 @@ static DRIVER_INIT( dayto2pe )
 	UINT32 *rom = (UINT32*)memory_region(machine, "user1");
 	DRIVER_INIT_CALL(model3_20);
 
-	memory_install_write64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
+	memory_install_write64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
 
 	rom[(0x606784^4)/4] = 0x60000000;
 	rom[(0x69a3fc^4)/4] = 0x60000000;		// jump to encrypted code

@@ -99,12 +99,12 @@ void skimaxx_scanline_update(const device_config *screen, bitmap_t *bitmap, int 
 
 static WRITE32_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(space->machine->cpu[2], offset, data);
+	tms34010_host_w(cputag_get_cpu(space->machine, "tms"), offset, data);
 }
 
 static READ32_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(space->machine->cpu[2], offset);
+	return tms34010_host_r(cputag_get_cpu(space->machine, "tms"), offset);
 }
 
 

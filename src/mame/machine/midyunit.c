@@ -479,12 +479,12 @@ static void term2_init_common(running_machine *machine, write16_space_func hack_
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	t2_hack_mem = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
+	t2_hack_mem = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
 }
 
 DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }

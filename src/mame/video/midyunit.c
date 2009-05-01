@@ -386,7 +386,7 @@ static void dma_draw(UINT16 command)
 static TIMER_CALLBACK( dma_callback )
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
@@ -449,7 +449,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 

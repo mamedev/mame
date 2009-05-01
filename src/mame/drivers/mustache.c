@@ -176,7 +176,7 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( clear_irq_cb )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( assert_irq )

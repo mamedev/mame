@@ -67,8 +67,8 @@ static READ16_HANDLER( io1_r ) //240006
 static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
-	if(cpu_get_pc(space->cpu)==0x822)
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
+	if(cpu_get_pc(space->cpu) == 0x822)
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -314,7 +314,7 @@ INPUT_PORTS_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "z80", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static GFXDECODE_START( mlanding )

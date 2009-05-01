@@ -62,12 +62,12 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	soundlatch_w( space, offset, data );
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

@@ -94,7 +94,7 @@ static MACHINE_RESET( midzeus )
 {
 	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
 	*ram_base <<= 1;
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	cmos_protected = TRUE;
 }
@@ -109,7 +109,7 @@ static MACHINE_RESET( midzeus )
 
 static TIMER_CALLBACK( display_irq_off )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( display_irq )
@@ -500,9 +500,9 @@ static void update_gun_irq(running_machine *machine)
 {
 	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
-		cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
 }
 
 
@@ -1330,7 +1330,7 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
 
@@ -1340,8 +1340,8 @@ static DRIVER_INIT( crusnexo )
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
 
-	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
-	memory_install_write32_handler    (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
+	memory_install_write32_handler    (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
 }
 
 

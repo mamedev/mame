@@ -31,7 +31,7 @@ static TIMER_CALLBACK( flyball_joystick_callback )
 	int potsense = param;
 
 	if (potsense & ~flyball_potmask)
-		generic_pulse_irq_line(machine->cpu[0], 0);
+		generic_pulse_irq_line(cputag_get_cpu(machine, "maincpu"), 0);
 
 	flyball_potsense |= potsense;
 }
@@ -73,7 +73,7 @@ static MACHINE_RESET( flyball )
 
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
 }

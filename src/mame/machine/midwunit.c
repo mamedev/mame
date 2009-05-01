@@ -257,7 +257,7 @@ static void midxunit_dcs_output_full(running_machine *machine, int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -466,13 +466,13 @@ DRIVER_INIT( mk3r10 )
 DRIVER_INIT( umk3 )
 {
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 DRIVER_INIT( umk3r11 )
 {
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 
@@ -557,7 +557,7 @@ DRIVER_INIT( wwfmania )
 	init_wunit_generic(machine);
 
 	/* enable I/O shuffling */
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
 
 	/* serial prefixes 430, 528 */
 	midway_serial_pic_init(machine, 528);

@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_sc3_tile_info )
 
 static VIDEO_START(mil4000)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// game doesn't clear the palette, so to avoid seeing mame defaults we clear it

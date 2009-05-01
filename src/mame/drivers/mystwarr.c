@@ -281,7 +281,7 @@ static WRITE16_HANDLER( sound_cmd2_msb_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )

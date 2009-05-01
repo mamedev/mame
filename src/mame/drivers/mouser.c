@@ -47,7 +47,7 @@ static INTERRUPT_GEN( mouser_nmi_interrupt )
 static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_sound_byte = data;
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )
@@ -283,4 +283,3 @@ static DRIVER_INIT( mouser )
 
 GAME( 1983, mouser,   0,      mouser, mouser, mouser, ROT90, "UPL", "Mouser", 0 )
 GAME( 1983, mouserc,  mouser, mouser, mouser, mouser, ROT90, "[UPL] (Cosmos license)", "Mouser (Cosmos)", 0 )
-

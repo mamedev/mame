@@ -39,13 +39,13 @@
 
 void mystston_on_scanline_interrupt(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( irq_clear_w )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

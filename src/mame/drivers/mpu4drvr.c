@@ -228,7 +228,7 @@ static MACHINE_RESET( mpu4_vid )
 {
 	ROC10937_reset(0);
 
-/*  cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE); */
+/*  cputag_set_input_line(machine, "video", INPUT_LINE_HALT, ASSERT_LINE); */
 	mpu4_stepper_reset();
 
 	lamp_strobe    = 0;
@@ -269,9 +269,9 @@ static MACHINE_RESET( mpu4_vid )
 
 static void update_mpu68_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[1], 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "video", 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "video", 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "video", 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -305,7 +305,7 @@ static READ_LINE_DEVICE_HANDLER( m6809_acia_dcd_r )
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
 {
 	m68k_acia_cts = state;
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
@@ -1634,7 +1634,7 @@ static VIDEO_UPDATE(dealem)
 
 static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, vsync);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, vsync);
 }
 
 /*************************************
