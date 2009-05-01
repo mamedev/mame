@@ -353,7 +353,7 @@ static int dac0_value, dac1_value, dac0_gain, dac1_gain;
 
 static WRITE8_HANDLER( namcos1_sub_firq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( irq_ack_w )
@@ -1057,7 +1057,7 @@ GFXDECODE_END
 
 static void namcos1_sound_interrupt( const device_config *device, int irq )
 {
-	cpu_set_input_line(device->machine->cpu[2], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -2746,4 +2746,3 @@ GAME( 1990, puzlclub, 0,        ns1,     puzlclub, puzlclub, ROT90,  "Namco", "P
 GAME( 1991, tankfrce, 0,        ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
 GAME( 1991, tankfrc4, tankfrce, ns1,     tankfrc4, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )
 GAME( 1991, tankfrcj, tankfrce, ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
-

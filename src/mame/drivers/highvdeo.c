@@ -1142,7 +1142,7 @@ static READ16_HANDLER( ciclone_status_r )
 
 static DRIVER_INIT( ciclone )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
 }
 
 /*
@@ -1212,7 +1212,7 @@ static WRITE16_HANDLER( fashion_output_w )
 
 static DRIVER_INIT( fashion )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
 }
 
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )

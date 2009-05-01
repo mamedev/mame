@@ -181,7 +181,7 @@ static const z80ctc_interface ctc_intf =
 
 static MACHINE_RESET( niyanpai )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -251,7 +251,7 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
-	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
@@ -917,4 +917,3 @@ GAME( 1996, niyanpai, 0, niyanpai, niyanpai, niyanpai, ROT0, "Nichibutsu", "Niya
 GAME( 1995, musobana, 0, musobana, musobana, niyanpai, ROT0, "Nichibutsu/Yubis", "Musoubana (Japan)", 0 )
 GAME( 1994, 4psimasy, 0, musobana, 4psimasy, niyanpai, ROT0, "SPHINX/AV JAPAN", "Mahjong 4P Simasyo (Japan)", 0 )
 GAME( 199?, mhhonban, 0, mhhonban, mhhonban, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", 0 )
-

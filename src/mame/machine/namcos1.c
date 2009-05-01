@@ -587,9 +587,9 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 		namcos1_reset = data & 1;
 	}
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -667,7 +667,8 @@ static WRITE8_HANDLER( unknown_w )
 /* Main bankswitching routine */
 static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
+	static const char *const cputags[] = { "maincpu", "sub" };
+	const address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -734,7 +735,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag, offset, data);
 
-	namcos1_bankswitch(space->machine, (space->cpu == space->machine->cpu[0]) ? 0 : 1, offset, data);
+	namcos1_bankswitch(space->machine, (space->cpu == cputag_get_cpu(space->machine, "maincpu")) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -859,10 +860,10 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	device_reset(machine->cpu[0]);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* mcu patch data clear */
 	mcu_patch_data = 0;
@@ -1204,7 +1205,7 @@ DRIVER_INIT( tankfrc4 )
 	};
 	namcos1_driver_init(machine, &tankfrce_specific);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }
 
 /*******************************************************************************
@@ -1295,7 +1296,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT( quester )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
 }
 
 
@@ -1384,7 +1385,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT( berabohm )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
 }
 
 
@@ -1454,5 +1455,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT( faceoff )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }

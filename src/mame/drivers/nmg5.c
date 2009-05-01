@@ -247,7 +247,7 @@ static WRITE16_HANDLER( nmg5_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -959,7 +959,7 @@ GFXDECODE_END
 
 static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, state);
+	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }
 
 static const ym3812_interface ym3812_intf =

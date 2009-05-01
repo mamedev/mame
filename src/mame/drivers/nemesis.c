@@ -1601,7 +1601,7 @@ static const ay8910_interface ay8910_interface_2 =
 static void sound_irq(const device_config *device, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
-/*cpu_set_input_line(device->machine->cpu[1],0,HOLD_LINE);*/
+/*cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE);*/
 }
 
 static const ym2151_interface ym2151_config =

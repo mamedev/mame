@@ -2099,7 +2099,7 @@ GetDspControlRegister( void )
 */
 static TIMER_CALLBACK( start_subcpu )
 {
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( namcos22_system_controller_w )
@@ -2136,11 +2136,11 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable for Super System 22 */
 			if (data)
 			{
-				cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{
-				cpu_set_input_line(space->machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
+				cputag_set_input_line(space->machine, "mcu",INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
 			}
 		}
 	}
@@ -2601,7 +2601,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					generic_pulse_irq_line(space->machine->cpu[3], M37710_LINE_TIMERA3TICK);
+					generic_pulse_irq_line(cputag_get_cpu(space->machine, "mcu"), M37710_LINE_TIMERA3TICK);
 				}
 			}
 
@@ -5071,19 +5071,19 @@ static READ16_HANDLER( mcuc74_speedup_r )
 
 static void install_c74_speedup(running_machine *machine)
 {
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
 }
 
 static void install_130_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
 }
 
 static void install_141_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
 }
 
 static void namcos22_init( running_machine *machine, enum namcos22_gametype game_type )
@@ -5102,7 +5102,7 @@ static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5111,7 +5111,7 @@ static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER_2);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5120,7 +5120,7 @@ static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5129,7 +5129,7 @@ static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
 static DRIVER_INIT( propcycl )
@@ -5153,7 +5153,7 @@ static DRIVER_INIT( propcycl )
 
 	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5234,7 +5234,7 @@ static DRIVER_INIT( cybrcyc )
 
 	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
 	install_130_speedup(machine);
 }

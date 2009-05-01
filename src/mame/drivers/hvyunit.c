@@ -310,14 +310,14 @@ static VIDEO_EOF(hvyunit)
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "suoundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_HANDLER( trigger_nmi_on_sub_cpu)
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( main_bankswitch_w )
@@ -693,5 +693,3 @@ ROM_END
 GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)" ,GAME_NOT_WORKING )
 GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)" ,GAME_NOT_WORKING )
 GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)" ,GAME_NOT_WORKING )
-
-

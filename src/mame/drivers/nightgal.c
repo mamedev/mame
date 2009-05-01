@@ -193,7 +193,7 @@ static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 				}
 			}
 			//printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
-			//cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+			//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -270,7 +270,7 @@ static UINT8 nsc_latch,z80_latch;
 
 static WRITE8_HANDLER( nsc_latch_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( nsc_latch_r )

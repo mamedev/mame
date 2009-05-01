@@ -499,7 +499,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
 	UINT16 data;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
@@ -723,7 +723,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cpu_set_input_line(space->machine->cpu[1], M37710_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(space->machine, "mcu", M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 
@@ -850,7 +850,7 @@ static WRITE8_HANDLER( port4_w )
 		logerror("launching 68k, PC=%x\n", cpu_get_pc(space->cpu));
 
 		// reset and launch the 68k
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	mcu_port4 = data;
@@ -925,7 +925,7 @@ static MACHINE_START( namcona1 )
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
 static MACHINE_RESET( namcona1_mcu )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	mcu_port5 = 1;
 }

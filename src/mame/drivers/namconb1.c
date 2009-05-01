@@ -298,7 +298,7 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 
 	video_screen_update_partial(machine->primary_screen, param);
 	pos_irq_active = 1;
-	cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb1_interrupt )
@@ -374,7 +374,7 @@ static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	video_screen_update_partial(machine->primary_screen, param);
 	pos_irq_active = 1;
-	cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02], ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb2_interrupt )
@@ -429,9 +429,9 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x02: // POS IRQ level/enable
 		if(pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			cpu_set_input_line(machine->cpu[0], prev & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				cpu_set_input_line(machine->cpu[0], data & 0xf, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
 				pos_irq_active = 0;
 		}
@@ -439,9 +439,9 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK IRQ level/enable
 		if(vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			cpu_set_input_line(machine->cpu[0], prev & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				cpu_set_input_line(machine->cpu[0], data & 0xf, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
 				vblank_irq_active = 0;
 		}
@@ -449,14 +449,14 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x07: // POS ack
 		if(pos_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
 			pos_irq_active = 0;
 		}
 		break;
 
 	case 0x09: // VBLANK ack
 		if(vblank_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
 			vblank_irq_active = 0;
 		}
 		break;
@@ -466,11 +466,11 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x18: // C75 Control
 		if(data & 1) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		} else
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
 		break;
 	}
 }
@@ -495,9 +495,9 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x00: // VBLANK IRQ level
 		if(vblank_irq_active && (prev != data)) {
-			cpu_set_input_line(machine->cpu[0], prev, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
-				cpu_set_input_line(machine->cpu[0], data, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
 				vblank_irq_active = 0;
 		}
@@ -505,9 +505,9 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x02: // POS IRQ level
 		if(pos_irq_active && (prev != data)) {
-			cpu_set_input_line(machine->cpu[0], prev, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
-				cpu_set_input_line(machine->cpu[0], data, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
 				pos_irq_active = 0;
 		}
@@ -515,14 +515,14 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK ack
 		if(vblank_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x00], CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x00], CLEAR_LINE);
 			vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x06: // POS ack
 		if(pos_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02], CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], CLEAR_LINE);
 			pos_irq_active = 0;
 		}
 		break;
@@ -532,11 +532,11 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x16: // C75 Control
 		if(data & 1) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		} else {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		break;
 	}

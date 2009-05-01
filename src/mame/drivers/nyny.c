@@ -117,13 +117,13 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) | pia6821_get_irq_b(pia2);
 
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -435,14 +435,14 @@ static VIDEO_UPDATE( nyny )
 static WRITE8_HANDLER( audio_1_command_w )
 {
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_1_answer_w )
 {
 	soundlatch3_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -486,7 +486,7 @@ static const ay8910_interface ay8910_64_interface =
 static WRITE8_HANDLER( audio_2_command_w )
 {
 	soundlatch2_w(space, 0, (data & 0x60) >> 5);
-	cpu_set_input_line(space->machine->cpu[2], M6800_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audio2", M6800_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

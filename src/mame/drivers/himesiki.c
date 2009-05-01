@@ -101,7 +101,7 @@ extern UINT8 *himesiki_bg_ram;
 static WRITE8_HANDLER( himesiki_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1, &ROM[0x10000+0x800*(data & 8)]);
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + 0x800 * (data & 8)]);
 
 	if (data & 0xf7)
 		logerror("p06_w %02x\n",data);
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( himesiki_rombank_w )
 static WRITE8_HANDLER( himesiki_sound_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /****************************************************************************/

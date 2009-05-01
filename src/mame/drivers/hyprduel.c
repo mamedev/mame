@@ -61,7 +61,7 @@ static void update_irq_state(running_machine *machine)
 {
 	int irq = requested_int & ~*hyprduel_irq_enable;
 
-	cpu_set_input_line(machine->cpu[0], 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( vblank_end_callback )
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 		case 0x01:
 			if (!subcpu_resetline)
 			{
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 				subcpu_resetline = 1;
 			}
 			break;
@@ -123,7 +123,7 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 		case 0x00:
 			if (subcpu_resetline)
 			{
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
 				subcpu_resetline = 0;
 			}
 			cpu_spinuntil_int(space->cpu);
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 
 		case 0x0c:
 		case 0x80:
-			cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
+			cputag_set_input_line(space->machine, "sub", 2, HOLD_LINE);
 			break;
 	}
 }
@@ -193,7 +193,7 @@ static emu_timer *magerror_irq_timer;
 
 static TIMER_CALLBACK( magerror_irq_callback )
 {
-	cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
+	cputag_set_input_line(machine, "sub", 1, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -669,7 +669,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
+	cputag_set_input_line(device->machine, "sub", 1, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -684,7 +684,7 @@ static const ym2151_interface ym2151_config =
 static MACHINE_RESET( hyprduel )
 {
 	/* start with cpu2 halted */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	subcpu_resetline = 1;
 	cpu_trigger = 0;
 
@@ -849,10 +849,10 @@ static DRIVER_INIT( hyprduel )
 	savestate(machine);
 
 	/* cpu synchronization (severe timings) */
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
 }
 
 static DRIVER_INIT( magerror )

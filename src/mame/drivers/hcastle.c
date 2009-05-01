@@ -38,7 +38,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
@@ -190,7 +190,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-//  cpu_set_input_line(device->machine->cpu[1],0,linestate);
+//  cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static void volume_callback(const device_config *device, int v)

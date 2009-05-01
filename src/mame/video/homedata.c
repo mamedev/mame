@@ -132,7 +132,7 @@ static void mrokumei_handleblit( const address_space *space, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void reikaids_handleblit( const address_space *space, int rom_base )
@@ -232,7 +232,7 @@ static void reikaids_handleblit( const address_space *space, int rom_base )
 	}
 
 finish:
-	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void pteacher_handleblit( const address_space *space, int rom_base )
@@ -320,7 +320,7 @@ static void pteacher_handleblit( const address_space *space, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 

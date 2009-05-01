@@ -472,14 +472,14 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( network_interrupt_callback )
 {
-	cpu_set_input_line(machine->cpu[0], I960_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ0, ASSERT_LINE);
 	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
@@ -487,7 +487,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	cpu_set_input_line(machine->cpu[0], I960_IRQ1, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
 	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 

@@ -312,9 +312,9 @@ void neogeo_set_display_counter_lsb(const address_space *space, UINT16 data)
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 1, vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 2, display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 3, irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -400,19 +400,19 @@ static void start_interrupt_timers(running_machine *machine)
 
 static void audio_cpu_irq(const device_config *device, int assert)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_assert_nmi(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -550,7 +550,7 @@ static void calendar_clock(void)
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	return (pd4990a_databit_r(space, 0) << 1) | pd4990a_testbit_r(space, 0);
 }
 
@@ -701,7 +701,7 @@ static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->cpu[0]), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(cputag_get_cpu(field->port->machine, "maincpu")), ret);
 
 	return ret;
 }
@@ -768,7 +768,7 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 
 static void main_cpu_banking_init(running_machine *machine)
 {
-	const address_space *mainspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
@@ -852,7 +852,7 @@ static void _set_audio_cpu_rom_source(const address_space *space)
 	{
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", cpu_get_pc(space->cpu), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
@@ -902,7 +902,7 @@ static void audio_cpu_banking_init(running_machine *machine)
 	set_audio_cpu_banking(machine);
 
 	audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
+	set_audio_cpu_rom_source(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0);
 }
 
 
@@ -1054,7 +1054,7 @@ static STATE_POSTLOAD( neogeo_postload )
 	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source(machine);
 	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM));
+	_set_audio_cpu_rom_source(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM));
 	set_outputs();
 }
 
@@ -1115,12 +1115,12 @@ static MACHINE_START( neogeo )
 static MACHINE_RESET( neogeo )
 {
 	offs_t offs;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	neogeo_reset_rng();
 
