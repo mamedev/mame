@@ -410,7 +410,7 @@ INPUT_PORTS_END
 
 static void sfkick_vdp_interrupt(running_machine *machine, int i)
 {
-	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static VIDEO_START( sfkick )
@@ -441,7 +441,7 @@ static INTERRUPT_GEN( sfkick_interrupt )
 }
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	cputag_set_input_line_and_vector(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2203_interface ym2203_config =

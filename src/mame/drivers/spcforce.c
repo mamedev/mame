@@ -78,7 +78,7 @@ static READ8_HANDLER( spcforce_t0_r )
 
 static WRITE8_HANDLER( spcforce_soundtrigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -358,4 +358,3 @@ ROM_END
 GAME( 1980, spcforce, 0,        spcforce, spcforce, 0, ROT270, "Venture Line", "Space Force (set 1)", GAME_IMPERFECT_COLORS )
 GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, 0, ROT270, "Elcon (bootleg?)", "Space Force (set 2)", GAME_IMPERFECT_COLORS )
 GAME( 1981, meteor,   spcforce, spcforce, spcforc2, 0, ROT270, "Venture Line", "Meteoroids", GAME_IMPERFECT_COLORS )
-

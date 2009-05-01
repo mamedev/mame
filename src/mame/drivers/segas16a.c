@@ -246,7 +246,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( system16a )
 {
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -380,7 +380,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
 }
@@ -432,8 +432,8 @@ static WRITE8_DEVICE_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(device->machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "n7751", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "n7751", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
@@ -512,7 +512,7 @@ static void bodyslam_i8751_sim(running_machine *machine)
 	UINT8 min = workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* out of time? set the flag */
 	if (tick == 0 && sec == 0 && min == 0)
@@ -551,9 +551,9 @@ static void bodyslam_i8751_sim(running_machine *machine)
 
 static void quartet_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* X scroll values */
 	segaic16_textram_0_w(space, 0xff8/2, workram[0x0d14/2], 0xffff);

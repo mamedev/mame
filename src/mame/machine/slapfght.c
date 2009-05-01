@@ -41,7 +41,7 @@ MACHINE_RESET( slapfight )
 	getstar_sh_intenabled = 0;	/* disable sound cpu interrupts */
 
 	/* SOUND CPU */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* MCU */
 	mcu_val = 0;
@@ -56,14 +56,14 @@ MACHINE_RESET( slapfight )
 /* Reset and hold sound CPU */
 WRITE8_HANDLER( slapfight_port_00_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_HANDLER( slapfight_port_01_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */
@@ -722,7 +722,7 @@ WRITE8_HANDLER( tigerh_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 	}
 	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04))
@@ -762,8 +762,8 @@ WRITE8_HANDLER( tigerh_mcu_w )
 {
 	from_main = data;
 	main_sent = 1;
-	mcu_sent=0;
-	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
+	mcu_sent = 0;
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( tigerh_mcu_r )

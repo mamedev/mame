@@ -119,8 +119,8 @@ static WRITE16_HANDLER( heberpop_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);	/* RST 38h */
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
 	}
 }
 
@@ -467,7 +467,7 @@ static const ay8910_interface ay8910_config =
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, linestate);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface ym3438_config =

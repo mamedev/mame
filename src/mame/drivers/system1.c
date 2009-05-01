@@ -4480,11 +4480,11 @@ static DRIVER_INIT( dakkochn )
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4);
 
-//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 }
 
 

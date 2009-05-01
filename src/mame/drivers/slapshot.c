@@ -182,14 +182,14 @@ static WRITE16_HANDLER( color_ram_word_w )
 
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 }
 
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, slapshot_interrupt6);
-	cpu_set_input_line(device,5,HOLD_LINE);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL, 0, slapshot_interrupt6);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 
@@ -220,7 +220,7 @@ static READ16_HANDLER( opwolf3_adc_r )
 static WRITE16_HANDLER( opwolf3_adc_req_w )
 {
 	/* 4 writes a frame - one for each analogue port */
-	cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE);
 }
 
 /*****************************************************
@@ -501,7 +501,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

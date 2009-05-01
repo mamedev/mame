@@ -121,9 +121,9 @@ static const segaic16_memory_map_entry outrun_info[] =
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, param);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -135,7 +135,7 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,offset);
 }
 
@@ -172,9 +172,9 @@ static void outrun_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(vblank_irq_state || irq2_state)
 		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
@@ -217,14 +217,14 @@ static TIMER_CALLBACK( scanline_callback )
 		case 223:
 			vblank_irq_state = 1;
 			next_scanline = scanline + 1;
-			cpu_set_input_line(machine->cpu[1], 4, ASSERT_LINE);
+			cputag_set_input_line(machine, "sub", 4, ASSERT_LINE);
 			break;
 
 		/* VBLANK turns off at the start of scanline 224 */
 		case 224:
 			vblank_irq_state = 0;
 			next_scanline = 65;
-			cpu_set_input_line(machine->cpu[1], 4, CLEAR_LINE);
+			cputag_set_input_line(machine, "sub", 4, CLEAR_LINE);
 			break;
 	}
 
@@ -245,13 +245,13 @@ static TIMER_CALLBACK( scanline_callback )
 
 static void outrun_reset(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
 static MACHINE_RESET( outrun )
 {
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 	/* reset misc components */
 	segaic16_memory_mapper_reset(machine);
@@ -260,7 +260,7 @@ static MACHINE_RESET( outrun )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(machine->cpu[0], outrun_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), outrun_reset);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
@@ -278,7 +278,7 @@ static void log_unknown_ppi_read( running_machine *machine, unsigned port )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(machine->cpu[0]), ports[port]);
+	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), ports[port]);
 }
 
 
@@ -286,7 +286,7 @@ static void log_unknown_ppi_write( running_machine *machine, unsigned port, UINT
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(machine->cpu[0]), data, ports[port]);
+	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), data, ports[port]);
 }
 
 
@@ -335,7 +335,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
     */
 	segaic16_set_display_enable(device->machine, data & 0x20);
 	adc_select = (data >> 2) & 7;
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -475,7 +475,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* Output port:
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 0x3000/2:

@@ -81,7 +81,7 @@ static void snes_latch_counters(running_machine *machine)
 static TIMER_CALLBACK( snes_nmi_tick )
 {
 	// pull NMI
-	cpu_set_input_line(machine->cpu[0], G65816_LINE_NMI, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, HOLD_LINE );
 
 	// don't happen again
 	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
@@ -93,7 +93,7 @@ static void snes_hirq_tick(running_machine *machine)
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cpu_set_input_line(machine->cpu[0], G65816_LINE_IRQ, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, HOLD_LINE );
 
 	// don't happen again
 	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
@@ -107,7 +107,7 @@ static TIMER_CALLBACK( snes_hirq_tick_callback )
 static TIMER_CALLBACK( snes_scanline_tick )
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
@@ -123,7 +123,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
 			snes_latch_counters(machine);
-			cpu_set_input_line(machine->cpu[0], G65816_LINE_IRQ, HOLD_LINE );
+			cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, HOLD_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -169,7 +169,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if( snes_ram[NMITIMEN] & 0x80 )	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust_oneshot(snes_nmi_timer, cpu_clocks_to_attotime(machine->cpu[0], 12), 0);
+			timer_adjust_oneshot(snes_nmi_timer, cputag_clocks_to_attotime(machine, "maincpu", 12), 0);
 		}
 	}
 
@@ -229,7 +229,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		snes_ram[STAT77] &= 0x3f;		/* Clear Time Over and Range Over bits */
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 
-		cpu_set_input_line(machine->cpu[0], G65816_LINE_NMI, CLEAR_LINE );
+		cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, CLEAR_LINE );
 	}
 
 	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
@@ -239,7 +239,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
 static TIMER_CALLBACK( snes_hblank_tick )
 {
-	const address_space *cpu0space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int nextscan;
 
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
@@ -1036,7 +1036,7 @@ WRITE8_HANDLER( snes_w_io )
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
              * Currently we are just increasing it no matter what */
-//          cpu_set_clockscale(space->machine->cpu[0], (data & 0x1) ? 1.335820896 : 1.0 );
+//          cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), (data & 0x1) ? 1.335820896 : 1.0 );
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x1) != (snes_ram[MEMSEL] & 0x1) )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
@@ -1519,7 +1519,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 static void snes_init_ram(running_machine *machine)
 {
-	const address_space *cpu0space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Init DSP1 */
@@ -1634,8 +1634,8 @@ MACHINE_START( snes )
 	snes_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
 	snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
 	snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), snes_direct);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), spc_direct);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), snes_direct);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), spc_direct);
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;
@@ -1668,7 +1668,7 @@ MACHINE_RESET( snes )
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT( snes )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -1734,7 +1734,7 @@ DRIVER_INIT( snes )
 
 DRIVER_INIT( snes_hirom )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 

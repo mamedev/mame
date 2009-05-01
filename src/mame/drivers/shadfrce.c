@@ -221,8 +221,8 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space,1,data >> 8);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space, 1, data >> 8);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -230,13 +230,13 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_pen_contrast(space->machine,i,brt);
+			palette_set_pen_contrast(space->machine, i, brt);
 	}
 }
 
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], offset ^ 3, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", offset ^ 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_w )
@@ -289,7 +289,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 			raster_scanline = (raster_scanline + 1) % 240;
 			if (raster_scanline > 0)
 				video_screen_update_partial(timer->machine->primary_screen, raster_scanline - 1);
-			cpu_set_input_line(timer->machine->cpu[0], 1, ASSERT_LINE);
+			cputag_set_input_line(timer->machine, "maincpu", 1, ASSERT_LINE);
 		}
 	}
 
@@ -300,7 +300,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		{
 			if (scanline > 0)
 				video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-			cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
+			cputag_set_input_line(timer->machine, "maincpu", 2, ASSERT_LINE);
 		}
 	}
 
@@ -310,7 +310,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		if (scanline == 248)
 		{
 			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-			cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
+			cputag_set_input_line(timer->machine, "maincpu", 3, ASSERT_LINE);
 		}
 	}
 }
@@ -503,7 +503,7 @@ GFXDECODE_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

@@ -203,7 +203,7 @@ static UINT16 *ssv_mainram;
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static IRQ_CALLBACK(ssv_irq_callback)
@@ -339,7 +339,7 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
-	cpu_set_irq_callback(machine->cpu[0], ssv_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), ssv_irq_callback);
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 }
 

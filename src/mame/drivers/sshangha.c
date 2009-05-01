@@ -82,15 +82,15 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 
 	if (offset == (0x260 >> 1)) {
-		//soundlatch_w(0,data&0xff);
-		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		//soundlatch_w(0, data & 0xff);
+		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
-	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data & 0xff);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -136,7 +136,7 @@ static READ16_HANDLER( deco_71_r )
 
 static MACHINE_RESET( sshangha )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Such thing is needed as there is no code to turn the screen
        to normal orientation when the game is reset.
        I'm using the value that forces the screen to be in normal
@@ -309,7 +309,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
 static const ym2203_interface ym2203_config =

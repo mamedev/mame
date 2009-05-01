@@ -52,8 +52,8 @@ static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -791,7 +791,7 @@ GFXDECODE_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -1140,4 +1140,3 @@ GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", 0
 GAME( 1987, sfus, sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US)", 0 )
 GAME( 1987, sfjp, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", 0 )
 GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", 0 )
-

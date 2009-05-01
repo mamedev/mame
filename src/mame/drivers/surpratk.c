@@ -165,7 +165,7 @@ INPUT_PORTS_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],KONAMI_FIRQ_LINE,linestate);
+	cputag_set_input_line(device->machine, "maincpu", KONAMI_FIRQ_LINE, linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -280,7 +280,7 @@ logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
 
 static MACHINE_RESET( surpratk )
 {
-	konami_configure_set_lines(machine->cpu[0], surpratk_banking);
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), surpratk_banking);
 
 	paletteram = &memory_region(machine, "maincpu")[0x48000];
 }

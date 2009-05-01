@@ -52,7 +52,7 @@ WRITE8_HANDLER( sidearms_c804_w )
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 5 enables starfield */
@@ -359,7 +359,7 @@ VIDEO_UPDATE( sidearms )
 
 VIDEO_EOF( sidearms )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

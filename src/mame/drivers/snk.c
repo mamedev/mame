@@ -279,24 +279,24 @@ static int sound_status;
 
 READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -318,13 +318,13 @@ static WRITE8_HANDLER( marvins_soundlatch_w )
 {
 	marvins_sound_busy_flag = 1;
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( marvins_soundlatch_r )
 {
 	marvins_sound_busy_flag = 0;
-	return soundlatch_r(space,0);
+	return soundlatch_r(space, 0);
 }
 
 static CUSTOM_INPUT( marvins_sound_busy )
@@ -334,7 +334,7 @@ static CUSTOM_INPUT( marvins_sound_busy )
 
 static READ8_HANDLER( marvins_sound_nmi_ack_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -357,7 +357,7 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 			break;
 	}
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -381,7 +381,7 @@ static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 
 static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -442,7 +442,7 @@ static TIMER_CALLBACK( sndirq_update_callback )
 			break;
 	}
 
-	cpu_set_input_line(machine->cpu[2], 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -6161,7 +6161,7 @@ ROM_END
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc300, 0xc300, 0, 0, countryc_trackball_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc300, 0xc300, 0, 0, countryc_trackball_w);
 }
 
 

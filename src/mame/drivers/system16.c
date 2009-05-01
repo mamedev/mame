@@ -255,7 +255,7 @@ static void tturfbl_msm5205_callback(const device_config *device)
 	sample_buffer <<= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface =
@@ -367,17 +367,17 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_BITS_0_7 )
 {
-		soundlatch_w( space,0,data&0xff );
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+		soundlatch_w( space, 0, data & 0xff );
+		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE );
 	}
 }
 
 static WRITE16_HANDLER( sound_command_nmi_w )
 {
 	if( ACCESSING_BITS_0_7 )
-{
-		soundlatch_w( space,0,data&0xff );
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	{
+		soundlatch_w( space, 0, data & 0xff );
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1141,11 +1141,11 @@ static READ16_HANDLER( ga_io_service_r )
 
 static WRITE16_HANDLER( ga_sound_command_w )
 {
-	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
+	COMBINE_DATA( &sys16_workingram[(0xecfc - 0xc000) / 2] );
 	if( ACCESSING_BITS_8_15 )
-{
-		soundlatch_w( space,0,data>>8 );
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	{
+		soundlatch_w( space, 0, data >> 8 );
+		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE );
 	}
 }
 

@@ -866,8 +866,8 @@ static const ay8910_interface ay8910_interface_2 =
 
 static VIDEO_EOF( perfrman )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	buffer_spriteram_w(space,0,0);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram_w(space, 0, 0);
 }
 
 static MACHINE_DRIVER_START( perfrman )
@@ -1719,12 +1719,12 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
 }
 
 static DRIVER_INIT( tigerhb )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
 }
 
 
@@ -1784,7 +1784,7 @@ static READ8_HANDLER( gtstarb1_port_0_read )
 
 static void getstar_init( running_machine *machine )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w  );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w  );
 }
 
 static DRIVER_INIT( getstar )
@@ -1807,7 +1807,7 @@ static DRIVER_INIT( gtstarb1 )
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1849,8 +1849,8 @@ static READ8_HANDLER( slapfigh_mcu_r )
 static DRIVER_INIT( slapfigh )
 {
 	slapfigh_prot_pos = 0;
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
-//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
+//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
 }
 
 
@@ -1872,4 +1872,3 @@ GAME( 1986, getstar,  0,        slapfigh, getstar,  getstar,  ROT0,   "Taito Ame
 GAME( 1986, getstarj, getstar,  slapfigh, getstarj, getstarj, ROT0,   "Taito",   "Get Star (Japan)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb1, getstar,  slapfigh, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb2, getstar,  slapfigh, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
-

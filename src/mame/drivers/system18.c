@@ -96,28 +96,32 @@ static WRITE16_HANDLER( sys18_tilebank_w )
 
 /***************************************************************************/
 
-static void set_fg_page( int data ){
+static void set_fg_page( int data )
+{
 	sys16_fg_page[0] = data>>12;
 	sys16_fg_page[1] = (data>>8)&0xf;
 	sys16_fg_page[2] = (data>>4)&0xf;
 	sys16_fg_page[3] = data&0xf;
 }
 
-static void set_bg_page( int data ){
+static void set_bg_page( int data )
+{
 	sys16_bg_page[0] = data>>12;
 	sys16_bg_page[1] = (data>>8)&0xf;
 	sys16_bg_page[2] = (data>>4)&0xf;
 	sys16_bg_page[3] = data&0xf;
 }
 
-static void set_fg2_page( int data ){
+static void set_fg2_page( int data )
+{
 	sys16_fg2_page[0] = data>>12;
 	sys16_fg2_page[1] = (data>>8)&0xf;
 	sys16_fg2_page[2] = (data>>4)&0xf;
 	sys16_fg2_page[3] = data&0xf;
 }
 
-static void set_bg2_page( int data ){
+static void set_bg2_page( int data )
+{
 	sys16_bg2_page[0] = data>>12;
 	sys16_bg2_page[1] = (data>>8)&0xf;
 	sys16_bg2_page[2] = (data>>4)&0xf;
@@ -174,7 +178,7 @@ static void shdancbl_msm5205_callback(const device_config *device)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface =
@@ -185,10 +189,12 @@ static const msm5205_interface shdancbl_msm5205_interface =
 
 static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
 
-static WRITE16_HANDLER( sound_command_irq_w ){
-	if( ACCESSING_BITS_0_7 ){
-		soundlatch_w( space,0,data&0xff );
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+static WRITE16_HANDLER( sound_command_irq_w )
+{
+	if( ACCESSING_BITS_0_7 )
+	{
+		soundlatch_w( space, 0, data&0xff );
+		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE );
 	}
 }
 
@@ -282,10 +288,12 @@ static ADDRESS_MAP_START( sound_18_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static WRITE16_HANDLER( sound_command_nmi_w ){
-	if( ACCESSING_BITS_0_7 ){
-		soundlatch_w( space,0,data&0xff );
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+static WRITE16_HANDLER( sound_command_nmi_w )
+{
+	if( ACCESSING_BITS_0_7 )
+	{
+		soundlatch_w( space, 0, data & 0xff );
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -689,7 +697,8 @@ static MACHINE_RESET( shdancbl )
 	sys16_update_proc = shdancbl_update_proc;
 }
 
-static READ16_HANDLER( shdancbl_skip_r ){
+static READ16_HANDLER( shdancbl_skip_r )
+{
 	if (cpu_get_pc(space->cpu)==0x2f76) {cpu_spinuntil_int(space->cpu); return 0xffff;}
 	return sys16_workingram[0];
 }
@@ -705,7 +714,7 @@ static DRIVER_INIT( shdancbl )
 		mem[i] ^= 0xFF;
 
 	MACHINE_RESET_CALL(sys16_onetime);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xffc000, 0xffc001, 0, 0, shdancbl_skip_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xffc000, 0xffc001, 0, 0, shdancbl_skip_r );
 
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
@@ -746,7 +755,8 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static void mwalkbl_update_proc( void ){
+static void mwalkbl_update_proc( void )
+{
 	sys16_fg_scrollx = sys16_textram[0x0e98/2];
 	sys16_bg_scrollx = sys16_textram[0x0e9a/2];
 	sys16_fg_scrolly = sys16_textram[0x0e90/2];
@@ -773,7 +783,8 @@ static void mwalkbl_update_proc( void ){
 		sys18_bg2_active=0;
 }
 
-static MACHINE_RESET( mwalkbl ){
+static MACHINE_RESET( mwalkbl )
+{
 	static const sys16_patch patch[] =
 	{
 		{ 0x70116, 0x4e },
@@ -822,7 +833,8 @@ static MACHINE_RESET( mwalkbl ){
 	sys16_update_proc = mwalkbl_update_proc;
 }
 
-static DRIVER_INIT( mwalkbl ){
+static DRIVER_INIT( mwalkbl )
+{
 	UINT8 *RAM= memory_region(machine, "soundcpu");
 	static const int mwalk_sound_info[] =
 	{
@@ -867,7 +879,8 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static void astormbl_update_proc( void ){
+static void astormbl_update_proc( void )
+{
 	UINT16 data;
 	sys16_fg_scrollx = sys16_textram[0x0e98/2];
 	sys16_bg_scrollx = sys16_textram[0x0e9a/2];
@@ -914,7 +927,8 @@ static void astormbl_update_proc( void ){
 		sys18_bg2_active=0;
 }
 
-static MACHINE_RESET( astormbl ){
+static MACHINE_RESET( astormbl )
+{
 	static const sys16_patch patch[] =
 	{
 		{ 0x02D6E, 0x32 },
@@ -984,7 +998,8 @@ static MACHINE_RESET( astormbl ){
 }
 
 
-static DRIVER_INIT( astormbl ){
+static DRIVER_INIT( astormbl )
+{
 	UINT8 *RAM= memory_region(machine, "soundcpu");
 	static const int astormbl_sound_info[] =
 	{
@@ -1464,4 +1479,3 @@ GAME( 1990, astormb2, astorm,   astormbl, astormbl, astormbl, ROT0, "bootleg", "
 GAME( 1990, mwalkbl,  mwalk,    mwalkbl,  mwalkbl,  mwalkbl,  ROT0, "bootleg", "Michael Jackson's Moonwalker (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl,  shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-

@@ -37,7 +37,7 @@ static PALETTE_INIT( sspeedr )
 
 static WRITE8_HANDLER( sspeedr_int_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -231,4 +231,3 @@ ROM_END
 
 
 GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, 0, ROT270, "Midway", "Super Speed Race", GAME_NO_SOUND, layout_sspeedr )
-

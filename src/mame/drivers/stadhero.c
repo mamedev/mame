@@ -52,8 +52,8 @@ static WRITE16_HANDLER( stadhero_control_w )
 		case 4: /* Interrupt ack (VBL - IRQ 5) */
 			break;
 		case 6: /* 6502 sound cpu */
-			soundlatch_w(space,0,data & 0xff);
-			cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+			soundlatch_w(space, 0, data & 0xff);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+offset);
@@ -209,7 +209,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

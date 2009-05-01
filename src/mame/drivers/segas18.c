@@ -149,9 +149,9 @@ static const segaic16_memory_map_entry *const region_info_list[] =
 
 static void sound_w(running_machine *machine, UINT8 data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -202,10 +202,10 @@ static MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset(machine);
 	segaic16_tilemap_reset(machine, 0);
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
-	if (machine->cpu[2] != NULL && cpu_get_type(machine->cpu[2]) == CPU_I8751)
+	if (cputag_get_cpu(machine, "mcu") != NULL && cpu_get_type(cputag_get_cpu(machine, "mcu")) == CPU_I8751)
 		timer_call_after_resynch(machine, NULL, 0, boost_interleave);
 }
 
@@ -561,7 +561,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpu_set_input_line(space->machine->cpu[2], MCS51_INT1_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, HOLD_LINE);
 }
 
 

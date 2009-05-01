@@ -103,8 +103,8 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 
 static WRITE8_HANDLER(speedspn_sound_w)
 {
-	soundlatch_w(space,1,data);
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space, 1, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
@@ -352,4 +352,3 @@ ROM_END
 /*** GAME DRIVERS ************************************************************/
 
 GAME( 1994, speedspn, 0, speedspn, speedspn, 0, ROT180, "TCH", "Speed Spin", GAME_IMPERFECT_GRAPHICS )
-

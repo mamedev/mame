@@ -264,7 +264,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, offset, data);
 }
 
@@ -301,7 +301,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	/* D2 : SCONT1 - Tilemap origin bit 1 */
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
 	sound_global_enable(data & 0x01);
@@ -314,8 +314,8 @@ static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 	/* D6 : INTR line on second CPU */
 	/* D5 : RESET line on second CPU */
 	/* D3-D2 : ADC_SELECT */
-	cpu_set_input_line(device->machine->cpu[1], 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "sub", 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 	adc_select = (data >> 2) & 3;
 }
 
@@ -368,7 +368,7 @@ static void sharrier_i8751_sim(running_machine *machine)
 
 static void sound_irq(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -31,7 +31,7 @@ extern VIDEO_UPDATE( ssozumo );
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 

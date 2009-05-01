@@ -650,7 +650,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1178,6 +1178,3 @@ GAME( 1989, dyger,    0,        turtship, dyger,    dyger,    ROT270, "Philko", 
 GAME( 1989, dygera,   dyger,    turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 )
 GAME( 1989, twinfalc, 0,        whizz,    whizz,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 )
 GAME( 1989, whizz,    twinfalc, whizz,    whizz,    whizz,    ROT0,   "Philko", "Whizz", 0 )
-
-
-

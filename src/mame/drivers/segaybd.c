@@ -1,4 +1,4 @@
-/***************************************************************************
+	/***************************************************************************
 
     Sega Y-board hardware
 
@@ -82,15 +82,15 @@ static void yboard_generic_init(void)
 
 static void update_main_irqs(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[2], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[2], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[2], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "subx", 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "suby", 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "subx", 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "suby", 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "subx", 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "suby", 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(timer_irq_state || vblank_irq_state)
 		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
@@ -209,16 +209,16 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[3], 0, state);
+	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }
 
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -231,7 +231,7 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,offset);
 }
 
@@ -323,9 +323,9 @@ static WRITE16_HANDLER( io_chip_w )
             */
 			segaic16_set_display_enable(space->machine, data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(space,0,0);
-			cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "subx", INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			cputag_set_input_line(space->machine, "suby", INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */

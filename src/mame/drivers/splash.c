@@ -68,17 +68,19 @@ VIDEO_UPDATE( funystrp );
 
 static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 {
-	if (ACCESSING_BITS_0_7){
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (ACCESSING_BITS_0_7)
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
 static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 {
-	if (ACCESSING_BITS_0_7){
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (ACCESSING_BITS_0_7)
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 
 	// give the z80 time to see it
@@ -87,8 +89,10 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 
 static WRITE16_HANDLER( splash_coin_w )
 {
-	if (ACCESSING_BITS_8_15){
-		switch ((offset >> 3)){
+	if (ACCESSING_BITS_8_15)
+	{
+		switch ((offset >> 3))
+		{
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
 				coin_lockout_w( (offset >> 3) & 0x01, (data & 0x0400) >> 8);
@@ -118,7 +122,8 @@ static ADDRESS_MAP_START( splash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( splash_adpcm_data_w ){
+static WRITE8_HANDLER( splash_adpcm_data_w )
+{
 	adpcm_data = data;
 }
 

@@ -38,7 +38,7 @@ WRITE8_HANDLER( spacefb_port_1_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 
-	cpu_set_input_line(space->machine->cpu[1], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
 	if (!(data & 0x01) && (spacefb_sound_latch & 0x01))  sample_start(samples, 0,0,0);

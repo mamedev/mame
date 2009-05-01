@@ -32,8 +32,8 @@ static int i8751_return;
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(space,offset,data);
-    cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+    soundlatch_w(space, offset, data);
+    cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sidepckt_i8751_r )
@@ -48,7 +48,7 @@ static WRITE8_HANDLER( sidepckt_i8751_w )
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
 	static int current_ptr=0,current_table=0,in_math=0,math_param;
 
-	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (in_math==1) {
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 	static int current_ptr=0,current_table=0,in_math,math_param;
 
-	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (in_math==1) {
@@ -257,7 +257,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -387,14 +387,14 @@ ROM_END
 
 static DRIVER_INIT( sidepckt )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
 }
 
 static DRIVER_INIT( sidepctj )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
 }
 
 

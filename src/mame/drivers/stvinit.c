@@ -119,11 +119,11 @@ NVRAM_HANDLER( stv )
 void install_stvbios_speedups(running_machine *machine)
 {
 	// flushes 0 & 1 on both CPUs are for the BIOS speedups
-	sh2drc_add_pcflush(machine->cpu[0], 0x60154b2);
-	sh2drc_add_pcflush(machine->cpu[0], 0x6013aee);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60154b2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6013aee);
 
-	sh2drc_add_pcflush(machine->cpu[1], 0x60154b2);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6013aee);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60154b2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6013aee);
 }
 
 DRIVER_INIT(shienryu)
@@ -132,9 +132,9 @@ DRIVER_INIT(shienryu)
 	stv_default_eeprom_length = sizeof(shienryu_default_eeprom);
 
 	// master
-	sh2drc_add_pcflush(machine->cpu[0], 0x60041c6);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60041c6);
 	// slave
-	sh2drc_add_pcflush(machine->cpu[1], 0x600440e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x600440e);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -149,9 +149,9 @@ DRIVER_INIT(prikura)
     (loops for 263473 instructions)
 */
 	// master
-	sh2drc_add_pcflush(machine->cpu[0], 0x6018640);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6018640);
 	// slave
-	sh2drc_add_pcflush(machine->cpu[1], 0x6018c6e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6018c6e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -179,7 +179,7 @@ DRIVER_INIT(hanagumi)
 
    (loops for 288688 instructions)
 */
-	sh2drc_add_pcflush(machine->cpu[0], 0x6010160);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6010160);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -205,9 +205,9 @@ CPU0: Aids Screen
 
 DRIVER_INIT(puyosun)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6021cf0);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6021cf0);
 
-	sh2drc_add_pcflush(machine->cpu[1], 0x60236fe);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60236fe);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -227,7 +227,7 @@ CPU0 Data East Logo:
 
 DRIVER_INIT(mausuke)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x60461A0);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60461A0);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -237,8 +237,8 @@ DRIVER_INIT(mausuke)
 
 DRIVER_INIT(cottonbm)
 {
-//  sh2drc_add_pcflush(machine->cpu[0], 0x6030ee2);
-//  sh2drc_add_pcflush(machine->cpu[1], 0x6032b52);
+//  sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6030ee2);
+//  sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6032b52);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -247,8 +247,8 @@ DRIVER_INIT(cottonbm)
 
 DRIVER_INIT(cotton2)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6031c7a);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60338ea);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6031c7a);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60338ea);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -258,13 +258,13 @@ DRIVER_INIT(cotton2)
 DRIVER_INIT(dnmtdeka)
 {
 	// install all 3 speedups on both master and slave
-	sh2drc_add_pcflush(machine->cpu[0], 0x6027c90);
-	sh2drc_add_pcflush(machine->cpu[0], 0xd04);
-	sh2drc_add_pcflush(machine->cpu[0], 0x60051f2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6027c90);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0xd04);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60051f2);
 
-	sh2drc_add_pcflush(machine->cpu[1], 0x6027c90);
-	sh2drc_add_pcflush(machine->cpu[1], 0xd04);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60051f2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6027c90);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0xd04);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -272,22 +272,22 @@ DRIVER_INIT(dnmtdeka)
 DRIVER_INIT(diehard)
 {
 	// install all 3 speedups on both master and slave
-	sh2drc_add_pcflush(machine->cpu[0], 0x6027c98);
-	sh2drc_add_pcflush(machine->cpu[0], 0xd04);
-	sh2drc_add_pcflush(machine->cpu[0], 0x60051f2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6027c98);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0xd04);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60051f2);
 
-	sh2drc_add_pcflush(machine->cpu[1], 0x6027c98);
-	sh2drc_add_pcflush(machine->cpu[1], 0xd04);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60051f2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6027c98);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0xd04);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(fhboxers)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x60041c2);
-	sh2drc_add_pcflush(machine->cpu[0], 0x600bb0a);
-	sh2drc_add_pcflush(machine->cpu[0], 0x600b31e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60041c2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x600bb0a);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x600b31e);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -311,15 +311,15 @@ static READ32_HANDLER( groovef_hack2_r )
 
 DRIVER_INIT( groovef )
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6005e7c);
-	sh2drc_add_pcflush(machine->cpu[0], 0x6005e86);
-	sh2drc_add_pcflush(machine->cpu[0], 0x60a4970);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6005e7c);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6005e86);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60a4970);
 
-	sh2drc_add_pcflush(machine->cpu[1], 0x60060c2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60060c2);
 
 	/* prevent game from hanging on startup -- todo: remove these hacks */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
 
 	DRIVER_INIT_CALL(stv);
 
@@ -364,12 +364,12 @@ static READ32_HANDLER( danchih_hack_r )
 
 DRIVER_INIT( danchih )
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6028b28);
-	sh2drc_add_pcflush(machine->cpu[0], 0x6028c8e);
-	sh2drc_add_pcflush(machine->cpu[1], 0x602ae26);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6028b28);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6028c8e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x602ae26);
 
 	/* prevent game from hanging on title screen -- todo: remove these hacks */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
 
 	DRIVER_INIT_CALL(stv);
 
@@ -407,10 +407,10 @@ static READ32_HANDLER( astrass_hack_r )
 
 DRIVER_INIT( astrass )
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x60011b8);
-	sh2drc_add_pcflush(machine->cpu[0], 0x605b9da);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60011b8);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x605b9da);
 
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
 
 	install_astrass_protection(machine);
 
@@ -419,9 +419,9 @@ DRIVER_INIT( astrass )
 
 DRIVER_INIT(thunt)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x602A024);
-	sh2drc_add_pcflush(machine->cpu[0], 0x6013EEA);
-	sh2drc_add_pcflush(machine->cpu[1], 0x602AAF8);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x602A024);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6013EEA);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x602AAF8);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -430,9 +430,9 @@ DRIVER_INIT(thunt)
 
 DRIVER_INIT(sandor)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x602a0f8);
-	sh2drc_add_pcflush(machine->cpu[0], 0x6013fbe);
-	sh2drc_add_pcflush(machine->cpu[1], 0x602abcc);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x602a0f8);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6013fbe);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x602abcc);
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
@@ -441,8 +441,8 @@ DRIVER_INIT(sandor)
 
 DRIVER_INIT(grdforce)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6041e32);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6043aa2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6041e32);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6043aa2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -451,8 +451,8 @@ DRIVER_INIT(grdforce)
 
 DRIVER_INIT(batmanfr)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x60121c0);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60125bc);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x60121c0);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60125bc);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -462,7 +462,7 @@ DRIVER_INIT(batmanfr)
 
 DRIVER_INIT(colmns97)
 {
-	sh2drc_add_pcflush(machine->cpu[1], 0x60298a2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60298a2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -472,8 +472,8 @@ DRIVER_INIT(colmns97)
 
 DRIVER_INIT(winterht)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6098aea);
-	sh2drc_add_pcflush(machine->cpu[1], 0x609ae4e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6098aea);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x609ae4e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -482,8 +482,8 @@ DRIVER_INIT(winterht)
 
 DRIVER_INIT(seabass)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x602cbfa);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60321ee);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x602cbfa);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60321ee);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -492,8 +492,8 @@ DRIVER_INIT(seabass)
 
 DRIVER_INIT(vfremix)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x602c30c);
-	sh2drc_add_pcflush(machine->cpu[1], 0x604c332);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x602c30c);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x604c332);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -502,8 +502,8 @@ DRIVER_INIT(vfremix)
 
 DRIVER_INIT(sss)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6026398);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6028cd6);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6026398);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6028cd6);
 
 	install_standard_protection(machine);
 
@@ -514,8 +514,8 @@ DRIVER_INIT(sss)
 
 DRIVER_INIT(othellos)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x602bcbe);
-	sh2drc_add_pcflush(machine->cpu[1], 0x602d92e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x602bcbe);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x602d92e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -525,7 +525,7 @@ DRIVER_INIT(othellos)
 
 DRIVER_INIT(sasissu)
 {
-	sh2drc_add_pcflush(machine->cpu[1], 0x60710be);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60710be);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -534,14 +534,14 @@ DRIVER_INIT(sasissu)
 
 DRIVER_INIT(gaxeduel)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6012ee4);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6012ee4);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(suikoenb)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6013f7a);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6013f7a);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -556,8 +556,8 @@ DRIVER_INIT(sokyugrt)
 
 DRIVER_INIT(znpwfv)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6012ec2);
-	sh2drc_add_pcflush(machine->cpu[1], 0x60175a6);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6012ec2);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x60175a6);
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_NSEC(500);
@@ -565,8 +565,8 @@ DRIVER_INIT(znpwfv)
 
 DRIVER_INIT(twcup98)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x605edde);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6062bca);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x605edde);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 	install_standard_protection(machine);
@@ -576,8 +576,8 @@ DRIVER_INIT(twcup98)
 
 DRIVER_INIT(smleague)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6063bf4);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6062bca);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6063bf4);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -586,7 +586,7 @@ DRIVER_INIT(smleague)
 
 DRIVER_INIT(finlarch)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6064d60);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6064d60);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -594,8 +594,8 @@ DRIVER_INIT(finlarch)
 
 DRIVER_INIT(maruchan)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x601ba46);
-	sh2drc_add_pcflush(machine->cpu[1], 0x601ba46);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x601ba46);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x601ba46);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -604,22 +604,22 @@ DRIVER_INIT(maruchan)
 
 DRIVER_INIT(pblbeach)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x605eb78);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(shanhigw)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6020c5c);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6020c5c);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(elandore)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x604eac0);
-	sh2drc_add_pcflush(machine->cpu[1], 0x605340a);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x604eac0);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x605340a);
 
 	install_standard_protection(machine);
 
@@ -630,8 +630,8 @@ DRIVER_INIT(elandore)
 
 DRIVER_INIT(rsgun)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x6034d04);
-	sh2drc_add_pcflush(machine->cpu[1], 0x6036152);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x6034d04);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x6036152);
 
 	install_standard_protection(machine);
 
@@ -655,8 +655,8 @@ DRIVER_INIT(decathlt)
 
 DRIVER_INIT(nameclv3)
 {
-	sh2drc_add_pcflush(machine->cpu[0], 0x601eb4c);
-	sh2drc_add_pcflush(machine->cpu[1], 0x602b80e);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x601eb4c);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "slave"), 0x602b80e);
 
 	DRIVER_INIT_CALL(stv);
 }

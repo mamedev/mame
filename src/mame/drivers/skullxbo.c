@@ -33,15 +33,15 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 1, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 2, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_gen )
 {
-	atarigen_scanline_int_gen(machine->cpu[0]);
+	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
 }
 
 

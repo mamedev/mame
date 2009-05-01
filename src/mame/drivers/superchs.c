@@ -90,8 +90,8 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE); /* Guess */
+		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		if (data&0x8000) cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -222,8 +222,8 @@ static WRITE32_HANDLER( superchs_stick_w )
 	/* This is guess work - the interrupts are in groups of 4, with each writing to a
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
-	if (mem_mask!=0xff000000)
-		cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE);
+	if (mem_mask != 0xff000000)
+		cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE);
 }
 
 /***********************************************************
@@ -484,8 +484,8 @@ static READ16_HANDLER( sub_cycle_r )
 static DRIVER_INIT( superchs )
 {
 	/* Speedup handlers */
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x100003, 0, 0, main_cycle_r);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x100003, 0, 0, main_cycle_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
 GAMEL( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

@@ -608,7 +608,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
 	{
 		/* port 0: irq ack */
 		case 0:
-			cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control

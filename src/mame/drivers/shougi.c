@@ -221,13 +221,13 @@ static WRITE8_HANDLER( shougi_watchdog_reset_w )
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )
 {
 	/* logerror("mcu HALT OFF"); */
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 {
 	/* logerror("mcu HALT ON"); */
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
@@ -238,8 +238,8 @@ static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 	nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -252,8 +252,8 @@ static INTERRUPT_GEN( shougi_vblank_nmi )
 	if ( nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 

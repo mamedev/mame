@@ -78,18 +78,18 @@ static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, data?0:1 );
+	cputag_set_input_line(space->machine, "bbx", INPUT_LINE_HALT, data?0:1 );
 }
 
 static WRITE8_HANDLER( shangkid_cpu_reset_w )
 {
 	if( data == 0 )
 	{
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "bbx", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -104,7 +104,7 @@ static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cpu_set_input_line(device->machine->cpu[2], 0, HOLD_LINE );
+			cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE );
 	}
 }
 
@@ -114,7 +114,7 @@ static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cpu_set_input_line(device->machine->cpu[2], 0, HOLD_LINE );
+			cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE );
 	}
 	else
 		memory_set_bank(device->machine, 2, data ? 0 : 1);
@@ -152,12 +152,12 @@ static DRIVER_INIT( shangkid )
 
 static MACHINE_RESET( chinhero )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, 1 );
+	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
 }
 
 static MACHINE_RESET( shangkid )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, 1 );
+	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
 
 	memory_set_bank(machine, 1, 0);
 	memory_set_bank(machine, 2, 0);

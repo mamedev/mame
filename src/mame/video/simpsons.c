@@ -104,16 +104,16 @@ void simpsons_video_banking(running_machine *machine, int bank)
 {
 	if (bank & 1)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(machine, 5, paletteram);
 	}
 	else
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, K052109_r, K052109_w);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, K052109_r, K052109_w);
 
 	if (bank & 2)
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, simpsons_K053247_r, simpsons_K053247_w);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, simpsons_K053247_r, simpsons_K053247_w);
 	else
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, simpsons_K052109_r, simpsons_K052109_w);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, simpsons_K052109_r, simpsons_K052109_w);
 }
 
 

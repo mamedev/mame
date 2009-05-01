@@ -98,7 +98,7 @@ WRITE8_HANDLER( simpsons_coin_counter_w )
 
 READ8_HANDLER( simpsons_sound_interrupt_r )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
@@ -123,7 +123,7 @@ MACHINE_RESET( simpsons )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(machine->cpu[0], simpsons_banking);
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), simpsons_banking);
 
 	paletteram = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];

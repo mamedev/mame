@@ -106,17 +106,17 @@ static int sb3_music;
 
 static WRITE16_HANDLER( snowbros_irq4_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( snowbros_irq3_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( snowbros_irq2_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( snowbros_interrupt )
@@ -163,8 +163,8 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -310,8 +310,8 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1478,7 +1478,7 @@ GFXDECODE_END
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* SnowBros Sound */
@@ -2298,7 +2298,7 @@ static DRIVER_INIT( moremorp )
 //      hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, moremorp_0a_read );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, moremorp_0a_read );
 }
 
 
@@ -2696,7 +2696,7 @@ static DRIVER_INIT(4in1boot)
 		memcpy(src,buffer,len);
 		free(buffer);
 	}
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _4in1_02_read );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _4in1_02_read );
 }
 
 static DRIVER_INIT(snowbro3)
@@ -2723,7 +2723,7 @@ static READ16_HANDLER( _3in1_read )
 
 static DRIVER_INIT( 3in1semi )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _3in1_read );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _3in1_read );
 }
 
 static READ16_HANDLER( cookbib3_read )
@@ -2733,7 +2733,7 @@ static READ16_HANDLER( cookbib3_read )
 
 static DRIVER_INIT( cookbib3 )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, cookbib3_read );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, cookbib3_read );
 }
 
 
@@ -2760,5 +2760,3 @@ GAME( 1999, moremorp, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / E
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
 GAME( 2002, snowbro3, snowbros, snowbro3, snowbroj, snowbro3, ROT0, "Syrmex (bootleg/hack)", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // its basically snowbros code?...
 GAME( 1993, finalttr, 0,        finalttr, finalttr, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
-
-

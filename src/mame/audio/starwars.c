@@ -65,7 +65,7 @@ static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 oldd
 
 static void snd_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, state);
 }
 
 
@@ -148,5 +148,5 @@ WRITE8_HANDLER( starwars_soundrst_w )
 	riot6532_porta_in_set(riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }

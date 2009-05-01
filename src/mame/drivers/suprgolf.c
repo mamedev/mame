@@ -181,7 +181,7 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	suprgolf_bg_bank = (data & 0x1f);
 
 	if(data & 0x20) //TODO: understand the proper condition
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 pen;

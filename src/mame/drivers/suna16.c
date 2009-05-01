@@ -358,7 +358,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 
@@ -922,7 +922,7 @@ MACHINE_DRIVER_END
 
 static void bestbest_ym3526_irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface bestbest_ym3526_interface =

@@ -73,13 +73,13 @@ static WRITE8_HANDLER(bank_w)
 
 static TIMER_CALLBACK( subcpu_suspend )
 {
-    cpu_suspend(machine->cpu[2],SUSPEND_REASON_HALT,1);
+    cputag_suspend(machine, "sub", SUSPEND_REASON_HALT, 1);
 }
 
 static TIMER_CALLBACK( subcpu_resume )
 {
-    cpu_resume(machine->cpu[2],SUSPEND_REASON_HALT);
-    cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+    cputag_resume(machine, "sub", SUSPEND_REASON_HALT);
+    cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( subcpu_halt_set )
@@ -165,7 +165,7 @@ static WRITE8_HANDLER(soundcpu_busyflag_reset_w)
 
 static WRITE8_HANDLER(soundcpu_int_clear_w)
 {
-    cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE );
+    cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( soundcpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 
 static void unlock_shared_ram(const address_space *space)
 {
-    if(!cpu_is_suspended(space->machine->cpu[2], SUSPEND_REASON_HALT))
+    if(!cputag_is_suspended(space->machine, "sub", SUSPEND_REASON_HALT))
     {
         subcpu_status|=1;
     }
@@ -292,12 +292,12 @@ INPUT_PORTS_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-    cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+    cputag_set_input_line(device->machine, "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sothello_vdp_interrupt(running_machine *machine, int i)
 {
-    cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+    cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( sothello_interrupt )
@@ -309,7 +309,7 @@ static void adpcm_int(const device_config *device)
 {
     /* only 4 bits are used */
     msm5205_data_w( device, msm_data & 0x0f );
-    cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE );
+    cputag_set_input_line(device->machine, "soundcpu", 0, ASSERT_LINE );
 }
 
 

@@ -401,7 +401,7 @@ static MACHINE_RESET( system32 )
 	v60_irq_timer[1] = timer_alloc(machine, signal_v60_irq_callback, NULL);
 
 	/* clear IRQ lines */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -422,13 +422,13 @@ static void update_irq_state(running_machine *machine)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, vector);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -695,7 +695,7 @@ static void common_io_chip_w(const address_space *space, int which, offs_t offse
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -1040,13 +1040,13 @@ static void update_sound_irq_state(running_machine *machine)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 2 * vector);
+			cputag_set_input_line_and_vector(machine, "soundcpu", 0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 }
 
 
@@ -3787,14 +3787,14 @@ static READ16_HANDLER( arescue_slavebusy_r )
 static DRIVER_INIT( arescue )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
 
 	dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
 }
 
 
@@ -3803,8 +3803,8 @@ static DRIVER_INIT( arabfgt )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
 }
 
 
@@ -3814,8 +3814,8 @@ static DRIVER_INIT( brival )
 
 	/* install protection handlers */
 	system32_protram = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
 }
 
 
@@ -3824,7 +3824,7 @@ static DRIVER_INIT( darkedge )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
 	system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -3833,7 +3833,7 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(NULL, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
 }
 
 static WRITE16_HANDLER( f1en_comms_echo_w )
@@ -3848,10 +3848,10 @@ static DRIVER_INIT( f1en )
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 
 	dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
 }
 
 
@@ -3866,7 +3866,7 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	decrypt_ga2_protrom(machine);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
 }
 
 
@@ -3942,7 +3942,7 @@ static DRIVER_INIT( scross )
 {
 	const device_config *multipcm = devtag_get_device(machine, "sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
+	memory_install_write8_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 }
 
 
@@ -3957,7 +3957,7 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(sonic_custom_io_r, sonic_custom_io_w, NULL);
 
 	/* install protection handlers */
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
 }
 
 
@@ -3982,7 +3982,7 @@ static DRIVER_INIT( svf )
 static DRIVER_INIT( jleague )
 {
 	segas32_common_init(NULL, NULL, NULL);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
 }
 
 

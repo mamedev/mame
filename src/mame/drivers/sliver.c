@@ -307,21 +307,21 @@ static WRITE16_HANDLER( jpeg1_w )
 
 static void render_jpeg(running_machine *machine)
 {
-	int x,y;
-	int addr=jpeg_addr;
+	int x, y;
+	int addr = jpeg_addr;
 	UINT8 *rom;
 
-	bitmap_fill(sliver_bitmap_bg, 0,0);
-	if(jpeg_addr<0)
+	bitmap_fill(sliver_bitmap_bg, 0, 0);
+	if(jpeg_addr < 0)
 	{
 		return;
 	}
 	rom = memory_region(machine, "user3");
-	for (y=0;y<jpeg_h;y++)
+	for (y = 0; y < jpeg_h; y++)
 	{
-		for (x=0;x<jpeg_w;x++)
+		for (x = 0; x < jpeg_w; x++)
 		{
-			plot_pixel_rgb(x-x_offset+jpeg_x,jpeg_h-y-y_offset-jpeg_y,rom[addr],rom[addr+1],rom[addr+2]);
+			plot_pixel_rgb(x - x_offset + jpeg_x, jpeg_h - y - y_offset - jpeg_y, rom[addr], rom[addr + 1], rom[addr + 2]);
 			addr+=3;
 		}
 	}
@@ -329,10 +329,10 @@ static void render_jpeg(running_machine *machine)
 
 static int find_data(int offset)
 {
-	int idx=0;
-	while(gfxlookup[idx][0]>=0)
+	int idx = 0;
+	while(gfxlookup[idx][0] >= 0)
 	{
-		if(offset==gfxlookup[idx][1])
+		if(offset == gfxlookup[idx][1])
 		{
 			return idx;
 		}
@@ -346,17 +346,17 @@ static WRITE16_HANDLER( jpeg2_w )
 		COMBINE_DATA(&jpeg2);
 
 		{
-			int idx=find_data((int)jpeg2+(((int)jpeg1)<<16));
-			if(idx>=0)
+			int idx = find_data((int)jpeg2 + (((int)jpeg1) << 16));
+			if(idx >= 0)
 			{
-				jpeg_addr=gfxlookup[idx][0];
-				jpeg_w=gfxlookup[idx][2];
-				jpeg_h=gfxlookup[idx][3];
+				jpeg_addr = gfxlookup[idx][0];
+				jpeg_w = gfxlookup[idx][2];
+				jpeg_h = gfxlookup[idx][3];
 				render_jpeg(space->machine);
 		}
 		else
 			{
-				jpeg_addr=-1;
+				jpeg_addr = -1;
 			}
 		}
 }
@@ -370,16 +370,16 @@ static WRITE16_HANDLER(io_data_w)
 {
 	if(io_offset<IO_SIZE)
 	{
-		int tmpx,tmpy;
+		int tmpx, tmpy;
 		COMBINE_DATA(&io_reg[io_offset]);
 
-		tmpy=io_reg[0x1a]+(io_reg[0x1b]<<8)-io_reg[0x20]; //0x20  ???
-		tmpx=io_reg[0x1e]+(io_reg[0x1f]<<8);
+		tmpy = io_reg[0x1a] + (io_reg[0x1b] << 8) - io_reg[0x20]; //0x20  ???
+		tmpx = io_reg[0x1e] + (io_reg[0x1f] << 8);
 
-		if(tmpy!=jpeg_y || tmpx!=jpeg_x)
+		if(tmpy != jpeg_y || tmpx != jpeg_x)
 		{
-			jpeg_x=tmpx;
-			jpeg_y=tmpy;
+			jpeg_x = tmpx;
+			jpeg_y = tmpy;
 			render_jpeg(space->machine);
 		}
 	}
@@ -391,8 +391,8 @@ static WRITE16_HANDLER(io_data_w)
 
 static WRITE16_HANDLER(sound_w)
 {
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], MCS51_INT0_LINE, HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )

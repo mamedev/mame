@@ -58,7 +58,7 @@ static WRITE8_HANDLER( shootout_bankswitch_w )
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	soundlatch_w( space, offset, data );
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
@@ -238,12 +238,12 @@ GFXDECODE_END
 
 static void shootout_snd_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static void shootout_snd2_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],0,linestate);
+	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
 
 static const ym2203_interface ym2203_config =

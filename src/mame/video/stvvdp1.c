@@ -1987,7 +1987,7 @@ static void stv_vdp1_process_list(running_machine *machine)
 
 	/* not here! this is done every frame drawn even if the cpu isn't running eg in the debugger */
 //  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-//      cpu_set_input_line_and_vector(machine->cpu[0], 2, HOLD_LINE , 0x4d);
+//      cputag_set_input_line_and_vector(machine, "maincpu", 2, HOLD_LINE , 0x4d);
 
 	if (vdp1_sprite_log) logerror ("End of list processing!\n");
 }

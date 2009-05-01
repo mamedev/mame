@@ -303,22 +303,22 @@ static void update_main_irqs(running_machine *machine)
 	if (timer_irq_state)
 		irq |= 2;
 	else
-		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
 
 	if (vblank_irq_state)
 		irq |= 4;
 	else
-		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
 
 	if (gprider_hack && irq > 4)
 		irq = 4;
 
 	if (!(irq==6))
-		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
 
 	if (irq)
 	{
-		cpu_set_input_line(machine->cpu[0], irq, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", irq, ASSERT_LINE);
 		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
@@ -338,7 +338,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 223)
 	{
 		vblank_irq_state = update = 1;
-		cpu_set_input_line(machine->cpu[1], 4, ASSERT_LINE);
+		cputag_set_input_line(machine, "sub", 4, ASSERT_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -347,7 +347,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		vblank_irq_state = 0;
 		update = 1;
-		cpu_set_input_line(machine->cpu[1], 4, CLEAR_LINE);
+		cputag_set_input_line(machine, "sub", 4, CLEAR_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -377,10 +377,10 @@ static void timer_ack_callback(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -392,13 +392,13 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 
 static void sound_cpu_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[2], 0, state);
+	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -412,18 +412,18 @@ static READ8_HANDLER( sound_data_r )
 
 static void xboard_reset(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
 static MACHINE_RESET( xboard )
 {
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(machine->cpu[0], xboard_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), xboard_reset);
 
 	/* set up the compare/timer chip */
 	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);
@@ -559,7 +559,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
 			segaic16_set_display_enable(space->machine, data & 0x20);
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -2811,7 +2811,7 @@ static DRIVER_INIT( aburner2 )
 	xboard_generic_init(machine);
 	xboard_set_road_priority(0);
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
 
 
@@ -2828,14 +2828,14 @@ static DRIVER_INIT( loffire )
 	adc_reverse[1] = adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	loffire_sync = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	loffire_sync = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init(machine);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 

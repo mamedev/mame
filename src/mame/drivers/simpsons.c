@@ -115,7 +115,7 @@ static int nmi_enabled;
 
 static void sound_nmi_callback( running_machine *machine, int param )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ( nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ( nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
 }
@@ -123,13 +123,13 @@ static void sound_nmi_callback( running_machine *machine, int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(25), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -239,7 +239,7 @@ static void simpsons_objdma(void)
 static TIMER_CALLBACK( dmaend_callback )
 {
 	if (simpsons_firq_enabled)
-		cpu_set_input_line(machine->cpu[0], KONAMI_FIRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( simpsons_irq )

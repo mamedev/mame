@@ -325,7 +325,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 		}
 		spy_collision();
 //ZT
-		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	old = data;
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )
@@ -458,7 +458,7 @@ static const k007232_interface k007232_interface_2 =
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, linestate);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }
 
 static const ym3812_interface ym3812_config =

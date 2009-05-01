@@ -238,19 +238,19 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 						 					      pia6821_get_irq_b(pia2) |
 						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
 
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( audio_cpu_irq )
 {
-	cpu_set_input_line(device->machine->cpu[1], M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

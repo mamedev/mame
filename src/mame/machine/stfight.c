@@ -93,7 +93,7 @@ DRIVER_INIT( stfight )
 
 MACHINE_RESET( stfight )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	adpcm_data_offs = adpcm_data_end = 0;
 	toggle = 0;
 	fm_data = 0;
@@ -123,13 +123,13 @@ static WRITE8_HANDLER( stfight_bank_w )
 static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
-    cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xcf);
+    cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xcf);
 }
 
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);
+    cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);
     timer_set(device->machine, ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 

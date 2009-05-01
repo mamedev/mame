@@ -231,7 +231,7 @@ static INTERRUPT_GEN( sg1000a_interrupt )
 
 static void vdp_interrupt(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9928a_interface =

@@ -689,14 +689,14 @@ static void reset_reset(running_machine *machine)
 	int changed = resetcontrol ^ prev_resetcontrol;
 	if(changed & 2) {
 		if(resetcontrol & 2) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(machine, "sub", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
 			s24_fd1094_machine_init(machine);
 
 		} else
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
 		devtag_reset(machine, "ym");
@@ -802,18 +802,18 @@ static TIMER_CALLBACK( irq_timer_cb )
 {
 	irq_timer_pend0 = irq_timer_pend1 = 1;
 	if(irq_allow0 & (1 << IRQ_TIMER))
-		cpu_set_input_line(machine->cpu[0], IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", IRQ_TIMER+1, ASSERT_LINE);
 	if(irq_allow1 & (1 << IRQ_TIMER))
-		cpu_set_input_line(machine->cpu[1], IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(machine, "sub", IRQ_TIMER+1, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( irq_timer_clear_cb )
 {
 	irq_sprite = irq_vblank = 0;
-	cpu_set_input_line(machine->cpu[0], IRQ_VBLANK+1, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], IRQ_SPRITE+1, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], IRQ_VBLANK+1, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(machine, "sub", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(machine, "sub", IRQ_SPRITE+1, CLEAR_LINE);
 }
 
 static void irq_init(running_machine *machine)
@@ -860,18 +860,18 @@ static WRITE16_HANDLER(irq_w)
 	case 2:
 		irq_allow0 = data;
 		irq_timer_pend0 = 0;
-		cpu_set_input_line(space->machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[0], IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[0], IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data;
 		irq_timer_pend1 = 0;
-		cpu_set_input_line(space->machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[1], IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[1], IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -900,11 +900,11 @@ static READ16_HANDLER(irq_r)
 	}
 	case 2:
 		irq_timer_pend0 = 0;
-		cpu_set_input_line(space->machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		cpu_set_input_line(space->machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	return 0xffff;
@@ -927,10 +927,10 @@ static INTERRUPT_GEN(irq_vbl)
 	mask = 1 << irq;
 
 	if(irq_allow0 & mask)
-		cpu_set_input_line(device->machine->cpu[0], 1+irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 1+irq, ASSERT_LINE);
 
 	if(irq_allow1 & mask)
-		cpu_set_input_line(device->machine->cpu[1], 1+irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "sub", 1+irq, ASSERT_LINE);
 
 	if(!cpu_getiloops(device)) {
 		// Ensure one index pulse every 20 frames
@@ -945,8 +945,8 @@ static INTERRUPT_GEN(irq_vbl)
 static void irq_ym(const device_config *device, int irq)
 {
 	irq_yms = irq;
-	cpu_set_input_line(device->machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(device->machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "sub", IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1095,7 +1095,7 @@ static MACHINE_START( system24 )
 
 static MACHINE_RESET( system24 )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	prev_resetcontrol = resetcontrol = 0x06;
 	fdc_init();
 	curbank = 0;

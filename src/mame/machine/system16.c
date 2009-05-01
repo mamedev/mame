@@ -8,7 +8,8 @@ UINT16 *sys16_extraram;
 UINT16 *sys16_extraram2;
 UINT16 *sys16_extraram3;
 
-static void patch_codeX( UINT16 *mem, offs_t offset, int data ){
+static void patch_codeX( UINT16 *mem, offs_t offset, int data )
+{
 	int aligned_offset = offset&0xfffffe;
 	int old_word = mem[aligned_offset/2];
 
@@ -20,7 +21,8 @@ static void patch_codeX( UINT16 *mem, offs_t offset, int data ){
 	mem[aligned_offset/2] = data;
 }
 
-void sys16_patch_code( running_machine *machine, const sys16_patch *data, int count ){
+void sys16_patch_code( running_machine *machine, const sys16_patch *data, int count )
+{
 	int i;
 	UINT16 *mem = (UINT16 *)memory_region(machine, "maincpu");
 	for (i=0; i<count; i++)
@@ -28,7 +30,8 @@ void sys16_patch_code( running_machine *machine, const sys16_patch *data, int co
 }
 
 
-MACHINE_RESET( sys16_onetime ){
+MACHINE_RESET( sys16_onetime )
+{
 	sys16_bg1_trans=0;
 	sys16_rowscroll_scroll=0;
 	sys18_splittab_bg_x=0;
@@ -55,9 +58,10 @@ GFXDECODE_END
 
 /* sound */
 
-static void sound_cause_nmi( const device_config *device, int chip ){
+static void sound_cause_nmi( const device_config *device, int chip )
+{
 	/* upd7759 callback */
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

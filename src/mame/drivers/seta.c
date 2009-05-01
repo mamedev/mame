@@ -1330,7 +1330,7 @@ static void uPD71054_update_timer( running_machine *machine, const device_config
 	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0])), 16 * max);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(cputag_get_clock(machine, "maincpu")), 16 * max);
 		timer_adjust_oneshot( uPD71054.timer[no], period, no );
 	} else {
 		timer_adjust_oneshot( uPD71054.timer[no], attotime_never, no);
@@ -1346,7 +1346,7 @@ static void uPD71054_update_timer( running_machine *machine, const device_config
 ------------------------------*/
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE );
 	uPD71054_update_timer( machine, NULL, param );
 }
 
@@ -1429,7 +1429,7 @@ static const x1_010_interface seta_sound_intf2 =
 
 static void utoukond_ym3438_interrupt(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, linestate);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
@@ -1482,8 +1482,8 @@ static WRITE16_HANDLER( sub_ctrl_w )
 		case 0/2:	// bit 0: reset sub cpu?
 			if (ACCESSING_BITS_0_7)
 			{
-				if ( !(old_data&1) && (data&1) )
-					cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+				if ( !(old_data & 1) && (data & 1) )
+					cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 				old_data = data;
 			}
 			break;
@@ -1641,8 +1641,8 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_word_w(space,0,data,mem_mask);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_word_w(space, 0, data, mem_mask);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
@@ -2409,7 +2409,7 @@ static READ8_HANDLER( wiggie_soundlatch_r )
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
 	wiggie_soundlatch = data >> 8;
-	cpu_set_input_line(space->machine->cpu[1],0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -2473,8 +2473,8 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
-		soundlatch_w(space,0,data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -2745,7 +2745,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(calibr50)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
 }
 
@@ -9054,10 +9054,10 @@ logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(space->cpu),offset,dat
 static DRIVER_INIT( twineagl )
 {
 	/* debug? */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
 }
 
 
@@ -9087,7 +9087,7 @@ static WRITE16_HANDLER( downtown_protection_w )
 
 static DRIVER_INIT( downtown )
 {
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
 }
 
 
@@ -9107,7 +9107,7 @@ static READ16_HANDLER( arbalest_debug_r )
 
 static DRIVER_INIT( arbalest )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
 }
 
 
@@ -9116,7 +9116,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
+//  memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -9160,14 +9160,14 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, (read16_space_func)SMH_NOP);	// watchdog??
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, (read16_space_func)SMH_NOP);	// watchdog??
 }
 
 
 static DRIVER_INIT( zombraid )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
 }
 
 
@@ -9185,7 +9185,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, (read16_space_func)SMH_NOP);	// irq ack?
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, (read16_space_func)SMH_NOP);	// irq ack?
 }
 
 static DRIVER_INIT(wiggie)
@@ -9217,9 +9217,9 @@ static DRIVER_INIT(wiggie)
 	}
 
 	/* X1_010 is not used. */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 
 }
 

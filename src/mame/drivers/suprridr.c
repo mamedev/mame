@@ -118,7 +118,7 @@ static INTERRUPT_GEN( main_nmi_gen )
 static TIMER_CALLBACK( delayed_sound_w )
 {
 	sound_data = param;
-	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 }
 
 
@@ -136,7 +136,7 @@ static READ8_DEVICE_HANDLER( sound_data_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 

@@ -203,7 +203,7 @@ static MACHINE_RESET(sexyboom)
 
 static void msx_vdp_interrupt(running_machine *machine, int i)
 {
-	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( sangho_interrupt )
@@ -329,4 +329,3 @@ static DRIVER_INIT(sangho)
 
 GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
 GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_NOT_WORKING | GAME_NO_SOUND )
-
