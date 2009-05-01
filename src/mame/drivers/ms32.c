@@ -268,96 +268,63 @@ Also, gametngk uses mirror addresses for the background during gameplay, without
 support for them bad tiles appear in the bg.
 */
 
-
-static ADDRESS_MAP_START( ms32_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0xfc000000, 0xfc007fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
-	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
-/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_READ(SMH_RAM)	/* roz control registers */
-/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_READ(SMH_RAM)	/* tx scroll registers */
-/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_READ(SMH_RAM)	/* bg scroll registers */
-
-	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
-
-///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_READ(SMH_RAM) /* f1superb */
-///**/AM_RANGE(0xfd144000, 0xfd145fff) AM_READ(SMH_RAM) /* f1superb */
-
-	AM_RANGE(0xfd180000, 0xfd19ffff) AM_READ(ms32_priram_r)	/* priority ram */
-	AM_RANGE(0xfd1a0000, 0xfd1bffff) AM_READ(ms32_priram_r)	/* mirror only used by memory test in service mode */
-
-	AM_RANGE(0xfd400000, 0xfd43ffff) AM_READ(SMH_RAM) /* Palette */
-///**/AM_RANGE(0xfd440000, 0xfd47ffff) AM_READ(SMH_RAM) /* f1superb color */
-
-///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_READ(SMH_RAM) /* f1superb */
-///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_READ(SMH_RAM) /* f1superb lineram */
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_READ(ms32_rozram_r)	/* roz layer */
-	AM_RANGE(0xfe020000, 0xfe03ffff) AM_READ(ms32_rozram_r)	/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfe200000, 0xfe201fff) AM_READ(ms32_lineram_r) /* line ram for roz layer */
-///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_READ(SMH_RAM) /* f1superb vram */
-
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_READ(ms32_spram_r)	/* sprites */
-	AM_RANGE(0xfe840000, 0xfe87ffff) AM_READ(ms32_spram_r)	/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_READ(ms32_txram_r)	/* tx layer */
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_READ(ms32_bgram_r)	/* bg layer */
-	AM_RANGE(0xfec10000, 0xfec17fff) AM_READ(ms32_txram_r)	/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec18000, 0xfec1ffff) AM_READ(ms32_bgram_r)
-	AM_RANGE(0xfee00000, 0xfee1ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_READ(SMH_BANK(1))
-ADDRESS_MAP_END
-
 static WRITE32_HANDLER( pip_w )
 {
 	if (data)
 		popmessage("fce00a7c = %02x",data);
 }
 
-static ADDRESS_MAP_START( ms32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfc000000, 0xfc007fff) AM_WRITE(SMH_RAM) AM_BASE(&ms32_fc000000)	// NVRAM?
+static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+	AM_RANGE(0xfc000000, 0xfc007fff) AM_RAM AM_BASE(&ms32_fc000000)	// NVRAM?
+	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
-	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
+
+	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
+
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
 	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
-//  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_fce00000) /* registers not ram? */
+//  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE(&ms32_fce00000) /* registers not ram? */
+	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
 	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
-	AM_RANGE(0xfce00600, 0xfce0065f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_roz_ctrl)	/* roz control registers */
-//  { 0xfce00800, 0xfce0085f, // f1superb, roz #2 control?
-	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITE(SMH_RAM) AM_BASE(&ms32_tx_scroll)	/* tx layer scroll */
-	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITE(SMH_RAM) AM_BASE(&ms32_bg_scroll)	/* bg layer scroll */
+/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE(&ms32_roz_ctrl)		/* roz control registers */
+/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE(&ms32_tx_scroll)	/* tx layer scroll */
+/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE(&ms32_bg_scroll)	/* bg layer scroll */
 	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
+//  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
 
-//  AM_RANGE(0xfd104000, 0xfd105fff) AM_WRITE(SMH_RAM) /* f1superb */
-//  AM_RANGE(0xfd144000, 0xfd145fff) AM_WRITE(SMH_RAM) /* f1superb */
+	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
+	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
 
-	AM_RANGE(0xfd180000, 0xfd19ffff) AM_WRITE(ms32_priram_w) AM_BASE(&ms32_priram)	/* priority ram */
-	AM_RANGE(0xfd1a0000, 0xfd1bffff) AM_WRITE(ms32_priram_w)			/* mirror only used by memory test in service mode */
+///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM /* f1superb */
+///**/AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM /* f1superb */
 
-	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITE(SMH_RAM) AM_BASE(&ms32_mahjong_input_select) // ?
+	AM_RANGE(0xfd180000, 0xfd19ffff) AM_READWRITE(ms32_priram_r,ms32_priram_w) AM_BASE(&ms32_priram) /* priority ram */
+	AM_RANGE(0xfd1a0000, 0xfd1bffff) AM_READWRITE(ms32_priram_r,ms32_priram_w)	/* mirror only used by memory test in service mode */
+	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(&ms32_mahjong_input_select)
 
-	AM_RANGE(0xfd400000, 0xfd43ffff) AM_WRITE(ms32_palram_w) AM_BASE(&ms32_palram) /* Palette */
-///**/AM_RANGE(0xfd440000, 0xfd47ffff) AM_WRITE(SMH_RAM) /* f1superb color */
-//  AM_RANGE(0xfdc00000, 0xfdc006ff) AM_WRITE(SMH_RAM) /* f1superb */
-//  AM_RANGE(0xfde00000, 0xfde01fff) AM_WRITE(SMH_RAM) /* f1superb, lineram #2? */
+	AM_RANGE(0xfd400000, 0xfd43ffff) AM_RAM_WRITE(ms32_palram_w) AM_BASE(&ms32_palram) /* Palette */
+///**/AM_RANGE(0xfd440000, 0xfd47ffff) AM_RAM /* f1superb color */
 
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_WRITE(ms32_rozram_w) AM_BASE(&ms32_rozram)	/* roz layer */
-	AM_RANGE(0xfe020000, 0xfe03ffff) AM_WRITE(ms32_rozram_w)		/* mirror only used by memory test in service mode */
+///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM /* f1superb */
+///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM /* f1superb lineram #2? */
+	AM_RANGE(0xfe000000, 0xfe01ffff) AM_READWRITE(ms32_rozram_r,ms32_rozram_w) AM_BASE(&ms32_rozram)	/* roz layer */
+	AM_RANGE(0xfe020000, 0xfe03ffff) AM_READWRITE(ms32_rozram_r,ms32_rozram_w)	/* mirror only used by memory test in service mode */
 	AM_RANGE(0xfe1ffc88, 0xfe1fffff) AM_WRITENOP	/* gratia writes here before falling into lineram, could be a mirror */
-	AM_RANGE(0xfe200000, 0xfe201fff) AM_WRITE(ms32_lineram_w) AM_BASE(&ms32_lineram) /* line ram for roz layer */
-///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_WRITE(SMH_RAM) /* f1superb vram */
-///**/AM_RANGE(0xfe100000, 0xfe1fffff) AM_WRITE(SMH_RAM) /* gratia writes here ?! */
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_WRITE(ms32_spram_w) AM_BASE(&ms32_spram)	/* sprites */
-	AM_RANGE(0xfe840000, 0xfe87ffff) AM_WRITE(ms32_spram_w)		/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_WRITE(ms32_txram_w) AM_BASE(&ms32_txram)	/* tx layer */
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_WRITE(ms32_bgram_w) AM_BASE(&ms32_bgram)	/* bg layer */
-	AM_RANGE(0xfec10000, 0xfec17fff) AM_WRITE(ms32_txram_w)		/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec18000, 0xfec1ffff) AM_WRITE(ms32_bgram_w)		/* mirror used by gametngk at the beginning of the game */
-	AM_RANGE(0xfee00000, 0xfee1ffff) AM_WRITE(SMH_RAM) AM_BASE(&ms32_mainram)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xfe200000, 0xfe201fff) AM_READWRITE(ms32_lineram_r,ms32_lineram_w) AM_BASE(&ms32_lineram) /* line ram for roz layer */
+///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_RAM /* f1superb vram */
+
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_READWRITE(ms32_spram_r,ms32_spram_w) AM_BASE(&ms32_spram)	/* sprites */
+	AM_RANGE(0xfe840000, 0xfe87ffff) AM_READWRITE(ms32_spram_r,ms32_spram_w) /* mirror only used by memory test in service mode */
+	AM_RANGE(0xfec00000, 0xfec07fff) AM_READWRITE(ms32_txram_r,ms32_txram_w) AM_BASE(&ms32_txram)	/* tx layer */
+	AM_RANGE(0xfec08000, 0xfec0ffff) AM_READWRITE(ms32_bgram_r,ms32_bgram_w) AM_BASE(&ms32_bgram)	/* bg layer */
+	AM_RANGE(0xfec10000, 0xfec17fff) AM_READWRITE(ms32_txram_r,ms32_txram_w) /* mirror only used by memory test in service mode */
+	AM_RANGE(0xfec18000, 0xfec1ffff) AM_READWRITE(ms32_bgram_r,ms32_bgram_w) /* mirror used by gametngk at the beginning of the game */
+	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM AM_BASE(&ms32_mainram)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1168,31 +1135,24 @@ static WRITE8_HANDLER( ms32_snd_bank_w )
 
 static WRITE8_HANDLER( to_main_w )
 {
-		to_main=data;
-		irq_raise(space->machine, 1);
+	to_main=data;
+	irq_raise(space->machine, 1);
 }
 
-static ADDRESS_MAP_START( ms32_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3eff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREAD("ymf", ymf271_r)
-	AM_RANGE(0x3f10, 0x3f10) AM_READ(latch_r)
+static ADDRESS_MAP_START( ms32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3eff) AM_ROM
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_r,ymf271_w)
+	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(4))
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(5))
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ms32_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3eff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVWRITE("ymf", ymf271_w)
-	AM_RANGE(0x3f10, 0x3f10) AM_WRITE(to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
 	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(4)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(5)
 ADDRESS_MAP_END
+
 
 /********** MACHINE INIT **********/
 
@@ -1210,11 +1170,11 @@ static MACHINE_DRIVER_START( ms32 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MDRV_CPU_PROGRAM_MAP(ms32_readmem,ms32_writemem)
+	MDRV_CPU_PROGRAM_MAP(ms32_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(ms32_snd_readmem, ms32_snd_writemem)
+	MDRV_CPU_PROGRAM_MAP(ms32_sound_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 

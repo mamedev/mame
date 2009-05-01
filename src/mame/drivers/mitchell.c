@@ -8,7 +8,6 @@ and without EEPROM.
 
 Other games that might run on this hardware:
 "Chi-toitsu"(YUGA 1988)-Another version of"Mahjong Gakuen"
-"MIRAGE -Youjyu mahjong den-"(MITCHELL 1994)
 
 Notes:
 - Super Pang has a protection which involves copying code stored in the
@@ -348,43 +347,26 @@ logerror("PC %04x: write %02x to port 01\n",cpu_get_pc(space->cpu),data);
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mgakuen_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(mgakuen_paletteram_r)	/* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READ(pang_colorram_r)	/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(mgakuen_videoram_r)	/* char RAM */
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)	/* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READ(mgakuen_objram_r)	/* OBJ RAM */
+static ADDRESS_MAP_START( mgakuen_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r,mgakuen_paletteram_w)	/* palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r,mgakuen_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* char RAM */
+	AM_RANGE(0xe000, 0xefff) AM_RAM	/* Work RAM */
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r,mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mgakuen_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(mgakuen_paletteram_w)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(pang_colorram_w) AM_BASE(&pang_colorram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(mgakuen_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(mgakuen_objram_w)	/* OBJ RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(pang_paletteram_r)	/* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READ(pang_colorram_r)	/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(pang_videoram_r)	/* Banked char / OBJ RAM */
+static ADDRESS_MAP_START( mitchell_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)/* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)	/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(pang_paletteram_w)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(pang_colorram_w) AM_BASE(&pang_colorram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(pang_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* Super Pang needs a kludge to initialize EEPROM.
@@ -403,17 +385,16 @@ ADDRESS_MAP_END
 
 /* spangbl */
 
-static ADDRESS_MAP_START( spangb_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_NOP)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1) AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE(&pang_colorram)/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)	/* Work RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangb_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
@@ -439,13 +420,13 @@ static WRITE8_HANDLER( spangbl_msm5205_data_w )
 }
 #endif
 
-static ADDRESS_MAP_START( spangb_sound_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0xec00, 0xec00) AM_WRITE( spangbl_msm5205_data_w )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangb_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spangbl_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -456,18 +437,12 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 	okim6295_set_bank_base(device, 0x40000 * (data & 3));
 }
 
-static ADDRESS_MAP_START( mstworld_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mstworld_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( mstworld_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
@@ -1117,8 +1092,8 @@ static MACHINE_DRIVER_START( mgakuen )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mgakuen_map,0)
+	MDRV_CPU_IO_MAP(mitchell_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
@@ -1151,8 +1126,8 @@ static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 8000000)	/* (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
+	MDRV_CPU_IO_MAP(mitchell_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
@@ -1222,13 +1197,13 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_IMPORT_FROM(pang)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spangb_memmap,0)
-	MDRV_CPU_IO_MAP(spangb_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(spangbl_map,0)
+	MDRV_CPU_IO_MAP(spangbl_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu",Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
-	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(spangbl_sound_map,0 )
+	MDRV_CPU_IO_MAP(spangbl_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
@@ -1243,19 +1218,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mstworld )
 
 	/* basic machine hardware */
-
-
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
       the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
       more likely wrong.. the game appears to run too fast anyway .. */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000*4)
-
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
 	MDRV_CPU_IO_MAP(mstworld_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(mstworld_sound_readmem,mstworld_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(mstworld_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1284,8 +1256,8 @@ static MACHINE_DRIVER_START( marukin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
+	MDRV_CPU_IO_MAP(mstworld_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)

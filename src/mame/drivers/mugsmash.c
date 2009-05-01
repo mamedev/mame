@@ -179,16 +179,16 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 }
 #endif
 
-static ADDRESS_MAP_START( mugsmash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x082000, 0x082fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x100000, 0x1001ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x100200, 0x1005ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1c4000, 0x1cffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x201fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x202000, 0x203fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mugsmash_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE(&mugsmash_videoram1)
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE(&mugsmash_videoram2)
+	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE(&mugsmash_regs1) 	/* video registers*/
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE(&mugsmash_regs2) /* sound + ? */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
+	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&mugs_spriteram) /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
 #else
@@ -199,31 +199,12 @@ static ADDRESS_MAP_START( mugsmash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mugsmash_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(mugsmash_videoram1_w) AM_BASE(&mugsmash_videoram1)
-	AM_RANGE(0x082000, 0x082fff) AM_WRITE(mugsmash_videoram2_w) AM_BASE(&mugsmash_videoram2)
-	AM_RANGE(0x0C0000, 0x0C0007) AM_WRITE(mugsmash_reg_w) AM_BASE(&mugsmash_regs1) 	/* video registers*/
-	AM_RANGE(0x100000, 0x1005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE(&mugsmash_regs2) /* sound + ? */
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM) /* main ram? */
-	AM_RANGE(0x1c4000, 0x1cffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(SMH_RAM) AM_BASE(&mugs_spriteram) /* sprite ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8801) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( mugsmash_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8801) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -427,14 +408,11 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( mugsmash )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(mugsmash_readmem,mugsmash_writemem)
+	MDRV_CPU_PROGRAM_MAP(mugsmash_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* Guess */
-	MDRV_CPU_PROGRAM_MAP(snd_readmem,snd_writemem)
-
-	MDRV_GFXDECODE(mugsmash)
-
+	MDRV_CPU_PROGRAM_MAP(mugsmash_sound_map,0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -442,6 +420,7 @@ static MACHINE_DRIVER_START( mugsmash )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MDRV_GFXDECODE(mugsmash)
 
 	MDRV_PALETTE_LENGTH(0x300)
 

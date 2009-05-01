@@ -198,37 +198,18 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #endif
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0xf0e0, 0xf0e0) AM_READ(msisaac_mcu_r)
-	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
-
-	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("IN0")
-	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
-//AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
-
-//AM_RANGE(0xf400, 0xf43f) AM_WRITE(msisaac_fg_colorram_w) AM_BASE(&colorram)
-
-	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
+static ADDRESS_MAP_START( msisaac_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITENOP 					//???
+	AM_RANGE(0xf002, 0xf002) AM_WRITENOP		 			//???
 
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????
 
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(SMH_RAM) 			//???
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(SMH_RAM) 			//???
+	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
 
 	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE(msisaac_fg_scrollx_w)
 	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE(msisaac_fg_scrolly_w)
@@ -237,27 +218,24 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE(msisaac_bg_scrollx_w)
 	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE(msisaac_bg_scrolly_w)
 
-	AM_RANGE(0xf0e0, 0xf0e0) AM_WRITE(msisaac_mcu_w)
+	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r,msisaac_mcu_w)
+	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
 
-	AM_RANGE(0xf100, 0xf17f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(msisaac_fg_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(msisaac_bg2_videoram_w) AM_BASE(&msisaac_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(msisaac_bg_videoram_w) AM_BASE(&msisaac_videoram)
+	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
+	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("IN0")
+	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
+//	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&spriteram)	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE(&msisaac_videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE(&msisaac_videoram)
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
-ADDRESS_MAP_END
-
 
 static int vol_ctrl[16];
 
@@ -309,45 +287,33 @@ static WRITE8_HANDLER( sound_control_1_w )
 	//popmessage("SND1 0=%2x 1=%2x", snd_ctrl0, snd_ctrl1);
 }
 
-
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-
+static ADDRESS_MAP_START( msisaac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE("msm", sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
-
+	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END
 
 #ifdef USE_MCU
 
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( msisaac_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_portB_r)
-	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_portC_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(buggychl_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(buggychl_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(buggychl_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_portA_r,buggychl_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_portB_r,buggychl_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_portC_r,buggychl_68705_portC_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 #endif
@@ -513,16 +479,16 @@ static MACHINE_DRIVER_START( msisaac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(msisaac_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(msisaac_sound_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+	MDRV_CPU_PROGRAM_MAP(msisaac_mcu_map,0)
 #endif
 
 	MDRV_MACHINE_RESET(ta7630)
