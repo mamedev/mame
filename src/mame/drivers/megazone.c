@@ -92,63 +92,49 @@ static WRITE8_HANDLER( megazone_coin_counter_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x33ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)		/* 4000->5FFF is a debug rom */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( megazone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_RAM) AM_BASE(&megazone_scrollx)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_RAM) AM_BASE(&megazone_scrolly)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&megazone_videoram2) AM_SIZE(&megazone_videoram2_size)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&megazone_colorram2)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE(&megazone_scrolly)
+	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE(&megazone_scrollx)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&megazone_videoram2) AM_SIZE(&megazone_videoram2_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&megazone_colorram2)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")  /* IO Coin */
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")  /* P1 IO */
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")  /* P2 IO */
+static ADDRESS_MAP_START( megazone_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")  			/* IO Coin */
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")  			/* P1 IO */
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")  			/* P2 IO */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2")
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP					/* INTMAIN - Interrupts main CPU (unused) */
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP					/* INT (Actually is NMI) enable/disable (unused)*/
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_RAM)				/* INTMAIN - Interrupts main CPU (unused) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_RAM)				/* INT (Actually is NMI) enable/disable (unused)*/
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( megazone_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay", ay8910_address_w)
 	AM_RANGE(0x00, 0x02) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay", ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( megazone_i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( megazone_i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
@@ -256,17 +242,17 @@ static MACHINE_DRIVER_START( megazone )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 18432000/9)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(megazone_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megazone_sound_map,0)
+	MDRV_CPU_IO_MAP(megazone_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("daccpu", I8039,14318000/2)	/* 1/2 14MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megazone_i8039_map,0)
+	MDRV_CPU_IO_MAP(megazone_i8039_io_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(900))
 

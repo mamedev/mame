@@ -2140,52 +2140,34 @@ static WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( megadriv_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000 , 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000 , 0xa01fff) AM_READ(megadriv_68k_read_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREAD8("ym", megadriv_68k_YM2612_read, 0xffff)
-
-	AM_RANGE(0xa10000 , 0xa1001f) AM_READ(megadriv_68k_io_read)
-
-	AM_RANGE(0xa11100 , 0xa11101) AM_READ(megadriv_68k_check_z80_bus)
-
-	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
-	AM_RANGE(0xd00000 , 0xd0001f) AM_READ(megadriv_vdp_r) // the earth defend
-
-	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000 , 0xb0ffff) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000 , 0xb1007f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100 , 0xb1017f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_cram)
-
-
-
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
-//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
-	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( megadriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(SMH_ROM)
-
-	AM_RANGE(0xa00000 , 0xa01fff) AM_WRITE(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa00000 , 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000 , 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_DEVWRITE8("ym", megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
 	AM_RANGE(0xa06000 , 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000 , 0xa1001f) AM_WRITE(megadriv_68k_io_write)
+	AM_RANGE(0xa10000 , 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100 , 0xa11101) AM_WRITE(megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11100 , 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200 , 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
-	AM_RANGE(0xd00000 , 0xd0001f) AM_WRITE(megadriv_vdp_w) // the earth defend
+	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
+//  AM_RANGE(0xb00000 , 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000 , 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100 , 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
 
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xc00000 , 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000 , 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
+	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
+
 
 /* z80 sounds/sub CPU */
 
@@ -2490,33 +2472,23 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( z80_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000 , 0xff) AM_NOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-
-	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK(1)) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000 , 0x4003) AM_DEVREAD("ym", ym2612_r)
-
-	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
-
-	AM_RANGE(0x7f00 , 0x7fff) AM_READ(megadriv_z80_vdp_read)
-
-	AM_RANGE(0x8000 , 0xffff) AM_READ(z80_read_68k_banked_data) // The Z80 can read the 68k address space this way
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK(1)) AM_MIRROR(0x2000)
-	AM_RANGE(0x4000 , 0x4003) AM_DEVWRITE("ym", ym2612_w)
-
-	AM_RANGE(0x7f00 , 0x7fff) AM_WRITE(megadriv_z80_vdp_write)
+static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000 , 0x1fff) AM_RAMBANK(1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
+	AM_RANGE(0x4000 , 0x4003) AM_DEVREADWRITE("ym", ym2612_r,ym2612_w)
 
 	AM_RANGE(0x6000 , 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
 	AM_RANGE(0x6001 , 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x8000 , 0xffff) AM_WRITE(z80_write_68k_banked_data)
+	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+
+	AM_RANGE(0x7f00 , 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+
+	AM_RANGE(0x8000 , 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megadriv_z80_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000 , 0xff) AM_NOP
 ADDRESS_MAP_END
 
 /****************************************** 32X related ******************************************/
@@ -3827,8 +3799,8 @@ static READ16_HANDLER( svp_68k_cell2_r )
 }
 
 static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000 , 0x03ff) AM_READ(SMH_BANK(3))
-	AM_RANGE(0x0400 , 0xffff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x0000 , 0x03ff) AM_ROMBANK(3)
+	AM_RANGE(0x0400 , 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
@@ -5935,7 +5907,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
-				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0)) 
+				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
 					cputag_set_input_line(machine, "genesis_snd_z80", 0, HOLD_LINE);
 			}
 			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
@@ -5958,7 +5930,7 @@ static TIMER_CALLBACK( irq6_on_callback )
 
 	{
 //      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6) 
+		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
 			cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 	}
 }
@@ -6229,12 +6201,12 @@ static NVRAM_HANDLER( megadriv )
 
 MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
-	MDRV_CPU_IO_MAP(z80_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -6273,12 +6245,12 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( megadpal )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
-	MDRV_CPU_IO_MAP(z80_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)

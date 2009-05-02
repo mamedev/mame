@@ -23,7 +23,6 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/hd6309/hd6309.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
@@ -141,7 +140,13 @@ static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainevt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
+	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITENOP	/* ??? */
+	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
+
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
 	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
@@ -151,90 +156,59 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f9a, 0x1f9a) AM_READ_PORT("P4")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
+
+	AM_RANGE(0x4000, 0x5dff) AM_RAM
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( devstors_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
-	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
+	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
 
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x4000, 0x5dff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5e00, 0x5fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
- 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dv_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
 	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
 	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1fa0, 0x1fbf) AM_READ(K051733_r)
+	AM_RANGE(0x1fa0, 0x1fbf) AM_READWRITE(K051733_r,K051733_w)
 
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
 
-static ADDRESS_MAP_START( dv_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
-	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
-	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
-	AM_RANGE(0x1fa0, 0x1fbf) AM_WRITE(K051733_w)
-
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x4000, 0x5dff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5e00, 0x5fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x5dff) AM_RAM
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("upd", mainevt_sh_busy_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w)
+static ADDRESS_MAP_START( mainevt_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", upd7759_port_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r,k007232_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("upd", mainevt_sh_busy_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( devstors_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r,k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", dv_sh_bankswitch_w)
 ADDRESS_MAP_END
-
 
 
 /*****************************************************************************/
@@ -423,12 +397,12 @@ static MACHINE_DRIVER_START( mainevt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(mainevt_map,0)
 	MDRV_CPU_VBLANK_INT("screen", mainevt_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,8)	/* ??? */
+	MDRV_CPU_PROGRAM_MAP(mainevt_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,8*60)	/* ??? */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -462,12 +436,12 @@ static MACHINE_DRIVER_START( devstors )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(dv_readmem,dv_writemem)
+	MDRV_CPU_PROGRAM_MAP(devstors_map,0)
 	MDRV_CPU_VBLANK_INT("screen", dv_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(dv_sound_readmem,dv_sound_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_PROGRAM_MAP(devstors_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ??? */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

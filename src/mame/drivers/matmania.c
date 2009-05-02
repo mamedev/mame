@@ -53,113 +53,72 @@ static WRITE8_HANDLER( maniach_sh_command_w )
 
 
 
-static ADDRESS_MAP_START( matmania_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1")
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( matmania_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0780, 0x07df) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_RAM) AM_BASE(&matmania_pageselect)
-	AM_RANGE(0x3010, 0x3010) AM_WRITE(matmania_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_WRITE(SMH_RAM) AM_BASE(&matmania_scroll)
-//  AM_RANGE(0x3030, 0x3030) AM_WRITENOP /* ?? */
+static ADDRESS_MAP_START( matmania_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x077f) AM_RAM
+	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&matmania_colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(&matmania_colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(&matmania_pageselect)
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(matmania_sh_command_w)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(&matmania_scroll)
+	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1")
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3040, 0x3040) AM_READ(maniach_mcu_r)
+static ADDRESS_MAP_START( maniach_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x077f) AM_RAM
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&matmania_colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(&matmania_colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(&matmania_pageselect)
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(&matmania_scroll)
+	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
+	AM_RANGE(0x3040, 0x3040) AM_READWRITE(maniach_mcu_r,maniach_mcu_w)
 	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( maniach_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0780, 0x07df) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&matmania_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_RAM) AM_BASE(&matmania_pageselect)
-	AM_RANGE(0x3010, 0x3010) AM_WRITE(maniach_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_WRITE(SMH_RAM) AM_BASE(&matmania_scroll)
-	AM_RANGE(0x3030, 0x3030) AM_WRITENOP	/* ?? */
-	AM_RANGE(0x3040, 0x3040) AM_WRITE(maniach_mcu_w)
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( matmania_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( maniach_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( maniach_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym", ym3526_w)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(maniach_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(maniach_68705_portB_r)
-	AM_RANGE(0x0002, 0x0002) AM_READ(maniach_68705_portC_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(maniach_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(maniach_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(maniach_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_portA_r,maniach_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_portB_r,maniach_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_portC_r,maniach_68705_portC_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( matmania )
@@ -313,11 +272,11 @@ static MACHINE_DRIVER_START( matmania )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(matmania_readmem,matmania_writemem)
+	MDRV_CPU_PROGRAM_MAP(matmania_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(matmania_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -368,14 +327,15 @@ static MACHINE_DRIVER_START( maniach )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_readmem,maniach_writemem)
+	MDRV_CPU_PROGRAM_MAP(maniach_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_sound_readmem,maniach_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(maniach_sound_map,0)
 								/* IRQs are caused by the main CPU */
+
 	MDRV_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
-	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+	MDRV_CPU_PROGRAM_MAP(maniach_mcu_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 

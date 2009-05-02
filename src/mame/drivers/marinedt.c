@@ -115,20 +115,6 @@ static WRITE8_HANDLER( tx_tileram_w )
 	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
-static ADDRESS_MAP_START( marinedt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4400, 0x47ff) AM_READ(SMH_RAM)	//unused, vram mirror?
-	AM_RANGE(0x4000, 0x4bff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( marinedt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tx_tileram_w) AM_BASE(&tx_tileram)
-	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
-ADDRESS_MAP_END
-
 static READ8_HANDLER( marinedt_port1_r )
 {
 //might need to be reversed for cocktail stuff
@@ -270,6 +256,13 @@ static WRITE8_HANDLER( marinedt_pf_w )
 
 }
 
+static ADDRESS_MAP_START( marinedt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x37ff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
+	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(tx_tileram_w) AM_BASE(&tx_tileram)
+	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marinedt_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -577,7 +570,7 @@ static MACHINE_DRIVER_START( marinedt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
-	MDRV_CPU_PROGRAM_MAP(marinedt_readmem,marinedt_writemem)
+	MDRV_CPU_PROGRAM_MAP(marinedt_map,0)
 	MDRV_CPU_IO_MAP(marinedt_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

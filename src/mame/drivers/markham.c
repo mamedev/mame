@@ -29,13 +29,13 @@ static READ8_HANDLER( markham_e004_r )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( markham_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM) AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
@@ -46,32 +46,16 @@ static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("SYSTEM")
 
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
-
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(markham_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP /* coin counter? */
-
 	AM_RANGE(0xe009, 0xe009) AM_WRITENOP /* to CPU2 busreq */
 
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(SMH_RAM) AM_BASE(&markham_xscroll)
+	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_BASE(&markham_xscroll)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM) AM_SHARE(1)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_SHARE(1)
+static ADDRESS_MAP_START( markham_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(1)
 
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("sn2", sn76496_w)
@@ -200,11 +184,11 @@ static MACHINE_DRIVER_START( markham )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
+	MDRV_CPU_PROGRAM_MAP(markham_master_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_PROGRAM_MAP(markham_slave_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

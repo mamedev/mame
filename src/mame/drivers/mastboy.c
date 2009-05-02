@@ -661,7 +661,7 @@ static const msm5205_interface msm5205_config =
 static WRITE8_HANDLER( mastboy_irq0_ack_w )
 {
 	mastboy_irq0_ack = data;
-	if ((data & 1) == 1) 
+	if ((data & 1) == 1)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -675,32 +675,23 @@ static INTERRUPT_GEN( mastboy_interrupt )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM) // Internal ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM) // External ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM) // worl ram
-	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_RAM) // tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_READ(SMH_RAM) AM_MIRROR(0x0e00) // colour ram
-	AM_RANGE(0xc000, 0xffff) AM_READ(banked_ram_r) // mastboy bank area read
+static ADDRESS_MAP_START( mastboy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READ(mastboy_backupram_r)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&mastboy_workram)// work ram
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE(&mastboy_tileram)// tilemap ram
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(&mastboy_colram) AM_MIRROR(0x0e00)  // colour ram
+
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
+
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
 	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
-	AM_RANGE(0xffc00, 0xfffff) AM_READ(SMH_RAM) // Internal RAM
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	//ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM) // Internal ROM
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM) // External  ROM
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM) AM_BASE(&mastboy_workram)// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&mastboy_tileram)// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(SMH_RAM) AM_BASE(&mastboy_colram) AM_MIRROR(0x0e00)  // colour ram
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(banked_ram_w) // mastboy bank area write
-
-	AM_RANGE(0xff000, 0xff7ff) AM_WRITE(mastboy_backupram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xff820, 0xff827) AM_WRITE(mastboy_bank_w)
 	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_data_w)
 	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_control_w)
@@ -710,7 +701,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
 	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE("msm", mastboy_msm5205_reset_w)
 	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
-	AM_RANGE(0xffc00, 0xfffff) AM_WRITE(SMH_RAM) // Internal RAM
+
+	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
 ADDRESS_MAP_END
 
 /* Ports */
@@ -726,7 +718,7 @@ static READ8_HANDLER( mastboy_nmi_read )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( port_readmem, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mastboy_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_READ(mastboy_port_38_read)
 	AM_RANGE(0x39, 0x39) AM_READ(mastboy_nmi_read)
 ADDRESS_MAP_END
@@ -865,8 +857,8 @@ static MACHINE_RESET( mastboy )
 
 static MACHINE_DRIVER_START( mastboy )
 	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(port_readmem,0)
+	MDRV_CPU_PROGRAM_MAP(mastboy_map,0)
+	MDRV_CPU_IO_MAP(mastboy_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", mastboy_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
