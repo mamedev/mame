@@ -376,28 +376,18 @@ static READ16_HANDLER( raiga_protection_r )
 	return prot;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x060000, 0x063fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x070000, 0x070fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x072000, 0x073fff) AM_READ(gaiden_videoram2_r)
-	AM_RANGE(0x074000, 0x075fff) AM_READ(gaiden_videoram3_r)
-	AM_RANGE(0x076000, 0x077fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x078000, 0x0787ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( gaiden_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x060000, 0x063fff) AM_RAM
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE(&gaiden_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE(&gaiden_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x078800, 0x079fff) AM_READNOP   /* extra portion of palette RAM, not really used */
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x060000, 0x063fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x070000, 0x070fff) AM_WRITE(gaiden_videoram_w) AM_BASE(&gaiden_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_WRITE(gaiden_videoram2_w) AM_BASE(&gaiden_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_WRITE(gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
 	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
 	AM_RANGE(0x07a204, 0x07a205) AM_WRITE(gaiden_fgscrolly_w)
@@ -429,23 +419,15 @@ static ADDRESS_MAP_START( drgnbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM) 	/* raiga only */
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	/* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM) 	/* raiga only */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("oki", okim6295_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xefff) AM_RAM	/* raiga only */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP	/* ?? */
+	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -841,11 +823,11 @@ static MACHINE_DRIVER_START( shadoww )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(gaiden_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 								/* IRQs are triggered by the YM2203 */
 
 	MDRV_MACHINE_RESET(raiga)

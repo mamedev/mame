@@ -176,35 +176,23 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( galastrm_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_READ(SMH_RAM)	/* Sprite ram */
+static ADDRESS_MAP_START( galastrm_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&galastrm_ram) 								/* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
-	AM_RANGE(0x500000, 0x500007) AM_READ(galastrm_adstick_ctrl_r)
-	AM_RANGE(0x600000, 0x6007ff) AM_READ(SMH_RAM)	/* Sound shared ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0480SCP_long_r)
-	AM_RANGE(0x830000, 0x83002f) AM_READ(TC0480SCP_ctrl_long_r)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READ(TC0100SCN_long_r)	/* piv tilemaps */
-	AM_RANGE(0xd20000, 0xd2000f) AM_READ(TC0100SCN_ctrl_long_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( galastrm_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(SMH_RAM) AM_BASE(&galastrm_ram)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)	/* eerom etc. */
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)									/* eerom etc. */
 	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
-	AM_RANGE(0x500000, 0x500007) AM_WRITE(galastrm_adstick_ctrl_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(TC0480SCP_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_WRITE(TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)	/* TC0110PCR */
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)		/* TC0610 */
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_BASE(&f3_shared_ram)								/* Sound shared ram */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
+	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)								/* TC0110PCR */
+	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)								/* TC0610 */
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(galastrm_tc0610_1_w)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_WRITE(TC0100SCN_long_w)	/* piv tilemaps */
-	AM_RANGE(0xd20000, 0xd2000f) AM_WRITE(TC0100SCN_ctrl_long_w)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)			/* piv tilemaps */
+	AM_RANGE(0xd20000, 0xd2000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -342,7 +330,7 @@ static NVRAM_HANDLER( galastrm )
 static MACHINE_DRIVER_START( galastrm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(galastrm_readmem,galastrm_writemem)
+	MDRV_CPU_PROGRAM_MAP(galastrm_map,0)
 	MDRV_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)

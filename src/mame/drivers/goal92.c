@@ -59,29 +59,23 @@ static READ16_HANDLER( goal92_inputs_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( goal92_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x13ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
-	AM_RANGE(0x18001c, 0x18001d) AM_READ(goal92_fg_bank_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( goal92_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x1007ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x100800, 0x100fff) AM_WRITE(goal92_background_w) AM_BASE(&goal92_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_WRITE(goal92_foreground_w) AM_BASE(&goal92_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_WRITE(SMH_RAM) // it has tiles for clouds, but they aren't used
-	AM_RANGE(0x102000, 0x102fff) AM_WRITE(goal92_text_w) AM_BASE(&goal92_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x104000, 0x13ffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( goal92_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE(&goal92_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE(&goal92_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE(&goal92_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
 	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
+	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
 	AM_RANGE(0x180010, 0x180017) AM_WRITE(SMH_RAM) AM_BASE(&goal92_scrollram16)
-	AM_RANGE(0x18001c, 0x18001d) AM_WRITE(goal92_fg_bank_w)
+	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
 ADDRESS_MAP_END
 
 /* Sound CPU */
@@ -315,7 +309,7 @@ static MACHINE_DRIVER_START( goal92 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(goal92_readmem,goal92_writemem)
+	MDRV_CPU_PROGRAM_MAP(goal92_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)

@@ -38,27 +38,19 @@ static READ8_HANDLER( input_port_r )
 }
 
 
-static ADDRESS_MAP_START( readmem_gomoku, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x47ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4800, 0x4fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5000, 0x53ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5400, 0x57ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5800, 0x58ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_gomoku, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x47ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(gomoku_videoram_w) AM_BASE(&gomoku_videoram)
-	AM_RANGE(0x5400, 0x57ff) AM_WRITE(gomoku_colorram_w) AM_BASE(&gomoku_colorram)
-	AM_RANGE(0x5800, 0x58ff) AM_WRITE(gomoku_bgram_w) AM_BASE(&gomoku_bgram)
+static ADDRESS_MAP_START( gomoku_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x47ff) AM_ROM
+	AM_RANGE(0x4800, 0x4fff) AM_RAM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE(&gomoku_videoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE(&gomoku_colorram)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE(&gomoku_bgram)
 	AM_RANGE(0x6000, 0x601f) AM_WRITE(gomoku_sound1_w) AM_BASE(&gomoku_soundregs1)
 	AM_RANGE(0x6800, 0x681f) AM_WRITE(gomoku_sound2_w) AM_BASE(&gomoku_soundregs2)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(gomoku_flipscreen_w)
 	AM_RANGE(0x7002, 0x7002) AM_WRITE(gomoku_bg_dispsw_w)
 	AM_RANGE(0x7003, 0x7007) AM_WRITENOP
+	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
 	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -128,7 +120,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gomoku )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/12)		 /* 1.536 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem_gomoku, writemem_gomoku)
+	MDRV_CPU_PROGRAM_MAP(gomoku_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

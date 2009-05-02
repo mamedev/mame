@@ -174,32 +174,20 @@ static WRITE32_HANDLER( gunbustr_gun_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gunbustr_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_READ(SMH_RAM)	/* Sprite ram */
-	AM_RANGE(0x390000, 0x3907ff) AM_READ(SMH_RAM)	/* Sound shared ram */
+static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&gunbustr_ram)										/* main CPUA ram */
+	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)				/* Sprite ram */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
+	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_BASE(&f3_shared_ram)										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500000, 0x500003) AM_READ(gunbustr_gun_r)	/* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0480SCP_long_r)
-	AM_RANGE(0x830000, 0x83002f) AM_READ(TC0480SCP_ctrl_long_r)
-	AM_RANGE(0x900000, 0x901fff) AM_READ(SMH_RAM)	/* Palette ram */
-	AM_RANGE(0xc00000, 0xc03fff) AM_READ(SMH_RAM)	/* network ram ?? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gunbustr_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(SMH_RAM) AM_BASE(&gunbustr_ram)
-	AM_RANGE(0x300000, 0x301fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)	/* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)	/* eerom etc. */
-	AM_RANGE(0x500000, 0x500003) AM_WRITE(gunbustr_gun_w)	/* gun int request */
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(TC0480SCP_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_WRITE(TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_WRITE(gunbustr_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(SMH_RAM)	/* network ram ?? */
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)											/* eerom etc. */
+	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
+	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE(&paletteram32)			/* Palette ram */
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -361,7 +349,7 @@ static MACHINE_DRIVER_START( gunbustr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(gunbustr_readmem,gunbustr_writemem)
+	MDRV_CPU_PROGRAM_MAP(gunbustr_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)

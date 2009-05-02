@@ -205,22 +205,13 @@ static WRITE16_HANDLER( ioc_w )
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gcpinbal_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc00000, 0xc03fff) AM_READ(gcpinbal_tilemaps_word_r)
-	AM_RANGE(0xc80000, 0xc80fff) AM_READ(SMH_RAM)	/* sprite ram */
-	AM_RANGE(0xd00000, 0xd00fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd80000, 0xd800ff) AM_READ(ioc_r)
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)	/* RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gcpinbal_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(gcpinbal_tilemaps_word_w) AM_BASE(&gcpinbal_tilemapram)
-	AM_RANGE(0xc80000, 0xc80fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd00000, 0xd00fff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd80000, 0xd800ff) AM_WRITE(ioc_w) AM_BASE(&gcpinbal_ioc_ram)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( gcpinbal_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(&gcpinbal_tilemapram)
+	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE(&gcpinbal_ioc_ram)
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM	/* RAM */
 ADDRESS_MAP_END
 
 
@@ -379,7 +370,7 @@ static MACHINE_DRIVER_START( gcpinbal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(gcpinbal_readmem,gcpinbal_writemem)
+	MDRV_CPU_PROGRAM_MAP(gcpinbal_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gcpinbal_interrupt)
 
 	/* video hardware */

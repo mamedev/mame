@@ -39,26 +39,20 @@ TODO: Emulated sound
 #include "includes/gotya.h"
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( gotya_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("P1")
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("P2")
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("DSW")
-	AM_RANGE(0xc000, 0xd3ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x6004, 0x6004) AM_WRITE(gotya_video_control_w)
 	AM_RANGE(0x6005, 0x6005) AM_WRITE(gotya_soundlatch_w)
 	AM_RANGE(0x6006, 0x6006) AM_WRITE(SMH_RAM) AM_BASE(&gotya_scroll)
 	AM_RANGE(0x6007, 0x6007) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(gotya_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(gotya_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd000, 0xd3df) AM_WRITE(SMH_RAM) AM_BASE(&gotya_videoram2)
-	AM_RANGE(0xd3e0, 0xd3ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_BASE(&gotya_videoram2)
+	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_BASE(&spriteram)
 ADDRESS_MAP_END
 
 
@@ -184,7 +178,7 @@ static MACHINE_DRIVER_START( gotya )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(gotya_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

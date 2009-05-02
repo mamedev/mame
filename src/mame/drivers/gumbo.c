@@ -53,65 +53,39 @@ WRITE16_HANDLER( gumbo_fg_videoram_w );
 VIDEO_START( gumbo );
 VIDEO_UPDATE( gumbo );
 
-static ADDRESS_MAP_START( gumbo_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( gumbo_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gumbo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_WRITE(SMH_RAM) // main ram
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
+	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
 ADDRESS_MAP_END
 
 /* Miss Puzzle has a different memory map */
 
-static ADDRESS_MAP_START( mspuzzle_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mspuzzle_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
+	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
+	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-	AM_RANGE(0x190000, 0x197fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mspuzzle_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM) // main ram
-	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x190000, 0x197fff) AM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dblpoint_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( dblpoint_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1f0000, 0x1f0fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dblpoint_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_WRITE(SMH_RAM) // main ram
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
-	AM_RANGE(0x1f0000, 0x1f0fff) AM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
+	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
+	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gumbo )
@@ -262,7 +236,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( gumbo )
 	MDRV_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
-	MDRV_CPU_PROGRAM_MAP(gumbo_readmem,gumbo_writemem)
+	MDRV_CPU_PROGRAM_MAP(gumbo_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // all the same
 
 	MDRV_GFXDECODE(gumbo)
@@ -291,13 +265,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mspuzzle )
 	MDRV_IMPORT_FROM(gumbo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mspuzzle_readmem,mspuzzle_writemem)
+	MDRV_CPU_PROGRAM_MAP(mspuzzle_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dblpoint )
 	MDRV_IMPORT_FROM(gumbo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dblpoint_readmem,dblpoint_writemem)
+	MDRV_CPU_PROGRAM_MAP(dblpoint_map,0)
 MACHINE_DRIVER_END
 
 ROM_START( gumbo )

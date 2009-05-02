@@ -75,26 +75,17 @@ VIDEO_UPDATE( ginganin );
 */
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x020000, 0x023fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x030000, 0x0307ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x040000, 0x0407ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x050000, 0x0507ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x060000, 0x06000f) AM_READ(SMH_RAM)
-	AM_RANGE(0x068000, 0x06bfff) AM_READ(SMH_RAM)	/* bg lives in ROM */
+static ADDRESS_MAP_START( ginganin_map, ADDRESS_SPACE_PROGRAM, 16 )
+/* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x020000, 0x023fff) AM_RAM
+	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE(&ginganin_txtram16)
+	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x050000, 0x0507ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE(&ginganin_vregs16)
+	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE(&ginganin_fgram16)
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-/* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
-	AM_RANGE(0x020000, 0x023fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x030000, 0x0307ff) AM_WRITE(ginganin_txtram16_w) AM_BASE(&ginganin_txtram16)
-	AM_RANGE(0x040000, 0x0407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x050000, 0x0507ff) AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x060000, 0x06000f) AM_WRITE(ginganin_vregs16_w) AM_BASE(&ginganin_vregs16)
-	AM_RANGE(0x068000, 0x06bfff) AM_WRITE(ginganin_fgram16_w) AM_BASE(&ginganin_fgram16)
 ADDRESS_MAP_END
 
 
@@ -168,21 +159,16 @@ static WRITE8_HANDLER( MC6840_write_port_1_w )
 	MC6840_register1 = data;
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(MC6840_control_port_0_w)	/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(MC6840_control_port_1_w)	/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(MC6840_write_port_0_w)		/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(MC6840_write_port_1_w)		/* Takahiro Nogi. 1999/09/27 */
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym", y8950_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 
@@ -341,11 +327,11 @@ static MACHINE_DRIVER_START( ginganin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(ginganin_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
 	/* video hardware */

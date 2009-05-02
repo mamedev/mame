@@ -203,21 +203,28 @@ static MACHINE_START( gijoe )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)			// Sprites
-	AM_RANGE(0x120000, 0x121fff) AM_READ(K056832_ram_word_r)	// Graphic planes
-	AM_RANGE(0x122000, 0x123fff) AM_READ(K056832_ram_word_r)	// Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_READ(K056832_rom_word_r)	// Passthrough to tile roms
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(SMH_RAM)			// Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&spriteram16)								// Sprites
+	AM_RANGE(0x110000, 0x110007) AM_WRITE(K053246_word_w)
+	AM_RANGE(0x120000, 0x121fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes
+	AM_RANGE(0x122000, 0x123fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes mirror read
+	AM_RANGE(0x130000, 0x131fff) AM_READ(K056832_rom_word_r) 								// Passthrough to tile roms
+	AM_RANGE(0x160000, 0x160007) AM_WRITE(K056832_b_word_w)									// VSCCS (board dependent)
+	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&gijoe_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_WRITE(K056832_word_w)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_READ(SMH_RAM)			// sound regs read fall through
+	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ(control1_r)
-	AM_RANGE(0x1e8000, 0x1e8001) AM_READ(control2_r)
+	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_READ(K053246_word_r)
 #if JOE_DEBUG
 	AM_RANGE(0x110000, 0x110007) AM_READ(K053246_reg_word_r)
@@ -227,37 +234,12 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0x110000, 0x110007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x120000, 0x121fff) AM_WRITE(K056832_ram_word_w)
-	AM_RANGE(0x122000, 0x123fff) AM_WRITE(K056832_ram_word_w)
-	AM_RANGE(0x130000, 0x131fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x160000, 0x160007) AM_WRITE(K056832_b_word_w)	// VSCCS (board dependent)
-	AM_RANGE(0x170000, 0x170001) AM_WRITENOP			// Watchdog
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(SMH_RAM) AM_BASE(&gijoe_workram)
-	AM_RANGE(0x190000, 0x190fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_WRITE(K056832_word_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_WRITE(SMH_RAM)			// sound regs write fall through
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(control2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xebff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xfa2f) AM_DEVREAD("konami", k054539_r)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xebff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xfa2f) AM_DEVWRITE("konami", k054539_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xebff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )
@@ -310,11 +292,11 @@ static MACHINE_DRIVER_START( gijoe )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* Confirmed */
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(gijoe_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gijoe_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)	/* Amuse & confirmed. z80e */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(gijoe)
 	MDRV_NVRAM_HANDLER(gijoe)

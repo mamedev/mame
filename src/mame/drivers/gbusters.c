@@ -122,48 +122,34 @@ static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 #endif
 }
 
-static ADDRESS_MAP_START( gbusters_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gbusters_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)									/* sound code # */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)								/* watchdog reset */
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)	/* tiles + sprites (RAM H21, G21 & H6) */
-	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)			/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READ(bankedram_r)		/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM 878n02.rom */
+	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
+	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
+	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)	/* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)											/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gbusters_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)	/* coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* sound code # */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)			/* enable gfx ROM read through VRAM */
-	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)			/* ??? */
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)			/* tiles + sprites (RAM H21, G21 & H6) */
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(SMH_RAM)					/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(bankedram_w) AM_BASE(&ram)			/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM 878n02.rom */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gbusters_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 878h01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ym", ym2151_status_port_r)	/* YM 2151 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gbusters_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 878h01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)		/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", gbusters_snd_bankswitch_w)	/* 007232 bankswitch? */
+static ADDRESS_MAP_START( gbusters_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)									/* soundlatch_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ym", ym2151_status_port_r)					/* YM 2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)				/* YM 2151 */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -245,11 +231,11 @@ static MACHINE_DRIVER_START( gbusters )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
-	MDRV_CPU_PROGRAM_MAP(gbusters_readmem,gbusters_writemem)
+	MDRV_CPU_PROGRAM_MAP(gbusters_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gbusters_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(gbusters_readmem_sound,gbusters_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(gbusters_sound_map,0)
 
 	MDRV_MACHINE_RESET(gbusters)
 
