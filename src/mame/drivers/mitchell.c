@@ -1257,7 +1257,7 @@ static MACHINE_DRIVER_START( marukin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
-	MDRV_CPU_IO_MAP(mstworld_io_map,0)
+	MDRV_CPU_IO_MAP(mitchell_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
