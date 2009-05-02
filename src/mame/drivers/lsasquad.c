@@ -168,10 +168,13 @@ static WRITE8_HANDLER( lsasquad_bankswitch_w )
 	/* other bits unknown */
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xa000, 0xe5ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( lsasquad_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -180,61 +183,34 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xec00, 0xec00) AM_READ(lsasquad_sound_result_r)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READ(lsasquad_mcu_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_RAM)	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(lsasquad_mcu_w)
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
+	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r,lsasquad_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(lsasquad_sh_sound_command_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym2203_w)
+static ADDRESS_MAP_START( lsasquad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(lsasquad_sh_result_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r,lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)	/* space for diagnostic ROM? */
+	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
+	AM_RANGE(0xe000, 0xefff) AM_ROM		/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(lsasquad_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(lsasquad_68705_portB_r)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_portA_r,lsasquad_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_portB_r,lsasquad_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_READ(lsasquad_mcu_status_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(lsasquad_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(lsasquad_68705_portB_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(lsasquad_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(lsasquad_68705_ddrB_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( lsasquad )
@@ -362,7 +338,7 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-static ADDRESS_MAP_START( mem_daikaiju, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
@@ -382,7 +358,7 @@ static ADDRESS_MAP_START( mem_daikaiju, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE(daikaiju_mcu_r, daikaiju_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem_daikaiju, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
@@ -556,14 +532,14 @@ static MACHINE_DRIVER_START( lsasquad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_sound_map,0)
 								/* IRQs are triggered by the YM2203 */
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -601,11 +577,11 @@ static MACHINE_DRIVER_START( daikaiju )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(mem_daikaiju, 0)
+	MDRV_CPU_PROGRAM_MAP(daikaiju_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(sound_mem_daikaiju, 0)
+	MDRV_CPU_PROGRAM_MAP(daikaiju_sound_map, 0)
 	/* IRQs are triggered by the YM2203 */
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
