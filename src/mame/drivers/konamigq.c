@@ -270,23 +270,17 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( sndreadmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x2004ff) AM_READ(dual539_r)
-	AM_RANGE(0x300000, 0x300001) AM_READ(tms57002_data_word_r)
-	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
-	AM_RANGE(0x500000, 0x500001) AM_READ(tms57002_status_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sndwritemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x2004ff) AM_WRITE(dual539_w)
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(tms57002_data_word_w)
+static ADDRESS_MAP_START( konamigq_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r,dual539_w)
+	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r,tms57002_data_word_w)
 	AM_RANGE(0x400000, 0x40000f) AM_WRITE(sndcomm68k_w)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(tms57002_control_word_w)
+	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
+	AM_RANGE(0x500000, 0x500001) AM_READWRITE(tms57002_status_word_r,tms57002_control_word_w)
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
+
 
 static const k054539_interface k054539_config =
 {
@@ -391,7 +385,7 @@ static MACHINE_DRIVER_START( konamigq )
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MDRV_CPU_ADD( "soundcpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( sndreadmem, sndwritemem )
+	MDRV_CPU_PROGRAM_MAP( konamigq_sound_map, 0 )
 	MDRV_CPU_PERIODIC_INT( irq2_line_hold, 480 )
 
 	MDRV_MACHINE_START( konamigq )

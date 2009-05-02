@@ -9,7 +9,7 @@ driver by
 TODO:
 - map inputs (temp mapped to keys a-l and z-x)
 - is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen)
-- colors (afaik color(?) prom outputs are connected to one of pals)
+- colors (afaik color(?) prom outputs are connected to one of pals), might help to have a screenshot of the original thing.
 
 
 Basic hw is...
@@ -51,9 +51,9 @@ static const int inputTab[]= {	0x22,	0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code  = videoram[tile_index]|((videoram[tile_index+0x400]<<2)&0x100);
-	int color = videoram[tile_index+0x400]&0x1f;
-	int flip  =(videoram[tile_index+0x400]&0x80)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
+	int code  = videoram[tile_index]|((videoram[tile_index+0x400] & 0x40)<<2);
+	int color = (videoram[tile_index+0x400]&0x1f);
+	int flip  = (videoram[tile_index+0x400]&0x80)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
 
 	SET_TILE_INFO(	0,	code,	color, flip);
 }
@@ -62,11 +62,6 @@ static WRITE8_HANDLER(vram_w)
 {
 	videoram[offset]=data;
 	tilemap_mark_tile_dirty(koikoi_tilemap,offset&0x3ff);
-}
-
-static READ8_HANDLER(vram_r)
-{
-	return videoram[offset];
 }
 
 static READ8_DEVICE_HANDLER(input_r)
@@ -111,30 +106,28 @@ static WRITE8_DEVICE_HANDLER(unknown_w)
 static READ8_HANDLER(io_r)
 {
 	if(!offset)
-	{
-			return input_port_read(space->machine, "IN0")^ioram[4]; //coin
-	}
+		return input_port_read(space->machine, "IN0")^ioram[4]; //coin
+
 	return 0;
 }
 
 static WRITE8_HANDLER(io_w)
 {
 	if(offset==7 && data==0)
-	{
 		inputcnt=0; //reset read cycle counter
-	}
+
 	ioram[offset]=data;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( koikoi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
-	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(vram_r, vram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( koikoi_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP //unknown , many writes
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("ay", ay8910_r)
@@ -176,14 +169,14 @@ static INPUT_PORTS_START( koikoi )
 	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")	/* IN1 */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A) //1
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) //2
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D) //3
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F) //4
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G) //5
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H) //6
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J) //7
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K) //8
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button 1") PORT_CODE(KEYCODE_A) //1
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 2") PORT_CODE(KEYCODE_S) //2
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 3") PORT_CODE(KEYCODE_D) //3
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button 4") PORT_CODE(KEYCODE_F) //4
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button 5") PORT_CODE(KEYCODE_G) //5
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Button 6") PORT_CODE(KEYCODE_H) //6
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 Button 7") PORT_CODE(KEYCODE_J) //7
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("P1 Button 8") PORT_CODE(KEYCODE_K) //8
 
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X)
@@ -198,18 +191,18 @@ static PALETTE_INIT( koikoi ) //wrong
 {
 	int i;
 
-	for (i = 0;i < 256;i++)
+	for (i = 0;i < 0x100;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 2) & 0x01;
+		bit2 = (color_prom[i] >> 1) & 0x01;
+		bit3 = (color_prom[i] >> 0) & 0x01;
 
-		r=bit0*255;
-		g=bit1*255;
-		b=bit2*255;
+		r=bit0*0xaa+bit3*0x55;
+		g=bit1*0xaa+bit3*0x55;
+		b=bit2*0xaa+bit3*0x55;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
@@ -226,13 +219,13 @@ static VIDEO_UPDATE(koikoi)
 	return 0;
 }
 
-
 static const gfx_layout tilelayout =
 {
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(0,3), RGN_FRAC(2,3), RGN_FRAC(1,3) },
+	//{ RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(1,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -258,8 +251,8 @@ static MACHINE_DRIVER_START( koikoi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(readmem, 0)
-	MDRV_CPU_IO_MAP(readport, 0)
+	MDRV_CPU_PROGRAM_MAP(koikoi_map, 0)
+	MDRV_CPU_IO_MAP(koikoi_io_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -282,8 +275,7 @@ static MACHINE_DRIVER_START( koikoi )
 
 	MDRV_SOUND_ADD("ay", AY8910, KOIKOI_CRYSTAL/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
-  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 
@@ -314,7 +306,6 @@ ROM_START( koikoi )
 	ROM_LOAD( "pal16r8a_yellow.ic8",   0x0400, 0x0104, CRC(7d8da540) SHA1(28925d1fb4ef670e9c9d24860b67fdff8791c6a9) )
 	ROM_LOAD( "pal16r8a_brown.ic11",   0x0600, 0x0104, CRC(fff46363) SHA1(97f673c862e9d5b12cac283000a779c465c76828) )
 	ROM_LOAD( "pal16r8a_red.ic10",     0x0800, 0x0104, CRC(027ad661) SHA1(fa5aafe6deb3a9865498152b92dd3776ea10a51d) )
-
 ROM_END
 
 GAME( 1982, koikoi,   0,      koikoi, koikoi, 0, ROT270, "Kiwako", "Koi Koi Part 2", GAME_WRONG_COLORS )

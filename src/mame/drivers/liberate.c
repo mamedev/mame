@@ -15,7 +15,6 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
@@ -88,68 +87,47 @@ static WRITE8_HANDLER( deco16_bank_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosport_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x021f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( prosport_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x021f) AM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1200, 0x1fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x3fff) AM_READ(SMH_ROM) /* Mirror of main rom */
+static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x6200, 0x67ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( liberate_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x3fff) AM_WRITE(SMH_ROM) /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_WRITE(SMH_RAM) AM_BASE(&scratchram)
+	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( deco16_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberatb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00fe, 0x00fe) AM_READ_PORT("IN0")
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x3fff) AM_READ(SMH_ROM) /* Mirror of main rom */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
+	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE(&scratchram)
+	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( liberatb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x3fff) AM_WRITE(SMH_ROM) /* Mirror of main rom */
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_WRITE(SMH_RAM) AM_BASE(&scratchram)
-	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*************************************
@@ -159,36 +137,26 @@ ADDRESS_MAP_END
  *************************************/
 
 #if 0
-static ADDRESS_MAP_START( prosoccr_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( prosoccr_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( prosoccr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DeVWRITE(SOUND, "ay2", ay8910_address_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( liberate_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*************************************
@@ -518,13 +486,13 @@ static MACHINE_DRIVER_START( liberate )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
+	MDRV_CPU_PROGRAM_MAP(liberate_map,0)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 
 	MDRV_CPU_ADD("audiocpu",M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
+	MDRV_CPU_PROGRAM_MAP(liberate_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -559,7 +527,7 @@ static MACHINE_DRIVER_START( liberatb )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_TYPE(M6502)
-	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
+	MDRV_CPU_PROGRAM_MAP(liberatb_map,0)
 	MDRV_CPU_IO_MAP(0,0)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 MACHINE_DRIVER_END
@@ -578,7 +546,7 @@ static MACHINE_DRIVER_START( prosoccr )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(3000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
+	MDRV_CPU_PROGRAM_MAP(liberate_map,0)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
 
 	MDRV_VIDEO_START(prosoccr)
@@ -589,12 +557,12 @@ static MACHINE_DRIVER_START( prosport )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(prosport_readmem,prosport_writemem)
+	MDRV_CPU_PROGRAM_MAP(prosport_map,0)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
+	MDRV_CPU_PROGRAM_MAP(liberate_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -773,10 +741,10 @@ ROM_END
 
 ROM_START( yellowcj )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "bp11.bin", 0xc000, 0x2000, CRC(63cdee83) SHA1(c4a5c3d7761336f4fc3fe83490b69812d70b2cde) )
-	ROM_RELOAD(            0x0000, 0x2000 )
-	ROM_LOAD( "bp10.bin", 0xe000, 0x2000, CRC(1024f2f1) SHA1(a3804df3c9ecfde9318ed121327ef095d7a9e1f0) )
+	ROM_LOAD( "bp11.bin", 0xe000, 0x2000, CRC(63cdee83) SHA1(c4a5c3d7761336f4fc3fe83490b69812d70b2cde) )
 	ROM_RELOAD(            0x2000, 0x2000 )
+	ROM_LOAD( "bp10.bin", 0xc000, 0x2000, CRC(1024f2f1) SHA1(a3804df3c9ecfde9318ed121327ef095d7a9e1f0) )
+	ROM_RELOAD(            0x0000, 0x2000 )
 
 	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
@@ -992,7 +960,7 @@ GAME( 1983, prosport, 0,        prosport,  liberate, prosport, ROT270, "Data Eas
 GAME( 1983, boomrang, 0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
 GAME( 1983, boomrana, boomrang, boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", 0 )
 GAME( 1984, kamikcab, 0,        boomrang,  kamikcab, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", 0 )
-GAME( 1984, yellowcj, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", GAME_NOT_WORKING )
+GAME( 1984, yellowcj, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", 0 )
 GAME( 1984, yellowcb, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", 0 )
 GAME( 1984, liberate, 0,        liberate,  liberate, liberate, ROT270, "Data East Corporation", "Liberation", 0 )
 GAME( 1984, dualaslt, liberate, liberate,  dualaslt, liberate, ROT270, "Data East USA",         "Dual Assault", 0 )
