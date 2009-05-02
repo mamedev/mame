@@ -436,7 +436,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_CPU_ADD("mcu", M68705, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
 
-	MDRV_PIA6821_ADD("pia", a600xl_pia_interface)
+	MDRV_PIA6821_ADD("pia", atarixl_pia_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_MACHINE_START( a600xl )
+	MDRV_MACHINE_START( atarixl )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( maxaflex )

@@ -20,7 +20,6 @@
 #define VERBOSE_SERIAL	0
 #define VERBOSE_TIMERS	0
 
-static void a800xl_mmu(running_machine *machine, UINT8 new_mmu);
 static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine *machine);
@@ -73,12 +72,11 @@ READ8_DEVICE_HANDLER(atari_pia_pb_r)
 	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_2_3", 0);
 }
 
-static WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine, data); }
-WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
+WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine, data); }
 
 static WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }	// This is used by Floppy drive on Atari 8bits Home Computers
 
-const pia6821_interface a600xl_pia_interface =
+const pia6821_interface atarixl_pia_interface =
 {
 	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
 	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
@@ -97,7 +95,7 @@ const pia6821_interface a600xl_pia_interface =
 
 /**************************************************************
  *
- * Reset hardware
+ * Memory banking
  *
  **************************************************************/
 
@@ -122,75 +120,6 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	if (rbank2 == (read8_space_func)SMH_BANK(2))
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x5000);
-}
-
-void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
-{
-	read8_space_func rbank1, rbank2, rbank3, rbank4;
-	write8_space_func wbank1, wbank2, wbank3, wbank4;
-	UINT8 *base1, *base2, *base3, *base4;
-
-	/* check if memory C000-FFFF changed */
-	if( new_mmu & 0x01 )
-	{
-		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		rbank3 = (read8_space_func)SMH_BANK(3);
-		wbank3 = (write8_space_func)SMH_UNMAP;
-		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		rbank4 = (read8_space_func)SMH_BANK(4);
-		wbank4 = (write8_space_func)SMH_UNMAP;
-		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
-	}
-	else
-	{
-		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		rbank3 = (read8_space_func)SMH_BANK(3);
-		wbank3 = (write8_space_func)SMH_BANK(3);
-		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		rbank4 = (read8_space_func)SMH_BANK(4);
-		wbank4 = (write8_space_func)SMH_BANK(4);
-		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
-	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
-	memory_set_bankptr(machine, 3, base3);
-	memory_set_bankptr(machine, 4, base4);
-
-	/* check if BASIC changed */
-	if( new_mmu & 0x02 )
-	{
-		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
-		rbank1 = (read8_space_func)SMH_BANK(1);
-		wbank1 = (write8_space_func)SMH_BANK(1);
-		base1 = memory_region(machine, "maincpu") + 0x0a000;  /* 8K RAM */
-	}
-	else
-	{
-		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
-		rbank1 = (read8_space_func)SMH_BANK(1);
-		wbank1 = (write8_space_func)SMH_UNMAP;
-		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
-	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
-	memory_set_bankptr(machine, 1, base1);
-
-	/* check if self-test ROM changed */
-	if( new_mmu & 0x80 )
-	{
-		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		rbank2 = (read8_space_func)SMH_BANK(2);
-		wbank2 = (write8_space_func)SMH_BANK(2);
-		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
-	}
-	else
-	{
-		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		rbank2 = (read8_space_func)SMH_BANK(2);
-		wbank2 = (write8_space_func)SMH_UNMAP;
-		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
-	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);
 }
 
 
@@ -440,7 +369,7 @@ void atari_machine_start(running_machine *machine)
  *
  *************************************/
 
-MACHINE_START( a600xl )
+MACHINE_START( atarixl )
 {
 	atari_machine_start(machine);
 }
