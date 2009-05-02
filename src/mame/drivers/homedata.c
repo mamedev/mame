@@ -565,34 +565,28 @@ static WRITE8_HANDLER( bankswitch_w )
 /********************************************************************************/
 
 
-static ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_RAM) /* videoram */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM) /* work ram */
-	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM) /* hourouki expects this to act as RAM */
-	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM) /* only used to store the result of the ROM check */
+static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
+	AM_RANGE(0x7800, 0x7800) AM_RAM /* only used to store the result of the ROM check */
 	AM_RANGE(0x7801, 0x7802) AM_READ(mrokumei_keyboard_r)	// also vblank and active page
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(mrokumei_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(SMH_RAM) /* only used to store the result of the ROM check */
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITE(SMH_RAM) AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn", sn76496_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1211,7 +1205,7 @@ static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
+	MDRV_CPU_PROGRAM_MAP(mrokumei_map,0)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */

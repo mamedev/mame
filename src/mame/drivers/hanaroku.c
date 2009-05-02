@@ -118,34 +118,22 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 
 /* main cpu */
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa1ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc400, 0xc4ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2")
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram3)
+static ADDRESS_MAP_START( hanaroku_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&hanaroku_spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(&hanaroku_spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(&hanaroku_spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
 	AM_RANGE(0xa300, 0xa304) AM_WRITENOP	// ???
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM)				// main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(SMH_RAM)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(hanaroku_out_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(hanaroku_out_1_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(hanaroku_out_2_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
+	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE(hanaroku_out_2_w)
 ADDRESS_MAP_END
 
 
@@ -241,7 +229,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( hanaroku )
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(hanaroku_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

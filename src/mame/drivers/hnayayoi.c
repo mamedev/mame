@@ -103,16 +103,10 @@ static MACHINE_RESET( hnayayoi )
 
 
 
-static ADDRESS_MAP_START( hnayayoi_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hnayayoi_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( hnayayoi_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnayayoi_io_map, ADDRESS_SPACE_IO, 8 )
@@ -135,22 +129,13 @@ static ADDRESS_MAP_START( hnayayoi_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x62, 0x67) AM_WRITE(dynax_blitter_rev1_param_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnfubuki_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xfeff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( hnfubuki_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xfeff) AM_ROM
+	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xff02, 0xff03) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW3")
-	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
-	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
-	AM_RANGE(0xff43, 0xff43) AM_READ_PORT("COIN")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hnfubuki_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xfeff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xff06, 0xff06) AM_DEVWRITE("msm", adpcm_data_w)
 //  AM_RANGE(0xff08, 0xff08) AM_WRITENOP // CRT Controller
 //  AM_RANGE(0xff09, 0xff09) AM_WRITENOP // CRT Controller
@@ -159,20 +144,17 @@ static ADDRESS_MAP_START( hnfubuki_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff23, 0xff23) AM_DEVWRITE("msm", adpcm_vclk_w)
 	AM_RANGE(0xff24, 0xff24) AM_DEVWRITE("msm", adpcm_reset_inv_w)
 	AM_RANGE(0xff40, 0xff40) AM_WRITE(keyboard_w)
+	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
+	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
+	AM_RANGE(0xff43, 0xff43) AM_READ_PORT("COIN")
 	AM_RANGE(0xff60, 0xff61) AM_WRITE(hnayayoi_palbank_w)
 	AM_RANGE(0xff62, 0xff67) AM_WRITE(dynax_blitter_rev1_param_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( untoucha_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( untoucha_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( untoucha_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_io_map, ADDRESS_SPACE_IO, 8 )
@@ -562,7 +544,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( hnayayoi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(hnayayoi_readmem,hnayayoi_writemem)
+	MDRV_CPU_PROGRAM_MAP(hnayayoi_map,0)
 	MDRV_CPU_IO_MAP(hnayayoi_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
@@ -603,13 +585,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hnfubuki )
 	MDRV_IMPORT_FROM(hnayayoi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnfubuki_readmem,hnfubuki_writemem)
+	MDRV_CPU_PROGRAM_MAP(hnfubuki_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( untoucha )
 	MDRV_IMPORT_FROM(hnayayoi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(untoucha_readmem,untoucha_writemem)
+	MDRV_CPU_PROGRAM_MAP(untoucha_map,0)
 	MDRV_CPU_IO_MAP(untoucha_io_map,0)
 
 	MDRV_VIDEO_START(untoucha)

@@ -49,40 +49,30 @@ static WRITE8_HANDLER( hcastle_coin_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0020, 0x003f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0220, 0x023f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM")
+static ADDRESS_MAP_START( hcastle_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0007) AM_WRITE(hcastle_pf1_control_w)
+	AM_RANGE(0x0020, 0x003f) AM_RAM	/* rowscroll? */
+	AM_RANGE(0x0200, 0x0207) AM_WRITE(hcastle_pf2_control_w)
+	AM_RANGE(0x0220, 0x023f) AM_RAM /* rowscroll? */
+	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
+	AM_RANGE(0x0404, 0x0404) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x0408, 0x0408) AM_WRITE(hcastle_soundirq_w)
+	AM_RANGE(0x040c, 0x040c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM") AM_WRITE(hcastle_coin_w)
 	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
 	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
 	AM_RANGE(0x0413, 0x0413) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0418, 0x0418) AM_READ(hcastle_gfxbank_r)
-	AM_RANGE(0x0600, 0x06ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0700, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(hcastle_pf1_control_w)
-	AM_RANGE(0x0020, 0x003f) AM_WRITE(SMH_RAM)	/* rowscroll? */
-	AM_RANGE(0x0200, 0x0207) AM_WRITE(hcastle_pf2_control_w)
-	AM_RANGE(0x0220, 0x023f) AM_WRITE(SMH_RAM)	/* rowscroll? */
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
-	AM_RANGE(0x0404, 0x0404) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE(hcastle_soundirq_w)
-	AM_RANGE(0x040c, 0x040c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(hcastle_coin_w)
-	AM_RANGE(0x0418, 0x0418) AM_WRITE(hcastle_gfxbank_w)
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x0700, 0x1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(hcastle_pf1_video_w) AM_BASE(&hcastle_pf1_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(hcastle_pf2_video_w) AM_BASE(&hcastle_pf2_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
- 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0418, 0x0418) AM_READWRITE(hcastle_gfxbank_r, hcastle_gfxbank_w)
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)
+	AM_RANGE(0x0700, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(hcastle_pf1_video_w) AM_BASE(&hcastle_pf1_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(hcastle_pf2_video_w) AM_BASE(&hcastle_pf2_videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -94,24 +84,17 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 	k007232_set_bank(device, bank_A, bank_B );
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym", ym3812_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami1", k007232_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE("konami2", k051649_waveform_w)
 	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_frequency_w)
 	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_volume_w)
 	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym3812_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami1", k007232_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("konami1", sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -213,11 +196,11 @@ static MACHINE_DRIVER_START( hcastle )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Derived from 24 MHz clock */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(hcastle_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

@@ -78,20 +78,13 @@ static WRITE8_HANDLER( hanaawas_inputs_mux_w )
 	mux = data;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(hanaawas_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(hanaawas_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( hanaawas_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -202,7 +195,7 @@ static MACHINE_DRIVER_START( hanaawas )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(hanaawas_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

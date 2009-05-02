@@ -70,55 +70,54 @@ static NVRAM_HANDLER( hyperspt )
 
 
 
-static ADDRESS_MAP_START( hyperspt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1681, 0x1681) AM_READ(konami_IN1_r)	 /* P1/P2 IO and handle fake button for cheating */
-	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( roadf_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
-	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
-	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10bf) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x10C0, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&hyperspt_scroll)	/* Scroll amount */
+static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE(&hyperspt_scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
 	AM_RANGE(0x1487, 0x1487) AM_WRITE(interrupt_enable_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(hyperspt_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(hyperspt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
+//  AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x1681, 0x1681) AM_READ(konami_IN1_r)	 /* P1/P2 IO and handle fake button for cheating */
+	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
+	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE(&hyperspt_scroll)	/* Scroll amount */
+	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
+	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
+	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
+	AM_RANGE(0x1487, 0x1487) AM_WRITE(interrupt_enable_w)  /* Interrupt enable */
+	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
+	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
+	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(hyperspt_sh_timer_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("vlm", hyperspt_sound_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
@@ -309,11 +308,11 @@ static MACHINE_DRIVER_START( hyperspt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(hyperspt_readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(hyperspt_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_NVRAM_HANDLER(hyperspt)
 
@@ -349,7 +348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roadf )
 	MDRV_IMPORT_FROM(hyperspt)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(roadf_readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(roadf_map,0)
 	MDRV_GFXDECODE(roadf)
 	MDRV_VIDEO_START(roadf)
 MACHINE_DRIVER_END

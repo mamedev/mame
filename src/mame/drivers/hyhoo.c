@@ -55,14 +55,9 @@ static DRIVER_INIT( hyhoo2 )
 }
 
 
-static ADDRESS_MAP_START( readmem_hyhoo, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_hyhoo, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+static ADDRESS_MAP_START( hyhoo_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
@@ -261,7 +256,7 @@ static MACHINE_DRIVER_START( hyhoo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000/1)	/* 5.00 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(readmem_hyhoo, writemem_hyhoo)
+	MDRV_CPU_PROGRAM_MAP(hyhoo_map,0)
 	MDRV_CPU_IO_MAP(hyhoo_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 

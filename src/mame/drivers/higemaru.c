@@ -34,26 +34,20 @@ static INTERRUPT_GEN( higemaru_interrupt )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( higemaru_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(higemaru_c800_w)
 	AM_RANGE(0xc801, 0xc802) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xc803, 0xc804) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(higemaru_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(higemaru_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd880, 0xd9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd880, 0xd9ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -173,7 +167,7 @@ static MACHINE_DRIVER_START( higemaru )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/3)	/* 4 MHz? Sharp LH0080A Z80A-CPU-D */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(higemaru_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(higemaru_interrupt,2)
 
 	/* video hardware */

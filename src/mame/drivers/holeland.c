@@ -27,36 +27,23 @@ WRITE8_HANDLER( holeland_pal_offs_w );
 WRITE8_HANDLER( holeland_scroll_w );
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf3ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( holeland_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(holeland_pal_offs_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(holeland_flipscreen_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crzrally_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe800, 0xebff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( crzrally_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( crzrally_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe800, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(holeland_scroll_w)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(holeland_pal_offs_w)
 ADDRESS_MAP_END
@@ -300,7 +287,7 @@ static MACHINE_DRIVER_START( holeland )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(holeland_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -369,7 +356,7 @@ static MACHINE_DRIVER_START( crzrally )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
-	MDRV_CPU_PROGRAM_MAP(crzrally_readmem,crzrally_writemem)
+	MDRV_CPU_PROGRAM_MAP(crzrally_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
