@@ -459,6 +459,7 @@ static UINT32 *hng_cart;
 static UINT32 *hng64_dualport;
 static UINT32 *hng64_sram;
 static UINT16 *hng64_soundram;
+static UINT32 *hng64_sysregs;
 
 // Stuff from over in video...
 extern tilemap *hng64_tilemap0, *hng64_tilemap1, *hng64_tilemap2, *hng64_tilemap3 ;
@@ -622,7 +623,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( hng64_port_read )
+static READ32_HANDLER( hng64_sysregs_r )
 {
 	mame_system_time systime;
 	mame_get_base_datetime(space->machine, &systime);
@@ -632,8 +633,13 @@ static READ32_HANDLER( hng64_port_read )
 
 	switch(offset*4)
 	{
+		case 0x001c: return mame_rand(space->machine); // hng64 hangs on start-up if zero.
+		//case 0x106c:
+		//case 0x107c:
 		case 0x1084: return 0x00000002; //???
+		//case 0x108c:
 		case 0x1104: return hng64_interrupt_level_request;
+		case 0x1254: return 0x00000000; //dma status, 0x800
 		/* 4-bit RTC */
 		case 0x2104: return (systime.local_time.second % 10);
 		case 0x210c: return (systime.local_time.second / 10);
@@ -654,13 +660,15 @@ static READ32_HANDLER( hng64_port_read )
 		case 0x217c: return 0; //RTC status?
 	}
 
+	//printf("%08x\n",offset*4);
 
-	return mame_rand(space->machine)&0xffffffff;
+	//return mame_rand(space->machine)&0xffffffff;
+	return hng64_sysregs[offset];
 }
-
 
 /* preliminary dma code, dma is used to copy program code -> ram */
 static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
+
 static void hng64_do_dma (const address_space *space)
 {
 	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
@@ -677,26 +685,34 @@ static void hng64_do_dma (const address_space *space)
 	}
 }
 
+/*
+//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
+//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
+//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
 
-static WRITE32_HANDLER( hng_dma_start_w )
+//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+
+*/
+
+static WRITE32_HANDLER( hng64_sysregs_w )
 {
-	logerror ("DMA Start Write %08x\n",data);
-	COMBINE_DATA(&hng_dma_start);
-}
-
-static WRITE32_HANDLER( hng_dma_dst_w )
-{
-	logerror ("DMA Dst Write %08x\n",data);
-	COMBINE_DATA(&hng_dma_dst);
-}
-
-static WRITE32_HANDLER( hng_dma_len_w )
-{
-	logerror ("DMA Len Write %08x\n",data);
-	COMBINE_DATA(&hng_dma_len);
-
-	hng64_do_dma(space);
-
+	COMBINE_DATA (&hng64_sysregs[offset]);
+	switch(offset*4)
+	{
+		case 0x111c: /* irq ack */ break;
+		case 0x1204: hng_dma_start = hng64_sysregs[offset]; break;
+		case 0x1214: hng_dma_dst = hng64_sysregs[offset]; break;
+		case 0x1224:
+			hng_dma_len = hng64_sysregs[offset];
+			hng64_do_dma(space);
+			break;
+		default:
+			logerror("HNG64 reading from SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+	}
 }
 
 static READ32_HANDLER( hng64_sram_r )
@@ -916,19 +932,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3",0) AM_BASE(&hng_cart)
 
 	// Ports
-	AM_RANGE(0x1F700000, 0x1F702fff) AM_READ(hng64_port_read)
-
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
-//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
-	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
-	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
-	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r,hng64_sysregs_w) AM_BASE(&hng64_sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
