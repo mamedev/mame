@@ -202,7 +202,7 @@ static MACHINE_RESET( common )
 	memory_set_bank(machine, 1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "tms", INPUT_LINE_RESET, ASSERT_LINE);
 
 	for (i = 0; i < SOUND_CHANNELS; i++)
 	{
@@ -255,7 +255,7 @@ static INTERRUPT_GEN( vblank_gen )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
 }
 
 
@@ -308,7 +308,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	logerror("delayed_sound_w(%02X)\n", param);
 	sound_data = param;
-	cpu_set_input_line(machine->cpu[2], ADSP2115_IRQ2, ASSERT_LINE);
+	cputag_set_input_line(machine, "adsp", ADSP2115_IRQ2, ASSERT_LINE);
 }
 
 
@@ -323,7 +323,7 @@ static WRITE16_HANDLER( sound_data_w )
 static READ16_HANDLER( sound_data_r )
 {
 	logerror("sound_data_r(%02X)\n", sound_data);
-	cpu_set_input_line(space->machine->cpu[2], ADSP2115_IRQ2, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "adsp", ADSP2115_IRQ2, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -433,7 +433,7 @@ static WRITE16_HANDLER( tms_reset_w )
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "tms", INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -443,7 +443,7 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* done after uploading, and after modifying the comm area */
 	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(space->machine->cpu[1], 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "tms", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -550,7 +550,7 @@ static WRITE16_HANDLER( adsp_rombank_w )
 static TIMER_CALLBACK( adsp_autobuffer_irq )
 {
 	/* get the index register */
-	int reg = cpu_get_reg(machine->cpu[2], ADSP2100_I0 + adsp_ireg);
+	int reg = cpu_get_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -567,11 +567,11 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(machine->cpu[2], ADSP2105_IRQ1);
+		generic_pulse_irq_line(cputag_get_cpu(machine, "adsp"), ADSP2105_IRQ1);
 	}
 
 	/* store it */
-	cpu_set_reg(machine->cpu[2], ADSP2100_I0 + adsp_ireg, reg);
+	cpu_set_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
 }
 
 

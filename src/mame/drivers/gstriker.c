@@ -202,8 +202,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
-		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -270,9 +270,9 @@ GFXDECODE_END
 static void gs_ym2610_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -975,11 +975,11 @@ static void mcu_init( running_machine *machine )
 	pending_command = 0;
 	mcu_data = 0;
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_w);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_r);
 }
 
 static DRIVER_INIT( twrldc94 )
@@ -999,8 +999,8 @@ static DRIVER_INIT( vgoalsoc )
 	gametype = 3;
 	mcu_init( machine );
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_r);
 }
 
 /*** GAME DRIVERS ************************************************************/
@@ -1012,4 +1012,3 @@ GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, vgoalsoc,   ROT0, "Tecmo", "
 GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 2)", GAME_NOT_WORKING )
 GAME( 1994, twrldc94, 0,        twrldc94, twrldc94, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, twrdc94a, twrldc94, twrldc94, twrldc94, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-

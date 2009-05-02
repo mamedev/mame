@@ -162,17 +162,17 @@ WRITE16_HANDLER( gaiden_flip_w );
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	if (ACCESSING_BITS_0_7) soundlatch_w(space,0,data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_BITS_8_15) soundlatch_w(space,0,data >> 8);	/* Tecmo Knight */
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	if (ACCESSING_BITS_0_7) soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
+	if (ACCESSING_BITS_8_15) soundlatch_w(space, 0, data >> 8);	/* Tecmo Knight */
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space,0,data >> 8);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space, 0, data >> 8);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -806,7 +806,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1333,8 +1333,8 @@ static DRIVER_INIT( wildfang )
 	/* sprite size Y = sprite size X */
 	gaiden_sprite_sizey = 0;
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
 }
 
 static DRIVER_INIT( raiga )
@@ -1342,8 +1342,8 @@ static DRIVER_INIT( raiga )
 	/* sprite size Y independent from sprite size X */
 	gaiden_sprite_sizey = 2;
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
 }
 
 static DRIVER_INIT( drgnbowl )

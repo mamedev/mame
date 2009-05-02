@@ -691,7 +691,7 @@ static READ8_HANDLER( diamond_hack_r )
 
 static DRIVER_INIT( diamond )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, diamond_hack_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, diamond_hack_r);
 }
 
 
@@ -705,4 +705,3 @@ GAME( 1985, makaimur, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Jap
 GAME( 1985, makaimuc, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
 GAME( 1985, makaimug, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision G)", GAME_SUPPORTS_SAVE )
 GAME( 1989, diamond,  0,   gng, diamond,  diamond, ROT0, "KH Video", "Diamond Run", GAME_SUPPORTS_SAVE )
-

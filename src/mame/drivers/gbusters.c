@@ -104,7 +104,7 @@ char baf[40];
 
 static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
@@ -368,7 +368,7 @@ static MACHINE_RESET( gbusters )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(machine->cpu[0], gbusters_banking);
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );

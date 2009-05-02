@@ -39,8 +39,8 @@ static UINT16* go2000_video2;
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	soundlatch_w(space,offset,data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space, offset, data & 0xff);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( go2000_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -283,7 +283,7 @@ static VIDEO_UPDATE(go2000)
 
 static MACHINE_RESET(go2000)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	go2000_pcm_1_bankswitch_w(space, 0, 0);
 }
 

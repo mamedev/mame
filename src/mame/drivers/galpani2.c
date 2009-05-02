@@ -81,7 +81,7 @@ static MACHINE_RESET( galpani2 )
 
 static void galpani2_write_kaneko(running_machine *machine)
 {
-	const address_space *dstspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(dstspace,0x100000,0x4b);
 	memory_write_byte(dstspace,0x100001,0x41);
 	memory_write_byte(dstspace,0x100002,0x4e);
@@ -92,8 +92,8 @@ static void galpani2_write_kaneko(running_machine *machine)
 
 void galpani2_mcu_run(running_machine *machine)
 {
-	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
 	int i,x;
 
 	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
@@ -113,8 +113,8 @@ void galpani2_mcu_run(running_machine *machine)
 
 static void galpani2_mcu_nmi(running_machine *machine)
 {
-	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_src, mcu_dst, mcu_size;
 
 	/* "Last Check" */

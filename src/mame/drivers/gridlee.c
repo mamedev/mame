@@ -113,7 +113,7 @@ static emu_timer *firq_timer;
 
 static TIMER_CALLBACK( irq_off_tick )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( irq_timer_tick )
         timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
     timer_adjust_oneshot(irq_off, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), 0);
@@ -135,7 +135,7 @@ static TIMER_CALLBACK( irq_timer_tick )
 
 static TIMER_CALLBACK( firq_off_tick )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -145,7 +145,7 @@ static TIMER_CALLBACK( firq_timer_tick )
     timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
     timer_adjust_oneshot(firq_off, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), 0);

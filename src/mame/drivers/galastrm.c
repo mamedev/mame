@@ -64,7 +64,7 @@ static INTERRUPT_GEN( galastrm_interrupt )
 
 static TIMER_CALLBACK( galastrm_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[0], 6, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 }
 
 

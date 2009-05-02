@@ -46,7 +46,7 @@ static int start, end, bank;
 
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
-	cpu_set_input_line(machine->cpu[0],1,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -55,7 +55,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		cpu_set_input_line(machine->cpu[0],3,HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
 	}
 }
 #endif

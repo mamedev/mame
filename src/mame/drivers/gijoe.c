@@ -151,7 +151,7 @@ static void gijoe_objdma(void)
 static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x0020)
-		cpu_set_input_line(machine->cpu[0], 6, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gijoe_interrupt )
@@ -182,7 +182,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -192,7 +192,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void sound_nmi(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( gijoe )

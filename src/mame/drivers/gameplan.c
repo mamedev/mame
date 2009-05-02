@@ -140,7 +140,7 @@ static const via6522_interface via_1_interface =
 static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 	if (data == 0)
 	{
 		device_reset(state->riot);
@@ -182,7 +182,7 @@ static const via6522_interface via_2_interface =
 
 static void r6532_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 	if (state == ASSERT_LINE)
 		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
@@ -190,7 +190,7 @@ static void r6532_irq(const device_config *device, int state)
 
 static void r6532_soundlatch_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, newdata);
 }
 

@@ -272,7 +272,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
 		memory_set_bankptr(machine, 2,rom);
-		device_reset(machine->cpu[2]);
+		device_reset(cputag_get_cpu(machine, "audiocpu"));
 	}
 }
 
@@ -287,7 +287,7 @@ static WRITE8_DEVICE_HANDLER( gladiator_int_control_w )
 static void gladiator_ym_irq(const device_config *device, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -306,12 +306,12 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,0);
 }
 
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
@@ -1047,7 +1047,7 @@ static DRIVER_INIT(ppking)
 		}
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
 }
 
 

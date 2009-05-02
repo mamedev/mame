@@ -83,7 +83,7 @@ static int irqAen,irqBmask;
 static MACHINE_RESET( gradius3 )
 {
 	/* start with cpu B halted */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	irqAen = 0;
 	irqBmask = 0;
 }
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		gradius3_priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
 		irqAen = data & 0x20;
@@ -143,7 +143,7 @@ static WRITE16_HANDLER( cpuB_irqtrigger_w )
 	if (irqBmask & 4)
 	{
 logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
-		cpu_set_input_line(space->machine->cpu[1],4,HOLD_LINE);
+		cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
 	}
 	else
 logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
@@ -157,7 +157,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bank_w )

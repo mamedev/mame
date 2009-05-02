@@ -214,7 +214,7 @@ static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpu_set_input_line(machine->cpu[0], 0, param);
+	cputag_set_input_line(machine, "maincpu", 0, param);
 }
 
 

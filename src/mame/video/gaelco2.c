@@ -509,7 +509,7 @@ VIDEO_UPDATE( gaelco2_dual )
 
 VIDEO_EOF( gaelco2 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* sprites are one frame ahead */
 	buffer_spriteram16_w(space, 0, 0, 0xffff);

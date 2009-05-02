@@ -220,7 +220,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( groundfx )
 {
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
