@@ -811,25 +811,6 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 static WRITE32_HANDLER( dl_w )
 {
 	COMBINE_DATA (&hng64_dl[offset]) ;
-
-	// !!! There are a few other writes over 0x80 as well - don't forget about those someday !!!
-
-	// This method of finding the 85 writes and switching banks seems to work
-	//  the problem is when there are a lot of things to be drawn (more than what can fit in 2*0x80)
-	//  the list doesn't fit anymore, and parts aren't drawn every frame.
-
-
-
-	// For some reason, if the value at 0x86 and'ed with 0x02 is non-zero, the software just keeps
-	//   checking 0x86 until and'ing it with 2 returns 0...  What could change 0x86 if cpu0 is in this infinite loop?
-	//   Why 0x2?  And why (see below) does a read of 0x86 only happen when there is data 'hiding'
-	//   in the display list?
-
-	// Sends the program into an infinite loop...
-//  if (offset == 0x85 && hng64_dl[offset] == 0x1)      // Just before the second half of the writes
-//      hng64_dl[0x86] = 0x2 ;                          // set 0x86 to 2 (so it drops into the loop)
-
-//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 }
 
 #if 0
@@ -845,18 +826,16 @@ static READ32_HANDLER( dl_r )
 
 // A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
 
+// Some kind of buffering of the display lists, or 'render current buffer' write?
 static WRITE32_HANDLER( dl_control_w )
 {
 	if (activeBuffer==0 || activeBuffer==1)
 		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
 
-	// Only if it's VALID
+	// Only if it's VALID (hack)
 	if (data == 1 || data == 2)
 		activeBuffer = data - 1;
 
-	
-//	if (offset <= 0x80)
-//		hng64_dls[activeBuffer][offset] = hng64_dl[offset] ;
 }
 
 
