@@ -647,6 +647,7 @@ const game_driver * const drivers[] =
 	DRIVER( xevios )	/* bootleg */
 	DRIVER( battles )	/* bootleg */
 	DRIVER( sxevious )	/* (c) 1984 */
+	DRIVER( sxeviousj )	/* (c) 1984 */
 	DRIVER( superpac )	/* (c) 1982 */
 	DRIVER( superpcm )	/* (c) 1982 Midway */
 	DRIVER( pacnpal )	/* (c) 1983 */
