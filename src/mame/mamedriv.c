@@ -8979,6 +8979,7 @@ Other Sun games
 	/* H8/3337 italian gambling games */
 	DRIVER( ntcash )	/* (c) 1999 unknown */
 	DRIVER( wizard )	/* (c) 1999 A.A. */
+	DRIVER( trstar2k )	/* (c) 1999 A.M. */
 	DRIVER( laser2k1 )	/* (c) 2001 unknown */
 	DRIVER( mdrink )	/* (c) 2001 unknown */
 	DRIVER( te0144 )	/* (c) 2001 unknown */
@@ -8986,6 +8987,7 @@ Other Sun games
 	DRIVER( millsun )	/* (c) 200? unknown */
 	DRIVER( sspac2k1 )	/* (c) 200? unknown */
 	DRIVER( elvis )		/* (c) 200? unknown */
+	DRIVER( sstar )		/* (c) 200? unknown */
 
 	/* Intel 8086-based italian gambling games */
 	DRIVER( newmcard )	/* (c) 19?? unknown */

@@ -1,5 +1,6 @@
 /************************************************************************
 
+
   Italian Gambling games based on H8/3337 MCU + NEC D7759GC (sound).
 
   Written by Roberto Fresca.
@@ -691,18 +692,81 @@ ROM_START( elvis )
 	ROM_LOAD( "0.bin", 0x00000, 0x20000, CRC(833c5be5) SHA1(89110cb52265ee5bfdf73c0af343b7ce2356e394) )
 ROM_END
 
+/* Triple Star 2000
+
+CPU:
+1x HD64F3337YCP16 (main)(not dumped)
+2x NEC D7759GC (speech synthesizer)
+1x TDA2003 (sound)
+1x oscillator 16.000000
+1x oscillator 14.318180
+
+ROMs:
+1x M27C1001 (0)
+4x M27C4001 (1,2,3,4)
+
+
+RAMs
+3x TC551001
+
+PLDs
+2x ispLSI10032E-70LJ
+Note	1x 28x2 edge connector
+1x 14 legs connector
+1x RS232 connector
+1x trimmer (volume)
+1x trimmer (unknown)
+1x red LED
+2x 8x2 switches DIP
+1x battery 3.6V
+*/
+
+ROM_START( trstar2k )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "trstar2k_hd64f3337ycp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_LOAD( "ep1.bin", 0x000000, 0x80000, CRC(59394c87) SHA1(a8b5de197b474714a8e5a5c959b81cb78fc69291) )
+	ROM_LOAD( "ep2.bin", 0x080000, 0x80000, CRC(80608870) SHA1(5af501e4bb9498d2b9b614cc98ec9f4c907f207d) )
+	ROM_LOAD( "ep3.bin", 0x100000, 0x80000, CRC(cad4523f) SHA1(1a16f200622a8c9666beea2da2ec64bf7c9195a8) )
+	ROM_LOAD( "ep4.bin", 0x180000, 0x80000, CRC(e488d31d) SHA1(e0a51abf1459a1c7205750b9cad28a63bbabed96) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "msg0.bin", 0x00000, 0x20000, CRC(b25e1c8a) SHA1(a211412c3354a9f1a9662445b4cc379dad27813b) )
+ROM_END
+
+/* Super Star
+
+(no readme)
+
+*/
+
+ROM_START( sstar )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "sstar_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_LOAD( "sstar.ep1", 0x000000, 0x80000, CRC(e798295e) SHA1(ed9a0ceeaefccfb1bde5894548ba91d631055b69) ) //contains C-based strings?
+	ROM_LOAD( "sstar.ep2", 0x080000, 0x80000, CRC(5e9fa33b) SHA1(5196723db69bf9f1df497f4d8f84ac1d9768736f) )
+	ROM_LOAD( "sstar.ep3", 0x100000, 0x80000, CRC(67abc2a1) SHA1(877e233b2120281779a2480e8035a73df87e7240) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "sstar.msg0", 0x00000, 0x20000, CRC(04f44a53) SHA1(0b27d1fe1992d1769abec2078defc30896c36bcb) )
+ROM_END
 
 /*************************
 *      Game Drivers      *
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY    FULLNAME                          FLAGS  */
-GAME( 1999, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                          GAME_NOT_WORKING )
-GAME( 1999, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "A.A.",    "Wizard (Ver 1.0)",                GAME_NOT_WORKING )
-GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Laser 2001 (Ver 1.2)",            GAME_NOT_WORKING )
-GAME( 2001, mdrink,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Magic Drink (Ver 1.2)",           GAME_NOT_WORKING )
-GAME( 2001, te0144,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Unknown italian gambling game",   GAME_NOT_WORKING )
-GAME( 200?, cmagica,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Carta Magica (Ver 1.8)",          GAME_NOT_WORKING )
-GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millennium Sun",                  GAME_NOT_WORKING )
-GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Space 2001",                GAME_NOT_WORKING )
-GAME( 200?, elvis,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Elvis?",                          GAME_NOT_WORKING )
+GAME( 1999, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                               GAME_NOT_WORKING )
+GAME( 1999, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "A.A.",    "Wizard (Ver 1.0)",                     GAME_NOT_WORKING )
+GAME( 200?, trstar2k, 0,      itgambl2, itgambl2, 0,   ROT0, "A.M.",    "Triple Star 2000",                     GAME_NOT_WORKING )
+GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Laser 2001 (Ver 1.2)",                 GAME_NOT_WORKING )
+GAME( 2001, mdrink,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Magic Drink (Ver 1.2)",                GAME_NOT_WORKING )
+GAME( 2001, te0144,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Puzzle Bobble (Italian Gambling Game)",GAME_NOT_WORKING )
+GAME( 200?, cmagica,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Carta Magica (Ver 1.8)",               GAME_NOT_WORKING )
+GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millennium Sun",                       GAME_NOT_WORKING )
+GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Space 2001",                     GAME_NOT_WORKING )
+GAME( 200?, elvis,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Elvis?",                               GAME_NOT_WORKING )
+GAME( 200?, sstar,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Star",                           GAME_NOT_WORKING )
