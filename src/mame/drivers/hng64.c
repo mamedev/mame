@@ -806,6 +806,8 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 
 
 // The 3d 'display list'
+// is it a fifo?
+// sams64 / sams64_2 access it in a very different way to fatal fury...
 static WRITE32_HANDLER( dl_w )
 {
 	COMBINE_DATA (&hng64_dl[offset]) ;
@@ -816,15 +818,7 @@ static WRITE32_HANDLER( dl_w )
 	//  the problem is when there are a lot of things to be drawn (more than what can fit in 2*0x80)
 	//  the list doesn't fit anymore, and parts aren't drawn every frame.
 
-	if (offset == 0x85)
-	{
-		// Only if it's VALID
-		if ((INT32)hng64_dl[offset] == 1 || (INT32)hng64_dl[offset] == 2)
-			activeBuffer = (INT32)hng64_dl[offset] - 1 ;		// Subtract 1 to fit into my array...
-	}
 
-	if (offset <= 0x80)
-		hng64_dls[activeBuffer][offset] = hng64_dl[offset] ;
 
 	// For some reason, if the value at 0x86 and'ed with 0x02 is non-zero, the software just keeps
 	//   checking 0x86 until and'ing it with 2 returns 0...  What could change 0x86 if cpu0 is in this infinite loop?
@@ -840,13 +834,30 @@ static WRITE32_HANDLER( dl_w )
 
 static READ32_HANDLER( dl_r )
 {
-	// A read of 0x86 ONLY happens if there are more display lists than what are readily available.
-	// (PC = 8006fe1c)
+
 
 //  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 //  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 	return hng64_dl[offset] ;
 }
+
+// A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
+
+static WRITE32_HANDLER( dl_control_w )
+{
+	if (activeBuffer==0 || activeBuffer==1)
+		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
+
+	// Only if it's VALID
+	if (data == 1 || data == 2)
+		activeBuffer = data - 1;
+
+	
+//	if (offset <= 0x80)
+//		hng64_dls[activeBuffer][offset] = hng64_dl[offset] ;
+}
+
+
 
 #ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( activate_3d_buffer )
@@ -950,8 +961,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
 	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(SMH_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
-	AM_RANGE(0x20300000, 0x2030ffff) AM_READWRITE(dl_r, dl_w) AM_BASE(&hng64_dl)						// 3d Display List
-
+	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
+	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
+	
 	// 3d?
 //  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
 	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)		// 3D Display Buffer A
