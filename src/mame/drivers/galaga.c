@@ -2924,8 +2924,8 @@ ROM_END
 
 ROM_START( sxeviousj )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
-	ROM_LOAD( "3p.bin",       0x0000, 0x1000, CRC(afbc3372) SHA1() )
-	ROM_LOAD( "3m.bin",       0x1000, 0x1000, CRC(1854a5ee) SHA1() )
+	ROM_LOAD( "3p.bin",       0x0000, 0x1000, CRC(afbc3372) SHA1(9001856aad0f31b40443f21b7a895e4101684307) )
+	ROM_LOAD( "3m.bin",       0x1000, 0x1000, CRC(1854a5ee) SHA1(2fb4034d9d757376df59378df539bf41d99ed43e) )
 	ROM_LOAD( "cpu_2m.rom",   0x2000, 0x1000, CRC(294d5404) SHA1(ecc39fb2c0065a36f20541747089b4e30dfb99b1) )
 	ROM_LOAD( "cpu_2l.rom",   0x3000, 0x1000, CRC(6a44bf92) SHA1(0ca726f7f9528789f2a718df55e59406a283cdfa) )
 
