@@ -711,7 +711,7 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 			hng64_do_dma(space);
 			break;
 		default:
-			logerror("HNG64 reading from SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+			logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 	}
 }
 
