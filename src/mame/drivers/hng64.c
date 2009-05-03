@@ -832,6 +832,7 @@ static WRITE32_HANDLER( dl_w )
 //  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 }
 
+#if 0
 static READ32_HANDLER( dl_r )
 {
 
@@ -840,6 +841,7 @@ static READ32_HANDLER( dl_r )
 //  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 	return hng64_dl[offset] ;
 }
+#endif
 
 // A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
 
