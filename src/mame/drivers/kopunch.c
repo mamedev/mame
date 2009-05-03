@@ -1,6 +1,11 @@
+/********************************************************
+
+KO Punch (c) 1981 Sega
+
+********************************************************/
+
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "deprecat.h"
 
 extern UINT8 *kopunch_videoram2;
 
@@ -17,21 +22,8 @@ extern VIDEO_UPDATE( kopunch );
 
 static INTERRUPT_GEN( kopunch_interrupt )
 {
-	if (cpu_getiloops(device) == 0)
-	{
-		if (~input_port_read(device->machine, "SYSTEM") & 0x80)	/* coin 1 */
-		{
-			cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xf7);	/* RST 30h */
-			return;
-		}
-		else if (~input_port_read(device->machine, "SYSTEM") & 0x08)	/* coin 2 */
-		{
-			cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xef);	/* RST 28h */
-			return;
-		}
-	}
-
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xff);	/* RST 38h */
+	cpu_set_input_line(device,I8085_RST75_LINE,ASSERT_LINE);
+	cpu_set_input_line(device,I8085_RST75_LINE,CLEAR_LINE);
 }
 
 static READ8_HANDLER( kopunch_in_r )
@@ -88,6 +80,19 @@ static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3f, 0x3f) AM_WRITENOP
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( left_coin_inserted )
+{
+	/* left coin insertion causes a rst6.5 (vector 0x34) */
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, HOLD_LINE);
+}
+
+static INPUT_CHANGED( right_coin_inserted )
+{
+	/* right coin insertion causes a rst5.5 (vector 0x2c) */
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, HOLD_LINE);
+}
 
 static INPUT_PORTS_START( kopunch )
 	PORT_START("P1")
@@ -102,11 +107,11 @@ static INPUT_PORTS_START( kopunch )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -180,7 +185,7 @@ static MACHINE_DRIVER_START( kopunch )
 	MDRV_CPU_ADD("maincpu", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT("screen",kopunch_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
