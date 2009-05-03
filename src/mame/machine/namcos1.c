@@ -679,7 +679,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (read8_space_func)SMH_BANK((FPTR)banknum + 1));
+			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (read8_space_func)SMH_BANK(banknum + 1));
 	}
 	else
 	{
@@ -693,7 +693,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (write8_space_func)SMH_BANK((FPTR)banknum + 1));
+				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (write8_space_func)SMH_BANK(banknum + 1));
 		}
 		else
 		{

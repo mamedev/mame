@@ -442,7 +442,7 @@ union _addrmap64_token
 #define SMH_ROM							((void *)STATIC_ROM)
 #define SMH_NOP							((void *)STATIC_NOP)
 #define SMH_UNMAP						((void *)STATIC_UNMAP)
-#define SMH_BANK(n)						((void *)(STATIC_BANK1 + (n) - 1))
+#define SMH_BANK(n)						((void *)(FPTR)(STATIC_BANK1 + (n) - 1))
 
 
 /* helper macro for merging data with the memory mask */
