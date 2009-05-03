@@ -82,7 +82,7 @@ static WRITE8_HANDLER( test_w )
 
 	x[offset] = data;
 
-	popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
+	//popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 }
 
 static ADDRESS_MAP_START( m14_map, ADDRESS_SPACE_PROGRAM, 8 )
