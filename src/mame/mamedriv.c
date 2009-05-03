@@ -339,6 +339,7 @@ const game_driver * const drivers[] =
 	DRIVER( ccboot2 )	/* bootleg */
 	DRIVER( ckong )		/* (c) 1981 Falcon */
 	DRIVER( ckonga )	/* (c) 1981 Falcon */
+	DRIVER( ckong2j )	/* (c) 1981 Falcon */
 	DRIVER( ckongjeu )	/* bootleg */
 	DRIVER( ckongo )	/* bootleg */
 	DRIVER( ckongalc )	/* bootleg */
