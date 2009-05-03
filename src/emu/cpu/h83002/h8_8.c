@@ -73,15 +73,29 @@ static CPU_DISASSEMBLE(h8)
 	return h8_disasm(buffer, pc, oprom, opram, 0xffff);
 }
 
-static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source)
+static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 mode)
 {
-	if(source>31)
+	if (source>31)
 	{
-		h8->h8_IRQrequestH |= (1<<(source-32));
+		if (mode)
+		{
+			h8->h8_IRQrequestH |= (1<<(source-32));
+		}
+		else
+		{
+			h8->h8_IRQrequestH &= ~(1<<(source-32));
+		}
 	}
 	else
 	{
-		h8->h8_IRQrequestL |= (1<<source);
+		if (mode)
+		{
+			h8->h8_IRQrequestL |= (1<<source);
+		}
+		else
+		{
+			h8->h8_IRQrequestL &= ~(1<<source);
+		}
 	}
 }
 
@@ -267,9 +281,9 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 		h8_set_ccr(h8, h8_get_ccr(h8) | 0x40);
 	h8->pc = h8_mem_read16(h8, vectornr * 2) & 0xffff;
 
-	// I couldn't find timing info for exceptions, so this is a guess (based on JSR/BSR)
-	H8_IFETCH_TIMING(2);
-	H8_STACK_TIMING(2);
+	// these timings are still approximations but much better than before
+	H8_IFETCH_TIMING(8);	// 24 cycles
+	H8_STACK_TIMING(3);	// 12 cycles
 }
 
 static int h8_get_priority(h83xx_state *h8, UINT8 bit)
@@ -277,27 +291,39 @@ static int h8_get_priority(h83xx_state *h8, UINT8 bit)
 	int res = 0;
 	switch(bit)
 	{
-	case 12: // IRQ0
-		if (h8->per_regs[0xF8]&0x80) res = 1; break;
-	case 13: // IRQ1
-		if (h8->per_regs[0xF8]&0x40) res = 1; break;
-	case 14: // IRQ2
-	case 15: // IRQ3
-		if (h8->per_regs[0xF8]&0x20) res = 1; break;
-	case 16: // IRQ4
-	case 17: // IRQ5
-		if (h8->per_regs[0xF8]&0x10) res = 1; break;
+	case 3: // NMI
+		res = 2; break;
+	case 4: // IRQ0
+		if (h8->per_regs[0xc7]&0x01) res = 1; break;
+	case 5: // IRQ1
+		if (h8->per_regs[0xc7]&0x02) res = 1; break;
+	case 6: // IRQ2
+		if (h8->per_regs[0xc7]&0x04) res = 1; break;
+	case 7: // IRQ3
+		if (h8->per_regs[0xc7]&0x08) res = 1; break;
+	case 8: // IRQ4
+		if (h8->per_regs[0xc7]&0x10) res = 1; break;
+	case 9: // IRQ5
+		if (h8->per_regs[0xc7]&0x20) res = 1; break;
+	case 10: // IRQ6
+		if (h8->per_regs[0xc7]&0x40) res = 1; break;
+	case 11: // IRQ7
+		if (h8->per_regs[0xc7]&0x80) res = 1; break;
+	case 28: // SCI0 Rx
+		if (h8->per_regs[0xda]&0x40) res = 1; break; 
+	case 32: // SCI1 Rx
+		if (h8->per_regs[0x8a]&0x40) res = 1; break; 
 	}
 	return res;
 }
 
 static void h8_check_irqs(h83xx_state *h8)
 {
-	int lv = -1;
+	int lv = 0;
 
-	if (h8->h8iflag == 0)
+	if (h8->h8iflag != 0)
 	{
-		lv = 0;
+		lv = 2;
 	}
 
 	// any interrupts wanted and can accept ?
@@ -312,7 +338,6 @@ static void h8_check_irqs(h83xx_state *h8)
 				if (h8_get_priority(h8, bit) >= lv)
 				{
 					// mask off
-					h8->h8_IRQrequestL &= ~(1<<bit);
 					source = bit;
 				}
 			}
@@ -325,7 +350,6 @@ static void h8_check_irqs(h83xx_state *h8)
 				if (h8_get_priority(h8, bit + 32) >= lv)
 				{
 					// mask off
-					h8->h8_IRQrequestH &= ~(1<<bit);
 					source = bit + 32;
 				}
 			}
@@ -367,18 +391,18 @@ static CPU_SET_INFO( h8 )
 	case CPUINFO_INT_REGISTER + H8_E6:			h8->regs[6] = info->i;							break;
 	case CPUINFO_INT_REGISTER + H8_E7:			h8->regs[7] = info->i;							break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_NMI:		if (info->i) h8_300_InterruptRequest(h8, 3);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		if (info->i) h8_300_InterruptRequest(h8, 4);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		if (info->i) h8_300_InterruptRequest(h8, 5);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		if (info->i) h8_300_InterruptRequest(h8, 6);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		if (info->i) h8_300_InterruptRequest(h8, 7);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		if (info->i) h8_300_InterruptRequest(h8, 8);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		if (info->i) h8_300_InterruptRequest(h8, 9);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ6:		if (info->i) h8_300_InterruptRequest(h8, 10);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ7:		if (info->i) h8_300_InterruptRequest(h8, 11);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_NMI:		h8_300_InterruptRequest(h8, 3, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		h8_300_InterruptRequest(h8, 4, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		h8_300_InterruptRequest(h8, 5, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		h8_300_InterruptRequest(h8, 6, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		h8_300_InterruptRequest(h8, 7, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		h8_300_InterruptRequest(h8, 8, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		h8_300_InterruptRequest(h8, 9, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ6:		h8_300_InterruptRequest(h8, 10, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ7:		h8_300_InterruptRequest(h8, 11, info->i);		break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	if (info->i) h8_300_InterruptRequest(h8, 28);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	if (info->i) h8_300_InterruptRequest(h8, 32);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	h8_300_InterruptRequest(h8, 28, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_300_InterruptRequest(h8, 32, info->i);		break;
 
 	default:
 		fatalerror("h8_set_info unknown request %x", state);

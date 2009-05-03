@@ -1258,7 +1258,7 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		if(opcode == 0x5670)
 		{
 			// restore CCR
-			udata16 = h8_mem_read16(h8, h8_getreg32(h8, H8_SP));
+			udata8 = (UINT8)h8_mem_read16(h8, h8_getreg32(h8, H8_SP));
 			h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)+2);
 
 			// check if PC is 16 or 24/32 bits wide
@@ -1279,7 +1279,7 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 				h8->pc = udata32;
 			}
 			// must do this last, because set_ccr() does a check_irq()
-			h8_set_ccr(h8, (UINT8)udata16);
+			h8_set_ccr(h8, udata8);
 			H8_IFETCH_TIMING(2);
 			H8_STACK_TIMING(2);
 			H8_IOP_TIMING(2);
