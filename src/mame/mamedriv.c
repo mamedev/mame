@@ -1380,6 +1380,7 @@ const game_driver * const drivers[] =
 	DRIVER( andromed )	/* (c) 1979 */
 	DRIVER( ipminvad )	/* M10 no copyright notice */
 	DRIVER( ipminva1 )	/* M10 incomplete dump */
+	DRIVER( ptmj )		/* M14 (c) 1979  */
 	DRIVER( skychut )	/* Irem [1980] */
 	DRIVER( spacbeam )	/* M15 no copyright notice */
 	DRIVER( greenber )	/* Irem */

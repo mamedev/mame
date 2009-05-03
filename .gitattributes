@@ -1696,6 +1696,7 @@ src/mame/drivers/lvcards.c svneol=native#text/plain
 src/mame/drivers/lwings.c svneol=native#text/plain
 src/mame/drivers/m10.c svneol=native#text/plain
 src/mame/drivers/m107.c svneol=native#text/plain
+src/mame/drivers/m14.c svneol=native#text/plain
 src/mame/drivers/m52.c svneol=native#text/plain
 src/mame/drivers/m57.c svneol=native#text/plain
 src/mame/drivers/m58.c svneol=native#text/plain
