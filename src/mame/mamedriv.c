@@ -9085,7 +9085,8 @@ Other Sun games
 	DRIVER( nfb96seb )	/* bootleg */
 	DRIVER( carb2002 )	/* bootleg */
 	DRIVER( carb2003 )	/* bootleg */
-
+	DRIVER( nfm )		/* bootleg */
+	
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( wcat3 )

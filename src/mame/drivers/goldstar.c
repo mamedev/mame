@@ -271,6 +271,7 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 
+
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
 
@@ -287,6 +288,27 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
+
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+
+
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_WRITE( goldstar_reel1_ram_w ) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM AM_WRITE( goldstar_reel2_ram_w ) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM AM_WRITE( goldstar_reel3_ram_w ) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+
+	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xf880, 0xf9ff) AM_RAM
+	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xfa80, 0xfbff) AM_RAM
+	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+	AM_RANGE(0xfc80, 0xffff) AM_RAM
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
@@ -4144,6 +4166,34 @@ GFXDECODE_END
 #endif
 
 
+static const gfx_layout tiles8x32_4bpp_layout =
+{
+	8,32,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8,16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8 },
+	32*8
+};
+
+static const gfx_layout tiles8x8_3bpp_layout =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },
+	{ 0,1,2,3,4,5,6,7},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( nfm )
+	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
+GFXDECODE_END
+
+
 /*************************************
 *      PPI 8255 (x3) Interfaces      *
 *************************************/
@@ -4899,6 +4949,41 @@ static MACHINE_DRIVER_START( amcoe2 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(cm)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
+	MDRV_SOUND_CONFIG(cm_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( nfm )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(nfm_map, 0)
+	MDRV_CPU_IO_MAP(amcoe2_portmap, 0)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	/* 2x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(nfm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -6716,6 +6801,7 @@ ROM_END
 
 
 
+
 /* descrambled by looking at CALLs
 
 0000 -> 0000
@@ -6965,6 +7051,43 @@ ROM_END
 
 
 
+ROM_START( nfm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fuitprg", 0x00000, 0x01000, CRC(6f6c98cf) SHA1(4641cb2b90d4d21edc65e504584f3ec92fe741c4) )
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000) //?
+	ROM_CONTINUE(0xb000,0x1000) //?
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000) // ?
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+
+	ROM_REGION( 0x10000, "reelgfx", 0 )
+	ROM_LOAD( "fruit1", 0x00000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_LOAD( "fruit2", 0x04000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_LOAD( "fruit3", 0x08000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_CONTINUE(0x8000, 0x4000)
+	ROM_LOAD( "fruit4", 0x0c000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+	
+	// do these graphics really belong with this set? a lot of the tiles seem wrong for it
+	ROM_REGION( 0x18000, "tilegfx", 0 )
+	ROM_LOAD( "fruit5", 0x00000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
+	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
+	ROM_LOAD( "fruit7", 0x10000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
+	
+	ROM_REGION( 0x18000, "proms", 0 ) // colours?
+	ROM_LOAD( "fruiprg2", 0x00000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+ROM_END
 
 
 static DRIVER_INIT(goldstar)
@@ -7620,6 +7743,7 @@ GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg"
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS )
 
+GAME( 2003, nfm, 0, nfm, nfb96bl, 0, ROT0, "Ming-Yang Electronic",         "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING )
 
 /* possible stealth sets:
 
