@@ -429,6 +429,38 @@ ROM_START( aliensj2 )
 	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
+ROM_START( aliensa )
+	ROM_REGION( 0x38000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "875_r02.e24", 0x10000, 0x08000, CRC(973e4f11) SHA1(a4f65ef4c84b1dcac591dc348ebbb96d35ef5f93) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "875_m01.c24",  0x18000, 0x20000, CRC(1663d3dc) SHA1(706bdf3daa3bda372d94263f3405d67a7ef8dc69) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "875_k03.g04", 0x00000, 0x08000, CRC(bd86264d) SHA1(345fd666daf8a29ef314b14306c1a976cb159bed) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* graphics */
+	ROM_LOAD( "875b11.k13", 0x000000, 0x80000, CRC(89c5c885) SHA1(02a1581579b6ef816e04bec312a7b3ae7c7e84f8) )	/* characters (set 1) */
+	ROM_LOAD( "875b07.j13", 0x080000, 0x40000, CRC(e9c56d66) SHA1(1f58949d5391aef002a6e1ee7034e57bf99cee61) )	/* characters (set 2) */
+	/* second half empty */
+	ROM_LOAD( "875b12.k19", 0x100000, 0x80000, CRC(ea6bdc17) SHA1(a7c22370f8adc5b479283f1ff831f493df78282f) )	/* characters (set 1) */
+	ROM_LOAD( "875b08.j19", 0x180000, 0x40000, CRC(f9387966) SHA1(470ecc4a5a3edd08d5e0ab10b0c590db1968fb0a) )	/* characters (set 2) */
+	/* second half empty */
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* graphics */
+	ROM_LOAD( "875b10.k08", 0x000000, 0x80000, CRC(0b1035b1) SHA1(db04020761386e79249762cd1540208375c38c7f) )	/* sprites (set 1) */
+	ROM_LOAD( "875b06.j08", 0x080000, 0x40000, CRC(081a0566) SHA1(3a4aa14178fe76a030224743c9e9cd974e08bd79) )	/* sprites (set 2) */
+	/* second half empty */
+	ROM_LOAD( "875b09.k02", 0x100000, 0x80000, CRC(e76b3c19) SHA1(6838e07460b3eaaeb129208ad0696c8019bd63d9) )	/* sprites (set 1) */
+	ROM_LOAD( "875b05.j02", 0x180000, 0x40000, CRC(19a261f2) SHA1(b0518fad833b3e613e0201d5d9cab73dc5e78e1d) )	/* sprites (set 2) */
+	/* second half empty */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
+
+	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -471,6 +503,7 @@ static DRIVER_INIT( aliens )
 GAME( 1990, aliens,   0,      aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, aliens2,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1990, aliens3,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (World set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (US)",          GAME_SUPPORTS_SAVE )
 GAME( 1990, aliensj,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, aliensj2, aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens, ROT0, "Konami", "Aliens (Asia)",        GAME_SUPPORTS_SAVE )

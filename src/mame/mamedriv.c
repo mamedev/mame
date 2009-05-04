@@ -5178,6 +5178,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( aliensu )	/* GX875 (c) 1990 (US) */
 	DRIVER( aliensj )	/* GX875 (c) 1990 (Japan) */
 	DRIVER( aliensj2 )	/* GX875 (c) 1990 (Japan) */
+	DRIVER( aliensa )	/* GX875 (c) 1990 (Asia) */
 	DRIVER( suratk )	/* GX911 (c) 1990 (World) */
 	DRIVER( suratka )	/* GX911 (c) 1990 (Asia) */
 	DRIVER( suratkj )	/* GX911 (c) 1990 (Japan) */
@@ -9086,7 +9087,7 @@ Other Sun games
 	DRIVER( carb2002 )	/* bootleg */
 	DRIVER( carb2003 )	/* bootleg */
 	DRIVER( nfm )		/* bootleg */
-	
+
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( wcat3 )
