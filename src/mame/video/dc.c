@@ -149,6 +149,31 @@ INLINE UINT32 cv_4444(UINT16 c)
 		((c <<  4) & 0x000000f0) | ((c      ) & 0x0000000f);
 }
 
+INLINE UINT32 cv_yuv(UINT16 c1, UINT16 c2, int x)
+{
+	int u = 11*((c1 & 0xff) - 128);
+	int v = 11*((c2 & 0xff) - 128);
+	int y = (x & 1 ? c2 : c1) >> 8;
+	int r = y + v/8;
+	int g = y - u/32 - v/16;
+	int b = y + (3*u)/16;
+	r = r < 0 ? 0 : r > 255 ? 255 : r;
+	g = g < 0 ? 0 : g > 255 ? 255 : g;
+	b = b < 0 ? 0 : b > 255 ? 255 : b;
+	return 0xff000000 | (r << 16) | (g << 8) | b;
+}
+
+
+static UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
+{
+	int xt = ((int)x) & (t->sizex-1);
+	int yt = ((int)y) & (t->sizey-1);
+	int addrp = t->address + (t->sizex*yt + (xt & ~1))*2;
+	UINT16 c1 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp));
+	UINT16 c2 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp+2));
+	return cv_yuv(c1, c2, xt);
+}
+
 static UINT32 tex_r_1555_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
@@ -418,6 +443,11 @@ static void tex_prepare(texinfo *t)
 		break;
 
 	case 3: // yuv422
+		switch(t->mode) {
+		case 0:  /*t->r = tex_r_yuv_tw*/; break;
+		case 1:  t->r = tex_r_yuv_n;  break;
+		default: /*t->r = tex_r_yuv_vq*/; break;
+		}
 		break;
 
 	case 4: // bumpmap
