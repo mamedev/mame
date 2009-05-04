@@ -1,15 +1,15 @@
-/***************************************************************************
+/********************************************************************************************
 
 M14 Hardware (c) 1979 Irem
 
 driver by Angelo Salese
 
 TODO:
-- Inputs / Outputs;
+- Check if the coin latch are correct and understand why the proper gameplay looks stiff;
 - Sound (very likely to be discrete);
-- What are the high 4 bits in the colorram for?
+- What are the high 4 bits in the colorram for? They are used on the tiles only, left-over?
 
-============================================================================
+==============================================================================================
 x (Mystery Rom)
 (c)1978-1981? Irem?
 PCB No.	:M14S-2
@@ -36,7 +36,7 @@ http://japump.i.am/
 Dumped by Chackn
 01/30/2000
 
-***************************************************************************/
+********************************************************************************************/
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
@@ -73,7 +73,7 @@ VIDEO_UPDATE( m14 )
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return (mame_rand(space->machine) & 0x3f) | (input_port_read(space->machine, "IN2") & 0xc0);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER( test_w )
@@ -101,8 +101,20 @@ static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w)
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( left_coin_inserted )
+{
+	/* left coin insertion causes a rst6.5 (vector 0x34) */
+	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static INPUT_CHANGED( right_coin_inserted )
+{
+	/* right coin insertion causes a rst5.5 (vector 0x2c) */
+	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static INPUT_PORTS_START( m14 )
-	PORT_START("IN0")
+	PORT_START("IN0") // paddle?
 	PORT_DIPNAME( 0x01, 0x00, "IN0" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -135,7 +147,7 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) //affects the medal settings
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) //this affects the medal settings
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
@@ -154,16 +166,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x40, 0x00, "IN2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x00, "Show available tiles" ) // interpret it as a difficulty setting
+	PORT_START("IN3") //this whole port is stored at work ram $2112.
+	PORT_DIPNAME( 0x01, 0x00, "Show available tiles" ) // debug mode for the rng?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -187,6 +191,10 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("FAKE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
