@@ -262,7 +262,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-ROM_START( ptmj )
+ROM_START( ptrmj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mgpb1.bin",   0x0000, 0x0400, CRC(47c041b8) SHA1(e834c375e689f99a13964863fc9847a8e148ec91) )
 	ROM_LOAD( "mgpa2.bin",   0x0400, 0x0400, CRC(cf8bfa23) SHA1(091055e803255f1b5520f50b31af7135d71d0a40) )
@@ -278,4 +278,4 @@ ROM_START( ptmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong Tsumo (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1979, ptrmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING )
