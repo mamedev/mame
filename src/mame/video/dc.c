@@ -1348,7 +1348,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	wbufline = &wbuffer[y][xxl];
 
 	while(xxl < xxr) {
-		if(wl > *wbufline) {
+		if((wl < *wbufline) || *wbufline==0) {
 			UINT32 c;
 			float u = ul/wl;
 			float v = vl/wl;
@@ -1600,7 +1600,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 	ns=state_ta.grab[rs].teststrips_size;
 	if(ns)
-		memset(wbuffer, 0, sizeof(wbuffer));
+		memset(wbuffer, 0x00, sizeof(wbuffer));
 
 	for (cs=0;cs < ns;cs++)
 	{
