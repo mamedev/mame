@@ -1275,7 +1275,6 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/nycaptor.o $(MACHINE)/nycaptor.o $(VIDEO)/nycaptor.o \
 	$(DRIVERS)/opwolf.o $(MACHINE)/opwolf.o \
 	$(DRIVERS)/othunder.o $(VIDEO)/othunder.o \
-	$(DRIVERS)/parentj.o \
 	$(DRIVERS)/pitnrun.o $(MACHINE)/pitnrun.o $(VIDEO)/pitnrun.o \
 	$(DRIVERS)/qix.o $(MACHINE)/qix.o $(AUDIO)/qix.o $(VIDEO)/qix.o \
 	$(DRIVERS)/rainbow.o $(MACHINE)/rainbow.o \
@@ -1294,6 +1293,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taito_l.o $(VIDEO)/taito_l.o \
 	$(DRIVERS)/taito_x.o $(MACHINE)/cchip.o \
 	$(DRIVERS)/taito_z.o $(VIDEO)/taito_z.o \
+	$(DRIVERS)/taito_o.o $(VIDEO)/taito_o.o \
 	$(DRIVERS)/taitoair.o $(VIDEO)/taitoair.o \
 	$(DRIVERS)/taitojc.o $(VIDEO)/taitojc.o \
 	$(DRIVERS)/taitopjc.o $\
