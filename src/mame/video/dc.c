@@ -28,7 +28,7 @@ static int pvr_parameterconfig[64];
 static UINT32 dilated0[15][1024];
 static UINT32 dilated1[15][1024];
 static int dilatechose[64];
-static float wbuffer[640][480];
+static float wbuffer[480][640];
 
 UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
