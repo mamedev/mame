@@ -1348,7 +1348,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	wbufline = &wbuffer[y][xxl];
 
 	while(xxl < xxr) {
-		if((wl < *wbufline) || *wbufline==0) {
+		if((wl > *wbufline)) {
 			UINT32 c;
 			float u = ul/wl;
 			float v = vl/wl;
@@ -1614,7 +1614,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 		for(i=sv; i <= ev; i++)
 		{
 			testvertices *tv = state_ta.grab[rs].showvertices + i;
-			tv->w = tv->z ? 1/tv->z : 0;
+			tv->w = tv->z;// ? 1/tv->z : 0;
 			tv->u = tv->u * (ts->ti.sizex-1) * tv->w;
 			tv->v = tv->v * (ts->ti.sizey-1) * tv->w;
 		}
