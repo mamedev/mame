@@ -74,9 +74,8 @@ typedef struct
 #if DEBUG_VERTICES
 typedef	struct
 {
-	float x, y, z, u, v;
+	float x, y, w, u, v;
 	int endofstrip;
-	float w;
 } testvertices;
 
 typedef struct
@@ -1154,7 +1153,7 @@ void process_ta_fifo(running_machine* machine)
 
 					testvertex->x=u2f(tafifo_buff[1]);
 					testvertex->y=u2f(tafifo_buff[2]);
-					testvertex->z=u2f(tafifo_buff[3]);
+					testvertex->w=u2f(tafifo_buff[3]);
 					testvertex->u=u2f(tafifo_buff[4]);
 					testvertex->v=u2f(tafifo_buff[5]);
 					testvertex->endofstrip=state_ta.endofstrip;
@@ -1340,7 +1339,13 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 		vl += -dvdx*xl;
 		wl += -dwdx*xl;
 		xxl = 0;
+	} else {
+		float dt = xxl - xl;
+		ul += dudx*dt;
+		vl += dvdx*dt;
+		wl += dwdx*dt;
 	}
+
 	if(xxr > 640)
 		xxr = 640;
 
@@ -1461,7 +1466,7 @@ static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, testvertices *v0, t
 
 	float xl, xr, ul, ur, vl, vr, wl, wr;
 
-	if(v0->y >=480 || v0->y < 0)
+	if(v0->y >= 480 || v2->y < 0)
 		return;
 
 	y0 = (int)(v0->y);
@@ -1614,9 +1619,8 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 		for(i=sv; i <= ev; i++)
 		{
 			testvertices *tv = state_ta.grab[rs].showvertices + i;
-			tv->w = tv->z;// ? 1/tv->z : 0;
-			tv->u = tv->u * (ts->ti.sizex-1) * tv->w;
-			tv->v = tv->v * (ts->ti.sizey-1) * tv->w;
+			tv->u = tv->u * ts->ti.sizex * tv->w;
+			tv->v = tv->v * ts->ti.sizey * tv->w;
 		}
 
 		for(i=sv; i <= ev-2; i++)
