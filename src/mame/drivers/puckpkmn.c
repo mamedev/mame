@@ -44,6 +44,10 @@ Notes:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
+#include "sound/sn76496.h"
+#include "sound/2612intf.h"
+
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100

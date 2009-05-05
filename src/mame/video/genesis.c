@@ -8,6 +8,8 @@
 ***********************************************************************************************/
 
 #include "driver.h"
+#include "sound/sn76496.h"
+
 #include "genesis.h"
 
 /* in video/segasyse.c */

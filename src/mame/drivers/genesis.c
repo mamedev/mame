@@ -15,6 +15,8 @@ segac2.c
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2612intf.h"
+#include "sound/sn76496.h"
+
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100
@@ -72,9 +74,9 @@ UINT8 *genesis_z80_ram;
 /* call this whenever the interrupt state has changed */
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, irq2_int ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, scanline_int ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, vblank_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, irq2_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, scanline_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, vblank_int ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -151,14 +153,14 @@ MACHINE_START( genesis )
 MACHINE_RESET( genesis )
 {
 	/* C2 doesn't have a Z80, so we can't just assume */
-	if (machine->cpu[1] != NULL && cpu_get_type(machine->cpu[1]) == CPU_Z80)
+	if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL && cpu_get_type(cputag_get_cpu(machine, "genesis_snd_z80")) == CPU_Z80)
 	{
 	    /* the following ensures that the Z80 begins without running away from 0 */
 		/* 0x76 is just a forced 'halt' as soon as the CPU is initially run */
 	    genesis_z80_ram[0] = 0x76;
 		genesis_z80_ram[0x38] = 0x76;
 
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 
 		z80running = 0;
 	}
@@ -206,7 +208,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 		if (data == 0x100)
 		{
 			z80running = 0;
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
 			/* logerror("z80 stopped by 68k BusReq\n"); */
 		}
 		else
@@ -214,17 +216,17 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			z80running = 1;
 //          memory_set_bankptr(space->machine, 1, &genesis_z80_ram[0]);
 
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 			/* logerror("z80 started, BusReq ends\n"); */
 		}
 		return;
 	case 0x100:						/* Z80 CPU Reset */
 		if (data == 0x00)
 		{
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_RESET, PULSE_LINE);
 
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
 			z80running = 0;
 			return;

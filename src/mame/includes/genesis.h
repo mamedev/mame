@@ -1,10 +1,5 @@
 /* Todo, reorganise, cleanup etc.*/
 
-#include "sound/okim6295.h"
-#include "sound/sn76496.h"
-#include "sound/2612intf.h"
-#include "sound/upd7759.h"
-
 /*----------- defined in drivers/megaplay.c -----------*/
 
 extern UINT16 *ic36_ram;

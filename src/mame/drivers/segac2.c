@@ -68,11 +68,12 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "megadriv.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+
+#include "megadriv.h"
 
 #define XL1_CLOCK			640000
 #define XL2_CLOCK			53693175

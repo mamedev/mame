@@ -79,10 +79,12 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 */
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "genesis.h"
+#include "sound/sn76496.h"
 #include "rendlay.h"
-#include "megadriv.h"
+
 #include "segae.h"
+#include "genesis.h"
+#include "megadriv.h"
 
 /* Megatech BIOS specific */
 static UINT32 bios_port_ctrl;

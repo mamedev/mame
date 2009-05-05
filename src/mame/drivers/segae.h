@@ -23,5 +23,4 @@ extern READ8_HANDLER( md_sms_vdp_data_r );
 extern WRITE8_HANDLER( md_sms_vdp_data_w );
 extern READ8_HANDLER( md_sms_vdp_ctrl_r );
 extern WRITE8_HANDLER( md_sms_vdp_ctrl_w );
-extern WRITE8_HANDLER( sms_sn76496_w );
 
