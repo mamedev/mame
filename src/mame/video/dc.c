@@ -1081,6 +1081,7 @@ void process_ta_fifo(running_machine* machine)
 				#endif
 				if (state_ta.texture == 1)
 				{
+#if 0
 					testsprites* testsprite;
 					#if DEBUG_PVRDLIST
 					mame_printf_verbose(" A(%f,%f) B(%f,%f) C(%f,%f)\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
@@ -1173,6 +1174,54 @@ void process_ta_fifo(running_machine* machine)
 					tex_get_info(&testsprite->ti, &state_ta);
 
 					state_ta.grab[state_ta.grabsel].testsprites_size++;
+#else
+					if (state_ta.grab[state_ta.grabsel].testvertices_size <= 65530)
+					{
+						teststrips *ts;
+						testvertices *tv = &state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size];
+						tv[0].x = u2f(tafifo_buff[0x1]);
+						tv[0].y = u2f(tafifo_buff[0x2]);
+						tv[0].w = u2f(tafifo_buff[0x3]);
+						tv[1].x = u2f(tafifo_buff[0x4]);
+						tv[1].y = u2f(tafifo_buff[0x5]);
+						tv[1].w = u2f(tafifo_buff[0x6]);
+						tv[3].x = u2f(tafifo_buff[0x7]);
+						tv[3].y = u2f(tafifo_buff[0x8]);
+						tv[3].w = u2f(tafifo_buff[0x9]);
+						tv[2].x = u2f(tafifo_buff[0xa]);
+						tv[2].y = u2f(tafifo_buff[0xb]);
+						tv[2].w = tv[0].w+tv[3].w-tv[1].w;
+						tv[0].u = u2f(tafifo_buff[0xd] & 0xffff0000);
+						tv[0].v = u2f(tafifo_buff[0xd] << 16);
+						tv[1].u = u2f(tafifo_buff[0xe] & 0xffff0000);
+						tv[1].v = u2f(tafifo_buff[0xe] << 16);
+						tv[3].u = u2f(tafifo_buff[0xf] & 0xffff0000);
+						tv[3].v = u2f(tafifo_buff[0xf] << 16);
+						tv[2].u = tv[0].u+tv[3].u-tv[1].u;
+						tv[2].v = tv[0].v+tv[3].v-tv[1].v;
+
+#if 0
+						fprintf(stderr, "(%f, %f)-(%f, %f)-(%f, %f)-(%f, %f) [%f %f %f]\n",
+								tv[0].x, tv[0].y,
+								tv[1].x, tv[1].y,
+								tv[2].x, tv[2].y,
+								tv[3].x, tv[3].y,
+								tv[0].w, tv[1].w, tv[2].w);
+						fprintf(stderr, "[%f, %f]-[%f, %f]-[%f, %f]-[%f, %f]\n",
+								tv[0].u, tv[0].v,
+								tv[1].u, tv[1].v,
+								tv[2].u, tv[2].v,
+								tv[3].u, tv[3].v);
+#endif
+
+						ts = &state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size++];
+						tex_get_info(&ts->ti, &state_ta);
+						ts->svert = state_ta.grab[state_ta.grabsel].testvertices_size;
+						ts->evert = ts->svert + 3;
+
+						state_ta.grab[state_ta.grabsel].testvertices_size += 4;
+					}					
+#endif
 				}
 			}
 			else if (state_ta.global_paratype == 4)
@@ -1352,6 +1401,7 @@ render_bounds line, clip;
 		}
 	}
 }
+
 void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
 {
 	int xxl, xxr;
@@ -1394,16 +1444,21 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	while(xxl < xxr) {
 		if((wl > *wbufline)) {
 			UINT32 c;
-			float u = ul/wl;
-			float v = vl/wl;
+			float u = ul/wl+0.5;
+			float v = vl/wl+0.5;
 
 			c = ti->r(ti, u, v);
-			//		alpha_blend_r32(*tdata, c & 0xffffff, c >> 24);
-			if(c & 0x80000000) {
+
+			if((c & 0xff000000) == 0xff000000) {
 				*wbufline = wl;
 				*tdata = c;
+			} else if(c & 0xff000000) {
+				int a = (c >> 24)+1;
+				int ca = 256-a;
+				UINT32 c2 = *tdata;
+				*tdata = ((((c & 0xff00ff)*a + (c2 & 0xff00ff)*ca) & 0xff00ff00) |
+						  (((c & 0xff00)*a + (c2 & 0xff00)*ca) & 0xff0000)) >> 8;
 			}
-
 		}
 		wbufline++;
 		tdata++;
@@ -1426,8 +1481,8 @@ void render_span(bitmap_t *bitmap, texinfo *ti,
                  float dvldy, float dvrdy,
                  float dwldy, float dwrdy)
 {
-	if(y1 > 480-1)
-		y1 = 480-1;
+	if(y1 > 480)
+		y1 = 480;
 	if(y1 <= 0) {
 		*xl += dxldy*(y1-y0);
 		*xr += dxrdy*(y1-y0);
