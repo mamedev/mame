@@ -1933,6 +1933,11 @@ static MACHINE_DRIVER_START( qbert )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( screwloo )
+	MDRV_IMPORT_FROM(gottlieb2)
+
+	MDRV_VIDEO_START(screwloo)
+MACHINE_DRIVER_END
 
 
 /*************************************
@@ -2543,14 +2548,17 @@ static DRIVER_INIT( stooges )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
+static DRIVER_INIT( screwloo )
+{
+	gottlieb_gfxcharlo = 0;
+	gottlieb_gfxcharhi = 1;
+}
 
 static DRIVER_INIT( vidvince )
 {
 	gottlieb_gfxcharlo = 1;
 	gottlieb_gfxcharhi = 0;
 }
-
-
 
 /*************************************
  *
@@ -2578,7 +2586,7 @@ GAME( 1983, qbertqub, 0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar"
 GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo, 0,        gottlieb2, screwloo, romtiles, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
+GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1983, mach3,    0,        g2laser,   mach3,    romtiles, ROT0,   "Mylstar", "M.A.C.H. 3", 0 )
 GAME( 1984, cobram3,  0,        g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", GAME_NOT_WORKING )
 GAME( 1984, usvsthem, 0,        g2laser,   usvsthem, romtiles, ROT0,   "Mylstar", "Us vs. Them", 0 )

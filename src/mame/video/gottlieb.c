@@ -143,6 +143,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 		SET_TILE_INFO(gottlieb_gfxcharhi, code, 0, 0);
 }
 
+static TILE_GET_INFO( get_screwloo_bg_tile_info )
+{
+	int code = videoram[tile_index];
+	if ((code & 0xc0) == 0)
+		SET_TILE_INFO(gottlieb_gfxcharlo, code, 0, 0);
+	else
+		SET_TILE_INFO(gottlieb_gfxcharhi, code, 0, 0);
+}
+
 
 VIDEO_START( gottlieb )
 {
@@ -159,6 +168,32 @@ VIDEO_START( gottlieb )
 
 	/* configure the background tilemap */
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(bg_tilemap, 0);
+	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
+
+	gfx_element_set_source(machine->gfx[0], gottlieb_charram);
+
+	/* save some state */
+	state_save_register_global(machine, background_priority);
+	state_save_register_global(machine, spritebank);
+	state_save_register_global(machine, transparent0);
+}
+
+VIDEO_START( screwloo )
+{
+	static const int resistances[4] = { 2000, 1000, 470, 240 };
+
+	/* compute palette information */
+	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
+	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			4, resistances, weights, 180, 0,
+			4, resistances, weights, 180, 0,
+			4, resistances, weights, 180, 0);
+	transparent0 = FALSE;
+
+	/* configure the background tilemap */
+	bg_tilemap = tilemap_create(machine, get_screwloo_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
 
