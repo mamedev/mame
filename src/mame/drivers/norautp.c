@@ -634,7 +634,7 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    INIT  ROT    COMPANY        FULLNAME                 FLAGS */
 GAME( 1988, norautp,  0,       norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1988, norautjp, norautp, norautp,  norautp  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",     GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1988, norautjp, norautp, norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",     GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1983, gtipoker, 0,       gtipoker, norautp, 0,    ROT0, "GTI Inc",     "GTI Poker",              GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */

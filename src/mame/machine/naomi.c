@@ -27,6 +27,12 @@ DRIVER_INIT(naomi)
 	jvsboard_type = JVSBD_DEFAULT;
 }
 
+DRIVER_INIT(naomi_mp)
+{
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+	jvsboard_type = JVSBD_MAHJONG;
+}
+
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
