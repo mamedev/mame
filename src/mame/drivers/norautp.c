@@ -8,8 +8,10 @@
 
     Games running on this hardware:
 
-    * Noraut Poker,  1988,  Noraut Ltd.
-    * Poker,         198?,  Unknown.
+    * Noraut Poker,      1988,  Noraut Ltd.
+    * Noraut Joker Poker 1988,  Noraut Ltd.
+    * GTI Poker          1983,  GTI Inc.
+    * Poker,             198?,  Unknown.
 
 
 *******************************************************************************
@@ -139,6 +141,16 @@
       to Noraut Poker (bootleg), since the game has payout system.
     - Some clean-ups.
 
+    Notes:
+    - norautjp: at the first start-up, the game will give you a very clever
+      "FU" screen. Press the following buttons *together* on different times
+      to get rid of it (and actually initialize the machine):
+      * start + bet buttons (1+2);
+      * Hold 3 + Hold 2 + Save (Half Gamble) + Change Card (C+X+F+D)
+      Also notice that you actually need to map the last four buttons on the
+      same button / on a joypad since MAME's steady key doesn't seem to work on
+      my end...
+
 
     TODO:
 
@@ -219,7 +231,7 @@ static PALETTE_INIT( norautp )
 {
 	/* 1st gfx bank */
 	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine, 1, MAKE_RGB(0x7f, 0xff, 0x7f));	/* white? */
+	palette_set_color(machine, 1, MAKE_RGB(0xff, 0xff, 0x00)); 	/* yellow */
 	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
 	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
 	palette_set_color(machine, 4, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
@@ -316,7 +328,7 @@ ADDRESS_MAP_END
   c0 --> W  ; data (in case of PPI, port data)
   c1 --> W  ; addressing
   c2 --> R  ; status?
-  c3 --> W  ; alternate 00 & 01 (in case of PPI, seting reseting bit 0 of hadshaked port)
+  c3 --> W  ; alternate 00 & 01 (in case of PPI, setting resetting bit 0 of handshaked port)
 
 */
 
@@ -438,7 +450,6 @@ static INPUT_PORTS_START( poker )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-
 
 /*************************
 *    Graphics Layouts    *
@@ -608,12 +619,22 @@ ROM_START( norautpn )
 ROM_END
 
 
+ROM_START( norautjp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764-1prog.bin",   0x0000, 0x2000, CRC(5f776ce1) SHA1(673b8c67ebd5c1334187a9407b86a43150cbe67b) )
+
+	ROM_REGION( 0x800,  "gfx", ROMREGION_DISPOSE )
+	ROM_LOAD( "2732-1char.bin",   0x0000, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) 	/* first half 0xff filled */
+	ROM_CONTINUE(                 0x0000, 0x0800 )
+ROM_END
+
 /*************************
 *      Game Drivers      *
 *************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    INIT  ROT    COMPANY        FULLNAME                 FLAGS */
 GAME( 1988, norautp,  0,       norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1988, norautjp, norautp, norautp,  norautp  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",     GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1983, gtipoker, 0,       gtipoker, norautp, 0,    ROT0, "GTI Inc",     "GTI Poker",              GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */

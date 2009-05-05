@@ -9326,6 +9326,7 @@ Other Sun games
 	/* Hi-Lo Poker-based */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( norautp )	/* (c) 1988? Noraut */
+	DRIVER( norautjp )	/* (c) 1988? Noraut */
 	DRIVER( norautpn )	/* (c) 1990? unknown */
 
 	/* Sanki Denshi Kogyo */
