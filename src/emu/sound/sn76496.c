@@ -111,8 +111,16 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 	/* update the output buffer before changing the registers */
 	stream_update(R->Channel);
 
-	/* set number of cycles until READY is active; this is always one 'sample', i.e. it equals the clock divider exactly; until the clock divider is fully supported, we delay until one sample has played */
-	R->CyclestoREADY = 4;
+	/* set number of cycles until READY is active; this is always one
+           'sample', i.e. it equals the clock divider exactly; until the
+           clock divider is fully supported, we delay until one sample has
+           played. The fact that this below is '2' and not '1' is because
+           of a ?race condition? in the mess crvision driver, where after
+           any sample is played at all, no matter what, the cycles_to_ready
+           ends up never being not ready, unless this value is greater than
+           1. Once the full clock divider stuff is written, this should no
+           longer be an issue. */
+	R->CyclestoREADY = 2;
 
 	if (data & 0x80)
 	{
