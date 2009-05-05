@@ -1012,7 +1012,7 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 
 						if (ym && (sound_get_type(ym) == SOUND_YM3812))
 						{
-							cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+							cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 							devtag_reset(machine, "ym");
 						}
 					}

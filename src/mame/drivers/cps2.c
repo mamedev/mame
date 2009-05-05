@@ -590,7 +590,6 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h" // gigamn2 bootleg
-#include "chd.h"
 
 #include "cps1.h"       /* External CPS1 definitions */
 

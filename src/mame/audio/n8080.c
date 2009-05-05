@@ -201,7 +201,7 @@ static void spacefev_sound_pins_changed(running_machine *machine)
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(machine->cpu[1], 0);
+		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), 0);
 	}
 }
 
@@ -225,7 +225,7 @@ static void sheriff_sound_pins_changed(running_machine *machine)
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(machine->cpu[1], 0);
+		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), 0);
 	}
 }
 
@@ -240,7 +240,7 @@ static void helifire_sound_pins_changed(running_machine *machine)
 
 	if (changes & (1 << 6))
 	{
-		generic_pulse_irq_line(machine->cpu[1], 0);
+		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), 0);
 	}
 }
 

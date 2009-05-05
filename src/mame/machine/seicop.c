@@ -871,8 +871,8 @@ WRITE16_HANDLER( copdxbl_0_w )
 		/*WRONG*/
 		case (0x65c/2):
 		{
-			soundlatch_w(space,1,data&0xff);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+			soundlatch_w(space, 1, data & 0xff);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 		/*video regs (not scrollram,something else)*/
@@ -888,8 +888,8 @@ WRITE16_HANDLER( copdxbl_0_w )
 		/*bootleg sound HW*/
 		/*case (0x740/2):
         {
-            soundlatch_w(1,data&0x00ff);
-            cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+            soundlatch_w(space, 1, data & 0x00ff);
+            cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
             break;
         }*/
 	}

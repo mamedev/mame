@@ -114,7 +114,7 @@ static double freq_to_step;
 static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
 	const device_config *pia = devtag_get_device(device->machine, "pia1");
-	cpu_set_input_line(device->machine->cpu[1], M6502_IRQ_LINE, (pia6821_get_irq_b(pia) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(pia) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -462,7 +462,7 @@ static void r6532_irq(const device_config *device, int state)
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	if (has_mc3417)
-		cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(device->machine, "cvsd", INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

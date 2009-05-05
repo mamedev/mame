@@ -63,7 +63,7 @@ WRITE8_HANDLER( cyberbal_sound_bank_select_w )
 	memory_set_bankptr(space->machine, 8, &bank_base[0x1000 * ((data >> 6) & 3)]);
 	coin_counter_w(1, (data >> 5) & 1);
 	coin_counter_w(0, (data >> 4) & 1);
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "dac", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x01)) devtag_reset(space->machine, "ym");
 }
 
@@ -97,8 +97,8 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
 
 static void update_sound_68k_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[3], 6, fast_68k_int ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[3], 2, io_68k_int   ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "dac", 6, fast_68k_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "dac", 2, io_68k_int   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
