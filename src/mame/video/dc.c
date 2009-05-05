@@ -126,8 +126,8 @@ INLINE UINT32 cv_1555(UINT16 c)
 {
 	return
 		(c & 0x8000 ? 0xff000000 : 0) |
-		((c << 9) & 0x00f80000) | ((c << 4) & 0x00070000) | 
-		((c << 6) & 0x0000f800) | ((c << 1) & 0x00000700) | 
+		((c << 9) & 0x00f80000) | ((c << 4) & 0x00070000) |
+		((c << 6) & 0x0000f800) | ((c << 1) & 0x00000700) |
 		((c << 3) & 0x000000f8) | ((c >> 2) & 0x00000007);
 }
 
@@ -135,8 +135,8 @@ INLINE UINT32 cv_565(UINT16 c)
 {
 	return
 		0xff000000 |
-		((c << 8) & 0x00f80000) | ((c << 3) & 0x00070000) | 
-		((c << 5) & 0x0000fc00) | ((c >> 1) & 0x00000300) | 
+		((c << 8) & 0x00f80000) | ((c << 3) & 0x00070000) |
+		((c << 5) & 0x0000fc00) | ((c >> 1) & 0x00000300) |
 		((c << 3) & 0x000000f8) | ((c >> 2) & 0x00000007);
 }
 
@@ -144,8 +144,8 @@ INLINE UINT32 cv_4444(UINT16 c)
 {
 	return
  		((c << 16) & 0xf0000000) | ((c << 12) & 0x0f000000) |
-		((c << 12) & 0x00f00000) | ((c <<  8) & 0x000f0000) | 
-		((c <<  8) & 0x0000f000) | ((c <<  4) & 0x00000f00) | 
+		((c << 12) & 0x00f00000) | ((c <<  8) & 0x000f0000) |
+		((c <<  8) & 0x0000f000) | ((c <<  4) & 0x00000f00) |
 		((c <<  4) & 0x000000f0) | ((c      ) & 0x0000000f);
 }
 
@@ -558,6 +558,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 		UINT32 pvr_addr;
 		UINT32 sys_addr;
 		UINT32 size;
+		UINT8 sel;
 		UINT8 dir;
 		UINT8 flag;
 		UINT8 start;
@@ -572,12 +573,14 @@ WRITE64_HANDLER( pvr_ctrl_w )
 		case SB_PDSTAR: pvr_dma.sys_addr = dat; break;
 		case SB_PDLEN: pvr_dma.size = dat; break;
 		case SB_PDDIR: pvr_dma.dir = dat & 1; break;
-		case SB_PDTSEL: mame_printf_verbose("PVRCTRL: initiation mode %x\n",dat); break;
+		case SB_PDTSEL:
+			pvr_dma.sel = dat & 1;
+			if(pvr_dma.sel & 1)
+				printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
+			break;
 		case SB_PDEN: pvr_dma.flag = dat & 1; break;
 		case SB_PDST:
 			pvr_dma.start = dat & 1;
-			/*We need to know where this is actually used on Naomi, for testing purpose.*/
-			if(pvr_dma.start) { printf("Warning: PVR-DMA start\n"); }
 
 			if(pvr_dma.flag && pvr_dma.start)
 			{
@@ -585,6 +588,12 @@ WRITE64_HANDLER( pvr_ctrl_w )
 				dst = pvr_dma.pvr_addr;
 				src = pvr_dma.sys_addr;
 				size = 0;
+
+				/* used by usagui and sprtjam*/
+				printf("PVR-DMA start\n");
+				printf("%08x %08x %08x\n",pvr_dma.pvr_addr,pvr_dma.sys_addr,pvr_dma.size);
+				printf("src %s dst %08x\n",pvr_dma.dir ? "->" : "<-",pvr_dma.sel);
+
 				/* 0 rounding size = 16 Mbytes */
 				if(pvr_dma.size == 0) { pvr_dma.size = 0x100000; }
 
