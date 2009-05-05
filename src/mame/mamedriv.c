@@ -8076,6 +8076,7 @@ Other Sun games
 	DRIVER( kinst210 )	/* (c) 1995 Rare */
 
 	/* Nihon System games */
+	DRIVER( gigas )		/* (c) 1986 Sega */
 	DRIVER( gigasb )	/* (c) 1986 bootleg */
 	DRIVER( gigasm2b )	/* (c) 1986 bootleg */
 	DRIVER( oigas )		/* (c) 1986 bootleg */
