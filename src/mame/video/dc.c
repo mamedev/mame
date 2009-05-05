@@ -2056,9 +2056,9 @@ VIDEO_UPDATE(dc)
 #endif
 
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
-	for (y = visarea->min_y ; y < visarea->max_y ; y++)
+	for (y = visarea->min_y ; y <= visarea->max_y ; y++)
 	{
-		for (x = visarea->min_x ; x < visarea->max_x ; x++)
+		for (x = visarea->min_x ; x <= visarea->max_x ; x++)
 		{
 			UINT32* src = BITMAP_ADDR32(fakeframebuffer_bitmap, y, x);
 			UINT32* dst = BITMAP_ADDR32(bitmap, y, x);
