@@ -789,6 +789,8 @@ ROM_END
 // alternate bootleg
 // this is much closer to the original, the only real difference is the soundcpu has been pre-decrypted,
 // with the encrypted/decrypted data split across the rom
+// based on stickers present on the board it appears to have been manufactured by 'TAB-Austria' and is marked 'CA02'
+
 ROM_START( cabalbl2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "c9.bin",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
@@ -796,7 +798,7 @@ ROM_START( cabalbl2 )
 	ROM_LOAD16_BYTE( "c8.bin",    0x20000, 0x10000, CRC(d763a47c) SHA1(146d8082a404b6eddaf2dc9ba41a997949c17f8a) )
 	ROM_LOAD16_BYTE( "c6.bin",    0x20001, 0x10000, CRC(96d5e8af) SHA1(ed7d854f08e87db5ae6cf526eafa029dfd2bfb9f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code + 64k for decrypted */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "c4.bin",    0x2000, 0x2000, CRC(82f9f296) SHA1(2769ffdc28f003684e77d4806be07b87d50be31c) )
 	ROM_CONTINUE(0x0000,0x2000)
 	ROM_IGNORE(0x4000)
