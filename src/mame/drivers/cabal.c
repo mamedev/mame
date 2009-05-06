@@ -808,8 +808,6 @@ ROM_START( cabalbl2 )
 	ROM_LOAD( "c5.bin",           0x00000, 0x04000, CRC(183e4834) SHA1(05ab0c388be8701930a9de437978206cda6fed68) ) /* characters */
 	ROM_CONTINUE(0x0000,0x4000)
 	
-	/* The bootleg versions use a sub-board instead of the mask roms
-       the content is the same as the mask roms */
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "c14.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "c10.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
@@ -868,8 +866,8 @@ static DRIVER_INIT( cabalbl2 )
 
 GAME( 1988, cabal,   0,     cabal,   cabalj,   cabal,   ROT0, "Tad Corporation", "Cabal (World, Joystick version)", 0 )
 GAME( 1989, cabala,  cabal, cabal,   cabalj,   cabal,   ROT0, "Tad Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,  0,       ROT0, "[Tad Corporation] (Red Corporation bootleg)", "Cabal (bootleg of Joystick version)", GAME_IMPERFECT_SOUND )
-GAME( 1988, cabalbl2,cabal, cabal,   cabalj,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,  0,       ROT0, "[Tad Corporation] (Red Corporation bootleg)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
+GAME( 1988, cabalbl2,cabal, cabal,   cabalj,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", 0 )
 
 GAME( 1988, cabalus, cabal, cabal,   cabalt,   cabal,  ROT0, "Tad (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )
 GAME( 1988, cabalus2,cabal, cabal,   cabalt,   cabal,  ROT0, "Tad (Fabtek license)", "Cabal (US set 2, Trackball version)", 0 )
