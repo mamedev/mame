@@ -43,30 +43,30 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-static UINT8 latch,prot_latch;
+static UINT8 z80_latch,i8751_latch;
 
 static READ8_HANDLER( blktiger_from_mcu_r )
 {
-	return prot_latch;
+	return i8751_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
 	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
-	latch = data;
+	z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
 	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
-	return latch;
+	return z80_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_main_w )
 {
 	//printf("%02x write\n",data);
-	prot_latch = data;
+	i8751_latch = data;
 }
 
 
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
-	/* other ports unknown */
+	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP 	/* other ports unknown */
 ADDRESS_MAP_END
 
 
