@@ -7242,7 +7242,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wrallyb )	/* (c) 1993 - Ref 930217 */
 	DRIVER( glass )		/* (c) 1993 - Ref 931021 */
 	DRIVER( glass10 )	/* (c) 1993 - Ref 931021 */
-	DRIVER( glass10a )	/* (c) 1993 - Ref 931021 */
+	DRIVER( glassbrk )	/* (c) 1993 - Ref 931021 shows "Break Edition" on a real PCB */
 	DRIVER( targeth )	/* (c) 1994 - Ref 940531 */
 	DRIVER( thoop2 )	/* (c) 1994 - Ref ??? */
 	DRIVER( aligator )	/* (c) 1994 - Ref 940411 */
