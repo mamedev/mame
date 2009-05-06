@@ -14,7 +14,6 @@
 #define DEBUG_PVRTA	(0)
 #define DEBUG_PVRTA_REGS (0)
 #define DEBUG_PVRDLIST	(1)
-#define DEBUG_VERTICES	(1)
 #define DEBUG_PALRAM (1)
 
 #define NUM_BUFFERS 4
@@ -43,57 +42,30 @@ static int scanline;
 static bitmap_t *fakeframebuffer_bitmap;
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
-typedef struct
-{
-	float x;
-	float y;
-	float z;
-	float u;
-	float v;
-} vert;
-
 typedef struct texinfo {
-	UINT32 address, mipoffset;
+	UINT32 address, vqbase;
 	int sizex, sizey, sizes, pf, palette, mode, mipmapped;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
 	int palbase, cd;
 } texinfo;
 
-typedef struct
-{
-	texinfo ti;
-
-	int positionx, positiony;
-	int sizex, sizey;
-	float u, v, du, dv;
-	vert a,b,c,d;
-
-} testsprites;
-
-#if DEBUG_VERTICES
 typedef	struct
 {
 	float x, y, w, u, v;
-	int endofstrip;
-} testvertices;
+} vert;
 
 typedef struct
 {
 	int svert, evert;
 	texinfo ti;
-} teststrips;
-#endif
+} strip;
 
 typedef struct {
-	testsprites showsprites[2048];
+	vert verts[65536];
+	strip strips[65536];
 
-	#if DEBUG_VERTICES
-	testvertices showvertices[65536];
-	teststrips showstrips[65536];
-	#endif
-
-	int testsprites_size, testsprites_toerase, testvertices_size, teststrips_size;
+	int verts_size, strips_size;
 	UINT32 ispbase;
 	UINT32 fbwsof1;
 	UINT32 fbwsof2;
@@ -131,6 +103,15 @@ INLINE UINT32 cv_1555(UINT16 c)
 		((c << 3) & 0x000000f8) | ((c >> 2) & 0x00000007);
 }
 
+INLINE UINT32 cv_1555z(UINT16 c)
+{
+	return
+		(c & 0x8000 ? 0xff000000 : 0) |
+		((c << 9) & 0x00f80000) |
+		((c << 6) & 0x0000f800) |
+		((c << 3) & 0x000000f8);
+}
+
 INLINE UINT32 cv_565(UINT16 c)
 {
 	return
@@ -140,6 +121,15 @@ INLINE UINT32 cv_565(UINT16 c)
 		((c << 3) & 0x000000f8) | ((c >> 2) & 0x00000007);
 }
 
+INLINE UINT32 cv_565z(UINT16 c)
+{
+	return
+		0xff000000 |
+		((c << 8) & 0x00f80000) |
+		((c << 5) & 0x0000fc00) |
+		((c << 3) & 0x000000f8);
+}
+
 INLINE UINT32 cv_4444(UINT16 c)
 {
 	return
@@ -147,6 +137,15 @@ INLINE UINT32 cv_4444(UINT16 c)
 		((c << 12) & 0x00f00000) | ((c <<  8) & 0x000f0000) |
 		((c <<  8) & 0x0000f000) | ((c <<  4) & 0x00000f00) |
 		((c <<  4) & 0x000000f0) | ((c      ) & 0x0000000f);
+}
+
+INLINE UINT32 cv_4444z(UINT16 c)
+{
+	return
+ 		((c << 16) & 0xf0000000) |
+		((c << 12) & 0x00f00000) |
+		((c <<  8) & 0x0000f000) |
+		((c <<  4) & 0x000000f0);
 }
 
 INLINE UINT32 cv_yuv(UINT16 c1, UINT16 c2, int x)
@@ -179,7 +178,7 @@ static UINT32 tex_r_1555_n(texinfo *t, float x, float y)
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->sizex*yt + xt)*2;
-	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_1555z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
 static UINT32 tex_r_1555_tw(texinfo *t, float x, float y)
@@ -194,8 +193,8 @@ static UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -204,7 +203,7 @@ static UINT32 tex_r_565_n(texinfo *t, float x, float y)
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->sizex*yt + xt)*2;
-	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_565z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
 static UINT32 tex_r_565_tw(texinfo *t, float x, float y)
@@ -219,8 +218,8 @@ static UINT32 tex_r_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -229,7 +228,7 @@ static UINT32 tex_r_4444_n(texinfo *t, float x, float y)
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->sizex*yt + xt)*2;
-	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_4444z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
 static UINT32 tex_r_4444_tw(texinfo *t, float x, float y)
@@ -244,8 +243,8 @@ static UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -255,7 +254,7 @@ static UINT32 tex_r_p4_1555_tw(texinfo *t, float x, float y)
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2))& 0xf;
+	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
 
@@ -263,8 +262,8 @@ static UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
@@ -275,7 +274,7 @@ static UINT32 tex_r_p4_565_tw(texinfo *t, float x, float y)
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2))& 0xf;
+	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
 
@@ -283,8 +282,8 @@ static UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
@@ -295,7 +294,7 @@ static UINT32 tex_r_p4_4444_tw(texinfo *t, float x, float y)
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2))& 0xf;
+	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
 
@@ -303,8 +302,8 @@ static UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
@@ -315,7 +314,7 @@ static UINT32 tex_r_p4_8888_tw(texinfo *t, float x, float y)
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2))& 0xf;
+	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return pvrta_regs[t->palbase + c];
 }
 
@@ -323,8 +322,8 @@ static UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return pvrta_regs[t->palbase + c];
 }
@@ -342,8 +341,8 @@ static UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
@@ -361,8 +360,8 @@ static UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset+ 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
@@ -380,8 +379,8 @@ static UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset+ 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
@@ -399,8 +398,8 @@ static UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
-	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return pvrta_regs[t->palbase + c];
 }
@@ -414,22 +413,20 @@ static UINT32 tex_r_default(texinfo *t, float x, float y)
 static void tex_prepare(texinfo *t)
 {
 	int miptype = 0;
-	static int xxxx = 0;
-	xxxx++;
 	
 	t->r = tex_r_default;
-	t->palbase = 0x400 | ((t->palette & 0x3f) << 4);
 	t->cd = dilatechose[t->sizes];
-	t->mipoffset = 0;
+	t->palbase = 0;
+	t->vqbase = t->address;
 
-	
+	//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);	
 	
 	switch(t->pf) {
 	case 0: // 1555
 		switch(t->mode) {
 		case 0:  t->r = tex_r_1555_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_1555_n;  miptype = 2; break;
-		default: t->r = tex_r_1555_vq; miptype = 3; break;
+		default: t->r = tex_r_1555_vq; miptype = 3; t->address += 0x800; break;
 		}
 		break;
 
@@ -437,7 +434,7 @@ static void tex_prepare(texinfo *t)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_565_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_565_n;  miptype = 2; break;
-		default: t->r = tex_r_565_vq; miptype = 3; break;
+		default: t->r = tex_r_565_vq; miptype = 3; t->address += 0x800; break;
 		}
 		break;
 
@@ -445,7 +442,7 @@ static void tex_prepare(texinfo *t)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_4444_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_4444_n;  miptype = 2; break;
-		default: t->r = tex_r_4444_vq; miptype = 3; break;
+		default: t->r = tex_r_4444_vq; miptype = 3; t->address += 0x800; break;
 		}
 		break;
 
@@ -461,6 +458,7 @@ static void tex_prepare(texinfo *t)
 		break;
 
 	case 5: // 4bpp palette
+		t->palbase = 0x400 | ((t->palette & 0x3f) << 4);
 		switch(t->mode) {
 		case 0: case 1:
 			miptype = 0;	
@@ -476,16 +474,17 @@ static void tex_prepare(texinfo *t)
 			miptype = 3; // ?	
 
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
-			case 0: t->r = tex_r_p4_1555_vq; break;
-			case 1: t->r = tex_r_p4_565_vq; break;
-			case 2: t->r = tex_r_p4_4444_vq; break;
-			case 3: t->r = tex_r_p4_8888_vq; break;
+			case 0: t->r = tex_r_p4_1555_vq; t->address += 0x800; break;
+			case 1: t->r = tex_r_p4_565_vq;  t->address += 0x800; break;
+			case 2: t->r = tex_r_p4_4444_vq; t->address += 0x800; break;
+			case 3: t->r = tex_r_p4_8888_vq; t->address += 0x800; break;
 			}
 			break;
 		}
 		break;
 
 	case 6: // 8bpp palette
+		t->palbase = 0x400 | ((t->palette & 0x30) << 4);
 		switch(t->mode) {
 		case 0: case 1:
 			miptype = 1;	
@@ -501,10 +500,10 @@ static void tex_prepare(texinfo *t)
 			miptype = 3; // ?	
 		
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
-			case 0: t->r = tex_r_p8_1555_vq; break;
-			case 1: t->r = tex_r_p8_565_vq; break;
-			case 2: t->r = tex_r_p8_4444_vq; break;
-			case 3: t->r = tex_r_p8_8888_vq; break;
+			case 0: t->r = tex_r_p8_1555_vq; t->address += 0x800; break;
+			case 1: t->r = tex_r_p8_565_vq;  t->address += 0x800; break;
+			case 2: t->r = tex_r_p8_4444_vq; t->address += 0x800; break;
+			case 3: t->r = tex_r_p8_8888_vq; t->address += 0x800; break;
 			}
 			break;
 		}
@@ -585,22 +584,22 @@ static void tex_prepare(texinfo *t)
 		
 			case 0: // 4bpp
 				//printf("4bpp\n");
-				t->address+= mipmap_4_8_offset[t->sizes&7]>>1;
+				t->address += mipmap_4_8_offset[t->sizes&7]>>1;
 				break;
 			
 			case 1: // 8bpp
 				//printf("8bpp\n");
-				t->address+= mipmap_4_8_offset[t->sizes&7];
+				t->address += mipmap_4_8_offset[t->sizes&7];
 				break;
 				
 			case 2: // nonpalette
 				//printf("np\n");
-				t->address+= mipmap_np_offset[t->sizes&7];
+				t->address += mipmap_np_offset[t->sizes&7];
 				break;
 			
 			case 3: // vq
 				//printf("vq\n");
-				t->mipoffset = mipmap_vq_offset[t->sizes&7];
+				t->address += mipmap_vq_offset[t->sizes&7];
 				break;
 		}
 	}
@@ -939,9 +938,8 @@ WRITE64_HANDLER( pvr_ta_w )
 		state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
 		state_ta.grab[state_ta.grabsel].busy=0;
 		state_ta.grab[state_ta.grabsel].valid=1;
-		state_ta.grab[state_ta.grabsel].testsprites_size=0;
-		state_ta.grab[state_ta.grabsel].testvertices_size=0;
-		state_ta.grab[state_ta.grabsel].teststrips_size=0;
+		state_ta.grab[state_ta.grabsel].verts_size=0;
+		state_ta.grab[state_ta.grabsel].strips_size=0;
 		break;
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
@@ -970,6 +968,8 @@ void process_ta_fifo(running_machine* machine)
      o = object control
 
     */
+
+	receiveddata *rd = &state_ta.grab[state_ta.grabsel];
 
 	// Para Control
 	state_ta.paracontrol=(tafifo_buff[0] >> 24) & 0xff;
@@ -1189,104 +1189,10 @@ void process_ta_fifo(running_machine* machine)
 				#endif
 				if (state_ta.texture == 1)
 				{
-#if 0
-					testsprites* testsprite;
-					#if DEBUG_PVRDLIST
-					mame_printf_verbose(" A(%f,%f) B(%f,%f) C(%f,%f)\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
-					#endif
-
-					/* add a sprite to our 'test sprites' list */
-					/* sprites are used for the Naomi Bios logo + text for example */
-					/* -- this is wildly inaccurate! */
-					testsprite = &state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size];
-
-					/* Sprite Type 1 (for Sprite)
-                     0x00 Parameter Control Word (see above)
-                     0x04 A.X
-                     0x08 A.Y
-                     0x0C A.Z
-                     0x10 B.X
-                     0x14 B.Y
-                     0x18 B.Z
-                     0x1C C.X
-                     0x20 C.Y
-                     0x24 C.Z
-                     0x28 D.X
-                     0x2C D.Y
-                     0x30 (ignored) D.Z is calculated from the Plane Equation
-                     0x34 AU/AV (16-bits each)
-                     0x38 BU/BV (16-bits each)
-                     0x3C CU/CV  (16-bits each)
-
-                     note: DU/DV is calculated, not specified
-                    */
-
-					testsprite->a.x = u2f(tafifo_buff[0x04/4]);
-					testsprite->a.y = u2f(tafifo_buff[0x08/4]);
-					testsprite->a.z = u2f(tafifo_buff[0x0c/4]);
-					testsprite->b.x = u2f(tafifo_buff[0x10/4]);
-					testsprite->b.y = u2f(tafifo_buff[0x14/4]);
-					testsprite->b.z = u2f(tafifo_buff[0x18/4]);
-					testsprite->c.x = u2f(tafifo_buff[0x1c/4]);
-					testsprite->c.y = u2f(tafifo_buff[0x20/4]);
-					testsprite->c.z = u2f(tafifo_buff[0x24/4]);
-
-					testsprite->d.x = u2f(tafifo_buff[0x28/4]);
-					testsprite->d.y = u2f(tafifo_buff[0x2c/4]);
-					testsprite->d.z = 0.0f;// calculated
-
-					testsprite->a.u = u2f( (tafifo_buff[0x34/4]&0xffff0000) );
-					testsprite->a.v = u2f( (tafifo_buff[0x34/4]&0x0000ffff)<<16);
-					testsprite->b.u = u2f( (tafifo_buff[0x38/4]&0xffff0000) );
-					testsprite->b.v = u2f( (tafifo_buff[0x38/4]&0x0000ffff)<<16);
-					testsprite->c.u = u2f( (tafifo_buff[0x3c/4]&0xffff0000) );
-					testsprite->c.v = u2f( (tafifo_buff[0x3c/4]&0x0000ffff)<<16);
-					testsprite->d.u = 0.0f;// calculated
-					testsprite->d.v = 0.0f;// calculated
-
-					/*
-                    printf("Sending a sprite with\n%f %f %f - %f %f\n %f %f %f - %f %f\n%f %f %f - %f %f\n%f %f %f - %f %f\n",
-                    testsprite->a.x, testsprite->a.y, testsprite->a.z, testsprite->a.u, testsprite->a.v,
-                    testsprite->b.x, testsprite->b.y, testsprite->b.z, testsprite->b.u, testsprite->b.v,
-                    testsprite->c.x, testsprite->c.y, testsprite->c.z, testsprite->c.u, testsprite->c.v,
-                    testsprite->d.x, testsprite->d.y, testsprite->d.z, testsprite->d.u, testsprite->d.v);
-                    */
-
-					/*
-                    horizontal test mode
-                    224.000000 224.000000 999.999939 - 0.000000 0.609375
-                    232.000000 224.000000 999.999939 - 1.000000 0.609375
-                    232.000000 232.000000 999.999939 - 1.000000 0.617188
-                    224.000000 232.000000
-                    should calculate      999.999939 - 0.000000 0.617188
-
-
-                    vertical test mode
-                      8.000000 184.000000 999.999939 - 0.000000 0.617188
-                     16.000000 184.000000 999.999939 - 0.000000 0.609375
-                     16.000000 192.000000 999.999939 - 1.000000 0.609375
-                      8.000000 192.000000
-                    should calculate      999.999939 - 1.000000 0.617188
-                    */
-
-					// old code, used for the test drawing
-					testsprite->positionx=testsprite->a.x;
-					testsprite->positiony=testsprite->a.y;
-					testsprite->sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
-					testsprite->sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
-					testsprite->u=u2f(tafifo_buff[13] & 0xffff0000);
-					testsprite->v=u2f((tafifo_buff[13] & 0xffff) << 16);
-					testsprite->du=u2f(tafifo_buff[14] & 0xffff0000)-testsprite->u;
-					testsprite->dv=u2f((tafifo_buff[15] & 0xffff) << 16)-testsprite->v;
-
-					tex_get_info(&testsprite->ti, &state_ta);
-
-					state_ta.grab[state_ta.grabsel].testsprites_size++;
-#else
-					if (state_ta.grab[state_ta.grabsel].testvertices_size <= 65530)
+					if (rd->verts_size <= 65530)
 					{
-						teststrips *ts;
-						testvertices *tv = &state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size];
+						strip *ts;
+						vert *tv = &rd->verts[rd->verts_size];
 						tv[0].x = u2f(tafifo_buff[0x1]);
 						tv[0].y = u2f(tafifo_buff[0x2]);
 						tv[0].w = u2f(tafifo_buff[0x3]);
@@ -1308,28 +1214,13 @@ void process_ta_fifo(running_machine* machine)
 						tv[2].u = tv[0].u+tv[3].u-tv[1].u;
 						tv[2].v = tv[0].v+tv[3].v-tv[1].v;
 
-#if 0
-						fprintf(stderr, "(%f, %f)-(%f, %f)-(%f, %f)-(%f, %f) [%f %f %f]\n",
-								tv[0].x, tv[0].y,
-								tv[1].x, tv[1].y,
-								tv[2].x, tv[2].y,
-								tv[3].x, tv[3].y,
-								tv[0].w, tv[1].w, tv[2].w);
-						fprintf(stderr, "[%f, %f]-[%f, %f]-[%f, %f]-[%f, %f]\n",
-								tv[0].u, tv[0].v,
-								tv[1].u, tv[1].v,
-								tv[2].u, tv[2].v,
-								tv[3].u, tv[3].v);
-#endif
-
-						ts = &state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size++];
+						ts = &rd->strips[rd->strips_size++];
 						tex_get_info(&ts->ti, &state_ta);
-						ts->svert = state_ta.grab[state_ta.grabsel].testvertices_size;
-						ts->evert = ts->svert + 3;
+						ts->svert = rd->verts_size;
+						ts->evert = rd->verts_size + 3;
 
-						state_ta.grab[state_ta.grabsel].testvertices_size += 4;
+						rd->verts_size += 4;
 					}					
-#endif
 				}
 			}
 			else if (state_ta.global_paratype == 4)
@@ -1339,38 +1230,31 @@ void process_ta_fifo(running_machine* machine)
 				mame_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
 				mame_printf_verbose("\n");
 				#endif
-#if DEBUG_VERTICES
-				if (state_ta.grab[state_ta.grabsel].testvertices_size <= 65530)
+				if (rd->verts_size <= 65530)
 				{
-					/* add a vertex to our 'testverticies' list */
+					/* add a vertex to our list */
 					/* this is used for 3d stuff, ie most of the graphics (see guilty gear, confidential mission, maze of the kings etc.) */
 					/* -- this is also wildly inaccurate! */
-					testvertices* testvertex = &state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size];
+					vert *tv = &rd->verts[rd->verts_size];
 
-					testvertex->x=u2f(tafifo_buff[1]);
-					testvertex->y=u2f(tafifo_buff[2]);
-					testvertex->w=u2f(tafifo_buff[3]);
-					testvertex->u=u2f(tafifo_buff[4]);
-					testvertex->v=u2f(tafifo_buff[5]);
+					tv->x=u2f(tafifo_buff[1]);
+					tv->y=u2f(tafifo_buff[2]);
+					tv->w=u2f(tafifo_buff[3]);
+					tv->u=u2f(tafifo_buff[4]);
+					tv->v=u2f(tafifo_buff[5]);
 					
-					
-					testvertex->endofstrip=state_ta.endofstrip;
-
-					
-					
-					if((!state_ta.grab[state_ta.grabsel].teststrips_size) ||
-					   state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size-1].evert != -1)
+					if((!rd->strips_size) ||
+					   rd->strips[rd->strips_size-1].evert != -1)
 					{
-						teststrips *ts = &state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size++];
+						strip *ts = &rd->strips[rd->strips_size++];
 						tex_get_info(&ts->ti, &state_ta);
-						ts->svert = state_ta.grab[state_ta.grabsel].testvertices_size;
+						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
 					if(state_ta.endofstrip)
-						state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size-1].evert = state_ta.grab[state_ta.grabsel].testvertices_size;
+						rd->strips[rd->strips_size-1].evert = rd->verts_size;
+					rd->verts_size++;
 				}
-				state_ta.grab[state_ta.grabsel].testvertices_size++;
-#endif
 			}
 		}
 	}
@@ -1458,60 +1342,6 @@ static void computedilated(void)
 	for (b=0;b <= 7;b++)
 		for (a=0;a < 7;a++)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
-}
-
-
-
-#if DEBUG_VERTICES
-
-
-INLINE void testdrawline(bitmap_t *bitmap, testvertices* from, testvertices* to)
-{
-UINT32 *bmpaddr;
-int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;
-int dxix, dyiy;
-render_bounds line, clip;
-
-	clip.x0=0;
-	clip.y0=0;
-	clip.x1=639;
-	clip.y1=479;
-	line.x0=from->x;
-	line.y0=from->y;
-	line.x1=to->x;
-	line.y1=to->y;
-	if (render_clip_line(&line, &clip))
-		return;
-	dx=line.x1-line.x0;
-	dy=line.y1-line.y0;
-	plotx=line.x0;
-	ploty=line.y0;
-	ix = abs(dx);
-	iy = abs(dy);
-	inc = MAX(ix,iy);
-	x = y = 0;
-	dxix = (dx ? dx/ix : 0);
-	dyiy = (dy ? dy/iy : 0);
-
-	for (i=0; i <= inc; ++i)
-    {
-		x += ix;  y += iy;
-
-		if (x > inc)
-		{
-			x -= inc;
-			plotx += dxix;
-			bmpaddr = BITMAP_ADDR32(bitmap,ploty,plotx);
-			*bmpaddr = MAKE_RGB(0, 0, 255);
-		}
-		if (y > inc)
-		{
-			y -= inc;
-			ploty += dyiy;
-			bmpaddr = BITMAP_ADDR32(bitmap,ploty,plotx);
-			*bmpaddr = MAKE_RGB(0, 0, 255);
-		}
-	}
 }
 
 void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
@@ -1632,7 +1462,7 @@ void render_span(bitmap_t *bitmap, texinfo *ti,
 	}
 }
 
-static void sort_vertices(testvertices *v, int *i0, int *i1, int *i2)
+static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 {
 	float miny, maxy;
 	int imin, imax, imid;
@@ -1663,7 +1493,7 @@ static void sort_vertices(testvertices *v, int *i0, int *i1, int *i2)
 }
 
 
-static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, testvertices *v0, testvertices *v1, testvertices *v2)
+static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	int y0, y1, y2;
 	float dy01, dy02, dy12;
@@ -1740,7 +1570,7 @@ static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, testvertices *v0, t
 	}
 }
 
-static void render_tri(bitmap_t *bitmap, texinfo *ti, testvertices *v)
+static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 {
 	int i0, i1, i2;
 
@@ -1748,29 +1578,10 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, testvertices *v)
 	render_tri_sorted(bitmap, ti, v+i0, v+i1, v+i2);
 }
 
-
-
-#endif
-
-#if 0
-INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
-{
-	int alphad = 256 - level;
-	return ((((s & 0x001f) * level + (d & 0x001f) * alphad) >> 8)) |
-		   ((((s & 0x07e0) * level + (d & 0x07e0) * alphad) >> 8) & 0x07e0) |
-		   ((((s & 0xf800) * level + (d & 0xf800) * alphad) >> 8) & 0xf800);
-}
-#endif
-
-/// !!
-
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int cs,x,y,dx,dy,xi,yi,rs,ns;
-	float iu,iv,u,v;
-	UINT32 *bmpaddr;
-	float xt, yt;
+	int cs,rs,ns;
 	UINT32 c;
 #if 0
 	int stride;
@@ -1809,13 +1620,13 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 	}
 #endif
 
-	ns=state_ta.grab[rs].teststrips_size;
+	ns=state_ta.grab[rs].strips_size;
 	if(ns)
 		memset(wbuffer, 0x00, sizeof(wbuffer));
 
 	for (cs=0;cs < ns;cs++)
 	{
-		teststrips *ts = &state_ta.grab[rs].showstrips[cs];
+		strip *ts = &state_ta.grab[rs].strips[cs];
 		int sv = ts->svert;
 		int ev = ts->evert;
 		int i;
@@ -1824,109 +1635,13 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 		for(i=sv; i <= ev; i++)
 		{
-			testvertices *tv = state_ta.grab[rs].showvertices + i;
+			vert *tv = state_ta.grab[rs].verts + i;
 			tv->u = tv->u * ts->ti.sizex * tv->w;
 			tv->v = tv->v * ts->ti.sizey * tv->w;
 		}
 
 		for(i=sv; i <= ev-2; i++)
-			render_tri(bitmap, &ts->ti, state_ta.grab[rs].showvertices + i);
-	}
-
-	ns=state_ta.grab[rs].testsprites_size;
-	for (cs=0;cs < ns;cs++)
-	{
-		texinfo *ti;
-		dx=state_ta.grab[rs].showsprites[cs].sizex;
-		dy=state_ta.grab[rs].showsprites[cs].sizey;
-		iu=state_ta.grab[rs].showsprites[cs].du/dx;
-		iv=state_ta.grab[rs].showsprites[cs].dv/dy;
-		ti=&state_ta.grab[rs].showsprites[cs].ti;
-
-		if ((state_ta.grab[rs].showsprites[cs].positionx+dx) > 640)
-			dx=640-state_ta.grab[rs].showsprites[cs].positionx;
-		if ((state_ta.grab[rs].showsprites[cs].positiony+dy) > 480)
-			dy=480-state_ta.grab[rs].showsprites[cs].positiony;
-		xi=0;
-		yi=0;
-
-		if (state_ta.grab[rs].showsprites[cs].positionx < 0)
-			xi=-state_ta.grab[rs].showsprites[cs].positionx;
-		if (state_ta.grab[rs].showsprites[cs].positiony < 0)
-			yi=-state_ta.grab[rs].showsprites[cs].positiony;
-
-		for (y = yi;y < dy;y++)
-		{
-			for (x = xi;x < dx;x++)
-			{
-				// find the coordinates
-				u=state_ta.grab[rs].showsprites[cs].u+iu*x;
-				v=state_ta.grab[rs].showsprites[cs].v+iv*y;
-				xt=u*(ti->sizex-1);
-				yt=v*(ti->sizey-1);
-
-				c = ti->r(ti, xt, yt);
-
-				bmpaddr=BITMAP_ADDR32(bitmap,state_ta.grab[rs].showsprites[cs].positiony+y,state_ta.grab[rs].showsprites[cs].positionx+x);
-				*bmpaddr = alpha_blend_r32(*bmpaddr, c & 0xffffff, c >> 24);
-#if 0
-				// write into framebuffer
-				switch (pvrta_regs[FB_W_CTRL] & 7)
-				{
-				case 0: // 0555 KRGB 16 bit
-					k=pvrta_regs[FB_W_CTRL] & 0x8000;
-					addrp=state_ta.grab[s].fbwsof1+(state_ta.grab[s].showsprites[cs].positiony+y)*stride+(state_ta.grab[s].showsprites[cs].positionx+x)*2;
-					bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
-					*bmpaddr16=k | alpha_blend_r16(*bmpaddr16,((c & 0xf80000) >> 9) | ((c & 0xf800) >> 6) | ((c & 0xf8) >> 3),a);
-					break;
-				case 1: // 565 RGB 16 bit
-					addrp=state_ta.grab[rs].fbwsof1+(state_ta.grab[rs].showsprites[cs].positiony+y)*stride+(state_ta.grab[rs].showsprites[cs].positionx+x)*2;
-					bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
-					//*bmpaddr16=alpha_blend_r16_565(*bmpaddr16,((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3),a);
-					*bmpaddr16=((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3);
-					break;
-				case 2: // 4444 ARGB 16 bit
-					break;
-				case 3: // 1555 ARGB 16 bit
-					break;
-				case 4: // 888 RGB 24 bit packed
-					break;
-				case 5: // 0888 KRGB 32 bit
-					break;
-				case 6: // 8888 ARGB 32 bit
-					break;
-				case 7: // reserved
-					break;
-				} // switch
-#endif
-			}
-		}
-
-		#if 0
-		// test--draw the verts fore each quad as polys too
-		{
-			testvertices vv[4];
-			testvertices* v[3];
-
-			vv[0].x = state_ta.grab[rs].showsprites[cs].a.x;
-			vv[0].y = state_ta.grab[rs].showsprites[cs].a.y;
-			vv[1].x = state_ta.grab[rs].showsprites[cs].b.x;
-			vv[1].y = state_ta.grab[rs].showsprites[cs].b.y;
-			vv[2].x = state_ta.grab[rs].showsprites[cs].c.x;
-			vv[2].y = state_ta.grab[rs].showsprites[cs].c.y;
-			vv[3].x = state_ta.grab[rs].showsprites[cs].d.x;
-			vv[3].y = state_ta.grab[rs].showsprites[cs].d.y;
-
-			v[0] = &vv[0];
-			v[1] = &vv[1];
-			v[2] = &vv[2];
-			testdrawpoly(bitmap,v);
-			v[0] = &vv[0];
-			v[1] = &vv[2];
-			v[2] = &vv[3];
-			testdrawpoly(bitmap,v);
-		}
-		#endif
+			render_tri(bitmap, &ts->ti, state_ta.grab[rs].verts + i);
 	}
 	state_ta.grab[rs].busy=0;
 }
