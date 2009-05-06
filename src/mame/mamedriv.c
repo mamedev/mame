@@ -6952,6 +6952,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cabal )		/* (c) 1988 Tad + Fabtek license */
 	DRIVER( cabala )	/* (c) 1988 Tad + Fabtek license */
 	DRIVER( cabalbl )	/* bootleg */
+	DRIVER( cabalbl2 )	/* bootleg */
 	DRIVER( cabalus )	/* (c) 1988 Tad + Fabtek license */
 	DRIVER( cabalus2 )	/* (c) 1988 Tad + Fabtek license */
 	DRIVER( toki )		/* (c) 1989 Tad (World) */

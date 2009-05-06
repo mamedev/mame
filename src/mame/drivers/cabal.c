@@ -786,6 +786,70 @@ ROM_START( cabalbl )
 ROM_END
 
 
+// alternate bootleg
+// this is much closer to the original, the only real difference is the soundcpu has been pre-decrypted,
+// with the encrypted/decrypted data split across the rom
+ROM_START( cabalbl2 )
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_LOAD16_BYTE( "c9.bin",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
+	ROM_LOAD16_BYTE( "c7.bin",    0x00001, 0x10000, CRC(44736281) SHA1(1d6da95ef96d9c02aea70791e1cb87b70097d5ed) )
+	ROM_LOAD16_BYTE( "c8.bin",    0x20000, 0x10000, CRC(d763a47c) SHA1(146d8082a404b6eddaf2dc9ba41a997949c17f8a) )
+	ROM_LOAD16_BYTE( "c6.bin",    0x20001, 0x10000, CRC(96d5e8af) SHA1(ed7d854f08e87db5ae6cf526eafa029dfd2bfb9f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code + 64k for decrypted */
+	ROM_LOAD( "c4.bin",    0x2000, 0x2000, CRC(82f9f296) SHA1(2769ffdc28f003684e77d4806be07b87d50be31c) )
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "c3.bin",    0x8000, 0x8000,  CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
+
+	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "c5.bin",           0x00000, 0x04000, CRC(183e4834) SHA1(05ab0c388be8701930a9de437978206cda6fed68) ) /* characters */
+	ROM_CONTINUE(0x0000,0x4000)
+	
+	/* The bootleg versions use a sub-board instead of the mask roms
+       the content is the same as the mask roms */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "c14.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
+	ROM_LOAD16_BYTE( "c10.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
+	ROM_LOAD16_BYTE( "c15.bin",   0x20000, 0x10000, CRC(420b0801) SHA1(175be6e3ca3cb98672e4cdbc9b5f5b007bc531c9) )
+	ROM_LOAD16_BYTE( "c11.bin",   0x20001, 0x10000, CRC(77bc7a60) SHA1(4d148241835f6a6b63f66494636c09a1fc1d3c06) )
+	ROM_LOAD16_BYTE( "c16.bin",   0x40000, 0x10000, CRC(543fcb37) SHA1(78c40f6a78a8b9ca9f73fc67fc87f78b15e7abbe) )
+	ROM_LOAD16_BYTE( "c12.bin",   0x40001, 0x10000, CRC(0bc50075) SHA1(565eb59b41f71fb69f62397f9747f5ae18b83009) )
+	ROM_LOAD16_BYTE( "c17.bin",   0x60000, 0x10000, CRC(d28d921e) SHA1(e133de5129a33ca9ff449948a959621bbfc58c11) )
+	ROM_LOAD16_BYTE( "c13.bin",   0x60001, 0x10000, CRC(67e4fe47) SHA1(15620fc5e985a249677da333b77331e40d2b24ab) )
+
+	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "c18.bin",   0x00000, 0x10000, CRC(34d3cac8) SHA1(a6a2304fb576267db2c72cfbf0a3f66740ebe60e) )
+	ROM_LOAD16_BYTE( "c22.bin",   0x00001, 0x10000, CRC(4e49c28e) SHA1(ea74443a9423b14611a1f97e44692badfedd0ead) )
+	ROM_LOAD16_BYTE( "c19.bin",   0x20000, 0x10000, CRC(7065e840) SHA1(baa8cd28be60c678d782ecfabde6cd5e36480415) )
+	ROM_LOAD16_BYTE( "c23.bin",   0x20001, 0x10000, CRC(6a0e739d) SHA1(e3f4f5b4587f573426ec00417f33e94a257c77e6) )
+	ROM_LOAD16_BYTE( "c20.bin",   0x40000, 0x10000, CRC(0e1ec30e) SHA1(4b1f092fc1e92da0f92e55d1548db7961a13f717) )
+	ROM_LOAD16_BYTE( "c24.bin",   0x40001, 0x10000, CRC(581a50c1) SHA1(5afd65c15a0a63a54727e6d882011f0718a9fefc) )
+	ROM_LOAD16_BYTE( "c21.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
+	ROM_LOAD16_BYTE( "c25.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples */
+	ROM_LOAD( "c2.bin",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
+	ROM_LOAD( "c1.bin",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+ROM_END
+
+
+
+void seibu_sound_bootleg(running_machine *machine,const char *cpu,int length)
+{
+	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
+	UINT8 *rom = memory_region(machine, cpu);
+
+	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+
+	memcpy(decrypt, rom+length, length);
+	
+	if (length > 0x10000)
+		memory_configure_bank_decrypted(machine, 1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+}
+
+
 
 static DRIVER_INIT( cabal )
 {
@@ -793,10 +857,17 @@ static DRIVER_INIT( cabal )
 	seibu_adpcm_decrypt(machine,"adpcm");
 }
 
+static DRIVER_INIT( cabalbl2 )
+{
+	seibu_sound_bootleg(machine,"audiocpu",0x2000);
+	seibu_adpcm_decrypt(machine,"adpcm");
+}
 
-GAME( 1988, cabal,   0,     cabal,   cabalj,   cabal,  ROT0, "Tad Corporation", "Cabal (World, Joystick version)", 0 )
-GAME( 1989, cabala,  cabal, cabal,   cabalj,   cabal,  ROT0, "Tad Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,  0,      ROT0, "[Tad Corporation] (Red Corporation bootleg)", "Cabal (bootleg of Joystick version)", GAME_IMPERFECT_SOUND )
+
+GAME( 1988, cabal,   0,     cabal,   cabalj,   cabal,   ROT0, "Tad Corporation", "Cabal (World, Joystick version)", 0 )
+GAME( 1989, cabala,  cabal, cabal,   cabalj,   cabal,   ROT0, "Tad Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,  0,       ROT0, "[Tad Corporation] (Red Corporation bootleg)", "Cabal (bootleg of Joystick version)", GAME_IMPERFECT_SOUND )
+GAME( 1988, cabalbl2,cabal, cabal,   cabalj,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", GAME_IMPERFECT_SOUND )
 
 GAME( 1988, cabalus, cabal, cabal,   cabalt,   cabal,  ROT0, "Tad (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )
 GAME( 1988, cabalus2,cabal, cabal,   cabalt,   cabal,  ROT0, "Tad (Fabtek license)", "Cabal (US set 2, Trackball version)", 0 )
