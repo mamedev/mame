@@ -53,8 +53,8 @@ typedef struct
 } vert;
 
 typedef struct texinfo {
-	UINT32 address;
-	int sizex, sizey, sizes, pf, palette, mode;
+	UINT32 address, mipoffset;
+	int sizex, sizey, sizes, pf, palette, mode, mipmapped;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
 	int palbase, cd;
@@ -194,7 +194,7 @@ static UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
@@ -219,7 +219,7 @@ static UINT32 tex_r_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
@@ -244,7 +244,7 @@ static UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
@@ -263,7 +263,7 @@ static UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_1555(pvrta_regs[t->palbase + c]);
@@ -283,7 +283,7 @@ static UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_565(pvrta_regs[t->palbase + c]);
@@ -303,7 +303,7 @@ static UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_4444(pvrta_regs[t->palbase + c]);
@@ -323,7 +323,7 @@ static UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
 	return pvrta_regs[t->palbase + c];
@@ -342,7 +342,7 @@ static UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + t->mipoffset + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_1555(pvrta_regs[t->palbase + c]);
@@ -361,7 +361,7 @@ static UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset+ 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_565(pvrta_regs[t->palbase + c]);
@@ -380,7 +380,7 @@ static UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset+ 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return cv_4444(pvrta_regs[t->palbase + c]);
@@ -399,7 +399,7 @@ static UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + t->mipoffset + 0x800 + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->address + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
 	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
 	return pvrta_regs[t->palbase + c];
@@ -413,40 +413,47 @@ static UINT32 tex_r_default(texinfo *t, float x, float y)
 
 static void tex_prepare(texinfo *t)
 {
+	int miptype = 0;
+	static int xxxx = 0;
+	xxxx++;
+	
 	t->r = tex_r_default;
 	t->palbase = 0x400 | ((t->palette & 0x3f) << 4);
 	t->cd = dilatechose[t->sizes];
+	t->mipoffset = 0;
 
+	
+	
 	switch(t->pf) {
 	case 0: // 1555
 		switch(t->mode) {
-		case 0:  t->r = tex_r_1555_tw; break;
-		case 1:  t->r = tex_r_1555_n;  break;
-		default: t->r = tex_r_1555_vq; break;
+		case 0:  t->r = tex_r_1555_tw; miptype = 2; break;
+		case 1:  t->r = tex_r_1555_n;  miptype = 2; break;
+		default: t->r = tex_r_1555_vq; miptype = 3; break;
 		}
 		break;
 
 	case 1: // 565
 		switch(t->mode) {
-		case 0:  t->r = tex_r_565_tw; break;
-		case 1:  t->r = tex_r_565_n;  break;
-		default: t->r = tex_r_565_vq; break;
+		case 0:  t->r = tex_r_565_tw; miptype = 2; break;
+		case 1:  t->r = tex_r_565_n;  miptype = 2; break;
+		default: t->r = tex_r_565_vq; miptype = 3; break;
 		}
 		break;
 
 	case 2: // 4444
 		switch(t->mode) {
-		case 0:  t->r = tex_r_4444_tw; break;
-		case 1:  t->r = tex_r_4444_n;  break;
-		default: t->r = tex_r_4444_vq; break;
+		case 0:  t->r = tex_r_4444_tw; miptype = 2; break;
+		case 1:  t->r = tex_r_4444_n;  miptype = 2; break;
+		default: t->r = tex_r_4444_vq; miptype = 3; break;
 		}
 		break;
 
 	case 3: // yuv422
 		switch(t->mode) {
-		case 0:  /*t->r = tex_r_yuv_tw*/; break;
-		case 1:  t->r = tex_r_yuv_n;  break;
-		default: /*t->r = tex_r_yuv_vq*/; break;
+		case 0:  /*t->r = tex_r_yuv_tw*/; miptype = -1; break;
+		case 1:  t->r = tex_r_yuv_n; miptype = -1; break;
+		default: /*t->r = tex_r_yuv_vq*/; miptype = -1; break;
 		}
 		break;
 
@@ -456,14 +463,18 @@ static void tex_prepare(texinfo *t)
 	case 5: // 4bpp palette
 		switch(t->mode) {
 		case 0: case 1:
+			miptype = 0;	
+		
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_tw; break;
-			case 1: t->r = tex_r_p4_565_tw; break;
+			case 1: t->r = tex_r_p4_565_tw;  break;
 			case 2: t->r = tex_r_p4_4444_tw; break;
 			case 3: t->r = tex_r_p4_8888_tw; break;
 			}
 			break;
 		default:
+			miptype = 3; // ?	
+
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_vq; break;
 			case 1: t->r = tex_r_p4_565_vq; break;
@@ -477,6 +488,8 @@ static void tex_prepare(texinfo *t)
 	case 6: // 8bpp palette
 		switch(t->mode) {
 		case 0: case 1:
+			miptype = 1;	
+		
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_tw; break;
 			case 1: t->r = tex_r_p8_565_tw; break;
@@ -485,6 +498,8 @@ static void tex_prepare(texinfo *t)
 			}
 			break;
 		default:
+			miptype = 3; // ?	
+		
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_vq; break;
 			case 1: t->r = tex_r_p8_565_vq; break;
@@ -498,6 +513,98 @@ static void tex_prepare(texinfo *t)
 	case 9: // reserved
 		break;
 	}
+	
+	if (t->mipmapped)
+	{
+		// full offset tables for reference,
+		// we don't do mipmapping, so don't use anything < 8x8
+		// first table is half-bytes
+	
+		// 4BPP palette textures
+		// Texture size _4-bit_ offset value for starting address
+		// 1x1			0x00003
+		// 2x2 			0x00004
+		// 4x4 			0x00008
+		// 8x8 			0x00018
+		// 16x16 		0x00058
+		// 32x32 		0x00158
+		// 64x64 		0x00558
+		// 128x128		0x01558
+		// 256x256 		0x05558
+		// 512x512 		0x15558
+		// 1024x1024 	0x55558
+	
+		// 8BPP palette textures
+		// Texture size Byte offset value for starting address
+		// 1x1			0x00003
+		// 2x2 			0x00004
+		// 4x4 			0x00008
+		// 8x8 			0x00018
+		// 16x16 		0x00058
+		// 32x32 		0x00158
+		// 64x64 		0x00558
+		// 128x128		0x01558
+		// 256x256 		0x05558
+		// 512x512 		0x15558
+		// 1024x1024 	0x55558
+	
+		// Non-palette textures
+		// Texture size Byte offset value for starting address
+		// 1x1 			0x00006
+		// 2x2 			0x00008
+		// 4x4 			0x00010
+		// 8x8 			0x00030
+		// 16x16 		0x000B0
+		// 32x32 		0x002B0
+		// 64x64 		0x00AB0
+		// 128x128 		0x02AB0
+		// 256x256 		0x0AAB0
+		// 512x512 		0x2AAB0
+		// 1024x1024 	0xAAAB0
+	
+		// VQ textures
+		// Texture size Byte offset value for starting address
+		// 1x1 			0x00000
+		// 2x2 			0x00001
+		// 4x4 			0x00002
+		// 8x8 			0x00006
+		// 16x16 		0x00016
+		// 32x32 		0x00056
+		// 64x64 		0x00156
+		// 128x128 		0x00556
+		// 256x256 		0x01556
+		// 512x512 		0x05556
+		// 1024x1024 	0x15556
+		
+		static const int mipmap_4_8_offset[8] = { 0x00018, 0x00058, 0x00158, 0x00558, 0x01558, 0x05558, 0x15558, 0x55558 };  // 4bpp (4bit offset) / 8bpp (8bit offset)
+		static const int mipmap_np_offset[8] =  { 0x00030, 0x000B0, 0x002B0, 0x00AB0, 0x02AB0, 0x0AAB0, 0x2AAB0, 0xAAAB0 };  // nonpalette textures
+		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 }; // vq textures
+		
+		switch (miptype)
+		{
+		
+			case 0: // 4bpp
+				//printf("4bpp\n");
+				t->address+= mipmap_4_8_offset[t->sizes&7]>>1;
+				break;
+			
+			case 1: // 8bpp
+				//printf("8bpp\n");
+				t->address+= mipmap_4_8_offset[t->sizes&7];
+				break;
+				
+			case 2: // nonpalette
+				//printf("np\n");
+				t->address+= mipmap_np_offset[t->sizes&7];
+				break;
+			
+			case 3: // vq
+				//printf("vq\n");
+				t->mipoffset = mipmap_vq_offset[t->sizes&7];
+				break;
+		}
+	}
+	
 }
 
 static void tex_get_info(texinfo *ti, pvrta_state *sa)
@@ -508,6 +615,7 @@ static void tex_get_info(texinfo *ti, pvrta_state *sa)
 	ti->mode    = sa->scanorder + sa->vqcompressed*2;
 	ti->sizes   = sa->texturesizes;
 	ti->pf      = sa->pixelformat;
+	ti->mipmapped  = sa->mipmapped;
 	ti->palette = sa->paletteselector;
 	tex_prepare(ti);
 }
@@ -1244,8 +1352,12 @@ void process_ta_fifo(running_machine* machine)
 					testvertex->w=u2f(tafifo_buff[3]);
 					testvertex->u=u2f(tafifo_buff[4]);
 					testvertex->v=u2f(tafifo_buff[5]);
+					
+					
 					testvertex->endofstrip=state_ta.endofstrip;
 
+					
+					
 					if((!state_ta.grab[state_ta.grabsel].teststrips_size) ||
 					   state_ta.grab[state_ta.grabsel].showstrips[state_ta.grab[state_ta.grabsel].teststrips_size-1].evert != -1)
 					{
