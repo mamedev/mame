@@ -41,6 +41,7 @@ To do:
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/3526intf.h"
@@ -81,7 +82,7 @@ static READ8_HANDLER( gondo_player_1_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN0");
 
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
@@ -95,7 +96,7 @@ static READ8_HANDLER( gondo_player_2_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN1");
 
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
@@ -107,11 +108,37 @@ static READ8_HANDLER( gondo_player_2_r )
 
 /******************************************************************************/
 
+/***************************************************
+*
+* Hook-up for games that we have a proper MCU dump.
+*
+***************************************************/
+
+static WRITE8_HANDLER( meikyuh_i8751_w )
+{
+	switch (offset)
+	{
+	case 0: /* High byte */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		break;
+	case 1: /* Low byte */
+		i8751_value = (i8751_value & 0xff00) | data;
+		cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
+		break;
+	}
+}
+
+/********************************
+*
+* MCU simulations
+*
+********************************/
+
 static WRITE8_HANDLER( ghostb_i8751_w )
 {
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -126,12 +153,14 @@ static WRITE8_HANDLER( ghostb_i8751_w )
 	if (i8751_value == 0x021b) i8751_return = 0x6e4; /* Meikyuu Hunter G ID */
 }
 
+
+
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
 	static int coins, latch;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -205,11 +234,11 @@ static WRITE8_HANDLER( gondo_i8751_w )
 	static int coin1, coin2, latch,snd;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
-		if (int_enable) 
+		if (int_enable)
 			cputag_set_input_line (space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
 		break;
 	case 1: /* Low byte */
@@ -240,7 +269,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	static int coin1, coin2, latch = 0;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -269,7 +298,7 @@ static WRITE8_HANDLER( lastmiss_i8751_w )
 	static int coin, latch = 0, snd;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -301,7 +330,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	static int coin, latch = 0, snd;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -331,7 +360,7 @@ static WRITE8_HANDLER( garyoret_i8751_w )
 	static int coin1, coin2, latch;
 	i8751_return = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: /* High byte */
 		i8751_value = (i8751_value & 0xff) | (data << 8);
@@ -444,7 +473,7 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 static WRITE8_HANDLER( oscar_int_w )
 {
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* IRQ2 */
 			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
@@ -468,7 +497,7 @@ static WRITE8_HANDLER( shackled_int_w )
 /* This is correct, but the cpus in Shackled need an interleave of about 5000!
     With lower interleave CPU 0 misses an interrupt at the start of the game
     (The last interrupt has not finished and been ack'd when the new one occurs */
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* CPU 2 - IRQ acknowledge */
 			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
@@ -487,7 +516,7 @@ static WRITE8_HANDLER( shackled_int_w )
 	}
 #endif
 
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* CPU 2 - IRQ acknowledge */
             return;
@@ -542,7 +571,7 @@ static ADDRESS_MAP_START( ghostb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE(&dec8_row)
-	AM_RANGE(0x2e00, 0x2fff) AM_WRITE(SMH_RAM) /* Unused */
+	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
@@ -555,6 +584,30 @@ static ADDRESS_MAP_START( ghostb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
 	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
 	AM_RANGE(0x3860, 0x3861) AM_WRITE(ghostb_i8751_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM
+	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE(&dec8_row)
+	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
+	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
+	AM_RANGE(0x3820, 0x383f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
+	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
+	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
+	AM_RANGE(0x3860, 0x3861) AM_WRITE(meikyuh_i8751_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -838,6 +891,41 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+static READ8_HANDLER( dec8_mcu_from_main_r )
+{
+	switch (offset)
+	{
+		case 0:
+			return ((i8751_value & 0xff00) >> 8);
+		case 1:
+			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+			return i8751_value & 0xff;
+	}
+
+	return 0; //compile safe.
+}
+
+static WRITE8_HANDLER( dec8_mcu_to_main_w )
+{
+	switch (offset)
+	{
+		case 0: /* High byte */
+			i8751_return = (i8751_return & 0xff) | (data << 8);
+			break;
+		case 1: /* Low byte */
+			i8751_return = (i8751_return & 0xff00) | data;
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( dec8_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P1) AM_READWRITE(dec8_mcu_from_main_r,dec8_mcu_to_main_w)
+	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_WRITENOP
+	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_READ_PORT("I8751") AM_WRITENOP
+ADDRESS_MAP_END
+
+/******************************************************************************/
+
 #define PLAYER1_JOYSTICK /* Player 1 controls */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY \
@@ -1010,6 +1098,23 @@ static INPUT_PORTS_START( ghostb3 )
 
 	PORT_MODIFY("DSW0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+/* same but with coin latches hooked up with the irqs since we have a MCU dump. */
+static INPUT_CHANGED( coin_inserted )
+{
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+}
+
+static INPUT_PORTS_START( meikyuh )
+	PORT_INCLUDE(ghostb)
+
+	PORT_MODIFY("I8751")	/* hooked up on the i8751 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( srdarwin )
@@ -1884,7 +1989,7 @@ static INTERRUPT_GEN( oscar_interrupt )
 	static int latch = 1;
 
 	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch = 1;
-	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7) 
+	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
 	{
 		latch = 0;
     	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -1976,6 +2081,18 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
+
+/* these two will be unified one day... */
+static MACHINE_DRIVER_START( meikyuh )
+	MDRV_IMPORT_FROM( ghostb )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(meikyuh_map,0)
+	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
+
+	MDRV_CPU_ADD("mcu", I8751, 3000000*4)
+	MDRV_CPU_IO_MAP(dec8_mcu_io_map,0)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( srdarwin )
 
@@ -2359,7 +2476,7 @@ ROM_START( ghostb )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2397,7 +2514,7 @@ ROM_START( ghostb3 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2520,8 +2637,8 @@ ROM_START( meikyuh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dw-05.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
+	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "dw-00.16b", 0x00000, 0x8000, CRC(3d25f15c) SHA1(590518460d069bc235b5efebec81731d7a2375de) )
@@ -2615,8 +2732,8 @@ ROM_START( meikyuha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
+	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "27256.16b", 0x00000, 0x8000, CRC(3d25f15c) SHA1(590518460d069bc235b5efebec81731d7a2375de) )
@@ -2651,7 +2768,7 @@ ROM_START( srdarwin )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2688,7 +2805,7 @@ ROM_START( srdarwnj )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2726,7 +2843,7 @@ ROM_START( gondo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt-05.256", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2770,7 +2887,7 @@ ROM_START( makyosen )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05",      0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2820,7 +2937,7 @@ ROM_START( oscar )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2850,7 +2967,7 @@ ROM_START( oscaru )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000,  CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2883,7 +3000,7 @@ ROM_START( oscarj1 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2916,7 +3033,7 @@ ROM_START( oscarj2 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2949,7 +3066,7 @@ ROM_START( lastmisn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2985,7 +3102,7 @@ ROM_START( lastmsno )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3021,7 +3138,7 @@ ROM_START( lastmsnj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3060,7 +3177,7 @@ ROM_START( shackled )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dk-07.rom", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3097,7 +3214,7 @@ ROM_START( breywood )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.bin", 0x8000, 0x8000,  CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3180,7 +3297,7 @@ ROM_START( csilver )
 	ROM_LOAD( "dx05.3f", 0x10000, 0x08000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 	ROM_CONTINUE(   0x08000, 0x08000 )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP ) // dx-8.19a ?
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3218,7 +3335,7 @@ ROM_START( csilverj )
 	ROM_LOAD( "dx05.a6", 0x10000, 0x08000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 	ROM_CONTINUE(   0x08000, 0x08000 )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3253,7 +3370,7 @@ ROM_START( garyoret )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dv05", 0x08000, 0x08000, CRC(c97c347f) SHA1(a1b22733dc15d524af97db3e608a82503a49b182) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3330,8 +3447,8 @@ GAME( 1988, cobracom, 0,        cobracom, cobracom, 0,       ROT0,   "Data East 
 GAME( 1988, cobracmj, cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", 0 )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", 0 )
-GAME( 1987, meikyuh,  ghostb,   ghostb,   ghostb,   meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
-GAME( 1987, meikyuha, ghostb,   ghostb,   ghostb,   meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
+GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
+GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (World)", 0 )
 GAME( 1987, srdarwnj, srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
 GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )
