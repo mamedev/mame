@@ -395,7 +395,7 @@ ROM_START( blktiger )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-ROM_START( bktigrb1 )
+ROM_START( blktigerb1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "btiger1.f6",   0x00000, 0x08000, CRC(9d8464e8) SHA1(c847ee9a22b8b636e85427214747e6bd779023e8) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
@@ -428,7 +428,7 @@ ROM_START( bktigrb1 )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-ROM_START( bktigrb2 )
+ROM_START( blktigerb2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(47e2b21e) SHA1(3f03543ace435239978a95f569ac89f6762253c0) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
@@ -497,7 +497,7 @@ ROM_START( blkdrgon )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-ROM_START( blkdrgnb )
+ROM_START( blkdrgonb )
 	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "a1",           0x00000, 0x08000, CRC(7caf2ba0) SHA1(57b17caff67d36b24075f5865d433bfc8bcc9bc2) )	/* CODE */
 	ROM_LOAD( "blkdrgon.6e",  0x10000, 0x10000, CRC(7d39c26f) SHA1(562a3f578e109ae020f65e341c876ad7e510a311) )	/* 0+1 */
@@ -531,8 +531,8 @@ ROM_START( blkdrgnb )
 ROM_END
 
 
-GAME( 1987, blktiger, 0,        blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
-GAME( 1987, bktigrb1, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bktigrb2, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon, blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Dragon",                GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgnb, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Dragon",                GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )

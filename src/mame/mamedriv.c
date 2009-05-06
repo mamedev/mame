@@ -2430,10 +2430,10 @@ V-V                           TP-027
 	DRIVER( 1943 )		/*  6/1987 (c) 1987 (US) */
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
-	DRIVER( bktigrb1 )	/* bootleg */
-	DRIVER( bktigrb2 )	/* bootleg */
+	DRIVER( blktigerb1 )/* bootleg */
+	DRIVER( blktigerb2 )/* bootleg */
 	DRIVER( blkdrgon )	/*  8/1987 (c) 1987 (Japan) */
-	DRIVER( blkdrgnb )	/* bootleg, hacked to say Black Tiger */
+	DRIVER( blkdrgonb )	/* bootleg, hacked to say Black Tiger */
 	DRIVER( sf )		/*  8/1987 (c) 1987 (World) */
 	DRIVER( sfus )		/*  8/1987 (c) 1987 (US) */
 	DRIVER( sfjp )		/*  8/1987 (c) 1987 (Japan) */
