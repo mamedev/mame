@@ -16,6 +16,7 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "cpu/mcs51/mcs51.h"
 
 
 extern UINT8 *blktiger_txvideoram;
@@ -36,15 +37,39 @@ VIDEO_UPDATE( blktiger );
 VIDEO_EOF( blktiger );
 
 
+/**************************************************
 
-/* this is a protection check. The game crashes (thru a jump to 0x8000) */
-/* if a read from this address doesn't return the value it expects. */
-static READ8_HANDLER( blktiger_protection_r )
+Protection comms between main cpu and i8751
+
+**************************************************/
+
+static UINT8 latch,prot_latch;
+
+static READ8_HANDLER( blktiger_from_mcu_r )
 {
-	int data = cpu_get_reg(space->cpu, Z80_DE) >> 8;
-	logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(space->cpu),data);
-	return data;
+	return prot_latch;
 }
+
+static WRITE8_HANDLER( blktiger_to_mcu_w )
+{
+	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
+	latch = data;
+}
+
+static READ8_HANDLER( blktiger_from_main_r )
+{
+	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+	//printf("%02x read\n",latch);
+	return latch;
+}
+
+static WRITE8_HANDLER( blktiger_to_main_w )
+{
+	//printf("%02x write\n",data);
+	prot_latch = data;
+}
+
+
 
 static WRITE8_HANDLER( blktiger_bankswitch_w )
 {
@@ -61,7 +86,7 @@ static WRITE8_HANDLER( blktiger_coinlockout_w )
 }
 
 
-static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blktiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
@@ -72,7 +97,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( blktiger_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
@@ -81,7 +106,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITENOP /* Software protection (7) */
+	AM_RANGE(0x07, 0x07) AM_READWRITE(blktiger_from_mcu_r,blktiger_to_mcu_w)	 /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
@@ -89,13 +114,40 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blktigerbl_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_NOP	 /* Software protection (7) */
+	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
+	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(blktiger_bgvideoram_bank_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( blktiger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( blktiger_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( blktiger_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
+	/* other ports unknown */
+ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( blktiger )
@@ -251,12 +303,17 @@ static MACHINE_DRIVER_START( blktiger )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
-	MDRV_CPU_IO_MAP(port_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blktiger_map, 0)
+	MDRV_CPU_IO_MAP(blktiger_io_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_mem_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blktiger_sound_map, 0)
+
+	MDRV_CPU_ADD("mcu", I8751, XTAL_24MHz/4) /* ??? */
+	MDRV_CPU_PROGRAM_MAP(blktiger_mcu_map,0)
+	MDRV_CPU_IO_MAP(blktiger_mcu_io_map,0)
+	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(blktiger)
 
@@ -288,6 +345,13 @@ static MACHINE_DRIVER_START( blktiger )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( blktigerbl )
+	MDRV_IMPORT_FROM(blktiger)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(blktigerbl_io_map, 0)
+
+	MDRV_CPU_REMOVE("mcu")
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -305,6 +369,9 @@ ROM_START( blktiger )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "bd.5k",  0x0000, 0x1000, CRC(ac7d14f1) SHA1(46fd6b43f10312e3e8d3c9e0c0fd616af98fdbad) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "bd-15.2n",  0x00000, 0x08000, CRC(70175d78) SHA1(2f02be2785d1824002145ea20db79821d0393929) )	/* characters */
@@ -405,6 +472,9 @@ ROM_START( blkdrgon )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "bd.5k",  0x0000, 0x1000, CRC(ac7d14f1) SHA1(46fd6b43f10312e3e8d3c9e0c0fd616af98fdbad) )
+
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "blkdrgon.2n",  0x00000, 0x08000, CRC(3821ab29) SHA1(576f1839f63b0cad6b851d6e6a3e9dec21ac811d) )	/* characters */
 
@@ -461,9 +531,8 @@ ROM_START( blkdrgnb )
 ROM_END
 
 
-
-GAME( 1987, blktiger, 0,        blktiger, blktiger, 0, ROT0, "Capcom", "Black Tiger", GAME_SUPPORTS_SAVE )
-GAME( 1987, bktigrb1, blktiger, blktiger, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bktigrb2, blktiger, blktiger, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon, blktiger, blktiger, blktiger, 0, ROT0, "Capcom", "Black Dragon", GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgnb, blktiger, blktiger, blktiger, 0, ROT0, "bootleg", "Black Dragon (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blktiger, 0,        blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
+GAME( 1987, bktigrb1, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bktigrb2, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon, blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Dragon",                GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgnb, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )
