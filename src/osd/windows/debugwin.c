@@ -2241,9 +2241,9 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 							/* if it doesn't exist, add a new one */
 							if (bpindex == -1)
-								sprintf(command, "bpset %X", address);
+								sprintf(command, "bpset 0x%X", address);
 							else
-								sprintf(command, "bpclear %X", bpindex);
+								sprintf(command, "bpclear 0x%X", bpindex);
 							debug_console_execute_command(info->machine, command, 1);
 						}
 					}
