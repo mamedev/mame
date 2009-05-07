@@ -282,7 +282,9 @@ static void init_mem_names(int feature_set, const char **mem_names)
 
 static const char *get_data_address( const char **mem_names, UINT8 arg )
 {
-	static char buffer[32];
+	static char buffer_array[4][32];
+	static int whichbuf;
+	char *buffer = &buffer_array[++whichbuf % 4][0];
 
 	if (mem_names[arg] == NULL)
 		sprintf(buffer,"$%02X",arg);
