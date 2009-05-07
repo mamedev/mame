@@ -4193,6 +4193,51 @@ ROM_START( sciu )
 	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )	// road A/B internal priority
 ROM_END
 
+ROM_START( scin )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "ic37.37", 0x00000, 0x20000, CRC(33fb159c) SHA1(b004a5249414f69768d8a951ded3c104ea107b32) )
+	ROM_LOAD16_BYTE( "ic40.38", 0x00001, 0x20000, CRC(657df3f2) SHA1(80e30961e2cdcb834d2cbd48803ace68acaab422) )
+	ROM_LOAD16_BYTE( "ic38.42", 0x40000, 0x20000, CRC(0a09b90b) SHA1(0970644a0d79ab3898187849bec6c7cf598652f3) )
+	ROM_LOAD16_BYTE( "ic41.39", 0x40001, 0x20000, CRC(43167b2a) SHA1(1e6f2a113deb57df869ec2ceb99d6a7ecfa5d7e5) )
+
+	ROM_REGION( 0x20000, "sub", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c09-33.6", 0x00000, 0x10000, CRC(cf4e6c5b) SHA1(8d6720b605b8e0c7f0473ba452c79bf5efc2615d) ) /* Actual label is "C09 33*" */
+	ROM_LOAD16_BYTE( "c09-32.5", 0x00001, 0x10000, CRC(a4713719) SHA1(b1110e397d3407ec63975cdd92a23cbb16348200) ) /* Actual label is "C09 32*" */
+
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_LOAD( "c09-34.31",   0x00000, 0x04000, CRC(a21b3151) SHA1(f59c7b1ba5edf97d72670ee194ce9fdc5c5b9a58) )
+	ROM_CONTINUE(            0x10000, 0x1c000 )	/* banked stuff */
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "c09-05.16", 0x00000, 0x80000, CRC(890b38f0) SHA1(b478c96214ce027926346a4653250c8ee8a98bdc) )	/* SCR 8x8 */
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "c09-04.52", 0x000000, 0x080000, CRC(2cbb3c9b) SHA1(9e3d95f76f5f5d385b6a9516af781aefef1eb0ca) )	/* OBJ 16x8 */
+	ROM_LOAD32_BYTE( "c09-02.53", 0x000001, 0x080000, CRC(a83a0389) SHA1(932788b5b5f01326d0fbb2b9fdb94a8c7c004db3) )
+	ROM_LOAD32_BYTE( "c09-03.54", 0x000002, 0x080000, CRC(a31d0e80) SHA1(dfeff1b89dd7b3f19b26e77f2d66f6448cb00553) )
+	ROM_LOAD32_BYTE( "c09-01.55", 0x000003, 0x080000, CRC(64bfea10) SHA1(15ea43092027b1717d0f24fbe6ac2cdf11a7ddc6) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* don't dispose */
+	ROM_LOAD( "c09-07.15", 0x00000, 0x80000, CRC(963bc82b) SHA1(e3558aecd1b82ddbf10ab2b71843a3664705f1f1) )	/* ROD, road lines */
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )	/* STY spritemap */
+
+	ROM_REGION( 0x180000, "ym", 0 )	/* ADPCM samples */
+	ROM_LOAD( "c09-14.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
+	ROM_LOAD( "c09-13.43", 0x080000, 0x080000, CRC(d57c41d3) SHA1(3375a1fc6389840544b9fdb96b2fafbc8e3276e2) )
+	ROM_LOAD( "c09-12.44", 0x100000, 0x080000, CRC(56c99fa5) SHA1(3f9a6bc89d847cc4c99d35f98157ea3f187c0f98) )
+
+	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_LOAD( "c09-15.29", 0x00000, 0x80000, CRC(e63b9095) SHA1(c6ea670b5a90ab39429259ec1fefb2bde5d0213f) )
+
+	ROM_REGION( 0x10000, "user2", 0 )	/* unused ROMs */
+	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) )	// road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )	// road A/B internal priority
+
+ROM_END
+
 ROM_START( nightstr )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "b91-45.bin", 0x00000, 0x20000, CRC(7ad63421) SHA1(4ecfc3c8cd691d878e5d9212ccff0d225bb06bd9) )
@@ -4647,6 +4692,7 @@ GAMEL(1989, sci,      0,        sci,      sci,      taitoz,   ROT0,             
 GAMEL(1989, scia,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAMEL(1989, scij,     sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAMEL(1989, sciu,     sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1991, scin,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (Negro Torino hack)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAME( 1989, nightstr, 0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan", "Night Striker (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstrj, nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation", "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstru, nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )

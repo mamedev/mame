@@ -1908,6 +1908,7 @@ const game_driver * const drivers[] =
 	DRIVER( scia )		/* C09 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( scij )		/* C09 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( sciu )		/* C09 (c) 1989 Taito America Corporation (US) */
+	DRIVER( scin )		/* C09 (c) 1991 Taito Corporation Japan (Negro Torino hack) */
 	DRIVER( bshark )	/* C34 (c) 1989 Taito America Corporation (US) */
 	DRIVER( bsharkj )	/* C34 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( aquajack )	/* B77 (c) 1990 Taito Corporation Japan (World) */
