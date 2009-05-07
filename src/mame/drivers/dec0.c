@@ -1435,6 +1435,9 @@ ROM_START( hbarrel )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "hb07.bin",     0x8000, 0x8000, CRC(a127f0f7) SHA1(2cf962410936ac336e384dda2bf434a297bc940f) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "hb25.bin",     0x00000, 0x10000, CRC(8649762c) SHA1(84d3d82d4d011c54271ef7a0dc5857a34b61cf8a) )
 	ROM_LOAD( "hb26.bin",     0x10000, 0x10000, CRC(f8189bbd) SHA1(b4445f50e8771af6ba4fcbc34018f6ecd379779a) )
@@ -1481,6 +1484,9 @@ ROM_START( hbarrelw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "hb_ec07.rom",  0x8000, 0x8000, CRC(16a5a1aa) SHA1(27eb8c09be6b1be502bda9ae9c9ff860d2560d46) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "hb_ec25.rom",  0x00000, 0x10000, CRC(2e5732a2) SHA1(b730ce11db1876b81d2b7cde0f129bd6fbfeb771) )
 	ROM_LOAD( "hb_ec26.rom",  0x10000, 0x10000, CRC(161a2c4d) SHA1(fbfa97ecc8b4d540d38f811ebb6272b348ed37e5) )
@@ -1525,6 +1531,9 @@ ROM_START( baddudes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "baddudes.7",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "baddudes.25",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
 	ROM_LOAD( "baddudes.26",  0x08000, 0x08000, CRC(9aff67b8) SHA1(18c3972a9f17a48897463f48be0d723ea0cf5aba) )
@@ -1564,6 +1573,9 @@ ROM_START( drgninja )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "drgninja.07",  0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
@@ -1606,6 +1618,9 @@ ROM_START( birdtry )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "ek-07.bin",     0x8000, 0x8000, CRC(236549bc) SHA1(1f664a277b3451b7905638abdf98c7e428b2e935) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "ek-25.bin",     0x00000, 0x08000, CRC(4df134ad) SHA1(f2cfa7e3fc4a2ac40897c2600c901ff75237e081) )

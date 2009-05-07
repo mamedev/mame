@@ -619,8 +619,8 @@ ROM_START( hvyunit )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
 
-	ROM_REGION( 0x02000, "mermaid", 0 )
-	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "i8751_mermaid",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) // loading only verified for roms marked 'ok'
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) ) // attract ok
@@ -646,8 +646,8 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
 
-	ROM_REGION( 0x02000, "mermaid", 0 )
-	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "i8751_mermaid",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) // loading only verified for roms marked 'ok'
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) ) // attract ok
@@ -673,8 +673,8 @@ ROM_START( hvyunito )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
 
-	ROM_REGION( 0x02000, "mermaid", 0 )
-	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "i8751_mermaid",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) // loading only verified for roms marked 'ok'
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) ) // attract ok

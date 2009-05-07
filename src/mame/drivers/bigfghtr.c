@@ -568,7 +568,7 @@ ROM_START( skyrobo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
 	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -600,7 +600,7 @@ ROM_START( bigfghtr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
 	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

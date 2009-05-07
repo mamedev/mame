@@ -708,6 +708,9 @@ ROM_START( f1dream )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
 
