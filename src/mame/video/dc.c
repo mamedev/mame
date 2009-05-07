@@ -45,9 +45,10 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
-	int sizex, sizey, sizes, pf, palette, mode, mipmapped;
+	int sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
+	UINT32 (*blend)(UINT32 s, UINT32 d);
 	int palbase, cd;
 } texinfo;
 
@@ -87,13 +88,149 @@ typedef struct {
 	UINT32 groupcontrol,groupen,striplen,userclip;
 	UINT32 objcontrol,shadow,volume,coltype,texture,offfset,gouraud,uv16bit;
 	UINT32 textureusize,texturevsize,texturesizes,textureaddress,scanorder,pixelformat;
-	UINT32 srcalphainstr,dstalphainstr,srcselect,dstselect,fogcontrol,colorclamp,usealpha;
+	UINT32 blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
 	UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
 } pvrta_state;
 
 static pvrta_state state_ta;
 
+// Multiply with alpha value in bits 31-24
+static UINT32 bla(UINT32 c, UINT32 a)
+{
+	a = a >> 24;
+	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
+}
+
+// Multiply with 1-alpha value in bits 31-24
+static UINT32 blia(UINT32 c, UINT32 a)
+{
+	a = 0x100 - (a >> 24);
+	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
+}
+
+// Per-component multiply with color value
+static UINT32 blc(UINT32 c1, UINT32 c2)
+{
+	UINT32 cr =
+		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) >> 8)  |
+		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0x00ff0000) >> 8);
+	c1 >>= 16;
+	c2 >>= 16;
+	cr |=
+		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) << 8)  |
+		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0x00ff0000) << 8);
+	return cr;
+}
+
+// Per-component multiply with 1-color value
+static UINT32 blic(UINT32 c1, UINT32 c2)
+{
+	UINT32 cr =
+		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) >> 8)  |
+		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0x00ff0000) >> 8);
+	c1 >>= 16;
+	c2 >>= 16;
+	cr |=
+		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) << 8)  |
+		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0x00ff0000) << 8);
+	return cr;
+}
+
+// Add two colors with saturation
+static UINT32 bls(UINT32 c1, UINT32 c2)
+{
+	UINT32 cr1, cr2;
+	cr1 = (c1 & 0x00ff00ff) + (c2 & 0x00ff00ff);
+	if(cr1 & 0x0000ff00)
+		cr1 = (cr1 & 0xffff00ff) | 0x000000ff;
+	if(cr1 & 0xff000000)
+		cr1 = (cr1 & 0x00ffffff) | 0x00ff0000;
+
+	cr2 = ((c1 >> 8) & 0x00ff00ff) + ((c2 >> 8) & 0x00ff00ff);
+	if(cr2 & 0x0000ff00)
+		cr2 = (cr2 & 0xffff00ff) | 0x000000ff;
+	if(cr2 & 0xff000000)
+		cr2 = (cr2 & 0x00ffffff) | 0x00ff0000;
+	return cr1|(cr2 << 8);
+}
+
+// All 64 blending modes, 3 top bits are source mode, 3 bottom bits are destination mode
+static UINT32 bl00(UINT32 s, UINT32 d) { return 0; }
+static UINT32 bl01(UINT32 s, UINT32 d) { return d; }
+static UINT32 bl02(UINT32 s, UINT32 d) { return blc(d, s); }
+static UINT32 bl03(UINT32 s, UINT32 d) { return blic(d, s); }
+static UINT32 bl04(UINT32 s, UINT32 d) { return bla(d, s); }
+static UINT32 bl05(UINT32 s, UINT32 d) { return blia(d, s); }
+static UINT32 bl06(UINT32 s, UINT32 d) { return bla(d, d); }
+static UINT32 bl07(UINT32 s, UINT32 d) { return blia(d, d); }
+static UINT32 bl10(UINT32 s, UINT32 d) { return s; }
+static UINT32 bl11(UINT32 s, UINT32 d) { return bls(s, d); }
+static UINT32 bl12(UINT32 s, UINT32 d) { return bls(s, blc(s, d)); }
+static UINT32 bl13(UINT32 s, UINT32 d) { return bls(s, blic(s, d)); }
+static UINT32 bl14(UINT32 s, UINT32 d) { return bls(s, bla(d, s)); }
+static UINT32 bl15(UINT32 s, UINT32 d) { return bls(s, blia(d, s)); }
+static UINT32 bl16(UINT32 s, UINT32 d) { return bls(s, bla(d, d)); }
+static UINT32 bl17(UINT32 s, UINT32 d) { return bls(s, blia(d, d)); }
+static UINT32 bl20(UINT32 s, UINT32 d) { return blc(d, s); }
+static UINT32 bl21(UINT32 s, UINT32 d) { return bls(blc(d, s), d); }
+static UINT32 bl22(UINT32 s, UINT32 d) { return bls(blc(d, s), blc(s, d)); }
+static UINT32 bl23(UINT32 s, UINT32 d) { return bls(blc(d, s), blic(s, d)); }
+static UINT32 bl24(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, s)); }
+static UINT32 bl25(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, s)); }
+static UINT32 bl26(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, d)); }
+static UINT32 bl27(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, d)); }
+static UINT32 bl30(UINT32 s, UINT32 d) { return blic(d, s); }
+static UINT32 bl31(UINT32 s, UINT32 d) { return bls(blic(d, s), d); }
+static UINT32 bl32(UINT32 s, UINT32 d) { return bls(blic(d, s), blc(s, d)); }
+static UINT32 bl33(UINT32 s, UINT32 d) { return bls(blic(d, s), blic(s, d)); }
+static UINT32 bl34(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, s)); }
+static UINT32 bl35(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, s)); }
+static UINT32 bl36(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, d)); }
+static UINT32 bl37(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, d)); }
+static UINT32 bl40(UINT32 s, UINT32 d) { return bla(s, s); }
+static UINT32 bl41(UINT32 s, UINT32 d) { return bls(bla(s, s), d); }
+static UINT32 bl42(UINT32 s, UINT32 d) { return bls(bla(s, s), blc(s, d)); }
+static UINT32 bl43(UINT32 s, UINT32 d) { return bls(bla(s, s), blic(s, d)); }
+static UINT32 bl44(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, s)); }
+static UINT32 bl45(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, s)); }
+static UINT32 bl46(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, d)); }
+static UINT32 bl47(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, d)); }
+static UINT32 bl50(UINT32 s, UINT32 d) { return blia(s, s); }
+static UINT32 bl51(UINT32 s, UINT32 d) { return bls(blia(s, s), d); }
+static UINT32 bl52(UINT32 s, UINT32 d) { return bls(blia(s, s), blc(s, d)); }
+static UINT32 bl53(UINT32 s, UINT32 d) { return bls(blia(s, s), blic(s, d)); }
+static UINT32 bl54(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, s)); }
+static UINT32 bl55(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, s)); }
+static UINT32 bl56(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, d)); }
+static UINT32 bl57(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, d)); }
+static UINT32 bl60(UINT32 s, UINT32 d) { return bla(s, d); }
+static UINT32 bl61(UINT32 s, UINT32 d) { return bls(bla(s, d), d); }
+static UINT32 bl62(UINT32 s, UINT32 d) { return bls(bla(s, d), blc(s, d)); }
+static UINT32 bl63(UINT32 s, UINT32 d) { return bls(bla(s, d), blic(s, d)); }
+static UINT32 bl64(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, s)); }
+static UINT32 bl65(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, s)); }
+static UINT32 bl66(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, d)); }
+static UINT32 bl67(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, d)); }
+static UINT32 bl70(UINT32 s, UINT32 d) { return blia(s, d); }
+static UINT32 bl71(UINT32 s, UINT32 d) { return bls(blia(s, d), d); }
+static UINT32 bl72(UINT32 s, UINT32 d) { return bls(blia(s, d), blc(s, d)); }
+static UINT32 bl73(UINT32 s, UINT32 d) { return bls(blia(s, d), blic(s, d)); }
+static UINT32 bl74(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, s)); }
+static UINT32 bl75(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, s)); }
+static UINT32 bl76(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, d)); }
+static UINT32 bl77(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, d)); }
+
+static UINT32 (*blend_functions[64])(UINT32 s, UINT32 d) = {
+	bl00, bl01, bl02, bl03, bl04, bl05, bl06, bl07,
+	bl10, bl11, bl12, bl13, bl14, bl15, bl16, bl17,
+	bl20, bl21, bl22, bl23, bl24, bl25, bl26, bl27,
+	bl30, bl31, bl32, bl33, bl34, bl35, bl36, bl37,
+	bl40, bl41, bl42, bl43, bl44, bl45, bl46, bl47,
+	bl50, bl51, bl52, bl53, bl54, bl55, bl56, bl57,
+	bl60, bl61, bl62, bl63, bl64, bl65, bl66, bl67,
+	bl70, bl71, bl72, bl73, bl74, bl75, bl76, bl77,
+};
 
 INLINE UINT32 cv_1555(UINT16 c)
 {
@@ -411,14 +548,25 @@ static UINT32 tex_r_default(texinfo *t, float x, float y)
 	return ((int)x ^ (int)y) & 4 ? 0xffffff00 : 0xff0000ff;
 }
 
-static void tex_prepare(texinfo *t)
+static void tex_get_info(texinfo *t, pvrta_state *sa)
 {
 	int miptype = 0;
+	
+	t->address    = sa->textureaddress;
+	t->sizex      = sa->textureusize;
+	t->sizey      = sa->texturevsize;
+	t->mode       = sa->scanorder + sa->vqcompressed*2;
+	t->sizes      = sa->texturesizes;
+	t->pf         = sa->pixelformat;
+	t->mipmapped  = sa->mipmapped;
+	t->palette    = sa->paletteselector;
+	t->blend_mode = sa->blend_mode;
 
 	t->r = tex_r_default;
 	t->cd = dilatechose[t->sizes];
 	t->palbase = 0;
 	t->vqbase = t->address;
+	t->blend = sa->use_alpha ? blend_functions[t->blend_mode] : bl10;
 
 	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
 
@@ -605,19 +753,6 @@ static void tex_prepare(texinfo *t)
 		}
 	}
 
-}
-
-static void tex_get_info(texinfo *ti, pvrta_state *sa)
-{
-	ti->address = sa->textureaddress;
-	ti->sizex   = sa->textureusize;
-	ti->sizey   = sa->texturevsize;
-	ti->mode    = sa->scanorder + sa->vqcompressed*2;
-	ti->sizes   = sa->texturesizes;
-	ti->pf      = sa->pixelformat;
-	ti->mipmapped  = sa->mipmapped;
-	ti->palette = sa->paletteselector;
-	tex_prepare(ti);
 }
 
 // register decode helper
@@ -1115,16 +1250,16 @@ void process_ta_fifo(running_machine* machine)
 			state_ta.cachebypass=(tafifo_buff[1] >> 21) & 1;
 			state_ta.dcalcctrl=(tafifo_buff[1] >> 20) & 1;
 			state_ta.volumeinstruction=(tafifo_buff[1] >> 29) & 7;
+
 			state_ta.textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
 			state_ta.texturevsize=1 << (3+(tafifo_buff[2] & 7));
 			state_ta.texturesizes=tafifo_buff[2] & 0x3f;
-			state_ta.srcalphainstr=(tafifo_buff[2] >> 29) & 7;
-			state_ta.dstalphainstr=(tafifo_buff[2] >> 26) & 7;
+			state_ta.blend_mode = tafifo_buff[2] >> 26;
 			state_ta.srcselect=(tafifo_buff[2] >> 25) & 1;
 			state_ta.dstselect=(tafifo_buff[2] >> 24) & 1;
 			state_ta.fogcontrol=(tafifo_buff[2] >> 22) & 3;
 			state_ta.colorclamp=(tafifo_buff[2] >> 21) & 1;
-			state_ta.usealpha=(tafifo_buff[2] >> 20) & 1;
+			state_ta.use_alpha = (tafifo_buff[2] >> 20) & 1;
 			state_ta.ignoretexalpha=(tafifo_buff[2] >> 19) & 1;
 			state_ta.flipuv=(tafifo_buff[2] >> 17) & 3;
 			state_ta.clampuv=(tafifo_buff[2] >> 15) & 3;
@@ -1391,22 +1526,16 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	wbufline = &wbuffer[y][xxl];
 
 	while(xxl < xxr) {
-		if((wl > *wbufline)) {
+		if((wl >= *wbufline)) {
 			UINT32 c;
 			float u = ul/wl;
 			float v = vl/wl;
 
 			c = ti->r(ti, u, v);
 
-			if((c & 0xff000000) == 0xff000000) {
+			if(c & 0xff000000) {
+				*tdata = ti->blend(c, *tdata);
 				*wbufline = wl;
-				*tdata = c;
-			} else if(c & 0xff000000) {
-				int a = (c >> 24)+1;
-				int ca = 256-a;
-				UINT32 c2 = *tdata;
-				*tdata = ((((c & 0xff00ff)*a + (c2 & 0xff00ff)*ca) & 0xff00ff00) |
-						  (((c & 0xff00)*a + (c2 & 0xff00)*ca) & 0xff0000)) >> 8;
 			}
 		}
 		wbufline++;
