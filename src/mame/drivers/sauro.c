@@ -334,7 +334,7 @@ static INTERRUPT_GEN( sauro_interrupt )
 
 static MACHINE_DRIVER_START( tecfri )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)        // 4 MHz???
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( tecfri )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3600000)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_20MHz/8)       /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
