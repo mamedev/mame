@@ -81,7 +81,7 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	state_save_register_device_item_pointer(cpu, space, vtlb->live, fixed_entries + dynamic_entries);
 
 	/* allocate the lookup table */
-	vtlb->table = alloc_array_clear_or_die(vtlb_entry, 1 << (vtlb->addrwidth - vtlb->pageshift));
+	vtlb->table = alloc_array_clear_or_die(vtlb_entry, (size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
 	state_save_register_device_item_pointer(cpu, space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
 
 	/* allocate the fixed page count array */
