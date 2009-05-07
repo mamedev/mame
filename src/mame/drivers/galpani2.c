@@ -1,4 +1,4 @@
-/***************************************************************************
+	/***************************************************************************
 
                             -= Gals Panic II =-
 
@@ -77,64 +77,109 @@ static MACHINE_RESET( galpani2 )
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x16c0 + 0xc00;
 	kaneko16_sprite_yoffs = 0x000;
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(running_machine *machine)
+static void galpani2_write_kaneko(const device_config *device)
 {
-	const address_space *dstspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_write_byte(dstspace,0x100000,0x4b);
-	memory_write_byte(dstspace,0x100001,0x41);
-	memory_write_byte(dstspace,0x100002,0x4e);
-	memory_write_byte(dstspace,0x100003,0x45);
-	memory_write_byte(dstspace,0x100004,0x4b);
-	memory_write_byte(dstspace,0x100005,0x4f);
-}
-
-void galpani2_mcu_run(running_machine *machine)
-{
-	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
-	int i,x;
+	const address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	int i,x,tpattidx;
+	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
 	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
 
 	x  = 0;
 
 	for (i = 0x100000; i < 0x100007; i++)
-		x |= memory_read_byte(srcspace,i);
+	{
+		for (tpattidx = 0; tpattidx < 6; tpattidx++)
+		{
+			if (memory_read_byte(dstspace,i) == testpattern[tpattidx]) x = 1; //ram test fragment present
+		}
+	}
 
 	if	( x == 0 )
 	{
-		galpani2_write_kaneko(machine);
-		memory_write_byte(dstspace,0x100006,1);
-		logerror("MCU executes CHECK0\n");
+		memory_write_byte(dstspace,0x100000,0x4b); //K
+		memory_write_byte(dstspace,0x100001,0x41); //A
+		memory_write_byte(dstspace,0x100002,0x4e); //N
+		memory_write_byte(dstspace,0x100003,0x45); //E
+		memory_write_byte(dstspace,0x100004,0x4b); //K
+		memory_write_byte(dstspace,0x100005,0x4f); //O
 	}
 }
 
-static void galpani2_mcu_nmi(running_machine *machine)
+static WRITE8_HANDLER( galpani2_mcu_init_w )
+{
+	running_machine *machine = space->machine;
+	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
+	UINT32 mcu_address, mcu_data;
+
+	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
+	{
+		mcu_data	=	memory_read_byte(srcspace, mcu_address );
+		memory_write_byte(dstspace, mcu_address-0x10, mcu_data);
+	}
+	cputag_set_input_line(machine, "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
+}
+
+static void galpani2_mcu_nmi1(running_machine *machine)
 {
 	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
-	UINT32 mcu_list, mcu_command, mcu_address, mcu_src, mcu_dst, mcu_size;
+	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
-	/* "Last Check" */
-	galpani2_write_kaneko(machine);
-
-	for ( mcu_list = 0x100020; mcu_list < (0x100020 + 0x40); mcu_list += 4 )
+	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
 	{
-		mcu_command		=	memory_read_byte(srcspace, mcu_list + 1 );
+		mcu_command		=	memory_read_byte(srcspace, mcu_list);
 
 		mcu_address		=	0x100000 +
-							(memory_read_byte(srcspace, mcu_list + 2)<<8) +
-							(memory_read_byte(srcspace, mcu_list + 3)<<0) ;
+							(memory_read_byte(srcspace, mcu_list + 1)<<8) +
+							(memory_read_byte(srcspace, mcu_list + 2)<<0) ;
+
+		mcu_extra		=	memory_read_byte(srcspace, mcu_list + 3); //0xff for command $A and $2, 0x02 for others
+
+		if (mcu_command != 0)
+		{
+			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
+			cpuexec_describe_context(machine),
+			mcu_list,
+			memory_read_byte(srcspace, 0x100020),
+			mcu_command,
+			mcu_address,
+			mcu_extra
+			);
+		}
 
 		switch (mcu_command)
 		{
 		case 0x00:
 			break;
 
-		//case 0x02: //?, gp2se is the only one to use it, often!
-		//  break;
+		case 0x02: //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
+			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 3)<<0) ;
+
+			mcu_dst		=	(memory_read_byte(srcspace, mcu_address + 6)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 7)<<0) ;
+
+			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
+
+			for( ; mcu_size > 0 ; mcu_size-- )
+			{
+				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
+				memory_write_byte(srcspace,0x100000 + mcu_dst,memory_read_byte(dstspace,0x100000 + mcu_src));
+				mcu_src ++;			mcu_dst ++;
+			}
+
+			/* Raise a "job done" flag */
+			memory_write_byte(srcspace,mcu_address+0,0xff);
+			memory_write_byte(srcspace,mcu_address+1,0xff);
+
+			break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
 			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
@@ -146,7 +191,7 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
 							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
 
-			logerror("%s : MCU executes command $A, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -162,17 +207,13 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			break;
 
 		//case 0x10: //? Clear gal?
-		//case 0x1B: //? Display gal?
-		//case 0x1F: //? Display gal?
-		//case 0x21: //? Display gal?
-		//case 0x27: //? Display gal?
-		//case 0x3E: //? Display gal?
-		//case 0x43: //? Display gal?
-		//case 0x45: //? Display gal?
-		//case 0x4C: //? Display gal?
-		//case 0x68: //? Display "Changed" gal?
-		//case 0x6B: //? Display "Changed" gal?
-		//case 0x6E: //? Display "Changed" gal?
+		//case 0x14: //? Display gal?
+		//until
+		//case 0x50: //? Display gal?
+		//case 0x68: //? Display "Changed" monster?
+		//until
+		//case 0x6E: //? Display "Changed" monster?
+		//case 0x85: //? Do what?
 		default:
 			/* Raise a "job done" flag */
 			memory_write_byte(srcspace,mcu_address+0,0xff);
@@ -181,18 +222,36 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			logerror("%s : MCU ERROR, unknown command $%02X\n",cpuexec_describe_context(machine),mcu_command);
 		}
 
-		/* Erase command? */
-		memory_write_byte(srcspace,mcu_list + 1,0x00);
+		/* Erase command (so that it won't be processed again)? */
+		memory_write_byte(srcspace,mcu_list,0x00);
 	}
 }
 
-static WRITE16_HANDLER( galpani2_mcu_nmi_w )
+static void galpani2_mcu_nmi2(running_machine *machine)
 {
-	static UINT16 old = 0;
-	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi(space->machine);
-	old = data;
+		galpani2_write_kaneko(machine->cpu[0]);
+		//logerror("%s : MCU executes CHECKs synchro\n",cpuexec_describe_context(machine));
 }
 
+static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR
+{
+//for galpan2t:
+//Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
+//Triggered from 'maincpu' (000080BE),once, for unknown command, during init
+//Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
+	static UINT16 old_mcu_nmi1 = 0;
+	if ( (data & 1) && !(old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(space->machine);
+	//if ( (data & 0x10) && !(old_mcu_nmi1 & 0x10) )	galpani2_mcu_nmi1(space->machine);
+	//alternate line, same function?
+	old_mcu_nmi1 = data;
+}
+
+static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
+{
+	static UINT16 old_mcu_nmi2 = 0;
+	if ( (data & 1) && !(old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(space->machine);
+	old_mcu_nmi2 = data;
+}
 
 
 /***************************************************************************
@@ -203,84 +262,78 @@ static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( galpani2_coin_lockout_w )
+static WRITE8_HANDLER( galpani2_coin_lockout_w )
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		coin_counter_w(0, data & 0x0100);
-		coin_counter_w(1, data & 0x0200);
-		coin_lockout_w(0,~data & 0x0400);
-		coin_lockout_w(1,~data & 0x0800);
-		// & 0x1000     CARD in lockout?
-		// & 0x2000     CARD in lockout?
-		// & 0x4000     CARD out
-	}
+		coin_counter_w(0, data & 0x01);
+		coin_counter_w(1, data & 0x02);
+		coin_lockout_w(0,~data & 0x04);
+		coin_lockout_w(1,~data & 0x08);
+		// & 0x10     CARD in lockout?
+		// & 0x20     CARD in lockout?
+		// & 0x40     CARD out
 }
 
-static WRITE16_DEVICE_HANDLER( galpani2_oki1_bank_w )
+static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
 		UINT8 *ROM = memory_region(device->machine, "oki1");
 		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag,data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
-	}
 }
 
-static WRITE16_DEVICE_HANDLER( galpani2_oki2_bank_w )
+static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
 		okim6295_set_bank_base(device, 0x40000 * (data & 0xf) );
 		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag,data);
-	}
 }
 
 
 static ADDRESS_MAP_START( galpani2_mem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM												// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&galpani2_ram				)		// Work RAM
+	AM_RANGE(0x110000, 0x11000f) AM_RAM												// ? corrupted? stack dumper on POST failure, pc+sr on gp2se
 	AM_RANGE(0x300000, 0x301fff) AM_RAM												// ?
 	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0x304000, 0x30401f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs	)	// Sprites Regs
-	AM_RANGE(0x308000, 0x308001) AM_WRITE(SMH_NOP								)	// ? 0 at startup
-	AM_RANGE(0x30c000, 0x30c001) AM_WRITE(SMH_NOP								)	// ? hblank effect ?
+	AM_RANGE(0x308000, 0x308001) AM_WRITENOP										// ? 0 at startup
+	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP										// ? hblank effect ?
 	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE(galpani2_palette_0_w) AM_BASE(&galpani2_palette_0	)	// ?
-	AM_RANGE(0x314000, 0x314001) AM_WRITE(SMH_NOP								)	// ? flip backgrounds ?
-	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w	)	// EEPROM
+	AM_RANGE(0x314000, 0x314001) AM_WRITENOP										// ? flip backgrounds ?
+	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x390000, 0x3901ff) AM_WRITE(SMH_NOP								)	// ? at startup of service mode
+	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP										// ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(galpani2_bg8_0_w) AM_BASE(&galpani2_bg8_0	)	// Background 0
 	AM_RANGE(0x440000, 0x440001) AM_RAM AM_BASE(&galpani2_bg8_0_scrollx	)			// Background 0 Scroll X
 	AM_RANGE(0x480000, 0x480001) AM_RAM AM_BASE(&galpani2_bg8_0_scrolly	)			// Background 0 Scroll Y
-	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITE(SMH_NOP								)	// ? 0 at startup only
+	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP										// ? 0 at startup only
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(galpani2_bg8_1_w) AM_BASE(&galpani2_bg8_1	)	// Background 1
 	AM_RANGE(0x540000, 0x540001) AM_RAM AM_BASE(&galpani2_bg8_1_scrollx	)			// Background 1 Scroll X
 
-	AM_RANGE(0x54059a, 0x54059b) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4
-	AM_RANGE(0x5405a2, 0x5405a3) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405aa, 0x5405ab) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405b2, 0x5405b3) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405ba, 0x5405bb) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405c2, 0x5405c3) AM_READ(SMH_NOP						)	// ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405ca, 0x5405cb) AM_READ(SMH_NOP						)	// ? galpani2 at F148
+	AM_RANGE(0x540572, 0x540573) AM_READNOP											// ? galpani2 at F0A4
+	AM_RANGE(0x54057a, 0x54057b) AM_READNOP											// ? galpani2 at F148
+	AM_RANGE(0x54059a, 0x54059b) AM_READNOP											// ? galpani2 at F0A4
+	AM_RANGE(0x5405a2, 0x5405a3) AM_READNOP											// ? galpani2 at F0A4 and F148
+	AM_RANGE(0x5405aa, 0x5405ab) AM_READNOP											// ? galpani2 at F0A4 and F148
+	AM_RANGE(0x5405b2, 0x5405b3) AM_READNOP											// ? galpani2 at F0A4 and F148
+	AM_RANGE(0x5405ba, 0x5405bb) AM_READNOP											// ? galpani2 at F0A4 and F148
+	AM_RANGE(0x5405c2, 0x5405c3) AM_READNOP											// ? galpani2 at F0A4 and F148
+	AM_RANGE(0x5405ca, 0x5405cb) AM_READNOP											// ? galpani2 at F148
 
 	AM_RANGE(0x580000, 0x580001) AM_RAM AM_BASE(&galpani2_bg8_1_scrolly	)			// Background 1 Scroll Y
-	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITE(SMH_NOP								)	// ? 0 at startup only
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP								)	// Watchdog
-	AM_RANGE(0x640000, 0x640001) AM_WRITE(SMH_NOP								)	// ? 0 before resetting and at startup
-    AM_RANGE(0x680000, 0x680001) AM_WRITE(galpani2_mcu_nmi_w	)					// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(galpani2_coin_lockout_w				)	// Coin + Card Lockout
+	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP										// ? 0 at startup only
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP										// Watchdog
+	AM_RANGE(0x640000, 0x640001) AM_WRITE8(galpani2_mcu_init_w, 0x00ff			)	// ? 0 before resetting and at startup, Reset mcu ?
+	AM_RANGE(0x680000, 0x680001) AM_WRITE8(galpani2_mcu_nmi1_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE8(galpani2_coin_lockout_w, 0xff00		)	// Coin + Card Lockout
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x780002, 0x780003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x780004, 0x780005) AM_READ_PORT("SPECIAL")
 	AM_RANGE(0x780006, 0x780007) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff	)	// 2 x OKIM6295
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff	)	//
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE("oki1", galpani2_oki1_bank_w					)	//
-	AM_RANGE(0xcc0000, 0xcc0001) AM_DEVWRITE("oki2", galpani2_oki2_bank_w					)	//
+	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE8("oki1", galpani2_oki1_bank_w, 0x00ff			)	//
+	AM_RANGE(0xcc0000, 0xcc0001) AM_DEVWRITE8("oki2", galpani2_oki2_bank_w, 0x00ff			)	//
 ADDRESS_MAP_END
 
 
@@ -302,7 +355,7 @@ static READ16_HANDLER( galpani2_bankedrom_r )
 	offset += (0x800000/2) * (*galpani2_rombank & 0x0003);
 
 	if ( offset < len )	return ROM[offset];
-	else				return 0xffff;
+	else				return 0xffff; //floating bus for absent ROMs
 }
 
 static ADDRESS_MAP_START( galpani2_mem2, ADDRESS_SPACE_PROGRAM, 16 )
@@ -311,11 +364,12 @@ static ADDRESS_MAP_START( galpani2_mem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE(galpani2_bg15_w) AM_BASE(&galpani2_bg15)	// bg15
 	AM_RANGE(0x500000, 0x5fffff) AM_RAM																// bg15
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(SMH_NOP, SMH_NOP			)	// ? 0 at startup only
-	AM_RANGE(0x640000, 0x640001) AM_WRITE(SMH_NOP						)	// ? 0 at startup only
-	AM_RANGE(0x680000, 0x680001) AM_WRITE(SMH_NOP						)	// ? 0 at startup only
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(SMH_NOP						)	// ? 0 at startup only
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(SMH_NOP						)	// Watchdog
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(SMH_NOP						)	// ? 0 -> 1 -> 0 (lev 5)
+	AM_RANGE(0x640000, 0x640001) AM_WRITENOP								// ? 0 at startup only
+	AM_RANGE(0x680000, 0x680001) AM_WRITENOP								// ? 0 at startup only
+	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP								// ? 0 at startup only
+	AM_RANGE(0x700000, 0x700001) AM_WRITENOP								// Watchdog
+//	AM_RANGE(0x740000, 0x740001) AM_WRITENOP								// ? Reset mcu
+	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(SMH_RAM) AM_BASE(&galpani2_rombank	)	// Rom Bank
 	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM
 ADDRESS_MAP_END
@@ -426,7 +480,9 @@ static INPUT_PORTS_START( galpani2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gp2se )
-	PORT_START("DSW1_P1")	/* 780000.w */
+	PORT_INCLUDE( galpani2 )
+
+	PORT_MODIFY("DSW1_P1")	/* 780000.w */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Easy ) )
@@ -448,74 +504,10 @@ static INPUT_PORTS_START( gp2se )
 	PORT_DIPSETTING(      0x0040, "4" )
 	PORT_DIPSETTING(      0x0000, "6" )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-
-	PORT_START("DSW2_P2")	/* 780002.w */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x000f, "1 Coin/1 Credit  1/1" )
-	PORT_DIPSETTING(      0x000e, "2 Coin/1 Credit  2/1" )
-	PORT_DIPSETTING(      0x000d, "3 Coin/1 Credit  3/1" )
-	PORT_DIPSETTING(      0x000c, "4 Coin/1 Credit  4/1" )
-	PORT_DIPSETTING(      0x000b, "5 Coin/1 Credit  5/1" )
-	PORT_DIPSETTING(      0x000a, "2 Coin/1 Credit  1/1" )
-	PORT_DIPSETTING(      0x0009, "3 Coin/1 Credit  1/1" )
-	PORT_DIPSETTING(      0x0008, "4 Coin/1 Credit  1/1" )
-	PORT_DIPSETTING(      0x0007, "5 Coin/1 Credit  1/1" )
-	PORT_DIPSETTING(      0x0006, "2 Coin/1 Credit  2/1" )
-	PORT_DIPSETTING(      0x0005, "3 Coin/1 Credit  2/1" )
-	PORT_DIPSETTING(      0x0004, "4 Coin/1 Credit  2/1" )
-	PORT_DIPSETTING(      0x0003, "5 Coin/1 Credit  2/1" )
-	PORT_DIPSETTING(      0x0002, "1 Coin/2 Credit  1/2" )
-	PORT_DIPSETTING(      0x0001, "1 Coin/3 Credit  1/3" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_MODIFY("DSW2_P2")	/* 780002.w */
 	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )
 	PORT_DIPSETTING(      0x0000, "Used" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Unused ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2  )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-
-	PORT_START("SPECIAL")	/* 780004.w */
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL )	// CARD full
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )	// CARD full
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	// CARD empty
-
-	PORT_START("SERVICE")	/* 780006.w */
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT     )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	//missing "test" input
 INPUT_PORTS_END
@@ -556,7 +548,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-/* CPU#1 Interrups */
+/* CPU#1 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 6 */
 #define GALPANI2_INTERRUPTS_NUM	4
 static INTERRUPT_GEN( galpani2_interrupt1 )
 {
@@ -569,8 +561,7 @@ static INTERRUPT_GEN( galpani2_interrupt1 )
 	}
 }
 
-/* CPU#2 Interrups */
-/* lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
+/* CPU#2 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
 #define GALPANI2_INTERRUPTS_NUM2	3
 static INTERRUPT_GEN( galpani2_interrupt2 )
 {
@@ -585,11 +576,12 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 static MACHINE_DRIVER_START( galpani2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem1, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
+	//MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("sub", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem2, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
@@ -614,12 +606,12 @@ static MACHINE_DRIVER_START( galpani2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
@@ -701,11 +693,11 @@ ROM_START( galpani2 )
 	ROM_LOAD16_BYTE( "g000a2.u165-1", 0x000000, 0x080000, CRC(0c6dfe3f) SHA1(22b16eaa3fee7f8f8434c6775255b25c8d960620) )
 	ROM_LOAD16_BYTE( "g001a2.u164-1", 0x000001, 0x080000, CRC(b3a5951f) SHA1(78cf2d85a8b3cd46c5e30fd13b474af2ed2ee09b) )
 
- 	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+ 	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002a2.u64-1", 0x000000, 0x020000, CRC(c0b94eaf) SHA1(4f3a65b238b31ee8d256b7025253f01eaf6e55d5) )
 	ROM_LOAD16_BYTE( "g003a2.u63-1", 0x000001, 0x020000, CRC(0d30725d) SHA1(d4614f9ffb930c4ea36cb3fbacffe63060e92402) )
 
-	ROM_REGION16_BE( 0x1500000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -735,9 +727,9 @@ ROM_START( galpani2 )
 	ROM_LOAD( "gp2-100.043", 0x040000, 0x100000, CRC(4235ac5b) SHA1(7e35831523fbb2d0587b9ab93c13b2b43dc481a8) )	// $10 x $10000
 	ROM_COPY( "oki1", 0x0c0000, 0, 0x40000 )
 
-	ROM_REGION( 0x400000, "oki2", 0 )	/* Samples */
-	ROM_LOAD( "gp2-102.045", 0x080000, 0x180000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
-	ROM_CONTINUE(            0x000000, 0x080000 )
+	ROM_REGION( 0x300000, "oki2", 0 )	/* Samples */
+	ROM_LOAD( "gp2-102.045", 0x180000, 0x080000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
+	ROM_CONTINUE(            0x000000, 0x180000 )
 	ROM_LOAD( "gp2-101.044", 0x280000, 0x080000, CRC(f75ba6a0) SHA1(91cc0c019a7ebfa2562bbe570af029f00b5e0699) )	//  $4 x $40000
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
@@ -747,11 +739,11 @@ ROM_START( galpan2g )
 	ROM_LOAD16_BYTE( "g000g1.u133-0", 0x000000, 0x080000, CRC(5a9c4886) SHA1(6fbc443612e72bafc5cac30de78c72815db20c4c) )
 	ROM_LOAD16_BYTE( "g001g1.u134-0", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )
 
- 	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+ 	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002t1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )
 	ROM_LOAD16_BYTE( "g003t1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
-	ROM_REGION16_BE( 0x1500000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD16_BYTE( "g300a0.u44-00", 0x0000000, 0x080000, CRC(50406294) SHA1(fc1165b7b31a44ab204cd5ac3e7b2733ed6b1534) )
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
@@ -786,9 +778,9 @@ ROM_START( galpan2g )
  /* Sound samples: unknown load position, but included here to retain the rom in this set */
 	ROM_LOAD( "g104g1.u04-00", 0x140000, 0x080000, CRC(03539013) SHA1(36b96c59c59d0e747eb000472c22a30de0810902) )	// $8 x $10000, 1st is just audio data, no header
 
-	ROM_REGION( 0x400000, "oki2", 0 )	/* Samples */
-	ROM_LOAD( "gp2-102.045", 0x080000, 0x180000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
-	ROM_CONTINUE(            0x000000, 0x080000 )
+	ROM_REGION( 0x300000, "oki2", 0 )	/* Samples */
+	ROM_LOAD( "gp2-102.045", 0x180000, 0x080000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
+	ROM_CONTINUE(            0x000000, 0x180000 )
 	ROM_LOAD( "gp2-101.044", 0x280000, 0x080000, CRC(f75ba6a0) SHA1(91cc0c019a7ebfa2562bbe570af029f00b5e0699) )	//  $4 x $40000
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
@@ -798,11 +790,11 @@ ROM_START( galpan2t )
 	ROM_LOAD16_BYTE( "g000t1.133", 0x000000, 0x080000, CRC(332048e7) SHA1(1a353d4b29f7a08158fc454309dc496df6b5b108) )
 	ROM_LOAD16_BYTE( "g001t1.134", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )
 
- 	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+ 	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002t1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )
 	ROM_LOAD16_BYTE( "g003t1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
-	ROM_REGION16_BE( 0x1500000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -833,9 +825,9 @@ ROM_START( galpan2t )
 	ROM_LOAD( "gp2-100.043", 0x040000, 0x100000, CRC(4235ac5b) SHA1(7e35831523fbb2d0587b9ab93c13b2b43dc481a8) )	// $10 x $10000
 	ROM_COPY( "oki1", 0x0c0000, 0, 0x40000 )
 
-	ROM_REGION( 0x400000, "oki2", 0 )	/* Samples */
-	ROM_LOAD( "gp2-102.045", 0x080000, 0x180000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
-	ROM_CONTINUE(            0x000000, 0x080000 )
+	ROM_REGION( 0x300000, "oki2", 0 )	/* Samples */
+	ROM_LOAD( "gp2-102.045", 0x180000, 0x080000, CRC(b4bee779) SHA1(a41098e4b8e48577719dc4bd7f09f5e893e8b388) )	//  $8 x $40000
+	ROM_CONTINUE(            0x000000, 0x180000 )
 	ROM_LOAD( "gp2-101.044", 0x280000, 0x080000, CRC(f75ba6a0) SHA1(91cc0c019a7ebfa2562bbe570af029f00b5e0699) )	//  $4 x $40000
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
@@ -863,11 +855,11 @@ ROM_START( galpan2j )
 	ROM_LOAD16_BYTE( "g000j2.165", 0x000000, 0x080000, CRC(e0c5a03d) SHA1(e12457400ca8cd78674b44d7f4d664cfc0afc8c9) )
 	ROM_LOAD16_BYTE( "g001j2.164", 0x000001, 0x080000, CRC(c8e12223) SHA1(0e0160565e95cb33dc6ad796225e995ed3baf8eb) )
 
-	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002j1.64",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
 	ROM_LOAD16_BYTE( "g003j1.63",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
 
-	ROM_REGION16_BE( 0x800000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300j.175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301j.176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a.177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
@@ -894,11 +886,11 @@ ROM_START( gp2se )
 	ROM_LOAD16_BYTE( "g000j4.u165", 0x000000, 0x080000, CRC(d8258a7a) SHA1(12991392d7e70bfba394ec4ad49b427959ca019e) )
 	ROM_LOAD16_BYTE( "g001j4.u164", 0x000001, 0x080000, CRC(23f706bf) SHA1(960c6e6c17f03072cecabfd52018e0351ff4b661) )
 
-	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002j4.u64",  0x000000, 0x020000, CRC(bcd4edd9) SHA1(17ae6fbf75d8e5333133737de926a36f5cd29661) )
 	ROM_LOAD16_BYTE( "g003j4.u63",  0x000001, 0x020000, CRC(2fbe0194) SHA1(52da771ba813b27ec1a996b237c14dab9b33db82) )
 
-	ROM_REGION16_BE( 0xa00000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
@@ -930,11 +922,11 @@ ROM_START( gp2quiz )
 	ROM_LOAD16_BYTE( "g000e3.u165-3", 0x000000, 0x080000, CRC(b6de2653) SHA1(a24daf5e6b6b268f60b1dbb374861c85f642cea5) )
 	ROM_LOAD16_BYTE( "g001e3.u164-3", 0x000001, 0x080000, CRC(74e8d0e8) SHA1(d131be9f52ee79e1b82f46721c2ad5d71b3da649) )
 
-	ROM_REGION( 0x1000000, "sub", 0 )			/* CPU#2 Code */
+	ROM_REGION( 0x40000, "sub", 0 )			/* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
 	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
 
-	ROM_REGION16_BE( 0x800000, "user1", 0 )	/* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "user1", 0 )	/* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )

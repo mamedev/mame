@@ -151,8 +151,6 @@ VIDEO_UPDATE( galpani2 )
 {
 	int layers_ctrl = -1;
 
-	galpani2_mcu_run(screen->machine);
-
 #ifdef MAME_DEBUG
 if (input_code_pressed(KEYCODE_Z))
 {	int msk = 0;
