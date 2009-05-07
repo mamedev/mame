@@ -1329,6 +1329,37 @@ ROM_START( crusnw20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 ROM_END
 
 
+ROM_START( crusnw17 ) /* Version 1.7, Fri Jan 24 1997 - 16:23:59 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
+	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
+	ROM_LOAD16_BYTE( "cwld.u4",  0x400000, 0x80000, CRC(69f02d84) SHA1(0fb4ff750de78505f241ae6cd18fccf3ddf4223f) )
+	ROM_LOAD16_BYTE( "cwld.u5",  0x600000, 0x80000, CRC(9d0b9071) SHA1(05edf9073399a942a9d0b969274a7ebf4ca677da) )
+	ROM_LOAD16_BYTE( "cwld.u6",  0x800000, 0x80000, CRC(df28f492) SHA1(c61f3870f59458b7bb5efbf93d697e3fa44a7830) )
+	ROM_LOAD16_BYTE( "cwld.u7",  0xa00000, 0x80000, CRC(0128913e) SHA1(c11bc115877310c17f9b57f72b29d19b0ad71afa) )
+	ROM_LOAD16_BYTE( "cwld.u8",  0xc00000, 0x80000, CRC(5127c08e) SHA1(4f0eae73817270fa156829100b66f0ff88fa422c) )
+	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "crusnw17.u10", 0x0000000, 0x100000, CRC(afca0f15) SHA1(52ed51e31ba7f8ac1a71a7bdb64733b6e95b0669) )
+	ROM_LOAD32_BYTE( "crusnw17.u11", 0x0000001, 0x100000, CRC(6610af52) SHA1(c6ab7f369bd0b05e0ce28c7829b870f5b6ddf12f) )
+	ROM_LOAD32_BYTE( "crusnw17.u12", 0x0000002, 0x100000, CRC(ef0107b1) SHA1(350017ab56c220516dda53c8323eaf82d7dee8dd) )
+	ROM_LOAD32_BYTE( "crusnw17.u13", 0x0000003, 0x100000, CRC(c1d68aa0) SHA1(07d5ec75d921935474a9de738b1b7e9cb0748483) )
+	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
+	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
+	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
+	ROM_LOAD32_BYTE( "cwld.u17",     0x0400003, 0x100000, CRC(d6278c0c) SHA1(3e152d755d69903718a84d4154e442a31026f3d8) )
+	ROM_LOAD32_BYTE( "cwld.u18",     0x0800000, 0x100000, CRC(e2dc2733) SHA1(c277643548c03d831a3b091f1a311accac9d106b) )
+	ROM_LOAD32_BYTE( "cwld.u19",     0x0800001, 0x100000, CRC(5223a070) SHA1(90ce48b2308fa9e7cb636c4732b20b8e177aa9b1) )
+	ROM_LOAD32_BYTE( "cwld.u20",     0x0800002, 0x100000, CRC(db535625) SHA1(599ccd6bcfb155eb68ac131de4af524510ab35b7) )
+	ROM_LOAD32_BYTE( "cwld.u21",     0x0800003, 0x100000, CRC(92a080e8) SHA1(e5e0faf820b5870a81f121b6ad4c37a9081724e4) )
+	ROM_LOAD32_BYTE( "cwld.u22",     0x0c00000, 0x100000, CRC(77c56318) SHA1(52344038942c83f3ce82f3169a345ceb86e43dcb) )
+	ROM_LOAD32_BYTE( "cwld.u23",     0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
+	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
+	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+ROM_END
+
+
 ROM_START( crusnw13 ) /* Version 1.3, Mon Nov 25 1996 - 23:22:45 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1621,6 +1652,7 @@ GAME( 1994, crusnu21, crusnusa, midvunit, crusnusa, crusnu21, ROT0, "Midway", "C
 GAME( 1996, crusnwld, 0,        midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", GAME_SUPPORTS_SAVE )
 GAME( 1996, crusnw23, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", GAME_SUPPORTS_SAVE )
 GAME( 1996, crusnw20, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnw17, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", GAME_SUPPORTS_SAVE )
 GAME( 1996, crusnw13, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", GAME_SUPPORTS_SAVE )
 GAME( 1997, offroadc, 0,        midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1997, offrodc3, offroadc, midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
