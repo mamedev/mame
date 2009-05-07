@@ -9,6 +9,8 @@
 #include "render.h"
 #include "rendutil.h"
 
+#include <math.h>
+
 static int vblc=0;
 #define DEBUG_FIFO_POLY (0)
 #define DEBUG_PVRCTRL	(0)
@@ -1484,15 +1486,15 @@ static void computedilated(void)
 void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
 {
 	int xxl, xxr;
-	float dx, dudx, dvdx, dwdx;
+	float dx, ddx, dudx, dvdx, dwdx;
 	UINT32 *tdata;
 	float *wbufline;
 
 	if(xr < 0 || xl >= 640)
 		return;
 
-	xxl = (int)xl;
-	xxr = (int)xr;
+	xxl = (int)round(xl);
+	xxr = (int)round(xr);
 
 	if(xxl == xxr)
 		return;
@@ -1502,25 +1504,17 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	dvdx = (vr-vl)/dx;
 	dwdx = (wr-wl)/dx;
 
-	if(xl < 0) {
-		ul += -dudx*xl;
-		vl += -dvdx*xl;
-		wl += -dwdx*xl;
+	if(xxl < 0)
 		xxl = 0;
-	} else {
-		float dt = xxl - xl;
-		ul += dudx*dt;
-		vl += dvdx*dt;
-		wl += dwdx*dt;
-	}
-
-	// Target the pixel center
-	ul += 0.5*dudx;
-	vl += 0.5*dvdx;
-	wl += 0.5*dwdx;
-
 	if(xxr > 640)
 		xxr = 640;
+
+	// Target the pixel center
+	ddx = xxl + 0.5 - xl;
+	ul += ddx*dudx;
+	vl += ddx*dvdx;
+	wl += ddx*dwdx;
+
 
 	tdata = BITMAP_ADDR32(bitmap, y, xxl);
 	wbufline = &wbuffer[y][xxl];
@@ -1549,63 +1543,67 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 }
 
 void render_span(bitmap_t *bitmap, texinfo *ti,
-                 int y0, int y1, float adj,
-                 float *xl, float *xr,
-                 float *ul, float *ur,
-                 float *vl, float *vr,
-                 float *wl, float *wr,
+                 float y0, float y1,
+                 float xl, float xr,
+                 float ul, float ur,
+                 float vl, float vr,
+                 float wl, float wr,
                  float dxldy, float dxrdy,
                  float duldy, float durdy,
                  float dvldy, float dvrdy,
                  float dwldy, float dwrdy)
 {
+	float dy;
+	int yy0, yy1;
+
+	if(y1 <= 0)
+		return;
 	if(y1 > 480)
 		y1 = 480;
-	if(y1 <= 0) {
-		*xl += dxldy*(y1-y0);
-		*xr += dxrdy*(y1-y0);
-		*ul += duldy*(y1-y0);
-		*ur += durdy*(y1-y0);
-		*vl += dvldy*(y1-y0);
-		*vr += dvrdy*(y1-y0);
-		*wl += dwldy*(y1-y0);
-		*wr += dwrdy*(y1-y0);
-		return;
-	}
+
 	if(y0 < 0) {
-		*xl += -dxldy*y0;
-		*xr += -dxrdy*y0;
-		*ul += -duldy*y0;
-		*ur += -durdy*y0;
-		*vl += -dvldy*y0;
-		*vr += -dvrdy*y0;
-		*wl += -dwldy*y0;
-		*wr += -dwrdy*y0;
+		xl += -dxldy*y0;
+		xr += -dxrdy*y0;
+		ul += -duldy*y0;
+		ur += -durdy*y0;
+		vl += -dvldy*y0;
+		vr += -dvrdy*y0;
+		wl += -dwldy*y0;
+		wr += -dwrdy*y0;
 		y0 = 0;
 	}
 
-	if(adj) {
-		*xl += adj*dxldy;
-		*xr += adj*dxrdy;
-		*ul += adj*duldy;
-		*ur += adj*durdy;
-		*vl += adj*dvldy;
-		*vr += adj*dvrdy;
-		*wl += adj*dwldy;
-		*wr += adj*dwrdy;
-	}
-	while(y0 < y1) {
-		render_hline(bitmap, ti, y0, *xl, *xr, *ul, *ur, *vl, *vr, *wl, *wr);
+	yy0 = (int)round(y0);
+	yy1 = (int)round(y1);
 
-		*xl += dxldy;
-		*xr += dxrdy;
-		*ul += duldy;
-		*ur += durdy;
-		*vl += dvldy;
-		*vr += dvrdy;
-		*wl += dwldy;
-		*wr += dwrdy;
-		y0 ++;
+	dy = yy0+0.5-y0;
+
+	if(0)
+		fprintf(stderr, "%f %f %f %f -> %f %f | %f %f -> %f %f\n",
+				y0,
+				dy, dxldy, dxrdy, dy*dxldy, dy*dxrdy,
+				xl, xr, xl + dy*dxldy, xr + dy*dxrdy);
+	xl += dy*dxldy;
+	xr += dy*dxrdy;
+	ul += dy*duldy;
+	ur += dy*durdy;
+	vl += dy*dvldy;
+	vr += dy*dvrdy;
+	wl += dy*dwldy;
+	wr += dy*dwrdy;
+
+	while(yy0 < yy1) {
+		render_hline(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr);
+
+		xl += dxldy;
+		xr += dxrdy;
+		ul += duldy;
+		ur += durdy;
+		vl += dvldy;
+		vr += dvrdy;
+		wl += dwldy;
+		wr += dwrdy;
+		yy0 ++;
 	}
 }
 
@@ -1642,24 +1640,17 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 
 static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
-	int y0, y1, y2;
 	float dy01, dy02, dy12;
 	float dy;
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
-	float xl, xr, ul, ur, vl, vr, wl, wr;
-
 	if(v0->y >= 480 || v2->y < 0)
 		return;
 
-	y0 = (int)(v0->y);
-	y1 = (int)(v1->y);
-	y2 = (int)(v2->y);
-
-	dy01 = y1-y0;
-	dy02 = y2-y0;
-	dy12 = y2-y1;
+	dy01 = v1->y - v0->y;
+	dy02 = v2->y - v0->y;
+	dy12 = v2->y - v1->y;
 
 	dx01dy = dy01 ? (v1->x-v0->x)/dy01 : 0;
 	dx02dy = dy02 ? (v2->x-v0->x)/dy02 : 0;
@@ -1677,46 +1668,37 @@ static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, con
 	dw02dy = dy02 ? (v2->w-v0->w)/dy02 : 0;
 	dw12dy = dy12 ? (v2->w-v1->w)/dy12 : 0;
 
-	// Target the pixel center
-	dy = (y0-v0->y) + 0.5;
-
-	xl = v0->x;
-	xr = v0->x;
-	ul = v0->u;
-	ur = v0->u;
-	vl = v0->v;
-	vr = v0->v;
-	wl = v0->w;
-	wr = v0->w;
-
 	if(!dy01) {
 		if(!dy12)
 			return;
-		if(v1->x > v0->x) {
-			xr = v1->x;
-			ur = v1->u;
-			vr = v1->v;
-			wr = v1->w;
-			render_span(bitmap, ti, y1, y2, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
-		} else {
-			xl = v1->x;
-			ul = v1->u;
-			vl = v1->v;
-			wl = v1->w;
-			render_span(bitmap, ti, y1, y2, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
-		}
-	} else if(!dy12) {
-		if(v2->x > v1->x)
-			render_span(bitmap, ti, y0, y1, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
+
+		if(v1->x > v0->x)
+			render_span(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
 		else
-			render_span(bitmap, ti, y0, y1, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
+			render_span(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
+
+	} else if(!dy12) {
+
+		if(v2->x > v1->x)
+			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
+		else
+			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
+
 	} else {
 		if(dx01dy < dx02dy) {
-			render_span(bitmap, ti, y0, y1, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
-			render_span(bitmap, ti, y1, y2,  0, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
+			render_span(bitmap, ti, v0->y, v1->y,
+						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w,
+						dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
+			render_span(bitmap, ti, v1->y, v2->y,
+						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01,
+						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
 		} else {
-			render_span(bitmap, ti, y0, y1, dy, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
-			render_span(bitmap, ti, y1, y2,  0, &xl, &xr, &ul, &ur, &vl, &vr, &wl, &wr, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
+			render_span(bitmap, ti, v0->y, v1->y,
+						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w,
+						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
+			render_span(bitmap, ti, v1->y, v2->y,
+						v0->x + dx02dy*dy01, v1->x, v0->u + du02dy*dy01, v1->u, v0->v + dv02dy*dy01, v1->v, v0->w + dw02dy*dy01, v1->w,
+						dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
 		}
 	}
 }
