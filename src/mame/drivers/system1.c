@@ -191,6 +191,7 @@ Notes:
 #include "driver.h"
 #include "video/system1.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/z80pio.h"
 #include "machine/8255ppi.h"
 #include "machine/segacrpt.h"
@@ -692,6 +693,111 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  MCU address maps
+ *
+ *************************************/
+
+static UINT8 mcu_control;
+
+static WRITE8_HANDLER( mcu_control_w )
+{
+	mcu_control = data;
+}
+
+static WRITE8_HANDLER( mcu_io_w )
+{
+	switch (mcu_control)
+	{
+		case 0x01:
+			if (offset >= 0xc000 && offset < 0xd000)
+				memory_write_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset, data);
+			else
+				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+	
+		case 0x51:
+			memory_write_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), offset, data);
+			break;
+		
+		default:
+			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+	}
+}
+
+static READ8_HANDLER( mcu_io_r )
+{
+	switch (mcu_control)
+	{
+		case 0x01:
+			if (offset >= 0xc000)
+				return memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset);
+			else
+			{
+				logerror("%03X: MCU movx read mode %02X offset %04X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset);
+				return 0xff;
+			}
+	
+		case 0x47:
+			return memory_region(space->machine, "maincpu")[offset + 0x00000];
+
+		case 0x4f:
+			return memory_region(space->machine, "maincpu")[offset + 0x10000];
+		
+		case 0x51:
+			return memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), offset);
+		
+		case 0x59: /* read after each byte of internal checksum */
+		case 0x5f: /* read after each pair of bytes during main CPU checksum */
+			return 0xff;
+
+		default:
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+	}
+}
+
+/*
+
+     +------------- HALT?
+     | +----------- I/O?
+     | | +--------- ROM bank select
+     | | |
+01	0000 0001 = read/write to Z80 program space
+51	0101 0001 = read/write to Z80 I/O space
+41  0100 0001 = write at initialization time
+47	0100 0111 = read from ROM 00000-07FFF
+4F	0100 1111 = read from ROM 10000-1FFFF
+5F  0101 1111 = read during ROM checksum
+19	0001 1001 = reads here before doing shorter loops
+59	0101 1001 = reads here during checksum, and in infinite loop on checksum error
+
+
+When P1 = $01, movx writes to ???, reads from ???
+When P1 = $19, movx reads from ???
+When P1 = $41, movx writes to ??? (done at init, with no dptr)
+When P1 = $47, movx reads from ROM 00000-07FFF
+When P1 = $4F, movx reads from ROM 10000-1FFFF
+When P1 = $51, movx writes to ??? (address $17, $14, $15, $16)
+When P1 = $59, movx reads from ??? (done on error, and on each byte of internal checksum)
+When P1 = $5F, movx reads from ??? (when after each pair of bytes during checksum)
+When P1 = $FF, default state
+*/
+
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
 ADDRESS_MAP_END
 
 
@@ -2079,6 +2185,15 @@ static MACHINE_DRIVER_START( nob )
 	MDRV_CPU_PROGRAM_MAP(nobo_map,0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( nobm )
+	MDRV_IMPORT_FROM( nob )
+	
+	/* basic machine hardware */
+	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
+	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+MACHINE_DRIVER_END
+
 
 
 /* system2 video */
@@ -2090,12 +2205,30 @@ static MACHINE_DRIVER_START( sys2 )
 	MDRV_VIDEO_UPDATE(system2)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sys2m )
+	MDRV_IMPORT_FROM( sys2 )
+	
+	/* basic machine hardware */
+	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
+	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+MACHINE_DRIVER_END
+
 /* system2 with rowscroll */
 static MACHINE_DRIVER_START( sys2row )
 	MDRV_IMPORT_FROM( sys2 )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(system2_rowscroll)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sys2rowm )
+	MDRV_IMPORT_FROM( sys2row )
+	
+	/* basic machine hardware */
+	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
+	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 
 
@@ -3181,8 +3314,8 @@ ROM_START( shtngmst )
 	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
     /* This mcu is located on the main board. */
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Internal i8751 MCU code */
-	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(2a301391ffeb38ce0ebba96b7fe2acde3097e220) )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, "tiles", 0 )
@@ -3240,8 +3373,8 @@ ROM_START( shtngmst1 )
 	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
     /* This mcu is located on the main board. */
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Internal i8751 MCU code */
-	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, "tiles", 0 )
@@ -3380,8 +3513,8 @@ ROM_START( choplift )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7130.ic126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Internal i8751 MCU code */
-	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, BAD_DUMP CRC(7bd11a6c) SHA1(2d75a2276e572f97f269af062536c1c58e1c8eaf) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7127.ic4",	0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
@@ -4376,8 +4509,8 @@ ROM_START( nob )
 	ROM_LOAD( "dm10.1k", 0x10000, 0x8000, CRC(e7c06663) SHA1(8ae42b0875afe60ef672f2285aeb72da1c7e167b) )
 	ROM_LOAD( "dm09.1h", 0x18000, 0x8000, CRC(dc4c872f) SHA1(aab85203cfd2463ffddfd48e87733fb8d6d8bcf6) )
 
-	ROM_REGION( 0x8000, "mcu", 0 )
-	ROM_LOAD( "8751.mcu", 0x00000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "dm.bin", 0x00000, 0x1000, CRC(6fde9dcb) SHA1(e1340644471a149b49a616c59445c85785e44fa4) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dm03.9h", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
@@ -4587,7 +4720,7 @@ static DRIVER_INIT( choplift )
 	i8751_run = choplift_i8751_run;
 }
 
-static DRIVER_INIT( shtngmst )
+static DRIVER_INIT( shtngmst1 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_write8_handler(space, 0x10, 0x10, 0x00, 0x00, mcuenable_hack_w);
@@ -4595,7 +4728,18 @@ static DRIVER_INIT( shtngmst )
 	memory_install_read_port_handler(space, 0x18, 0x18, 0x00, 0x03, "18");
 	memory_install_read_port_handler(space, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
 	memory_install_read_port_handler(space, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
-	DRIVER_INIT_CALL(choplift);
+	DRIVER_INIT_CALL(bank0c);
+}
+
+static DRIVER_INIT( shtngmst )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+	int addr;
+
+	// this is not right, but works for a decent amount of the data	
+	for (addr = 0; addr < 0x8000; addr++)
+		rom[addr] ^= 0x04;
+	DRIVER_INIT_CALL(shtngmst1);
 }
 
 
@@ -4626,8 +4770,8 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,  seganinj,  bank00,   ROT0,   "Sega",
 GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1986, nob,        nobb,     nob,      nob,       bank44,   ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
-GAME( 1986, nobb,       0,        nob,      nob,       nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nob,        0,        nobm,     nob,       bank44,   ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
+GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
 GAME( 1984, flicky,     0,        sys1pio,  flicky,    flicky,   ROT0,   "Sega",            "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
@@ -4665,12 +4809,12 @@ GAME( 1986, gardia,     0,        sys1pio,  gardia,    gardia,   ROT270, "Sega /
 GAME( 1986, brain,      0,        sys1pio,  brain,     bank44,   ROT0,   "Coreland / Sega", "Brain", GAME_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2row,  choplift,  choplift, ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, choplift,   0,        sys2rowm, choplift,  choplift, ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1985, chopliftu,  choplift, sys2row,  choplift,  bank0c,   ROT0,   "Sega",            "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,  choplift,  bank0c,   ROT0,   "bootleg",         "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2,     shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmst1,  shtngmst, sys2,     shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmsta,  shtngmst, sys2,     shtngmst,  shtngmst, ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmst,   0,        sys2m,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmst1,  shtngmst, sys2m,    shtngmst,  shtngmst1,ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmsta,  shtngmst, sys2,     shtngmst,  shtngmst1,ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1986, gardiab,    gardia,   sys2,     gardia,    gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_SUPPORTS_SAVE )
