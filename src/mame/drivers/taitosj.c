@@ -717,10 +717,10 @@ static INPUT_PORTS_START( piratpet )
 	/* If cabinet is upright -> only 1 set of controls -> only P1 Skip Next Level    */
 	/* If cabinet is cocktal -> 2 sets of controls -> both Skip Next Level bits work */
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("P1 Skip Next Level")	// Button 2 skips levels when Debug dips is on
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F2) PORT_NAME("P2 Skip Next Level")	// Button 2 skips levels when Debug dips is on
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Debug Mode" )
