@@ -4400,15 +4400,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2005.12 Radirgy (Rev. A) */
 	DRIVER( kurucham )	/* 2006.03 Kurukuru Chameleon */
-	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
+						/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
-	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
-	DRIVER( karous )	/* 2006.11 Karous */
+						/* 2006.09 Jingi Storm */
+						/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
-	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
-	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
-	DRIVER( meltyba )	/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
+						/* 2006.12 Melty Blood Act Cadenza ver.B */
+						/* 2006.12.16 Noukone Puzzle Takoron */
+						/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
 
 	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
 	DRIVER( ngdup23c )
@@ -4535,7 +4535,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 						/* 2005.12 Mario Kart Arcade Grand Prix */
-	DRIVER( vs42006 )	/* 2006.05 Virtua Striker 4 ver.2006 */
+						/* 2006.05 Virtua Striker 4 ver.2006 */
 						/* 2007.03 Mario Kart Arcade Grand Prix 2 */
 
 	DRIVER( tfupdate )	/* Triforce GDROM Boot Update (GDT-0011) */
