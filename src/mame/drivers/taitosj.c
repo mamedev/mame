@@ -711,44 +711,23 @@ static INPUT_PORTS_START( junglek )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( piratpet )
-	COMMON_IN0
+	PORT_INCLUDE( junglek )
 
-	COMMON_IN1 //Button 2 skips levels when Debug mode is on
+	/* These 'skip' bits actually work no matter how you set the Debug Dip!          */
+	/* If cabinet is upright -> only 1 set of controls -> only P1 Skip Next Level    */
+	/* If cabinet is cocktal -> 2 sets of controls -> both Skip Next Level bits work */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("P1 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
-	COMMON_IN2
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F2) PORT_NAME("P2 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
-	COMMON_IN3(IP_ACTIVE_HIGH)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, NULL)	// from sound CPU
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
-	PORT_DIPSETTING(    0x03, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x02, "Timer x1" )
-	PORT_DIPSETTING(    0x01, "Timer x2" )
-	PORT_DIPSETTING(    0x00, "Timer x3" )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Debug Mode" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2")      /* Coinage */
-	DSW2_PORT
-
-	PORT_START("DSW3")
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x01, "20000" )
@@ -763,15 +742,9 @@ static INPUT_PORTS_START( piratpet )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Free Game (Cheat)")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x80, "A and B" )
-	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpine )
