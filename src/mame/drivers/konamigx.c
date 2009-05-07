@@ -3332,7 +3332,7 @@ static MACHINE_RESET(konamigx)
 	memset(sndto020, 0, 16);
 
 	// sound CPU initially disabled?
-	cputag_set_input_line(machine, "sound", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "dasp", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
