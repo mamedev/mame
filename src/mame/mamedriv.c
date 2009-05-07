@@ -4232,7 +4232,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_mwalk )	/* 40 */
 	DRIVER( mt_crack )	/* 41 */
 				/* 42 */
-				/* 43 */
+	DRIVER( mt_shado )	/* 43 */
 	DRIVER( mt_arrow )	/* 44 */
 				/* 45 */
 				/* 46 */
@@ -4240,7 +4240,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_wwar )	/* 48 */
 	DRIVER( mt_bbros )	/* 49 */
 				/* 50 */
-				/* 51 */
+	DRIVER( mt_srage )	/* 51 */
 	DRIVER( mt_sonic )	/* 52 */
 	DRIVER( mt_sonia )	/* ^^ */
 	DRIVER( mt_fshrk )	/* 53 */

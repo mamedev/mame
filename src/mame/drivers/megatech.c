@@ -1214,6 +1214,32 @@ ROM_START( mt_fwrld ) /* Forgotten Worlds */
 	MEGATECH_GAME26("game0", "inst0")
 ROM_END
 
+/* Game 43 - Shadow Dancer */
+
+#define MEGATECH_GAME43(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-13571-s.ic1", 0x000000, 0x080000, CRC(56a29310) SHA1(55836177e4a1e2deb68408976b29d0282cf661a9) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-43.ic2", 0x000000, 0x08000, CRC(1116cbc7) SHA1(ba6dd21ceadeedf730b71b67acbd20d9067114f3) ) \
+
+ROM_START( mt_shado ) /* Bonanza Bros */
+	MEGATECH_BIOS
+	MEGATECH_GAME43("game0", "inst0")
+ROM_END
+
+/* Game 51 - Streets of Rage */
+
+#define MEGATECH_GAME51(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-13571-s.ic1", 0x000000, 0x080000, CRC(db4ac746) SHA1(c7cc24e2329f279574513fa32bbf79f72f75aeea) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-51.ic2", 0x000000, 0x08000, CRC(49b7d6f4) SHA1(96e69851c92715e7daf35b184cf374147a8d2880) ) \
+
+ROM_START( mt_srage ) /* Bonanza Bros */
+	MEGATECH_BIOS
+	MEGATECH_GAME51("game0", "inst0")
+ROM_END
+
 /* Compilations of games to show the multi-cart support */
 
 ROM_START( mt_comp1 )
@@ -1287,7 +1313,7 @@ ROM_END
 /* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Michael Jackson's Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
 /* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
 /* 42 */ // unknown
-/* 43 */ // unknown
+/* 43 */ GAME( 1990, mt_shado, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shadow Dancer (Mega-Tech)", GAME_NOT_WORKING )
 /* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
 /* 45 */ // unknown
 /* 46 */ // unknown
@@ -1295,7 +1321,7 @@ ROM_END
 /* 48 */ GAME( 1991, mt_wwar,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Wrestle War (Mega-Tech)", GAME_NOT_WORKING ) /* Copyright 1989, 1991 Sega */
 /* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
 /* 50 */ // unknown
-/* 51 */ // unknown
+/* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", GAME_NOT_WORKING )
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
