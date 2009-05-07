@@ -721,11 +721,11 @@ static WRITE8_HANDLER( mcu_io_w )
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
 						 cpu_get_pc(space->cpu), mcu_control, offset, data);
 			break;
-	
+
 		case 0x51:
 			memory_write_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), offset, data);
 			break;
-		
+
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
 					 cpu_get_pc(space->cpu), mcu_control, offset, data);
@@ -746,16 +746,16 @@ static READ8_HANDLER( mcu_io_r )
 						 cpu_get_pc(space->cpu), mcu_control, offset);
 				return 0xff;
 			}
-	
+
 		case 0x47:
 			return memory_region(space->machine, "maincpu")[offset + 0x00000];
 
 		case 0x4f:
 			return memory_region(space->machine, "maincpu")[offset + 0x10000];
-		
+
 		case 0x51:
 			return memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_IO), offset);
-		
+
 		case 0x59: /* read after each byte of internal checksum */
 		case 0x5f: /* read after each pair of bytes during main CPU checksum */
 			return 0xff;
@@ -773,14 +773,14 @@ static READ8_HANDLER( mcu_io_r )
      | +----------- I/O?
      | | +--------- ROM bank select
      | | |
-01	0000 0001 = read/write to Z80 program space
-51	0101 0001 = read/write to Z80 I/O space
+01  0000 0001 = read/write to Z80 program space
+51  0101 0001 = read/write to Z80 I/O space
 41  0100 0001 = write at initialization time
-47	0100 0111 = read from ROM 00000-07FFF
-4F	0100 1111 = read from ROM 10000-1FFFF
+47  0100 0111 = read from ROM 00000-07FFF
+4F  0100 1111 = read from ROM 10000-1FFFF
 5F  0101 1111 = read during ROM checksum
-19	0001 1001 = reads here before doing shorter loops
-59	0101 1001 = reads here during checksum, and in infinite loop on checksum error
+19  0001 1001 = reads here before doing shorter loops
+59  0101 1001 = reads here during checksum, and in infinite loop on checksum error
 
 
 When P1 = $01, movx writes to ???, reads from ???
@@ -2187,7 +2187,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nobm )
 	MDRV_IMPORT_FROM( nob )
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
@@ -2207,7 +2207,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys2m )
 	MDRV_IMPORT_FROM( sys2 )
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
@@ -2224,7 +2224,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys2rowm )
 	MDRV_IMPORT_FROM( sys2row )
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
@@ -4736,7 +4736,7 @@ static DRIVER_INIT( shtngmst )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int addr;
 
-	// this is not right, but works for a decent amount of the data	
+	// this is not right, but works for a decent amount of the data
 	for (addr = 0; addr < 0x8000; addr++)
 		rom[addr] ^= 0x04;
 	DRIVER_INIT_CALL(shtngmst1);

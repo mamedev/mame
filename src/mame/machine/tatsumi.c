@@ -223,7 +223,7 @@ WRITE16_HANDLER( roundup5_control_w )
 //  if ((tatsumi_control_w&0x200)==0 && (last_bank&0x200)==0x200)
 //      logerror("68k reset\n");
 
-	if (tatsumi_control_word == 0x3a00) 
+	if (tatsumi_control_word == 0x3a00)
 	{
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //      logerror("68k on\n");
@@ -274,13 +274,13 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 */
 
-	if ((tatsumi_control_word & 4) == 4 && (tatsumi_last_control & 4) == 0) 
+	if ((tatsumi_control_word & 4) == 4 && (tatsumi_last_control & 4) == 0)
 	{
 //      logerror("68k 2 halt\n");
 		cputag_set_input_line(space->machine, "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
-	if ((tatsumi_control_word & 4) == 0 && (tatsumi_last_control & 4) == 4) 
+	if ((tatsumi_control_word & 4) == 0 && (tatsumi_last_control & 4) == 4)
 	{
 //      logerror("68k 2 irq go\n");
 		cputag_set_input_line(space->machine, "sub", INPUT_LINE_HALT, CLEAR_LINE);
@@ -288,7 +288,7 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 
 	// hack
-	if (cpu_get_pc(space->cpu) == 0x2c3c34) 
+	if (cpu_get_pc(space->cpu) == 0x2c3c34)
 	{
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //      logerror("hack 68k2 on\n");

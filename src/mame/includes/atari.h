@@ -24,7 +24,7 @@ READ8_DEVICE_HANDLER(atari_pia_pb_r);
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w);
 
 /* This is needed in MESS as well for Atari 8bit drivers */
-void atari_machine_start(running_machine *machine);	
+void atari_machine_start(running_machine *machine);
 
 MACHINE_START( atarixl );
 

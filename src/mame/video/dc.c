@@ -414,14 +414,14 @@ static UINT32 tex_r_default(texinfo *t, float x, float y)
 static void tex_prepare(texinfo *t)
 {
 	int miptype = 0;
-	
+
 	t->r = tex_r_default;
 	t->cd = dilatechose[t->sizes];
 	t->palbase = 0;
 	t->vqbase = t->address;
 
-	//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);	
-	
+	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
+
 	switch(t->pf) {
 	case 0: // 1555
 		switch(t->mode) {
@@ -462,8 +462,8 @@ static void tex_prepare(texinfo *t)
 		t->palbase = 0x400 | ((t->palette & 0x3f) << 4);
 		switch(t->mode) {
 		case 0: case 1:
-			miptype = 0;	
-		
+			miptype = 0;
+
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_tw; break;
 			case 1: t->r = tex_r_p4_565_tw;  break;
@@ -472,7 +472,7 @@ static void tex_prepare(texinfo *t)
 			}
 			break;
 		default:
-			miptype = 3; // ?	
+			miptype = 3; // ?
 
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_vq; t->address += 0x800; break;
@@ -488,8 +488,8 @@ static void tex_prepare(texinfo *t)
 		t->palbase = 0x400 | ((t->palette & 0x30) << 4);
 		switch(t->mode) {
 		case 0: case 1:
-			miptype = 1;	
-		
+			miptype = 1;
+
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_tw; break;
 			case 1: t->r = tex_r_p8_565_tw; break;
@@ -498,8 +498,8 @@ static void tex_prepare(texinfo *t)
 			}
 			break;
 		default:
-			miptype = 3; // ?	
-		
+			miptype = 3; // ?
+
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_vq; t->address += 0x800; break;
 			case 1: t->r = tex_r_p8_565_vq;  t->address += 0x800; break;
@@ -513,98 +513,98 @@ static void tex_prepare(texinfo *t)
 	case 9: // reserved
 		break;
 	}
-	
+
 	if (t->mipmapped)
 	{
 		// full offset tables for reference,
 		// we don't do mipmapping, so don't use anything < 8x8
 		// first table is half-bytes
-	
+
 		// 4BPP palette textures
 		// Texture size _4-bit_ offset value for starting address
-		// 1x1			0x00003
-		// 2x2 			0x00004
-		// 4x4 			0x00008
-		// 8x8 			0x00018
-		// 16x16 		0x00058
-		// 32x32 		0x00158
-		// 64x64 		0x00558
-		// 128x128		0x01558
-		// 256x256 		0x05558
-		// 512x512 		0x15558
-		// 1024x1024 	0x55558
-	
+		// 1x1          0x00003
+		// 2x2          0x00004
+		// 4x4          0x00008
+		// 8x8          0x00018
+		// 16x16        0x00058
+		// 32x32        0x00158
+		// 64x64        0x00558
+		// 128x128      0x01558
+		// 256x256      0x05558
+		// 512x512      0x15558
+		// 1024x1024    0x55558
+
 		// 8BPP palette textures
 		// Texture size Byte offset value for starting address
-		// 1x1			0x00003
-		// 2x2 			0x00004
-		// 4x4 			0x00008
-		// 8x8 			0x00018
-		// 16x16 		0x00058
-		// 32x32 		0x00158
-		// 64x64 		0x00558
-		// 128x128		0x01558
-		// 256x256 		0x05558
-		// 512x512 		0x15558
-		// 1024x1024 	0x55558
-	
+		// 1x1          0x00003
+		// 2x2          0x00004
+		// 4x4          0x00008
+		// 8x8          0x00018
+		// 16x16        0x00058
+		// 32x32        0x00158
+		// 64x64        0x00558
+		// 128x128      0x01558
+		// 256x256      0x05558
+		// 512x512      0x15558
+		// 1024x1024    0x55558
+
 		// Non-palette textures
 		// Texture size Byte offset value for starting address
-		// 1x1 			0x00006
-		// 2x2 			0x00008
-		// 4x4 			0x00010
-		// 8x8 			0x00030
-		// 16x16 		0x000B0
-		// 32x32 		0x002B0
-		// 64x64 		0x00AB0
-		// 128x128 		0x02AB0
-		// 256x256 		0x0AAB0
-		// 512x512 		0x2AAB0
-		// 1024x1024 	0xAAAB0
-	
+		// 1x1          0x00006
+		// 2x2          0x00008
+		// 4x4          0x00010
+		// 8x8          0x00030
+		// 16x16        0x000B0
+		// 32x32        0x002B0
+		// 64x64        0x00AB0
+		// 128x128      0x02AB0
+		// 256x256      0x0AAB0
+		// 512x512      0x2AAB0
+		// 1024x1024    0xAAAB0
+
 		// VQ textures
 		// Texture size Byte offset value for starting address
-		// 1x1 			0x00000
-		// 2x2 			0x00001
-		// 4x4 			0x00002
-		// 8x8 			0x00006
-		// 16x16 		0x00016
-		// 32x32 		0x00056
-		// 64x64 		0x00156
-		// 128x128 		0x00556
-		// 256x256 		0x01556
-		// 512x512 		0x05556
-		// 1024x1024 	0x15556
-		
+		// 1x1          0x00000
+		// 2x2          0x00001
+		// 4x4          0x00002
+		// 8x8          0x00006
+		// 16x16        0x00016
+		// 32x32        0x00056
+		// 64x64        0x00156
+		// 128x128      0x00556
+		// 256x256      0x01556
+		// 512x512      0x05556
+		// 1024x1024    0x15556
+
 		static const int mipmap_4_8_offset[8] = { 0x00018, 0x00058, 0x00158, 0x00558, 0x01558, 0x05558, 0x15558, 0x55558 };  // 4bpp (4bit offset) / 8bpp (8bit offset)
 		static const int mipmap_np_offset[8] =  { 0x00030, 0x000B0, 0x002B0, 0x00AB0, 0x02AB0, 0x0AAB0, 0x2AAB0, 0xAAAB0 };  // nonpalette textures
 		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 }; // vq textures
-		
+
 		switch (miptype)
 		{
-		
+
 			case 0: // 4bpp
 				//printf("4bpp\n");
 				t->address += mipmap_4_8_offset[t->sizes&7]>>1;
 				break;
-			
+
 			case 1: // 8bpp
 				//printf("8bpp\n");
 				t->address += mipmap_4_8_offset[t->sizes&7];
 				break;
-				
+
 			case 2: // nonpalette
 				//printf("np\n");
 				t->address += mipmap_np_offset[t->sizes&7];
 				break;
-			
+
 			case 3: // vq
 				//printf("vq\n");
 				t->address += mipmap_vq_offset[t->sizes&7];
 				break;
 		}
 	}
-	
+
 }
 
 static void tex_get_info(texinfo *ti, pvrta_state *sa)
@@ -1222,7 +1222,7 @@ void process_ta_fifo(running_machine* machine)
 						ts->evert = rd->verts_size + 3;
 
 						rd->verts_size += 4;
-					}					
+					}
 				}
 			}
 			else if (state_ta.global_paratype == 4)
@@ -1244,7 +1244,7 @@ void process_ta_fifo(running_machine* machine)
 					tv->w=u2f(tafifo_buff[3]);
 					tv->u=u2f(tafifo_buff[4]);
 					tv->v=u2f(tafifo_buff[5]);
-					
+
 					if((!rd->strips_size) ||
 					   rd->strips[rd->strips_size-1].evert != -1)
 					{

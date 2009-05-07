@@ -711,7 +711,7 @@ RAMs
 
 PLDs
 2x ispLSI10032E-70LJ
-Note	1x 28x2 edge connector
+Note    1x 28x2 edge connector
 1x 14 legs connector
 1x RS232 connector
 1x trimmer (volume)

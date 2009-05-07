@@ -2665,8 +2665,8 @@ static READ8_HANDLER( ff_r )	{return 0xff;}
 static ADDRESS_MAP_START( tndrcade_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM 							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(ff_r)						// ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-//  AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)  			//
-//  AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r) 			//
+//  AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)              //
+//  AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)             //
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")					// P2
@@ -2776,7 +2776,7 @@ static ADDRESS_MAP_START( metafox_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("COINS")			// Coins
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1")				// P1
-//  AM_RANGE(0x1004, 0x1004) AM_READNOP						// ?
+//  AM_RANGE(0x1004, 0x1004) AM_READNOP                     // ?
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM

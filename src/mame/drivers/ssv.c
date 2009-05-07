@@ -438,11 +438,11 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000e, 0x21000f) AM_READWRITE(SMH_NOP, ssv_lockout_w)								/*  Lockout */	\
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        				\
 	AM_RANGE(0x230000, 0x230071) AM_WRITE(SMH_RAM) AM_BASE(&ssv_irq_vectors)	          		    /*  IRQ Vec */ 	\
-	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 			/*	IRQ Ack	*/	\
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               			/* 	IRQ En 	*/  \
+	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 			/*  IRQ Ack */	\
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               			/*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
 	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)												\
-	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK(1)														/*  ROM  	*/	\
+	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK(1)														/*  ROM     */	\
 //AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
 
 
@@ -458,7 +458,7 @@ static READ16_HANDLER( drifto94_rand_r )
 }
 
 static ADDRESS_MAP_START( drifto94_map, ADDRESS_SPACE_PROGRAM, 16 )
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)										// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                                      // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITE(SMH_RAM)										// ?
 	AM_RANGE(0x480000, 0x480001) AM_NOP													// ?
 	AM_RANGE(0x483000, 0x485fff) AM_WRITE(SMH_NOP)										// ?
@@ -635,9 +635,9 @@ static READ16_HANDLER( hypreact_input_r )
 
 static ADDRESS_MAP_START( hypreact_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)			// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)						// ? 5 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                      // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)			// Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)						// ? read at the start, value not used
+//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)                       // ? read at the start, value not used
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(hypreact_input_r)				// Inputs
 	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_BASE(&ssv_input_sel)			//
 	AM_RANGE(0xc00008, 0xc00009) AM_NOP									//
@@ -651,9 +651,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hypreac2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)							// ? 5 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                          // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)				// Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)							// ? read at the start, value not used
+//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)                           // ? read at the start, value not used
 	AM_RANGE(0x500000, 0x500001) AM_READ(hypreact_input_r)					// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ(hypreact_input_r)					// (again?)
 	AM_RANGE(0x520000, 0x520001) AM_WRITE(SMH_RAM) AM_BASE(&ssv_input_sel)	// Inputs
@@ -670,7 +670,7 @@ static READ16_HANDLER( srmp4_input_r );
 
 static ADDRESS_MAP_START( janjans1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(SMH_NOP)							// koikois2 but not janjans1
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)							// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                          // ? 1 at the start
 	AM_RANGE(0x210006, 0x210007) AM_READ(SMH_NOP)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_RAM) AM_BASE(&ssv_input_sel)	// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ(srmp4_input_r)						// Inputs
@@ -683,7 +683,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( keithlcy_map, ADDRESS_SPACE_PROGRAM, 16 )
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)	// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)  // ? 1 at the start
 	AM_RANGE(0x210010, 0x210011) AM_WRITE(SMH_NOP)	//
 	AM_RANGE(0x21000e, 0x21000f) AM_READ(SMH_NOP)	//
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITE(SMH_RAM)	// ?
@@ -697,9 +697,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meosism_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r	)							// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)										// ? 5 at the start
-//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)										// ? read once, value not used
-//  AM_RANGE(0x500004, 0x500005) AM_WRITE(SMH_NOP)										// ? 0,58,18
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                                      // ? 5 at the start
+//  AM_RANGE(0x280000, 0x280001) AM_READ(SMH_NOP)                                       // ? read once, value not used
+//  AM_RANGE(0x500004, 0x500005) AM_WRITE(SMH_NOP)                                      // ? 0,58,18
 	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_BASE(&ssv_nvram) AM_SIZE(&ssv_nvram_size)	// NVRAM
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -722,9 +722,9 @@ static WRITE16_HANDLER( ssv_mainram_w )
 
 static ADDRESS_MAP_START( mslider_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)	// RAM Mirror
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)							// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                          // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITE(SMH_RAM)							// ?
-//  AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)							// ? ff at the start
+//  AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)                          // ? ff at the start
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ryorioh_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)	// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)				// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)              // ? 1 at the start
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -757,7 +757,7 @@ static READ16_HANDLER( srmp4_input_r )
 
 static ADDRESS_MAP_START( srmp4_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)							// ? 1,5 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)						// Inputs
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_RAM) AM_BASE(&ssv_input_sel)	// Inputs
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(SMH_NOP)							//
@@ -805,7 +805,7 @@ static READ16_HANDLER( srmp7_input_r )
 static ADDRESS_MAP_START( srmp7_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM										// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)							// ? 0,4 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                          // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)				// Coin Counters / Lockouts
 	AM_RANGE(0x300076, 0x300077) AM_READ(srmp7_irqv_r)						// Sound
 //  0x540000, 0x540003, related to lev 5 irq?
@@ -822,9 +822,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( survarts_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP) 				// ? 0,4 at the start
-//  AM_RANGE(0x290000, 0x290001) AM_READ(SMH_NOP) 				// ?
-//  AM_RANGE(0x2a0000, 0x2a0001) AM_READ(SMH_NOP) 				// ?
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)              // ? 0,4 at the start
+//  AM_RANGE(0x290000, 0x290001) AM_READ(SMH_NOP)               // ?
+//  AM_RANGE(0x2a0000, 0x2a0001) AM_READ(SMH_NOP)               // ?
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM							// dyna
 
@@ -871,9 +871,9 @@ static WRITE16_HANDLER( sxyreact_motor_w )
 }
 
 static ADDRESS_MAP_START( sxyreact_map, ADDRESS_SPACE_PROGRAM, 16 )
-//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w) 			// sxyreac2 reads / writes here, why?
+//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)             // sxyreac2 reads / writes here, why?
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)							// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)										// ? 1 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                                      // ? 1 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)							// Inverted lockout lines
 	AM_RANGE(0x500002, 0x500003) AM_READ(sxyreact_ballswitch_r)							// ?
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(sxyreact_dial_r, sxyreact_motor_w)		// Dial Value (serial)
@@ -905,7 +905,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ultrax_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with memory address 8)
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)				// ? 2,6 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)              // ? 2,6 at the start
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
@@ -1028,7 +1028,7 @@ static WRITE16_HANDLER( eaglshot_gfxram_w )
 static ADDRESS_MAP_START( eaglshot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
 	AM_RANGE(0x210000, 0x210001) AM_READ(/*watchdog_reset16_r*/SMH_NOP)					// Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)										// ? 0,4 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP)                                      // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)							// Inverted lockout lines
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_w)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(eaglshot_trackball_w)

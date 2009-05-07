@@ -385,12 +385,12 @@ static WRITE16_HANDLER ( z80_reset_w )
 {
 	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
-	if(data == 0x5050) 
+	if(data == 0x5050)
 	{
 		devtag_reset(space->machine, "ics");
 		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
 		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, PULSE_LINE);
-		if(0) 
+		if(0)
 		{
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
@@ -413,7 +413,7 @@ static WRITE16_HANDLER ( z80_ctrl_w )
 
 static WRITE16_HANDLER ( m68k_l1_w )
 {
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
 		soundlatch_w(space, 0, data);
@@ -1262,7 +1262,7 @@ GFXDECODE_END
 
 /* only dragon world 2 NEEDs irq4, Puzzli 2 explicitly doesn't want it, what
    is the source? maybe the protection device? */
-static INTERRUPT_GEN( drgw_interrupt ) 
+static INTERRUPT_GEN( drgw_interrupt )
 {
 	if( cpu_getiloops(device) == 0 )
 		cpu_set_input_line(device, 6, HOLD_LINE);

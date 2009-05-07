@@ -32,12 +32,12 @@ WRITE8_HANDLER( cm_girl_scroll_w )
 {
 	cm_girl_scroll = data;
 	/*
-	    xxxx ----  yscroll
-		---- xxxx  xscroll
+        xxxx ----  yscroll
+        ---- xxxx  xscroll
 
-		this isn't very fine scrolling, but i see no other registers.
-		1000 1000 is the center of the screen.
-	*/
+        this isn't very fine scrolling, but i see no other registers.
+        1000 1000 is the center of the screen.
+    */
 }
 
 WRITE8_HANDLER( cm_outport0_w )
@@ -288,7 +288,7 @@ VIDEO_UPDATE( goldstar )
 			const gfx_element *gfx = screen->machine->gfx[2];
 			int girlyscroll = (INT8)((cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((cm_girl_scroll & 0x0f)<<4);
-			
+
 			drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll),cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
 		}
 	}

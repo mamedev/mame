@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
 	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP              										/* ??? seems to be important */
+//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)							/* cause FIRQ on CPU A */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(4)												/* Shared RAM with the CPU A */

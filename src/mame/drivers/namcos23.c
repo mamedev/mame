@@ -1223,7 +1223,7 @@ static READ8_HANDLER( s23_mcu_iob_r )
 	im_rd++;
 	im_rd &= 0xf;
 
-	if (im_rd == im_wr) 
+	if (im_rd == im_wr)
 	{
 		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
 	}

@@ -136,7 +136,7 @@ static void splash_msm5205_int(const device_config *device)
 static ADDRESS_MAP_START( splash_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM										/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)				/* ADPCM data for the MSM5205 chip */
-//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                 				/* ??? */
+//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)						/* Sound latch */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym", ym3812_r,ym3812_w)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM										/* RAM */
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( funystrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM													/* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&splash_pixelram)						/* Pixel Layer */
-//  AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)						/* Sound command */
+//  AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")

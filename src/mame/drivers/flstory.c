@@ -46,7 +46,7 @@ static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) 
+	if (sound_nmi_enable)
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	else pending_nmi = 1;
 }

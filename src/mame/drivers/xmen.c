@@ -120,7 +120,7 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
@@ -136,7 +136,7 @@ static WRITE16_HANDLER( sound_irq_w )
 
 static WRITE16_HANDLER( xmen_18fa00_w )
 {
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		/* bit 2 is interrupt enable */
 		interrupt_enable_w(space, 0, data & 0x04);

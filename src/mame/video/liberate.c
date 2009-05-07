@@ -46,14 +46,14 @@ static TILE_GET_INFO( get_back_tile_info )
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
-	if (tile_index & 0x100) 
+	if (tile_index & 0x100)
 	{
 		if (tile_index & 0x200)
 			tile_index = (tile_index & 0xff) + (deco16_io_ram[5] << 8); /* Bottom right */
 		else
 			tile_index = (tile_index & 0xff) + (deco16_io_ram[4] << 8); /* Bottom left */
-	} 
-	else 
+	}
+	else
 	{
 		if (tile_index & 0x200)
 			tile_index = (tile_index & 0xff) + (deco16_io_ram[3] << 8); /* Top right */
@@ -89,10 +89,10 @@ WRITE8_HANDLER( deco16_io_w )
 	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(background_tilemap);
 
-	switch (offset) 
+	switch (offset)
 	{
 		case 6: /* Background colour */
-			if (((data >> 4) & 3) != background_color) 
+			if (((data >> 4) & 3) != background_color)
 			{
 				background_color = (data >> 4) & 3;
 				tilemap_mark_all_tiles_dirty(background_tilemap);
@@ -219,7 +219,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		if (multi && fy==0) sy-=16;
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			sy=240-sy;
 			sx=240-sx;
@@ -230,7 +230,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 		}
-		else 
+		else
 		{
 			if (fy)
 				sy2=sy-16;
@@ -282,7 +282,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			sy=240-sy;
 			sx=240-sx;
@@ -290,7 +290,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			if (fy) fy=0; else fy=1;
 			sy2=sy-16;
 		}
-		else 
+		else
 		{
 			sy2=sy+16;
 		}
@@ -340,7 +340,7 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			sy=240-sy;
 			sx=240-sx;
@@ -348,7 +348,7 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			if (fy) fy=0; else fy=1;
 			sy2=sy-16;
 		}
-		else 
+		else
 		{
 			sy2=sy+16;
 		}
@@ -393,7 +393,7 @@ VIDEO_UPDATE( prosport )
 
 	prosport_draw_sprites(screen->machine,bitmap,cliprect);
 
-	for (offs = 0;offs < 0x400;offs++) 
+	for (offs = 0;offs < 0x400;offs++)
 	{
 		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
 

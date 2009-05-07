@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( skyfox_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")			//
 	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)		// Video Regs
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")			//
-//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r)   		// fake to read the vregs
+//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r)        // fake to read the vregs
 ADDRESS_MAP_END
 
 
@@ -79,9 +79,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( skyfox_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								// RAM
-//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                    	// ??
+//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                        // ??
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)	// YM2203 #1
-//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                     	// ??
+//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                        // ??
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)	// YM2203 #2
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)				// From Main CPU
 ADDRESS_MAP_END

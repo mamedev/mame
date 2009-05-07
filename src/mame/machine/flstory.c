@@ -68,7 +68,7 @@ WRITE8_HANDLER( flstory_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) 
+		if (main_sent)
 			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 logerror("read command %02x from main cpu\n", portA_in);

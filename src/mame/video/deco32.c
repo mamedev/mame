@@ -285,7 +285,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
 						cliprect,TRANSPARENCY_PEN,0,prival);
-				
+
 				// wrap-around y
 				pdrawgfx(bitmap,machine->gfx[gfxbank],
 						sprite + y + h * x,

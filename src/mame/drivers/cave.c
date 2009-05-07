@@ -636,8 +636,8 @@ static ADDRESS_MAP_START( guwange_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")											// Inputs
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w)									// EEPROM
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")											// Inputs + EEPROM
-//  AM_RANGE(0xd00012, 0xd00013) AM_WRITE(SMH_NOP)   											// ?
-//  AM_RANGE(0xd00014, 0xd00015) AM_WRITE(SMH_NOP)   											// ? $800068 in dfeveron ? probably Watchdog
+//  AM_RANGE(0xd00012, 0xd00013) AM_WRITE(SMH_NOP)                                              // ?
+//  AM_RANGE(0xd00014, 0xd00015) AM_WRITE(SMH_NOP)                                              // ? $800068 in dfeveron ? probably Watchdog
 ADDRESS_MAP_END
 
 
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( hotdogst_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)				// Layer 1
 /**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2)				// Layer 2
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)										// IRQ Cause
-//  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)										// From Sound CPU
+//  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                      // From Sound CPU
 	AM_RANGE(0xa8006e, 0xa8006f) AM_WRITE(sound_cmd_w)											// To Sound CPU
 	AM_RANGE(0xa80000, 0xa8007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs)						// Video Regs
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE(&cave_vctrl_0)									// Layer 0 Control
@@ -737,17 +737,17 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 
 static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-//  AM_RANGE(0x100000, 0x107fff) AM_READ(SMH_RAM)															// Layer 0
+//  AM_RANGE(0x100000, 0x107fff) AM_READ(SMH_RAM)                                                           // Layer 0
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)								// Layer 0
-//  AM_RANGE(0x140000, 0x140005) AM_READ(SMH_RAM)															// Layer 0 Control
+//  AM_RANGE(0x140000, 0x140005) AM_READ(SMH_RAM)                                                           // Layer 0 Control
 	AM_RANGE(0x140000, 0x140005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_0)									// Layer 0 Control
-//  AM_RANGE(0x180000, 0x187fff) AM_READ(SMH_RAM)															// Sprites
+//  AM_RANGE(0x180000, 0x187fff) AM_READ(SMH_RAM)                                                           // Sprites
 	AM_RANGE(0x180000, 0x187fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)													// IRQ Cause
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs)									// Video Regs
-//  AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)															// Palette
+//  AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)                                                           // Palette
 	AM_RANGE(0x200000, 0x207fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( "ymz", ymz280b_r, 0x00ff)										// YMZ280
+//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( "ymz", ymz280b_r, 0x00ff)                                     // YMZ280
 	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)									// YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
@@ -1102,7 +1102,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w)							// Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)			//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
-//  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP)									// ?? volume
+//  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP)                                  // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w)						// ROM bank
 	AM_RANGE(0x60, 0x60) AM_READ(soundlatch_hi_r)							// From Main CPU
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_lo_r)							//

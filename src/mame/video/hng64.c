@@ -166,7 +166,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if(xflip)
 		{
 			//xinc=-(int)(16.0f*foomX);
-			
+
 			xinc=-16;
 			xpos-=xinc*chainx;
 		}
@@ -952,20 +952,20 @@ static TILE_GET_INFO( get_hng64_tile0_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0xffff0000)>>16;
 	int tileno,pal, flip;
-	
+
 	tileno = hng64_videoram[tile_index+(0x00000/4)];
 	// pppppppp ff--atttt tttttttt tttttttt
-	
+
 	pal = (tileno&0xff000000)>>24;
 	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
 	}
-		
+
 	tileno &= 0x1fffff;
-	
+
 	if (tilemapinfo&0x400)
 	{
 		SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));
@@ -981,20 +981,20 @@ static TILE_GET_INFO( get_hng64_tile1_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0x0000ffff)>>0;
 	int tileno,pal, flip;
-	
+
 	tileno = hng64_videoram[tile_index+(0x10000/4)];
 	// pppppppp ff--atttt tttttttt tttttttt
-	
+
 	pal = (tileno&0xff000000)>>24;
 	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
 	}
 
 	tileno &= 0x1fffff;
-	
+
 	if (tilemapinfo&0x400)
 	{
 		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
@@ -1010,20 +1010,20 @@ static TILE_GET_INFO( get_hng64_tile2_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0xffff0000)>>16;
 	int tileno,pal, flip;
-	
+
 	tileno = hng64_videoram[tile_index+(0x20000/4)];
 	// pppppppp ff--atttt tttttttt tttttttt
-	
+
 	pal = (tileno&0xff000000)>>24;
 	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
 	}
-	
+
 	tileno &= 0x1fffff;
-		
+
 	if (tilemapinfo&0x400)
 	{
 		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
@@ -1039,20 +1039,20 @@ static TILE_GET_INFO( get_hng64_tile3_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0x0000ffff)>>0;
 	int tileno,pal, flip;
-	
+
 	tileno = hng64_videoram[tile_index+(0x30000/4)];
 	// pppppppp ff--atttt tttttttt tttttttt
-	
+
 	pal = (tileno&0xff000000)>>24;
 	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
 	}
-		
-	tileno &= 0x1fffff;	
-		
+
+	tileno &= 0x1fffff;
+
 	if (tilemapinfo&0x400)
 	{
 		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
@@ -1072,8 +1072,8 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
 	xscroll = (INT16)(hng64_videoram[(0x40000+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40004+(scrollbase<<4))/4]>>16);
 	yscroll = (INT16)(hng64_videoram[(0x40008+(scrollbase<<4))/4]>>16);
-//	xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
-//	yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
+//  xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
+//  yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40014+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40018+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x4001c+(scrollbase<<4))/4]>>16);
@@ -1115,7 +1115,7 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
  *   8    | oooooooo | unknown - always seems to be 80008000 (fatfurwa)
  *   9    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
  *   a    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
- *   b    | mmmmmmmm | auto animation mask for tilemaps, - use these bits from the original tile number 
+ *   b    | mmmmmmmm | auto animation mask for tilemaps, - use these bits from the original tile number
  *   c    | xxxxxxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
  *   d    | oooooooo | not used ??
  *   e    | oooooooo | not used ??
@@ -1133,7 +1133,7 @@ VIDEO_UPDATE( hng64 )
 	tilemap_mark_all_tiles_dirty (hng64_tilemap1);
 	tilemap_mark_all_tiles_dirty (hng64_tilemap0);
 
-	
+
 	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x00003fff)>>0,  hng64_tilemap3);
 	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x3fff0000)>>16, hng64_tilemap2);
 	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x04]&0x00003fff)>>0,  hng64_tilemap1);
@@ -1147,24 +1147,24 @@ VIDEO_UPDATE( hng64 )
 	transition_control(bitmap, cliprect) ;
 
 	/*
-	popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x", 
-	hng64_videoregs[0x00],
-	hng64_videoregs[0x01],
-	hng64_videoregs[0x02],
-	hng64_videoregs[0x03],
-	hng64_videoregs[0x04],
-	hng64_videoregs[0x05],
-	hng64_videoregs[0x06],
-	hng64_videoregs[0x07],
-	hng64_videoregs[0x08],
-	hng64_videoregs[0x09],
-	hng64_videoregs[0x0a],
-	hng64_videoregs[0x0b],
-	hng64_videoregs[0x0c],
-	hng64_videoregs[0x0d],
-	hng64_videoregs[0x0e]);
-	*/
-	
+    popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
+    hng64_videoregs[0x00],
+    hng64_videoregs[0x01],
+    hng64_videoregs[0x02],
+    hng64_videoregs[0x03],
+    hng64_videoregs[0x04],
+    hng64_videoregs[0x05],
+    hng64_videoregs[0x06],
+    hng64_videoregs[0x07],
+    hng64_videoregs[0x08],
+    hng64_videoregs[0x09],
+    hng64_videoregs[0x0a],
+    hng64_videoregs[0x0b],
+    hng64_videoregs[0x0c],
+    hng64_videoregs[0x0d],
+    hng64_videoregs[0x0e]);
+    */
+
 	// tilemap0 per layer flags
 	// 0840 - startup tests, 8x8x4 layer
 	// 0cc0 - beast busters 2, 8x8x8 layer
@@ -1172,19 +1172,19 @@ VIDEO_UPDATE( hng64 )
 	// 08e0 - fatal fury wa during transitions
 	// 0940 - samurai shodown 64
 	// 0880 - buriki
-	
+
 	// ---l rb?? ???? ????
 	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3)
 	// r = tile size?
 	// b = 4bpp/8bpp ?  (beast busters, samsh64, sasm64 2 switch it for some screens)
-	
-	
-	
-	
+
+
+
+
 	popmessage("0: %04x  1: %04x   2: %04x  3: %04x\n", (hng64_videoregs[0x02]&0xffff0000)>>16, (hng64_videoregs[0x02]&0x0000ffff)>>0, (hng64_videoregs[0x03]&0xffff0000)>>16, (hng64_videoregs[0x03]&0x0000ffff)>>0);
-	
-	
-	
+
+
+
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
 	frameCount++ ;
 

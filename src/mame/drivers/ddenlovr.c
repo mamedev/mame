@@ -1582,7 +1582,7 @@ static ADDRESS_MAP_START( quiz365_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200c02, 0x200c03) AM_READ(quiz365_protection_r)							// Protection
 	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(quiz365_protection_w)							// Protection
-//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                  					// ?
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                                      // ?
 
 	AM_RANGE(0x300200, 0x300201) AM_WRITE(ddenlovr_select2_16_w)
 	AM_RANGE(0x300202, 0x300203) AM_WRITE(quiz365_coincounter_w)						// Coin Counters + more stuff written on startup
@@ -1642,7 +1642,7 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ROM
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)							// Palette
-//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                  					// ? B0 on startup, then 00
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                                      // ? B0 on startup, then 00
 
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1701,7 +1701,7 @@ static ADDRESS_MAP_START( ddenlvrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlvrk_protection2_r, ddenlvrk_protection2_w)	AM_BASE(&ddenlvrk_protection2)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                               					// ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1739,7 +1739,7 @@ static ADDRESS_MAP_START( ddenlovr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                               					// ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -3141,7 +3141,7 @@ static ADDRESS_MAP_START( akamaru_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x624680, 0x624681) AM_READ(akamaru_protection1_r)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(SMH_RAM)                  						// 0
+//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(SMH_RAM)                                          // 0
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)

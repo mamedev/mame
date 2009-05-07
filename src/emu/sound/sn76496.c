@@ -32,24 +32,24 @@
   23/04/2007 : Lord Nightmare
   Major update, implement all three different noise generation algorithms and a
   set_variant call to discern among them.
-  
+
   28/04/2009 : Lord Nightmare
   Add READY line readback; cleaned up struct a bit. Cleaned up comments.
   Add more TODOs. Fixed some unsaved savestate related stuff.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
-		  Requires making the core support both mono and stereo, and have
-		  a select register which determines which channels go where.
-		* Implement the TMS9919 and SN94624, which are earlier versions,
-		  possibly lacking the /8 clock divider, of the SN76489, and hence
-		  would have a max clock of 500Khz and 4 clocks per sample, as
-		  opposed to max of 4Mhz and 32 clocks per sample on the SN76489A 
-		* Implement the T6W28; has registers in a weird order, needs writes
-		  to be 'sanitized' first. Also is stereo, similar to game gear.
-		* Implement the NCR 7496; Is probably 100% compatible with SN76496,
-		  but the whitenoise taps could be different. Needs someone with a
-		  Tandy 1200 or whatever it was which uses this to run some tests.
-		* Factor out common code so that the SAA1099 can share some code.
+          Requires making the core support both mono and stereo, and have
+          a select register which determines which channels go where.
+        * Implement the TMS9919 and SN94624, which are earlier versions,
+          possibly lacking the /8 clock divider, of the SN76489, and hence
+          would have a max clock of 500Khz and 4 clocks per sample, as
+          opposed to max of 4Mhz and 32 clocks per sample on the SN76489A
+        * Implement the T6W28; has registers in a weird order, needs writes
+          to be 'sanitized' first. Also is stereo, similar to game gear.
+        * Implement the NCR 7496; Is probably 100% compatible with SN76496,
+          but the whitenoise taps could be different. Needs someone with a
+          Tandy 1200 or whatever it was which uses this to run some tests.
+        * Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
 #include "sndintrf.h"
@@ -162,7 +162,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 				/* N/512,N/1024,N/2048,Tone #3 output */
 				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
 			        /* Reset noise shifter */
-				R->RNG = R->FeedbackMask; 
+				R->RNG = R->FeedbackMask;
 				R->Output[3] = R->RNG & 1;
 			}
 			break;
@@ -179,15 +179,15 @@ static STREAM_UPDATE( SN76496Update )
 
 
 	/* If the volume is 0, increase the counter; this is more or less
-	a speedup hack for when silence is to be output */
+    a speedup hack for when silence is to be output */
 	for (i = 0;i < 4;i++)
 	{
 		if (R->Volume[i] == 0)
 		{
-			/* note that I do count += samples, NOT count = samples + 1. 
-			You might think it's the same since the volume is 0, but doing
-			the latter could cause interferencies when the program is 
-			rapidly modulating the volume. */
+			/* note that I do count += samples, NOT count = samples + 1.
+            You might think it's the same since the volume is 0, but doing
+            the latter could cause interferencies when the program is
+            rapidly modulating the volume. */
 			if (R->Count[i] <= samples*STEP) R->Count[i] += samples*STEP;
 		}
 	}
@@ -197,7 +197,7 @@ static STREAM_UPDATE( SN76496Update )
 		int vol[4];
 		unsigned int out;
 		int left;
-		
+
 		/* decrement Cycles to READY by one */
 		if (R->CyclestoREADY >0) R->CyclestoREADY--;
 
@@ -209,14 +209,14 @@ static STREAM_UPDATE( SN76496Update )
 		{
 			if (R->Output[i]) vol[i] += R->Count[i];
 			R->Count[i] -= STEP;
-			/* Period[i] is the half period of the square wave. Here, in each 
-			loop I add Period[i] twice, so that at the end of the loop the 
-			square wave is in the same status (0 or 1) it was at the start.
-			vol[i] is also incremented by Period[i], since the wave has been 1
-			exactly half of the time, regardless of the initial position. 
-			If we exit the loop in the middle, Output[i] has to be inverted
-			and vol[i] incremented only if the exit status of the square
-			wave is 1. */
+			/* Period[i] is the half period of the square wave. Here, in each
+            loop I add Period[i] twice, so that at the end of the loop the
+            square wave is in the same status (0 or 1) it was at the start.
+            vol[i] is also incremented by Period[i], since the wave has been 1
+            exactly half of the time, regardless of the initial position.
+            If we exit the loop in the middle, Output[i] has to be inverted
+            and vol[i] incremented only if the exit status of the square
+            wave is 1. */
 			while (R->Count[i] <= 0)
 			{
 				R->Count[i] += R->Period[i];

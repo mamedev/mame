@@ -166,7 +166,7 @@ WRITE8_HANDLER( srdarwin_control_w )
 	int bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	switch (offset) 
+	switch (offset)
 	{
     	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
 			bankaddress = 0x10000 + (data >> 5) * 0x4000;
@@ -227,7 +227,7 @@ WRITE8_HANDLER( lastmiss_scrolly_w )
 
 WRITE8_HANDLER( gondo_scroll_w )
 {
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x0:
 			scroll2[1] = data; /* X LSB */
@@ -278,7 +278,7 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		y=(y+16)%0x200;
 		x=256 - x;
 		y=256 - y;
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y=240-y;
 			x=240-x;
@@ -288,7 +288,7 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		}
 
 		/* Y Flip determines order of multi-sprite */
-		if (extra && fy) 
+		if (extra && fy)
 		{
 			sprite2=sprite;
 			sprite++;
@@ -352,7 +352,7 @@ static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rect
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			y=240-y;
 			x=240-x;
@@ -399,7 +399,7 @@ static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		fx = buffered_spriteram[offs+1] & 0x04;
 		multi = buffered_spriteram[offs+1] & 0x10;
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			sy=240-sy;
 			sx=240-sx;
@@ -430,7 +430,7 @@ static void draw_characters(running_machine* machine, bitmap_t *bitmap, const re
 {
 	int mx,my,tile,color,offs;
 
-	for (offs = 0x800 - 2;offs >= 0;offs -= 2) 
+	for (offs = 0x800 - 2;offs >= 0;offs -= 2)
 	{
 		tile=videoram[offs+1]+((videoram[offs]&0xf)<<8);
 
@@ -533,15 +533,15 @@ VIDEO_START( cobracom )
 
 VIDEO_UPDATE( ghostb )
 {
-   if (dec8_pf0_control[0]&0x4) 
+   if (dec8_pf0_control[0]&0x4)
    { /* Rowscroll */
  		int offs;
 
 		tilemap_set_scroll_rows(dec8_pf0_tilemap,512);
 		for (offs = 0;offs < 512;offs+=2)
 			tilemap_set_scrollx( dec8_pf0_tilemap,offs/2, (dec8_pf0_control[0x10]<<8)+dec8_pf0_control[0x11] + (dec8_row[offs]<<8)+dec8_row[offs+1] );
-	} 
-	else 
+	}
+	else
 	{
 		tilemap_set_scroll_rows(dec8_pf0_tilemap,1);
 		tilemap_set_scrollx( dec8_pf0_tilemap,0, (dec8_pf0_control[0x10]<<8)+dec8_pf0_control[0x11] );

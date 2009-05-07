@@ -310,9 +310,9 @@ static int h8_get_priority(h83xx_state *h8, UINT8 bit)
 	case 11: // IRQ7
 		if (h8->per_regs[0xc7]&0x80) res = 1; break;
 	case 28: // SCI0 Rx
-		if (h8->per_regs[0xda]&0x40) res = 1; break; 
+		if (h8->per_regs[0xda]&0x40) res = 1; break;
 	case 32: // SCI1 Rx
-		if (h8->per_regs[0x8a]&0x40) res = 1; break; 
+		if (h8->per_regs[0x8a]&0x40) res = 1; break;
 	}
 	return res;
 }

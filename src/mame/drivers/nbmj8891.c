@@ -641,7 +641,7 @@ static ADDRESS_MAP_START( taiwanmb_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("fm", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE("fm", ay8910_data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r) //AM_WRITENOP	// ?
+	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r) //AM_WRITENOP   // ?
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 //  AM_RANGE(0xc0, 0xc0) AM_WRITENOP                    // ?

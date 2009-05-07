@@ -807,7 +807,7 @@ ROM_START( cabalbl2 )
 	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "c5.bin",           0x00000, 0x04000, CRC(183e4834) SHA1(05ab0c388be8701930a9de437978206cda6fed68) ) /* characters */
 	ROM_CONTINUE(0x0000,0x4000)
-	
+
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "c14.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "c10.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
@@ -844,7 +844,7 @@ void seibu_sound_bootleg(running_machine *machine,const char *cpu,int length)
 	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	memcpy(decrypt, rom+length, length);
-	
+
 	if (length > 0x10000)
 		memory_configure_bank_decrypted(machine, 1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }

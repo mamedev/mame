@@ -211,7 +211,7 @@ static READ8_HANDLER(dma_page_select_r)
 {
 	UINT8 data = at_pages[offset % 0x10];
 
-	switch(offset % 8) 
+	switch(offset % 8)
 	{
 	case 1:
 		data = dma_offset[(offset / 8) & 1][2];
@@ -234,7 +234,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 {
 	at_pages[offset % 0x10] = data;
 
-	switch(offset % 8) 
+	switch(offset % 8)
 	{
 	case 1:
 		dma_offset[(offset / 8) & 1][2] = data;
@@ -283,7 +283,7 @@ static const struct dma8237_interface dma8237_2_config =
 8259 IRQ controller
 ******************/
 
-static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) 
+static PIC8259_SET_INT_LINE( pic8259_1_set_int_line )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
@@ -292,7 +292,7 @@ static const struct pic8259_interface pic8259_1_config = {
 	pic8259_1_set_int_line
 };
 
-static PIC8259_SET_INT_LINE( pic8259_2_set_int_line ) 
+static PIC8259_SET_INT_LINE( pic8259_2_set_int_line )
 {
 	pic8259_set_irq_line( streetg2_devices.pic8259_1, 2, interrupt);
 }
@@ -314,7 +314,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
-	if ( streetg2_devices.pic8259_1 ) 
+	if ( streetg2_devices.pic8259_1 )
 	{
 		pic8259_set_irq_line(streetg2_devices.pic8259_1, 0, state);
 	}
@@ -519,7 +519,7 @@ static PALETTE_INIT(pcat_286)
 	//todo: 256 colors
 }
 
-static void streetg2_set_keyb_int(running_machine *machine, int state) 
+static void streetg2_set_keyb_int(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(streetg2_devices.pic8259_1, 1, state);
 }

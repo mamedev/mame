@@ -241,7 +241,7 @@ static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR
 //Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
 	static UINT16 old_mcu_nmi1 = 0;
 	if ( (data & 1) && !(old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(space->machine);
-	//if ( (data & 0x10) && !(old_mcu_nmi1 & 0x10) )	galpani2_mcu_nmi1(space->machine);
+	//if ( (data & 0x10) && !(old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(space->machine);
 	//alternate line, same function?
 	old_mcu_nmi1 = data;
 }
@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( galpani2_mem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x680000, 0x680001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP								// Watchdog
-//	AM_RANGE(0x740000, 0x740001) AM_WRITENOP								// ? Reset mcu
+//  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
 	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(SMH_RAM) AM_BASE(&galpani2_rombank	)	// Rom Bank
 	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM

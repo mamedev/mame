@@ -143,7 +143,7 @@ static WRITE16_HANDLER( automat_control_w )
 
 static WRITE16_HANDLER( slyspy_control_w )
 {
-    switch (offset << 1) 
+    switch (offset << 1)
 	{
     	case 0:
 			if (ACCESSING_BITS_0_7)

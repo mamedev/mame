@@ -191,8 +191,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( ncb3_port81_w )
 {
-//	if (data!=0x00)
-//		popmessage("ncb3_port81_w %02x\n",data);
+//  if (data!=0x00)
+//      popmessage("ncb3_port81_w %02x\n",data);
 }
 
 // where is colour bank for 'all blue' in attract?
@@ -4652,7 +4652,7 @@ static MACHINE_DRIVER_START( cmasterc )
 
 	MDRV_IMPORT_FROM(cm)
 	MDRV_GFXDECODE(cmasterc)
-	
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cmnobmp )
@@ -7078,13 +7078,13 @@ ROM_START( nfm )
 	ROM_LOAD( "fruit3", 0x08000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
 	ROM_CONTINUE(0x8000, 0x4000)
 	ROM_LOAD( "fruit4", 0x0c000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
-	
+
 	// do these graphics really belong with this set? a lot of the tiles seem wrong for it
 	ROM_REGION( 0x18000, "tilegfx", 0 )
 	ROM_LOAD( "fruit5", 0x00000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
 	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
 	ROM_LOAD( "fruit7", 0x10000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
-	
+
 	ROM_REGION( 0x18000, "proms", 0 ) // colours?
 	ROM_LOAD( "fruiprg2", 0x00000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
 ROM_END

@@ -752,7 +752,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-	if (cputag_get_cpu(space->machine, "audiocpu"))	
+	if (cputag_get_cpu(space->machine, "audiocpu"))
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);

@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( bigkarnk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE(&gaelco_videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM																		/* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&gaelco_vregs)										/* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                     							/* INT 6 ACK/Watchdog timer */
+//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&gaelco_spriteram)											/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigkarnk_snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM											/* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	/* OKI6295 */
-//  AM_RANGE(0x0900, 0x0900) AM_WRITENOP             						/* enable sound output? */
+//  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
 	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)		/* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)							/* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_ROM											/* ROM */
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( maniacsq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE(&gaelco_videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM																		/* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_vregs)									/* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                     							/* INT 6 ACK/Watchdog timer */
+//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&gaelco_spriteram)											/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
@@ -572,7 +572,7 @@ static ADDRESS_MAP_START( squash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_encrypted_w) AM_BASE(&gaelco_videoram)			/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_BASE(&gaelco_screen)                                                                /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_vregs)									/* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                     							/* INT 6 ACK/Watchdog timer */
+//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&gaelco_spriteram)											/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
@@ -727,7 +727,7 @@ static ADDRESS_MAP_START( thoop_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop_vram_encrypted_w) AM_BASE(&gaelco_videoram)					/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_BASE(&gaelco_screen)						/* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_vregs)										/* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                     								/* INT 6 ACK/Watchdog timer */
+//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)		/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&gaelco_spriteram)												/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")

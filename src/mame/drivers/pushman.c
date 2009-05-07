@@ -131,7 +131,7 @@ static READ8_HANDLER( pushman_68000_r )
 
 static WRITE8_HANDLER( pushman_68000_w )
 {
-	if (offset == 2 && (shared_ram[2] & 2) == 0 && data & 2) 
+	if (offset == 2 && (shared_ram[2] & 2) == 0 && data & 2)
 	{
 		latch = (shared_ram[1] << 8) | shared_ram[0];
 		new_latch = 1;

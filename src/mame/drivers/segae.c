@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( systeme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						/* Banked ROM */
 
 //  AM_RANGE(0x0000 , 0xbfff) AM_ROM
-//  AM_RANGE(0xc000 , 0xdfff) AM_RAM	 AM_MIRROR(0x2000)
+//  AM_RANGE(0xc000 , 0xdfff) AM_RAM     AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io_map, ADDRESS_SPACE_IO, 8 )

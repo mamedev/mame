@@ -260,7 +260,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 {
 	int vblank;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 2: /* Raster IRQ ACK - value read is not used */
 		cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);

@@ -301,19 +301,19 @@ static void quark_tables_free(void)
 	if (source_table != NULL)
 		free(source_table);
 	source_table = NULL;
-	
+
 	if (name_table != NULL)
 		free(name_table);
 	name_table = NULL;
-	
+
 	if (description_table != NULL)
 		free(description_table);
 	description_table = NULL;
-	
+
 	if (roms_table != NULL)
 		free(roms_table);
 	roms_table = NULL;
-	
+
 	if (defstr_table != NULL)
 		free(defstr_table);
 	defstr_table = NULL;

@@ -146,11 +146,11 @@ static ADDRESS_MAP_START( puckpkmn_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* Unknown reads/writes: */
 	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP											/* ? */
-//  AM_RANGE(0xa10000, 0xa10001) AM_READNOP   							                /* ? once */
+//  AM_RANGE(0xa10000, 0xa10001) AM_READNOP                                             /* ? once */
 	AM_RANGE(0xa10002, 0xa10005) AM_NOP													/* ? alternative way of reading inputs ? */
 	AM_RANGE(0xa11100, 0xa11101) AM_NOP													/* ? */
-//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                    						/* ? once */
-//  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                  							/* ? once */
+//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                                            /* ? once */
+//  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                                            /* ? once */
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP											/* ? */
 ADDRESS_MAP_END
 

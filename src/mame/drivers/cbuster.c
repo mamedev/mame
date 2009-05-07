@@ -39,7 +39,7 @@ static UINT16 prot;
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
-	switch (offset << 1) 
+	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
 		buffer_spriteram16_w(space, 0, 0, 0xffff);

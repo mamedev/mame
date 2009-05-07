@@ -12,11 +12,11 @@ TODO:
 ==============================================================================================
 x (Mystery Rom)
 (c)1978-1981? Irem?
-PCB No.	:M14S-2
-	:M14L-2
-CPU	:NEC D8085AC
-Sound	:?
-OSC	:6MHz x2
+PCB No. :M14S-2
+    :M14L-2
+CPU :NEC D8085AC
+Sound   :?
+OSC :6MHz x2
 
 mgpb1.bin
 mgpa2.bin
@@ -258,9 +258,9 @@ static MACHINE_DRIVER_START( m14 )
 	MDRV_VIDEO_UPDATE(m14)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MDRV_SPEAKER_STANDARD_MONO("mono")
+//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /***************************************************************************

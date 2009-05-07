@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( olibochu )
 	MDRV_CPU_PROGRAM_MAP(olibochu_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) //???
 
-//	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+//  MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

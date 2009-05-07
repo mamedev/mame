@@ -806,7 +806,7 @@ static ADDRESS_MAP_START( penbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)	// Coins Counter
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
-//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)   	// Protection
+//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound

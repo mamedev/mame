@@ -46,7 +46,7 @@ static int control_port_select;
 
 static WRITE8_HANDLER( battlera_sound_w )
 {
-	if (offset == 0) 
+	if (offset == 0)
 	{
 		soundlatch_w(space,0,data);
 		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
@@ -62,7 +62,7 @@ static WRITE8_HANDLER( control_data_w )
 
 static READ8_HANDLER( control_data_r )
 {
-	switch (control_port_select) 
+	switch (control_port_select)
 	{
 		case 0xfe: return input_port_read(space->machine, "IN0"); /* Player 1 */
 		case 0xfd: return input_port_read(space->machine, "IN1"); /* Player 2 */

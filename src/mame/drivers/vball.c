@@ -165,7 +165,7 @@ static WRITE8_HANDLER( vb_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x4000 * (data & 1))]);
 
-	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) 
+	if (vball_gfxset != ((data  & 0x20) ^ 0x20))
 	{
 		vball_gfxset = (data  & 0x20) ^ 0x20;
 			vb_mark_all_dirty();
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( vb_bankswitch_w )
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
-static WRITE8_HANDLER( cpu_sound_command_w ) 
+static WRITE8_HANDLER( cpu_sound_command_w )
 {
 	soundlatch_w(space, offset, data);
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);

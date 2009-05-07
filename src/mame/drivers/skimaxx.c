@@ -235,7 +235,7 @@ static MACHINE_RESET( skimaxx )
 static MACHINE_DRIVER_START( skimaxx )
 	MDRV_CPU_ADD("maincpu", M68020, XTAL_40MHz)	// TODO: Should be a 68030!
 	MDRV_CPU_PROGRAM_MAP(68030_1_map, 0)
-//	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("subcpu", M68020, XTAL_40MHz)
 	MDRV_CPU_PROGRAM_MAP(68030_2_map, 0)		// TODO: Should be a 68030!

@@ -127,8 +127,8 @@ static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
 	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE(&metlclsh_scrollx)
-//  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                        	// ? 0
-//  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                        	// ? 0 on startup only
+//  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
+//  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
 	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END

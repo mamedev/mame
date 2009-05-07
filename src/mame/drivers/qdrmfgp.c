@@ -314,8 +314,8 @@ static void gp2_ide_interrupt(const device_config *device, int state)
 				gp2_irq_control = 0;
 			else
 				cputag_set_input_line(device->machine, "maincpu", 5, HOLD_LINE);
-		} 
-		else 
+		}
+		else
 		{
 			cputag_set_input_line(device->machine, "maincpu", 5, CLEAR_LINE);
 		}

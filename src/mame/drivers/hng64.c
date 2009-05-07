@@ -629,7 +629,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 	mame_get_base_datetime(space->machine, &systime);
 
 	//if(((offset*4) & 0xff00) == 0x2100)
-	//	printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+	//  printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	switch(offset*4)
 	{
@@ -944,7 +944,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
-	
+
 	// 3d?
 //  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
 	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)		// 3D Display Buffer A

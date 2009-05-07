@@ -1138,7 +1138,7 @@ static ADDRESS_MAP_START( kokushi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll Regs - WRONG
-//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP   											// ? increasing
+//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                            // ? increasing
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause /  IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
@@ -1444,7 +1444,7 @@ static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_BASE(&metro_irq_levels)				// IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_BASE(&metro_irq_vectors)				// IRQ Vectors
 	AM_RANGE(0x478830, 0x478831) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
-//  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)							   	// IRQ Cause
+//  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)                             // IRQ Cause
 	AM_RANGE(0x478832, 0x478833) AM_WRITE(metro_irq_cause_w)							// IRQ Acknowledge
 	AM_RANGE(0x478836, 0x478837) AM_WRITENOP											// ? watchdog ?
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1683,7 +1683,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM													// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM 												// RAM
-//  AM_RANGE(0x300000, 0x300001) AM_READNOP               								// Sound
+//  AM_RANGE(0x300000, 0x300001) AM_READNOP                                             // Sound
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0)	// Layer 0
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2

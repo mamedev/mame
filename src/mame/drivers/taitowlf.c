@@ -324,7 +324,7 @@ static READ8_HANDLER(at_page8_r)
 {
 	UINT8 data = at_pages[offset % 0x10];
 
-	switch(offset % 8) 
+	switch(offset % 8)
 	{
 	case 1:
 		data = dma_offset[(offset / 8) & 1][2];
@@ -347,7 +347,7 @@ static WRITE8_HANDLER(at_page8_w)
 {
 	at_pages[offset % 0x10] = data;
 
-	switch(offset % 8) 
+	switch(offset % 8)
 	{
 	case 1:
 		dma_offset[(offset / 8) & 1][2] = data;
@@ -548,13 +548,13 @@ static MACHINE_RESET(taitowlf)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( taitowlf_pic8259_1_set_int_line ) 
+static PIC8259_SET_INT_LINE( taitowlf_pic8259_1_set_int_line )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
-static PIC8259_SET_INT_LINE( taitowlf_pic8259_2_set_int_line ) 
+static PIC8259_SET_INT_LINE( taitowlf_pic8259_2_set_int_line )
 {
 	pic8259_set_irq_line( taitowlf_devices.pic8259_1, 2, interrupt);
 }
@@ -656,7 +656,7 @@ static void ide_interrupt(const device_config *device, int state)
 	pic8259_set_irq_line(taitowlf_devices.pic8259_2, 6, state);
 }
 
-static int taitowlf_get_out2(running_machine *machine) 
+static int taitowlf_get_out2(running_machine *machine)
 {
 	return pit8253_get_output(taitowlf_devices.pit8254, 2 );
 }
@@ -666,7 +666,7 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, taitowlf_get_out2
 };
 
-static void taitowlf_set_keyb_int(running_machine *machine, int state) 
+static void taitowlf_set_keyb_int(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(taitowlf_devices.pic8259_1, 1, state);
 }

@@ -426,13 +426,13 @@ void itech32_update_interrupts(running_machine *machine, int vint, int xint, int
 	if (xint != -1) xint_state = xint;
 	if (qint != -1) qint_state = qint;
 
-	if (is_drivedge) 
+	if (is_drivedge)
 	{
 		cputag_set_input_line(machine, "maincpu", 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
 		cputag_set_input_line(machine, "maincpu", 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
 		cputag_set_input_line(machine, "maincpu", 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
-	} 
-	else 
+	}
+	else
 	{
 		cputag_set_input_line(machine, "maincpu", 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
 		cputag_set_input_line(machine, "maincpu", 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
