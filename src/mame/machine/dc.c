@@ -572,11 +572,13 @@ WRITE64_HANDLER( dc_maple_w )
 					port=(buff[0] >> 16) & 3;
 					pattern=(buff[0] >> 8) & 7;
 					length=buff[0] & 255;
+					//if(length == 0)
+					//	length = 0x100;
 					destination=buff[1];
 					command=buff[2] & 255;
 					dap=(buff[2] >> 8) & 255;
 					sap=(buff[2] >> 16) & 255;
-					buff[0]=0;
+					//buff[0]=0;
 					ddtdata.size=4;
 
 					if (pattern == 0)
@@ -663,8 +665,8 @@ WRITE64_HANDLER( dc_maple_w )
 									#if DEBUG_MAPLE
 									printf("MAPLE: sent jvs command %x\n", jvs_command);
 									#endif
-									buff[1] = 0xe4e3e2e1;
-									ddtdata.length = 2;
+									//buff[1] = 0xe4e3e2e1;
+									ddtdata.length = 0;//2;
 								}
 								else if (subcommand == 0x15) // get response from previous jvs command
 								{
