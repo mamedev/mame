@@ -579,6 +579,8 @@ WRITE64_HANDLER( dc_maple_w )
 					dap=(buff[2] >> 8) & 255;
 					sap=(buff[2] >> 16) & 255;
 					//buff[0]=0;
+					//if(buff[1] == 0x700)
+					//	printf("%08x %08x",buff[0],buff[2]);
 					ddtdata.size=4;
 
 					if (pattern == 0)
@@ -818,8 +820,9 @@ WRITE64_HANDLER( dc_maple_w )
 								#if DEBUG_MAPLE
 								printf("MAPLE: unknown transfer command %x port %x\n", command, port);
 								#endif
-								ddtdata.length=1;
-								buff[0]=0xffffffff;
+								ddtdata.length=0;
+								endflag = 1; /*TODO: check this */
+								//buff[0]=0xffffffff;
 								break;
 						}
 					}
