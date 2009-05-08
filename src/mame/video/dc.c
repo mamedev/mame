@@ -1641,7 +1641,7 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
-	float dy;
+//	float dy; // unused, compiler complains about this 
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
