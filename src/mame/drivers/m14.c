@@ -138,6 +138,7 @@ static READ8_HANDLER( input_buttons_r )
 	else        { return input_port_read(space->machine, "IN0"); }
 }
 
+#if 0
 static WRITE8_HANDLER( test_w )
 {
 	static UINT8 x[5];
@@ -146,6 +147,7 @@ static WRITE8_HANDLER( test_w )
 
 	popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 }
+#endif
 
 static WRITE8_HANDLER( hopper_w )
 {
@@ -170,11 +172,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") //AM_WRITENOP
-	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) //AM_WRITENOP
-	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) //AM_WRITENOP
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITENOP
+	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITENOP
+	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITENOP
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
-	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w) //at startup only?
+	AM_RANGE(0xf8, 0xfc) AM_WRITENOP
 ADDRESS_MAP_END
 
 /*************************************
