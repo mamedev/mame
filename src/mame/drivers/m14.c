@@ -7,7 +7,8 @@ driver by Angelo Salese
 TODO:
 - Check if the coin latch are correct and understand why the proper gameplay looks stiff;
 - Sound (very likely to be discrete);
-- What are the high 4 bits in the colorram for? They are used on the tiles only, left-over?
+- What are the high 4 bits in the colorram for? They are used on the mahjong tiles only,
+  left-over?
 
 ==============================================================================================
 x (Mystery Rom)
@@ -41,34 +42,75 @@ Dumped by Chackn
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 
+static tilemap *m14_tilemap;
+
+/*************************************
+ *
+ *  Video Hardware
+ *
+ *************************************/
+
+/* guess, might not be 100% accurate. */
+static PALETTE_INIT( m14 )
+{
+	int i;
+
+	for (i = 0; i < 0x20; i++)
+	{
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
+		else
+			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+
+		palette_set_color(machine, i, color);
+	}
+}
+
+static TILE_GET_INFO( m14_get_tile_info )
+{
+	int code = videoram[tile_index];
+	int color = colorram[tile_index] & 0xf;
+
+	/* colorram & 0xf0 used but unknown purpose*/
+
+	SET_TILE_INFO(
+			0,
+			code,
+			color,
+			0);
+}
+
 VIDEO_START( m14 )
 {
-
+	m14_tilemap = tilemap_create(machine, m14_get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 VIDEO_UPDATE( m14 )
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int count = 0;
-
-	int y,x;
-
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int tile = videoram[count];
-			int colour = colorram[count] & 0x0f;
-			/* bits 4-7? */
-
-			drawgfx(bitmap,gfx,tile,colour,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
-
-			count++;
-		}
-	}
+	tilemap_draw(bitmap,cliprect,m14_tilemap,0,0);
 	return 0;
 }
+
+
+static WRITE8_HANDLER( m14_vram_w )
+{
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(m14_tilemap,offset);
+}
+
+static WRITE8_HANDLER( m14_cram_w )
+{
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(m14_tilemap,offset);
+}
+
+/*************************************
+ *
+ *  I/O
+ *
+ *************************************/
 
 static READ8_HANDLER( m14_rng_r )
 {
@@ -85,11 +127,17 @@ static WRITE8_HANDLER( test_w )
 	//popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 }
 
+/*************************************
+ *
+ *  Memory Map
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( m14_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
@@ -100,6 +148,12 @@ static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
 	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w)
 ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Input Port Definitions
+ *
+ *************************************/
 
 static INPUT_CHANGED( left_coin_inserted )
 {
@@ -211,23 +265,6 @@ static const gfx_layout charlayout =
 static GFXDECODE_START( m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
-
-static PALETTE_INIT( m14 )
-{
-	int i;
-
-	for (i = 0; i < 0x20; i++)
-	{
-		rgb_t color;
-
-		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
-		else
-			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
-
-		palette_set_color(machine, i, color);
-	}
-}
 
 static INTERRUPT_GEN( m14_irq )
 {
