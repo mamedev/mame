@@ -502,7 +502,7 @@ DRIVER_INIT( hogalley )
 static READ8_HANDLER( vsgshoe_security_r )
 {
 	/* low part must be 0x1c */
-	return ppu2c0x_r( devtag_get_device(space->machine, "ppu"), 2 ) | 0x1c;
+	return ppu2c0x_r( devtag_get_device(space->machine, "ppu1"), 2 ) | 0x1c;
 }
 
 static WRITE8_HANDLER( vsgshoe_gun_in0_w )
@@ -784,7 +784,7 @@ DRIVER_INIT( cstlevna )
 static READ8_HANDLER( topgun_security_r )
 {
 	/* low part must be 0x1b */
-	return ppu2c0x_r( devtag_get_device(space->machine, "ppu"), 2 ) | 0x1b;
+	return ppu2c0x_r( devtag_get_device(space->machine, "ppu1"), 2 ) | 0x1b;
 }
 
 DRIVER_INIT( topgun )
@@ -1228,7 +1228,7 @@ DRIVER_INIT( bnglngby )
 static READ8_HANDLER( jajamaru_security_r )
 {
 	/* low part must be 0x40 */
-	return ppu2c0x_r( devtag_get_device(space->machine, "ppu"), 2 ) | 0x40;
+	return ppu2c0x_r( devtag_get_device(space->machine, "ppu1"), 2 ) | 0x40;
 }
 
 DRIVER_INIT( jajamaru )
@@ -1255,7 +1255,7 @@ DRIVER_INIT( jajamaru )
 static READ8_HANDLER( mightybj_security_r )
 {
 	/* low part must be 0x3d */
-	return ppu2c0x_r( devtag_get_device(space->machine, "ppu"), 2 ) | 0x3d;
+	return ppu2c0x_r( devtag_get_device(space->machine, "ppu1"), 2 ) | 0x3d;
 }
 
 DRIVER_INIT( mightybj )
