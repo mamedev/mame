@@ -4,7 +4,7 @@ Alien Command (c) 1993 Jaleco
 
 driver by Angelo Salese
 
-Similar (same?) to the Cisco Heat board type.
+Actually same HW as the Cisco Heat ones.
 
 TODO:
 -Understand what "devices" area needs to make this working.It's likely that the upper switches
@@ -14,7 +14,7 @@ controls the UFO's and the lower switches the astronauts.
 -Merge to the Cisco Heat driver.
 
 Notes:
--The real HW is a redemption machine with two guns,similar to the "Cosmo Gang the Video"
+-The real HW is a redemption machine with two guns, similar to the "Cosmo Gang the Video"
 (Namco) bonus games.
 
 m68k irq table vectors
@@ -103,8 +103,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int color = spriteram16[offs+7];
 			int w = (spriteram16[offs+0] & 0x0f);
 			int h = ((spriteram16[offs+0] & 0xf0) >> 4);
-			/*Unlike NMK16,the given Y offset is where the sprite must end instead
-            of where it starts.*/
 			int sy = (spriteram16[offs+4] & 0x0ff) - ((h+1)*0x10);
 /**/		int pri = spriteram16[offs+5];
 /**/		int flipy = ((spriteram16[offs+1] & 0x0200) >> 9);
@@ -545,7 +543,7 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( acommand )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x2700, 16 ) /*???*/
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x1800, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x0f00, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
