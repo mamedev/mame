@@ -341,9 +341,9 @@ $(MAMEOBJ)/shared.a: \
 #-------------------------------------------------
 
 $(MAMEOBJ)/alba.a: \
-	$(DRIVERS)/hanaroku.o \
+	$(DRIVERS)/albazc.o \
+	$(DRIVERS)/albazg.o \
 	$(DRIVERS)/rmhaihai.o \
-	$(DRIVERS)/yumefuda.o \
 
 $(MAMEOBJ)/alliedl.a: \
 	$(DRIVERS)/ace.o \

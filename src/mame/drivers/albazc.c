@@ -1,4 +1,4 @@
-/* Hanaroku */
+/* Hanaroku - Alba ZC HW */
 
 /*
 TODO:
@@ -212,7 +212,6 @@ static const gfx_layout hanaroku_charlayout =
 
 static GFXDECODE_START( hanaroku )
 	GFXDECODE_ENTRY( "gfx1", 0, hanaroku_charlayout,   0, 32  )
-
 GFXDECODE_END
 
 

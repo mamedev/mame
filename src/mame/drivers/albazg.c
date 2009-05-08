@@ -1,12 +1,12 @@
 /*******************************************************************************************
 
-Yumefuda (c) 1991 Alba
+ZG board (c) 1991 Alba
 
 driver by Angelo Salese
 
 Notes:
--I think the name of this hardware is "Alba ZG board",a newer revision of the
- "Alba ZC board" used by Hanaroku (hanaroku.c driver).Test mode says clearly that this is
+-The name of this hardware is "Alba ZG board",a newer revision of the
+ "Alba ZC board" used by Hanaroku (albazc.c driver). Test mode says clearly that this is
  from 1991.
 
 TODO:
