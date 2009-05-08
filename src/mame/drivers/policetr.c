@@ -121,7 +121,7 @@ static offs_t speedup_pc;
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cputag_set_input_line(machine, "audiocpu", R3000_IRQ5, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", R3000_IRQ5, ASSERT_LINE);
 }
 
 
