@@ -8,6 +8,7 @@
 #include "cpu/sh4/sh4.h"
 #include "render.h"
 #include "rendutil.h"
+#include "profiler.h"
 
 #include <math.h>
 
@@ -98,21 +99,21 @@ typedef struct {
 static pvrta_state state_ta;
 
 // Multiply with alpha value in bits 31-24
-static UINT32 bla(UINT32 c, UINT32 a)
+INLINE UINT32 bla(UINT32 c, UINT32 a)
 {
 	a = a >> 24;
 	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
 }
 
 // Multiply with 1-alpha value in bits 31-24
-static UINT32 blia(UINT32 c, UINT32 a)
+INLINE UINT32 blia(UINT32 c, UINT32 a)
 {
 	a = 0x100 - (a >> 24);
 	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
 }
 
 // Per-component multiply with color value
-static UINT32 blc(UINT32 c1, UINT32 c2)
+INLINE UINT32 blc(UINT32 c1, UINT32 c2)
 {
 	UINT32 cr =
 		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) >> 8)  |
@@ -126,7 +127,7 @@ static UINT32 blc(UINT32 c1, UINT32 c2)
 }
 
 // Per-component multiply with 1-color value
-static UINT32 blic(UINT32 c1, UINT32 c2)
+INLINE UINT32 blic(UINT32 c1, UINT32 c2)
 {
 	UINT32 cr =
 		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) >> 8)  |
@@ -140,7 +141,7 @@ static UINT32 blic(UINT32 c1, UINT32 c2)
 }
 
 // Add two colors with saturation
-static UINT32 bls(UINT32 c1, UINT32 c2)
+INLINE UINT32 bls(UINT32 c1, UINT32 c2)
 {
 	UINT32 cr1, cr2;
 	cr1 = (c1 & 0x00ff00ff) + (c2 & 0x00ff00ff);
@@ -158,70 +159,70 @@ static UINT32 bls(UINT32 c1, UINT32 c2)
 }
 
 // All 64 blending modes, 3 top bits are source mode, 3 bottom bits are destination mode
-static UINT32 bl00(UINT32 s, UINT32 d) { return 0; }
-static UINT32 bl01(UINT32 s, UINT32 d) { return d; }
-static UINT32 bl02(UINT32 s, UINT32 d) { return blc(d, s); }
-static UINT32 bl03(UINT32 s, UINT32 d) { return blic(d, s); }
-static UINT32 bl04(UINT32 s, UINT32 d) { return bla(d, s); }
-static UINT32 bl05(UINT32 s, UINT32 d) { return blia(d, s); }
-static UINT32 bl06(UINT32 s, UINT32 d) { return bla(d, d); }
-static UINT32 bl07(UINT32 s, UINT32 d) { return blia(d, d); }
-static UINT32 bl10(UINT32 s, UINT32 d) { return s; }
-static UINT32 bl11(UINT32 s, UINT32 d) { return bls(s, d); }
-static UINT32 bl12(UINT32 s, UINT32 d) { return bls(s, blc(s, d)); }
-static UINT32 bl13(UINT32 s, UINT32 d) { return bls(s, blic(s, d)); }
-static UINT32 bl14(UINT32 s, UINT32 d) { return bls(s, bla(d, s)); }
-static UINT32 bl15(UINT32 s, UINT32 d) { return bls(s, blia(d, s)); }
-static UINT32 bl16(UINT32 s, UINT32 d) { return bls(s, bla(d, d)); }
-static UINT32 bl17(UINT32 s, UINT32 d) { return bls(s, blia(d, d)); }
-static UINT32 bl20(UINT32 s, UINT32 d) { return blc(d, s); }
-static UINT32 bl21(UINT32 s, UINT32 d) { return bls(blc(d, s), d); }
-static UINT32 bl22(UINT32 s, UINT32 d) { return bls(blc(d, s), blc(s, d)); }
-static UINT32 bl23(UINT32 s, UINT32 d) { return bls(blc(d, s), blic(s, d)); }
-static UINT32 bl24(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, s)); }
-static UINT32 bl25(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, s)); }
-static UINT32 bl26(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, d)); }
-static UINT32 bl27(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, d)); }
-static UINT32 bl30(UINT32 s, UINT32 d) { return blic(d, s); }
-static UINT32 bl31(UINT32 s, UINT32 d) { return bls(blic(d, s), d); }
-static UINT32 bl32(UINT32 s, UINT32 d) { return bls(blic(d, s), blc(s, d)); }
-static UINT32 bl33(UINT32 s, UINT32 d) { return bls(blic(d, s), blic(s, d)); }
-static UINT32 bl34(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, s)); }
-static UINT32 bl35(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, s)); }
-static UINT32 bl36(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, d)); }
-static UINT32 bl37(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, d)); }
-static UINT32 bl40(UINT32 s, UINT32 d) { return bla(s, s); }
-static UINT32 bl41(UINT32 s, UINT32 d) { return bls(bla(s, s), d); }
-static UINT32 bl42(UINT32 s, UINT32 d) { return bls(bla(s, s), blc(s, d)); }
-static UINT32 bl43(UINT32 s, UINT32 d) { return bls(bla(s, s), blic(s, d)); }
-static UINT32 bl44(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, s)); }
-static UINT32 bl45(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, s)); }
-static UINT32 bl46(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, d)); }
-static UINT32 bl47(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, d)); }
-static UINT32 bl50(UINT32 s, UINT32 d) { return blia(s, s); }
-static UINT32 bl51(UINT32 s, UINT32 d) { return bls(blia(s, s), d); }
-static UINT32 bl52(UINT32 s, UINT32 d) { return bls(blia(s, s), blc(s, d)); }
-static UINT32 bl53(UINT32 s, UINT32 d) { return bls(blia(s, s), blic(s, d)); }
-static UINT32 bl54(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, s)); }
-static UINT32 bl55(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, s)); }
-static UINT32 bl56(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, d)); }
-static UINT32 bl57(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, d)); }
-static UINT32 bl60(UINT32 s, UINT32 d) { return bla(s, d); }
-static UINT32 bl61(UINT32 s, UINT32 d) { return bls(bla(s, d), d); }
-static UINT32 bl62(UINT32 s, UINT32 d) { return bls(bla(s, d), blc(s, d)); }
-static UINT32 bl63(UINT32 s, UINT32 d) { return bls(bla(s, d), blic(s, d)); }
-static UINT32 bl64(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, s)); }
-static UINT32 bl65(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, s)); }
-static UINT32 bl66(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, d)); }
-static UINT32 bl67(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, d)); }
-static UINT32 bl70(UINT32 s, UINT32 d) { return blia(s, d); }
-static UINT32 bl71(UINT32 s, UINT32 d) { return bls(blia(s, d), d); }
-static UINT32 bl72(UINT32 s, UINT32 d) { return bls(blia(s, d), blc(s, d)); }
-static UINT32 bl73(UINT32 s, UINT32 d) { return bls(blia(s, d), blic(s, d)); }
-static UINT32 bl74(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, s)); }
-static UINT32 bl75(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, s)); }
-static UINT32 bl76(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, d)); }
-static UINT32 bl77(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, d)); }
+INLINE UINT32 bl00(UINT32 s, UINT32 d) { return 0; }
+INLINE UINT32 bl01(UINT32 s, UINT32 d) { return d; }
+INLINE UINT32 bl02(UINT32 s, UINT32 d) { return blc(d, s); }
+INLINE UINT32 bl03(UINT32 s, UINT32 d) { return blic(d, s); }
+INLINE UINT32 bl04(UINT32 s, UINT32 d) { return bla(d, s); }
+INLINE UINT32 bl05(UINT32 s, UINT32 d) { return blia(d, s); }
+INLINE UINT32 bl06(UINT32 s, UINT32 d) { return bla(d, d); }
+INLINE UINT32 bl07(UINT32 s, UINT32 d) { return blia(d, d); }
+INLINE UINT32 bl10(UINT32 s, UINT32 d) { return s; }
+INLINE UINT32 bl11(UINT32 s, UINT32 d) { return bls(s, d); }
+INLINE UINT32 bl12(UINT32 s, UINT32 d) { return bls(s, blc(s, d)); }
+INLINE UINT32 bl13(UINT32 s, UINT32 d) { return bls(s, blic(s, d)); }
+INLINE UINT32 bl14(UINT32 s, UINT32 d) { return bls(s, bla(d, s)); }
+INLINE UINT32 bl15(UINT32 s, UINT32 d) { return bls(s, blia(d, s)); }
+INLINE UINT32 bl16(UINT32 s, UINT32 d) { return bls(s, bla(d, d)); }
+INLINE UINT32 bl17(UINT32 s, UINT32 d) { return bls(s, blia(d, d)); }
+INLINE UINT32 bl20(UINT32 s, UINT32 d) { return blc(d, s); }
+INLINE UINT32 bl21(UINT32 s, UINT32 d) { return bls(blc(d, s), d); }
+INLINE UINT32 bl22(UINT32 s, UINT32 d) { return bls(blc(d, s), blc(s, d)); }
+INLINE UINT32 bl23(UINT32 s, UINT32 d) { return bls(blc(d, s), blic(s, d)); }
+INLINE UINT32 bl24(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, s)); }
+INLINE UINT32 bl25(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, s)); }
+INLINE UINT32 bl26(UINT32 s, UINT32 d) { return bls(blc(d, s), bla(d, d)); }
+INLINE UINT32 bl27(UINT32 s, UINT32 d) { return bls(blc(d, s), blia(d, d)); }
+INLINE UINT32 bl30(UINT32 s, UINT32 d) { return blic(d, s); }
+INLINE UINT32 bl31(UINT32 s, UINT32 d) { return bls(blic(d, s), d); }
+INLINE UINT32 bl32(UINT32 s, UINT32 d) { return bls(blic(d, s), blc(s, d)); }
+INLINE UINT32 bl33(UINT32 s, UINT32 d) { return bls(blic(d, s), blic(s, d)); }
+INLINE UINT32 bl34(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, s)); }
+INLINE UINT32 bl35(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, s)); }
+INLINE UINT32 bl36(UINT32 s, UINT32 d) { return bls(blic(d, s), bla(d, d)); }
+INLINE UINT32 bl37(UINT32 s, UINT32 d) { return bls(blic(d, s), blia(d, d)); }
+INLINE UINT32 bl40(UINT32 s, UINT32 d) { return bla(s, s); }
+INLINE UINT32 bl41(UINT32 s, UINT32 d) { return bls(bla(s, s), d); }
+INLINE UINT32 bl42(UINT32 s, UINT32 d) { return bls(bla(s, s), blc(s, d)); }
+INLINE UINT32 bl43(UINT32 s, UINT32 d) { return bls(bla(s, s), blic(s, d)); }
+INLINE UINT32 bl44(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, s)); }
+INLINE UINT32 bl45(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, s)); }
+INLINE UINT32 bl46(UINT32 s, UINT32 d) { return bls(bla(s, s), bla(d, d)); }
+INLINE UINT32 bl47(UINT32 s, UINT32 d) { return bls(bla(s, s), blia(d, d)); }
+INLINE UINT32 bl50(UINT32 s, UINT32 d) { return blia(s, s); }
+INLINE UINT32 bl51(UINT32 s, UINT32 d) { return bls(blia(s, s), d); }
+INLINE UINT32 bl52(UINT32 s, UINT32 d) { return bls(blia(s, s), blc(s, d)); }
+INLINE UINT32 bl53(UINT32 s, UINT32 d) { return bls(blia(s, s), blic(s, d)); }
+INLINE UINT32 bl54(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, s)); }
+INLINE UINT32 bl55(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, s)); }
+INLINE UINT32 bl56(UINT32 s, UINT32 d) { return bls(blia(s, s), bla(d, d)); }
+INLINE UINT32 bl57(UINT32 s, UINT32 d) { return bls(blia(s, s), blia(d, d)); }
+INLINE UINT32 bl60(UINT32 s, UINT32 d) { return bla(s, d); }
+INLINE UINT32 bl61(UINT32 s, UINT32 d) { return bls(bla(s, d), d); }
+INLINE UINT32 bl62(UINT32 s, UINT32 d) { return bls(bla(s, d), blc(s, d)); }
+INLINE UINT32 bl63(UINT32 s, UINT32 d) { return bls(bla(s, d), blic(s, d)); }
+INLINE UINT32 bl64(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, s)); }
+INLINE UINT32 bl65(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, s)); }
+INLINE UINT32 bl66(UINT32 s, UINT32 d) { return bls(bla(s, d), bla(d, d)); }
+INLINE UINT32 bl67(UINT32 s, UINT32 d) { return bls(bla(s, d), blia(d, d)); }
+INLINE UINT32 bl70(UINT32 s, UINT32 d) { return blia(s, d); }
+INLINE UINT32 bl71(UINT32 s, UINT32 d) { return bls(blia(s, d), d); }
+INLINE UINT32 bl72(UINT32 s, UINT32 d) { return bls(blia(s, d), blc(s, d)); }
+INLINE UINT32 bl73(UINT32 s, UINT32 d) { return bls(blia(s, d), blic(s, d)); }
+INLINE UINT32 bl74(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, s)); }
+INLINE UINT32 bl75(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, s)); }
+INLINE UINT32 bl76(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, d)); }
+INLINE UINT32 bl77(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, d)); }
 
 static UINT32 (*blend_functions[64])(UINT32 s, UINT32 d) = {
 	bl00, bl01, bl02, bl03, bl04, bl05, bl06, bl07,
@@ -303,7 +304,7 @@ INLINE UINT32 cv_yuv(UINT16 c1, UINT16 c2, int x)
 }
 
 
-static UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -313,7 +314,7 @@ static UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
 	return cv_yuv(c1, c2, xt);
 }
 
-static UINT32 tex_r_1555_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -321,7 +322,7 @@ static UINT32 tex_r_1555_n(texinfo *t, float x, float y)
 	return cv_1555z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -329,7 +330,7 @@ static UINT32 tex_r_1555_tw(texinfo *t, float x, float y)
 	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -338,7 +339,7 @@ static UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
 	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_565_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -346,7 +347,7 @@ static UINT32 tex_r_565_n(texinfo *t, float x, float y)
 	return cv_565z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -354,7 +355,7 @@ static UINT32 tex_r_565_tw(texinfo *t, float x, float y)
 	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -363,7 +364,7 @@ static UINT32 tex_r_565_vq(texinfo *t, float x, float y)
 	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_4444_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -371,7 +372,7 @@ static UINT32 tex_r_4444_n(texinfo *t, float x, float y)
 	return cv_4444z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -379,7 +380,7 @@ static UINT32 tex_r_4444_tw(texinfo *t, float x, float y)
 	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -388,7 +389,7 @@ static UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
 	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-static UINT32 tex_r_p4_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_1555_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -398,7 +399,7 @@ static UINT32 tex_r_p4_1555_tw(texinfo *t, float x, float y)
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -408,7 +409,7 @@ static UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_565_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -418,7 +419,7 @@ static UINT32 tex_r_p4_565_tw(texinfo *t, float x, float y)
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -428,7 +429,7 @@ static UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_4444_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -438,7 +439,7 @@ static UINT32 tex_r_p4_4444_tw(texinfo *t, float x, float y)
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -448,7 +449,7 @@ static UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p4_8888_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_8888_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -458,7 +459,7 @@ static UINT32 tex_r_p4_8888_tw(texinfo *t, float x, float y)
 	return pvrta_regs[t->palbase + c];
 }
 
-static UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -468,7 +469,7 @@ static UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
 	return pvrta_regs[t->palbase + c];
 }
 
-static UINT32 tex_r_p8_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_1555_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -477,7 +478,7 @@ static UINT32 tex_r_p8_1555_tw(texinfo *t, float x, float y)
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -487,7 +488,7 @@ static UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
 	return cv_1555(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_565_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -496,7 +497,7 @@ static UINT32 tex_r_p8_565_tw(texinfo *t, float x, float y)
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -506,7 +507,7 @@ static UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
 	return cv_565(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_4444_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -515,7 +516,7 @@ static UINT32 tex_r_p8_4444_tw(texinfo *t, float x, float y)
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -525,7 +526,7 @@ static UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
 	return cv_4444(pvrta_regs[t->palbase + c]);
 }
 
-static UINT32 tex_r_p8_8888_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_8888_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -534,7 +535,7 @@ static UINT32 tex_r_p8_8888_tw(texinfo *t, float x, float y)
 	return pvrta_regs[t->palbase + c];
 }
 
-static UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
@@ -545,7 +546,7 @@ static UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
 }
 
 
-static UINT32 tex_r_default(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_default(texinfo *t, float x, float y)
 {
 	return ((int)x ^ (int)y) & 4 ? 0xffffff00 : 0xff0000ff;
 }
@@ -943,6 +944,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		}
 		break;
 	case STARTRENDER:
+		profiler_mark(PROFILER_USER1);	
 		#if DEBUG_PVRTA
 		mame_printf_verbose("Start Render Received:\n");
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
@@ -1079,6 +1081,8 @@ WRITE64_HANDLER( pvr_ta_w )
 		state_ta.grab[state_ta.grabsel].valid=1;
 		state_ta.grab[state_ta.grabsel].verts_size=0;
 		state_ta.grab[state_ta.grabsel].strips_size=0;
+
+		profiler_mark(PROFILER_END);
 		break;
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
@@ -1493,8 +1497,8 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	if(xr < 0 || xl >= 640)
 		return;
 
-	xxl = (int)round(xl);
-	xxr = (int)round(xr);
+	xxl = round(xl);
+	xxr = round(xr);
 
 	if(xxl == xxr)
 		return;
@@ -1573,8 +1577,8 @@ void render_span(bitmap_t *bitmap, texinfo *ti,
 		y0 = 0;
 	}
 
-	yy0 = (int)round(y0);
-	yy1 = (int)round(y1);
+	yy0 = round(y0);
+	yy1 = round(y1);
 
 	dy = yy0+0.5-y0;
 
