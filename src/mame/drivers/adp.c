@@ -506,14 +506,12 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 INPUT_PORTS_END
-
 /*
 static INTERRUPT_GEN( adp_int )
 {
     cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
-
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
@@ -538,7 +536,7 @@ static MACHINE_DRIVER_START( quickjac )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
 
@@ -566,7 +564,7 @@ static MACHINE_DRIVER_START( skattv )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
 
@@ -588,7 +586,7 @@ static MACHINE_DRIVER_START( backgamn )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
 
