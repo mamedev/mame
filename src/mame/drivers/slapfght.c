@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
-/* identical to slapfigh_ but writemem has different scroll registers */
+/* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
 static MACHINE_DRIVER_START( slapbtuk )
 
 	/* basic machine hardware */

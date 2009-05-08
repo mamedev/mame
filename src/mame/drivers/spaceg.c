@@ -294,7 +294,7 @@ static VIDEO_UPDATE( spaceg )
 }
 
 
-static ADDRESS_MAP_START( readwritemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spaceg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( spaceg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,2500000)		 /* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(readwritemem,0)
+	MDRV_CPU_PROGRAM_MAP(spaceg_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* 60 Hz NMIs (verified) */
 
 	/* video hardware */

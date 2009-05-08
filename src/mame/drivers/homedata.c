@@ -586,15 +586,8 @@ static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mrokumei_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mrokumei_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( mrokumei_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP	/* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
 ADDRESS_MAP_END
@@ -606,23 +599,14 @@ ADDRESS_MAP_END
 
 /********************************************************************************/
 
-static ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_RAM) /* videoram */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM) /* work ram */
-	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
+	AM_RANGE(0x7800, 0x7800) AM_RAM	/* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(reikaids_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(SMH_RAM)	/* behaves as normal RAM */
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITE(SMH_RAM) AM_BASE(&homedata_vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
@@ -630,17 +614,13 @@ static ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(reikaids_snd_command_w)
 	AM_RANGE(0x8005, 0x8005) AM_WRITE(reikaids_gfx_bank_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reikaids_upd7807_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( reikaids_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK(2)	/* External ROM (Banked) */
+	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
@@ -653,23 +633,14 @@ ADDRESS_MAP_END
 /**************************************************************************/
 
 
-static ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM) /* work ram */
-	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( pteacher_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(pteacher_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x5eff) AM_RAM
+	AM_RANGE(0x5f00, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
+	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(pteacher_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x5eff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5f00, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(SMH_RAM)	/* behaves as normal RAM */
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITE(SMH_RAM) AM_BASE(&homedata_vreg)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
@@ -677,18 +648,14 @@ static ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8005, 0x8005) AM_WRITE(pteacher_blitter_bank_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(pteacher_gfx_bank_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pteacher_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pteacher_upd7807_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pteacher_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
-	AM_RANGE(0x0000, 0xfeff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK(1)	/* External ROM (Banked) */
+	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1209,7 +1176,7 @@ static MACHINE_DRIVER_START( mrokumei )
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_readmem,mrokumei_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_map,0)
 	MDRV_CPU_IO_MAP(mrokumei_sound_io_map,0)
 
 	/* video hardware */
@@ -1268,12 +1235,12 @@ static MACHINE_DRIVER_START( reikaids )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
+	MDRV_CPU_PROGRAM_MAP(reikaids_map,0)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
+	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_map,0)
 	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 
@@ -1318,12 +1285,12 @@ static MACHINE_DRIVER_START( pteacher )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
+	MDRV_CPU_PROGRAM_MAP(pteacher_map,0)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
+	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_map,0)
 	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 

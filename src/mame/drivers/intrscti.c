@@ -21,18 +21,11 @@ static READ8_HANDLER( unk_r )
 
 static UINT8 *intrscti_ram;
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM) AM_BASE(&intrscti_ram) // video ram
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( intrscti_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&intrscti_ram) // video ram
+	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
@@ -90,7 +83,7 @@ static VIDEO_UPDATE(intrscti)
 static MACHINE_DRIVER_START( intrscti )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(intrscti_map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

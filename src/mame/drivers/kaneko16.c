@@ -616,61 +616,52 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START( gtmr_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0ffffd) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r				)	// Wheel Value
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM					)	// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// Shared With MCU
-	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x310000, 0x327fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0x500000, 0x503fff) AM_READ(SMH_RAM					)	// Layers 0
-	AM_RANGE(0x580000, 0x583fff) AM_READ(SMH_RAM					)	// Layers 1
-	AM_RANGE(0x600000, 0x60000f) AM_READ(SMH_RAM					)	// Layers 0 Regs
-	AM_RANGE(0x680000, 0x68000f) AM_READ(SMH_RAM					)	// Layers 1 Regs
-	AM_RANGE(0x700000, 0x70001f) AM_READ(kaneko16_sprites_regs_r	)	// Sprites Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREAD8("oki1", okim6295_r, 0x00ff	)	// Samples
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("oki2", okim6295_r, 0x00ff	)
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r			)	// Random Number ?
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(watchdog_reset16_r		)	// Watchdog
+static ADDRESS_MAP_START( gtmr_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0ffffd) AM_ROM																		// ROM
+	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r)														// Wheel Value
+
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// Work RAM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram)											// Shared With MCU
+
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w)												// To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
+
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x310000, 0x327fff) AM_RAM																		//
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)						// Sprites
+
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)					// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)					//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)										//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)										//
+
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_3_w) AM_BASE(&kaneko16_vram_3)					// Layers 1
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_2_w) AM_BASE(&kaneko16_vram_2)					//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_3)										//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_2)										//
+
+	AM_RANGE(0x600000, 0x60000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x680000, 0x68000f) AM_RAM_WRITE(kaneko16_layers_1_regs_w) AM_BASE(&kaneko16_layers_1_regs)	// Layers 1 Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)					// Samples
+	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ?
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
+
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r		)
-ADDRESS_MAP_END
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)											// Coin Lockout
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)											// might do more than that
 
-static ADDRESS_MAP_START( gtmr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM					)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM					)	// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&kaneko16_mcu_ram	)	// Shared With MCU
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w			)	// To MCU ?
-	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w			)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w			)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w			)
-	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x310000, 0x327fff) AM_WRITE(SMH_RAM												)	//
-	AM_RANGE(0x400000, 0x401fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size			)	// Sprites
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1				)	// Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0				)	//
-	AM_RANGE(0x502000, 0x502fff) AM_WRITE(SMH_RAM) AM_BASE(&kaneko16_vscroll_1					)	//
-	AM_RANGE(0x503000, 0x503fff) AM_WRITE(SMH_RAM) AM_BASE(&kaneko16_vscroll_0					)	//
-	AM_RANGE(0x580000, 0x580fff) AM_WRITE(kaneko16_vram_3_w) AM_BASE(&kaneko16_vram_3				)	// Layers 1
-	AM_RANGE(0x581000, 0x581fff) AM_WRITE(kaneko16_vram_2_w) AM_BASE(&kaneko16_vram_2				)	//
-	AM_RANGE(0x582000, 0x582fff) AM_WRITE(SMH_RAM) AM_BASE(&kaneko16_vscroll_3					)	//
-	AM_RANGE(0x583000, 0x583fff) AM_WRITE(SMH_RAM) AM_BASE(&kaneko16_vscroll_2					)	//
-	AM_RANGE(0x600000, 0x60000f) AM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs	)	// Layers 0 Regs
-	AM_RANGE(0x680000, 0x68000f) AM_WRITE(kaneko16_layers_1_regs_w) AM_BASE(&kaneko16_layers_1_regs	)	// Layers 1 Regs
-	AM_RANGE(0x700000, 0x70001f) AM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs	)	// Sprites Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff			)	// Samples
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff			)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(watchdog_reset16_w		)	// Watchdog
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w	)	// Coin Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable	)	// might do more than that
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("oki1", gtmr_oki_0_bank_w			)	// Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("oki2", gtmr_oki_1_bank_w			)
-ADDRESS_MAP_END
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
 
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("oki1", gtmr_oki_0_bank_w)										// Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("oki2", gtmr_oki_1_bank_w)
+ADDRESS_MAP_END
 
 /***************************************************************************
                             Great 1000 Miles Rally 2
@@ -698,31 +689,54 @@ static READ16_HANDLER( gtmr2_IN1_r )
 	return	(input_port_read(space->machine, "P2") & (input_port_read(space->machine, "FAKE") | ~0x7100));
 }
 
-static ADDRESS_MAP_START( gtmr2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0ffffd) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r				)	// Wheel Value
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM					)	// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// Shared With MCU
-	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x310000, 0x327fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0x500000, 0x503fff) AM_READ(SMH_RAM					)	// Layers 0
-	AM_RANGE(0x580000, 0x583fff) AM_READ(SMH_RAM					)	// Layers 1
-	AM_RANGE(0x600000, 0x60000f) AM_READ(SMH_RAM					)	// Layers 0 Regs
-	AM_RANGE(0x680000, 0x68000f) AM_READ(SMH_RAM					)	// Layers 1 Regs
-	AM_RANGE(0x700000, 0x70001f) AM_READ(kaneko16_sprites_regs_r	)	// Sprites Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREAD8("oki1", okim6295_r, 0x00ff	)	// Samples
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("oki2", okim6295_r, 0x00ff	)
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r			)	// Random Number ?
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(watchdog_reset16_r		)	// Watchdog
+static ADDRESS_MAP_START( gtmr2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0ffffd) AM_ROM // ROM
+	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r)	// Wheel Value
+
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram) // Shared With MCU
+
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(toybox_mcu_com0_w)	// To MCU ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
+
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x310000, 0x327fff) AM_RAM //
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) // Sprites
+
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)	//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)	//
+
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_3_w) AM_BASE(&kaneko16_vram_3)	// Layers 1
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_2_w) AM_BASE(&kaneko16_vram_2)	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_3)	//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_2)	//
+	AM_RANGE(0x600000, 0x60000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
+
+	AM_RANGE(0x680000, 0x68000f) AM_RAM_WRITE(kaneko16_layers_1_regs_w) AM_BASE(&kaneko16_layers_1_regs)	// Layers 1 Regs
+	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(kaneko16_sprites_regs_r, kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs)	// Sprites Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)	// Samples
+	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
+
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
+
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 //  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ(gtmr2_IN1_r		)
+	AM_RANGE(0xb00002, 0xb00003) AM_READ(gtmr2_IN1_r)
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r		)
-ADDRESS_MAP_END
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)	// might do more than that
 
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
+
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("oki1", gtmr_oki_0_bank_w)	// Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("oki2", gtmr_oki_1_bank_w)
+ADDRESS_MAP_END
 
 /***************************************************************************
                                 Magical Crystal
@@ -1803,7 +1817,7 @@ static MACHINE_DRIVER_START( gtmr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gtmr_readmem,gtmr_writemem)
+	MDRV_CPU_PROGRAM_MAP(gtmr_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(gtmr)
@@ -1859,7 +1873,7 @@ static MACHINE_DRIVER_START( gtmr2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
-	MDRV_CPU_PROGRAM_MAP(gtmr2_readmem,gtmr_writemem)
+	MDRV_CPU_PROGRAM_MAP(gtmr2_map,0)
 MACHINE_DRIVER_END
 
 /***************************************************************************

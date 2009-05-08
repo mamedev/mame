@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( naughtyb )
 MACHINE_DRIVER_END
 
 
-/* Exactly the same but for the writemem handler */
+/* Exactly the same but for certain address writes */
 static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
