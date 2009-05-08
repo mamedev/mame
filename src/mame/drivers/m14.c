@@ -115,7 +115,7 @@ static WRITE8_HANDLER( m14_cram_w )
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return mame_rand(space->machine);
+	return (mame_rand(space->machine) & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
 }
 
 static WRITE8_HANDLER( test_w )
@@ -142,10 +142,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN1")
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE")
+	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")
 	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW")
 	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w)
 ADDRESS_MAP_END
 
@@ -168,59 +168,34 @@ static INPUT_CHANGED( right_coin_inserted )
 }
 
 static INPUT_PORTS_START( m14 )
-	PORT_START("IN0") // paddle?
-	PORT_DIPNAME( 0x01, 0x00, "IN0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("AN_PADDLE")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE  ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_REVERSE
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) //this affects the medal settings
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) //affects medal settings?
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Freeze" )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3") //this whole port is stored at work ram $2112.
+	//PORT_START("IN1")
+	/* 0x00-0x7f rng */
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("DSW") //this whole port is stored at work ram $2112.
 	PORT_DIPNAME( 0x01, 0x00, "Show available tiles" ) // debug mode for the rng?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
