@@ -1,14 +1,25 @@
-/********************************************************************************************
+/**********************************************************************************************
 
 M14 Hardware (c) 1979 Irem
 
 driver by Angelo Salese
 
 TODO:
-- Check if the coin latch are correct and understand why the proper gameplay looks stiff;
 - Sound (very likely to be discrete);
+- Colors might be not 100% accurate (needs screenshots from the real thing);
 - What are the high 4 bits in the colorram for? They are used on the mahjong tiles only,
-  left-over?
+  left-over or something more important?
+- I'm not sure about the hopper hook-up, it could also be that the player should press
+  start + button 1 + ron buttons (= 0x43) instead of being "automatic";
+- Inputs are grossly mapped;
+
+Notes:
+- If you call a ron but you don't have the right hand you'll automatically lose the match;
+- If you make the timer to run out, you'll lose the turn but you don't get any visible message
+  (presumably signaled by a sound effect);
+- As you could expect, the cpu hands are actually pre-determined, so you actually play alone
+  against a variable number of available tiles;
+
 
 ==============================================================================================
 x (Mystery Rom)
@@ -37,7 +48,7 @@ http://japump.i.am/
 Dumped by Chackn
 01/30/2000
 
-********************************************************************************************/
+**********************************************************************************************/
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
@@ -112,10 +123,19 @@ static WRITE8_HANDLER( m14_cram_w )
  *
  *************************************/
 
+static UINT8 hop_mux;
+
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
 	return (mame_rand(space->machine) & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
+}
+
+/* Here routes the hopper & the inputs */
+static READ8_HANDLER( input_buttons_r )
+{
+	if(hop_mux) { hop_mux = 0; return 0; } //0x43 status bits
+	else        { return input_port_read(space->machine, "IN0"); }
 }
 
 static WRITE8_HANDLER( test_w )
@@ -124,7 +144,15 @@ static WRITE8_HANDLER( test_w )
 
 	x[offset] = data;
 
-	//popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
+	popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
+}
+
+static WRITE8_HANDLER( hopper_w )
+{
+	/* ---- x--- coin out */
+	/* ---- --x- hopper/input mux? */
+	hop_mux = data & 2;
+	//popmessage("%02x",data);
 }
 
 /*************************************
@@ -142,11 +170,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")
-	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW")
-	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") //AM_WRITENOP
+	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) //AM_WRITENOP
+	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) //AM_WRITENOP
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
+	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w) //at startup only?
 ADDRESS_MAP_END
 
 /*************************************
@@ -158,13 +186,15 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( left_coin_inserted )
 {
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
-	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
 {
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
-	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
@@ -173,7 +203,7 @@ static INPUT_PORTS_START( m14 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) //could be reach too
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) //affects medal settings?
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -190,10 +220,6 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	//PORT_START("IN1")
-	/* 0x00-0x7f rng */
-	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("DSW") //this whole port is stored at work ram $2112.
 	PORT_DIPNAME( 0x01, 0x00, "Show available tiles" ) // debug mode for the rng?
@@ -222,8 +248,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0) //coin x 5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -271,8 +297,10 @@ static MACHINE_DRIVER_START( m14 )
 
 	/* sound hardware */
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+//	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+//	MDRV_SOUND_CONFIG_DISCRETE(m14)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -298,4 +326,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1979, ptrmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", GAME_NO_SOUND )
