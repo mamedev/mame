@@ -612,10 +612,28 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->address     = sa->textureaddress;
 	t->sizex       = sa->textureusize;
 	t->sizey       = sa->texturevsize;
-	t->mode        = sa->scanorder + (sa->vqcompressed<<1) + (sa->strideselect<<2);
+	t->mode        = sa->scanorder + (sa->vqcompressed<<1);
+	
+	/* Stride Select only valid when ScanOrder is 1 */
+	/* Guilty Gear XX Slash / Reload will have lots of broken gfx otherwise */
+	if (sa->scanorder)
+	{
+		t->mode += (sa->strideselect<<2);
+	}
+	
 	t->sizes       = sa->texturesizes;
 	t->pf          = sa->pixelformat;
-	t->mipmapped   = sa->mipmapped;
+
+	/* Mipmapped is ignored if scanorder is 0 */
+	if (!sa->scanorder)
+	{
+		t->mipmapped  = sa->mipmapped;
+	}
+	else
+	{
+		t->mipmapped  = 0;
+	}
+	
 	t->palette     = sa->paletteselector;
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
@@ -681,7 +699,6 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			break;
 		default:
 			miptype = 3; // ?
-
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_vq; t->address += 0x800; break;
 			case 1: t->r = tex_r_p4_565_vq;  t->address += 0x800; break;
@@ -707,7 +724,6 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			break;
 		default:
 			miptype = 3; // ?
-
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_vq; t->address += 0x800; break;
 			case 1: t->r = tex_r_p8_565_vq;  t->address += 0x800; break;
@@ -1442,7 +1458,8 @@ void process_ta_fifo(running_machine* machine)
 					tv->w=u2f(tafifo_buff[3]);
 					tv->u=u2f(tafifo_buff[4]);
 					tv->v=u2f(tafifo_buff[5]);
-
+					
+					
 					if((!rd->strips_size) ||
 					   rd->strips[rd->strips_size-1].evert != -1)
 					{
