@@ -219,8 +219,7 @@ static ADDRESS_MAP_START( freekckb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -719,7 +718,7 @@ ROM_START( pbillrd )
 	ROM_LOAD( "82s129.3c", 0x0500, 0x0100, CRC(cc1657e5) SHA1(358f20dce376c2389009f9673ce38b297af863f6) )
 ROM_END
 
-ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU modual */
+ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU module */
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "10626.8n",  0x00000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) ) /* encrypted */
 	ROM_LOAD( "10625.8r",  0x04000, 0x4000, CRC(8977c724) SHA1(f00835a04dc6fa7d8c1e382dace515f2aa7d6f44) ) /* encrypted */
@@ -960,17 +959,16 @@ ROM_END
 ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
  * the daughterboard also has an input for the spinner control the game uses,
- * Also note that roms 7 and 8 are encrypted, and the load order may be swapped or
- * otherwise wrong; It is also possible that the 7 and 8 labels were switched on
- * the files submitted. 7 is at location 8p, 8 at location 8n according to pcb pics.
+ * It is also possible that the 7 and 8 labels were switched on the files submitted;
+ * the load order as it is now is definitely correct, and opposite of the bootlegs.
+ * 7 is at location 8p, 8 at location 8n according to pcb pics.
  * An empty socket marked 27256 is at location 10n */
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
-	ROM_LOAD( "7.8p",   0x10000, 0x4000, CRC(43653909) SHA1(30f6666ba5c0f016299f462c4c07c81ee4832808) ) /* 27256 */
-	ROM_CONTINUE(        0x00000, 0x4000)
-	ROM_LOAD( "8.8n",   0x04000, 0x4000, NO_DUMP CRC(ab54d286) SHA1(897256b6709e1a4da9daba92b6bde39ccfccd8c1) ) /* 27128, dumped as all 0x00s, bad eprom */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.8n",   0x00000, 0x4000, NO_DUMP ) /* 27128, dumped as all 0x00s, bad eprom */
+	ROM_LOAD( "7.8p",   0x04000, 0x8000, CRC(43653909) SHA1(30f6666ba5c0f016299f462c4c07c81ee4832808) ) /* 27256 */
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
-	ROM_LOAD( "317-5002.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-5002.key", 0x0000, 0x2000, CRC(86a7e5f6) SHA1(3ff3a17c02eb5610182b6febfada4e8eca0c5eea) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD( "4.3k", 0x00000, 0x04000, CRC(8ed78981) SHA1(1f2c0584fcc6d04b042638c7b9a7e21fc560ca3d) )
@@ -1071,7 +1069,7 @@ ROM_END
 static DRIVER_INIT(gigasb)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	memory_set_decrypted_region(space, 0x0000, 0xbfff, memory_region(machine, "maincpu") + 0x10000);
 }
 
 
@@ -1082,10 +1080,7 @@ static DRIVER_INIT( pbillrds )
 
 static DRIVER_INIT( gigas )
 {
-	/* uncomment this next line and remove the two lines below it once the key is dumped */
-	//mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 2);
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", 0, 1);
 }
 
 
@@ -1097,7 +1092,7 @@ static DRIVER_INIT( gigas )
  *
  *************************************/
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT     COMPANY   FULLNAME        FLAGS  */
-GAME( 1986, gigas,    0,        gigas,    gigas,    gigas,    ROT270, "Sega", "Gigas", GAME_NOT_WORKING )
+GAME( 1986, gigas,    0,        gigas,    gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NOT_WORKING )
 GAME( 1986, gigasb,   gigas,    gigas,    gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL )
 GAME( 1986, oigas,    gigas ,   oigas,    gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL )
 GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL )
