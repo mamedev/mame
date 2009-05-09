@@ -778,8 +778,6 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	/* construct the standard map */
 	if (cpuconfig->address_map[spacenum] != NULL)
 		map_detokenize(map, driver, device->tag, cpuconfig->address_map[spacenum]);
-	if (cpuconfig->address_map2[spacenum] != NULL)
-		map_detokenize(map, driver, device->tag, cpuconfig->address_map2[spacenum]);
 
 	return map;
 }

@@ -63,8 +63,7 @@ struct _cpu_config
 {
 	cpu_type			type;						/* index for the CPU type */
 	UINT32				flags;						/* flags; see #defines below */
-	const addrmap_token *address_map[ADDRESS_SPACES]; /* 2 memory maps per address space */
-	const addrmap_token *address_map2[ADDRESS_SPACES]; /* 2 memory maps per address space */
+	const addrmap_token *address_map[ADDRESS_SPACES]; /* 1 memory map per address space */
 	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
 	int 				vblank_interrupts_per_frame;/* usually 1 */
 	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */

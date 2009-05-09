@@ -782,13 +782,6 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 			address_map_entry *entry;
 			address_map *map;
 
-			/* check to see that the same map is not used twice */
-			if (cpuconfig->address_map[spacenum] != NULL && cpuconfig->address_map[spacenum] == cpuconfig->address_map2[spacenum])
-			{
-				mame_printf_error("%s: %s uses identical memory maps for CPU '%s' spacenum %d\n", driver->source_file, driver->name, device->tag, spacenum);
-				error = TRUE;
-			}
-
 			/* construct the maps */
 			map = address_map_alloc(device, driver, spacenum);
 
