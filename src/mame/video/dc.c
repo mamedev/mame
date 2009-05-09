@@ -93,7 +93,7 @@ typedef struct {
 	UINT32 paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
 	UINT32 groupcontrol,groupen,striplen,userclip;
 	UINT32 objcontrol,shadow,volume,coltype,texture,offfset,gouraud,uv16bit;
-	UINT32 textureusize,texturevsize,texturesizes,textureaddress,scanorder,pixelformat;
+	UINT32 texturesizes,textureaddress,scanorder,pixelformat;
 	UINT32 blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
 	UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
@@ -610,8 +610,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	if (!t->textured) return;
 	
 	t->address     = sa->textureaddress;
-	t->sizex       = sa->textureusize;
-	t->sizey       = sa->texturevsize;
+	
+
+
+	
 	t->mode        = sa->scanorder + (sa->vqcompressed<<1);
 	
 	/* Stride Select only valid when ScanOrder is 1 */
@@ -621,7 +623,6 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		t->mode += (sa->strideselect<<2);
 	}
 	
-	t->sizes       = sa->texturesizes;
 	t->pf          = sa->pixelformat;
 
 	/* Mipmapped is ignored if scanorder is 0 */
@@ -633,6 +634,21 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	{
 		t->mipmapped  = 0;
 	}
+	
+	// Mipmapped textures are always square, ignore v size
+	if (t->mipmapped)
+	{	
+		t->sizes = (sa->texturesizes & 0x38) | ((sa->texturesizes & 0x38) >> 3);
+	}
+	else
+	{
+		t->sizes = sa->texturesizes;
+	}
+
+	
+	t->sizex = 1 << (3+((t->sizes >> 3) & 7));
+	t->sizey = 1 << (3+(t->sizes & 7));
+	
 	
 	t->palette     = sa->paletteselector;
 	t->blend_mode  = sa->blend_mode;
@@ -803,28 +819,28 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		static const int mipmap_4_8_offset[8] = { 0x00018, 0x00058, 0x00158, 0x00558, 0x01558, 0x05558, 0x15558, 0x55558 };  // 4bpp (4bit offset) / 8bpp (8bit offset)
 		static const int mipmap_np_offset[8] =  { 0x00030, 0x000B0, 0x002B0, 0x00AB0, 0x02AB0, 0x0AAB0, 0x2AAB0, 0xAAAB0 };  // nonpalette textures
 		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 }; // vq textures
-
+		
 		switch (miptype)
 		{
 
 			case 0: // 4bpp
 				//printf("4bpp\n");
-				t->address += mipmap_4_8_offset[t->sizes&7]>>1;
+				t->address += mipmap_4_8_offset[(t->sizes)&7]>>1;
 				break;
 
 			case 1: // 8bpp
 				//printf("8bpp\n");
-				t->address += mipmap_4_8_offset[t->sizes&7];
+				t->address += mipmap_4_8_offset[(t->sizes)&7];
 				break;
 
 			case 2: // nonpalette
 				//printf("np\n");
-				t->address += mipmap_np_offset[t->sizes&7];
+				t->address += mipmap_np_offset[(t->sizes)&7];
 				break;
 
 			case 3: // vq
 				//printf("vq\n");
-				t->address += mipmap_vq_offset[t->sizes&7];
+				t->address += mipmap_vq_offset[(t->sizes)&7];
 				break;
 		}
 	}
@@ -1330,8 +1346,8 @@ void process_ta_fifo(running_machine* machine)
 			state_ta.dcalcctrl=(tafifo_buff[1] >> 20) & 1;
 			state_ta.volumeinstruction=(tafifo_buff[1] >> 29) & 7;
 
-			state_ta.textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
-			state_ta.texturevsize=1 << (3+(tafifo_buff[2] & 7));
+			//state_ta.textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
+			//state_ta.texturevsize=1 << (3+(tafifo_buff[2] & 7));
 			state_ta.texturesizes=tafifo_buff[2] & 0x3f;
 			state_ta.blend_mode = tafifo_buff[2] >> 26;
 			state_ta.srcselect=(tafifo_buff[2] >> 25) & 1;
@@ -1356,7 +1372,7 @@ void process_ta_fifo(running_machine* machine)
 				state_ta.strideselect=(tafifo_buff[3] >> 25) & 1;
 				state_ta.paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Texture %d x %d at %08x format %d\n", state_ta.textureusize, state_ta.texturevsize, (tafifo_buff[3] & 0x1FFFFF) << 3, state_ta.pixelformat);
+				mame_printf_verbose(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, state_ta.pixelformat);
 				#endif
 			}
 			if (state_ta.paratype == 4)
