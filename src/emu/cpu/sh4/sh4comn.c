@@ -989,6 +989,10 @@ READ32_HANDLER( sh4_internal_r )
 		if (sh4->m[BCR2] & 1)
 			return (memory_read_dword_64le(sh4->io, SH4_IOPORT_4) & ~sh4->ioport4_direction) | (sh4->m[PDTRB] & sh4->ioport4_direction);
 		break;
+
+		// SCIF (UART with FIFO)
+	case SCFSR2:
+		return 0x60; //read-only status register
 	}
 	return sh4->m[offset];
 }
