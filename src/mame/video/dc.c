@@ -50,7 +50,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
-	int sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode;
+	int sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
 	UINT32 (*blend)(UINT32 s, UINT32 d);
@@ -98,7 +98,53 @@ typedef struct {
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
 } pvrta_state;
 
+enum
+{
+	TEX_FILTER_NEAREST = 0,
+	TEX_FILTER_BILINEAR,
+	TEX_FILTER_TRILINEAR_A,
+	TEX_FILTER_TRILINEAR_B
+};
+
 static pvrta_state state_ta;
+
+// Perform a standard bilinear filter across four pixels
+INLINE INT32 clamp(INT32 in, INT32 min, INT32 max)
+{
+	if(in < min) return min;
+	if(in > max) return max;
+	return in;
+}
+
+INLINE UINT32 bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v)
+{
+	float u_ratio = (float)((float)u - (int)u);
+	float v_ratio = (float)((float)v - (int)v);
+	float u_opposite = 1.0f - u_ratio;
+	float v_opposite = 1.0f - v_ratio;
+	UINT32 channel = 0;
+	UINT32 out = 0;
+	if(u < 0.0f)
+	{
+		u_opposite = 0.0f - u_ratio;
+		u_ratio = 1.0f + u_ratio;
+	}
+	if(v < 0.0f)
+	{
+		v_opposite = 0.0f - v_ratio;
+		v_ratio = 1.0f + v_ratio;
+	}
+	for(channel = 0; channel < 4; channel++)
+	{
+		INT32 p0 = (c0 >> (channel << 3)) & 0x000000ff;
+		INT32 p1 = (c1 >> (channel << 3)) & 0x000000ff;
+		INT32 p2 = (c2 >> (channel << 3)) & 0x000000ff;
+		INT32 p3 = (c3 >> (channel << 3)) & 0x000000ff;
+		out |= (UINT8)clamp((p0 * u_opposite + p1 * u_ratio) * v_opposite +
+		                    (p3 * u_opposite + p2 * u_ratio) * v_ratio, 0, 255) << (channel << 3);
+	}
+	return out;
+}
 
 // Multiply with alpha value in bits 31-24
 INLINE UINT32 bla(UINT32 c, UINT32 a)
@@ -556,16 +602,19 @@ INLINE UINT32 tex_r_default(texinfo *t, float x, float y)
 static void tex_get_info(texinfo *t, pvrta_state *sa)
 {
 	int miptype = 0;
-	
-	t->address    = sa->textureaddress;
-	t->sizex      = sa->textureusize;
-	t->sizey      = sa->texturevsize;
-	t->mode       = sa->scanorder + sa->vqcompressed*2;
-	t->sizes      = sa->texturesizes;
-	t->pf         = sa->pixelformat;
-	t->mipmapped  = sa->mipmapped;
-	t->palette    = sa->paletteselector;
-	t->blend_mode = sa->blend_mode;
+
+	t->address     = sa->textureaddress;
+	t->sizex       = sa->textureusize;
+	t->sizey       = sa->texturevsize;
+	t->mode        = sa->scanorder + sa->vqcompressed*2;
+	t->sizes       = sa->texturesizes;
+	t->pf          = sa->pixelformat;
+	t->mipmapped   = sa->mipmapped;
+	t->palette     = sa->paletteselector;
+	t->blend_mode  = sa->blend_mode;
+	t->filter_mode = sa->filtermode;
+	t->flip_u      = (sa->flipuv >> 1) & 1;
+	t->flip_v      = sa->flipuv & 1;
 
 	t->r = tex_r_default;
 	t->cd = dilatechose[t->sizes];
@@ -946,7 +995,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		}
 		break;
 	case STARTRENDER:
-		profiler_mark(PROFILER_USER1);	
+		profiler_mark(PROFILER_USER1);
 		#if DEBUG_PVRTA
 		mame_printf_verbose("Start Render Received:\n");
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
@@ -1531,7 +1580,25 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 			float u = ul/wl;
 			float v = vl/wl;
 
+			/*
+			if(ti->flip_u)
+			{
+				u = ti->sizex - u;
+			}
+
+			if(ti->flip_v)
+			{
+				v = ti->sizey - v;
+			}*/
+
 			c = ti->r(ti, u, v);
+			if(ti->filter_mode == TEX_FILTER_BILINEAR)
+			{
+				UINT32 c1 = ti->r(ti, u+1.0, v);
+				UINT32 c2 = ti->r(ti, u+1.0, v+1.0);
+				UINT32 c3 = ti->r(ti, u, v+1.0);
+				c = bilinear_filter(c, c1, c2, c3, u, v);
+			}
 
 			if(c & 0xff000000) {
 				*tdata = ti->blend(c, *tdata);
@@ -1647,7 +1714,7 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
-//	float dy; // unused, compiler complains about this 
+//	float dy; // unused, compiler complains about this
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
