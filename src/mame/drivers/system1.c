@@ -3303,7 +3303,7 @@ ROM_END
 */
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-    /* This rom is located on the daughter board .*/
+    /* This rom is located on the daughter board. */
 	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
     /* These roms are located on the main board. */
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
@@ -3315,7 +3315,7 @@ ROM_START( shtngmst )
 
     /* This mcu is located on the main board. */
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(2a301391ffeb38ce0ebba96b7fe2acde3097e220) )
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, "tiles", 0 )
@@ -3362,7 +3362,7 @@ ROM_END
 */
 ROM_START( shtngmst1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-    /* This rom is located on the daughter board .*/
+    /* This rom is located on the daughter board. */
 	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
     /* These roms are located on the main board. */
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
@@ -3374,7 +3374,7 @@ ROM_START( shtngmst1 )
 
     /* This mcu is located on the main board. */
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, "tiles", 0 )
