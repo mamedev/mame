@@ -679,7 +679,12 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_1555_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_1555_n;  miptype = 2; break;
-		default: t->r = tex_r_1555_vq; miptype = 3; t->address += 0x800; break;
+		case 2:
+		case 3:  t->r = tex_r_1555_vq; miptype = 3; t->address += 0x800; break;
+
+		default:
+			//
+			break;	
 		}
 		break;
 
@@ -687,7 +692,12 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_565_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_565_n;  miptype = 2; break;
-		default: t->r = tex_r_565_vq; miptype = 3; t->address += 0x800; break;
+		case 2:
+		case 3:  t->r = tex_r_565_vq; miptype = 3; t->address += 0x800; break;
+
+		default:
+			//
+			break;	
 		}
 		break;
 
@@ -695,7 +705,12 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_4444_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_4444_n;  miptype = 2; break;
-		default: t->r = tex_r_4444_vq; miptype = 3; t->address += 0x800; break;
+		case 2: 
+		case 3:  t->r = tex_r_4444_vq; miptype = 3; t->address += 0x800; break;
+
+		default:
+			//
+			break;	
 		}
 		break;
 
@@ -723,7 +738,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 3: t->r = tex_r_p4_8888_tw; break;
 			}
 			break;
-		default:
+		case 2: case 3:
 			miptype = 3; // ?
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_vq; t->address += 0x800; break;
@@ -732,6 +747,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 3: t->r = tex_r_p4_8888_vq; t->address += 0x800; break;
 			}
 			break;
+			
+		default:
+			//
+			break;	
 		}
 		break;
 
@@ -748,7 +767,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 3: t->r = tex_r_p8_8888_tw; break;
 			}
 			break;
-		default:
+		case 2: case 3:
 			miptype = 3; // ?
 			switch(pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_vq; t->address += 0x800; break;
@@ -756,6 +775,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 2: t->r = tex_r_p8_4444_vq; t->address += 0x800; break;
 			case 3: t->r = tex_r_p8_8888_vq; t->address += 0x800; break;
 			}
+			break;
+			
+		default:
+			//
 			break;
 		}
 		break;
