@@ -612,7 +612,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->address     = sa->textureaddress;
 	t->sizex       = sa->textureusize;
 	t->sizey       = sa->texturevsize;
-	t->mode        = sa->scanorder + sa->vqcompressed*2;
+	t->mode        = sa->scanorder + (sa->vqcompressed<<1) + (sa->strideselect<<2);
 	t->sizes       = sa->texturesizes;
 	t->pf          = sa->pixelformat;
 	t->mipmapped   = sa->mipmapped;
