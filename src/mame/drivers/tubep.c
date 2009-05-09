@@ -270,6 +270,7 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK( tubep_scanline_callback )
 {
 	int scanline = param;
+	static const char *const cputags[] = { "mcu", "nsc" };
 
 	curr_scanline = scanline;//for debugging
 
@@ -297,14 +298,14 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	{
 		logerror("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
-		cputag_set_input_line(machine, "nsc", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, cputags[(cputag_get_cpu(machine, "nsc") != NULL) ? 1 : 0], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		cputag_set_input_line(machine, "nsc", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine, cputags[(cputag_get_cpu(machine, "nsc") != NULL) ? 1 : 0], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
