@@ -12,6 +12,8 @@
 
 #include <math.h>
 
+#define round(x) floor((x) + 0.5)
+
 static int vblc=0;
 #define DEBUG_FIFO_POLY (0)
 #define DEBUG_PVRCTRL	(0)
