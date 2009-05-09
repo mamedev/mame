@@ -50,7 +50,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
-	int sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
+	int textured, sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
 	UINT32 (*blend)(UINT32 s, UINT32 d);
@@ -603,6 +603,11 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 {
 	int miptype = 0;
 
+	t->textured    = sa->texture;
+	
+	// not textured, abort.
+	if (!t->textured) return;
+	
 	t->address     = sa->textureaddress;
 	t->sizex       = sa->textureusize;
 	t->sizey       = sa->texturevsize;
@@ -1545,6 +1550,9 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 	UINT32 *tdata;
 	float *wbufline;
 
+	// untextured cases aren't handled
+	if (!ti->textured) return;
+	
 	if(xr < 0 || xl >= 640)
 		return;
 
@@ -1573,7 +1581,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 
 	tdata = BITMAP_ADDR32(bitmap, y, xxl);
 	wbufline = &wbuffer[y][xxl];
-
+	
 	while(xxl < xxr) {
 		if((wl >= *wbufline)) {
 			UINT32 c;
