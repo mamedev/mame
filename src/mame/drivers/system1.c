@@ -3304,7 +3304,7 @@ ROM_END
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, "maincpu", 0 )
     /* This rom is located on the daughter board. */
-	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
+	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, BAD_DUMP CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
     /* These roms are located on the main board. */
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
