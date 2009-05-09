@@ -620,7 +620,8 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	/* Guilty Gear XX Slash / Reload will have lots of broken gfx otherwise */
 	if (sa->scanorder)
 	{
-		t->mode += (sa->strideselect<<2);
+	// disasbled pending further invetigation, it *still* breaks some usagui intro stuff
+	//	t->mode += (sa->strideselect<<2);
 	}
 	
 	t->pf          = sa->pixelformat;
@@ -1638,7 +1639,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 			// debug dip to turn on/off bilinear filtering, it's slooooow
 			if (debug_dip_status&0x1)
 			{	
-				if(ti->filter_mode == TEX_FILTER_BILINEAR)
+				if(ti->filter_mode >= TEX_FILTER_BILINEAR)
 				{
 					UINT32 c1 = ti->r(ti, u+1.0, v);
 					UINT32 c2 = ti->r(ti, u+1.0, v+1.0);
