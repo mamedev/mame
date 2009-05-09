@@ -1483,7 +1483,7 @@ static void computedilated(void)
 			dilated1[b][a]=dilate1(a,b);
 		}
 	for (b=0;b <= 7;b++)
-		for (a=0;a < 7;a++)
+		for (a=0;a <= 7;a++)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
