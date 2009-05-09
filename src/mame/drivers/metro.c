@@ -5856,4 +5856,4 @@ GAME( 1999, batlbubl, bangball, batlbubl, batlbubl, balcube,  ROT0,   "Limenko",
 GAME( 1996, mouja,    0,        mouja,    mouja,    mouja,    ROT0,   "Etona",                                  "Mouja (Japan)",                     GAME_NO_COCKTAIL )
 GAME( 1997, gakusai,  0,        gakusai,  gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai (Japan)",         GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, gakusai2, 0,        gakusai2, gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai 2 (Japan)",       0 )
-GAME( 2000, puzzlet,  0,        puzzlet,  puzzlet,  puzzlet,  ROT0,   "Yunizu Corporation",                     "Puzzlet (Japan)",                   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, puzzlet,  0,        puzzlet,  puzzlet,  puzzlet,  ROT0,   "Unies Corporation",                      "Puzzlet (Japan)",                   GAME_NOT_WORKING | GAME_NO_SOUND )
