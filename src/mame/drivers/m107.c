@@ -439,11 +439,11 @@ static MACHINE_DRIVER_START( firebarr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 
 	MDRV_CPU_ADD("soundcpu", V30, 14318000/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_CONFIG(firebarr_config)
 
 	MDRV_MACHINE_START(m107)

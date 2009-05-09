@@ -137,7 +137,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( nitedrvr )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, 12096000/12) // 1 MHz
-	MDRV_CPU_PROGRAM_MAP(nitedrvr_map, 0)
+	MDRV_CPU_PROGRAM_MAP(nitedrvr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
 

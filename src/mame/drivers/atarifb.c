@@ -514,7 +514,7 @@ static MACHINE_DRIVER_START( atarifb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)
-	MDRV_CPU_PROGRAM_MAP(atarifb_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarifb_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
@@ -545,7 +545,7 @@ static MACHINE_DRIVER_START( atarifb4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(atarifb4_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarifb4_map)
 MACHINE_DRIVER_END
 
 
@@ -554,7 +554,7 @@ static MACHINE_DRIVER_START( abaseb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(abaseb_map,0)
+	MDRV_CPU_PROGRAM_MAP(abaseb_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(abaseb)
@@ -571,7 +571,7 @@ static MACHINE_DRIVER_START( soccer )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(soccer_map,0)
+	MDRV_CPU_PROGRAM_MAP(soccer_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

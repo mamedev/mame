@@ -3886,8 +3886,8 @@ MACHINE_DRIVER_START( megdsvp )
 	MDRV_IMPORT_FROM(megadriv)
 
 	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
-	MDRV_CPU_IO_MAP(svp_ext_map, 0)
+	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
+	MDRV_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_DRIVER_END
 
@@ -3895,8 +3895,8 @@ MACHINE_DRIVER_START( megdsvppal )
 	MDRV_IMPORT_FROM(megadpal)
 
 	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
-	MDRV_CPU_IO_MAP(svp_ext_map, 0)
+	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
+	MDRV_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_DRIVER_END
 
@@ -6184,12 +6184,12 @@ static NVRAM_HANDLER( megadriv )
 
 MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -6228,12 +6228,12 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( megadpal )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -6277,11 +6277,11 @@ MACHINE_DRIVER_START( genesis_32x )
 	MDRV_IMPORT_FROM(megadriv)
 
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
@@ -6297,11 +6297,11 @@ MACHINE_DRIVER_START( genesis_32x_pal )
 	MDRV_IMPORT_FROM(megadpal)
 
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
 MACHINE_DRIVER_END
@@ -6310,14 +6310,14 @@ MACHINE_DRIVER_START( genesis_scd )
 	MDRV_IMPORT_FROM(megadriv)
 
 	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map,0)
+	MDRV_CPU_PROGRAM_MAP(segacd_map)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( genesis_32x_scd )
 	MDRV_IMPORT_FROM(genesis_32x)
 
 	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map,0)
+	MDRV_CPU_PROGRAM_MAP(segacd_map)
 MACHINE_DRIVER_END
 
 

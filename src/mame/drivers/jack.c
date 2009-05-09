@@ -841,12 +841,12 @@ static MACHINE_DRIVER_START( jack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(jack_map,0)
+	MDRV_CPU_PROGRAM_MAP(jack_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* jack needs 1 or its too fast */
 
 	MDRV_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -894,7 +894,7 @@ static MACHINE_DRIVER_START( joinem )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jack)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
+	MDRV_CPU_PROGRAM_MAP(joinem_map)
 	MDRV_CPU_VBLANK_INT_HACK(joinem_interrupts,3)
 
 	MDRV_GFXDECODE(joinem)
@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( loverboy )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jack)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
+	MDRV_CPU_PROGRAM_MAP(joinem_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_GFXDECODE(joinem)

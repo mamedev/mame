@@ -1590,7 +1590,7 @@ static MACHINE_DRIVER_START( centiped )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
-	MDRV_CPU_PROGRAM_MAP(centiped_map,0)
+	MDRV_CPU_PROGRAM_MAP(centiped_map)
 
 	MDRV_MACHINE_START(centiped)
 	MDRV_MACHINE_RESET(centiped)
@@ -1637,7 +1637,7 @@ static MACHINE_DRIVER_START( centipdb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(centipdb_map,0)
+	MDRV_CPU_PROGRAM_MAP(centipdb_map)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
@@ -1664,7 +1664,7 @@ static MACHINE_DRIVER_START( milliped )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(milliped_map,0)
+	MDRV_CPU_PROGRAM_MAP(milliped_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(milliped)
@@ -1689,7 +1689,7 @@ static MACHINE_DRIVER_START( warlords )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(warlords_map,0)
+	MDRV_CPU_PROGRAM_MAP(warlords_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(warlords)
@@ -1711,7 +1711,7 @@ static MACHINE_DRIVER_START( mazeinv )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(milliped)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mazeinv_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazeinv_map)
 	MDRV_VIDEO_UPDATE(centiped)
 MACHINE_DRIVER_END
 
@@ -1720,8 +1720,8 @@ static MACHINE_DRIVER_START( bullsdrt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)
-	MDRV_CPU_PROGRAM_MAP(bullsdrt_map,0)
-	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(bullsdrt_map)
+	MDRV_CPU_IO_MAP(bullsdrt_port_map)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
 

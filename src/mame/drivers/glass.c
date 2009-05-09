@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( glass )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
-	MDRV_CPU_PROGRAM_MAP(glass_map,0)
+	MDRV_CPU_PROGRAM_MAP(glass_map)
 	MDRV_CPU_VBLANK_INT("screen", glass_interrupt)
 
 	MDRV_MACHINE_RESET(glass)

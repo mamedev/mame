@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( burglarx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(burglarx_map,0)
+	MDRV_CPU_PROGRAM_MAP(burglarx_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(unico)
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( zeropnt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(zeropnt_map,0)
+	MDRV_CPU_PROGRAM_MAP(zeropnt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(zeropt)
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( zeropnt2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(zeropnt2_map,0)
+	MDRV_CPU_PROGRAM_MAP(zeropnt2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(zeropt)

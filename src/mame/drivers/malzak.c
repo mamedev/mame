@@ -367,8 +367,8 @@ static MACHINE_DRIVER_START( malzak )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)
-	MDRV_CPU_PROGRAM_MAP(malzak_map,0)
-	MDRV_CPU_IO_MAP(malzak_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(malzak_map)
+	MDRV_CPU_IO_MAP(malzak_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( malzak2 )
 	MDRV_IMPORT_FROM( malzak )
 
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(malzak2_map,0)
+	MDRV_CPU_PROGRAM_MAP(malzak2_map)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 MACHINE_DRIVER_END

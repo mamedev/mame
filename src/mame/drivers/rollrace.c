@@ -214,11 +214,11 @@ static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rollrace_map,0)
+	MDRV_CPU_PROGRAM_MAP(rollrace_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rollrace_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rollrace_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */

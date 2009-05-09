@@ -307,11 +307,11 @@ static MACHINE_DRIVER_START( xxmissio )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4)	/* 3.0MHz */
-	MDRV_CPU_PROGRAM_MAP(map1,0)
+	MDRV_CPU_PROGRAM_MAP(map1)
 	MDRV_CPU_VBLANK_INT("screen", xxmissio_interrupt_m)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/4)	/* 3.0MHz */
-	MDRV_CPU_PROGRAM_MAP(map2,0)
+	MDRV_CPU_PROGRAM_MAP(map2)
 	MDRV_CPU_VBLANK_INT_HACK(xxmissio_interrupt_s,2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

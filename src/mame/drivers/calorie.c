@@ -362,12 +362,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( calorie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(calorie_map,0)
+	MDRV_CPU_PROGRAM_MAP(calorie_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(calorie_sound_map,0)
-	MDRV_CPU_IO_MAP(calorie_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(calorie_sound_map)
+	MDRV_CPU_IO_MAP(calorie_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 64)
 
 	/* video hardware */

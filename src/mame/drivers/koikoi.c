@@ -251,8 +251,8 @@ static MACHINE_DRIVER_START( koikoi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(koikoi_map, 0)
-	MDRV_CPU_IO_MAP(koikoi_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(koikoi_map)
+	MDRV_CPU_IO_MAP(koikoi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

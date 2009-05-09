@@ -474,20 +474,20 @@ static MACHINE_DRIVER_START( kingofb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_map,0)
+	MDRV_CPU_PROGRAM_MAP(kingobox_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_video_map,0)
+	MDRV_CPU_PROGRAM_MAP(kingobox_video_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sprite_map,0)
+	MDRV_CPU_PROGRAM_MAP(kingobox_sprite_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map,0)
-	MDRV_CPU_IO_MAP(ringking_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map)
+	MDRV_CPU_IO_MAP(ringking_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
@@ -524,20 +524,20 @@ static MACHINE_DRIVER_START( ringking )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_map,0)
+	MDRV_CPU_PROGRAM_MAP(ringking_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_video_map,0)
+	MDRV_CPU_PROGRAM_MAP(ringking_video_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_sprite_map,0)
+	MDRV_CPU_PROGRAM_MAP(ringking_sprite_map)
 	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map,0)
-	MDRV_CPU_IO_MAP(ringking_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map)
+	MDRV_CPU_IO_MAP(ringking_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */

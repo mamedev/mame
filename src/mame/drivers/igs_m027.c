@@ -367,7 +367,7 @@ static INTERRUPT_GEN( igs_majhong_interrupt )
 static MACHINE_DRIVER_START( igs_majhong )
 	MDRV_CPU_ADD("maincpu",ARM7, 20000000)
 
-	MDRV_CPU_PROGRAM_MAP(igs_majhong_map,0)
+	MDRV_CPU_PROGRAM_MAP(igs_majhong_map)
 
 	MDRV_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
 	//MDRV_NVRAM_HANDLER(generic_0fill)

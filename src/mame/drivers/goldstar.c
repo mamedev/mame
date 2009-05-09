@@ -4366,8 +4366,8 @@ static MACHINE_DRIVER_START( goldstar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
-	MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(goldstar_map)
+	MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -4402,8 +4402,8 @@ static MACHINE_DRIVER_START( goldstbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
-	MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(goldstar_map)
+	MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -4437,8 +4437,8 @@ static MACHINE_DRIVER_START( moonlght )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
-	MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(goldstar_map)
+	MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -4533,8 +4533,8 @@ static MACHINE_DRIVER_START( chrygld )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
-	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
+	MDRV_CPU_PROGRAM_MAP(ncb3_map)
+	MDRV_CPU_IO_MAP(ncb3_readwriteport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
@@ -4575,8 +4575,8 @@ static MACHINE_DRIVER_START( ncb3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
-	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
+	MDRV_CPU_PROGRAM_MAP(ncb3_map)
+	MDRV_CPU_IO_MAP(ncb3_readwriteport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
@@ -4617,8 +4617,8 @@ static MACHINE_DRIVER_START( cm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map,0)
-	MDRV_CPU_IO_MAP(cm_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(cm_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4659,8 +4659,8 @@ static MACHINE_DRIVER_START( cmnobmp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map,0)
-	MDRV_CPU_IO_MAP(cm_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(cm_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4694,8 +4694,8 @@ static MACHINE_DRIVER_START( cmast91 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map,0)
-	MDRV_CPU_IO_MAP(cmast91_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(cmast91_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4729,8 +4729,8 @@ static MACHINE_DRIVER_START( lucky8 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(lucky8_map,0)
-	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(lucky8_map)
+	//MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 3x 8255 */
@@ -4771,8 +4771,8 @@ static MACHINE_DRIVER_START( kkojnoli )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(kkojnoli_map,0)
-	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(kkojnoli_map)
+	//MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 
@@ -4809,8 +4809,8 @@ static MACHINE_DRIVER_START( ladylinr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ladylinr_map,0)
-	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_PROGRAM_MAP(ladylinr_map)
+	//MDRV_CPU_IO_MAP(goldstar_readport)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 2x 8255 */
@@ -4850,8 +4850,8 @@ static MACHINE_DRIVER_START( amcoe1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
-	MDRV_CPU_IO_MAP(amcoe1_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(amcoe1_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4891,8 +4891,8 @@ static MACHINE_DRIVER_START( amcoe1a )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
-	MDRV_CPU_IO_MAP(amcoe1_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(amcoe1_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4932,8 +4932,8 @@ static MACHINE_DRIVER_START( amcoe2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
-	MDRV_CPU_IO_MAP(amcoe2_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(cm_map)
+	MDRV_CPU_IO_MAP(amcoe2_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
@@ -4967,8 +4967,8 @@ static MACHINE_DRIVER_START( nfm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(nfm_map, 0)
-	MDRV_CPU_IO_MAP(amcoe2_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(nfm_map)
+	MDRV_CPU_IO_MAP(amcoe2_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */

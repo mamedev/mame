@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( mquake )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(mquake)
 	MDRV_NVRAM_HANDLER(generic_0fill)

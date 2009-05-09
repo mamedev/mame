@@ -569,16 +569,16 @@ static MACHINE_DRIVER_START( fromanc2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
 
 	MDRV_MACHINE_RESET(fromanc2)
@@ -621,16 +621,16 @@ static MACHINE_DRIVER_START( fromancr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromancr_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromancr_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
 	MDRV_MACHINE_RESET(fromancr)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -672,12 +672,12 @@ static MACHINE_DRIVER_START( fromanc4 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_MACHINE_RESET(fromanc4)
 	MDRV_NVRAM_HANDLER(93C46)

@@ -1082,7 +1082,7 @@ static MACHINE_DRIVER_START( panic )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(panic_map,0)
+	MDRV_CPU_PROGRAM_MAP(panic_map)
 	MDRV_CPU_VBLANK_INT_HACK(panic_interrupt,2)
 
 	/* video hardware */
@@ -1110,7 +1110,7 @@ static MACHINE_DRIVER_START( cosmica )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(cosmica_map,0)
+	MDRV_CPU_PROGRAM_MAP(cosmica_map)
 	MDRV_CPU_VBLANK_INT_HACK(cosmica_interrupt,32)
 
 	/* video hardware */
@@ -1141,8 +1141,8 @@ static MACHINE_DRIVER_START( cosmicg )
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
             1.5MHz.  So, if someone can check this... */
-	MDRV_CPU_PROGRAM_MAP(cosmicg_map,0)
-	MDRV_CPU_IO_MAP(cosmicg_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cosmicg_map)
+	MDRV_CPU_IO_MAP(cosmicg_io_map)
 	MDRV_CPU_VBLANK_INT("screen", cosmicg_interrupt)
 
 	/* video hardware */
@@ -1175,7 +1175,7 @@ static MACHINE_DRIVER_START( magspot )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(magspot_map,0)
+	MDRV_CPU_PROGRAM_MAP(magspot_map)
 	MDRV_CPU_VBLANK_INT("screen", magspot_interrupt)
 
 	/* video hardware */
@@ -1209,7 +1209,7 @@ static MACHINE_DRIVER_START( nomnlnd )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(magspot_map,0)
+	MDRV_CPU_PROGRAM_MAP(magspot_map)
 	MDRV_CPU_VBLANK_INT("screen", nomnlnd_interrupt)
 
 	/* video hardware */

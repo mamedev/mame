@@ -946,8 +946,8 @@ static NVRAM_HANDLER(meritm_crt260)
 
 static MACHINE_DRIVER_START(meritm_crt250)
 	MDRV_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
-	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map,0)
-	MDRV_CPU_IO_MAP(meritm_crt250_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map)
+	MDRV_CPU_IO_MAP(meritm_crt250_io_map)
 	MDRV_CPU_CONFIG(meritm_daisy_chain)
   	MDRV_CPU_VBLANK_INT_HACK(meritm_interrupt,262)
 
@@ -986,22 +986,22 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(meritm_crt250_questions)
 	MDRV_IMPORT_FROM(meritm_crt250)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(meritm_crt250_questions_map,0)
+	MDRV_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
 	MDRV_MACHINE_START(meritm_crt250_questions)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(meritm_crt250_crt252_crt258)
 	MDRV_IMPORT_FROM(meritm_crt250_questions)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(meritm_crt250_crt258_io_map,0)
+	MDRV_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MDRV_MACHINE_START(meritm_crt250_crt252_crt258)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(meritm_crt260)
 	MDRV_IMPORT_FROM(meritm_crt250)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(meritm_map,0)
-	MDRV_CPU_IO_MAP(meritm_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(meritm_map)
+	MDRV_CPU_IO_MAP(meritm_io_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
 

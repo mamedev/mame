@@ -250,8 +250,8 @@ static MACHINE_DRIVER_START( dominob )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(portmap,0)
+	MDRV_CPU_PROGRAM_MAP(memmap)
+	MDRV_CPU_IO_MAP(portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

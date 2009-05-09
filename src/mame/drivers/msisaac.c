@@ -479,16 +479,16 @@ static MACHINE_DRIVER_START( msisaac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(msisaac_map,0)
+	MDRV_CPU_PROGRAM_MAP(msisaac_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(msisaac_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(msisaac_sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(msisaac_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(msisaac_mcu_map)
 #endif
 
 	MDRV_MACHINE_RESET(ta7630)

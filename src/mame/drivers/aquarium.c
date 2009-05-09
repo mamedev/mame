@@ -349,12 +349,12 @@ static MACHINE_DRIVER_START( aquarium )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(snd_map,0)
-	MDRV_CPU_IO_MAP(snd_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(snd_map)
+	MDRV_CPU_IO_MAP(snd_portmap)
 
     MDRV_MACHINE_START(aquarium)
 #if AQUARIUS_HACK

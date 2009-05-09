@@ -822,7 +822,7 @@ static MACHINE_RESET( pballoon )
 static MACHINE_DRIVER_START( sasuke )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
-	MDRV_CPU_PROGRAM_MAP(sasuke_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sasuke_map)
 	MDRV_CPU_VBLANK_INT_HACK(satansat_interrupt, 2)
 
 	MDRV_MACHINE_RESET(sasuke)
@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( satansat )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(sasuke)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(satansat_map, 0)
+	MDRV_CPU_PROGRAM_MAP(satansat_map)
 
 	MDRV_MACHINE_RESET(satansat)
 
@@ -896,7 +896,7 @@ static MACHINE_DRIVER_START( vanguard )
 	// basic machine hardware
 	//MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MDRV_CPU_ADD("maincpu", M6502, 930000)		// adjusted
-	MDRV_CPU_PROGRAM_MAP(vanguard_map, 0)
+	MDRV_CPU_PROGRAM_MAP(vanguard_map)
 	MDRV_CPU_VBLANK_INT_HACK(rockola_interrupt, 2)
 
 	MDRV_MACHINE_RESET(vanguard)
@@ -942,7 +942,7 @@ static MACHINE_DRIVER_START( fantasy )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(vanguard)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fantasy_map, 0)
+	MDRV_CPU_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
 	MDRV_SOUND_REPLACE("samples", SAMPLES, 0)
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( pballoon )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(nibbler)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pballoon_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pballoon_map)
 
 	MDRV_MACHINE_RESET(pballoon)
 

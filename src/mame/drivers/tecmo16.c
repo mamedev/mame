@@ -402,11 +402,11 @@ static MACHINE_DRIVER_START( fstarfrc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(fstarfrc_map,0)
+	MDRV_CPU_PROGRAM_MAP(fstarfrc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)			/* 4MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -442,7 +442,7 @@ static MACHINE_DRIVER_START( ginkun )
 	MDRV_IMPORT_FROM(fstarfrc)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ginkun_map,0)
+	MDRV_CPU_PROGRAM_MAP(ginkun_map)
 
 	MDRV_VIDEO_START(ginkun)
 MACHINE_DRIVER_END

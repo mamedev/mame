@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START( magicfly )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/12)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(magicfly_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magicfly_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

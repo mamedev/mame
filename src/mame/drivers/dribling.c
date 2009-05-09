@@ -289,8 +289,8 @@ static MACHINE_DRIVER_START( dribling )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(dribling_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dribling_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", dribling_irq_gen)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

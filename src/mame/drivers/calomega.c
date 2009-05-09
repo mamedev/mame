@@ -1919,7 +1919,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( sys903 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
-	MDRV_CPU_PROGRAM_MAP(sys903_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sys903_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1959,7 +1959,7 @@ static MACHINE_DRIVER_START( sys905 )
 	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sys905_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sys905_map)
 
 	MDRV_PIA6821_MODIFY("pia0", sys905_pia0_intf)
 	MDRV_PIA6821_MODIFY("pia1", sys905_pia1_intf)
@@ -1977,7 +1977,7 @@ static MACHINE_DRIVER_START( s903mod )
 	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(s903mod_map, 0)
+	MDRV_CPU_PROGRAM_MAP(s903mod_map)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("ay8912")

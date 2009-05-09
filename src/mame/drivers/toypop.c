@@ -542,15 +542,15 @@ static MACHINE_DRIVER_START( liblrabl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
-	MDRV_CPU_PROGRAM_MAP(liblrabl_map,0)
+	MDRV_CPU_PROGRAM_MAP(liblrabl_map)
 	MDRV_CPU_VBLANK_INT("screen", toypop_main_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1536000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
-	MDRV_CPU_PROGRAM_MAP(m68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(m68k_map)
 	MDRV_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( toypop )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(liblrabl)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(toypop_map,0)
+	MDRV_CPU_PROGRAM_MAP(toypop_map)
 MACHINE_DRIVER_END
 
 

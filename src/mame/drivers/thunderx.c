@@ -563,11 +563,11 @@ static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 052001 */
-	MDRV_CPU_PROGRAM_MAP(scontra_map,0)
+	MDRV_CPU_PROGRAM_MAP(scontra_map)
 	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(scontra_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(scontra_sound_map)
 
 	MDRV_MACHINE_RESET(scontra)
 
@@ -604,11 +604,11 @@ static MACHINE_DRIVER_START( thunderx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(thunderx_map,0)
+	MDRV_CPU_PROGRAM_MAP(thunderx_map)
 	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(thunderx_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(thunderx_sound_map)
 
 	MDRV_MACHINE_RESET(thunderx)
 

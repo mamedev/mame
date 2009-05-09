@@ -880,13 +880,13 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(io_map)
 
 	MDRV_GFXDECODE(tecmosys)
 

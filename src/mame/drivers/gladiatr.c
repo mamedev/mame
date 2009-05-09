@@ -686,17 +686,17 @@ static MACHINE_DRIVER_START( ppking )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map,0)
-	MDRV_CPU_IO_MAP(ppking_cpu1_io,0)
+	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map)
+	MDRV_CPU_IO_MAP(ppking_cpu1_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_IO_MAP(ppking_cpu2_io,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MDRV_CPU_IO_MAP(ppking_cpu2_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map,0)
+	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -736,16 +736,16 @@ static MACHINE_DRIVER_START( gladiatr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map,0)
-	MDRV_CPU_IO_MAP(gladiatr_cpu1_io,0)
+	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
+	MDRV_CPU_IO_MAP(gladiatr_cpu1_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_IO_MAP(gladiatr_cpu2_io,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MDRV_CPU_IO_MAP(gladiatr_cpu2_io)
 
 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map,0)
+	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

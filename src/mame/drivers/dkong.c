@@ -1575,7 +1575,7 @@ static MACHINE_DRIVER_START( dkong_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_1H)
-	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong2b)
@@ -1643,8 +1643,8 @@ static MACHINE_DRIVER_START( dkong3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)	/* verified in schematics */
-	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
-	MDRV_CPU_IO_MAP(dkong3_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong3_map)
+	MDRV_CPU_IO_MAP(dkong3_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)
@@ -1672,7 +1672,7 @@ static MACHINE_DRIVER_START( dkongjr )
 	MDRV_IMPORT_FROM(dkong_base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dkongjr_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkongjr_map)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dkongjr_audio)
@@ -1709,8 +1709,8 @@ static MACHINE_DRIVER_START( s2650 )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(s2650_map, 0)
-	MDRV_CPU_IO_MAP(s2650_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(s2650_map)
+	MDRV_CPU_IO_MAP(s2650_io_map)
 	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
 
 	MDRV_DEVICE_MODIFY("dma8257")
@@ -1742,7 +1742,7 @@ static MACHINE_DRIVER_START( strtheat )
 	MDRV_IMPORT_FROM(dkong2b)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(epos_readport,0)
+	MDRV_CPU_IO_MAP(epos_readport)
 
 	MDRV_MACHINE_RESET(strtheat)
 MACHINE_DRIVER_END
@@ -1752,7 +1752,7 @@ static MACHINE_DRIVER_START( drakton )
 	MDRV_IMPORT_FROM(dkong2b)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(epos_readport,0)
+	MDRV_CPU_IO_MAP(epos_readport)
 
 	MDRV_MACHINE_RESET(drakton)
 MACHINE_DRIVER_END
@@ -1762,7 +1762,7 @@ static MACHINE_DRIVER_START( drktnjr )
 	MDRV_IMPORT_FROM(dkongjr)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(epos_readport,0)
+	MDRV_CPU_IO_MAP(epos_readport)
 
 	MDRV_MACHINE_RESET(drakton)
 MACHINE_DRIVER_END

@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( gunbustr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(gunbustr_map,0)
+	MDRV_CPU_PROGRAM_MAP(gunbustr_map)
 	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)

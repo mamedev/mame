@@ -181,12 +181,12 @@ static MACHINE_DRIVER_START( mouser )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mouser_map,0)
+	MDRV_CPU_PROGRAM_MAP(mouser_map)
 	MDRV_CPU_VBLANK_INT("screen", mouser_nmi_interrupt) /* NMI is masked externally */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mouser_sound_map,0)
-	MDRV_CPU_IO_MAP(mouser_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mouser_sound_map)
+	MDRV_CPU_IO_MAP(mouser_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
 	/* video hardware */

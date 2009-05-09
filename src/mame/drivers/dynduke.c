@@ -284,11 +284,11 @@ static INTERRUPT_GEN( dynduke_interrupt )
 static MACHINE_DRIVER_START( dynduke )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
-	MDRV_CPU_PROGRAM_MAP(master_map, 0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_VBLANK_INT("screen", dynduke_interrupt)
 
 	MDRV_CPU_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
-	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
 	MDRV_CPU_VBLANK_INT("screen", dynduke_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( dbldyn )
 	MDRV_IMPORT_FROM(dynduke)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(masterj_map,0)
+	MDRV_CPU_PROGRAM_MAP(masterj_map)
 MACHINE_DRIVER_END
 
 /* ROMs */

@@ -693,11 +693,11 @@ static MACHINE_DRIVER_START( artmagic )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(tms_map,0)
+	MDRV_CPU_PROGRAM_MAP(tms_map)
 
 	MDRV_MACHINE_RESET(artmagic)
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -732,10 +732,10 @@ static MACHINE_DRIVER_START( stonebal )
 	MDRV_IMPORT_FROM(artmagic)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(stonebal_map,0)
+	MDRV_CPU_PROGRAM_MAP(stonebal_map)
 
 	MDRV_CPU_MODIFY("tms")
-	MDRV_CPU_PROGRAM_MAP(stonebal_tms_map,0)
+	MDRV_CPU_PROGRAM_MAP(stonebal_tms_map)
 
 	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)

@@ -614,7 +614,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( base )
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	//confirmed
-	MDRV_CPU_PROGRAM_MAP(pbillrd_map,0)
+	MDRV_CPU_PROGRAM_MAP(pbillrd_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 50*3) //??
 	MDRV_CPU_VBLANK_INT("screen", freekick_irqgen)
 
@@ -660,8 +660,8 @@ static MACHINE_DRIVER_START( freekckb )
 	MDRV_IMPORT_FROM(base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(freekckb_map,0)
-	MDRV_CPU_IO_MAP(freekckb_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(freekckb_map)
+	MDRV_CPU_IO_MAP(freekckb_io_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -673,8 +673,8 @@ static MACHINE_DRIVER_START( gigas )
 	MDRV_IMPORT_FROM(base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gigas_map,0)
-	MDRV_CPU_IO_MAP(gigas_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(gigas_map)
+	MDRV_CPU_IO_MAP(gigas_io_map)
 
 	MDRV_VIDEO_UPDATE(gigas)
 MACHINE_DRIVER_END
@@ -682,7 +682,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( oigas )
 	MDRV_IMPORT_FROM(gigas)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(oigas_io_map,0)
+	MDRV_CPU_IO_MAP(oigas_io_map)
 MACHINE_DRIVER_END
 
 

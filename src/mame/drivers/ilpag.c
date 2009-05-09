@@ -444,7 +444,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ilpag )
 	MDRV_CPU_ADD("maincpu", M68000, 11059200 )	// ?
-	MDRV_CPU_PROGRAM_MAP(ilpag_map,0)
+	MDRV_CPU_PROGRAM_MAP(ilpag_map)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold) //3 & 6 used, mcu comms?
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -513,7 +513,7 @@ static INTERRUPT_GEN( steaser_irq )
 static MACHINE_DRIVER_START( steaser )
 	MDRV_IMPORT_FROM( ilpag )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(steaser_map,0)
+	MDRV_CPU_PROGRAM_MAP(steaser_map)
 	MDRV_CPU_VBLANK_INT_HACK(steaser_irq,4)
 
 	MDRV_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, HZ(10000)) // not real, but for simulating the MCU

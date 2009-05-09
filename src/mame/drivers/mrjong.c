@@ -164,8 +164,8 @@ static MACHINE_DRIVER_START( mrjong )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,15468000/6)	/* 2.578 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(mrjong_map,0)
-	MDRV_CPU_IO_MAP(mrjong_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrjong_map)
+	MDRV_CPU_IO_MAP(mrjong_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

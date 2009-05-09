@@ -348,7 +348,7 @@ static const psx_spu_interface konamigv_psxspu_interface =
 static MACHINE_DRIVER_START( konamigv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( konamigv_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( konamigv_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MDRV_MACHINE_RESET( konamigv )

@@ -531,15 +531,15 @@ static MACHINE_DRIVER_START( dassault )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* Accurate */
-	MDRV_CPU_PROGRAM_MAP(dassault_map,0)
+	MDRV_CPU_PROGRAM_MAP(dassault_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 14000000) /* Accurate */
-	MDRV_CPU_PROGRAM_MAP(dassault_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(dassault_sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
 

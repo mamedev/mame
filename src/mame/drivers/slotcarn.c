@@ -593,8 +593,8 @@ static MACHINE_DRIVER_START( slotcarn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MDRV_CPU_PROGRAM_MAP(slotcarn_map,0)
-	MDRV_CPU_IO_MAP(spielbud_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(slotcarn_map)
+	MDRV_CPU_IO_MAP(spielbud_io_map)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", scarn_ppi8255_intf[0] )

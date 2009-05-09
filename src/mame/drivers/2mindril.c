@@ -403,7 +403,7 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_DRIVER_START( drill )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
-	MDRV_CPU_PROGRAM_MAP(drill_map,0)
+	MDRV_CPU_PROGRAM_MAP(drill_map)
 	MDRV_CPU_VBLANK_INT("screen", drill_interrupt)
 	MDRV_GFXDECODE(2mindril)
 

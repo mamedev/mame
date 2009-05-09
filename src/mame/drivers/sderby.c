@@ -466,7 +466,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( sderby )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sderby_map,0)
+	MDRV_CPU_PROGRAM_MAP(sderby_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -491,7 +491,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spacewin )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(spacewin_map,0)
+	MDRV_CPU_PROGRAM_MAP(spacewin_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -516,7 +516,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmroulet )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(roulette_map,0)
+	MDRV_CPU_PROGRAM_MAP(roulette_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

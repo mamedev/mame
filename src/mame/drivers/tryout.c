@@ -191,11 +191,11 @@ static INTERRUPT_GEN( tryout_interrupt )
 static MACHINE_DRIVER_START( tryout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu)
 	MDRV_CPU_VBLANK_INT("screen", tryout_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,800) /* ? */
 
 	/* video hardware */

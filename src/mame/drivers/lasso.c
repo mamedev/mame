@@ -465,11 +465,11 @@ static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(lasso_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 600000)
-	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lasso_audio_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( lasso )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_ADD("blitter", M6502, 11289000/16)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map,0)
+	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map)
 
 MACHINE_DRIVER_END
 
@@ -512,10 +512,10 @@ static MACHINE_DRIVER_START( chameleo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chameleo_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(chameleo_main_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(chameleo_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(chameleo)
@@ -526,10 +526,10 @@ static MACHINE_DRIVER_START( wwjgtin )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -551,11 +551,11 @@ static MACHINE_DRIVER_START( pinbo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pinbo_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(pinbo_main_map)
 
 	MDRV_CPU_REPLACE("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(pinbo_audio_map,0)
-	MDRV_CPU_IO_MAP(pinbo_audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pinbo_audio_map)
+	MDRV_CPU_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(pinbo)

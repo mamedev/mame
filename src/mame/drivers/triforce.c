@@ -36,7 +36,7 @@ static MACHINE_DRIVER_START( triforce_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000) /* Wrong! */
-	MDRV_CPU_PROGRAM_MAP(gc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gc_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

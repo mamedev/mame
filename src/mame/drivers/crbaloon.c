@@ -362,8 +362,8 @@ static MACHINE_DRIVER_START( crbaloon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(crballoon)

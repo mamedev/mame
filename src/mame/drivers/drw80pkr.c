@@ -308,8 +308,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( drw80pkr )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drw80pkr_map, 0)
-    MDRV_CPU_IO_MAP(drw80pkr_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(drw80pkr_map)
+    MDRV_CPU_IO_MAP(drw80pkr_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	// video hardware

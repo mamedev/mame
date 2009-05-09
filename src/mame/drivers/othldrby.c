@@ -232,7 +232,7 @@ static MACHINE_DRIVER_START( othldrby )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(othldrby_map,0)
+	MDRV_CPU_PROGRAM_MAP(othldrby_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */

@@ -193,12 +193,12 @@ static MACHINE_DRIVER_START( scotrsht )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(scotrsht_map,0)
+	MDRV_CPU_PROGRAM_MAP(scotrsht_map)
 	MDRV_CPU_VBLANK_INT("screen", scotrsht_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(scotrsht_sound_map,0)
-	MDRV_CPU_IO_MAP(scotrsht_sound_port,0)
+	MDRV_CPU_PROGRAM_MAP(scotrsht_sound_map)
+	MDRV_CPU_IO_MAP(scotrsht_sound_port)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -301,7 +301,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( pktgaldx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(pktgaldx_map,0)
+	MDRV_CPU_PROGRAM_MAP(pktgaldx_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -336,7 +336,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pktgaldb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(pktgaldb_map,0)
+	MDRV_CPU_PROGRAM_MAP(pktgaldb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */

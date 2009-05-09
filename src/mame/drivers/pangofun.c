@@ -113,7 +113,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( pangofun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 14318180*2)	/* I486 ?? Mhz */
-	MDRV_CPU_PROGRAM_MAP(pangofun_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pangofun_map)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

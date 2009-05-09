@@ -231,11 +231,11 @@ static MACHINE_DRIVER_START( pokechmp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000)
-	MDRV_CPU_PROGRAM_MAP(pokechmp_map,0)
+	MDRV_CPU_PROGRAM_MAP(pokechmp_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 4000000)
-	MDRV_CPU_PROGRAM_MAP(pokechmp_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pokechmp_sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

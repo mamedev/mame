@@ -1036,7 +1036,7 @@ static MACHINE_DRIVER_START( legionna )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2) 	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(legionna_map,0)
+	MDRV_CPU_PROGRAM_MAP(legionna_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -1068,7 +1068,7 @@ static MACHINE_DRIVER_START( heatbrl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2) 	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(heatbrl_map,0)
+	MDRV_CPU_PROGRAM_MAP(heatbrl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( godzilla )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
-	MDRV_CPU_PROGRAM_MAP(godzilla_map,0)
+	MDRV_CPU_PROGRAM_MAP(godzilla_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
@@ -1130,7 +1130,7 @@ static MACHINE_DRIVER_START( denjinmk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
-	MDRV_CPU_PROGRAM_MAP(denjinmk_map,0)
+	MDRV_CPU_PROGRAM_MAP(denjinmk_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
@@ -1161,7 +1161,7 @@ static MACHINE_DRIVER_START( sdgndmrb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
-	MDRV_CPU_PROGRAM_MAP(sdgndmrb_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sdgndmrb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
@@ -1193,7 +1193,7 @@ static MACHINE_DRIVER_START( cupsoc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
-	MDRV_CPU_PROGRAM_MAP(cupsoc_mem,0)
+	MDRV_CPU_PROGRAM_MAP(cupsoc_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -1225,13 +1225,13 @@ static MACHINE_DRIVER_START( cupsocbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(cupsocbl_mem,0)
+	MDRV_CPU_PROGRAM_MAP(cupsocbl_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) /* VBL */
 
 	/*Different Sound hardware*/
 	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)
-	MDRV_CPU_PROGRAM_MAP(cupsocbl_sound_mem,0)
+	MDRV_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
 	//MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	//MDRV_MACHINE_INIT(seibu_sound)

@@ -343,7 +343,7 @@ static MACHINE_DRIVER_START( atetris )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(atetris)
 	MDRV_MACHINE_RESET(atetris)
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( atetrsb2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(atetrsb2_map,0)
+	MDRV_CPU_PROGRAM_MAP(atetrsb2_map)
 
 	MDRV_MACHINE_START(atetris)
 	MDRV_MACHINE_RESET(atetris)

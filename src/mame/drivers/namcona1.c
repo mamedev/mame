@@ -1007,12 +1007,12 @@ static const c140_interface C140_interface_typeA =
 static MACHINE_DRIVER_START( namcona1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
-	MDRV_CPU_PROGRAM_MAP(namcona1_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
 	MDRV_CPU_ADD("mcu", M37702, 50113000/4)
-	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map, 0)
-	MDRV_CPU_IO_MAP( namcona1_mcu_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map)
+	MDRV_CPU_IO_MAP( namcona1_mcu_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
 
 	MDRV_NVRAM_HANDLER(namcosna1)
@@ -1063,7 +1063,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	MDRV_IMPORT_FROM(namcona1)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 50113000/4)
-	MDRV_CPU_PROGRAM_MAP(namcona2_main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(namcona2_main_map)
 MACHINE_DRIVER_END
 
 

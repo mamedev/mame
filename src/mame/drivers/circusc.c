@@ -344,12 +344,12 @@ static MACHINE_DRIVER_START( circusc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(circusc_map,0)
+	MDRV_CPU_PROGRAM_MAP(circusc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)     /* Z80 Clock is derived from a 14.31818 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(circusc)
 	MDRV_MACHINE_RESET(circusc)

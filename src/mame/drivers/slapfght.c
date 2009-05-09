@@ -874,12 +874,12 @@ static MACHINE_DRIVER_START( perfrman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(perfrman_map,0)
-	MDRV_CPU_IO_MAP(slapfght_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(perfrman_map)
+	MDRV_CPU_IO_MAP(slapfght_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(perfrman_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(perfrman_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
 
 	MDRV_QUANTUM_TIME(HZ(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -921,12 +921,12 @@ static MACHINE_DRIVER_START( tigerhb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(tigerh_map,0)
-	MDRV_CPU_IO_MAP(tigerhb_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tigerh_map)
+	MDRV_CPU_IO_MAP(tigerhb_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -967,16 +967,16 @@ static MACHINE_DRIVER_START( tigerh )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tigerh_map,0)
-	MDRV_CPU_IO_MAP(tigerh_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tigerh_map)
+	MDRV_CPU_IO_MAP(tigerh_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
 	MDRV_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tigerh_m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(tigerh_m68705_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -1017,12 +1017,12 @@ static MACHINE_DRIVER_START( slapfigh )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_map,0)
-	MDRV_CPU_IO_MAP(slapfght_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapfght_map)
+	MDRV_CPU_IO_MAP(slapfght_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -1065,7 +1065,7 @@ static MACHINE_DRIVER_START( slapbtuk )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(slapfigh)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(slapbtuk_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapbtuk_map)
 MACHINE_DRIVER_END
 
 

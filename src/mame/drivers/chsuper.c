@@ -195,8 +195,8 @@ static MACHINE_DRIVER_START( chsuper )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(chsuper_prg_map,0)
-	MDRV_CPU_IO_MAP(chsuper_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(chsuper_prg_map)
+	MDRV_CPU_IO_MAP(chsuper_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

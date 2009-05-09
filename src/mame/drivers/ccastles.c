@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START( ccastles )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(ccastles)
 	MDRV_MACHINE_RESET(ccastles)

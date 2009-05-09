@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( sprint8 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sprint8_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sprint8_map)
 
 	MDRV_MACHINE_RESET(sprint8)
 

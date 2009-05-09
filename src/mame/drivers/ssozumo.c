@@ -191,11 +191,11 @@ static MACHINE_DRIVER_START( ssozumo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1200000)	/* 1.2 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(ssozumo_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssozumo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 975000) 		/* 975 kHz ?? */
-	MDRV_CPU_PROGRAM_MAP(ssozumo_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssozumo_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,60*16)	/* not accurate */
 
 	/* video hardware */

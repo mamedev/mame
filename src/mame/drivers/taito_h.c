@@ -528,11 +528,11 @@ static MACHINE_DRIVER_START( syvalion )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(syvalion_map,0)
+	MDRV_CPU_PROGRAM_MAP(syvalion_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
@@ -568,11 +568,11 @@ static MACHINE_DRIVER_START( recordbr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(recordbr_map,0)
+	MDRV_CPU_PROGRAM_MAP(recordbr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
@@ -608,11 +608,11 @@ static MACHINE_DRIVER_START( dleague )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(dleague_map,0)
+	MDRV_CPU_PROGRAM_MAP(dleague_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)

@@ -514,7 +514,7 @@ static INTERRUPT_GEN( adp_int )
 */
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(quickjac_mem)
 //  MDRV_CPU_VBLANK_INT("screen", adp_int)
 
 	MDRV_MACHINE_START(skattv)
@@ -542,7 +542,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(skattv_mem)
 //  MDRV_CPU_VBLANK_INT("screen", adp_int)
 
 	MDRV_MACHINE_START(skattv)
@@ -570,7 +570,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( backgamn )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(backgamn_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(backgamn_mem)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -593,7 +593,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( funland )
 	MDRV_IMPORT_FROM( skattv )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(funland_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(funland_mem)
 MACHINE_DRIVER_END
 
 ROM_START( quickjac )

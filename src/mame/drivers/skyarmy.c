@@ -237,8 +237,8 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( skyarmy )
 	MDRV_CPU_ADD("maincpu", Z80,4000000)
-	MDRV_CPU_PROGRAM_MAP(skyarmy_map,0)
-	MDRV_CPU_IO_MAP(skyarmy_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyarmy_map)
+	MDRV_CPU_IO_MAP(skyarmy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(skyarmy_nmi_source,650)	/* Hz */
 

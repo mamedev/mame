@@ -862,7 +862,7 @@ static MACHINE_DRIVER_START( astrof )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astrof_map,0)
+	MDRV_CPU_PROGRAM_MAP(astrof_map)
 
 	MDRV_MACHINE_START(astrof)
 
@@ -889,7 +889,7 @@ static MACHINE_DRIVER_START( spfghmk2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spfghmk2_map,0)
+	MDRV_CPU_PROGRAM_MAP(spfghmk2_map)
 
 	MDRV_MACHINE_START(spfghmk2)
 
@@ -906,7 +906,7 @@ static MACHINE_DRIVER_START( tomahawk )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tomahawk_map,0)
+	MDRV_CPU_PROGRAM_MAP(tomahawk_map)
 
 	MDRV_MACHINE_START(tomahawk)
 

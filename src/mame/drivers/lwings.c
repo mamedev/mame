@@ -736,11 +736,11 @@ static MACHINE_DRIVER_START( lwings )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(lwings_map,0)
+	MDRV_CPU_PROGRAM_MAP(lwings_map)
 	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(lwings_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(lwings_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ??? */
 
 	/* video hardware */
@@ -780,11 +780,11 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_IMPORT_FROM( lwings )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trojan_map,0)
+	MDRV_CPU_PROGRAM_MAP(trojan_map)
 
 	MDRV_CPU_ADD("adpcm", Z80, 4000000) // 3.579545 Mhz (?)
-	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map,0)
-	MDRV_CPU_IO_MAP(trojan_adpcm_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map)
+	MDRV_CPU_IO_MAP(trojan_adpcm_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
 
 	/* video hardware */
@@ -803,11 +803,11 @@ static MACHINE_DRIVER_START( avengers )
 	MDRV_IMPORT_FROM( trojan )
 
 	MDRV_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
-	MDRV_CPU_PROGRAM_MAP(avengers_map,0)
+	MDRV_CPU_PROGRAM_MAP(avengers_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) // RST 38h triggered by software
 
 	MDRV_CPU_MODIFY("adpcm")
-	MDRV_CPU_IO_MAP(avengers_adpcm_io_map,0)
+	MDRV_CPU_IO_MAP(avengers_adpcm_io_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(avengers)

@@ -1848,7 +1848,7 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)
 	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
+	MDRV_CPU_PROGRAM_MAP(mod2_memmap)
 
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
@@ -1874,7 +1874,7 @@ static MACHINE_DRIVER_START( mod4yam )
 	MDRV_MACHINE_START(mpu4mod4)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mod4_yam_map,0)
+	MDRV_CPU_PROGRAM_MAP(mod4_yam_map)
 
 	MDRV_SOUND_REMOVE("ay8913")
 	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
@@ -1888,7 +1888,7 @@ static MACHINE_DRIVER_START( mod4oki )
 	MDRV_PIA6821_ADD("pia_gamebd", pia_gameboard_intf)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mod4_oki_map,0)
+	MDRV_CPU_PROGRAM_MAP(mod4_oki_map)
 
 	MDRV_SOUND_REMOVE("ay8913")
 	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
@@ -1898,7 +1898,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mpu4dutch )
 	MDRV_IMPORT_FROM( mod4oki )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dutch_memmap,0)	  			// setup read and write memorymap
+	MDRV_CPU_PROGRAM_MAP(dutch_memmap)	  			// setup read and write memorymap
 	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
 MACHINE_DRIVER_END
 

@@ -735,7 +735,7 @@ static MACHINE_DRIVER_START( undrfire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(undrfire_map,0)
+	MDRV_CPU_PROGRAM_MAP(undrfire_map)
 	MDRV_CPU_VBLANK_INT("screen", undrfire_interrupt)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
@@ -766,13 +766,13 @@ static MACHINE_DRIVER_START( cbombers )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(cbombers_cpua_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cbombers_cpua_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */

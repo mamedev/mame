@@ -34,7 +34,7 @@ static MACHINE_DRIVER_START( chihiro_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
-	MDRV_CPU_PROGRAM_MAP(xbox_map, 0)
+	MDRV_CPU_PROGRAM_MAP(xbox_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

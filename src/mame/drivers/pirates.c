@@ -277,7 +277,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pirates )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MDRV_CPU_PROGRAM_MAP(pirates_map,0)
+	MDRV_CPU_PROGRAM_MAP(pirates_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(pirates)

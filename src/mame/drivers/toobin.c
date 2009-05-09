@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( toobin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(toobin)
 	MDRV_NVRAM_HANDLER(atarigen)

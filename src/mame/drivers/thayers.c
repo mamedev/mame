@@ -758,11 +758,11 @@ static COP400_INTERFACE( thayers_cop_intf )
 static MACHINE_DRIVER_START( thayers )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(thayers_map, 0)
-	MDRV_CPU_IO_MAP(thayers_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(thayers_map)
+	MDRV_CPU_IO_MAP(thayers_io_map)
 
 	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MDRV_CPU_IO_MAP(thayers_cop_io_map, 0)
+	MDRV_CPU_IO_MAP(thayers_cop_io_map)
 	MDRV_CPU_CONFIG(thayers_cop_intf)
 
 	MDRV_MACHINE_START(thayers)

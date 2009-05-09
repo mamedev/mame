@@ -235,7 +235,7 @@ static MACHINE_DRIVER_START( batman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(batman)
 	MDRV_NVRAM_HANDLER(atarigen)

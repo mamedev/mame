@@ -1450,12 +1450,12 @@ ROM_END
 
 static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
-	MDRV_CPU_PROGRAM_MAP(model1_mem, 0)
-	MDRV_CPU_IO_MAP(model1_io, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_mem)
+	MDRV_CPU_IO_MAP(model1_io)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
-	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_snd)
 
 	MDRV_MACHINE_RESET(model1)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1489,16 +1489,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1_vr )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
-	MDRV_CPU_PROGRAM_MAP(model1_vr_mem, 0)
-	MDRV_CPU_IO_MAP(model1_vr_io, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_vr_mem)
+	MDRV_CPU_IO_MAP(model1_vr_io)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
-	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_snd)
 
 	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(model1_vr_tgp_config)
-	MDRV_CPU_PROGRAM_MAP(model1_vr_tgp_map, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_vr_tgp_map)
 
 	MDRV_MACHINE_RESET(model1_vr)
 	MDRV_NVRAM_HANDLER(generic_0fill)

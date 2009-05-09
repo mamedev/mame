@@ -273,10 +273,10 @@ static MACHINE_DRIVER_START( shootout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(shootout_map,0)
+	MDRV_CPU_PROGRAM_MAP(shootout_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(shootout_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( shootouj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(shootouj_map,0)
+	MDRV_CPU_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

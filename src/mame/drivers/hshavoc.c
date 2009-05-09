@@ -126,7 +126,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(genesis_z80_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -161,7 +161,7 @@ static MACHINE_DRIVER_START( hshavoc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( genesis_base )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(topshoot_map,0)
+	MDRV_CPU_PROGRAM_MAP(topshoot_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)

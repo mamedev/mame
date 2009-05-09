@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( safarir )
 
  	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, 3072000)	/* 3 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(safarir)
 

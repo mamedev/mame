@@ -42,7 +42,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( igs_m68 )
 	MDRV_CPU_ADD("maincpu", M68000, 22000000 /2)	 // 11mhz
-	MDRV_CPU_PROGRAM_MAP(igs_m68_map,0)
+	MDRV_CPU_PROGRAM_MAP(igs_m68_map)
 	//MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	//MDRV_GFXDECODE(igs_m68)

@@ -293,7 +293,7 @@ static MACHINE_DRIVER_START(boxer)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MDRV_CPU_PROGRAM_MAP(boxer_map, 0)
+	MDRV_CPU_PROGRAM_MAP(boxer_map)
 
 	/* video hardware */
 	MDRV_MACHINE_RESET(boxer)

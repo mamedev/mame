@@ -53,7 +53,7 @@ static const vr0_interface vr0_config =
 
 static MACHINE_DRIVER_START( ddz )
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
-	MDRV_CPU_PROGRAM_MAP(ddz_mem,0)
+	MDRV_CPU_PROGRAM_MAP(ddz_mem)
  	MDRV_CPU_VBLANK_INT("screen", ddz_interrupt)
 
 	//MDRV_MACHINE_RESET(ddz)

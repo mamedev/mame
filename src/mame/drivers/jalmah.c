@@ -1296,7 +1296,7 @@ static MACHINE_RESET ( jalmah )
 
 static MACHINE_DRIVER_START( jalmah )
 	MDRV_CPU_ADD("maincpu" , M68000, 8000000) /* 68000-8 */
-	MDRV_CPU_PROGRAM_MAP(jalmah,0)
+	MDRV_CPU_PROGRAM_MAP(jalmah)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	//M50747 MCU
@@ -1328,7 +1328,7 @@ static MACHINE_DRIVER_START( urashima )
 	MDRV_IMPORT_FROM(jalmah)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(urashima,0)
+	MDRV_CPU_PROGRAM_MAP(urashima)
 
 	MDRV_GFXDECODE(urashima)
 

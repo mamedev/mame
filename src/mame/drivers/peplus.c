@@ -1020,8 +1020,8 @@ static MACHINE_RESET( peplus )
 static MACHINE_DRIVER_START( peplus )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
-	MDRV_CPU_IO_MAP(peplus_iomap, 0)
+	MDRV_CPU_PROGRAM_MAP(peplus_map)
+	MDRV_CPU_IO_MAP(peplus_iomap)
 
 	MDRV_MACHINE_RESET(peplus)
 	MDRV_NVRAM_HANDLER(peplus)

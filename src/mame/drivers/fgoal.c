@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( fgoal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
 
 	MDRV_MACHINE_RESET(fgoal)
 

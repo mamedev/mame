@@ -478,11 +478,11 @@ static MACHINE_DRIVER_START( moo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(moo_map,0)
+	MDRV_CPU_PROGRAM_MAP(moo_map)
 	MDRV_CPU_VBLANK_INT("screen", moo_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( moobl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16100000)
-	MDRV_CPU_PROGRAM_MAP(moobl_map,0)
+	MDRV_CPU_PROGRAM_MAP(moobl_map)
 	MDRV_CPU_VBLANK_INT("screen", moobl_interrupt)
 
 	MDRV_MACHINE_START(moo)
@@ -555,7 +555,7 @@ static MACHINE_DRIVER_START( bucky )
 	MDRV_IMPORT_FROM(moo)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bucky_map,0)
+	MDRV_CPU_PROGRAM_MAP(bucky_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)

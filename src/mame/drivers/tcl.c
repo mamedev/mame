@@ -116,7 +116,7 @@ static MACHINE_DRIVER_START( tcl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4)
-	MDRV_CPU_PROGRAM_MAP(tcl_map,0)
+	MDRV_CPU_PROGRAM_MAP(tcl_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

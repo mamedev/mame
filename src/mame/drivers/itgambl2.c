@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( itgambl2 )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
-	MDRV_CPU_PROGRAM_MAP(itgambl2_map,0)
+	MDRV_CPU_PROGRAM_MAP(itgambl2_map)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

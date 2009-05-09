@@ -3215,12 +3215,12 @@ static MACHINE_DRIVER_START( system16b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MDRV_CPU_PROGRAM_MAP(system16b_map,0)
+	MDRV_CPU_PROGRAM_MAP(system16b_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(system16b)
 	MDRV_NVRAM_HANDLER(system16b)
@@ -3254,7 +3254,7 @@ static MACHINE_DRIVER_START( system16b_8751 )
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 

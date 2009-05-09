@@ -1924,11 +1924,11 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( halleys )
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(halleys_map,0)
+	MDRV_CPU_PROGRAM_MAP(halleys_map)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
 	MDRV_MACHINE_RESET(halleys)

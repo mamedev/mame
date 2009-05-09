@@ -326,11 +326,11 @@ static MACHINE_DRIVER_START( sshangha )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)
-	MDRV_CPU_PROGRAM_MAP(sshangha_map,0)
+	MDRV_CPU_PROGRAM_MAP(sshangha_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(sshangha)	/* init machine */
 

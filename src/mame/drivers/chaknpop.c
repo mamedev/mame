@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( chaknpop )
 	//MDRV_CPU_ADD("maincpu", Z80, 18432000 / 6)   /* 3.072 MHz */
 	MDRV_CPU_ADD("maincpu", Z80, 2350000)
 	//MDRV_CPU_ADD("maincpu", Z80, 2760000)
-	MDRV_CPU_PROGRAM_MAP(chaknpop_map,0)
+	MDRV_CPU_PROGRAM_MAP(chaknpop_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(chaknpop)

@@ -659,16 +659,16 @@ static MACHINE_DRIVER_START( tehkanwc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/4)	/* 18.432000 / 4 */
-	MDRV_CPU_PROGRAM_MAP(main_mem,0)
+	MDRV_CPU_PROGRAM_MAP(main_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 18432000/4)
-	MDRV_CPU_PROGRAM_MAP(sub_mem,0)
+	MDRV_CPU_PROGRAM_MAP(sub_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 18432000/4)
-	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
-	MDRV_CPU_IO_MAP(sound_port,0)
+	MDRV_CPU_PROGRAM_MAP(sound_mem)
+	MDRV_CPU_IO_MAP(sound_port)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */

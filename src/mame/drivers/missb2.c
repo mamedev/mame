@@ -356,15 +356,15 @@ static INTERRUPT_GEN( missb2_interrupt )
 static MACHINE_DRIVER_START( missb2 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(master_map, 0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT("screen", missb2_interrupt)
 

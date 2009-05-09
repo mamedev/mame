@@ -779,8 +779,8 @@ static MACHINE_DRIVER_START( mpnew )
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
        which includes an SN76496 for sound */
 	MDRV_CPU_ADD("mpbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(megaplay_bios_map,0)
-	MDRV_CPU_IO_MAP(megaplay_bios_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megaplay_bios_map)
+	MDRV_CPU_IO_MAP(megaplay_bios_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

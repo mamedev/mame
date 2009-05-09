@@ -1308,12 +1308,12 @@ static MACHINE_DRIVER_START( pspikes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pspikes_map,0)
+	MDRV_CPU_PROGRAM_MAP(pspikes_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1348,7 +1348,7 @@ static MACHINE_DRIVER_START( spikes91 )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(spikes91_map,0)
+	MDRV_CPU_PROGRAM_MAP(spikes91_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	/* + Z80 for sound */
@@ -1379,7 +1379,7 @@ static MACHINE_DRIVER_START( pspikesb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pspikesb_map,0)
+	MDRV_CPU_PROGRAM_MAP(pspikesb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	/* video hardware */
@@ -1407,7 +1407,7 @@ static MACHINE_DRIVER_START( pspikesc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pspikesc_map,0)
+	MDRV_CPU_PROGRAM_MAP(pspikesc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	/* video hardware */
@@ -1435,12 +1435,12 @@ static MACHINE_DRIVER_START( karatblz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(karatblz_map,0)
+	MDRV_CPU_PROGRAM_MAP(karatblz_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1474,12 +1474,12 @@ static MACHINE_DRIVER_START( spinlbrk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(spinlbrk_map,0)
+	MDRV_CPU_PROGRAM_MAP(spinlbrk_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* there are vectors for 3 and 4 too */
 
 	MDRV_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4)	/* 5mhz verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1513,12 +1513,12 @@ static MACHINE_DRIVER_START( turbofrc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(turbofrc_map,0)
+	MDRV_CPU_PROGRAM_MAP(turbofrc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD("audiocpu",Z80,XTAL_5MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1552,12 +1552,12 @@ static MACHINE_DRIVER_START( aerofgtb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(aerofgtb_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerofgtb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1592,12 +1592,12 @@ static MACHINE_DRIVER_START( aerofgt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(aerofgt_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerofgt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD("audiocpu",Z80,5000000) /* 5 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
     MDRV_MACHINE_START(aerofgt)
@@ -1632,11 +1632,11 @@ static MACHINE_DRIVER_START( aerfboot )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(aerfboot_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerfboot_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(aerfboot_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerfboot_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1664,7 +1664,7 @@ static MACHINE_DRIVER_START( aerfboo2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(aerfboo2_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerfboo2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	/* video hardware */
@@ -1693,11 +1693,11 @@ static MACHINE_DRIVER_START( wbbc97 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(wbbc97_map,0)
+	MDRV_CPU_PROGRAM_MAP(wbbc97_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wbbc97_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(wbbc97_sound_map)
 								/* IRQs are triggered by the YM3812 */
 
     MDRV_MACHINE_START(aerofgt)

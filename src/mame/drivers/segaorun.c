@@ -808,14 +808,14 @@ static MACHINE_DRIVER_START( outrundx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(outrun_map,0)
+	MDRV_CPU_PROGRAM_MAP(outrun_map)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(outrun)
 	MDRV_QUANTUM_TIME(HZ(6000))

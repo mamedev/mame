@@ -1243,7 +1243,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( scorpion1 )
 	MDRV_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
-	MDRV_CPU_PROGRAM_MAP(memmap,0)						// setup read and write memorymap
+	MDRV_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1262,7 +1262,7 @@ static MACHINE_DRIVER_START( scorpion1_adder2 )
 	MDRV_IMPORT_FROM( scorpion1 )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(memmap_adder2,0)				// setup read and write memorymap
+	MDRV_CPU_PROGRAM_MAP(memmap_adder2)				// setup read and write memorymap
 
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc1)
 	MDRV_SCREEN_ADD("adder", RASTER)
@@ -1281,7 +1281,7 @@ static MACHINE_DRIVER_START( scorpion1_adder2 )
 	MDRV_GFXDECODE(adder2)
 
 	MDRV_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )		// adder2 board 6809 CPU at 2 Mhz
-	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
+	MDRV_CPU_PROGRAM_MAP(adder2_memmap)				// setup adder2 board memorymap
 	MDRV_CPU_VBLANK_INT("adder",adder2_vbl)				// board has a VBL IRQ
 MACHINE_DRIVER_END
 
@@ -1292,7 +1292,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scorpion1_nec_uk )
 	MDRV_IMPORT_FROM( scorpion1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sc1_nec_uk,0)					// setup read and write memorymap
+	MDRV_CPU_PROGRAM_MAP(sc1_nec_uk)					// setup read and write memorymap
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

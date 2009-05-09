@@ -662,11 +662,11 @@ static MACHINE_DRIVER_START( fcrash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(fcrash_map,0)
+	MDRV_CPU_PROGRAM_MAP(fcrash_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 24000000/6) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -711,11 +711,11 @@ static MACHINE_DRIVER_START( kodb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
+	MDRV_CPU_PROGRAM_MAP(kodb_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
 //  MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-//  MDRV_CPU_PROGRAM_MAP(sub_map,0)
+//  MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

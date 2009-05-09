@@ -287,7 +287,7 @@ static NVRAM_HANDLER( showhand )
 static MACHINE_DRIVER_START( showhand )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(showhand_map,0)
+	MDRV_CPU_PROGRAM_MAP(showhand_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_NVRAM_HANDLER(showhand)
@@ -317,7 +317,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( showhanc )
 	MDRV_IMPORT_FROM( showhand )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(showhanc_map,0)
+	MDRV_CPU_PROGRAM_MAP(showhanc_map)
 MACHINE_DRIVER_END
 
 

@@ -272,11 +272,11 @@ static MACHINE_DRIVER_START( matmania )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(matmania_map,0)
+	MDRV_CPU_PROGRAM_MAP(matmania_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(matmania_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(matmania_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -327,15 +327,15 @@ static MACHINE_DRIVER_START( maniach )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_map,0)
+	MDRV_CPU_PROGRAM_MAP(maniach_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(maniach_sound_map)
 								/* IRQs are caused by the main CPU */
 
 	MDRV_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
-	MDRV_CPU_PROGRAM_MAP(maniach_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(maniach_mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 

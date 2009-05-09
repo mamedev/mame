@@ -55,7 +55,7 @@ static MACHINE_RESET( aristmk5 )
 
 static MACHINE_DRIVER_START( aristmk5 )
 	MDRV_CPU_ADD("maincpu", ARM, 10000000) // ?
-	MDRV_CPU_PROGRAM_MAP(aristmk5_map,0)
+	MDRV_CPU_PROGRAM_MAP(aristmk5_map)
 
 	MDRV_MACHINE_RESET( aristmk5 )
 	MDRV_MACHINE_START( aristmk5 )

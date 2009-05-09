@@ -292,18 +292,18 @@ static MACHINE_DRIVER_START( exzisus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)			/* 6 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(cpua_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpua_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)			/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_CPU_ADD("cpub", Z80, 6000000)			/* 6 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("cpuc", Z80, 6000000)			/* 6 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(cpuc_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpuc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */

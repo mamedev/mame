@@ -280,15 +280,15 @@ static MACHINE_DRIVER_START( junofrst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_CPU_ADD("mcu", I8039,8000000)	/* 8MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

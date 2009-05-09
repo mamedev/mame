@@ -967,14 +967,14 @@ static MACHINE_DRIVER_START( ddragon )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddragon_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
  	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -1015,7 +1015,7 @@ static MACHINE_DRIVER_START( ddragonb )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 MACHINE_DRIVER_END
 
 
@@ -1024,8 +1024,8 @@ static MACHINE_DRIVER_START( ddragnba )
 
 	/* basic machine hardware */
  	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragnba_sub_map,0)
-	MDRV_CPU_IO_MAP(ddragnba_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(ddragnba_sub_map)
+	MDRV_CPU_IO_MAP(ddragnba_sub_portmap)
 MACHINE_DRIVER_END
 
 
@@ -1033,14 +1033,14 @@ static MACHINE_DRIVER_START( ddgn6809 )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddragon_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
  	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -1080,14 +1080,14 @@ static MACHINE_DRIVER_START( ddragon2 )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(dd2_map,0)
+	MDRV_CPU_PROGRAM_MAP(dd2_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(dd2_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(dd2_sub_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(dd2_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(dd2_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -1124,7 +1124,7 @@ static MACHINE_DRIVER_START( darktowr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", M68705,XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 MACHINE_DRIVER_END

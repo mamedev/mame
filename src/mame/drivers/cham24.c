@@ -248,7 +248,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cham24 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(cham24_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cham24_map)
 
 	MDRV_MACHINE_RESET( cham24 )
 

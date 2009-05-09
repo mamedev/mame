@@ -382,7 +382,7 @@ static VIDEO_UPDATE( ertictac )
 static MACHINE_DRIVER_START( ertictac )
 
 	MDRV_CPU_ADD("maincpu", ARM, 16000000) /* guess */
-	MDRV_CPU_PROGRAM_MAP(ertictac_map,0)
+	MDRV_CPU_PROGRAM_MAP(ertictac_map)
 	MDRV_CPU_VBLANK_INT("screen", ertictac_interrupt)
 
 	MDRV_MACHINE_RESET(ertictac)

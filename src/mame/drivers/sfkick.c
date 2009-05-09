@@ -457,15 +457,15 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( sfkick )
 
 	MDRV_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(sfkick_map,0)
-	MDRV_CPU_IO_MAP(sfkick_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sfkick_map)
+	MDRV_CPU_IO_MAP(sfkick_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(sfkick_sound_map,0)
-	MDRV_CPU_IO_MAP(sfkick_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sfkick_sound_map)
+	MDRV_CPU_IO_MAP(sfkick_sound_io_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

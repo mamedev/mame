@@ -1172,12 +1172,12 @@ static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrokumei_map)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_map,0)
-	MDRV_CPU_IO_MAP(mrokumei_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_map)
+	MDRV_CPU_IO_MAP(mrokumei_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1235,13 +1235,13 @@ static MACHINE_DRIVER_START( reikaids )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(reikaids_map,0)
+	MDRV_CPU_PROGRAM_MAP(reikaids_map)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_map,0)
-	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_map)
+	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map)
 	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
@@ -1285,13 +1285,13 @@ static MACHINE_DRIVER_START( pteacher )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(pteacher_map,0)
+	MDRV_CPU_PROGRAM_MAP(pteacher_map)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_map,0)
-	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_map)
+	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map)
 	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough

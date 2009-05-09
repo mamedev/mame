@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( firetrk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
-	MDRV_CPU_PROGRAM_MAP(firetrk_map, 0)
+	MDRV_CPU_PROGRAM_MAP(firetrk_map)
 	MDRV_CPU_VBLANK_INT("screen", firetrk_interrupt)
 	MDRV_WATCHDOG_VBLANK_INIT(5)
 
@@ -915,7 +915,7 @@ static MACHINE_DRIVER_START( superbug )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
 	MDRV_CPU_REPLACE("maincpu", M6800, MASTER_CLOCK/12)
-	MDRV_CPU_PROGRAM_MAP(superbug_map, 0)
+	MDRV_CPU_PROGRAM_MAP(superbug_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(superbug)
@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( montecar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
 	MDRV_CPU_REPLACE("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
-	MDRV_CPU_PROGRAM_MAP(montecar_map, 0)
+	MDRV_CPU_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(montecar)

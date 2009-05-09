@@ -571,15 +571,15 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map_1,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_1)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
 
 	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map_2,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_2)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 	MDRV_PIA6821_ADD( "pia0", pia_0_intf )

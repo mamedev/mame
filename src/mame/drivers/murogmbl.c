@@ -169,7 +169,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( murogmbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MDRV_CPU_PROGRAM_MAP(murogmbl_map, 0)
+	MDRV_CPU_PROGRAM_MAP(murogmbl_map)
 
 	MDRV_GFXDECODE(murogmbl)
 

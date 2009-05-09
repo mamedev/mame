@@ -682,18 +682,18 @@ static PALETTE_INIT(kingdrby)
 
 static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(master_map,0)
-	MDRV_CPU_IO_MAP(master_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
+	MDRV_CPU_IO_MAP(master_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(slave_map,0)
-	MDRV_CPU_IO_MAP(slave_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
+	MDRV_CPU_IO_MAP(slave_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,1000) /* guess, controls ay8910 tempo.*/
 
 	MDRV_QUANTUM_PERFECT_CPU("master")

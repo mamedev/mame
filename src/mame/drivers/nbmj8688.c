@@ -2986,8 +2986,8 @@ static MACHINE_DRIVER_START( crystalg )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_256)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(crystalg_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(crystalg_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 96) // nmiclock = 2f
 MACHINE_DRIVER_END
 
@@ -2997,8 +2997,8 @@ static MACHINE_DRIVER_START( apparel )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_256)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(secolove_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(secolove_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
@@ -3008,8 +3008,8 @@ static MACHINE_DRIVER_START( mbmj_h12bit )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(secolove_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(secolove_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	/* video hardware */
@@ -3022,7 +3022,7 @@ static MACHINE_DRIVER_START( barline )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mbmj_h12bit)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(barline_io_map, 0)
+	MDRV_CPU_IO_MAP(barline_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	MDRV_SOUND_REPLACE("psg", YM3812, 20000000/8)
@@ -3036,8 +3036,8 @@ static MACHINE_DRIVER_START( mbmj_p16bit )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(secolove_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(secolove_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60/40
 
 	/* video hardware */
@@ -3050,9 +3050,9 @@ static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz */
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(secolove_io_map, 0)
-	MDRV_CPU_IO_MAP(p16bit_LCD_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(secolove_io_map)
+	MDRV_CPU_IO_MAP(p16bit_LCD_io_map)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -3103,8 +3103,8 @@ static MACHINE_DRIVER_START( seiha )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(seiha_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(seiha_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
@@ -3114,8 +3114,8 @@ static MACHINE_DRIVER_START( mjgaiden )
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ojousan_map, 0)
-	MDRV_CPU_IO_MAP(mjgaiden_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ojousan_map)
+	MDRV_CPU_IO_MAP(mjgaiden_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( iemoto )
@@ -3123,8 +3123,8 @@ static MACHINE_DRIVER_START( iemoto )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(iemoto_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(iemoto_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
@@ -3134,8 +3134,8 @@ static MACHINE_DRIVER_START( ojousan )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ojousan_map, 0)
-	MDRV_CPU_IO_MAP(iemoto_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ojousan_map)
+	MDRV_CPU_IO_MAP(iemoto_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
@@ -3144,8 +3144,8 @@ static MACHINE_DRIVER_START( mbmj_p12bit )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjsikaku_map, 0)
-	MDRV_CPU_IO_MAP(kaguya_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjsikaku_map)
+	MDRV_CPU_IO_MAP(kaguya_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_DRIVER_END
 
@@ -3155,8 +3155,8 @@ static MACHINE_DRIVER_START( mjsikaku )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjsikaku_map, 0)
-	MDRV_CPU_IO_MAP(mjsikaku_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjsikaku_map)
+	MDRV_CPU_IO_MAP(mjsikaku_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 144)    // nmiclock = 70
 
 	/* sound hardware */
@@ -3170,8 +3170,8 @@ static MACHINE_DRIVER_START( mmsikaku )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(secolove_map, 0)
-	MDRV_CPU_IO_MAP(mmsikaku_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(secolove_map)
+	MDRV_CPU_IO_MAP(mmsikaku_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_DRIVER_END
 
@@ -3181,7 +3181,7 @@ static MACHINE_DRIVER_START( otonano )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjsikaku)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(otonano_io_map, 0)
+	MDRV_CPU_IO_MAP(otonano_io_map)
 MACHINE_DRIVER_END
 
 

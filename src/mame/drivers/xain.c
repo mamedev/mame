@@ -479,17 +479,17 @@ static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu_map_B,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map_B)
 
 	MDRV_CPU_ADD("audiocpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 //  MDRV_CPU_ADD("mcu", M68705, MCU_CLOCK)    /* Confirmed 3MHz */
-//  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+//  MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(xsleena)
 

@@ -760,13 +760,13 @@ static SOUND_START( jangou )
 static MACHINE_DRIVER_START( jangou )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(0, cpu0_map)
-	MDRV_CPU_IO_MAP(0, cpu0_io)
+	MDRV_CPU_PROGRAM_MAP(cpu0_map)
+	MDRV_CPU_IO_MAP(cpu0_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(0, cpu1_map)
-	MDRV_CPU_IO_MAP(0, cpu1_io)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
+	MDRV_CPU_IO_MAP(cpu1_io)
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(jangou)
@@ -801,14 +801,14 @@ static MACHINE_DRIVER_START( jngolady )
 	MDRV_IMPORT_FROM(jangou)
 
 	MDRV_CPU_MODIFY("cpu0")
-	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu0_map)
+	MDRV_CPU_PROGRAM_MAP(jngolady_cpu0_map)
 
 	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu1_map)
-	MDRV_CPU_IO_MAP(0, jngolady_cpu1_io)
+	MDRV_CPU_PROGRAM_MAP(jngolady_cpu1_map)
+	MDRV_CPU_IO_MAP(jngolady_cpu1_io)
 
 	MDRV_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(nsc_map)
 
 	/* sound hardware */
 	MDRV_SOUND_START(NULL)
@@ -824,8 +824,8 @@ static MACHINE_DRIVER_START( cntrygrl )
 	MDRV_IMPORT_FROM(jangou)
 
 	MDRV_CPU_MODIFY("cpu0")
-	MDRV_CPU_PROGRAM_MAP(0, cntrygrl_cpu0_map )
-	MDRV_CPU_IO_MAP(0,cntrygrl_cpu0_io )
+	MDRV_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
+	MDRV_CPU_IO_MAP(cntrygrl_cpu0_io )
 
 	MDRV_CPU_REMOVE("cpu1")
 

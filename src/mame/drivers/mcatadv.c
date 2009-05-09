@@ -434,12 +434,12 @@ static MACHINE_DRIVER_START( mcatadv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mcatadv_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcatadv_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_map,0)
-	MDRV_CPU_IO_MAP(mcatadv_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_map)
+	MDRV_CPU_IO_MAP(mcatadv_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -473,8 +473,8 @@ static MACHINE_DRIVER_START( nost )
 	MDRV_IMPORT_FROM( mcatadv )
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(nost_sound_map,0)
-	MDRV_CPU_IO_MAP(nost_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(nost_sound_map)
+	MDRV_CPU_IO_MAP(nost_sound_io_map)
 MACHINE_DRIVER_END
 
 

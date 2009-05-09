@@ -402,13 +402,13 @@ static MACHINE_DRIVER_START( kchampvs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kchampvs_map,0)
-	MDRV_CPU_IO_MAP(kchampvs_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kchampvs_map)
+	MDRV_CPU_IO_MAP(kchampvs_io_map)
 	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kchampvs_sound_map,0)
-	MDRV_CPU_IO_MAP(kchampvs_sound_io_map,0)		/* irq's triggered from main cpu */
+	MDRV_CPU_PROGRAM_MAP(kchampvs_sound_map)
+	MDRV_CPU_IO_MAP(kchampvs_sound_io_map)		/* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
 	/* video hardware */
@@ -448,13 +448,13 @@ static MACHINE_DRIVER_START( kchamp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kchamp_map,0)
-	MDRV_CPU_IO_MAP(kchamp_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kchamp_map)
+	MDRV_CPU_IO_MAP(kchamp_io_map)
 	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kchamp_sound_map,0)
-	MDRV_CPU_IO_MAP(kchamp_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kchamp_sound_map)
+	MDRV_CPU_IO_MAP(kchamp_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(sound_int, 125)	/* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */

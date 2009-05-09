@@ -230,16 +230,16 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pitnrun )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(pitnrun_map,0)
+	MDRV_CPU_PROGRAM_MAP(pitnrun_map)
 	MDRV_CPU_VBLANK_INT("screen", pitnrun_nmi_source)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(pitnrun_sound_map,0)
-	MDRV_CPU_IO_MAP(pitnrun_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pitnrun_sound_map)
+	MDRV_CPU_IO_MAP(pitnrun_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(pitnrun_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(pitnrun_mcu_map)
 
 	MDRV_MACHINE_RESET(pitnrun)
 

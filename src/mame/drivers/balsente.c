@@ -1194,12 +1194,12 @@ static MACHINE_DRIVER_START( balsente )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 5000000/4)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", balsente_update_analog_inputs)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_IO_MAP(cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MDRV_CPU_IO_MAP(cpu2_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -1252,7 +1252,7 @@ static MACHINE_DRIVER_START( shrike )
 	MDRV_IMPORT_FROM(balsente)
 
 	MDRV_CPU_ADD("68k", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(shrike68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(shrike68k_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END

@@ -552,12 +552,12 @@ static MACHINE_DRIVER_START( talbot )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(talbot_map, 0)
+	MDRV_CPU_PROGRAM_MAP(talbot_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* MCU */
 	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -586,11 +586,11 @@ static MACHINE_DRIVER_START( champbas )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(champbas_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(champbas_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(champbas_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(champbas_sub_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( champmcu )
 
 	/* MCU */
 	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* to MCU timeout champbbj */
 	MDRV_QUANTUM_TIME(HZ(3000))
@@ -635,17 +635,17 @@ static MACHINE_DRIVER_START( exctsccr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
-	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
-	MDRV_CPU_PROGRAM_MAP(exctsccr_sub_map,0)
-	MDRV_CPU_IO_MAP(exctsccr_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(exctsccr_sub_map)
+	MDRV_CPU_IO_MAP(exctsccr_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
 	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(exctsccr)
 
@@ -692,11 +692,11 @@ static MACHINE_DRIVER_START( exctsccb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
-	MDRV_CPU_PROGRAM_MAP(champbas_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(champbas_sub_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

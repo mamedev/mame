@@ -1160,11 +1160,13 @@ static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM	// chip 21Q / S
 	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM	// chip 22N / S
+	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32)
+	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1178,6 +1180,7 @@ static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM_WRITE(konamigx_555_palette2_w) AM_BASE(&gx_subpaletteram32) // sub monitor palette
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM
+	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1191,6 +1194,7 @@ static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM_WRITE(konamigx_palette2_w) AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE(&gx_psacram)	// PSAC2 tilemap
+	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -1341,15 +1345,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( konamigx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 24000000)
-	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type2_map)
+	MDRV_CPU_PROGRAM_MAP(gx_type2_map)
 	MDRV_CPU_VBLANK_INT("screen", konamigx_vbinterrupt)
 
 	MDRV_CPU_ADD("soundcpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(gxsndmap, 0)
+	MDRV_CPU_PROGRAM_MAP(gxsndmap)
 	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
 
 	MDRV_CPU_ADD("dasp", TMS57002, 12500000)
-	MDRV_CPU_DATA_MAP(gxtmsmap, 0)
+	MDRV_CPU_DATA_MAP(gxtmsmap)
 	MDRV_CPU_PERIODIC_INT(tms_sync, 48000)
 
 	MDRV_QUANTUM_TIME(HZ(1920))
@@ -1422,7 +1426,7 @@ static MACHINE_DRIVER_START( opengolf )
 	MDRV_VIDEO_START(opengolf)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type1_map)
+	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( racinfrc )
@@ -1434,14 +1438,14 @@ static MACHINE_DRIVER_START( racinfrc )
 	MDRV_VIDEO_START(racinfrc)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type1_map)
+	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gxtype3 )
 	MDRV_IMPORT_FROM(konamigx)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type3_map)
+	MDRV_CPU_PROGRAM_MAP(gx_type3_map)
 	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
 
 	MDRV_VIDEO_START(konamigx_type3)
@@ -1456,7 +1460,7 @@ static MACHINE_DRIVER_START( gxtype4 )
 	MDRV_IMPORT_FROM(konamigx)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type4_map)
+	MDRV_CPU_PROGRAM_MAP(gx_type4_map)
 	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
 
 	MDRV_SCREEN_MODIFY("screen")

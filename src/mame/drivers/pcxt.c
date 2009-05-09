@@ -908,8 +908,8 @@ static MACHINE_RESET( filetto )
 
 static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
-	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
-	MDRV_CPU_IO_MAP(filetto_io,0)
+	MDRV_CPU_PROGRAM_MAP(filetto_map)
+	MDRV_CPU_IO_MAP(filetto_io)
 
 	MDRV_MACHINE_RESET( filetto )
 
@@ -953,8 +953,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tetriskr )
 	MDRV_CPU_ADD("maincpu", I8088, 14318180/3)
-	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
-	MDRV_CPU_IO_MAP(tetriskr_io,0)
+	MDRV_CPU_PROGRAM_MAP(filetto_map)
+	MDRV_CPU_IO_MAP(tetriskr_io)
 
 	MDRV_MACHINE_RESET( filetto )
 

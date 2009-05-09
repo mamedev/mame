@@ -272,11 +272,11 @@ static MACHINE_DRIVER_START( mnchmobl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
-	MDRV_CPU_PROGRAM_MAP(mnchmobl_map,0)
+	MDRV_CPU_PROGRAM_MAP(mnchmobl_map)
 	MDRV_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_assert)
 
 	/* video hardware */

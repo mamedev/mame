@@ -384,8 +384,8 @@ static MACHINE_DRIVER_START( m52 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( alpha1v )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alpha1v_map,0)
+	MDRV_CPU_PROGRAM_MAP(alpha1v_map)
 MACHINE_DRIVER_END
 
 

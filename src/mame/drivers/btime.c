@@ -1416,10 +1416,10 @@ static MACHINE_DRIVER_START( btime )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, HCLK2)	/* seletable between H2/H4 via jumper */
-	MDRV_CPU_PROGRAM_MAP(btime_map,0)
+	MDRV_CPU_PROGRAM_MAP(btime_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 	MDRV_TIMER_ADD_SCANLINE("audionmi", audio_nmi_gen, "screen", 0, 8)
 
 	/* video hardware */
@@ -1462,10 +1462,10 @@ static MACHINE_DRIVER_START( cookrace )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cookrace_map,0)
+	MDRV_CPU_PROGRAM_MAP(cookrace_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(cookrace)
@@ -1480,7 +1480,7 @@ static MACHINE_DRIVER_START( lnc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lnc_map,0)
+	MDRV_CPU_PROGRAM_MAP(lnc_map)
 
 	MDRV_MACHINE_RESET(lnc)
 
@@ -1508,7 +1508,7 @@ static MACHINE_DRIVER_START( mmonkey )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(wtennis)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mmonkey_map,0)
+	MDRV_CPU_PROGRAM_MAP(mmonkey_map)
 MACHINE_DRIVER_END
 
 
@@ -1517,7 +1517,7 @@ static MACHINE_DRIVER_START( bnj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_REPLACE("maincpu", M6502, HCLK4)
-	MDRV_CPU_PROGRAM_MAP(bnj_map,0)
+	MDRV_CPU_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(bnj)
@@ -1533,7 +1533,7 @@ static MACHINE_DRIVER_START( zoar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(zoar_map,0)
+	MDRV_CPU_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(zoar)
@@ -1555,10 +1555,10 @@ static MACHINE_DRIVER_START( disco )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_REPLACE("maincpu", M6502, HCLK4)
-	MDRV_CPU_PROGRAM_MAP(disco_map,0)
+	MDRV_CPU_PROGRAM_MAP(disco_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(disco_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(disco_audio_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(disco)
@@ -1573,7 +1573,7 @@ static MACHINE_DRIVER_START( tisland )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tisland_map,0)
+	MDRV_CPU_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(zoar)

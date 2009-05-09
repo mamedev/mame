@@ -757,7 +757,7 @@ static MACHINE_DRIVER_START( snookr10 )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
-	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
+	MDRV_CPU_PROGRAM_MAP(snookr10_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -803,7 +803,7 @@ static MACHINE_DRIVER_START( tenballs )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snookr10)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tenballs_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tenballs_map)
 
 MACHINE_DRIVER_END
 

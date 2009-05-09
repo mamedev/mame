@@ -442,12 +442,12 @@ static MACHINE_DRIVER_START( nomcu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(kangaroo)
@@ -477,7 +477,7 @@ static MACHINE_DRIVER_START( mcu )
 
 	MDRV_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/12)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 MACHINE_DRIVER_END
 
 

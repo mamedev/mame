@@ -696,12 +696,12 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( nightgal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 4)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(0,nightgal_map)
-	MDRV_CPU_IO_MAP(0,nightgal_io)
+	MDRV_CPU_PROGRAM_MAP(nightgal_map)
+	MDRV_CPU_IO_MAP(nightgal_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 4)
-	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(nsc_map)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -731,12 +731,12 @@ static MACHINE_DRIVER_START( sexygal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( nightgal )
   	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(0,sexygal_map)
-	MDRV_CPU_IO_MAP(0,sexygal_io)
+	MDRV_CPU_PROGRAM_MAP(sexygal_map)
+	MDRV_CPU_IO_MAP(sexygal_io)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SOUND_REMOVE("ay")

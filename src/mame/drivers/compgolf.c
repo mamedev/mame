@@ -199,7 +199,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_DRIVER_START( compgolf )
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(compgolf_map,0)
+	MDRV_CPU_PROGRAM_MAP(compgolf_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

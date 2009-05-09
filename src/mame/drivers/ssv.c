@@ -2743,7 +2743,7 @@ static MACHINE_DRIVER_START( drifto94 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(drifto94_map, 0)
+	MDRV_CPU_PROGRAM_MAP(drifto94_map)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
@@ -2758,7 +2758,7 @@ static MACHINE_DRIVER_START( gdfs )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gdfs_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gdfs_map)
 	MDRV_CPU_VBLANK_INT_HACK(gdfs_interrupt,1+4)
 
 	MDRV_NVRAM_HANDLER(gdfs)
@@ -2778,7 +2778,7 @@ static MACHINE_DRIVER_START( hypreact )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hypreact_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hypreact_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2791,7 +2791,7 @@ static MACHINE_DRIVER_START( hypreac2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hypreac2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hypreac2_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2804,7 +2804,7 @@ static MACHINE_DRIVER_START( janjans1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(janjans1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(janjans1_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2817,7 +2817,7 @@ static MACHINE_DRIVER_START( keithlcy )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(keithlcy_map, 0)
+	MDRV_CPU_PROGRAM_MAP(keithlcy_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2830,7 +2830,7 @@ static MACHINE_DRIVER_START( meosism )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(meosism_map, 0)
+	MDRV_CPU_PROGRAM_MAP(meosism_map)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
@@ -2845,7 +2845,7 @@ static MACHINE_DRIVER_START( mslider )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mslider_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mslider_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2858,7 +2858,7 @@ static MACHINE_DRIVER_START( ryorioh )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ryorioh_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ryorioh_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2871,7 +2871,7 @@ static MACHINE_DRIVER_START( srmp4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(srmp4_map, 0)
+	MDRV_CPU_PROGRAM_MAP(srmp4_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2884,7 +2884,7 @@ static MACHINE_DRIVER_START( srmp7 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(srmp7_map, 0)
+	MDRV_CPU_PROGRAM_MAP(srmp7_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2897,7 +2897,7 @@ static MACHINE_DRIVER_START( stmblade )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(drifto94_map, 0)
+	MDRV_CPU_PROGRAM_MAP(drifto94_map)
 
 	MDRV_NVRAM_HANDLER(ssv)
 	/* video hardware */
@@ -2911,7 +2911,7 @@ static MACHINE_DRIVER_START( survarts )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(survarts_map, 0)
+	MDRV_CPU_PROGRAM_MAP(survarts_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2932,7 +2932,7 @@ static MACHINE_DRIVER_START( eaglshot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(eaglshot_map, 0)
+	MDRV_CPU_PROGRAM_MAP(eaglshot_map)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
@@ -2951,7 +2951,7 @@ static MACHINE_DRIVER_START( sxyreact )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sxyreact_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
@@ -2966,7 +2966,7 @@ static MACHINE_DRIVER_START( twineag2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(twineag2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(twineag2_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2979,7 +2979,7 @@ static MACHINE_DRIVER_START( ultrax )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ultrax_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ultrax_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2991,10 +2991,10 @@ static MACHINE_DRIVER_START( jsk )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jsk_map, 0)
+	MDRV_CPU_PROGRAM_MAP(jsk_map)
 
 	MDRV_CPU_ADD("sub", V810,25000000)
-	MDRV_CPU_PROGRAM_MAP(jsk_v810_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(jsk_v810_mem)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

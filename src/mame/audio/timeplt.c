@@ -175,7 +175,7 @@ MACHINE_DRIVER_START( timeplt_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(timeplt_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(timeplt_sound_map)
 
 	MDRV_SOUND_START(timeplt)
 
@@ -214,5 +214,5 @@ MACHINE_DRIVER_START( locomotn_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("tpsound")
-	MDRV_CPU_PROGRAM_MAP(locomotn_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(locomotn_sound_map)
 MACHINE_DRIVER_END

@@ -3431,7 +3431,7 @@ static MACHINE_DRIVER_START( balcube )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(balcube_map,0)
+	MDRV_CPU_PROGRAM_MAP(balcube_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
@@ -3464,7 +3464,7 @@ static MACHINE_DRIVER_START( daitoa )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(daitoa_map,0)
+	MDRV_CPU_PROGRAM_MAP(daitoa_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
@@ -3496,7 +3496,7 @@ static MACHINE_DRIVER_START( bangball )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(bangball_map,0)
+	MDRV_CPU_PROGRAM_MAP(bangball_map)
 	MDRV_CPU_VBLANK_INT("screen", bangball_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -3529,7 +3529,7 @@ static MACHINE_DRIVER_START( batlbubl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(batlbubl_map,0)
+	MDRV_CPU_PROGRAM_MAP(batlbubl_map)
 	MDRV_CPU_VBLANK_INT("screen", bangball_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -3561,13 +3561,13 @@ static MACHINE_DRIVER_START( daitorid )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(daitorid_map,0)
+	MDRV_CPU_PROGRAM_MAP(daitorid_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(daitorid_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(daitorid_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3604,13 +3604,13 @@ static MACHINE_DRIVER_START( dharma )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(dharma_map,0)
+	MDRV_CPU_PROGRAM_MAP(dharma_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3646,13 +3646,13 @@ static MACHINE_DRIVER_START( karatour )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(karatour_map,0)
+	MDRV_CPU_PROGRAM_MAP(karatour_map)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3688,13 +3688,13 @@ static MACHINE_DRIVER_START( 3kokushi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(kokushi_map,0)
+	MDRV_CPU_PROGRAM_MAP(kokushi_map)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3730,13 +3730,13 @@ static MACHINE_DRIVER_START( lastfort )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(lastfort_map,0)
+	MDRV_CPU_PROGRAM_MAP(lastfort_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3771,13 +3771,13 @@ static MACHINE_DRIVER_START( lastforg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(lastforg_map,0)
+	MDRV_CPU_PROGRAM_MAP(lastforg_map)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -3812,7 +3812,7 @@ static MACHINE_DRIVER_START( dokyusei )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(dokyusei_map,0)
+	MDRV_CPU_PROGRAM_MAP(dokyusei_map)
 	MDRV_CPU_VBLANK_INT_HACK(dokyusei_interrupt,2)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
@@ -3862,7 +3862,7 @@ static MACHINE_DRIVER_START( dokyusp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(dokyusp_map,0)
+	MDRV_CPU_PROGRAM_MAP(dokyusp_map)
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -3900,7 +3900,7 @@ static MACHINE_DRIVER_START( gakusai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(gakusai_map,0)
+	MDRV_CPU_PROGRAM_MAP(gakusai_map)
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -3938,7 +3938,7 @@ static MACHINE_DRIVER_START( gakusai2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(gakusai2_map,0)
+	MDRV_CPU_PROGRAM_MAP(gakusai2_map)
 	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -3976,13 +3976,13 @@ static MACHINE_DRIVER_START( pangpoms )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(pangpoms_map,0)
+	MDRV_CPU_PROGRAM_MAP(pangpoms_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4018,13 +4018,13 @@ static MACHINE_DRIVER_START( poitto )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(poitto_map,0)
+	MDRV_CPU_PROGRAM_MAP(poitto_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4060,13 +4060,13 @@ static MACHINE_DRIVER_START( pururun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(pururun_map,0)
+	MDRV_CPU_PROGRAM_MAP(pururun_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(daitorid_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(daitorid_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4103,13 +4103,13 @@ static MACHINE_DRIVER_START( skyalert )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(skyalert_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyalert_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4145,13 +4145,13 @@ static MACHINE_DRIVER_START( toride2g )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(toride2g_map,0)
+	MDRV_CPU_PROGRAM_MAP(toride2g_map)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(metro_sound_map,0)
-	MDRV_CPU_IO_MAP(metro_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(metro_sound_map)
+	MDRV_CPU_IO_MAP(metro_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4187,7 +4187,7 @@ static MACHINE_DRIVER_START( mouja )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mouja_map,0)
+	MDRV_CPU_PROGRAM_MAP(mouja_map)
 	MDRV_CPU_VBLANK_INT("screen", mouja_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
@@ -4223,12 +4223,12 @@ static MACHINE_DRIVER_START( blzntrnd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(blzntrnd_map,0)
+	MDRV_CPU_PROGRAM_MAP(blzntrnd_map)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_map, 0)
-	MDRV_CPU_IO_MAP(blzntrnd_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_map)
+	MDRV_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4262,12 +4262,12 @@ static MACHINE_DRIVER_START( gstrik2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(blzntrnd_map,0)
+	MDRV_CPU_PROGRAM_MAP(blzntrnd_map)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_map, 0)
-	MDRV_CPU_IO_MAP(blzntrnd_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_map)
+	MDRV_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	MDRV_MACHINE_RESET(metro)
 
@@ -4331,8 +4331,8 @@ static MACHINE_DRIVER_START( puzzlet )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
-	MDRV_CPU_PROGRAM_MAP(puzzlet_map,0)
-	MDRV_CPU_IO_MAP(puzzlet_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(puzzlet_map)
+	MDRV_CPU_IO_MAP(puzzlet_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(puzzlet_interrupt, 5)
 
 	MDRV_MACHINE_RESET(metro)

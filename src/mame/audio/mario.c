@@ -603,8 +603,8 @@ MACHINE_DRIVER_START( mario_audio )
 #else
 	MDRV_CPU_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
 #endif
-	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
-	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mario_sound_map)
+	MDRV_CPU_IO_MAP(mario_sound_io_map)
 
 	MDRV_SOUND_START(mario)
 	MDRV_SOUND_RESET(mario)
@@ -619,7 +619,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( masao_audio )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24576000/16)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(masao_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(masao_sound_map)
 
 	MDRV_SOUND_START(mario)
 	MDRV_SOUND_RESET(mario)

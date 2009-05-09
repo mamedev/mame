@@ -295,16 +295,16 @@ static MACHINE_DRIVER_START( ataxx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(master_map_program,0)
-	MDRV_CPU_IO_MAP(master_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(master_map_program)
+	MDRV_CPU_IO_MAP(master_map_io)
 
 	MDRV_CPU_ADD("slave", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(slave_map_program,0)
-	MDRV_CPU_IO_MAP(slave_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(slave_map_program)
+	MDRV_CPU_IO_MAP(slave_map_io)
 
 	MDRV_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
-	MDRV_CPU_IO_MAP(ataxx_80186_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program)
+	MDRV_CPU_IO_MAP(ataxx_80186_map_io)
 
 	MDRV_MACHINE_START(ataxx)
 	MDRV_MACHINE_RESET(ataxx)

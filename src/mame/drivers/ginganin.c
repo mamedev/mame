@@ -327,11 +327,11 @@ static MACHINE_DRIVER_START( ginganin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(ginganin_map,0)
+	MDRV_CPU_PROGRAM_MAP(ginganin_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
 	/* video hardware */

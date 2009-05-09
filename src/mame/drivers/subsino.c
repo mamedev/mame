@@ -263,8 +263,8 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( victor5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(victor5_map,0)
-	MDRV_CPU_IO_MAP(subsino_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(victor5_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -304,8 +304,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( srider )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(srider_map,0)
-	MDRV_CPU_IO_MAP(subsino_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(srider_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -338,8 +338,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crsbingo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// Unknown CPU and clock
-	MDRV_CPU_PROGRAM_MAP(victor5_map,0)
-	MDRV_CPU_IO_MAP(subsino_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(victor5_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

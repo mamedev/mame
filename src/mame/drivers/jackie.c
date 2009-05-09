@@ -462,8 +462,8 @@ static MACHINE_DRIVER_START( jackie )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(jackie_prg_map,0)
-	MDRV_CPU_IO_MAP(jackie_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(jackie_prg_map)
+	MDRV_CPU_IO_MAP(jackie_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(jackie_interrupt,8)
 
 	MDRV_MACHINE_RESET(jackie)

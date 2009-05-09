@@ -548,13 +548,13 @@ static MACHINE_DRIVER_START( senjyo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(senjyo_map,0)
+	MDRV_CPU_PROGRAM_MAP(senjyo_map)
 	MDRV_CPU_VBLANK_INT("screen", senjyo_interrupt)
 
 	MDRV_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
 	MDRV_CPU_CONFIG(senjyo_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(senjyo_sound_map,0)
-	MDRV_CPU_IO_MAP(senjyo_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(senjyo_sound_map)
+	MDRV_CPU_IO_MAP(senjyo_sound_io_map)
 
 	MDRV_MACHINE_RESET(senjyo)
 
@@ -598,10 +598,10 @@ static MACHINE_DRIVER_START( starforb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(senjyo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(starforb_map,0)
+	MDRV_CPU_PROGRAM_MAP(starforb_map)
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(starforb_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(starforb_sound_map)
 MACHINE_DRIVER_END
 
 

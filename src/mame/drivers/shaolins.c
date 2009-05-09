@@ -212,7 +212,7 @@ static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(shaolins_map,0)
+	MDRV_CPU_PROGRAM_MAP(shaolins_map)
 	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */

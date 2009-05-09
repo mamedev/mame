@@ -907,15 +907,15 @@ static MACHINE_DRIVER_START( gticlub )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gticlub_map)
 	MDRV_CPU_VBLANK_INT("screen", gticlub_vblank)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap)
 
 	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map, 0)
+	MDRV_CPU_DATA_MAP(sharc_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -952,18 +952,18 @@ static MACHINE_DRIVER_START( hangplt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gticlub_map)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap)
 
 	MDRV_CPU_ADD("dsp1", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(hangplt_sharc0_map, 0)
+	MDRV_CPU_DATA_MAP(hangplt_sharc0_map)
 
 	MDRV_CPU_ADD("dsp2", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(hangplt_sharc1_map, 0)
+	MDRV_CPU_DATA_MAP(hangplt_sharc1_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

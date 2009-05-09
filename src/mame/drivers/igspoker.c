@@ -1576,8 +1576,8 @@ static MACHINE_DRIVER_START( igspoker )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(igspoker_prg_map,0)
-	MDRV_CPU_IO_MAP(igspoker_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(igspoker_prg_map)
+	MDRV_CPU_IO_MAP(igspoker_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(igs_interrupt,8)
 
 	MDRV_MACHINE_RESET(igs)
@@ -1625,7 +1625,7 @@ static MACHINE_DRIVER_START( number10 )
 
 	MDRV_IMPORT_FROM(igspoker)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(number10_io_map,0)
+	MDRV_CPU_IO_MAP(number10_io_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_VIDEO_START(cpokerpk)
@@ -1640,7 +1640,7 @@ static MACHINE_DRIVER_START( cpokerpk )
 
 	MDRV_IMPORT_FROM(number10)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(cpokerpk_io_map,0)
+	MDRV_CPU_IO_MAP(cpokerpk_io_map)
 	MDRV_GFXDECODE(cpokerpk)
 MACHINE_DRIVER_END
 

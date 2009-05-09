@@ -1016,17 +1016,17 @@ static MACHINE_DRIVER_START( cvs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
-	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map)
+	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", cvs_main_cpu_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map,0)
-	MDRV_CPU_IO_MAP(cvs_dac_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
+	MDRV_CPU_IO_MAP(cvs_dac_cpu_io_map)
 
 	MDRV_CPU_ADD("speech", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_speech_cpu_map,0)
-	MDRV_CPU_IO_MAP(cvs_speech_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
+	MDRV_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
 	MDRV_MACHINE_START(cvs)
 

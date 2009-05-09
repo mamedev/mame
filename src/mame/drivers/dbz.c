@@ -322,12 +322,12 @@ static MACHINE_DRIVER_START( dbz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(dbz_map,0)
+	MDRV_CPU_PROGRAM_MAP(dbz_map)
 	MDRV_CPU_VBLANK_INT_HACK(dbz_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(dbz_sound_map, 0)
-	MDRV_CPU_IO_MAP(dbz_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dbz_sound_map)
+	MDRV_CPU_IO_MAP(dbz_sound_io_map)
 
 	MDRV_GFXDECODE(dbz)
 

@@ -1609,11 +1609,11 @@ static MACHINE_DRIVER_START( arknoid2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", arknoid2_interrupt)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
@@ -1648,11 +1648,11 @@ static MACHINE_DRIVER_START( drtoppel )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", arknoid2_interrupt)
 
 	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
@@ -1687,15 +1687,15 @@ static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_IO_MAP(i8742_io_map,0)
+	MDRV_CPU_IO_MAP(i8742_io_map)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1728,11 +1728,11 @@ static MACHINE_DRIVER_START( insectx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
@@ -1766,11 +1766,11 @@ static MACHINE_DRIVER_START( kageki )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kageki_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(kageki_sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
@@ -1811,16 +1811,16 @@ static MACHINE_DRIVER_START( tnzsb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu0_type2,0)
+	MDRV_CPU_PROGRAM_MAP(cpu0_type2)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
-	MDRV_CPU_IO_MAP(tnzsb_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map)
+	MDRV_CPU_IO_MAP(tnzsb_io_map)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1858,10 +1858,10 @@ static MACHINE_DRIVER_START( kabukiz )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu1_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu2_map)
 
 	MDRV_SOUND_MODIFY("ym")
 	MDRV_SOUND_CONFIG(kabukiz_ym2203_interface)
@@ -1879,11 +1879,11 @@ static MACHINE_DRIVER_START( jpopnics )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)	/* Not verified - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")

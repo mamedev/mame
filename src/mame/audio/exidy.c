@@ -811,7 +811,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( venture_audio )
 
 	MDRV_CPU_ADD("audiocpu", M6502, 3579545/4)
-	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(venture_audio_map)
 
 	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
 
@@ -875,8 +875,8 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( mtrap_cvsd_audio )
 
 	MDRV_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
-	MDRV_CPU_IO_MAP(cvsd_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(cvsd_map)
+	MDRV_CPU_IO_MAP(cvsd_iomap)
 
 	/* audio hardware */
 	MDRV_SOUND_ADD("cvsd", MC3417, CVSD_CLOCK)
@@ -1037,7 +1037,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( victory_audio )
 
 	MDRV_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(victory_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(victory_audio_map)
 
 	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
 	MDRV_PIA6821_ADD("pia1", victory_pia1_intf)

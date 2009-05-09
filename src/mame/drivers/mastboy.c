@@ -857,8 +857,8 @@ static MACHINE_RESET( mastboy )
 
 static MACHINE_DRIVER_START( mastboy )
 	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
-	MDRV_CPU_PROGRAM_MAP(mastboy_map,0)
-	MDRV_CPU_IO_MAP(mastboy_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mastboy_map)
+	MDRV_CPU_IO_MAP(mastboy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mastboy_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)

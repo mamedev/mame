@@ -357,8 +357,8 @@ static INTERRUPT_GEN( spoker_interrupt )
 static MACHINE_DRIVER_START( spoker )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(spoker_map,0)
-	MDRV_CPU_IO_MAP(spoker_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(spoker_map)
+	MDRV_CPU_IO_MAP(spoker_portmap)
 	MDRV_CPU_VBLANK_INT("screen",spoker_interrupt)
 
 	MDRV_MACHINE_RESET(spoker)

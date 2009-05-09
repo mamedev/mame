@@ -79,7 +79,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( comebaby )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
-	MDRV_CPU_PROGRAM_MAP(comebaby_map, 0)
+	MDRV_CPU_PROGRAM_MAP(comebaby_map)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

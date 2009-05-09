@@ -788,7 +788,7 @@ static MACHINE_DRIVER_START( atarigt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 

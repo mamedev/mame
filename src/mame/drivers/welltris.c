@@ -719,12 +719,12 @@ static MACHINE_DRIVER_START( welltris )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_port_map,0)	/* IRQs are triggered by the YM2610 */
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_port_map)	/* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

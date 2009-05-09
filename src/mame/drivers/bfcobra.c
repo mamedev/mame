@@ -1736,12 +1736,12 @@ static INTERRUPT_GEN( vblank_gen )
 
 static MACHINE_DRIVER_START( bfcobra )
 	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
-	MDRV_CPU_PROGRAM_MAP(z80_prog_map, 0)
-	MDRV_CPU_IO_MAP(z80_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(z80_prog_map)
+	MDRV_CPU_IO_MAP(z80_io_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
 
 	MDRV_CPU_ADD("audiocpu", M6809, M6809_XTAL)
-	MDRV_CPU_PROGRAM_MAP(m6809_prog_map, 0)
+	MDRV_CPU_PROGRAM_MAP(m6809_prog_map)
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

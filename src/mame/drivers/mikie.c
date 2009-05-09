@@ -194,11 +194,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mikie )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6809, 1250000)	// ??? MC68A09E
-	MDRV_CPU_PROGRAM_MAP(mikie_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mikie_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, CLK)	// 3.58 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	// video hardware
 

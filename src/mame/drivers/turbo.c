@@ -1079,7 +1079,7 @@ static MACHINE_DRIVER_START( turbo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
+	MDRV_CPU_PROGRAM_MAP(turbo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", turbo_8255_intf[0] )
@@ -1110,7 +1110,7 @@ static MACHINE_DRIVER_START( subroc3d )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
+	MDRV_CPU_PROGRAM_MAP(subroc3d_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", subroc3d_8255_intf[0] )
@@ -1139,12 +1139,12 @@ static MACHINE_DRIVER_START( buckrog )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(buckrog_map,0)
+	MDRV_CPU_PROGRAM_MAP(buckrog_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)
-	MDRV_CPU_IO_MAP(buckrog_cpu2_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map)
+	MDRV_CPU_IO_MAP(buckrog_cpu2_portmap)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_MACHINE_RESET(buckrog)

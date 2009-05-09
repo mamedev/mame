@@ -396,13 +396,13 @@ static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_map,0)
+	MDRV_CPU_PROGRAM_MAP(superchs_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */

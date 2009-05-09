@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map_r1,0)
+	MDRV_CPU_PROGRAM_MAP(main_map_r1)
 
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( alg_r2 )
 	MDRV_IMPORT_FROM(alg_r1)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(main_map_r2,0)
+	MDRV_CPU_PROGRAM_MAP(main_map_r2)
 MACHINE_DRIVER_END
 
 
@@ -456,7 +456,7 @@ static MACHINE_DRIVER_START( picmatic )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_REPLACE("maincpu", M68000, AMIGA_68000_PAL_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map_picmatic,0)
+	MDRV_CPU_PROGRAM_MAP(main_map_picmatic)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)

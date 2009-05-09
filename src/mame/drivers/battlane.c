@@ -255,11 +255,11 @@ static MACHINE_DRIVER_START( battlane )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1250000)        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(battlane_map, 0)
+	MDRV_CPU_PROGRAM_MAP(battlane_map)
 	MDRV_CPU_VBLANK_INT("screen", battlane_cpu1_interrupt)
 
 	MDRV_CPU_ADD("sub", M6809, 1250000)        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(battlane_map, 0)
+	MDRV_CPU_PROGRAM_MAP(battlane_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

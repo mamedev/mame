@@ -195,8 +195,8 @@ static MACHINE_DRIVER_START( cardline )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80C32,12000000)
-	MDRV_CPU_PROGRAM_MAP(mem_prg,0)
-	MDRV_CPU_IO_MAP(mem_io,0)
+	MDRV_CPU_PROGRAM_MAP(mem_prg)
+	MDRV_CPU_IO_MAP(mem_io)
 	//MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* video hardware */

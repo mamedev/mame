@@ -534,12 +534,12 @@ static INTERRUPT_GEN( sliver_int )
 
 static MACHINE_DRIVER_START( sliver )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sliver_map,0)
+	MDRV_CPU_PROGRAM_MAP(sliver_map)
 	MDRV_CPU_VBLANK_INT_HACK(sliver_int,3)
 
 	MDRV_CPU_ADD("audiocpu", I8051, 8000000)
-	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)
-	MDRV_CPU_IO_MAP(soundmem_io,0)
+	MDRV_CPU_PROGRAM_MAP(soundmem_prg)
+	MDRV_CPU_IO_MAP(soundmem_io)
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)

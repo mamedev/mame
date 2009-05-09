@@ -319,7 +319,7 @@ typedef union _addrmap8_token addrmap8_token;
 union _addrmap8_token
 {
 	TOKEN_COMMON_FIELDS
-	const addrmap_token *	tokenptr;
+	const addrmap8_token *	tokenptr;
 	read8_space_func		sread;				/* pointer to native space read handler */
 	write8_space_func		swrite;				/* pointer to native space write handler */
 	read8_device_func		dread;				/* pointer to native device read handler */
@@ -336,7 +336,7 @@ typedef union _addrmap16_token addrmap16_token;
 union _addrmap16_token
 {
 	TOKEN_COMMON_FIELDS
-	const addrmap_token *	tokenptr;
+	const addrmap16_token *	tokenptr;
 	read16_space_func		sread;				/* pointer to native read handler */
 	write16_space_func 		swrite;				/* pointer to native write handler */
 	read16_device_func		dread;				/* pointer to native device read handler */
@@ -357,7 +357,7 @@ typedef union _addrmap32_token addrmap32_token;
 union _addrmap32_token
 {
 	TOKEN_COMMON_FIELDS
-	const addrmap_token *	tokenptr;
+	const addrmap32_token *	tokenptr;
 	read32_space_func		sread;				/* pointer to native read handler */
 	write32_space_func 		swrite;				/* pointer to native write handler */
 	read32_device_func		dread;				/* pointer to native device read handler */
@@ -382,7 +382,7 @@ typedef union _addrmap64_token addrmap64_token;
 union _addrmap64_token
 {
 	TOKEN_COMMON_FIELDS
-	const addrmap_token *	tokenptr;
+	const addrmap64_token *	tokenptr;
 	read64_space_func		sread;				/* pointer to native read handler */
 	write64_space_func 		swrite;				/* pointer to native write handler */
 	read64_device_func		dread;				/* pointer to native device read handler */
@@ -631,7 +631,7 @@ union _addrmap64_token
 /* importing data from other address maps */
 #define AM_IMPORT_FROM(_name) \
 	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_INCLUDE, 8), \
-	TOKEN_PTR(tokenptr, address_map_##_name),
+	TOKEN_PTR(tokenptr, ADDRESS_MAP_NAME(_name)),
 
 
 /* address ranges */

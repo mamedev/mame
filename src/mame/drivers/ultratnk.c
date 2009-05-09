@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( ultratnk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(ultratnk_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ultratnk_cpu_map)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_RESET(ultratnk)

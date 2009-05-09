@@ -569,11 +569,11 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 static MACHINE_DRIVER_START( ddragon3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(ddragon3_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddragon3_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -604,17 +604,17 @@ static MACHINE_DRIVER_START( ddrago3b )
 	MDRV_IMPORT_FROM(ddragon3)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dd3b_map,0)
+	MDRV_CPU_PROGRAM_MAP(dd3b_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ctribe )
 	MDRV_IMPORT_FROM(ddragon3)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_map,0)
+	MDRV_CPU_PROGRAM_MAP(ctribe_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ctribe_sound_map)
 
 	MDRV_VIDEO_UPDATE(ctribe)
 

@@ -329,11 +329,11 @@ static MACHINE_DRIVER_START( chqflag )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(chqflag_map,0)
+	MDRV_CPU_PROGRAM_MAP(chqflag_map)
 	MDRV_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(chqflag_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(chqflag_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

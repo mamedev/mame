@@ -612,11 +612,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( lethalen )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)	// ???
-	MDRV_CPU_PROGRAM_MAP(le_main, 0)
+	MDRV_CPU_PROGRAM_MAP(le_main)
 	MDRV_CPU_VBLANK_INT("screen", lethalen_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(le_sound, 0)
+	MDRV_CPU_PROGRAM_MAP(le_sound)
 
 	MDRV_MACHINE_START(lethalen)
 	MDRV_MACHINE_RESET(lethalen)

@@ -976,8 +976,8 @@ static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(cclimber_map,0)
-	MDRV_CPU_IO_MAP(cclimber_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cclimber_map)
+	MDRV_CPU_IO_MAP(cclimber_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(cclimber)
@@ -1022,7 +1022,7 @@ static MACHINE_DRIVER_START( cannonb )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cannonb_map,0)
+	MDRV_CPU_PROGRAM_MAP(cannonb_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(cannonb)
@@ -1035,12 +1035,12 @@ static MACHINE_DRIVER_START( yamato )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yamato_map,0)
-	MDRV_CPU_IO_MAP(yamato_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(yamato_map)
+	MDRV_CPU_IO_MAP(yamato_portmap)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(yamato_audio_map,0)
-	MDRV_CPU_IO_MAP(yamato_audio_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(yamato_audio_map)
+	MDRV_CPU_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(16*4+8*4+256)
@@ -1064,7 +1064,7 @@ static MACHINE_DRIVER_START( toprollr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(toprollr_map,0)
+	MDRV_CPU_PROGRAM_MAP(toprollr_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(toprollr)
@@ -1080,12 +1080,12 @@ static MACHINE_DRIVER_START( swimmer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(swimmer_map,0)
+	MDRV_CPU_PROGRAM_MAP(swimmer_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000/2)
-	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map,0)
-	MDRV_CPU_IO_MAP(swimmer_audio_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map)
+	MDRV_CPU_IO_MAP(swimmer_audio_portmap)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, (double)4000000/16384) /* IRQs are triggered by the main CPU */
 
 	/* video hardware */

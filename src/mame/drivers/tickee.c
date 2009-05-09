@@ -429,7 +429,7 @@ static MACHINE_DRIVER_START( tickee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(tickee_map,0)
+	MDRV_CPU_PROGRAM_MAP(tickee_map)
 
 	MDRV_MACHINE_RESET(tickee)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( ghoshunt )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ghoshunt_map,0)
+	MDRV_CPU_PROGRAM_MAP(ghoshunt_map)
 MACHINE_DRIVER_END
 
 

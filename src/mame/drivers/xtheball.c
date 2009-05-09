@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,15000)
 
 	MDRV_MACHINE_RESET(xtheball)

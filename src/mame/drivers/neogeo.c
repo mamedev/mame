@@ -1336,11 +1336,11 @@ static MACHINE_DRIVER_START( neogeo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
-	MDRV_CPU_IO_MAP(auido_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MDRV_CPU_IO_MAP(auido_io_map)
 
 	MDRV_WATCHDOG_TIME_INIT(USEC(128762))
 

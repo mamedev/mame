@@ -176,8 +176,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mirax )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000) // audio cpu ?
-	MDRV_CPU_PROGRAM_MAP(memory_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(memory_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
 	/* video hardware */

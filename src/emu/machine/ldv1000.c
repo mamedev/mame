@@ -165,8 +165,8 @@ static const z80_daisy_chain daisy_chain[] =
 static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
 	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(ldv1000_map,0)
-	MDRV_CPU_IO_MAP(ldv1000_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(ldv1000_map)
+	MDRV_CPU_IO_MAP(ldv1000_portmap)
 
 	MDRV_Z80CTC_ADD("ldvctc", XTAL_5MHz/2 /* same as "ldv1000" */, ctcintf)
 	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)

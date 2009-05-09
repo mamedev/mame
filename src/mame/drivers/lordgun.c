@@ -410,12 +410,12 @@ static const ym3812_interface lordgun_ym3812_interface =
 
 static MACHINE_DRIVER_START( lordgun )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(lordgun_map,0)
+	MDRV_CPU_PROGRAM_MAP(lordgun_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map,0)
-	MDRV_CPU_IO_MAP(lordgun_soundio_map,0)
+	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map)
+	MDRV_CPU_IO_MAP(lordgun_soundio_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -455,10 +455,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hfh )
 	MDRV_IMPORT_FROM(lordgun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hfh_map,0)
+	MDRV_CPU_PROGRAM_MAP(hfh_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(hfh_soundio_map,0)
+	MDRV_CPU_IO_MAP(hfh_soundio_map)
 
 	// sound hardware
 	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)	// 5MHz can't be right!

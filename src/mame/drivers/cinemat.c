@@ -981,9 +981,9 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(config_nojmi)
-	MDRV_CPU_PROGRAM_MAP(program_map_4k,0)
-	MDRV_CPU_DATA_MAP(data_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(program_map_4k)
+	MDRV_CPU_DATA_MAP(data_map)
+	MDRV_CPU_IO_MAP(io_map)
 
 	MDRV_MACHINE_START(cinemat)
 	MDRV_MACHINE_RESET(cinemat)
@@ -1011,28 +1011,28 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cinemat_nojmi_8k )
 	MDRV_IMPORT_FROM(cinemat_nojmi_4k)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(program_map_8k,0)
+	MDRV_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( cinemat_jmi_8k )
 	MDRV_IMPORT_FROM(cinemat_jmi_4k)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(program_map_8k,0)
+	MDRV_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( cinemat_jmi_16k )
 	MDRV_IMPORT_FROM(cinemat_jmi_4k)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(program_map_16k,0)
+	MDRV_CPU_PROGRAM_MAP(program_map_16k)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( cinemat_jmi_32k )
 	MDRV_IMPORT_FROM(cinemat_jmi_4k)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(program_map_32k,0)
+	MDRV_CPU_PROGRAM_MAP(program_map_32k)
 MACHINE_DRIVER_END
 
 
@@ -1149,7 +1149,7 @@ static MACHINE_DRIVER_START( qb3 )
 	MDRV_IMPORT_FROM(cinemat_jmi_32k)
 	MDRV_IMPORT_FROM(qb3_sound)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_DATA_MAP(data_map_qb3,0)
+	MDRV_CPU_DATA_MAP(data_map_qb3)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
 	MDRV_VIDEO_START(cinemat_qb3color)

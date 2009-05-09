@@ -435,12 +435,12 @@ static MACHINE_DRIVER_START( sandscrp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
-	MDRV_CPU_PROGRAM_MAP(sandscrp,0)
+	MDRV_CPU_PROGRAM_MAP(sandscrp)
 	MDRV_CPU_VBLANK_INT("screen", sandscrp_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem,0)
-	MDRV_CPU_IO_MAP(sandscrp_soundport,0)
+	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem)
+	MDRV_CPU_IO_MAP(sandscrp_soundport)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 

@@ -2759,11 +2759,11 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2816,11 +2816,11 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	// 12MHz verified
-	MDRV_CPU_PROGRAM_MAP(qsound_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
 	MDRV_CPU_REPLACE("audiocpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
 	MDRV_NVRAM_HANDLER(qsound)
@@ -2843,7 +2843,7 @@ static MACHINE_DRIVER_START( cpspicb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
@@ -2918,11 +2918,11 @@ static MACHINE_DRIVER_START( sf2mdt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map,0)
+	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -39,7 +39,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( tokyocop )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
-	MDRV_CPU_PROGRAM_MAP(tokyocop_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tokyocop_map)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

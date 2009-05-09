@@ -700,11 +700,11 @@ static MACHINE_DRIVER_START( trackfld )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -742,10 +742,10 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_IMPORT_FROM(trackfld)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map)
 
 	MDRV_CPU_ADD("adpcm", M6802, SOUND_CLOCK/8)	/* unknown clock */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("vlm")
@@ -761,7 +761,7 @@ static MACHINE_DRIVER_START( mastkin )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mastkin_map,0)
+	MDRV_CPU_PROGRAM_MAP(mastkin_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wizzquiz )
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START( wizzquiz )
 	MDRV_IMPORT_FROM(trackfld)
 	// right cpu?
 	MDRV_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wizzquiz_map,0)
+	MDRV_CPU_PROGRAM_MAP(wizzquiz_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
@@ -779,8 +779,8 @@ static MACHINE_DRIVER_START( reaktor )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(reaktor_map,0)
-	MDRV_CPU_IO_MAP(reaktor_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(reaktor_map)
+	MDRV_CPU_IO_MAP(reaktor_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 

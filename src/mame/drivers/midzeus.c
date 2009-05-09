@@ -1107,7 +1107,7 @@ static MACHINE_DRIVER_START( midzeus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
+	MDRV_CPU_PROGRAM_MAP(zeus_map)
 	MDRV_CPU_VBLANK_INT("screen", display_irq)
 
 	MDRV_MACHINE_START(midzeus)
@@ -1133,7 +1133,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
+	MDRV_CPU_PROGRAM_MAP(zeus2_map)
 	MDRV_CPU_VBLANK_INT("screen", display_irq)
 
 	MDRV_MACHINE_START(midzeus)

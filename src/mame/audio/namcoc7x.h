@@ -34,14 +34,14 @@ void namcoc7x_set_host_ram(UINT32 *hostram);
 
 #define NAMCO_C7X_MCU(clock)	\
 	MDRV_CPU_ADD("mcu", M37702, clock)	\
-	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_map, 0)	\
-	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
+	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_map)	\
+	MDRV_CPU_IO_MAP(namcoc7x_mcu_io)	\
 	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_MCU_SHARED(clock)	\
 	MDRV_CPU_ADD("mcu", M37702, clock)	\
-	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map, 0)	\
-	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
+	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map)	\
+	MDRV_CPU_IO_MAP(namcoc7x_mcu_io)	\
 	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_SOUND(clock)	\

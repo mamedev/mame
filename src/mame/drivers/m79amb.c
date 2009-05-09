@@ -193,7 +193,7 @@ static MACHINE_DRIVER_START( m79amb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_19_6608MHz / 10)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", m79amb_interrupt)
 
 	/* video hardware */

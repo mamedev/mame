@@ -725,8 +725,8 @@ static MACHINE_DRIVER_START( geebee )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(geebee_map,0)
-	MDRV_CPU_IO_MAP(geebee_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(geebee_map)
+	MDRV_CPU_IO_MAP(geebee_port_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -765,7 +765,7 @@ static MACHINE_DRIVER_START( bombbee )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9) 		/* 18.432 MHz / 9 */
-	MDRV_CPU_PROGRAM_MAP(bombbee_map,0)
+	MDRV_CPU_PROGRAM_MAP(bombbee_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */
@@ -792,7 +792,7 @@ static MACHINE_DRIVER_START( warpwarp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bombbee)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(warpwarp_map,0)
+	MDRV_CPU_PROGRAM_MAP(warpwarp_map)
 MACHINE_DRIVER_END
 
 

@@ -456,8 +456,8 @@ static MACHINE_DRIVER_START( quizdna )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(quizdna_map,0)
-	MDRV_CPU_IO_MAP(quizdna_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(quizdna_map)
+	MDRV_CPU_IO_MAP(quizdna_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -495,7 +495,7 @@ static MACHINE_DRIVER_START( gakupara )
 	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(gakupara_io_map,0)
+	MDRV_CPU_IO_MAP(gakupara_io_map)
 
 MACHINE_DRIVER_END
 
@@ -505,8 +505,8 @@ static MACHINE_DRIVER_START( gekiretu )
 	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gekiretu_map,0)
-	MDRV_CPU_IO_MAP(gekiretu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(gekiretu_map)
+	MDRV_CPU_IO_MAP(gekiretu_io_map)
 
 MACHINE_DRIVER_END
 

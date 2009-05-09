@@ -1576,11 +1576,11 @@ static MACHINE_DRIVER_START( superpac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(superpac_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(superpac_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(superpac_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(superpac_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -1623,15 +1623,15 @@ static MACHINE_DRIVER_START( phozon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
-	MDRV_CPU_PROGRAM_MAP(phozon_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(phozon_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809,	PIXEL_CLOCK/4)	/* SOUND CPU */
-	MDRV_CPU_PROGRAM_MAP(phozon_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(phozon_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", M6809,	PIXEL_CLOCK/4)	/* SUB CPU */
-	MDRV_CPU_PROGRAM_MAP(phozon_cpu3_map,0)
+	MDRV_CPU_PROGRAM_MAP(phozon_cpu3_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -1664,11 +1664,11 @@ static MACHINE_DRIVER_START( mappy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(mappy_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(mappy_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(mappy_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(mappy_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)

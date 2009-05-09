@@ -280,8 +280,8 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( speedatk )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
-	MDRV_CPU_PROGRAM_MAP(speedatk_mem,0)
-	MDRV_CPU_IO_MAP(speedatk_io,0)
+	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
+	MDRV_CPU_IO_MAP(speedatk_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

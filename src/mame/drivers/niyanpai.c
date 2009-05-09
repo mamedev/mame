@@ -780,13 +780,13 @@ static MACHINE_DRIVER_START( niyanpai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
-	MDRV_CPU_PROGRAM_MAP(niyanpai_map,0)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_map)
 	MDRV_CPU_VBLANK_INT("screen", niyanpai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map, 0)
-	MDRV_CPU_IO_MAP(niyanpai_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map)
+	MDRV_CPU_IO_MAP(niyanpai_sound_io_map)
 
 	MDRV_Z80CTC_ADD("ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf)
 
@@ -824,7 +824,7 @@ static MACHINE_DRIVER_START( musobana )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(musobana_map, 0)
+	MDRV_CPU_PROGRAM_MAP(musobana_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mhhonban )
@@ -832,7 +832,7 @@ static MACHINE_DRIVER_START( mhhonban )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mhhonban_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_DRIVER_END
 
 

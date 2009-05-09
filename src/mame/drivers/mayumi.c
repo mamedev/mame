@@ -272,8 +272,8 @@ static MACHINE_DRIVER_START( mayumi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mayumi_map,0)
-	MDRV_CPU_IO_MAP(mayumi_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mayumi_map)
+	MDRV_CPU_IO_MAP(mayumi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mayumi_interrupt)
 
 	MDRV_MACHINE_RESET( mayumi )

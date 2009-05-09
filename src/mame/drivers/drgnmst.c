@@ -380,12 +380,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( drgnmst )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
-	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */
-	MDRV_CPU_IO_MAP(drgnmst_sound_io_map, 0)
+	MDRV_CPU_IO_MAP(drgnmst_sound_io_map)
 
 	MDRV_GFXDECODE(drgnmst)
 

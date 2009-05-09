@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( groundfx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(groundfx_map,0)
+	MDRV_CPU_PROGRAM_MAP(groundfx_map)
 	MDRV_CPU_VBLANK_INT("screen", groundfx_interrupt)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)

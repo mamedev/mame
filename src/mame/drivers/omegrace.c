@@ -477,8 +477,8 @@ static MACHINE_DRIVER_START( omegrace )
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4)
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_IO_MAP(port_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(port_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,250)
 
 	/* audio CPU */
@@ -486,8 +486,8 @@ static MACHINE_DRIVER_START( omegrace )
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
 	MDRV_CPU_ADD("audiocpu", Z80,12000000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_IO_MAP(sound_port, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_port)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,250)
 
 	MDRV_MACHINE_RESET(omegrace)

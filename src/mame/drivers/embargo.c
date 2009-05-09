@@ -231,8 +231,8 @@ static MACHINE_DRIVER_START( embargo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 625000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 
 	MDRV_MACHINE_START(embargo)
 

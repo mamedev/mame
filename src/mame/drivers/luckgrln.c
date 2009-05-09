@@ -122,8 +122,8 @@ static VIDEO_UPDATE(luckgrln)
 
 static MACHINE_DRIVER_START( luckgrln )
 	MDRV_CPU_ADD("maincpu", Z180,8000000)
-	MDRV_CPU_PROGRAM_MAP(mainmap,0)
-	MDRV_CPU_IO_MAP(portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mainmap)
+	MDRV_CPU_IO_MAP(portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

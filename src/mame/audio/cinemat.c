@@ -1578,8 +1578,8 @@ MACHINE_DRIVER_START( demon_sound )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(demon_sound_map,0)
-	MDRV_CPU_IO_MAP(demon_sound_ports,0)
+	MDRV_CPU_PROGRAM_MAP(demon_sound_map)
+	MDRV_CPU_IO_MAP(demon_sound_ports)
 
 	MDRV_Z80CTC_ADD("ctc", 3579545 /* same as "audiocpu" */, demon_z80ctc_interface)
 

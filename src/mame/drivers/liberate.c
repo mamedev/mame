@@ -486,12 +486,12 @@ static MACHINE_DRIVER_START( liberate )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_map,0)
-	MDRV_CPU_IO_MAP(deco16_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberate_map)
+	MDRV_CPU_IO_MAP(deco16_io_map)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 
 	MDRV_CPU_ADD("audiocpu",M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(liberate_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(12000))
@@ -527,8 +527,8 @@ static MACHINE_DRIVER_START( liberatb )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_TYPE(M6502)
-	MDRV_CPU_PROGRAM_MAP(liberatb_map,0)
-	MDRV_CPU_IO_MAP(0,0)
+	MDRV_CPU_PROGRAM_MAP(liberatb_map)
+	MDRV_CPU_IO_MAP(0)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 MACHINE_DRIVER_END
 
@@ -546,8 +546,8 @@ static MACHINE_DRIVER_START( prosoccr )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(3000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_map,0)
-	MDRV_CPU_IO_MAP(deco16_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberate_map)
+	MDRV_CPU_IO_MAP(deco16_io_map)
 
 	MDRV_VIDEO_START(prosoccr)
 	MDRV_VIDEO_UPDATE(prosoccr)
@@ -557,11 +557,11 @@ static MACHINE_DRIVER_START( prosport )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(prosport_map,0)
-	MDRV_CPU_IO_MAP(deco16_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(prosport_map)
+	MDRV_CPU_IO_MAP(deco16_io_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(liberate_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(12000))

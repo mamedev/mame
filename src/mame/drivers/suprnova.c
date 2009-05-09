@@ -836,7 +836,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static MACHINE_DRIVER_START(skns)
 	MDRV_CPU_ADD("maincpu", SH2,28638000)
-	MDRV_CPU_PROGRAM_MAP(skns_map,0)
+	MDRV_CPU_PROGRAM_MAP(skns_map)
 	MDRV_CPU_VBLANK_INT_HACK(skns_interrupt,2)
 
 	MDRV_MACHINE_RESET(skns)

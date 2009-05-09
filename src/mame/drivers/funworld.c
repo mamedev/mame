@@ -2013,7 +2013,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( funworld )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(funworld_map, 0)
+	MDRV_CPU_PROGRAM_MAP(funworld_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -2053,7 +2053,7 @@ static MACHINE_DRIVER_START( magicrd2 )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 
 	MDRV_GFXDECODE(funworld)
 	MDRV_VIDEO_START(magicrd2)
@@ -2067,28 +2067,28 @@ static MACHINE_DRIVER_START( royalcrd )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cuoreuno )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(cuoreuno_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cuoreuno_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( royalmcu )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(royalmcu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(royalmcu_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( saloon )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(saloon_map, 0)
+	MDRV_CPU_PROGRAM_MAP(saloon_map)
 MACHINE_DRIVER_END
 
 static const UINT8 jolyc980_default_eeprom[0x800] = {

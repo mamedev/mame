@@ -669,14 +669,14 @@ static MACHINE_DRIVER_START( kickgoal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
 	MDRV_CPU_FLAGS(CPU_DISABLE)	/* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MDRV_CPU_IO_MAP(kickgoal_sound_io_map, 0)
+	MDRV_CPU_IO_MAP(kickgoal_sound_io_map)
 
 	MDRV_NVRAM_HANDLER(kickgoal)
 
@@ -705,13 +705,13 @@ static MACHINE_DRIVER_START( actionhw )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MDRV_CPU_IO_MAP(actionhw_io_map, 0)
+	MDRV_CPU_IO_MAP(actionhw_io_map)
 
 	MDRV_NVRAM_HANDLER(kickgoal) // 93C46 really
 

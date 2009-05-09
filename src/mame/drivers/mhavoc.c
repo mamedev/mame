@@ -475,10 +475,10 @@ static MACHINE_DRIVER_START( mhavoc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(alpha_map, 0)
+	MDRV_CPU_PROGRAM_MAP(alpha_map)
 
 	MDRV_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)	/* 1.25 MHz */
-	MDRV_CPU_PROGRAM_MAP(gamma_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gamma_map)
 
 	MDRV_MACHINE_RESET(mhavoc)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( alphaone )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mhavoc)
 	MDRV_CPU_MODIFY("alpha")
-	MDRV_CPU_PROGRAM_MAP(alphaone_map, 0)
+	MDRV_CPU_PROGRAM_MAP(alphaone_map)
 	MDRV_CPU_REMOVE("gamma")
 
 	MDRV_SCREEN_MODIFY("screen")

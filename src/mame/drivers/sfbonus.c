@@ -941,8 +941,8 @@ static NVRAM_HANDLER( sfbonus )
 
 static MACHINE_DRIVER_START( sfbonus )
 	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
-	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
-	MDRV_CPU_IO_MAP(0,sfbonus_io)
+	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
+	MDRV_CPU_IO_MAP(sfbonus_io)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 	//MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
 

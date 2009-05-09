@@ -285,11 +285,11 @@ static MACHINE_DRIVER_START( twocrude )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59 */
-	MDRV_CPU_PROGRAM_MAP(twocrude_map,0)
+	MDRV_CPU_PROGRAM_MAP(twocrude_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

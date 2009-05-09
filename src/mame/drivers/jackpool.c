@@ -253,7 +253,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 
 static MACHINE_DRIVER_START( jackpool )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) // ?
-	MDRV_CPU_PROGRAM_MAP(jackpool_mem,0)
+	MDRV_CPU_PROGRAM_MAP(jackpool_mem)
 	MDRV_CPU_VBLANK_INT("lscreen",jackpool_interrupt)  // ?
 
 	MDRV_GFXDECODE(jackpool)

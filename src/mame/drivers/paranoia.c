@@ -138,19 +138,19 @@ static const c6280_interface c6280_config =
 static MACHINE_DRIVER_START( paranoia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
-	MDRV_CPU_IO_MAP(pce_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pce_mem)
+	MDRV_CPU_IO_MAP(pce_io)
 	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_CPU_ADD("sub", 8085A, 18000000/3)
-	MDRV_CPU_PROGRAM_MAP(paranoia_8085_map,0)
-	MDRV_CPU_IO_MAP(paranoia_8085_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(paranoia_8085_map)
+	MDRV_CPU_IO_MAP(paranoia_8085_io_map)
 
 	MDRV_CPU_ADD("sub2", Z80, 18000000/6)
-	MDRV_CPU_PROGRAM_MAP(paranoia_z80_map,0)
-	MDRV_CPU_IO_MAP(paranoia_z80_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(paranoia_z80_map)
+	MDRV_CPU_IO_MAP(paranoia_z80_io_map)
 
     /* video hardware */
 

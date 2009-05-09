@@ -353,8 +353,8 @@ static MACHINE_DRIVER_START( mjkjidai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(mjkjidai_map,0)
-	MDRV_CPU_IO_MAP(mjkjidai_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mjkjidai_map)
+	MDRV_CPU_IO_MAP(mjkjidai_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(mjkjidai)

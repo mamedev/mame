@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( trckydoc )
 	MDRV_IMPORT_FROM(tecfri)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trckydoc_map,0 )
+	MDRV_CPU_PROGRAM_MAP(trckydoc_map)
 
 	MDRV_GFXDECODE(trckydoc)
 
@@ -373,11 +373,11 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_IMPORT_FROM(tecfri)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sauro_map, 0)
-	MDRV_CPU_IO_MAP(sauro_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sauro_map)
+	MDRV_CPU_IO_MAP(sauro_io_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(sauro_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sauro_sound_map)
 	MDRV_CPU_PERIODIC_INT(sauro_interrupt, 8*60) // ?
 
 	MDRV_GFXDECODE(sauro)

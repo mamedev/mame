@@ -809,16 +809,16 @@ static MACHINE_DRIVER_START( sf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
-	MDRV_CPU_PROGRAM_MAP(sf_map,0)
+	MDRV_CPU_PROGRAM_MAP(sf_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are caused by the main CPU */
 
 	MDRV_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
-	MDRV_CPU_PROGRAM_MAP(sound2_map,0)
-	MDRV_CPU_IO_MAP(sound2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound2_map)
+	MDRV_CPU_IO_MAP(sound2_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	/* video hardware */
@@ -860,7 +860,7 @@ static MACHINE_DRIVER_START( sfus )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sfus_map,0)
+	MDRV_CPU_PROGRAM_MAP(sfus_map)
 MACHINE_DRIVER_END
 
 
@@ -869,7 +869,7 @@ static MACHINE_DRIVER_START( sfjp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sfjp_map,0)
+	MDRV_CPU_PROGRAM_MAP(sfjp_map)
 MACHINE_DRIVER_END
 
 

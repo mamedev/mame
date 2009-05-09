@@ -245,8 +245,8 @@ static INTERRUPT_GEN( galaxia_interrupt )
 static MACHINE_DRIVER_START( galaxia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
-	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mem_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", galaxia_interrupt)
 
 	/* video hardware */
@@ -267,8 +267,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( astrowar )
 	MDRV_IMPORT_FROM( galaxia )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astrowar_mem, 0)
-	MDRV_CPU_IO_MAP(astrowar_io, 0)
+	MDRV_CPU_PROGRAM_MAP(astrowar_mem)
+	MDRV_CPU_IO_MAP(astrowar_io)
 	MDRV_GFXDECODE(astrowar)
 MACHINE_DRIVER_END
 

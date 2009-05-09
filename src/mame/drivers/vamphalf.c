@@ -669,7 +669,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( common )
 	MDRV_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
-	MDRV_CPU_PROGRAM_MAP(common_map,0)
+	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46_vamphalf)
@@ -716,15 +716,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sound_qs1000 )
 	MDRV_CPU_ADD("audiocpu", I8052, 24000000/4)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map, 0)
-	MDRV_CPU_IO_MAP( qs1000_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map)
+	MDRV_CPU_IO_MAP( qs1000_io_map)
 
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vamphalf )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(vamphalf_io,0)
+	MDRV_CPU_IO_MAP(vamphalf_io)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
@@ -732,7 +732,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( misncrft )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
-	MDRV_CPU_IO_MAP(misncrft_io,0)
+	MDRV_CPU_IO_MAP(misncrft_io)
 
 	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
@@ -740,7 +740,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coolmini )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(coolmini_io,0)
+	MDRV_CPU_IO_MAP(coolmini_io)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
@@ -748,7 +748,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( suplup )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(suplup_io,0)
+	MDRV_CPU_IO_MAP(suplup_io)
 
 	MDRV_IMPORT_FROM(sound_suplup)
 MACHINE_DRIVER_END
@@ -756,7 +756,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jmpbreak )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(jmpbreak_io,0)
+	MDRV_CPU_IO_MAP(jmpbreak_io)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
@@ -764,8 +764,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wyvernwg )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
-	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
-	MDRV_CPU_IO_MAP(wyvernwg_io,0)
+	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
+	MDRV_CPU_IO_MAP(wyvernwg_io)
 
 	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
@@ -773,8 +773,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( finalgdr )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
-	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
-	MDRV_CPU_IO_MAP(finalgdr_io,0)
+	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
+	MDRV_CPU_IO_MAP(finalgdr_io)
 
 	MDRV_NVRAM_HANDLER(finalgdr)
 
@@ -783,8 +783,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( aoh )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(aoh_map,0)
-	MDRV_CPU_IO_MAP(aoh_io,0)
+	MDRV_CPU_PROGRAM_MAP(aoh_map)
+	MDRV_CPU_IO_MAP(aoh_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)

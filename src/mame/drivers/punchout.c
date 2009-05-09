@@ -606,12 +606,12 @@ static MACHINE_DRIVER_START( punchout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(punchout_map,0)
-	MDRV_CPU_IO_MAP(punchout_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(punchout_map)
+	MDRV_CPU_IO_MAP(punchout_io_map)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(punchout_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(punchout_sound_map)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(punchout)
@@ -657,7 +657,7 @@ static MACHINE_DRIVER_START( armwrest )
 	MDRV_IMPORT_FROM(punchout)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(armwrest_map,0)
+	MDRV_CPU_PROGRAM_MAP(armwrest_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(armwrest)

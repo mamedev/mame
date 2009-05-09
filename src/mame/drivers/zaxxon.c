@@ -986,7 +986,7 @@ static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MDRV_CPU_PROGRAM_MAP(zaxxon_map, 0)
+	MDRV_CPU_PROGRAM_MAP(zaxxon_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
 	MDRV_MACHINE_START(zaxxon)
@@ -1047,12 +1047,12 @@ static MACHINE_DRIVER_START( congo )
 	MDRV_IMPORT_FROM(root)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(congo_map, 0)
+	MDRV_CPU_PROGRAM_MAP(congo_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(congo_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */

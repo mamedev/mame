@@ -342,18 +342,18 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_map,0)
+	MDRV_CPU_PROGRAM_MAP(mexico86_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(mexico86_sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(mexico86_m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(mexico86_m68705_map)
 	MDRV_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
 
 	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */

@@ -461,11 +461,11 @@ static INTERRUPT_GEN( chl_interrupt )
 static MACHINE_DRIVER_START( changela )
 
 	MDRV_CPU_ADD("maincpu", Z80,5000000)
-	MDRV_CPU_PROGRAM_MAP(changela_map,0)
+	MDRV_CPU_PROGRAM_MAP(changela_map)
 	MDRV_CPU_VBLANK_INT_HACK(chl_interrupt,4)
 
 	MDRV_CPU_ADD("mcu", M68705,2500000)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_RESET(changela)
 

@@ -565,8 +565,8 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( pcat_nit )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
-	MDRV_CPU_PROGRAM_MAP(pcat_map, 0)
-	MDRV_CPU_IO_MAP(pcat_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pcat_map)
+	MDRV_CPU_IO_MAP(pcat_io)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

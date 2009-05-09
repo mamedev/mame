@@ -341,8 +341,8 @@ static MACHINE_DRIVER_START( mario_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
-	MDRV_CPU_IO_MAP(mario_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mario_map)
+	MDRV_CPU_IO_MAP(mario_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* devices */
@@ -377,8 +377,8 @@ static MACHINE_DRIVER_START( masao )
 	MDRV_IMPORT_FROM(mario_base )
 
 	MDRV_CPU_REPLACE("maincpu", Z80, 4000000)        /* 4.000 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(masao_map, 0)
-	MDRV_CPU_IO_MAP(mario_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(masao_map)
+	MDRV_CPU_IO_MAP(mario_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */

@@ -319,19 +319,19 @@ static MACHINE_DRIVER_START( pandoras )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,18432000/6)	/* CPU A */
-	MDRV_CPU_PROGRAM_MAP(pandoras_master_map,0)
+	MDRV_CPU_PROGRAM_MAP(pandoras_master_map)
 	MDRV_CPU_VBLANK_INT("screen", pandoras_master_interrupt)
 
 	MDRV_CPU_ADD("sub", M6809,18432000/6)		/* CPU B */
-	MDRV_CPU_PROGRAM_MAP(pandoras_slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(pandoras_slave_map)
 	MDRV_CPU_VBLANK_INT("screen", pandoras_slave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)
-	MDRV_CPU_PROGRAM_MAP(pandoras_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pandoras_sound_map)
 
 	MDRV_CPU_ADD("mcu", I8039,14318000/2)
-	MDRV_CPU_PROGRAM_MAP(pandoras_i8039_map,0)
-	MDRV_CPU_IO_MAP(pandoras_i8039_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pandoras_i8039_map)
+	MDRV_CPU_IO_MAP(pandoras_i8039_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* slices per frame */
 

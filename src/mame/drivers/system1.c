@@ -2106,12 +2106,12 @@ static MACHINE_DRIVER_START( sys1ppi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* not really, see notes above */
-	MDRV_CPU_PROGRAM_MAP(system1_map,0)
-	MDRV_CPU_IO_MAP(system1_ppi_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(system1_map)
+	MDRV_CPU_IO_MAP(system1_ppi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_TIMER_ADD_SCANLINE("soundirq", soundirq_gen, "screen", 32, 64)
 
 	MDRV_MACHINE_START(system1)
@@ -2158,7 +2158,7 @@ static MACHINE_DRIVER_START( sys1pio )
 	MDRV_IMPORT_FROM( sys1ppi )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(system1_pio_io_map,0)
+	MDRV_CPU_IO_MAP(system1_pio_io_map)
 
 	MDRV_PPI8255_REMOVE("ppi")
 	MDRV_Z80PIO_ADD("pio", pio_interface)
@@ -2182,7 +2182,7 @@ static MACHINE_DRIVER_START( nob )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nobo_map,0)
+	MDRV_CPU_PROGRAM_MAP(nobo_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nobm )
@@ -2190,7 +2190,7 @@ static MACHINE_DRIVER_START( nobm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 
@@ -2210,7 +2210,7 @@ static MACHINE_DRIVER_START( sys2m )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 
@@ -2227,7 +2227,7 @@ static MACHINE_DRIVER_START( sys2rowm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, 8000000 /* unknown speed */)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 

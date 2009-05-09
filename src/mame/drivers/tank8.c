@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( tank8 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
-	MDRV_CPU_PROGRAM_MAP(tank8_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tank8_cpu_map)
 
 	MDRV_MACHINE_RESET(tank8)
 

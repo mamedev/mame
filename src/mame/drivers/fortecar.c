@@ -273,8 +273,8 @@ static MACHINE_RESET(fortecar)
 static MACHINE_DRIVER_START( fortecar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(fortecar_map,0)
-	MDRV_CPU_IO_MAP(fortecar_ports,0)
+	MDRV_CPU_PROGRAM_MAP(fortecar_map)
+	MDRV_CPU_IO_MAP(fortecar_ports)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

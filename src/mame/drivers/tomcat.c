@@ -375,17 +375,17 @@ static const riot6532_interface tomcat_riot6532_intf =
 
 static MACHINE_DRIVER_START(tomcat)
 	MDRV_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(tomcat_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tomcat_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)
 	//MDRV_CPU_PERIODIC_INT(irq1_line_assert, (double)XTAL_12MHz / 16 / 16 / 16 / 12)
 
 	MDRV_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP( dsp_map, 0 )
-	MDRV_CPU_IO_MAP( dsp_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( dsp_map)
+	MDRV_CPU_IO_MAP( dsp_io_map)
 
 	MDRV_CPU_ADD("soundcpu", M6502, XTAL_14_31818MHz / 8 )
 	MDRV_CPU_FLAGS( CPU_DISABLE )
-	MDRV_CPU_PROGRAM_MAP( sound_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( sound_map)
 
 	MDRV_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
 

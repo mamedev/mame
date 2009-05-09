@@ -833,8 +833,8 @@ static MACHINE_DRIVER_START( berzerk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(berzerk_map,0)
-	MDRV_CPU_IO_MAP(berzerk_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(berzerk_map)
+	MDRV_CPU_IO_MAP(berzerk_io_map)
 
 	MDRV_MACHINE_START(berzerk)
 	MDRV_MACHINE_RESET(berzerk)
@@ -867,7 +867,7 @@ static MACHINE_DRIVER_START( frenzy )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(berzerk)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(frenzy_map,0)
+	MDRV_CPU_PROGRAM_MAP(frenzy_map)
 MACHINE_DRIVER_END
 
 

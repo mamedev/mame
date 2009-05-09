@@ -772,7 +772,7 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -817,7 +817,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -838,7 +838,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa2_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa2_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -861,7 +861,7 @@ MACHINE_DRIVER_START( jsa_iii_mono )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jsa_ii_mono)
 	MDRV_CPU_MODIFY("jsa")
-	MDRV_CPU_PROGRAM_MAP(atarijsa3_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
 MACHINE_DRIVER_END
 
 
@@ -881,7 +881,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */

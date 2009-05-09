@@ -496,7 +496,7 @@ static MACHINE_DRIVER_START( sprint2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MDRV_CPU_PROGRAM_MAP(sprint2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sprint2_map)
 	MDRV_CPU_VBLANK_INT("screen", sprint2)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 

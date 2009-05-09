@@ -1518,8 +1518,8 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(cpu_90009_map,0)
-	MDRV_CPU_IO_MAP(cpu_90009_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_90009_map)
+	MDRV_CPU_IO_MAP(cpu_90009_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
 	MDRV_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
@@ -1556,8 +1556,8 @@ static MACHINE_DRIVER_START( mcr_90010 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cpu_90010_map,0)
-	MDRV_CPU_IO_MAP(cpu_90010_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_90010_map)
+	MDRV_CPU_IO_MAP(cpu_90010_portmap)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(64)
@@ -1586,8 +1586,8 @@ static MACHINE_DRIVER_START( mcr_91490 )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(5000000)
-	MDRV_CPU_PROGRAM_MAP(cpu_91490_map,0)
-	MDRV_CPU_IO_MAP(cpu_91490_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_91490_map)
+	MDRV_CPU_IO_MAP(cpu_91490_portmap)
 
 	MDRV_DEVICE_MODIFY("ctc")
 	MDRV_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
@@ -1612,8 +1612,8 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 
 	MDRV_CPU_ADD("ipu", Z80, 7372800/2)
 	MDRV_CPU_CONFIG(mcr_ipu_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(ipu_91695_map,0)
-	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(ipu_91695_map)
+	MDRV_CPU_IO_MAP(ipu_91695_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
 
 	MDRV_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)

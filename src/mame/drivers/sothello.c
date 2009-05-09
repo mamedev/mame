@@ -349,16 +349,16 @@ static MACHINE_DRIVER_START( sothello )
     /* basic machine hardware */
 
     MDRV_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(maincpu_mem_map,0)
-    MDRV_CPU_IO_MAP(maincpu_io_map,0)
+    MDRV_CPU_PROGRAM_MAP(maincpu_mem_map)
+    MDRV_CPU_IO_MAP(maincpu_io_map)
     MDRV_CPU_VBLANK_INT_HACK(sothello_interrupt,262)
 
     MDRV_CPU_ADD("soundcpu",Z80, SOUNDCPU_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(soundcpu_mem_map,0)
-    MDRV_CPU_IO_MAP(soundcpu_io_map,0)
+    MDRV_CPU_PROGRAM_MAP(soundcpu_mem_map)
+    MDRV_CPU_IO_MAP(soundcpu_io_map)
 
     MDRV_CPU_ADD("sub",M6809, SUBCPU_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(subcpu_mem_map,0)
+    MDRV_CPU_PROGRAM_MAP(subcpu_mem_map)
 
     MDRV_QUANTUM_TIME(HZ(600))
 

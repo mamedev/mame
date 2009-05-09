@@ -2002,11 +2002,11 @@ static MACHINE_DRIVER_START( cobracom )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(cobra_map,0)
+	MDRV_CPU_PROGRAM_MAP(cobra_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2043,11 +2043,11 @@ static MACHINE_DRIVER_START( ghostb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)
-	MDRV_CPU_PROGRAM_MAP(ghostb_map,0)
+	MDRV_CPU_PROGRAM_MAP(ghostb_map)
 	MDRV_CPU_VBLANK_INT("screen", ghostb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2086,11 +2086,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( meikyuh )
 	MDRV_IMPORT_FROM( ghostb )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(meikyuh_map,0)
+	MDRV_CPU_PROGRAM_MAP(meikyuh_map)
 	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("mcu", I8751, 3000000*4)
-	MDRV_CPU_IO_MAP(dec8_mcu_io_map,0)
+	MDRV_CPU_IO_MAP(dec8_mcu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -2098,11 +2098,11 @@ static MACHINE_DRIVER_START( srdarwin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
-	MDRV_CPU_PROGRAM_MAP(srdarwin_map,0)
+	MDRV_CPU_PROGRAM_MAP(srdarwin_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2139,11 +2139,11 @@ static MACHINE_DRIVER_START( gondo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
-	MDRV_CPU_PROGRAM_MAP(gondo_map,0)
+	MDRV_CPU_PROGRAM_MAP(gondo_map)
 	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2181,14 +2181,14 @@ static MACHINE_DRIVER_START( oscar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(oscar_map,0)
+	MDRV_CPU_PROGRAM_MAP(oscar_map)
 	MDRV_CPU_VBLANK_INT("screen", oscar_interrupt)
 
 	MDRV_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(oscar_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(oscar_sub_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8)
-	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(2400)) /* 40 CPU slices per frame */
 
@@ -2226,13 +2226,13 @@ static MACHINE_DRIVER_START( lastmiss )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_map,0)
+	MDRV_CPU_PROGRAM_MAP(lastmiss_map)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(lastmiss_sub_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(ym3526_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -2270,13 +2270,13 @@ static MACHINE_DRIVER_START( shackled )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(shackled_map,0)
+	MDRV_CPU_PROGRAM_MAP(shackled_map)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(shackled_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(shackled_sub_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(ym3526_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(4800))
 
@@ -2314,14 +2314,14 @@ static MACHINE_DRIVER_START( csilver )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_map,0)
+	MDRV_CPU_PROGRAM_MAP(csilver_map)
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(csilver_sub_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(csilver_s_map)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -2363,11 +2363,11 @@ static MACHINE_DRIVER_START( garyoret )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
-	MDRV_CPU_PROGRAM_MAP(garyoret_map,0)
+	MDRV_CPU_PROGRAM_MAP(garyoret_map)
 	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */

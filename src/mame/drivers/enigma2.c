@@ -565,11 +565,11 @@ static MACHINE_DRIVER_START( enigma2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
 
 	MDRV_MACHINE_START(enigma2)
 	MDRV_MACHINE_RESET(enigma2)
@@ -594,12 +594,12 @@ static MACHINE_DRIVER_START( enigma2a )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map,0)
-	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map)
+	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
 
 	MDRV_MACHINE_START(enigma2)
 	MDRV_MACHINE_RESET(enigma2)

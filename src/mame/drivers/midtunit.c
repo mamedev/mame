@@ -605,7 +605,7 @@ static MACHINE_DRIVER_START( tunit_core )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midtunit)
 	MDRV_NVRAM_HANDLER(generic_0fill)

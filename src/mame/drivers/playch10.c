@@ -687,12 +687,12 @@ static const nes_interface nes_config =
 static MACHINE_DRIVER_START( playch10 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
-	MDRV_CPU_PROGRAM_MAP(bios_map, 0)
-	MDRV_CPU_IO_MAP(bios_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bios_map)
+	MDRV_CPU_IO_MAP(bios_io_map)
 	MDRV_CPU_VBLANK_INT("top", playch10_interrupt)
 
 	MDRV_CPU_ADD("cart", N2A03, N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(cart_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cart_map)
 
 	MDRV_MACHINE_RESET(pc10)
 

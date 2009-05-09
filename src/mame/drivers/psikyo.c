@@ -1185,12 +1185,12 @@ static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map,0)
+	MDRV_CPU_PROGRAM_MAP(psikyo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(sngkace_sound_map,0)
-	MDRV_CPU_IO_MAP(sngkace_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sngkace_sound_map)
+	MDRV_CPU_IO_MAP(sngkace_sound_io_map)
 
 	MDRV_MACHINE_RESET(psikyo)
 
@@ -1236,12 +1236,12 @@ static MACHINE_DRIVER_START( gunbird )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map,0)
+	MDRV_CPU_PROGRAM_MAP(psikyo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map,0)
-	MDRV_CPU_IO_MAP(gunbird_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MDRV_CPU_IO_MAP(gunbird_sound_io_map)
 
 	MDRV_MACHINE_RESET(psikyo)
 
@@ -1296,12 +1296,12 @@ static MACHINE_DRIVER_START( s1945 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map,0)
+	MDRV_CPU_PROGRAM_MAP(psikyo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map,0)
-	MDRV_CPU_IO_MAP(s1945_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MDRV_CPU_IO_MAP(s1945_sound_io_map)
 
 	/* MCU should go here */
 

@@ -652,12 +652,12 @@ static MACHINE_DRIVER_START( firefox )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
 	MDRV_TIMER_ADD_SCANLINE("32v", video_timer_callback, "screen", 96+44, 128)
 
 	MDRV_CPU_ADD("audiocpu", M6502, MASTER_XTAL/8)
-	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 

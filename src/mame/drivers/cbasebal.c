@@ -241,8 +241,8 @@ static MACHINE_DRIVER_START( cbasebal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(cbasebal_map,0)
-	MDRV_CPU_IO_MAP(cbasebal_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cbasebal_map)
+	MDRV_CPU_IO_MAP(cbasebal_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
 	MDRV_NVRAM_HANDLER(cbasebal)

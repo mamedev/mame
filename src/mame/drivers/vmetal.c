@@ -426,7 +426,7 @@ static VIDEO_UPDATE(varia)
 
 static MACHINE_DRIVER_START( varia )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(varia_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(varia_program_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // also level 3
 
 

@@ -245,11 +245,11 @@ static MACHINE_DRIVER_START( momoko )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.0MHz */
-	MDRV_CPU_PROGRAM_MAP(momoko_map,0)
+	MDRV_CPU_PROGRAM_MAP(momoko_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)	/* 2.5MHz */
-	MDRV_CPU_PROGRAM_MAP(momoko_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(momoko_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

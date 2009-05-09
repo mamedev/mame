@@ -243,13 +243,13 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( roul )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(roul_map, 0)
-	MDRV_CPU_IO_MAP(roul_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(roul_map)
+	MDRV_CPU_IO_MAP(roul_cpu_io_map)
 	MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_cpu_io_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

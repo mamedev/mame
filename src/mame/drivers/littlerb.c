@@ -361,7 +361,7 @@ static VIDEO_UPDATE(littlerb)
 
 static MACHINE_DRIVER_START( littlerb )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(littlerb_main, 0)
+	MDRV_CPU_PROGRAM_MAP(littlerb_main)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 

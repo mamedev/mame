@@ -332,12 +332,12 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_DRIVER_START( taotaido )
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,20000000/4) // ??
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_GFXDECODE(taotaido)

@@ -377,7 +377,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( 4roses )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
-	MDRV_CPU_PROGRAM_MAP(4roses_map, 0)
+	MDRV_CPU_PROGRAM_MAP(4roses_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)

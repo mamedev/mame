@@ -119,8 +119,8 @@ static INTERRUPT_GEN( pesadelo_interrupt )
 static MACHINE_DRIVER_START( pesadelo )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
-	MDRV_CPU_PROGRAM_MAP(program_mem, 0)
-	MDRV_CPU_IO_MAP(io_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(program_mem)
+	MDRV_CPU_IO_MAP(io_mem)
 	MDRV_CPU_VBLANK_INT("screen",pesadelo_interrupt)
 
 	MDRV_MACHINE_START( forte2 )

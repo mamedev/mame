@@ -1295,19 +1295,19 @@ static INTERRUPT_GEN( taitojc_int6 )
 
 static MACHINE_DRIVER_START( taitojc )
 	MDRV_CPU_ADD("maincpu", M68040, 25000000)
-	MDRV_CPU_PROGRAM_MAP(taitojc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(taitojc_map)
 	MDRV_CPU_VBLANK_INT("screen", taitojc_vblank)
 	MDRV_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", MC68HC11, 4000000)
-	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map, 0)
-	MDRV_CPU_IO_MAP(hc11_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
+	MDRV_CPU_IO_MAP(hc11_io_map)
 
 	MDRV_CPU_ADD("dsp", TMS32051, 50000000)
-	MDRV_CPU_PROGRAM_MAP(tms_program_map, 0)
-	MDRV_CPU_DATA_MAP(tms_data_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tms_program_map)
+	MDRV_CPU_DATA_MAP(tms_data_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

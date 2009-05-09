@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( irobot )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,1500000)
-	MDRV_CPU_PROGRAM_MAP(irobot_map,0)
+	MDRV_CPU_PROGRAM_MAP(irobot_map)
 
 	MDRV_MACHINE_RESET(irobot)
 	MDRV_NVRAM_HANDLER(generic_0fill)

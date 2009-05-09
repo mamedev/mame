@@ -1035,8 +1035,8 @@ static MACHINE_DRIVER_START(mediagx)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MEDIAGX, 166000000)
-	MDRV_CPU_PROGRAM_MAP(mediagx_map, 0)
-	MDRV_CPU_IO_MAP(mediagx_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mediagx_map)
+	MDRV_CPU_IO_MAP(mediagx_io)
 
 	MDRV_MACHINE_START(mediagx)
 	MDRV_MACHINE_RESET(mediagx)

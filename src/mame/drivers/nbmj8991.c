@@ -1477,8 +1477,8 @@ static MACHINE_DRIVER_START( nbmjdrv1 )	// galkoku
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 25000000/5)		/* 5.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(galkoku_map, 0)
-	MDRV_CPU_IO_MAP(galkoku_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(galkoku_map)
+	MDRV_CPU_IO_MAP(galkoku_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nbmj8991)
@@ -1510,13 +1510,13 @@ static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000/2)	/* 3.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(pstadium_map, 0)
-	MDRV_CPU_IO_MAP(pstadium_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pstadium_map)
+	MDRV_CPU_IO_MAP(pstadium_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)					/* 4.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(nbmj8991_sound_map, 0)
-	MDRV_CPU_IO_MAP(nbmj8991_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(nbmj8991_sound_map)
+	MDRV_CPU_IO_MAP(nbmj8991_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 128*60) // ?
 
 	MDRV_MACHINE_RESET(nbmj8991)
@@ -1574,7 +1574,7 @@ static MACHINE_DRIVER_START( galkaika )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(galkaika_map, 0)
+	MDRV_CPU_PROGRAM_MAP(galkaika_map)
 MACHINE_DRIVER_END
 
 
@@ -1583,7 +1583,7 @@ static MACHINE_DRIVER_START( tokyogal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tokyogal_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tokyogal_map)
 MACHINE_DRIVER_END
 
 
@@ -1592,7 +1592,7 @@ static MACHINE_DRIVER_START( tokimbsj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(galkaika_map, 0)
+	MDRV_CPU_PROGRAM_MAP(galkaika_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -1617,7 +1617,7 @@ static MACHINE_DRIVER_START( hyouban )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv3)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hyouban_io_map, 0)
+	MDRV_CPU_IO_MAP(hyouban_io_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -1635,7 +1635,7 @@ static MACHINE_DRIVER_START( triplew1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(triplew1_map)
 MACHINE_DRIVER_END
 
 
@@ -1644,7 +1644,7 @@ static MACHINE_DRIVER_START( triplew2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(triplew2_map)
 MACHINE_DRIVER_END
 
 
@@ -1660,7 +1660,7 @@ static MACHINE_DRIVER_START( mjlstory )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjlstory_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjlstory_map)
 MACHINE_DRIVER_END
 
 
@@ -1691,7 +1691,7 @@ static MACHINE_DRIVER_START( mjgottub )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(triplew1_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -1702,8 +1702,8 @@ static MACHINE_DRIVER_START( av2mj1bb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(av2mj1bb_map, 0)
-	MDRV_CPU_IO_MAP(av2mj1bb_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(av2mj1bb_map)
+	MDRV_CPU_IO_MAP(av2mj1bb_io_map)
 MACHINE_DRIVER_END
 
 
@@ -1712,8 +1712,8 @@ static MACHINE_DRIVER_START( av2mj2rg )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nbmjdrv2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(av2mj2rg_map, 0)
-	MDRV_CPU_IO_MAP(av2mj1bb_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(av2mj2rg_map)
+	MDRV_CPU_IO_MAP(av2mj1bb_io_map)
 MACHINE_DRIVER_END
 
 

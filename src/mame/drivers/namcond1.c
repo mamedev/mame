@@ -285,13 +285,13 @@ static MACHINE_DRIVER_START( namcond1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000)
-	MDRV_CPU_PROGRAM_MAP(namcond1_map,0)
+	MDRV_CPU_PROGRAM_MAP(namcond1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
 
 	MDRV_CPU_ADD("mcu", H83002, 16384000 )
-	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap, 0 )
-	MDRV_CPU_IO_MAP( nd1h8iomap, 0 )
+	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap)
+	MDRV_CPU_IO_MAP( nd1h8iomap)
 	MDRV_CPU_VBLANK_INT("screen", mcu_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

@@ -436,8 +436,8 @@ static const st0016_interface st0016_config =
 static MACHINE_DRIVER_START( st0016 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
-	MDRV_CPU_IO_MAP(st0016_io,0)
+	MDRV_CPU_PROGRAM_MAP(st0016_mem)
+	MDRV_CPU_IO_MAP(st0016_io)
 
 	MDRV_CPU_VBLANK_INT_HACK(st0016_int,5) /*  4*nmi + int0 */
 
@@ -466,9 +466,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mayjinsn )
 	MDRV_IMPORT_FROM(st0016)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(st0016_m2_io,0)
+	MDRV_CPU_IO_MAP(st0016_m2_io)
 	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
-	MDRV_CPU_PROGRAM_MAP(v810_mem,0)
+	MDRV_CPU_PROGRAM_MAP(v810_mem)
 	MDRV_QUANTUM_TIME(HZ(60))
 MACHINE_DRIVER_END
 

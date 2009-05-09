@@ -313,8 +313,8 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( carrera )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MDRV_CPU_PROGRAM_MAP(carrera_map, 0)
-	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(carrera_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

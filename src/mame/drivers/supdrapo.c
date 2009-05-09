@@ -246,7 +246,7 @@ static PALETTE_INIT( sdpoker )
 
 static MACHINE_DRIVER_START( supdrapo )
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* ??? */
-	MDRV_CPU_PROGRAM_MAP(sdpoker_mem,0)
+	MDRV_CPU_PROGRAM_MAP(sdpoker_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

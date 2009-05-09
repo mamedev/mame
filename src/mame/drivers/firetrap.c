@@ -561,11 +561,11 @@ static MACHINE_DRIVER_START( firetrap )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(firetrap_map,0)
+	MDRV_CPU_PROGRAM_MAP(firetrap_map)
 	MDRV_CPU_VBLANK_INT_HACK(firetrap,2)
 
 	MDRV_CPU_ADD("audiocpu", M6502,3072000/2)	/* 1.536 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 	MDRV_MACHINE_RESET(firetrap)
@@ -600,11 +600,11 @@ static MACHINE_DRIVER_START( firetpbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(firetrap_bootleg_map,0)
+	MDRV_CPU_PROGRAM_MAP(firetrap_bootleg_map)
 	MDRV_CPU_VBLANK_INT("screen", bootleg)
 
 	MDRV_CPU_ADD("audiocpu", M6502,3072000/2) /* 1.536 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 

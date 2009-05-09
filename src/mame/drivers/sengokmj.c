@@ -288,8 +288,8 @@ static MACHINE_DRIVER_START( sengokmj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
-	MDRV_CPU_PROGRAM_MAP(sengokmj_map,0)
-	MDRV_CPU_IO_MAP(sengokmj_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sengokmj_map)
+	MDRV_CPU_IO_MAP(sengokmj_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sengokmj_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)

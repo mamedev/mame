@@ -411,18 +411,18 @@ static MACHINE_DRIVER_START( cyberbal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
 
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(extra_map,0)
+	MDRV_CPU_PROGRAM_MAP(extra_map)
 	MDRV_CPU_VBLANK_INT("lscreen", atarigen_video_int_gen)	/* or is it "right?" */
 
 	MDRV_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_68k_map)
 	MDRV_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -470,7 +470,7 @@ static MACHINE_DRIVER_START( cyberb2p )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(cyberb2p_map,0)
+	MDRV_CPU_PROGRAM_MAP(cyberb2p_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(cyberb2p)

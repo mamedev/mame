@@ -161,12 +161,12 @@ static MACHINE_DRIVER_START( cchasm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
-	MDRV_CPU_PROGRAM_MAP(memmap,0)
+	MDRV_CPU_PROGRAM_MAP(memmap)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3584229)		/* 3.58  MHz (from schematics) */
 	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(sound_memmap,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
 

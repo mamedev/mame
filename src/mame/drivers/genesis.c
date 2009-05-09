@@ -589,11 +589,11 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_PROGRAM_MAP(genesis_map,0)
+	MDRV_CPU_PROGRAM_MAP(genesis_map)
 	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(genesis_z80_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))

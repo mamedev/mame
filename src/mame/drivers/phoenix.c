@@ -453,7 +453,7 @@ static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 2.75 MHz */
-	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map, 0)
+	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map)
 
 	MDRV_MACHINE_RESET(phoenix)
 
@@ -492,7 +492,7 @@ static MACHINE_DRIVER_START( pleiads )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(phoenix)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pleiads_memory_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(pleiads)
@@ -526,7 +526,7 @@ static MACHINE_DRIVER_START( survival )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_CONFIG(survival_i8085_config)
-	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
+	MDRV_CPU_PROGRAM_MAP(survival_memory_map)
 
 	MDRV_MACHINE_RESET(phoenix)
 

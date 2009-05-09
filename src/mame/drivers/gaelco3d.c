@@ -933,17 +933,17 @@ static MACHINE_DRIVER_START( gaelco3d )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
 
 	MDRV_CPU_ADD("tms", TMS32031, 60000000)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(tms_map,0)
+	MDRV_CPU_PROGRAM_MAP(tms_map)
 
 	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
 	MDRV_CPU_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
-	MDRV_CPU_DATA_MAP(adsp_data_map, 0)
+	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
+	MDRV_CPU_DATA_MAP(adsp_data_map)
 
 	MDRV_MACHINE_RESET(gaelco3d)
 	MDRV_NVRAM_HANDLER(93C66B)
@@ -986,7 +986,7 @@ static MACHINE_DRIVER_START( gaelco3d2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68EC020, 25000000)
-	MDRV_CPU_PROGRAM_MAP(main020_map,0)
+	MDRV_CPU_PROGRAM_MAP(main020_map)
 
 	MDRV_CPU_REPLACE("tms", TMS32031, 50000000)
 

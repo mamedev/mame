@@ -1741,15 +1741,15 @@ static MACHINE_DRIVER_START( system16a )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(system16a_map,0)
+	MDRV_CPU_PROGRAM_MAP(system16a_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_CPU_ADD("n7751", N7751, 6000000)
-	MDRV_CPU_IO_MAP(n7751_portmap,0)
+	MDRV_CPU_IO_MAP(n7751_portmap)
 
 	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
 
@@ -1799,7 +1799,7 @@ static MACHINE_DRIVER_START( system16a_8751 )
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 

@@ -73,8 +73,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( queen )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 533000000) // Celeron or Pentium 3, 533 Mhz
-	MDRV_CPU_PROGRAM_MAP(queen_map, 0)
-	MDRV_CPU_IO_MAP(queen_io, 0)
+	MDRV_CPU_PROGRAM_MAP(queen_map)
+	MDRV_CPU_IO_MAP(queen_io)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

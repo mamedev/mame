@@ -529,12 +529,12 @@ static MACHINE_DRIVER_START( multchmp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(multchmp_map,0)
+	MDRV_CPU_PROGRAM_MAP(multchmp_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(multchmp_sound_map,0)
-	MDRV_CPU_IO_MAP(multchmp_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(multchmp_sound_map)
+	MDRV_CPU_IO_MAP(multchmp_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
 	/* video hardware */
@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_IMPORT_FROM(multchmp)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hedpanic_map,0)
+	MDRV_CPU_PROGRAM_MAP(hedpanic_map)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( mchampdx )
 	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mchampdx_map,0)
+	MDRV_CPU_PROGRAM_MAP(mchampdx_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tangtang )
@@ -594,7 +594,7 @@ static MACHINE_DRIVER_START( tangtang )
 	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tangtang_map,0)
+	MDRV_CPU_PROGRAM_MAP(tangtang_map)
 
 	MDRV_GFXDECODE(tangtang)
 MACHINE_DRIVER_END

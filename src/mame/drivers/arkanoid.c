@@ -763,11 +763,11 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
+	MDRV_CPU_PROGRAM_MAP(arkanoid_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
 
@@ -802,7 +802,7 @@ static MACHINE_DRIVER_START( bootleg )
 
 	// basic machine hardware
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bootleg_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 
 	MDRV_CPU_REMOVE("mcu")
 MACHINE_DRIVER_END

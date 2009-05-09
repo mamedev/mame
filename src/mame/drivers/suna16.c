@@ -763,19 +763,19 @@ static MACHINE_DRIVER_START( bssoccer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_map,0)
+	MDRV_CPU_PROGRAM_MAP(bssoccer_map)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
 	MDRV_CPU_ADD("pcm1", Z80, 5000000)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map,0)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
 	MDRV_CPU_ADD("pcm2", Z80, 5000000)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_map,0)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -823,15 +823,15 @@ static MACHINE_DRIVER_START( uballoon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(uballoon_map,0)
+	MDRV_CPU_PROGRAM_MAP(uballoon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(uballoon_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(uballoon_sound_map)
 
 	MDRV_CPU_ADD("pcm1", Z80, 5000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_map,0)
-	MDRV_CPU_IO_MAP(uballoon_pcm_1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
+	MDRV_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
@@ -874,15 +874,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sunaq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(sunaq_map,0)
+	MDRV_CPU_PROGRAM_MAP(sunaq_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318000/4)
-	MDRV_CPU_PROGRAM_MAP(sunaq_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sunaq_sound_map)
 
 	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map,0)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
@@ -946,15 +946,15 @@ static const ay8910_interface bestbest_ay8910_interface =
 static MACHINE_DRIVER_START( bestbest )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_map,0)
+	MDRV_CPU_PROGRAM_MAP(bestbest_map)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(bestbest_sound_map)
 
 	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_pcm_1_map,0)
-	MDRV_CPU_IO_MAP(bestbest_pcm_1_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
+	MDRV_CPU_IO_MAP(bestbest_pcm_1_iomap)
 
 	/* 2nd PCM Z80 missing */
 

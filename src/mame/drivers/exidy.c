@@ -211,6 +211,7 @@ static ADDRESS_MAP_START( sidetrac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -220,6 +221,7 @@ static ADDRESS_MAP_START( targ_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -229,6 +231,7 @@ static ADDRESS_MAP_START( spectar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -258,6 +261,7 @@ static ADDRESS_MAP_START( venture_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -266,6 +270,7 @@ static ADDRESS_MAP_START( pepper2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -279,6 +284,7 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP		/* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -808,7 +814,7 @@ static MACHINE_DRIVER_START( sidetrac )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,sidetrac_map)
+	MDRV_CPU_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(spectar_audio)
@@ -820,7 +826,7 @@ static MACHINE_DRIVER_START( targ )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,targ_map)
+	MDRV_CPU_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(targ_audio)
@@ -832,7 +838,7 @@ static MACHINE_DRIVER_START( spectar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,spectar_map)
+	MDRV_CPU_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(spectar_audio)
@@ -844,7 +850,7 @@ static MACHINE_DRIVER_START( rallys )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(spectar)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rallys_map,0)
+	MDRV_CPU_PROGRAM_MAP(rallys_map)
 MACHINE_DRIVER_END
 
 
@@ -853,7 +859,7 @@ static MACHINE_DRIVER_START( venture )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,venture_map)
+	MDRV_CPU_PROGRAM_MAP(venture_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -891,7 +897,7 @@ static MACHINE_DRIVER_START( pepper2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(venture)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,pepper2_map)
+	MDRV_CPU_PROGRAM_MAP(pepper2_map)
 MACHINE_DRIVER_END
 
 
@@ -900,7 +906,7 @@ static MACHINE_DRIVER_START( fax )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(pepper2)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidy_map,fax_map)
+	MDRV_CPU_PROGRAM_MAP(fax_map)
 MACHINE_DRIVER_END
 
 

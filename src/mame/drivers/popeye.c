@@ -445,8 +445,8 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( skyskipr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(skyskipr_map,0)
-	MDRV_CPU_IO_MAP(popeye_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyskipr_map)
+	MDRV_CPU_IO_MAP(popeye_io_map)
 	MDRV_CPU_VBLANK_INT("screen", popeye_interrupt)
 
 	/* video hardware */
@@ -476,7 +476,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popeye )
 	MDRV_IMPORT_FROM(skyskipr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(popeye_map,0)
+	MDRV_CPU_PROGRAM_MAP(popeye_map)
 
 	MDRV_VIDEO_START(popeye)
 MACHINE_DRIVER_END
@@ -485,7 +485,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popeyebl )
 	MDRV_IMPORT_FROM(skyskipr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(popeyebl_map,0)
+	MDRV_CPU_PROGRAM_MAP(popeyebl_map)
 
 	MDRV_PALETTE_INIT(popeyebl)
 	MDRV_VIDEO_START(popeye)

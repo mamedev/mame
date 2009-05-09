@@ -376,17 +376,17 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( shougi )
 
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", shougi_vblank_nmi)
 
 	MDRV_CPU_ADD("sub", Z80,10000000/4)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_IO_MAP(readport_sub,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MDRV_CPU_IO_MAP(readport_sub)
 	/* NMIs triggered in shougi_vblank_nmi() */
 
 	/* MCU */
 	MDRV_CPU_ADD("mcu", ALPHA8201, 10000000/4/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// assuming it's the same as champbas

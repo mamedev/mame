@@ -506,20 +506,20 @@ static MACHINE_DRIVER_START( gyruss )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(main_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)        /* 2 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_cpu1_map,0)
-	MDRV_CPU_IO_MAP(audio_cpu1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_cpu1_map)
+	MDRV_CPU_IO_MAP(audio_cpu1_io_map)
 
 	MDRV_CPU_ADD("audio2", I8039,8000000)	/* 8MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(audio_cpu2_map,0)
-	MDRV_CPU_IO_MAP(audio_cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_cpu2_map)
+	MDRV_CPU_IO_MAP(audio_cpu2_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

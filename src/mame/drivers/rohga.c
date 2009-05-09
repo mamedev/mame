@@ -736,11 +736,11 @@ static MACHINE_DRIVER_START( rohga )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(rohga_map,0)
+	MDRV_CPU_PROGRAM_MAP(rohga_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MDRV_CPU_PROGRAM_MAP(rohga_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -781,11 +781,11 @@ static MACHINE_DRIVER_START( wizdfire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(wizdfire_map,0)
+	MDRV_CPU_PROGRAM_MAP(wizdfire_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MDRV_CPU_PROGRAM_MAP(rohga_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -826,11 +826,11 @@ static MACHINE_DRIVER_START( nitrobal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(nitrobal_map,0)
+	MDRV_CPU_PROGRAM_MAP(nitrobal_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MDRV_CPU_PROGRAM_MAP(rohga_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -871,11 +871,11 @@ static MACHINE_DRIVER_START( schmeisr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(schmeisr_map,0)
+	MDRV_CPU_PROGRAM_MAP(schmeisr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MDRV_CPU_PROGRAM_MAP(rohga_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

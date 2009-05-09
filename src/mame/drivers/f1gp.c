@@ -429,16 +429,16 @@ static MACHINE_DRIVER_START( f1gp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(f1gp_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gp_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000,XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(f1gp_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gp_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
@@ -471,11 +471,11 @@ static MACHINE_DRIVER_START( f1gpb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,10000000)	/* 10 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000,10000000)	/* 10 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* NO sound CPU */
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( f1gp2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(f1gp)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(f1gp2_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gp2_cpu1_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(f1gp2)

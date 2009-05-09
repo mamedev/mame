@@ -292,16 +292,16 @@ static MACHINE_DRIVER_START( gradius3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(gradius3_map,0)
+	MDRV_CPU_PROGRAM_MAP(gradius3_map)
 	MDRV_CPU_VBLANK_INT("screen", cpuA_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(gradius3_map2,0)
+	MDRV_CPU_PROGRAM_MAP(gradius3_map2)
 	MDRV_CPU_VBLANK_INT_HACK(cpuB_interrupt,2)	/* has three interrupt vectors, 1 2 and 4 */
 								/* 4 is triggered by cpu A, the others are unknown but */
 								/* required for the game to run. */
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(gradius3_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(gradius3_s_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

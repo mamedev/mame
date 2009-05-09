@@ -316,7 +316,7 @@ static MACHINE_DRIVER_START( ohmygod )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(ohmygod_map,0)
+	MDRV_CPU_PROGRAM_MAP(ohmygod_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_MACHINE_RESET(ohmygod)

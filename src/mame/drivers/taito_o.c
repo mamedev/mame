@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( parentj )
 
 
 	MDRV_CPU_ADD("maincpu", M68000,12000000 )		/*?? MHz */
-	MDRV_CPU_PROGRAM_MAP(parentj_map,0)
+	MDRV_CPU_PROGRAM_MAP(parentj_map)
 	MDRV_CPU_VBLANK_INT_HACK(parentj_interrupt,2)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

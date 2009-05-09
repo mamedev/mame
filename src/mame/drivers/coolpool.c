@@ -686,11 +686,11 @@ static MACHINE_DRIVER_START( amerdart )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_amerdart)
-	MDRV_CPU_PROGRAM_MAP(amerdart_map,0)
+	MDRV_CPU_PROGRAM_MAP(amerdart_map)
 
 	MDRV_CPU_ADD("dsp", TMS32010, 15000000/2)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
-	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
+	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map)
 
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -715,11 +715,11 @@ static MACHINE_DRIVER_START( coolpool )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_coolpool)
-	MDRV_CPU_PROGRAM_MAP(coolpool_map,0)
+	MDRV_CPU_PROGRAM_MAP(coolpool_map)
 
 	MDRV_CPU_ADD("dsp", TMS32026,40000000)
-	MDRV_CPU_PROGRAM_MAP(dsp_program_map,0)
-	MDRV_CPU_IO_MAP(dsp_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dsp_program_map)
+	MDRV_CPU_IO_MAP(dsp_io_map)
 
 	MDRV_MACHINE_RESET(coolpool)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START( 9ballsht )
 	MDRV_IMPORT_FROM(coolpool)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nballsht_map,0)
+	MDRV_CPU_PROGRAM_MAP(nballsht_map)
 MACHINE_DRIVER_END
 
 

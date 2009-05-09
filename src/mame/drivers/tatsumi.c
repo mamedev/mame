@@ -860,18 +860,18 @@ static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
-	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
+	MDRV_CPU_PROGRAM_MAP(apache3_v30_map)
 	MDRV_CPU_VBLANK_INT("screen", roundup5_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
+	MDRV_CPU_PROGRAM_MAP(apache3_68000_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", V20, CLOCK_1 / 2)
-	MDRV_CPU_PROGRAM_MAP(apache3_v20_map,0)
+	MDRV_CPU_PROGRAM_MAP(apache3_v20_map)
 
 	MDRV_CPU_ADD("sub2", Z80, CLOCK_2 / 8)
-	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(apache3_z80_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -907,14 +907,14 @@ static MACHINE_DRIVER_START( roundup5 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
-	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
+	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map)
 	MDRV_CPU_VBLANK_INT("screen", roundup5_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map, 0)
+	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map, 0)
+	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -950,15 +950,15 @@ static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -994,15 +994,15 @@ static MACHINE_DRIVER_START( bigfight )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
-	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
-	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 

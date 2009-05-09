@@ -464,7 +464,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bloodbro )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(bloodbro_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bloodbro_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( weststry )
 	MDRV_IMPORT_FROM(bloodbro)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(weststry_map, 0)
+	MDRV_CPU_PROGRAM_MAP(weststry_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_GFXDECODE(weststry)

@@ -652,7 +652,7 @@ MACHINE_DRIVER_START( cage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cage", TMS32031, 33868800)
 	MDRV_CPU_CONFIG(cage_config)
-	MDRV_CPU_PROGRAM_MAP(cage_map,0)
+	MDRV_CPU_PROGRAM_MAP(cage_map)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -683,5 +683,5 @@ MACHINE_DRIVER_START( cage_seattle )
 	MDRV_IMPORT_FROM(cage)
 
 	MDRV_CPU_MODIFY("cage")
-	MDRV_CPU_PROGRAM_MAP(cage_map_seattle,0)
+	MDRV_CPU_PROGRAM_MAP(cage_map_seattle)
 MACHINE_DRIVER_END

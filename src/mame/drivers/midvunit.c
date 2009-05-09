@@ -1022,7 +1022,7 @@ static MACHINE_DRIVER_START( midvcommon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(midvunit_map,0)
+	MDRV_CPU_PROGRAM_MAP(midvunit_map)
 
 	MDRV_MACHINE_START(midvunit)
 	MDRV_MACHINE_RESET(midvunit)
@@ -1054,7 +1054,7 @@ static MACHINE_DRIVER_START( midvplus )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(midvplus_config)
-	MDRV_CPU_PROGRAM_MAP(midvplus_map,0)
+	MDRV_CPU_PROGRAM_MAP(midvplus_map)
 
 	MDRV_MACHINE_RESET(midvplus)
 	MDRV_NVRAM_HANDLER(midway_serial_pic2)

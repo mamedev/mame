@@ -391,8 +391,8 @@ static MACHINE_DRIVER_START( re900 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(mem_prg, 0)
-	MDRV_CPU_IO_MAP(mem_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mem_prg)
+	MDRV_CPU_IO_MAP(mem_io)
 	MDRV_CPU_VBLANK_INT("screen", re900_video_interrupt)
 
 	/* video hardware */

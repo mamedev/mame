@@ -1096,8 +1096,8 @@ static MACHINE_DRIVER_START( mcrmono )
 	MDRV_IMPORT_FROM(mcr3_base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mcrmono_map,0)
-	MDRV_CPU_IO_MAP(mcrmono_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mcrmono_map)
+	MDRV_CPU_IO_MAP(mcrmono_portmap)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mcrmono)
@@ -1134,8 +1134,8 @@ static MACHINE_DRIVER_START( mcrscroll )
 	MDRV_IMPORT_FROM(mcr_ssio)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spyhunt_map,0)
-	MDRV_CPU_IO_MAP(spyhunt_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(spyhunt_map)
+	MDRV_CPU_IO_MAP(spyhunt_portmap)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

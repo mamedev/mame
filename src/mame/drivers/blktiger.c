@@ -303,16 +303,16 @@ static MACHINE_DRIVER_START( blktiger )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(blktiger_map, 0)
-	MDRV_CPU_IO_MAP(blktiger_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blktiger_map)
+	MDRV_CPU_IO_MAP(blktiger_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(blktiger_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(blktiger_sound_map)
 
 	MDRV_CPU_ADD("mcu", I8751, XTAL_24MHz/4) /* ??? */
-	MDRV_CPU_PROGRAM_MAP(blktiger_mcu_map,0)
-	MDRV_CPU_IO_MAP(blktiger_mcu_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(blktiger_mcu_map)
+	MDRV_CPU_IO_MAP(blktiger_mcu_io_map)
 	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(blktiger)
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blktigerbl )
 	MDRV_IMPORT_FROM(blktiger)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(blktigerbl_io_map, 0)
+	MDRV_CPU_IO_MAP(blktigerbl_io_map)
 
 	MDRV_CPU_REMOVE("mcu")
 MACHINE_DRIVER_END

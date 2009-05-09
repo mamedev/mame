@@ -236,7 +236,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( gumbo )
 	MDRV_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
-	MDRV_CPU_PROGRAM_MAP(gumbo_map,0)
+	MDRV_CPU_PROGRAM_MAP(gumbo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // all the same
 
 	MDRV_GFXDECODE(gumbo)
@@ -265,13 +265,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mspuzzle )
 	MDRV_IMPORT_FROM(gumbo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mspuzzle_map,0)
+	MDRV_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dblpoint )
 	MDRV_IMPORT_FROM(gumbo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dblpoint_map,0)
+	MDRV_CPU_PROGRAM_MAP(dblpoint_map)
 MACHINE_DRIVER_END
 
 ROM_START( gumbo )

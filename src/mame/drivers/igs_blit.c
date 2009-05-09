@@ -2430,7 +2430,7 @@ static INTERRUPT_GEN( chmplst2_interrupt )
 static MACHINE_DRIVER_START( chmplst2 )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chmplst2,0)
+	MDRV_CPU_PROGRAM_MAP(chmplst2)
 	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 //  MDRV_GFXDECODE(chmplst2)
@@ -2443,7 +2443,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( chindrag )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chindrag,0)
+	MDRV_CPU_PROGRAM_MAP(chindrag)
 	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
@@ -2463,7 +2463,7 @@ static INTERRUPT_GEN( grtwall_interrupt )
 static MACHINE_DRIVER_START( grtwall )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(grtwall,0)
+	MDRV_CPU_PROGRAM_MAP(grtwall)
 	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
 
@@ -2487,7 +2487,7 @@ static INTERRUPT_GEN( lhb_interrupt )
 static MACHINE_DRIVER_START( lhb )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lhb,0)
+	MDRV_CPU_PROGRAM_MAP(lhb)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
 MACHINE_DRIVER_END
 
@@ -2517,7 +2517,7 @@ static INTERRUPT_GEN( vbowl_interrupt )
 static MACHINE_DRIVER_START( vbowl )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vbowl,0)
+	MDRV_CPU_PROGRAM_MAP(vbowl)
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
 	MDRV_VIDEO_EOF(vbowl)	// trackball
@@ -2534,7 +2534,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( xymg )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(xymg,0)
+	MDRV_CPU_PROGRAM_MAP(xymg)
 	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
 

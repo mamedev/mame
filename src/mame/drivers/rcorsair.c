@@ -117,7 +117,7 @@ static MACHINE_DRIVER_START( rcorsair )
        program code, unknown type */
 
 	MDRV_CPU_ADD("maincpu", 8085A,8000000)		 /* Sound CPU? */
-	MDRV_CPU_PROGRAM_MAP(rcorsair_map,0)
+	MDRV_CPU_PROGRAM_MAP(rcorsair_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

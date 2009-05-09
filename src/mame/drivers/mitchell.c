@@ -1092,8 +1092,8 @@ static MACHINE_DRIVER_START( mgakuen )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mgakuen_map,0)
-	MDRV_CPU_IO_MAP(mitchell_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mgakuen_map)
+	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
@@ -1126,8 +1126,8 @@ static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 8000000)	/* (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
-	MDRV_CPU_IO_MAP(mitchell_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map)
+	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
@@ -1197,13 +1197,13 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_IMPORT_FROM(pang)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spangbl_map,0)
-	MDRV_CPU_IO_MAP(spangbl_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(spangbl_map)
+	MDRV_CPU_IO_MAP(spangbl_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu",Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(spangbl_sound_map,0 )
-	MDRV_CPU_IO_MAP(spangbl_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(spangbl_sound_map)
+	MDRV_CPU_IO_MAP(spangbl_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
@@ -1222,12 +1222,12 @@ static MACHINE_DRIVER_START( mstworld )
       the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
       more likely wrong.. the game appears to run too fast anyway .. */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000*4)
-	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
-	MDRV_CPU_IO_MAP(mstworld_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map)
+	MDRV_CPU_IO_MAP(mstworld_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(mstworld_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(mstworld_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1256,8 +1256,8 @@ static MACHINE_DRIVER_START( marukin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
-	MDRV_CPU_PROGRAM_MAP(mitchell_map,0)
-	MDRV_CPU_IO_MAP(mitchell_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell_map)
+	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)

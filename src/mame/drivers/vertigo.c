@@ -107,7 +107,7 @@ static MACHINE_DRIVER_START( vertigo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(vertigo_map,0)
+	MDRV_CPU_PROGRAM_MAP(vertigo_map)
 	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
 	MDRV_IMPORT_FROM(exidy440_audio)
@@ -117,7 +117,7 @@ static MACHINE_DRIVER_START( vertigo )
 	/* motor controller */
 	/*
     MDRV_CPU_ADD("motor", M6805, 1000000)
-    MDRV_CPU_PROGRAM_MAP(vertigo_motor,0)
+    MDRV_CPU_PROGRAM_MAP(vertigo_motor)
     */
 	MDRV_MACHINE_RESET(vertigo)
 	MDRV_NVRAM_HANDLER(generic_0fill)

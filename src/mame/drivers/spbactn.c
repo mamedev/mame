@@ -341,11 +341,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( spbactn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(spbactn_map,0)
+	MDRV_CPU_PROGRAM_MAP(spbactn_map)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(spbactn_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

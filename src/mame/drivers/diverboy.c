@@ -183,11 +183,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( diverboy )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* guess */
-	MDRV_CPU_PROGRAM_MAP(diverboy_map,0)
+	MDRV_CPU_PROGRAM_MAP(diverboy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(snd_map,0)
+	MDRV_CPU_PROGRAM_MAP(snd_map)
 
 	MDRV_GFXDECODE(diverboy)
 

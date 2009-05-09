@@ -507,8 +507,8 @@ static MACHINE_DRIVER_START( marineb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(marineb_map,0)
-	MDRV_CPU_IO_MAP(marineb_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(marineb_map)
+	MDRV_CPU_IO_MAP(marineb_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(marineb)
@@ -573,7 +573,7 @@ static MACHINE_DRIVER_START( wanted )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(marineb)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(wanted_io_map,0)
+	MDRV_CPU_IO_MAP(wanted_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

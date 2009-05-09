@@ -1275,6 +1275,8 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ( daytona_unk_r )
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_BASE( &model2_backup2 )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2o_serial_w )
+
+	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* 2A-CRX overrides */
@@ -1302,6 +1304,8 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
+
+	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* 2B-CRX overrides */
@@ -1335,6 +1339,8 @@ static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
+
+	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* 2C-CRX overrides */
@@ -1359,6 +1365,8 @@ static ADDRESS_MAP_START( model2c_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ( hotd_unk_r )
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE( analog_2b_w )
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2_serial_w )
+
+	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* Input definitions */
@@ -1812,15 +1820,15 @@ static const mb86233_cpu_core tgp_config =
 /* original Model 2 */
 static MACHINE_DRIVER_START( model2o )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2o_mem)
+	MDRV_CPU_PROGRAM_MAP(model2o_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model1_snd)
 
 	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
-	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
+	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
 
 	MDRV_MACHINE_RESET(model2o)
 	MDRV_NVRAM_HANDLER( model2 )
@@ -1857,15 +1865,15 @@ MACHINE_DRIVER_END
 /* 2A-CRX */
 static MACHINE_DRIVER_START( model2a )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2a_crx_mem)
+	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model2_snd)
 
 	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
-	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
+	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
 
 	MDRV_MACHINE_RESET(model2)
 	MDRV_NVRAM_HANDLER( model2 )
@@ -1901,19 +1909,19 @@ static const sharc_config sharc_cfg =
 /* 2B-CRX */
 static MACHINE_DRIVER_START( model2b )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2b_crx_mem)
+	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model2_snd)
 
 	MDRV_CPU_ADD("dsp", ADSP21062, 40000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(copro_sharc_map, 0)
+	MDRV_CPU_DATA_MAP(copro_sharc_map)
 
 	//MDRV_CPU_ADD("dsp2", ADSP21062, 40000000)
 	//MDRV_CPU_CONFIG(sharc_cfg)
-	//MDRV_CPU_DATA_MAP(geo_sharc_map, 0)
+	//MDRV_CPU_DATA_MAP(geo_sharc_map)
 
 	MDRV_QUANTUM_TIME(HZ(18000))
 
@@ -1945,11 +1953,11 @@ MACHINE_DRIVER_END
 /* 2C-CRX */
 static MACHINE_DRIVER_START( model2c )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2c_crx_mem)
+	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
+	MDRV_CPU_PROGRAM_MAP(model2_snd)
 
 	MDRV_MACHINE_RESET(model2c)
 	MDRV_NVRAM_HANDLER( model2 )

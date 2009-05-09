@@ -425,8 +425,8 @@ static MACHINE_DRIVER_START( shanghai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(shanghai_map,0)
-	MDRV_CPU_IO_MAP(shanghai_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(shanghai_map)
+	MDRV_CPU_IO_MAP(shanghai_portmap)
 	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
@@ -458,8 +458,8 @@ static MACHINE_DRIVER_START( shangha2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(shangha2_map,0)
-	MDRV_CPU_IO_MAP(shangha2_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(shangha2_map)
+	MDRV_CPU_IO_MAP(shangha2_portmap)
 	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START( kothello )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(kothello_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kothello_map)
 	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)

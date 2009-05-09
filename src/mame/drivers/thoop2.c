@@ -199,7 +199,7 @@ static MACHINE_DRIVER_START( thoop2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(thoop2_map,0)
+	MDRV_CPU_PROGRAM_MAP(thoop2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */

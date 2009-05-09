@@ -397,11 +397,11 @@ static MACHINE_DRIVER_START( mainevt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(mainevt_map,0)
+	MDRV_CPU_PROGRAM_MAP(mainevt_map)
 	MDRV_CPU_VBLANK_INT("screen", mainevt_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(mainevt_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(mainevt_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,8*60)	/* ??? */
 
 	/* video hardware */
@@ -436,11 +436,11 @@ static MACHINE_DRIVER_START( devstors )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(devstors_map,0)
+	MDRV_CPU_PROGRAM_MAP(devstors_map)
 	MDRV_CPU_VBLANK_INT("screen", dv_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(devstors_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(devstors_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ??? */
 
 	/* video hardware */

@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( feversoc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(feversoc_map,0)
+	MDRV_CPU_PROGRAM_MAP(feversoc_map)
 	MDRV_CPU_VBLANK_INT("screen",feversoc_irq)
 
 	/* video hardware */

@@ -188,7 +188,7 @@ static MACHINE_DRIVER_START( vindictr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(vindictr)
 	MDRV_NVRAM_HANDLER(atarigen)

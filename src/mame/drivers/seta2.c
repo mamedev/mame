@@ -2274,7 +2274,7 @@ static MACHINE_DRIVER_START( mj4simai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
-	MDRV_CPU_PROGRAM_MAP(mj4simai_map,0)
+	MDRV_CPU_PROGRAM_MAP(mj4simai_map)
 	MDRV_CPU_VBLANK_INT("screen", seta2_interrupt)
 
 	MDRV_MACHINE_RESET( tmp68301 )
@@ -2308,7 +2308,7 @@ static MACHINE_DRIVER_START( gundamex )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gundamex_map,0)
+	MDRV_CPU_PROGRAM_MAP(gundamex_map)
 
 	MDRV_NVRAM_HANDLER(93C46_gundamex)
 
@@ -2321,7 +2321,7 @@ static MACHINE_DRIVER_START( grdians )
 
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(grdians_map,0)
+	MDRV_CPU_PROGRAM_MAP(grdians_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2334,7 +2334,7 @@ static MACHINE_DRIVER_START( myangel )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(myangel_map,0)
+	MDRV_CPU_PROGRAM_MAP(myangel_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2349,7 +2349,7 @@ static MACHINE_DRIVER_START( myangel2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(myangel2_map,0)
+	MDRV_CPU_PROGRAM_MAP(myangel2_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2364,7 +2364,7 @@ static MACHINE_DRIVER_START( pzlbowl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pzlbowl_map,0)
+	MDRV_CPU_PROGRAM_MAP(pzlbowl_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2377,7 +2377,7 @@ static MACHINE_DRIVER_START( penbros )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(penbros_map,0)
+	MDRV_CPU_PROGRAM_MAP(penbros_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2389,7 +2389,7 @@ static MACHINE_DRIVER_START( samshoot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(samshoot_map,0)
+	MDRV_CPU_PROGRAM_MAP(samshoot_map)
 	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -2449,12 +2449,12 @@ static MACHINE_RESET( funcube )
 
 static MACHINE_DRIVER_START( funcube )
 	MDRV_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
-	MDRV_CPU_PROGRAM_MAP(funcube_map, 0)
+	MDRV_CPU_PROGRAM_MAP(funcube_map)
 	MDRV_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
 
 	MDRV_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(funcube_sub_map, 0)
-	MDRV_CPU_IO_MAP(funcube_sub_io, 0)
+	MDRV_CPU_PROGRAM_MAP(funcube_sub_map)
+	MDRV_CPU_IO_MAP(funcube_sub_io)
 	MDRV_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

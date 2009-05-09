@@ -611,8 +611,8 @@ static const adsp21xx_config adsp_config =
 MACHINE_DRIVER_START( dcs_audio_2k )
 	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
 	MDRV_CPU_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map,0)
-	MDRV_CPU_DATA_MAP(dcs_2k_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map)
+	MDRV_CPU_DATA_MAP(dcs_2k_data_map)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -626,7 +626,7 @@ MACHINE_DRIVER_START( dcs_audio_2k_uart )
 	MDRV_IMPORT_FROM(dcs_audio_2k)
 
 	MDRV_CPU_MODIFY("dcs")
-	MDRV_CPU_DATA_MAP(dcs_2k_uart_data_map,0)
+	MDRV_CPU_DATA_MAP(dcs_2k_uart_data_map)
 MACHINE_DRIVER_END
 
 
@@ -635,8 +635,8 @@ MACHINE_DRIVER_START( dcs_audio_8k )
 	MDRV_IMPORT_FROM(dcs_audio_2k)
 
 	MDRV_CPU_MODIFY("dcs")
-	MDRV_CPU_PROGRAM_MAP(dcs_8k_program_map,0)
-	MDRV_CPU_DATA_MAP(dcs_8k_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(dcs_8k_program_map)
+	MDRV_CPU_DATA_MAP(dcs_8k_data_map)
 MACHINE_DRIVER_END
 
 
@@ -650,8 +650,8 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dcs2_audio_2115 )
 	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
 	MDRV_CPU_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map,0)
-	MDRV_CPU_DATA_MAP(dcs2_2115_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map)
+	MDRV_CPU_DATA_MAP(dcs2_2115_data_map)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -666,8 +666,8 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dcs2_audio_2104 )
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 	MDRV_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(dcs2_2104_program_map,0)
-	MDRV_CPU_DATA_MAP(dcs2_2104_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(dcs2_2104_program_map)
+	MDRV_CPU_DATA_MAP(dcs2_2104_data_map)
 MACHINE_DRIVER_END
 
 
@@ -681,9 +681,9 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dcs2_audio_dsio )
 	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
 	MDRV_CPU_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dsio_program_map,0)
-	MDRV_CPU_DATA_MAP(dsio_data_map,0)
-	MDRV_CPU_IO_MAP(dsio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dsio_program_map)
+	MDRV_CPU_DATA_MAP(dsio_data_map)
+	MDRV_CPU_IO_MAP(dsio_io_map)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -705,9 +705,9 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dcs2_audio_denver )
 	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MDRV_CPU_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(denver_program_map,0)
-	MDRV_CPU_DATA_MAP(denver_data_map,0)
-	MDRV_CPU_IO_MAP(denver_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(denver_program_map)
+	MDRV_CPU_DATA_MAP(denver_data_map)
+	MDRV_CPU_IO_MAP(denver_io_map)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -143,7 +143,7 @@ static MACHINE_DRIVER_START( magictg )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600BE, 10000000)  // ?? what cpu?
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(magictg_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magictg_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

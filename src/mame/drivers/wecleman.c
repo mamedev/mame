@@ -1087,15 +1087,15 @@ static MACHINE_DRIVER_START( wecleman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
-	MDRV_CPU_PROGRAM_MAP(wecleman_map,0)
+	MDRV_CPU_PROGRAM_MAP(wecleman_map)
 	MDRV_CPU_VBLANK_INT_HACK(wecleman_interrupt,5 + 1)	/* in order to read the inputs once per frame */
 
 	MDRV_CPU_ADD("sub", M68000, 10000000)	/* Schems show 10MHz */
-	MDRV_CPU_PROGRAM_MAP(wecleman_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(wecleman_sub_map)
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(wecleman_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(wecleman_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -1142,14 +1142,14 @@ static MACHINE_DRIVER_START( hotchase )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
-	MDRV_CPU_PROGRAM_MAP(hotchase_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotchase_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
-	MDRV_CPU_PROGRAM_MAP(hotchase_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotchase_sub_map)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 3579545 / 2)	/* 3.579/2 MHz - PCB is drawn in one set's readme */
-	MDRV_CPU_PROGRAM_MAP(hotchase_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MDRV_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
 
 	/* Amuse: every 2 ms */

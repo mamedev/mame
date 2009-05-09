@@ -863,8 +863,8 @@ static INTERRUPT_GEN( vblank_irq )
 
 static MACHINE_DRIVER_START( tv_vcf )
 	MDRV_CPU_ADD("maincpu", V30, XTAL_12MHz/2 )	// ?
-	MDRV_CPU_PROGRAM_MAP(tv_vcf_map,0)
-	MDRV_CPU_IO_MAP(tv_vcf_io,0)
+	MDRV_CPU_PROGRAM_MAP(tv_vcf_map)
+	MDRV_CPU_IO_MAP(tv_vcf_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -894,8 +894,8 @@ static MACHINE_DRIVER_START( tv_ncf )
 	MDRV_IMPORT_FROM(tv_vcf)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tv_ncf_map,0)
-	MDRV_CPU_IO_MAP(tv_ncf_io,0)
+	MDRV_CPU_PROGRAM_MAP(tv_ncf_map)
+	MDRV_CPU_IO_MAP(tv_ncf_io)
 
 MACHINE_DRIVER_END
 
@@ -903,8 +903,8 @@ static MACHINE_DRIVER_START( tv_tcf )
 	MDRV_IMPORT_FROM(tv_vcf)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tv_tcf_map,0)
-	MDRV_CPU_IO_MAP(tv_tcf_io,0)
+	MDRV_CPU_PROGRAM_MAP(tv_tcf_map)
+	MDRV_CPU_IO_MAP(tv_tcf_io)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
@@ -914,8 +914,8 @@ static MACHINE_DRIVER_START( newmcard )
 	MDRV_IMPORT_FROM(tv_tcf)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(newmcard_map,0)
-	MDRV_CPU_IO_MAP(newmcard_io,0)
+	MDRV_CPU_PROGRAM_MAP(newmcard_map)
+	MDRV_CPU_IO_MAP(newmcard_io)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
@@ -927,15 +927,15 @@ static MACHINE_DRIVER_START( ciclone )
 	MDRV_CPU_REMOVE("maincpu")
 
 	MDRV_CPU_ADD("maincpu", I80186, 20000000/2 )	// ?
-	MDRV_CPU_PROGRAM_MAP(tv_tcf_map,0)
-	MDRV_CPU_IO_MAP(tv_tcf_io,0)
+	MDRV_CPU_PROGRAM_MAP(tv_tcf_map)
+	MDRV_CPU_IO_MAP(tv_tcf_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( brasil )
 	MDRV_CPU_ADD("maincpu", I80186, 20000000 )	// fashion doesn't like 20/2 Mhz
-	MDRV_CPU_PROGRAM_MAP(brasil_map,0)
-	MDRV_CPU_IO_MAP(brasil_io,0)
+	MDRV_CPU_PROGRAM_MAP(brasil_map)
+	MDRV_CPU_IO_MAP(brasil_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

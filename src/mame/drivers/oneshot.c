@@ -349,11 +349,11 @@ static MACHINE_DRIVER_START( oneshot )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(oneshot_map,0)
+	MDRV_CPU_PROGRAM_MAP(oneshot_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(oneshot_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(oneshot_sound_map)
 
 	MDRV_GFXDECODE(oneshot)
 

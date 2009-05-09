@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( liberatr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
-	MDRV_CPU_PROGRAM_MAP(liberatr_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberatr_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
@@ -418,7 +418,7 @@ static MACHINE_DRIVER_START( liberat2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(liberatr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(liberat2_map,0)
+	MDRV_CPU_PROGRAM_MAP(liberat2_map)
 MACHINE_DRIVER_END
 
 

@@ -591,17 +591,17 @@ static MACHINE_DRIVER_START( looping )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(looping_map,0)
-	MDRV_CPU_IO_MAP(looping_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(looping_map)
+	MDRV_CPU_IO_MAP(looping_io_map)
 	MDRV_CPU_VBLANK_INT("screen", looping_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", TMS9980, SOUND_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(looping_sound_map,0)
-	MDRV_CPU_IO_MAP(looping_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(looping_sound_map)
+	MDRV_CPU_IO_MAP(looping_sound_io_map)
 
 	MDRV_CPU_ADD("mcu", COP420, COP_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(looping_cop_map,0)
-	MDRV_CPU_DATA_MAP(looping_cop_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(looping_cop_map)
+	MDRV_CPU_DATA_MAP(looping_cop_data_map)
 	MDRV_CPU_CONFIG(looping_cop_intf)
 
 	MDRV_MACHINE_START(looping)

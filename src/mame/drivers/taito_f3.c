@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( f3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(f3_map,0)
+	MDRV_CPU_PROGRAM_MAP(f3_map)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
@@ -502,7 +502,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bubsympb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(f3_map,0)
+	MDRV_CPU_PROGRAM_MAP(f3_map)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	MDRV_MACHINE_START(f3)

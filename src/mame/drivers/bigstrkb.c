@@ -206,7 +206,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bigstrkb )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(bigstrkb_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigstrkb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_GFXDECODE(bigstrkb)

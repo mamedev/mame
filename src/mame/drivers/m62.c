@@ -934,8 +934,8 @@ static MACHINE_DRIVER_START( ldrun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/6)
-	MDRV_CPU_PROGRAM_MAP(ldrun_map,0)
-	MDRV_CPU_IO_MAP(kungfum_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ldrun_map)
+	MDRV_CPU_IO_MAP(kungfum_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -963,8 +963,8 @@ static MACHINE_DRIVER_START( kungfum )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(kungfum_map,0)
-	MDRV_CPU_IO_MAP(kungfum_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kungfum_map)
+	MDRV_CPU_IO_MAP(kungfum_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -980,8 +980,8 @@ static MACHINE_DRIVER_START( battroad )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(battroad_map,0)
-	MDRV_CPU_IO_MAP(battroad_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(battroad_map)
+	MDRV_CPU_IO_MAP(battroad_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1000,8 +1000,8 @@ static MACHINE_DRIVER_START( ldrun2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun2_map,0)
-	MDRV_CPU_IO_MAP(ldrun2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ldrun2_map)
+	MDRV_CPU_IO_MAP(ldrun2_io_map)
 
 	MDRV_VIDEO_START(ldrun2)
 	MDRV_VIDEO_UPDATE(ldrun)
@@ -1013,8 +1013,8 @@ static MACHINE_DRIVER_START( ldrun3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun3_map,0)
-	MDRV_CPU_IO_MAP(ldrun3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ldrun3_map)
+	MDRV_CPU_IO_MAP(ldrun3_io_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ldrun3)
@@ -1028,8 +1028,8 @@ static MACHINE_DRIVER_START( ldrun4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun4_map,0)
-	MDRV_CPU_IO_MAP(ldrun4_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ldrun4_map)
+	MDRV_CPU_IO_MAP(ldrun4_io_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(ldrun3)
@@ -1043,7 +1043,7 @@ static MACHINE_DRIVER_START( lotlot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lotlot_map,0)
+	MDRV_CPU_PROGRAM_MAP(lotlot_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(lotlot)
@@ -1060,8 +1060,8 @@ static MACHINE_DRIVER_START( kidniki )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kidniki_map,0)
-	MDRV_CPU_IO_MAP(kidniki_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(kidniki_map)
+	MDRV_CPU_IO_MAP(kidniki_io_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(kidniki)
@@ -1076,7 +1076,7 @@ static MACHINE_DRIVER_START( spelunkr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spelunkr_map,0)
+	MDRV_CPU_PROGRAM_MAP(spelunkr_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(spelunkr)
@@ -1091,7 +1091,7 @@ static MACHINE_DRIVER_START( spelunk2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spelunk2_map,0)
+	MDRV_CPU_PROGRAM_MAP(spelunk2_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(spelunk2)
@@ -1108,8 +1108,8 @@ static MACHINE_DRIVER_START( youjyudn )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(youjyudn_map,0)
-	MDRV_CPU_IO_MAP(youjyudn_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(youjyudn_map)
+	MDRV_CPU_IO_MAP(youjyudn_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1126,7 +1126,7 @@ static MACHINE_DRIVER_START( horizon )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(horizon_map,0)
+	MDRV_CPU_PROGRAM_MAP(horizon_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

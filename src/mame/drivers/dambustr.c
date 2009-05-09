@@ -185,7 +185,7 @@ static DRIVER_INIT(dambustr)
 static MACHINE_DRIVER_START( dambustr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(dambustr_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dambustr_map)
 
 	MDRV_MACHINE_RESET(galaxold)
 

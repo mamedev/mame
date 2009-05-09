@@ -228,7 +228,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( hanaroku )
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(hanaroku_map,0)
+	MDRV_CPU_PROGRAM_MAP(hanaroku_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

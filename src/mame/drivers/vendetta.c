@@ -442,11 +442,11 @@ static MACHINE_DRIVER_START( vendetta )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
 //  MDRV_CPU_ADD("maincpu", KONAMI, 3000000)   /* is needed to have correct music speed */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vendetta_irq)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
                             /* interrupts are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(vendetta)
@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( esckids )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(vendetta)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(esckids_map, 0)
+	MDRV_CPU_PROGRAM_MAP(esckids_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 //MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */

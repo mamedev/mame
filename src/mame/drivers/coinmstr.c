@@ -980,7 +980,7 @@ static const mc6845_interface h46505_intf =
 
 static MACHINE_DRIVER_START( coinmstr )
 	MDRV_CPU_ADD("cpu",Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(coinmstr_map,0)
+	MDRV_CPU_PROGRAM_MAP(coinmstr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PIA6821_ADD("pia0", pia_0_intf)
@@ -1014,25 +1014,25 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( quizmstr )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_IO_MAP(quizmstr_io_map,0)
+	MDRV_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trailblz )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_IO_MAP(trailblz_io_map,0)
+	MDRV_CPU_IO_MAP(trailblz_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supnudg2 )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_IO_MAP(supnudg2_io_map,0)
+	MDRV_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pokeroul )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_IO_MAP(pokeroul_io_map,0)
+	MDRV_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_DRIVER_END
 
 /*

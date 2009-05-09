@@ -210,8 +210,8 @@ static MACHINE_DRIVER_START( dorachan )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(dorachan_map,0)
-	MDRV_CPU_IO_MAP(dorachan_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dorachan_map)
+	MDRV_CPU_IO_MAP(dorachan_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */

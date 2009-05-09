@@ -735,15 +735,15 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
     MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
-    MDRV_CPU_PROGRAM_MAP(sound_map,0)
+    MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
 
 	/* video hardware */
@@ -778,15 +778,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

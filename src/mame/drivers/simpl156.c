@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( chainrec )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MDRV_CPU_PROGRAM_MAP(chainrec_map,0)
+	MDRV_CPU_PROGRAM_MAP(chainrec_map)
 	MDRV_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(simpl156) // 93C45
@@ -496,28 +496,28 @@ static MACHINE_DRIVER_START( magdrop )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(magdrop_map,0)
+	MDRV_CPU_PROGRAM_MAP(magdrop_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( magdropp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(magdropp_map,0)
+	MDRV_CPU_PROGRAM_MAP(magdropp_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( joemacr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joemacr_map,0)
+	MDRV_CPU_PROGRAM_MAP(joemacr_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mitchell156 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mitchell156_map,0)
+	MDRV_CPU_PROGRAM_MAP(mitchell156_map)
 
 	MDRV_SOUND_REPLACE("okimusic", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)

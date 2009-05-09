@@ -6673,7 +6673,7 @@ static MACHINE_DRIVER_START( ddenlovr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(ddenlovr_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddenlovr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* video hardware */
@@ -6712,13 +6712,13 @@ static MACHINE_DRIVER_START( ddenlvrj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlvrj_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddenlvrj_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ddenlvrk )
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlvrk_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddenlvrk_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( akamaru )
@@ -6726,7 +6726,7 @@ static MACHINE_DRIVER_START( akamaru )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(akamaru_map,0)
+	MDRV_CPU_PROGRAM_MAP(akamaru_map)
 MACHINE_DRIVER_END
 
 
@@ -6745,7 +6745,7 @@ static MACHINE_DRIVER_START( quiz365 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(quiz365_map,0)
+	MDRV_CPU_PROGRAM_MAP(quiz365_map)
 
 	MDRV_SOUND_MODIFY("ay")
 	MDRV_SOUND_CONFIG(quiz365_ay8910_interface)
@@ -6757,7 +6757,7 @@ static MACHINE_DRIVER_START( nettoqc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nettoqc_map,0)
+	MDRV_CPU_PROGRAM_MAP(nettoqc_map)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -6798,8 +6798,8 @@ static MACHINE_DRIVER_START( quizchq )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(quizchq_map,0)
-	MDRV_CPU_IO_MAP(quizchq_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(quizchq_map)
+	MDRV_CPU_IO_MAP(quizchq_portmap)
 	MDRV_CPU_VBLANK_INT("screen", quizchq_irq)
 
 	/* video hardware */
@@ -6835,8 +6835,8 @@ static MACHINE_DRIVER_START( rongrong )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(quizchq)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rongrong_map,0)
-	MDRV_CPU_IO_MAP(rongrong_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(rongrong_map)
+	MDRV_CPU_IO_MAP(rongrong_portmap)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -6871,13 +6871,13 @@ static MACHINE_DRIVER_START( mmpanic )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(mmpanic_map,0)
-	MDRV_CPU_IO_MAP(mmpanic_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mmpanic_map)
+	MDRV_CPU_IO_MAP(mmpanic_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mmpanic_irq)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_map,0)
-	MDRV_CPU_IO_MAP(mmpanic_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_map)
+	MDRV_CPU_IO_MAP(mmpanic_sound_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
 
 	/* video hardware */
@@ -6943,8 +6943,8 @@ static MACHINE_DRIVER_START( hanakanz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000)	// TMPZ84C015BF-8
-	MDRV_CPU_PROGRAM_MAP(hanakanz_map,0)
-	MDRV_CPU_IO_MAP(hanakanz_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hanakanz_map)
+	MDRV_CPU_IO_MAP(hanakanz_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
 	/* video hardware */
@@ -6979,14 +6979,14 @@ static MACHINE_DRIVER_START( hkagerou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hkagerou_portmap,0)
+	MDRV_CPU_IO_MAP(hkagerou_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjreach1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjreach1_portmap,0)
+	MDRV_CPU_IO_MAP(mjreach1_portmap)
 MACHINE_DRIVER_END
 
 
@@ -7020,7 +7020,7 @@ static MACHINE_DRIVER_START( mjchuuka )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjchuuka_portmap,0)
+	MDRV_CPU_IO_MAP(mjchuuka_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 1789772)
@@ -7032,12 +7032,12 @@ static MACHINE_DRIVER_START( funkyfig )
 
 	MDRV_IMPORT_FROM(mmpanic)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(funkyfig_map,0)
-	MDRV_CPU_IO_MAP(funkyfig_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(funkyfig_map)
+	MDRV_CPU_IO_MAP(funkyfig_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(funkyfig_sound_portmap,0)
+	MDRV_CPU_IO_MAP(funkyfig_sound_portmap)
 
 	MDRV_VIDEO_START(ddenlovr)	// no extra layers?
 MACHINE_DRIVER_END
@@ -7093,8 +7093,8 @@ static MACHINE_DRIVER_START( mjmyster )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjmyster_map,0)
-	MDRV_CPU_IO_MAP(mjmyster_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
+	MDRV_CPU_IO_MAP(mjmyster_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
@@ -7142,8 +7142,8 @@ static MACHINE_DRIVER_START( hginga )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hginga_map,0)
-	MDRV_CPU_IO_MAP(hginga_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hginga_map)
+	MDRV_CPU_IO_MAP(hginga_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 3579545)
@@ -7155,8 +7155,8 @@ static MACHINE_DRIVER_START( hgokou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hgokou_map,0)
-	MDRV_CPU_IO_MAP(hgokou_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hgokou_map)
+	MDRV_CPU_IO_MAP(hgokou_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 3579545)
@@ -7168,16 +7168,16 @@ static MACHINE_DRIVER_START( mjmywrld )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( mjmyster )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hginga_map,0)
-	MDRV_CPU_IO_MAP(mjmywrld_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hginga_map)
+	MDRV_CPU_IO_MAP(mjmywrld_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjmyuniv )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjmyster_map,0)
-	MDRV_CPU_IO_MAP(mjmyster_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
+	MDRV_CPU_IO_MAP(mjmyster_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
@@ -7190,7 +7190,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjmyster_portmap,0)
+	MDRV_CPU_IO_MAP(mjmyster_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
@@ -7220,8 +7220,8 @@ static MACHINE_DRIVER_START( mjflove )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rongrong_map,0)
-	MDRV_CPU_IO_MAP(mjflove_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(rongrong_map)
+	MDRV_CPU_IO_MAP(mjflove_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
 
 	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
@@ -7241,8 +7241,8 @@ static MACHINE_DRIVER_START( hparadis )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hparadis_map,0)
-	MDRV_CPU_IO_MAP(hparadis_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hparadis_map)
+	MDRV_CPU_IO_MAP(hparadis_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hparadis_irq)
 MACHINE_DRIVER_END
 
@@ -7250,8 +7250,8 @@ static MACHINE_DRIVER_START( jongtei )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)	// ?
-	MDRV_CPU_PROGRAM_MAP(hanakanz_map,0)
-	MDRV_CPU_IO_MAP(jongtei_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hanakanz_map)
+	MDRV_CPU_IO_MAP(jongtei_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
 	/* video hardware */

@@ -377,17 +377,17 @@ static MACHINE_DRIVER_START( chinhero )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(chinhero_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(chinhero_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map,0)
-	MDRV_CPU_IO_MAP(chinhero_bbx_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map)
+	MDRV_CPU_IO_MAP(chinhero_bbx_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(chinhero)
 
@@ -425,14 +425,14 @@ static MACHINE_DRIVER_START( shangkid )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chinhero)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(shangkid_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(shangkid_main_map)
 
 	MDRV_CPU_MODIFY("bbx")
-	MDRV_CPU_PROGRAM_MAP(shangkid_bbx_map,0)
-	MDRV_CPU_IO_MAP(shangkid_bbx_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(shangkid_bbx_map)
+	MDRV_CPU_IO_MAP(shangkid_bbx_portmap)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(shangkid_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(shangkid_sound_map)
 
 	MDRV_MACHINE_RESET(shangkid)
 
@@ -470,8 +470,8 @@ static MACHINE_DRIVER_START( dynamski )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(dynamski_map,0)
-	MDRV_CPU_IO_MAP(dynamski_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(dynamski_map)
+	MDRV_CPU_IO_MAP(dynamski_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

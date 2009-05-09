@@ -314,7 +314,7 @@ static MACHINE_DRIVER_START( tunhunt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,2000000)		/* ??? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ? probably wrong */
 
 	/* video hardware */

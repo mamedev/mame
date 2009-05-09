@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( zerohour )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(zerohour_map,0)
+	MDRV_CPU_PROGRAM_MAP(zerohour_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START( redclash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(redclash_map,0)
+	MDRV_CPU_PROGRAM_MAP(redclash_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

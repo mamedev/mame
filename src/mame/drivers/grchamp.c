@@ -677,19 +677,19 @@ static MACHINE_DRIVER_START( grchamp )
 	/* basic machine hardware */
 	/* CPU BOARD */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", grchamp_cpu0_interrupt)
 
 	/* GAME BOARD */
 	MDRV_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_IO_MAP(sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MDRV_CPU_IO_MAP(sub_portmap)
 	MDRV_CPU_VBLANK_INT("screen", grchamp_cpu1_interrupt)
 
 	/* SOUND BOARD */
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/4/16/16/10/16)
 
 	MDRV_MACHINE_RESET(grchamp)

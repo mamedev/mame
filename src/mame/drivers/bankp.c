@@ -259,8 +259,8 @@ static MACHINE_DRIVER_START( bankp )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(bankp_map, 0)
-	MDRV_CPU_IO_MAP(bankp_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bankp_map)
+	MDRV_CPU_IO_MAP(bankp_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

@@ -662,15 +662,15 @@ static MACHINE_DRIVER_START( tsamurai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(z80_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(z80_io_map)
 	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound1_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound1_map)
 
 	MDRV_CPU_ADD("audio2", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound2_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound2_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -705,19 +705,19 @@ static MACHINE_DRIVER_START( m660 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(m660_map,0)
-	MDRV_CPU_IO_MAP(z80_m660_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(m660_map)
+	MDRV_CPU_IO_MAP(z80_m660_io_map)
 	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound1_m660_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound1_m660_map)
 
 	MDRV_CPU_ADD("audio2", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound2_m660_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound2_m660_map)
 
 	MDRV_CPU_ADD("audio3", Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound3_m660_map,0)
-	MDRV_CPU_IO_MAP(sound3_m660_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound3_m660_map)
+	MDRV_CPU_IO_MAP(sound3_m660_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -753,12 +753,12 @@ static MACHINE_DRIVER_START( vsgongf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(vsgongf_map,0)
+	MDRV_CPU_PROGRAM_MAP(vsgongf_map)
 	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_vsgongf_map,0)
-	MDRV_CPU_IO_MAP(vsgongf_audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_vsgongf_map)
+	MDRV_CPU_IO_MAP(vsgongf_audio_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)
 
 	/* video hardware */

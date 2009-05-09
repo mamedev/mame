@@ -390,13 +390,13 @@ static MACHINE_DRIVER_START( cop01 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(cop01_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cop01_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(audio_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -430,13 +430,13 @@ static MACHINE_DRIVER_START( mightguy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(cop01_map,0)
-	MDRV_CPU_IO_MAP(mightguy_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cop01_map)
+	MDRV_CPU_IO_MAP(mightguy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(mightguy_audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(mightguy_audio_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -606,11 +606,11 @@ static const es5506_interface es5506_config =
 static MACHINE_DRIVER_START( macrossp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 50000000/2)	/* 25 MHz */
-	MDRV_CPU_PROGRAM_MAP(macrossp_map,0)
+	MDRV_CPU_PROGRAM_MAP(macrossp_map)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold) // there are others ...
 
 	MDRV_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(macrossp_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(macrossp_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

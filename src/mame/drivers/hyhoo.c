@@ -256,8 +256,8 @@ static MACHINE_DRIVER_START( hyhoo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000/1)	/* 5.00 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(hyhoo_map,0)
-	MDRV_CPU_IO_MAP(hyhoo_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyhoo_map)
+	MDRV_CPU_IO_MAP(hyhoo_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)

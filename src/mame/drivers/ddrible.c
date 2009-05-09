@@ -263,15 +263,15 @@ static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu0_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu0_map)
 	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_0)
 
 	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_1)
 
 	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 

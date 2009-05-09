@@ -437,11 +437,11 @@ static MACHINE_DRIVER_START( wwfsstar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", wwfsstar_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

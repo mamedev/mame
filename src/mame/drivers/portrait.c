@@ -250,11 +250,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( portrait )
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(portrait_map,0)
+	MDRV_CPU_PROGRAM_MAP(portrait_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", I8039, 3120000)  /* ? */
-	MDRV_CPU_PROGRAM_MAP(portrait_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(portrait_sound_map)
 
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

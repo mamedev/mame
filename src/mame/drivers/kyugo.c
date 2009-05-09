@@ -462,13 +462,13 @@ static MACHINE_DRIVER_START( gyrodine )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(gyrodine_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(gyrodine_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gyrodine_sub_map,0)
-	MDRV_CPU_IO_MAP(gyrodine_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(gyrodine_sub_map)
+	MDRV_CPU_IO_MAP(gyrodine_sub_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -506,8 +506,8 @@ static MACHINE_DRIVER_START( sonofphx )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(sonofphx_sub_map,0)
-	MDRV_CPU_IO_MAP(sonofphx_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sonofphx_sub_map)
+	MDRV_CPU_IO_MAP(sonofphx_sub_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( srdmissn )
@@ -515,11 +515,11 @@ static MACHINE_DRIVER_START( srdmissn )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(srdmissn_portmap,0)
+	MDRV_CPU_IO_MAP(srdmissn_portmap)
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(srdmissn_sub_map,0)
-	MDRV_CPU_IO_MAP(srdmissn_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(srdmissn_sub_map)
+	MDRV_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( flashgal )
@@ -527,7 +527,7 @@ static MACHINE_DRIVER_START( flashgal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sonofphx)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(flashgal_portmap,0)
+	MDRV_CPU_IO_MAP(flashgal_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( flashgla )
@@ -535,11 +535,11 @@ static MACHINE_DRIVER_START( flashgla )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(flashgla_portmap,0)
+	MDRV_CPU_IO_MAP(flashgla_portmap)
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(flashgla_sub_map,0)
-	MDRV_CPU_IO_MAP(flashgla_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(flashgla_sub_map)
+	MDRV_CPU_IO_MAP(flashgla_sub_portmap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( legend )
@@ -547,8 +547,8 @@ static MACHINE_DRIVER_START( legend )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(legend_sub_map,0)
-	MDRV_CPU_IO_MAP(srdmissn_sub_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(legend_sub_map)
+	MDRV_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_DRIVER_END
 
 

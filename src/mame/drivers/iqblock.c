@@ -269,8 +269,8 @@ static MACHINE_DRIVER_START( iqblock )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )

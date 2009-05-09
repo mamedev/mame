@@ -544,8 +544,8 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( hnayayoi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(hnayayoi_map,0)
-	MDRV_CPU_IO_MAP(hnayayoi_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hnayayoi_map)
+	MDRV_CPU_IO_MAP(hnayayoi_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
 
@@ -585,14 +585,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hnfubuki )
 	MDRV_IMPORT_FROM(hnayayoi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnfubuki_map,0)
+	MDRV_CPU_PROGRAM_MAP(hnfubuki_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( untoucha )
 	MDRV_IMPORT_FROM(hnayayoi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(untoucha_map,0)
-	MDRV_CPU_IO_MAP(untoucha_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(untoucha_map)
+	MDRV_CPU_IO_MAP(untoucha_io_map)
 
 	MDRV_VIDEO_START(untoucha)
 MACHINE_DRIVER_END

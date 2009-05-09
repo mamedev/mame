@@ -468,7 +468,7 @@ static MACHINE_RESET( gselect )
 
 static MACHINE_DRIVER_START( getrivia )
 	MDRV_CPU_ADD("cpu",Z80,4000000) /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(getrivia_map,0)
+	MDRV_CPU_PROGRAM_MAP(getrivia_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( gselect )
 	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(gselect_map,0)
+	MDRV_CPU_PROGRAM_MAP(gselect_map)
 
 	MDRV_MACHINE_RESET(gselect)
 
@@ -517,7 +517,7 @@ static MACHINE_DRIVER_START( amuse )
 	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(amuse_map,0)
+	MDRV_CPU_PROGRAM_MAP(amuse_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gepoker )
@@ -526,7 +526,7 @@ static MACHINE_DRIVER_START( gepoker )
 	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(gepoker_map,0)
+	MDRV_CPU_PROGRAM_MAP(gepoker_map)
 MACHINE_DRIVER_END
 
 /***************************************************

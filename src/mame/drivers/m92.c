@@ -917,11 +917,11 @@ static MACHINE_DRIVER_START( m92 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V33,18000000/2)	/* NEC V33, 18 MHz clock */
-	MDRV_CPU_PROGRAM_MAP(m92_map,0)
-	MDRV_CPU_IO_MAP(m92_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(m92_map)
+	MDRV_CPU_IO_MAP(m92_portmap)
 
 	MDRV_CPU_ADD("soundcpu" ,V30, 14318180/2)	/* 14.31818 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(m92)
 	MDRV_MACHINE_RESET(m92)
@@ -973,7 +973,7 @@ static const nec_config lethalth_config ={ lethalth_decryption_table, };
 static MACHINE_DRIVER_START( lethalth )
 	MDRV_IMPORT_FROM(m92)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lethalth_map,0)
+	MDRV_CPU_PROGRAM_MAP(lethalth_map)
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(lethalth_config)
 MACHINE_DRIVER_END

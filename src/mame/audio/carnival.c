@@ -298,8 +298,8 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( carnival_audio )
 	MDRV_CPU_ADD("audiocpu", I8039, 3579545)
-	MDRV_CPU_PROGRAM_MAP(carnival_audio_map,0)
-	MDRV_CPU_IO_MAP(carnival_audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(carnival_audio_map)
+	MDRV_CPU_IO_MAP(carnival_audio_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

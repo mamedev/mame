@@ -371,8 +371,8 @@ static MACHINE_DRIVER_START( epos )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
-	MDRV_CPU_PROGRAM_MAP(epos_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(epos_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -395,8 +395,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dealer )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
-	MDRV_CPU_PROGRAM_MAP(dealer_map,0)
-	MDRV_CPU_IO_MAP(dealer_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dealer_map)
+	MDRV_CPU_IO_MAP(dealer_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )

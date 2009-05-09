@@ -571,11 +571,11 @@ static MACHINE_DRIVER_START( rainbow )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rainbow_map,0)
+	MDRV_CPU_PROGRAM_MAP(rainbow_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rainbow_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rainbow_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -608,11 +608,11 @@ static MACHINE_DRIVER_START( jumping )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)	/* not verified but matches original */
-	MDRV_CPU_PROGRAM_MAP(jumping_map,0)
+	MDRV_CPU_PROGRAM_MAP(jumping_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
-	MDRV_CPU_PROGRAM_MAP(jumping_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(jumping_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough ? */
 

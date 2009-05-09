@@ -1028,8 +1028,8 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_18_map,0)
-	MDRV_CPU_IO_MAP(sound_18_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_18_map)
+	MDRV_CPU_IO_MAP(sound_18_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1071,7 +1071,7 @@ static MACHINE_DRIVER_START( astormbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astormbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(astormbl_map)
 
 	MDRV_MACHINE_RESET(astormbl)
 MACHINE_DRIVER_END
@@ -1082,7 +1082,7 @@ static MACHINE_DRIVER_START( mwalkbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mwalkbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(mwalkbl_map)
 
 	MDRV_MACHINE_RESET(mwalkbl)
 MACHINE_DRIVER_END
@@ -1093,11 +1093,11 @@ static MACHINE_DRIVER_START( shdancbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(shdancbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(shdancbl_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(shdancbl_sound_map,0)
-	MDRV_CPU_IO_MAP(shdancbl_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(shdancbl_sound_map)
+	MDRV_CPU_IO_MAP(shdancbl_sound_io_map)
 	MDRV_SOUND_REMOVE("5c68")
 
 	MDRV_SOUND_ADD("5205", MSM5205, 200000)

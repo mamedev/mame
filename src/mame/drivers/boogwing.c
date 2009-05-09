@@ -298,11 +298,11 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( boogwing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
-	MDRV_CPU_PROGRAM_MAP(boogwing_map,0)
+	MDRV_CPU_PROGRAM_MAP(boogwing_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )

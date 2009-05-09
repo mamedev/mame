@@ -395,11 +395,11 @@ static MACHINE_DRIVER_START( splash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
-	MDRV_CPU_PROGRAM_MAP(splash_map,0)
+	MDRV_CPU_PROGRAM_MAP(splash_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,30000000/8)
-	MDRV_CPU_PROGRAM_MAP(splash_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(splash_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,60*64)	/* needed for the msm5205 to play the samples */
 
 	/* video hardware */
@@ -448,12 +448,12 @@ static MACHINE_DRIVER_START( roldfrog )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz - verified */
-	MDRV_CPU_PROGRAM_MAP(roldfrog_map,0)
+	MDRV_CPU_PROGRAM_MAP(roldfrog_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3000000)			/* 3 MHz - verified */
-	MDRV_CPU_PROGRAM_MAP(roldfrog_sound_map,0)
-	MDRV_CPU_IO_MAP(roldfrog_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(roldfrog_sound_map)
+	MDRV_CPU_IO_MAP(roldfrog_sound_io_map)
 //  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,60*64)  /* needed for the msm5205 to play the samples */
 
 	/* video hardware */
@@ -488,11 +488,11 @@ static MACHINE_DRIVER_START( funystrp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
-	MDRV_CPU_PROGRAM_MAP(funystrp_map,0)
+	MDRV_CPU_PROGRAM_MAP(funystrp_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 //  MDRV_CPU_ADD("audiocpu", Z80,30000000/8)
-//  MDRV_CPU_PROGRAM_MAP(funystrp_sound_map,0)
+//  MDRV_CPU_PROGRAM_MAP(funystrp_sound_map)
 //  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,60*64)  /* needed for the msm5205 to play the samples */
 
 	/* video hardware */

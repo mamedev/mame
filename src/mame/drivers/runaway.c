@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( runaway )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
-	MDRV_CPU_PROGRAM_MAP(runaway_map, 0)
+	MDRV_CPU_PROGRAM_MAP(runaway_map)
 
 	MDRV_MACHINE_RESET(runaway)
 

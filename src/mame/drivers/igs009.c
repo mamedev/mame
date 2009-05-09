@@ -633,8 +633,8 @@ static INTERRUPT_GEN( jingbell_interrupt )
 static MACHINE_DRIVER_START( jingbell )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(jingbell_map,0)
-	MDRV_CPU_IO_MAP(jingbell_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(jingbell_map)
+	MDRV_CPU_IO_MAP(jingbell_portmap)
 	MDRV_CPU_VBLANK_INT("screen",jingbell_interrupt)
 
 	MDRV_MACHINE_RESET(jingbell)

@@ -518,11 +518,11 @@ static MACHINE_DRIVER_START( slapshot )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
-	MDRV_CPU_PROGRAM_MAP(slapshot_map,0)
+	MDRV_CPU_PROGRAM_MAP(slapshot_map)
 	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -560,11 +560,11 @@ static MACHINE_DRIVER_START( opwolf3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf3_map)
 	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

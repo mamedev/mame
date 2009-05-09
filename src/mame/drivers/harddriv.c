@@ -1007,12 +1007,12 @@ static MACHINE_DRIVER_START( driver_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, 32000000/4)
-	MDRV_CPU_PROGRAM_MAP(driver_68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(driver_68k_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
 
 	MDRV_CPU_ADD("gsp", TMS34010, 48000000)
-	MDRV_CPU_PROGRAM_MAP(driver_gsp_map,0)
+	MDRV_CPU_PROGRAM_MAP(driver_gsp_map)
 	MDRV_CPU_CONFIG(gsp_config_driver)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
@@ -1040,7 +1040,7 @@ static MACHINE_DRIVER_START( driver_msp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("msp", TMS34010, 50000000)
-	MDRV_CPU_PROGRAM_MAP(driver_msp_map,0)
+	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
 	MDRV_CPU_CONFIG(msp_config)
 MACHINE_DRIVER_END
 
@@ -1051,11 +1051,11 @@ static MACHINE_DRIVER_START( multisync_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(multisync_68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(multisync_68k_map)
 
 	MDRV_CPU_MODIFY("gsp")
 	MDRV_CPU_CONFIG(gsp_config_multisync)
-	MDRV_CPU_PROGRAM_MAP(multisync_gsp_map,0)
+	MDRV_CPU_PROGRAM_MAP(multisync_gsp_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1069,7 +1069,7 @@ static MACHINE_DRIVER_START( multisync_msp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("msp", TMS34010, 50000000)
-	MDRV_CPU_PROGRAM_MAP(driver_msp_map,0)
+	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
 	MDRV_CPU_CONFIG(msp_config)
 MACHINE_DRIVER_END
 
@@ -1080,10 +1080,10 @@ static MACHINE_DRIVER_START( multisync2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(multisync2_68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(multisync2_68k_map)
 
 	MDRV_CPU_MODIFY("gsp")
-	MDRV_CPU_PROGRAM_MAP(multisync2_gsp_map,0)
+	MDRV_CPU_PROGRAM_MAP(multisync2_gsp_map)
 MACHINE_DRIVER_END
 
 
@@ -1099,8 +1099,8 @@ static MACHINE_DRIVER_START( adsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2100, 8000000)
-	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
-	MDRV_CPU_DATA_MAP(adsp_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
+	MDRV_CPU_DATA_MAP(adsp_data_map)
 MACHINE_DRIVER_END
 
 
@@ -1109,8 +1109,8 @@ static MACHINE_DRIVER_START( ds3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
-	MDRV_CPU_PROGRAM_MAP(ds3_program_map,0)
-	MDRV_CPU_DATA_MAP(ds3_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(ds3_program_map)
+	MDRV_CPU_DATA_MAP(ds3_data_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 MACHINE_DRIVER_END
@@ -1121,14 +1121,14 @@ static MACHINE_DRIVER_START( ds4 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
-	MDRV_CPU_PROGRAM_MAP(ds3_program_map,0)
-	MDRV_CPU_DATA_MAP(ds3_data_map,0)
+	MDRV_CPU_PROGRAM_MAP(ds3_program_map)
+	MDRV_CPU_DATA_MAP(ds3_data_map)
 
 //  MDRV_CPU_ADD("soundcpu", ADSP2105, 10000000)
-//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
+//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
 
 //  MDRV_CPU_ADD("sounddsp", ADSP2105, 10000000)
-//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
+//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1153,7 +1153,7 @@ static MACHINE_DRIVER_START( dsk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
 	MDRV_CPU_CONFIG(dsp32c_config)
-	MDRV_CPU_PROGRAM_MAP(dsk_dsp32_map,0)
+	MDRV_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	/* ASIC65 */
 	MDRV_IMPORT_FROM( asic65 )
@@ -1166,7 +1166,7 @@ static MACHINE_DRIVER_START( dsk2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
 	MDRV_CPU_CONFIG(dsp32c_config)
-	MDRV_CPU_PROGRAM_MAP(dsk2_dsp32_map,0)
+	MDRV_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
 	MDRV_IMPORT_FROM( asic65 )
@@ -1184,12 +1184,12 @@ static MACHINE_DRIVER_START( driversnd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M68000, 16000000/2)
-	MDRV_CPU_PROGRAM_MAP(driversnd_68k_map,0)
+	MDRV_CPU_PROGRAM_MAP(driversnd_68k_map)
 
 	MDRV_CPU_ADD("sounddsp", TMS32010, 20000000)
-	MDRV_CPU_PROGRAM_MAP(driversnd_dsp_program_map,0)
+	MDRV_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
-	MDRV_CPU_IO_MAP(driversnd_dsp_io_map,0)
+	MDRV_CPU_IO_MAP(driversnd_dsp_io_map)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

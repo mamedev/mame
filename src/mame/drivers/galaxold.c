@@ -2103,7 +2103,7 @@ static MACHINE_DRIVER_START( galaxold_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(galaxold_map,0)
+	MDRV_CPU_PROGRAM_MAP(galaxold_map)
 
 	MDRV_MACHINE_RESET(galaxold)
 
@@ -2151,7 +2151,7 @@ static MACHINE_DRIVER_START( mooncrst )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mooncrst_map,0)
+	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mooncrst)
@@ -2163,7 +2163,7 @@ static MACHINE_DRIVER_START( scramblb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scramblb_map,0)
+	MDRV_CPU_PROGRAM_MAP(scramblb_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+2+64+1)	/* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
@@ -2177,7 +2177,7 @@ static MACHINE_DRIVER_START( scramb2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scramb2_map,0)
+	MDRV_CPU_PROGRAM_MAP(scramb2_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+2+64+1)	/* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
@@ -2193,7 +2193,7 @@ static MACHINE_DRIVER_START( 4in1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(_4in1_map,0)
+	MDRV_CPU_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(_4in1)
@@ -2207,7 +2207,7 @@ static MACHINE_DRIVER_START( bagmanmc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bagmanmc_map,0)
+	MDRV_CPU_PROGRAM_MAP(bagmanmc_map)
 
 	MDRV_MACHINE_RESET( devilfsg )
 
@@ -2223,7 +2223,7 @@ static MACHINE_DRIVER_START( dkongjrm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dkongjrm_map,0)
+	MDRV_CPU_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(dkongjrm)
@@ -2233,7 +2233,7 @@ static MACHINE_DRIVER_START( rockclim )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rockclim_map,0)
+	MDRV_CPU_PROGRAM_MAP(rockclim_map)
 	MDRV_GFXDECODE(rockclim)
 	/* video hardware */
 	MDRV_VIDEO_START(rockclim)
@@ -2249,8 +2249,8 @@ static MACHINE_DRIVER_START( ozon1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ozon1_map,0)
-	MDRV_CPU_IO_MAP(ozon1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ozon1_map)
+	MDRV_CPU_IO_MAP(ozon1_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(NULL)
@@ -2267,8 +2267,8 @@ static MACHINE_DRIVER_START( drivfrcg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(drivfrcg,0)
-	MDRV_CPU_IO_MAP(drivfrcg_io,0)
+	MDRV_CPU_PROGRAM_MAP(drivfrcg)
+	MDRV_CPU_IO_MAP(drivfrcg_io)
 	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 
@@ -2298,8 +2298,8 @@ static MACHINE_DRIVER_START( bongo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bongo,0)
-	MDRV_CPU_IO_MAP(bongo_io,0)
+	MDRV_CPU_PROGRAM_MAP(bongo)
+	MDRV_CPU_IO_MAP(bongo_io)
 
 	MDRV_VIDEO_START(bongo)
 	MDRV_VIDEO_UPDATE(galaxold)
@@ -2313,8 +2313,8 @@ static MACHINE_DRIVER_START( hunchbkg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(hunchbkg,0)
-	MDRV_CPU_IO_MAP(hunchbkg_io,0)
+	MDRV_CPU_PROGRAM_MAP(hunchbkg)
+	MDRV_CPU_IO_MAP(hunchbkg_io)
 	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
@@ -2340,12 +2340,12 @@ static MACHINE_DRIVER_START( harem )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(harem_cpu1,0)
+	MDRV_CPU_PROGRAM_MAP(harem_cpu1)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1620000)
-	MDRV_CPU_PROGRAM_MAP(harem_cpu2,0)
-	MDRV_CPU_IO_MAP(harem_cpu2_io,0)
+	MDRV_CPU_PROGRAM_MAP(harem_cpu2)
+	MDRV_CPU_IO_MAP(harem_cpu2_io)
 
 	MDRV_MACHINE_RESET(NULL)
 
@@ -2368,15 +2368,15 @@ static MACHINE_DRIVER_START( tazzmang )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tazzmang,0)
+	MDRV_CPU_PROGRAM_MAP(tazzmang)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( racknrol )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(racknrol,0)
-	MDRV_CPU_IO_MAP(racknrol_io,0)
+	MDRV_CPU_PROGRAM_MAP(racknrol)
+	MDRV_CPU_IO_MAP(racknrol_io)
 	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
@@ -2407,7 +2407,7 @@ static MACHINE_DRIVER_START( ckongg )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ckongg_map,0)
+	MDRV_CPU_PROGRAM_MAP(ckongg_map)
 
 	MDRV_GFXDECODE(gmgalax)
 
@@ -2420,7 +2420,7 @@ static MACHINE_DRIVER_START( kkgalax )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kkgalax_map,0)
+	MDRV_CPU_PROGRAM_MAP(kkgalax_map)
 
 	MDRV_GFXDECODE(gmgalax)
 
@@ -2433,8 +2433,8 @@ static MACHINE_DRIVER_START( hexpoola )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(racknrol,0)
-	MDRV_CPU_IO_MAP(hexpoola_io,0)
+	MDRV_CPU_PROGRAM_MAP(racknrol)
+	MDRV_CPU_IO_MAP(hexpoola_io)
 	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)

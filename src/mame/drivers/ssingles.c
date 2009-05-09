@@ -258,8 +258,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
-	MDRV_CPU_IO_MAP(ssingles_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssingles_map)
+	MDRV_CPU_IO_MAP(ssingles_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

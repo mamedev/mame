@@ -1426,10 +1426,10 @@ static MACHINE_DRIVER_START( defender )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
-	MDRV_CPU_PROGRAM_MAP(defender_map,0)
+	MDRV_CPU_PROGRAM_MAP(defender_map)
 
 	MDRV_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(defender_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(defender_sound_map)
 
 	MDRV_MACHINE_RESET(defender)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1471,10 +1471,10 @@ static MACHINE_DRIVER_START( williams )
 	MDRV_IMPORT_FROM(defender)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(williams_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
@@ -1498,7 +1498,7 @@ static MACHINE_DRIVER_START( williams_extra_ram )
 	MDRV_IMPORT_FROM(williams)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(williams_extra_ram_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams_extra_ram_map)
 MACHINE_DRIVER_END
 
 
@@ -1528,7 +1528,7 @@ static MACHINE_DRIVER_START( alienar )
 	MDRV_IMPORT_FROM(defender)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(williams_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams_map)
 
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
@@ -1579,7 +1579,7 @@ static MACHINE_DRIVER_START( blaster )
 	MDRV_IMPORT_FROM(williams)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(blaster_map,0)
+	MDRV_CPU_PROGRAM_MAP(blaster_map)
 
 	MDRV_MACHINE_RESET(blaster)
 
@@ -1606,10 +1606,10 @@ static MACHINE_DRIVER_START( williams2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
-	MDRV_CPU_PROGRAM_MAP(williams2_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams2_map)
 
 	MDRV_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
-	MDRV_CPU_PROGRAM_MAP(williams2_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams2_sound_map)
 
 	MDRV_MACHINE_RESET(williams2)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1645,7 +1645,7 @@ static MACHINE_DRIVER_START( williams2_extra_ram )
 	MDRV_IMPORT_FROM(williams2)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(williams2_extra_ram_map,0)
+	MDRV_CPU_PROGRAM_MAP(williams2_extra_ram_map)
 MACHINE_DRIVER_END
 
 

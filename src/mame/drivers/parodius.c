@@ -227,11 +227,11 @@ static MACHINE_DRIVER_START( parodius )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* 053248 */
-	MDRV_CPU_PROGRAM_MAP(parodius_map,0)
+	MDRV_CPU_PROGRAM_MAP(parodius_map)
 	MDRV_CPU_VBLANK_INT("screen", parodius_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(parodius_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(parodius_sound_map)
 								/* NMIs are triggered by the 053260 */
 
 	MDRV_MACHINE_RESET(parodius)

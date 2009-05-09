@@ -888,7 +888,7 @@ static const psx_spu_interface psxspu_interface =
 static MACHINE_DRIVER_START( coh3002t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
-	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( zn_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */

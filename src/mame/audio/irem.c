@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( irem_audio_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
+	MDRV_CPU_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -410,8 +410,8 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
-	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
+	MDRV_CPU_IO_MAP(irem_sound_portmap)
+	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -439,7 +439,7 @@ MACHINE_DRIVER_START( m52_large_audio )	/* 10 yard fight */
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
-	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map)
 MACHINE_DRIVER_END
 
 
@@ -448,5 +448,5 @@ MACHINE_DRIVER_START( m62_audio )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
-	MDRV_CPU_PROGRAM_MAP(m62_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_DRIVER_END

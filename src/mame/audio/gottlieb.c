@@ -338,7 +338,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev1 )
 	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
 	MDRV_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
-	MDRV_CPU_PROGRAM_MAP(gottlieb_sound1_map,0)
+	MDRV_CPU_PROGRAM_MAP(gottlieb_sound1_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -585,10 +585,10 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( gottlieb_soundrev2 )
 	/* audio CPUs */
 	MDRV_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(gottlieb_audio2_map,0)
+	MDRV_CPU_PROGRAM_MAP(gottlieb_audio2_map)
 
 	MDRV_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(gottlieb_speech2_map,0)
+	MDRV_CPU_PROGRAM_MAP(gottlieb_speech2_map)
 
 	/* sound hardware */
 	MDRV_SOUND_START( gottlieb2 )

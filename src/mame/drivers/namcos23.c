@@ -1363,11 +1363,11 @@ static MACHINE_DRIVER_START( gorgon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, 133000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(gorgon_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gorgon_map)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap, 0 )
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
+	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
@@ -1401,16 +1401,16 @@ static MACHINE_DRIVER_START( s23 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ss23_map)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
-	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
+	MDRV_CPU_IO_MAP( s23h8iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23iobrdmap, 0 )
-	MDRV_CPU_IO_MAP( s23iobrdiomap, 0 )
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
+	MDRV_CPU_IO_MAP( s23iobrdiomap)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
@@ -1443,12 +1443,12 @@ static MACHINE_DRIVER_START( ss23 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", namcos23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap, 0 )
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
+	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60000))

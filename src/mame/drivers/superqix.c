@@ -978,8 +978,8 @@ static INTERRUPT_GEN( bootleg_interrupt )
 
 static MACHINE_DRIVER_START( pbillian )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(pbillian_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(pbillian_port_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(pbillian)
@@ -1011,12 +1011,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hotsmash )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(hotsmash_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(hotsmash_port_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000) /* ???? */
-	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(m68705_map)
 
 	MDRV_MACHINE_START(pbillian)
 
@@ -1049,12 +1049,12 @@ static MACHINE_DRIVER_START( sqix )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(sqix_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(sqix_port_map)
 	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
@@ -1091,8 +1091,8 @@ static MACHINE_DRIVER_START( sqixbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(bootleg_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(bootleg_port_map)
 	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
 
 	MDRV_MACHINE_START(superqix)

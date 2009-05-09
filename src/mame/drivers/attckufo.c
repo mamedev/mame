@@ -125,7 +125,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( attckufo )
 	MDRV_CPU_ADD("maincpu", M6502, 14318181/14)
-	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_PERIODIC_INT(attckufo_raster_interrupt, 15625)
 
   /* video hardware */

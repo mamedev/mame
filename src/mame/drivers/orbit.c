@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( orbit )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
-	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
+	MDRV_CPU_PROGRAM_MAP(orbit_map)
 	MDRV_CPU_VBLANK_INT("screen", orbit_interrupt)
 
 	MDRV_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)

@@ -421,11 +421,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( cshooter )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cshooter_map,0)
+	MDRV_CPU_PROGRAM_MAP(cshooter_map)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cshooter)
 
@@ -450,11 +450,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( airraid )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(airraid_map,0)
+	MDRV_CPU_PROGRAM_MAP(airraid_map)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map2,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map2)
 
 	MDRV_MACHINE_RESET(cshooter)
 

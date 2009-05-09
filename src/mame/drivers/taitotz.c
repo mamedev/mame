@@ -105,7 +105,7 @@ static const powerpc_config ppc603e_config =
 static MACHINE_DRIVER_START( taitotz )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(ppc603e_config)
-	MDRV_CPU_PROGRAM_MAP(ppc603e_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
 	/* MN1020819DA sound CPU */

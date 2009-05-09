@@ -394,12 +394,12 @@ static MACHINE_DRIVER_START( baraduke )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
-	MDRV_CPU_PROGRAM_MAP(baraduke_map,0)
+	MDRV_CPU_PROGRAM_MAP(baraduke_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("mcu", HD63701,49152000/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
-	MDRV_CPU_IO_MAP(mcu_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MDRV_CPU_IO_MAP(mcu_port_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))		/* we need heavy synch */

@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( champbwl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
-	MDRV_CPU_PROGRAM_MAP(champbwl_map,0)
+	MDRV_CPU_PROGRAM_MAP(champbwl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

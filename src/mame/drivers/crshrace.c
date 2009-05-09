@@ -442,12 +442,12 @@ static MACHINE_DRIVER_START( crshrace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(crshrace_map,0)
+	MDRV_CPU_PROGRAM_MAP(crshrace_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

@@ -977,12 +977,12 @@ static MACHINE_DRIVER_START( nekkyoku )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(nekkyoku_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(nekkyoku_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(nekkyoku_sub_map,0)
-	MDRV_CPU_IO_MAP(nekkyoku_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(nekkyoku_sub_map)
+	MDRV_CPU_IO_MAP(nekkyoku_sub_io_map)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1015,12 +1015,12 @@ static MACHINE_DRIVER_START( idolmj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromance_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_sub_map,0)
-	MDRV_CPU_IO_MAP(idolmj_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromance_sub_map)
+	MDRV_CPU_IO_MAP(idolmj_sub_io_map)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1053,12 +1053,12 @@ static MACHINE_DRIVER_START( fromance )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromance_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_sub_map,0)
-	MDRV_CPU_IO_MAP(fromance_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromance_sub_map)
+	MDRV_CPU_IO_MAP(fromance_sub_io_map)
 
 	MDRV_MACHINE_RESET(fromance)
 

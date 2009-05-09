@@ -1456,11 +1456,11 @@ static MACHINE_DRIVER_START( system_A )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1A_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
 	MDRV_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1A_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(120000))
 
@@ -1512,11 +1512,11 @@ static MACHINE_DRIVER_START( system_B )
 
 	MDRV_CPU_REPLACE("maincpu", M68000, SYS_B_CPU_CLOCK) /* 8MHz */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1B_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1B_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( system_B_hayaosi1 )
@@ -1542,11 +1542,11 @@ static MACHINE_DRIVER_START( system_C )
 	MDRV_IMPORT_FROM(system_A)
 	MDRV_CPU_REPLACE("maincpu", M68000, SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1C_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1C_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_DRIVER_END
 
 
@@ -1565,7 +1565,7 @@ static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(megasys1D_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1D_map)
 	MDRV_CPU_VBLANK_INT("screen", interrupt_D)
 
 	MDRV_MACHINE_RESET(megasys1)
@@ -1627,12 +1627,12 @@ static MACHINE_DRIVER_START( system_Z )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_map,0)
+	MDRV_CPU_PROGRAM_MAP(megasys1A_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
-	MDRV_CPU_IO_MAP(z80_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
+	MDRV_CPU_IO_MAP(z80_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

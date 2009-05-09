@@ -454,8 +454,8 @@ static MACHINE_DRIVER_START( sharkatt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sharkatt_main_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sharkatt_main_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */
@@ -492,8 +492,8 @@ static MACHINE_DRIVER_START( thief )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(thief_main_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(thief_main_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */
@@ -530,8 +530,8 @@ static MACHINE_DRIVER_START( natodef )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(thief_main_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(thief_main_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */

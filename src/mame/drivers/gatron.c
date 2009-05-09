@@ -441,8 +441,8 @@ static MACHINE_DRIVER_START( gat )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */
-	MDRV_CPU_PROGRAM_MAP(gat_map, 0)
-	MDRV_CPU_IO_MAP(gat_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(gat_map)
+	MDRV_CPU_IO_MAP(gat_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

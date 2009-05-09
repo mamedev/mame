@@ -634,15 +634,15 @@ static MACHINE_START(polygonet)
 
 static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", polygonet_interrupt)
 
 	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
-	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)
-	MDRV_CPU_DATA_MAP(dsp_data_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dsp_program_map)
+	MDRV_CPU_DATA_MAP(dsp_data_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
 	MDRV_MACHINE_START(polygonet)

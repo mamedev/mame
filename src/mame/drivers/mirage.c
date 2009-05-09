@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( mirage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)
-	MDRV_CPU_PROGRAM_MAP(mirage_map,0)
+	MDRV_CPU_PROGRAM_MAP(mirage_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */

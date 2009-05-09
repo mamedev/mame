@@ -342,12 +342,12 @@ static MACHINE_DRIVER_START( tankbust )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(map_cpu2,0)
-	MDRV_CPU_IO_MAP(port_map_cpu2,0)
+	MDRV_CPU_PROGRAM_MAP(map_cpu2)
+	MDRV_CPU_IO_MAP(port_map_cpu2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

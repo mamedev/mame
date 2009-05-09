@@ -304,8 +304,8 @@ static MACHINE_DRIVER_START( mjsister )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjsister_map,0)
-	MDRV_CPU_IO_MAP(mjsister_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mjsister_map)
+	MDRV_CPU_IO_MAP(mjsister_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_MACHINE_RESET(mjsister)

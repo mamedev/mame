@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( rocnrope )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
-	MDRV_CPU_PROGRAM_MAP(rocnrope_map,0)
+	MDRV_CPU_PROGRAM_MAP(rocnrope_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

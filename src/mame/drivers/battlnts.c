@@ -196,11 +196,11 @@ static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(battlnts_map,0)
+	MDRV_CPU_PROGRAM_MAP(battlnts_map)
 	MDRV_CPU_VBLANK_INT("screen", battlnts_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

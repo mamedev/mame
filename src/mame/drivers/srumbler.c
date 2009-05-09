@@ -242,11 +242,11 @@ static MACHINE_DRIVER_START( srumbler )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(srumbler_map,0)
+	MDRV_CPU_PROGRAM_MAP(srumbler_map)
 	MDRV_CPU_VBLANK_INT_HACK(srumbler_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(srumbler_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(srumbler_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_MACHINE_RESET(srumbler)

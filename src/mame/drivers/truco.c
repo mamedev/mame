@@ -139,7 +139,7 @@ static MACHINE_DRIVER_START( truco )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 750000)        /* ?? guess */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_VBLANK_INT("screen", truco_interrupt)
 

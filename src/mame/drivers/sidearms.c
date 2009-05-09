@@ -672,11 +672,11 @@ static MACHINE_DRIVER_START( sidearms )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(sidearms_map,0)
+	MDRV_CPU_PROGRAM_MAP(sidearms_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(sidearms_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sidearms_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -717,11 +717,11 @@ static MACHINE_DRIVER_START( turtship )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(turtship_map,0)
+	MDRV_CPU_PROGRAM_MAP(turtship_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(sidearms_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sidearms_sound_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -761,12 +761,12 @@ static MACHINE_DRIVER_START( whizz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(whizz_map,0)
+	MDRV_CPU_PROGRAM_MAP(whizz_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(whizz_sound_map,0)
-	MDRV_CPU_IO_MAP(whizz_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(whizz_sound_map)
+	MDRV_CPU_IO_MAP(whizz_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(60000))

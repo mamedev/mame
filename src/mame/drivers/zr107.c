@@ -717,15 +717,15 @@ static MACHINE_DRIVER_START( zr107 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(zr107_map, 0)
+	MDRV_CPU_PROGRAM_MAP(zr107_map)
 	MDRV_CPU_VBLANK_INT("screen", zr107_vblank)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap)
 
 	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map, 0)
+	MDRV_CPU_DATA_MAP(sharc_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
@@ -762,15 +762,15 @@ static MACHINE_DRIVER_START( jetwave )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(jetwave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(jetwave_map)
 	MDRV_CPU_VBLANK_INT("screen", zr107_vblank)
 
 	MDRV_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap)
 
 	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map, 0)
+	MDRV_CPU_DATA_MAP(sharc_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 

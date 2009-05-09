@@ -311,7 +311,7 @@ static MACHINE_DRIVER_START( timeplt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
-	MDRV_CPU_PROGRAM_MAP(timeplt_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(timeplt_main_map)
 	MDRV_CPU_VBLANK_INT("screen", timeplt_interrupt)
 
 	MDRV_MACHINE_START(timeplt)
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( psurge )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psurge_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(psurge_main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(NULL)

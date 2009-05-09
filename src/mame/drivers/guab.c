@@ -763,7 +763,7 @@ static MACHINE_RESET( guab )
 static MACHINE_DRIVER_START( guab )
 	/* TODO: Verify clock */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(guab_map, 0)
+	MDRV_CPU_PROGRAM_MAP(guab_map)
 
 	MDRV_MACHINE_START(guab)
 	MDRV_MACHINE_RESET(guab)

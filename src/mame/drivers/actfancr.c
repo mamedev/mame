@@ -297,11 +297,11 @@ static MACHINE_DRIVER_START( actfancr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
-	MDRV_CPU_PROGRAM_MAP(actfan_map,0)
+	MDRV_CPU_PROGRAM_MAP(actfan_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
 
 	MDRV_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -340,11 +340,11 @@ static MACHINE_DRIVER_START( triothep )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(triothep_map,0)
+	MDRV_CPU_PROGRAM_MAP(triothep_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
 
 	MDRV_CPU_ADD("audiocpu",M6502, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
     MDRV_MACHINE_START(triothep)
 

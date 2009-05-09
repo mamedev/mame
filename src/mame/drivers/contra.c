@@ -190,11 +190,11 @@ static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", M6809, 1500000)
-	MDRV_CPU_PROGRAM_MAP(contra_map,0)
+	MDRV_CPU_PROGRAM_MAP(contra_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
  	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

@@ -648,7 +648,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( magic10 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu", M68000, 10000000) // ?
-	MDRV_CPU_PROGRAM_MAP(magic10_map,0)
+	MDRV_CPU_PROGRAM_MAP(magic10_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -678,7 +678,7 @@ static MACHINE_DRIVER_START( magic10a )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(magic10a_map,0)
+	MDRV_CPU_PROGRAM_MAP(magic10a_map)
 MACHINE_DRIVER_END
 
 
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( magic102 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(magic102_map,0)
+	MDRV_CPU_PROGRAM_MAP(magic102_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
@@ -697,7 +697,7 @@ static MACHINE_DRIVER_START( hotslot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(hotslot_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotslot_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 32*8-1)
@@ -708,7 +708,7 @@ static MACHINE_DRIVER_START( sgsafari )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(sgsafari_map,0)
+	MDRV_CPU_PROGRAM_MAP(sgsafari_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)	/* L1 interrupts */
 
 	MDRV_SCREEN_MODIFY("screen")

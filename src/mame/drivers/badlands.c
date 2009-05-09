@@ -501,11 +501,11 @@ static MACHINE_DRIVER_START( badlands )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_MACHINE_RESET(badlands)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -707,11 +707,11 @@ static MACHINE_DRIVER_START( badlandb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 2800000/2)
-	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
+	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
 //  MDRV_CPU_ADD("audiocpu", Z80, 2800000/8)
-//  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
+//  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap)
 
 	MDRV_MACHINE_RESET(badlandb)
 	MDRV_NVRAM_HANDLER(atarigen)

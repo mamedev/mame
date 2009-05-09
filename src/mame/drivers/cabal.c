@@ -488,11 +488,11 @@ static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(seibu_sound)
 
@@ -530,21 +530,21 @@ static MACHINE_DRIVER_START( cabalbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_sound_map)
 
 	/* there are 2x z80s for the ADPCM */
 	MDRV_CPU_ADD("adpcm1", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_talk1_map,0)
-	MDRV_CPU_IO_MAP(cabalbl_talk1_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_talk1_map)
+	MDRV_CPU_IO_MAP(cabalbl_talk1_portmap)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	MDRV_CPU_ADD("adpcm2", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_talk2_map,0)
-	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_talk2_map)
+	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	MDRV_QUANTUM_TIME(HZ(600))

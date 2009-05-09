@@ -245,12 +245,12 @@ static MACHINE_DRIVER_START( battlera )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280,21477200/3)
-	MDRV_CPU_PROGRAM_MAP(battlera_map,0)
-	MDRV_CPU_IO_MAP(battlera_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(battlera_map)
+	MDRV_CPU_IO_MAP(battlera_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MDRV_CPU_ADD("audiocpu", H6280,21477200/3)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

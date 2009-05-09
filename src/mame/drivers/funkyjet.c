@@ -291,11 +291,11 @@ static MACHINE_DRIVER_START( funkyjet )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 28 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(funkyjet_map,0)
+	MDRV_CPU_PROGRAM_MAP(funkyjet_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4)	/* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

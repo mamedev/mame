@@ -351,11 +351,11 @@ static MACHINE_DRIVER_START( xmen )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(xmen)
 
@@ -416,11 +416,11 @@ static MACHINE_DRIVER_START( xmen6p )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(6p_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(6p_main_map)
 	MDRV_CPU_VBLANK_INT_HACK(xmen6p_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 
 	MDRV_NVRAM_HANDLER(xmen)

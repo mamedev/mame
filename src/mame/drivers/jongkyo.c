@@ -418,8 +418,8 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( jongkyo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,JONGKYO_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(jongkyo_memmap,0)
-	MDRV_CPU_IO_MAP(jongkyo_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(jongkyo_memmap)
+	MDRV_CPU_IO_MAP(jongkyo_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

@@ -1138,12 +1138,12 @@ static MACHINE_DRIVER_START( naomi_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
-	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
-	MDRV_CPU_IO_MAP(naomi_port,0)
+	MDRV_CPU_PROGRAM_MAP(naomi_map)
+	MDRV_CPU_IO_MAP(naomi_port)
 	MDRV_CPU_VBLANK_INT("screen", naomi_vblank)
 
 	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
 
 	MDRV_MACHINE_START( dc )
 	MDRV_MACHINE_RESET( naomi )
@@ -1207,7 +1207,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aw )
 	MDRV_IMPORT_FROM(naomi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(aw_map,0)
+	MDRV_CPU_PROGRAM_MAP(aw_map)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

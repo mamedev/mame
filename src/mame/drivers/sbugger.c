@@ -220,8 +220,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( sbugger )
 	MDRV_CPU_ADD("maincpu", 8085A, 6000000)        /* 3.00 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(sbugger_map,0)
-	MDRV_CPU_IO_MAP(sbugger_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sbugger_map)
+	MDRV_CPU_IO_MAP(sbugger_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq3_line_hold,NUM_INTS_FRAME)
 
 	MDRV_GFXDECODE(sbugger)

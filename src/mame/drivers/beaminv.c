@@ -299,8 +299,8 @@ static MACHINE_DRIVER_START( beaminv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)	/* 2 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 
 	MDRV_MACHINE_START(beaminv)
 	MDRV_MACHINE_RESET(beaminv)

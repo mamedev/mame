@@ -188,8 +188,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( homerun )
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(homerun_memmap, 0)
-	MDRV_CPU_IO_MAP(homerun_iomap, 0)
+	MDRV_CPU_PROGRAM_MAP(homerun_memmap)
+	MDRV_CPU_IO_MAP(homerun_iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(homerun)

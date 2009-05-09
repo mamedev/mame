@@ -729,15 +729,15 @@ static INTERRUPT_GEN( CPUB_interrupt )
 static MACHINE_DRIVER_START( twin16 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", CPUA_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, XTAL_18_432MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT("screen", CPUB_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -785,11 +785,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fround )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(fround_map,0)
+	MDRV_CPU_PROGRAM_MAP(fround_map)
 	MDRV_CPU_VBLANK_INT("screen", CPUA_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

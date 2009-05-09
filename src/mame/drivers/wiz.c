@@ -699,11 +699,11 @@ static MACHINE_DRIVER_START( wiz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
 
 	MDRV_MACHINE_RESET( wiz )
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START( stinger )
 	MDRV_IMPORT_FROM(wiz)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(stinger_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(stinger_sound_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(stinger)

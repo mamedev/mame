@@ -223,8 +223,8 @@ static VIDEO_START( sangho )
 static MACHINE_DRIVER_START(pzlestar)
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(pzlestar_map, 0)
-	MDRV_CPU_IO_MAP(pzlestar_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pzlestar_map)
+	MDRV_CPU_IO_MAP(pzlestar_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -256,8 +256,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sexyboom )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(pzlestar_map, 0)
-	MDRV_CPU_IO_MAP(sexyboom_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pzlestar_map)
+	MDRV_CPU_IO_MAP(sexyboom_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

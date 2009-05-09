@@ -446,13 +446,13 @@ static MACHINE_RESET( discoboy )
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(discoboy_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(discoboy_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-//  MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+//  MDRV_CPU_IO_MAP(sound_io_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 

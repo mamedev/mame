@@ -252,11 +252,11 @@ static MACHINE_DRIVER_START( firebatl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
+	MDRV_CPU_PROGRAM_MAP(clshroad_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
@@ -287,11 +287,11 @@ static MACHINE_DRIVER_START( clshroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
-	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
+	MDRV_CPU_PROGRAM_MAP(clshroad_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 18432000/6)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)

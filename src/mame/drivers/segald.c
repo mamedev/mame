@@ -338,8 +338,8 @@ static MACHINE_DRIVER_START( astron )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(mainmem,0)
-	MDRV_CPU_IO_MAP(mainport,0)
+	MDRV_CPU_PROGRAM_MAP(mainmem)
+	MDRV_CPU_IO_MAP(mainport)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
 	MDRV_MACHINE_START(astron)

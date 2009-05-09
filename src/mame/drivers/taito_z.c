@@ -2899,14 +2899,14 @@ static MACHINE_DRIVER_START( contcirc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(contcirc_map,0)
+	MDRV_CPU_PROGRAM_MAP(contcirc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(contcirc_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(contcirc_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -2955,14 +2955,14 @@ static MACHINE_DRIVER_START( chasehq )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(chasehq_map,0)
+	MDRV_CPU_PROGRAM_MAP(chasehq_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(chq_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(chq_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3009,14 +3009,14 @@ static MACHINE_DRIVER_START( enforce )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(enforce_map,0)
+	MDRV_CPU_PROGRAM_MAP(enforce_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(enforce_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(enforce_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3066,11 +3066,11 @@ static MACHINE_DRIVER_START( bshark )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(bshark_map,0)
+	MDRV_CPU_PROGRAM_MAP(bshark_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(bshark_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(bshark_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3118,14 +3118,14 @@ static MACHINE_DRIVER_START( sci )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sci_map,0)
+	MDRV_CPU_PROGRAM_MAP(sci_map)
 	MDRV_CPU_VBLANK_INT("screen", sci_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sci_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sci_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3173,14 +3173,14 @@ static MACHINE_DRIVER_START( nightstr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(nightstr_map,0)
+	MDRV_CPU_PROGRAM_MAP(nightstr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(nightstr_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(nightstr_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3229,14 +3229,14 @@ static MACHINE_DRIVER_START( aquajack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(aquajack_map,0)
+	MDRV_CPU_PROGRAM_MAP(aquajack_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(aquajack_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(aquajack_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3284,11 +3284,11 @@ static MACHINE_DRIVER_START( spacegun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(spacegun_map,0)
+	MDRV_CPU_PROGRAM_MAP(spacegun_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(spacegun_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(spacegun_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3336,14 +3336,14 @@ static MACHINE_DRIVER_START( dblaxle )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(dblaxle_map,0)
+	MDRV_CPU_PROGRAM_MAP(dblaxle_map)
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(dblaxle_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(dblaxle_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
@@ -3391,14 +3391,14 @@ static MACHINE_DRIVER_START( racingb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(racingb_map,0)
+	MDRV_CPU_PROGRAM_MAP(racingb_map)
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(racingb_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(racingb_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)

@@ -575,7 +575,7 @@ static INTERRUPT_GEN( ddealer_interrupt )
 
 static MACHINE_DRIVER_START( ddealer )
 	MDRV_CPU_ADD("maincpu" , M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(ddealer,0)
+	MDRV_CPU_PROGRAM_MAP(ddealer)
 	MDRV_CPU_VBLANK_INT("screen", ddealer_interrupt)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 90)//guess,controls music tempo,112 is way too fast
 

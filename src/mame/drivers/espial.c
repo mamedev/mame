@@ -293,12 +293,12 @@ static MACHINE_DRIVER_START( espial )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(espial_map,0)
+	MDRV_CPU_PROGRAM_MAP(espial_map)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
-	MDRV_CPU_PROGRAM_MAP(espial_sound_map,0)
-	MDRV_CPU_IO_MAP(espial_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(espial_sound_map)
+	MDRV_CPU_IO_MAP(espial_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
 	MDRV_MACHINE_RESET(espial)
@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( netwars )
 	MDRV_IMPORT_FROM(espial)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(netwars_map,0)
+	MDRV_CPU_PROGRAM_MAP(netwars_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

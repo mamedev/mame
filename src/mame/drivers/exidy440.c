@@ -1001,7 +1001,7 @@ static MACHINE_DRIVER_START( exidy440 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(exidy440_map,0)
+	MDRV_CPU_PROGRAM_MAP(exidy440_map)
 	MDRV_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
 
 	MDRV_MACHINE_RESET(exidy440)

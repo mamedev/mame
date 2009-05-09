@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( cloud9 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(cloud9_map,0)
+	MDRV_CPU_PROGRAM_MAP(cloud9_map)
 
 	MDRV_MACHINE_START(cloud9)
 	MDRV_MACHINE_RESET(cloud9)

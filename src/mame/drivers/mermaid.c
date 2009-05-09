@@ -349,7 +349,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mermaid )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(mermaid_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mermaid_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	// video hardware

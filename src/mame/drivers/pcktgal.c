@@ -225,11 +225,11 @@ static MACHINE_DRIVER_START( pcktgal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(pcktgal_map,0)
+	MDRV_CPU_PROGRAM_MAP(pcktgal_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(pcktgal_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pcktgal_sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 

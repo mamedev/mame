@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( livequiz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)
-	MDRV_CPU_PROGRAM_MAP(mem_map,0)
+	MDRV_CPU_PROGRAM_MAP(mem_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)

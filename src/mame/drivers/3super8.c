@@ -67,7 +67,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 3super8 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(0,map)
+	MDRV_CPU_PROGRAM_MAP(map)
 	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

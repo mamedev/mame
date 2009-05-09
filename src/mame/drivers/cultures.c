@@ -342,8 +342,8 @@ static MACHINE_DRIVER_START( cultures )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
-	MDRV_CPU_IO_MAP(cultures_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cultures_map)
+	MDRV_CPU_IO_MAP(cultures_io_map)
 	MDRV_CPU_VBLANK_INT("screen", cultures_interrupt)
 
 	MDRV_MACHINE_RESET(cultures)

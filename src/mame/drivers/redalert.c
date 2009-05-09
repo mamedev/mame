@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( redalert )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(redalert_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(redalert_main_map)
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( ww3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ww3_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(ww3_main_map)
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( demoneye )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(demoneye_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(demoneye_main_map)
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */

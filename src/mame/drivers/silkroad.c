@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( silkroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */

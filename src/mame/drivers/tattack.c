@@ -182,7 +182,7 @@ static MACHINE_DRIVER_START( tattack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

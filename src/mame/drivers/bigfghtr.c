@@ -421,13 +421,13 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bigfghtr )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(mainmem,0)
+	MDRV_CPU_PROGRAM_MAP(mainmem)
 
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(soundmem,0)
-	MDRV_CPU_IO_MAP(soundport,0)
+	MDRV_CPU_PROGRAM_MAP(soundmem)
+	MDRV_CPU_IO_MAP(soundport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */

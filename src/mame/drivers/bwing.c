@@ -371,16 +371,16 @@ static MACHINE_DRIVER_START( bwing )
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bwp1_map)
 	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bwp2_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
 	MDRV_CPU_ADD("audiocpu", DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp3_map, 0)
-	MDRV_CPU_IO_MAP(bwp3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bwp3_map)
+	MDRV_CPU_IO_MAP(bwp3_io_map)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
 
 	MDRV_QUANTUM_TIME(HZ(18000))		// high enough?

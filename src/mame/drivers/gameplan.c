@@ -1012,10 +1012,10 @@ static MACHINE_DRIVER_START( gameplan )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(gameplan_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(gameplan_main_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map)
 
 	MDRV_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
 
@@ -1046,7 +1046,7 @@ static MACHINE_DRIVER_START( leprechn )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(leprechn_video)

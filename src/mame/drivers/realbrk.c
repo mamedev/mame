@@ -171,6 +171,7 @@ ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
 static ADDRESS_MAP_START( realbrk_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
@@ -184,6 +185,7 @@ static ADDRESS_MAP_START( pkgnsh_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0xff00	)	// YM2413
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
+	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
@@ -192,6 +194,7 @@ static ADDRESS_MAP_START( pkgnshdx_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(SMH_RAM) AM_BASE(&realbrk_dsw_select) // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
+	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
@@ -204,6 +207,7 @@ static ADDRESS_MAP_START( dai2kaku_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w				)	// Hack! Parallel port data register
+	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -673,7 +677,7 @@ static MACHINE_DRIVER_START( realbrk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
-	MDRV_CPU_PROGRAM_MAP(realbrk_mem,base_mem)
+	MDRV_CPU_PROGRAM_MAP(realbrk_mem)
 	MDRV_CPU_VBLANK_INT("screen", realbrk_interrupt)
 
 	MDRV_MACHINE_RESET( tmp68301 )
@@ -707,19 +711,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pkgnsh )
 	MDRV_IMPORT_FROM( realbrk )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(base_mem,pkgnsh_mem)
+	MDRV_CPU_PROGRAM_MAP(pkgnsh_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pkgnshdx )
 	MDRV_IMPORT_FROM( realbrk )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(base_mem,pkgnshdx_mem)
+	MDRV_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dai2kaku )
 	MDRV_IMPORT_FROM( realbrk )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(base_mem,dai2kaku_mem)
+	MDRV_CPU_PROGRAM_MAP(dai2kaku_mem)
 
 	MDRV_GFXDECODE(dai2kaku)
 	MDRV_VIDEO_UPDATE(dai2kaku)

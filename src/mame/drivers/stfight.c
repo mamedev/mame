@@ -435,11 +435,11 @@ static MACHINE_DRIVER_START( stfight )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", stfight_vb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120)
 
 	MDRV_QUANTUM_TIME(HZ(600))

@@ -1018,16 +1018,16 @@ static MACHINE_DRIVER_START( hopmappy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M6809, 49152000/32)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("cpu2", M6809, 49152000/32)
-	MDRV_CPU_PROGRAM_MAP(hopmappy_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
-	MDRV_CPU_PROGRAM_MAP(hopmappy_mcu_map,0)
-	MDRV_CPU_IO_MAP(mcu_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(hopmappy_mcu_map)
+	MDRV_CPU_IO_MAP(mcu_port_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
@@ -1068,10 +1068,10 @@ static MACHINE_DRIVER_START( skykiddx )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(skykiddx_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(skykiddx_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(skykiddx_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(skykiddx_mcu_map)
 MACHINE_DRIVER_END
 
 
@@ -1080,10 +1080,10 @@ static MACHINE_DRIVER_START( roishtar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(roishtar_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(roishtar_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(roishtar_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(roishtar_mcu_map)
 MACHINE_DRIVER_END
 
 
@@ -1092,10 +1092,10 @@ static MACHINE_DRIVER_START( genpeitd )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(genpeitd_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(genpeitd_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(genpeitd_mcu_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
@@ -1108,10 +1108,10 @@ static MACHINE_DRIVER_START( rthunder )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(rthunder_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(rthunder_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(rthunder_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(rthunder_mcu_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
@@ -1124,10 +1124,10 @@ static MACHINE_DRIVER_START( wndrmomo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(wndrmomo_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(wndrmomo_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(wndrmomo_mcu_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)

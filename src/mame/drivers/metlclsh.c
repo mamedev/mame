@@ -288,11 +288,11 @@ static MACHINE_DRIVER_START( metlclsh )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        // ?
-	MDRV_CPU_PROGRAM_MAP(metlclsh_master_map, 0)
+	MDRV_CPU_PROGRAM_MAP(metlclsh_master_map)
 	// IRQ by YM3526, NMI by cpu #2
 
 	MDRV_CPU_ADD("sub", M6809, 1500000)        // ?
-	MDRV_CPU_PROGRAM_MAP(metlclsh_slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(metlclsh_slave_map)
 	MDRV_CPU_VBLANK_INT_HACK(metlclsh_interrupt2,2)
 	// IRQ by cpu #1, NMI by coins insertion
 

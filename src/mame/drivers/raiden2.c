@@ -1079,7 +1079,7 @@ static MACHINE_DRIVER_START( raiden2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(raiden2_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(raiden2_mem)
 	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
 	MDRV_MACHINE_RESET(raiden2)
@@ -2156,7 +2156,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
-	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
+	MDRV_CPU_PROGRAM_MAP(rdx_v33_map)
 	MDRV_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
 	MDRV_MACHINE_RESET(rdx_v33)

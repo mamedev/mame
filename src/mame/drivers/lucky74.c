@@ -1242,8 +1242,8 @@ static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
-	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
-	MDRV_CPU_IO_MAP(lucky74_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(lucky74_map)
+	MDRV_CPU_IO_MAP(lucky74_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_interrupt)	/* 60 Hz. measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( starshp1 )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", M6502, STARSHP1_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(starshp1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(starshp1_map)
 	MDRV_CPU_VBLANK_INT("screen", starshp1_interrupt)
 
 	/* video hardware */

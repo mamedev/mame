@@ -472,11 +472,11 @@ static MACHINE_DRIVER_START( spy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(spy_map,0)
+	MDRV_CPU_PROGRAM_MAP(spy_map)
 	MDRV_CPU_VBLANK_INT("screen", spy_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(spy_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(spy_sound_map)
 								/* nmi by the sound chip */
 
 	/* video hardware */

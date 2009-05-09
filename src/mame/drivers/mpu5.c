@@ -35,7 +35,7 @@ static VIDEO_UPDATE(mpu5)
 
 static MACHINE_DRIVER_START( mpu5 )
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	 // ?
-	MDRV_CPU_PROGRAM_MAP(mpu5_map,0)
+	MDRV_CPU_PROGRAM_MAP(mpu5_map)
 
 	/* actually non-video? */
 	MDRV_SCREEN_ADD("screen", RASTER)

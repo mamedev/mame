@@ -375,8 +375,8 @@ static MACHINE_RESET( pasha2 )
 
 static MACHINE_DRIVER_START( pasha2 )
 	MDRV_CPU_ADD("maincpu", E116XT, 20000000*4)		/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(pasha2_map,0)
-	MDRV_CPU_IO_MAP(pasha2_io,0)
+	MDRV_CPU_PROGRAM_MAP(pasha2_map)
+	MDRV_CPU_IO_MAP(pasha2_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(pasha2)

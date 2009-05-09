@@ -532,14 +532,14 @@ static MACHINE_DRIVER_START( lsasquad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(lsasquad_map,0)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(lsasquad_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_sound_map)
 								/* IRQs are triggered by the YM2203 */
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -577,11 +577,11 @@ static MACHINE_DRIVER_START( daikaiju )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(daikaiju_map, 0)
+	MDRV_CPU_PROGRAM_MAP(daikaiju_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(daikaiju_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(daikaiju_sound_map)
 	/* IRQs are triggered by the YM2203 */
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */

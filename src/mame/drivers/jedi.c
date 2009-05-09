@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( jedi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_QUANTUM_TIME(HZ(240))
 

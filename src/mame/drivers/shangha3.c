@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( shangha3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(shangha3_map,0)
+	MDRV_CPU_PROGRAM_MAP(shangha3_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */
@@ -516,12 +516,12 @@ static MACHINE_DRIVER_START( heberpop )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(heberpop_map,0)
+	MDRV_CPU_PROGRAM_MAP(heberpop_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(heberpop_sound_map,0)
-	MDRV_CPU_IO_MAP(heberpop_sound_io_map,0)	/* NMI triggered by YM3438 */
+	MDRV_CPU_PROGRAM_MAP(heberpop_sound_map)
+	MDRV_CPU_IO_MAP(heberpop_sound_io_map)	/* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -557,12 +557,12 @@ static MACHINE_DRIVER_START( blocken )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(blocken_map,0)
+	MDRV_CPU_PROGRAM_MAP(blocken_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(heberpop_sound_map,0)
-	MDRV_CPU_IO_MAP(heberpop_sound_io_map,0)	/* NMI triggered by YM3438 */
+	MDRV_CPU_PROGRAM_MAP(heberpop_sound_map)
+	MDRV_CPU_IO_MAP(heberpop_sound_io_map)	/* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

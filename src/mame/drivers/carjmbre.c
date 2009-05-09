@@ -169,12 +169,12 @@ static MACHINE_DRIVER_START( carjmbre )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
-	MDRV_CPU_PROGRAM_MAP(carjmbre_map,0)
+	MDRV_CPU_PROGRAM_MAP(carjmbre_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1500000)
-	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_map,0)
-	MDRV_CPU_IO_MAP(carjmbre_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_map)
+	MDRV_CPU_IO_MAP(carjmbre_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

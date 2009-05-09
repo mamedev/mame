@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( gotya )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(gotya_map,0)
+	MDRV_CPU_PROGRAM_MAP(gotya_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

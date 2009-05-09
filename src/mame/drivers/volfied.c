@@ -247,11 +247,11 @@ static MACHINE_DRIVER_START( volfied )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
-	MDRV_CPU_PROGRAM_MAP(z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 

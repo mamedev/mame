@@ -812,19 +812,19 @@ static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius_sound_map)
 
 	MDRV_CPU_ADD("cpub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius_cpub_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("adpcm", Z80,8000000/2) /* 4 MHz ? */	/* ADPCM player using MSM5205 */
-	MDRV_CPU_PROGRAM_MAP(darius_sound2_map,0)
-	MDRV_CPU_IO_MAP(darius_sound2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius_sound2_map)
+	MDRV_CPU_IO_MAP(darius_sound2_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame ? */
 

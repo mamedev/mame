@@ -304,12 +304,12 @@ static MACHINE_DRIVER_START( crospang )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
-	MDRV_CPU_PROGRAM_MAP(crospang_map,0)
+	MDRV_CPU_PROGRAM_MAP(crospang_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MDRV_CPU_PROGRAM_MAP(crospang_sound_map,0)
-	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(crospang_sound_map)
+	MDRV_CPU_IO_MAP(crospang_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -341,12 +341,12 @@ static MACHINE_DRIVER_START( bestri )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
-	MDRV_CPU_PROGRAM_MAP(bestri_map,0)
+	MDRV_CPU_PROGRAM_MAP(bestri_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MDRV_CPU_PROGRAM_MAP(crospang_sound_map,0)
-	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(crospang_sound_map)
+	MDRV_CPU_IO_MAP(crospang_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

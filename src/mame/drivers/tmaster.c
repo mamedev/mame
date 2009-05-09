@@ -774,7 +774,7 @@ static const duart68681_config tmaster_duart68681_config =
 
 static MACHINE_DRIVER_START( tm3k )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(tmaster_map,0)
+	MDRV_CPU_PROGRAM_MAP(tmaster_map)
 	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
 
 	MDRV_MACHINE_START(tmaster)
@@ -837,7 +837,7 @@ static MACHINE_RESET( galgames )
 
 static MACHINE_DRIVER_START( galgames )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(galgames_map,0)
+	MDRV_CPU_PROGRAM_MAP(galgames_map)
 	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
 
 	MDRV_NVRAM_HANDLER( galgames )

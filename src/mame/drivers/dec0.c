@@ -992,11 +992,11 @@ static MACHINE_DRIVER_START( automat )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(automat_map,0)
+	MDRV_CPU_PROGRAM_MAP(automat_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)// ?
-	MDRV_CPU_PROGRAM_MAP(automat_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(automat_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1036,11 +1036,11 @@ static MACHINE_DRIVER_START( hbarrel )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1078,11 +1078,11 @@ static MACHINE_DRIVER_START( baddudes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1120,11 +1120,11 @@ static MACHINE_DRIVER_START( birdtry )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1162,14 +1162,14 @@ static MACHINE_DRIVER_START( robocop )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
-	MDRV_CPU_PROGRAM_MAP(robocop_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(robocop_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* Interleave between HuC6280 & 68000 */
 
@@ -1209,11 +1209,11 @@ static MACHINE_DRIVER_START( robocopb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1251,14 +1251,14 @@ static MACHINE_DRIVER_START( hippodrm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
-	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(300))	/* Interleave between H6280 & 68000 */
 
@@ -1298,11 +1298,11 @@ static MACHINE_DRIVER_START( slyspy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(slyspy_map,0)
+	MDRV_CPU_PROGRAM_MAP(slyspy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slyspy_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1340,12 +1340,12 @@ static MACHINE_DRIVER_START( secretab )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(secretab_map,0)
+	MDRV_CPU_PROGRAM_MAP(secretab_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	/* z80 */
 //  MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-//  MDRV_CPU_PROGRAM_MAP(slyspy_s_map,0)
+//  MDRV_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1383,11 +1383,11 @@ static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(midres_map,0)
+	MDRV_CPU_PROGRAM_MAP(midres_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(midres_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(midres_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( sslam )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(sslam_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sslam_program_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", I8051, 12000000)
@@ -759,11 +759,11 @@ static MACHINE_DRIVER_START( powerbls )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(powerbls_map, 0)
+	MDRV_CPU_PROGRAM_MAP(powerbls_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", I80C51, 12000000)		/* 83C751 */
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

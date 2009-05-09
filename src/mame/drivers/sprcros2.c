@@ -271,13 +271,13 @@ static MACHINE_DRIVER_START( sprcros2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80,10000000/2)
-	MDRV_CPU_PROGRAM_MAP(sprcros2_master_map,0)
-	MDRV_CPU_IO_MAP(sprcros2_master_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sprcros2_master_map)
+	MDRV_CPU_IO_MAP(sprcros2_master_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
 
 	MDRV_CPU_ADD("slave", Z80,10000000/2)
-	MDRV_CPU_PROGRAM_MAP(sprcros2_slave_map,0)
-	MDRV_CPU_IO_MAP(sprcros2_slave_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sprcros2_slave_map)
+	MDRV_CPU_IO_MAP(sprcros2_slave_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
 
 	MDRV_MACHINE_START(sprcros2)

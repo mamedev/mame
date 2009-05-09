@@ -281,8 +281,8 @@ static MACHINE_DRIVER_START( esh )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
-	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
-	MDRV_CPU_IO_MAP(z80_0_io,0)
+	MDRV_CPU_PROGRAM_MAP(z80_0_mem)
+	MDRV_CPU_IO_MAP(z80_0_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_callback_esh)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

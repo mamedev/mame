@@ -823,11 +823,11 @@ static MACHINE_DRIVER_START( shadoww )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
-	MDRV_CPU_PROGRAM_MAP(gaiden_map,0)
+	MDRV_CPU_PROGRAM_MAP(gaiden_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MDRV_MACHINE_RESET(raiga)
@@ -882,12 +882,12 @@ static MACHINE_DRIVER_START( drgnbowl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnbowl_map,0)
+	MDRV_CPU_PROGRAM_MAP(drgnbowl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnbowl_sound_map,0)
-	MDRV_CPU_IO_MAP(drgnbowl_sound_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(drgnbowl_sound_map)
+	MDRV_CPU_IO_MAP(drgnbowl_sound_port_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

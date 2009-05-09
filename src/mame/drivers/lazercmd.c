@@ -620,8 +620,8 @@ static MACHINE_DRIVER_START( lazercmd )
             but memory and IO access is only possible
             within the line and frame blanking period
             thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(lazercmd_map,0)
-	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(lazercmd_map)
+	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
@@ -655,8 +655,8 @@ static MACHINE_DRIVER_START( medlanes )
             but memory and IO access is only possible
             within the line and frame blanking period
             thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(medlanes_map,0)
-	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(medlanes_map)
+	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
@@ -690,8 +690,8 @@ static MACHINE_DRIVER_START( bbonk )
             but memory and IO access is only possible
             within the line and frame blanking period
             thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(bbonk_map,0)
-	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(bbonk_map)
+	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */

@@ -873,7 +873,7 @@ static MACHINE_DRIVER_START( galpanic )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(galpanic_map,0)
+	MDRV_CPU_PROGRAM_MAP(galpanic_map)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
@@ -915,7 +915,7 @@ static MACHINE_DRIVER_START( comad )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galpanic)
 	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(comad_map,0)
+	MDRV_CPU_PROGRAM_MAP(comad_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
@@ -927,7 +927,7 @@ static MACHINE_DRIVER_START( supmodel )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(supmodel_map,0)
+	MDRV_CPU_PROGRAM_MAP(supmodel_map)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
@@ -946,7 +946,7 @@ static MACHINE_DRIVER_START( fantsia2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(fantsia2_map,0)
+	MDRV_CPU_PROGRAM_MAP(fantsia2_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
@@ -958,7 +958,7 @@ static MACHINE_DRIVER_START( galhustl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(galhustl_map,0)
+	MDRV_CPU_PROGRAM_MAP(galhustl_map)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */
@@ -976,7 +976,7 @@ static MACHINE_DRIVER_START( zipzap )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(zipzap_map,0)
+	MDRV_CPU_PROGRAM_MAP(zipzap_map)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */

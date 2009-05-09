@@ -270,12 +270,12 @@ static MACHINE_DRIVER_START( amspdwy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)
-	MDRV_CPU_PROGRAM_MAP(amspdwy_map,0)
-	MDRV_CPU_IO_MAP(amspdwy_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(amspdwy_map)
+	MDRV_CPU_IO_MAP(amspdwy_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
 
 	MDRV_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
-	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
     MDRV_MACHINE_START(amspdwy)
 

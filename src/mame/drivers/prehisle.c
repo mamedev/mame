@@ -216,12 +216,12 @@ static MACHINE_DRIVER_START( prehisle )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(prehisle_map,0)
+	MDRV_CPU_PROGRAM_MAP(prehisle_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(prehisle_sound_map,0)
-	MDRV_CPU_IO_MAP(prehisle_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(prehisle_sound_map)
+	MDRV_CPU_IO_MAP(prehisle_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

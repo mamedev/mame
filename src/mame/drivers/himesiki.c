@@ -280,13 +280,13 @@ static MACHINE_DRIVER_START( himesiki )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(himesiki_prm0,0)
-	MDRV_CPU_IO_MAP(himesiki_iom0,0)
+	MDRV_CPU_PROGRAM_MAP(himesiki_prm0)
+	MDRV_CPU_IO_MAP(himesiki_iom0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, MCLK/3) /* 4.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(himesiki_prm1,0)
-	MDRV_CPU_IO_MAP(himesiki_iom1,0)
+	MDRV_CPU_PROGRAM_MAP(himesiki_prm1)
+	MDRV_CPU_IO_MAP(himesiki_iom1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

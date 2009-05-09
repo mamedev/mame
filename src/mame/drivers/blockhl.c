@@ -150,11 +150,11 @@ static MACHINE_DRIVER_START( blockhl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,3000000)		/* Konami custom 052526 */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", blockhl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_MACHINE_RESET(blockhl)
 

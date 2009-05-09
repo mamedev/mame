@@ -736,18 +736,18 @@ static const esrip_config rip_config =
 
 static MACHINE_DRIVER_START( esripsys )
 	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(game_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(game_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
 
 	MDRV_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(frame_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(frame_cpu_map)
 
 	MDRV_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(video_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(video_cpu_map)
 	MDRV_CPU_CONFIG(rip_config)
 
 	MDRV_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
 
 	MDRV_NVRAM_HANDLER(esripsys)
 

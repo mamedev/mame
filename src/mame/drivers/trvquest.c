@@ -212,7 +212,7 @@ static MACHINE_DRIVER_START( trvquest )
 	MDRV_DRIVER_DATA(gameplan_state)
 
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
-	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)

@@ -352,12 +352,12 @@ static MACHINE_DRIVER_START( inufuku )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(inufuku_map, 0)
+	MDRV_CPU_PROGRAM_MAP(inufuku_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(inufuku_sound_map, 0)
-	MDRV_CPU_IO_MAP(inufuku_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(inufuku_sound_map)
+	MDRV_CPU_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(inufuku)

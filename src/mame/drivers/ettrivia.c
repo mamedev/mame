@@ -239,8 +239,8 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 
 static MACHINE_DRIVER_START( ettrivia )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
-	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", ettrivia_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

@@ -354,11 +354,11 @@ static MACHINE_DRIVER_START( olibochu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(olibochu_map,0)
+	MDRV_CPU_PROGRAM_MAP(olibochu_map)
 	MDRV_CPU_VBLANK_INT_HACK(olibochu_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(olibochu_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(olibochu_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) //???
 
 //  MDRV_QUANTUM_PERFECT_CPU("maincpu")

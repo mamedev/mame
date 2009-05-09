@@ -562,11 +562,11 @@ static MACHINE_DRIVER_START( fuuki32 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
-	MDRV_CPU_PROGRAM_MAP(fuuki32_map,0)
+	MDRV_CPU_PROGRAM_MAP(fuuki32_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
-	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_map,0)
-	MDRV_CPU_IO_MAP(fuuki32_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_map)
+	MDRV_CPU_IO_MAP(fuuki32_sound_io_map)
 
 	MDRV_MACHINE_START(fuuki32)
 	MDRV_MACHINE_RESET(fuuki32)

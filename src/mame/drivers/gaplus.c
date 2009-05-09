@@ -522,15 +522,15 @@ static MACHINE_DRIVER_START( gaplus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	24576000/16)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", gaplus_interrupt_1)
 
 	MDRV_CPU_ADD("sub", M6809,	24576000/16)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", M6809, 24576000/16)	/* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu3_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* a high value to ensure proper synchronization of the CPUs */

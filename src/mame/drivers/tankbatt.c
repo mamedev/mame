@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( tankbatt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", tankbatt_interrupt)
 
 	/* video hardware */

@@ -522,11 +522,11 @@ static MACHINE_RESET( namcofl )
 
 static MACHINE_DRIVER_START( namcofl )
 	MDRV_CPU_ADD("maincpu", I960, 20000000)	// i80960KA-20 == 20 MHz part
-	MDRV_CPU_PROGRAM_MAP(namcofl_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(namcofl_mem)
 
 	MDRV_CPU_ADD("mcu", M37702, 48384000/3)
-	MDRV_CPU_PROGRAM_MAP(namcoc75_am, 0)
-	MDRV_CPU_IO_MAP(namcoc75_io, 0)
+	MDRV_CPU_PROGRAM_MAP(namcoc75_am)
+	MDRV_CPU_IO_MAP(namcoc75_io)
 	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
 	MDRV_MACHINE_START(namcofl)

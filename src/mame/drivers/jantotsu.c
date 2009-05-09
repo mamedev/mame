@@ -401,8 +401,8 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( jantotsu )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/4)
-	MDRV_CPU_PROGRAM_MAP(0,jantotsu_map)
-	MDRV_CPU_IO_MAP(0,jantotsu_io)
+	MDRV_CPU_PROGRAM_MAP(jantotsu_map)
+	MDRV_CPU_IO_MAP(jantotsu_io)
 	MDRV_CPU_VBLANK_INT("screen", jantotsu_irq)
 
 	MDRV_MACHINE_RESET(jantotsu)

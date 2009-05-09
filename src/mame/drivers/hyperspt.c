@@ -308,11 +308,11 @@ static MACHINE_DRIVER_START( hyperspt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(hyperspt_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyperspt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_NVRAM_HANDLER(hyperspt)
 
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roadf )
 	MDRV_IMPORT_FROM(hyperspt)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(roadf_map,0)
+	MDRV_CPU_PROGRAM_MAP(roadf_map)
 	MDRV_GFXDECODE(roadf)
 	MDRV_VIDEO_START(roadf)
 MACHINE_DRIVER_END

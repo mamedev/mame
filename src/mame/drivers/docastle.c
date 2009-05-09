@@ -593,16 +593,16 @@ static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
 //  MDRV_CPU_ADD("maincpu", Z80, 4000000)  // 4 MHz
 	MDRV_CPU_ADD("maincpu", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
-	MDRV_CPU_PROGRAM_MAP(docastle_map, 0)
-	MDRV_CPU_IO_MAP(docastle_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(docastle_map)
+	MDRV_CPU_IO_MAP(docastle_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, 4000000)	// 4 MHz
-	MDRV_CPU_PROGRAM_MAP(docastle_map2, 0)
+	MDRV_CPU_PROGRAM_MAP(docastle_map2)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
 	MDRV_CPU_ADD("cpu3", Z80, 4000000)	// 4 MHz
-	MDRV_CPU_PROGRAM_MAP(docastle_map3, 0)
+	MDRV_CPU_PROGRAM_MAP(docastle_map3)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	// video hardware
@@ -645,10 +645,10 @@ static MACHINE_DRIVER_START( dorunrun )
 	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dorunrun_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dorunrun_map)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(dorunrun_map2, 0)
+	MDRV_CPU_PROGRAM_MAP(dorunrun_map2)
 
 	// video hardware
 	MDRV_VIDEO_START(dorunrun)
@@ -659,10 +659,10 @@ static MACHINE_DRIVER_START( idsoccer )
 	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(idsoccer_map, 0)
+	MDRV_CPU_PROGRAM_MAP(idsoccer_map)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(idsoccer_map2, 0)
+	MDRV_CPU_PROGRAM_MAP(idsoccer_map2)
 
 	// video hardware
 	MDRV_VIDEO_START(dorunrun)

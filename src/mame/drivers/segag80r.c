@@ -834,8 +834,8 @@ static MACHINE_DRIVER_START( g80r_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", segag80r_vblank_start)
 
 	MDRV_MACHINE_START(g80r)
@@ -873,7 +873,7 @@ static MACHINE_DRIVER_START( 005 )
 	MDRV_IMPORT_FROM(g80r_base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
+	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
 	MDRV_IMPORT_FROM(005_sound_board)
@@ -903,7 +903,7 @@ static MACHINE_DRIVER_START( monsterb )
 	MDRV_IMPORT_FROM(g80r_base)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
+	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
 	MDRV_GFXDECODE(monsterb)
@@ -934,7 +934,7 @@ static MACHINE_DRIVER_START( sindbadm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(sindbadm_portmap,0)
+	MDRV_CPU_IO_MAP(sindbadm_portmap)
 	MDRV_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
 
 	MDRV_PPI8255_ADD( "ppi8255", sindbadm_ppi_intf )
@@ -946,7 +946,7 @@ static MACHINE_DRIVER_START( sindbadm )
 	/* sound boards */
 
 	MDRV_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* sound hardware */

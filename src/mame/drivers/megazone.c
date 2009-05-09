@@ -242,17 +242,17 @@ static MACHINE_DRIVER_START( megazone )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 18432000/9)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(megazone_map,0)
+	MDRV_CPU_PROGRAM_MAP(megazone_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
-	MDRV_CPU_PROGRAM_MAP(megazone_sound_map,0)
-	MDRV_CPU_IO_MAP(megazone_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megazone_sound_map)
+	MDRV_CPU_IO_MAP(megazone_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("daccpu", I8039,14318000/2)	/* 1/2 14MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(megazone_i8039_map,0)
-	MDRV_CPU_IO_MAP(megazone_i8039_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(megazone_i8039_map)
+	MDRV_CPU_IO_MAP(megazone_i8039_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(900))
 

@@ -554,7 +554,7 @@ static MACHINE_DRIVER_START( qix_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_CONFIG(encryption_config)	// for kram3
 
 	/* high interleave needed to ensure correct text in service mode */
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_IMPORT_FROM(qix)
 
 	MDRV_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(qixmcu)
 
@@ -600,7 +600,7 @@ static MACHINE_DRIVER_START( zookeep )
 	MDRV_IMPORT_FROM(mcu)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(zoo_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(zoo_main_map)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(zookeep_video)

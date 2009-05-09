@@ -549,20 +549,20 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
 	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_0_map,0)
+	MDRV_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* The top board i860 */
 	MDRV_CPU_ADD("vid_1", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_1_map,0)
+	MDRV_CPU_PROGRAM_MAP(vid_1_map)
 
 	/* Sound CPU */
 	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -597,16 +597,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( shadfgtr )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
 	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_0_map,0)
+	MDRV_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* Sound CPU */
 	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(shadfgtr)

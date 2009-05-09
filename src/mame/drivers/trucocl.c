@@ -137,7 +137,7 @@ static INTERRUPT_GEN( trucocl_interrupt )
 static MACHINE_DRIVER_START( trucocl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", trucocl_interrupt)
 
 	/* video hardware */

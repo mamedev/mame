@@ -359,12 +359,12 @@ static MACHINE_DRIVER_START( magmax )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(magmax_map,0)
+	MDRV_CPU_PROGRAM_MAP(magmax_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_20MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(magmax_sound_map,0)
-	MDRV_CPU_IO_MAP(magmax_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(magmax_sound_map)
+	MDRV_CPU_IO_MAP(magmax_sound_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

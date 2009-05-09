@@ -325,11 +325,11 @@ static MACHINE_DRIVER_START( strnskil )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(strnskil_map1,0)
+	MDRV_CPU_PROGRAM_MAP(strnskil_map1)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(strnskil_map2,0)
+	MDRV_CPU_PROGRAM_MAP(strnskil_map2)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

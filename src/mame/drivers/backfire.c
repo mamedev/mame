@@ -466,7 +466,7 @@ static MACHINE_DRIVER_START( backfire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
-	MDRV_CPU_PROGRAM_MAP(backfire_map,0)
+	MDRV_CPU_PROGRAM_MAP(backfire_map)
 	MDRV_CPU_VBLANK_INT("lscreen", deco32_vbl_interrupt)	/* or is it "rscreen?" */
 
 	MDRV_NVRAM_HANDLER(93C46)

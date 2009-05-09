@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( pengo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(pengo_map,0)
+	MDRV_CPU_PROGRAM_MAP(pengo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( jrpacmbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jrpacmbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(jrpacmbl_map)
 
 	MDRV_VIDEO_START(jrpacman)
 MACHINE_DRIVER_END

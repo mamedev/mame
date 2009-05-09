@@ -1578,19 +1578,19 @@ static MACHINE_DRIVER_START( bigrun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigrun_map)
 	MDRV_CPU_VBLANK_INT_HACK(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
 
 	MDRV_CPU_ADD("cpu2", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map2,0)
+	MDRV_CPU_PROGRAM_MAP(bigrun_map2)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("cpu3", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map3,0)
+	MDRV_CPU_PROGRAM_MAP(bigrun_map3)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", M68000, 6000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigrun_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
@@ -1633,16 +1633,16 @@ static MACHINE_DRIVER_START( cischeat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map,0)
+	MDRV_CPU_PROGRAM_MAP(cischeat_map)
 
 	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map2,0)
+	MDRV_CPU_PROGRAM_MAP(cischeat_map2)
 
 	MDRV_CPU_MODIFY("cpu3")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map3,0)
+	MDRV_CPU_PROGRAM_MAP(cischeat_map3)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(cischeat_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1661,16 +1661,16 @@ static MACHINE_DRIVER_START( f1gpstar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_REPLACE("cpu1", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstar_map)
 
 	MDRV_CPU_REPLACE("cpu2", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map2,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstar_map2)
 
 	MDRV_CPU_REPLACE("cpu3", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map3,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstar_map3)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(f1gpstar)
@@ -1687,13 +1687,13 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_IMPORT_FROM(f1gpstar)
 
 	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstr2_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
 
 	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 MACHINE_DRIVER_END
 
@@ -1724,7 +1724,7 @@ static MACHINE_DRIVER_START( scudhamm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(scudhamm_map,0)
+	MDRV_CPU_PROGRAM_MAP(scudhamm_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
 
 	/* video hardware */
@@ -1776,7 +1776,7 @@ static MACHINE_DRIVER_START( armchmp2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scudhamm)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(armchmp2_map,0)
+	MDRV_CPU_PROGRAM_MAP(armchmp2_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
 MACHINE_DRIVER_END

@@ -692,11 +692,11 @@ static MACHINE_DRIVER_START( cninja )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(cninja_map,0)
+	MDRV_CPU_PROGRAM_MAP(cninja_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
 
@@ -740,11 +740,11 @@ static MACHINE_DRIVER_START( stoneage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(cninja_map,0)
+	MDRV_CPU_PROGRAM_MAP(cninja_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(stoneage_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(stoneage_s_map)
 
 	MDRV_MACHINE_RESET(cninja)
 
@@ -785,11 +785,11 @@ static MACHINE_DRIVER_START( edrandy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(edrandy_map,0)
+	MDRV_CPU_PROGRAM_MAP(edrandy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
 
@@ -833,11 +833,11 @@ static MACHINE_DRIVER_START( robocop2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(robocop2_map,0)
+	MDRV_CPU_PROGRAM_MAP(robocop2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
 
@@ -884,11 +884,11 @@ static MACHINE_DRIVER_START( mutantf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(mutantf_map,0)
+	MDRV_CPU_PROGRAM_MAP(mutantf_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map_mutantf,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_mutantf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )

@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(toki_map,0)
+	MDRV_CPU_PROGRAM_MAP(toki_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)	/* verifed on pcb */
@@ -466,11 +466,11 @@ static MACHINE_DRIVER_START( tokib )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
-	MDRV_CPU_PROGRAM_MAP(tokib_map,0)
+	MDRV_CPU_PROGRAM_MAP(tokib_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL (could be level1, same vector) */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified with PCB */
-	MDRV_CPU_PROGRAM_MAP(tokib_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(tokib_audio_map)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

@@ -539,7 +539,7 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_DRIVER_START( psikyo3v1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(ps3v1_map,0)
+	MDRV_CPU_PROGRAM_MAP(ps3v1_map)
 	MDRV_CPU_VBLANK_INT("screen", psikyosh_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C56)
@@ -575,7 +575,7 @@ static MACHINE_DRIVER_START( psikyo5 )
 	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ps5_map,0)
+	MDRV_CPU_PROGRAM_MAP(ps5_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psikyo5_240 )
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ps5_map,0)
+	MDRV_CPU_PROGRAM_MAP(ps5_map)
 
 	/* It probably has a register to change visarea */
 	MDRV_SCREEN_MODIFY("screen")

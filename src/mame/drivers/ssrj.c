@@ -155,7 +155,7 @@ static MACHINE_DRIVER_START( ssrj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(ssrj_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssrj_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

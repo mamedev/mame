@@ -108,8 +108,8 @@ static MACHINE_DRIVER_START( spacefev )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
-	MDRV_CPU_IO_MAP(main_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -136,8 +136,8 @@ static MACHINE_DRIVER_START( sheriff )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
-	MDRV_CPU_IO_MAP(main_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -164,8 +164,8 @@ static MACHINE_DRIVER_START( helifire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
-	MDRV_CPU_IO_MAP(main_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

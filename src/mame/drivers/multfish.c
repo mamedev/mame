@@ -428,8 +428,8 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( multfish )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000) /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(multfish_map,0)
-	MDRV_CPU_IO_MAP(multfish_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(multfish_map)
+	MDRV_CPU_IO_MAP(multfish_portmap)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	MDRV_MACHINE_RESET( multfish )

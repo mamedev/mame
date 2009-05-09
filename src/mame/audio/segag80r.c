@@ -844,7 +844,7 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", N7751, 6000000)
-	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
+	MDRV_CPU_IO_MAP(monsterb_7751_portmap)
 
 	MDRV_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
 

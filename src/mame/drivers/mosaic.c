@@ -260,8 +260,8 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_DRIVER_START( mosaic )
 	MDRV_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mosaic_map,0)
-	MDRV_CPU_IO_MAP(mosaic_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mosaic_map)
+	MDRV_CPU_IO_MAP(mosaic_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -289,8 +289,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gfire2 )
 	MDRV_IMPORT_FROM(mosaic)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gfire2_map,0)
-	MDRV_CPU_IO_MAP(gfire2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(gfire2_map)
+	MDRV_CPU_IO_MAP(gfire2_io_map)
 MACHINE_DRIVER_END
 
 

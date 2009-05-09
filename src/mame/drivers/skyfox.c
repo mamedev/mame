@@ -234,11 +234,11 @@ static MACHINE_DRIVER_START( skyfox )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(skyfox_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyfox_map)
 	MDRV_CPU_VBLANK_INT("screen", skyfox_interrupt)		/* NMI caused by coin insertion */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1748000)
-	MDRV_CPU_PROGRAM_MAP(skyfox_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyfox_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

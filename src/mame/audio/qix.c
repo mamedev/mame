@@ -241,7 +241,7 @@ static const pia6821_interface slithersnd_pia_0_intf =
 
 MACHINE_DRIVER_START( qix_audio )
 	MDRV_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_PIA6821_ADD("sndpia0", qixsnd_pia_0_intf)
 	MDRV_PIA6821_ADD("sndpia1", qixsnd_pia_1_intf)

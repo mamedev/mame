@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( pzletime )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu",M68000,10000000)
-	MDRV_CPU_PROGRAM_MAP(pzletime_map,0)
+	MDRV_CPU_PROGRAM_MAP(pzletime_map)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold)
 
 	/* video hardware */

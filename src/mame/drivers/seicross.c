@@ -401,12 +401,12 @@ static MACHINE_DRIVER_START( nvram )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map)
 
 	MDRV_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
@@ -445,7 +445,7 @@ static MACHINE_DRIVER_START( no_nvram )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nvram)
 	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(mcu_no_nvram_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MDRV_NVRAM_HANDLER(NULL)
 MACHINE_DRIVER_END

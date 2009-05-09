@@ -304,8 +304,8 @@ static MACHINE_DRIVER_START( hitme )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/16)
-	MDRV_CPU_PROGRAM_MAP(hitme_map,0)
-	MDRV_CPU_IO_MAP(hitme_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hitme_map)
+	MDRV_CPU_IO_MAP(hitme_portmap)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

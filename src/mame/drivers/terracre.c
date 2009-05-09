@@ -541,12 +541,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( amazon )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP(amazon_map,0)
+	MDRV_CPU_PROGRAM_MAP(amazon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_3526_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 	MDRV_MACHINE_START(amazon)
@@ -580,12 +580,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym3526 )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP(terracre_map,0)
+	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_3526_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 
@@ -617,12 +617,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym2203 )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(terracre_map,0)
+	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_2203_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_2203_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 

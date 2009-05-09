@@ -204,7 +204,7 @@ static MACHINE_DRIVER_START( dommy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dommy_map,0)
+	MDRV_CPU_PROGRAM_MAP(dommy_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
 
 	/* video hardware */
@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( scregg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(eggs_map,0)
+	MDRV_CPU_PROGRAM_MAP(eggs_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
 
 	/* video hardware */

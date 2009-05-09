@@ -472,8 +472,8 @@ static MACHINE_DRIVER_START( lvcards )
 	// basic machine hardware
  	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 
-	MDRV_CPU_PROGRAM_MAP(lvcards_map, 0)
-	MDRV_CPU_IO_MAP(lvcards_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lvcards_map)
+	MDRV_CPU_IO_MAP(lvcards_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	// video hardware
@@ -506,7 +506,7 @@ static MACHINE_DRIVER_START( lvpoker )
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
  	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lvpoker_map,0)
+	MDRV_CPU_PROGRAM_MAP(lvpoker_map)
 	MDRV_MACHINE_START(lvpoker)
 	MDRV_MACHINE_RESET(lvpoker)
 MACHINE_DRIVER_END
@@ -517,7 +517,7 @@ static MACHINE_DRIVER_START( ponttehk )
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
  	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ponttehk_map,0)
+	MDRV_CPU_PROGRAM_MAP(ponttehk_map)
 	MDRV_MACHINE_RESET(lvpoker)
 
 	// video hardware

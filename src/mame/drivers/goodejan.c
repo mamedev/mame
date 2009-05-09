@@ -119,10 +119,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
+	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
+	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goodejan )
@@ -327,8 +329,8 @@ static MACHINE_DRIVER_START( goodejan )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
-	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
-	MDRV_CPU_IO_MAP(common_io_map,goodejan_io_map)
+	MDRV_CPU_PROGRAM_MAP(goodejan_map)
+	MDRV_CPU_IO_MAP(goodejan_io_map)
 	MDRV_CPU_VBLANK_INT("screen",goodejan_irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
@@ -356,7 +358,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( totmejan )
 	MDRV_IMPORT_FROM( goodejan )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(common_io_map,totmejan_io_map)
+	MDRV_CPU_IO_MAP(totmejan_io_map)
 MACHINE_DRIVER_END
 
 ROM_START( totmejan )

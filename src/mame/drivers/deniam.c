@@ -238,12 +238,12 @@ static MACHINE_DRIVER_START( deniam16b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(deniam16b_map,0)
+	MDRV_CPU_PROGRAM_MAP(deniam16b_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_MACHINE_RESET(deniam)
 
@@ -277,7 +277,7 @@ static MACHINE_DRIVER_START( deniam16c )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(deniam16c_map,0)
+	MDRV_CPU_PROGRAM_MAP(deniam16c_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_RESET(deniam)

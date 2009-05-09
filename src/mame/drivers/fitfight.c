@@ -729,13 +729,13 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( fitfight )
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(fitfight_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fitfight_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(sound_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(snd_mem, 0)
-	MDRV_CPU_IO_MAP(snd_io, 0)
+	MDRV_CPU_PROGRAM_MAP(snd_mem)
+	MDRV_CPU_IO_MAP(snd_io)
 	MDRV_CPU_VBLANK_INT("screen", snd_irq)
 
 	MDRV_GFXDECODE(fitfight)
@@ -762,7 +762,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbprot )
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(bbprot_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(bbprot_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_GFXDECODE(prot)

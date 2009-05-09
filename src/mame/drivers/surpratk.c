@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( surpratk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 053248 */
-	MDRV_CPU_PROGRAM_MAP(surpratk_map,0)
+	MDRV_CPU_PROGRAM_MAP(surpratk_map)
 	MDRV_CPU_VBLANK_INT("screen", surpratk_interrupt)
 
 	MDRV_MACHINE_RESET(surpratk)

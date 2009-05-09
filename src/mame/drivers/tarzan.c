@@ -54,7 +54,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tarzan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(tarzan_map,0)
+	MDRV_CPU_PROGRAM_MAP(tarzan_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

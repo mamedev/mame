@@ -288,15 +288,15 @@ static MACHINE_DRIVER_START( tp84 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -338,7 +338,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tp84b )
 	MDRV_IMPORT_FROM(tp84)
 	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(tp84b_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(tp84b_cpu1_map)
 MACHINE_DRIVER_END
 
 /***************************************************************************

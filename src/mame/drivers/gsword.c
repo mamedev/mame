@@ -696,17 +696,17 @@ static MACHINE_DRIVER_START( gsword )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
-	MDRV_CPU_IO_MAP(cpu1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
+	MDRV_CPU_IO_MAP(cpu1_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_IO_MAP(cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MDRV_CPU_IO_MAP(cpu2_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(gsword_snd_interrupt,4)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu3_map)
 
 	MDRV_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
 
@@ -751,13 +751,13 @@ static MACHINE_DRIVER_START( josvolly )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
-	MDRV_CPU_IO_MAP(josvolly_cpu1_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
+	MDRV_CPU_IO_MAP(josvolly_cpu1_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
-	MDRV_CPU_PROGRAM_MAP(josvolly_cpu2_map,0)
-	MDRV_CPU_IO_MAP(josvolly_cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(josvolly_cpu2_map)
+	MDRV_CPU_IO_MAP(josvolly_cpu2_io_map)
 //  MDRV_CPU_VBLANK_INT("screen", gsword_snd_interrupt)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

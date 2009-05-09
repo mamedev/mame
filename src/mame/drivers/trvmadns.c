@@ -285,8 +285,8 @@ static MACHINE_RESET( trvmadns )
 
 static MACHINE_DRIVER_START( trvmadns )
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2) // ?
-	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(trvmadns)

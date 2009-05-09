@@ -577,12 +577,12 @@ static MACHINE_DRIVER_START( galpani2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(galpani2_mem1, 0)
+	MDRV_CPU_PROGRAM_MAP(galpani2_mem1)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
 	//MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_CPU_ADD("sub", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(galpani2_mem2, 0)
+	MDRV_CPU_PROGRAM_MAP(galpani2_mem2)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
 	MDRV_MACHINE_RESET(galpani2)

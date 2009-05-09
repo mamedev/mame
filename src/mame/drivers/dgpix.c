@@ -305,8 +305,8 @@ static MACHINE_RESET( dgpix )
 
 static MACHINE_DRIVER_START( dgpix )
 	MDRV_CPU_ADD("maincpu", E132XT, 20000000*4)	/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu_map)
+	MDRV_CPU_IO_MAP(io_map)
 
 /*
     unknown 16bit sound cpu, embedded inside the KS0164 sound chip

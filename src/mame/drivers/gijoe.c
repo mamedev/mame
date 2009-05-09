@@ -292,11 +292,11 @@ static MACHINE_DRIVER_START( gijoe )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* Confirmed */
-	MDRV_CPU_PROGRAM_MAP(gijoe_map,0)
+	MDRV_CPU_PROGRAM_MAP(gijoe_map)
 	MDRV_CPU_VBLANK_INT("screen", gijoe_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)	/* Amuse & confirmed. z80e */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(gijoe)
 	MDRV_NVRAM_HANDLER(gijoe)

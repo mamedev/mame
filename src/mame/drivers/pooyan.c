@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( pooyan )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", pooyan_interrupt)
 
 	MDRV_MACHINE_START(pooyan)

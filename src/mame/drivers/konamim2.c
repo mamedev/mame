@@ -1135,12 +1135,12 @@ static MACHINE_DRIVER_START( m2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC602, 33000000)	/* actually PPC602, 66MHz */
 	MDRV_CPU_CONFIG(ppc602_config)
-	MDRV_CPU_PROGRAM_MAP(m2_main, 0)
+	MDRV_CPU_PROGRAM_MAP(m2_main)
 	MDRV_CPU_VBLANK_INT("screen", m2)
 
 	MDRV_CPU_ADD("sub", PPC602, 33000000)	/* actually PPC602, 66MHz */
 	MDRV_CPU_CONFIG(ppc602_config)
-	MDRV_CPU_PROGRAM_MAP(m2_main, 0)
+	MDRV_CPU_PROGRAM_MAP(m2_main)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

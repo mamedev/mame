@@ -1339,14 +1339,14 @@ static MACHINE_DRIVER_START( xboard )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(xboard)
 	MDRV_NVRAM_HANDLER(xboard)
@@ -1382,8 +1382,8 @@ static MACHINE_DRIVER_START( smgp )
 	MDRV_IMPORT_FROM(xboard)
 
 	MDRV_CPU_ADD("comm", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(smgp_comm_map,0)
-	MDRV_CPU_IO_MAP(smgp_comm_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(smgp_comm_map)
+	MDRV_CPU_IO_MAP(smgp_comm_portmap)
 MACHINE_DRIVER_END
 
 

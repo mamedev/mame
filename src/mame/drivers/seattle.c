@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( seattle_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map,0)
+	MDRV_CPU_PROGRAM_MAP(seattle_map)
 
 	MDRV_MACHINE_START(seattle)
 	MDRV_MACHINE_RESET(seattle)

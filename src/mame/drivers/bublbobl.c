@@ -676,15 +676,15 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( tokio )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tokio_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tokio_slave_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_sound_map, 0) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	MDRV_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -713,18 +713,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bublbobl )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(master_map, 0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
 	// IRQs are triggered by the MCU
 
 	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0) // IRQs are triggered by the YM2203
+	MDRV_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
 
 	MDRV_CPU_ADD("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
-	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
@@ -757,7 +757,7 @@ static MACHINE_DRIVER_START( boblbobl )
 
 	// basic machine hardware
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bootleg_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
 
 	MDRV_CPU_REMOVE("mcu")
@@ -769,7 +769,7 @@ static MACHINE_DRIVER_START( bub68705 )
 	MDRV_CPU_REMOVE("mcu")
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
-	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map)
 	MDRV_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
 MACHINE_DRIVER_END
 

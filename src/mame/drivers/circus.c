@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map,0)
+	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -304,7 +304,7 @@ static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map,0)
+	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map,0)
+	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
@@ -372,7 +372,7 @@ static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map,0)
+	MDRV_CPU_PROGRAM_MAP(circus_map)
 	//MDRV_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
 
 	/* video hardware */

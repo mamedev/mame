@@ -1103,7 +1103,7 @@ static MACHINE_DRIVER_START( tetrisp2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(tetrisp2_map,0)
+	MDRV_CPU_PROGRAM_MAP(tetrisp2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
@@ -1136,7 +1136,7 @@ static MACHINE_DRIVER_START( nndmseal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(nndmseal_map,0)
+	MDRV_CPU_PROGRAM_MAP(nndmseal_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
@@ -1168,7 +1168,7 @@ static MACHINE_DRIVER_START( rockn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rockn1_map,0)
+	MDRV_CPU_PROGRAM_MAP(rockn1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
@@ -1200,7 +1200,7 @@ static MACHINE_DRIVER_START( rockn2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rockn2_map,0)
+	MDRV_CPU_PROGRAM_MAP(rockn2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
@@ -1232,11 +1232,11 @@ static MACHINE_DRIVER_START( rocknms )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rocknms_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(rocknms_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rocknms_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(rocknms_sub_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)

@@ -648,16 +648,16 @@ static MACHINE_RESET( micro3d )
 
 static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(hostmem, 0)
+	MDRV_CPU_PROGRAM_MAP(hostmem)
 	MDRV_CPU_VBLANK_INT("screen", micro3d_vblank)
 
  	MDRV_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(vgb_config)
-	MDRV_CPU_PROGRAM_MAP(vgbmem, 0)
+	MDRV_CPU_PROGRAM_MAP(vgbmem)
 
 	MDRV_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
-	MDRV_CPU_PROGRAM_MAP(soundmem_prg, 0)
-	MDRV_CPU_IO_MAP(soundmem_io, 0)
+	MDRV_CPU_PROGRAM_MAP(soundmem_prg)
+	MDRV_CPU_IO_MAP(soundmem_io)
 
 	MDRV_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
 

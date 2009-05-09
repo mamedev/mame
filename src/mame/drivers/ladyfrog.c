@@ -259,11 +259,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(ladyfrog_map,0)
+	MDRV_CPU_PROGRAM_MAP(ladyfrog_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(ladyfrog_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ladyfrog_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */

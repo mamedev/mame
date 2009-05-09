@@ -276,8 +276,8 @@ static PALETTE_INIT( caswin )
 static MACHINE_DRIVER_START( vvillage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(vvillage_mem,0)
-	MDRV_CPU_IO_MAP(vvillage_io,0)
+	MDRV_CPU_PROGRAM_MAP(vvillage_mem)
+	MDRV_CPU_IO_MAP(vvillage_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold )
 
 	/* video hardware */

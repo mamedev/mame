@@ -353,16 +353,16 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( lkage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage_map,0)
-	MDRV_CPU_IO_MAP(lkage_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_map)
+	MDRV_CPU_IO_MAP(lkage_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(lkage_m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_m68705_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -399,12 +399,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lkageb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage_map,0)
-	MDRV_CPU_IO_MAP(lkage_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_map)
+	MDRV_CPU_IO_MAP(lkage_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */

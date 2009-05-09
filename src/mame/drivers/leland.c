@@ -709,13 +709,13 @@ static MACHINE_DRIVER_START( leland )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(master_map_program,0)
-	MDRV_CPU_IO_MAP(master_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(master_map_program)
+	MDRV_CPU_IO_MAP(master_map_io)
 	MDRV_CPU_VBLANK_INT("screen", leland_master_interrupt)
 
 	MDRV_CPU_ADD("slave", Z80, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(slave_small_map_program,0)
-	MDRV_CPU_IO_MAP(slave_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(slave_small_map_program)
+	MDRV_CPU_IO_MAP(slave_map_io)
 
 	MDRV_MACHINE_START(leland)
 	MDRV_MACHINE_RESET(leland)
@@ -746,8 +746,8 @@ static MACHINE_DRIVER_START( redline )
 	MDRV_IMPORT_FROM(leland)
 
 	MDRV_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
-	MDRV_CPU_IO_MAP(redline_80186_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program)
+	MDRV_CPU_IO_MAP(redline_80186_map_io)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", REDLINE_80186, 0)
@@ -761,7 +761,7 @@ static MACHINE_DRIVER_START( quarterb )
 	MDRV_IMPORT_FROM(redline)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_IO_MAP(leland_80186_map_io,0)
+	MDRV_CPU_IO_MAP(leland_80186_map_io)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", LELAND_80186, 0)
@@ -775,7 +775,7 @@ static MACHINE_DRIVER_START( lelandi )
 	MDRV_IMPORT_FROM(quarterb)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(slave_large_map_program,0)
+	MDRV_CPU_PROGRAM_MAP(slave_large_map_program)
 MACHINE_DRIVER_END
 
 

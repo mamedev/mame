@@ -1708,7 +1708,7 @@ static MACHINE_DRIVER_START( dfeveron )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(dfeveron_map,0)
+	MDRV_CPU_PROGRAM_MAP(dfeveron_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1747,7 +1747,7 @@ static MACHINE_DRIVER_START( ddonpach )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(ddonpach_map,0)
+	MDRV_CPU_PROGRAM_MAP(ddonpach_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1786,7 +1786,7 @@ static MACHINE_DRIVER_START( donpachi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(donpachi_map,0)
+	MDRV_CPU_PROGRAM_MAP(donpachi_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1830,7 +1830,7 @@ static MACHINE_DRIVER_START( esprade )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(esprade_map,0)
+	MDRV_CPU_PROGRAM_MAP(esprade_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1869,7 +1869,7 @@ static MACHINE_DRIVER_START( gaia )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(gaia_map,0)
+	MDRV_CPU_PROGRAM_MAP(gaia_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1907,7 +1907,7 @@ static MACHINE_DRIVER_START( guwange )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(guwange_map,0)
+	MDRV_CPU_PROGRAM_MAP(guwange_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -1945,12 +1945,12 @@ static MACHINE_DRIVER_START( hotdogst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(hotdogst_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotdogst_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hotdogst_sound_map,0)
-	MDRV_CPU_IO_MAP(hotdogst_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(hotdogst_sound_map)
+	MDRV_CPU_IO_MAP(hotdogst_sound_portmap)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -1999,7 +1999,7 @@ static MACHINE_DRIVER_START( korokoro )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(korokoro_map,0)
+	MDRV_CPU_PROGRAM_MAP(korokoro_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
@@ -2038,12 +2038,12 @@ static MACHINE_DRIVER_START( mazinger )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(mazinger_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazinger_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // Bidirectional communication
-	MDRV_CPU_PROGRAM_MAP(mazinger_sound_map,0)
-	MDRV_CPU_IO_MAP(mazinger_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mazinger_sound_map)
+	MDRV_CPU_IO_MAP(mazinger_sound_portmap)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
@@ -2094,12 +2094,12 @@ static MACHINE_DRIVER_START( metmqstr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(metmqstr_map,0)
+	MDRV_CPU_PROGRAM_MAP(metmqstr_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_map,0)
-	MDRV_CPU_IO_MAP(metmqstr_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_map)
+	MDRV_CPU_IO_MAP(metmqstr_sound_portmap)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
@@ -2151,12 +2151,12 @@ static MACHINE_DRIVER_START( pwrinst2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(pwrinst2_map,0)
+	MDRV_CPU_PROGRAM_MAP(pwrinst2_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_16MHz / 2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pwrinst2_sound_map,0)
-	MDRV_CPU_IO_MAP(pwrinst2_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(pwrinst2_sound_map)
+	MDRV_CPU_IO_MAP(pwrinst2_sound_portmap)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2210,12 +2210,12 @@ static MACHINE_DRIVER_START( sailormn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(sailormn_map,0)
+	MDRV_CPU_PROGRAM_MAP(sailormn_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
-	MDRV_CPU_PROGRAM_MAP(sailormn_sound_map,0)
-	MDRV_CPU_IO_MAP(sailormn_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sailormn_sound_map)
+	MDRV_CPU_IO_MAP(sailormn_sound_portmap)
 
 //  MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2264,7 +2264,7 @@ static MACHINE_DRIVER_START( uopoko )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(uopoko_map,0)
+	MDRV_CPU_PROGRAM_MAP(uopoko_map)
 	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
 
 	MDRV_NVRAM_HANDLER(cave)

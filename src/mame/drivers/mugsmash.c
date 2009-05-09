@@ -408,11 +408,11 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( mugsmash )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(mugsmash_map,0)
+	MDRV_CPU_PROGRAM_MAP(mugsmash_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* Guess */
-	MDRV_CPU_PROGRAM_MAP(mugsmash_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(mugsmash_sound_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

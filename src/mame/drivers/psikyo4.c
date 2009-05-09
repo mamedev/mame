@@ -434,7 +434,7 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_DRIVER_START( ps4big )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(ps4_map,0)
+	MDRV_CPU_PROGRAM_MAP(ps4_map)
 	MDRV_CPU_VBLANK_INT("lscreen", psikyosh_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C56)

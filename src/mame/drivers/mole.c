@@ -196,7 +196,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mole )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, 4000000) // ???
-	MDRV_CPU_PROGRAM_MAP(mole_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mole_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	// video hardware

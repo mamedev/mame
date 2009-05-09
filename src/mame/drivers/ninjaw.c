@@ -564,14 +564,14 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_master_map,0)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_master_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 16/4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_slave_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* CPU slices */
@@ -637,14 +637,14 @@ static MACHINE_DRIVER_START( darius2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius2_master_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius2_master_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ninjaw_sound_map)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius2_slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius2_slave_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* CPU slices */

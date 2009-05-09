@@ -207,7 +207,7 @@ static MACHINE_DRIVER_START( mystston )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(mystston_video)

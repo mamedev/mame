@@ -183,11 +183,11 @@ static INTERRUPT_GEN( progolf_interrupt )
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu)
 //  MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
 
   	MDRV_CPU_ADD("audiocpu", M6502, 500000)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 //  MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	/* video hardware */

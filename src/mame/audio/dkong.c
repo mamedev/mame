@@ -1243,8 +1243,8 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
 	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
-	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -1267,7 +1267,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 
 	MDRV_IMPORT_FROM( radarscp_audio )
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
+	MDRV_CPU_IO_MAP(radarsc1_sound_io_map)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
@@ -1306,8 +1306,8 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
 	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
-	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map)
+	MDRV_CPU_IO_MAP(dkongjr_sound_io_map)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1320,11 +1320,11 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dkong3_audio )
 
 	MDRV_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound latches */

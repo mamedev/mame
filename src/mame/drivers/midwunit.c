@@ -635,7 +635,7 @@ static MACHINE_DRIVER_START( wunit )
 
 	MDRV_CPU_ADD("maincpu", TMS34010, 50000000)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midwunit)
 	MDRV_NVRAM_HANDLER(generic_0fill)

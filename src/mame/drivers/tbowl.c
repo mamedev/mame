@@ -481,17 +481,17 @@ static MACHINE_DRIVER_START( tbowl )
 
 	/* CPU on Board '6206B' */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(6206B_map,0)
+	MDRV_CPU_PROGRAM_MAP(6206B_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq0_line_hold)
 
 	/* CPU on Board '6206C' */
 	MDRV_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(6206C_map,0)
+	MDRV_CPU_PROGRAM_MAP(6206C_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq0_line_hold)
 
 	/* CPU on Board '6206A' */
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MDRV_CPU_PROGRAM_MAP(6206A_map,0)
+	MDRV_CPU_PROGRAM_MAP(6206A_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

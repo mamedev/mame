@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( kungfur )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(kungfur_map,0)
+	MDRV_CPU_PROGRAM_MAP(kungfur_map)
 	MDRV_CPU_VBLANK_INT("screen",kungfur_irq)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

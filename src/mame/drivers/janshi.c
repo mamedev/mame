@@ -72,7 +72,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( janshi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000) /* Z180 */		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(0,mainmap)
+	MDRV_CPU_PROGRAM_MAP(mainmap)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( dday )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(dday_map,0)
+	MDRV_CPU_PROGRAM_MAP(dday_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

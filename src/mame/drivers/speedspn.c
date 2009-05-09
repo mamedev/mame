@@ -281,12 +281,12 @@ static MACHINE_DRIVER_START( speedspn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(speedspn_map,0)
-	MDRV_CPU_IO_MAP(speedspn_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(speedspn_map)
+	MDRV_CPU_IO_MAP(speedspn_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(speedspn_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(speedspn_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

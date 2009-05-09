@@ -469,7 +469,7 @@ ADDRESS_MAP_END
 /********* machine driver ***********/
 MACHINE_DRIVER_START(mcr_ssio)
 	MDRV_CPU_ADD("ssiocpu", Z80, SSIO_CLOCK/2/4)
-	MDRV_CPU_PROGRAM_MAP(ssio_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssio_map)
 	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -600,7 +600,7 @@ static const pia6821_interface csdeluxe_pia_intf =
 /********* machine driver ***********/
 MACHINE_DRIVER_START(chip_squeak_deluxe)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
+	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
 
 	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
@@ -611,7 +611,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
+	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
 
 	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
@@ -719,7 +719,7 @@ static const pia6821_interface soundsgood_pia_intf =
 /********* machine driver ***********/
 MACHINE_DRIVER_START(sounds_good)
 	MDRV_CPU_ADD("sgcpu", M68000, SOUNDSGOOD_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(soundsgood_map,0)
+	MDRV_CPU_PROGRAM_MAP(soundsgood_map)
 
 	MDRV_PIA6821_ADD("sgpia", soundsgood_pia_intf)
 
@@ -821,7 +821,7 @@ static const pia6821_interface turbocs_pia_intf =
 /********* machine driver ***********/
 MACHINE_DRIVER_START(turbo_chip_squeak)
 	MDRV_CPU_ADD("tcscpu", M6809E, TURBOCS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(turbocs_map,0)
+	MDRV_CPU_PROGRAM_MAP(turbocs_map)
 
 	MDRV_PIA6821_ADD("tcspia", turbocs_pia_intf)
 
@@ -982,7 +982,7 @@ static const pia6821_interface squawkntalk_pia1_intf =
 /********* machine driver ***********/
 MACHINE_DRIVER_START(squawk_n_talk)
 	MDRV_CPU_ADD("sntcpu", M6802, SQUAWKTALK_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(squawkntalk_map,0)
+	MDRV_CPU_PROGRAM_MAP(squawkntalk_map)
 
 	MDRV_PIA6821_ADD("sntpia0", squawkntalk_pia0_intf)
 	MDRV_PIA6821_ADD("sntpia1", squawkntalk_pia1_intf)

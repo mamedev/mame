@@ -514,13 +514,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( srmp5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000)
-	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
-	MDRV_CPU_IO_MAP(st0016_io,0)
+	MDRV_CPU_PROGRAM_MAP(st0016_mem)
+	MDRV_CPU_IO_MAP(st0016_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
+	MDRV_CPU_PROGRAM_MAP(srmp5_mem)
 	//256???K??
 	MDRV_CPU_VBLANK_INT_HACK(irq4_gen, 256)
 

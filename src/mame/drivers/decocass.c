@@ -323,14 +323,14 @@ static MACHINE_DRIVER_START( decocass )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, HCLK4)
-	MDRV_CPU_PROGRAM_MAP(decocass_map,0)
+	MDRV_CPU_PROGRAM_MAP(decocass_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(decocass_sound_map)
 	MDRV_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MDRV_CPU_ADD("mcu", I8041, HCLK)
-	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
+	MDRV_CPU_IO_MAP(decocass_mcu_portmap)
 
 	MDRV_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
 

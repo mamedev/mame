@@ -446,12 +446,12 @@ static MACHINE_RESET( pturn )
 
 static MACHINE_DRIVER_START( pturn )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/3)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", pturn_main_intgen)
 	MDRV_MACHINE_RESET(pturn)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/3)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_VBLANK_INT_HACK(pturn_sub_intgen,3)
 
 	MDRV_GFXDECODE(pturn)

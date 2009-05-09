@@ -115,17 +115,14 @@ struct _cpu_class_header
 #define MDRV_CPU_CONFIG(_config) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
+#define MDRV_CPU_PROGRAM_MAP(_map1) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map1)) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map2))
 
-#define MDRV_CPU_DATA_MAP(_map1, _map2) \
+#define MDRV_CPU_DATA_MAP(_map1) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map1)) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map2))
 
-#define MDRV_CPU_IO_MAP(_map1, _map2) \
+#define MDRV_CPU_IO_MAP(_map1) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map1)) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map2))
 
 #define MDRV_CPU_VBLANK_INT(_tag, _func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \

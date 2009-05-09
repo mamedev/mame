@@ -323,7 +323,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( lions )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
-	MDRV_CPU_PROGRAM_MAP(lions_map,0)
+	MDRV_CPU_PROGRAM_MAP(lions_map)
 	MDRV_CPU_VBLANK_INT("screen", lions_irq )
 
 	/* video hardware */

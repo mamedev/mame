@@ -707,11 +707,11 @@ static MACHINE_DRIVER_START( spiders )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2800000)
-	MDRV_CPU_PROGRAM_MAP(spiders_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(spiders_main_map)
 	MDRV_CPU_PERIODIC_INT(update_pia_1, 25)
 
 	MDRV_CPU_ADD("audiocpu", M6802, 3000000)
-	MDRV_CPU_PROGRAM_MAP(spiders_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(spiders_audio_map)
 
 	MDRV_MACHINE_START(spiders)
 	MDRV_NVRAM_HANDLER(generic_0fill)

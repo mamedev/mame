@@ -1022,8 +1022,8 @@ static MACHINE_DRIVER_START( ampoker2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
-	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ampoker2_map)
+	MDRV_CPU_IO_MAP(ampoker2_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
 	MDRV_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
 

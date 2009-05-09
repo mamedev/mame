@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( starfire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

@@ -550,11 +550,11 @@ static MACHINE_DRIVER_START( combasc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
-	MDRV_CPU_PROGRAM_MAP(combasc_map,0)
+	MDRV_CPU_PROGRAM_MAP(combasc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(combasc_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(combasc_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 
@@ -591,11 +591,11 @@ static MACHINE_DRIVER_START( combascb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
-	MDRV_CPU_PROGRAM_MAP(combascb_map,0)
+	MDRV_CPU_PROGRAM_MAP(combascb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(combasc_sound_map,0) /* FAKE */
+	MDRV_CPU_PROGRAM_MAP(combasc_sound_map) /* FAKE */
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 

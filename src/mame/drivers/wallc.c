@@ -278,7 +278,7 @@ static DRIVER_INIT( wallca )
 static MACHINE_DRIVER_START( wallc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(wallc_map,0)
+	MDRV_CPU_PROGRAM_MAP(wallc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

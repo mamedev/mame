@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( sbrkout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16) 	   /* 375 KHz? Should be 750KHz? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(sbrkout)
 	MDRV_MACHINE_RESET(sbrkout)

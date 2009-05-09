@@ -270,12 +270,12 @@ static MACHINE_DRIVER_START( pbaction )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(pbaction_map,0)
+	MDRV_CPU_PROGRAM_MAP(pbaction_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)
-	MDRV_CPU_PROGRAM_MAP(pbaction_sound_map,0)
-	MDRV_CPU_IO_MAP(pbaction_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pbaction_sound_map)
+	MDRV_CPU_IO_MAP(pbaction_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */
 									/* IRQs are caused by the main CPU */
 

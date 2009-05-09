@@ -211,8 +211,8 @@ static MACHINE_DRIVER_START( victory )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", victory_vblank_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

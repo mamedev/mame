@@ -633,8 +633,8 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( limenko )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
-	MDRV_CPU_IO_MAP(limenko_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(limenko_map)
+	MDRV_CPU_IO_MAP(limenko_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
@@ -658,12 +658,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spotty )
 	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
-	MDRV_CPU_IO_MAP(spotty_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(spotty_map)
+	MDRV_CPU_IO_MAP(spotty_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
-	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)
+	MDRV_CPU_IO_MAP(spotty_sound_io_map)
 
 	MDRV_NVRAM_HANDLER(93C46)
 

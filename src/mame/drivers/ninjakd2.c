@@ -938,12 +938,12 @@ static MACHINE_DRIVER_START( ninjakd2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
 	MDRV_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu,0)
-	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
+	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MDRV_CPU_IO_MAP(ninjakd2_sound_io)
 
 	MDRV_MACHINE_RESET(ninjakd2)
 
@@ -988,7 +988,7 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_IMPORT_FROM(ninjakd2)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mnight)
@@ -1003,7 +1003,7 @@ static MACHINE_DRIVER_START( arkarea )
 	MDRV_IMPORT_FROM(ninjakd2)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
 	MDRV_VIDEO_START(arkarea)
@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( robokid )
 	MDRV_IMPORT_FROM(mnight)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu, 0)
+	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu)
 
 	MDRV_MACHINE_RESET(robokid)
 
@@ -1036,7 +1036,7 @@ static MACHINE_DRIVER_START( omegaf )
 	MDRV_IMPORT_FROM(robokid)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu, 0)
+	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu)
 
 	MDRV_MACHINE_RESET(omegaf)
 

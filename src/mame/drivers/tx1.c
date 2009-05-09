@@ -702,15 +702,15 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
 
 static MACHINE_DRIVER_START( tx1 )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(tx1_main, 0)
+	MDRV_CPU_PROGRAM_MAP(tx1_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(tx1_math, 0)
+	MDRV_CPU_PROGRAM_MAP(tx1_math)
 
 	MDRV_CPU_ADD("audio_cpu", Z80, TX1_PIXEL_CLOCK / 2)
-	MDRV_CPU_PROGRAM_MAP(tx1_sound_prg, 0)
-	MDRV_CPU_IO_MAP(tx1_sound_io, 0)
+	MDRV_CPU_PROGRAM_MAP(tx1_sound_prg)
+	MDRV_CPU_IO_MAP(tx1_sound_io)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
 	MDRV_MACHINE_RESET(tx1)
@@ -755,16 +755,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( buggyboy )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
+	MDRV_CPU_PROGRAM_MAP(buggyboy_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
+	MDRV_CPU_PROGRAM_MAP(buggyboy_math)
 
 	MDRV_CPU_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MDRV_CPU_PROGRAM_MAP(buggyboy_sound_prg, 0)
+	MDRV_CPU_PROGRAM_MAP(buggyboy_sound_prg)
 	MDRV_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
-	MDRV_CPU_IO_MAP(buggyboy_sound_io, 0)
+	MDRV_CPU_IO_MAP(buggyboy_sound_io)
 
 	MDRV_MACHINE_RESET(buggyboy)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -810,15 +810,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( buggybjr )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(buggybjr_main, 0)
+	MDRV_CPU_PROGRAM_MAP(buggybjr_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
-	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
+	MDRV_CPU_PROGRAM_MAP(buggyboy_math)
 
 	MDRV_CPU_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MDRV_CPU_PROGRAM_MAP(buggybjr_sound_prg, 0)
-	MDRV_CPU_IO_MAP(buggyboy_sound_io, 0)
+	MDRV_CPU_PROGRAM_MAP(buggybjr_sound_prg)
+	MDRV_CPU_IO_MAP(buggyboy_sound_io)
 	MDRV_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
 
 	MDRV_MACHINE_RESET(buggybjr)

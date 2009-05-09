@@ -474,17 +474,17 @@ static MACHINE_DRIVER_START( exterm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(master_config)
-	MDRV_CPU_PROGRAM_MAP(master_map,0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
 
 	MDRV_CPU_ADD("slave", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(slave_config)
-	MDRV_CPU_PROGRAM_MAP(slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound_master_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_master_map)
 
 	MDRV_CPU_ADD("audioslave", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(sound_slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_slave_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

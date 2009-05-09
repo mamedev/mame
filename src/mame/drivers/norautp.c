@@ -531,8 +531,8 @@ static MACHINE_DRIVER_START( norautp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(norautp_map, 0)
-	MDRV_CPU_IO_MAP(norautp_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(norautp_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -567,8 +567,8 @@ static MACHINE_DRIVER_START( gtipoker )
 	MDRV_IMPORT_FROM(norautp)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gtipoker_map, 0)
-	MDRV_CPU_IO_MAP(gtipoker_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(gtipoker_map)
+	MDRV_CPU_IO_MAP(gtipoker_portmap)
 
 MACHINE_DRIVER_END
 

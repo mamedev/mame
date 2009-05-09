@@ -333,7 +333,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mil4000 )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )	// ?
-	MDRV_CPU_PROGRAM_MAP(mil4000_map,0)
+	MDRV_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 

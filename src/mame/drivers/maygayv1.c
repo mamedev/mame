@@ -991,13 +991,13 @@ static INTERRUPT_GEN( vsync_interrupt )
 
 static MACHINE_DRIVER_START( maygayv1 )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sound_prg, 0)
-	MDRV_CPU_DATA_MAP(sound_data, 0)
-	MDRV_CPU_IO_MAP(sound_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_prg)
+	MDRV_CPU_DATA_MAP(sound_data)
+	MDRV_CPU_IO_MAP(sound_io)
 
 	MDRV_PIA6821_ADD("pia", pia_intf)
 

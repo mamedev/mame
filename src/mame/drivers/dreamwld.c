@@ -386,7 +386,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(dreamwld_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dreamwld_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) // 4, 5, or 6, all point to the same place
 
 	/* video hardware */

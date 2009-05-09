@@ -595,7 +595,7 @@ static MACHINE_DRIVER_START( asteroid )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(asteroid_map,0)
+	MDRV_CPU_PROGRAM_MAP(asteroid_map)
 	MDRV_CPU_PERIODIC_INT(asteroid_interrupt, (double)MASTER_CLOCK/4096/12)
 
 	MDRV_MACHINE_RESET(asteroid)
@@ -631,7 +631,7 @@ static MACHINE_DRIVER_START( astdelux )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(asteroid)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astdelux_map,0)
+	MDRV_CPU_PROGRAM_MAP(astdelux_map)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
 
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( llander )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(asteroid)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(llander_map,0)
+	MDRV_CPU_PROGRAM_MAP(llander_map)
 	MDRV_CPU_PERIODIC_INT(llander_interrupt, (double)MASTER_CLOCK/4096/12)
 
 	MDRV_MACHINE_RESET(avgdvg)

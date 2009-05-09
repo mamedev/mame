@@ -190,8 +190,8 @@ static MACHINE_DRIVER_START( sspeedr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000 / 8)
-	MDRV_CPU_PROGRAM_MAP(sspeedr_map, 0)
-	MDRV_CPU_IO_MAP(sspeedr_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sspeedr_map)
+	MDRV_CPU_IO_MAP(sspeedr_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */

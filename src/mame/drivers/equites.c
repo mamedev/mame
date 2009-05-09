@@ -1158,8 +1158,8 @@ static const samples_interface alphamc07_samples_interface =
 static MACHINE_DRIVER_START( common_sound )
 
 	MDRV_CPU_ADD("audiocpu", 8085A, XTAL_6_144MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_SOUND_START(equites)
 
@@ -1201,13 +1201,13 @@ static MACHINE_DRIVER_START( equites )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(equites_map,0)
+	MDRV_CPU_PROGRAM_MAP(equites_map)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
 	MDRV_IMPORT_FROM(common_sound)
 
 	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1239,13 +1239,13 @@ static MACHINE_DRIVER_START( splndrbt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(splndrbt_map, 0)
+	MDRV_CPU_PROGRAM_MAP(splndrbt_map)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
 	MDRV_IMPORT_FROM(common_sound)
 
 	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

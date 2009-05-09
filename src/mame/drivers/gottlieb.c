@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( gottlieb_core )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
-	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
+	MDRV_CPU_PROGRAM_MAP(gottlieb_map)
 	MDRV_CPU_VBLANK_INT("screen", gottlieb_interrupt)
 
 	MDRV_MACHINE_START(gottlieb)
@@ -1913,7 +1913,7 @@ static MACHINE_DRIVER_START( reactor )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(reactor_map,0)
+	MDRV_CPU_PROGRAM_MAP(reactor_map)
 
 	MDRV_NVRAM_HANDLER(NULL)
 

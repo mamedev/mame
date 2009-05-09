@@ -682,7 +682,7 @@ static MACHINE_DRIVER_START( ladybug )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(ladybug_map,0)
+	MDRV_CPU_PROGRAM_MAP(ladybug_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -714,12 +714,12 @@ static MACHINE_DRIVER_START( sraider )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sraider_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(sraider_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sraider_cpu2_map,0)
-	MDRV_CPU_IO_MAP(sraider_cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sraider_cpu2_map)
+	MDRV_CPU_IO_MAP(sraider_cpu2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

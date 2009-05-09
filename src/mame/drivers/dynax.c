@@ -3618,8 +3618,8 @@ static MACHINE_DRIVER_START( hanamai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
-	MDRV_CPU_IO_MAP(hanamai_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MDRV_CPU_IO_MAP(hanamai_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
@@ -3675,8 +3675,8 @@ static MACHINE_DRIVER_START( hnoridur )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
-	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map)
+	MDRV_CPU_IO_MAP(hnoridur_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
@@ -3733,8 +3733,8 @@ static MACHINE_DRIVER_START( sprtmtch )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
-	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MDRV_CPU_IO_MAP(sprtmtch_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -3773,8 +3773,8 @@ static MACHINE_DRIVER_START( mjfriday )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
-	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MDRV_CPU_IO_MAP(mjfriday_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -3810,7 +3810,7 @@ static MACHINE_DRIVER_START( mjdialq2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( mjfriday )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map,0)
+	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map)
 MACHINE_DRIVER_END
 
 
@@ -3844,8 +3844,8 @@ static MACHINE_DRIVER_START( yarunara )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
-	MDRV_CPU_IO_MAP(yarunara_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
+	MDRV_CPU_IO_MAP(yarunara_io_map)
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -3867,8 +3867,8 @@ static MACHINE_DRIVER_START( mcnpshnt )
 
 	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map,0)
-	MDRV_CPU_IO_MAP(mcnpshnt_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
+	MDRV_CPU_IO_MAP(mcnpshnt_io_map)
 
 	MDRV_VIDEO_START(mcnpshnt)	// different priorities
 MACHINE_DRIVER_END
@@ -3882,8 +3882,8 @@ static MACHINE_DRIVER_START( nanajign )
 
 	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
-	MDRV_CPU_IO_MAP(nanajign_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
+	MDRV_CPU_IO_MAP(nanajign_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3913,13 +3913,13 @@ static MACHINE_DRIVER_START( jantouki )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
-	MDRV_CPU_IO_MAP(jantouki_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map)
+	MDRV_CPU_IO_MAP(jantouki_io_map)
 	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_CPU_ADD("soundcpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
-	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
+	MDRV_CPU_IO_MAP(jantouki_sound_io_map)
 	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
@@ -3995,8 +3995,8 @@ static MACHINE_DRIVER_START( mjelctrn )
 
 	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
-	MDRV_CPU_IO_MAP(mjelctrn_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
+	MDRV_CPU_IO_MAP(mjelctrn_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
@@ -4081,8 +4081,8 @@ static MACHINE_DRIVER_START( htengoku )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000 / 4)
-	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
-	MDRV_CPU_IO_MAP(htengoku_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
+	MDRV_CPU_IO_MAP(htengoku_io_map)
 	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
@@ -4144,8 +4144,8 @@ static MACHINE_DRIVER_START( tenkai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
-	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
-	MDRV_CPU_IO_MAP(tenkai_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tenkai_map)
+	MDRV_CPU_IO_MAP(tenkai_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

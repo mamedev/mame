@@ -211,11 +211,11 @@ static MACHINE_DRIVER_START( bigkarnk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* MC68000P10, 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(bigkarnk_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigkarnk_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
-	MDRV_CPU_PROGRAM_MAP(bigkarnk_snd_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigkarnk_snd_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( maniacsq )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(maniacsq_map,0)
+	MDRV_CPU_PROGRAM_MAP(maniacsq_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -588,7 +588,7 @@ static MACHINE_DRIVER_START( squash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(squash_map,0)
+	MDRV_CPU_PROGRAM_MAP(squash_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START( thoop )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(thoop_map,0)
+	MDRV_CPU_PROGRAM_MAP(thoop_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))

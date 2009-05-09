@@ -1084,8 +1084,8 @@ static MACHINE_DRIVER_START( iqblocka )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(iqblocka_map,0)
-	MDRV_CPU_IO_MAP(iqblocka_io,0)
+	MDRV_CPU_PROGRAM_MAP(iqblocka_map)
+	MDRV_CPU_IO_MAP(iqblocka_io)
 	MDRV_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
 
 	MDRV_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
@@ -1153,7 +1153,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 
 static MACHINE_DRIVER_START( mgcs )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(mgcs,0)
+	MDRV_CPU_PROGRAM_MAP(mgcs)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
 
 	MDRV_MACHINE_RESET(mgcs)

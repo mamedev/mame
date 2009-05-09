@@ -198,8 +198,8 @@ static MACHINE_DRIVER_START( battlex )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
-	MDRV_CPU_PROGRAM_MAP(battlex_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(battlex_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 
 	/* video hardware */

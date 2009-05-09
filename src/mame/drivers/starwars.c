@@ -318,12 +318,12 @@ static MACHINE_DRIVER_START( starwars )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 128))
 
 	MDRV_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(starwars)
 	MDRV_NVRAM_HANDLER(generic_0fill)

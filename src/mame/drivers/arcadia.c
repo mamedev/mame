@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( arcadia )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(amiga_map,0)
+	MDRV_CPU_PROGRAM_MAP(amiga_map)
 
 	MDRV_MACHINE_RESET(amiga)
 	MDRV_NVRAM_HANDLER(generic_0fill)

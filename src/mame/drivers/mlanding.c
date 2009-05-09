@@ -344,18 +344,18 @@ static MACHINE_DRIVER_START( mlanding )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )		/* 12 MHz ??? (guess) */
-	MDRV_CPU_PROGRAM_MAP(mlanding_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mlanding_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("z80", Z80, 4000000 )		/* 4 MHz ??? (guess) */
-	MDRV_CPU_PROGRAM_MAP(mlanding_z80_mem,0)
+	MDRV_CPU_PROGRAM_MAP(mlanding_z80_mem)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
-	MDRV_CPU_PROGRAM_MAP(mlanding_sub_mem,0)
+	MDRV_CPU_PROGRAM_MAP(mlanding_sub_mem)
 	MDRV_CPU_VBLANK_INT_HACK(irq6_line_hold,7)
 
 	MDRV_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
-	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem,0)
+	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

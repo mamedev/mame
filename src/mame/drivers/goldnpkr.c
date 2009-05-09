@@ -2304,7 +2304,7 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldnpkr_map, 0)
+	MDRV_CPU_PROGRAM_MAP(goldnpkr_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -2348,7 +2348,7 @@ static MACHINE_DRIVER_START( pottnpkr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pottnpkr_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pottnpkr_map)
 
 	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
@@ -2365,7 +2365,7 @@ static MACHINE_DRIVER_START( witchcrd )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(witchcrd_map, 0)
+	MDRV_CPU_PROGRAM_MAP(witchcrd_map)
 
 	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 

@@ -676,8 +676,8 @@ static const ay8910_interface dunhuang_ay8910_interface =
 static MACHINE_DRIVER_START( dunhuang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
-	MDRV_CPU_PROGRAM_MAP(dunhuang_map,0)
-	MDRV_CPU_IO_MAP(dunhuang_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(dunhuang_map)
+	MDRV_CPU_IO_MAP(dunhuang_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(5))

@@ -887,7 +887,7 @@ static MACHINE_DRIVER_START( zwackery )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
-	MDRV_CPU_PROGRAM_MAP(zwackery_map,0)
+	MDRV_CPU_PROGRAM_MAP(zwackery_map)
 	MDRV_CPU_VBLANK_INT("screen", mcr68_interrupt)
 
 //  MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -921,7 +921,7 @@ static MACHINE_DRIVER_START( mcr68 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7723800)
-	MDRV_CPU_PROGRAM_MAP(mcr68_map,0)
+	MDRV_CPU_PROGRAM_MAP(mcr68_map)
 	MDRV_CPU_VBLANK_INT("screen", mcr68_interrupt)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -979,7 +979,7 @@ static MACHINE_DRIVER_START( pigskin )
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pigskin_map,0)
+	MDRV_CPU_PROGRAM_MAP(pigskin_map)
 MACHINE_DRIVER_END
 
 
@@ -990,7 +990,7 @@ static MACHINE_DRIVER_START( trisport )
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trisport_map,0)
+	MDRV_CPU_PROGRAM_MAP(trisport_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END

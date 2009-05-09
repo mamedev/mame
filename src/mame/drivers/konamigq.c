@@ -381,11 +381,11 @@ static MACHINE_RESET( konamigq )
 static MACHINE_DRIVER_START( konamigq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( konamigq_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( konamigq_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MDRV_CPU_ADD( "soundcpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( konamigq_sound_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( konamigq_sound_map)
 	MDRV_CPU_PERIODIC_INT( irq2_line_hold, 480 )
 
 	MDRV_MACHINE_START( konamigq )

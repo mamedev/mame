@@ -203,7 +203,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( koftball )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
-	MDRV_CPU_PROGRAM_MAP(koftball_mem,0)
+	MDRV_CPU_PROGRAM_MAP(koftball_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,3)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

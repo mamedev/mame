@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( bishi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(bishi_interrupt, 2)
 
 	MDRV_MACHINE_START(bishi)

@@ -353,11 +353,11 @@ static MACHINE_DRIVER_START( capbowl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(capbowl_map,0)
+	MDRV_CPU_PROGRAM_MAP(capbowl_map)
 	MDRV_CPU_VBLANK_INT("screen", capbowl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(capbowl)
 	MDRV_NVRAM_HANDLER(capbowl)
@@ -393,7 +393,7 @@ static MACHINE_DRIVER_START( bowlrama )
 	MDRV_IMPORT_FROM(capbowl)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bowlrama_map,0)
+	MDRV_CPU_PROGRAM_MAP(bowlrama_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

@@ -1729,11 +1729,11 @@ static MACHINE_DRIVER_START( timekill )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(timekill_map,0)
+	MDRV_CPU_PROGRAM_MAP(timekill_map)
 	MDRV_CPU_VBLANK_INT("screen", generate_int1)
 
 	MDRV_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(itech32)
 	MDRV_NVRAM_HANDLER(itech32)
@@ -1767,7 +1767,7 @@ static MACHINE_DRIVER_START( bloodstm )
 	MDRV_IMPORT_FROM(timekill)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bloodstm_map,0)
+	MDRV_CPU_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
@@ -1780,14 +1780,14 @@ static MACHINE_DRIVER_START( drivedge )
 	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_map,0)
+	MDRV_CPU_PROGRAM_MAP(drivedge_map)
 	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
 	MDRV_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map,0)
+	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map)
 
 	MDRV_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_tms2_map,0)
+	MDRV_CPU_PROGRAM_MAP(drivedge_tms2_map)
 
 //  MDRV_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
@@ -1802,10 +1802,10 @@ static MACHINE_DRIVER_START( sftm )
 	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(itech020_map,0)
+	MDRV_CPU_PROGRAM_MAP(itech020_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(sound_020_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_020_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
 
 	MDRV_NVRAM_HANDLER(itech020)

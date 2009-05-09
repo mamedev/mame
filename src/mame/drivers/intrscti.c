@@ -83,8 +83,8 @@ static VIDEO_UPDATE(intrscti)
 static MACHINE_DRIVER_START( intrscti )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(intrscti_map,0)
-	MDRV_CPU_IO_MAP(readport,0)
+	MDRV_CPU_PROGRAM_MAP(intrscti_map)
+	MDRV_CPU_IO_MAP(readport)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

@@ -71,7 +71,7 @@ static MACHINE_DRIVER_START( minivadr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000 / 6)		 /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(minivadr_map,0)
+	MDRV_CPU_PROGRAM_MAP(minivadr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

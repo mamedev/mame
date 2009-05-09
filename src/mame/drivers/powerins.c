@@ -357,12 +357,12 @@ static MACHINE_DRIVER_START( powerins )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(powerins_map,0)
+	MDRV_CPU_PROGRAM_MAP(powerins_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(powerins_sound_map,0)
-	MDRV_CPU_IO_MAP(powerins_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(powerins_sound_map)
+	MDRV_CPU_IO_MAP(powerins_sound_io_map)
 
 	MDRV_MACHINE_RESET(powerins)
 
@@ -402,7 +402,7 @@ static MACHINE_DRIVER_START( powerina )
 	MDRV_IMPORT_FROM(powerins)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(powerina_map,0)
+	MDRV_CPU_PROGRAM_MAP(powerina_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_CPU_MODIFY("soundcpu") /* 6 MHz */
-	MDRV_CPU_IO_MAP(powerinb_sound_io_map,0)
+	MDRV_CPU_IO_MAP(powerinb_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
 	MDRV_SOUND_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board

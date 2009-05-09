@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( galsnew )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(galsnew_map,0)
+	MDRV_CPU_PROGRAM_MAP(galsnew_map)
 	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
@@ -518,7 +518,7 @@ static MACHINE_DRIVER_START( fantasia )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( galsnew )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fantasia_map,0)
+	MDRV_CPU_PROGRAM_MAP(fantasia_map)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
 

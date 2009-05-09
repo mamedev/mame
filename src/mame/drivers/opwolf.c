@@ -546,11 +546,11 @@ static MACHINE_DRIVER_START( opwolf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -595,14 +595,14 @@ static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, bu
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolfb_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolfb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
 	MDRV_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolfb_sub_z80_map,0)
+	MDRV_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */

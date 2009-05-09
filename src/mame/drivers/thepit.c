@@ -652,12 +652,12 @@ static MACHINE_DRIVER_START( thepit )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(thepit_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(thepit_main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
-	MDRV_CPU_IO_MAP(audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MDRV_CPU_IO_MAP(audio_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -689,7 +689,7 @@ static MACHINE_DRIVER_START( intrepid )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(thepit)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(intrepid_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(intrepid_main_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(intrepid)

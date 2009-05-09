@@ -438,13 +438,13 @@ static MACHINE_DRIVER_START( galivan )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(galivan_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(galivan_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
 
 	MDRV_MACHINE_RESET(galivan)
@@ -481,13 +481,13 @@ static MACHINE_DRIVER_START( ninjemak )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(ninjemak_map,0)
-	MDRV_CPU_IO_MAP(ninjemak_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ninjemak_map)
+	MDRV_CPU_IO_MAP(ninjemak_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
 
 	MDRV_MACHINE_RESET(galivan)

@@ -495,19 +495,19 @@ static const cubeqst_lin_config lin_config =
 
 static MACHINE_DRIVER_START( cubeqst )
 	MDRV_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(m68k_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank)
 
 	MDRV_CPU_ADD("rotate_cpu", CQUESTROT, XTAL_10MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(rotate_map, 0)
+	MDRV_CPU_PROGRAM_MAP(rotate_map)
 	MDRV_CPU_CONFIG(rot_config)
 
 	MDRV_CPU_ADD("line_cpu", CQUESTLIN, XTAL_10MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(line_sound_map)
 	MDRV_CPU_CONFIG(lin_config)
 
 	MDRV_CPU_ADD("sound_cpu", CQUESTSND, XTAL_10MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(line_sound_map)
 	MDRV_CPU_CONFIG(snd_config)
 
 	MDRV_QUANTUM_TIME(HZ(48000))

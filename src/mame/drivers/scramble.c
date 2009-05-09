@@ -1236,11 +1236,11 @@ static MACHINE_DRIVER_START( scramble )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(scramble_map,0)
+	MDRV_CPU_PROGRAM_MAP(scramble_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(scramble_sound_map,0)
-	MDRV_CPU_IO_MAP(scramble_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(scramble_sound_map)
+	MDRV_CPU_IO_MAP(scramble_sound_io_map)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -1277,7 +1277,7 @@ static MACHINE_DRIVER_START( mars )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mars_map,0)
+	MDRV_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
@@ -1289,7 +1289,7 @@ static MACHINE_DRIVER_START( devilfsh )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mars_map,0)
+	MDRV_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(devilfsh)
@@ -1302,7 +1302,7 @@ static MACHINE_DRIVER_START( newsin7 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(newsin7_map,0)
+	MDRV_CPU_PROGRAM_MAP(newsin7_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(newsin7)
@@ -1316,7 +1316,7 @@ static MACHINE_DRIVER_START( mrkougar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mrkougar_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
@@ -1331,7 +1331,7 @@ static MACHINE_DRIVER_START( mrkougb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mrkougar_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
@@ -1345,7 +1345,7 @@ static MACHINE_DRIVER_START( ckongs )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ckongs_map,0)
+	MDRV_CPU_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
@@ -1358,13 +1358,13 @@ static MACHINE_DRIVER_START( hotshock )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hotshock_map,0)
+	MDRV_CPU_PROGRAM_MAP(hotshock_map)
 
 	MDRV_PPI8255_REMOVE( "ppi8255_0" )
 	MDRV_PPI8255_REMOVE( "ppi8255_1" )
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_IO_MAP(hotshock_sound_io_map,0)
+	MDRV_CPU_IO_MAP(hotshock_sound_io_map)
 
 	MDRV_MACHINE_RESET(galaxold)
 
@@ -1397,7 +1397,7 @@ static MACHINE_DRIVER_START( mimonscr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mimonscr_map,0)
+	MDRV_CPU_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mimonkey)
@@ -1409,7 +1409,7 @@ static MACHINE_DRIVER_START( triplep )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(triplep_io_map,0)
+	MDRV_CPU_IO_MAP(triplep_io_map)
 
 	MDRV_CPU_REMOVE("audiocpu")
 
@@ -1444,8 +1444,8 @@ static MACHINE_DRIVER_START( hunchbks )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_REPLACE("maincpu", S2650, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(hunchbks_map,0)
-	MDRV_CPU_IO_MAP(hunchbks_readport,0)
+	MDRV_CPU_PROGRAM_MAP(hunchbks_map)
+	MDRV_CPU_IO_MAP(hunchbks_readport)
 	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -1469,7 +1469,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ad2083 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(ad2083_map,0)
+	MDRV_CPU_PROGRAM_MAP(ad2083_map)
 
 	MDRV_MACHINE_RESET(galaxold)
 
@@ -1499,7 +1499,7 @@ static MACHINE_DRIVER_START( turpins )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(turpins_map,0)
+	MDRV_CPU_PROGRAM_MAP(turpins_map)
 
 MACHINE_DRIVER_END
 

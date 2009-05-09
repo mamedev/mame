@@ -1518,12 +1518,12 @@ static MACHINE_DRIVER_START( snowbros )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(snowbros_map,0)
+	MDRV_CPU_PROGRAM_MAP(snowbros_map)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1553,7 +1553,7 @@ static MACHINE_DRIVER_START( wintbob )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_REPLACE("maincpu", M68000, 10000000) /* 10mhz - Confirmed */
-	MDRV_CPU_PROGRAM_MAP(wintbob_map,0)
+	MDRV_CPU_PROGRAM_MAP(wintbob_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(wb)
@@ -1567,10 +1567,10 @@ static MACHINE_DRIVER_START( semicom )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_REPLACE("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyperpac_map)
 
 	MDRV_CPU_REPLACE("soundcpu", Z80, 4000000) /* 4.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_map)
 
 	MDRV_GFXDECODE(hyperpac)
 
@@ -1593,8 +1593,8 @@ static MACHINE_DRIVER_START( semicom_mcu )
 	MDRV_IMPORT_FROM(semicom)
 
 	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
-	MDRV_CPU_PROGRAM_MAP(protection_map,0)
-	MDRV_CPU_IO_MAP(protection_iomap,0)
+	MDRV_CPU_PROGRAM_MAP(protection_map)
+	MDRV_CPU_IO_MAP(protection_iomap)
 MACHINE_DRIVER_END
 
 
@@ -1627,12 +1627,12 @@ static MACHINE_DRIVER_START( honeydol )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_map,0)
+	MDRV_CPU_PROGRAM_MAP(honeydol_map)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_sound_map,0)
-	MDRV_CPU_IO_MAP(honeydol_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(honeydol_sound_map)
+	MDRV_CPU_IO_MAP(honeydol_sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1666,12 +1666,12 @@ static MACHINE_DRIVER_START( twinadv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
-	MDRV_CPU_PROGRAM_MAP(twinadv_map,0)
+	MDRV_CPU_PROGRAM_MAP(twinadv_map)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(twinadv_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(twinadv_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -1719,7 +1719,7 @@ static MACHINE_DRIVER_START( finalttr )
 	MDRV_IMPORT_FROM(semicom)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(finalttr_map,0)
+	MDRV_CPU_PROGRAM_MAP(finalttr_map)
 
 	MDRV_CPU_REPLACE("soundcpu", Z80, 3578545)
 
@@ -1746,7 +1746,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(snowbros3_map,0)
+	MDRV_CPU_PROGRAM_MAP(snowbros3_map)
 	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */

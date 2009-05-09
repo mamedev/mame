@@ -462,7 +462,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 
 static MACHINE_DRIVER_START( lastfght )
 	MDRV_CPU_ADD("maincpu", H83044, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP( lastfght_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( lastfght_map)
 	MDRV_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

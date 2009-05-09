@@ -438,18 +438,18 @@ static MACHINE_DRIVER_START( wardner )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
-	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
-	MDRV_CPU_IO_MAP(main_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_program_map)
+	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", wardner_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,24000000/7)			/* 3.43MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)
-	MDRV_CPU_IO_MAP(sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_program_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_CPU_ADD("dsp", TMS32010,14000000)	/* 14MHz Crystal CLKin */
-	MDRV_CPU_PROGRAM_MAP(DSP_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
-	MDRV_CPU_IO_MAP(DSP_io_map, 0)
+	MDRV_CPU_IO_MAP(DSP_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))					/* 100 CPU slices per frame */
 

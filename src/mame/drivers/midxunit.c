@@ -260,7 +260,7 @@ static MACHINE_DRIVER_START( midxunit )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34020, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midxunit)
 	MDRV_NVRAM_HANDLER(generic_0fill)

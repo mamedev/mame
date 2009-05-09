@@ -515,10 +515,10 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( r2dtank )
 	MDRV_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
-	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map)
 
 	MDRV_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
-	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map)
 
 	MDRV_MACHINE_START(r2dtank)
 	MDRV_NVRAM_HANDLER(generic_0fill)

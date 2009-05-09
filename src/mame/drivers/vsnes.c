@@ -1765,7 +1765,7 @@ static MACHINE_DRIVER_START( vsnes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsnes)
 
@@ -1800,10 +1800,10 @@ static MACHINE_DRIVER_START( vsdual )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MDRV_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(vsnes_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(vsnes_cpu2_map)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsdual)
 

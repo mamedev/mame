@@ -871,11 +871,11 @@ static MACHINE_DRIVER_START( hangon_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
-	MDRV_CPU_PROGRAM_MAP(hangon_map,0)
+	MDRV_CPU_PROGRAM_MAP(hangon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK_25MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	MDRV_MACHINE_RESET(hangon)
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( sharrier_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MDRV_CPU_PROGRAM_MAP(sharrier_map,0)
+	MDRV_CPU_PROGRAM_MAP(sharrier_map)
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_REPLACE("sub", M68000, MASTER_CLOCK_10MHz)
@@ -915,8 +915,8 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map_2203,0)
-	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_2203)
+	MDRV_CPU_IO_MAP(sound_portmap_2203)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -943,8 +943,8 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
-	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_2151)
+	MDRV_CPU_IO_MAP(sound_portmap_2203x2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -981,8 +981,8 @@ static MACHINE_DRIVER_START( sound_board_2151 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
-	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map_2151)
+	MDRV_CPU_IO_MAP(sound_portmap_2151)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( sharrier )
 	MDRV_IMPORT_FROM(sound_board_2203)
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
-	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 

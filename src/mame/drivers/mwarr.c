@@ -455,7 +455,7 @@ static VIDEO_UPDATE( mwarr )
 
 static MACHINE_DRIVER_START( mwarr )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(mwarr_map,0)
+	MDRV_CPU_PROGRAM_MAP(mwarr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_GFXDECODE(mwarr)

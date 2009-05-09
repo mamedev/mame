@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( subs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(subs_interrupt,4)
 
 	MDRV_MACHINE_RESET(subs)

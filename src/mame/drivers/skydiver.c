@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( skydiver )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
-	MDRV_CPU_PROGRAM_MAP(skydiver_map, 0)
+	MDRV_CPU_PROGRAM_MAP(skydiver_map)
 	MDRV_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
 	MDRV_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 

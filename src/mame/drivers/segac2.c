@@ -1364,7 +1364,7 @@ static MACHINE_DRIVER_START( segac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)

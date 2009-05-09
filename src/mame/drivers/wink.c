@@ -323,13 +323,13 @@ static MACHINE_RESET( wink )
 static MACHINE_DRIVER_START( wink )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
-	MDRV_CPU_PROGRAM_MAP(wink_map,0)
-	MDRV_CPU_IO_MAP(wink_io,0)
+	MDRV_CPU_PROGRAM_MAP(wink_map)
+	MDRV_CPU_IO_MAP(wink_io)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000 / 8)
-	MDRV_CPU_PROGRAM_MAP(wink_sound_map,0)
-	MDRV_CPU_IO_MAP(wink_sound_io,0)
+	MDRV_CPU_PROGRAM_MAP(wink_sound_map)
+	MDRV_CPU_IO_MAP(wink_sound_io)
 	MDRV_CPU_PERIODIC_INT(wink_sound, 15625)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)

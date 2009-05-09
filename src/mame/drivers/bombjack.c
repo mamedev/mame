@@ -321,12 +321,12 @@ static MACHINE_DRIVER_START( bombjack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz????? */
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
-	MDRV_CPU_IO_MAP(audio_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MDRV_CPU_IO_MAP(audio_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(bombjack)

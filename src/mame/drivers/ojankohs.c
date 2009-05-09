@@ -819,8 +819,8 @@ static MACHINE_DRIVER_START( ojankohs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ojankohs_map,0)
-	MDRV_CPU_IO_MAP(ojankohs_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ojankohs_map)
+	MDRV_CPU_IO_MAP(ojankohs_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
@@ -856,8 +856,8 @@ static MACHINE_DRIVER_START( ojankoy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ojankoy_map,0)
-	MDRV_CPU_IO_MAP(ojankoy_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ojankoy_map)
+	MDRV_CPU_IO_MAP(ojankoy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
@@ -894,8 +894,8 @@ static MACHINE_DRIVER_START( ccasino )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ojankoy_map,0)
-	MDRV_CPU_IO_MAP(ccasino_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ojankoy_map)
+	MDRV_CPU_IO_MAP(ccasino_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)
@@ -931,8 +931,8 @@ static MACHINE_DRIVER_START( ojankoc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(ojankoc_map,0)
-	MDRV_CPU_IO_MAP(ojankoc_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(ojankoc_map)
+	MDRV_CPU_IO_MAP(ojankoc_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(ojankohs)

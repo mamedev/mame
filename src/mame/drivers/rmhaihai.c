@@ -439,8 +439,8 @@ static MACHINE_DRIVER_START( rmhaihai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(rmhaihai_map,0)
-	MDRV_CPU_IO_MAP(rmhaihai_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(rmhaihai_map)
+	MDRV_CPU_IO_MAP(rmhaihai_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -486,8 +486,8 @@ static MACHINE_DRIVER_START( themj )
 	MDRV_IMPORT_FROM(rmhaihai)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(themj_map,0)
-	MDRV_CPU_IO_MAP(themj_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(themj_map)
+	MDRV_CPU_IO_MAP(themj_io_map)
 
 	MDRV_MACHINE_RESET(themj)
 

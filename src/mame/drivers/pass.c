@@ -244,12 +244,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( pass )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2 )
-	MDRV_CPU_PROGRAM_MAP(pass_map,0)
+	MDRV_CPU_PROGRAM_MAP(pass_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* all the same */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4 )
-	MDRV_CPU_PROGRAM_MAP(pass_sound_map,0)
-	MDRV_CPU_IO_MAP(pass_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pass_sound_map)
+	MDRV_CPU_IO_MAP(pass_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
 
 	/* video hardware */

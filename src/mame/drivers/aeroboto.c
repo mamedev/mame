@@ -236,11 +236,11 @@ static MACHINE_DRIVER_START( formatz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_10MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", aeroboto_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_10MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
     MDRV_MACHINE_START(formatz)

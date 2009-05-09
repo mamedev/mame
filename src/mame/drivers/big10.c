@@ -241,8 +241,8 @@ static MACHINE_DRIVER_START( big10 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_IO_MAP(main_io, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io)
 	MDRV_CPU_VBLANK_INT_HACK(big10_interrupt, 262)
 
 	MDRV_MACHINE_RESET(big10)

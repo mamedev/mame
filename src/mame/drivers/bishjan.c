@@ -825,7 +825,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 
 static MACHINE_DRIVER_START( bishjan )
 	MDRV_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
-	MDRV_CPU_PROGRAM_MAP( bishjan_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( bishjan_map)
 	MDRV_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -856,8 +856,8 @@ static INTERRUPT_GEN( saklove_interrupt )
 
 static MACHINE_DRIVER_START( saklove )
 	MDRV_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
-	MDRV_CPU_PROGRAM_MAP( saklove_map, 0 )
-	MDRV_CPU_IO_MAP( saklove_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( saklove_map)
+	MDRV_CPU_IO_MAP( saklove_io)
 	MDRV_CPU_VBLANK_INT( "screen", saklove_interrupt )
 
 	MDRV_MACHINE_RESET(saklove)

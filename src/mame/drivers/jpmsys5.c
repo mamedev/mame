@@ -597,7 +597,7 @@ static MACHINE_RESET( jpmsys5v )
 
 static MACHINE_DRIVER_START( jpmsys5v )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(68000_map, 0)
+	MDRV_CPU_PROGRAM_MAP(68000_map)
 
 	MDRV_ACIA6850_ADD("acia6850_0", acia0_if)
 	MDRV_ACIA6850_ADD("acia6850_1", acia1_if)

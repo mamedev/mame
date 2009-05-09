@@ -331,7 +331,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_DRIVER_START( chanbara )
 	MDRV_CPU_ADD("maincpu", M6809, 12000000/8)
-	MDRV_CPU_PROGRAM_MAP(memmap,0)
+	MDRV_CPU_PROGRAM_MAP(memmap)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -984,12 +984,12 @@ static MACHINE_DRIVER_START( nmg5 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(nmg5_map,0)
+	MDRV_CPU_PROGRAM_MAP(nmg5_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)		/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(nmg5_sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(nmg5_sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_MACHINE_START(nmg5)
 	MDRV_MACHINE_RESET(nmg5)
@@ -1025,10 +1025,10 @@ static MACHINE_DRIVER_START( garogun )
 	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pclubys_map,0)
+	MDRV_CPU_PROGRAM_MAP(pclubys_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_DRIVER_END
 
 
@@ -1037,10 +1037,10 @@ static MACHINE_DRIVER_START( pclubys )
 	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pclubys_map,0)
+	MDRV_CPU_PROGRAM_MAP(pclubys_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
 
 	MDRV_GFXDECODE(pclubys)
 MACHINE_DRIVER_END
@@ -1060,7 +1060,7 @@ static MACHINE_DRIVER_START( 7ordi )
 	MDRV_IMPORT_FROM(nmg5)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_DRIVER_END
 
 

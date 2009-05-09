@@ -917,11 +917,11 @@ static MACHINE_DRIVER_START( superman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(superman_map,0)
+	MDRV_CPU_PROGRAM_MAP(superman_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -957,11 +957,11 @@ static MACHINE_DRIVER_START( daisenpu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(daisenpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(daisenpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(daisenpu_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(daisenpu_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -994,11 +994,11 @@ static MACHINE_DRIVER_START( gigandes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(gigandes_map,0)
+	MDRV_CPU_PROGRAM_MAP(gigandes_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(ballbros_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ballbros_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -1033,11 +1033,11 @@ static MACHINE_DRIVER_START( ballbros )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(ballbros_map,0)
+	MDRV_CPU_PROGRAM_MAP(ballbros_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(ballbros_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(ballbros_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

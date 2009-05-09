@@ -2700,16 +2700,16 @@ static MACHINE_DRIVER_START( stv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(stv_mem)
 	MDRV_CPU_VBLANK_INT("screen",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(stv_mem)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
 	MDRV_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_mem)
 
 	MDRV_MACHINE_START(stv)
 	MDRV_MACHINE_RESET(stv)

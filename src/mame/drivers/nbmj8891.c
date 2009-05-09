@@ -2613,8 +2613,8 @@ static MACHINE_DRIVER_START( gionbana )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(gionbana_map, 0)
-	MDRV_CPU_IO_MAP(gionbana_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gionbana_map)
+	MDRV_CPU_IO_MAP(gionbana_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 132)    // nmiclock = 60
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
@@ -2649,8 +2649,8 @@ static MACHINE_DRIVER_START( mgion )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mgion_map,0)
-	MDRV_CPU_IO_MAP(mgion_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mgion_map)
+	MDRV_CPU_IO_MAP(mgion_io_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -2661,8 +2661,8 @@ static MACHINE_DRIVER_START( omotesnd )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(omotesnd_map,0)
-	MDRV_CPU_IO_MAP(omotesnd_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(omotesnd_map)
+	MDRV_CPU_IO_MAP(omotesnd_io_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
@@ -2679,7 +2679,7 @@ static MACHINE_DRIVER_START( mjcamerb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hanamomo_io_map, 0)
+	MDRV_CPU_IO_MAP(hanamomo_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // ?
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -2695,7 +2695,7 @@ static MACHINE_DRIVER_START( mmcamera )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hanamomo_io_map, 0)
+	MDRV_CPU_IO_MAP(hanamomo_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -2711,8 +2711,8 @@ static MACHINE_DRIVER_START( hanamomo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hanamomo_map, 0)
-	MDRV_CPU_IO_MAP(hanamomo_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hanamomo_map)
+	MDRV_CPU_IO_MAP(hanamomo_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	/* video hardware */
@@ -2727,8 +2727,8 @@ static MACHINE_DRIVER_START( msjiken )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hanamomo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gionbana_map, 0)
-	MDRV_CPU_IO_MAP(msjiken_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(gionbana_map)
+	MDRV_CPU_IO_MAP(msjiken_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 MACHINE_DRIVER_END
 
@@ -2773,7 +2773,7 @@ static MACHINE_DRIVER_START( mjnanpas )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(club90s_map, 0)
+	MDRV_CPU_PROGRAM_MAP(club90s_map)
 MACHINE_DRIVER_END
 
 
@@ -2782,8 +2782,8 @@ static MACHINE_DRIVER_START( maiko )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjnanpas)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(maiko_map, 0)
-	MDRV_CPU_IO_MAP(maiko_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(maiko_map)
+	MDRV_CPU_IO_MAP(maiko_io_map)
 MACHINE_DRIVER_END
 
 
@@ -2792,7 +2792,7 @@ static MACHINE_DRIVER_START( mmaiko )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(maiko)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(maiko_map, 0)
+	MDRV_CPU_PROGRAM_MAP(maiko_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -2803,8 +2803,8 @@ static MACHINE_DRIVER_START( lovehous )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjnanpas)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lovehous_map, 0)
-	MDRV_CPU_IO_MAP(lovehous_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lovehous_map)
+	MDRV_CPU_IO_MAP(lovehous_io_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -2815,7 +2815,7 @@ static MACHINE_DRIVER_START( hanaoji )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(maiko)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hanaoji_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hanaoji_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -2825,8 +2825,8 @@ static MACHINE_DRIVER_START( hnxmasev )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(maiko)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnxmasev_map, 0)
-	MDRV_CPU_IO_MAP(maiko_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hnxmasev_map)
+	MDRV_CPU_IO_MAP(maiko_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hnageman )
@@ -2834,8 +2834,8 @@ static MACHINE_DRIVER_START( hnageman )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(maiko)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnageman_map, 0)
-	MDRV_CPU_IO_MAP(maiko_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(hnageman_map)
+	MDRV_CPU_IO_MAP(maiko_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( scandal )
@@ -2843,8 +2843,8 @@ static MACHINE_DRIVER_START( scandal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hanamomo)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map, 0)
-	MDRV_CPU_IO_MAP(scandal_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(scandalm_map)
+	MDRV_CPU_IO_MAP(scandal_io_map)
 MACHINE_DRIVER_END
 
 
@@ -2853,8 +2853,8 @@ static MACHINE_DRIVER_START( bananadr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjnanpas)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map, 0)
-	MDRV_CPU_IO_MAP(bananadr_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(scandalm_map)
+	MDRV_CPU_IO_MAP(bananadr_io_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
@@ -2866,8 +2866,8 @@ static MACHINE_DRIVER_START( mjfocusm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map, 0)
-	MDRV_CPU_IO_MAP(scandalm_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(scandalm_map)
+	MDRV_CPU_IO_MAP(scandalm_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -2889,8 +2889,8 @@ static MACHINE_DRIVER_START( taiwanmb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(taiwanmb_map, 0)
-	MDRV_CPU_IO_MAP(taiwanmb_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(taiwanmb_map)
+	MDRV_CPU_IO_MAP(taiwanmb_io_map)
 //  MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)

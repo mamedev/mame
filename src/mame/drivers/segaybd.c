@@ -968,17 +968,17 @@ static MACHINE_DRIVER_START( yboard )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("subx", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(subx_map,0)
+	MDRV_CPU_PROGRAM_MAP(subx_map)
 
 	MDRV_CPU_ADD("suby", M68000, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(suby_map,0)
+	MDRV_CPU_PROGRAM_MAP(suby_map)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(yboard)
 	MDRV_NVRAM_HANDLER(yboard)

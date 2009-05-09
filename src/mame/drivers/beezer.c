@@ -76,11 +76,11 @@ static MACHINE_DRIVER_START( beezer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

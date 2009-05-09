@@ -367,16 +367,16 @@ static MACHINE_DRIVER_START( pipeline )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", Z80, 7372800/2)
-	MDRV_CPU_PROGRAM_MAP(cpu0_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(cpu0_mem)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 7372800/2)
 	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(cpu1_mem, 0)
-	MDRV_CPU_IO_MAP(sound_port, 0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_mem)
+	MDRV_CPU_IO_MAP(sound_port)
 
 	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
-	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mcu_mem)
 
 	MDRV_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audiocpu" */, ctc_intf )
 

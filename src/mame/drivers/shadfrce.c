@@ -513,11 +513,11 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( shadfrce )
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) 			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
+	MDRV_CPU_PROGRAM_MAP(shadfrce_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

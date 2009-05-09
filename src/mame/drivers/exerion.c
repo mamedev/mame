@@ -278,10 +278,10 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( exerion )
 
 	MDRV_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

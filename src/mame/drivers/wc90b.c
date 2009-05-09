@@ -386,15 +386,15 @@ static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(wc90b_map1,0)
+	MDRV_CPU_PROGRAM_MAP(wc90b_map1)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(wc90b_map2,0)
+	MDRV_CPU_PROGRAM_MAP(wc90b_map2)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_19_6608MHz/8)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */

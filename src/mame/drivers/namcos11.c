@@ -872,7 +872,7 @@ static MACHINE_RESET( namcos11 )
 static MACHINE_DRIVER_START( coh100 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( namcos11_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( namcos11_map)
 	MDRV_CPU_VBLANK_INT("screen", namcos11_vblank)
 
 	MDRV_MACHINE_RESET( namcos11 )

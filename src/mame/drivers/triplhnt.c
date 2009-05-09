@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( triplhnt )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 800000)
-	MDRV_CPU_PROGRAM_MAP(triplhnt_map, 0)
+	MDRV_CPU_PROGRAM_MAP(triplhnt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

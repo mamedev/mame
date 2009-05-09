@@ -306,8 +306,8 @@ static INTERRUPT_GEN( cabaret_interrupt )
 static MACHINE_DRIVER_START( cabaret )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(cabaret_map,0)
-	MDRV_CPU_IO_MAP(cabaret_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(cabaret_map)
+	MDRV_CPU_IO_MAP(cabaret_portmap)
 	MDRV_CPU_VBLANK_INT("screen",cabaret_interrupt)
 
 	MDRV_MACHINE_RESET(cabaret)

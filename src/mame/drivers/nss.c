@@ -412,10 +412,10 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( snes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
-	MDRV_CPU_PROGRAM_MAP(snes_map, 0)
+	MDRV_CPU_PROGRAM_MAP(snes_map)
 
 	MDRV_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
-	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(spc_mem)
 
 	MDRV_QUANTUM_TIME(HZ(24000))
 

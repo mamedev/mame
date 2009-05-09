@@ -1701,7 +1701,7 @@ static MACHINE_DRIVER_START( galaxian_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
-	MDRV_CPU_PROGRAM_MAP(galaxian_map,0)
+	MDRV_CPU_PROGRAM_MAP(galaxian_map)
 	MDRV_CPU_VBLANK_INT("screen", interrupt_gen)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -1747,8 +1747,8 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
 	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(frogger_sound_map,0)
-	MDRV_CPU_IO_MAP(frogger_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(frogger_sound_map)
+	MDRV_CPU_IO_MAP(frogger_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -1767,8 +1767,8 @@ static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
 	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
-	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(konami_sound_map)
+	MDRV_CPU_IO_MAP(konami_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -1836,7 +1836,7 @@ static MACHINE_DRIVER_START( mooncrst )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mooncrst_map,0)
+	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
 MACHINE_DRIVER_END
 
 
@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( jumpbug )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jumpbug_map,0)
+	MDRV_CPU_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1789750)
@@ -1860,8 +1860,8 @@ static MACHINE_DRIVER_START( checkman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 1620000)	/* 1.62 MHz */
-	MDRV_CPU_PROGRAM_MAP(checkman_sound_map,0)
-	MDRV_CPU_IO_MAP(checkman_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(checkman_sound_map)
+	MDRV_CPU_IO_MAP(checkman_sound_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
@@ -1875,7 +1875,7 @@ static MACHINE_DRIVER_START( checkmaj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 1620000)
-	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_map)
 
 	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "screen", 0, 8)
 
@@ -1891,8 +1891,8 @@ static MACHINE_DRIVER_START( mshuttle )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mshuttle_map,0)
-	MDRV_CPU_IO_MAP(mshuttle_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(mshuttle_map)
+	MDRV_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
@@ -1910,8 +1910,8 @@ static MACHINE_DRIVER_START( kingball )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80,5000000/2)
-	MDRV_CPU_PROGRAM_MAP(kingball_sound_map,0)
-	MDRV_CPU_IO_MAP(kingball_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(kingball_sound_map)
+	MDRV_CPU_IO_MAP(kingball_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -1925,7 +1925,7 @@ static MACHINE_DRIVER_START( frogger )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(frogger_map,0)
+	MDRV_CPU_PROGRAM_MAP(frogger_map)
 MACHINE_DRIVER_END
 
 
@@ -1935,7 +1935,7 @@ static MACHINE_DRIVER_START( froggrmc )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mooncrst_map,0)
+	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
 MACHINE_DRIVER_END
 
 
@@ -1945,7 +1945,7 @@ static MACHINE_DRIVER_START( froggers )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+	MDRV_CPU_PROGRAM_MAP(theend_map)
 MACHINE_DRIVER_END
 
 
@@ -1955,7 +1955,7 @@ static MACHINE_DRIVER_START( frogf )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(frogf_map,0)
+	MDRV_CPU_PROGRAM_MAP(frogf_map)
 MACHINE_DRIVER_END
 
 
@@ -1965,7 +1965,7 @@ static MACHINE_DRIVER_START( turtles )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(turtles_map,0)
+	MDRV_CPU_PROGRAM_MAP(turtles_map)
 MACHINE_DRIVER_END
 
 
@@ -1975,7 +1975,7 @@ static MACHINE_DRIVER_START( theend )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+	MDRV_CPU_PROGRAM_MAP(theend_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", theend_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
@@ -1988,7 +1988,7 @@ static MACHINE_DRIVER_START( scramble )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+	MDRV_CPU_PROGRAM_MAP(theend_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi8255_1_intf )
@@ -2000,12 +2000,12 @@ static MACHINE_DRIVER_START( explorer )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+	MDRV_CPU_PROGRAM_MAP(theend_map)
 
 	/* 2nd CPU to drive sound */
 	MDRV_CPU_ADD("audiocpu", Z80,KONAMI_SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
-	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(konami_sound_map)
+	MDRV_CPU_IO_MAP(konami_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -2042,12 +2042,12 @@ static MACHINE_DRIVER_START( sfx )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
+	MDRV_CPU_PROGRAM_MAP(sfx_map)
 
 	/* 3rd CPU for the sample player */
 	MDRV_CPU_ADD("audio2", Z80, KONAMI_SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
-	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(sfx_sample_map)
+	MDRV_CPU_IO_MAP(sfx_sample_portmap)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
@@ -2069,7 +2069,7 @@ static MACHINE_DRIVER_START( scobra )
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scobra_map,0)
+	MDRV_CPU_PROGRAM_MAP(scobra_map)
 MACHINE_DRIVER_END
 
 

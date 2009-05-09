@@ -239,7 +239,7 @@ static MACHINE_DRIVER_START( usg32 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(usgames_map,0)
+	MDRV_CPU_PROGRAM_MAP(usgames_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,5*60) /* ?? */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -271,7 +271,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( usg185 )
 	MDRV_IMPORT_FROM(usg32)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(usg185_map,0)
+	MDRV_CPU_PROGRAM_MAP(usg185_map)
 MACHINE_DRIVER_END
 
 

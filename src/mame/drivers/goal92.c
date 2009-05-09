@@ -309,11 +309,11 @@ static MACHINE_DRIVER_START( goal92 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(goal92_map,0)
+	MDRV_CPU_PROGRAM_MAP(goal92_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 								/* IRQs are triggered by the main CPU */
 
 	/* video hardware */

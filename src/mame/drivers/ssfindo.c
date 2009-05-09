@@ -599,7 +599,7 @@ static MACHINE_DRIVER_START( ssfindo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MDRV_CPU_PROGRAM_MAP(ssfindo_map,0)
+	MDRV_CPU_PROGRAM_MAP(ssfindo_map)
 
 	MDRV_CPU_VBLANK_INT("screen", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)
@@ -622,7 +622,7 @@ static MACHINE_DRIVER_START( ppcar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MDRV_CPU_PROGRAM_MAP(ppcar_map,0)
+	MDRV_CPU_PROGRAM_MAP(ppcar_map)
 
 	MDRV_CPU_VBLANK_INT("screen", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)

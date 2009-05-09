@@ -1022,7 +1022,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 
 static MACHINE_DRIVER_START( rabbit )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MDRV_CPU_PROGRAM_MAP(rabbit_map,0)
+	MDRV_CPU_PROGRAM_MAP(rabbit_map)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
 	/* (rabbit) */
 /*  lev 1 : 0x64 : 0000 027c -
@@ -1147,7 +1147,7 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 static MACHINE_DRIVER_START( tmmjprd )
 	MDRV_IMPORT_FROM(rabbit)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tmmjprd_map,0)
+	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
 	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
 
 	MDRV_VIDEO_START(tmmjprd)

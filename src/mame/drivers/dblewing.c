@@ -665,12 +665,12 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( dblewing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
-	MDRV_CPU_PROGRAM_MAP(dblewing_map,0)
+	MDRV_CPU_PROGRAM_MAP(dblewing_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

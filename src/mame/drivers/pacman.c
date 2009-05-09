@@ -1237,77 +1237,76 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(pacman_interrupt_vector_w)	/* Pac-Man only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vanvan_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( vanvan_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("namco", sn76496_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dremshpr_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dremshpr_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("namco", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( piranha_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( piranha_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(piranha_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmouse_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nmouse_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmouse_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( theglobp_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( theglobp_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(theglobp_decrypt_rom)	/* Switch protection logic */
+	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( acitya_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( acitya_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(acitya_decrypt_rom) /* Switch protection logic */
+	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mschamp_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( mschamp_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(mschamp_kludge_r)
+	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbucks_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bigbucks_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READ(bigbucks_question_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( drivfrcp_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READNOP
-	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( _8bpm_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READNOP
-	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
-	AM_RANGE(0xe0, 0xe0) AM_READNOP
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( porky_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("namco", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
+static ADDRESS_MAP_START( drivfrcp_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READNOP
+	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( _8bpm_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READNOP
+	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
+	AM_RANGE(0xe0, 0xe0) AM_READNOP
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_IMPORT_FROM(s2650games_writeport)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( porky_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_IMPORT_FROM(s2650games_writeport)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( crushs_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("namco", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
 
@@ -3174,8 +3173,8 @@ static MACHINE_DRIVER_START( pacman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(pacman_map,0)
-	MDRV_CPU_IO_MAP(0,writeport)
+	MDRV_CPU_PROGRAM_MAP(pacman_map)
+	MDRV_CPU_IO_MAP(writeport)
 	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 
@@ -3206,7 +3205,7 @@ static MACHINE_DRIVER_START( piranha )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(0,piranha_writeport)
+	MDRV_CPU_IO_MAP(piranha_portmap)
 MACHINE_DRIVER_END
 
 
@@ -3216,7 +3215,7 @@ static MACHINE_DRIVER_START( nmouse )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(0,nmouse_writeport)
+	MDRV_CPU_IO_MAP(nmouse_portmap)
 MACHINE_DRIVER_END
 
 
@@ -3226,7 +3225,7 @@ static MACHINE_DRIVER_START( mspacman )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mspacman_map,0)
+	MDRV_CPU_PROGRAM_MAP(mspacman_map)
 MACHINE_DRIVER_END
 
 
@@ -3236,7 +3235,7 @@ static MACHINE_DRIVER_START( woodpek )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(woodpek_map,0)
+	MDRV_CPU_PROGRAM_MAP(woodpek_map)
 
 MACHINE_DRIVER_END
 
@@ -3247,7 +3246,7 @@ static MACHINE_DRIVER_START( alibaba )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alibaba_map,0)
+	MDRV_CPU_PROGRAM_MAP(alibaba_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 
@@ -3258,8 +3257,8 @@ static MACHINE_DRIVER_START( dremshpr )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dremshpr_map,0)
-	MDRV_CPU_IO_MAP(0,dremshpr_writeport)
+	MDRV_CPU_PROGRAM_MAP(dremshpr_map)
+	MDRV_CPU_IO_MAP(dremshpr_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */
@@ -3274,8 +3273,8 @@ static MACHINE_DRIVER_START( theglobp )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map,0)
-	MDRV_CPU_IO_MAP(theglobp_readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(epos_map)
+	MDRV_CPU_IO_MAP(theglobp_portmap)
 
 	MDRV_MACHINE_RESET(theglobp)
 MACHINE_DRIVER_END
@@ -3287,8 +3286,8 @@ static MACHINE_DRIVER_START( acitya )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map,0)
-	MDRV_CPU_IO_MAP(acitya_readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(epos_map)
+	MDRV_CPU_IO_MAP(acitya_portmap)
 
 	MDRV_MACHINE_RESET(acitya)
 MACHINE_DRIVER_END
@@ -3300,8 +3299,8 @@ static MACHINE_DRIVER_START( vanvan )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vanvan_map,0)
-	MDRV_CPU_IO_MAP(0,vanvan_writeport)
+	MDRV_CPU_PROGRAM_MAP(vanvan_map)
+	MDRV_CPU_IO_MAP(vanvan_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -3322,8 +3321,8 @@ static MACHINE_DRIVER_START( bigbucks )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigbucks_map,0)
-	MDRV_CPU_IO_MAP(bigbucks_readport,0)
+	MDRV_CPU_PROGRAM_MAP(bigbucks_map)
+	MDRV_CPU_IO_MAP(bigbucks_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -3338,7 +3337,7 @@ static MACHINE_DRIVER_START( s2650games )
 
 	MDRV_CPU_REMOVE("maincpu")
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
-	MDRV_CPU_PROGRAM_MAP(s2650games_map,0)
+	MDRV_CPU_PROGRAM_MAP(s2650games_map)
 	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
 
 	MDRV_GFXDECODE(s2650games)
@@ -3363,7 +3362,7 @@ static MACHINE_DRIVER_START( drivfrcp )
 	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(drivfrcp_readport,s2650games_writeport)
+	MDRV_CPU_IO_MAP(drivfrcp_portmap)
 MACHINE_DRIVER_END
 
 
@@ -3373,7 +3372,7 @@ static MACHINE_DRIVER_START( 8bpm )
 	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(_8bpm_readport,s2650games_writeport)
+	MDRV_CPU_IO_MAP(_8bpm_portmap)
 MACHINE_DRIVER_END
 
 
@@ -3383,7 +3382,7 @@ static MACHINE_DRIVER_START( porky )
 	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(porky_readport,s2650games_writeport)
+	MDRV_CPU_IO_MAP(porky_portmap)
 MACHINE_DRIVER_END
 
 
@@ -3393,7 +3392,7 @@ static MACHINE_DRIVER_START( rocktrv2 )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rocktrv2_map,0)
+	MDRV_CPU_PROGRAM_MAP(rocktrv2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -3407,8 +3406,8 @@ static MACHINE_DRIVER_START( mschamp )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mschamp_map,0)
-	MDRV_CPU_IO_MAP(mschamp_readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(mschamp_map)
+	MDRV_CPU_IO_MAP(mschamp_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(mschamp)
@@ -3439,8 +3438,8 @@ static MACHINE_DRIVER_START( crushs )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(crushs_map,0)
-	MDRV_CPU_IO_MAP(crushs_readport,crushs_writeport)
+	MDRV_CPU_PROGRAM_MAP(crushs_map)
+	MDRV_CPU_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("namco", AY8912, 1789750)

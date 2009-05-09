@@ -1781,11 +1781,11 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( system24 )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq_vbl, 2)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

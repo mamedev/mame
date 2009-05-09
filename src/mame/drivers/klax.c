@@ -159,7 +159,7 @@ static MACHINE_DRIVER_START( klax )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(klax_map,0)
+	MDRV_CPU_PROGRAM_MAP(klax_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(klax)

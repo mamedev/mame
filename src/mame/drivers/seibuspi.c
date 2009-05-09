@@ -1850,11 +1850,11 @@ static MACHINE_DRIVER_START( spi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 50000000/2)	/* Intel 386DX, 25MHz */
-	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
+	MDRV_CPU_PROGRAM_MAP(spi_map)
 	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 28636360/4)
-	MDRV_CPU_PROGRAM_MAP(spisound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(spisound_map)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -2168,7 +2168,7 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 40000000)	/* AMD 386DX, 40MHz */
-	MDRV_CPU_PROGRAM_MAP(seibu386_map, 0)
+	MDRV_CPU_PROGRAM_MAP(seibu386_map)
 	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
 	MDRV_NVRAM_HANDLER(sxx2f)
@@ -2223,7 +2223,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 25000000)	/* 25mhz */
-	MDRV_CPU_PROGRAM_MAP(sys386f2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sys386f2_map)
 	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
 	/* no z80? */

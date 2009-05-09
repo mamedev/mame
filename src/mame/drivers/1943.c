@@ -249,11 +249,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 1943 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(c1943_map, 0)
+	MDRV_CPU_PROGRAM_MAP(c1943_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware

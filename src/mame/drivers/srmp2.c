@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( srmp2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(srmp2_map,0)
+	MDRV_CPU_PROGRAM_MAP(srmp2_map)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)
@@ -1065,8 +1065,8 @@ static MACHINE_DRIVER_START( srmp3 )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(srmp3_map,0)
-	MDRV_CPU_IO_MAP(srmp3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(srmp3_map)
+	MDRV_CPU_IO_MAP(srmp3_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(srmp3)
@@ -1103,7 +1103,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjyuugi_map,0)
+	MDRV_CPU_PROGRAM_MAP(mjyuugi_map)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)

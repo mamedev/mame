@@ -525,12 +525,12 @@ static MACHINE_DRIVER_START( tigeroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_port_map)
 
 	/* IRQs are triggered by the YM2203 */
 
@@ -570,8 +570,8 @@ static MACHINE_DRIVER_START( toramich )
 	MDRV_IMPORT_FROM(tigeroad)
 
 	MDRV_CPU_ADD("sample", Z80, 3579545) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sample_map,0)
-	MDRV_CPU_IO_MAP(sample_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(sample_map)
+	MDRV_CPU_IO_MAP(sample_port_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
 
 	/* sound hardware */

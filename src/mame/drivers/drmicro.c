@@ -214,8 +214,8 @@ static MACHINE_DRIVER_START( drmicro )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
-	MDRV_CPU_PROGRAM_MAP(drmicro_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(drmicro_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", drmicro_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(60))

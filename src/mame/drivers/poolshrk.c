@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( poolshrk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MDRV_CPU_PROGRAM_MAP(poolshrk_cpu_map, 0)
+	MDRV_CPU_PROGRAM_MAP(poolshrk_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */

@@ -305,11 +305,11 @@ static MACHINE_DRIVER_START( rng )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(rungun_map,0)
+	MDRV_CPU_PROGRAM_MAP(rungun_map)
 	MDRV_CPU_VBLANK_INT("screen", rng_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
-	MDRV_CPU_PROGRAM_MAP(rungun_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rungun_sound_map)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // higher if sound stutters

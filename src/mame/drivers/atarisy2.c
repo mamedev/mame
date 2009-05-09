@@ -1145,11 +1145,11 @@ static MACHINE_DRIVER_START( atarisy2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
 	MDRV_CPU_CONFIG(t11_data)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
 	MDRV_CPU_ADD("soundcpu", M6502, SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
 
 	MDRV_MACHINE_START(atarisy2)

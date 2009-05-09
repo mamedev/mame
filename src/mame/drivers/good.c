@@ -257,7 +257,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( good )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 /2)
-	MDRV_CPU_PROGRAM_MAP(good_map,0)
+	MDRV_CPU_PROGRAM_MAP(good_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_GFXDECODE(good)

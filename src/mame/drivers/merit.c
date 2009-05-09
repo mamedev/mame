@@ -1175,8 +1175,8 @@ static MACHINE_START(casino5)
 
 static MACHINE_DRIVER_START( pitboss )
 	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pitboss_map)
+	MDRV_CPU_IO_MAP(trvwhiz_io_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -1204,7 +1204,7 @@ static MACHINE_DRIVER_START( casino5 )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(casino5_map, 0)
+	MDRV_CPU_PROGRAM_MAP(casino5_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -1215,8 +1215,8 @@ static MACHINE_DRIVER_START( bigappg )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigappg_map,0)
-	MDRV_CPU_IO_MAP(tictac_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bigappg_map)
+	MDRV_CPU_IO_MAP(tictac_io_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
@@ -1225,7 +1225,7 @@ static MACHINE_DRIVER_START( dodge )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dodge_map,0)
+	MDRV_CPU_PROGRAM_MAP(dodge_map)
 
 	MDRV_NVRAM_HANDLER(dodge)
 MACHINE_DRIVER_END
@@ -1234,40 +1234,40 @@ static MACHINE_DRIVER_START( tictac )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tictac_map,0)
-	MDRV_CPU_IO_MAP(tictac_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tictac_map)
+	MDRV_CPU_IO_MAP(tictac_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trvwhiz )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhiz_map,0)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(trvwhiz_map)
+	MDRV_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( phrcraze )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(phrcraze_map,0)
-	MDRV_CPU_IO_MAP(phrcraze_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(phrcraze_map)
+	MDRV_CPU_IO_MAP(phrcraze_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trvwhziv )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhziv_map,0)
-	MDRV_CPU_IO_MAP(tictac_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(trvwhziv_map)
+	MDRV_CPU_IO_MAP(tictac_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( couple )
 	MDRV_IMPORT_FROM(pitboss)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(couple_map,0)
-	MDRV_CPU_IO_MAP(tictac_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(couple_map)
+	MDRV_CPU_IO_MAP(tictac_io_map)
 
 	MDRV_DEVICE_MODIFY("ppi8255_0")
 	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[0])

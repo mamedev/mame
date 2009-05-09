@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( gridlee )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map)
 
     MDRV_MACHINE_START(gridlee)
 	MDRV_MACHINE_RESET(gridlee)

@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START( naughtyb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MDRV_CPU_PROGRAM_MAP(naughtyb_map,0)
+	MDRV_CPU_PROGRAM_MAP(naughtyb_map)
 	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MDRV_CPU_PROGRAM_MAP(popflame_map,0)
+	MDRV_CPU_PROGRAM_MAP(popflame_map)
 	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */

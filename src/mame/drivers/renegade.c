@@ -781,11 +781,11 @@ static MACHINE_DRIVER_START( renegade )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */
-	MDRV_CPU_PROGRAM_MAP(renegade_map,0)
+	MDRV_CPU_PROGRAM_MAP(renegade_map)
 	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 12000000/8)
-	MDRV_CPU_PROGRAM_MAP(renegade_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(renegade_sound_map)
 								/* IRQs are caused by the main CPU */
 	MDRV_MACHINE_START(renegade)
 	MDRV_MACHINE_RESET(renegade)

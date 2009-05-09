@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( invadpt2 )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(invadpt2_io_map,0)
+    MDRV_CPU_IO_MAP(invadpt2_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
     /* 60 Hz signal clocks two LS161. Ripple carry will */
@@ -299,7 +299,7 @@ static MACHINE_DRIVER_START( spcewars )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(spcewars_io_map,0)
+	MDRV_CPU_IO_MAP(spcewars_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
@@ -371,7 +371,7 @@ static MACHINE_DRIVER_START( astropal )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(invaders)
     MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(astropal_io_map, 0)
+	MDRV_CPU_IO_MAP(astropal_io_map)
 
 MACHINE_DRIVER_END
 
@@ -421,8 +421,8 @@ static MACHINE_DRIVER_START( cosmo )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cosmo_map, 0)
-	MDRV_CPU_IO_MAP(cosmo_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(cosmo_map)
+	MDRV_CPU_IO_MAP(cosmo_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
     /* video hardware */
@@ -544,7 +544,7 @@ static MACHINE_DRIVER_START( invrvnge )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(invrvnge_io_map,0)
+	MDRV_CPU_IO_MAP(invrvnge_io_map)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -647,7 +647,7 @@ static MACHINE_DRIVER_START( lrescue )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(lrescue_io_map,0)
+	MDRV_CPU_IO_MAP(lrescue_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -792,8 +792,8 @@ static MACHINE_DRIVER_START( rollingc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rollingc_map,0)
-	MDRV_CPU_IO_MAP(rollingc_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(rollingc_map)
+	MDRV_CPU_IO_MAP(rollingc_io_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(rollingc)
@@ -891,8 +891,8 @@ static MACHINE_DRIVER_START( schaser )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",8080,1996800)        /* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
-	MDRV_CPU_IO_MAP(schaser_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(schaser_map)
+	MDRV_CPU_IO_MAP(schaser_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
 	MDRV_MACHINE_START(schaser)
 	MDRV_MACHINE_RESET(schaser)
@@ -959,8 +959,8 @@ static MACHINE_DRIVER_START( schasrcv )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
-	MDRV_CPU_IO_MAP(schasrcv_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(schaser_map)
+	MDRV_CPU_IO_MAP(schasrcv_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( sflush )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",M6800,2000000)        /* ?? */
-	MDRV_CPU_PROGRAM_MAP(sflush_map,0)
+	MDRV_CPU_PROGRAM_MAP(sflush_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
     MDRV_MACHINE_START(sflush)
 
@@ -1120,8 +1120,8 @@ static MACHINE_DRIVER_START( lupin3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
-	MDRV_CPU_IO_MAP(lupin3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(schaser_map)
+	MDRV_CPU_IO_MAP(lupin3_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -1245,8 +1245,8 @@ static MACHINE_DRIVER_START( polaris )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",8080,1996800)        /* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
-	MDRV_CPU_IO_MAP(polaris_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(schaser_map)
+	MDRV_CPU_IO_MAP(polaris_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
 	MDRV_CPU_VBLANK_INT("screen", polaris_interrupt)
     MDRV_MACHINE_START(polaris)
@@ -1371,7 +1371,7 @@ static MACHINE_DRIVER_START( ballbomb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(ballbomb_io_map,0)
+	MDRV_CPU_IO_MAP(ballbomb_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -1445,8 +1445,8 @@ static MACHINE_DRIVER_START( yosakdon )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yosakdon_map,0)
-	MDRV_CPU_IO_MAP(yosakdon_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(yosakdon_map)
+	MDRV_CPU_IO_MAP(yosakdon_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
@@ -1543,7 +1543,7 @@ static MACHINE_DRIVER_START( indianbt )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(indianbt_io_map,0)
+	MDRV_CPU_IO_MAP(indianbt_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -1640,8 +1640,8 @@ static MACHINE_DRIVER_START( shuttlei )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(shuttlei_map,0)
-	MDRV_CPU_IO_MAP(shuttlei_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(shuttlei_map)
+	MDRV_CPU_IO_MAP(shuttlei_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -1750,8 +1750,8 @@ static MACHINE_DRIVER_START( darthvdr )
     /* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(darthvdr_map,0)
-	MDRV_CPU_IO_MAP(darthvdr_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(darthvdr_map)
+	MDRV_CPU_IO_MAP(darthvdr_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(darthvdr)

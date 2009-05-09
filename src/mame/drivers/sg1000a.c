@@ -266,8 +266,8 @@ static const ppi8255_interface ppi8255_intf =
 static MACHINE_DRIVER_START( sg1000a )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(program_map, 0)
-	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(program_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", sg1000a_interrupt)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )

@@ -249,12 +249,12 @@ static INTERRUPT_GEN( darkmist_interrupt )
 static MACHINE_DRIVER_START( darkmist )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(memmap)
 	MDRV_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
 
 	MDRV_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
-	MDRV_CPU_IO_MAP(t5182_io, 0)
+	MDRV_CPU_PROGRAM_MAP(t5182_map)
+	MDRV_CPU_IO_MAP(t5182_io)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

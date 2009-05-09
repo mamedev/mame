@@ -613,11 +613,11 @@ static MACHINE_DRIVER_START( fastfred )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(fastfred_map,0)
+	MDRV_CPU_PROGRAM_MAP(fastfred_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
@@ -650,7 +650,7 @@ static MACHINE_DRIVER_START( jumpcoas )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jumpcoas_map,0)
+	MDRV_CPU_PROGRAM_MAP(jumpcoas_map)
 
 	MDRV_CPU_REMOVE("audiocpu")
 
@@ -666,7 +666,7 @@ static MACHINE_DRIVER_START( imago )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(imago_map,0)
+	MDRV_CPU_PROGRAM_MAP(imago_map)
 
 	MDRV_MACHINE_START(imago)
 

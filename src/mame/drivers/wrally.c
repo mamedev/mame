@@ -248,13 +248,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(wrally_map, 0)
+	MDRV_CPU_PROGRAM_MAP(wrally_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
-	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
-	MDRV_CPU_IO_MAP(dallas_ram, 0)
+	MDRV_CPU_PROGRAM_MAP(dallas_rom)
+	MDRV_CPU_IO_MAP(dallas_ram)
 
 	MDRV_QUANTUM_TIME(HZ(38400))					/* heavy sync */
 

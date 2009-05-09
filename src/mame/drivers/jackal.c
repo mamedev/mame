@@ -252,11 +252,11 @@ static INTERRUPT_GEN( jackal_interrupt )
 static MACHINE_DRIVER_START( jackal )
 	// basic machine hardware
 	MDRV_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
-	MDRV_CPU_PROGRAM_MAP(master_map, 0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_VBLANK_INT("screen", jackal_interrupt)
 
 	MDRV_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
-	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

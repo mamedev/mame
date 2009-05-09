@@ -299,12 +299,12 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_DRIVER_START( suprslam )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(suprslam_map,0)
+	MDRV_CPU_PROGRAM_MAP(suprslam_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_GFXDECODE(suprslam)
 

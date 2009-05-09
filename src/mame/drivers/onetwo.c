@@ -279,13 +279,13 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( onetwo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
-	MDRV_CPU_IO_MAP(main_cpu_io,0)
+	MDRV_CPU_PROGRAM_MAP(main_cpu)
+	MDRV_CPU_IO_MAP(main_cpu_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-	MDRV_CPU_IO_MAP(sound_cpu_io,0)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu)
+	MDRV_CPU_IO_MAP(sound_cpu_io)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

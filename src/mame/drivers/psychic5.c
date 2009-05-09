@@ -681,12 +681,12 @@ static MACHINE_DRIVER_START( psychic5 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
-	MDRV_CPU_PROGRAM_MAP(psychic5_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(psychic5_main_map)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
-	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map,0)
-	MDRV_CPU_IO_MAP(psychic5_soundport_map,0)
+	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map)
+	MDRV_CPU_IO_MAP(psychic5_soundport_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
 	MDRV_MACHINE_RESET(psychic5)
@@ -728,12 +728,12 @@ static MACHINE_DRIVER_START( bombsa )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(bombsa_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(bombsa_main_map)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
-	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map,0)
-	MDRV_CPU_IO_MAP(bombsa_soundport_map,0)
+	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map)
+	MDRV_CPU_IO_MAP(bombsa_soundport_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_MACHINE_RESET(psychic5)

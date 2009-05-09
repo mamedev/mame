@@ -1794,11 +1794,11 @@ static MACHINE_DRIVER_START( nomcu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(taitosj_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
@@ -1852,10 +1852,10 @@ static MACHINE_DRIVER_START( mcu )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nomcu)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
 	MDRV_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map,0)
+	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
@@ -1866,7 +1866,7 @@ static MACHINE_DRIVER_START( kikstart )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mcu)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kikstart_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(kikstart_main_map)
 
 	MDRV_VIDEO_UPDATE(kikstart)
 MACHINE_DRIVER_END

@@ -173,8 +173,8 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mogura )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(mogura_map,0)
-	MDRV_CPU_IO_MAP(mogura_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mogura_map)
+	MDRV_CPU_IO_MAP(mogura_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_GFXDECODE(mogura)

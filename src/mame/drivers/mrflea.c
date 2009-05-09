@@ -228,13 +228,13 @@ static MACHINE_DRIVER_START( mrflea )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(mrflea_master_map,0)
-	MDRV_CPU_IO_MAP(mrflea_master_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrflea_master_map)
+	MDRV_CPU_IO_MAP(mrflea_master_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD("sub", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(mrflea_slave_map,0)
-	MDRV_CPU_IO_MAP(mrflea_slave_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrflea_slave_map)
+	MDRV_CPU_IO_MAP(mrflea_slave_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(mrflea_slave_interrupt,2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

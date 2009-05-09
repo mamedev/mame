@@ -231,11 +231,11 @@ static MACHINE_DRIVER_START( gbusters )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
-	MDRV_CPU_PROGRAM_MAP(gbusters_map,0)
+	MDRV_CPU_PROGRAM_MAP(gbusters_map)
 	MDRV_CPU_VBLANK_INT("screen", gbusters_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(gbusters_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(gbusters_sound_map)
 
 	MDRV_MACHINE_RESET(gbusters)
 

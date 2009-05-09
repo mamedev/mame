@@ -366,12 +366,12 @@ static MACHINE_RESET( egghunt )
 static MACHINE_DRIVER_START( egghunt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz ?*/
-	MDRV_CPU_PROGRAM_MAP(egghunt_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(egghunt_map)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // or 2 like mitchell.c?
 
 	MDRV_CPU_ADD("audiocpu", Z80,12000000/2)		 /* 6 MHz ?*/
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(egghunt)
 

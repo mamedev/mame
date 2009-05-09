@@ -512,8 +512,8 @@ static MACHINE_DRIVER_START( destryer )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MDRV_CPU_PROGRAM_MAP(destryer_map, 0)
-	MDRV_CPU_IO_MAP(destryer_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(destryer_map)
+	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -529,8 +529,8 @@ static MACHINE_DRIVER_START( destryea )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MDRV_CPU_PROGRAM_MAP(destryea_map, 0)
-	MDRV_CPU_IO_MAP(destryer_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(destryea_map)
+	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -547,8 +547,8 @@ static MACHINE_DRIVER_START( altair )
 	/* basic system hardware */
 
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
-	MDRV_CPU_PROGRAM_MAP(altair_map, 0)
-	MDRV_CPU_IO_MAP(altair_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(altair_map)
+	MDRV_CPU_IO_MAP(altair_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 
 	MDRV_MACHINE_START(cidelsa)
@@ -569,8 +569,8 @@ static MACHINE_DRIVER_START( draco )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
-	MDRV_CPU_PROGRAM_MAP(draco_map, 0)
-	MDRV_CPU_IO_MAP(draco_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(draco_map)
+	MDRV_CPU_IO_MAP(draco_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -578,8 +578,8 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_MACHINE_RESET(cidelsa)
 
 	MDRV_CPU_ADD("audiocpu", COP402, DRACO_SND_CHR1) // COP402N
-	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
-	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(draco_sound_map)
+	MDRV_CPU_IO_MAP(draco_sound_io_map)
 	MDRV_CPU_CONFIG(draco_cop_intf)
 
 	/* input/output hardware */

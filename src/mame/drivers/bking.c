@@ -432,12 +432,12 @@ static MACHINE_DRIVER_START( bking )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(bking_map,0)
-	MDRV_CPU_IO_MAP(bking_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bking_map)
+	MDRV_CPU_IO_MAP(bking_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(bking_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
 	/* - NMI triggered by the main CPU */
@@ -477,10 +477,10 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_IMPORT_FROM(bking)
 
 	MDRV_CPU_MODIFY("main_cpu")
-	MDRV_CPU_IO_MAP(bking3_io_map,0)
+	MDRV_CPU_IO_MAP(bking3_io_map)
 
 	MDRV_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
+	MDRV_CPU_PROGRAM_MAP(m68705_map)
 
 	MDRV_MACHINE_RESET(buggychl)
 

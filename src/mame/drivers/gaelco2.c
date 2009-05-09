@@ -158,7 +158,7 @@ static const gaelcosnd_interface maniacsq_snd_interface =
 static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)		/* 13 MHz? */
-	MDRV_CPU_PROGRAM_MAP(maniacsq_map,0)
+	MDRV_CPU_PROGRAM_MAP(maniacsq_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -277,7 +277,7 @@ static const gaelcosnd_interface bang_snd_interface =
 static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
-	MDRV_CPU_PROGRAM_MAP(bang_map,0)
+	MDRV_CPU_PROGRAM_MAP(bang_map)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
@@ -472,7 +472,7 @@ static const gaelcosnd_interface alighunt_snd_interface =
 static MACHINE_DRIVER_START( alighunt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)			/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(alighunt_map,0)
+	MDRV_CPU_PROGRAM_MAP(alighunt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -715,7 +715,7 @@ static const gaelcosnd_interface touchgo_snd_interface =
 static MACHINE_DRIVER_START( touchgo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)			/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(touchgo_map,0)
+	MDRV_CPU_PROGRAM_MAP(touchgo_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
 	/* video hardware */
@@ -908,7 +908,7 @@ static const gaelcosnd_interface snowboar_snd_interface =
 static MACHINE_DRIVER_START( snowboar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
-	MDRV_CPU_PROGRAM_MAP(snowboar_map,0)
+	MDRV_CPU_PROGRAM_MAP(snowboar_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
@@ -1150,7 +1150,7 @@ static const gaelcosnd_interface wrally2_snd_interface =
 static MACHINE_DRIVER_START( wrally2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)			/* 13 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrally2_map,0)
+	MDRV_CPU_PROGRAM_MAP(wrally2_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)

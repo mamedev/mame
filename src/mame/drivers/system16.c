@@ -408,8 +408,8 @@ static MACHINE_DRIVER_START( system16 )
 	MDRV_CPU_VBLANK_INT("screen", sys16_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -440,8 +440,8 @@ static MACHINE_DRIVER_START( system16_7759 )
 	MDRV_IMPORT_FROM(system16)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(sound_7759_map,0)
-	MDRV_CPU_IO_MAP(sound_7759_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_7759_map)
+	MDRV_CPU_IO_MAP(sound_7759_io_map)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
@@ -682,7 +682,7 @@ static MACHINE_DRIVER_START( bayroute )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bayroute_map,0)
+	MDRV_CPU_PROGRAM_MAP(bayroute_map)
 
 	MDRV_MACHINE_RESET(bayroute)
 MACHINE_DRIVER_END
@@ -817,7 +817,7 @@ static MACHINE_DRIVER_START( dduxbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dduxbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(dduxbl_map)
 
 	MDRV_MACHINE_RESET(dduxbl)
 MACHINE_DRIVER_END
@@ -936,7 +936,7 @@ static MACHINE_DRIVER_START( eswatbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(eswatbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(eswatbl_map)
 
 	MDRV_MACHINE_RESET(eswatbl)
 MACHINE_DRIVER_END
@@ -1121,10 +1121,10 @@ static MACHINE_DRIVER_START( fpointbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fpointbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(fpointbl_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(fpointbl_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(fpointbl_sound_map)
 
 	MDRV_MACHINE_RESET(fpointbl)
 MACHINE_DRIVER_END
@@ -1269,7 +1269,7 @@ static MACHINE_DRIVER_START( goldnaxe )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(goldnaxe_map,0)
+	MDRV_CPU_PROGRAM_MAP(goldnaxe_map)
 
 	MDRV_MACHINE_RESET(goldnaxe)
 MACHINE_DRIVER_END
@@ -1523,7 +1523,7 @@ static MACHINE_DRIVER_START( passsht )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(passsht_map,0)
+	MDRV_CPU_PROGRAM_MAP(passsht_map)
 
 	MDRV_MACHINE_RESET(passsht)
 MACHINE_DRIVER_END
@@ -1534,7 +1534,7 @@ static MACHINE_DRIVER_START( passht4b )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(passht4b_map,0)
+	MDRV_CPU_PROGRAM_MAP(passht4b_map)
 
 	MDRV_MACHINE_RESET(passht4b)
 MACHINE_DRIVER_END
@@ -1627,7 +1627,7 @@ static MACHINE_DRIVER_START( shinob2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(shinobl_map,0)
+	MDRV_CPU_PROGRAM_MAP(shinobl_map)
 
 	MDRV_MACHINE_RESET(shinobl)
 MACHINE_DRIVER_END
@@ -1758,7 +1758,7 @@ static MACHINE_DRIVER_START( tetrisbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tetrisbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(tetrisbl_map)
 
 	MDRV_MACHINE_RESET(tetrisbl)
 MACHINE_DRIVER_END
@@ -1768,7 +1768,7 @@ static MACHINE_DRIVER_START( beautyb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(beautyb_map, 0)
+	MDRV_CPU_PROGRAM_MAP(beautyb_map)
 
 	MDRV_MACHINE_RESET(tetrisbl)
 MACHINE_DRIVER_END
@@ -1930,11 +1930,11 @@ static MACHINE_DRIVER_START( tturfbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tturfbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(tturfbl_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(tturfbl_sound_map,0)
-	MDRV_CPU_IO_MAP(tturfbl_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(tturfbl_sound_map)
+	MDRV_CPU_IO_MAP(tturfbl_sound_io_map)
 
 	MDRV_SOUND_REMOVE("7759")
 	MDRV_SOUND_ADD("5205", MSM5205, 220000)
@@ -2064,7 +2064,7 @@ static MACHINE_DRIVER_START( wb3bbl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wb3bbl_map,0)
+	MDRV_CPU_PROGRAM_MAP(wb3bbl_map)
 
 	MDRV_MACHINE_RESET(wb3bbl)
 MACHINE_DRIVER_END

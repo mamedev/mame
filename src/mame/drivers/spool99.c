@@ -266,7 +266,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( spool99 )
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/8)
-	MDRV_CPU_PROGRAM_MAP(0,spool99_map)
+	MDRV_CPU_PROGRAM_MAP(spool99_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_GFXDECODE(spool99)

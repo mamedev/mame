@@ -1411,13 +1411,13 @@ static MACHINE_DRIVER_START( hardhead )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)			/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_map,0)
-	MDRV_CPU_IO_MAP(hardhead_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hardhead_map)
+	MDRV_CPU_IO_MAP(hardhead_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* No NMI */
 
 	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map,0)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
@@ -1477,12 +1477,12 @@ static MACHINE_DRIVER_START( rranger )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(rranger_map,0)
-	MDRV_CPU_IO_MAP(rranger_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(rranger_map)
+	MDRV_CPU_IO_MAP(rranger_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ & NMI ! */
 
 	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(rranger_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rranger_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
 	/* video hardware */
@@ -1539,16 +1539,16 @@ static MACHINE_DRIVER_START( brickzn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
-	MDRV_CPU_PROGRAM_MAP(brickzn_map,0)
+	MDRV_CPU_PROGRAM_MAP(brickzn_map)
 //  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
 	MDRV_CPU_ADD("soundcpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
-	MDRV_CPU_PROGRAM_MAP(brickzn_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(brickzn_sound_map)
 
 	MDRV_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
-	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_map,0)
-	MDRV_CPU_IO_MAP(brickzn_pcm_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_map)
+	MDRV_CPU_IO_MAP(brickzn_pcm_io_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1615,7 +1615,7 @@ static MACHINE_DRIVER_START( hardhea2 )
 
 	MDRV_IMPORT_FROM( brickzn )
 	MDRV_CPU_MODIFY("maincpu")			/* SUNA T568009 */
-	MDRV_CPU_PROGRAM_MAP(hardhea2_map,0)
+	MDRV_CPU_PROGRAM_MAP(hardhea2_map)
 	MDRV_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
 
 	MDRV_MACHINE_RESET(hardhea2)
@@ -1641,13 +1641,13 @@ static MACHINE_DRIVER_START( starfigh )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(starfigh_map,0)
+	MDRV_CPU_PROGRAM_MAP(starfigh_map)
 	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
 	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map,0)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
@@ -1700,12 +1700,12 @@ static MACHINE_DRIVER_START( sparkman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(sparkman_map,0)
+	MDRV_CPU_PROGRAM_MAP(sparkman_map)
 	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 
 	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map,0)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */

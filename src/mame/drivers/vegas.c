@@ -2212,7 +2212,7 @@ static MACHINE_DRIVER_START( vegascore )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*2)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb,0)
+	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MDRV_MACHINE_START(vegas)
 	MDRV_MACHINE_RESET(vegas)
@@ -2259,7 +2259,7 @@ static MACHINE_DRIVER_START( vegas32m )
 	MDRV_IMPORT_FROM(dcs2_audio_dsio)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
+	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
 MACHINE_DRIVER_END
 
 
@@ -2268,7 +2268,7 @@ static MACHINE_DRIVER_START( vegasban )
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
+	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "screen")
@@ -2293,7 +2293,7 @@ static MACHINE_DRIVER_START( denver )
 	MDRV_IMPORT_FROM(dcs2_audio_denver)
 
 	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
+	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")

@@ -595,7 +595,7 @@ static MACHINE_DRIVER_START(viper)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MPC8240, 200000000)
 	MDRV_CPU_CONFIG(viper_ppc_cfg)
-	MDRV_CPU_PROGRAM_MAP(viper_map, 0)
+	MDRV_CPU_PROGRAM_MAP(viper_map)
 	MDRV_CPU_VBLANK_INT("screen", viper_vblank)
 
 	MDRV_MACHINE_RESET(viper)

@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( skyraid )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 12)
-	MDRV_CPU_PROGRAM_MAP(skyraid_map, 0)
+	MDRV_CPU_PROGRAM_MAP(skyraid_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

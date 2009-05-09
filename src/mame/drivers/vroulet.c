@@ -260,8 +260,8 @@ static const ppi8255_interface ppi8255_intf[2] =
 static MACHINE_DRIVER_START( vroulet )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	//???
-	MDRV_CPU_PROGRAM_MAP(vroulet_map, 0)
-	MDRV_CPU_IO_MAP(vroulet_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(vroulet_map)
+	MDRV_CPU_IO_MAP(vroulet_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)

@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( beathead )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(beathead)
 	MDRV_NVRAM_HANDLER(generic_1fill)

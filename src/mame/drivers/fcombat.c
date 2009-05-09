@@ -280,10 +280,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( fcombat )
 
 	MDRV_CPU_ADD("maincpu", Z80, 10000000/3)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 10000000/3)
-	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

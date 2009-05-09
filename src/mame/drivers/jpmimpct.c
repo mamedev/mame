@@ -845,11 +845,11 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( jpmimpct )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(m68k_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 
  	MDRV_CPU_ADD("dsp", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(tms_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(tms_program_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 	MDRV_MACHINE_RESET(jpmimpct)
@@ -1316,7 +1316,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( impctawp )
 	MDRV_CPU_ADD("maincpu",M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(awp68k_program_map, 0)
+	MDRV_CPU_PROGRAM_MAP(awp68k_program_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 

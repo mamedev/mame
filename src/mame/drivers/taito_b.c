@@ -2142,11 +2142,11 @@ static MACHINE_DRIVER_START( rastsag2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(rastsag2_map,0)
+	MDRV_CPU_PROGRAM_MAP(rastsag2_map)
 	MDRV_CPU_VBLANK_INT("screen", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2180,11 +2180,11 @@ static MACHINE_DRIVER_START( ashura )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(rastsag2_map,0)
+	MDRV_CPU_PROGRAM_MAP(rastsag2_map)
 	MDRV_CPU_VBLANK_INT("screen", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2218,11 +2218,11 @@ static MACHINE_DRIVER_START( crimec )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(crimec_map,0)
+	MDRV_CPU_PROGRAM_MAP(crimec_map)
 	MDRV_CPU_VBLANK_INT("screen", crimec_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2256,11 +2256,11 @@ static MACHINE_DRIVER_START( tetrist )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ???*/
-	MDRV_CPU_PROGRAM_MAP(tetrist_map,0)
+	MDRV_CPU_PROGRAM_MAP(tetrist_map)
 	MDRV_CPU_VBLANK_INT("screen", rastansaga2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2293,11 +2293,11 @@ static MACHINE_DRIVER_START( tetrista )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(tetrista_map,0)
+	MDRV_CPU_PROGRAM_MAP(tetrista_map)
 	MDRV_CPU_VBLANK_INT("screen", masterw_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(masterw_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2331,11 +2331,11 @@ static MACHINE_DRIVER_START( hitice )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(hitice_map,0)
+	MDRV_CPU_PROGRAM_MAP(hitice_map)
 	MDRV_CPU_VBLANK_INT("screen", hitice_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(viofight_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2375,11 +2375,11 @@ static MACHINE_DRIVER_START( rambo3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rambo3_map,0)
+	MDRV_CPU_PROGRAM_MAP(rambo3_map)
 	MDRV_CPU_VBLANK_INT("screen", rambo3_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2413,11 +2413,11 @@ static MACHINE_DRIVER_START( rambo3a )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rambo3_map,0)
+	MDRV_CPU_PROGRAM_MAP(rambo3_map)
 	MDRV_CPU_VBLANK_INT("screen", rambo3_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2451,11 +2451,11 @@ static MACHINE_DRIVER_START( pbobble )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(pbobble_map,0)
+	MDRV_CPU_PROGRAM_MAP(pbobble_map)
 	MDRV_CPU_VBLANK_INT("screen", pbobble_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2492,11 +2492,11 @@ static MACHINE_DRIVER_START( spacedx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(spacedx_map,0)
+	MDRV_CPU_PROGRAM_MAP(spacedx_map)
 	MDRV_CPU_VBLANK_INT("screen", pbobble_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2533,11 +2533,11 @@ static MACHINE_DRIVER_START( spacedxo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(spacedxo_map,0)
+	MDRV_CPU_PROGRAM_MAP(spacedxo_map)
 	MDRV_CPU_VBLANK_INT("screen", selfeena_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2571,11 +2571,11 @@ static MACHINE_DRIVER_START( qzshowby )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz according to the readme*/
-	MDRV_CPU_PROGRAM_MAP(qzshowby_map,0)
+	MDRV_CPU_PROGRAM_MAP(qzshowby_map)
 	MDRV_CPU_VBLANK_INT("screen", pbobble_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2612,11 +2612,11 @@ static MACHINE_DRIVER_START( viofight )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(viofight_map,0)
+	MDRV_CPU_PROGRAM_MAP(viofight_map)
 	MDRV_CPU_VBLANK_INT("screen", viofight_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz verified */
-	MDRV_CPU_PROGRAM_MAP(viofight_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2654,11 +2654,11 @@ static MACHINE_DRIVER_START( masterw )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(masterw_map,0)
+	MDRV_CPU_PROGRAM_MAP(masterw_map)
 	MDRV_CPU_VBLANK_INT("screen", masterw_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(masterw_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2693,11 +2693,11 @@ static MACHINE_DRIVER_START( silentd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(silentd_map,0)
+	MDRV_CPU_PROGRAM_MAP(silentd_map)
 	MDRV_CPU_VBLANK_INT("screen", silentd_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2731,11 +2731,11 @@ static MACHINE_DRIVER_START( selfeena )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(selfeena_map,0)
+	MDRV_CPU_PROGRAM_MAP(selfeena_map)
 	MDRV_CPU_VBLANK_INT("screen", selfeena_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2778,11 +2778,11 @@ static MACHINE_DRIVER_START( ryujin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(selfeena_map,0)
+	MDRV_CPU_PROGRAM_MAP(selfeena_map)
 	MDRV_CPU_VBLANK_INT("screen", selfeena_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -2823,11 +2823,11 @@ static MACHINE_DRIVER_START( sbm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(sbm_map,0)
+	MDRV_CPU_PROGRAM_MAP(sbm_map)
 	MDRV_CPU_VBLANK_INT("screen", sbm_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

@@ -579,7 +579,7 @@ static INTERRUPT_GEN( darkhors )
 
 static MACHINE_DRIVER_START( darkhors )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
-	MDRV_CPU_PROGRAM_MAP(darkhors_map,0)
+	MDRV_CPU_PROGRAM_MAP(darkhors_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
 
 	MDRV_NVRAM_HANDLER(darkhors)

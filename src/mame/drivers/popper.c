@@ -289,11 +289,11 @@ static MACHINE_DRIVER_START( popper )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
-	MDRV_CPU_PROGRAM_MAP(popper_map,0)
+	MDRV_CPU_PROGRAM_MAP(popper_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80,18432000/12)
-	MDRV_CPU_PROGRAM_MAP(popper_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(popper_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
 	MDRV_QUANTUM_TIME(HZ(1800))

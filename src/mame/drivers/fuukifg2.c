@@ -451,11 +451,11 @@ static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(fuuki16_map,0)
+	MDRV_CPU_PROGRAM_MAP(fuuki16_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_map,0)
-	MDRV_CPU_IO_MAP(fuuki16_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_map)
+	MDRV_CPU_IO_MAP(fuuki16_sound_io_map)
 
 	MDRV_MACHINE_START(fuuki16)
 	MDRV_MACHINE_RESET(fuuki16)

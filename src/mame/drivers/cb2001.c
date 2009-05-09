@@ -183,8 +183,8 @@ static const nec_config cb2001_config = { cb2001_decryption_table, };
 static MACHINE_DRIVER_START( cb2001 )
 	MDRV_CPU_ADD("maincpu", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MDRV_CPU_CONFIG(cb2001_config)
-	MDRV_CPU_PROGRAM_MAP(cb2001_map,0)
-	MDRV_CPU_IO_MAP(cb2001_io,0)
+	MDRV_CPU_PROGRAM_MAP(cb2001_map)
+	MDRV_CPU_IO_MAP(cb2001_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_GFXDECODE(cb2001)

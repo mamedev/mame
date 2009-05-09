@@ -241,7 +241,7 @@ static MACHINE_RESET( quizpani )
 
 static MACHINE_DRIVER_START( quizpani )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(quizpani_map,0)
+	MDRV_CPU_PROGRAM_MAP(quizpani_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,164) // music tempo
 

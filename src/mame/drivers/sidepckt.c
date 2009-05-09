@@ -271,11 +271,11 @@ static MACHINE_DRIVER_START( sidepckt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(sidepckt_map,0)
+	MDRV_CPU_PROGRAM_MAP(sidepckt_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */

@@ -683,8 +683,8 @@ DISCRETE_SOUND_EXTERN( cliffhgr );
 static MACHINE_DRIVER_START( cliffhgr )
 
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
-	MDRV_CPU_PROGRAM_MAP(mainmem,0)
-	MDRV_CPU_IO_MAP(mainport,0)
+	MDRV_CPU_PROGRAM_MAP(mainmem)
+	MDRV_CPU_IO_MAP(mainport)
 	MDRV_CPU_VBLANK_INT("screen", cliff_vsync)
 
 	MDRV_MACHINE_START(cliffhgr)

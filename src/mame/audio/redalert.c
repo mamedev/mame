@@ -220,7 +220,7 @@ static SOUND_START( redalert )
 static MACHINE_DRIVER_START( redalert_audio_m37b )
 
 	MDRV_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(redalert_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(redalert_audio_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)
 
 	MDRV_SOUND_ADD("ay", AY8910, REDALERT_AY8910_CLOCK)
@@ -241,7 +241,7 @@ static MACHINE_DRIVER_START( redalert_audio_voice )
 
 	MDRV_CPU_ADD("voice", 8085A, REDALERT_VOICE_CPU_CLOCK)
 	MDRV_CPU_CONFIG(redalert_voice_i8085_config)
-	MDRV_CPU_PROGRAM_MAP(redalert_voice_map,0)
+	MDRV_CPU_PROGRAM_MAP(redalert_voice_map)
 
 	MDRV_SOUND_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -408,7 +408,7 @@ static SOUND_START( demoneye )
 MACHINE_DRIVER_START( demoneye_audio )
 
 	MDRV_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(demoneye_audio_map,0)
+	MDRV_CPU_PROGRAM_MAP(demoneye_audio_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
 	MDRV_PIA6821_ADD("sndpia", demoneye_pia_intf)

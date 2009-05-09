@@ -193,11 +193,11 @@ static MACHINE_DRIVER_START( citycon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(citycon_map,0)
+	MDRV_CPU_PROGRAM_MAP(citycon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

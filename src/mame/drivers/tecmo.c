@@ -572,11 +572,11 @@ static MACHINE_DRIVER_START( rygar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rygar_map,0)
+	MDRV_CPU_PROGRAM_MAP(rygar_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rygar_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rygar_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -612,10 +612,10 @@ static MACHINE_DRIVER_START( gemini )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(rygar)
 	MDRV_CPU_REPLACE("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(gemini_map,0)
+	MDRV_CPU_PROGRAM_MAP(gemini_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(tecmo_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(tecmo_sound_map)
 MACHINE_DRIVER_END
 
 
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( silkworm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gemini)
 	MDRV_CPU_REPLACE("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(silkworm_map,0)
+	MDRV_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_DRIVER_END
 
 

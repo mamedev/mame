@@ -544,8 +544,8 @@ static MACHINE_DRIVER_START( paradise )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
-	MDRV_CPU_PROGRAM_MAP(paradise_map,0)
-	MDRV_CPU_IO_MAP(paradise_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(paradise_map)
+	MDRV_CPU_IO_MAP(paradise_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
 
 	/* video hardware */
@@ -578,15 +578,15 @@ static MACHINE_DRIVER_START( tgtball )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tgtball_map,0)
+	MDRV_CPU_PROGRAM_MAP(tgtball_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( torus )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(torus_map,0)
-	MDRV_CPU_IO_MAP(torus_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(torus_map)
+	MDRV_CPU_IO_MAP(torus_io_map)
 
 	MDRV_GFXDECODE(torus)
 
@@ -599,8 +599,8 @@ static MACHINE_DRIVER_START( madball )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(torus_map,0)
-	MDRV_CPU_IO_MAP(torus_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(torus_map)
+	MDRV_CPU_IO_MAP(torus_io_map)
 
 	MDRV_GFXDECODE(madball)
 

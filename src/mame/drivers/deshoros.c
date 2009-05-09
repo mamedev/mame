@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( deshoros )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,2000000)
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen",deshoros_irq)
 
 	MDRV_MACHINE_RESET(deshoros)

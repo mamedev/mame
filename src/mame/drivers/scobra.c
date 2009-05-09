@@ -853,11 +853,11 @@ static MACHINE_DRIVER_START( type1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(type1_map,0)
+	MDRV_CPU_PROGRAM_MAP(type1_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(scobra_sound_map,0)
-	MDRV_CPU_IO_MAP(scobra_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(scobra_sound_map)
+	MDRV_CPU_IO_MAP(scobra_sound_io_map)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -928,7 +928,7 @@ static MACHINE_DRIVER_START( mimonkey )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mimonkey_map,0)
+	MDRV_CPU_PROGRAM_MAP(mimonkey_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mimonkey)
@@ -940,7 +940,7 @@ static MACHINE_DRIVER_START( type2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(type2_map,0)
+	MDRV_CPU_PROGRAM_MAP(type2_map)
 MACHINE_DRIVER_END
 
 
@@ -977,11 +977,11 @@ static MACHINE_DRIVER_START( hustler )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(hustler_map,0)
+	MDRV_CPU_PROGRAM_MAP(hustler_map)
 
 	MDRV_CPU_ADD("audiocpu",Z80,14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(hustler_sound_map,0)
-	MDRV_CPU_IO_MAP(hustler_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hustler_sound_map)
+	MDRV_CPU_IO_MAP(hustler_sound_io_map)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -1017,11 +1017,11 @@ static MACHINE_DRIVER_START( hustlerb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hustler)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hustlerb_map,0)
+	MDRV_CPU_PROGRAM_MAP(hustlerb_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(hustlerb_sound_map,0)
-	MDRV_CPU_IO_MAP(hustlerb_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(hustlerb_sound_map)
+	MDRV_CPU_IO_MAP(hustlerb_sound_io_map)
 MACHINE_DRIVER_END
 
 
@@ -1031,7 +1031,7 @@ static MACHINE_DRIVER_START( anteatg )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(anteatg_map,0)
+	MDRV_CPU_PROGRAM_MAP(anteatg_map)
 MACHINE_DRIVER_END
 
 /* same as type1 but with a strange memory map, maybe a kind of protection */
@@ -1040,7 +1040,7 @@ static MACHINE_DRIVER_START( anteatgb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(anteatgb_map,0)
+	MDRV_CPU_PROGRAM_MAP(anteatgb_map)
 MACHINE_DRIVER_END
 
 

@@ -735,7 +735,7 @@ static const vr0_interface vr0_config =
 
 static MACHINE_DRIVER_START( crystal )
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
-	MDRV_CPU_PROGRAM_MAP(crystal_mem,0)
+	MDRV_CPU_PROGRAM_MAP(crystal_mem)
  	MDRV_CPU_VBLANK_INT("screen", crystal_interrupt)
 
 	MDRV_MACHINE_START(crystal)

@@ -176,10 +176,10 @@ static MACHINE_DRIVER_START( madalien )
 
 	/* main CPU */
 	MDRV_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
-	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("audiocpu", M6502, SOUND_CLOCK / 8)   /* 512kHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(audio_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */

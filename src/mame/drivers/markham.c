@@ -184,11 +184,11 @@ static MACHINE_DRIVER_START( markham )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(markham_master_map,0)
+	MDRV_CPU_PROGRAM_MAP(markham_master_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(markham_slave_map,0)
+	MDRV_CPU_PROGRAM_MAP(markham_slave_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

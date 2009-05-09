@@ -272,11 +272,11 @@ static MACHINE_DRIVER_START( rockrage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8 */
-	MDRV_CPU_PROGRAM_MAP(rockrage_map,0)
+	MDRV_CPU_PROGRAM_MAP(rockrage_map)
 	MDRV_CPU_VBLANK_INT("screen", rockrage_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1500000)		/* 24MHz/16 */
-	MDRV_CPU_PROGRAM_MAP(rockrage_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(rockrage_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

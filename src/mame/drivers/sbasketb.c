@@ -188,11 +188,11 @@ static MACHINE_DRIVER_START( sbasketb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sbasketb_map,0)
+	MDRV_CPU_PROGRAM_MAP(sbasketb_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
-	MDRV_CPU_PROGRAM_MAP(sbasketb_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sbasketb_sound_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -1950,14 +1950,14 @@ static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(fhawk_map,0)
+	MDRV_CPU_PROGRAM_MAP(fhawk_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_3_map,0)
+	MDRV_CPU_PROGRAM_MAP(fhawk_3_map)
 
 	MDRV_CPU_ADD("slave", Z80, 12000000/3) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_2_map,0)
+	MDRV_CPU_PROGRAM_MAP(fhawk_2_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -1996,13 +1996,13 @@ static MACHINE_DRIVER_START( champwr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_map,0)
+	MDRV_CPU_PROGRAM_MAP(champwr_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_3_map,0)
+	MDRV_CPU_PROGRAM_MAP(champwr_3_map)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(champwr_2_map,0)
+	MDRV_CPU_PROGRAM_MAP(champwr_2_map)
 
 	MDRV_MACHINE_RESET(champwr)
 
@@ -2026,13 +2026,13 @@ static MACHINE_DRIVER_START( raimais )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_map,0)
+	MDRV_CPU_PROGRAM_MAP(raimais_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_3_map,0)
+	MDRV_CPU_PROGRAM_MAP(raimais_3_map)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(raimais_2_map,0)
+	MDRV_CPU_PROGRAM_MAP(raimais_2_map)
 
 	MDRV_MACHINE_RESET(raimais)
 
@@ -2049,11 +2049,11 @@ static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(kurikint_map,0)
+	MDRV_CPU_PROGRAM_MAP(kurikint_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu",  Z80, 12000000/3) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kurikint_2_map,0)
+	MDRV_CPU_PROGRAM_MAP(kurikint_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -2100,7 +2100,7 @@ static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(plotting_map,0)
+	MDRV_CPU_PROGRAM_MAP(plotting_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_MACHINE_RESET(plotting)
@@ -2137,7 +2137,7 @@ static MACHINE_DRIVER_START( puzznic )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznic_map,0)
+	MDRV_CPU_PROGRAM_MAP(puzznic_map)
 
 	MDRV_MACHINE_RESET(puzznic)
 MACHINE_DRIVER_END
@@ -2147,7 +2147,7 @@ static MACHINE_DRIVER_START( puzznici )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznici_map,0)
+	MDRV_CPU_PROGRAM_MAP(puzznici_map)
 
 	MDRV_MACHINE_RESET(puzznic)
 MACHINE_DRIVER_END
@@ -2158,7 +2158,7 @@ static MACHINE_DRIVER_START( horshoes )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(horshoes_map,0)
+	MDRV_CPU_PROGRAM_MAP(horshoes_map)
 
 	MDRV_MACHINE_RESET(horshoes)
 MACHINE_DRIVER_END
@@ -2169,7 +2169,7 @@ static MACHINE_DRIVER_START( palamed )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(palamed_map,0)
+	MDRV_CPU_PROGRAM_MAP(palamed_map)
 
 	MDRV_MACHINE_RESET(palamed)
 MACHINE_DRIVER_END
@@ -2180,7 +2180,7 @@ static MACHINE_DRIVER_START( cachat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cachat_map,0)
+	MDRV_CPU_PROGRAM_MAP(cachat_map)
 
 	MDRV_MACHINE_RESET(cachat)
 MACHINE_DRIVER_END
@@ -2189,11 +2189,11 @@ static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* not verfied */
-	MDRV_CPU_PROGRAM_MAP(evilston_map,0)
+	MDRV_CPU_PROGRAM_MAP(evilston_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/3) 	/* not verified */
-	MDRV_CPU_PROGRAM_MAP(evilston_2_map,0)
+	MDRV_CPU_PROGRAM_MAP(evilston_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

@@ -448,11 +448,11 @@ static MACHINE_DRIVER_START( darius2d )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
-	MDRV_CPU_PROGRAM_MAP(darius2d_map,0)
+	MDRV_CPU_PROGRAM_MAP(darius2d_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_MACHINE_START( warriorb )
 	MDRV_MACHINE_RESET( taito_dualscreen )
@@ -506,11 +506,11 @@ static MACHINE_DRIVER_START( warriorb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(warriorb_map,0)
+	MDRV_CPU_PROGRAM_MAP(warriorb_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MDRV_MACHINE_START( warriorb )
 	MDRV_MACHINE_RESET( taito_dualscreen )
