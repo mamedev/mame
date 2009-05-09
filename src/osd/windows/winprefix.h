@@ -39,6 +39,7 @@ void free_file_line(void *memory, const char *file, int line);
 
 #ifdef _MSC_VER
 #define alloca _alloca
+#define round(x) floor((x) + 0.5)
 #if _MSC_VER < 1500
 #define vsnprintf _vsnprintf
 #endif

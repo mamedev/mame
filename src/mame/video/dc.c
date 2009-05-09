@@ -9,10 +9,9 @@
 #include "render.h"
 #include "rendutil.h"
 #include "profiler.h"
+#include "video/rgbutil.h"
 
 #include <math.h>
-
-#define round(x) floor((x) + 0.5)
 
 static int vblc=0;
 #define DEBUG_FIFO_POLY (0)
@@ -119,32 +118,9 @@ INLINE INT32 clamp(INT32 in, INT32 min, INT32 max)
 
 INLINE UINT32 bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v)
 {
-	float u_ratio = (float)((float)u - (int)u);
-	float v_ratio = (float)((float)v - (int)v);
-	float u_opposite = 1.0f - u_ratio;
-	float v_opposite = 1.0f - v_ratio;
-	UINT32 channel = 0;
-	UINT32 out = 0;
-	if(u < 0.0f)
-	{
-		u_opposite = 0.0f - u_ratio;
-		u_ratio = 1.0f + u_ratio;
-	}
-	if(v < 0.0f)
-	{
-		v_opposite = 0.0f - v_ratio;
-		v_ratio = 1.0f + v_ratio;
-	}
-	for(channel = 0; channel < 4; channel++)
-	{
-		INT32 p0 = (c0 >> (channel << 3)) & 0x000000ff;
-		INT32 p1 = (c1 >> (channel << 3)) & 0x000000ff;
-		INT32 p2 = (c2 >> (channel << 3)) & 0x000000ff;
-		INT32 p3 = (c3 >> (channel << 3)) & 0x000000ff;
-		out |= (UINT8)clamp((p0 * u_opposite + p1 * u_ratio) * v_opposite +
-		                    (p3 * u_opposite + p2 * u_ratio) * v_ratio, 0, 255) << (channel << 3);
-	}
-	return out;
+	UINT32 ui = (u * 256.0);
+	UINT32 vi = (v * 256.0);
+	return rgba_bilinear_filter(c0, c1, c3, c2, ui, vi);
 }
 
 // Multiply with alpha value in bits 31-24
