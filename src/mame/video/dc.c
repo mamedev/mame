@@ -610,30 +610,40 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	if (!t->textured) return;
 	
 	t->address     = sa->textureaddress;
-	
-
-
-	
-	t->mode        = sa->scanorder + (sa->vqcompressed<<1);
-	
-	/* Stride Select only valid when ScanOrder is 1 */
-	/* Guilty Gear XX Slash / Reload will have lots of broken gfx otherwise */
-	if (sa->scanorder)
-	{
-	// disasbled pending further invetigation, it *still* breaks some usagui intro stuff
-	//	t->mode += (sa->strideselect<<2);
-	}
-	
 	t->pf          = sa->pixelformat;
+	t->palette 	   = 0;
+	
+	
+	t->mode = (sa->vqcompressed<<1);
 
-	/* Mipmapped is ignored if scanorder is 0 */
-	if (!sa->scanorder)
+	// scanorder is ignored for palettized textures (palettized textures are ALWAYS twiddled)
+	// (the same bits are used for palette select instead)
+	if ((t->pf == 5) || (t->pf == 6))
 	{
-		t->mipmapped  = sa->mipmapped;
+		t->palette = sa->paletteselector;
 	}
 	else
 	{
+		t->mode |= sa->scanorder;
+	}
+	
+	/* When scan order is 0 stride select is ignored */
+	/* When scan order is 1 mipmap is ignored */
+	if (t->mode&1)
+	{
+		/* scan order is 1 (non-twiddled tezture), use stride select if specified*/
+		t->mode |= (sa->strideselect<<2);
+		
+		/* scan order is 1 (non-twiddled tezture), ignore mipmaps */
 		t->mipmapped  = 0;
+	}
+	else 
+	{
+		/* scan order is 0 (twiddled tezture), ignore stride select*/
+		//t->mode += (sa->strideselect<<2);
+		
+		/* scan order is 0 (twiddled tezture), use mipmap if specified */
+		t->mipmapped  = sa->mipmapped;
 	}
 	
 	// Mipmapped textures are always square, ignore v size
@@ -645,13 +655,12 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	{
 		t->sizes = sa->texturesizes;
 	}
-
 	
 	t->sizex = 1 << (3+((t->sizes >> 3) & 7));
 	t->sizey = 1 << (3+(t->sizes & 7));
 	
 	
-	t->palette     = sa->paletteselector;
+	
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
 	t->flip_u      = (sa->flipuv >> 1) & 1;
