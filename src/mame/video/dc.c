@@ -34,6 +34,7 @@ static UINT32 dilated0[15][1024];
 static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
+static UINT32 debug_dip_status;
 
 UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
@@ -1600,12 +1601,17 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 			}*/
 
 			c = ti->r(ti, u, v);
-			if(ti->filter_mode == TEX_FILTER_BILINEAR)
-			{
-				UINT32 c1 = ti->r(ti, u+1.0, v);
-				UINT32 c2 = ti->r(ti, u+1.0, v+1.0);
-				UINT32 c3 = ti->r(ti, u, v+1.0);
-				c = bilinear_filter(c, c1, c2, c3, u, v);
+			
+			// debug dip to turn on/off bilinear filtering, it's slooooow
+			if (debug_dip_status&0x1)
+			{	
+				if(ti->filter_mode == TEX_FILTER_BILINEAR)
+				{
+					UINT32 c1 = ti->r(ti, u+1.0, v);
+					UINT32 c2 = ti->r(ti, u+1.0, v+1.0);
+					UINT32 c3 = ti->r(ti, u, v+1.0);
+					c = bilinear_filter(c, c1, c2, c3, u, v);
+				}
 			}
 
 			if(c & 0xff000000) {
@@ -2107,6 +2113,9 @@ VIDEO_UPDATE(dc)
 		}
 	}
 
+	// update this here so we only do string lookup once per frame
+	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
+	
 	return 0;
 }
 

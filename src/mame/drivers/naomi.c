@@ -976,6 +976,13 @@ ADDRESS_MAP_END
 * Input ports
 */
 
+#define NAOMI_MAME_DEBUG_DIP \
+	PORT_START("MAMEDEBUG") \
+	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
+
+
 /* for now we hardwire a joystick + 6 buttons for every game.*/
 static INPUT_PORTS_START( naomi )
 	PORT_START("IN0")
@@ -1011,6 +1018,8 @@ static INPUT_PORTS_START( naomi )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
+	
+	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
 /* JVS mahjong panel */
@@ -1122,6 +1131,8 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
+	
+	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
 static MACHINE_RESET( naomi )
