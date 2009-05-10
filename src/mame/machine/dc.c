@@ -1050,8 +1050,9 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
 				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 				wave_dma.start = g2bus_regs[SB_ADST] = 0;
-				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
-				dc_update_interrupt_status(space->machine);
+				/*TODO: this makes the sfz3upper to not play any bgm, understand why. */
+				//dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+				//dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}
