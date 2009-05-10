@@ -269,10 +269,10 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 }
 
 static ADDRESS_MAP_START( tmp68301_regs, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w) \
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w) \
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w) \
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w) \
+	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
+	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
+	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
+	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w)
 	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
 ADDRESS_MAP_END
 
