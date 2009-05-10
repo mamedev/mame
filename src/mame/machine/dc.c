@@ -19,6 +19,7 @@
 #define DEBUG_SYSCTRL	(0)
 #define DEBUG_MAPLE	(0)
 #define DEBUG_MAPLE_REGS	(0)
+#define DEBUG_AICA_DMA (0)
 
 #define ENABLE_MAPLE_IRQ (0)
 
@@ -974,7 +975,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 {
 	int reg;
 	UINT64 shift;
-	UINT32 dat,old;
+	UINT32 dat;
 	static struct {
 		UINT32 aica_addr;
 		UINT32 root_addr;
@@ -983,11 +984,11 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		UINT8 flag;
 		UINT8 indirect;
 		UINT8 start;
+		UINT8 sel;
 	}wave_dma;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = g2bus_regs[reg];
 
 	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
 
@@ -1006,16 +1007,17 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		case SB_ADDIR: wave_dma.dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
 		case SB_ADEN: wave_dma.flag = (dat & 1); break;
-		case SB_ADTSEL:
-			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
-			//mame_printf_verbose("SB_ADTSEL data %08x\n",dat);
-			break;
+		case SB_ADTSEL: wave_dma.sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
-			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
-			//mame_printf_verbose("AICA: G2-DMA start\n");
-			//mame_printf_verbose("%08x %08x %08x %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
 			wave_dma.start = dat & 1;
+
+			#if DEBUG_AICA_DMA
+			printf("AICA: G2-DMA start \n");
+			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
+			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",wave_dma.sel,wave_dma.start,wave_dma.flag,wave_dma.dir);
+			#endif
+
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
 			if(wave_dma.flag && wave_dma.start)
 			{
@@ -1055,8 +1057,11 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				//dc_update_interrupt_status(space->machine);
 			}
 			break;
+		default:
+			/* might access the unhandled DMAs, so tell us if this happens. */
+			printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
+			break;
 	}
-	mame_printf_verbose("G2CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7800+reg*4, dat, data, offset, mem_mask);
 }
 
 READ64_HANDLER( dc_modem_r )
