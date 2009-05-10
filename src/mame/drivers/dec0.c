@@ -173,19 +173,19 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)								/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
- 	AM_RANGE(0x242000, 0x24207f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_colscroll)
-	AM_RANGE(0x242400, 0x2427ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_rowscroll)
+ 	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242400, 0x2427ff) AM_WRITEONLY AM_BASE(&dec0_pf1_rowscroll)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM														/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
 	AM_RANGE(0x246000, 0x246007) AM_WRITE(dec0_pf2_control_0_w)								/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_WRITE(dec0_pf2_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_colscroll)
-	AM_RANGE(0x248400, 0x2487ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x248000, 0x24807f) AM_WRITEONLY AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x248400, 0x2487ff) AM_WRITEONLY AM_BASE(&dec0_pf2_rowscroll)
 	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
 	AM_RANGE(0x24c000, 0x24c007) AM_WRITE(dec0_pf3_control_0_w)								/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_WRITE(dec0_pf3_control_1_w)
 	AM_RANGE(0x24c800, 0x24c87f) AM_RAM AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
@@ -239,8 +239,8 @@ static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* Pf3 is unaffected by protection */
 	AM_RANGE(0x300000, 0x300007) AM_WRITE(dec0_pf3_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf3_control_1_w)
-	AM_RANGE(0x300800, 0x30087f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x300c00, 0x300fff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x300800, 0x30087f) AM_WRITEONLY AM_BASE(&dec0_pf3_colscroll)
+	AM_RANGE(0x300c00, 0x300fff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x301000, 0x3017ff) AM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(&dec0_ram) 	/* Sly spy main ram */
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Physical memory map (21 bits) */
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300c00, 0x300fff) AM_RAM AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x301000, 0x3017ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE(&dec0_ram) /* Sly spy main ram */
-	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE(&spriteram16) /* Sprites */
 ADDRESS_MAP_END
 
@@ -349,28 +349,28 @@ static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)			/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
-	AM_RANGE(0x242000, 0x24207f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_colscroll)
-	AM_RANGE(0x242400, 0x2427ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_rowscroll)
+	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242400, 0x2427ff) AM_WRITEONLY AM_BASE(&dec0_pf1_rowscroll)
 
 	AM_RANGE(0x242800, 0x243fff) AM_RAM 								/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
 
 	AM_RANGE(0x246000, 0x246007) AM_WRITE(dec0_pf2_control_0_w)			/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_WRITE(dec0_pf2_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_colscroll)
-	AM_RANGE(0x248400, 0x2487ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x248000, 0x24807f) AM_WRITEONLY AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x248400, 0x2487ff) AM_WRITEONLY AM_BASE(&dec0_pf2_rowscroll)
 
 	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
 	AM_RANGE(0x24c000, 0x24c007) AM_WRITE(dec0_pf3_control_0_w)			/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_WRITE(dec0_pf3_control_1_w)
 	AM_RANGE(0x24c800, 0x24c87f) AM_RAM AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x314000, 0x3147ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w) 				// NEW
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram) 				/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(&spriteram16) 			/* Sprites */
