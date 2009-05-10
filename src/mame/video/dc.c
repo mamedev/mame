@@ -1182,6 +1182,17 @@ WRITE64_HANDLER( pvr_ta_w )
 
 		profiler_mark(PROFILER_END);
 		break;
+//#define TA_YUV_TEX_BASE		((0x005f8148-0x005f8000)/4)
+	case TA_YUV_TEX_BASE:
+		printf("TA_YUV_TEX_BASE initialized to %08x\n", dat);
+		
+		// hack, this interrupt is generated after transfering a set amount of data
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+		dc_update_interrupt_status(space->machine);
+		
+		break;
+		
+		
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
 		mame_printf_verbose("List continuation processing\n");
