@@ -1642,6 +1642,7 @@ const game_driver * const drivers[] =
 	DRIVER( 40love )	/* A30 (c) 1984 Taito */
 	DRIVER( tsamurai )	/* A35 (c) 1985 Taito */
 	DRIVER( tsamurai2 )	/* A35 (c) 1985 Taito */
+	DRIVER( tsamuraih )	/* A35 (c) 1985 Taito */
 	DRIVER( ladymstr )	/* A49 (c) 1985 Taito */
 	DRIVER( nunchaku )	/* ??? (c) 1985 Taito */
 	DRIVER( yamagchi )	/* A38 (c) 1985 Taito */
