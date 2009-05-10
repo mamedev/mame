@@ -1669,7 +1669,7 @@ static READ16_HANDLER(beautyb_unk2_r)
 }
 
 static ADDRESS_MAP_START( beautyb_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_WRITENOP
 	//AM_RANGE(0x010000, 0x03ffff) AM_WRITENOP
 
 	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unk2_r)
@@ -2618,7 +2618,7 @@ ROM_START( beautyb )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.2",  0x0000, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
 
-	ROM_REGION( 0x0144, "user1", 0 )
+	ROM_REGION( 0x0144, "pals", 0 )
 	ROM_LOAD( "pal16r4acn.1",  0x0000, 0x0104, CRC(826be9e7) SHA1(893fc49c38aa8e7d6e98f6320157ba627a5d1748) )
 	ROM_LOAD( "pal16r4acn.2",  0x0000, 0x0104, CRC(b3084ffe) SHA1(086ad2f89bdd8524ae358fd49b0803f9bb4aff33) )
 	ROM_LOAD( "pal16r4acn.3",  0x0000, 0x0104, CRC(741cd872) SHA1(d53bdcadcd25d44b6423e0740e88209f85c709bd) )
@@ -2626,5 +2626,32 @@ ROM_START( beautyb )
 	ROM_LOAD( "pal16l8ajc.u4", 0x0000, 0x0104, NO_DUMP)
 ROM_END
 
+ROM_START( iqpipe )
+	ROM_REGION( 0x010000, "maincpu", ROMREGION_ERASEFF ) /* 68000 code */
+	ROM_LOAD16_BYTE( "iqpipe.u3", 0x00000, 0x8000, CRC(4ef1a0ba) SHA1(b11412b6b9e1a5d2f44ed5b7ceaa011418e5eab5) )
+	ROM_LOAD16_BYTE( "iqpipe.u2", 0x00001, 0x8000, CRC(1dacee68) SHA1(7a37362a679a2c4cbeadca63c2ef9a112c946c97) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "iqpipe.4", 0x00000, 0x10000, CRC(938b9a04) SHA1(98c61b0526e76d5de134d9e22be0af0d576a6749) )
+	ROM_LOAD( "iqpipe.5", 0x10000, 0x10000, CRC(dfaedd39) SHA1(498f1c34fecd8de497fdce41bb683d00047a868a) )
+	ROM_LOAD( "iqpipe.6", 0x20000, 0x10000, CRC(8e554f8d) SHA1(4b3b0e47c36f37947422f1c31063f11975108cd0) )
+
+	ROM_REGION( 0x020000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	/* no sprites on this */
+
+	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "iqpipe.1", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.2",  0x0000, 0x0020, NO_DUMP ) //same as beauty block?
+
+	ROM_REGION( 0x0144, "pals", 0 )
+	ROM_LOAD( "iqpipe.a",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.b",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.c",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.d",  0x0000, 0x0144, CRC(36e30d71) SHA1(e38f0257f9beedccc9421eec78701a86465d16ad) )
+	ROM_LOAD( "iqpipe.u4", 0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+ROM_END
 
 GAME( 1991, beautyb,    0,        beautyb,    tetris,    beautyb, ROT0,  "AMT", "Beauty Block", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1991, iqpipe,     0,        beautyb,    tetris,    beautyb, ROT0,  "AMT", "IQ Pipe", GAME_NO_SOUND|GAME_NOT_WORKING )
