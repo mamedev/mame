@@ -270,7 +270,6 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK( tubep_scanline_callback )
 {
 	int scanline = param;
-	static const char *const cputags[] = { "mcu", "nsc" };
 
 	curr_scanline = scanline;//for debugging
 
@@ -298,14 +297,14 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	{
 		logerror("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
-		cputag_set_input_line(machine, cputags[(cputag_get_cpu(machine, "nsc") != NULL) ? 1 : 0], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		cputag_set_input_line(machine, cputags[(cputag_get_cpu(machine, "nsc") != NULL) ? 1 : 0], INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
@@ -479,14 +478,14 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	{
 		logerror("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
-		cputag_set_input_line(machine, "nsc", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		cputag_set_input_line(machine, "nsc", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
@@ -908,7 +907,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap)
 
-	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -950,9 +949,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tubepb )
 	MDRV_IMPORT_FROM( tubep )
 
-	MDRV_CPU_REMOVE("nsc")
-
-	MDRV_CPU_ADD("mcu", M6802,6000000) /* ? MHz Xtal */
+	MDRV_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
@@ -973,7 +970,7 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap)
 
-	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map)
 
 	MDRV_MACHINE_START(rjammer)
@@ -1039,7 +1036,7 @@ ROM_START( tubep )
 	ROM_LOAD( "tp-s.1", 0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
 	ROM_LOAD( "tp-s.2", 0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
 
-	ROM_REGION( 0x10000,"nsc", 0 ) /* 64k for the custom CPU */
+	ROM_REGION( 0x10000,"mcu", 0 ) /* 64k for the custom CPU */
 	ROM_LOAD( "tp-g5.e1", 0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
 	ROM_LOAD( "tp-g6.d1", 0xe000, 0x2000, CRC(3ea127b8) SHA1(a5f83ee0eb871da81eeaf839499baf14b986c69e) )
 
@@ -1168,7 +1165,7 @@ ROM_START( rjammer )
 	ROM_LOAD( "tp-s2.2d", 0x4000, 0x2000, CRC(444b6a1d) SHA1(1252b14d473d764a5326401aac782a1fa3419784) )
 	ROM_LOAD( "tp-s1.1d", 0x6000, 0x2000, CRC(391097cd) SHA1(d4b48a3f26044b131e65f74479bf1671ad677eb4) )
 
-	ROM_REGION( 0x10000,"nsc", 0 ) /* 64k for the custom CPU */
+	ROM_REGION( 0x10000,"mcu", 0 ) /* 64k for the custom CPU */
 	ROM_LOAD( "tp-g7.e1",  0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
 	ROM_LOAD( "tp-g8.d1",  0xe000, 0x2000, CRC(2e619fec) SHA1(d3d5fa708ca0097abf12d59ae41cb852278fe45d) )
 
