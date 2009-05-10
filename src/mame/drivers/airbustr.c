@@ -683,6 +683,9 @@ ROM_START( airbustr )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
+	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
+	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
 
@@ -706,6 +709,9 @@ ROM_START( airbustj )
 	ROM_REGION( 0x24000, "audiocpu", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
+	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
