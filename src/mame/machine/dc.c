@@ -1057,6 +1057,14 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				//dc_update_interrupt_status(space->machine);
 			}
 			break;
+
+		case SB_ADSUSP:
+		case SB_E1SUSP:
+		case SB_E2SUSP:
+		case SB_DDSUSP:
+		case SB_G2APRO:
+			break;
+
 		default:
 			/* might access the unhandled DMAs, so tell us if this happens. */
 			printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
