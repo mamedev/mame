@@ -2974,7 +2974,7 @@ V-V                           TP-027
 	DRIVER( taitogn )
 	DRIVER( chaoshea )	/* 1998.10 Chaos Heat (V2.08J) */
 	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
-						/* 1999.02 Otenami Haiken (Success) */
+	DRIVER( otenamih )	/* 1999.02 Otenami Haiken (Success) */
 	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
 	DRIVER( spuzbobl )	/* 1999.?? Super Puzzle Bobble (V2.05O) */
 	DRIVER( gobyrc )	/* 1999.?? Go By RC (V2.03O) */
@@ -2991,7 +2991,7 @@ V-V                           TP-027
 	DRIVER( shikigam )	/* 2001.09 Shikigami no Shiro */
 	DRIVER( otenki )	/* 2001.10 Otenki Kororin */
 	DRIVER( usagi )		/* 2001.12 Usagi (V2.02J) */
-						/* 2002.02 Shanghai Sangokuhaitougi */
+	DRIVER( shangtou )	/* 2002.02 Shanghai Sangokuhaitougi */
 	DRIVER( xiistag )	/* 2002.07 XII Stag (V2.01J) */
 	DRIVER( sianniv )	/* 2003.10 Space Invaders Anniversary (V2.02J) */
 	DRIVER( kollon )	/* 2003.11 Kollon */

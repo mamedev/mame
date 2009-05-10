@@ -1138,7 +1138,16 @@ ROM_START(shikigam)
 	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
 ROM_END
 
+
 /* Success */
+
+ROM_START(otenamih)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "otenamih", 0, BAD_DUMP SHA1(10706d0497aea8891166ed2ca7b84e7b7e85bd28) ) // wrong IDENT metadata
+ROM_END
+
 
 ROM_START(psyvaria)
 	TAITOGNET_BIOS
@@ -1167,6 +1176,10 @@ ROM_START(zokuoten)
 	DISK_REGION( "card" )
 	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
+
+
+
+
 
 /* Takumi */
 
@@ -1200,6 +1213,14 @@ ROM_START(mahjngoh)
 	DISK_IMAGE( "mahjngoh", 0, SHA1(3ef1110d15582d7c0187438d7ad61765dd121cff))
 ROM_END
 
+ROM_START(shangtou)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "shanghaito", 0, BAD_DUMP SHA1(59d34cccb91b18d3f87dbd3089dc23e841b8d11d) ) // wrong IDENT metadata
+ROM_END
+
+
 /* Triangle Service */
 
 ROM_START(xiistag)
@@ -1226,6 +1247,7 @@ GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito/Alf
 GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
 GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", 0 )
 
+GAME( 1999, otenamih, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Otenami Haiken (V2.04J)", 0 )
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
@@ -1235,8 +1257,12 @@ GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warash
 GAME( 2001, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
 GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Soutenryu (V2.07J)", 0 )
 GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", 0 )
+GAME( 2002, shangtou, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi/Sunsoft/Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J)", 0 )
 
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
 GAME( 2001, otenki,   taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Otenki Kororin (V2.01J)", 0 )
 
 GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )
+
+
+
