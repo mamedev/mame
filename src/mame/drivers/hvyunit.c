@@ -320,7 +320,7 @@ static WRITE8_HANDLER( trigger_nmi_on_slave_cpu)
 	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( main_bankswitch_w )
+static WRITE8_HANDLER( master_bankswitch_w )
 {
 	unsigned char *ROM = memory_region(space->machine, "master");
 	int bank=data&7;
@@ -343,7 +343,7 @@ WRITE8_HANDLER( hu_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static ADDRESS_MAP_START( main_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
@@ -352,10 +352,10 @@ static ADDRESS_MAP_START( main_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(main_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START(master_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(main_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(main_bankswitch_w) // correct?
+	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_slave_cpu)
 ADDRESS_MAP_END
 
@@ -569,8 +569,8 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 static MACHINE_DRIVER_START( hvyunit )
 
 	MDRV_CPU_ADD("master", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(main_memory)
-	MDRV_CPU_IO_MAP(main_io)
+	MDRV_CPU_PROGRAM_MAP(master_memory)
+	MDRV_CPU_IO_MAP(master_io)
 	MDRV_CPU_VBLANK_INT_HACK(hvyunit_interrupt,2)
 
 	MDRV_CPU_ADD("slave", Z80,6000000)
