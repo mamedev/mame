@@ -311,18 +311,18 @@ static VIDEO_EOF(hvyunit)
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "suoundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static WRITE8_HANDLER( trigger_nmi_on_sub_cpu)
+static WRITE8_HANDLER( trigger_nmi_on_slave_cpu)
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( main_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "maincpu");
+	unsigned char *ROM = memory_region(space->machine, "master");
 	int bank=data&7;
 
 	ROM = &ROM[0x4000 * bank];
@@ -345,7 +345,7 @@ WRITE8_HANDLER( hu_colorram_w )
 
 static ADDRESS_MAP_START( main_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
@@ -355,13 +355,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(main_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(main_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(main_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sub_cpu)
+	AM_RANGE(0x01, 0x01) AM_WRITE(main_bankswitch_w) // correct?
+	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_slave_cpu)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( sub_bankswitch_w )
+static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "sub");
+	unsigned char *ROM = memory_region(space->machine, "slave");
 	int bank=(data&0x03);
 	port0_data=data;
 	ROM = &ROM[0x4000 * bank];
@@ -379,9 +379,9 @@ static WRITE8_HANDLER( hu_scrolly_w)
 	hu_scrolly=data;
 }
 
-static ADDRESS_MAP_START( sub_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE(&paletteram_2)
@@ -391,15 +391,15 @@ static ADDRESS_MAP_START( sub_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sub_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START(slave_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sub_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READ(mermaid_data_r) AM_WRITE(mermaid_data_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(mermaid_data_r,mermaid_data_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(hu_scrolly_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_RAM
+	AM_RANGE(0x0e, 0x0e) AM_RAM //should be coin info, see djoy.c
 
 //  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
 //  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
@@ -418,7 +418,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static ADDRESS_MAP_START( sound_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -458,7 +458,7 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/*copied from DJ Boy, might be wrong */
+	/*copied from DJ Boy, WRONG */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -568,14 +568,14 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 
 static MACHINE_DRIVER_START( hvyunit )
 
-	MDRV_CPU_ADD("maincpu", Z80,6000000)
+	MDRV_CPU_ADD("master", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(main_memory)
 	MDRV_CPU_IO_MAP(main_io)
 	MDRV_CPU_VBLANK_INT_HACK(hvyunit_interrupt,2)
 
-	MDRV_CPU_ADD("sub", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(sub_memory)
-	MDRV_CPU_IO_MAP(sub_io)
+	MDRV_CPU_ADD("slave", Z80,6000000)
+	MDRV_CPU_PROGRAM_MAP(slave_memory)
+	MDRV_CPU_IO_MAP(slave_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 6000000)
@@ -610,10 +610,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hvyunit )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "b73_10.5c",  0x00000, 0x20000, CRC(ca52210f) SHA1(346951962aa5bbad641117dbd66f035dddc7c0bf) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b73_11.5p",  0x00000, 0x10000, CRC(cb451695) SHA1(116fd59f96a54c22fae65eea9ee5e58cb9ce5074) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -637,10 +637,10 @@ ROM_START( hvyunit )
 ROM_END
 
 ROM_START( hvyunitj )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "b73_30.5c",  0x00000, 0x20000, CRC(600af545) SHA1(c52b9be2bae28848ad0818c296f000a1bda4fa4f) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b73_14.5p",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -664,10 +664,10 @@ ROM_START( hvyunitj )
 ROM_END
 
 ROM_START( hvyunito )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "b73_13.5c",  0x00000, 0x20000, CRC(e2874601) SHA1(7f7f3287113b8622eb365d04135d2d9c35d70554) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b73_14.5p",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
