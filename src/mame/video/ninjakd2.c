@@ -442,13 +442,14 @@ static int stencil_robokid(  UINT16 pal ) { return( (pal & 0xf0) <  0xe0 ); }
 static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
 //////            OVERDRAW     STENCIL     UNKNOWN
 //////  NINJAKD2  023459ABCDE  F           1678
-//////    MNIGHT  023459ABCDE  F           279
+//////    MNIGHT  0134568ABCDE F           279
 //////   ARKAREA  012345679BDE             8ACF
 //////   ROBOKID  EF           01236       45789ABCD
-//////    OMEGAF                                     unused ?
+//////    OMEGAF  -            -           -         (unused)
 // I could not find a port to select overdraw or stencil.
 // Temporarily, I compare with constant number.
 // This is very hackish.
+// (Is there a possibility that software can't select it but hardware can?)
 
 static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
