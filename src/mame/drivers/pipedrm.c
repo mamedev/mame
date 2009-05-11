@@ -128,7 +128,7 @@ static MACHINE_RESET( pipedrm )
 	memory_set_bank(machine, 1, 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 	/* state save */
 	state_save_register_global(machine, pending_command);
@@ -181,7 +181,7 @@ static TIMER_CALLBACK( delayed_command_w	)
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -518,7 +518,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -554,7 +554,7 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
+	MDRV_CPU_ADD("sub", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 
@@ -593,7 +593,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
+	MDRV_CPU_ADD("sub", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(hatris_sound_portmap)
 
@@ -636,7 +636,7 @@ ROM_START( pipedrm )
 	ROM_LOAD( "y1.u129",	0x00000, 0x08000, CRC(9b4d84a2) SHA1(82c26cf52b37ca3bcc10a534759e7bb52b1daa2d) )
 	ROM_LOAD( "yb.u110",	0x10000, 0x10000, CRC(7416554a) SHA1(612aff94da3ec282e200c07eae9af26a28e071bd) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -670,7 +670,7 @@ ROM_START( pipedrmu )
 	ROM_LOAD( "01.u12",	0x00000, 0x08000, CRC(9fe261fb) SHA1(57beeeade8809be0a71086f55b14b1676c0b3759) )
 	ROM_LOAD( "02.u11",	0x10000, 0x10000, CRC(c8209b67) SHA1(cca7356d75e8091b07e3328aef523ff452abbcd8) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -705,7 +705,7 @@ ROM_START( pipedrmj )
 	ROM_LOAD( "1",	0x00000, 0x08000, CRC(dbfac46b) SHA1(98ddfaed61de28b238964445572eb398b9dd03c7) )
 	ROM_LOAD( "2",	0x10000, 0x10000, CRC(b7adb99a) SHA1(fdab2b99e86aa0b6b17ec95556222e5211ba55e9) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "sub", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -739,7 +739,7 @@ ROM_START( hatris )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2.ic79",	0x00000, 0x08000, CRC(4ab50b54) SHA1(0eaab164a88c127bdf05c72f36d95be7fa3bb7de) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "1-ic81.bin",	0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -761,7 +761,7 @@ ROM_START( hatrisj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-ic79.bin",	0x00000, 0x08000, CRC(bbcaddbf) SHA1(7f01493dadfed87112644a8ef77ae58fa273980d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "1-ic81.bin",	0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
