@@ -462,7 +462,7 @@ static void r6532_irq(const device_config *device, int state)
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	if (has_mc3417)
-		cputag_set_input_line(device->machine, "cvsd", INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(device->machine, "cvsdcpu", INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
