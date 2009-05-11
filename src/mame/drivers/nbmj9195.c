@@ -530,7 +530,7 @@ static DRIVER_INIT( nbmj9195 )
 	nbmj9195_soundbank_w(space, 0, 0);
 }
 
-static ADDRESS_MAP_START( tmpz84c011_regs, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmpz84c011_regs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("main_ctc", z80ctc_r,z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w)
