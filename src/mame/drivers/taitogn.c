@@ -1145,7 +1145,7 @@ ROM_START(otenamih)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "otenamih", 0, SHA1(e1ee6444c939900fe96e12ceb65d945ab7136306) )
+	DISK_IMAGE( "otenamih", 0, SHA1(b3babe3a1876c43745616ee1e7d87276ce7dad0b) )
 ROM_END
 
 
@@ -1217,7 +1217,7 @@ ROM_START(shangtou)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "shanghaito", 0, SHA1(bbf588f18a4c793a5a74e795663a1f1f8ee7d08c) )
+	DISK_IMAGE( "shanghaito", 0, SHA1(9901db5a9aae77e3af4157aa2c601eaab5b7ca85) )
 ROM_END
 
 
