@@ -1145,7 +1145,7 @@ ROM_START(otenamih)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "otenamih", 0, BAD_DUMP SHA1(10706d0497aea8891166ed2ca7b84e7b7e85bd28) ) // wrong IDENT metadata
+	DISK_IMAGE( "otenamih", 0, SHA1(e1ee6444c939900fe96e12ceb65d945ab7136306) )
 ROM_END
 
 
@@ -1217,7 +1217,7 @@ ROM_START(shangtou)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "shanghaito", 0, BAD_DUMP SHA1(59d34cccb91b18d3f87dbd3089dc23e841b8d11d) ) // wrong IDENT metadata
+	DISK_IMAGE( "shanghaito", 0, SHA1(bbf588f18a4c793a5a74e795663a1f1f8ee7d08c) )
 ROM_END
 
 
