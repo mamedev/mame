@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( fromancr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP							// VRAM Unused ?
 
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromancr_paletteram_0_r, fromancr_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_0_w)	// PALETTE (2P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_1_w)	// PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)			// SCROLL REG (1P/2P)
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP							// ?
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)	// VRAM TEXT (1P/2P)
 
 	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_0_w)	// PALETTE (2P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_1_w)	// PALETTE (2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
