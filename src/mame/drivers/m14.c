@@ -278,7 +278,7 @@ static INTERRUPT_GEN( m14_irq )
 static MACHINE_DRIVER_START( m14 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",8085A,6000000)
+	MDRV_CPU_ADD("maincpu",8085A,6000000/2) //guess: 6 Mhz internally divided by 2
 	MDRV_CPU_PROGRAM_MAP(m14_map)
 	MDRV_CPU_IO_MAP(m14_io_map)
 	MDRV_CPU_VBLANK_INT("screen",m14_irq)
