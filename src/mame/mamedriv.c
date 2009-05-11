@@ -7115,7 +7115,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pipedrm )	/* (c) 1990 Video System Co. (World) */
 	DRIVER( pipedrmu )	/* (c) 1990 Video System Co. (US) */
 	DRIVER( pipedrmj )	/* (c) 1990 Video System Co. (Japan) */
-	DRIVER( hatris )	/* (c) 1990 Video System Co. (Japan) */
+	DRIVER( hatris )	/* (c) 1990 Video System Co. (World) */
+	DRIVER( hatrisj )	/* (c) 1990 Video System Co. (Japan) */
 	DRIVER( spinlbrk )	/* (c) 1990 V-System Co. (World) */
 	DRIVER( spinlbru )	/* (c) 1990 V-System Co. (US) */
 	DRIVER( spinlbrj )	/* (c) 1990 V-System Co. (Japan) */
