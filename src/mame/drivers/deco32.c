@@ -866,6 +866,10 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 	AM_RANGE(0x178000, 0x179fff) AM_RAM AM_BASE(&spriteram32_2) AM_SIZE(&spriteram_2_size)
 
+	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_2_w)
+	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
+
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
