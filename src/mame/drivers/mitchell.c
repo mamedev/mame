@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)/* Banked char / OBJ RAM */
