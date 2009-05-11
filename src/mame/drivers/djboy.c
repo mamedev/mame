@@ -170,10 +170,6 @@ extern VIDEO_START( djboy );
 extern VIDEO_UPDATE( djboy );
 extern VIDEO_EOF( djboy );
 
-static UINT8 *sharedram;
-static READ8_HANDLER( sharedram_r )	{ return sharedram[offset]; }
-static WRITE8_HANDLER( sharedram_w )	{ sharedram[offset] = data; }
-
 /******************************************************************************/
 
 /* KANEKO BEAST state */
@@ -737,13 +733,13 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xafff) AM_ROMBANK(4)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&sharedram)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_port_am, ADDRESS_SPACE_IO, 8 )
@@ -754,19 +750,19 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM) AM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_READ(SMH_RAM) AM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd400, 0xd8ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(sharedram_r) AM_WRITE(sharedram_w)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd400, 0xd8ff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READ(beast_data_r) AM_WRITE(beast_data_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(beast_data_r,beast_data_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(djboy_scrolly_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
@@ -777,9 +773,9 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu2_am, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(3))
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_port_am, ADDRESS_SPACE_IO, 8 )
