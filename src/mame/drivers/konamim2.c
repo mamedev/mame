@@ -1103,7 +1103,7 @@ static ADDRESS_MAP_START( m2_main, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP		// ???
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE(2)
 	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE(3) AM_BASE(&main_ram)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE(2)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( m2 )
@@ -1159,64 +1159,72 @@ static MACHINE_DRIVER_START( m2 )
 MACHINE_DRIVER_END
 
 
-ROM_START(polystar)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6))
+ROM_START( polystar )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x80, "user2", 0 ) /* serial eeprom */
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(66d02984) SHA1(d07c57d198c611b6ff67a783c20a3d038ba34cd1) )
 
-	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "623jaa02", 0, SHA1(cd542931cdac95d05344d34421e223dd6e371bb5))
+	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
+	DISK_IMAGE( "623jaa02", 0, BAD_DUMP SHA1(cd542931cdac95d05344d34421e223dd6e371bb5) )
 ROM_END
 
-ROM_START(btltryst)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
+ROM_START( btltryst )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "btltryst", 0, SHA1(c76326b0a0fcfe696a2ca019170d3abde40e773e))
+	DISK_IMAGE( "btltryst", 0, SHA1(c76326b0a0fcfe696a2ca019170d3abde40e773e) )
 ROM_END
 
-ROM_START(heatof11)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
+ROM_START( heatof11 )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )	/* boot rom */
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* timekeeper eeprom */
+	ROM_REGION( 0x2000, "timekeep", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "heatof11", 0, SHA1(5a0a2782cd8676d3f6dfad4e0f805b309e230d8b))
+	DISK_IMAGE( "heatof11", 0, SHA1(5a0a2782cd8676d3f6dfad4e0f805b309e230d8b) )
 ROM_END
 
-ROM_START(evilngt)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
+ROM_START( evilngt )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x1000, "user2", 0 ) /* timekeeper eeprom */
-	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
-ROM_END
-
-ROM_START(hellngt)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
-
-	ROM_REGION( 0x1000, "user2", 0 ) /* timekeeper eeprom */
+	ROM_REGION( 0x1000, "timekeep", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
 
-	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "810eaa02", 0, SHA1(c407bad498cb87788ce332dbef5e8c6e19c1fd16))
+	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
+
+	// TODO: Add CHD
 ROM_END
 
-ROM_START(totlvice)
-	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
-	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
+ROM_START( hellngt )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x100000, "user2", 0 ) /* sound rom on sub board */
+	ROM_REGION( 0x1000, "timekeep", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board. NOTE: May not be the same as evilngt! */
+	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
+
+	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
+	DISK_IMAGE( "810eaa02", 0, BAD_DUMP SHA1(c407bad498cb87788ce332dbef5e8c6e19c1fd16) )
+ROM_END
+
+ROM_START( totlvice )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "639jad01", 0, SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8))
+	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
+	DISK_IMAGE( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
 static DRIVER_INIT( m2 )
