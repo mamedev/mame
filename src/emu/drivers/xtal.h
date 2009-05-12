@@ -75,6 +75,7 @@ enum
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
+	XTAL_10_6875MHz 	= 10687500,		/* BBC Bridge Companion */
 	XTAL_10_730MHz   	= 10730000,		/* Ruleta RE-900 VDP Clock */
 	XTAL_10_733MHz   	= 10733000,		/* The Fairyland Story */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
@@ -118,6 +119,7 @@ enum
 	XTAL_22_1184MHz		= 22118400,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
+	XTAL_24_8832MHz 	= 24883200,		/* DEC VT100 */
 	XTAL_25MHz   		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
 	XTAL_25_1748MHz  	= 25174800,		/* Sega S16A, S16B */
 	XTAL_25_447MHz  	= 25447000,		/* Namco EVA3A (Funcube2) */
