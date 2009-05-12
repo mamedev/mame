@@ -461,12 +461,12 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			#if DEBUG_SYSCTRL
 			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE0])
-					mame_printf_verbose("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
 				else
 					mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
 			else if ((address >= 0x13000000) && (address <= 0x13FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE1])
-					mame_printf_verbose("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
 				else
 					mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
 			else if ((address >= 0x10800000) && (address <= 0x10ffffff))
@@ -476,7 +476,15 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			else
 				mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 			#endif
-			dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
+			if ((address >= 0x10000000) && (address <= 0x10ffffff))
+			{
+				dc_sysctrl_regs[SB_C2DSTAT]=address;
+			}
+			else
+			{
+				dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
+			}
+			
 			dc_sysctrl_regs[SB_C2DLEN]=0;
 			dc_sysctrl_regs[SB_C2DST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
