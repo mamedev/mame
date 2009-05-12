@@ -1630,7 +1630,7 @@ static MACHINE_DRIVER_START( system_Z )
 	MDRV_CPU_PROGRAM_MAP(megasys1A_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	MDRV_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
 	MDRV_CPU_IO_MAP(z80_sound_io_map)
 
@@ -2748,7 +2748,7 @@ ROM_START( lomakai )
 	ROM_LOAD16_BYTE( "lom_30.rom", 0x000000, 0x020000, CRC(ba6d65b8) SHA1(4c83e57c977b2be82a99a4a61ab8fd5f7099ae38) )
 	ROM_LOAD16_BYTE( "lom_20.rom", 0x000001, 0x020000, CRC(56a00dc2) SHA1(5d97f89d384e12d70cbb5aabd6ce309e5cfb5497) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound CPU Code (Z80) */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Sound CPU Code (Z80) */
 	ROM_LOAD( "lom_01.rom",  0x0000, 0x10000, CRC(46e85e90) SHA1(905899346f7cd91e76d0e303258149c3d16604e0) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Scroll 0 */
@@ -2771,7 +2771,7 @@ ROM_START( makaiden )
 	ROM_LOAD16_BYTE( "makaiden.3a", 0x000000, 0x020000, CRC(87cf81d1) SHA1(c4410a86a01c683368dbc3daca61e21931885650) )
 	ROM_LOAD16_BYTE( "makaiden.2a", 0x000001, 0x020000, CRC(d40e0fea) SHA1(0f8a0440f63f52508ab44c3a8eb5b7f03ccca49d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound CPU Code (Z80) */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Sound CPU Code (Z80) */
 	ROM_LOAD( "lom_01.rom",  0x0000, 0x10000, CRC(46e85e90) SHA1(905899346f7cd91e76d0e303258149c3d16604e0) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Scroll 0 */
