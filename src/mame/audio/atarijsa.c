@@ -532,8 +532,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (oki6295_l != NULL) okim6295_set_pin7(oki6295_l, data & 8);
-			if (oki6295_r != NULL) okim6295_set_pin7(oki6295_r, data & 8);
+			if (oki6295 != NULL) okim6295_set_pin7(oki6295, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
