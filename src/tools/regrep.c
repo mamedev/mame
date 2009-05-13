@@ -59,7 +59,7 @@ typedef struct _summary_file summary_file;
 struct _summary_file
 {
     summary_file *  next;
-    char            name[10];
+    char            name[20];
     char            source[100];
     UINT8           status[MAX_COMPARES];
     UINT8			matchbitmap[MAX_COMPARES];
