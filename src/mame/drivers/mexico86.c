@@ -8,8 +8,8 @@ ernesto@imagina.com
 Notes:
 - master/slave 4 players mode is not emulated at all.
 
-- Single board 4 players mode is emulated but the 2p mode is broken if you
-  enable the shared ram on the sub cpu side. Disabled for now.
+- Single board 4 players mode actually works but I'm not sure how the reset /
+  halt line is truly connected on the sub cpu, so I've disabled it by default.
 
 - kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
   PS4 is the MC6801U4 mcu.
@@ -62,12 +62,6 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 }
 //ZT
 
-static WRITE8_HANDLER( mexico86_comms_w )
-{
-	if(data & 0x01)
-		cputag_set_input_line(space->machine, "sub", 0,HOLD_LINE);
-}
-
 static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)  	 				/* banked roms */
@@ -79,7 +73,7 @@ static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  	/* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    	  	/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
-	AM_RANGE(0xf018, 0xf018) AM_WRITE(mexico86_comms_w)			/* watchdog? */
+	AM_RANGE(0xf018, 0xf018) AM_WRITENOP						/* watchdog? */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)					/* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
@@ -108,13 +102,13 @@ static WRITE8_HANDLER( mexico86_sub_output_w )
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/
 	/*---- -x-- coin counter*/
-	/*---- --x- <unknown, always high>*/
+	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
 static ADDRESS_MAP_START( mexico86_sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM //AM_SHARE(2)  /* shared with main */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2)  /* shared with main */
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN4")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")
@@ -384,6 +378,13 @@ static const ym2203_interface ym2203_config =
 };
 
 
+static MACHINE_RESET( mexico86 )
+{
+	/*TODO: check the PCB and see how the halt / reset lines are connected. */
+	if (cputag_get_cpu(machine, "sub") != NULL)
+		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	//cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static MACHINE_DRIVER_START( mexico86 )
 
@@ -401,9 +402,12 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+
+	MDRV_MACHINE_RESET(mexico86)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -435,6 +439,7 @@ static MACHINE_DRIVER_START( knightb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mexico86)
+
 	MDRV_CPU_REMOVE("sub")
 
 	/* video hardware */
