@@ -6,9 +6,10 @@ Ernesto Corvi
 ernesto@imagina.com
 
 Notes:
-- 4 players mode is not emulated. This involves some shared RAM and a subboard.
-  There is additional code for a third Z80 in the bootleg version, I don't
-  know if it's related or if its just a replacement for the 68705.
+- master/slave 4 players mode is not emulated at all.
+
+- Single board 4 players mode is emulated but the 2p mode is broken if you
+  enable the shared ram on the sub cpu side. Disabled for now.
 
 - kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
   PS4 is the MC6801U4 mcu.
@@ -61,8 +62,11 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 }
 //ZT
 
-
-
+static WRITE8_HANDLER( mexico86_comms_w )
+{
+	if(data & 0x01)
+		cputag_set_input_line(space->machine, "sub", 0,HOLD_LINE);
+}
 
 static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -75,7 +79,7 @@ static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  	/* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    	  	/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
-	AM_RANGE(0xf018, 0xf018) AM_WRITENOP						/* watchdog? */
+	AM_RANGE(0xf018, 0xf018) AM_WRITE(mexico86_comms_w)			/* watchdog? */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)					/* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
@@ -99,12 +103,23 @@ static ADDRESS_MAP_START( mexico86_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( mexico86_sub_output_w )
+{
+	/*--x- ---- coin lockout 2*/
+	/*---x ---- coin lockout 1*/
+	/*---- -x-- coin counter*/
+	/*---- --x- <unknown, always high>*/
+}
+
 static ADDRESS_MAP_START( mexico86_sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM //AM_SHARE(2)
-	AM_RANGE(0xc000, 0xc003) AM_NOP
-	AM_RANGE(0xc004, 0xc004) AM_WRITENOP
+	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM //AM_SHARE(2)  /* shared with main */
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN4")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN7")
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(mexico86_sub_output_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mexico86 )
@@ -190,7 +205,7 @@ static INPUT_PORTS_START( mexico86 )
 
 	PORT_START("IN3")
 	/* the following is actually service coin 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -198,6 +213,38 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //p3 service
+
+	PORT_START("IN5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //p4 service
+
+	PORT_START("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_COIN3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_COIN4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kikikai )
@@ -354,7 +401,6 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
