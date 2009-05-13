@@ -1018,7 +1018,7 @@ static INPUT_PORTS_START( naomi )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
-	
+
 	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
@@ -1131,7 +1131,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
-	
+
 	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
@@ -3896,6 +3896,34 @@ ROM_START( monkeyba )
 	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
 ROM_END
 
+/*
+This is the I/O board used for Dynamic Golf which is
+located under the panel.
+It must be connected to the normal I/O board with a USB cable.
+
+PCB Layout
+----------
+
+837-13938
+|--------------------|
+|CN2      CN1        |
+|                    |
+|      |-----|       |
+|      | IC2 |       |
+| CN3  |     |       |
+|      |-----|    IC3|
+|LED    CN4     IC4  |
+|--------------------|
+Notes:
+      CN1 - 24 pin connector. not used
+      CN2 - 4 pin connector used for 5 volt power input
+      CN3 - USB connector type B
+      CN4 - 16 pin connector used for buttons and trackball
+      IC1 - HC240 logic IC (SOIC20)
+      IC2 - Sega 315-6146 custom IC (QFP176)
+      IC3 - 27C512 EPROM with label 'EPR-22084' (DIP28)
+      IC4 - HC4020 logic IC (SOIC16)
+*/
 
 ROM_START( dygolf )
 	NAOMIGD_BIOS
@@ -3909,6 +3937,9 @@ ROM_START( dygolf )
 	//PIC16C622A (317-0308-COM)
 	//(sticker 253-5508-0308)
 	ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
+
+	ROM_REGION( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-22-84.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 ROM_END
 
 
