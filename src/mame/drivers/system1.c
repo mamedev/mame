@@ -209,6 +209,9 @@ static UINT8 *system1_ram;
 static UINT8 dakkochn_mux_data;
 static UINT8 videomode_prev;
 static UINT8 mcu_control;
+static UINT8 *nob_mcu_status;
+static UINT8 *nob_mcu_latch;
+static UINT8 nob_maincpu_latch;
 
 
 
@@ -357,6 +360,7 @@ static MACHINE_START( system1 )
 	state_save_register_global(machine, dakkochn_mux_data);
 	state_save_register_global(machine, videomode_prev);
 	state_save_register_global(machine, mcu_control);
+	state_save_register_global(machine, nob_maincpu_latch);
 }
 
 
@@ -450,7 +454,7 @@ static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevda
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	/* bit 0 = MUTE */
-	sound_global_enable(~(data & 1));
+	sound_global_enable(~data & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 
@@ -597,6 +601,55 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 
 /*************************************
  *
+ *  nob MCU 
+ *
+ *************************************/
+
+static WRITE8_HANDLER( nob_mcu_control_p2_w )
+{
+	/* bit 0 triggers a read from MCU port 0 */
+	if (((mcu_control ^ data) & 0x01) && !(data & 0x01))
+		*nob_mcu_latch = nob_maincpu_latch;
+
+	/* bit 1 triggers a write from MCU port 0 */
+	if (((mcu_control ^ data) & 0x02) && !(data & 0x02))
+		nob_maincpu_latch = *nob_mcu_latch;
+	
+	/* bit 2 is toggled once near the end of an IRQ */
+	if (((mcu_control ^ data) & 0x04) && !(data & 0x04))
+		cpu_set_input_line(space->cpu, MCS51_INT0_LINE, CLEAR_LINE);
+	
+	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
+	if (((mcu_control ^ data) & 0x08) && !(data & 0x08))
+		;//logerror("MCU IRQ(8) toggle\n");
+	
+	mcu_control = data;
+}
+
+
+static READ8_HANDLER( nob_maincpu_latch_r )
+{
+	return nob_maincpu_latch;
+}
+
+
+static WRITE8_HANDLER( nob_maincpu_latch_w )
+{
+	nob_maincpu_latch = data;
+	cputag_set_input_line(space->machine, "mcu", MCS51_INT0_LINE, ASSERT_LINE);
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+}
+
+
+static READ8_HANDLER( nob_mcu_status_r )
+{
+	return *nob_mcu_status;
+}
+
+
+
+/*************************************
+ *
  *  Generic port definitions
  *
  *************************************/
@@ -716,6 +769,14 @@ static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( nob_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE(&nob_mcu_latch)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE(&nob_mcu_status)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
 ADDRESS_MAP_END
 
 
@@ -2120,7 +2181,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nobm )
 	MDRV_IMPORT_FROM( nob )
-	MDRV_IMPORT_FROM( mcu )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("mcu", I8751, SOUND_CLOCK)
+	MDRV_CPU_IO_MAP(nob_mcu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -4560,6 +4624,29 @@ static DRIVER_INIT( myherok )
 	myheroj_decode(machine, "maincpu");
 }
 
+static READ8_HANDLER( nob_start_r )
+{
+	/* in reality, it's likely some M1-dependent behavior */
+	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : memory_region(space->machine, "maincpu")[1];
+}
+
+static DRIVER_INIT( nob )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+
+	DRIVER_INIT_CALL(bank44);
+	
+	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
+	/* patching the ROM causes errors in the self-test */
+	/* in real-life, it could be some behavior dependent upon M1 */
+	memory_install_read8_handler(space, 0x0001, 0x0001, 0x0000, 0x0000, nob_start_r);
+	
+	/* install MCU communications */
+	memory_install_readwrite8_handler(iospace, 0x18, 0x18, 0x00, 0x00, nob_maincpu_latch_r, nob_maincpu_latch_w);
+	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x00, 0x00, nob_mcu_status_r);
+}
+
 static DRIVER_INIT( nobb )
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
@@ -4577,17 +4664,17 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	UINT8 *ROM2 = memory_region(machine, "soundcpu");
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
 	DRIVER_INIT_CALL(bank44);
 
-	memory_install_read8_handler(space, 0x1c, 0x1c, 0x00, 0x00, nobb_inport1c_r);
-	memory_install_read8_handler(space, 0x22, 0x22, 0x00, 0x00, nobb_inport22_r);
-	memory_install_read8_handler(space, 0x23, 0x23, 0x00, 0x00, nobb_inport23_r);
-	memory_install_write8_handler(space, 0x24, 0x24, 0x00, 0x00, nobb_outport24_w);
+	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x00, 0x00, nobb_inport1c_r);
+	memory_install_read8_handler(iospace, 0x22, 0x22, 0x00, 0x00, nobb_inport22_r);
+	memory_install_read8_handler(iospace, 0x23, 0x23, 0x00, 0x00, nobb_inport23_r);
+	memory_install_write8_handler(iospace, 0x24, 0x24, 0x00, 0x00, nobb_outport24_w);
 }
 
 
@@ -4612,8 +4699,8 @@ static DRIVER_INIT( choplift )
 	UINT8 *mcurom = memory_region(machine, "mcu");
 	
 	/* the ROM dump we have is bad; the following patches make it work */
-	mcurom[0x100] = 0x55;	/* D5 in current dump */
-	mcurom[0x27b] = 0xfb;	/* F2 in current dump */
+	mcurom[0x100] = 0x55;		/* D5 in current dump */
+	mcurom[0x27b] = 0xfb;		/* F2 in current dump */
 	mcurom[0x2ff] = 0xff - 9;	/* fix up checksum; means there's still something incorrect */
 	
 	DRIVER_INIT_CALL(bank0c);
@@ -4621,11 +4708,11 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	memory_install_read_port_handler(space, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
-	memory_install_read_port_handler(space, 0x18, 0x18, 0x00, 0x03, "18");
-	memory_install_read_port_handler(space, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
-	memory_install_read_port_handler(space, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
+	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_install_read_port_handler(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
+	memory_install_read_port_handler(iospace, 0x18, 0x18, 0x00, 0x03, "18");
+	memory_install_read_port_handler(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
+	memory_install_read_port_handler(iospace, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }
 
@@ -4657,7 +4744,7 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,  seganinj,  bank00,   ROT0,   "Sega",
 GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1986, nob,        0,        nobm,     nob,       bank44,   ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
+GAME( 1986, nob,        0,        nobm,     nob,       nob,      ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */

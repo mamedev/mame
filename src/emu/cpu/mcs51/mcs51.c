@@ -140,7 +140,7 @@
 #include "debugger.h"
 #include "mcs51.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
@@ -326,8 +326,11 @@ struct _mcs51_state_t
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-#define IRAM_IR(a) 		memory_read_byte_8le(mcs51_state->data, (a) & mcs51_state->ram_mask)
-#define IRAM_IW(a, d) 	memory_write_byte_8le(mcs51_state->data, (a) & mcs51_state->ram_mask, d)
+INLINE UINT8 iram_iread(mcs51_state_t *mcs51_state, offs_t a) { return (a <= mcs51_state->ram_mask) ? memory_read_byte_8le(mcs51_state->data, a) : 0xff; }
+INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <= mcs51_state->ram_mask) memory_write_byte_8le(mcs51_state->data, a, d); }
+
+#define IRAM_IR(a)		iram_iread(mcs51_state, a)
+#define IRAM_IW(a, d)	iram_iwrite(mcs51_state, a, d)
 
 /* Form an Address to Read/Write to External RAM indirectly */
 /* (called from indirect addressing)                        */
