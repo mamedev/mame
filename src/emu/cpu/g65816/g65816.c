@@ -396,13 +396,16 @@ static CPU_SET_INFO( g65816 )
 		case CPUINFO_INT_REGISTER + G65816_E:			g65816_set_reg(cpustate, G65816_E, info->i);		break;
 		case CPUINFO_INT_REGISTER + G65816_NMI_STATE:	g65816_set_reg(cpustate, G65816_NMI_STATE, info->i); break;
 		case CPUINFO_INT_REGISTER + G65816_IRQ_STATE:	g65816_set_reg(cpustate, G65816_IRQ_STATE, info->i); break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_G65816_READVECTOR_CALLBACK:	READ_VECTOR = (read8_space_func) info->f;	break;
 	}
 }
 
 
+
+void g65816_set_read_vector_callback(const device_config *device, read8_space_func read_vector)
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
+	READ_VECTOR = read_vector;
+}
 
 /**************************************************************************
  * Generic get_info
@@ -470,7 +473,6 @@ CPU_GET_INFO( g65816 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(g65816);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;			break;
-		case CPUINFO_FCT_G65816_READVECTOR_CALLBACK:	info->f = (genf *) READ_VECTOR;			break;
 
 		case CPUINFO_FCT_READOP:						info->readop = CPU_READOP_NAME(g65816);			break;
 

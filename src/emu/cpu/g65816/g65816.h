@@ -58,15 +58,11 @@ enum
 	G65816_NMI_STATE, G65816_IRQ_STATE
 };
 
-enum
-{
-	CPUINFO_FCT_G65816_READVECTOR_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC
-};
-
 /* Main interface function */
 CPU_GET_INFO( g65816 );
 #define CPU_G65816 CPU_GET_INFO_NAME( g65816 )
 
+void g65816_set_read_vector_callback(const device_config *device, read8_space_func read_vector);
 
 
 /* ======================================================================== */
