@@ -38,7 +38,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 /* M6585 */
 
-static int start, end, bank;
+static UINT32 msm_start, msm_end, msm_bank;
+static UINT32 adpcm_start, adpcm_end, adpcm_idle;
 
 /***********************************************************
                       INTERRUPTS
@@ -119,7 +120,7 @@ static WRITE16_HANDLER( ioc_w )
 	switch (offset)
 	{
 		// these are all written every frame
-		/*case 0x3b:
+		case 0x3b:
 		case 0xa:
 		case 0xc:
 		case 0xb:
@@ -127,21 +128,17 @@ static WRITE16_HANDLER( ioc_w )
 		case 0xe:
 		case 0xf:
 		case 0x10:
-			break;
 		case 0x47:
-			popmessage("%04x",data);
-			break;*/
+			break;
 
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
-			if (data & 0x10) // Check this, this looks a 8-bit port so it must be bit 12, not 4 -AS
-				bank = 0x100000;
-			else
-				bank = 0;
+			msm_bank = data & 0x1000 ? 0x100000 : 0;
 			okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * ((data & 0x800)>>11));
 			break;
 
 		case 0x45:
+			//adpcm_idle = 1;
 			break;
 
 		// OKIM6295
@@ -152,32 +149,38 @@ static WRITE16_HANDLER( ioc_w )
 
 		// MSM6585 ADPCM - mini emulation
 		case 0x60:
-			start &= 0xffff00;
-			start |= (data>>8);
+			msm_start &= 0xffff00;
+			msm_start |= (data>>8);
 			break;
 		case 0x61:
-			start &= 0xff00ff;
-			start |= data;
+			msm_start &= 0xff00ff;
+			msm_start |= data;
 			break;
 		case 0x62:
-			start &= 0x00ffff;
-			start |= (data<<8);
+			msm_start &= 0x00ffff;
+			msm_start |= (data<<8);
 			break;
 		case 0x63:
-			end &= 0xffff00;
-			end |= (data>>8);
+			msm_end &= 0xffff00;
+			msm_end |= (data>>8);
 			break;
 		case 0x64:
-			end &= 0xff00ff;
-			end |= data;
+			msm_end &= 0xff00ff;
+			msm_end |= data;
 			break;
 		case 0x65:
-			end &= 0x00ffff;
-			end |= (data<<8);
+			msm_end &= 0x00ffff;
+			msm_end |= (data<<8);
 			break;
 		case 0x66:
-			if (start < end)
+			if (msm_start < msm_end)
 			{
+				/* data written here is adpcm param? */
+				//popmessage("%08x %08x",msm_start+msm_bank,msm_end);
+				adpcm_idle = 0;
+				msm5205_reset_w(devtag_get_device(space->machine, "msm"),0);
+				adpcm_start = msm_start+msm_bank;
+				adpcm_end = msm_end;
 //              ADPCM_stop(0);
 //              ADPCM_play(0, start+bank, end-start);
 			}
@@ -197,7 +200,28 @@ static WRITE16_HANDLER( ioc_w )
 
 
 /* Controlled through ioc? */
+static void gcp_adpcm_int(const device_config *device)
+{
+	static UINT8 trigger,adpcm_data;
 
+	if (adpcm_idle)
+		msm5205_reset_w(device,1);
+	if (adpcm_start >= 0x200000 || adpcm_start > adpcm_end)
+	{
+		//msm5205_reset_w(device,1);
+		adpcm_start = msm_start+msm_bank;
+		trigger = 0;
+	}
+	else
+	{
+		UINT8 *ROM = memory_region(device->machine, "msm");
+
+		adpcm_data = ((trigger ? (ROM[adpcm_start] & 0x0f) : (ROM[adpcm_start] & 0xf0)>>4) );
+		msm5205_data_w(device,adpcm_data & 0xf);
+		trigger^=1;
+		if(trigger == 0) { adpcm_start++; }
+	}
+}
 
 
 /***********************************************************
@@ -357,9 +381,14 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	NULL,				/* VCK function */
+	gcp_adpcm_int,		/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
 };
+
+static MACHINE_RESET( gcpinbal )
+{
+	adpcm_idle = 1;
+}
 
 /***********************************************************
                         MACHINE DRIVERS
@@ -382,6 +411,8 @@ static MACHINE_DRIVER_START( gcpinbal )
 
 	MDRV_GFXDECODE(gcpinbal)
 	MDRV_PALETTE_LENGTH(4096)
+
+	MDRV_MACHINE_RESET(gcpinbal)
 
 	MDRV_VIDEO_START(gcpinbal)
 	MDRV_VIDEO_UPDATE(gcpinbal)
