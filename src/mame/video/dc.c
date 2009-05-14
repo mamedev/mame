@@ -581,15 +581,15 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	int miptype = 0;
 
 	t->textured    = sa->texture;
-	
+
 	// not textured, abort.
 	if (!t->textured) return;
-	
+
 	t->address     = sa->textureaddress;
 	t->pf          = sa->pixelformat;
 	t->palette 	   = 0;
-	
-	
+
+
 	t->mode = (sa->vqcompressed<<1);
 
 	// scanorder is ignored for palettized textures (palettized textures are ALWAYS twiddled)
@@ -602,41 +602,41 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	{
 		t->mode |= sa->scanorder;
 	}
-	
+
 	/* When scan order is 0 stride select is ignored */
 	/* When scan order is 1 mipmap is ignored */
 	if (t->mode&1)
 	{
 		/* scan order is 1 (non-twiddled tezture), use stride select if specified*/
 		t->mode |= (sa->strideselect<<2);
-		
+
 		/* scan order is 1 (non-twiddled tezture), ignore mipmaps */
 		t->mipmapped  = 0;
 	}
-	else 
+	else
 	{
 		/* scan order is 0 (twiddled tezture), ignore stride select*/
 		//t->mode += (sa->strideselect<<2);
-		
+
 		/* scan order is 0 (twiddled tezture), use mipmap if specified */
 		t->mipmapped  = sa->mipmapped;
 	}
-	
+
 	// Mipmapped textures are always square, ignore v size
 	if (t->mipmapped)
-	{	
+	{
 		t->sizes = (sa->texturesizes & 0x38) | ((sa->texturesizes & 0x38) >> 3);
 	}
 	else
 	{
 		t->sizes = sa->texturesizes;
 	}
-	
+
 	t->sizex = 1 << (3+((t->sizes >> 3) & 7));
 	t->sizey = 1 << (3+(t->sizes & 7));
-	
-	
-	
+
+
+
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
 	t->flip_u      = (sa->flipuv >> 1) & 1;
@@ -660,7 +660,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 
 		default:
 			//
-			break;	
+			break;
 		}
 		break;
 
@@ -673,7 +673,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 
 		default:
 			//
-			break;	
+			break;
 		}
 		break;
 
@@ -681,12 +681,12 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		switch(t->mode) {
 		case 0:  t->r = tex_r_4444_tw; miptype = 2; break;
 		case 1:  t->r = tex_r_4444_n;  miptype = 2; break;
-		case 2: 
+		case 2:
 		case 3:  t->r = tex_r_4444_vq; miptype = 3; t->address += 0x800; break;
 
 		default:
 			//
-			break;	
+			break;
 		}
 		break;
 
@@ -723,10 +723,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 3: t->r = tex_r_p4_8888_vq; t->address += 0x800; break;
 			}
 			break;
-			
+
 		default:
 			//
-			break;	
+			break;
 		}
 		break;
 
@@ -752,7 +752,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			case 3: t->r = tex_r_p8_8888_vq; t->address += 0x800; break;
 			}
 			break;
-			
+
 		default:
 			//
 			break;
@@ -828,7 +828,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		static const int mipmap_4_8_offset[8] = { 0x00018, 0x00058, 0x00158, 0x00558, 0x01558, 0x05558, 0x15558, 0x55558 };  // 4bpp (4bit offset) / 8bpp (8bit offset)
 		static const int mipmap_np_offset[8] =  { 0x00030, 0x000B0, 0x002B0, 0x00AB0, 0x02AB0, 0x0AAB0, 0x2AAB0, 0xAAAB0 };  // nonpalette textures
 		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 }; // vq textures
-		
+
 		switch (miptype)
 		{
 
@@ -1182,17 +1182,17 @@ WRITE64_HANDLER( pvr_ta_w )
 
 		profiler_mark(PROFILER_END);
 		break;
-//#define TA_YUV_TEX_BASE		((0x005f8148-0x005f8000)/4)
+//#define TA_YUV_TEX_BASE       ((0x005f8148-0x005f8000)/4)
 	case TA_YUV_TEX_BASE:
 		printf("TA_YUV_TEX_BASE initialized to %08x\n", dat);
-		
+
 		// hack, this interrupt is generated after transfering a set amount of data
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 		dc_update_interrupt_status(space->machine);
-		
+
 		break;
-		
-		
+
+
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
 		mame_printf_verbose("List continuation processing\n");
@@ -1494,8 +1494,8 @@ void process_ta_fifo(running_machine* machine)
 					tv->w=u2f(tafifo_buff[3]);
 					tv->u=u2f(tafifo_buff[4]);
 					tv->v=u2f(tafifo_buff[5]);
-					
-					
+
+
 					if((!rd->strips_size) ||
 					   rd->strips[rd->strips_size-1].evert != -1)
 					{
@@ -1606,7 +1606,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 
 	// untextured cases aren't handled
 	if (!ti->textured) return;
-	
+
 	if(xr < 0 || xl >= 640)
 		return;
 
@@ -1635,7 +1635,7 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 
 	tdata = BITMAP_ADDR32(bitmap, y, xxl);
 	wbufline = &wbuffer[y][xxl];
-	
+
 	while(xxl < xxr) {
 		if((wl >= *wbufline)) {
 			UINT32 c;
@@ -1643,21 +1643,21 @@ void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, floa
 			float v = vl/wl;
 
 			/*
-			if(ti->flip_u)
-			{
-				u = ti->sizex - u;
-			}
+            if(ti->flip_u)
+            {
+                u = ti->sizex - u;
+            }
 
-			if(ti->flip_v)
-			{
-				v = ti->sizey - v;
-			}*/
+            if(ti->flip_v)
+            {
+                v = ti->sizey - v;
+            }*/
 
 			c = ti->r(ti, u, v);
-			
+
 			// debug dip to turn on/off bilinear filtering, it's slooooow
 			if (debug_dip_status&0x1)
-			{	
+			{
 				if(ti->filter_mode >= TEX_FILTER_BILINEAR)
 				{
 					UINT32 c1 = ti->r(ti, u+1.0, v);
@@ -1781,7 +1781,7 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
-//	float dy; // unused, compiler complains about this
+//  float dy; // unused, compiler complains about this
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
@@ -2168,7 +2168,7 @@ VIDEO_UPDATE(dc)
 
 	// update this here so we only do string lookup once per frame
 	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
-	
+
 	return 0;
 }
 

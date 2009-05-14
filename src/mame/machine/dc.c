@@ -484,7 +484,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			{
 				dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 			}
-			
+
 			dc_sysctrl_regs[SB_C2DLEN]=0;
 			dc_sysctrl_regs[SB_C2DST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
@@ -582,14 +582,14 @@ WRITE64_HANDLER( dc_maple_w )
 					pattern=(buff[0] >> 8) & 7;
 					length=buff[0] & 255;
 					//if(length == 0)
-					//	length = 0x100;
+					//  length = 0x100;
 					destination=buff[1];
 					command=buff[2] & 255;
 					dap=(buff[2] >> 8) & 255;
 					sap=(buff[2] >> 16) & 255;
 					//buff[0]=0;
 					//if(buff[1] == 0x700)
-					//	printf("%08x %08x",buff[0],buff[2]);
+					//  printf("%08x %08x",buff[0],buff[2]);
 					ddtdata.size=4;
 
 					if (pattern == 0)

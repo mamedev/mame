@@ -556,10 +556,10 @@ static INPUT_PORTS_START( common_2p )
 INPUT_PORTS_END
 
 	/*************************************************************
-	Note:
-	These all games' DIP switch manufacturer settings are All Off.
-	(looked into Japanese manuals only)
-	*************************************************************/
+    Note:
+    These all games' DIP switch manufacturer settings are All Off.
+    (looked into Japanese manuals only)
+    *************************************************************/
 
 static INPUT_PORTS_START( ninjakd2 )
 	PORT_INCLUDE(common)
@@ -686,7 +686,7 @@ static INPUT_PORTS_START( arkarea )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")  // listed on Japanese manual only ? 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")  // listed on Japanese manual only ?
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:25")

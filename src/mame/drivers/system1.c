@@ -395,7 +395,7 @@ static WRITE8_HANDLER( videomode_w )
 {
 	const device_config *i8751 = cputag_get_cpu(space->machine, "mcu");
 
-	/* bit 6 is connected to the 8751 IRQ */	
+	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
 		cpu_set_input_line(i8751, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -519,15 +519,15 @@ static WRITE_LINE_DEVICE_HANDLER( pio_ready_w )
 static WRITE8_HANDLER( mcu_control_w )
 {
 	/*
-		Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
-		Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
-		Bit 5 -> n/c
-		Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
-		Bit 3 -> 
-		Bit 2 -> n/c
-		Bit 1 -> n/c
-		Bit 0 -> Directly connected to Z80 /INT line
-	*/
+        Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
+        Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
+        Bit 5 -> n/c
+        Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
+        Bit 3 ->
+        Bit 2 -> n/c
+        Bit 1 -> n/c
+        Bit 0 -> Directly connected to Z80 /INT line
+    */
 	mcu_control = data;
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(space->machine, "maincpu", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -563,7 +563,7 @@ static READ8_HANDLER( mcu_io_r )
 
 		case 1:
 			return memory_region(space->machine, "maincpu")[offset + 0x10000];
-		
+
 		case 2:
 			return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), offset);
 
@@ -580,7 +580,7 @@ static INTERRUPT_GEN( mcu_irq_assert )
 	/* toggle the INT0 line on the MCU */
 	cpu_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
 	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
-	
+
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
@@ -589,8 +589,8 @@ static INTERRUPT_GEN( mcu_irq_assert )
 static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 {
 	/* the T0 line is clocked by something; if it is not clocked fast
-	   enough, the MCU will fail; on shtngmst this happens after 3
-	   VBLANKs without a tick */
+       enough, the MCU will fail; on shtngmst this happens after 3
+       VBLANKs without a tick */
 
 	const device_config *mcu = cputag_get_cpu(timer->machine, "mcu");
 	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
@@ -601,7 +601,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 
 /*************************************
  *
- *  nob MCU 
+ *  nob MCU
  *
  *************************************/
 
@@ -614,15 +614,15 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 	/* bit 1 triggers a write from MCU port 0 */
 	if (((mcu_control ^ data) & 0x02) && !(data & 0x02))
 		nob_maincpu_latch = *nob_mcu_latch;
-	
+
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((mcu_control ^ data) & 0x04) && !(data & 0x04))
 		cpu_set_input_line(space->cpu, MCS51_INT0_LINE, CLEAR_LINE);
-	
+
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((mcu_control ^ data) & 0x08) && !(data & 0x08))
 		;//logerror("MCU IRQ(8) toggle\n");
-	
+
 	mcu_control = data;
 }
 
@@ -2160,11 +2160,11 @@ static MACHINE_DRIVER_START( mcu )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT(NULL, NULL)
-	
+
 	MDRV_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
-	
+
 	MDRV_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, MSEC(20))	/* ??? actual clock unknown */
 MACHINE_DRIVER_END
 
@@ -3334,30 +3334,30 @@ ROM_START( shtngmst )
 ROM_END
 
 /*
-	Shooting Master (EVG)
-	Year: 1985
-	Manufacturer: E.V.G. SRL Milano made in Italy (Sega license)
+    Shooting Master (EVG)
+    Year: 1985
+    Manufacturer: E.V.G. SRL Milano made in Italy (Sega license)
 
-	CPU
-	1x Z8400AB1-Z80ACPU-Y28548 (main board)
-	1x iC8751H-88-L5310039 (main board)
-	1x AMD P8255A-8526YP (main board)
-	1x SEGA 315-5012-8605P5 (main board)
-	1x SEGA 315-5011-8549X5 (main board)
-	1x SEGA 315-5049-8551PX (main board)
-	1x SEGA 315-5139-8537-CK2605-V-J (main board)
-	1x oscillator 20.000MHz (main board)
-	1x SYS Z8400AB1-Z80ACPU-Y28535 (upper board)
-	1x NEC D8255AC-2 (upper board)
-	1x oscillator 4.9152MHz (upper board)
+    CPU
+    1x Z8400AB1-Z80ACPU-Y28548 (main board)
+    1x iC8751H-88-L5310039 (main board)
+    1x AMD P8255A-8526YP (main board)
+    1x SEGA 315-5012-8605P5 (main board)
+    1x SEGA 315-5011-8549X5 (main board)
+    1x SEGA 315-5049-8551PX (main board)
+    1x SEGA 315-5139-8537-CK2605-V-J (main board)
+    1x oscillator 20.000MHz (main board)
+    1x SYS Z8400AB1-Z80ACPU-Y28535 (upper board)
+    1x NEC D8255AC-2 (upper board)
+    1x oscillator 4.9152MHz (upper board)
 
-	ROMs
-	1x HN27256G-25 (7043)(main board close to Z80)
-	2x HN27256G-25 (7101-7102)(main board close to C8751)
-	3x HN27256G-25 (7040-7041-7042)(main board close to 315-5049)
-	2x PAL16R4A (315-5137 and 315-5138)
-	1x HN27256G-25 (7100)(upper board close to oscillator)
-	7x HN27256G-25 (7104 to 7110)(upper board close to Z80 and 8255)
+    ROMs
+    1x HN27256G-25 (7043)(main board close to Z80)
+    2x HN27256G-25 (7101-7102)(main board close to C8751)
+    3x HN27256G-25 (7040-7041-7042)(main board close to 315-5049)
+    2x PAL16R4A (315-5137 and 315-5138)
+    1x HN27256G-25 (7100)(upper board close to oscillator)
+    7x HN27256G-25 (7104 to 7110)(upper board close to Z80 and 8255)
 */
 ROM_START( shtngmste )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -4636,12 +4636,12 @@ static DRIVER_INIT( nob )
 	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	DRIVER_INIT_CALL(bank44);
-	
+
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
 	memory_install_read8_handler(space, 0x0001, 0x0001, 0x0000, 0x0000, nob_start_r);
-	
+
 	/* install MCU communications */
 	memory_install_readwrite8_handler(iospace, 0x18, 0x18, 0x00, 0x00, nob_maincpu_latch_r, nob_maincpu_latch_w);
 	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x00, 0x00, nob_mcu_status_r);
@@ -4697,12 +4697,12 @@ static DRIVER_INIT( bootlegb )
 static DRIVER_INIT( choplift )
 {
 	UINT8 *mcurom = memory_region(machine, "mcu");
-	
+
 	/* the ROM dump we have is bad; the following patches make it work */
 	mcurom[0x100] = 0x55;		/* D5 in current dump */
 	mcurom[0x27b] = 0xfb;		/* F2 in current dump */
 	mcurom[0x2ff] = 0xff - 9;	/* fix up checksum; means there's still something incorrect */
-	
+
 	DRIVER_INIT_CALL(bank0c);
 }
 
