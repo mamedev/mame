@@ -363,18 +363,18 @@ static WRITE8_HANDLER( adpcm_soundcommand_w )
 	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( cpu1_map, 0 , 8 )
+static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM , 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
-	AM_RANGE(0xa380, 0xa3ff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&gsword_spritetile_ram)
+	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE(&gsword_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&gsword_spritexy_ram) AM_SIZE(&gsword_spritexy_size)
+	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE(&gsword_spritexy_ram) AM_SIZE(&gsword_spritexy_size)
 	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
-	AM_RANGE(0xab80, 0xabff) AM_WRITE(SMH_RAM) AM_BASE(&gsword_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(gsword_videoram_w) AM_READ(SMH_RAM) AM_BASE(&videoram)
+	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE(&gsword_spriteattrib_ram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -396,9 +396,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(TAITO8741_2_w) AM_READ(TAITO8741_2_r)
-	AM_RANGE(0x20, 0x21) AM_WRITE(TAITO8741_3_w) AM_READ(TAITO8741_3_r)
-	AM_RANGE(0x40, 0x41) AM_WRITE(TAITO8741_1_w) AM_READ(TAITO8741_1_r)
+	AM_RANGE(0x00, 0x01) AM_READWRITE(TAITO8741_2_r,TAITO8741_2_w)
+	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_3_r,TAITO8741_3_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(TAITO8741_1_r,TAITO8741_1_w)
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
@@ -599,7 +599,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_DIPSETTING(    0x20, "78H" )
 	PORT_DIPSETTING(    0x10, "5AH" )
 	PORT_DIPSETTING(    0x00, "3CH" )
-	PORT_DIPNAME( 0x40, 0x00, "TEST_MODE" )
+	PORT_DIPNAME( 0x40, 0x40, "TEST_MODE" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "DIP1-80(982C)" )
@@ -913,6 +913,7 @@ ROM_START( josvolly )
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "aa0-10.9n",    0x0000, 0x2000, CRC(207c4f42) SHA1(4cf2922d55cfc9e68cc07c3252ea3b5619b8aca5) )	/* tiles */
 	ROM_LOAD( "aa1-11.9p",    0x2000, 0x1000, CRC(c130464a) SHA1(9d23577b8aaaffeefff3d8f93668d1b2bd0ba3d9) )
+	ROM_RELOAD(               0x3000, 0x1000 ) // title screen data is actually read from here
 
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "aa0-6.9e",     0x0000, 0x2000, CRC(c2c2401a) SHA1(ef987d53d9e502277086f39b455174d3539572e6) )	/* sprites */
