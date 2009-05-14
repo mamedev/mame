@@ -21,7 +21,7 @@ Understand role of bit 5 of IN1
 
 Eprom?
 
-MSM6295 banking?  (also missing in Raine)
+BGMs (controlled by MSM-6585 sound chip)
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( ioc_w )
 	switch (offset)
 	{
 		// these are all written every frame
-		case 0x3b:
+		/*case 0x3b:
 		case 0xa:
 		case 0xc:
 		case 0xb:
@@ -127,19 +127,18 @@ static WRITE16_HANDLER( ioc_w )
 		case 0xe:
 		case 0xf:
 		case 0x10:
-		case 0x47:
 			break;
+		case 0x47:
+			popmessage("%04x",data);
+			break;*/
 
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
-			if (data & 0x10)
-			{
+			if (data & 0x10) // Check this, this looks a 8-bit port so it must be bit 12, not 4 -AS
 				bank = 0x100000;
-			}
 			else
-			{
 				bank = 0;
-			}
+			okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * ((data & 0x800)>>11));
 			break;
 
 		case 0x45:
