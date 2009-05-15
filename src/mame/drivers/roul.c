@@ -53,8 +53,8 @@ not handled commands with reg[3] & 0xc0 == 0x00
 
 #define VIDEOBUF_SIZE 256*256
 
-UINT8 reg[0x10];
-UINT8 *videobuf;
+static UINT8 reg[0x10];
+static UINT8 *videobuf;
 
 static UINT8 lamp_old = 0;
 

@@ -19,12 +19,12 @@ static ADDRESS_MAP_START( gc_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-VIDEO_START(triforce)
+static VIDEO_START(triforce)
 {
 
 }
 
-VIDEO_UPDATE(triforce)
+static VIDEO_UPDATE(triforce)
 {
 	return 0;
 }

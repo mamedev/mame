@@ -37,7 +37,7 @@ static UINT16 *frame_buffer;
  *
  *************************************/
 
-VIDEO_START( skimaxx )
+static VIDEO_START( skimaxx )
 {
 
 }
@@ -50,12 +50,12 @@ VIDEO_START( skimaxx )
  *************************************/
 
 // TODO: Might not be used
-void skimaxx_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &frame_buffer[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&frame_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
@@ -67,7 +67,7 @@ void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UINT16 *s
  *
  *************************************/
 
-void skimaxx_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void skimaxx_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	// TODO: This isn't correct. I just hacked it together quickly so I could see something!
 	if (params->rowaddr >= 0x220)

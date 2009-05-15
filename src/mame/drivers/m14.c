@@ -93,12 +93,12 @@ static TILE_GET_INFO( m14_get_tile_info )
 			0);
 }
 
-VIDEO_START( m14 )
+static VIDEO_START( m14 )
 {
 	m14_tilemap = tilemap_create(machine, m14_get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-VIDEO_UPDATE( m14 )
+static VIDEO_UPDATE( m14 )
 {
 	tilemap_draw(bitmap,cliprect,m14_tilemap,0,0);
 	return 0;

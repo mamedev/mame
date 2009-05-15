@@ -17,12 +17,12 @@ static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-VIDEO_START(chihiro)
+static VIDEO_START(chihiro)
 {
 
 }
 
-VIDEO_UPDATE(chihiro)
+static VIDEO_UPDATE(chihiro)
 {
 	return 0;
 }

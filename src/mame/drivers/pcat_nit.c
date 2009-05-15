@@ -327,7 +327,7 @@ static PIT8253_OUTPUT_CHANGED( at_pit8254_out2_changed )
 }
 
 
-const struct pit8253_config at_pit8254_config =
+static const struct pit8253_config at_pit8254_config =
 {
 	{
 		{

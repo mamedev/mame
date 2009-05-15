@@ -1915,7 +1915,7 @@ static int process_IRQs(tms32025_state *cpustate)
 	return cpustate->tms32025_irq_cycles;
 }
 
-void set_fsx_line(tms32025_state *cpustate, int state)
+static void set_fsx_line(tms32025_state *cpustate, int state)
 {
 	if (state != CLEAR_LINE && cpustate->waiting_for_serial_frame)
 	{

@@ -54,10 +54,6 @@ WRITE8_HANDLER( thief_video_control_w ){
 */
 }
 
-WRITE8_HANDLER( thief_vtcsel_w ){
-	/* TMS9927 VTAC registers */
-}
-
 WRITE8_HANDLER( thief_color_map_w ){
 /*
     --xx----    blue

@@ -331,13 +331,13 @@ static WRITE8_HANDLER( master_bankswitch_w )
 }
 
 
-WRITE8_HANDLER( hu_videoram_w )
+static WRITE8_HANDLER( hu_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( hu_colorram_w )
+static WRITE8_HANDLER( hu_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);

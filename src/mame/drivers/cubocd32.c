@@ -138,10 +138,10 @@ static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
 ADDRESS_MAP_END
 
-int cubo_input_port_val = 0;
-int cubo_input_select = 0;
-UINT16 potgo_value = 0;
-int cd32_shifter[2];
+//int cubo_input_port_val = 0;
+//int cubo_input_select = 0;
+static UINT16 potgo_value = 0;
+static int cd32_shifter[2];
 
 static void cubocd32_potgo_w(running_machine *machine, UINT16 data)
 {

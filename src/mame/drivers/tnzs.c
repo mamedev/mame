@@ -629,7 +629,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/tnzs.h"
 #include "sound/2151intf.h"
 
-UINT8 *tnzs_objram, *tnzs_sharedram;
+UINT8 *tnzs_objram;
 UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 
 

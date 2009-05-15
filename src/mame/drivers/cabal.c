@@ -835,7 +835,7 @@ ROM_END
 
 
 
-void seibu_sound_bootleg(running_machine *machine,const char *cpu,int length)
+static void seibu_sound_bootleg(running_machine *machine,const char *cpu,int length)
 {
 	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);

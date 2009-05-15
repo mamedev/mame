@@ -181,7 +181,7 @@ static void wfield_32(tms34010_state *tms, offs_t offset, UINT32 data)
 }
 
 
-void (*const tms34010_wfield_functions[32])(tms34010_state *tms, offs_t offset, UINT32 data) =
+static void (*const tms34010_wfield_functions[32])(tms34010_state *tms, offs_t offset, UINT32 data) =
 {
 	wfield_32, wfield_01, wfield_02, wfield_03, wfield_04, wfield_05,
 	wfield_06, wfield_07, wfield_08, wfield_09, wfield_10, wfield_11,
@@ -662,7 +662,7 @@ static UINT32 rfield_s_31(tms34010_state *tms, offs_t offset)
 	return ((INT32)(ret << 1)) >> 1;
 }
 
-UINT32 (*const tms34010_rfield_functions[64])(tms34010_state *tms, offs_t offset) =
+static UINT32 (*const tms34010_rfield_functions[64])(tms34010_state *tms, offs_t offset) =
 {
 	rfield_32  , rfield_z_01, rfield_z_02, rfield_z_03, rfield_z_04, rfield_z_05,
 	rfield_z_06, rfield_z_07, rfield_z_08, rfield_z_09, rfield_z_10, rfield_z_11,

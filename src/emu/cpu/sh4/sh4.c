@@ -2078,7 +2078,7 @@ INLINE void LDCSPC(SH4 *sh4, UINT32 m)
 	sh4->spc = sh4->r[m];
 }
 
-UINT32 sh4_getsqremap(SH4 *sh4, UINT32 address)
+static UINT32 sh4_getsqremap(SH4 *sh4, UINT32 address)
 {
 	if (!sh4->sh4_mmu_enabled)
 		return address;
@@ -3666,7 +3666,7 @@ ADDRESS_MAP_END
 #endif
 
 
-READ64_HANDLER( sh4_tlb_r )
+static READ64_HANDLER( sh4_tlb_r )
 {
 	SH4 *sh4 = get_safe_token(space->cpu);
 
@@ -3684,7 +3684,7 @@ READ64_HANDLER( sh4_tlb_r )
 	}
 }
 
-WRITE64_HANDLER( sh4_tlb_w )
+static WRITE64_HANDLER( sh4_tlb_w )
 {
 	SH4 *sh4 = get_safe_token(space->cpu);
 

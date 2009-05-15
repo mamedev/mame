@@ -1478,7 +1478,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 
 ***************************************************************************/
 
-void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
+static void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
 						  UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
 						  const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2)
 {
