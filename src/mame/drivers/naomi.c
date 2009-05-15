@@ -264,6 +264,310 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 Zombie Revenge             840-0003C  21707        19         315-6213   317-0249-COM   joystick + 3 buttons
 
 
+Sega I/O boards
+---------------
+
+These are used on NAOMI and all other Sega games from 1999 onwards.
+Not all I/O boards are listed here. If you know of others, please let us know.
+
+
+838-13683
+838-13683-91 (sticker)
+838-13683-92 (sticker)
+838-13683-93 (sticker)
+|-----------------------------|
+| CN6     CN7   CN2  CN1 RELAY|
+| IC4 IC7          IC5    CN5 |
+| IC3                  IC6    |
+|CN3         IC1    IC2    IC9|
+|    OSC1     JP1             |
+|CN4                          |
+|  IC8               IC10     |
+|--|        JAMMA        |----|
+   |---------------------|
+Notes:
+      JVS to JAMMA I/O board. Has both digital and analog inputs
+
+              JVS test mode strings
+              ---------------------
+              NAME         SEGA ENTERPRISES,LTD.
+                           I/O 838-13683B
+                           Ver1.07
+                           99/06
+              CMD VER      1.1
+              JVS VER      2.0
+              COM VER      1.0
+              SWITCH       2 PLAYER(S) 11 BITS
+              COIN         2 SLOT
+              ANALOG       8 CH
+              ROTARY       0 CH
+              KEYCODE      0
+              SCREEN       X:0 Y:0 CH:0
+              CARD         0 SLOT
+              HOPPER OUT   0 CH
+              DRIVER OUT   8 SLOT
+              ANALOG OUT   0 CH
+              CHARACTER    CHARA:0 LINE:0
+              BACKUP       0
+
+      CN1   - USB connector type A
+      CN2   - USB connector type B
+      CN3   - 14 pin connector used for switch input or lamp output via jumper setting
+              1-2    +5V
+              3      NC
+              4-6    1P SW6-SW8
+              7      NC
+              8-10   2P SW6-SW8
+              11-12  NC
+              13-14  GND
+      CN4   - 2 pin connector
+      CN5   - 15 pin VGA connector
+      CN6   - 6 pin connector used for 5 volt and 12 volt power input/output
+              1-2 +5V
+              3-4 +12V
+              5-6 GND
+      CN7   - 26 pin analog controls connector
+              1-2  +5V              15     Reserved
+              3    1P Analog Y      16     Reserved
+              4    2P Analog Y      21     Reserved
+              9    1P Analog X      22     Reserved
+              10   2P Analog X      23-24  GND
+      IC1   - Toshiba TMP90PH44 microcontroller with sticker 'SP5001-B' (SDIP64)
+      IC2   - location for TMP90PH44 QFP64 (not used)
+      IC3   - 74HC541 (SOIC20)
+      IC4   - BA6212 (DIP20)
+      IC5   - Analog Devices ADM485 (SOIC8)
+      IC6   - 5W393 (SOIC8)
+      IC7   - 74HC4052 (SOIC16)
+      IC8   - Toshiba TD62384 (SOIC16)
+      IC9   - A7666FS (SOIC16)
+      IC10  - 74F86 (SOIC14)
+      JP1   - Set in position A to use CN3 as input for switches. Set in position B to use as output (for lamps etc)
+              When in position A, in the JVS test mode, 'SWITCH' becomes '2 PLAYER(S) 15 BITS' and 'DRIVER OUT' becomes '0 SLOT'
+      RELAY - Omron G6S-2 relay
+      OSC1  - 14.74MHz
+
+
+837-13551
+837-13551-92 (sticker)
+837-13551-93 (sticker)
+|-----------------------------|
+|CN4 CN5         CN6   CN7 CN8|
+|LED   ADM485                 |
+|  RELAY         IC1A    *    |
+|                             |
+|                    14.745MHz|
+|            PS2801-4(x8)     |
+|                          LED|
+|CN1 CN2      CN3             |
+|-----------------------------|
+Notes:
+             JVS I/O board. Has both digital and analogue inputs.
+             This is the most common type. Used on Sega driving games, NAOMI, Hikaru, Triforce, Chihiro etc
+
+             JVS test mode strings
+             ---------------------
+             NAME         SEGA ENTERPRISES,LTD.
+                          I/O BD JVS
+                          837-13551
+                          Ver1.00
+             CMD VER      1.1
+             JVS VER      2.0
+             COM VER      1.0
+             SWITCH       2 PLAYER(S) 13 BITS
+             COIN         2 SLOT(S)
+             ANALOG       8 CH
+             ROTARY       0 CH
+             KEYCODE      0
+             SCREEN       X:0 Y:0 CH:0
+             CARD         0 SLOT(S)
+             HOPPER OUT   0 CH
+             DRIVER OUT   6 CH
+             ANALOG OUT   0 CH
+             CHARACTER    CHARA:0 LINE:0
+             BACKUP       0
+
+      IC1A - Toshiba TMP90PH44 microcontroller marked '315-6215' (SDIP64)
+         * - location under the PCB for TMP90PH44 QFP64 (not used)
+     RELAY - NEC EB2-4.5NU relay
+    ADM485 - Analog Devices ADM485
+       CN1 - 5 pin connector 12 volt power input
+             1-2 +12V
+             3 NC
+             4-5 GND
+       CN2 - 5 pin connector 12 volt power output
+             1-2 +12V
+             3 NC
+             4-5 GND
+       CN3 - 60 pin digital input connector
+             1-8   +5V          33    1P SW4
+             9-15  GND          34    2P SW4
+             16    NC           35    1P SW5
+             17    1P Start     36    2P SW5
+             18    2P Start     37    1P SW6
+             19    1P Right     38    2P SW6
+             20    2P Right     39    1P SW7
+             21    1P Left      40    2P SW7
+             22    2P Left      41    1P Service Credit
+             23    1P Up        42    2P Service Credit
+             24    2P Up        43    Test SW
+             25    1P Down      44    Tilt SW
+             26    2P Down      45    Coin SW1
+             27    1P SW1       46    Coin SW2
+             28    2P SW1       47-48 NC
+             29    1P SW2       49-50 Coin Meter 1 & 2
+             30    2P SW2       51-56 Output 1-6
+             31    1P SW3       57-60 +12V
+             32    2P SW3
+             Note: For coin input to work, the coin meters need to be connected to
+             pins 49 and 50, or tie +5 volts to pin 49 and 50 via a resistor.
+       CN4 - USB connector type B
+       CN5 - USB connector type A
+       CN6 - Analog I/O connector
+             1-2   VCC     15    AD 2
+             3     AD 0    16    AD 6
+             4     AD 4    17-18 NC
+             5     GND     19-20 VCC
+             6     GND     21    AD 3
+             7-8   NC      22    AD 7
+             9     AD 1    23    GND
+             10    AD 5    24    GND
+             11-14 NC      25-26 NC
+       CN7 - 4 pin connector 5V power input
+             1-2 +5v       3-4 GND
+       CN8 - 4 pin connector 5V power out
+             1-2 +5v       3-4 GND
+
+
+837-13741
+837-13844-02 (sticker)
+|-----------------------------|
+|       CN8        CN9        |
+|DB9                       CN1|
+|RESET_SW |----|              |
+|         |IC6 |  OSC1     CN5|
+|         |----|              |
+|CN7      LED  DSW1(5)     CN2|
+|   OSC2   RELAY              |
+|CNx  USB USB  IC7 LED     CN6|
+|-----------------------------|
+Notes: (most info taken from poor quality pics/scans, better info is needed)
+
+             JVS I/O board 2. Has both digital and analogue inputs.
+             This board is used with F355, Ghost Squad, and many
+             others including network/satellite games.
+
+             JVS test mode strings
+             ---------------------
+
+             NAME         SEGA ENTERPRISES,LTD.;837-13741
+                          I/O CONTROL BD2;Ver0.15;99/06
+             CMD VER      1.1
+             JVS VER      2.0
+             COM VER      1.0
+             SWITCH       2 PLAYERS 12BITS
+             COIN         2 SLOTS
+             ANALOG       8CH
+             DRIVER OUT   22CH
+
+      IC6  - Sega 315-6146 custom IC (QFP176)
+      IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
+      IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
+      IC10 - Something by NEC? (QFP44)
+      OSC1 - 14.7456MHz
+      OSC2 - 32MHz
+      CNx  - 6 pin connector
+      CN1  - 5 pin connector 12 volt power input
+             1-2 +12V
+             3 NC
+             4-5 GND
+      CN2  - 4 pin connector 5V power input
+             1-2 +5v
+             3-4 GND
+      CN5  - 5 pin connector 12 volt power output
+             1-2 +12V
+             3 NC
+             4-5 GND
+      CN6  - 4 pin connector 5V power output
+             1-2 +5v
+             3-4 GND
+      CN7  - 26 pin connector (many pins unknown)
+             1  +5V              14
+             2                   15  Analog Output
+             3  Analog Output    16
+             4                   17  GND
+             5  GND              18
+             6                   19  +5V
+             7  +5V              20
+             8                   21  Analog Output
+             9  Analog Output    22
+             10                  23  GND
+             11 GND              24
+             12                  25
+             13 +5V              26
+      CN8  - 40 pin connector (many pins unknown)
+             3-5   +5V           21    Switch
+             7-9   GND           22    Switch
+             13-14 Coin SW1/2    23    Switch
+             15    Test SW       24    Switch
+             17    1P Start SW   25    2P Start SW
+             18    Service SW    31    Switch
+             19    Switch        32    Switch
+             20    Switch        33-40 RX1-RX8 (for communications)
+      CN9  - 34 pin connector (some pins unknown)
+             1-4   +5V
+             5-8   GND
+             9-10  Coin Meter 1 & 2
+             11    Lamp
+             12    Lamp
+             13    Lamp
+             14    Lamp
+             15    Lamp
+             16    Lamp
+             17    Lamp
+             18    Lamp
+             19    Lamp
+             20    Lamp
+             21    Coin LED
+             22-24 ?
+             25-32 TX1-TX8 (for communications)
+             33-34 12V
+
+
+837-13938
+171-7807A
+|--------------------|
+|CN2      CN1    IC9S|
+|         OSC1       |
+|      |-----|       |
+|      | IC2 |OSC2   |
+| CN3  |     |       |
+|  IC7S|-----|    IC3|
+|LED    CN4     IC4  |
+|--------------------|
+Notes:
+      This is the I/O board used for Dynamic Golf which is
+      located under the panel. It's also used for spinner
+      controls such as those used on Outtrigger.
+      It must be daisy-chained to the normal I/O board with a USB cable.
+
+      CN1 - 24 pin connector (not used on Dynamic Golf, other use unknown)
+      CN2 - 4 pin connector used for 5 volt power input
+      CN3 - USB connector type B
+      CN4 - 16 pin connector used for buttons and trackball
+      IC1 - HC240 logic IC (SOIC20)
+      IC2 - Sega 315-6146 custom IC (QFP176)
+      IC3 - 27C512 EPROM with label 'EPR-22084' (DIP28)
+      IC4 - HC4020 logic IC (SOIC16)
+      These parts on the other side of the PCB....
+      IC7S - Analog Devices ADM485 (SOIC8)
+      IC9S - Sharp LH52256 32k x8 SRAM (SOP28)
+      OSC1 - 14.7456MHz
+      OSC2 - 32MHz
+      Not shown above.... Sharp PC410 (x8, at PC9S to PC16S)
+                          HC74 at IC8S
+                          34164 (?) at IC10S (SOIC8)
+
 Sega's I/O board has:
 - spare output of 5V, 12V, and GND (from JAMMA power input via noise filter)
 - analog input
