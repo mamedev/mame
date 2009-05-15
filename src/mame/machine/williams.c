@@ -50,6 +50,7 @@ static void tshoot_main_irq(const device_config *device, int state);
 
 /* Lotto Fun-specific code */
 static READ8_DEVICE_HANDLER( lottofun_input_port_0_r );
+static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
 
 /* Turkey Shoot-specific code */
 static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r );
@@ -142,7 +143,7 @@ const pia6821_interface williams_snd_pia_intf =
 const pia6821_interface lottofun_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -889,7 +890,10 @@ static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
 	return input_port_read(device->machine, "IN0") | ticket_dispenser_r(space, offset);
 }
 
-
+static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
+{
+	coin_lockout_global_w(data & 1); /* bit 5 of PIC control port A */
+}
 
 /*************************************
  *
