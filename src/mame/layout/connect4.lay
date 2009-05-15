@@ -74,18 +74,49 @@
 			<color red="0.1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
-	<element name="arrow" defstate="0">
-		<text string="->" state="1">
+
+	<element name="C" defstate="0">
+		<text string="C" state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="target" defstate="0">
+
+	<element name="O" defstate="0">
 		<text string="O" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
+
+	<element name="N" defstate="0">
+		<text string="N" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="E" defstate="0">
+		<text string="E" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="T" defstate="0">
+		<text string="T" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="4" defstate="0">
+		<text string="4" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
 	<element name="vfd0">
 	<led16segsc>
 			<color red="0" green="0.6" blue="1.0" />
@@ -493,28 +524,28 @@
 			<bounds x="48" y="42" width="7" height="7"/>
 		</backdrop>
 
-		<backdrop name="lamp7" element="arrow" state="0">
+		<backdrop name="lamp7" element="C" state="0">
 			<bounds x="0" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp15" element="arrow" state="0">
+		<backdrop name="lamp15" element="O" state="0">
 			<bounds x="8" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp23" element="arrow" state="0">
+		<backdrop name="lamp23" element="N" state="0">
 			<bounds x="16" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp31" element="arrow" state="0">
+		<backdrop name="lamp31" element="N" state="0">
 			<bounds x="24" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp39" element="arrow" state="0">
+		<backdrop name="lamp39" element="E" state="0">
 			<bounds x="32" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp47" element="arrow" state="0">
+		<backdrop name="lamp47" element="C" state="0">
 			<bounds x="40" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp55" element="arrow" state="0">
+		<backdrop name="lamp55" element="T" state="0">
 			<bounds x="48" y="48" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp63" element="target" state="0">
+		<backdrop name="lamp63" element="4" state="0">
 			<bounds x="56" y="48" width="7" height="7"/>
 		</backdrop>
 

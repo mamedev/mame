@@ -4,6 +4,7 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
+     05-2009: Miscellaneous lamp fixes, based on data from FME Forever.
      09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
                          Connect 4 now has the right sound.
@@ -294,6 +295,7 @@ static int lamp_col;
 static int ic23_active;
 static int led_extend;
 static int serial_card_connected;
+static int multiplex_smooth;
 static emu_timer *ic24_timer;
 static TIMER_CALLBACK( ic24_timeout );
 
@@ -394,7 +396,15 @@ static void update_lamps(void)
 		mpu4_draw_led(8, pled_segs[0]);
 		mpu4_draw_led(9, pled_segs[1]);
 	}
-	draw_lamps();
+
+	/* Lamp smoothing, this draws lamps only at the peaks of the AC power that would light them */
+	if ((multiplex_smooth == (input_strobe - 1))||((multiplex_smooth == 7) && (input_strobe == 0))||(multiplex_smooth == input_strobe))
+	{
+		draw_lamps();
+		mpu4_draw_led(input_strobe, led_segs[input_strobe]);
+		multiplex_smooth = input_strobe;
+	}
+
 }
 
 
@@ -540,7 +550,6 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 	if(ic23_active)
 	{
 		lamp_strobe = data;
-		update_lamps();
 	}
 }
 
@@ -552,7 +561,6 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 	if(ic23_active)
 	{
 		lamp_strobe2 = data;
-		update_lamps();
 	}
 }
 
@@ -1731,10 +1739,10 @@ static DRIVER_INIT (m_gmball)
 static TIMER_DEVICE_CALLBACK( gen_50hz )
 {
 	/* Although reported as a '50Hz' signal, the fact that both rising and
-    falling edges of the pulse are used, the timer actually gives a 100Hz
+    falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
 	signal_50hz = signal_50hz?0:1;
-
+	update_lamps();
 	pia6821_ca1_w(devtag_get_device(timer->machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
 }
 
