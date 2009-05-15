@@ -1664,7 +1664,7 @@ ROM_START( robocop )
 	ROM_LOAD( "ep03-3", 0x08000, 0x08000, CRC(5b164b24) SHA1(b217a2ac8b26aebd208631a13030487ed27d232e) )
 
 	ROM_REGION( 0x200000, "sub", 0 )	/* HuC6280 CPU */
-	ROM_LOAD( "en_24.a2", 0x01e00, 0x0200, CRC(b8e2ca98) SHA1(bd1e193c544dc17a665aa6c4d3b844775ed08b43) )
+	ROM_LOAD( "en_24_mb7124e.a2", 0x01e00, 0x0200, CRC(b8e2ca98) SHA1(bd1e193c544dc17a665aa6c4d3b844775ed08b43) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "ep23", 0x00000, 0x10000, CRC(a77e4ab1) SHA1(d06cc847192b6c7f642e4ff7128e298d0aa034b2) )
@@ -1694,6 +1694,21 @@ ROM_START( robocop )
 
 	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
+
+/*
+MB7116E at 12C on CPU board - Removing this causes all sprites to disappear
+
+MB7124E at 12A on ROM Board (although the board 
+is screened as MB7130) - Removing this causes the 
+display to disappear, although coining up makes 
+the correct text appear (and sound to play), 
+intro graphics appear on starting a game, then 
+nothing, it won't even play blind (although the 
+coin up sound still plays on coin insert)
+*/
+	ROM_REGION( 0xc00, "proms", 0 )	/* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
+	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
 ROM_END
 
 ROM_START( robocopw )
