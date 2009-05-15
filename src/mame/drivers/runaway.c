@@ -27,6 +27,7 @@ extern WRITE8_HANDLER( runaway_paletteram_w );
 extern WRITE8_HANDLER( runaway_video_ram_w );
 extern WRITE8_HANDLER( runaway_tile_bank_w );
 
+static emu_timer *interrupt_timer;
 
 static TIMER_CALLBACK( interrupt_callback )
 {
@@ -40,13 +41,17 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 16;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
+static MACHINE_START( runaway )
+{
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+}
 
 static MACHINE_RESET( runaway )
 {
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 16, 0), 16);
 }
 
 
@@ -357,6 +362,7 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(runaway_map)
 
+	MDRV_MACHINE_START(runaway)
 	MDRV_MACHINE_RESET(runaway)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
@@ -433,5 +439,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak,    0, ROT270, "Atari", "Qwak (prototype)", 0 )
-GAME( 1982, runaway, 0, runaway, runaway, 0, ROT0,   "Atari", "Runaway (prototype)", 0 )
+GAME( 1982, qwak,    0, qwak,    qwak,    0, ROT270, "Atari", "Qwak (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, 0, ROT0,   "Atari", "Runaway (prototype)", GAME_SUPPORTS_SAVE )

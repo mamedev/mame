@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 void tlc34076_reset(int dacwidth);
+void tlc34076_state_save(running_machine *machine);
 
 const pen_t *tlc34076_get_pens(void);
 

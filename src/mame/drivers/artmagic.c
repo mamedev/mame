@@ -76,11 +76,25 @@ static void m68k_gen_int(const device_config *device, int state)
  *
  *************************************/
 
+static MACHINE_START( artmagic )
+{
+	state_save_register_global(machine, tms_irq);
+	state_save_register_global(machine, hack_irq);
+	state_save_register_global(machine, prot_input_index);
+	state_save_register_global(machine, prot_output_index);
+	state_save_register_global(machine, prot_output_bit);
+	state_save_register_global(machine, prot_bit_index);
+	state_save_register_global(machine, prot_save);
+	state_save_register_global_array(machine, prot_input);
+	state_save_register_global_array(machine, prot_output);
+}
+
 static MACHINE_RESET( artmagic )
 {
 	tms_irq = hack_irq = 0;
 	update_irq_state(machine);
 	tlc34076_reset(6);
+	tlc34076_state_save(machine);
 }
 
 
@@ -699,6 +713,7 @@ static MACHINE_DRIVER_START( artmagic )
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tms_map)
 
+	MDRV_MACHINE_START(artmagic)
 	MDRV_MACHINE_RESET(artmagic)
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -917,7 +932,7 @@ static DRIVER_INIT( stonebal )
  *
  *************************************/
 
-GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis",		 0 )
-GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase",			 0 )
-GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", 0 )
-GAME( 1994, stoneba2, stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", 0 )
+GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis",		 GAME_SUPPORTS_SAVE )
+GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase",			 GAME_SUPPORTS_SAVE )
+GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1994, stoneba2, stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )
