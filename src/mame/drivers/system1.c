@@ -203,7 +203,9 @@ Notes:
 #define SOUND_CLOCK		XTAL_8MHz
 
 
+/* driver config */
 static void (*videomode_custom)(running_machine *machine, UINT8 data, UINT8 prevdata);
+static UINT8 mute_xor;
 
 static UINT8 *system1_ram;
 static UINT8 dakkochn_mux_data;
@@ -357,10 +359,19 @@ static MACHINE_START( system1 )
 
 	z80_set_cycle_tables(cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
+	mute_xor = 0x00;
+
 	state_save_register_global(machine, dakkochn_mux_data);
 	state_save_register_global(machine, videomode_prev);
 	state_save_register_global(machine, mcu_control);
 	state_save_register_global(machine, nob_maincpu_latch);
+}
+
+
+static MACHINE_START( system2 )
+{
+	MACHINE_START_CALL(system1);
+	mute_xor = 0x01;
 }
 
 
@@ -453,8 +464,8 @@ static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevda
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	/* bit 0 = MUTE */
-	sound_global_enable(~data & 1);
+	/* bit 0 = MUTE (inverted sense on System 2) */
+	sound_global_enable(~(data ^ mute_xor) & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 
@@ -2192,6 +2203,8 @@ MACHINE_DRIVER_END
 /* system2 video */
 static MACHINE_DRIVER_START( sys2 )
 	MDRV_IMPORT_FROM( sys1ppi )
+
+	MDRV_MACHINE_START(system2)
 
 	/* video hardware */
 	MDRV_VIDEO_START(system2)
@@ -4686,7 +4699,7 @@ static DRIVER_INIT( bootleg )
 }
 
 
-static DRIVER_INIT( bootlegb )
+static DRIVER_INIT( bootsys2 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
@@ -4794,10 +4807,10 @@ GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Sega (
 GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbml,       0,        sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
+GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
 GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2row,  ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensib,  ufosensi, sys2row,  ufosensi,  bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensib,  ufosensi, sys2row,  ufosensi,  bootsys2, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
