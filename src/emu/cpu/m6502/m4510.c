@@ -146,8 +146,8 @@ struct _m4510_Regs {
 	const address_space *space;
 	int 	icount;
 
-	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
-	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8    port;
@@ -197,13 +197,31 @@ static void default_wrmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
+	const m6502_interface *intf = (const m6502_interface *)device->static_config;
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wrmem_id;
+	cpustate->port_read = NULL;
+	cpustate->port_write = NULL;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	if ( intf )
+	{
+		if ( intf->read_indexed_func )
+			cpustate->rdmem_id = intf->read_indexed_func;
+
+		if ( intf->write_indexed_func )
+			cpustate->wrmem_id = intf->write_indexed_func;
+
+		if ( intf->port_read_func )
+			cpustate->port_read = intf->port_read_func;
+
+		if ( intf->port_write_func )
+			cpustate->port_write = intf->port_write_func;
+	}
 }
 
 static CPU_RESET( m4510 )
@@ -426,12 +444,6 @@ static CPU_SET_INFO( m4510 )
 		case CPUINFO_INT_REGISTER + M4510_MEM5:			cpustate->mem[5] = info->i;					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM6:			cpustate->mem[6] = info->i;					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			cpustate->mem[7] = info->i;					break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
-		case CPUINFO_FCT_M6510_PORTREAD:				cpustate->port_read = (m6510_port_read_func) info->f; break;
-		case CPUINFO_FCT_M6510_PORTWRITE:				cpustate->port_write = (m6510_port_write_func) info->f; break;
 	}
 }
 
@@ -511,10 +523,6 @@ CPU_GET_INFO( m4510 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m4510_mem); break;
 		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(m4510);		break;
-		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
-		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
-		case CPUINFO_FCT_M6510_PORTREAD:				info->f = (genf *) cpustate->port_read;		break;
-		case CPUINFO_FCT_M6510_PORTWRITE:				info->f = (genf *) cpustate->port_write;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M4510");				break;

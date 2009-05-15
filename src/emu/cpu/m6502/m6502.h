@@ -52,19 +52,23 @@ enum
    positiv edge sets overflow flag */
 #define M6502_SET_OVERFLOW	1
 
-typedef UINT8 (*m6502_read_indexed_func)(const address_space *space, offs_t address);
-typedef void (*m6502_write_indexed_func)(const address_space *space, offs_t address, UINT8 data);
 typedef UINT8 (*m6510_port_read_func)(const device_config *device, UINT8 direction);
 typedef void (*m6510_port_write_func)(const device_config *device, UINT8 direction, UINT8 data);
 
 
+/* Optional interface to set callbacks */
+typedef struct _m6502_interface m6502_interface;
+struct _m6502_interface
+{
+	read8_space_func		read_indexed_func;
+	write8_space_func		write_indexed_func;
+	m6510_port_read_func	port_read_func;
+	m6510_port_write_func	port_write_func;
+};
+
+
 enum
 {
-	CPUINFO_FCT_M6502_READINDEXED_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,
-	CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK,
-	CPUINFO_FCT_M6510_PORTREAD,
-	CPUINFO_FCT_M6510_PORTWRITE,
-
 	CPUINFO_INT_M6510_PORT = CPUINFO_INT_CPU_SPECIFIC
 };
 

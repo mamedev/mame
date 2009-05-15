@@ -82,8 +82,8 @@ struct _m6509_Regs {
 
 	int 	icount;
 
-	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
-	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 INLINE m6509_Regs *get_safe_token(const device_config *device)
@@ -141,12 +141,22 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m6509 )
 {
 	m6509_Regs *cpustate = get_safe_token(device);
+	const m6502_interface *intf = (const m6502_interface *)device->static_config;
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	if ( intf )
+	{
+		if ( intf->read_indexed_func )
+			cpustate->rdmem_id = intf->read_indexed_func;
+
+		if ( intf->write_indexed_func )
+			cpustate->wrmem_id = intf->write_indexed_func;
+	}
 }
 
 static CPU_RESET( m6509 )
@@ -309,10 +319,6 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_REGISTER + M6509_IND_BANK:		cpustate->ind_bank.b.h2 = info->i;			break;
 		case CPUINFO_INT_REGISTER + M6509_EA:			cpustate->ea.w.l = info->i;					break;
 		case CPUINFO_INT_REGISTER + M6509_ZP:			cpustate->zp.w.l = info->i;					break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -379,8 +385,6 @@ CPU_GET_INFO( m6509 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6509_mem); break;
-		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
-		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6509");				break;
