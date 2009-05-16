@@ -187,6 +187,17 @@ Notes:
       PIC16C621 - DIP18 socket and 4MHz OSC on a 90-degrees-mounted small PCB for
                   Microchip PIC16C621A protection key chip
 
+                  Usage:
+                  +-----------------------+-----------------+----------------+
+                  |                       |                 | Sega Security  |
+                  | Game                  | Sticker         | Part Number    |
+                  +-----------------------+-----------------+----------------+
+                  | Mario Kart Arcade GP  | 253-5509-5109   | 317-5109-COM   |
+                  | Nintendo/Namco, 2005  |                 |                |
+                  |                       |                 |                |
+                  | Namco Code: MKA2Ver.B |                 |                |
+                  +-----------------------+-----------------+----------------+
+
 ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart version of the Media Board)
 ---------
 
@@ -381,7 +392,7 @@ Notes:
       J7 - 8-pin JVS Power Connector
       J8 - 3-pin Fan Connector
       J9 - 4-pin Namco Audio Connector (unused)
-      
+
 
 */
 
