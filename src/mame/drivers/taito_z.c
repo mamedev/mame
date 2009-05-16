@@ -4692,7 +4692,7 @@ GAMEL(1989, sci,      0,        sci,      sci,      taitoz,   ROT0,             
 GAMEL(1989, scia,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAMEL(1989, scij,     sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAMEL(1989, sciu,     sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
-GAMEL(1991, scin,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (Negro Torino hack)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1991, scin,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Super Special Criminal Investigation (Negro Torino hack)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAME( 1989, nightstr, 0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan", "Night Striker (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstrj, nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation", "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstru, nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )
