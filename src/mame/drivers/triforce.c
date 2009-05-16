@@ -187,19 +187,6 @@ Notes:
       PIC16C621 - DIP18 socket and 4MHz OSC on a 90-degrees-mounted small PCB for
                   Microchip PIC16C621A protection key chip
 
-                  Usage:
-                  +-----------------------+-----------------+----------------+-------------------------------+
-                  |                       |                 | Sega Security  |                               |
-                  | Game                  | Sticker         | Part Number    | Security Info (PIC16C621A)    |
-                  +-----------------------+-----------------+----------------+-------------------------------+
-                  | Mario Kart Arcade GP  | 253-5509-5109   | 317-5109-COM   | Version   - VER0001           |
-                  | Nintendo/Namco, 2005  |                 |                | Ping      - TEST_OK           |
-                  |                       |                 |                | Boot File - BKP.BIN           |
-                  | Namco Code: MKA2Ver.B |                 |                | GD Unlock - 70 1F 71 1F       |
-                  |                       |                 |                | DES Key   - F767A7B0019E6751  |
-                  +-----------------------+-----------------+----------------+-------------------------------+
-
-
 ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart version of the Media Board)
 ---------
 
