@@ -253,7 +253,7 @@ VIDEO_START( mcatadv )
 	tilemap_set_transparent_pen(mcatadv_tilemap2,0);
 
 	spriteram_old = auto_alloc_array_clear(machine, UINT16, spriteram_size/2);
-	vidregs_old = auto_alloc_array(machine, UINT16, 0xf/2);
+	vidregs_old = auto_alloc_array(machine, UINT16, (0xf+1)/2);
 
 	palette_bank1 = 0;
 	palette_bank2 = 0;
