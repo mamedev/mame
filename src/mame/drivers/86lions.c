@@ -16,7 +16,6 @@ NOTES:
 TODO:
     - Understand inputs / via mapping properly;
     - Finish the mc6845 conversion;
-    - Colors? This shoudn't use a color prom.
 
 *******************************************************************************************/
 
@@ -194,11 +193,7 @@ static const gfx_layout layout8x8x3 =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{
-		RGN_FRAC(0,3),
-		RGN_FRAC(1,3),
-		RGN_FRAC(2,3),
-	},
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3), }, // Trusted, see MT 03190
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
