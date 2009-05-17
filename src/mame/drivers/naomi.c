@@ -1119,23 +1119,13 @@ static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
-#if (IVY_ENABLE)
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2) AM_BASE( &dc_texture_ram )	// texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)								// mirror of texture RAM 32 bit access
-#else
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-#endif
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-#if (IVY_ENABLE)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-#else
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
 	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-#endif
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -1165,13 +1155,8 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
-#if (IVY_ENABLE)
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2) AM_BASE( &dc_texture_ram )	// texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)								// mirror of texture RAM 32 bit access
-#else
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-#endif
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
@@ -1185,22 +1170,11 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-
-#if (IVY_ENABLE)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-#else
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
-#endif
-
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
-
-#if (IVY_ENABLE)
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-#else
 	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
-#endif
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1244,13 +1218,8 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
-#if (IVY_ENABLE)
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2) AM_BASE( &dc_texture_ram )	// texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)								// mirror of texture RAM 32 bit access
-#else
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-#endif
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
@@ -1267,22 +1236,11 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-
-#if (IVY_ENABLE)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-#else
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
-#endif
-
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
-
-#if (IVY_ENABLE)
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM_WRITE( ivy_texture_w ) AM_SHARE(2)          // another mirror of texture memory
-#else
 	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
-#endif
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1326,12 +1284,7 @@ ADDRESS_MAP_END
 	PORT_START("MAMEDEBUG") \
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
-#define NAOMI_MAME_DEBUG_BUTTON(btn) \
-    PORT_START("IVY") \
-    PORT_BIT( 0x8000, IP_ACTIVE_HIGH, btn ) PORT_PLAYER(1) PORT_NAME("IVY Capture") \
-    PORT_BIT( 0x7fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
 
 
 /* for now we hardwire a joystick + 6 buttons for every game.*/
@@ -1371,8 +1324,6 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 
 	NAOMI_MAME_DEBUG_DIP
-
-	NAOMI_MAME_DEBUG_BUTTON( IPT_BUTTON7 )
 INPUT_PORTS_END
 
 /* JVS mahjong panel */
@@ -1486,8 +1437,6 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 
 	NAOMI_MAME_DEBUG_DIP
-
-	NAOMI_MAME_DEBUG_BUTTON( IPT_BUTTON1 )
 INPUT_PORTS_END
 
 static MACHINE_RESET( naomi )
