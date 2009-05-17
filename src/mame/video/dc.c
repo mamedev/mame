@@ -108,6 +108,61 @@ enum
 
 static pvrta_state state_ta;
 
+#if (IVY_ENABLE)
+
+int     ivy_capture = 0;
+static	FILE* ivy_log = NULL;
+
+static int ivy_capture_index = 0;
+
+void ivy_update(running_machine *machine)
+{
+	static int ivy_button_ignore = 0;
+
+	char ivy_capture_name[64];
+
+	if( ivy_capture == 1 )
+	{
+		ivy_capture = 0;
+		fclose( ivy_log );
+	}
+	if( ( input_port_read(machine, "IVY") & 0x8000 ) != 0 && ivy_capture == 0 && ivy_button_ignore == 0 )
+	{
+        ivy_capture = 1;
+        sprintf( ivy_capture_name, "ivy_%04d.cap", ivy_capture_index++ );
+        ivy_log = fopen( ivy_capture_name, "rb" );
+        while( ivy_log != NULL )
+        {
+            fclose( ivy_log );
+        	sprintf( ivy_capture_name, "ivy_%04d.cap", ivy_capture_index++ );
+            ivy_log = fopen( ivy_capture_name, "rb" );
+		}
+        ivy_log = fopen( ivy_capture_name, "wb" );
+
+        fwrite( (UINT8*)dc_texture_ram, 16777216, 1, ivy_log );
+
+        ivy_button_ignore = 1;
+	}
+    if( ( input_port_read(machine, "IVY") & 0x8000 ) == 0 )
+    {
+        ivy_button_ignore = 0;
+    }
+}
+
+WRITE64_HANDLER( ivy_texture_w )
+{
+	if( ivy_capture == 1 && ivy_log != NULL )
+	{
+		UINT8 type = IVY_TEXTURE;
+		fwrite( &type, 1, 1, ivy_log );
+		fwrite( &offset, 8, 1, ivy_log );
+		fwrite( &mem_mask, 8, 1, ivy_log );
+		fwrite( &data, 8, 1, ivy_log );
+	}
+}
+
+#endif
+
 // Perform a standard bilinear filter across four pixels
 INLINE INT32 clamp(INT32 in, INT32 min, INT32 max)
 {
@@ -908,6 +963,17 @@ WRITE64_HANDLER( pvr_ctrl_w )
 		UINT8 start;
 	}pvr_dma;
 
+#if (IVY_ENABLE)
+	if( ivy_capture == 1 && ivy_log != NULL )
+	{
+		UINT8 type = IVY_PVR_CTRL;
+		fwrite( &type, 1, 1, ivy_log );
+		fwrite( &offset, 8, 1, ivy_log );
+		fwrite( &mem_mask, 8, 1, ivy_log );
+		fwrite( &data, 8, 1, ivy_log );
+	}
+#endif
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
@@ -1004,6 +1070,17 @@ WRITE64_HANDLER( pvr_ta_w )
 	UINT32 sizera,offsetra,v;
 	#endif
 	int a;
+
+#if (IVY_ENABLE)
+	if( ivy_capture == 1 && ivy_log != NULL )
+	{
+		UINT8 type = IVY_PVR_TA;
+		fwrite( &type, 1, 1, ivy_log );
+		fwrite( &offset, 8, 1, ivy_log );
+		fwrite( &mem_mask, 8, 1, ivy_log );
+		fwrite( &data, 8, 1, ivy_log );
+	}
+#endif
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1113,7 +1190,10 @@ WRITE64_HANDLER( pvr_ta_w )
 			}
 		}
 		if (a != NUM_BUFFERS)
+		{
+			ivy_update(space->machine);
 			break;
+		}
 		assert_always(0, "TA grabber error A!\n");
 		break;
 	case TA_LIST_INIT:
@@ -1516,6 +1596,17 @@ static void process_ta_fifo(running_machine* machine)
 WRITE64_HANDLER( ta_fifo_poly_w )
 {
 
+#if (IVY_ENABLE)
+	if( ivy_capture == 1 && ivy_log != NULL )
+	{
+		UINT8 type = IVY_TA_FIFO_POLY;
+		fwrite( &type, 1, 1, ivy_log );
+		fwrite( &offset, 8, 1, ivy_log );
+		fwrite( &mem_mask, 8, 1, ivy_log );
+		fwrite( &data, 8, 1, ivy_log );
+	}
+#endif
+
 	if (mem_mask == U64(0xffffffffffffffff)) 	// 64 bit
 	{
 		tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
@@ -1543,6 +1634,17 @@ WRITE64_HANDLER( ta_fifo_yuv_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+
+#if (IVY_ENABLE)
+	if( ivy_capture == 1 && ivy_log != NULL )
+	{
+		UINT8 type = IVY_TA_FIFO_YUV;
+		fwrite( &type, 1, 1, ivy_log );
+		fwrite( &offset, 8, 1, ivy_log );
+		fwrite( &mem_mask, 8, 1, ivy_log );
+		fwrite( &data, 8, 1, ivy_log );
+	}
+#endif
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);

@@ -200,6 +200,17 @@ extern UINT32 dc_coin_counts[2];
 
 /*----------- defined in video/dc.c -----------*/
 
+#define IVY_ENABLE		(1)
+
+enum
+{
+	IVY_PVR_CTRL = 0,
+	IVY_PVR_TA,
+	IVY_TA_FIFO_POLY,
+	IVY_TA_FIFO_YUV,
+	IVY_TEXTURE,
+};
+
 extern UINT64 *dc_texture_ram;
 
 void dc_vblank( running_machine *machine );
@@ -212,6 +223,12 @@ WRITE64_HANDLER( ta_fifo_poly_w );
 WRITE64_HANDLER( ta_fifo_yuv_w );
 VIDEO_START(dc);
 VIDEO_UPDATE(dc);
+
+#if (IVY_ENABLE)
+
+WRITE64_HANDLER( ivy_texture_w );
+
+#endif // (IVY_ENABLE)
 
 /*--------------- CORE registers --------------*/
 #define PVRID				((0x005f8000-0x005f8000)/4)
