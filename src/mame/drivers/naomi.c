@@ -1105,29 +1105,36 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
-	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+ // SB_LMMODE0
+ static WRITE64_HANDLER( ta_texture_directpath0_w )
+ {
+	int mode = pvrctrl_regs[SB_LMMODE0]&1;
+	if (mode&1)
+	{
+		printf("ta_texture_directpath0_w 32-bit access!\n");
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
+	}
+	else
+	{
+		COMBINE_DATA(&dc_texture_ram[offset]);
+	}
+ }
+
+ // SB_LMMODE1
+ static WRITE64_HANDLER( ta_texture_directpath1_w )
+ {
+ 	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	if (mode&1)
+	{
+		printf("ta_texture_directpath0_w 32-bit access!\n");
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
+	}
+	else
+	{
+		COMBINE_DATA(&dc_texture_ram[offset]);
+	}
+ }
+ 
 
 /*
  * Naomi 1 address map
@@ -1155,8 +1162,8 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
@@ -1170,11 +1177,11 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE( ta_texture_directpath0_w ) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE( ta_texture_directpath1_w )  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1217,9 +1224,9 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
-	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
+	/* Area 1 - half the texture memory, like dreamcast, not naomi */
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
@@ -1233,15 +1240,16 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
 	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE(4) // RAM access through cache
 
-	/* Area 4 */
+	/* Area 4 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE( ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
+	
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
 
