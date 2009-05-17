@@ -6595,6 +6595,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* nmk16.c bootlegs using the Seibu Sound System */
 	DRIVER( mustangb )	/* bootleg */
+	DRIVER( mustangb2 ) /* TAB Austria bootleg */
 	DRIVER( tdragonb )	/* bootleg */
 
 	/* Comad games on unofficial hardware based on nmk16.c */

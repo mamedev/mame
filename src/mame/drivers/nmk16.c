@@ -5282,6 +5282,42 @@ ROM_START( mustangb )
 	ROM_LOAD( "mustang.17",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
+/* bootleg manufacturered by TAB AUSTRIA */
+ROM_START( mustangb2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "05.bin",    0x00000, 0x20000, CRC(13c6363b) SHA1(e2c1985d1c8ec9751c47cd7e1b85e007f3aeb6fd) )
+	ROM_LOAD16_BYTE( "04.bin",    0x00001, 0x20000, CRC(0d06f723) SHA1(28d5899114746d186e1ddd207deb177b31ff614d) )
+
+	ROM_REGION(0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_LOAD( "01.bin",    0x00000, 0x8000, CRC(90820499) SHA1(ddd43373eb1891a05159085b52bf74760824e5aa) )
+	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "06.bin",    0x00000, 0x20000, CRC(81ccfcad) SHA1(70a0f769c0d4588f6f17bd52cc86a745f30e9f00) )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "07.bin",    0x00000, 0x20000, CRC(5f8fdfb1) SHA1(529494a317409da978d44610682ef56ebc24e0af) )
+	ROM_LOAD( "10.bin",    0x20000, 0x20000, CRC(39757d6a) SHA1(71acf748c752df70f437b3ffa759d68d283c22cf) )
+	ROM_LOAD( "08.bin",    0x40000, 0x20000, CRC(b3dd5243) SHA1(38b71dad7d392319ecef690fb230fa9ca46c7d0a) )
+	ROM_LOAD( "09.bin",    0x60000, 0x20000, CRC(c6c9752f) SHA1(41a3581af7a10eab9eb15580760a99d27e67f085) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "18.bin",    0x00000, 0x20000, CRC(d13f0722) SHA1(3e9c0a3e124f8b2616bb4a39d2d3fb25623b8c85) )
+	ROM_LOAD16_BYTE( "13.bin",    0x00001, 0x20000, CRC(54773f95) SHA1(2c57f54efa069907dfb59f15fbc2c580180df3cc) )
+	ROM_LOAD16_BYTE( "17.bin",    0x40000, 0x20000, CRC(87c1fb43) SHA1(e874ab8aba448b002f64197dacb5d6c47fb83af2) )
+	ROM_LOAD16_BYTE( "14.bin",    0x40001, 0x20000, CRC(932d3e33) SHA1(a784f288fa99e605a0bf396bc7694319980d1cd1) )
+	ROM_LOAD16_BYTE( "16.bin",    0x80000, 0x20000, CRC(23d03ad5) SHA1(2cde1accd1d97ce9ea3d0ef24ae4d54e04b8f12f) )
+	ROM_LOAD16_BYTE( "15.bin",    0x80001, 0x20000, CRC(a62b2f87) SHA1(bcffc6d10bed84c509e5cb57125d08127ab2c89d) )
+	ROM_LOAD16_BYTE( "12.bin",    0xc0000, 0x20000, CRC(42a6cfc2) SHA1(46fc3b30a50efc94613e3b34aaf0543fa4cdc919) )
+	ROM_LOAD16_BYTE( "11.bin",    0xc0001, 0x20000, CRC(9d3bee66) SHA1(e8db57b9a5581d3d54e69bb7ba229a49a7cc224f) )
+
+	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "02.bin",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
+
+
 ROM_START( acrobatm )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "02_ic100.bin",    0x00000, 0x20000, CRC(3fe487f4) SHA1(29aba5debcfddff14e584a1c7c5a403e85fc6ec0) )
@@ -6925,7 +6961,8 @@ GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",  
 /* Non NMK boards */
 
 // these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
-GAME( 1990, mustangb, mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
+GAME( 1990, mustangb, mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
+GAME( 1990, mustangb2,mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and roms have TAB Austria stickers
 GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",	               "Thunder Dragon (Bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
