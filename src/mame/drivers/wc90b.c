@@ -149,7 +149,7 @@ static WRITE8_HANDLER( wc90b_sound_command_w )
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(device->machine, "sub");
+	UINT8 *RAM = memory_region(device->machine, "audiocpu");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
