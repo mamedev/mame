@@ -222,8 +222,7 @@ static CPU_EXECUTE(h8)
 
 	if (h8->h8err)
 	{
-		fatalerror("H8/3xx: Unknown opcode (PC=%x)  %x", h8->ppc, opcode);
-
+		fatalerror("H8/3xx: Unknown opcode (PC=%x) %x", h8->ppc, opcode);
 	}
 
 	return cycles - h8->cyccnt;
@@ -1233,7 +1232,7 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 			udata32 = h8_mem_read32(h8, h8_getreg32(h8, H8_SP));
 			h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)+4);
 			// extended mode
-			h8->pc = udata32;
+			h8->pc = udata32 & 0xffffff;
 			H8_IFETCH_TIMING(2);
 			H8_STACK_TIMING(2);
 			H8_IOP_TIMING(2);
@@ -1695,7 +1694,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 
 			if(((opcode>>4)&0x8) == 0)
 			{
-				switch((opcode>>8)&7)
+				switch((opcode>>8)&0x7)
 				{
 				case 0:	udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
 				case 2:	udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8);H8_IFETCH_TIMING(1);break;
@@ -1924,6 +1923,19 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 					bitnr = (ext16>>4)&7;
 					h8_btst8(h8, bitnr, udata8);
 					break;
+				// bld.b #imm, @Rn                                              
+				case 0x77:
+					udata16 = h8_mem_read16(h8, h8->pc);
+					h8->pc += 2;
+					dstreg = (opcode>>4) & 7;
+					h8_bld8(h8, (udata16>>4) & 7, h8_mem_read8(h8_getreg16(h8, dstreg)));
+					H8_IFETCH_TIMING(1); 
+					H8_WORD_TIMING(1, h8_getreg16(h8, dstreg));
+					break;
+
+
+
+
 				default:
 					h8->h8err=1;
 			}

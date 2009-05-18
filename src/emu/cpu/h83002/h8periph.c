@@ -38,7 +38,7 @@ static const UINT8 tier[5] = { TIER0, TIER1, TIER2, TIER3, TIER4 };
 static const UINT8 tcr[5] = { TCR0, TCR1, TCR2, TCR3, TCR4 };
 static const int tscales[4] = { 1, 2, 4, 8 };
 
-extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source);
+extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state);
 extern void *h8_token;
 
 static void h8itu_timer_expire(h83xx_state *h8, int which)
@@ -49,7 +49,7 @@ static void h8itu_timer_expire(h83xx_state *h8, int which)
 	// interrupt on overflow ?
 	if(h8->per_regs[tier[which]] & 4)
 	{
-		h8_3002_InterruptRequest(h8, 26 + 4*which);
+		h8_3002_InterruptRequest(h8, 26 + 4*which, 1);
 	}
 }
 
@@ -414,11 +414,15 @@ void h8_register_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 
 	switch (reg)
 	{
-		case 0xb3:
+		case 0xb3:	// serial 0 send
 			memory_write_byte(h8->io, H8_SERIAL_0, val);
+			h8_3002_InterruptRequest(h8, 54, 1);
+			h8_3002_InterruptRequest(h8, 55, 1);
 			break;
-		case 0xbb:
+		case 0xbb:	// serial 1 send
 			memory_write_byte(h8->io, H8_SERIAL_1, val);
+			h8_3002_InterruptRequest(h8, 58, 1);
+			h8_3002_InterruptRequest(h8, 59, 1);
 			break;
 		case 0xc7:
 			memory_write_byte(h8->io, H8_PORT_4, val);
@@ -493,7 +497,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		if(h8->per_regs[0x64] & (4<<tnum))	// interrupt enable
 		{
 			//logerror("h8/3007 timer %d GRA INTERRUPT\n",tnum);
-			h8_3002_InterruptRequest(h8, 24+tnum*4);
+			h8_3002_InterruptRequest(h8, 24+tnum*4, 1);
 		}
 	}
 	// GRB match
@@ -515,7 +519,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		if(h8->per_regs[0x65] & (4<<tnum))	// interrupt enable
 		{
 			//logerror("h8/3007 timer %d GRB INTERRUPT\n",tnum);
-			h8_3002_InterruptRequest(h8, 25+tnum*4);
+			h8_3002_InterruptRequest(h8, 25+tnum*4, 1);
 		}
 	}
 	// Overflow
@@ -526,7 +530,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		if(h8->per_regs[0x66] & (4<<tnum))	// interrupt enable
 		{
 			//logerror("h8/3007 timer %d OVF INTERRUPT\n",tnum);
-			h8_3002_InterruptRequest(h8, 26+tnum*4);
+			h8_3002_InterruptRequest(h8, 26+tnum*4, 1);
 		}
 	}
 
@@ -574,7 +578,7 @@ UINT8 h8_3007_itu_read8(h83xx_state *h8, UINT8 reg)
 
 void h8_3007_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val)
 {
-	//logerror("%06x: h8/3007 reg %02x = %02x\n",h8->pc,reg,val);
+	logerror("%06x: h8/3007 reg %02x = %02x\n",h8->pc,reg,val);
 	h8->per_regs[reg] = val;
 	switch(reg)
 	{

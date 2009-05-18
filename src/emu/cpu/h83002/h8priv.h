@@ -30,14 +30,17 @@ struct _h83xx_state
 	const address_space *program;
 	const address_space *io;
 
-	// H8/3002 onboard peripherals stuff
-
+	// onboard peripherals stuff
 	UINT8 per_regs[256];
 
 	UINT16 h8TCNT[5];
 	UINT8 h8TSTR;
 
+	UINT8 STCR, TCR[2], TCSR[2], TCORA[2], TCORB[2], TCNT[2];
+	UINT16 FRC;
+
 	emu_timer *timer[5];
+	emu_timer *frctimer;
 
 	int mode_8bit;
 };

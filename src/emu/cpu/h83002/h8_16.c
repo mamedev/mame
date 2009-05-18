@@ -65,15 +65,32 @@ static CPU_DISASSEMBLE(h8_32)
 	return h8_disasm(buffer, pc, oprom, opram, 0xffffffff);
 }
 
-void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source)
+void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 {
-	if(source>31)
+	// don't allow clear on external interrupts
+	if ((source <= 17) && (state == 0)) return;
+
+	if (state)
 	{
-		h8->h8_IRQrequestH |= (1<<(source-32));
+		if (source>31)
+		{
+			h8->h8_IRQrequestH |= (1<<(source-32));
+		}
+		else
+		{
+			h8->h8_IRQrequestL |= (1<<source);
+		}
 	}
 	else
 	{
-		h8->h8_IRQrequestL |= (1<<source);
+		if (source>31)
+		{
+			h8->h8_IRQrequestH &= ~(1<<(source-32));
+		}
+		else
+		{
+			h8->h8_IRQrequestL &= ~(1<<source);
+		}
 	}
 }
 
@@ -292,9 +309,23 @@ static int h8_get_priority(h83xx_state *h8, UINT8 bit)
 	case 17: // IRQ5
 		if (h8->per_regs[0xF8]&0x10) res = 1; break;
 	case 53: // SCI0 Rx
-		if (h8->per_regs[0xB2]&0x40) res = 1; break;
+		if (!(h8->per_regs[0xB2]&0x40)) res = -2;
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
+	case 54: // SCI0 Tx Empty
+		if (!(h8->per_regs[0xB2]&0x80)) res = -2;
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
+	case 55: // SCI0 Tx End
+		if (!(h8->per_regs[0xB2]&0x04)) res = -2;
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
 	case 57: // SCI1 Rx
-		if (h8->per_regs[0xBA]&0x40) res = 1; break;
+		if (!(h8->per_regs[0xBA]&0x40)) res = -2;
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
+	case 58: // SCI1 Tx Empty
+		if (!(h8->per_regs[0xBA]&0x80)) res = -2;
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
+	case 59: // SCI1 Tx End
+		if (!(h8->per_regs[0xBA]&0x04)) res = -2;
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
 	}
 	return res;
 }
@@ -381,17 +412,17 @@ static CPU_SET_INFO( h8 )
 	case CPUINFO_INT_REGISTER + H8_E6:			h8->regs[6] = info->i;							break;
 	case CPUINFO_INT_REGISTER + H8_E7:			h8->regs[7] = info->i;							break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		if (info->i) h8_3002_InterruptRequest(h8, 12);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		if (info->i) h8_3002_InterruptRequest(h8, 13);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		if (info->i) h8_3002_InterruptRequest(h8, 14);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		if (info->i) h8_3002_InterruptRequest(h8, 15);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		if (info->i) h8_3002_InterruptRequest(h8, 16);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		if (info->i) h8_3002_InterruptRequest(h8, 17);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		h8_3002_InterruptRequest(h8, 12, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		h8_3002_InterruptRequest(h8, 13, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		h8_3002_InterruptRequest(h8, 14, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		h8_3002_InterruptRequest(h8, 15, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		h8_3002_InterruptRequest(h8, 16, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		h8_3002_InterruptRequest(h8, 17, info->i);		break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_METRO_TIMER_HACK:	if (info->i) h8_3002_InterruptRequest(h8, 24);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_METRO_TIMER_HACK:	h8_3002_InterruptRequest(h8, 24, info->i);		break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	if (info->i) h8_3002_InterruptRequest(h8, 53);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	if (info->i) h8_3002_InterruptRequest(h8, 57);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	h8_3002_InterruptRequest(h8, 53, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_3002_InterruptRequest(h8, 57, info->i);		break;
 
 	default:
 		fatalerror("h8_set_info unknown request %x", state);

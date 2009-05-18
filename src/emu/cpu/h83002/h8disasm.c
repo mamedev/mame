@@ -1247,6 +1247,10 @@ static UINT32 h8disasm_7(UINT32 address, UINT32 opcode, char *buffer, const UINT
 				}
 				sprintf(buffer, "%4.4x %s.b #%1.1x, @%s", opcode, bit_instr[(data16>>8)&7], (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
 				break;
+
+			case 0x77:	// bld #xx:3, @rd
+				sprintf(buffer, "%4.4x bld #%d, @%s", opcode, (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
+				break;
 		}
 		break;
 		// bxx.b #imm, @aa:8
