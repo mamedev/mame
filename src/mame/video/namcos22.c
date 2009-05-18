@@ -1314,6 +1314,12 @@ DrawSpritesHelper(
 
 			{
 				struct SceneNode *node = NewSceneNode(machine, zcoord,eSCENENODE_SPRITE);
+
+//				printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
+//					i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
+
+				if (color == 0) color = 0x67;	// extreme hack for Tokyo Wars
+
 				node->data.sprite.tile = tile;
 				node->data.sprite.pri = cz&0x80;
 				//              node->data.sprite.pri = (color&0x80);
@@ -1413,6 +1419,13 @@ DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *clipre
 	int deltax = spriteram32[0x14/4]>>16;
 	int deltay = spriteram32[0x18/4]>>16;
 	int enable = spriteram32[0]>>16;
+
+	/* HACK for Tokyo Wars */
+	if (deltax == 0 && deltay == 0)
+	{	
+		deltax = 190;
+		deltay = 250;
+	}
 
 	if( spriteram32[0x14/4] == 0x000002ff &&
 	spriteram32[0x18/4] == 0x000007ff )
@@ -2238,6 +2251,12 @@ VIDEO_START( namcos22s )
    namcos22_czram[1] = auto_alloc_array(machine, UINT16, 0x200/2 );
    namcos22_czram[2] = auto_alloc_array(machine, UINT16, 0x200/2 );
    namcos22_czram[3] = auto_alloc_array(machine, UINT16, 0x200/2 );
+
+   memset(namcos22_czram[0], 0, 0x200);
+   memset(namcos22_czram[1], 0, 0x200);
+   memset(namcos22_czram[2], 0, 0x200);
+   memset(namcos22_czram[3], 0, 0x200);
+
    VIDEO_START_CALL(common);
 }
 

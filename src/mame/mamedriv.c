@@ -884,6 +884,7 @@ const game_driver * const drivers[] =
 	DRIVER( raveraja )	/* (c) 1995 */
 	DRIVER( airco22b )	/* (c) 1995 */
 	DRIVER( alpinr2b )	/* (c) 1995 */
+	DRIVER( alpinr2a )	/* (c) 1995 */
 	DRIVER( cybrcomm )	/* (c) 1995 */
 	DRIVER( cybrcycc )	/* (c) 1995 */
 	DRIVER( timecris )	/* (c) 1995 */
@@ -891,6 +892,8 @@ const game_driver * const drivers[] =
 	DRIVER( victlapw )	/* (c) 1996 */
 	DRIVER( alpinesa )	/* (c) 1996 */
 	DRIVER( propcycl )	/* (c) 1996 */
+	DRIVER( tokyowar )	/* (c) 1996 */
+	DRIVER( aquajet ) 	/* (c) 1996 */
 
 	/* Namco System 23 */
 	DRIVER( rapidrvr )	/* (c) 1997 */

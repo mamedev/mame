@@ -143,32 +143,32 @@
  *  RR1.GAM (for Ridge Racer 1/2, Rave Racer)
  **********************************************************************************************************
  *
- * Namco Super System 22 Hardware Overview (last updated 3rd July 2008 at 11:40pm)
+ * Namco Super System 22 Hardware Overview (last updated 26th April 2009 at 4:11pm)
  * ---------------------------------------
- *
+ * 
  * Note! This document will be updated from time to time when more dumps are available.
- *
+ * 
  * This document covers all the known Namco Super System 22 games, including....
  * Air Combat 22    (C) Namco, 1995
  * Alpine Racer 1   (C) Namco, 1995
  * Alpine Racer 2   (C) Namco, 1996
  * Alpine Surfer    (C) Namco, 1996
- * !Aqua Jet        (C) Namco, 1996
+ * Aqua Jet         (C) Namco, 1996
  * *Armidillo Racing(C) Namco, 1997
  * Cyber Cycles     (C) Namco, 1995
- * *Dirt Dash       (C) Namco, 1995
+ * !Dirt Dash       (C) Namco, 1995
  * Prop Cycle       (C) Namco, 1996
  * Time Crisis      (C) Namco, 1995
- * !Tokyo Wars      (C) Namco, 1996
- *
+ * Tokyo Wars       (C) Namco, 1996
+ * 
  * ! - denotes secured but not dumped yet.
- * * - denotes not dumped yet. If you can help with the remaining undumped SS22 games,
-     * please contact http://www.mameworld.net/gurudumps/
- *
+ * * - denotes not available. If you can help with the remaining undumped SS22 games,
+ *     please contact http://guru.mameworld.info/
+ * 
  * The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
  * some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools
  * the video board as these are known to run hot and commonly fail, especially now the system is 10 years+ old.
- *
+ * 
  * CPU PCB   - There are four known revisions of this PCB. Three of them have an extra connector for an
  *             auxillary PCB. One of the others doesn't have that connector but is are otherwise identical.
  *             All PCBs can be swapped to any game and it will work. However, ALL required IC's must be swapped.
@@ -177,19 +177,22 @@
  *             to defaults by holding down SERVICE + TEST on power-up. All games are swappable to ANY CPU PCB and will
  *             run ok (all dumped games have been swapped/tested and work fine)
  * DSP PCB   - There is only 1 revision of this PCB. All games use the exact same PCB. The DSP PCB can be swapped to
- *             any other game and works fine (all dumped games tested)
+ *             any other game and works fine (all dumped games tested). Note that some games use different parts of the
+ *             DSP PCB and some do more thorough tests on bootup so a DSP PCB that works fine in one game may come
+ *             up as faulty in a different SS22 game.
  * MROM PCB  - These PCB's have many SOP44 ROMs on them and are identical for each game, but the contents of the ROMs
  *             and the number of ROMs vary per game. (a few of the dumped games have had their surface mounted ROMs
  *             swapped to other PCBs and worked fine)
- * FLASH PCB - Flash ROM board used only for Armidillo Racing that contains TSOP56 16M FlashROMs
+ * FLASH PCB - Flash ROM board used only for Armidillo Racing and contains many TSOP56 16M FlashROMs
  * VIDEO PCB - There are three known revisions of this PCB. They're mostly identical apart from some component shuffling
  *             and in the earlier versions (A & B), an Altera FPGA chip is used instead of a Namco custom chip.
- *             All revisions of the Video PCBs are swappable and fully compatible with any SS22 game.
+ *             All revisions of the Video PCBs are swappable and fully compatible with any SS22 game. The Altera FPGA runs
+ *             very hot and almost always fails even if heatsinked!
  * MOTHER PCB- There are probably 3 revisions of this PCB, but only the original revision and (C) are documented here.
  *             The differences are very minor, just the amount of connectors on the PCB. The Mother PCB is swappable to
  *             any game as long as the required connectors for that game are present on the PCB. (all dumped games tested
- *             and worked fine)
- *
+ *             and worked fine using any MOTHER PCB)
+ * 
  * Each game has a 2 or 3 digit letter code assigned to it. Then a number 1 or 2, Then a Rev. A/B/C/D which denotes the
  * software revision.
  * The 1 denotes a Japanese version. 2 denotes a World version. So far there are no other numbers used other than 1 or 2.
@@ -197,18 +200,18 @@
  * There is one exception so far. The World version of Alpine Racer 2, which uses a World version DATA ROM, and also one
  * of the WAVE ROMs is a World version, but one Japanese WAVE ROM is also used.
  * See the CPU PCB, Program ROM Daughterboard and MROM PCB texts below for more details on ROM usage.
- *
+ * 
  * CPU PCB
  * -------
  * 1st Revision
  * SYSTEM SUPER22 CPU PCB 8646960102 (8646970102)
- *
+ * 
  * 2nd Revision
  * SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972600)
- *
+ * 
  * 3rd Revision
  * SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972601) <-- very minor?
- *
+ * 
  * 4th Revision
  * SYSTEM SUPER22 CPU(B) PCB 8646962601 (8646972601) <-- very minor?
  * |--------------------------------------------------------------|
@@ -242,7 +245,7 @@
  * |      WAVEB.1L                LC78815M      LC78815M          |
  * |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- *
+ * 
  * Notes:
  *       J6           : Custom Namco connector for plug-in program ROM PCB
  *       J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 MASKROMs)
@@ -290,7 +293,7 @@
  *                                          Prop Cycle       = C428
  *                                          Time Crisis      = C419
  *                                          Tokyo Wars       = C424
- *
+ * 
  *      *1            : Unpopulated position for PAL16V8 (PLCC20)
  *      *2            : Unpopulated position for Fujitsu MB86601 (QFP100)
  *      *3            : Unpopulated position for 32MHz OSC
@@ -308,7 +311,7 @@
  *                      Prop Cycle         'PR1 DATA'
  *                      Time Crisis        'TS1 DATA'
  *                      Tokyo Wars         'TW1 DATA'
- *
+ * 
  *      WAVEA.2L   \
  *      WAVEB.1L   /  : 16M/32M WAVE MASKROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
  *                      Game                Wave A        Wave B        Type
@@ -324,8 +327,8 @@
  *                      Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
  *                      Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
  *                      Tokyo Wars         'TW1 WAVE A',              , DIP42 32M MASKROM
- *
- *
+ * 
+ * 
  * PROGRAM ROM Daughterboard PCB
  * -----------------------------
  * This PCB holds the main program ROMs. There is a small sticker on each PCB stating the game code and software revision.
@@ -333,7 +336,7 @@
  * There are 4 known types of program daughterboards used on SS22 games (so far). The most common is the first type.
  * The PCB is very small (approx 2" x 3") containing one custom connector and some FlashROMs, and a PAL (in some cases).
  * The ones that contain a PAL are approx 3" x 3".
- *
+ * 
  * Type 1
  * SYSTEM SUPER22 MPM(F) PCB 8646961600 (8646971600)
  * |-------------------------|
@@ -347,7 +350,7 @@
  * |-------------------------|
  * Notes:
  *       ROMx: Intel E28F008SA 8MBit FlashROM (x4, TSOP40)
- *
+ * 
  *       This PCB is used on:
  *                           Game          Software revision
  *                           -------------------------------
@@ -359,7 +362,7 @@
  *                           Prop Cycle       'PR2 Ver.A'
  *                           Time Crisis      'TS2 Ver.B'
  *                           Tokyo Wars       'TW2 Ver.A'
- *
+ * 
  * Type 2
  * SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
  * |-------------------------|
@@ -374,12 +377,12 @@
  * |-------------------------|
  * Notes:
  *       ROMx: Intel E28F016SA 16MBit FlashROMs (x2, TSOP56)
- *
+ * 
  *       This PCB is used on:
  *                           Game          Software revision
  *                           -------------------------------
  *                           Time Crisis   'TS2 Ver.A'
- *
+ * 
  * Type 3
  * SYSTEM SUPER22 MPM(F16X4) PCB 8646962901 (8646972901)
  * |-------------------------|
@@ -397,12 +400,12 @@
  * Notes:
  *       ICx*   : Intel E28F016SA 16MBit FlashROMs (x4, TSOP56)
  *       SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
- *
+ * 
  *       This PCB is used on:
  *                           Game           Software revision
  *                           -------------------------------
  *                           Alpine Racer 2 'ARS2 Ver.B'
- *
+ * 
  * Type 4
  * SYSTEM SUPER22 MPM(F16X4F) PCB 8646963500 (8646973500)
  * |-------------------------|
@@ -427,13 +430,13 @@
  *                  That pin traces to pin 6 (OUTPUT Y) of a 74F08 at 15F on the CPU board
  *                  Pins 4 (INPUT A) & 5 (INPUT B) of the 74F08 at 15F trace to Namco custom
  *                  IC C383 pins 53 (A INPUT) & 52 (B INPUT)
- *
+ * 
  *       This PCB is used on:
  *                           Game          Software revision
  *                           -------------------------------
  *                           Alpine Surfer 'AF2 Ver.A'
- *
- *
+ * 
+ * 
  * Auxillary PCB (connector JC410 on the CPU PCB is used only for Time Crisis)
  * -------------
  * V159 GUN POINT PCB 244790102 (2447970102)
@@ -458,10 +461,10 @@
  * Notes:
  *       There isn't much on this PCB other than 2 connectors and an oscillator plus a large amount of logic chips.
  *       J1 : Connector joining Gun PCB to a connector on the metal box (which joins to the gun interface PCB in the
- *            cab which supplies 24V for the soleniod in the guns)
+ *            cab which supplies 24V for the solenoid in the guns)
  *       J2 : Connector joining to the CPU PCB (to JC410)
- *
- *
+ * 
+ * 
  * DSP PCB
  * -------
  * SYSTEM SUPER22 DSP PCB 8646960302 (8646970302)
@@ -496,7 +499,7 @@
  *   |   |-----|  |---------|                                       |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- *
+ * 
  * Notes:
  *       JD3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known as a
  *                      'DHD harness'
@@ -518,8 +521,8 @@
  *       SS22D4B      : PALCE 16V8H (PLCC20, labelled 'SS22D4B')
  *       SS22D5       : PALCE 16V8H (PLCC20, labelled 'SS22D5')
  *       LEDS         : 8 red LEDs flash (in various pretty patterns) when the DSP PCB is active.
- *
- *
+ * 
+ * 
  * ROM PCB (type 1)
  * -------
  * SYSTEM SUPER22 MROM PCB 8646960400 (8646970400)
@@ -554,11 +557,11 @@
  *   |   SCG6.1L               SCG6.1F                              |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- *
+ * 
  * Notes:
  *       Namco SS22 MROM PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
  *       The Japanese region code '1' is appended to all game codes on all MROMs.
- *
+ * 
  *       JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
  *                      as a 'DHD harness'
  *       SS22M1       : PALCE 16V8H (PLCC20, labelled 'SS22M1')
@@ -570,7 +573,7 @@
  *       JP7, JP8, JP9: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
  *    JP10, JP11, JP12: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
  *       JP13         : Jumper  to configure PTR* ROMs. Hardwired to '4M'  on the PCB. Alt. setting '8M'
- *
+ * 
  * Game               ROMs populated
  * ---------------------------------------------------------
  * Air Combat 22      ACS1CCRH.5B, ACS1CCRH.1D    4M SOP32
@@ -597,7 +600,7 @@
  *                    ACS1PTRL1.16K                  "
  *                    ACS1PTRL2.15K                  "
  *                    ACS1PTRL3.14K                  "
- *
+ * 
  * Alpine Racer 1     AR1CCRH.5B, AR1CCRH.1D      4M SOP32
  *                    AR1CCRL.7B, AR1CCRL.3D     16M SOP44
  *                    AR1CG0.12B, AR1CG0.8D          "
@@ -622,7 +625,7 @@
  *                    AR1PTRL1.16K                   "
  *                    AR1PTRL2.15K                   "
  *                    AR1PTRL3.14K                   "
- *
+ * 
  * Alpine Racer 2     ARS1CCRH.5B, ARS1CCRH.1D    4M SOP32
  *                    ARS1CCRL.7B, ARS1CCRL.3D   16M SOP44
  *                    ARS1CG0.12B, ARS1CG0.8D        "
@@ -644,7 +647,7 @@
  *                    ARS1PTRL1.16K                  "
  *                    ARS1PTRL2.15K                  "
  *                    ARS1PTRL3.14K                  "
- *
+ * 
  * Alpine Surfer      AF1CCRH.5B, AF1CCRH.1D      4M SOP32
  *                    AF1CCRL.7B, AF1CCRL.3D     16M SOP44
  *                    AF1CG0.12B, AF1CG0.8D          "
@@ -659,7 +662,7 @@
  *                    AF1PTRM1.16J                   "
  *                    AF1PTRL0.18K                   "
  *                    AF1PTRL1.16K                   "
- *
+ * 
  * Aqua Jet           AJ1CCRH.5B, AJ1CCRH.1D      4M SOP32
  *                    AJ1CCRL.7B, AJ1CCRL.3D     16M SOP44
  *                    AJ1CG0.12B, AJ1CG0.8D          "
@@ -685,7 +688,7 @@
  *                    AJ1PTRL1.16K                   "
  *                    AJ1PTRL2.15K                   "
  *                    AJ1PTRL3.14K                   "
- *
+ * 
  * Cyber Cycles       CB1CCRH.5B, CB1CCRH.1D      4M SOP32
  *                    CB1CCRL.7B, CB1CCRL.3D     16M SOP44
  *                    CB1CG0.12B, CB1CG0.8D          "
@@ -709,9 +712,9 @@
  *                    CB1PTRL1.16K                   "
  *                    CB1PTRL2.15K                   "
  *                    CB1PTRL3.14K                   "
- *
+ * 
  * Dirt Dash          N/A
- *
+ * 
  * Prop Cycle         PR1CCRH.5B, PR1CCRH.1D      4M SOP32
  *                    PR1CCRL.7B, PR1CCRL.3D     16M SOP44
  *                    PR1CG0.12B, PR1CG0.8D          "
@@ -733,7 +736,7 @@
  *                    PR1PTRL0.18K                   "
  *                    PR1PTRL1.16K                   "
  *                    PR1PTRL2.15K                   "
- *
+ * 
  * Time Crisis        TS1CCRH.5B, TS1CCRH.1D      4M SOP32
  *                    TS1CCRL.7B, TS1CCRL.3D     16M SOP44
  *                    TS1CG0.12B, TS1CG0.8D          "
@@ -759,7 +762,7 @@
  *                    TS1PTRL0.18K                   "
  *                    TS1PTRL1.16K                   "
  *                    TS1PTRL2.15K                   "
- *
+ * 
  * Tokyo Wars         TW1CCRH.5B, TW1CCRH.1D      4M SOP32
  *                    TW1CCRL.7B, TW1CCRL.3D     16M SOP44
  *                    TW1CG0.12B, TW1CG0.8D          "
@@ -786,8 +789,8 @@
  *                    TW1PTRL1.16K                   "
  *                    TW1PTRL2.15K                   "
  *                    TW1PTRL3.14K                   "
- *
- *
+ * 
+ * 
  * ROM PCB (type 2)
  * -------
  * SS22DS FLASH PCB 8650961300 (8650971300)
@@ -822,10 +825,10 @@
  *   | SS22DSF2  F1L   F1M                 F1J     F1E              |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- *
+ * 
  * Notes:
  *       Namco SS22 FLASH PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
- *
+ * 
  *       JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
  *                      as a 'DHD harness'
  *       EPMXXXX      : Altera EPM??? (PLCC84, unknown chip model, possibly EPM7064, sticker on top of it blocking ID markings)
@@ -834,30 +837,30 @@
  *       SS22DSF3     : EPM7032 (x2, PLCC44, labelled 'SS22DSF3')
  *       SS22DSF2     : EPM7032 (x2, PLCC44, labelled 'SS22DSF2')
  *       HM628128     : Hitachi HM628128 128k x8 SRAM (TSOP32)
- *
+ * 
  * Game               ROMs populated (All Intel E28F016SA TSOP56 16M FlashROMs)
  * -----------------------------------------------------------------
  * Armidillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH ROMs
- *
+ * 
  *                    F4E, F4J, F5E, F5J, F6E, F6J, \
  *                    F7E, F7J, F8E, F8J, F9E, F9J, \ CGx ROMs
  *                    F11E, F11J, F12E, F12J        /
- *
+ * 
  *                    F1L, F1M, F3L, F3M, F5L, F5M, \
  *                    F7L, F7M                      / SCGx ROMs
- *
+ * 
  *                    F9L, F11L, F12L, F13L,        \
  *                    F12M, F13M                    / PTR ROMs
- *
- *
+ * 
+ * 
  * VIDEO PCB
  * ---------
  * 1st Revision
  * SYSTEM SUPER22 VIDEO 8646960204 (8646970204)
- *
+ * 
  * 2nd Revision
  * SYSTEM SUPER22 VIDEO(B) 8646961200 (8646971200)
- *
+ * 
  * 3rd Revision (PCB layout shown below)
  * SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
  *   |--------------------------------------------------------------|
@@ -891,7 +894,7 @@
  *   |  |---------| |---------| N341256                    CXD1178Q |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- *
+ * 
  * Notes:
  *       JV3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known
  *                      as a 'DHD harness'
@@ -920,16 +923,16 @@
  *                                                      video faults on Namco Super System 22 PCBs.
  *                                                      (Second reason for video faults is generally attributed
  *                                                      to failure of RAM on this PCB and/or the DSP PCB)
- *
- *
+ * 
+ * 
  * Motherboard PCB
  * ---------------
  * 1st Revision
  * SYSTEM SUPER22 MOTHER PCB 8646960602 (8646970602)
- *
+ * 
  * 2nd Revision
  * SYSTEM SUPER22 MOTHER(B) PCB (number not known)
- *
+ * 
  * 3rd Revision
  * SYSTEM SUPER22 MOTHER(C) PCB 8646960602 (8646970602)
  * |------------------------------------------------------------------|
@@ -952,12 +955,12 @@
  * Notes:
  *       IC1     : LB1233 (DIP8)
  *       IC2, IC3: LB1235 (DIP8)
- *
+ * 
  *       JC1, JC2: Connectors to plug in CPU PCB
  *       JD1, JD2: Connectors to plug in DSP PCB
  *       JR1     : Connector  to plug in MROM PCB
  *       JV1, JV2: Connectors to plug in VIDEO PCB
- *
+ * 
  *       J1 : 9 pin power input socket   Pin  Use
  *                                      -----------
  *                                       1    +5V
@@ -969,7 +972,7 @@
  *                                       7    Ground
  *                                       8    NC
  *                                       9    +12V
- *
+ * 
  *       J2 : 9 pin link connector   Pin  Use
  *                                   --------------
  *                                    1   Ring In+
@@ -981,7 +984,7 @@
  *                                    7   /TXD  (NC)
  *                                    8   GND   (NC)
  *                                    9   +5V   (NC)
- *
+ * 
  *       J3 : 9 pin socket   Pin  Use
  *                           -------------------
  *                            1   Service Credit
@@ -993,18 +996,18 @@
  *                            7   Ground
  *                            8   Coin Sw
  *                            9   NC
- *
+ * 
  *       J4 : 8 pin connector  Pin  Use
  *                             -------------------------------------
  *                              1   Start
- *                              2   Left select
- *                              3   Right select
+ *                              2   Left Select
+ *                              3   Right Select
  *                              4   Safety Free Controls (Ski's etc)
  *                              5   Safety Lock Controls (Ski's etc)
  *                              6   NC
  *                              7   Ground
  *                              8   Ground
- *
+ * 
  *       J5 : 15 pin socket   Pin  Use
  *                            ---------------
  *                             1   Relay1
@@ -1022,7 +1025,7 @@
  *                             13  +12V
  *                             14  +5V
  *                             15  NC
- *
+ * 
  *       J6 : 12 pin audio output connector  Pin  Use
  *                                           ----------
  *                                            1   SPKL+
@@ -1037,7 +1040,7 @@
  *                                            10  NC
  *                                            11  NC
  *                                            12  NC
- *
+ * 
  *       J7 : 12 pin analog controls socket   Pin  Use
  *                                            ---------------------------
  *                                             1   +5V
@@ -1052,9 +1055,9 @@
  *                                             10  NC
  *                                             11  NC
  *                                             12  NC
- *
+ * 
  *       J8 : 10 pin connector (not used?)
- *
+ * 
  *       J9 : 6 pin video output socket   Pin  Use
  *                                        ---------
  *                                         1   Red
@@ -1063,10 +1066,10 @@
  *                                         4   Composite Sync (VSync 15kHz interlaced)
  *                                         5   Ground
  *                                         6   NC
- *
+ * 
  *       J10: 16 pin flat cable connector (only populated on Mother(C) PCB, use not known)
- *
- *
+ * 
+ * 
  * AMP PCB
  * -------
  * SYSTEM SUPER22 AMP(4) PCB 8647960100 (8647970100) (sticker 'AMP(2) PCB 8647961100')
@@ -1081,14 +1084,14 @@
  *                                           1   +12V
  *                                           2   Ground
  *                                           3   NC
- *
+ * 
  *       J2    : 4 pin dual speaker output socket   Pin  Use
  *                                                  ---------
  *                                                   1   SP1+
  *                                                   2   SP1-
  *                                                   3   SP2+
  *                                                   4   SP2-
- *
+ * 
  *       J3    : 8 pin sound data input connector from Mother PCB J6   Pin  Use
  *                                                                     ----------
  *                                                                      1   SPKL+
@@ -1099,7 +1102,7 @@
  *                                                                      6   NC
  *                                                                      7   NC
  *                                                                      8   NC
- *
+ * 
  *       *1    : Unpopulated position for a 2nd LA4705 Power Amp
  *       *2    : J4 - Unpopulated position for another 4 pin dual speaker output socket
  *       J5    : 2 pin connector used for sound mute  Pin  Use
@@ -2211,6 +2214,8 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 
 static READ32_HANDLER( namcos22_keycus_r )
 {
+//	printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(space->cpu));
+
 	switch( namcos22_gametype )
 	{
 	case NAMCOS22_RIDGE_RACER:
@@ -2232,6 +2237,9 @@ static READ32_HANDLER( namcos22_keycus_r )
 
 	case NAMCOS22_CYBER_CYCLES:
 		return 0x0387;
+
+	case NAMCOS22_TOKYO_WARS:
+		return 0x01a8<<16;
 
 	case NAMCOS22_ALPINE_SURFER:
 		return 0x01a9;
@@ -2316,7 +2324,7 @@ static READ32_HANDLER( spotram_r )
 
 static WRITE32_HANDLER( spotram_w )
 { /**
-   * 0x860000: reset
+   * 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
    * 0x860002: append data
    *
    * 0x860006: enable
@@ -2329,13 +2337,12 @@ static WRITE32_HANDLER( spotram_w )
 			{
 				mSpotRAM.portW = 0;
 			}
-         logerror( "spotram[0x%x] == 0x%x\n", mSpotRAM.portW, data );
 			mSpotRAM.RAM[mSpotRAM.portW++] = data;
 		}
 		else
 		{
-			mSpotRAM.portR = 0;
-			mSpotRAM.portW = 0;
+			mSpotRAM.portR = (data>>19)*3;
+			mSpotRAM.portW = (data>>19)*3;
 		}
 	}
 } /* spotram_w */
@@ -2673,6 +2680,40 @@ static READ8_HANDLER( cybrcycc_mcu_adc_r )
 			return brake & 0xff;
 
 		case 5:
+			return (brake>>8);
+
+		default:
+			return 0;
+	}
+}
+
+static READ8_HANDLER( tokyowar_mcu_adc_r )
+{
+	UINT16 gas,brake,steer;
+	ReadAnalogDrivingPorts( space->machine, &gas, &brake, &steer );
+
+	gas <<= 2;
+	brake <<= 2;
+	steer <<= 2;
+
+	switch (offset)
+	{
+		case 0:
+			return steer & 0xff;
+
+		case 1:
+			return (steer>>8);
+
+		case 4:
+			return gas & 0xff;
+
+		case 5:
+			return (gas>>8);
+
+		case 6:
+			return brake & 0xff;
+
+		case 7:
 			return (brake>>8);
 
 		default:
@@ -3383,6 +3424,60 @@ ROM_START( alpinr2b )
         ROM_LOAD32_BYTE( "ars2ver-b.3",  0x000001, 0x200000, CRC(8e7a9983) SHA1(34c82e5f080efe04d6b77a77a8391cb48b69c1af) )
         ROM_LOAD32_BYTE( "ars2ver-b.4",  0x000002, 0x200000, CRC(610e49c2) SHA1(433c6d2216551bac31584306f748af1c912c3b07) )
         ROM_LOAD32_BYTE( "ars2ver-b.5",  0x000000, 0x200000, CRC(7f3517b0) SHA1(3e6ba1a51bf235f40f933aae1f00638b88bba522) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
+
+	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+        ROM_LOAD( "ars2data.8k",  0x000000, 0x080000, CRC(29b36dcb) SHA1(70fde130c11789c822829493a70ecefb077c0c15) )
+
+	ROM_REGION( 0x200000*2, "sprite", ROMREGION_DISPOSE ) /* 32x32x8bpp sprite tiles */
+        ROM_LOAD( "ars1scg0.12f", 0x000000, 0x200000, CRC(bc49ed86) SHA1(289b39f2cb21c723dbe4ddd64ee4b2c5fa65c368) )
+
+	ROM_REGION( 0xc00000, "textile", ROMREGION_DISPOSE) /* 16x16x8bpp texture tiles */
+        ROM_LOAD( "ars1cg0.8d",   0x000000, 0x200000, CRC(74f4515c) SHA1(1e3a96281d543213d10c962b4d387c414d76e0c3) )
+        ROM_LOAD( "ars1cg1.10d",  0x200000, 0x200000, CRC(329a95c1) SHA1(2cad7fd9e5ca7c64729ca2548ef4f873a0b8de64) )
+        ROM_LOAD( "ars1cg2.12d",  0x400000, 0x200000, CRC(5648345a) SHA1(0dc7aedba65b7d97687a9e38a63597f16cee6179) )
+        ROM_LOAD( "ars1cg3.13d",  0x600000, 0x200000, CRC(a752f205) SHA1(373b5a69e4488bc30763568ceae512ab7039f5f8) )
+        ROM_LOAD( "ars1cg4.14d",  0x800000, 0x200000, CRC(54bf35b6) SHA1(aec43b66e7597ad7d113ae785417bf26164c1bca) )
+        ROM_LOAD( "ars1cg5.16d",  0xa00000, 0x200000, CRC(e24a19a2) SHA1(34c1b51eea954ae3000602e550eb1cef0a10e651) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+        ROM_LOAD( "ars1ccrl.3d",  0x000000, 0x200000, CRC(fc8c9161) SHA1(ad0fcfae27e02d68a6f8d1d03c514dc2f12d9ee8) )
+        ROM_LOAD( "ars1ccrh.1d",  0x200000, 0x080000, CRC(a17660bb) SHA1(bae2c3f20772c6cea99f271ee3f39b1f999038c6) )
+
+	ROM_REGION( 0x80000*12, "pointrom", 0 ) /* 3d model data */
+        ROM_LOAD( "ars1ptrl0.18k", 0x000000, 0x080000, CRC(f04e0e61) SHA1(d58a1d3ca1d0922e134db21a04feaee7dc97b020) )
+        ROM_LOAD( "ars1ptrl1.16k", 0x080000, 0x080000, CRC(8bdb4970) SHA1(a504cd4beca4bedd1a7a228c83dd6b844ca3a1e0) )
+        ROM_LOAD( "ars1ptrl2.15k", 0x100000, 0x080000, CRC(ec993a4f) SHA1(883f64e3e8d951415e9cef589c354eba9406c0aa) )
+        ROM_LOAD( "ars1ptrl3.14k", 0x180000, 0x080000, CRC(4d453f3c) SHA1(7a82e5d8f974d9e56d0031b35e73647fe6aeec2e) )
+
+        ROM_LOAD( "ars1ptrm0.18j", 0x200000, 0x080000, CRC(d1bdc524) SHA1(b898bb38de397551ada4da4677dd733bf8fa5010) )
+        ROM_LOAD( "ars1ptrm1.16j", 0x280000, 0x080000, CRC(86b81c81) SHA1(45096abf46794f06a4b647f5e4222798d8467632) )
+        ROM_LOAD( "ars1ptrm2.15j", 0x300000, 0x080000, CRC(24116b83) SHA1(41c6a880abce7b543c409fda767682b2537b0d99) )
+        ROM_LOAD( "ars1ptrm3.14j", 0x380000, 0x080000, CRC(772bede3) SHA1(f9565b7a40f0bbf11081d619fe5a46feafce2e56) )
+
+        ROM_LOAD( "ars1ptru0.18f", 0x400000, 0x080000, CRC(a4cf197a) SHA1(ee78cc259e87395df75179bbe5b6e521e762b582) )
+        ROM_LOAD( "ars1ptru1.16f", 0x480000, 0x080000, CRC(1deb1fc0) SHA1(bfd1dfcaccf5a0f851b6757995fa7195452a3965) )
+        ROM_LOAD( "ars1ptru2.15f", 0x500000, 0x080000, CRC(bcfad0ba) SHA1(bee7f2f9ecd2b289c6706e19fa86863913b286b5) )
+        ROM_LOAD( "ars1ptru3.14f", 0x580000, 0x080000, CRC(73ce6958) SHA1(918b0fb0fca33dbe3be3ac679b8b28f58213f75b) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
+        ROM_LOAD( "ars1wavea.2l", 0x000000, 0x400000, CRC(f8d107e9) SHA1(5c418691f0b35403553f21f5570eda8bbb66890f) )
+        ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
+ROM_END
+
+ROM_START( alpinr2a )
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
+        ROM_LOAD32_BYTE( "ars2ver-a.2",  0x000003, 0x200000, CRC(b07b15a4) SHA1(ea3b2d7b4ef4ccf3aafeef7e7eac92e8d446f4e7) )
+        ROM_LOAD32_BYTE( "ars2ver-a.3",  0x000002, 0x200000, CRC(90a92e40) SHA1(bf8083256e56e7e33e61b4cdaf9fd03dabfb36ba) )
+        ROM_LOAD32_BYTE( "ars2ver-a.4",  0x000001, 0x200000, CRC(9e9d771d) SHA1(6fb983e3f4f8233544667b1bbf87864e4fb8698c) )
+        ROM_LOAD32_BYTE( "ars2ver-a.5",  0x000000, 0x200000, CRC(e93c7771) SHA1(305f35488a55be1b845702df972bba8334c0726c) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4274,13 +4369,13 @@ ROM_START( timecris )
 	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
 	ROM_LOAD( "ts1data.8k", 0, 0x080000, CRC(e68aa973) SHA1(663e80d249be5d5841139d98a9d72e2396851272) )
 
-	ROM_REGION( 0x200000*6, "sprite", ROMREGION_DISPOSE ) /* 32x32x8bpp sprite tiles */
-	ROM_LOAD( "ts1scg0.12f",0x200000*0, 0x200000,CRC(14a3674d) SHA1(c5792a385572452b43bbc7eb8428335b19daa3c0) )
-	ROM_LOAD( "ts1scg1.10f",0x200000*1, 0x200000,CRC(11791dbf) SHA1(3d75b468d69a8bf398d45f310cdb8bc88b63f25c) )
-	ROM_LOAD( "ts1scg2.8f", 0x200000*2, 0x200000,CRC(d630fff9) SHA1(691394027b858702f06282f965f5b53e6fed496b) )
-	ROM_LOAD( "ts1scg3.7f", 0x200000*3, 0x200000,CRC(1a62f015) SHA1(7d09ae480ae7813391616ae0090929ba845a345a) )
-	ROM_LOAD( "ts1scg4.5f", 0x200000*4, 0x200000,CRC(511b8dd6) SHA1(936649c0a61d29f024a28e4ab64cce4b55d58f64) )
-	ROM_LOAD( "ts1scg5.3f", 0x200000*5, 0x200000,CRC(553bb246) SHA1(94659bee4fd0afe834a8bf3414d8825411cf9e86) )
+	ROM_REGION( 0xe00000, "sprite", ROMREGION_DISPOSE ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "ts1scg0.12f",0x200000, 0x200000,CRC(14a3674d) SHA1(c5792a385572452b43bbc7eb8428335b19daa3c0) )
+	ROM_LOAD( "ts1scg1.10f",0x400000, 0x200000,CRC(11791dbf) SHA1(3d75b468d69a8bf398d45f310cdb8bc88b63f25c) )
+	ROM_LOAD( "ts1scg2.8f", 0x600000, 0x200000,CRC(d630fff9) SHA1(691394027b858702f06282f965f5b53e6fed496b) )
+	ROM_LOAD( "ts1scg3.7f", 0x800000, 0x200000,CRC(1a62f015) SHA1(7d09ae480ae7813391616ae0090929ba845a345a) )
+	ROM_LOAD( "ts1scg4.5f", 0xa00000, 0x200000,CRC(511b8dd6) SHA1(936649c0a61d29f024a28e4ab64cce4b55d58f64) )
+	ROM_LOAD( "ts1scg5.3f", 0xc00000, 0x200000,CRC(553bb246) SHA1(94659bee4fd0afe834a8bf3414d8825411cf9e86) )
 
 	ROM_REGION( 0x200000*8, "textile", ROMREGION_DISPOSE) /* 16x16x8bpp texture tiles */
 	ROM_LOAD( "ts1cg0.8d",   0x200000*0x0, 0x200000,CRC(de07b22c) SHA1(f4d07b8840ec8be625eff634bce619e960c334a5) )
@@ -4362,6 +4457,118 @@ ROM_START( timecrsa )
 	ROM_REGION( 0xa00000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "ts1wavea.2l", 0x000000, 0x400000, CRC(d1123301) SHA1(4bf1fd746fef4e6befa63c61a761971d729e1573) )
 	ROM_LOAD( "ts1waveb.1l", 0x800000, 0x200000, CRC(bf4d7272) SHA1(c7c7b3620e7b3176644b6784ee36e679c9e31cc1) )
+ROM_END
+
+ROM_START( tokyowar )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+        ROM_LOAD32_BYTE( "tw2ver-a.1",   0x000003, 0x100000, CRC(2b17ca92) SHA1(7bcb1658059c59fb1a0131a41ede7157855130a8) )
+        ROM_LOAD32_BYTE( "tw2ver-a.2",   0x000002, 0x100000, CRC(12da84e3) SHA1(a9406d0b77f60ba930c30e60bf4b3656c8905585) )
+        ROM_LOAD32_BYTE( "tw2ver-a.3",   0x000001, 0x100000, CRC(7d42c516) SHA1(28c1596dd55c15207bbb41a8b9a5abc97abc2bc8) )
+        ROM_LOAD32_BYTE( "tw2ver-a.4",   0x000000, 0x100000, CRC(b904ed16) SHA1(773e11536e1b3fe4971608a63a8e6eca702f8667) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
+
+	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+        ROM_LOAD( "tw1data.8k",   0x000000, 0x080000, CRC(bd046e4b) SHA1(162bc4ab69959ccab49fd69de291d34d472fb1c8) )
+
+	ROM_REGION( 0x800000, "sprite", ROMREGION_DISPOSE ) /* 32x32x8bpp sprite tiles */
+        ROM_LOAD( "tw1scg0.12f",  0x000000, 0x200000, CRC(e3ec4daa) SHA1(f3a71ae9820d62075b814ffa2fecf3343ae09ffe) )
+        ROM_LOAD( "tw1scg1.10f",  0x200000, 0x200000, CRC(b18a06e9) SHA1(ecf6a1e11603b8ea5119a036a57595dea021d778) )
+        ROM_LOAD( "tw1scg2.8f",   0x400000, 0x200000, CRC(36f8c3d8) SHA1(d5c965d5cdd258c77b9db3137ce33404a5a3641c) )
+        ROM_LOAD( "tw1scg3.7f",   0x600000, 0x200000, CRC(8e14d013) SHA1(ca63105a5c07bb9653499eef7a757db52612b59b) )
+
+	ROM_REGION( 0x200000*8, "textile", ROMREGION_DISPOSE) /* 16x16x8bpp texture tiles */
+        ROM_LOAD( "tw1cg0.8d",    0x000000, 0x200000, CRC(98b9b070) SHA1(cb920a34700dab330c967cc634717134c04b7e1d) ) 
+        ROM_LOAD( "tw1cg1.10d",   0x200000, 0x200000, CRC(f96a723a) SHA1(5ba14963a4c51c875ac8d3b42049bc334de90038) )  
+        ROM_LOAD( "tw1cg2.12d",   0x400000, 0x200000, CRC(573e9ded) SHA1(815bda1ac000532c915c2d65ffdb04fee6fa8201) )  
+        ROM_LOAD( "tw1cg3.13d",   0x600000, 0x200000, CRC(302d5c74) SHA1(5a823f6842cf0f79eb93da47d5bf8c5f51e420db) )  
+        ROM_LOAD( "tw1cg4.14d",   0x800000, 0x200000, CRC(ab8aa1df) SHA1(355192d999f493e0761fbc822fa9b30c33d8e1c4) ) 
+        ROM_LOAD( "tw1cg5.16d",   0xa00000, 0x200000, CRC(5063f3d0) SHA1(ad8dd2f4184373a3a3ca748b411a5eec1835dc97) )  
+        ROM_LOAD( "tw1cg6.18d",   0xc00000, 0x200000, CRC(d764027c) SHA1(5cbf93392683885c220628936ba50c09cb40fcfb) )
+        ROM_LOAD( "tw1cg7.19d",   0xe00000, 0x200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+        ROM_LOAD( "tw1ccrl.3d",   0x000000, 0x200000, CRC(d08f5794) SHA1(336a97a2b060505e259e3bcedb9eb8aa4ea8815e) ) 
+        ROM_LOAD( "tw1ccrh.1d",   0x200000, 0x080000, CRC(ad17e693) SHA1(4f06dc82c03159894fb8e10383862920f94563b1) ) 
+
+	ROM_REGION( 0x600000, "pointrom", 0 ) /* 3d model data */
+        ROM_LOAD( "tw1ptrl0.18k", 0x000000, 0x080000, CRC(44ac5e86) SHA1(5e42db58f2e352c0fe5e49588a9283817dd15ab1) )
+        ROM_LOAD( "tw1ptrl1.16k", 0x080000, 0x080000, CRC(3c769860) SHA1(19b32c3d262f2a9d07354fbd6ac6be97b05f176e) )
+        ROM_LOAD( "tw1ptrl2.15k", 0x100000, 0x080000, CRC(6e94103c) SHA1(ee90b77939a9f5780ce271882133cdf977eb643e) )
+        ROM_LOAD( "tw1ptrl3.14k", 0x180000, 0x080000, CRC(e3ce5eb2) SHA1(4e15a6f630be15eb017cd51c5e7901db3138a061) )
+        ROM_LOAD( "tw1ptrm0.18j", 0x200000, 0x080000, CRC(e170cea2) SHA1(ca259508d76fdab97a9d0502f871f0e560e6c308) )
+        ROM_LOAD( "tw1ptrm1.16j", 0x280000, 0x080000, CRC(36a32237) SHA1(f46851dc5c094810ddc42d56310a9f85908bf715) )
+        ROM_LOAD( "tw1ptrm2.15j", 0x300000, 0x080000, CRC(c426c278) SHA1(64232ac3c1649e0d0adb4b03e58b8b5ea4013f83) )
+        ROM_LOAD( "tw1ptrm3.14j", 0x380000, 0x080000, CRC(d9b9a651) SHA1(0c49a051526081149d894d629f19cb0f2b66a698) )
+        ROM_LOAD( "tw1ptru0.18f", 0x400000, 0x080000, CRC(62a9e9fb) SHA1(24739adba029b0acf2d7078962c9d01098a29a6c) )
+        ROM_LOAD( "tw1ptru1.16f", 0x480000, 0x080000, CRC(2fd36177) SHA1(368b915261d914be01ae9daeb52571bead52d14d) )
+        ROM_LOAD( "tw1ptru2.15f", 0x500000, 0x080000, CRC(ceacb1c9) SHA1(b86cf576e16bbe26ad0d6d6df8bf28d0071c25e2) )
+        ROM_LOAD( "tw1ptru3.14f", 0x580000, 0x080000, CRC(939044c2) SHA1(f4c1c0a1c2f07ca7f784d59ef4162a2a6a8bbc43) )
+
+	ROM_REGION( 0xa00000, "c352", 0 ) /* sound samples */
+        ROM_LOAD( "tw1wavea.2l",  0x000000, 0x400000, CRC(ebce6366) SHA1(44ebe90ff3c7af5bebbf1baba3b7a2b1863daebb) )
+ROM_END
+
+ROM_START( aquajet )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+        ROM_LOAD32_BYTE( "aj2ver-b.1",   0x000003, 0x100000, CRC(3a67b9f4) SHA1(8cd51f319e082297fdb99634486fe297a0ace654) )
+        ROM_LOAD32_BYTE( "aj2ver-b.2",   0x000002, 0x100000, CRC(f5e8fc96) SHA1(e23fcf6f84724d1de15870ff578ff8a6b26e8f31) )
+        ROM_LOAD32_BYTE( "aj2ver-b.3",   0x000001, 0x100000, CRC(ef6ebcf7) SHA1(358973b678b9a3065e945fb589af16e8102d437b) )
+        ROM_LOAD32_BYTE( "aj2ver-b.4",   0x000000, 0x100000, CRC(7799b909) SHA1(e40005f96f51742b2778605926b8184c9b2c1ad2) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
+
+	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+        ROM_LOAD( "aj1data.8k",   0x000000, 0x080000, CRC(52bcc6d5) SHA1(25319ea6db35cc9bdcb39cc83d597a2a9f1690f3) )
+
+	ROM_REGION( 0x800000, "sprite", ROMREGION_DISPOSE ) /* 32x32x8bpp sprite tiles */
+        ROM_LOAD( "aj1scg0.12f",  0x000000, 0x200000, CRC(13ea766c) SHA1(a1a259bd8f468b90cbc891f1c2875fe03bba9802) )
+        ROM_LOAD( "aj1scg1.10f",  0x200000, 0x200000, CRC(cb3638de) SHA1(0af99aaf00782036d7f479b00b0c3d9d7ad4fc37) )
+        ROM_LOAD( "aj1scg2.8f",   0x400000, 0x200000, CRC(1048a09b) SHA1(6859533e24db5ac54e28d480aaac7b411a648dfe) )
+
+	ROM_REGION( 0x200000*8, "textile", ROMREGION_DISPOSE) /* 16x16x8bpp texture tiles */
+        ROM_LOAD( "aj1cg0.8d",    0x000000, 0x200000, CRC(b814e1eb) SHA1(1af29897dcfd0a58743b4fcdd5049d9e6e3d4cbd) ) 
+        ROM_LOAD( "aj1cg1.10d",   0x200000, 0x200000, CRC(dc63d496) SHA1(d3c3eea6b134850004062dd513c0f26096101227) ) 
+        ROM_LOAD( "aj1cg2.12d",   0x400000, 0x200000, CRC(71fbb571) SHA1(40f84ab5a4a7bb4438fb53751762609671d17800) )  
+        ROM_LOAD( "aj1cg3.13d",   0x600000, 0x200000, CRC(e28052e2) SHA1(3dbc446d7a13312ed4c1d20c2e1209947853f2c4) ) 
+        ROM_LOAD( "aj1cg4.14d",   0x800000, 0x200000, CRC(c77ae1a0) SHA1(e15f2ccbadb8634f6e5cfd2cf48f428d68bd92e1) ) 
+        ROM_LOAD( "aj1cg5.16d",   0xa00000, 0x200000, CRC(15be0080) SHA1(ca14dfd2a66996f0b32fa1155c04f21d300e8f30) )  
+        ROM_LOAD( "aj1cg6.18d",   0xc00000, 0x200000, CRC(1a4f733a) SHA1(60a991f06e73667fa2c9016189999c4301cba24f) )  
+        ROM_LOAD( "aj1cg7.19d",   0xe00000, 0x200000, CRC(ea118130) SHA1(24ef22e5c8c6f6e8a01c72466be1e7acbfba63bc) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+        ROM_LOAD( "aj1ccrl.3d",   0x000000, 0x200000, CRC(3cc7a247) SHA1(336e4dd506d932987e20a5890dd3b0db75c02ccf) )  
+        ROM_LOAD( "aj1ccrh.1d",   0x200000, 0x080000, CRC(9d936030) SHA1(a383bcca494a9f8d9a08fbe9940c8071d4525d65) ) 
+
+	ROM_REGION( 0x600000, "pointrom", 0 ) /* 3d model data */
+        ROM_LOAD( "aj1ptrl0.18k", 0x000000, 0x080000, CRC(16205d45) SHA1(7e9681af852e2e875f80cbbe350e4982eaf80884) )
+        ROM_LOAD( "aj1ptrl1.16k", 0x080000, 0x080000, CRC(6f114da7) SHA1(a1e7349ef8eb0ef043fce06f88bfbb76c2967393) )
+        ROM_LOAD( "aj1ptrl2.15k", 0x100000, 0x080000, CRC(719b73f0) SHA1(bf8530a706097ae663769090177f1f259c540aa6) )
+        ROM_LOAD( "aj1ptrl3.14k", 0x180000, 0x080000, CRC(9555fe31) SHA1(03bdd0784817191b3600d643b775191181a21706) )
+        ROM_LOAD( "aj1ptrm0.18j", 0x200000, 0x080000, CRC(89bee2e0) SHA1(d84b06ef1318814fcf4782fef09a85ae1a87beb8) )
+        ROM_LOAD( "aj1ptrm1.16j", 0x280000, 0x080000, CRC(0ecf88c7) SHA1(20b7cb09a6a13599cac024ef19c73612ce2952f6) )
+        ROM_LOAD( "aj1ptrm2.15j", 0x300000, 0x080000, CRC(829bc7ba) SHA1(7104d66a027911e38ecf521f01ff098ccb76d5fb) )
+        ROM_LOAD( "aj1ptrm3.14j", 0x380000, 0x080000, CRC(7d0a222a) SHA1(e78c405d00429580015c6c7d1bcd35393317a769) )
+        ROM_LOAD( "aj1ptru0.18f", 0x400000, 0x080000, CRC(90d4e36a) SHA1(bdc44aac6aef5266d289f03c816aa2abdb263e9b) )
+        ROM_LOAD( "aj1ptru1.16f", 0x480000, 0x080000, CRC(bf0cf4bf) SHA1(bbf06c7605c083d2fb8c72528c5c9d3b8b067073) )
+        ROM_LOAD( "aj1ptru2.15f", 0x500000, 0x080000, CRC(91ffbb77) SHA1(fbfe7d32ef22037f7190d1b8263b5e8c55f2d892) )
+        ROM_LOAD( "aj1ptru3.14f", 0x580000, 0x080000, CRC(d83d8d42) SHA1(e1561ce4538b01db92b7e645ad008cd1a2ddaf8a) )
+
+	ROM_REGION( 0xa00000, "c352", 0 ) /* sound samples */
+        ROM_LOAD( "aj1waveb.1l",  0x000000, 0x400000, CRC(ab5a457f) SHA1(c34531fd574eb0c3e78fc31a9af8658df3446adc) )
+        ROM_LOAD( "aj1wavea.2l",  0x400000, 0x400000, CRC(8c72ea59) SHA1(3ae8dbd8baae08f1daab2b218932ba9d9451231d) )
 ROM_END
 
 /*******************************************************************/
@@ -4538,6 +4745,56 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Cyber Cycles */
+
+static INPUT_PORTS_START( tokyowar )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "DIP4-1 (Test Mode)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP4-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP4-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIP4-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIP4-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIP4-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIP4-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	DRIVING_ANALOG_PORTS
+
+	PORT_START("MCUP5A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* VIEW */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) /* RIGHT */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) /* LEFT */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MCUP5B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END /* Tokyo Wars */
 
 static INPUT_PORTS_START( propcycl )
 	PORT_START("DSW0")	/* DIP4 */
@@ -5246,6 +5503,18 @@ static DRIVER_INIT( timecris )
 	// install_130_speedup(machine); // with speed up the SUBCPU START WAIT test fails
 }
 
+static DRIVER_INIT( tokyowar )
+{
+	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
+
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
+}
+
+static DRIVER_INIT( aquajet )
+{
+	namcos22s_init(machine, NAMCOS22_AQUA_JET);
+}
+
 /************************************************************************************/
 
 /*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,                                    FLAGS */
@@ -5264,7 +5533,7 @@ GAME( 1994, acedrvrw, 0,        namcos22,  acedrvr,  acedrvr,  ROT0, "Namco", "A
 GAME( 1996, victlapw, 0,        namcos22,  victlap,  victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 
 /* Super System22 games */
-GAME( 1995, airco22b, 0,        namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) /* fails DSP RAM test */
+GAME( 1995, airco22b, 0,        namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) /* boots but missing sprite clear DMA? */
 GAME( 1995, alpinerd, 0,        namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, alpinerc, alpinerd, namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, cybrcycc, 0,        namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
@@ -5272,8 +5541,9 @@ GAME( 1995, cybrcycc, 0,        namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "C
 GAME( 1995, timecris, 0,        namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, timecrsa, timecris, namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, alpinr2b, 0,        namcos22s, alpiner,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, alpinr2a, alpinr2b, namcos22s, alpiner,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )	/* issues with step lock */
 GAME( 1996, alpinesa, 0,        namcos22s, alpiner,  alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, propcycl, 0,        namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev PR2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-//GAME( 1996, tokyowrx, "Tokyo Wars")
-//GAME( 1996, aquajetx, "Aqua Jet")
+GAME( 1996, propcycl, 0,        namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, tokyowar, 0,        namcos22s, tokyowar, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )	/* missing sprite clear DMA?  or protection? */
+GAME( 1996, aquajet,  0,        namcos22s, tokyowar, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 //GAME( 1997, armdilox, "Armidillo Racing")
