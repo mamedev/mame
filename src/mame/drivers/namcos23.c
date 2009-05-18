@@ -23,7 +23,7 @@
     TODO:
     - Palette is not right.
 
-    - H8/3002 does not handshake.  Looks like it needs to speak serially with the I/O board.
+    - H8/3002 now communicates with the H8/3334 on the I/O board, but it's not reliable yet.
 
     - Hook up actual inputs (?) via the 2 serial latches at d00004 and d00006.
       Works like this: write to d00004, then read d00004 12 times.  Ditto at
@@ -745,6 +745,7 @@ static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
+static UINT8 namcos23_jvssense;
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -994,9 +995,16 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 }
 
 // must return this magic number
+static UINT32 s23_vbl = 0;
+
+static INTERRUPT_GEN(s23_interrupt)
+{
+	s23_vbl ^= 0x80008000;
+}
+
 static READ32_HANDLER(s23_unk_r)
 {
-	return 0x008e008e;
+	return 0x008e008e | s23_vbl;
 }
 
 // this & 8 and this & 4 are checked
@@ -1068,6 +1076,12 @@ static WRITE16_HANDLER( sharedram_sub_w )
 {
 	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
 
+	// fake that an I/O board is connected
+	if ((offset == 0x4052/2) && (data == 0x78))
+	{
+		data = 0;
+	}
+
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
 }
 
@@ -1078,13 +1092,6 @@ static READ16_HANDLER( sharedram_sub_r )
 	return shared16[BYTE_XOR_BE(offset)];
 }
 
-static WRITE16_HANDLER(cause_sync_w)
-{
-	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
-
-	shared16[BYTE_XOR_BE(0x4052/2)] = 0;
-}
-
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
@@ -1093,7 +1100,7 @@ static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("IN1")
 	AM_RANGE(0x300002, 0x300003) AM_READNOP //AM_READ_PORT("IN2")
 	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300030, 0x300031) AM_WRITE(cause_sync_w)	// cheats comms with I/O board and makes SUBCPU TEST pass
+	AM_RANGE(0x300030, 0x300031) AM_WRITENOP	// timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 ADDRESS_MAP_END
 
 static READ8_HANDLER( s23_mcu_p8_r )
@@ -1213,19 +1220,24 @@ static WRITE8_HANDLER( s23_mcu_settings_w )
 	s23_setstate ^= 1;
 }
 
-static UINT8 maintoio[16], mi_rd, mi_wr;
-static UINT8 iotomain[16], im_rd, im_wr;
+static UINT8 maintoio[64], mi_rd, mi_wr;
+static UINT8 iotomain[64], im_rd, im_wr;
 
 static READ8_HANDLER( s23_mcu_iob_r )
 {
 	UINT8 ret = iotomain[im_rd];
 
 	im_rd++;
-	im_rd &= 0xf;
+	im_rd &= 0x3f;
 
 	if (im_rd == im_wr)
 	{
 		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
+	}
+	else
+	{
+		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 	}
 
 	return ret;
@@ -1234,7 +1246,7 @@ static READ8_HANDLER( s23_mcu_iob_r )
 static WRITE8_HANDLER( s23_mcu_iob_w )
 {
 	maintoio[mi_wr++] = data;
-	mi_wr &= 0xf;
+	mi_wr &= 0x3f;
 
 	cputag_set_input_line(space->machine, "ioboard", H8_SCI_0_RX, ASSERT_LINE);
 }
@@ -1243,7 +1255,20 @@ static INPUT_PORTS_START( ss23 )
 	PORT_START("H8PORT")
 INPUT_PORTS_END
 
+
+static READ8_HANDLER(s23_mcu_p6_r)
+{
+	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
+		return (namcos23_jvssense << 1) | 0xfd;
+}
+
+static WRITE8_HANDLER(s23_mcu_p6_w)
+{
+//	printf("%02x to port 6\n", data);
+}
+
 static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
@@ -1275,7 +1300,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 	UINT8 ret = maintoio[mi_rd];
 
 	mi_rd++;
-	mi_rd &= 0xf;
+	mi_rd &= 0x3f;
 
 	if (mi_rd == mi_wr)
 	{
@@ -1288,10 +1313,24 @@ static READ8_HANDLER( s23_iob_mcu_r )
 static WRITE8_HANDLER( s23_iob_mcu_w )
 {
 	iotomain[im_wr++] = data;
-	im_wr &= 0xf;
+	im_wr &= 0x3f;
 
 	cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 }
+
+static UINT8 s23_tssio_port_4 = 0;
+
+static READ8_HANDLER( s23_iob_p4_r )
+{
+	return s23_tssio_port_4;
+}
+
+static WRITE8_HANDLER( s23_iob_p4_w )
+{
+	s23_tssio_port_4 = data;
+
+	namcos23_jvssense = (data & 0x04) ? 0 : 1;
+ }
 
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1299,13 +1338,19 @@ static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
+/*
+	port 5 bit 2 = LED to indicate transmitting packet to main
+	port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
+*/
 static ADDRESS_MAP_START( s23iobrdiomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_iob_mcu_r, s23_iob_mcu_w )
 ADDRESS_MAP_END
 
 static DRIVER_INIT(ss23)
 {
 	mi_rd = mi_wr = im_rd = im_wr = 0;
+	namcos23_jvssense = 1;
 }
 
 static const gfx_layout namcos23_cg_layout =
@@ -1402,6 +1447,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
+	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
@@ -1412,7 +1458,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
 	MDRV_CPU_IO_MAP( s23iobrdiomap)
 
-	MDRV_QUANTUM_TIME(HZ(60000))
+	MDRV_QUANTUM_TIME(HZ(60*4000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1590,7 +1636,7 @@ ROM_START( timecrs2 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
-
+		
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
