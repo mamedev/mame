@@ -10,7 +10,7 @@ Credits:
           Golden Castle Rom Set Support
 - Phil Stroffolino: palette, sprites, misc video driver fixes
 - Tatsuyuki Satoh: YM2203 sound improvements, NEC 8741 simulation,ADPCM with MC6809
-- Tomasz Slanina   preliminary Ping POng King driver
+- Tomasz Slanina   preliminary Ping Pong King driver
 - Nicola Salmoria  clean up
 
 special thanks to:
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
 }
 #endif
 
