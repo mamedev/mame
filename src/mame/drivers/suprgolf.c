@@ -54,6 +54,11 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
+
+	msm_nmi_mask = data & 0x40;
+
+	if(data & 0x80)
+		printf("Rom bank select with data %02x activated\n",data);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
@@ -62,6 +67,9 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 //  if(data == 0) data = 1; //test hack
 	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
+
+	if(data & 0xf0)
+		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
 static MACHINE_RESET( suprgolf )
@@ -181,10 +189,9 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	suprgolf_vreg = data;
 	palette_switch = (data & 0x80);
 	suprgolf_bg_bank = (data & 0x1f);
-	msm_nmi_mask = data & 0x20;
 
-	//if(data & 0x20) //TODO: understand the proper condition
-	//	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	//if(data & 0x60)
+	//	printf("Video regs with data %02x activated\n",data);
 }
 
 static UINT8 pen;
@@ -200,6 +207,7 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = data ? pen : 0;
 }
 
+/* maybe bit 7 isn't actually for the pen? */
 static WRITE8_HANDLER( suprgolf_pen_w )
 {
 	pen = data;
@@ -226,10 +234,11 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
+//	AM_RANGE(0x03, 0x03)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
-
+//  AM_RANGE(0x07, 0x07)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
  ADDRESS_MAP_END
@@ -416,8 +425,7 @@ static void adpcm_int(const device_config *device)
 		if(toggle)
 		{
 			msm5205_data_w(device, (msm5205next & 0xf0) >> 4);
-			/* USED, but it currently causes crashes in the service mode. */
-			//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			if(msm_nmi_mask) { cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
 		}
 		else
 		{
