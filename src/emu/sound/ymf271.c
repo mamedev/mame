@@ -162,8 +162,25 @@ static const double DCTime[] =
 
     There appears to be at least 2 errors in the table from the original manual.
 
-    Both 201 & 202 where listed as 3.74490.  202 has be changed to 3.92000 which is "about right"
-    232 was listed as 13.35547.  We use 14.35547 as it apears to be the correct value
+    Both 201 & 202 where listed as 3.74490.  202 has be changed to 3.91513 which was computed based on formulas by OG & Nicola
+    232 was listed as 13.35547.  We use 14.35547 as this is the correct value based on the formula listed below:
+
+LFO period seems easy to compute:
+
+int lfo_period(int entry)
+{
+  int ma, ex;
+  entry = 256-entry;
+  ma = entry & 15;
+  ex = entry >> 4;
+  if(ex)
+    return (ma | 16) << (ex+6);
+  else
+    return ma << 7;
+}
+
+lfo_freq = 44100 / lfo_period
+
 */
 
 static const double LFO_frequency_table[256] =
@@ -193,7 +210,7 @@ static const double LFO_frequency_table[256] =
 	1.34583,	1.38924,	1.43555,	1.48505,	1.53809,	1.59509,	1.65640,	1.72266,
 	1.79443,	1.87245,	1.95756,	2.05078,	2.15332,	2.26665,	2.39258,	2.53332,
 	2.69165,	2.77848,	2.87109,	2.97010,	3.07617,	3.19010,	3.31280,	3.44531,
-	3.58887,	3.74490,	3.92000,	4.10156,	4.30664,	4.53331,	4.78516,	5.06664,
+	3.58887,	3.74490,	3.91513,	4.10156,	4.30664,	4.53331,	4.78516,	5.06664,
 	5.38330,	5.55696,	5.74219,	5.94019,	6.15234,	6.38021,	6.62560,	6.89062,
 	7.17773,	7.48981,	7.83026,	8.20312,	8.61328,	9.06661,	9.57031,	10.13327,
 	10.76660,	11.11391,	11.48438,	11.88039,	12.30469,	12.76042,	13.25120,	13.78125,
