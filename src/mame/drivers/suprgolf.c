@@ -56,9 +56,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
 
 	msm_nmi_mask = data & 0x40;
-
-	if(data & 0x80)
-		printf("Rom bank select with data %02x activated\n",data);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
@@ -370,7 +368,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -553,4 +551,4 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
