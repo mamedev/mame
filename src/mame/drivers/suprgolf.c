@@ -17,6 +17,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "sound/msm5205.h"
 
 static tilemap *suprgolf_tilemap;
 static UINT8 *suprgolf_bg_vram;
@@ -24,6 +25,7 @@ static UINT8 *suprgolf_bg_pen;
 static int suprgolf_rom_bank;
 static UINT8 suprgolf_bg_bank;
 static UINT8 suprgolf_vreg;
+static UINT8 msm5205next,msm_nmi_mask;
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -179,9 +181,10 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	suprgolf_vreg = data;
 	palette_switch = (data & 0x80);
 	suprgolf_bg_bank = (data & 0x1f);
+	msm_nmi_mask = data & 0x20;
 
-	if(data & 0x20) //TODO: understand the proper condition
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	//if(data & 0x20) //TODO: understand the proper condition
+	//	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 pen;
@@ -200,6 +203,11 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 static WRITE8_HANDLER( suprgolf_pen_w )
 {
 	pen = data;
+}
+
+static WRITE8_HANDLER( adpcm_data_w )
+{
+	msm5205next = data;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -223,6 +231,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
 
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )
@@ -381,7 +390,7 @@ static WRITE8_DEVICE_HANDLER( suprgolf_writeB )
 
 static void irqhandler(const device_config *device, int irq)
 {
-//  cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -396,6 +405,33 @@ static const ym2203_interface ym2203_config =
 	},
 	irqhandler
 };
+
+static void adpcm_int(const device_config *device)
+{
+	static int toggle = 0;
+
+	{
+		msm5205_reset_w(device,0);
+		toggle ^= 1;
+		if(toggle)
+		{
+			msm5205_data_w(device, (msm5205next & 0xf0) >> 4);
+			/* USED, but it currently causes crashes in the service mode. */
+			//cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		}
+		else
+		{
+			msm5205_data_w(device, (msm5205next & 0x0f) >> 0);
+		}
+	}
+}
+
+static const msm5205_interface msm5205_config =
+{
+	adpcm_int,		/* interrupt function */
+	MSM5205_S48_4B	/* 4KHz 4-bit */
+};
+
 static const gfx_layout gfxlayout =
 {
    8,8,
@@ -413,7 +449,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( suprgolf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)
+	MDRV_CPU_ADD("maincpu", Z80,4000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -437,9 +473,13 @@ static MACHINE_DRIVER_START( suprgolf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, 3000000) /* guess */
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MDRV_SOUND_ADD("msm", MSM5205, 400000) /* guess */
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
 
