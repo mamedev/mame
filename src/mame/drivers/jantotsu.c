@@ -10,11 +10,10 @@ Notes:
 
 TODO:
 -MSM5205 samples are wrongly played i.e. plays chi when it's clearly a pon.ADPCM index issue;
--MSM5205 sample stop is wrong;
--Video buffering? If you coin up,you can see the "credit 1" msg that gets build into the
+-Video buffering? If you coin up, you can see the "credit 1" msg that gets build into the
  video bitmaps...
--According to the flyer,color bitplanes might be wrong on the A-N mahjong charset,might be a
- BTANB however...
+-According to the flyer, color bitplanes might be wrong on the A-N mahjong charset, might be
+ a BTANB however...
 -I need schematics / pcb photos (component + solder sides) to understand if the background
  color is hard-wired to the DIP-Switches or there's something else wrong.
 
@@ -67,16 +66,18 @@ dumped by sayu
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
 
-static UINT8 *jan_bitmap_1,*jan_bitmap_2,*jan_bitmap_3,*jan_bitmap_4;
+static UINT8 *jan_bitmap;
 static UINT8 vram_bank,col_bank;
 static UINT8 mux_data;
 
+static UINT32 adpcm_pos;
+static UINT8 adpcm_idle;
+static int adpcm_data;
+
 static VIDEO_START(jantotsu)
 {
-	jan_bitmap_1 = auto_alloc_array(machine, UINT8, 0x2000);
-	jan_bitmap_2 = auto_alloc_array(machine, UINT8, 0x2000);
-	jan_bitmap_3 = auto_alloc_array(machine, UINT8, 0x2000);
-	jan_bitmap_4 = auto_alloc_array(machine, UINT8, 0x2000);
+	jan_bitmap = auto_alloc_array(machine, UINT8, 0x8000);
+
 	vram_bank = 0;
 }
 
@@ -94,10 +95,10 @@ static VIDEO_UPDATE(jantotsu)
 
 			for (i=0;i<8;i++)
 			{
-				pen[0] = (jan_bitmap_1[count])>>(7-i);
-				pen[1] = (jan_bitmap_2[count])>>(7-i);
-				pen[2] = (jan_bitmap_3[count])>>(7-i);
-				pen[3] = (jan_bitmap_4[count])>>(7-i);
+				pen[0] = (jan_bitmap[count+0x0000])>>(7-i);
+				pen[1] = (jan_bitmap[count+0x2000])>>(7-i);
+				pen[2] = (jan_bitmap[count+0x4000])>>(7-i);
+				pen[3] = (jan_bitmap[count+0x6000])>>(7-i);
 
 				color = ((pen[0] & 1)<<0);
 				color|= ((pen[1] & 1)<<1);
@@ -116,27 +117,15 @@ static VIDEO_UPDATE(jantotsu)
 	return 0;
 }
 
+/* banked vram */
 static READ8_HANDLER( jantotsu_bitmap_r )
 {
-	switch(vram_bank & 3)
-	{
-		case 0: return jan_bitmap_1[offset];
-		case 1: return jan_bitmap_2[offset];
-		case 2: return jan_bitmap_3[offset];
-		case 3: return jan_bitmap_4[offset];
-	}
-	return 0;
+	return jan_bitmap[offset+((vram_bank & 3)*0x2000)];
 }
 
 static WRITE8_HANDLER( jantotsu_bitmap_w )
 {
-	switch(vram_bank & 3)
-	{
-		case 0: jan_bitmap_1[offset] = data; break;
-		case 1: jan_bitmap_2[offset] = data; break;
-		case 2: jan_bitmap_3[offset] = data; break;
-		case 3: jan_bitmap_4[offset] = data; break;
-	}
+	jan_bitmap[offset+((vram_bank & 3)*0x2000)] = data;
 }
 
 static WRITE8_HANDLER( bankaddr_w )
@@ -185,10 +174,10 @@ static READ8_HANDLER( jantotsu_mux_r )
 
 	switch(mux_data)
 	{
-		case 1:    return input_port_read(space->machine, "PL1_1") | coin_port;
-		case 2:    return input_port_read(space->machine, "PL1_2") | coin_port;
-		case 4:    return input_port_read(space->machine, "PL1_3") | coin_port;
-		case 8:    return input_port_read(space->machine, "PL1_4") | coin_port;
+		case 0x01: return input_port_read(space->machine, "PL1_1") | coin_port;
+		case 0x02: return input_port_read(space->machine, "PL1_2") | coin_port;
+		case 0x04: return input_port_read(space->machine, "PL1_3") | coin_port;
+		case 0x08: return input_port_read(space->machine, "PL1_4") | coin_port;
 		case 0x10: return input_port_read(space->machine, "PL2_1") | coin_port;
 		case 0x20: return input_port_read(space->machine, "PL2_2") | coin_port;
 		case 0x40: return input_port_read(space->machine, "PL2_3") | coin_port;
@@ -205,28 +194,24 @@ static WRITE8_HANDLER( jantotsu_mux_w )
 
 /*If bits 6 & 7 doesn't return 0x80,the game hangs until this bit is set,
   so I'm guessing that these bits can't be read by the z80 at all but directly
-  hard-wired to the video chip.However I need the schematics / pcb snaps and/or
+  hard-wired to the video chip. However I need the schematics / pcb snaps and/or
   a side-by-side test (to know if the background colors really works) to be sure. */
 static READ8_HANDLER( jantotsu_dsw2_r )
 {
 	return (input_port_read(space->machine, "DSW2") & 0x3f) | 0x80;
 }
 
-static UINT32 adpcm_pos;
-static UINT8 adpcm_idle;
-static int adpcm_data;
-
 static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 {
 	switch (offset)
 	{
 		case 0:
-			adpcm_pos = (data & 0xff) * 0x80;
+			adpcm_pos = (data & 0x7f) * 0x100;
 			adpcm_idle = 0;
 			msm5205_reset_w(device,0);
 //          printf("%02x 0\n",data);
 			break;
-		/*same write as port 2?*/
+		/*same write as port 2? MSM sample ack? */
 		case 1:
 //          adpcm_idle = 1;
 //          msm5205_reset_w(device,1);
@@ -255,7 +240,7 @@ static void jan_adpcm_int(const device_config *device)
 		if(trigger == 0)
 		{
 			adpcm_pos++;
-			if((ROM[adpcm_pos] & 0xff) == 0xff)
+			if((ROM[adpcm_pos] & 0xff) == 0x70)
 				adpcm_idle = 1;
 		}
 	}
@@ -286,7 +271,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW1:2" )
-	PORT_DIPNAME( 0x1c, 0x00, "Player vs. CPU timer decrement speed") PORT_DIPLOCATION("SW1:3,4,5") //in msecs I suppose
+	PORT_DIPNAME( 0x1c, 0x10, "Player vs. CPU timer decrement speed") PORT_DIPLOCATION("SW1:3,4,5") //in msecs I suppose
 	PORT_DIPSETTING(    0x00, "30")
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x04, "70")
@@ -295,7 +280,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_DIPSETTING(    0x18, "130" )
 	PORT_DIPSETTING(    0x14, "150" )
 	PORT_DIPSETTING(    0x1c, "170" )
-	PORT_DIPNAME( 0xe0, 0x00, "Player vs. Player timer decrement speed" ) PORT_DIPLOCATION("SW1:6,7,8") //in msecs I suppose
+	PORT_DIPNAME( 0xe0, 0x80, "Player vs. Player timer decrement speed" ) PORT_DIPLOCATION("SW1:6,7,8") //in msecs I suppose
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x40, "120" )
 	PORT_DIPSETTING(    0x20, "140" )
@@ -378,11 +363,6 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( jantotsu_irq )
-{
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
-}
-
 static MACHINE_RESET( jantotsu )
 {
 	mux_data = 0;
@@ -403,7 +383,7 @@ static MACHINE_DRIVER_START( jantotsu )
 	MDRV_CPU_ADD("maincpu", Z80,18432000/4)
 	MDRV_CPU_PROGRAM_MAP(jantotsu_map)
 	MDRV_CPU_IO_MAP(jantotsu_io)
-	MDRV_CPU_VBLANK_INT("screen", jantotsu_irq)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(jantotsu)
 	/* video hardware */
