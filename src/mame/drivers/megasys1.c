@@ -102,8 +102,10 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
   bootleg version of rodlandj has one instruction patched out to do exactly
   the same thing that we are doing (ignoring the 6295 status).
 
-- VERY bad sprite lag in iganinju and plusalph and generally others.
-  Is this a sprites buffer issue ?
+- Understand properly how irqs truly works, kazan / iganinju is (again) broken.
+
+- 64street: player characters in attract mode doesn't move at all, protection
+  or btanb?
 
 - Understand a handful of unknown bits in video regs
 
@@ -1480,6 +1482,7 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_PALETTE_INIT(megasys1)
 	MDRV_VIDEO_START(megasys1)
 	MDRV_VIDEO_UPDATE(megasys1)
+	MDRV_VIDEO_EOF(megasys1)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1584,6 +1587,7 @@ static MACHINE_DRIVER_START( system_D )
 	MDRV_PALETTE_INIT(megasys1)
 	MDRV_VIDEO_START(megasys1)
 	MDRV_VIDEO_UPDATE(megasys1)
+	MDRV_VIDEO_EOF(megasys1)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

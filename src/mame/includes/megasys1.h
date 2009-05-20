@@ -37,6 +37,7 @@ extern int megasys1_bits_per_color_code;
 /* Functions */
 VIDEO_START( megasys1 );
 VIDEO_UPDATE( megasys1 );
+VIDEO_EOF( megasys1 );
 
 PALETTE_INIT( megasys1 );
 
