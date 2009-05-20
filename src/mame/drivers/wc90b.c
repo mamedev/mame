@@ -90,6 +90,11 @@ Noted added by ClawGrip 28-Mar-2008:
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
+#define MASTER_CLOCK XTAL_14_31818MHz/2
+#define SOUND_CLOCK XTAL_20MHz/4
+#define YM2203_CLOCK 2512000/2
+#define MSM5205_CLOCK 384000
+
 extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
 
 extern UINT8 *wc90b_scroll1x;
@@ -374,15 +379,15 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map1)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map2)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_19_6608MHz/8)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
@@ -403,11 +408,11 @@ static MACHINE_DRIVER_START( wc90b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 2510000/2)
+	MDRV_SOUND_ADD("ym", YM2203, YM2203_CLOCK)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
