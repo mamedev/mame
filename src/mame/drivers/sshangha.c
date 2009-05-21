@@ -13,8 +13,8 @@
   OSC  : 28.0000MHz 16.0000MHz
 
   The original uses a protection chip which isn't fully worked out yet.
-  Sound doesn't work.  The bootleg never seems to write to a sound latch
-  (Not sure the bootleg even has the same sound hardware as the original).
+  Sound doesn't work for the original set, probably the sound ports are inside
+  the protection area.
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -73,6 +73,8 @@ extern UINT16 *sshangha_pf1_rowscroll, *sshangha_pf2_rowscroll;
 
 static UINT16 *sshangha_prot_data;
 
+static UINT16 *sshangha_sound_shared_ram;
+
 /******************************************************************************/
 
 static WRITE16_HANDLER( sshangha_protection16_w )
@@ -85,12 +87,6 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 		//soundlatch_w(0, data & 0xff);
 		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
-}
-
-static WRITE16_HANDLER( sshangha_sound_w )
-{
-	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -151,9 +147,8 @@ static MACHINE_RESET( sshangha )
 static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(sshangha_sound_w)
-	AM_RANGE(0x101000, 0x101001) AM_READ(deco_71_r)//bootleg hack
-	AM_RANGE(0x10100c, 0x10100d) AM_WRITE(sshangha_sound_w)	/* the bootleg writes here */
+	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE(&sshangha_sound_shared_ram)
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(&sshangha_sound_shared_ram) /* the bootleg writes here */
 
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE(&sshangha_pf1_data)
 	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE(&sshangha_pf2_data)
@@ -178,11 +173,25 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+/* 8 "sound latches" shared between main and sound cpus. */
+
+static READ8_HANDLER(sshangha_sound_shared_r)
+{
+	return sshangha_sound_shared_ram[offset] & 0xff;
+}
+
+static WRITE8_HANDLER(sshangha_sound_shared_w)
+{
+	sshangha_sound_shared_ram[offset] = data & 0xff;
+}
+
+/* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
+static ADDRESS_MAP_START( sshangha_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-//  AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki",okim6295_r,okim6295_w)
+	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
+	AM_RANGE(0xf808, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -330,7 +339,9 @@ static MACHINE_DRIVER_START( sshangha )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_PROGRAM_MAP(sshangha_sound_map)
+
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(sshangha)	/* init machine */
 
@@ -351,7 +362,7 @@ static MACHINE_DRIVER_START( sshangha )
 	MDRV_VIDEO_UPDATE(sshangha)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
 
 	MDRV_SOUND_ADD("ym", YM2203, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2203_config)
@@ -425,4 +436,4 @@ static DRIVER_INIT( sshangha )
 
 
 GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",  "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
-GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", GAME_NO_SOUND )
+GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
