@@ -6,10 +6,11 @@ Ernesto Corvi
 ernesto@imagina.com
 
 Notes:
-- master/slave 4 players mode is not emulated at all.
+- master/slave 4 players mode is not emulated at all. To set it up, enable the
+
 
 - Single board 4 players mode actually works but I'm not sure how the reset /
-  halt line is truly connected on the sub cpu, so I've disabled it by default.
+  halt line is truly connected on the sub cpu.
 
 - kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
   PS4 is the MC6801U4 mcu.
@@ -150,52 +151,52 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_START("DSW0")
 	/* When Bit 1 is On, the machine waits a signal from another one */
 	/* Seems like if you can join two cabinets, one as master */
-	/* and the other as slave, probably to play four players */
-	PORT_DIPNAME( 0x01, 0x01, "System Selection" )
+	/* and the other as slave, probably to play four players. */
+	PORT_DIPNAME( 0x01, 0x01, "Master/Slave Mode" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // Screen ?
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2") // Screen ?
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) // this should be Demo Sounds, but doesn't work?
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")// this should be Demo Sounds, but doesn't work?
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Playing Time" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Playing Time" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "40 Seconds" )
 	PORT_DIPSETTING(    0x0c, "One Minute" )
 	PORT_DIPSETTING(    0x08, "One Minute and 20 Sec." )
 	PORT_DIPSETTING(    0x04, "One Minute and 40 Sec." )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* The following dip seems to be related with the first one */
-	PORT_DIPNAME( 0x20, 0x20, "System Selection" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Number of Matches" )
+	PORT_DIPNAME( 0x20, 0x20, "Board ID" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Master" )
+	PORT_DIPSETTING(    0x00, "Slave" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Matches" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x40, "6" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Players ) )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x80, 0x80, "Single board 4 Players Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
 	/* the following is actually service coin 1 */
@@ -274,14 +275,14 @@ static INPUT_PORTS_START( kikikai )
 
 //AT
 	PORT_START("DSW0")	/* DSW0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -299,37 +300,37 @@ static INPUT_PORTS_START( kikikai )
 #endif
 
 	// coinage copied from Japanese manual but type B doesn't work
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW1")	/* DSW1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "50000 100000" )
 	PORT_DIPSETTING(    0x0c, "70000 150000" )
 	PORT_DIPSETTING(    0x08, "70000 200000" )
 	PORT_DIPSETTING(    0x04, "100000 300000" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "A" )
 	PORT_DIPSETTING(    0x00, "B" )
-	PORT_DIPNAME( 0x80, 0x00, "Number Match" )
+	PORT_DIPNAME( 0x80, 0x00, "Number Match" )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 //ZT
@@ -382,8 +383,7 @@ static MACHINE_RESET( mexico86 )
 {
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (cputag_get_cpu(machine, "sub") != NULL)
-		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
-	//cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MACHINE_DRIVER_START( mexico86 )
