@@ -6,11 +6,15 @@ Ernesto Corvi
 ernesto@imagina.com
 
 Notes:
-- master/slave 4 players mode is not emulated at all. To set it up, enable the
-
+- master/slave 4 players mode is not emulated at all.
+  To set it up, enable the Master/Slave Mode and set the two boards IDs with
+  different settings. Do NOT enable the Single board 4p mode, I don't think
+  that the main board is supposed to be still connected to the sub board.
 
 - Single board 4 players mode actually works but I'm not sure how the reset /
   halt line is truly connected on the sub cpu.
+  To set it up, just enable the single board 4p mode and keep the master/slave
+  mode to off and the board ID to master.
 
 - kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
   PS4 is the MC6801U4 mcu.
