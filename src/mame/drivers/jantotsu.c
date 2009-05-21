@@ -26,6 +26,42 @@ c03b-c048 "up" computer tiles / player-2 tiles
 c04b-c058 "left" computer tiles
 
 ============================================================================================
+MSM samples table (I'm assuming that F is up player, M1 is right and M2 is left):
+start |end   |sample    |possible data triggers
+------------------------|----------------------
+0x0000|0x08ff|odaii?    |
+0x0900|0x0cff|tsumo F   |
+0x0d00|0x0fff|tsumo M1  | 0xc9 (right)
+0x1000|0x13ff|ron F     | 0x14 (up)
+0x1400|0x17ff|pon F     | 0x40 (up)
+0x1800|0x1bff|kan F     | 0x1c
+0x1c00|0x1fff|chi       | 0xdc
+0x2000|0x27ff|ippatsu F |
+0x2800|0x2fff|ryutochu? |
+0x3000|0x35ff|otoyo?    |
+0x3600|0x3eff|yatta     |
+0x4000|0x42ff|koi?      |
+0x4300|0x4ef0|ippatsu M |
+0x5000|0x52ff|pon M     | 0xd4-0x50 (???)
+0x5300|0x57ff|tsumo M2  |
+0x5800|0x5dff|rii'chi F | 0x07
+0x6000|0x66ff|rii'chi M1| 0x58
+0x6700|0x6bff|rii'chi M2|
+0x6c00|0x6fff|nagare?   |
+0x7000|0x73ff|ron M     | 0xd0
+0x7400|0x77ff|kore?     |
+0x7800|0x7bff|kan M1    |
+0x7c00|0x7fff|kan M2    |
+------------------------------------------------
+                          0x90: when you lose too much time
+                          0xc0: calculation sample
+                          0x43: called after a "ron"
+                          0x88: called on a No-Ten situation
+                          0x80: called after a "ron"
+                          0x96: calculation sample
+
+
+============================================================================================
 
 4nin-uchi mahjong Jantotsu
 (c)1983 Sanritsu
@@ -266,6 +302,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_START("COINS")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -289,6 +326,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_DIPSETTING(    0xc0, "200" )
 	PORT_DIPSETTING(    0xa0, "220" )
 	PORT_DIPSETTING(    0xe0, "240" )
+
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( Easy ) )
@@ -306,6 +344,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_DIPSETTING(    0x80, "Green" )
 	PORT_DIPSETTING(    0x40, "Blue" )
 	PORT_DIPSETTING(    0x00, "Black" )
+
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Mahjong Nagare") PORT_CODE(KEYCODE_S)
@@ -313,6 +352,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Continue Button No") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+
 	PORT_START("PL1_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
@@ -320,6 +360,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+
 	PORT_START("PL1_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
@@ -327,6 +368,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+
 	PORT_START("PL1_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -334,12 +376,14 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+
 	PORT_START("PL2_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Mahjong Nagare") PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Continue Button Yes") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Continue Button No") PORT_PLAYER(2)
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("PL2_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
@@ -347,6 +391,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+
 	PORT_START("PL2_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
@@ -354,6 +399,7 @@ static INPUT_PORTS_START( jantotsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+
 	PORT_START("PL2_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
