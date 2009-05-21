@@ -92,8 +92,8 @@ Noted added by ClawGrip 28-Mar-2008:
 
 #define MASTER_CLOCK XTAL_14_31818MHz/2
 #define SOUND_CLOCK XTAL_20MHz/4
-#define YM2203_CLOCK 2512000/2
-#define MSM5205_CLOCK 384000
+#define YM2203_CLOCK XTAL_20MHz/16
+#define MSM5205_CLOCK XTAL_384kHz
 
 extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
 
@@ -559,6 +559,6 @@ ROM_END
 #endif
 
 
-GAME( 1989, wc90b1,  wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1989, wc90b2, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 //GAME( 1989, wc90ba,  wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League (alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
