@@ -2975,7 +2975,8 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
-	DRIVER( chaoshea )	/* 1998.10 Chaos Heat (V2.08J) */
+	DRIVER( chaoshea )	/* 1998.10 Chaos Heat (V2.09O) */
+	DRIVER( chaoshej )	/* 1998.10 Chaos Heat (V2.08J) */
 	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
 	DRIVER( otenamih )	/* 1999.02 Otenami Haiken (Success) */
 	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
