@@ -2242,6 +2242,30 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 }
 
 
+static TIMER_CALLBACK( megadriv_z80_run_state )
+{
+	/* Is the z80 RESET line pulled? */
+	if ( genz80.z80_is_reset )
+	{
+		devtag_reset( machine, "genesis_snd_z80" );
+		cputag_suspend( machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
+		devtag_reset( machine, "ym" );
+	}
+	else
+	{
+		/* Check if z80 has the bus */
+		if ( genz80.z80_has_bus )
+		{
+			cputag_resume( machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
+		}
+		else
+		{
+			cputag_suspend( machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
+		}
+	}
+}
+
+
 static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 {
 	/* Request the Z80 bus, allows 68k to read/write Z80 address space */
@@ -2251,13 +2275,11 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 0;
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 1;
-			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -2266,13 +2288,11 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 0;
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 1;
-			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
 	else // word access
@@ -2281,15 +2301,14 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 0;
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus = 1;
-			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
+	timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
 }
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
@@ -2300,16 +2319,11 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 0;
-			if ( genz80.z80_has_bus )
-				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 1;
-			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
-			devtag_reset(space->machine, "ym");
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -2318,17 +2332,11 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 0;
-			if ( genz80.z80_has_bus )
-				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 1;
-			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
-			devtag_reset(space->machine, "ym");
-
 		}
 	}
 	else // word access
@@ -2337,18 +2345,14 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 0;
-			if ( genz80.z80_has_bus )
-				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset = 1;
-			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
-			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
-			devtag_reset(space->machine, "ym");
 		}
 	}
+	timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
 }
 
 static READ8_HANDLER( z80_read_68k_banked_data )
@@ -5973,11 +5977,10 @@ MACHINE_RESET( megadriv )
 	if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL)
 	{
 		genz80.z80_is_reset = 1;
-		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 		genz80.z80_has_bus = 1;
-		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
+		timer_set( machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
 	}
 
 	megadrive_imode = 0;
