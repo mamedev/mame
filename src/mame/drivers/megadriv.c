@@ -2308,7 +2308,10 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 			genz80.z80_has_bus = 1;
 		}
 	}
-	timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
+
+	/* If the z80 is running, sync the z80 execution state */
+	if ( ! genz80.z80_is_reset )
+		timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
 }
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
