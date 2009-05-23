@@ -4006,13 +4006,11 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( stress )	/* 1998.10 Stress Busters */
 	DRIVER( elandore )	/* 1998.11 Touryuu Densetsu Elandore (Sai-Mate) */
 	DRIVER( sss )		/* 1998.12 Steep Slope Sliders (Capcom / Cave / Victor) */
+	DRIVER( micrombc )	/* 1999.03 Microman Battle Charge */
 	DRIVER( sanjeon )	/* 1999.04 Sanjun Sujun (Sega / Deniam) */
 	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
 	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
 						/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
-
-
-	DRIVER( micrombc )
 
 	/* Sega Model 2 Games */
 

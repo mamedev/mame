@@ -5302,21 +5302,26 @@ UINT8 stv_get_vblank(running_machine *machine)
 /*some vblank lines measurements (according to Charles MacDonald)*/
 static int get_vblank_duration(running_machine *machine)
 {
+	/* TODO: +64 is probably due of missing pixel clock/screen raw params hook-up.
+	         Problem is, I don't know if it's possible to handle that in MAME with
+	         all this dynamic resolution babblecrap...
+	         */
+
 	if(STV_VDP2_HRES & 4)
 	{
 		switch(STV_VDP2_HRES & 1)
 		{
-			case 0: return 45; //31kHz Monitor
-			case 1: return 82; //Hi-Vision Monitor
+			case 0: return 45+64; //31kHz Monitor
+			case 1: return 82+64; //Hi-Vision Monitor
 		}
 	}
 
 	switch(STV_VDP2_VRES & 3)
 	{
-		case 0: return 39; //263-224
-		case 1: return 23; //263-240
-		case 2: return 7; //263-256
-		case 3: return 7; //263-256
+		case 0: return 39+64; //263-224
+		case 1: return 23+64; //263-240
+		case 2: return 7+64; //263-256
+		case 3: return 7+64; //263-256
 	}
 
 	return 0;
@@ -5355,11 +5360,15 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		}
 		case 0x8/4:
 		/*H/V Counter Register*/
-								     /*H-Counter                               V-Counter                                         */
-			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(space->machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(space->machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
+		{
+			static UINT16 h_count,v_count;
+			/* TODO: handle various h/v settings. */
+			h_count = video_screen_get_hpos(space->machine->primary_screen) & 0x3ff;
+			v_count = video_screen_get_vpos(space->machine->primary_screen) & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+			stv_vdp2_regs[offset] = (h_count<<16)|(v_count);
 			if(LOG_VDP2) logerror("CPU %s PC(%08x) = VDP2: H/V counter read : %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
-			stv_vdp2_regs[offset] = 0;
-		break;
+			break;
+		}
 	}
 	return stv_vdp2_regs[offset];
 }

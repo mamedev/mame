@@ -790,11 +790,13 @@ static int port_i;
 static READ32_HANDLER ( stv_io_r32 )
 {
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
-//  popmessage("SEL: %02x MUX: %02x %02x %02x %02x %02x",port_sel,mux_data,ioga[1],ioga[2],ioga[3],ioga[5]);
+//  popmessage("SEL: %02x MUX: %02x OFF: %02x",port_sel,mux_data,offset*4);
+
+//	printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
 
 	switch(offset)
 	{
-		case 0:
+		case 0x00/4:
 		switch(port_sel)
 		{
 			case 0x77: return 0xff000000|(input_port_read(space->machine, "P1") << 16) |0x0000ff00|(input_port_read(space->machine, "P2"));
@@ -832,17 +834,18 @@ static READ32_HANDLER ( stv_io_r32 )
 				}
 			}
 			//default:
+			//case 0x40: return mame_rand(space->machine);
 			default:
 			//popmessage("%02x PORT SEL",port_sel);
 			return (input_port_read(space->machine, "P1") << 16) | (input_port_read(space->machine, "P2"));
 		}
-		case 1:
+		case 0x04/4:
 		if ( strcmp(space->machine->gamedrv->name,"critcrsh") == 0 )
 			return ((input_port_read(space->machine, "SYSTEM") << 16) & ((input_port_read(space->machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		else
 			return (input_port_read(space->machine, "SYSTEM") << 16) | (ioga[1]);
 
-		case 2:
+		case 0x08/4:
 		switch(port_sel)
 		{
 			case 0x77:	return (input_port_read(space->machine, "UNUSED") << 16) | (input_port_read(space->machine, "EXTRA"));
@@ -853,8 +856,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			default:
 			return 0xffffffff;
 		}
-		break;
-		case 3:
+		case 0x0c/4:
 		switch(port_sel)
 		{
 			case 0x60:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
@@ -862,8 +864,8 @@ static READ32_HANDLER ( stv_io_r32 )
 			//popmessage("offs: 3 %02x",port_sel);
 			return 0xffffffff;
 		}
-		break;
-		case 5:
+		//case 0x10/4:
+		case 0x14/4:
 		switch(port_sel)
 		{
 			case 0x77:
@@ -877,8 +879,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			}
 			default: return 0xffffffff;
 		}
-		break;
-		case 6:
+		case 0x18/4:
 		switch(port_sel)
 		{
 			case 0x60:  return ioga[5];
@@ -892,8 +893,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			//popmessage("offs: 6 %02x",port_sel);
 			return 0xffffffff;
 		}
-		break;
-		case 7:
+		case 0x1c/4:
 		if(LOG_IOGA) logerror("(PC %s=%06x) Warning: READ from PORT_AD\n", space->cpu->tag, cpu_get_pc(space->cpu));
 		popmessage("Read from PORT_AD");
 		port_i++;
@@ -907,12 +907,14 @@ static WRITE32_HANDLER ( stv_io_w32 )
 {
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
+//	printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
+
 	switch(offset)
 	{
-		case 1:
+		case 0x04/4:
 			if(ACCESSING_BITS_0_7)
 			{
-				/*Why does the BIOS tests these as ACTIVE HIGH?A program bug?*/
+				/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 				ioga[1] = (data) & 0xff;
 				coin_counter_w(0,~data & 0x01);
 				coin_counter_w(1,~data & 0x02);
@@ -922,8 +924,8 @@ static WRITE32_HANDLER ( stv_io_w32 )
                 other bits reserved
                 */
 			}
-		break;
-		case 2:
+			break;
+		case 0x08/4:
 			if(ACCESSING_BITS_16_23)
 			{
 				ioga[2] = data >> 16;
@@ -931,19 +933,26 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			}
 			else if(ACCESSING_BITS_0_7)
 				ioga[2] = data;
-		break;
-		case 3:
+			break;
+		case 0x0c/4:
 			if(ACCESSING_BITS_16_23)
 				ioga[3] = data;
-		break;
-		case 4:
+			break;
+		case 0x10/4:
 			if(ACCESSING_BITS_16_23)
 				port_sel = (data & 0xffff0000) >> 16;
-		break;
-		case 5:
+			break;
+		case 0x14/4:
 			if(ACCESSING_BITS_16_23)
 				ioga[5] = data;
-		break;
+			break;
+		//case 0x18/4:
+		case 0x1c/4:
+			//technical bowling tests here
+			if(ACCESSING_BITS_16_23)
+				ioga[7] = data;
+			break;
+
 	}
 }
 
@@ -2100,7 +2109,7 @@ static INPUT_PORTS_START( stv )
 	PORT_START("UNUSED")
 	PORT_BIT ( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* Extra button layout, used by Power Instinct 3, Suikoenbu, Elan Doree, Golden Axe Duel & Astra SuperStar */
+	/* Extra button layout, used by Power Instinct 3, Suikoenbu, Elan Doree, Golden Axe Duel & Astra SuperStars */
 	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
@@ -2141,6 +2150,32 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("X") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R trig") PORT_CODE(KEYCODE_S)
 	#endif
+
+	PORT_START("UNKNOWN")
+	PORT_DIPNAME( 0x01, 0x01, "UNK" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( critcrsh )
