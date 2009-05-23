@@ -12,9 +12,12 @@ is not present in the earlier games. It also has two 8910, while the earlier
 games have one 8910 + a sample player.
 
 Notes:
-- The 8751 ROM, sq07.108, was bad: bit 3 was stuck high. I have recovered it
-  by carefully checking the disassembly. There are probably some mistakes.
-  Note that that ROM probably came from a bootleg in the first place.
+- The sq07.108 ROM came from a bootleg where the 8751 MCU was replaced by a
+  model using external ROM. The ROM was bad (bit 3 was stuck high). It was
+  recovered by carefully checking the disassembly but there might still be
+  some mistakes.
+  The bootleg MCU code is different from the original; it was modified by the
+  bootleggers to avoid use of port 2.
 
 - The MCU sends some ID to the Z80 on startup, but the Z80 happily ignores it.
   This happens in all sets. There appears to be code that would check part of
@@ -23,11 +26,6 @@ Notes:
 - sqixa might be an earlier version because there is a bug with coin lockout:
   it is activated after inesrting 10 coins instead of 9. sqix doesn't have
   that bug and also inverts the coin lockout output.
-
-- Note that the sqixa ROMs probably came from a bootleg board, where the 8751
-  MCU was replaced by a model using external ROM (which was bad, and manually
-  repaired). Even if it was a bootleg, at this point there is no reason to
-  believe the ROMs had been tampered with.
 
 - sqixbl is a bootleg of sqixa, with the MCU removed.
 
@@ -193,7 +191,7 @@ The MCU acts this way:
 
 **************************************************************************/
 
-static UINT8 port1, port3, port3_latch, from_mcu, from_z80, portb;
+static UINT8 port1, port2, port3, port3_latch, from_mcu, from_z80, portb;
 static int from_mcu_pending, from_z80_pending, invert_coin_lockout;
 
 static READ8_DEVICE_HANDLER( in4_mcu_r )
@@ -227,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( sqix_z80_mcu_w )
 	portb = data;
 }
 
-static WRITE8_HANDLER( mcu_p1_w )
+static WRITE8_HANDLER( bootleg_mcu_p1_w )
 {
 	switch ((data & 0x0e) >> 1)
 	{
@@ -268,7 +266,12 @@ static WRITE8_HANDLER( mcu_p1_w )
 	}
 }
 
-static READ8_HANDLER( mcu_p3_r )
+static WRITE8_HANDLER( mcu_p3_w )
+{
+	port3 = data;
+}
+
+static READ8_HANDLER( bootleg_mcu_p3_r )
 {
 	if ((port1 & 0x10) == 0)
 	{
@@ -287,9 +290,50 @@ static READ8_HANDLER( mcu_p3_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( mcu_p3_w )
+static READ8_HANDLER( sqixu_mcu_p0_r )
 {
-	port3 = data;
+	return input_port_read(space->machine, "SYSTEM") | (from_mcu_pending << 6) | (from_z80_pending << 7);
+}
+
+static WRITE8_HANDLER( sqixu_mcu_p2_w )
+{
+	// bit 0 = unknown (clocked often)
+
+	// bit 1 = coin cointer 1
+	coin_counter_w(0,data & 2);
+
+	// bit 2 = coin counter 2
+	coin_counter_w(1,data & 4);
+
+	// bit 3 = coin lockout
+	coin_lockout_global_w(~data & 8);
+
+	// bit 4 = flip screen
+	flip_screen_set(space->machine, data & 0x10);
+
+	// bit 5 = unknown (set on startup)
+
+	// bit 6 = unknown
+	if ((data & 0x40) == 0)
+		from_mcu_pending = 0;	// ????
+
+	// bit 7 = clock latch from port 3 to Z80
+	if ((port2 & 0x80) != 0 && (data & 0x80) == 0)
+	{
+//              logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(space->cpu),port3);
+		from_mcu = port3;
+		from_mcu_pending = 1;
+		from_z80_pending = 0;	// ????
+	}
+
+	port2 = data;
+}
+
+static READ8_HANDLER( sqixu_mcu_p3_r )
+{
+//      logerror("%04x: read Z80 command %02x\n",cpu_get_pc(space->cpu),from_z80);
+	from_z80_pending = 0;
+	return from_z80;
 }
 
 
@@ -499,6 +543,7 @@ static void machine_init_common(running_machine *machine)
 	state_save_register_global(machine, from_mcu_pending);
 	state_save_register_global(machine, from_z80_pending);
 	state_save_register_global(machine, port1);
+	state_save_register_global(machine, port2);
 	state_save_register_global(machine, port3);
 	state_save_register_global(machine, port3_latch);
 	state_save_register_global(machine, from_mcu);
@@ -602,9 +647,16 @@ ADDRESS_MAP_END
 
 /* I8751 memory handlers */
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_p1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mcu_p3_r, mcu_p3_w)
+static ADDRESS_MAP_START( bootleg_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_p1_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_p3_r, mcu_p3_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sqixu_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqixu_mcu_p0_r)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(sqixu_mcu_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(sqixu_mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1054,7 +1106,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
-	MDRV_CPU_IO_MAP(mcu_io_map)
+	MDRV_CPU_IO_MAP(bootleg_mcu_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
@@ -1084,6 +1136,14 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(sqix_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( sqixu )
+	MDRV_IMPORT_FROM( sqix )
+
+	MDRV_CPU_MODIFY("mcu")
+	MDRV_CPU_IO_MAP(sqixu_mcu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -1170,7 +1230,7 @@ ROM_START( sqix )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* I8751 code */
-	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )	// from sqixa
+	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )	// from sqixa (bootleg)
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1189,7 +1249,7 @@ ROM_START( sqixu )
 	ROM_LOAD( "b03-07.h3",     0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* I8751 code */
-	ROM_LOAD( "b03-08",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )	// from sqixa
+	ROM_LOAD( "b03_08.2l",     0x00000, 0x1000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1209,7 +1269,7 @@ ROM_START( sqixa )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* I8751 code */
-	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )
+	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1358,7 +1418,7 @@ GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "P
 GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,     superqix, sqix,     ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // different MCU?
+GAME( 1987, sqixu,    sqix,     sqixu,    superqix, 0,        ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )
 GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", GAME_SUPPORTS_SAVE )
