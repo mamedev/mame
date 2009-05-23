@@ -2934,6 +2934,7 @@ V-V                           TP-027
 	/* PS Arcade 95 */
 	DRIVER( psarc95 )
 	DRIVER( beastrzr )	/* Beastorizer (USA) */
+	DRIVER( bldyroar )	/* Bloody Roar (JAPAN) */
 	DRIVER( beastrzb )	/* Beastorizer (USA Bootleg) */
 	DRIVER( bldyror2 )	/* Bloody Roar 2 (JAPAN) */
 	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
