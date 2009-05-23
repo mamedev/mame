@@ -20,6 +20,7 @@ extern int arkanoid_bootleg_id;
 extern WRITE8_HANDLER( arkanoid_videoram_w );
 
 extern WRITE8_HANDLER( arkanoid_d008_w );
+extern WRITE8_HANDLER( tetrsark_d008_w );
 
 extern VIDEO_START( arkanoid );
 extern VIDEO_UPDATE( arkanoid );
