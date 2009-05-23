@@ -83,7 +83,8 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 
-	if (offset == (0x260 >> 1)) {
+	if ((offset >= (0x260 >> 1)) && (offset <= (0x26f >> 1))) {
+
 		//soundlatch_w(0, data & 0xff);
 		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -146,9 +147,7 @@ static MACHINE_RESET( sshangha )
 
 static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE(&sshangha_sound_shared_ram)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(&sshangha_sound_shared_ram) /* the bootleg writes here */
 
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE(&sshangha_pf1_data)
 	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE(&sshangha_pf2_data)
@@ -158,6 +157,7 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
+	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
@@ -169,6 +169,33 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(&sshangha_prot_data)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sshanghb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(&sshangha_sound_shared_ram) /* the bootleg writes here */
+
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE(&sshangha_pf1_data)
+	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE(&sshangha_pf2_data)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(&sshangha_pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(&sshangha_pf2_rowscroll)
+	AM_RANGE(0x206800, 0x207fff) AM_RAM
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
+	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
+	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
+	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
+
+	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
+	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
+	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_BASE(&spriteram16_2)
+	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
+	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
+	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
+	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
+	AM_RANGE(0xff4000, 0xff47ff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -375,6 +402,13 @@ static MACHINE_DRIVER_START( sshangha )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sshanghb )
+	MDRV_IMPORT_FROM( sshangha )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(sshanghb_map)
+MACHINE_DRIVER_END
+
 /******************************************************************************/
 
 ROM_START( sshangha )
@@ -436,4 +470,4 @@ static DRIVER_INIT( sshangha )
 
 
 GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",  "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
-GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshanghb, sshangha, sshanghb, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
