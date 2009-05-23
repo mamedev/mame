@@ -9,7 +9,7 @@ Notes:
  Mode is for adjusting these screens (to not let the human opponent to read your tiles).
 
 TODO:
--MSM5205 samples are wrongly played i.e. plays chi when it's clearly a pon.ADPCM index issue;
+-ADPCM index table isn't yet complete, needs LOTS of game testing;
 -Video buffering? If you coin up, you can see the "credit 1" msg that gets build into the
  video bitmaps...
 -According to the flyer, color bitplanes might be wrong on the A-N mahjong charset, might be
@@ -26,9 +26,10 @@ c03b-c048 "up" computer tiles / player-2 tiles
 c04b-c058 "left" computer tiles
 
 ============================================================================================
-MSM samples table (I'm assuming that F is up player, M1 is right and M2 is left):
+MSM samples table (I'm assuming that F is left-right players, M1 is up / player 2 and M2 is player 1):
 start |end   |sample    |possible data triggers
 ------------------------|----------------------
+jat-40 (0x6000-0x7fff)
 0x0000|0x08ff|odaii?    |
 0x0900|0x0cff|tsumo F   |
 0x0d00|0x0fff|tsumo M1  | 0xc9 (right)
@@ -36,15 +37,18 @@ start |end   |sample    |possible data triggers
 0x1400|0x17ff|pon F     | 0x40 (up)
 0x1800|0x1bff|kan F     | 0x1c
 0x1c00|0x1fff|chi       | 0xdc
+jat-41 (0x2000-0x3fff)
 0x2000|0x27ff|ippatsu F |
-0x2800|0x2fff|ryutochu? |
+0x2800|0x2fff|ryutoku?  |
 0x3000|0x35ff|otoyo?    |
 0x3600|0x3eff|yatta     |
+jat-42 (0x4000-0x5fff)
 0x4000|0x42ff|koi?      |
 0x4300|0x4ef0|ippatsu M |
 0x5000|0x52ff|pon M     | 0xd4-0x50 (???)
 0x5300|0x57ff|tsumo M2  |
 0x5800|0x5dff|rii'chi F | 0x07
+jat-43 (0x0000-0x1fff)
 0x6000|0x66ff|rii'chi M1| 0x58
 0x6700|0x6bff|rii'chi M2|
 0x6c00|0x6fff|nagare?   |
@@ -53,12 +57,12 @@ start |end   |sample    |possible data triggers
 0x7800|0x7bff|kan M1    |
 0x7c00|0x7fff|kan M2    |
 ------------------------------------------------
-                          0x90: when you lose too much time
-                          0xc0: calculation sample
-                          0x43: called after a "ron"
-                          0x88: called on a No-Ten situation
-                          0x80: called after a "ron"
-                          0x96: calculation sample
+                          *0x90: when you lose too much time
+                          *0xc0: calculation sample
+                          *0x43: called after a "ron"
+                          *0x88: called on a No-Ten situation
+                          *0x80: called after a "ron"
+                          *0x96: calculation sample
 
 
 ============================================================================================
@@ -242,7 +246,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 	switch (offset)
 	{
 		case 0:
-			adpcm_pos = (data & 0x7f) * 0x100;
+			adpcm_pos = (data & 0xff) * 0x100;
 			adpcm_idle = 0;
 			msm5205_reset_w(device,0);
 //          printf("%02x 0\n",data);
@@ -260,7 +264,7 @@ static void jan_adpcm_int(const device_config *device)
 {
 	static UINT8 trigger;
 
-	if (adpcm_pos >= 0x8000 || adpcm_idle)
+	if (adpcm_pos >= 0x10000 || adpcm_idle)
 	{
 		//adpcm_idle = 1;
 		msm5205_reset_w(device,1);
@@ -471,11 +475,17 @@ ROM_START( jantotsu )
 	ROM_LOAD( "jat-04.3e", 0x08000, 0x02000, CRC(734e029f) SHA1(75aa13397847b4db32c41aaa6ff2ac82f16bd7a2) )
 	ROM_LOAD( "jat-05.4e", 0x0a000, 0x02000, CRC(1a725e1a) SHA1(1d39d607850f47b9389f41147d4570da8814f639) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )
-	ROM_LOAD( "jat-40.6b", 0x00000, 0x02000, CRC(2275253e) SHA1(64e9415faf2775c6b9ab497dce7fda8c4775192e) )
+	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_LOAD( "jat-40.6b", 0x06000, 0x02000, CRC(2275253e) SHA1(64e9415faf2775c6b9ab497dce7fda8c4775192e) )
 	ROM_LOAD( "jat-41.7b", 0x02000, 0x02000, CRC(ce08ed71) SHA1(8554e5e7ec178f57bed5fbdd5937e3a35f72c454) )
 	ROM_LOAD( "jat-42.8b", 0x04000, 0x02000, CRC(3ac3efbf) SHA1(846faea7c7c01fb7500aa33a70d4b54e878c0e41) )
-	ROM_LOAD( "jat-43.9b", 0x06000, 0x02000, CRC(3c1d843c) SHA1(7a836e66cad4e94916f0d80a439efde49306a0e1) )
+	ROM_LOAD( "jat-43.9b", 0x00000, 0x02000, CRC(3c1d843c) SHA1(7a836e66cad4e94916f0d80a439efde49306a0e1) )
+	/* Guess that the engineers got some fun with the PALs there... */
+	ROM_COPY( "adpcm",     0x02000, 0x08000, 0x2000 )
+	//a000-bfff
+	ROM_COPY( "adpcm",     0x06000, 0x0c000, 0x1000 )
+	ROM_COPY( "adpcm",     0x01000, 0x0d000, 0x1000 )
+	//e000-ffff
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "jat-60.10p", 0x00, 0x20,  CRC(65528ae0) SHA1(6e3bf27d10ec14e3c6a494667b03b68726fcff14) )
