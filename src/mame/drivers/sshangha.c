@@ -82,12 +82,6 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 	COMBINE_DATA(&sshangha_prot_data[offset]);
 
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
-
-	if ((offset >= (0x260 >> 1)) && (offset <= (0x26f >> 1))) {
-
-		//soundlatch_w(0, data & 0xff);
-		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	}
 }
 
 /* Protection/IO chip 146 */
@@ -120,6 +114,7 @@ static READ16_HANDLER( sshanghb_protection16_r )
 		case 0x0ac >> 1:
 			return input_port_read(space->machine, "DSW");
 	}
+
 	return sshangha_prot_data[offset];
 }
 
@@ -469,5 +464,5 @@ static DRIVER_INIT( sshangha )
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",  "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",  "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, sshanghb, sshangha, sshanghb, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
