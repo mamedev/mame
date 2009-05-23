@@ -3983,11 +3983,15 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shienryu )	/* 1997.02 Shienryu (Warashi) */
 	DRIVER( vmahjong )	/* 1997.02 Virtual Mahjong (Micronet) */
 	DRIVER( groovef )	/* 1997.05 Groove on Fight (Atlus) */
+	DRIVER( nclubv3 )	/* 1997.07 Name Club Ver. 3 */
+	DRIVER( thunt )		/* 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License)) */
+	DRIVER( thuntk )
 	DRIVER( winterht )	/* 1997.10 Winter Heat (Data East) */
 	DRIVER( cotton2 )	/* 1997.11 Cotton 2 (Success) */
 	DRIVER( hanagumi )	/* 1997.11 Sakura Taisen Hanagumi Taisen Columns */
 	DRIVER( findlove )	/* 1997.12 Find Love (Daiki / FCF) */
 	DRIVER( maruchan )	/* 1997.12 Maruchan de Goo!!! */
+	DRIVER( techbowl )	/* 1997.12 Technical Bowling */
 	DRIVER( znpwfv )	/* 1997.12 Zen Nippon Pro Wrestling featuring Virtua */
 	DRIVER( seabass )	/* 1998.02 Sea Bass Fishing (A wave Inc (Able License)) */
 	DRIVER( sasissu )	/* 1998.02 Taisen Tanto-R Sasissu!! */
@@ -4002,15 +4006,13 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( stress )	/* 1998.10 Stress Busters */
 	DRIVER( elandore )	/* 1998.11 Touryuu Densetsu Elandore (Sai-Mate) */
 	DRIVER( sss )		/* 1998.12 Steep Slope Sliders (Capcom / Cave / Victor) */
+	DRIVER( sanjeon )	/* 1999.04 Sanjun Sujun (Sega / Deniam) */
 	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
 	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
 						/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
 
-	DRIVER( thunt )		/* 1995.?? Puzzle & Action Treasure Hunt (Sega (Deniam License)) */
-	DRIVER( thuntk )
-	DRIVER( sanjeon )	/* 1999.?? Sanjun Sujun (Sega / Deniam) */
 
-	DRIVER( nclubv3 )
+	DRIVER( micrombc )
 
 	/* Sega Model 2 Games */
 
