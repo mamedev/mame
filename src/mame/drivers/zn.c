@@ -141,6 +141,7 @@ static const struct
 	{ "stridr2a", cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "shiryu2",  cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "beastrzr", et01, et02 }, /* OK */
+	{ "bldyroar", et01, et02 }, /* OK */
 	{ "beastrzb", et01, et02 }, /* OK */
 	{ "bldyror2", et01, et03 }, /* OK */
 	{ "bam2",     et01, et05 },
