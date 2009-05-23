@@ -421,7 +421,7 @@ static MACHINE_RESET( jantotsu )
 static const msm5205_interface msm5205_config =
 {
 	jan_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B	/* 8kHz */
+	MSM5205_S64_4B	/* 6 KHz */
 };
 
 static MACHINE_DRIVER_START( jantotsu )
@@ -455,7 +455,7 @@ static MACHINE_DRIVER_START( jantotsu )
 	MDRV_SOUND_ADD("sn2", SN76489A, 18432000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm", MSM5205, 288000)
+	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END

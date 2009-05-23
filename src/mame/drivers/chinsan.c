@@ -3,7 +3,9 @@
 
 ToDo:
 Improve Inputs
-Add Sample Playback (M5205)
+
+Notes:
+-ADPCM hook-up is virtually identical to the other Sanritsu games (Jantotsu, Appoooh, Dr. Micro etc.).
 
 */
 
@@ -43,9 +45,13 @@ MM63.10N
 #include "cpu/z80/z80.h"
 #include "machine/mc8123.h"
 #include "sound/2203intf.h"
+#include "sound/msm5205.h"
 
 static UINT8* chinsan_video;
 static UINT8 chinsan_port_select;
+
+static UINT32 adpcm_pos;
+static UINT8 adpcm_idle,adpcm_data;
 
 static VIDEO_START(chinsan)
 {
@@ -75,6 +81,8 @@ static VIDEO_UPDATE(chinsan)
 static MACHINE_RESET( chinsan )
 {
 	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+
+	adpcm_idle = 1;
 }
 
 
@@ -185,6 +193,12 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 	return mame_rand(space->machine);
 }
 
+static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
+{
+	adpcm_pos = (data & 0xff) * 0x100;
+	adpcm_idle = 0;
+	msm5205_reset_w(device,0);
+}
 
 static ADDRESS_MAP_START( chinsan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -199,6 +213,7 @@ static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("adpcm", chin_adpcm_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
@@ -280,7 +295,6 @@ static INPUT_PORTS_START( chinsan )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) // adds coins?, but maybe its the service switch?
-
 
 	PORT_START("MAHJONG_P1_2")
 	PORT_DIPNAME( 0x01, 0x01, "1-2" )
@@ -458,6 +472,48 @@ static GFXDECODE_START( chinsan )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 32 )
 GFXDECODE_END
 
+static void chin_adpcm_int(const device_config *device)
+{
+	static UINT8 trigger;
+
+	if (adpcm_pos >= 0x10000 || adpcm_idle)
+	{
+		//adpcm_idle = 1;
+		msm5205_reset_w(device,1);
+		trigger = 0;
+	}
+	else
+	{
+		UINT8 *ROM = memory_region(device->machine, "adpcm");
+
+		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
+		msm5205_data_w(device,adpcm_data & 0xf);
+		trigger^=1;
+		if(trigger == 0)
+		{
+			adpcm_pos++;
+			if((ROM[adpcm_pos] & 0xff) == 0x70)
+				adpcm_idle = 1;
+		}
+	}
+}
+
+static const msm5205_interface msm5205_config =
+{
+	chin_adpcm_int,	/* interrupt function */
+	MSM5205_S64_4B	/* 8kHz */
+};
+
+static PALETTE_INIT( chinsan )
+{
+	UINT8 *src = memory_region( machine, "color_proms" );
+	int i;
+
+	for (i=0;i<0x100;i++)
+	{
+		palette_set_color_rgb(machine,i,pal4bit(src[i+0x200]),pal4bit(src[i+0x100]),pal4bit(src[i+0x000]));
+	}
+}
 
 static MACHINE_DRIVER_START( chinsan )
 	/* basic machine hardware */
@@ -478,6 +534,7 @@ static MACHINE_DRIVER_START( chinsan )
 
 	MDRV_GFXDECODE(chinsan)
 	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(chinsan)
 
 	MDRV_VIDEO_START(chinsan)
 	MDRV_VIDEO_UPDATE(chinsan)
@@ -491,6 +548,10 @@ static MACHINE_DRIVER_START( chinsan )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.10)
+
+	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -515,7 +576,7 @@ ROM_START( chinsan )
 	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "mm60.2c", 0x000, 0x020, CRC(88477178) SHA1(03c1c9e3e88a5ae9970cb4b872ad4b6e4d77a6da) )
 
-	ROM_REGION( 0x300, "user3", 0 )
+	ROM_REGION( 0x300, "color_proms", 0 )
 	ROM_LOAD( "mm61.9m",  0x000, 0x100, CRC(57024262) SHA1(e084e6baa3c529217f6f8e37c9dd5f0687ba2fc4) ) // b
 	ROM_LOAD( "mm62.9n",  0x100, 0x100, CRC(b5a1dbe5) SHA1(770a791c061ce422f860bb8d32f82bbbf9b4d12a) ) // g
 	ROM_LOAD( "mm63.10n", 0x200, 0x100, CRC(b65e3567) SHA1(f146af51dfaa5b4bf44c4e27f1a0292f8fd07ce9) ) // r
@@ -524,17 +585,8 @@ ROM_END
 
 static DRIVER_INIT( chinsan )
 {
-
-	int i;
-	UINT8 *src = memory_region( machine, "user3" );
-
 	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4);
-
-	for (i=0;i<0x100;i++)
-	{
-		palette_set_color_rgb(machine,i,pal4bit(src[i+0x200]),pal4bit(src[i+0x100]),pal4bit(src[i+0x000]));
-	}
 }
 
 
-GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", GAME_IMPERFECT_SOUND )
+GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", 0 )
