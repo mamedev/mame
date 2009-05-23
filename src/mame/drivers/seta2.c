@@ -2723,7 +2723,7 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "asx905m01.u18", 0x100000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
 ROM_END
 
-ROM_START( wschamp ) /* V2.0 */
+ROM_START( wschamp ) /* Wing Shootiong Championship V2.00 (01/23/2002) */
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as1006e02.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
 	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
@@ -2739,7 +2739,7 @@ ROM_START( wschamp ) /* V2.0 */
 	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( wschampa ) /* V1.01 */
+ROM_START( wschampa ) /* Wing Shootiong Championship V1.01 */
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as1006e01.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) )
 	ROM_LOAD16_BYTE( "as1007e01.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) )
