@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(tryout_flipscreen_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE(tryout_bankswitch_w)
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(tryout_vram_bankswitch_w)
-	AM_RANGE(0xe402, 0xe404) AM_WRITE(SMH_RAM) AM_BASE(&tryout_gfx_control)
+	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_BASE(&tryout_gfx_control)
 	AM_RANGE(0xe414, 0xe414) AM_WRITE(tryout_sound_w)
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(tryout_nmi_ack_w)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* resect vectors */
@@ -83,6 +83,12 @@ static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tryout_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+static INPUT_CHANGED( coin_inserted )
+{
+	if(newval != oldval)
+		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+}
 
 static INPUT_PORTS_START( tryout )
 	PORT_START("DSW")
@@ -120,12 +126,12 @@ static INPUT_PORTS_START( tryout )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1	 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2	 ) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -133,8 +139,8 @@ static INPUT_PORTS_START( tryout )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -156,7 +162,7 @@ static const gfx_layout vramlayout =
 	16, 16,
 	128,
 	3,
-	{ 0, 0x2000 * 8, 0x4000 * 8 },
+	{ 0x0000 * 8, 0x2000 * 8, 0x4000 * 8 },
 	{ 7, 6, 5, 4, 128+7, 128+6, 128+5, 128+4, 256+7, 256+6, 256+5, 256+4, 384+7, 384+6, 384+5, 384+4  },
 	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8,
 	  7*8, 6*8,5*8,4*8,3*8,2*8,1*8,0*8 },
@@ -177,22 +183,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( tryout )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 0x20 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x20 )
-	GFXDECODE_ENTRY( NULL,		   0, vramlayout,   0, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
+	GFXDECODE_ENTRY( NULL,	 0, vramlayout,   0, 4 )
 GFXDECODE_END
-
-static INTERRUPT_GEN( tryout_interrupt )
-{
-	if ((input_port_read(device->machine, "SYSTEM") & 0x1c) != 0x1c)
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-}
 
 static MACHINE_DRIVER_START( tryout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
-	MDRV_CPU_VBLANK_INT("screen", tryout_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)

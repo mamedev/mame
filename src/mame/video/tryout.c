@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 0, 0);
+	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_HANDLER( tryout_vram_r )
@@ -115,28 +115,28 @@ WRITE8_HANDLER( tryout_vram_w )
 
 	switch (offset&0x1c00) {
 	case 0x0400:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0800:
-		tryout_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0c00:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1400:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1800:
-		tryout_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1c00:
-		tryout_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(data&0xf);
-		tryout_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(data&0xf0)>>4;
+		tryout_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
+		tryout_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	}
 
