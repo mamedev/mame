@@ -1739,9 +1739,10 @@ const game_driver * const drivers[] =
 	DRIVER( arkatour )	/* ??? (c) 1987 Taito America Corporation + Romstar license (US) */
 	DRIVER( tetrsark )	/* ??? (c) D.R.Korea */
 	DRIVER( sqix )		/* B03 1987 */
-	DRIVER( sqixa )		/* B03 1987 */
+	DRIVER( sqixr1 )	/* B03 1987 */
 	DRIVER( sqixu )		/* B03 1987 */
-	DRIVER( sqixbl )	/* bootleg? but (c) 1987 */
+	DRIVER( sqixb1 )	/* bootleg? but (c) 1987 */
+	DRIVER( sqixb2 )	/* bootleg? but (c) 1987 */
 	DRIVER( perestro )	/* (c) 1994 Promat */
 	DRIVER( perestrf )	/* (c) 1993 Promat / Fuuki */
 	DRIVER( pbillian )	/* (c) 1986 Taito */

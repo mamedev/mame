@@ -23,11 +23,11 @@ Notes:
   This happens in all sets. There appears to be code that would check part of
   the MCU init sequence ($5973 onwards), but it doesn't seem to be called.
 
-- sqixa might be an earlier version because there is a bug with coin lockout:
+- sqixb1 might be an earlier version because there is a bug with coin lockout:
   it is activated after inesrting 10 coins instead of 9. sqix doesn't have
   that bug and also inverts the coin lockout output.
 
-- sqixbl is a bootleg of sqixa, with the MCU removed.
+- sqixb2 is a bootleg of sqixb1, with the MCU removed.
 
 - Prebillian controls: (from the Japanese flyer):
   - pullout plunger for shot power (there's no on-screen power indicator in the game)
@@ -1226,76 +1226,95 @@ ROM_END
 
 ROM_START( sqix )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-01-1",     0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
-	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "b03-01-2.f3",   0x00000, 0x08000, CRC(5ded636b) SHA1(827954001b4617b3bd439be75094d8dca06ea32b) )
+	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* I8751 code */
+	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
+	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
+	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
+
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "sq-iu3.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+ROM_END
+
+ROM_START( sqixr1 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b03-01-1.f3",   0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
+	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* I8751 code */
+	ROM_LOAD( "b03-03.l2",    0x00000, 0x1000, NO_DUMP ) /* Original Taito ID code for this set's MCU */
+	/* sq07.108 is from the sqixb1 set, it will be removed once the actual MCU code from b03-03.l2 is decapped / dumped */
 	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )	// from sqixa (bootleg)
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
+	ROM_LOAD( "sq-iu3.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b03-06.f3",     0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
-	ROM_LOAD( "b03-07.h3",     0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
+	ROM_LOAD( "b03-06.f3",    0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
+	ROM_LOAD( "b03-07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* I8751 code */
-	ROM_LOAD( "b03_08.2l",     0x00000, 0x1000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
+	ROM_LOAD( "b03-08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
+	ROM_LOAD( "sq-iu3.p8",    0x00000, 0x20000, CRC(b8d0c493) SHA1(ef5d62ef3835c7ae088a7aa98945f747130fe0ec) ) /* Sharp LH231041 28 pin 128K x 8bit mask rom */
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-09.t8",    0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
 ROM_END
 
-/* this was probably a bootleg */
-ROM_START( sqixa )
+ROM_START( sqixb1 ) /* this was probably a bootleg */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sq01.97",      0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
-	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
+	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* I8751 code */
 	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(d11411fb) SHA1(31183f433596c4d2503c01f6dc8d91024f2cf5de) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8 */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8 */
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
-ROM_START( sqixbl )
+ROM_START( sqixb2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cpu.2",        0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
-	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
+	ROM_LOAD( "cpu.2",         0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
+	ROM_LOAD( "b03-02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
+	ROM_LOAD( "b03-04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
-	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
+	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) ) /* 1st half of sq-iu3.p8 */
+	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) ) /* 2nd half of sq-iu3.p8 */
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
+	ROM_LOAD( "b03-05.t8",    0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( perestrf )
@@ -1416,9 +1435,10 @@ static DRIVER_INIT( perestro )
 
 GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", GAME_SUPPORTS_SAVE )
 GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (World, Rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (World, Rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixu,    sqix,     sqixu,    superqix, 0,        ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix,     superqix, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )
 GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", GAME_SUPPORTS_SAVE )
