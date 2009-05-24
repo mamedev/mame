@@ -89,13 +89,6 @@ WRITE8_HANDLER( tryout_vram_w )
 	if ((bank==0 || bank==2 || bank==4 || bank==6) && (offset&0x7ff)<0x400) {
 		int newoff=offset&0x3ff;
 
-		switch (newoff&0x300){
-		case 0x000: newoff=(newoff&0xff) | 0x100; break;
-		case 0x100: newoff=(newoff&0xff) | 0x200; break;
-		case 0x200: newoff=(newoff&0xff) | 0x000; break;
-		case 0x300: newoff=(newoff&0xff) | 0x300; break;
-		}
-
 		tryout_vram[newoff]=data;
 		tilemap_mark_tile_dirty(bg_tilemap,newoff);
 		return;
@@ -236,14 +229,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tryout )
 {
-//  UINT8* mem=memory_region(machine, REGION_CPU1);
-
-	int scrollx;
+	int scrollx = 0;
 
 	if (!flip_screen_get(screen->machine))
 		tilemap_set_scrollx(fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
 		tilemap_set_scrollx(fg_tilemap, 0, -8); /* Assumed hard-wired */
+
+	scrollx = tryout_gfx_control[1] + ((tryout_gfx_control[0]&1)<<8) + ((tryout_gfx_control[0]&4)<<7) - ((tryout_gfx_control[0] & 2) ? 0 : 0x100);
+
+	/* wrap-around */
+	if(tryout_gfx_control[1] == 0) { scrollx+=0x100; }
+
+	tilemap_set_scrollx(bg_tilemap, 0, scrollx+2); /* why +2? hard-wired? */
+	tilemap_set_scrolly(bg_tilemap, 0, -tryout_gfx_control[2]);
 
 	if(!(tryout_gfx_control[0] & 0x8)) // screen disable
 	{
@@ -252,21 +251,11 @@ VIDEO_UPDATE( tryout )
 	}
 	else
 	{
-		if(tryout_gfx_control[0] == 0xc)
-			scrollx = tryout_gfx_control[1];
-		if(tryout_gfx_control[0] == 0x8 && !tryout_gfx_control[1])
-			scrollx = 0x100;
-		else
-			scrollx = tryout_gfx_control[1] | ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7);
-
-		tilemap_set_scrollx(bg_tilemap, 0, scrollx);
-		tilemap_set_scrolly(bg_tilemap, 0, -tryout_gfx_control[2]);
-
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 		draw_sprites(screen->machine, bitmap,cliprect);
 	}
 
-//  popmessage("%02x %02x %02x - %04x",mem[0xe402],mem[0xe403],mem[0xe404], ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7));
+	popmessage("%02x %02x %02x %02x",tryout_gfx_control[0],tryout_gfx_control[1],tryout_gfx_control[2],scrollx);
 	return 0;
 }
