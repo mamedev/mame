@@ -7,7 +7,6 @@
 
  TODO:
  - Fix the scroll properly
- - Some colors problems
  - Fix sprite position in cocktail mode
 
 ****************************************************************/

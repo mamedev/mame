@@ -42,14 +42,14 @@ PALETTE_INIT( tryout )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code, attr;
+	int code, attr, color;
 
 	code = videoram[tile_index];
 	attr = videoram[tile_index + 0x400];
-
 	code |= ((attr & 0x03) << 8);
+	color = ((attr & 0x4)>>2)+6;
 
-	SET_TILE_INFO(0, code, 6, 0);
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
