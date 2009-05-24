@@ -2969,6 +2969,7 @@ V-V                           TP-027
 	DRIVER( raystorm )	/* Ray Storm (Ver 2.06A) */
 	DRIVER( raystorj )	/* Ray Storm (Ver 2.05J) */
 	DRIVER( ftimpact )	/* Fighters' Impact (Ver 2.02O) */
+	DRIVER( ftimpactj )	/* Fighters' Impact (Ver 2.02J) */
 	DRIVER( ftimpcta )	/* Fighters' Impact A (Ver 2.00J) */
 	DRIVER( gdarius )	/* G-Darius (Ver 2.01J) */
 	DRIVER( gdariusb )	/* G-Darius (Ver 2.02A) */
@@ -3038,7 +3039,7 @@ V-V                           TP-027
 	DRIVER( toukon3 )	/* 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A, Japan) */
 	DRIVER( ehrgeiz )	/* 1998.?? Ehrgeiz (EG3/VER.A) */
 	DRIVER( ehrgeiza )	/* 1998.?? Ehrgeiz (EG2/VER.A) */
-						/* 1998.05 Ehrgeiz (EG1, Japan) */
+	DRIVER( ehrgeizj )	/* 1998.05 Ehrgeiz (EG1, Japan) */
 	DRIVER( sws98 )		/* 1998.06 Super World Stadium '98 (SS81/VER.A, Japan) */
 	DRIVER( soulclbr )	/* 1998.?? Soul Calibur (SOC14/VER.C) */
 	DRIVER( soulclba )	/* 1998.07 Soul Calibur (SOC11/VER.C, Japan) */
