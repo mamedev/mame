@@ -9,6 +9,16 @@
  - Fix the scroll properly
  - Fix sprite position in cocktail mode
 
+=================================================================
+Debug cheats:
+
+*tryout
+Pitching stage (3)
+$201 remaining ball counter
+$208 strikes count
+(note: put a wpset 20x,1,w and modify the value AFTER that the
+       game modifies it)
+
 ****************************************************************/
 
 #include "driver.h"
