@@ -245,19 +245,27 @@ VIDEO_UPDATE( tryout )
 	else
 		tilemap_set_scrollx(fg_tilemap, 0, -8); /* Assumed hard-wired */
 
-	if(tryout_gfx_control[0] == 0xc)
-		scrollx = tryout_gfx_control[1];
-	if(tryout_gfx_control[0] == 0x8 && !tryout_gfx_control[1])
-		scrollx = 0x100;
+	if(!(tryout_gfx_control[0] & 0x8)) // screen disable
+	{
+		/* TODO: Color might be different, needs a video from an original pcb. */
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
+	}
 	else
-		scrollx = tryout_gfx_control[1] | ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7);
+	{
+		if(tryout_gfx_control[0] == 0xc)
+			scrollx = tryout_gfx_control[1];
+		if(tryout_gfx_control[0] == 0x8 && !tryout_gfx_control[1])
+			scrollx = 0x100;
+		else
+			scrollx = tryout_gfx_control[1] | ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7);
 
-	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, -tryout_gfx_control[2]);
+		tilemap_set_scrollx(bg_tilemap, 0, scrollx);
+		tilemap_set_scrolly(bg_tilemap, 0, -tryout_gfx_control[2]);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+		draw_sprites(screen->machine, bitmap,cliprect);
+	}
 
 //  popmessage("%02x %02x %02x - %04x",mem[0xe402],mem[0xe403],mem[0xe404], ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7));
 	return 0;
