@@ -209,12 +209,12 @@ VIDEO_START( mechatt );
 VIDEO_UPDATE( bbuster );
 VIDEO_UPDATE( mechatt );
 
-static UINT16 *bbuster_ram, *eprom_data;
-extern UINT16 *bbuster_pf1_data,*bbuster_pf2_data,*bbuster_pf1_scroll_data,*bbuster_pf2_scroll_data;
+static UINT16 *bbusters_ram, *eprom_data;
+extern UINT16 *bbusters_pf1_data,*bbusters_pf2_data,*bbusters_pf1_scroll_data,*bbusters_pf2_scroll_data;
 
-WRITE16_HANDLER( bbuster_pf1_w );
-WRITE16_HANDLER( bbuster_pf2_w );
-WRITE16_HANDLER( bbuster_video_w );
+WRITE16_HANDLER( bbusters_pf1_w );
+WRITE16_HANDLER( bbusters_pf2_w );
+WRITE16_HANDLER( bbusters_video_w );
 
 /******************************************************************************/
 
@@ -321,19 +321,19 @@ static READ16_HANDLER( mechatt_gun_r )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( bbuster_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bbusters_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(&bbuster_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbuster_video_w) AM_BASE(&videoram16)
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(&bbusters_ram)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
 	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbuster_pf1_w) AM_BASE(&bbuster_pf1_data)
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbuster_pf2_w) AM_BASE(&bbuster_pf2_data)
+	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE(&bbusters_pf1_data)
+	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE(&bbusters_pf2_data)
 	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM		/* service mode */
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf1_scroll_data)
-	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf2_scroll_data)
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE(&bbusters_pf1_scroll_data)
+	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_BASE(&bbusters_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")	/* Coins */
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")	/* Player 1 & 2 */
@@ -345,21 +345,21 @@ static ADDRESS_MAP_START( bbuster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
 	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
-	AM_RANGE(0x0f8000, 0x0f80ff) AM_READWRITE(eprom_r, SMH_RAM) AM_BASE(&eprom_data) /* Eeprom */
+	AM_RANGE(0x0f8000, 0x0f80ff) AM_READ(eprom_r) AM_WRITEONLY AM_BASE(&eprom_data) /* Eeprom */
 ADDRESS_MAP_END
 
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( mechatt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
-	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE(&bbuster_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbuster_video_w) AM_BASE(&videoram16)
+	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE(&bbusters_ram)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbuster_pf1_w) AM_BASE(&bbuster_pf1_data)
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE(&bbuster_pf1_scroll_data)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbuster_pf2_w) AM_BASE(&bbuster_pf2_data)
-	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_BASE(&bbuster_pf2_scroll_data)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE(&bbusters_pf1_data)
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE(&bbusters_pf1_scroll_data)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE(&bbusters_pf2_data)
+	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_BASE(&bbusters_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
@@ -708,7 +708,7 @@ static MACHINE_DRIVER_START( bbusters )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(bbuster_map)
+	MDRV_CPU_PROGRAM_MAP(bbusters_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */

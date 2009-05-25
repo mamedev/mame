@@ -581,11 +581,11 @@ static ADDRESS_MAP_START( berzerk_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x48, 0x48) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x49, 0x49) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x4a, 0x4a) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0x4b, 0x4b) AM_READWRITE(SMH_NOP, magicram_control_w)
+	AM_RANGE(0x4b, 0x4b) AM_READNOP AM_WRITE(magicram_control_w)
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(nmi_enable_r, nmi_enable_w)
 	AM_RANGE(0x4d, 0x4d) AM_READWRITE(nmi_disable_r, nmi_disable_w)
-	AM_RANGE(0x4e, 0x4e) AM_READWRITE(intercept_v256_r, SMH_NOP)
-	AM_RANGE(0x4f, 0x4f) AM_READWRITE(SMH_NOP, irq_enable_w)
+	AM_RANGE(0x4e, 0x4e) AM_READ(intercept_v256_r) AM_WRITENOP
+	AM_RANGE(0x4f, 0x4f) AM_READNOP AM_WRITE(irq_enable_w)
 	AM_RANGE(0x50, 0x57) AM_NOP /* second sound board, but not used */
 	AM_RANGE(0x58, 0x5f) AM_NOP
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x18) AM_READ_PORT("F3") AM_WRITENOP

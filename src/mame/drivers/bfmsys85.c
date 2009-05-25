@@ -426,7 +426,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)		// mux enable
 
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)			// 48K ROM
+	AM_RANGE(0x4000, 0xffff) AM_ROM						// 48K ROM
 	AM_RANGE(0x8000, 0xFFFF) AM_WRITE(watchdog_w)		// kick watchdog
 
 ADDRESS_MAP_END

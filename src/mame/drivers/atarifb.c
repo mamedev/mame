@@ -157,12 +157,11 @@ static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
@@ -178,12 +177,11 @@ static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb4_in0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb4_in2_r)
@@ -200,12 +198,11 @@ static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
@@ -221,7 +218,7 @@ static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
 	AM_RANGE(0x0800, 0x0bbf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
 	AM_RANGE(0x1004, 0x1004) AM_WRITENOP /* Interrupt Acknowledge */

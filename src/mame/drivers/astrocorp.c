@@ -170,7 +170,7 @@ static WRITE16_HANDLER( astrocorp_palette_w )
 static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE( &spriteram16 ) AM_SIZE( &spriteram_size )
-	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE( SMH_NOP )
+	AM_RANGE( 0x052000, 0x052001 ) AM_WRITENOP
 	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT( "INPUTS" )
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE( astrocorp_eeprom_w )
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE( astrocorp_outputs_w )
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE( "oki", astrocorp_sound_bank_w )
 	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE( &spriteram16 ) AM_SIZE( &spriteram_size )
-	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE( SMH_NOP )
+	AM_RANGE( 0x082000, 0x082001 ) AM_WRITENOP
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT( "INPUTS" )
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE( astrocorp_eeprom_w )
 	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE( astrocorp_outputs_w )

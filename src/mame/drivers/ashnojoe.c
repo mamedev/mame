@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITE(SMH_RAM) AM_BASE(&ashnojoe_tilemap_reg)
+	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE(&ashnojoe_tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)

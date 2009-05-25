@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITENOP
 	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITE(SMH_RAM) AM_BASE(&ambush_colorbank)
+	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE(&ambush_colorbank)
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 

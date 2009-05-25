@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)			// affects IRQ line (more protection?)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&aeroboto_mainram)	// main  RAM
 	AM_RANGE(0x0800, 0x08ff) AM_RAM								// tile color buffer; copied to 0x2000
-	AM_RANGE(0x0900, 0x09ff) AM_WRITE(SMH_RAM)					// a backup of default tile colors
+	AM_RANGE(0x0900, 0x09ff) AM_WRITEONLY 						// a backup of default tile colors
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_BASE(&aeroboto_videoram)		// tile RAM
 	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&aeroboto_hscroll)	// horizontal scroll regs
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_BASE(&aeroboto_tilecolor)	// tile color RAM
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_BASE(&aeroboto_vscroll)
-	AM_RANGE(0x3004, 0x3004) AM_READWRITE(aeroboto_201_r, SMH_RAM) AM_BASE(&aeroboto_starx)
+	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_BASE(&aeroboto_starx)
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(&aeroboto_stary)	// usable but probably wrong
 	AM_RANGE(0x3006, 0x3006) AM_WRITEONLY AM_BASE(&aeroboto_bgcolor)
 	AM_RANGE(0x3800, 0x3800) AM_READNOP							// watchdog or IRQ ack

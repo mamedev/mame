@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( aerofgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffffa4, 0xffffa5) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xffffa6, 0xffffa7) AM_READ_PORT("DSW1")
 	AM_RANGE(0xffffa8, 0xffffa9) AM_READ_PORT("DSW2")
-	AM_RANGE(0xffffac, 0xffffad) AM_READWRITE(pending_command_r, SMH_NOP)	/* ??? */
+	AM_RANGE(0xffffac, 0xffffad) AM_READ(pending_command_r) AM_WRITENOP /* ??? */
 	AM_RANGE(0xffffae, 0xffffaf) AM_READ_PORT("DSW3")
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( wbbc97_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE(pspikes_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(pspikes_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(SMH_NOP, sound_command_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READNOP AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(wbbc97_bitmap_enable_w)
 ADDRESS_MAP_END
 

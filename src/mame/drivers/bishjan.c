@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE( bishjan_scrollram_1_hi_lo_word_w )
 
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( SMH_NOP, bishjan_sel_w )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE( bishjan_sel_w )
 	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE( colordac_word_w )
 	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE( bishjan_byte_lo_msb_w )
 

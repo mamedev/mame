@@ -76,7 +76,7 @@ static READ16_HANDLER( joystick_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
-	AM_RANGE(0x022000, 0x0220ff) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)

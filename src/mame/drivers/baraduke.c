@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( baraduke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)		/* irq acknowledge */
 	AM_RANGE(0xb000, 0xb002) AM_WRITE(baraduke_scroll0_w)		/* scroll (layer 0) */
 	AM_RANGE(0xb004, 0xb006) AM_WRITE(baraduke_scroll1_w)		/* scroll (layer 1) */
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
+	AM_RANGE(0x6000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
 static READ8_HANDLER( soundkludge_r )
@@ -199,11 +199,11 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM								/* built in RAM */
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)				/* cures speech */
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata)/* PSG device, shared RAM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)					/* MCU external ROM */
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP					/* watchdog reset? */
-	AM_RANGE(0x8800, 0x8800) AM_WRITENOP					/* irq acknoledge? */
+	AM_RANGE(0x8000, 0xbfff) AM_ROM								/* MCU external ROM */
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP						/* watchdog reset? */
+	AM_RANGE(0x8800, 0x8800) AM_WRITENOP						/* irq acknoledge? */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM								/* RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)					/* MCU internal ROM */
+	AM_RANGE(0xf000, 0xffff) AM_ROM								/* MCU internal ROM */
 ADDRESS_MAP_END
 
 

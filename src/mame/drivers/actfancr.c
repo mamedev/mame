@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( triothep_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x046400, 0x0467ff) AM_WRITENOP /* Pf2 rowscroll - is it used? */
 	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
 	AM_RANGE(0x064000, 0x0647ff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE(&actfancr_pf1_data)
-	AM_RANGE(0x066400, 0x0667ff) AM_WRITE(SMH_RAM) AM_BASE(&actfancr_pf1_rowscroll_data)
+	AM_RANGE(0x066400, 0x0667ff) AM_WRITEONLY AM_BASE(&actfancr_pf1_rowscroll_data)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
