@@ -3,7 +3,6 @@
 TODO:
 -eeprom emulation? Software settings all changes if you toggle the "flip screen" dip-switch
 -priorities.
--sound banking is known to be imperfect.
 
 Notes:To enter into Test Mode you need to keep pressed the Mahjong A button at start-up.
 */
@@ -157,22 +156,14 @@ static READ16_HANDLER( mirage_input_r )
 
 static WRITE16_HANDLER( okim1_rombank_w )
 {
-	if(ACCESSING_BITS_0_7)
-	{
-		UINT8 *oki = memory_region(space->machine, "oki2");
-		memcpy(&oki[0], &oki[(data & 3) * 0x40000] + 0x40000, 0x40000);
-	}
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki_sfx"), 0x40000 * (data & 0x3));
 }
 
 static WRITE16_HANDLER( okim0_rombank_w )
 {
-	/*bits 4-6 used?Volume control?*/
+	/*bits 4-6 used on POST? */
 
-	if(ACCESSING_BITS_0_7)
-	{
-		UINT8 *oki = memory_region(space->machine, "oki1");
-		memcpy(&oki[0], &oki[(data & 7) * 0x40000] + 0x40000, 0x40000);
-	}
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki_bgm"), 0x40000 * (data & 0x7));
 }
 
 static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -185,8 +176,8 @@ static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_r, okim6295_w, 0x00ff)
 //  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
 //  AM_RANGE(0x150006, 0x150007) AM_READNOP
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
@@ -347,13 +338,13 @@ static MACHINE_DRIVER_START( mirage )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 2000000)
+	MDRV_SOUND_ADD("oki_bgm", OKIM6295, 2000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki_sfx", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
 
@@ -369,13 +360,17 @@ ROM_START( mirage )
   	ROM_LOAD16_BYTE( "mbl-01.11a", 0x000001, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
 	ROM_LOAD16_BYTE( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )	/* M6295 samples */
-	ROM_LOAD( "mbl-03.10a", 0x040000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
-	ROM_RELOAD(				0x000000, 0x040000 )
+	ROM_REGION( 0x200000, "oki_bgm_data", 0 )
+	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )	/* M6295 samples */
-	ROM_LOAD( "mbl-04.12k", 0x040000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
-	ROM_RELOAD(				0x000000, 0x040000 )
+	ROM_REGION( 0x200000, "oki_bgm", 0 )
+	ROM_COPY( "oki_bgm_data", 0x000000, 0x000000, 0x080000 )
+	ROM_COPY( "oki_bgm_data", 0x100000, 0x080000, 0x080000 ) // - banks 2,3 and 4,5 are swapped, PAL address shuffle
+	ROM_COPY( "oki_bgm_data", 0x080000, 0x100000, 0x080000 ) // /
+	ROM_COPY( "oki_bgm_data", 0x180000, 0x180000, 0x080000 )
+
+	ROM_REGION( 0x100000, "oki_sfx", 0 )	/* M6295 samples */
+	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
 static DRIVER_INIT( mirage )
@@ -383,4 +378,4 @@ static DRIVER_INIT( mirage )
 	deco56_decrypt_gfx(machine, "gfx1");
 }
 
-GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS )
