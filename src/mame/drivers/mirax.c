@@ -145,7 +145,7 @@ static const gfx_layout layout16 =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
-	{ 0,RGN_FRAC(1,3),RGN_FRAC(2,3)},
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3)},
 	{ 0, 1, 2, 3, 4, 5, 6, 7 ,
 	  0+8*8,1+8*8,2+8*8,3+8*8,4+8*8,5+8*8,6+8*8,7+8*8},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -158,21 +158,50 @@ static const gfx_layout layout8 =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3)},
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3)},
 	{ 0, 1, 2, 3, 4, 5, 6, 7},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
 	8*8
 };
 
 static GFXDECODE_START( mirax )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 1 )
-	GFXDECODE_ENTRY( "gfx3", 0, layout16,    0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, layout16,    0, 8 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( mirax )
 
 INPUT_PORTS_END
+
+
+PALETTE_INIT( mirax )
+{
+	int i;
+
+	for (i = 0;i < machine->config->total_colors;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+	}
+}
 
 static MACHINE_DRIVER_START( mirax )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000) // audio cpu ?
@@ -188,7 +217,8 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(0x40)
+	MDRV_PALETTE_INIT(mirax)
 	MDRV_GFXDECODE(mirax)
 	MDRV_VIDEO_START(mirax)
 	MDRV_VIDEO_UPDATE(mirax)
