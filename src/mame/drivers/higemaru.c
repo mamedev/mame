@@ -166,7 +166,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( higemaru )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/3)	/* 4 MHz? Sharp LH0080A Z80A-CPU-D */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MDRV_CPU_PROGRAM_MAP(higemaru_map)
 	MDRV_CPU_VBLANK_INT_HACK(higemaru_interrupt,2)
 
