@@ -48,6 +48,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 /* ======================================================================== */
 
 /* Exception Vectors handled by emulation */
+#define EXCEPTION_RESET                    0
 #define EXCEPTION_BUS_ERROR                2 /* This one is not emulated! */
 #define EXCEPTION_ADDRESS_ERROR            3 /* This one is partially emulated (doesn't stack a proper frame yet) */
 #define EXCEPTION_ILLEGAL_INSTRUCTION      4
@@ -563,6 +564,7 @@ struct _m68ki_cpu_core
 
 	int  initial_cycles;
 	int  remaining_cycles;                     /* Number of clocks remaining */
+	int  reset_cycles;
 	UINT32 tracing;
 
 	jmp_buf aerr_trap;

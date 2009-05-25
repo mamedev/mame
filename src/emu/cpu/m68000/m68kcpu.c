@@ -88,13 +88,13 @@ const UINT32 m68ki_shift_32_table[65] =
 const UINT8 m68ki_exception_cycle_table[4][256] =
 {
 	{ /* 000 */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
+		 40, /*  0: Reset - Initial Stack Pointer                      */
 		  4, /*  1: Reset - Initial Program Counter                    */
 		 50, /*  2: Bus Error                             (unemulated) */
 		 50, /*  3: Address Error                         (unemulated) */
 		 34, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero -- ASG: changed from 42             */
-		 40, /*  6: CHK -- ASG: chanaged from 44                       */
+		 38, /*  5: Divide by Zero                                     */
+		 40, /*  6: CHK                                                */
 		 34, /*  7: TRAPV                                              */
 		 34, /*  8: Privilege Violation                                */
 		 34, /*  9: Trace                                              */
@@ -120,7 +120,7 @@ const UINT8 m68ki_exception_cycle_table[4][256] =
 		 44, /* 29: Level 5 Interrupt Autovector                       */
 		 44, /* 30: Level 6 Interrupt Autovector                       */
 		 44, /* 31: Level 7 Interrupt Autovector                       */
-		 34, /* 32: TRAP #0 -- ASG: chanaged from 38                   */
+		 34, /* 32: TRAP #0                                            */
 		 34, /* 33: TRAP #1                                            */
 		 34, /* 34: TRAP #2                                            */
 		 34, /* 35: TRAP #3                                            */
@@ -161,7 +161,7 @@ const UINT8 m68ki_exception_cycle_table[4][256] =
 		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 010 */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
+		 40, /*  0: Reset - Initial Stack Pointer                      */
 		  4, /*  1: Reset - Initial Program Counter                    */
 		126, /*  2: Bus Error                             (unemulated) */
 		126, /*  3: Address Error                         (unemulated) */
@@ -539,6 +539,12 @@ static CPU_EXECUTE( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
+	/* eat up any reset cycles */
+	cycles -= m68k->reset_cycles;
+	m68k->reset_cycles = 0;
+	if (cycles <= 0)
+		return m68k->reset_cycles;
+
 	/* Set our pool of clock cycles available */
 	m68k->remaining_cycles = cycles;
 	m68k->initial_cycles = cycles;
@@ -660,6 +666,8 @@ static CPU_RESET( m68k )
 	m68ki_jump(m68k, REG_PC);
 
 	m68k->run_mode = RUN_MODE_NORMAL;
+	
+	m68k->reset_cycles = m68k->cyc_exception[EXCEPTION_RESET];
 }
 
 static CPU_DISASSEMBLE( m68k )
