@@ -2,7 +2,6 @@
 
 TODO:
 -eeprom emulation? Software settings all changes if you toggle the "flip screen" dip-switch
--priorities.
 
 Notes:To enter into Test Mode you need to keep pressed the Mahjong A button at start-up.
 */
@@ -42,7 +41,7 @@ MR_01-.3A    [a0b758aa]
 
 #include "deco16ic.h"
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -55,13 +54,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
+
 		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+
+		if (pri != ((y & 0x8000)>>15)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0x1f;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;
+
 		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
 
 		x = x & 0x01ff;
@@ -127,9 +130,10 @@ static VIDEO_UPDATE(mirage)
 	bitmap_fill(bitmap,cliprect,256); /* not verified */
 
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 
-	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -378,4 +382,4 @@ static DRIVER_INIT( mirage )
 	deco56_decrypt_gfx(machine, "gfx1");
 }
 
-GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", 0 )
