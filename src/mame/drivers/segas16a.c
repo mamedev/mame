@@ -165,6 +165,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 static UINT16 *workram;
 
 static UINT8 video_control;
+static UINT8 mcu_control;
 static UINT8 mj_input_num;
 
 static read16_space_func custom_io_r;
@@ -244,6 +245,17 @@ static TIMER_CALLBACK( suspend_i8751 )
  *
  *************************************/
 
+static MACHINE_START( system16a )
+{
+	state_save_register_global(machine, video_control);
+	state_save_register_global(machine, mcu_control);
+	state_save_register_global(machine, mj_input_num);
+
+	state_save_register_global(machine, n7751_command);
+	state_save_register_global(machine, n7751_rom_address);
+}
+
+
 static MACHINE_RESET( system16a )
 {
 	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
@@ -251,6 +263,8 @@ static MACHINE_RESET( system16a )
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
 		timer_call_after_resynch(machine, NULL, 0, suspend_i8751);
+	
+	mcu_control = 0x00;
 }
 
 
@@ -344,11 +358,18 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
         D1 : Coin meter #2
         D0 : Coin meter #1
     */
+	const device_config *mcu = cputag_get_cpu(device->machine, "mcu");
+
 	if (((video_control ^ data) & 0x0c) && lamp_changed_w)
 		(*lamp_changed_w)(video_control ^ data, data);
 	video_control = data;
+	
 	segaic16_tilemap_set_flip(device->machine, 0, data & 0x80);
 	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
+
+	if (mcu != NULL)
+		cpu_set_input_line(mcu, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+
 	segaic16_set_display_enable(device->machine, data & 0x10);
 	set_led_status(1, data & 0x08);
 	set_led_status(0, data & 0x04);
@@ -504,7 +525,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void bodyslam_i8751_sim(running_machine *machine)
+static void dumpmtmt_i8751_sim(running_machine *machine)
 {
 	UINT8 flag = workram[0x200/2] >> 8;
 	UINT8 tick = workram[0x200/2] & 0xff;
@@ -552,6 +573,7 @@ static void bodyslam_i8751_sim(running_machine *machine)
 static void quartet_i8751_sim(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
 	/* signal a VBLANK to the main CPU */
 	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
@@ -696,6 +718,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
+
+
 /*************************************
  *
  *  Passing Shot custom I/O
@@ -729,6 +753,8 @@ static READ16_HANDLER( pshot16a_custom_io_r )
 	}
 	return standard_io_r(space, offset, mem_mask);
 }
+
+
 
 /*************************************
  *
@@ -785,6 +811,142 @@ static void sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
 {
 	if ((changed & 4) && (newval & 4))
 		mj_input_num = (mj_input_num + 1) % 6;
+}
+
+
+
+/*************************************
+ *
+ *  MCU I/O
+ *
+ *************************************/
+
+INLINE UINT8 maincpu_byte_r(running_machine *machine, offs_t offset)
+{
+	return memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
+}
+
+
+INLINE void maincpu_byte_w(running_machine *machine, offs_t offset, UINT8 data)
+{
+	memory_write_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
+}
+
+
+static WRITE8_HANDLER( mcu_control_w )
+{
+	const device_config *maincpu = cputag_get_cpu(space->machine, "maincpu");
+	int irqline;
+
+	cpu_set_input_line(maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	for (irqline = 1; irqline <= 7; irqline++)
+		cpu_set_input_line(maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
+	
+	if (data & 0x40)
+		segaic16_set_display_enable(space->machine, 1);
+
+	if ((mcu_control ^ data) & 0x40)
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+
+	mcu_control = data;
+}
+
+
+static WRITE8_HANDLER( mcu_io_w )
+{
+	/* 
+		1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
+		1.00 1... = text RAM (accessed @ $8000+x)
+		1.01 1... = palette RAM
+		1.10 1... = checksum #0
+		1.11 0... = checksum #1
+		1.11 1... = checksum #2
+	*/
+	switch ((mcu_control >> 3) & 7)
+	{
+		case 0:
+			if (offset >= 0x4000 && offset < 0x8000)
+				maincpu_byte_w(space->machine, 0xc70001 ^ (offset & 0x3fff), data);
+			else if (offset >= 0x8000 && offset < 0xc000)
+				maincpu_byte_w(space->machine, 0xc40001 ^ (offset & 0x3fff), data);
+			else
+				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+
+		case 1:
+			if (offset >= 0x8000 && offset < 0x9000)
+				maincpu_byte_w(space->machine, 0x410001 ^ (offset & 0xfff), data);
+			else
+				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+						 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+
+		case 3:
+			maincpu_byte_w(space->machine, 0x840001 ^ offset, data);
+			break;
+
+		case 5:
+		case 6:
+		case 7:
+			/* ROM */
+
+		default:
+			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset, data);
+			break;
+	}
+}
+
+
+static READ8_HANDLER( mcu_io_r )
+{
+	switch ((mcu_control >> 3) & 7)
+	{
+		case 0:
+			if (offset >= 0x0000 && offset < 0x3fff)
+				return watchdog_reset_r(space, 0);		/* unsure about this one */
+			else if (offset >= 0x4000 && offset < 0x8000)
+				return maincpu_byte_r(space->machine, 0xc70001 ^ (offset & 0x3fff));
+			else if (offset >= 0x8000 && offset < 0xc000)
+				return maincpu_byte_r(space->machine, 0xc40001 ^ (offset & 0x3fff));
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+
+		case 1:
+			if (offset >= 0x8000 && offset < 0x9000)
+				return maincpu_byte_r(space->machine, 0x410001 ^ (offset & 0xfff));
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+
+		case 3:
+			return maincpu_byte_r(space->machine, 0x840001 ^ offset);
+
+		case 5:
+			return memory_region(space->machine, "maincpu")[0x00000 + offset];
+		case 6:
+			return memory_region(space->machine, "maincpu")[0x10000 + offset];
+		case 7:
+			return memory_region(space->machine, "maincpu")[0x20000 + offset];
+
+		default:
+			logerror("%03X: MCU movx read mode %02X offset %04X\n",
+					 cpu_get_pc(space->cpu), mcu_control, offset);
+			return 0xff;
+	}
+}
+
+
+static INTERRUPT_GEN( mcu_irq_assert )
+{
+	/* toggle the INT0 line on the MCU */
+	cpu_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
+	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
+
+	/* boost interleave to ensure that the MCU can break the M68000 out of a STOP */
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -870,8 +1032,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP	/* read during jb int0 */
 ADDRESS_MAP_END
 
 
@@ -1170,6 +1335,16 @@ static INPUT_PORTS_START( bodyslam )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Speed" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "Slowest" )
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x04, "Fast" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
 
@@ -1753,6 +1928,7 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
 
+	MDRV_MACHINE_START(system16a)
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
 
@@ -1800,7 +1976,7 @@ static MACHINE_DRIVER_START( system16a_8751 )
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
 MACHINE_DRIVER_END
 
 
@@ -2183,8 +2359,8 @@ ROM_START( bodyslam )
 	ROM_LOAD( "epr-10031.c3", 0x10000, 0x8000, CRC(ea3c4472) SHA1(ad8eac2d3d14fd6aba713f4d624861c17aabf757) )
 	ROM_LOAD( "epr-10032.c4", 0x18000, 0x8000, CRC(0aabebce) SHA1(fab12df8f4eab270be491c6c025d832c338e1e83) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
-	ROM_LOAD( "317-0015.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_LOAD( "317-0015.bin", 0x0000, 0x1000, CRC(833869e2) SHA1(2675fda669351e958be28ca28de276abb2bbc99a) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -2228,7 +2404,7 @@ ROM_START( dumpmtmt )
 	ROM_LOAD( "epr-7713.c3", 0x10000, 0x8000, CRC(33f292e7) SHA1(4358cd3922a0dcbf109d2d697c7b8c4e090c3d52) )
 	ROM_LOAD( "epr-7714.c4", 0x18000, 0x8000, CRC(8fd48c47) SHA1(1cba63a9e7e0b477683b7758d124f4949558ba7a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-00xx.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -2431,7 +2607,7 @@ ROM_START( quartet )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", ROMREGION_DISPOSE )
@@ -2481,7 +2657,7 @@ ROM_START( quartet1 )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", ROMREGION_DISPOSE )
@@ -2537,8 +2713,8 @@ ROM_START( quart21 )
 	ROM_LOAD( "epr-7474.3c", 0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c", 0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
-	ROM_LOAD( "317-0010.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_LOAD( "317-0010.bin", 0x00000, 0x1000, CRC(8c2033ea) SHA1(4a60d141517a5d5d065f40f71be4d2ee3be18384) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3115,10 +3291,10 @@ static DRIVER_INIT( fd1089b_16a )
 }
 
 
-static DRIVER_INIT( bodyslam )
+static DRIVER_INIT( dumpmtmt )
 {
 	system16a_generic_init(machine);
-	i8751_vblank_hook = bodyslam_i8751_sim;
+	i8751_vblank_hook = dumpmtmt_i8751_sim;
 }
 
 
@@ -3158,6 +3334,7 @@ static DRIVER_INIT( sjryukoa )
 }
 
 
+
 /*************************************
  *
  *  Game driver(s)
@@ -3165,12 +3342,12 @@ static DRIVER_INIT( sjryukoa )
  *************************************/
 
 /* "Pre-System 16" */
-GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Body Slam (8751 317-0015)", 0 )
-GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, bodyslam,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", 0 )
+GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, generic_16a, ROT0,   "Sega",           "Body Slam (8751 317-0015)", 0 )
+GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, dumpmtmt,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", GAME_UNEMULATED_PROTECTION )
 GAME( 1985, mjleague, 0,        system16a,        mjleague, mjleague,    ROT270, "Sega",           "Major League", 0 )
-GAME( 1986, quartet,  0,        system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (Rev A, 8751 315-5194)", 0 )
-GAME( 1986, quartet1, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", 0 )
-GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   quartet,     ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
+GAME( 1986, quartet,  0,        system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION )
+GAME( 1986, quartet1, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION )
+GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
 GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
