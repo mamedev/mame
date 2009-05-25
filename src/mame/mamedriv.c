@@ -4710,14 +4710,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( deshoros )	/* (c) 1983 */
 	DRIVER( prosoccr )	/* (c) 1983 */
 	DRIVER( prosport )	/* (c) 1983 */
+	DRIVER( prosporta )	/* (c) 1983 */
 	DRIVER( boomrang )	/* (c) 1983 */
-	DRIVER( boomrana )	/* (c) 1983 */
+	DRIVER( boomranga )	/* (c) 1983 */
 	DRIVER( kamikcab )	/* (c) 1984 */
-	DRIVER( yellowcj )	/* (c) 1984 */
-	DRIVER( yellowcb )	/* bootleg */
+	DRIVER( yellowcbj )	/* (c) 1984 */
+	DRIVER( yellowcbb )	/* bootleg */
 	DRIVER( liberate )	/* (c) 1984  Data East Corporation */
 	DRIVER( dualaslt )	/* (c) 1984  Data East USA (US) */
-	DRIVER( liberatb )	/* bootleg */
+	DRIVER( liberateb )	/* bootleg */
 	DRIVER( bwings )	/* (c) 1984 */
 	DRIVER( bwingso )	/* (c) 1984 */
 	DRIVER( bwingsa )	/* (c) 1984 */
