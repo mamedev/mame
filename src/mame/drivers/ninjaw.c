@@ -58,6 +58,127 @@ The triple palette generator (one for each screen) is probably just a
 result of the way the hardware works: the colors in each are the same.
 
 
+Ninja Warriors
+Taito, 1987
+
+PCB Layout
+----------
+
+J1100136A
+K1100313A
+SOUND BOARD
+|------------------------------|
+|  Z80     16MHz        YM2610 |
+|M      B31-37.11              |
+|  TMM2063           TC0140SYT |
+|  TC0060DCA                   |
+|  TC0060DCA  YM3016-F         |
+|  TL074 TL074 TL074           |
+|                     B31-08.19|
+|                     B31-09.18|
+|  MB3735   MB3735    B31-10.17|
+|                     B31-11.16|
+|  VOL1     VOL2               |
+|                        S     |
+|------------------------------|
+Notes:
+      Z80        - clock 4.000MHz [16/4]
+      YM2610     - clock 8.000MHz [16/2]
+      MB3735     - Audio power AMP
+      TC006DCA   - Taito custom ceramic DAC/filter module (SIL20)
+      TC0140SYT  - Taito custom sound control IC (QFP120)
+      YM3016F    - Yamaha stereo audio DAC (DOIC16)
+      TL074      - Texas Instruments low noise quad J-Fet op-amp (DIP14)
+      M          - 25 pin connector
+      S          - 30 pin flat cable joining to CPU BOARD
+      TMM2063    - 8kx8 SRAM (DIP28)
+      B31-37     - TC541000 mask ROM (DIP32)
+      Other B31* - 234000 mask ROM (DIP40)
+
+
+K1100311B
+J1100134B
+CPU BOARD
+|--------------------------------------------------------------|
+|                     2018                              2063   |
+|                    TC0070RGB   TC0110PCR    B31-02.29 43256  |
+|     68000             2018        TC0100SCN B31-01.28 43256  |
+|                           26.686MHz                   2063   |
+|                B31-16.68  16MHZ                              |
+|H                     2018                             2063   |
+|  B31-36.97 B31-33.87  TC0070RGB  TC011PCR   B31-02.27 43256  |
+|  B31-35.96 B31-32.86  2018       TC0100SCN  B31-01.26 43256  |
+|  B31-34.95 B31-31.85  B31-15.62                       2063   |
+|J    DIP28     DIP28                                          |
+|   43256     43256                                            |
+|                                                       2063   |
+|                 2018            TC0100SCN  B31-02.24  43256  |
+|     B31-17.82   TC0070RGB   TC0110PCR      B31-01.24  43256  |
+|                     B31-14-1.54                       2063   |
+|                                                              |
+|                 2018                                  43256  |
+|G                                                      43256  |
+|                                43256     43256     B31-13.20 |
+|                         3771   B31-45.35 B31-47.32    68000  |
+|     PC050CM    TC0040IOC  DSWA B31-29.34 B31-27.31           |
+|                           DSWB    DIP40             B31-12.1 |
+|--------------------------------------------------------------|
+Notes:
+      43256 - 32kx8 SRAM (DIP28)
+      2063  - 8kx8 SRAM (NDIP28)
+      DIP28 - Empty socket(s)
+      DIP40 - Socket for mounting 'ROM 5 BOARD'
+      2018  - 2kx8 SRAM (NDIP24)
+      H     - 12 pin connector for power input
+      J     - 15 pin connector
+      G     - 22-way edge connector
+      B31-12 thru B31-17 - PALs
+
+
+K9100162A
+J9100118A
+ROM 5 BOARD
+|-----------------|
+|B31-38.3 B31-40.6|
+|B31-39.2 B31-41.5|
+|                 |
+| DIP40     74F139|
+|-----------------|
+
+
+K1100312A
+J1100135A
+OBJECT BOARD
+|--------------------------------------------------------------|
+|                                                              |
+|                    B31-18.IC78                               |
+|                                    TMM2064   TMM2064 TMM2064 |
+|                    B31-19.IC80                               |
+|                                    TMM2064                   |
+|                                                              |
+|                                                              |
+|                             B31-20.IC119                     |
+|                             B31-21.IC120                     |
+|                             B31-22.IC121                     |
+|                                                  B31-04.IC173|
+|                                     B31-23.IC143 B31-05.IC174|
+|                                     B31-24.IC144 B31-06.IC175|
+|                                                  B31-07.IC176|
+|                  MB81461 MB81461 MB81461 MB81461             |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|H                 MB81461 MB81461 MB81461 MB81461   TC0120SHT |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|                  MB81461 MB81461 MB81461 MB81461             |
+|--------------------------------------------------------------|
+Notes:
+      B31-04 thru 06 - 234000 mask ROM (DIP40)
+      B31-18 thru 24 - PALs
+      MB81461        - 64kx4 dual-port DRAM (ZIP24)
+      TMM2064        - 8kx8 SRAM (DIP28)
+
 Dumpers Notes
 -------------
 

@@ -10,6 +10,87 @@ his PCB for dumping/collecting the c-chip data from Rainbow Islands Extra.
 
                             ***
 
+Rainbow Islands & Rainbow Islands Extra
+Taito, 1987
+
+PCB Layout
+----------
+
+MAIN PCB
+J1100128A
+K1100277A
+|----------------------------------------------------|
+| MB3735 Z80 B22-14.43    16MHz      DIP28    DIP28  |
+|       YM2151  5563                                 |
+|VOL          PC060HA    B22-05.33          B22-01.2 |
+| 4556  TL074 YM3012               |-------|         |
+|Y   6116 6116                     |TAITO  |   43256 |
+|                                  |PC080SN|         |
+|J    TC0070RGB  2018   |-------|  |-------|   43256 |
+|A               2018   |TAITO  |                    |
+|M     PC050CM   2018   |PC0900J|           B22-02.5 |
+|M               2018   |-------|           B22-13.6 |
+|A                                          B22-12.7 |
+|        TC0030CMD  12MHz                        3771|
+|  26.686MHz                   B39-02.20  B22-01.19  |
+|        68000                 B39-04.22  B39-03.21  |
+|        B22-07.56  B22-06.41  B22-04.24  B22-03.23  |
+|   DSWB   DSWA                8464       8464       |
+|----------------------------------------------------|
+Notes:
+      68000       - clock 8.000MHz [16/2]
+      Z80         - clock 4.000MHz [16/4]
+      YM2151      - clock 4.000MHz [16/4]
+      6116        - 2kx8 SRAM (color RAM)
+      43256       - 32kx8 SRAM (tile RAM)
+      8464        - 8kx8 SRAM (68000 work RAM)
+      5563        - 8kx8 SRAM (Z80 work RAM)
+      2018        - 2kx8 SRAM (sprite RAM)
+      4556        - NEC uPC4556 dual operational amplifier IC (DIP8)
+      TL074       - Texas Instruments TL074 low noise j-fet quad operational amplifier (DIP14)
+      YM3102      - Yamaha YM3012 2-channel serial input floating DAC (DIP16)
+      MB3735      - Fujitsu MB3735 20 watt BTL audio power amplifier (SIP9)
+      PC080SN     - Taito custom tilemap generator IC (connected to 43256 SRAM)
+      PC0900J     - Taito custom sprite generator IC (connected to 2018 SRAM)
+      PC060HA     - Taito custom IC (sound-related)
+      TC0030CMD   - Taito custom C-Chip marked 'TC0030CMD, clock input 12.000MHz on pin 20
+                      - For Rainbow Islands with sticker 'B22-15' at IC53
+                      - For Rainbow Islands Extra with sticker 'B39-05' at IC53
+      TC0070RGB   - Taito custom ceramic module RGB mixer IC
+      PC050CM     - Taito custom ceramic module (input related functions)
+      3771        - Fujitsu MB3771 master reset IC (DIP8)
+      Y           - 3 pin connector for 2nd speaker output
+      DIP28       - unpopulated DIP28 socket(s)
+
+      ROMs -
+         |----------------------------------------------------------------------|
+         | Common to Rainbow Islands and Rainbow Islands Extra                  |
+         |--------------|---------------|---------------|-----------------------|
+         |   234000     |   23C1000     |   27C512      |   PALs                |
+         |--------------|---------------|---------------|-----------------------|
+         |   B22-01.2   |   B22-03.23   |   B22-12.7    |   B22-05.33 (PAL16L8) |
+         |   B22-02.5   |   B22-04.24   |   B22-13.6    |   B22-06.41 (PAL16L8) |
+         |              |               |   B22-14.43   |   B22-07.56 (PAL20L8) |
+         |--------------|---------------|---------------|-----------------------|
+         |---------------------------------------|------------------------------|
+         | Used only on Rainbow Islands Extra    | Used only on Rainbow Islands |
+         |--------------|------------------------|--------------|---------------|
+         |   27C512     |  C-Chip                |   27C512     |  C-Chip       |
+         |--------------|------------------------|--------------|---------------|
+         |   B39-01.19  |  B39-05.53             |   B22-10.19  |  B22-15.53    |
+         |   B39-02.20  |                        |   B22-11.20  |               |
+         |   B39-03.21  |                        |   B22-08.21  |               |
+         |   B39-04.22  |                        |   B22-09.22  |               |
+         |--------------|------------------------|--------------|---------------|
+
+      Measurements
+      ------------
+      XTAL1 - 26.68599MHz
+      XTAL2 - 16.00000MHz
+      XTAL3 - 12.00000MHz
+      VSync - 60.0559Hz
+      HSync - 15.6745kHz
+
 Notes on Rainbow Islands romsets by Robert Gallagher
 ----------------------------------------------------
 
@@ -662,7 +743,7 @@ ROM_START( rainbow )
 	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "b22-01.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
@@ -684,7 +765,7 @@ ROM_START( rainbowo )
 	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", ROMREGION_DISPOSE )
-  	ROM_LOAD( "b22-01.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+  	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
@@ -706,7 +787,7 @@ ROM_START( rainbowe )
 	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", ROMREGION_DISPOSE )
-  	ROM_LOAD( "b22-01.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+  	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END

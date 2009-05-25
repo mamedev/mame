@@ -36,6 +36,174 @@ of the status bar (you can shoot enemies underneath it).
 To keep the input span 0-255 a multiplier (300/256 ?)
 would be used.
 
+Operation Wolf
+Taito, 1987
+
+PCB Layouts
+-----------
+
+SOUND BOARD
+J1100122A (J1100122B) \ <-- minor rev, but no difference on PCB
+K1100268A (K1100268B) /
+K1100268A OPERATION WOLF (sticker)
+|-----------------------------------------|
+|X                S              8464     |
+|        VR1         PC060HA     B20-07.10|
+|N       MB3735       YM2151        Z80   |
+|               SEIBU YM3012          8MHz|
+|               HB-41                     |
+|                                         |
+|        VR2                              |
+|        MB3735                           |
+|    TL074                                |
+|T       TC0060DCA                        |
+|        TC0060DCA                        |
+|    TL074                                |
+|                                         |
+|    M5205                                |
+|    384kHz                               |
+|    M5205                       B20-08.21|
+|-----------------------------------------|
+Notes:
+      Z80       - clock 4.000MHz [8/2]
+      YM2151    - clock 4.000MHz [8/2]
+      YM3012    - 2-channel serial input floating D/A converter
+      M5205     - clock 384kHz (via resonator)
+      HB-41     - Seibu HB-41 ceramic module (sound/filter related)
+      MB3735    - Audio power amp IC
+      TL074     - Op amp
+      8464      - 8kx8 SRAM
+      PC060HA   - Taito PC060HA CIU custom IC (DIP28). Manufactured by Fujitsu
+      B20-07.10 - 27C512 EPROM (DIP28)
+      B20-08.21 - 234000 mask ROM (DIP40)
+      VR1/2     - Volume pots
+      S         - 30 pin flat cable joining to main board (for main board/sound board communication)
+      X         - 5 pin connector for sound output (left+right speakers)
+      N         - 10 pin connector for power inputs
+      T         - 18-way edge connector (single sided, pins on solder side only)
+
+      Pinouts
+      -------
+              X  Connector            N  Connector      T  Connector
+              ------------            ------------      ------------
+              1  Right Speaker (+)    1  GND            1  GND
+              2  Right Speaker (-)    2  GND            2  GND
+              3  Left  Speaker (+)    3  not used       3  GND
+              4  not used             4  +5 Volts       4  GND
+              5  Left  Speaker (-)    5  +5 Volts       5  Optical sensor input from gun
+                                      6  not used       6  not used
+                                      7  -5 Volts       7  not used
+                                      8  +12 Volts      8  not used
+                                      9  not used       9  not used
+                                      10 not used       10 not used
+                                                        11 not used
+                                                        12 not used
+                                                        13 not used
+                                                        14 not used
+                                                        15 +5 Volts
+                                                        16 +5 Volts
+                                                        17 +5 Volts
+                                                        18 +5 Volts
+MAIN PCB
+J1100130A
+K1100288A
+M4300084F OPERATION WOLF (sticker)
+K1100303A OPERATION WOLF (sticker)
+|----------------------------------------------------|
+|         SWB SWA        S      M                    |
+| 12MHz                                       16MHz  |
+|H               6116                       26.686MHz|
+|      TC0070RGB 6116             B20-09.19 MB3771   |
+|                                                    |
+|                                  |-------|B20-13.13|
+|                    2018 2018     |TAITO  |         |
+|G     PC050CM       2018 2018     |PC080SN|         |
+|                       |-------|  |-------|         |
+|   B20-18.73           |TAITO  |               DIP28|
+|   B20-14.72           |PC0900J|      43256  DIP28  |
+| B20-12.92             |-------|          43256     |
+|               DIP28      B20-03-2.30               |
+|    68000      DIP28      B20-19.29  8464  8464     |
+| B20-11.85     B20-05-2.40  DIP28                   |
+| B20-10.84     B20-04.39    DIP28                   |
+|----------------------------------------------------|
+Notes:
+      68000       - clock 8.000MHz [16/2]
+      6116        - 2k x8 SRAM (color RAM)
+      43256       - 32k x8 SRAM (tile RAM)
+      8464        - 8k x8 SRAM (work RAM)
+      2018        - 2k x8 SRAM (sprite RAM)
+      PC080SN     - Taito custom tilemap generator IC (connected to 43256 SRAM)
+      PC0900J     - Taito custom sprite generator IC (connected to 2018 SRAM)
+      DIP28       - unpopulated DIP28 socket
+      B20-18.73   - Taito custom C-Chip marked 'TC0030CMD, with sticker 'B20-18'
+      TC0070RGB   - Taito custom ceramic module RGB mixer IC
+      PC050CM     - Taito custom ceramic module (input related functions)
+      MB3771      - Fujitsu MB3771 master reset IC
+      S           - 30 pin flat cable connector joining to sound PCB
+      M           - 4 pin connector for gun vibration motor power and grenade button
+      H           - 12 pin connector for power input
+      G           - 44-way edge connector
+      B20-13/14   - MN234000 mask ROM
+      B20-03.30   - \
+      B20-19.29   -  |
+      B20-04.39   -  | 27C512 EPROM
+      B20-05.40   - _|
+      B20-09.19   - \
+      B20-10.84   -  |
+      B20-11.85   -  | MMI PAL16L8ACN
+      B20-12.92   - _|
+
+      Measurements
+      ------------
+      XTAL1 - 26.68558MHz
+      XTAL2 - 15.99965MHz
+      XTAL3 - 11.9999MHz
+      VSync - 60.0551Hz
+      HSync - 15.6742kHz
+
+      Pinouts
+      -------
+              M  Connector               H  Connector           G  Connector
+              ------------               ------------           ------------
+              1  BUTTON	2 (grenade)      1  GND                Solder   Parts
+              2  not used                2  GND                GND  A   1  GND
+              3  +12V (to motor in gun)  3  GND          VIDEO GND  B   2  RED
+              4  -12V (to motor in gun)  4  GND               BLUE  C   3  GREEN
+                                         5  +5 Volts      not used  D   4  SYNC
+                                         6  +5 Volts      not used  E   5  not used
+                                         7  +5 Volts      not used  F   6  not used
+                                         8  -5 Volts      not used  H   7  not used
+                                         9  +13 Volts*      COIN B  J   8  COIN A
+                                         10 not used       METER B  K   9  METER A
+                                         11 +12 Volts    LOCKOUT B  L  10  LOCKOUT A
+                                         12 +12 Volts         TILT  M  11  SERVICE CREDIT
+                                   * leave unconnected!   not used  N  12  START
+                                                          not used  P  13  not used
+                                                          not used  R  14  not used
+                                                          not used  S  15  not used
+                                                          not used  T  16  not used
+                                                          not used  U  17  not used
+                                                          not used  V  18  not used
+                                                          not used  W  19  not used
+                                                          not used  X  20  not used
+                                                          not used  Y  21  BUTTON 1 (bullets)
+                                                          not used  Z  22  not used
+
+
+
+Gun board (inside gun)
+
+J9100095A
+K9100122A
+|-----------|
+|CN1        |
+|           |
+|-----------|
+Notes:
+      PCB contains mostly caps/resistors and three small opto-related 8-pin ICs
+      CN1 - 4 pin connector joins to connector M on main board
+
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
