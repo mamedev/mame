@@ -2021,6 +2021,14 @@ ROM_START( spclaser )
 	ROM_LOAD( "la04",         0x1800, 0x0800, CRC(5116b234) SHA1(b165b2574cbcb26a5bb43f91df5f8be5f111f486) )
 ROM_END
 
+ROM_START( intruder )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la01-1",       0x0000, 0x0800, CRC(bedc0078) SHA1(a5bb0cbbb8e3f27d03beb8101b2be1111d73689d) )
+	ROM_LOAD( "la02-1",       0x0800, 0x0800, CRC(43bc65c5) SHA1(5f9827c02c2d221e1607359c840374ff7fb92fbf) )
+	ROM_LOAD( "la03-1",       0x1000, 0x0800, CRC(278ef9cf) SHA1(74a9c1d3500ea28e50d07363a547c381999c84fa) )
+	ROM_LOAD( "la04-1",       0x1800, 0x0800, CRC(5116b234) SHA1(b165b2574cbcb26a5bb43f91df5f8be5f111f486) )
+ROM_END
+
 ROM_START( laser )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u36",        0x0000, 0x0800, CRC(b44e2c41) SHA1(00e0b2e088495d6f3bc175e8a53dcb3686ea8484) )
@@ -2584,7 +2592,8 @@ GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", GAME_SUPPORTS_SAVE )
 GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
-GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Space Laser", GAME_SUPPORTS_SAVE )
+GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )
+GAME( 1980, intruder, spclaser, invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Intruder", GAME_SUPPORTS_SAVE )
 GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", GAME_SUPPORTS_SAVE )
 GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
 GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_SUPPORTS_SAVE )
