@@ -2959,7 +2959,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 		case 1:
 			if ( stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000 )
 			{
-				int gfx_wraparound = -1;
+				//int gfx_wraparound = -1;
 
 				gfxdata += xlinesize*cliprect->min_y;
 
@@ -2985,7 +2985,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						}
 						if ( (gfxdata + xs) >= gfxdatahigh )
 						{
-							gfx_wraparound = (ycnt << 16) | xcnt;
+							//gfx_wraparound = (ycnt << 16) | xcnt;
 							gfxdata = gfxdatalow - xs;
 						}
 					}

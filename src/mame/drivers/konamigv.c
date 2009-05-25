@@ -454,12 +454,12 @@ static NVRAM_HANDLER( simpbowl )
 static READ32_HANDLER( flash_r )
 {
 	int reg = offset*2;
-	int shift = 0;
+	//int shift = 0;
 
 	if (mem_mask == 0xffff0000)
 	{
 		reg++;
-		shift = 16;
+		//shift = 16;
 	}
 
 	if (reg == 4)	// set odd address

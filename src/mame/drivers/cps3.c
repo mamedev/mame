@@ -1042,18 +1042,18 @@ static VIDEO_UPDATE(cps3)
 				if (xsize2==0) // xsize of 0 tiles seems to be a special command to draw tilemaps
 				{
 					int tilemapnum = ((value3 & 0x00000030)>>4);
-					int startline;// = value2 & 0x3ff;
-					int endline;
-					int height = (value3 & 0x7f000000)>>24;
+					//int startline;// = value2 & 0x3ff;
+					//int endline;
+					//int height = (value3 & 0x7f000000)>>24;
 					int uu;
 					UINT32* tmapregs[4] = { tilemap20_regs_base, tilemap30_regs_base, tilemap40_regs_base, tilemap50_regs_base };
 					UINT32* regs;
 					regs = tmapregs[tilemapnum];
-					endline = value2;
-					startline = endline - height;
+					//endline = value2;
+					//startline = endline - height;
 
-					startline &=0x3ff;
-					endline &=0x3ff;
+					//startline &=0x3ff;
+					//endline &=0x3ff;
 
 					//printf("tilemap draw %01x %02x %02x %02x\n",tilemapnum, value2, height, regs[0]&0x000003ff );
 

@@ -22,7 +22,7 @@ INLINE void ea (void)
 CPU_DISASSEMBLE( pdp1 )
 {
 	int md;
-	int etime = 0;
+	//int etime = 0;
 
 	md = *((UINT32 *) oprom);
 
@@ -34,25 +34,25 @@ CPU_DISASSEMBLE( pdp1 )
 		ea ();
 		sprintf (buffer, "AND (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case IOR:
 		ea ();
 		sprintf (buffer, "IOR (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case XOR:
 		ea ();
 		sprintf (buffer, "XOR (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case XCT:
 		ea ();
 		sprintf (buffer, "XCT (0%06o)", y);
 		IN;
-		etime = 5;
+		//etime = 5;
 		break;
 	case CALJDA:
 		{
@@ -60,110 +60,110 @@ CPU_DISASSEMBLE( pdp1 )
 				sprintf (buffer, "JDA 0%06o  ", y);
 			if (ib == 0)
 				sprintf (buffer, "CAL         ");
-			etime = 10;
+			//etime = 10;
 			break;
 		}
 	case LAC:
 		ea ();
 		sprintf (buffer, "LAC (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case LIO:
 		ea ();
 		sprintf (buffer, "LIO (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DAC:
 		ea ();
 		sprintf (buffer, "DAC 0%06o  ", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DAP:
 		ea ();
 		sprintf (buffer, "DAP 0%06o  ", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DIP:
 		ea ();
 		sprintf (buffer, "DIP 0%06o  ", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DIO:
 		ea ();
 		sprintf (buffer, "DIO 0%06o  ", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DZM:
 		ea ();
 		sprintf (buffer, "DZM 0%06o  ", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case ADD:
 		ea ();
 		sprintf (buffer, "ADD (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case SUB:
 		ea ();
 		sprintf (buffer, "SUB (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case IDX:
 		ea ();
 		sprintf (buffer, "IDX (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case ISP:
 		ea ();
 		sprintf (buffer, "ISP (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case SAD:
 		ea ();
 		sprintf (buffer, "SAD (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case SAS:
 		ea ();
 		sprintf (buffer, "SAS (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case MUS_MUL:
 		ea ();
 		sprintf (buffer, "MUS (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case DIS_DIV:
 		ea ();
 		sprintf (buffer, "DIS (0%06o)", y);
 		IN;
-		etime = 10;
+		//etime = 10;
 		break;
 	case JMP:
 		ea ();
 		sprintf (buffer, "JMP 0%06o  ", y);
 		IN;
-		etime = 5;
+		//etime = 5;
 		break;
 	case JSP:
 		ea ();
 		sprintf (buffer, "JSP 0%06o  ", y);
 		IN;
-		etime = 5;
+		//etime = 5;
 		break;
 	case SKP:
 		{
@@ -183,7 +183,7 @@ CPU_DISASSEMBLE( pdp1 )
 			if (y & 7)
 				sprintf (buffer + strlen (buffer), "SZF 0%01o ", (y & 7));
 			IN;
-			etime = 5;
+			//etime = 5;
 			break;
 		}
 	case SFT:
@@ -200,55 +200,55 @@ CPU_DISASSEMBLE( pdp1 )
 			{
 			case 1:
 				sprintf (buffer, "RAL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 2:
 				sprintf (buffer, "RIL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 3:
 				sprintf (buffer, "RCL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 5:
 				sprintf (buffer, "SAL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 6:
 				sprintf (buffer, "SIL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 7:
 				sprintf (buffer, "SCL 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 9:
 				sprintf (buffer, "RAR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 10:
 				sprintf (buffer, "RIR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 11:
 				sprintf (buffer, "RCR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 13:
 				sprintf (buffer, "SAR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 14:
 				sprintf (buffer, "SIR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			case 15:
 				sprintf (buffer, "SCR 0%02o", nshift);
-				etime = 5;
+				//etime = 5;
 				break;
 			default:
 				sprintf (buffer, "SKP ???");
-				etime = 5;
+				//etime = 5;
 				break;
 			}
 			break;
@@ -256,11 +256,11 @@ CPU_DISASSEMBLE( pdp1 )
 	case LAW:
 		sprintf (buffer, "LAW 0%06o", y);
 		IN;
-		etime = 5;
+		//etime = 5;
 		break;
 	case IOT:
 		sprintf (buffer, "IOT 0%06o", md);
-		etime = 10;
+		//etime = 10;
 		break;
 	case OPR:
 		{
@@ -281,12 +281,12 @@ CPU_DISASSEMBLE( pdp1 )
 				sprintf (buffer + strlen (buffer), "CLF 0%01o ", (y & 7));
 			if (!(y))
 				sprintf (buffer + strlen (buffer), "NOP ");
-			etime = 5;
+			//etime = 5;
 			break;
 		}
 	default:
 		sprintf (buffer, "ILLEGAL");
-		etime = 5;
+		//etime = 5;
 		break;
 	}
 	return 4;

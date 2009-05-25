@@ -243,9 +243,9 @@ static void DSP_Update                     /* Mix one sample of audio      */
 int                     V;
 #ifndef NO_ECHO
 int                     echo_base;
-#endif
 int                     echol;
 int                     echor;
+#endif
 int                     envx;
 int                     m;
 int                     outl;
@@ -291,8 +291,10 @@ if( noise_cnt <= 0 )
     }
 outl  = 0;
 outr  = 0;
+#ifndef NO_ECHO
 echol = 0;
 echor = 0;
+#endif
 for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
     {
     vp = &voice_state[ v ];
@@ -630,8 +632,10 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
     outr += vr;
     if( DSPregs[ 0x4D ] & m )
         {
+#ifndef NO_ECHO
         echol += vl;
         echor += vr;
+#endif
         }
     }
 outl = ( outl * ( signed char )DSPregs[ 0x0C ] ) >> 7;

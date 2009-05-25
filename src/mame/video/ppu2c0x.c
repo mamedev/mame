@@ -199,6 +199,7 @@ void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 	/* Loop through the emphasis modes (8 total) */
 	for (colorEmphasis = 0; colorEmphasis < 8; colorEmphasis ++)
 	{
+		/*
 		double r_mod = 0.0;
 		double g_mod = 0.0;
 		double b_mod = 0.0;
@@ -214,6 +215,7 @@ void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 			case 6: r_mod = 1.02; g_mod = .98; b_mod = .653; break;
 			case 7: r_mod = .75; g_mod = .75; b_mod = .75; break;
 		}
+		*/
 
 		/* loop through the 4 intensities */
 		for (colorIntensity = 0; colorIntensity < 4; colorIntensity++)

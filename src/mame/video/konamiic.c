@@ -7996,7 +7996,7 @@ INLINE void K053250_pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UIN
 
 	UINT32 src_wrapmask;
 	UINT8  *src_base;
-	int src_x;
+	//int src_x;
 	int src_fx, src_fdx;
 	int pix_data, dst_offset;
 	const pen_t  *pal_base;
@@ -8104,7 +8104,7 @@ INLINE void K053250_pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UIN
 
 	// generalized
 	src_base = source;
-	src_x = 0;
+	//src_x = 0;
 
 	// there is no need to wrap source offsets along with source clipping
 	// so we set all bits of the wrapmask to one

@@ -420,7 +420,7 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 	for (offs = 0; offs<0x400; offs+=4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult; /*,pri=0,spri=0;*/
-		int trans;
+		//int trans;
 
 		sprite = spritedata[offs+1] & 0xffff;
 
@@ -428,7 +428,7 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		flash=y&0x1000;
 		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
-		trans=TRANSPARENCY_PEN;
+		//trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
 
 		// Prepare colour, priority and alpha info

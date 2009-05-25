@@ -68,12 +68,12 @@ WRITE8_HANDLER( invinco_audio_w )
 	static int port2State = 0;
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int bitsChanged;
-	int bitsGoneHigh;
+	//int bitsGoneHigh;
 	int bitsGoneLow;
 
 
 	bitsChanged  = port2State ^ data;
-	bitsGoneHigh = bitsChanged & data;
+	//bitsGoneHigh = bitsChanged & data;
 	bitsGoneLow  = bitsChanged & ~data;
 
 	port2State = data;

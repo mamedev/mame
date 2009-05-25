@@ -789,18 +789,18 @@ static void cde_handle_reports(void)
 static void cde_dma_transfer(const address_space *space, int channel, int next)
 {
 	UINT32 address;
-	int length;
+	//int length;
 	int i;
 
 	if (next)
 	{
 		address = cde_dma[channel].next_dst_addr;
-		length = cde_dma[channel].next_length;
+		//length = cde_dma[channel].next_length;
 	}
 	else
 	{
 		address = cde_dma[channel].dst_addr;
-		length = cde_dma[channel].length;
+		//length = cde_dma[channel].length;
 	}
 
 	for (i=0; i < cde_dma[channel].next_length; i++)

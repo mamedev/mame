@@ -1179,10 +1179,10 @@ MACHINE_RESET( dc )
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
 {
-	int reg;
+	//int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(device->machine, offset, mem_mask, &shift);
+	/*reg = */decode_reg32_64(device->machine, offset, mem_mask, &shift);
 
 //  mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 

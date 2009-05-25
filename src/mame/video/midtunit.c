@@ -293,10 +293,10 @@ READ16_HANDLER( midwunit_control_r )
 
 WRITE16_HANDLER( midtunit_paletteram_w )
 {
-	int newword;
+	//int newword;
 
 	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	//newword = paletteram16[offset];
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 

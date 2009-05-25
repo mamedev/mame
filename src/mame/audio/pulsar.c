@@ -90,12 +90,12 @@ WRITE8_HANDLER( pulsar_audio_1_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int bitsChanged;
-	int bitsGoneHigh;
+	//int bitsGoneHigh;
 	int bitsGoneLow;
 
 
 	bitsChanged  = port1State ^ data;
-	bitsGoneHigh = bitsChanged & data;
+	//bitsGoneHigh = bitsChanged & data;
 	bitsGoneLow  = bitsChanged & ~data;
 
 	port1State = data;

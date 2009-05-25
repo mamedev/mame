@@ -79,7 +79,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
-	int controlsyes = 0;
+	//int controlsyes = 0;
 	int analogcontrol = 0;
 	int i;
 	const char* service = 0;
@@ -135,7 +135,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cjoy].Xway = "joy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICK_UP:
@@ -154,7 +154,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cjoy].Xway = "joy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICKRIGHT_UP:
@@ -175,7 +175,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cdoublejoy].Xway = "doublejoy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				case IPT_JOYSTICKRIGHT_LEFT:
@@ -196,7 +196,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 						else
 							control[cdoublejoy].Xway = "doublejoy8way";
 					}
-					controlsyes = 1;
+					//controlsyes = 1;
 					break;
 
 				/* mark as an analog input, and get analog stats after switch */
@@ -265,7 +265,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			/* get the analog stats */
 			if (analogcontrol)
 			{
-				controlsyes = 1;
+				//controlsyes = 1;
 				control[analogcontrol].analog = 1;
 
 				if (field->min)

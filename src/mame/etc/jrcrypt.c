@@ -327,7 +327,7 @@ void jr_monitor()
 {
 	int i;
 	int encrypted=0;
-	int last_used=-1;
+	//int last_used=-1;
 	int unmapped_encrypted=0;
 	int unmapped=0;
 	printf("statistics: \n");
@@ -341,7 +341,7 @@ hardware and RAM is */
 				encrypted = 1;
 			else
 				encrypted = 0;
-			last_used = i;
+			//last_used = i;
 		}
 		else
 		{
@@ -368,7 +368,7 @@ start,int end);
 		if (c=='d')
 		{
 			char line[100],*l;
-			int i;
+			//int i;
 			printf("Enter file prefix (files will be named 'prefix'.8d 'prefix'.8e, etc.\n");
 			gets(line);
 			// kill newline:

@@ -731,7 +731,9 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 	struct point *old_p0, *old_p1, *p0, *p1;
 	struct vector vn;
 	int link, type;
+#if 0
 	int dump;
+#endif
 	int lightmode;
 	float old_z;
 	struct quad cquad;
@@ -743,8 +745,10 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 		poly_data=(float *) poly_rom;
 
 	poly_adr &= 0x7fffff;
+#if 0
 	dump = poly_adr == 0x944ea;
 	dump = 0;
+#endif
 
 #if 0
 	if(poly_adr < 0x10000 || poly_adr >= 0x80000)

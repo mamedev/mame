@@ -308,7 +308,7 @@ static READ16_HANDLER( duart_1_r )
 
 static WRITE16_HANDLER( duart_1_w )
 {
-	int old_val;
+	//int old_val;
 	switch (offset)
 	{
 		case 0x1:
@@ -364,7 +364,7 @@ static WRITE16_HANDLER( duart_1_w )
 		}
 		case 0xe:
 		{
-		    old_val = duart_1.OPR;
+		    //old_val = duart_1.OPR;
 		    duart_1.OPR = duart_1.OPR | data;
 		    duart_1.OP = ~duart_1.OPR;
 			/* Output port bit set */
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( duart_1_w )
 		}
 		case 0xf:
 		{
-		    old_val = duart_1.OPR;
+		    //old_val = duart_1.OPR;
 		    duart_1.OPR = duart_1.OPR &~data;
 		    duart_1.OP = ~duart_1.OPR;
 			/* Output port bit reset */

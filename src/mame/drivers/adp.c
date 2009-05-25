@@ -363,8 +363,9 @@ static READ16_HANDLER(t2_r)
  vblank ^=0x40;
  hblank ^=0x20;
 
-return mame_rand(space->machine) & 0x00f0;
+ return mame_rand(space->machine) & 0x00f0;
 
+// FIXME: this code is never executed
 // popmessage("%08x",cpu_get_pc(space->cpu));
 // return 0x0000;
  return 0xff9f | vblank | hblank;

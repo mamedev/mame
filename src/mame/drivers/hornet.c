@@ -1192,7 +1192,9 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 {
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
+#if 0
 	int length;
+#endif
 	int rdata_ptr;
 	int sum;
 
@@ -1200,8 +1202,10 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 	node = jvs_sdata[1];
 	byte_num = jvs_sdata[2];
 
-	length = jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
-
+#if 0
+	length = 
+#endif
+		jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
 #if 0
     printf("jvs input data:\n");
     for (i=0; i < byte_num; i++)

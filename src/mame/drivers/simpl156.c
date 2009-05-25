@@ -176,9 +176,9 @@ static READ32_HANDLER(  simpl156_system_r )
 
 static WRITE32_HANDLER( simpl156_eeprom_w )
 {
-	int okibank;
+	//int okibank;
 
-	okibank = data & 0x07;
+	//okibank = data & 0x07;
 
 	okim6295_set_bank_base(devtag_get_device(space->machine, "okimusic"), 0x40000 * (data & 0x7) );
 

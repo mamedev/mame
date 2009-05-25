@@ -1385,7 +1385,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			const input_setting_config *setting;
-			int strindex = 0;
+			//int strindex = 0;
 
 			/* verify analog inputs */
 			if (input_type_is_analog(field->type))
@@ -1437,7 +1437,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				}
 
 				/* look up the string and print an error if default strings are not used */
-				strindex = get_defstr_index(field->name, driver, &error);
+				/*strindex = */get_defstr_index(field->name, driver, &error);
 			}
 
 			/* verify conditions on the field */

@@ -430,7 +430,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
-	float cellaspect;
+	//float cellaspect;
 	float x0, y0;
 	render_bounds cellboxbounds;
 	render_bounds boxbounds;
@@ -497,7 +497,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 	/* compute the size of a single cell at this pixel scale factor, as well as the aspect ratio */
 	cellwidth = (cellboxwidth / (float)xcells) / (float)targwidth;
 	cellheight = (cellboxheight / (float)ycells) / (float)targheight;
-	cellaspect = cellwidth / cellheight;
+	//cellaspect = cellwidth / cellheight;
 
 	/* working from the new width/height, recompute the boxbounds */
 	fullwidth = (float)cellboxwidth / (float)targwidth + 6.5f * chwidth;

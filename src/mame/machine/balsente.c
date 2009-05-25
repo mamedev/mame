@@ -1082,10 +1082,13 @@ WRITE8_HANDLER( balsente_chip_select_w )
 	for (i = 0; i < 6; i++)
 		if ((diffchip & (1 << i)) && (data & (1 << i)))
 		{
+#if LOG_CEM_WRITES
 			double temp = 0;
 
 			/* remember the previous value */
-			temp = cem3394_get_parameter(cem_device[i], reg);
+			temp = 				
+#endif
+				cem3394_get_parameter(cem_device[i], reg);
 
 			/* set the voltage */
 			cem3394_set_voltage(cem_device[i], reg, voltage);

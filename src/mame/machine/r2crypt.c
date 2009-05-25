@@ -256,16 +256,16 @@ void raiden2_decrypt_sprites(running_machine *machine)
     UINT32 x1, v1, y1;
 
     int idx = i & 0xff;
-    int i2;
-    int idx2;
+    //int i2;
+    //int idx2;
 
-    idx2 = ((i>>7) & 0x3ff) | ((i>>8) & 0x400);
+    //idx2 = ((i>>7) & 0x3ff) | ((i>>8) & 0x400);
     if(i & 0x008000)
       idx ^= 1;
     if(i & 0x100000)
       idx ^= 256;
 
-    i2 = i >> 8;
+    //i2 = i >> 8;
 
     v1 = sw(yrot(data[i], gr(i)));
 

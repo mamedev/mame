@@ -736,7 +736,9 @@ VIDEO_UPDATE( ygv608 )
 #ifdef _SHOW_VIDEO_DEBUG
     char buffer[64];
 #endif
+#ifdef _ENABLE_SCROLLY
     int col;
+#endif
 #ifdef _ENABLE_ROTATE_ZOOM
     int xc, yc;
     double r, alpha, sin_theta, cos_theta;
@@ -1570,7 +1572,7 @@ static void SetPostShortcuts( running_machine *machine, int reg )
 
 #ifdef MAME_DEBUG
 
-#define nSHOW_SOURCE_MODE
+//#define SHOW_SOURCE_MODE
 
 #if 0
 void dump_block( char *name, UINT8 *block, int len )
@@ -1592,7 +1594,9 @@ READ16_HANDLER( ygv608_debug_trigger )
 {
   static int oneshot = 0;
 
+#ifndef SHOW_SOURCE_MODE
   int i;
+#endif
   char ascii[16];
 
   if( oneshot )

@@ -464,10 +464,11 @@ static void update_outputs(UINT16 which)
 	for (i = 0; i < 16; i++)
 		if (which & (1 << i))
 		{
+/*
 			int val;
 
 			val = i8279.ram[i] & 0xff;
-/*
+
             val = i8279.ram[i] & 0x0f;
             if (i8279.inhibit & 0x01)
                 val = i8279.clear & 0x0f;

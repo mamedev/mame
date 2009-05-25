@@ -1814,7 +1814,7 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
 
 			if (x >= clipx1 && x < clipx2)
 			{
-                int alpha_out = 0;
+                //int alpha_out = 0;
 				COLOR c1, c2;
 				c1.r = c1.g = c1.b = c1.a = 0;
 				c2.r = c2.g = c2.b = c2.a = 0;
@@ -1901,7 +1901,7 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
 					c1 = COLOR_COMBINER(0);
                     if( c1.a == 0 )
                     {
-                        alpha_out = 1;
+                        //alpha_out = 1;
                     }
 				}
 				else if (other_modes.cycle_type == CYCLE_TYPE_2)
@@ -1910,7 +1910,7 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
 					c2 = COLOR_COMBINER(1);
                     if( c2.a == 0 )
                     {
-                        alpha_out = 1;
+                        //alpha_out = 1;
                     }
 				}
 
@@ -2120,7 +2120,7 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
 			UINT16 sz = z >> 16;
 			int oz;
 			int sss = 0, sst = 0;
-            int alpha_out = 0;
+            //int alpha_out = 0;
 			COLOR c1, c2;
 			c1.r = c1.g = c1.b = c1.a = 0;
 			c2.r = c2.g = c2.b = c2.a = 0;
@@ -2209,7 +2209,7 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
 					c1 = COLOR_COMBINER(0);
                     if( c1.a == 0 )
                     {
-                        alpha_out = 1;
+                        //alpha_out = 1;
                     }
 				}
 				else if (other_modes.cycle_type == CYCLE_TYPE_2)
@@ -2218,7 +2218,7 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
 					c2 = COLOR_COMBINER(1);
                     if( c2.a == 0 )
                     {
-                        alpha_out = 1;
+                        //alpha_out = 1;
                     }
 				}
 
@@ -2292,9 +2292,9 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 	int xleft, xright, xleft_inc, xright_inc;
 	int xstart, xend;
 	int r, g, b, a, z, s, t, w;
-	int dr, dg, db, da;
+	//int dr, dg, db, da;
 	int drdx = 0, dgdx = 0, dbdx = 0, dadx = 0, dzdx = 0, dsdx = 0, dtdx = 0, dwdx = 0;
-	int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
+	//int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
 	int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
 	int tile;
 	int flip = (w1 & 0x800000) ? 1 : 0;
@@ -2345,7 +2345,7 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 	tile = (w1 >> 16) & 0x7;
 
 	r = 0xff;	g = 0xff;	b = 0xff;	a = 0xff;	z = 0;	s = 0;	t = 0;	w = 0;
-	dr = 0;		dg = 0;		db = 0;		da = 0;
+	//dr = 0;		dg = 0;		db = 0;		da = 0;
 
 	if (shade)
 	{
@@ -2361,10 +2361,10 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 		dgde = ((rdp_cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+12] & 0x0000ffff);
 		dbde = (rdp_cmd_data[shade_base+9 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+13] >> 16) & 0x0000ffff);
 		dade = ((rdp_cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+13] & 0x0000ffff);
-		drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
-		dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
-		dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
-		dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
+		//drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
+		//dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
+		//dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
+		//dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
 	}
 	if (texture)
 	{
@@ -2377,16 +2377,16 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 		dsde = (rdp_cmd_data[texture_base+8 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+12] >> 16) & 0x0000ffff);
 		dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+12] & 0x0000ffff);
 		dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
-		dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
-		dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+14] & 0x0000ffff);
-		dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
+		//dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
+		//dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+14] & 0x0000ffff);
+		//dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
 	}
 	if (zbuffer)
 	{
 		z    = rdp_cmd_data[zbuffer_base+0];
 		dzdx = rdp_cmd_data[zbuffer_base+1];
 		dzde = rdp_cmd_data[zbuffer_base+2];
-		dzdy = rdp_cmd_data[zbuffer_base+3];
+		//dzdy = rdp_cmd_data[zbuffer_base+3];
 	}
 
 	xleft = xm;

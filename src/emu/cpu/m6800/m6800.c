@@ -962,14 +962,14 @@ static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 	}
 	else
 	{
-		int eddge;
+		//int eddge;
 
 		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag, irqline, state));
 		cpustate->irq_state[irqline] = state;
 
 		if (irqline == M6800_TIN_LINE && state != cpustate->irq_state[irqline])
 		{
-			eddge = (state == CLEAR_LINE ) ? 2 : 0;
+			//eddge = (state == CLEAR_LINE ) ? 2 : 0;
 			if( ((cpustate->tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
 				return;
 			/* active edge in */
