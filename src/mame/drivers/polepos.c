@@ -212,15 +212,17 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "deprecat.h"
 #include "machine/namcoio.h"
+#include "machine/namco51.h"
+#include "machine/namco53.h"
 #include "sound/namco.h"
 #include "sound/namco52.h"
 #include "sound/samples.h"
 #include "audio/namco54.h"
 #include "polepos.h"
-#include "nam_cust.h"
 
 #include "polepos.lh"
 
@@ -320,7 +322,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x06:	/* SB0 */
-			auto_start_mask = 0xfb | (bit << 2);
+			auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
@@ -339,15 +341,10 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0") & auto_start_mask; }	// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }				// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }					// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }				// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }					// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }				// dips B
-static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "STEER"); }					// wheel
-static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "STEER") >> 4; }				// wheel
-static WRITE8_HANDLER( out_0 )
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, param) >> 4; }
+static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
+
+static WRITE8_DEVICE_HANDLER( out_0 )
 {
 // no start lamps in pole position
 //  set_led_status(1,data & 1);
@@ -355,24 +352,41 @@ static WRITE8_HANDLER( out_0 )
 	coin_counter_w(1,~data & 4);
 	coin_counter_w(0,~data & 8);
 }
-static WRITE8_HANDLER( out_1 )
+
+static WRITE8_DEVICE_HANDLER( out_1 )
 {
 	coin_lockout_global_w(data & 1);
 }
 
-static const struct namcoio_interface intf0 =
+static const namco_51xx_interface namco_51xx_intf =
 {
-	{ in0_l, in0_h, dipB_l, dipB_h },	/* port read handlers */
-	{ out_0, out_1 }					/* port write handlers */
+	{	/* port read handlers */
+		DEVCB_INPUT_PORT("IN0L"),
+		DEVCB_INPUT_PORT("IN0H"),
+		DEVCB_INPUT_PORT("DSWB"),
+		DEVCB_INPUT_PORT("DSWB_HI")
+	},
+	{	/* port write handlers */
+		DEVCB_HANDLER(out_0),
+		DEVCB_HANDLER(out_1)
+	}
 };
-static const struct namcoio_interface intf1 =
+
+static const namco_53xx_interface namco_53xx_intf =
 {
-	{ in1_l, in1_h, dipA_l, dipA_h },	/* port read handlers */
-	{ NULL, NULL }						/* port write handlers */
+	{	/* port read handlers */
+		DEVCB_INPUT_PORT("STEER"),
+		DEVCB_INPUT_PORT("STEER_HI"),
+		DEVCB_INPUT_PORT("DSWA"),
+		DEVCB_INPUT_PORT("DSWA_HI")
+	},
+	{	/* port write handlers */
+		DEVCB_NULL,
+		DEVCB_NULL
+	}
 };
 
 
-#include "cpu/z8000/z8000.h"
 static MACHINE_RESET( polepos )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -383,8 +397,8 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0, NULL,
-		NAMCOIO_53XX_POLEPOS, &intf1, NULL,
+		NAMCOIO_51XX, NULL, "51xx",
+		NAMCOIO_53XX, NULL, "53xx",
 		NAMCOIO_52XX, NULL, "namco52",
 		NAMCOIO_54XX, NULL, "54xx");
 
@@ -445,15 +459,17 @@ ADDRESS_MAP_END
  *********************************************************************/
 
 static INPUT_PORTS_START( polepos )
-	PORT_START("IN0")
+	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0H")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -478,6 +494,9 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPNAME( 0x80, 0x80, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
+	
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -504,6 +523,9 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -513,6 +535,9 @@ static INPUT_PORTS_START( polepos )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	
+	PORT_START("STEER_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -520,7 +545,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL) // start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -550,6 +575,9 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPNAME( 0x01, 0x01, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x01, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
+	
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, "Practice Rank" )
@@ -577,6 +605,9 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -585,6 +616,9 @@ static INPUT_PORTS_START( poleposa )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	
+	PORT_START("STEER_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -593,7 +627,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -622,6 +656,9 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPNAME( 0x80, 0x80, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
+	
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -649,6 +686,9 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -657,6 +697,9 @@ static INPUT_PORTS_START( topracra )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	
+	PORT_START("STEER_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -664,7 +707,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -695,6 +738,9 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	/* docs say "freeze", but it doesn't seem to work */
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	
+	PORT_START("DSWA_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Game_Time ) )
@@ -719,6 +765,9 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, "Average" )
 	PORT_DIPSETTING(	0x00, DEF_STR( High ) )
 
+	PORT_START("DSWB_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -727,6 +776,9 @@ static INPUT_PORTS_START( polepos2 )
 
 	PORT_START("STEER")
 	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	
+	PORT_START("STEER_HI")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -846,6 +898,8 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
+	MDRV_NAMCO_51XX_ADD("51xx", 18432000/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_53XX_ADD("53xx", 18432000/12, namco_53xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
@@ -901,10 +955,6 @@ MACHINE_DRIVER_END
  * ROM definitions
  *********************************************************************/
 
-#define POLEPOS_CUSTOMS \
-	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_53XX( "53xx" ) \
-
 /*
     Pole Position - Namco Version
 */
@@ -924,8 +974,6 @@ ROM_START( polepos )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "pp1_5b.4m",     0x0001, 0x2000, CRC(5cdf5294) SHA1(dbdf327a541fd71aadafda9c925fa4cf7f7c4a24) )
 	ROM_LOAD16_BYTE( "pp1_6b.4l",     0x0000, 0x2000, CRC(81696272) SHA1(27041a7c24297a6f317537c44922b51d2b2278a6) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1011,8 +1059,6 @@ ROM_START( poleposa )
 	ROM_LOAD16_BYTE( "136014.203",   0x0001, 0x2000, CRC(eedea6e7) SHA1(e1459c5e3f824e589e624c3acb18a183fd160df6) )
 	ROM_LOAD16_BYTE( "136014.204",   0x0000, 0x2000, CRC(c52c98ed) SHA1(2e33c487deaf8afb941e07e511a9828d2d8f6b31) )
 
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.132",   0x0000, 0x1000, CRC(a949aa85) SHA1(2d6414196b6071101001128418233e585279ffb9) )
@@ -1091,8 +1137,6 @@ ROM_START( polepos1 )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "136014.103",   0x0001, 0x2000, CRC(af4fc019) SHA1(1bb6c0f3ffada2e1df72e1767581f8e8bb2b18f9) )
 	ROM_LOAD16_BYTE( "136014.104",   0x0000, 0x2000, CRC(ba0045f3) SHA1(aedb8d8c56407963aa4ffb66243288c8fd6d845a) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1270,9 +1314,6 @@ ROM_START( topracer )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.bin",     0x0000, 0x2000, CRC(9d038ada) SHA1(7a9496c3fb93fd1945393656f8510a0c6421a9ab) )
 
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
@@ -1346,9 +1387,6 @@ ROM_START( topracra )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) )
-
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1426,9 +1464,6 @@ ROM_START( topracrb )
 	ROM_REGION( 0x10000, "sub2", 0 )
 	ROM_LOAD16_BYTE( "tr5b.f7",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
 	ROM_LOAD16_BYTE( "tr6b.f5",     0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) )
-
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1510,8 +1545,6 @@ ROM_START( polepos2 )
 	ROM_LOAD16_BYTE( "pp4_6.4l",      0x0000, 0x2000, CRC(38d04e0f) SHA1(5527cb1864248208b10d219a50ad742f286a119f) )
 	ROM_LOAD16_BYTE( "pp4_7.3m",      0x4001, 0x1000, CRC(ad1c8994) SHA1(2877de9641516767170c0109900955cc7d1ff402) )
 	ROM_LOAD16_BYTE( "pp4_8.3l",      0x4000, 0x1000, CRC(ef25a2ee) SHA1(45959355cad1a48f19ae14193374e03d4f9965c7) )
-
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
@@ -1605,8 +1638,6 @@ ROM_START( poleps2a )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
-	POLEPOS_CUSTOMS
-
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.172",   0x0000, 0x2000, CRC(fbe5e72f) SHA1(07965d6e98ac1332ac6192b5e9cc927dd9eb706f) )
@@ -1690,9 +1721,6 @@ ROM_START( poleps2b )
 	ROM_LOAD16_BYTE( "136014.179",   0x0000, 0x2000, CRC(613e917d) SHA1(97c139f8aa7bd871a907e72980757b83f99fd8a0) )
 	ROM_LOAD16_BYTE( "136014.184",   0x4001, 0x2000, CRC(d893c4ed) SHA1(60d39abefbb0c8df68864a30b1f5fcbf4780c86c) )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
-
-	/* this is a bootleg, should we really be loading these? */
-	POLEPOS_CUSTOMS
 
 	/* graphics data */
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */

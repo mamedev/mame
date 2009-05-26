@@ -135,6 +135,8 @@ TODO:
 #include "driver.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
+#include "machine/namco51.h"
+#include "machine/namco53.h"
 #include "sound/namco52.h"
 #include "audio/namco54.h"
 
@@ -168,268 +170,6 @@ static WRITE8_HANDLER( nop_w ) { }
 #define READ_PORT(m,n)	(io[chip].in[n](m,0) & 0x0f)
 #define WRITE_PORT(m,n,d)	io[chip].out[n](m,0,(d) & 0x0f)
 
-
-
-/*
-51XX
-
-commands:
-00: nop
-01 + 4 arguments: set coinage (xevious, possibly because of a bug, is different)
-02: go in "credit" mode and enable start buttons
-03: disable joystick remapping
-04: enable joystick remapping
-05: go in "switch" mode
-06: nop
-07: nop
-*/
-
-static void namcoio_51XX_write(running_machine *machine,int chip,int data)
-{
-	data &= 0x07;
-
-	LOG(("%s: custom 51XX write %02x\n",cpuexec_describe_context(machine),data));
-
-	if (io[chip].coincred_mode)
-	{
-		switch (io[chip].coincred_mode--)
-		{
-			case 4: io[chip].coins_per_cred[0] = data; break;
-			case 3: io[chip].creds_per_coin[0] = data; break;
-			case 2: io[chip].coins_per_cred[1] = data; break;
-			case 1: io[chip].creds_per_coin[1] = data; break;
-		}
-	}
-	else
-	{
-		switch (data)
-		{
-			case 0:	// nop
-				break;
-
-			case 1:	// set coinage
-				io[chip].coincred_mode = 4;
-				/* this is a good time to reset the credits counter */
-				io[chip].credits = 0;
-
-				{
-					/* kludge for a possible bug in Xevious */
-					static const game_driver *namcoio_51XX_driver = NULL;
-					static int namcoio_51XX_kludge = 0;
-
-					/* Only compute namcoio_51XX_kludge when gamedrv changes */
-					if (namcoio_51XX_driver != machine->gamedrv)
-					{
-						namcoio_51XX_driver = machine->gamedrv;
-						if (strcmp(namcoio_51XX_driver->name, "xevious") == 0 ||
-							strcmp(namcoio_51XX_driver->parent, "xevious") == 0)
-							namcoio_51XX_kludge = 1;
-						else
-							namcoio_51XX_kludge = 0;
-					}
-
-					if (namcoio_51XX_kludge)
-					{
-						io[chip].coincred_mode = 6;
-						io[chip].remap_joy = 1;
-					}
-				}
-				break;
-
-			case 2:	// go in "credits" mode and enable start buttons
-				io[chip].mode = 1;
-				io[chip].in_count = 0;
-				break;
-
-			case 3:	// disable joystick remapping
-				io[chip].remap_joy = 0;
-				break;
-
-			case 4:	// enable joystick remapping
-				io[chip].remap_joy = 1;
-				break;
-
-			case 5:	// go in "switch" mode
-				io[chip].mode = 0;
-				io[chip].in_count = 0;
-				break;
-
-			default:
-				logerror("unknown 51XX command %02x\n",data);
-				break;
-		}
-	}
-}
-
-
-/* joystick input mapping
-
-  The joystick is parsed and a number corresponding to the direction is returned,
-  according to the following table:
-
-          0
-        7   1
-      6   8   2
-        5   3
-          4
-
-  The values for directions impossible to obtain on a joystick have not been
-  verified on Namco original hardware, but they are the same in all the bootlegs,
-  so we can assume they are right.
-*/
-static const int joy_map[16] =
-/*  LDRU, LDR, LDU,  LD, LRU, LR,  LU,    L, DRU,  DR,  DU,   D,  RU,   R,   U, center */
-{	 0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
-
-
-static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
-{
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	LOG(("%s: custom 51XX read\n",cpuexec_describe_context(machine)));
-
-	if (io[chip].mode == 0)	/* switch mode */
-	{
-		switch ((io[chip].in_count++) % 3)
-		{
-			default:
-			case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);
-			case 1: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);
-			case 2: return 0;	// nothing?
-		}
-	}
-	else	/* credits mode */
-	{
-		switch ((io[chip].in_count++) % 3)
-		{
-			default:
-			case 0:	// number of credits in BCD format
-				{
-					int in,toggle;
-
-					in = ~(READ_PORT(space,0) | (READ_PORT(space,1) << 4));
-					toggle = in ^ io[chip].lastcoins;
-					io[chip].lastcoins = in;
-
-					if (io[chip].coins_per_cred[0] > 0)
-					{
-						if (io[chip].credits >= 99)
-						{
-							WRITE_PORT(space,1,1);	// coin lockout
-						}
-						else
-						{
-							WRITE_PORT(space,1,0);	// coin lockout
-							/* check if the user inserted a coin */
-							if (toggle & in & 0x10)
-							{
-								io[chip].coins[0]++;
-								WRITE_PORT(space,0,0x04);	// coin counter
-								WRITE_PORT(space,0,0x0c);
-								if (io[chip].coins[0] >= io[chip].coins_per_cred[0])
-								{
-									io[chip].credits += io[chip].creds_per_coin[0];
-									io[chip].coins[0] -= io[chip].coins_per_cred[0];
-								}
-							}
-							if (toggle & in & 0x20)
-							{
-								io[chip].coins[1]++;
-								WRITE_PORT(space,0,0x08);	// coin counter
-								WRITE_PORT(space,0,0x0c);
-								if (io[chip].coins[1] >= io[chip].coins_per_cred[1])
-								{
-									io[chip].credits += io[chip].creds_per_coin[1];
-									io[chip].coins[1] -= io[chip].coins_per_cred[1];
-								}
-							}
-							if (toggle & in & 0x40)
-							{
-								io[chip].credits++;
-							}
-						}
-					}
-					else io[chip].credits = 100;	// free play
-
-					if (io[chip].mode == 1)
-					{
-						int on = (video_screen_get_frame_number(machine->primary_screen) & 0x10) >> 4;
-
-						if (io[chip].credits >= 2)
-							WRITE_PORT(space,0,0x0c | 3*on);	// lamps
-						else if (io[chip].credits >= 1)
-							WRITE_PORT(space,0,0x0c | 2*on);	// lamps
-						else
-							WRITE_PORT(space,0,0x0c);	// lamps off
-
-						/* check for 1 player start button */
-						if (toggle & in & 0x04)
-						{
-							if (io[chip].credits >= 1)
-							{
-								io[chip].credits--;
-								io[chip].mode = 2;
-								WRITE_PORT(space,0,0x0c);	// lamps off
-							}
-						}
-						/* check for 2 players start button */
-						else if (toggle & in & 0x08)
-						{
-							if (io[chip].credits >= 2)
-							{
-								io[chip].credits -= 2;
-								io[chip].mode = 2;
-								WRITE_PORT(space, 0,0x0c);	// lamps off
-							}
-						}
-					}
-				}
-
-				if (~input_port_read(machine, "IN0") & 0x80)	/* check test mode switch */
-					return 0xbb;
-
-				return (io[chip].credits / 10) * 16 + io[chip].credits % 10;
-
-			case 1:
-				{
-					int joy = READ_PORT(space,2) & 0x0f;
-					int in,toggle;
-
-					in = ~READ_PORT(space,0);
-					toggle = in ^ io[chip].lastbuttons;
-					io[chip].lastbuttons = (io[chip].lastbuttons & 2) | (in & 1);
-
-					/* remap joystick */
-					if (io[chip].remap_joy) joy = joy_map[joy];
-
-					/* fire */
-					joy |= ((toggle & in & 0x01)^1) << 4;
-					joy |= ((in & 0x01)^1) << 5;
-
-					return joy;
-				}
-
-			case 2:
-				{
-					int joy = READ_PORT(space,3) & 0x0f;
-					int in,toggle;
-
-					in = ~READ_PORT(space,0);
-					toggle = in ^ io[chip].lastbuttons;
-					io[chip].lastbuttons = (io[chip].lastbuttons & 1) | (in & 2);
-
-					/* remap joystick */
-					if (io[chip].remap_joy) joy = joy_map[joy];
-
-					/* fire */
-					joy |= ((toggle & in & 0x02)^2) << 3;
-					joy |= ((in & 0x02)^2) << 4;
-
-					return joy;
-				}
-		}
-	}
-}
 
 
 /***************************************************************************/
@@ -876,46 +616,15 @@ void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
 
 
 
-static UINT8 namcoio_53XX_digdug_read(running_machine *machine, int chip)
-{
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	LOG(("%s: custom 53XX read\n",cpuexec_describe_context(machine)));
-
-	switch ((io[chip].in_count++) % 2)
-	{
-		default:
-		case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);
-		case 1: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);
-	}
-}
-
-
-static UINT8 namcoio_53XX_polepos_read(running_machine *machine,int chip)
-{
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	LOG(("%s: custom 53XX read\n",cpuexec_describe_context(machine)));
-
-	switch ((io[chip].in_count++) % 8)
-	{
-		case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);	// steering
-		case 4: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);	// dip switches
-		default: return 0xff;	// polepos2 hangs if 0 is returned
-	}
-}
-
-
 static UINT8 namco_06xx_data_read(running_machine *machine, int chipnum)
 {
 	LOG(("forwarding read to chip %d\n",chipnum%3));
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   return namco_50xx_read(io[chipnum].device);
-		case NAMCOIO_51XX: return namcoio_51XX_read(machine, chipnum);
-		case NAMCOIO_53XX_DIGDUG:  return namcoio_53XX_digdug_read(machine, chipnum);
-		case NAMCOIO_53XX_POLEPOS: return namcoio_53XX_polepos_read(machine, chipnum);
+		case NAMCOIO_50XX:	return namco_50xx_read(io[chipnum].device, 0);
+		case NAMCOIO_51XX:	return namco_51xx_read(io[chipnum].device, 0);
+		case NAMCOIO_53XX:	return namco_53xx_read(io[chipnum].device, 0);
 		default:
 			logerror("%s: custom IO type %d unsupported read\n",cpuexec_describe_context(machine),io[chipnum].type);
 			return 0xff;
@@ -929,10 +638,10 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   namco_50xx_write(io[chipnum].device, data); break;
-		case NAMCOIO_51XX:   namcoio_51XX_write(machine,chipnum,data); break;
-		case NAMCOIO_52XX:   namco_52xx_write(io[chipnum].device, data); break;
-		case NAMCOIO_54XX:   namco_54xx_write(io[chipnum].device, data); break;
+		case NAMCOIO_50XX:   namco_50xx_write(io[chipnum].device, 0, data); break;
+		case NAMCOIO_51XX:   namco_51xx_write(io[chipnum].device, 0, data); break;
+		case NAMCOIO_52XX:   namco_52xx_write(io[chipnum].device, 0, data); break;
+		case NAMCOIO_54XX:   namco_54xx_write(io[chipnum].device, 0, data); break;
 		default:
 			logerror("%s: custom IO type %d unsupported write\n",cpuexec_describe_context(machine),io[chipnum].type);
 			break;

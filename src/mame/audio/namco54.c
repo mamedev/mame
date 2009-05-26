@@ -118,7 +118,7 @@ static TIMER_CALLBACK( namco_54xx_irq_clear )
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
-void namco_54xx_write(const device_config *device, UINT8 data)
+WRITE8_DEVICE_HANDLER( namco_54xx_write )
 {
 	namco_54xx_state *state = get_safe_token(device);
 
@@ -165,7 +165,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( namco_54xx )
-	ROM_REGION( 0x400, "mcu", 0 )
+	ROM_REGION( 0x400, "mcu", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 ROM_END
 

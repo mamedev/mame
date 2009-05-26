@@ -2,7 +2,7 @@
 
 Namco 52XX
 
-This instance of the Fujitsu MB8852 MCU is programmed to act as a sample player.
+This instance of the Fujitsu MB8843 MCU is programmed to act as a sample player.
 It is used by just two games: Bosconian and Pole Position.
 
 A0-A15 = address to read from sample ROMs
@@ -180,7 +180,7 @@ static DEVICE_START( namco_52xx )
 }
 
 
-void namco_52xx_write(const device_config *device, int data)
+WRITE8_DEVICE_HANDLER( namco_52xx_write )
 {
 	namco_52xx *chip = get_safe_token(device);
 	data &= 0x0f;
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_DRIVER_START( namco_52xx )
-	MDRV_CPU_ADD("mcu", MB8842/*MB8852*/, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
+	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_52xx_map_program)
 	MDRV_CPU_DATA_MAP(namco_52xx_map_data)
 	MDRV_CPU_IO_MAP(namco_52xx_map_io)

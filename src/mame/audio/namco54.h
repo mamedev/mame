@@ -12,7 +12,6 @@ struct _namco_54xx_config
 };
 
 
-
 #define MDRV_NAMCO_54XX_ADD(_tag, _clock, _discrete, _firstnode) \
 	MDRV_DEVICE_ADD(_tag, NAMCO_54XX, _clock) \
 	MDRV_DEVICE_CONFIG_DATAPTR(namco_54xx_config, discrete, _discrete) \
@@ -22,11 +21,13 @@ struct _namco_54xx_config
 	MDRV_DEVICE_REMOVE(_tag)
 
 
-void namco_54xx_write(const device_config *device, UINT8 data);
+WRITE8_DEVICE_HANDLER( namco_54xx_write );
+
 
 /* device get info callback */
 #define NAMCO_54XX DEVICE_GET_INFO_NAME(namco_54xx)
 DEVICE_GET_INFO( namco_54xx );
+
 
 /* discrete nodes */
 #define NAMCO_54XX_0_DATA(base)		(NODE_RELATIVE(base, 0))

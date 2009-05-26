@@ -9,9 +9,10 @@
 	MDRV_DEVICE_REMOVE(_tag)
 
 
-UINT8 namco_50xx_read(const device_config *device);
+READ8_DEVICE_HANDLER( namco_50xx_read );
 void namco_50xx_read_request(const device_config *device);
-void namco_50xx_write(const device_config *device, UINT8 data);
+WRITE8_DEVICE_HANDLER( namco_50xx_write );
+
 
 /* device get info callback */
 #define NAMCO_50XX DEVICE_GET_INFO_NAME(namco_50xx)

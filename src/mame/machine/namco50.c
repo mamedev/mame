@@ -222,7 +222,7 @@ static void namco_50xx_irq_set(const device_config *device)
 	timer_set(device->machine, ATTOTIME_IN_USEC(21), (void *)device, 0, namco_50xx_irq_clear);
 }
 
-void namco_50xx_write(const device_config *device, UINT8 data)
+WRITE8_DEVICE_HANDLER( namco_50xx_write )
 {
 	timer_call_after_resynch(device->machine, (void *)device, data, namco_50xx_latch_callback);
 
@@ -238,7 +238,7 @@ void namco_50xx_read_request(const device_config *device)
 }
 
 
-UINT8 namco_50xx_read(const device_config *device)
+READ8_DEVICE_HANDLER( namco_50xx_read )
 {
 	namco_50xx_state *state = get_safe_token(device);
 	UINT8 res = state->portO;
