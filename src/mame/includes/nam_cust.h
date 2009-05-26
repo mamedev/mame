@@ -16,7 +16,4 @@
 	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) ) \
 
 /* the 54XX is an explosion sound generator */
-#define ROM_REGION_NAMCO_54XX( region ) \
-	ROM_REGION( 0x400, region, 0 ) /* 1k for the 54xx  */ \
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) ) \
 

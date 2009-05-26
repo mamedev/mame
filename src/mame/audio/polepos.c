@@ -250,17 +250,17 @@ DISCRETE_SOUND_START(polepos)
 	/************************************************
      * Input register mapping
      ************************************************/
-	DISCRETE_INPUT_DATA(NAMCO_54XX_0_DATA)
-	DISCRETE_INPUT_DATA(NAMCO_54XX_1_DATA)
-	DISCRETE_INPUT_DATA(NAMCO_54XX_2_DATA)
-	DISCRETE_INPUT_DATA(NAMCO_52XX_P_DATA)
+	DISCRETE_INPUT_DATA(NAMCO_54XX_0_DATA(NODE_01))
+	DISCRETE_INPUT_DATA(NAMCO_54XX_1_DATA(NODE_01))
+	DISCRETE_INPUT_DATA(NAMCO_54XX_2_DATA(NODE_01))
+	DISCRETE_INPUT_DATA(NAMCO_52XX_P_DATA(NODE_01))
 
 	/************************************************
      * CHANL1 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
 					1,			/* ENAB */
-					NAMCO_54XX_2_DATA,
+					NAMCO_54XX_2_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_21,
@@ -278,7 +278,7 @@ DISCRETE_SOUND_START(polepos)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_30,
 					1,			/* ENAB */
-					NAMCO_54XX_1_DATA,
+					NAMCO_54XX_1_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_31,
@@ -296,7 +296,7 @@ DISCRETE_SOUND_START(polepos)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
 					1,			/* ENAB */
-					NAMCO_54XX_0_DATA,
+					NAMCO_54XX_0_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_41,
@@ -316,7 +316,7 @@ DISCRETE_SOUND_START(polepos)
 	/* this circuit was simulated in SPICE and an equivalent filter circuit generated */
 	DISCRETE_DAC_R1(NODE_50,
 					0,			/* ENAB */
-					NAMCO_52XX_P_DATA,
+					NAMCO_52XX_P_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_52xx_dac)
 	/* fake it so 0 is now vRef */

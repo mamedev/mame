@@ -846,7 +846,7 @@ static MACHINE_RESET( bosco )
 		NAMCOIO_51XX, &intf0, NULL,
 		NAMCOIO_NONE, NULL,   NULL,
 		NAMCOIO_50XX, NULL,   "50xx_1",
-		NAMCOIO_54XX, NULL,   NULL);
+		NAMCOIO_54XX, NULL,   "54xx");
 
 	namco_06xx_init(machine, 1, 1,
 		NAMCOIO_50XX, NULL,   "50xx_2",
@@ -866,7 +866,7 @@ static MACHINE_RESET( galaga )
 		NAMCOIO_51XX, &intf0, NULL,
 		NAMCOIO_NONE, NULL,   NULL,
 		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_54XX, NULL,   NULL);
+		NAMCOIO_54XX, NULL,   "54xx");
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -880,7 +880,7 @@ static MACHINE_RESET( xevious )
 		NAMCOIO_51XX, &intf0, NULL,
 		NAMCOIO_NONE, NULL,   NULL,
 		NAMCOIO_50XX, NULL,   "50xx",
-		NAMCOIO_54XX, NULL,   NULL);
+		NAMCOIO_54XX, NULL,   "54xx");
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -1635,11 +1635,7 @@ static MACHINE_DRIVER_START( bosco )
 	
 	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/12)	/* 1.536 MHz */
-
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1695,10 +1691,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1740,7 +1733,7 @@ static MACHINE_DRIVER_START( galagab )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaga)
 
-	MDRV_CPU_REMOVE(CPUTAG_54XX)
+	MDRV_NAMCO_54XX_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_mem4)
@@ -1765,11 +1758,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_PROGRAM_MAP(xevious_map)
 
 	MDRV_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/12)	/* 1.536 MHz */
-
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
@@ -1811,7 +1800,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_IMPORT_FROM( xevious )
 
 	MDRV_NAMCO_50XX_REMOVE("50xx")
-	MDRV_CPU_REMOVE(CPUTAG_54XX)
+	MDRV_NAMCO_54XX_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(battles_mem4)
@@ -1903,7 +1892,6 @@ Namco/Midway, 1981
 */
 
 #define BOSCO_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 
 
@@ -2293,7 +2281,6 @@ Notes:
 */
 
 #define GALAGA_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 
 
@@ -2528,7 +2515,6 @@ ROM_END
 **********************************************************************************************/
 
 #define XEVIOUS_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 
 /*

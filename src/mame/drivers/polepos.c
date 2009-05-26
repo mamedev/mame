@@ -386,7 +386,7 @@ static MACHINE_RESET( polepos )
 		NAMCOIO_51XX, &intf0, NULL,
 		NAMCOIO_53XX_POLEPOS, &intf1, NULL,
 		NAMCOIO_52XX, NULL, "namco52",
-		NAMCOIO_54XX, NULL, NULL);
+		NAMCOIO_54XX, NULL, "54xx");
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);
@@ -846,10 +846,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_54xx_map_data)
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
@@ -905,7 +902,6 @@ MACHINE_DRIVER_END
  *********************************************************************/
 
 #define POLEPOS_CUSTOMS \
-	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 	ROM_REGION_NAMCO_53XX( "53xx" ) \
 

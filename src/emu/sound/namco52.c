@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_DRIVER_START( namco_52xx )
-	MDRV_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
+	MDRV_CPU_ADD("mcu", MB8842/*MB8852*/, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_52xx_map_program)
 	MDRV_CPU_DATA_MAP(namco_52xx_map_data)
 	MDRV_CPU_IO_MAP(namco_52xx_map_io)

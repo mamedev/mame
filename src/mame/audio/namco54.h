@@ -3,18 +3,36 @@
 
 #include "sound/discrete.h"
 
-#define CPUTAG_54XX "54xx"
 
-ADDRESS_MAP_EXTERN( namco_54xx_map_program, 8 );
-ADDRESS_MAP_EXTERN( namco_54xx_map_data, 8 );
-ADDRESS_MAP_EXTERN( namco_54xx_map_io, 8 );
+typedef struct _namco_54xx_config namco_54xx_config;
+struct _namco_54xx_config
+{
+	const char *discrete;	/* name of the discrete sound device */
+	int			firstnode;	/* index of the first node */
+};
 
-void namco_54xx_write(running_machine *machine, UINT8 data);
+
+
+#define MDRV_NAMCO_54XX_ADD(_tag, _clock, _discrete, _firstnode) \
+	MDRV_DEVICE_ADD(_tag, NAMCO_54XX, _clock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_54xx_config, discrete, _discrete) \
+	MDRV_DEVICE_CONFIG_DATA32(namco_54xx_config, firstnode, _firstnode)
+
+#define MDRV_NAMCO_54XX_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+
+void namco_54xx_write(const device_config *device, UINT8 data);
+
+/* device get info callback */
+#define NAMCO_54XX DEVICE_GET_INFO_NAME(namco_54xx)
+DEVICE_GET_INFO( namco_54xx );
 
 /* discrete nodes */
-#define NAMCO_54XX_0_DATA		NODE_01
-#define NAMCO_54XX_1_DATA		NODE_02
-#define NAMCO_54XX_2_DATA		NODE_03
-#define NAMCO_52XX_P_DATA		NODE_04
+#define NAMCO_54XX_0_DATA(base)		(NODE_RELATIVE(base, 0))
+#define NAMCO_54XX_1_DATA(base)		(NODE_RELATIVE(base, 1))
+#define NAMCO_54XX_2_DATA(base)		(NODE_RELATIVE(base, 2))
+#define NAMCO_52XX_P_DATA(base)		(NODE_RELATIVE(base, 3))
+
 
 #endif	/* NAMCO54_H */
