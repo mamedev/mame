@@ -446,7 +446,7 @@ static READ8_HANDLER(unk_r)
 static ADDRESS_MAP_START( bronx_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xd000, 0xd000) AM_READ(cyclshtg_mcu_r) AM_WRITENOP
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READ(nycaptor_generic_control_r) AM_WRITE(cyclshtg_generic_control_w)
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( bronx_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd806, 0xd806) AM_READNOP
 	AM_RANGE(0xd807, 0xd807) AM_READ(cyclshtg_mcu_status_r)
 	AM_RANGE(0xdc00, 0xdc9f) AM_READ(nycaptor_spriteram_r) AM_WRITE(nycaptor_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READ(nycaptor_scrlram_r) AM_RANGE(0xdca0, 0xdcbf) AM_WRITE(nycaptor_scrlram_w) AM_BASE(&nycaptor_scrlram)
+	AM_RANGE(0xdca0, 0xdcbf) AM_READ(nycaptor_scrlram_r) AM_WRITE(nycaptor_scrlram_w) AM_BASE(&nycaptor_scrlram)
 	AM_RANGE(0xdd00, 0xdeff) AM_READ(nycaptor_palette_r) AM_WRITE(nycaptor_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_READ(nycaptor_gfxctrl_r) AM_WRITE(nycaptor_gfxctrl_w)
 	AM_RANGE(0xe000, 0xffff) AM_READ(nycaptor_sharedram_r) AM_WRITE(nycaptor_sharedram_w) AM_BASE(&nycaptor_sharedram)
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bronx_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x0000, 0x7fff) AM_ROM
- 	AM_RANGE(0xc000, 0xc7ff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+ 	AM_RANGE(0xc000, 0xcfff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
