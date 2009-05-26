@@ -383,10 +383,10 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_53XX_POLEPOS, &intf1,
-		NAMCOIO_52XX, NULL,
-		NAMCOIO_54XX, NULL);
+		NAMCOIO_51XX, &intf0, NULL,
+		NAMCOIO_53XX_POLEPOS, &intf1, NULL,
+		NAMCOIO_52XX, NULL, NULL,
+		NAMCOIO_54XX, NULL, NULL);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);

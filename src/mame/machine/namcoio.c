@@ -145,6 +145,7 @@ TODO:
 struct namcoio
 {
 	INT32 type;
+	const device_config *device;
 	read8_space_func in[4];
 	write8_space_func out[2];
 	INT32 reset;
@@ -810,11 +811,12 @@ static void namcoio_state_save(running_machine *machine, int chipnum)
 	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].remap_joy);
 }
 
-void namcoio_init(running_machine *machine, int chipnum, int type, const struct namcoio_interface *intf)
+void namcoio_init(running_machine *machine, int chipnum, int type, const struct namcoio_interface *intf, const char *device)
 {
 	if (chipnum < MAX_NAMCOIO)
 	{
 		io[chipnum].type = type;
+		io[chipnum].device = device ? devtag_get_device(machine, device) : NULL;
 		io[chipnum].in[0] = (intf && intf->in[0]) ? intf->in[0] : nop_r;
 		io[chipnum].in[1] = (intf && intf->in[1]) ? intf->in[1] : nop_r;
 		io[chipnum].in[2] = (intf && intf->in[2]) ? intf->in[2] : nop_r;
@@ -855,17 +857,17 @@ static void namco_06xx_state_save(running_machine *machine, int chipnum)
 
 
 void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
-	int type0, const struct namcoio_interface *intf0,
-	int type1, const struct namcoio_interface *intf1,
-	int type2, const struct namcoio_interface *intf2,
-	int type3, const struct namcoio_interface *intf3)
+	int type0, const struct namcoio_interface *intf0, const char *device0,
+	int type1, const struct namcoio_interface *intf1, const char *device1,
+	int type2, const struct namcoio_interface *intf2, const char *device2,
+	int type3, const struct namcoio_interface *intf3, const char *device3)
 {
 	if (chipnum < MAX_06XX)
 	{
-		namcoio_init(machine, 4*chipnum + 0, type0, intf0);
-		namcoio_init(machine, 4*chipnum + 1, type1, intf1);
-		namcoio_init(machine, 4*chipnum + 2, type2, intf2);
-		namcoio_init(machine, 4*chipnum + 3, type3, intf3);
+		namcoio_init(machine, 4*chipnum + 0, type0, intf0, device0);
+		namcoio_init(machine, 4*chipnum + 1, type1, intf1, device1);
+		namcoio_init(machine, 4*chipnum + 2, type2, intf2, device2);
+		namcoio_init(machine, 4*chipnum + 3, type3, intf3, device3);
 		nmi_cpu[chipnum] = cpu;
 		nmi_timer[chipnum] = timer_alloc(machine, nmi_generate, NULL);
 		namco_06xx_state_save(machine, chipnum);
@@ -910,8 +912,7 @@ static UINT8 namco_06xx_data_read(running_machine *machine, int chipnum)
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   return namco_50xx_read(machine);
-		case NAMCOIO_50XX_2: return namco_50xx_2_read(machine);
+		case NAMCOIO_50XX:   return namco_50xx_read(io[chipnum].device);
 		case NAMCOIO_51XX: return namcoio_51XX_read(machine, chipnum);
 		case NAMCOIO_53XX_DIGDUG:  return namcoio_53XX_digdug_read(machine, chipnum);
 		case NAMCOIO_53XX_POLEPOS: return namcoio_53XX_polepos_read(machine, chipnum);
@@ -928,8 +929,7 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   namco_50xx_write(machine, data); break;
-		case NAMCOIO_50XX_2: namco_50xx_2_write(machine, data); break;
+		case NAMCOIO_50XX:   namco_50xx_write(io[chipnum].device, data); break;
 		case NAMCOIO_51XX:   namcoio_51XX_write(machine,chipnum,data); break;
 		case NAMCOIO_52XX:   namcoio_52xx_write(devtag_get_device(machine, "namco52"), data); break;
 		case NAMCOIO_54XX:   namco_54xx_write(machine, data); break;
@@ -946,8 +946,7 @@ static void namco_06xx_read_request(running_machine *machine, int chipnum)
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   namco_50xx_read_request(machine); break;
-		case NAMCOIO_50XX_2: namco_50xx_2_read_request(machine); break;
+		case NAMCOIO_50XX:   namco_50xx_read_request(io[chipnum].device); break;
 		default:
 			logerror("%s: custom IO type %d read_request unsupported\n",cpuexec_describe_context(machine),io[chipnum].type);
 			break;

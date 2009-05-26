@@ -2,9 +2,6 @@
 
 
 /* the 50XX is a player score controller, used for protection */
-#define ROM_REGION_NAMCO_50XX( region ) \
-	ROM_REGION( 0x800, region, 0 ) /* 2k for the 50xx  */ \
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) ) \
 
 /* the 51XX is an I/O controller */
 #define ROM_REGION_NAMCO_51XX( region ) \

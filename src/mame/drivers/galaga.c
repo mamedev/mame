@@ -843,16 +843,16 @@ static MACHINE_RESET( bosco )
 	bosco_latch_reset(machine);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_50XX, NULL,
-		NAMCOIO_54XX, NULL);
+		NAMCOIO_51XX, &intf0, NULL,
+		NAMCOIO_NONE, NULL,   NULL,
+		NAMCOIO_50XX, NULL,   "50xx_1",
+		NAMCOIO_54XX, NULL,   NULL);
 
 	namco_06xx_init(machine, 1, 1,
-		NAMCOIO_50XX_2, NULL,
-		NAMCOIO_52XX, NULL,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL);
+		NAMCOIO_50XX, NULL,   "50xx_2",
+		NAMCOIO_52XX, NULL,   NULL,
+		NAMCOIO_NONE, NULL,   NULL,
+		NAMCOIO_NONE, NULL,   NULL);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -863,10 +863,10 @@ static MACHINE_RESET( galaga )
 	bosco_latch_reset(machine);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_54XX, NULL);
+		NAMCOIO_51XX, &intf0, NULL,
+		NAMCOIO_NONE, NULL,   NULL,
+		NAMCOIO_NONE, NULL,   NULL,
+		NAMCOIO_54XX, NULL,   NULL);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -877,10 +877,10 @@ static MACHINE_RESET( xevious )
 	bosco_latch_reset(machine);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_50XX, NULL,
-		NAMCOIO_54XX, NULL);
+		NAMCOIO_51XX, &intf0, NULL,
+		NAMCOIO_NONE, NULL,   NULL,
+		NAMCOIO_50XX, NULL,   "50xx",
+		NAMCOIO_54XX, NULL,   NULL);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -901,10 +901,10 @@ static MACHINE_RESET( digdug )
 	bosco_latch_reset(machine);
 
 	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, &intf0,
-		NAMCOIO_53XX_DIGDUG, &intf1,
-		NAMCOIO_NONE, NULL,
-		NAMCOIO_NONE, NULL);
+		NAMCOIO_51XX, &intf0, NULL,
+		NAMCOIO_53XX_DIGDUG, &intf1, NULL,
+		NAMCOIO_NONE, NULL, NULL,
+		NAMCOIO_NONE, NULL, NULL);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -1632,16 +1632,9 @@ static MACHINE_DRIVER_START( bosco )
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map)
-
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_map_io)
-
-	MDRV_CPU_ADD(CPUTAG_50XX_2, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_2_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_2_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_2_map_io)
+	
+	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/12)	/* 1.536 MHz */
+	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/12)	/* 1.536 MHz */
 
 	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
@@ -1771,10 +1764,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map)
 
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_50xx_map_data)
-	MDRV_CPU_IO_MAP(namco_50xx_map_io)
+	MDRV_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/12)	/* 1.536 MHz */
 
 	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program)
@@ -1820,7 +1810,7 @@ static MACHINE_DRIVER_START( battles )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( xevious )
 
-	MDRV_CPU_REMOVE(CPUTAG_50XX)
+	MDRV_NAMCO_50XX_REMOVE("50xx")
 	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
@@ -1913,8 +1903,6 @@ Namco/Midway, 1981
 */
 
 #define BOSCO_CUSTOMS \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX ) \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX_2 ) \
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 	ROM_REGION_NAMCO_52XX( "52xx" ) \
@@ -2541,7 +2529,6 @@ ROM_END
 **********************************************************************************************/
 
 #define XEVIOUS_CUSTOMS \
-	ROM_REGION_NAMCO_50XX( CPUTAG_50XX ) \
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 

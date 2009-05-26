@@ -126,6 +126,11 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* populate device configuration */
 	device->clock = clock;
+	if ((device->clock & 0xff000000) == 0xff000000)
+	{
+		assert(device->owner != NULL);
+		device->clock = device->owner->clock * ((device->clock >> 12) & 0xfff) / ((device->clock >> 0) & 0xfff);
+	}
 	device->static_config = NULL;
 	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
 

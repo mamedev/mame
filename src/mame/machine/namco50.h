@@ -1,23 +1,21 @@
 #ifndef NAMCO50_H
 #define NAMCO50_H
 
-#define CPUTAG_50XX "50xx"
-#define CPUTAG_50XX_2 "50xx_2"
 
-ADDRESS_MAP_EXTERN( namco_50xx_map_program, 8 );
-ADDRESS_MAP_EXTERN( namco_50xx_map_data, 8 );
-ADDRESS_MAP_EXTERN( namco_50xx_map_io, 8 );
+#define MDRV_NAMCO_50XX_ADD(_tag, _clock) \
+	MDRV_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
 
-ADDRESS_MAP_EXTERN( namco_50xx_2_map_program, 8 );
-ADDRESS_MAP_EXTERN( namco_50xx_2_map_data, 8 );
-ADDRESS_MAP_EXTERN( namco_50xx_2_map_io, 8 );
+#define MDRV_NAMCO_50XX_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
 
-UINT8 namco_50xx_read(running_machine *machine);
-void namco_50xx_read_request(running_machine *machine);
-void namco_50xx_write(running_machine *machine, UINT8 data);
 
-UINT8 namco_50xx_2_read(running_machine *machine);
-void namco_50xx_2_read_request(running_machine *machine);
-void namco_50xx_2_write(running_machine *machine, UINT8 data);
+UINT8 namco_50xx_read(const device_config *device);
+void namco_50xx_read_request(const device_config *device);
+void namco_50xx_write(const device_config *device, UINT8 data);
 
-#endif	/* NAMCO54_H */
+/* device get info callback */
+#define NAMCO_50XX DEVICE_GET_INFO_NAME(namco_50xx)
+DEVICE_GET_INFO( namco_50xx );
+
+
+#endif	/* NAMCO50_H */

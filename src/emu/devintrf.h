@@ -133,6 +133,9 @@ enum
 #define DEVICE_CUSTOM_CONFIG_CALL(name)		DEVICE_CUSTOM_CONFIG(name)(device, entrytype, tokens)
 
 
+#define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
+
+
 /* shorthand for accessing devices by machine/type/tag */
 #define devtag_get_device(mach,tag)							device_list_find_by_tag((mach)->config->devicelist, tag)
 
