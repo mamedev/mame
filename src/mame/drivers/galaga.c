@@ -850,7 +850,7 @@ static MACHINE_RESET( bosco )
 
 	namco_06xx_init(machine, 1, 1,
 		NAMCOIO_50XX, NULL,   "50xx_2",
-		NAMCOIO_52XX, NULL,   NULL,
+		NAMCOIO_52XX, NULL,   "namco52",
 		NAMCOIO_NONE, NULL,   NULL,
 		NAMCOIO_NONE, NULL,   NULL);
 
@@ -1905,7 +1905,6 @@ Namco/Midway, 1981
 #define BOSCO_CUSTOMS \
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_52XX( "52xx" ) \
 
 
 ROM_START( bosco )

@@ -28,10 +28,9 @@ struct _namco_52xx_interface
 	double	filt_gain;
 };
 
-void namcoio_52xx_write(const device_config *device, int data);
+void namco_52xx_write(const device_config *device, int data);
 
 DEVICE_GET_INFO( namco_52xx );
 #define SOUND_NAMCO_52XX DEVICE_GET_INFO_NAME( namco_52xx )
 
 #endif /* __NAMCO52_H__ */
-

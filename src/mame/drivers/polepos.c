@@ -385,7 +385,7 @@ static MACHINE_RESET( polepos )
 	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0, NULL,
 		NAMCOIO_53XX_POLEPOS, &intf1, NULL,
-		NAMCOIO_52XX, NULL, NULL,
+		NAMCOIO_52XX, NULL, "namco52",
 		NAMCOIO_54XX, NULL, NULL);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
@@ -907,7 +907,6 @@ MACHINE_DRIVER_END
 #define POLEPOS_CUSTOMS \
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
-	ROM_REGION_NAMCO_52XX( "52xx" ) \
 	ROM_REGION_NAMCO_53XX( "53xx" ) \
 
 /*

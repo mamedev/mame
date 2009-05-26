@@ -49,6 +49,7 @@ Jan 12, 2005.  The 555 is probably an external playback frequency.
 #include "streams.h"
 #include "filter.h"
 #include "namco52.h"
+#include "cpu/mb88xx/mb88xx.h"
 
 
 typedef struct _namco_52xx namco_52xx;
@@ -179,7 +180,7 @@ static DEVICE_START( namco_52xx )
 }
 
 
-void namcoio_52xx_write(const device_config *device, int data)
+void namco_52xx_write(const device_config *device, int data)
 {
 	namco_52xx *chip = get_safe_token(device);
 	data &= 0x0f;
@@ -206,6 +207,37 @@ void namcoio_52xx_write(const device_config *device, int data)
  * Generic get_info
  **************************************************************************/
 
+ADDRESS_MAP_START( namco_52xx_map_program, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( namco_52xx_map_data, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( namco_52xx_map_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_52xx_K_r)
+//	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_52xx_O_w)
+//	AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_52xx_R0_r)
+//	AM_RANGE(MB88_PORTR2, MB88_PORTR2) AM_READ(namco_52xx_R2_r)
+ADDRESS_MAP_END
+
+
+static MACHINE_DRIVER_START( namco_52xx )
+	MDRV_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
+	MDRV_CPU_PROGRAM_MAP(namco_52xx_map_program)
+	MDRV_CPU_DATA_MAP(namco_52xx_map_data)
+	MDRV_CPU_IO_MAP(namco_52xx_map_io)
+	MDRV_CPU_FLAGS(CPU_DISABLE)							/* not implemented yet */
+MACHINE_DRIVER_END
+
+
+ROM_START( namco_52xx )
+	ROM_REGION( 0x400, "mcu", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "52xx.bin",     0x0000, 0x0400, CRC(3257d11e) SHA1(4883b2fdbc99eb7b9906357fcc53915842c2c186) )
+ROM_END
+
+
 DEVICE_GET_INFO( namco_52xx )
 {
 	switch (state)
@@ -213,9 +245,12 @@ DEVICE_GET_INFO( namco_52xx )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(namco_52xx);						break;
 
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(namco_52xx);				break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(namco_52xx); break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( namco_52xx );		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */										break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( namco_52xx );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

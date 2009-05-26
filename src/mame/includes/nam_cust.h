@@ -9,9 +9,6 @@
 	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) ) \
 
 /* the 52XX is a sample player */
-#define ROM_REGION_NAMCO_52XX( region ) \
-	ROM_REGION( 0x400, region, 0 ) /* 1k for the 52xx  */ \
-	ROM_LOAD( "52xx.bin",     0x0000, 0x0400, CRC(3257d11e) SHA1(4883b2fdbc99eb7b9906357fcc53915842c2c186) ) \
 
 /* the 53XX is an I/O controller */
 #define ROM_REGION_NAMCO_53XX( region ) \
