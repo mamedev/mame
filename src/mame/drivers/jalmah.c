@@ -30,6 +30,7 @@ TODO:
 -There could be timing issues caused by MCU simulation at $80004;
 -Fix the sound banking, protection-related for the first version of the MCU
  (should be somewhere on the work ram/shared ram)
+-suchipi: I need a side-by-side to understand if the PAL shuffling is correct with the OKI bgm rom.
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
@@ -862,12 +863,16 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		UINT8 *oki = memory_region(space->machine, "oki");
+
 		oki_rom = data & 1;
-		/*ZA appears to be related to the banking*/
+
+		/* ZA appears to be related to the banking, or maybe kakumei2 uses PAL shuffling and this is for something else? */
 		oki_za = (data & 2) ? 1 : 0;
+
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank);
+
+	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank,(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000);
 }
 
 static WRITE16_HANDLER( jalmah_okibank_w )
@@ -875,10 +880,13 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		UINT8 *oki = memory_region(space->machine, "oki");
+
 		oki_bank = data & 3;
+
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank);
+
+	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(space->cpu),oki_rom,oki_za,oki_bank,(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000);
 }
 
 static WRITE16_HANDLER( jalmah_flip_screen_w )
@@ -1295,7 +1303,7 @@ static MACHINE_RESET ( jalmah )
 }
 
 static MACHINE_DRIVER_START( jalmah )
-	MDRV_CPU_ADD("maincpu" , M68000, 8000000) /* 68000-8 */
+	MDRV_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
@@ -1321,7 +1329,7 @@ static MACHINE_DRIVER_START( jalmah )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( urashima )
@@ -1593,10 +1601,21 @@ ROM_START( suchipi )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
+	ROM_REGION( 0x100000, "oki_data", ROMREGION_ERASEFF ) /* Samples */
+	ROM_LOAD( "3.bin", 0x00000, 0x80000, CRC(691b5387) SHA1(b8bc9f904eab7653566042b18d89276d537ba586) )
+	ROM_LOAD( "4.bin", 0x80000, 0x80000, CRC(3fe932a1) SHA1(9e768b901738ee9eba207a67c4fd19efb0035a68) )
+
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
-	ROM_LOAD( "3.bin", 0x40000, 0x80000, CRC(691b5387) SHA1(b8bc9f904eab7653566042b18d89276d537ba586) )
-	ROM_LOAD( "4.bin", 0xc0000, 0x80000, CRC(3fe932a1) SHA1(9e768b901738ee9eba207a67c4fd19efb0035a68) )
-	ROM_COPY( "oki" ,  0x40000, 0x00000, 0x40000 )
+	ROM_COPY( "oki_data" , 0x00000, 0x000000+0x00000, 0x40000 )
+
+	/* PAL address shuffling for the BGM data (TODO: check this with a side-by-side test)*/
+	ROM_COPY( "oki_data" , 0x20000, 0x000000+0x40000, 0x20000 ) // 0
+	ROM_COPY( "oki_data" , 0x40000, 0x020000+0x40000, 0x20000 ) // 1
+	ROM_COPY( "oki_data" , 0x60000, 0x040000+0x40000, 0x20000 ) // 2
+	ROM_COPY( "oki_data" , 0x00000, 0x060000+0x40000, 0x20000 ) // 3
+
+	ROM_COPY( "oki_data" , 0x80000, 0x080000+0x40000, 0x40000 )
+	ROM_COPY( "oki_data" , 0xc0000, 0x0c0000+0x40000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "14.bin", 0x00000, 0x20000, CRC(e465a540) SHA1(10e19599ab90b0c0b6ef6ee41f16620bd1ba6800) )
@@ -1613,7 +1632,6 @@ ROM_START( suchipi )
 	ROM_LOAD( "9.bin",  0x100000, 0x80000, CRC(8a348246) SHA1(13516c48bdbe8d78e7517473ef2835a4dea2ce93) )
 	ROM_LOAD( "10.bin", 0x180000, 0x80000, CRC(2b0d1afd) SHA1(40009b450901567052aa63c4629a2f7a10343e63) )
 
-	/* the 3 missing proms should be the same as the other games */
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
 	ROM_LOAD( "mj16.bpr", 0x100, 0x100, CRC(8d5dc1f6) SHA1(9f723e7cd44f8c09ec30b04725644346484ec753) )
