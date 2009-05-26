@@ -1716,7 +1716,7 @@ ROM_END
 
 /**************************************************************************************************************************
     D.D. Crew, Sega System 18
-    CPU: FD1094 (317-0182)
+    CPU: FD1094 (317-0182 for 2P version, 317-0185 for 4P version, 317-0188 for 3P version)
     ROM Board: 171-5987A
 */
 ROM_START( ddcrewj )
@@ -1760,7 +1760,7 @@ ROM_END
     game No. 833-8830-02
     pcb  No. 837-8832-02 (171-5873-02b)
     rom  No. 834-8831-02 (171-5987a)
-    CPU Hiatchi FD1094 317-0196
+    CPU Hiatchi FD1094 317-0196 (Japanese version uses 317-0194)
 */
 ROM_START( desertbr )
 	ROM_REGION( 0x300000, "maincpu", 0 ) /* 68000 code - custom CPU 317-0196 */
@@ -1954,7 +1954,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Moonwalker, Sega System 18
-    CPU: FD1094 (317-0157)
+    CPU: FD1094 (317-0157, version uses i8751(315-5437) known to be exist)
     ROM Board: 171-5873B
 */
 ROM_START( mwalkj )
