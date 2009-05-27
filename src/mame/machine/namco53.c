@@ -158,6 +158,8 @@ static DEVICE_START( namco_53xx )
 	/* resolve our write callbacks */
 	devcb_resolve_write8(&state->out[0], &config->out[0], device);
 	devcb_resolve_write8(&state->out[1], &config->out[1], device);
+	
+	state_save_register_device_item(device, 0, state->in_count);
 }
 
 
@@ -167,7 +169,8 @@ static DEVICE_START( namco_53xx )
 
 static DEVICE_RESET( namco_53xx )
 {
-//	namco_53xx_state *state = get_safe_token(device);
+	namco_53xx_state *state = get_safe_token(device);
+	state->in_count = 0;
 }
 
 

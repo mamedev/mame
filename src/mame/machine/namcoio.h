@@ -3,14 +3,9 @@
 
 #include "devintrf.h"
 
+
 enum
 {
-	NAMCOIO_NONE = 0,
-	NAMCOIO_50XX,
-	NAMCOIO_51XX,
-	NAMCOIO_52XX,
-	NAMCOIO_53XX,
-	NAMCOIO_54XX,
 	NAMCOIO_56XX,
 	NAMCOIO_58XX,
 	NAMCOIO_59XX,
@@ -18,7 +13,6 @@ enum
 };
 
 #define MAX_NAMCOIO 8
-#define MAX_06XX 2
 
 
 struct namcoio_interface
@@ -26,21 +20,6 @@ struct namcoio_interface
 	read8_space_func in[4];	/* read handlers for ports A-D */
 	write8_space_func out[2];	/* write handlers for ports A-B */
 };
-
-
-void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
-	int type0, const struct namcoio_interface *intf0, const char *device0,
-	int type1, const struct namcoio_interface *intf1, const char *device1,
-	int type2, const struct namcoio_interface *intf2, const char *device2,
-	int type3, const struct namcoio_interface *intf3, const char *device3);
-READ8_HANDLER( namco_06xx_0_data_r );
-READ8_HANDLER( namco_06xx_1_data_r );
-WRITE8_HANDLER( namco_06xx_0_data_w );
-WRITE8_HANDLER( namco_06xx_1_data_w );
-READ8_HANDLER( namco_06xx_0_ctrl_r );
-READ8_HANDLER( namco_06xx_1_ctrl_r );
-WRITE8_HANDLER( namco_06xx_0_ctrl_w );
-WRITE8_HANDLER( namco_06xx_1_ctrl_w );
 
 
 READ8_HANDLER( namcoio_r );

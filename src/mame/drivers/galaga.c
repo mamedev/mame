@@ -698,7 +698,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "machine/atari_vg.h"
-#include "machine/namcoio.h"
+#include "machine/namco06.h"
 #include "machine/namco50.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
@@ -854,18 +854,6 @@ static MACHINE_RESET( bosco )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, NULL,   "51xx",
-		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_50XX, NULL,   "50xx_1",
-		NAMCOIO_54XX, NULL,   "54xx");
-
-	namco_06xx_init(machine, 1, 1,
-		NAMCOIO_50XX, NULL,   "50xx_2",
-		NAMCOIO_52XX, NULL,   "namco52",
-		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_NONE, NULL,   NULL);
-
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -873,13 +861,7 @@ static MACHINE_RESET( galaga )
 {
 	/* Reset all latches */
 	bosco_latch_reset(machine);
-
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, NULL,   "51xx",
-		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_54XX, NULL,   "54xx");
-
+	
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -887,12 +869,6 @@ static MACHINE_RESET( xevious )
 {
 	/* Reset all latches */
 	bosco_latch_reset(machine);
-
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, NULL,   "51xx",
-		NAMCOIO_NONE, NULL,   NULL,
-		NAMCOIO_50XX, NULL,   "50xx",
-		NAMCOIO_54XX, NULL,   "54xx");
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -912,12 +888,6 @@ static MACHINE_RESET( digdug )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, NULL, "51xx",
-		NAMCOIO_53XX, NULL, "53xx",
-		NAMCOIO_NONE, NULL, NULL,
-		NAMCOIO_NONE, NULL, NULL);
-
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -930,12 +900,12 @@ static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx_0", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx_0", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(bosco_videoram_r, bosco_videoram_w) AM_BASE(&bosco_videoram)	/* + sprite registers */
-	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_1_data_r, namco_06xx_1_data_w)
-	AM_RANGE(0x9100, 0x9100) AM_READWRITE(namco_06xx_1_ctrl_r, namco_06xx_1_ctrl_w)
+	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x9800, 0x980f) AM_WRITE(SMH_RAM) AM_SHARE(2) AM_BASE(&bosco_radarattr)
 	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
@@ -952,8 +922,8 @@ static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(galaga_videoram_r, galaga_videoram_w) AM_BASE(&galaga_videoram)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(1) AM_BASE(&galaga_ram1)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE(2) AM_BASE(&galaga_ram2)
@@ -969,8 +939,8 @@ static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)	/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)							/* work RAM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2) AM_BASE(&xevious_sr1)	/* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE(3) AM_BASE(&xevious_sr2)	/* work RAM + sprite registers */
@@ -989,8 +959,8 @@ static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x7100, 0x7100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(digdug_videoram_r, digdug_videoram_w) AM_BASE(&digdug_videoram)	/* tilemap RAM (bottom half of RAM 0 */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE(1)							/* work RAM (top half for RAM 0 */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(2) AM_BASE(&digdug_objram)	/* work RAM + sprite registers */
@@ -1674,6 +1644,9 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
+	MDRV_NAMCO_06XX_ADD("06xx_0", "maincpu", "51xx",   NULL,      "50xx_1", "54xx")
+	MDRV_NAMCO_06XX_ADD("06xx_1", "sub",     "50xx_2", "namco52", NULL,     NULL)
+
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -1730,6 +1703,8 @@ static MACHINE_DRIVER_START( galaga )
 
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", NULL, NULL, "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1798,6 +1773,8 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", NULL, "50xx", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
@@ -1875,6 +1852,8 @@ static MACHINE_DRIVER_START( digdug )
 
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/12, namco_53xx_intf)		/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", NULL, NULL)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

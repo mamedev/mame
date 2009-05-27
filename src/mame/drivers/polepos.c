@@ -215,7 +215,7 @@ Notes:
 #include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "deprecat.h"
-#include "machine/namcoio.h"
+#include "machine/namco06.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
 #include "sound/namco.h"
@@ -396,12 +396,6 @@ static MACHINE_RESET( polepos )
 	for (i = 0; i < 8; i++)
 		polepos_latch_w(space, i, 0);
 
-	namco_06xx_init(machine, 0, 0,
-		NAMCOIO_51XX, NULL, "51xx",
-		NAMCOIO_53XX, NULL, "53xx",
-		NAMCOIO_52XX, NULL, "namco52",
-		NAMCOIO_54XX, NULL, "54xx");
-
 	/* set the interrupt vectors (this shouldn't be needed) */
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub2"), 0, Z8000_NVI);
@@ -425,8 +419,8 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83bf) AM_WRITE(SMH_RAM)						/* Sound Memory */
 	AM_RANGE(0x83c0, 0x83ff) AM_DEVWRITE("namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
 
-	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
-	AM_RANGE(0x9100, 0x9100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
+	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(polepos_ready_r)					/* READY */
 	AM_RANGE(0xa000, 0xa007) AM_WRITE(polepos_latch_w)				/* misc latches */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(watchdog_reset_w)				/* Watchdog */
@@ -901,6 +895,8 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_NAMCO_51XX_ADD("51xx", 18432000/12, namco_51xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_53XX_ADD("53xx", 18432000/12, namco_53xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
+
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", "namco52", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 

@@ -409,6 +409,14 @@ static DEVICE_START( namco_51xx )
 	/* resolve our write callbacks */
 	devcb_resolve_write8(&state->out[0], &config->out[0], device);
 	devcb_resolve_write8(&state->out[1], &config->out[1], device);
+
+	state_save_register_device_item(device, 0, state->lastcoins);
+	state_save_register_device_item(device, 0, state->lastbuttons);
+	state_save_register_device_item(device, 0, state->credits);
+	state_save_register_device_item_array(device, 0, state->coins);
+	state_save_register_device_item_array(device, 0, state->coins_per_cred);
+	state_save_register_device_item_array(device, 0, state->creds_per_coin);
+	state_save_register_device_item(device, 0, state->in_count);
 }
 
 
@@ -418,7 +426,17 @@ static DEVICE_START( namco_51xx )
 
 static DEVICE_RESET( namco_51xx )
 {
-//	namco_51xx_state *state = get_safe_token(device);
+	namco_51xx_state *state = get_safe_token(device);
+
+	/* reset internal registers */
+	state->credits = 0;
+	state->coins[0] = 0;
+	state->coins_per_cred[0] = 1;
+	state->creds_per_coin[0] = 1;
+	state->coins[1] = 0;
+	state->coins_per_cred[1] = 1;
+	state->creds_per_coin[1] = 1;
+	state->in_count = 0;
 }
 
 

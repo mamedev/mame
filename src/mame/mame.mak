@@ -939,6 +939,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/warpwarp.o $(AUDIO)/warpwarp.o $(VIDEO)/warpwarp.o \
 	$(MACHINE)/namcoio.o \
 	$(AUDIO)/geebee.o \
+	$(MACHINE)/namco06.o \
 	$(MACHINE)/namco50.o \
 	$(MACHINE)/namco51.o \
 	$(MACHINE)/namco53.o \
