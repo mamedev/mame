@@ -229,8 +229,8 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 
 static void galpani2_mcu_nmi2(running_machine *machine)
 {
-		galpani2_write_kaneko(machine->cpu[0]);
-		//logerror("%s : MCU executes CHECKs synchro\n",cpuexec_describe_context(machine));
+		galpani2_write_kaneko(cputag_get_cpu(machine, "maincpu"));
+		//logerror("%s : MCU executes CHECKs synchro\n", cpuexec_describe_context(machine));
 }
 
 static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR

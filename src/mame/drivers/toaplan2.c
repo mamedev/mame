@@ -317,7 +317,7 @@ static MACHINE_RESET( toaplan2 )
       This is important for games with common RAM; the RAM test will fail
       when leaving service mode if the sound CPU is not reset.
     */
-	m68k_set_reset_callback(machine->cpu[0], toaplan2_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
@@ -394,7 +394,7 @@ static DRIVER_INIT( fixeight )
 	#if USE_V25
 
 	#else
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
 	memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
 	#endif
 
@@ -529,7 +529,7 @@ static READ16_HANDLER( toaplan2_inputport_0_word_r )
 
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cpu_set_input_line(machine->cpu[0], param, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
@@ -1157,14 +1157,14 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", raizing_sndirq_line, HOLD_LINE);
 }
 
 

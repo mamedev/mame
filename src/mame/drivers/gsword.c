@@ -359,8 +359,8 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM , 8 )
@@ -943,7 +943,7 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 
@@ -958,7 +958,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 

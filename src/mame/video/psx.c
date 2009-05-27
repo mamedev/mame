@@ -3921,7 +3921,7 @@ INTERRUPT_GEN( psx_vblank )
 
 void psx_gpu_reset( running_machine *machine )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	psx_gpu_w(space, 1, 0, 0xffffffff );
 }
