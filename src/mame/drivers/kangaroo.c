@@ -293,18 +293,6 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Microcontroller memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
  *  Port definitions
  *
  *************************************/
@@ -475,9 +463,8 @@ static MACHINE_DRIVER_START( mcu )
 
 	MDRV_MACHINE_START(kangaroo_mcu)
 
-	MDRV_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/12)
+	MDRV_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
 MACHINE_DRIVER_END
 
 

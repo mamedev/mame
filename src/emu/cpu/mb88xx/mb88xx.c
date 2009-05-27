@@ -745,6 +745,26 @@ static CPU_EXECUTE( mb88 )
 }
 
 /***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(program_11bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_6bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+/***************************************************************************
     INFORMATION SETTERS
 ***************************************************************************/
 
@@ -799,7 +819,7 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 6;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
@@ -849,6 +869,8 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mb88);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB88xx");				break;
@@ -898,6 +920,10 @@ CPU_GET_INFO( mb8841 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
 
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8841");				break;
 
@@ -912,6 +938,10 @@ CPU_GET_INFO( mb8842 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 11;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8842");				break;
@@ -928,6 +958,10 @@ CPU_GET_INFO( mb8843 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 6;					break;
 
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit); break;
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8843");				break;
 
@@ -942,6 +976,10 @@ CPU_GET_INFO( mb8844 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 6;					break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8844");				break;

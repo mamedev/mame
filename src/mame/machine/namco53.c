@@ -101,14 +101,6 @@ READ8_DEVICE_HANDLER( namco_53xx_read )
     DEVICE INTERFACE
 ***************************************************************************/
 
-ADDRESS_MAP_START( namco_53xx_map_program, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( namco_53xx_map_data, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
-
 ADDRESS_MAP_START( namco_53xx_map_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_53xx_K_r)
 //	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_53xx_O_w)
@@ -118,9 +110,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_DRIVER_START( namco_53xx )
-	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,6))		/* parent clock, internally divided by 6 */
-	MDRV_CPU_PROGRAM_MAP(namco_53xx_map_program)
-	MDRV_CPU_DATA_MAP(namco_53xx_map_data)
+	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_IO_MAP(namco_53xx_map_io)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 MACHINE_DRIVER_END
