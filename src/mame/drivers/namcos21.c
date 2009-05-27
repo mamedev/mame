@@ -558,8 +558,8 @@ namcos21_kickstart( running_machine *machine, int internal )
 	mpDspState->slaveOutputSize = 0;
 	mpDspState->masterFinished = 0;
 	mpDspState->slaveActive = 0;
-	cpu_set_input_line(machine->cpu[4], 0, HOLD_LINE); /* DSP: master */
-	cpu_set_input_line(machine->cpu[5], INPUT_LINE_RESET, PULSE_LINE); /* DSP: slave */
+	cputag_set_input_line(machine, "dspmaster", 0, HOLD_LINE);
+	cputag_set_input_line(machine, "dspslave", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static UINT16
@@ -611,9 +611,9 @@ static WRITE16_HANDLER( dspram16_w )
 			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
 			TransferDspData(space->machine);
 		}
-		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
+		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					space->cpu == space->machine->cpu[0] )
+					space->cpu == cputag_get_cpu(space->machine, "maincpu"))
 		{ /* hack; synchronization for solvalou */
 			cpu_yield(space->cpu);
 		}
@@ -1269,7 +1269,7 @@ static WRITE16_HANDLER( winrun_dsp_complete_w )
 	if( data )
 	{
 		winrun_flushpoly();
-		cpu_set_input_line(space->machine->cpu[4], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, PULSE_LINE);
 		namcos21_ClearPolyFrameBuffer();
 	}
 }

@@ -190,11 +190,11 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
+			sharc_set_flag_input(cputag_get_cpu(space->machine, "dsp"), 1, ASSERT_LINE);
 		}
 		else
 		{
-			sharc_set_flag_input(space->machine->cpu[2], 1, CLEAR_LINE);
+			sharc_set_flag_input(cputag_get_cpu(space->machine, "dsp"), 1, CLEAR_LINE);
 		}
 	}
 
@@ -341,7 +341,7 @@ static MACHINE_RESET(model2o)
 	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -352,7 +352,7 @@ static MACHINE_RESET(model2_scsp)
 	memory_set_bankptr(machine, 5, memory_region(machine, "scsp") + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, memory_region(machine, "audiocpu")+0x80000, 16);
+	memcpy(model2_soundram, memory_region(machine, "audiocpu") + 0x80000, 16);
 	device_reset(cputag_get_cpu(machine, "audiocpu"));
 }
 
@@ -362,7 +362,7 @@ static MACHINE_RESET(model2)
 	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -372,12 +372,12 @@ static MACHINE_RESET(model2b)
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG0, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
+	cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
 
 	dsp_type = DSP_TYPE_SHARC;
 }
@@ -503,7 +503,10 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-				cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+				if (dsp_type == DSP_TYPE_SHARC)
+					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+				else
+					cputag_set_input_line(space->machine, "tgp", INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -518,7 +521,10 @@ static WRITE32_HANDLER(copro_function_port_w)
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	copro_fifoin_push(space->machine->cpu[2], d);
+	if (dsp_type == DSP_TYPE_SHARC)
+		copro_fifoin_push(cputag_get_cpu(space->machine, "dsp"), d);
+	else
+		copro_fifoin_push(cputag_get_cpu(space->machine, "tgp"), d);
 }
 
 static READ32_HANDLER(copro_fifo_r)
@@ -533,7 +539,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	{
 		if (dsp_type == DSP_TYPE_SHARC)
 		{
-			sharc_external_dma_write(space->machine->cpu[2], model2_coprocnt, data & 0xffff);
+			sharc_external_dma_write(cputag_get_cpu(space->machine, "dsp"), model2_coprocnt, data & 0xffff);
 		}
 		else if (dsp_type == DSP_TYPE_TGP)
 		{
@@ -545,7 +551,10 @@ static WRITE32_HANDLER(copro_fifo_w)
 	else
 	{
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-		copro_fifoin_push(space->machine->cpu[2], data);
+		if (dsp_type == DSP_TYPE_SHARC)
+			copro_fifoin_push(cputag_get_cpu(space->machine, "dsp"), data);
+		else
+			copro_fifoin_push(cputag_get_cpu(space->machine, "tgp"), data);
 	}
 }
 
@@ -558,7 +567,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0))
 	{
-		sharc_external_iop_write(space->machine->cpu[2], offset, data);
+		sharc_external_iop_write(cputag_get_cpu(space->machine, "dsp"), offset, data);
 	}
 	else
 	{
@@ -569,7 +578,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		else
 		{
 			iop_data |= (data & 0xffff) << 16;
-			sharc_external_iop_write(space->machine->cpu[2], offset, iop_data);
+			sharc_external_iop_write(cputag_get_cpu(space->machine, "dsp"), offset, iop_data);
 		}
 		iop_write_num++;
 	}
@@ -619,7 +628,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         else
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
-            cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
+            cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
@@ -644,7 +653,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
     if (model2_geoctl & 0x80000000)
     {
-        sharc_external_dma_write(space->machine->cpu[3], model2_geocnt, data & 0xffff);
+        sharc_external_dma_write(cputag_get_cpu(space->machine, "dsp2"), model2_geocnt, data & 0xffff);
 
         model2_geocnt++;
     }
@@ -660,7 +669,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
 {
     if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
     {
-        sharc_external_iop_write(space->machine->cpu[3], offset, data);
+        sharc_external_iop_write(cputag_get_cpu(space->machine, "dsp2"), offset, data);
     }
     else
     {
@@ -671,7 +680,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         else
         {
             geo_iop_data |= (data & 0xffff) << 16;
-            sharc_external_iop_write(space->machine->cpu[3], offset, geo_iop_data);
+            sharc_external_iop_write(cputag_get_cpu(space->machine, "dsp2"), offset, geo_iop_data);
         }
         geo_iop_write_num++;
     }
@@ -1754,14 +1763,14 @@ static READ32_HANDLER(copro_sharc_input_fifo_r)
 	UINT32 result = 0;
 	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
 
-	copro_fifoin_pop(space->machine->cpu[2], &result);
+	copro_fifoin_pop(cputag_get_cpu(space->machine, "dsp"), &result);
 	return result;
 }
 
 static WRITE32_HANDLER(copro_sharc_output_fifo_w)
 {
 	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
-	copro_fifoout_push(space->machine->cpu[2], data);
+	copro_fifoout_push(cputag_get_cpu(space->machine, "dsp"), data);
 }
 
 static READ32_HANDLER(copro_sharc_buffer_r)

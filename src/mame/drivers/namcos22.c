@@ -1342,9 +1342,9 @@ static void
 InitDSP( running_machine *machine, int bSuperSystem22 )
 {
 	mbSuperSystem22 = bSuperSystem22;
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-	cpu_set_input_line(machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
-	cpu_set_input_line(machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	cputag_set_input_line(machine, "master",INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+	cputag_set_input_line(machine, "slave",INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+	cputag_set_input_line(machine, "mcu",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 } /* InitDSP */
 
 static READ16_HANDLER( pdp_status_r )
@@ -1524,12 +1524,12 @@ static WRITE16_HANDLER( slave_external_ram_w )
 
 static void HaltSlaveDSP( running_machine *machine )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static void EnableSlaveDSP( void )
 {
-//  cpu_set_input_line(Machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+//  cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static READ16_HANDLER( dsp_HOLD_signal_r )
@@ -1707,14 +1707,14 @@ static INTERRUPT_GEN( dsp_serial_pulse1 )
 	{
 		mSerialDataSlaveToMasterCurrent = mSerialDataSlaveToMasterNext;
 
-		if( cpu_getiloops(device)==0 )
+		if( cpu_getiloops(device) == 0 )
 		{
-			cpu_set_input_line(device->machine->cpu[1], TMS32025_INT0, HOLD_LINE);
+			cputag_set_input_line(device->machine, "master", TMS32025_INT0, HOLD_LINE);
 		}
-		cpu_set_input_line(device->machine->cpu[1], TMS32025_RINT, HOLD_LINE);
-		cpu_set_input_line(device->machine->cpu[1], TMS32025_XINT, HOLD_LINE);
-		cpu_set_input_line(device->machine->cpu[2], TMS32025_RINT, HOLD_LINE);
-		cpu_set_input_line(device->machine->cpu[2], TMS32025_XINT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "master", TMS32025_RINT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "master", TMS32025_XINT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "slave", TMS32025_RINT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "slave", TMS32025_XINT, HOLD_LINE);
 	}
 }
 
@@ -2165,19 +2165,19 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	{
 		if( newReg == 0 )
 		{ /* disable DSPs */
-			cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-			cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+			cputag_set_input_line(space->machine, "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
 			mbEnableDspIrqs = 0;
 		}
-		else if( newReg==1 )
+		else if( newReg == 1 )
 		{ /*enable dsp and rendering subsystem */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "master", INPUT_LINE_RESET, CLEAR_LINE);
 			namcos22_enable_slave_simulation();
 			mbEnableDspIrqs = 1;
 		}
-		else if( newReg==0xff )
+		else if( newReg == 0xff )
 		{ /* used to upload game-specific code to master/slave dsps */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "master", INPUT_LINE_RESET, CLEAR_LINE);
 			mbEnableDspIrqs = 0;
 		}
 	}
@@ -3253,13 +3253,13 @@ static MACHINE_DRIVER_START( namcos22 )
 	MDRV_CPU_PROGRAM_MAP(namcos22_am)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
 
-	MDRV_CPU_ADD("dspmaster", TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MDRV_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program)
 	MDRV_CPU_DATA_MAP(master_dsp_data)
 	MDRV_CPU_IO_MAP(master_dsp_io)
 	MDRV_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
 
-	MDRV_CPU_ADD("dspslave", TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MDRV_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(slave_dsp_program)
 	MDRV_CPU_DATA_MAP(slave_dsp_data)
 	MDRV_CPU_IO_MAP(slave_dsp_io)
@@ -3622,10 +3622,10 @@ ROM_START( cybrcomm )
 	ROM_LOAD32_BYTE( "cy1prgum.8d", 0x00001, 0x80000, CRC(c9c4a921) SHA1(76a52461165a8bd8d984a34063fbeb4cb73624af) )
 	ROM_LOAD32_BYTE( "cy1prguu.6d", 0x00000, 0x80000, CRC(5f22975b) SHA1(a1a5cb66358d64a3c564b912f2eeafa182786b1e) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
@@ -3799,10 +3799,10 @@ ROM_START( acedrvrw )
 	ROM_LOAD32_BYTE( "ad2prgum.8d", 0x00001, 0x80000, CRC(d5042d6e) SHA1(9ae93e7ea7126302831a879ba0aadcb6e5b842f5) )
 	ROM_LOAD32_BYTE( "ad2prguu.6d", 0x00000, 0x80000, CRC(86d4661d) SHA1(2a1529a51ca5466994a2d0d84c7aab13cef95a11) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
@@ -3851,10 +3851,10 @@ ROM_START( victlapw )
 	ROM_LOAD32_BYTE( "advprgum.8d", 0x00001, 0x80000, CRC(af67f2fb) SHA1(f391843ee0d053e33660c60e3718871142d932f2) )
 	ROM_LOAD32_BYTE( "advprguu.6d", 0x00000, 0x80000, CRC(b60e5d2b) SHA1(f5740615c2864c5c6433275cf4388bda5122b7a7) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
@@ -3910,10 +3910,10 @@ ROM_START( raveracw )
 	ROM_LOAD32_BYTE( "rv2prumb.8d", 0x00001, 0x80000, CRC(6414a800) SHA1(c278ff644909d12a43ba6fc2bf8d2092e469c3e6) )
 	ROM_LOAD32_BYTE( "rv2pruub.6d", 0x00000, 0x80000, CRC(a9f18714) SHA1(8e7b17749d151f92020f68d1ac06003cf1f5c573) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -3972,10 +3972,10 @@ ROM_START( raveracj )
 	ROM_LOAD32_BYTE( "rv1prumb.8d", 0x00001, 0x80000, CRC(375fabcf) SHA1(448e3db3e3fab8c7c27e214ab5a5fa84e5f84366) )
 	ROM_LOAD32_BYTE( "rv1pruub.6d", 0x00000, 0x80000, CRC(92f834d6) SHA1(028368790f0293fcfea5c7b12f7f315e27a62f77) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -4034,10 +4034,10 @@ ROM_START( raveraja )
 	ROM_LOAD32_BYTE( "rv1prum.8d", 0x00001, 0x80000, CRC(28e503e3) SHA1(a3071461f840f28c65c660de215c73f812f356b3) )
 	ROM_LOAD32_BYTE( "rv1pruu.6d", 0x00000, 0x80000, CRC(c47d9ff4) SHA1(4d7c4ac4151a3b306e7277937add8eee26e561a6) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -4096,10 +4096,10 @@ ROM_START( ridgera2 )
 	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
 	ROM_LOAD32_BYTE( "rrs1pruub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -4147,10 +4147,10 @@ ROM_START( ridger2a )
 	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
 	ROM_LOAD32_BYTE( "rrs1pruub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -4199,10 +4199,10 @@ ROM_START( ridger2b )
 	ROM_LOAD32_BYTE( "rrs1prum.8d", 0x00001, 0x80000, CRC(93259fb0) SHA1(c29787e873797a003db27adbd20d7b852e26d8c6) )
 	ROM_LOAD32_BYTE( "rrs1pruu.6d", 0x00000, 0x80000, CRC(31cdefe8) SHA1(ae836d389bed43dd156eb4cf3e97b6f1ad68181e) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
@@ -4250,10 +4250,10 @@ ROM_START( ridgerac )
 	ROM_LOAD32_BYTE( "rr3prgum.8d", 0x00001, 0x80000, CRC(e160f63f) SHA1(9b4b7a13eb4bc19fcb53daedb87e4945c20a1b8e) )
 	ROM_LOAD32_BYTE( "rr3prguu.6d", 0x00000, 0x80000, CRC(f07c78c0) SHA1(dbed76d868b761711faf5b6e11f2c9affb91db5d) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
@@ -4301,10 +4301,10 @@ ROM_START( ridgerab )
 	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
 	ROM_LOAD32_BYTE( "rr2pruu.6d", 0x00000, 0x80000, CRC(a79e456f) SHA1(049c596e01e53e3a401c5c4260517f170688d387) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
@@ -4352,10 +4352,10 @@ ROM_START( ridgeraj )
 	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
 	ROM_LOAD32_BYTE( "rr1pruu.6d", 0x00000, 0x80000, CRC(c1371f96) SHA1(a78e0bf6c147c034487a85efa0a8470f4e8f4bf0) )
 
-	ROM_REGION( 0x10000*2, "dspmaster", 0 ) /* Master DSP */
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x10000*2, "dspslave", 0 ) /* Slave DSP */
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
 	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
@@ -5609,14 +5609,14 @@ static DRIVER_INIT( tokyowar )
 {
 	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
 }
 
 static DRIVER_INIT( aquajet )
 {
 	namcos22s_init(machine, NAMCOS22_AQUA_JET);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
 }
 
 /************************************************************************************/
