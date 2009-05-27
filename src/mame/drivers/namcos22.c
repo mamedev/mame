@@ -2721,6 +2721,51 @@ static READ8_HANDLER( tokyowar_mcu_adc_r )
 	}
 }
 
+static READ8_HANDLER( aquajet_mcu_adc_r )
+{
+	UINT16 gas, steer, ddy;
+
+	gas   = input_port_read(space->machine, "GAS") ^ 0x7f;
+	steer = input_port_read(space->machine, "STEER") ^ 0xff;
+	ddy = input_port_read(space->machine, "STICKY");
+	if (ddy > 0) ddy -= 1;
+
+	gas <<= 2;
+	steer <<= 2;
+	ddy <<= 2;
+
+	/*
+		0 & 1 = handle left/right
+		2 & 3 = accelerator
+		4 & 5 = handle pole (Y axis)
+
+	*/
+
+	switch (offset)
+	{
+		case 0:
+			return steer & 0xff;
+
+		case 1:
+			return (steer>>8);
+
+		case 2:
+			return gas & 0xff;
+
+		case 3:
+			return (gas>>8);
+						     
+		case 4:
+			return ddy & 0xff;
+
+		case 5:
+		       	return (ddy>>8);	
+
+		default:
+			return 0;
+	}
+}
+
 static READ8_HANDLER( airco22_mcu_adc_r )
 {
 	UINT16 pedal, x, y;
@@ -4796,6 +4841,63 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Tokyo Wars */
 
+static INPUT_PORTS_START( aquajet )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "DIP4-1 (Test Mode)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP4-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP4-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIP4-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIP4-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIP4-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIP4-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("GAS")
+	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("MCUP5A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MCUP5B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )			
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END /* Aqua Jet */
+
 static INPUT_PORTS_START( propcycl )
 	PORT_START("DSW0")	/* DIP4 */
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
@@ -5513,6 +5615,8 @@ static DRIVER_INIT( tokyowar )
 static DRIVER_INIT( aquajet )
 {
 	namcos22s_init(machine, NAMCOS22_AQUA_JET);
+
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
 }
 
 /************************************************************************************/
@@ -5545,5 +5649,5 @@ GAME( 1996, alpinr2a, alpinr2b, namcos22s, alpiner,  alpiner2, ROT0, "Namco", "A
 GAME( 1996, alpinesa, 0,        namcos22s, alpiner,  alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, propcycl, 0,        namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, tokyowar, 0,        namcos22s, tokyowar, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )	/* missing sprite clear DMA?  or protection? */
-GAME( 1996, aquajet,  0,        namcos22s, tokyowar, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1996, aquajet,  0,        namcos22s, aquajet,  aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 //GAME( 1997, armdilox, "Armidillo Racing")
