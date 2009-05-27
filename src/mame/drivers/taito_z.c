@@ -903,20 +903,11 @@ static void parse_control(running_machine *machine)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
-static void parse_control_noz80(running_machine *machine)
-{
-	/* bit 0 enables cpu B */
-	/* however this fails when recovering from a save state
-       if cpu B is disabled !! */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
-
-}
-
-static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
+static WRITE16_HANDLER( cpua_ctrl_w )
 {
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;	/* for Wgp */
@@ -927,22 +918,11 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 	// Chase HQ: handle the lights
 	if ((!strcmp(space->machine->gamedrv->name, "chasehq")) || (!strcmp(space->machine->gamedrv->name, "chasehqj")))
 	{
-		output_set_lamp_value(0, (data&0x20) ? 1 : 0);
-		output_set_lamp_value(1, (data&0x40) ? 1 : 0);
+		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
+		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
 	}
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
-}
-
-static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
-{
-	if ((data &0xff00) && ((data &0xff) == 0))
-		data = data >> 8;	/* for Wgp */
-	cpua_ctrl = data;
-
-	parse_control_noz80(space->machine);
-
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -954,27 +934,20 @@ static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
 
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 }
 
 /* 68000 B */
 
-#if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
-	cpu_set_input_line(machine->cpu[2],5,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
-}
-#endif
-
-static TIMER_CALLBACK( taitoz_sg_cpub_interrupt5 )
-{
-	cpu_set_input_line(machine->cpu[1],5,HOLD_LINE);	/* assumes no Z80 */
+	cputag_set_input_line(machine, "sub", 5, HOLD_LINE);
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[2],6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cputag_set_input_line(machine, "sub", 6, HOLD_LINE);
 }
 #endif
 
@@ -1330,7 +1303,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_sg_cpub_interrupt5);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, taitoz_cpub_interrupt5);
 }
 
 
@@ -1407,7 +1380,7 @@ static READ16_HANDLER( aquajack_unknown_r )
 
 static INT32 banknum;
 
-static void reset_sound_region(running_machine *machine)	/* assumes Z80 sandwiched between 68Ks */
+static void reset_sound_region(running_machine *machine)
 {
 	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
@@ -1601,7 +1574,7 @@ static ADDRESS_MAP_START( bshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_noz80_ctrl_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -2806,9 +2779,9 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)	// assumes Z80 sandwiched between 68Ks
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
@@ -4666,7 +4639,7 @@ static DRIVER_INIT( taitoz )
 
 static STATE_POSTLOAD( bshark_postload )
 {
-	parse_control_noz80(machine);
+	parse_control(machine);
 }
 
 static DRIVER_INIT( bshark )

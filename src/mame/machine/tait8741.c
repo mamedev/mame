@@ -443,13 +443,13 @@ static void josvolly_8741_do(running_machine *machine, int num)
 	}
 }
 
-static void josvolly_8741_w(const address_space *space,int num,int offset,int data)
+static void josvolly_8741_w(const address_space *space, int num, int offset, int data)
 {
 	JV8741 *mcu = &i8741[num];
 
 	if(offset==1)
 	{
-		LOG(("%s:8741[%d] CW %02X\n",cpuexec_describe_context(space->machine),num,data));
+		LOG(("%s:8741[%d] CW %02X\n", cpuexec_describe_context(space->machine), num, data));
 
 		/* read pointer */
 		mcu->cmd = data;
@@ -487,17 +487,17 @@ static void josvolly_8741_w(const address_space *space,int num,int offset,int da
 	else
 	{
 		/* data */
-		LOG(("%s:8741[%d] DW %02X\n",cpuexec_describe_context(space->machine),num,data));
+		LOG(("%s:8741[%d] DW %02X\n", cpuexec_describe_context(space->machine), num, data));
 
-		mcu->txd  = data^0x40; /* parity reverce ? */
-		mcu->sts  |= 0x02;     /* TXD busy         */
+		mcu->txd = data ^ 0x40; /* parity reverce ? */
+		mcu->sts |= 0x02;     /* TXD busy         */
 #if 1
 		/* interrupt ? */
-		if(num==0)
+		if(num == 0)
 		{
 			if(josvolly_nmi_enable)
 			{
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				josvolly_nmi_enable = 0;
 			}
 		}

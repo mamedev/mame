@@ -2489,7 +2489,7 @@ static DRIVER_INIT( twotiger )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
 }
 
 
@@ -2558,7 +2558,7 @@ static DRIVER_INIT( demoderb )
 	ssio_set_custom_output(4, 0xff, demoderb_op4_w);
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
+	cputag_suspend(machine, "tcscpu", SUSPEND_REASON_DISABLE, 1);
 }
 
 

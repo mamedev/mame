@@ -1516,26 +1516,26 @@ static void mcr_common_init(running_machine *machine, int sound_board)
 static DRIVER_INIT( demoderm )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, demoderm_ip1_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, demoderm_ip2_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, demoderm_op6_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, demoderm_ip1_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, demoderm_ip2_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, demoderm_op6_w);
 }
 
 
 static DRIVER_INIT( sarge )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, turbocs_data_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, turbocs_data_w);
 }
 
 
 static DRIVER_INIT( maxrpm )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, maxrpm_ip1_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, maxrpm_ip2_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, maxrpm_ip1_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, maxrpm_ip2_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
 
 	state_save_register_global(machine, maxrpm_adc_control);
 	state_save_register_global(machine, maxrpm_adc_select);
@@ -1548,26 +1548,26 @@ static DRIVER_INIT( maxrpm )
 static DRIVER_INIT( rampage )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, rampage_ip4_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, rampage_op6_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, rampage_ip4_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, rampage_op6_w);
 }
 
 
 static DRIVER_INIT( powerdrv )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, powerdrv_ip2_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, powerdrv_op5_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, powerdrv_op6_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, powerdrv_ip2_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, powerdrv_op5_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, powerdrv_op6_w);
 }
 
 
 static DRIVER_INIT( stargrds )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, stargrds_ip0_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, stargrds_op5_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, stargrds_op6_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, stargrds_ip0_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, stargrds_op5_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, stargrds_op6_w);
 }
 
 
@@ -1603,10 +1603,10 @@ static DRIVER_INIT( turbotag )
 	spyhunt_scroll_offset = 88;
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
+	cputag_suspend(machine, "csdcpu", SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
 }
 
 

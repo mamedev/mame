@@ -896,7 +896,7 @@ logerror("vlbank starting\n");
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			timer_adjust_oneshot(this_ppu->nmi_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 4), 0);
+			timer_adjust_oneshot(this_ppu->nmi_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 4), 0);
 		}
 	}
 
@@ -924,7 +924,7 @@ logerror("vlbank ending\n");
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
 	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, next_scanline * this_ppu->scan_scale, 0), 0);
@@ -952,7 +952,7 @@ static DEVICE_RESET( ppu2c0x )
 	timer_adjust_oneshot(this_ppu->nmi_timer, attotime_never, 0);
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cputag_clocks_to_attotime(device->machine, "maincpu", 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
 	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 1, 0), 0);

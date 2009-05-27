@@ -568,12 +568,12 @@ static WRITE32_HANDLER(K037122_reg_w)
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hornet )
@@ -704,7 +704,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = ADDI (ADC DI)
                 0x01 = ADDSCLK (ADC SCLK)
             */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -739,9 +739,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = EXRGB
             */
 			if (data & 0x80)
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -968,10 +968,10 @@ static MACHINE_START( hornet )
 	jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x00000000, 0x003fffff, FALSE, workram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
 
 	state_save_register_global(machine, led_reg0);
 	state_save_register_global(machine, led_reg1);
@@ -989,7 +989,7 @@ static MACHINE_RESET( hornet )
 		memory_set_bank(machine, 1, 0);
 	}
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		memory_set_bankptr(machine, 5, usr5);
@@ -1056,8 +1056,8 @@ static MACHINE_RESET( hornet_2board )
 		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
 		memory_set_bank(machine, 1, 0);
 	}
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		memory_set_bankptr(machine, 5, usr5);
@@ -1148,19 +1148,19 @@ static int jvs_encode_data(running_machine *machine, UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(machine->cpu[0], 0xdf);
+			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(machine->cpu[0], 0xcf);
+			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(machine->cpu[0], b);
+			ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), b);
 		}
 	}
 	return sum;
@@ -1253,11 +1253,11 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(machine->cpu[0], 0xe0);			// sync
-	ppc4xx_spu_receive_byte(machine->cpu[0], 0x00);			// node
-	ppc4xx_spu_receive_byte(machine->cpu[0], rdata_ptr+1);	// num of bytes
+	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0xe0);			// sync
+	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), 0x00);			// node
+	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), rdata_ptr + 1);	// num of bytes
 	sum += jvs_encode_data(machine, rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(machine->cpu[0], sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(cputag_get_cpu(machine, "maincpu"), sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1267,13 +1267,13 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
@@ -1287,7 +1287,7 @@ static DRIVER_INIT(hornet)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine->cpu[0], jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
 }
 
 static DRIVER_INIT(hornet_2board)
@@ -1301,7 +1301,7 @@ static DRIVER_INIT(hornet_2board)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine->cpu[0], jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
 }
 
 /*****************************************************************************/

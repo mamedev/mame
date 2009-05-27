@@ -256,12 +256,12 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
@@ -512,10 +512,10 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_w((data >> 0) & 1);
 			adc1038_clk_w(space->machine, (data >> 1) & 1);
@@ -543,7 +543,7 @@ READ8_HANDLER( K056230_r )
 
 static TIMER_CALLBACK( network_irq_clear )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( K056230_w )
@@ -561,12 +561,12 @@ WRITE8_HANDLER( K056230_w )
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(space->machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
+					cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
 					timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
-//              cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
+//              cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -595,10 +595,10 @@ WRITE32_HANDLER( lanc_ram_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x00000000, 0x000fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -900,7 +900,7 @@ static const sharc_config sharc_cfg =
 
 static MACHINE_RESET( gticlub )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( gticlub )
@@ -944,8 +944,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hangplt )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( hangplt )
@@ -957,7 +957,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap)
 
-	MDRV_CPU_ADD("dsp1", ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(hangplt_sharc0_map)
 
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_MACHINE_RESET(hangplt)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
-	MDRV_3DFX_VOODOO_CPU("dsp1")
+	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
@@ -1203,13 +1203,13 @@ ROM_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

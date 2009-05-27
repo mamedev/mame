@@ -377,7 +377,7 @@ static void mcr68_common_init(running_machine *machine)
 	}
 
 	/* initialize the clock */
-	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0]) / 10);
+	m6840_internal_counter_period = ATTOTIME_IN_HZ(cputag_get_clock(machine, "maincpu") / 10);
 
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
@@ -481,8 +481,8 @@ INTERRUPT_GEN( mcr68_interrupt )
 
 static void update_mcr68_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

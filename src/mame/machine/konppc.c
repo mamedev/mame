@@ -143,7 +143,7 @@ READ32_HANDLER( cgboard_dsp_comm_r_ppc )
 
 WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 {
-	int dsp = (cgboard_id == 0) ? 2 : 3;
+	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
 //  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if (cgboard_id < MAX_CG_BOARDS)
@@ -160,15 +160,15 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				pci_bridge_enable[cgboard_id] = (data & 0x20000000) ? 1 : 0;
 
 				if (data & 0x10000000)
-					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_RESET, CLEAR_LINE);
+					cputag_set_input_line(space->machine, dsptag, INPUT_LINE_RESET, CLEAR_LINE);
 				else
-					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_RESET, ASSERT_LINE);
+					cputag_set_input_line(space->machine, dsptag, INPUT_LINE_RESET, ASSERT_LINE);
 
 				if (data & 0x02000000)
-					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_IRQ0, ASSERT_LINE);
+					cputag_set_input_line(space->machine, dsptag, INPUT_LINE_IRQ0, ASSERT_LINE);
 
 				if (data & 0x04000000)
-					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_IRQ1, ASSERT_LINE);
+					cputag_set_input_line(space->machine, dsptag, INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -223,13 +223,13 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG0, ASSERT_LINE);
-			sharc_set_flag_input(space->machine->cpu[2], 0, ASSERT_LINE);
+			//cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
+			sharc_set_flag_input(cputag_get_cpu(space->machine, "dsp"), 0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_IRQ2, ASSERT_LINE);
+					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -237,13 +237,16 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		case CGBOARD_TYPE_NWKTR:
 		case CGBOARD_TYPE_HANGPLT:
 		{
+			const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+			const device_config *device = devtag_get_device(space->machine, dsptag);
+
 			if (offset == 1)
 			{
 				nwk_device_sel[board] = data;
 
 				if (data & 0x01 || data & 0x10)
 				{
-					sharc_set_flag_input(space->machine->cpu[board == 0 ? 2 : 3], 1, ASSERT_LINE);
+					sharc_set_flag_input(device, 1, ASSERT_LINE);
 				}
 
 				if (texture_bank[board] != -1)
@@ -349,8 +352,8 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 
 static UINT32 nwk_fifo_r(const address_space *space, int board)
 {
-	int cpu = (board == 0) ? 2 : 3;
-	const device_config *device = space->machine->cpu[cpu];
+	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+	const device_config *device = devtag_get_device(space->machine, dsptag);
 	UINT32 data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
@@ -380,8 +383,8 @@ static UINT32 nwk_fifo_r(const address_space *space, int board)
 
 static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
 {
-	int cpu = (board == 0) ? 2 : 3;
-	const device_config *device = machine->cpu[cpu];
+	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+	const device_config *device = devtag_get_device(machine, dsptag);
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
