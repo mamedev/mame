@@ -853,7 +853,7 @@ static INPUT_PORTS_START( paperboy )
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("5/6A:!8,!7")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, "Med. Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium_Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("5/6A:!6,!5")
 	PORT_DIPSETTING(    0x08, "10000" )
@@ -956,12 +956,12 @@ static INPUT_PORTS_START( ssprint )
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("5/6A:!8,!7")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, "Med. Hard" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium_Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x0c, 0x00, "Obstacles" )				PORT_DIPLOCATION("5/6A:!6,!5")
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x08, "Med. Hard" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Medium_Hard ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x30, 0x00, "Wrenches" )				PORT_DIPLOCATION("5/6A:!4,!3")
 	PORT_DIPSETTING(    0x10, "2" )
@@ -1044,8 +1044,8 @@ static INPUT_PORTS_START( apb )
 	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )											/* 11                       5000                    Yes                 */
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy ) )										/* 10                       6000                    Yes                 */
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )												/* 9                        8000                    Yes                 */
-	PORT_DIPSETTING(    0x00, "Medium Easy" )												/* 8                        10000                   Yes                 */
-	PORT_DIPSETTING(    0x20, "Medium Hard" )												/* 7                        11000                   Yes                 */
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium_Easy ) )												/* 8                        10000                   Yes                 */
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium_Hard ) )												/* 7                        11000                   Yes                 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )												/* 6                        13000                   Yes                 */
 	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )										/* 5                        15000                   No                  */
 	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )											/* 4                        18000                   No                  */

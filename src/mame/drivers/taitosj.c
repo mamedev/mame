@@ -1635,8 +1635,8 @@ static INPUT_PORTS_START( kikstart )
 	PORT_DIPNAME(0x18, 0x10, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(   0x18, DEF_STR( Easy ) )		/* 3:00 */
 	PORT_DIPSETTING(   0x10, DEF_STR( Normal ) ) 		/* 2:30 */
-	PORT_DIPSETTING(   0x08, "Difficult" )		/* 2:00 */
-	PORT_DIPSETTING(   0x00, "Very Difficult" ) 	/* 1:30 */
+	PORT_DIPSETTING(   0x08, DEF_STR( Difficult ) )		/* 2:00 */
+	PORT_DIPSETTING(   0x00, DEF_STR( Very_Difficult ) ) 	/* 1:30 */
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )

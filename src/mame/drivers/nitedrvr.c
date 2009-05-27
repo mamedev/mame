@@ -91,7 +91,7 @@ static INPUT_PORTS_START( nitedrvr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Spare
 	PORT_DIPNAME( 0x20, 0x00, "Difficult Bonus" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x20, "Difficult" )
+	PORT_DIPSETTING(	0x20, DEF_STR( Difficult ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN0")	// fake

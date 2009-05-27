@@ -376,7 +376,7 @@ static INPUT_PORTS_START( starforc )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x18, "Difficult" )
+	PORT_DIPSETTING(    0x18, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Hardest ) )
 	/* 0x30 and x038 are unused */
