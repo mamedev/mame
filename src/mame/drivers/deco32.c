@@ -788,7 +788,8 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
-	AM_RANGE(0x438000, 0x438003) AM_READWRITE(dragngun_lightgun_r, dragngun_lightgun_w)
+	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
+	AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
 
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(dragngun_sprite_control_w)
