@@ -84,6 +84,8 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 
 #define SEGACD_CLOCK      12500000
 
+#define HAZE_MD 0 // to make appear / disappear the Region DipSwitch
+
 /* timing details */
 static int megadriv_framerate;
 static int megadrive_total_scanlines;
@@ -1443,97 +1445,131 @@ static void init_megadri6_io(running_machine *machine)
 UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
 void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
 
-INPUT_PORTS_START( megadri6 )
-	PORT_START("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+/*
+
+    A10001h = A0         Version register
+
+    A10003h = 7F         Data register for port A
+    A10005h = 7F         Data register for port B
+    A10007h = 7F         Data register for port C
+
+    A10009h = 00         Ctrl register for port A
+    A1000Bh = 00         Ctrl register for port B
+    A1000Dh = 00         Ctrl register for port C
+
+    A1000Fh = FF         TxData register for port A
+    A10011h = 00         RxData register for port A
+    A10013h = 00         S-Ctrl register for port A
+
+    A10015h = FF         TxData register for port B
+    A10017h = 00         RxData register for port B
+    A10019h = 00         S-Ctrl register for port B
+
+    A1001Bh = FF         TxData register for port C
+    A1001Dh = 00         RxData register for port C
+    A1001Fh = 00         S-Ctrl register for port C
+
+
+
+
+ Bit 7 - (Not connected)
+ Bit 6 - TH
+ Bit 5 - TL
+ Bit 4 - TR
+ Bit 3 - RIGHT
+ Bit 2 - LEFT
+ Bit 1 - DOWN
+ Bit 0 - UP
+
+
+*/
+
+INPUT_PORTS_START( md_common )
+	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") // b
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") // a
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 X") // x
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Y") // y
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Z") // z
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
 
-
-	PORT_START("PAD2")		/* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") // b
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") // a
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 START") // start
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 X") // x
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Y") // y
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
+INPUT_PORTS_END
 
-	PORT_START("IN0")		/* 3rd I/O port */
+
+INPUT_PORTS_START( megadriv )
+	PORT_INCLUDE( md_common )
 
 	PORT_START("RESET")		/* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-	PORT_START("REGION")	/* Buttons on Genesis Console */
+	#if HAZE_MD
+	PORT_START("REGION")	/* Region setting for Console */
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
 	PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
 	PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
 	PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
+	#endif
 INPUT_PORTS_END
 
+INPUT_PORTS_START( megadri6 )
+	PORT_INCLUDE( megadriv )
 
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Z") // z
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Y") // y
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 X") // x
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
 
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Y") // y
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 X") // x
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
+INPUT_PORTS_END
 
 INPUT_PORTS_START( ssf2ghw )
-	PORT_START("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("PAD2")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")		/* 3rd I/O port */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-
-//  PORT_START("RESET")     /* Buttons on Genesis Console */
-//  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
-
-//  PORT_START("REGION")    /* Buttons on Genesis Console */
-//  /* Region setting for Console */
-//  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-//  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
-//  PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
-//  PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
-//  PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
@@ -1578,117 +1614,17 @@ INPUT_PORTS_START( ssf2ghw )
 INPUT_PORTS_END
 
 
-
-
-
-/*
-
-    A10001h = A0         Version register
-
-    A10003h = 7F         Data register for port A
-    A10005h = 7F         Data register for port B
-    A10007h = 7F         Data register for port C
-
-    A10009h = 00         Ctrl register for port A
-    A1000Bh = 00         Ctrl register for port B
-    A1000Dh = 00         Ctrl register for port C
-
-    A1000Fh = FF         TxData register for port A
-    A10011h = 00         RxData register for port A
-    A10013h = 00         S-Ctrl register for port A
-
-    A10015h = FF         TxData register for port B
-    A10017h = 00         RxData register for port B
-    A10019h = 00         S-Ctrl register for port B
-
-    A1001Bh = FF         TxData register for port C
-    A1001Dh = 00         RxData register for port C
-    A1001Fh = 00         S-Ctrl register for port C
-
-
-
-
- Bit 7 - (Not connected)
- Bit 6 - TH
- Bit 5 - TL
- Bit 4 - TR
- Bit 3 - RIGHT
- Bit 2 - LEFT
- Bit 1 - DOWN
- Bit 0 - UP
-
-
-*/
-
-INPUT_PORTS_START( megadriv )
-	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
-
-	PORT_START("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 START") // start
-
-	PORT_START("IN0")		/* 3rd I/O port */
-
-	PORT_START("RESET")		/* Buttons on Genesis Console */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
-
-	PORT_START("REGION")	/* Region setting for Console */
-	/* Region setting for Console */
-	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
-	PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
-	PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
-	PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
-INPUT_PORTS_END
-
-
 INPUT_PORTS_START( aladbl )
-	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
 
-	PORT_START("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
-//  PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-//  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-//  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-//  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Throw") // a
-//  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Sword") // b
-//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump") // c
-//  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // start
-
-	PORT_START("IN0")		/* 3rd I/O port */
-
-//  PORT_START("RESET")     /* Buttons on Genesis Console */
-//  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
-
-//  PORT_START("REGION")    /* Region setting for Console */
-//  /* Region setting for Console */
-//  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-//  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
-//  PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
-//  PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
-//  PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
+	PORT_MODIFY("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
     /* As I don't know how it is on real hardware, this is more a guess than anything */
 	PORT_START("MCU")
@@ -1701,7 +1637,7 @@ INPUT_PORTS_START( aladbl )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
     PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+//	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )			/* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */
@@ -1711,24 +1647,6 @@ INPUT_PORTS_START( aladbl )
 	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
 INPUT_PORTS_END
-
-/* xxx_BUTTONs are used with player = 0, 1, 2, 3 so we need to return 0 for the missing 4th I/O port  */
-static const char *const padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
-
-#define MODE_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0800) >> 11)
-#define Z_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0400) >> 10)
-#define Y_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0200) >> 9 )
-#define X_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0100) >> 8 )
-
-#define START_BUTTON(machine,player) ((input_port_read_safe(machine, padnames[player], 0) & 0x0080) >> 7 )
-#define C_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0040) >> 6 )
-#define B_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0020) >> 5 )
-#define A_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0010) >> 4 )
-#define RIGHT_BUTTON(machine,player) ((input_port_read_safe(machine, padnames[player], 0) & 0x0008) >> 3 )
-#define LEFT_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0004) >> 2 )
-#define DOWN_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0002) >> 1 )
-#define UP_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0001) >> 0 )
-#define MD_RESET_BUTTON(machine)		 ((input_port_read_safe(machine, "RESET", 0x00) & 0x01) >> 0 )
 
 UINT8 megadrive_io_data_regs[3];
 UINT8 megadrive_io_ctrl_regs[3];
@@ -1746,113 +1664,83 @@ static void megadrive_init_io(running_machine *machine)
 	megadrive_io_tx_regs[1] = 0xff;
 	megadrive_io_tx_regs[2] = 0xff;
 
-	if (machine->gamedrv->ipt==ipt_megadri6)
+	if (machine->gamedrv->ipt == ipt_megadri6)
 		init_megadri6_io(machine);
 
-	if (machine->gamedrv->ipt==ipt_ssf2ghw)
+	if (machine->gamedrv->ipt == ipt_ssf2ghw)
 		init_megadri6_io(machine);
 }
 
-/************* 6 button version **************************/
+/************* 6 buttons version **************************/
 static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int portnum)
 {
-	UINT8 retdata;
+	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	static const char *pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
+	static const char *pad6names[] = { "EXTRA1", "EXTRA2", "IN0", "UNK" };
 
-	if (megadrive_io_data_regs[portnum]&0x40)
+	if (megadrive_io_data_regs[portnum] & 0x40)
 	{
-		if (io_stage[portnum]==2)
+		if (io_stage[portnum] == 2)
 		{
-			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-			          (1 <<6) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(MODE_BUTTON(machine,portnum)<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(X_BUTTON(machine,portnum)<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(Y_BUTTON(machine,portnum)<<1)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(Z_BUTTON(machine,portnum)<<0));
+			/* here we read B, C & the additional buttons */
+			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x30) | 
+							(input_port_read_safe(machine, pad6names[portnum], 0) & 0x0f)) & ~helper);
 		}
 		else
 		{
-			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-			          (1 << 6) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(machine,portnum)<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(machine,portnum)<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
+			/* here we read B, C & the directional buttons */
+			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+						((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) & ~helper);
 		}
 	}
 	else
 	{
-		if (io_stage[portnum]==1)
+		if (io_stage[portnum] == 1)
 		{
-			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(0<<1)) |
-	                  ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(0<<0));
+			/* here we read ((Start & A) >> 2) | 0x00 */
+			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (io_stage[portnum]==2)
 		{
-			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(1<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(1<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(1<<1)) |
-	                  ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(1<<0));
+			/* here we read ((Start & A) >> 2) | 0x0f */
+			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
-			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
-	                  ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
+			/* here we read ((Start & A) >> 2) | Up and Down */
+			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x02)) & ~helper);
 		}
 	}
 
 //  mame_printf_debug("read io data port stage %d port %d %02x\n",io_stage[portnum],portnum,retdata);
 
-
-	return retdata|(retdata<<8);
+	return retdata | (retdata << 8);
 }
-/************* end 6 button version ********************************************/
 
+
+/************* 3 buttons version **************************/
 static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int portnum)
 {
-	UINT8 retdata;
-
+	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	static const char *pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
 	if (megadrive_io_data_regs[portnum]&0x40)
 	{
-		retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x40)?(megadrive_io_data_regs[portnum]&0x40):(0x40)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(machine,portnum)<<3)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(machine,portnum)<<2)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
+		/* here we read B, C & the directional buttons */
+		retdata = (megadrive_io_data_regs[portnum] & helper) | 
+					((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) & ~helper);
 	}
 	else
 	{
-		retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x40)?(megadrive_io_data_regs[portnum]&0x40):(0x40)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
+		/* here we read ((Start & A) >> 2) | Up and Down */
+		retdata = (megadrive_io_data_regs[portnum] & helper) | 
+					((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+						(input_port_read_safe(machine, pad3names[portnum], 0) & 0x02)) & ~helper);
 	}
 
 	return retdata;
@@ -1863,40 +1751,21 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl)
 {
 	UINT8 retdata;
 
-	if (ctrl==0x55)
+	if (ctrl == 0x55)
 	{
-			retdata = (1<<0) |
-					  (1<<1) |
-					  (A_BUTTON(machine,1)<<2) |
-					  (1<<3) |
-					  (A_BUTTON(machine,0)<<4) |
-					  (1<<5) |
-					  (1<<6) |
-					  (1<<7);
+			/* A keys */
+			retdata = ((input_port_read(machine, "PAD1") & 0x40) >> 2) | 
+				((input_port_read(machine, "PAD2") & 0x40) >> 4) | 0xeb;
 	}
 	else
 	{
-		if (offset==0)
+		if (offset == 0)
 		{
-			retdata = (UP_BUTTON(machine,0)<<0) |
-					  (DOWN_BUTTON(machine,0)<<1) |
-					  (LEFT_BUTTON(machine,0)<<2) |
-					  (RIGHT_BUTTON(machine,0)<<3) |
-					  (B_BUTTON(machine,0)<<4) |
-					  (C_BUTTON(machine,0)<<5) |
-					  (UP_BUTTON(machine,1)<<6) |
-					  (DOWN_BUTTON(machine,1)<<7);
+			retdata = (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
 		}
 		else
 		{
-			retdata = (LEFT_BUTTON(machine,1)<<0) |
-					  (RIGHT_BUTTON(machine,1)<<1) |
-					  (B_BUTTON(machine,1)<<2) |
-					  (C_BUTTON(machine,1)<<3) |
-					  (1<<4) |
-					  (1<<5) |
-					  (1<<6) |
-					  (1<<7);
+			retdata = ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0xf0;
 		}
 
 	}
@@ -1908,27 +1777,17 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl)
 READ8_HANDLER (megatech_sms_ioport_dc_r)
 {
 	running_machine *machine = space->machine;
-	return (DOWN_BUTTON(machine,1)  << 7) |
-		   (UP_BUTTON(machine,1)    << 6) |
-		   (B_BUTTON(machine,0)     << 5) | // TR-A
-		   (A_BUTTON(machine,0)     << 4) | // TL-A
-		   (RIGHT_BUTTON(machine,0) << 3) |
-		   (LEFT_BUTTON(machine,0)  << 2) |
-		   (DOWN_BUTTON(machine,0)  << 1) |
-		   (UP_BUTTON(machine,0)    << 0);
+	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
+	/* bit 4: TL-A; bit 5: TR-A */
+	return (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
 }
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
 {
 	running_machine *machine = space->machine;
-	return (0               << 7) | // TH-B
-		   (0               << 6) | // TH-A
-		   (0               << 5) | // unused
-		   (1               << 4) | // RESET button
-		   (B_BUTTON(machine,1)     << 3) | // TR-B
-		   (A_BUTTON(machine,1)     << 2) | // TL-B
-		   (RIGHT_BUTTON(machine,1) << 1) |
-		   (LEFT_BUTTON(machine,1)  << 0);
+	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
+	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
+	return ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0x10;
 }
 
 static UINT8 megadrive_io_read_ctrl_port(int portnum)
@@ -1937,14 +1796,14 @@ static UINT8 megadrive_io_read_ctrl_port(int portnum)
 	retdata = megadrive_io_ctrl_regs[portnum];
 	//mame_printf_debug("read io ctrl port %d %02x\n",portnum,retdata);
 
-	return retdata|(retdata<<8);
+	return retdata | (retdata << 8);
 }
 
 static UINT8 megadrive_io_read_tx_port(int portnum)
 {
 	UINT8 retdata;
 	retdata = megadrive_io_tx_regs[portnum];
-	return retdata|(retdata<<8);
+	return retdata | (retdata << 8);
 }
 
 static UINT8 megadrive_io_read_rx_port(int portnum)
@@ -2020,7 +1879,7 @@ static READ16_HANDLER( megadriv_68k_io_read )
 
 	}
 
-	return retdata | (retdata<<8);
+	return retdata | (retdata << 8);
 }
 
 
@@ -2032,7 +1891,7 @@ static void megadrive_io_write_data_port_3button(running_machine *machine, int p
 }
 
 
-/******************************6 button version*****************************/
+/****************************** 6 buttons version*****************************/
 
 static void megadrive_io_write_data_port_6button(running_machine *machine, int portnum, UINT16 data)
 {
@@ -2051,7 +1910,8 @@ static void megadrive_io_write_data_port_6button(running_machine *machine, int p
 
 }
 
-/***************************end 6 button version ****************************/
+
+/*************************** 3 buttons version ****************************/
 
 static void megadrive_io_write_ctrl_port(running_machine *machine, int portnum, UINT16 data)
 {
@@ -6065,7 +5925,8 @@ VIDEO_EOF(megadriv)
 	megadrive_imode_odd_frame^=1;
 //  cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (MD_RESET_BUTTON(machine))  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	if (input_port_read_safe(machine, "RESET", 0x00) & 0x01)  
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;
@@ -6246,7 +6107,7 @@ MACHINE_DRIVER_START( megadpal )
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
