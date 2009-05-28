@@ -332,7 +332,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_START("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x80, 0x80, "Spurt Time" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, "Difficult" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	PORT_DIPNAME( 0x40, 0x40, "Level of Monster" ) PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
