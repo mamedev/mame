@@ -570,6 +570,21 @@ int flip_screen_y_get(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    black - completely black pelette
+-------------------------------------------------*/
+
+PALETTE_INIT( all_black )
+{
+	int i;
+
+	for (i = 0; i < machine->config->total_colors; i++)
+	{
+		palette_set_color(machine,i,RGB_BLACK); /* black */
+	}
+}
+
+
+/*-------------------------------------------------
     black_and_white - basic 2-color black & white
 -------------------------------------------------*/
 

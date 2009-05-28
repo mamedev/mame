@@ -3734,14 +3734,14 @@ DokiDoki Penguin Land *not confirmed
 
 
 	/* S16 Bootlegs */
-	DRIVER( bayrtbl1 )	/* (c) 1989 (protected) (bootleg) */
-	DRIVER( bayrtbl2 )	/* (c) 1989 (protected) (bootleg) */
+	DRIVER( bayrouteb1 )	/* (c) 1989 (protected) (bootleg) */
+	DRIVER( bayrouteb2 )	/* (c) 1989 (protected) (bootleg) */
 	DRIVER( dduxbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( eswatbl )	/* BOOTLEG */
 	DRIVER( fpointbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( fpointbj )	/* (c) 1989 (Datsu bootleg, Japan) */
-	DRIVER( goldnabl )	/* BOOTLEG  */
-	DRIVER( goldnab2 )	/* BOOTLEG  */
+	DRIVER( goldnaxeb1 )	/* BOOTLEG  */
+	DRIVER( goldnaxeb2 )	/* BOOTLEG  */
 	DRIVER( passht4b )	/* bootleg */
 	DRIVER( passshtb )	/* bootleg */
 	DRIVER( shinoblb )	/* (c) 1987 (but bootleg) */

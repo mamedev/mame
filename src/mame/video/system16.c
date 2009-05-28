@@ -1,102 +1,36 @@
 /***************************************************************************
 
-Sega System 16 Video Hardware
+	System 16 / 18 bootleg video
+	
+	Bugs to check against real HW
+	
+	System16A Tilemap bootlegs
+	
+	- Shinobi (Datsu bootleg) has a black bar down the right hand side,
+	  which turns red on the high score table.  This is in the Text layer.
+	  According to other games this should be the correct alignment for
+	  this bootleg HW.
+	  
+	- After inserting a coin in Passing Shot (2p version) the layers are
+	  misaligned by 1 pixel (happens on non-bootlegs too)
+	  	  	
+	- Causing a 'fault' in the Passing Shot 2p bootleg (not hitting the ball
+      on your serve) causes the tilemaps to be erased and not updated
+	  properly (mirroring?, bootleg protection?, missed case in bootleg?)
 
-Known issues:
-- better abstraction of tilemap hardware is needed; a lot of this mess could and should
-    be consolidated further
-- many games have ROM patches - why?  let's emulate protection when possible
-- several games fail their RAM self-test because of hacks in the drivers
-- many registers are suspiciously plucked from working RAM
-- several games have nvram according to the self test, but we aren't yet saving it
-- many games suffer from sys16_refreshenable register not being mapped
-- road-rendering routines need to be cleaned up or at least better described
-- logical sprite height computation isn't quite right - garbage pixels are drawn
-- sprite drawing is unoptimized
-- end-of-sprite marker support will fix some glitches
-- shadow and partial shadow sprite support
-- to achieve sprite-tilemap orthogonality we must draw sprites from front to back;
-    this will also allow us to avoid processing the same shadowed pixel twice.
-
-The System16 video hardware consists of:
-
-- Road Layer (present only for certain games)
-
-- Two scrolling tilemap layers
-
-- Two alternate scrolling tilemap layers, normally invisible.
-
-- A fixed tilemap layer, normally used for score, lives display
-
-Each scrolling layer (foreground, background) is an arrangement
-of 4 pages selected from 16 available pages, laid out as follows:
-
-    Page0  Page1
-    Page2  Page3
-
-Each page is an arrangement of 8x8 tiles, 64 tiles wide, and 32 tiles high.
-
-Layers normally scroll as a whole, with xscroll and yscroll.
-
-However, layers can also be configured with screenwise rowscroll, if the most significant
-bit of xscroll is set.  When a layer is in this mode, the splittable is used.
-
-When rowscroll is in effect, the most significant bit of rowscroll selects between the
-default layer and an alternate layer associated with it.
-
-The foreground layer's tiles may be flagged as high-priority; this is used to mask
-sprites, i.e. the grass in Altered Beast.
-
-The background layer's tiles may also be flagged as high-priority.  In this case,
-it's really a transparency_pen effect rather.  Aurail uses this.
-
-Most games map Video Registers in textram as follows:
-
-type0:
-most games
-
-type1:
-alexkidd,fantzone,shinobl,hangon
-mjleague
-
-others:
-    shangon, shdancbl,
-    dduxbl,eswat,
-    passsht,passht4b
-    quartet,quartet2,
-    tetris,tturfbl,wb3bl
-
-sys16_textram:
-type1       type0           function
----------------------------------------
-0x74f       0x740           sys16_fg_page
-0x74e       0x741           sys16_bg_page
-            0x742           sys16_fg2_page
-            0x743           sys16_bg2_page
-
-0x792       0x748           sys16_fg_scrolly
-0x793       0x749           sys16_bg_scrolly
-            0x74a           sys16_fg2_scrolly
-            0x74b           sys16_bg2_scrolly
-
-0x7fc       0x74c           sys16_fg_scrollx
-0x7fd       0x74d           sys16_bg_scrollx
-            0x74e           sys16_fg2_scrollx
-            0x74f           sys16_bg2_scrollx
-
-            0x7c0..0x7df    sys18_splittab_fg_x
-            0x7e0..0x7ff    sys18_splittab_bg_x
-
+	System18 Tilemap bootlegs
+	
+    - Alien Storm Credit text for Player 1 is not displayed after inserting
+	  a coin.
+	  
 ***************************************************************************/
 #include "driver.h"
 #include "system16.h"
 #include "video/resnet.h"
-#include "includes/genesis.h"
 
-static UINT16 sys18_ddcrew_bankregs[0x20];
 
-/* callback to poll video registers */
-void (* sys16_update_proc)( void );
+UINT16* system16a_bootleg_bg0_tileram;
+UINT16* system16a_bootleg_bg1_tileram;
 
 UINT16 *sys16_tileram;
 UINT16 *sys16_textram;
@@ -166,17 +100,71 @@ static tilemap *background2, *foreground2;
 static int old_bg_page[4],old_fg_page[4], old_tile_bank1, old_tile_bank0;
 static int old_bg2_page[4],old_fg2_page[4];
 
-/***************************************************************************/
 
-READ16_HANDLER( sys16_textram_r ){
-	return sys16_textram[offset];
+// doesn't use te page system
+#if 0
+
+//static UINT8 bg0_page[4];
+//static UINT8 bg1_page[4];
+
+static TILE_GET_INFO( get_system16b_bootleg_tile_info0 )
+{
+	/* TILEMAP_MAPPER can't be dynamic, so we do the page lookup here */
+	int data, tile_number;
+	int page = 0;
+	
+	if (tile_index & 0x0040)
+		page+=1;
+		
+	if (tile_index & 0x1000)
+		page+=2;
+		
+	tile_index = ((tile_index & 0x03f) >> 0) |
+				 ((tile_index & 0xf80) >> 1);
+				 
+	tile_index += bg0_page[page] * 0x800;
+
+	data = sys16_tileram[tile_index];
+	tile_number = data&0xfff;
+
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
 }
 
-READ16_HANDLER( sys16_tileram_r ){
-	return sys16_tileram[offset];
+static TILE_GET_INFO( get_system16b_bootleg_tile_info1 )
+{
+	/* TILEMAP_MAPPER can't be dynamic, so we do the page lookup here */
+	int data, tile_number;
+	int page = 0;
+	
+	if (tile_index & 0x0040)
+		page+=1;
+		
+	if (tile_index & 0x1000)
+		page+=2;
+		
+	tile_index = ((tile_index & 0x03f) >> 0) |
+				 ((tile_index & 0xf80) >> 1);
+				 
+	tile_index += bg1_page[page] * 0x800;
+
+	data = sys16_tileram[tile_index];
+	tile_number = data&0xfff;
+
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
 }
+#endif
+
 
 /***************************************************************************/
+
 
 /*
     We mark the priority buffer as follows:
@@ -472,18 +460,13 @@ static double weights[2][3][6];
 
 WRITE16_HANDLER( sys16_paletteram_w )
 {
-	UINT16 oldword = paletteram16[offset];
 	UINT16 newword;
 	COMBINE_DATA( &paletteram16[offset] );
 	newword = paletteram16[offset];
-
-	if( oldword!=newword )
+	
+	/*  sBGR BBBB GGGG RRRR */
+	/*  x000 4321 4321 4321 */
 	{
-		/* we can do this, because we initialize palette RAM to all black in vh_start */
-		/*     byte 0    byte 1 */
-		/*  sBGR BBBB GGGG RRRR */
-		/*  x000 4321 4321 4321 */
-
 		int r, g, b, rs, gs, bs, rh, gh, bh;
 		int r0 = (newword >> 12) & 1;
 		int r1 = (newword >>  0) & 1;
@@ -807,16 +790,7 @@ VIDEO_START( system16 ){
 
 	num_sprites = 128*2; /* only 128 for most games; aburner uses 256 */
 
-	if(!strcmp(machine->gamedrv->name, "hangon"))
-		num_sprites = 128;
-
 	{
-		/* initialize all entries to black - needed for Golden Axe*/
-		int i;
-		for( i=0; i<machine->config->total_colors; i++ ){
-			palette_set_color( machine, i, MAKE_RGB(0,0,0) );
-		}
-
 		if(sys16_bg1_trans) tilemap_set_transparent_pen( background, 0 );
 		tilemap_set_transparent_pen( foreground, 0 );
 		tilemap_set_transparent_pen( text_layer, 0 );
@@ -851,18 +825,9 @@ VIDEO_START( system16 ){
 	}
 }
 
-VIDEO_START( system18old ){
-	int i;
-
+VIDEO_START( system18old )
+{
 	sys16_bg1_trans=1;
-
-	system18_vdp_start(machine);
-
-	/* clear these registers to -1 so that writes of 0 get picked up */
-	for (i=0;i<0x20;i++)
-	{
-		sys18_ddcrew_bankregs[i]=-1;
-	}
 
 	background2 = tilemap_create(machine,
 		get_bg2_tile_info,
@@ -903,184 +868,278 @@ VIDEO_START( system18old ){
 	sys16_fg_priority_value=0x2000;
 }
 
+
+/*****************************************************************************************
+ System 16A bootleg video
+ 
+ The System16A bootlegs have extra RAM for 2 tilemaps.  The game code copies data from
+ the usual 'tilemap ram' area to this new RAM and sets scroll registers as appropriate
+ using additional registers not present on the original System 16A hardware.
+ 
+ For some unknown reason the 2p Passing Shot bootleg end up blanking this area at times,
+ this could be an emulation flaw or a problem with the original bootlegs.  Inserting a
+ coin at the incorrect time can also cause missing graphics on the initial entry screen.
+ See note at top of driver
+ 
+ Sprites:
+  ToDo
+ 
+*****************************************************************************************/
+
+static tilemap *system16a_bootleg_bg_tilemaps[2];
+static tilemap *system16a_bootleg_text_tilemap;
+static UINT16 system16a_bootleg_tilemapselect;
+
+
+int system16a_bootleg_bgscrolly;
+int system16a_bootleg_bgscrollx;
+int system16a_bootleg_fgscrolly;
+int system16a_bootleg_fgscrollx;
+
+static TILE_GET_INFO( get_system16a_bootleg_tile_infotxt )
+{
+	int data, tile_number;
+	
+	data = sys16_textram[tile_index];
+	tile_number = data&0x1ff;
+
+		
+	
+	
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			((data>>9)&0x7),
+			0);
+}
+
+static TILE_GET_INFO( get_system16a_bootleg_tile_info0 )
+{
+	int data, tile_number;
+	
+	data = system16a_bootleg_bg0_tileram[tile_index];
+	tile_number = data&0x1fff;
+
+
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
+}
+
+static TILE_GET_INFO( get_system16a_bootleg_tile_info1 )
+{
+	int data, tile_number;
+
+	data = system16a_bootleg_bg1_tileram[tile_index];
+	tile_number = data&0x1fff;
+
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
+}
+
+WRITE16_HANDLER( system16a_bootleg_bgscrolly_w )
+{
+	system16a_bootleg_bgscrolly = data;
+}
+
+WRITE16_HANDLER( system16a_bootleg_bgscrollx_w )
+{
+	system16a_bootleg_bgscrollx = data;
+}
+
+WRITE16_HANDLER( system16a_bootleg_fgscrolly_w )
+{
+	system16a_bootleg_fgscrolly = data;
+}
+
+WRITE16_HANDLER( system16a_bootleg_fgscrollx_w )
+{
+	system16a_bootleg_fgscrollx = data;
+}
+
+WRITE16_HANDLER( system16a_bootleg_tilemapselect_w )
+{
+	COMBINE_DATA(&system16a_bootleg_tilemapselect);
+	//printf("system16a_bootleg_tilemapselect %04x\n", system16a_bootleg_tilemapselect);
+}
+
+
+ 
+VIDEO_START( system16a_bootleg )
+{
+	/* Normal colors */
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_normal, weights[0][0], 0, 0,
+		6, resistances_normal, weights[0][1], 0, 0,
+		6, resistances_normal, weights[0][2], 0, 0
+		);
+
+	/* Shadow/Highlight colors */
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_sh, weights[1][0], 0, 0,
+		6, resistances_sh, weights[1][1], 0, 0,
+		6, resistances_sh, weights[1][2], 0, 0
+		);
+
+	
+	
+	system16a_bootleg_text_tilemap = tilemap_create(machine, get_system16a_bootleg_tile_infotxt, tilemap_scan_rows, 8,8, 64,32 );
+	
+	// the system16a bootlegs have simple tilemaps instead of the paged system
+	system16a_bootleg_bg_tilemaps[0] = tilemap_create(machine, get_system16a_bootleg_tile_info0, tilemap_scan_rows, 8,8, 64,32 );
+	system16a_bootleg_bg_tilemaps[1] = tilemap_create(machine, get_system16a_bootleg_tile_info1, tilemap_scan_rows, 8,8, 64,32 );
+	
+	tilemap_set_transparent_pen( system16a_bootleg_text_tilemap, 0 );
+	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[0], 0 );
+	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[1], 0 );
+
+	
+}
+
+// Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
+VIDEO_UPDATE( system16a_bootleg )
+{
+	int offset_txtx, offset_txty, offset_bg1x, offset_bg1y, offset_bg0x, offset_bg0y;
+	
+	// passing shot
+	offset_txtx = 192;
+	offset_txty = 0;
+	offset_bg1x = 190;
+	offset_bg1y = 0;
+	offset_bg0x = 187;
+	offset_bg0y = 0;
+	
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	
+	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);		
+
+	tilemap_set_scrollx( system16a_bootleg_text_tilemap, 0, offset_txtx );
+	tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, offset_txty );
+	
+	if ((system16a_bootleg_tilemapselect&0xff) == 0x12)
+	{
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrollx+offset_bg1x );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrolly+offset_bg1y );
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrollx+offset_bg0x );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrolly+offset_bg0y );
+
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], 0, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );		
+	}
+	else if ((system16a_bootleg_tilemapselect&0xff) == 0x21)
+	{
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_bgscrollx+187 );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_bgscrolly );
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_fgscrollx+187 );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_fgscrolly+1 );
+
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], TILEMAP_DRAW_OPAQUE, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], 0, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );	
+	}
+
+	return 0;
+}
+
+/* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
+VIDEO_UPDATE( system16a_bootleg_passht4b )
+{
+	int offset_txtx, offset_txty, offset_bg1x, offset_bg1y, offset_bg0x, offset_bg0y;
+	
+	// passing shot
+	offset_txtx = 192;
+	offset_txty = 0;
+	offset_bg1x = 3;
+	offset_bg1y = 32;
+	offset_bg0x = 5;
+	offset_bg0y = 32;
+	
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	
+	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);		
+
+	tilemap_set_scrollx( system16a_bootleg_text_tilemap, 0, offset_txtx );
+	tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, offset_txty );
+	
+	if ((system16a_bootleg_tilemapselect&0xff) == 0x12)
+	{
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, (system16a_bootleg_bgscrollx^0x7)+offset_bg1x );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrolly+offset_bg1y );
+		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[0], 0, (system16a_bootleg_fgscrollx^0x7)+offset_bg0x );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrolly+offset_bg0y );
+
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], 0, 0 );
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );		
+	}
+
+	return 0;
+}
+
+
 /***************************************************************************/
 
-static void sys16_vh_refresh_helper( void ){
-	if( sys18_splittab_bg_x ){
-		if( (sys16_bg_scrollx&0xff00)  != sys16_rowscroll_scroll ){
-			tilemap_set_scroll_rows( background , 1 );
-			tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
-		}
-		else {
-			int offset, scroll,i;
-
-			tilemap_set_scroll_rows( background , 64 );
-			offset = 32+((sys16_bg_scrolly&0x1f8) >> 3);
-
-			for( i=0; i<29; i++ ){
-				scroll = sys18_splittab_bg_x[i];
-				tilemap_set_scrollx( background , (i+offset)&0x3f, -320-(scroll&0x3ff)+sys16_bgxoffset );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
-	}
-
-	if( sys18_splittab_bg_y ){
-		if( (sys16_bg_scrolly&0xff00)  != sys16_rowscroll_scroll ){
-			tilemap_set_scroll_cols( background , 1 );
-			tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly );
-		}
-		else {
-			int offset, scroll,i;
-
-			tilemap_set_scroll_cols( background , 128 );
-			offset = 127-((sys16_bg_scrollx&0x3f8) >> 3)-40+2;
-
-			for( i=0;i<41;i++ ){
-				scroll = sys18_splittab_bg_y[(i+24)>>1];
-				tilemap_set_scrolly( background , (i+offset)&0x7f, -256+(scroll&0x3ff) );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly );
-	}
-
-	if( sys18_splittab_fg_x ){
-		if( (sys16_fg_scrollx&0xff00)  != sys16_rowscroll_scroll ){
-			tilemap_set_scroll_rows( foreground , 1 );
-			tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
-		}
-		else {
-			int offset, scroll,i;
-
-			tilemap_set_scroll_rows( foreground , 64 );
-			offset = 32+((sys16_fg_scrolly&0x1f8) >> 3);
-
-			for(i=0;i<29;i++){
-				scroll = sys18_splittab_fg_x[i];
-				tilemap_set_scrollx( foreground , (i+offset)&0x3f, -320-(scroll&0x3ff)+sys16_fgxoffset );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
-	}
-
-	if( sys18_splittab_fg_y ){
-		if( (sys16_fg_scrolly&0xff00)  != sys16_rowscroll_scroll ){
-			tilemap_set_scroll_cols( foreground , 1 );
-			tilemap_set_scrolly( foreground, 0, -256+sys16_fg_scrolly );
-		}
-		else {
-			int offset, scroll,i;
-
-			tilemap_set_scroll_cols( foreground , 128 );
-			offset = 127-((sys16_fg_scrollx&0x3f8) >> 3)-40+2;
-
-			for( i=0; i<41; i++ ){
-				scroll = sys18_splittab_fg_y[(i+24)>>1];
-				tilemap_set_scrolly( foreground , (i+offset)&0x7f, -256+(scroll&0x3ff) );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrolly( foreground, 0, -256+sys16_fg_scrolly );
-	}
-}
-
-static void sys18_vh_screenrefresh_helper( void ){
-	int i;
-	if( sys18_splittab_bg_x ){ // screenwise rowscroll?
-		int offset,offset2, scroll,scroll2,orig_scroll;
-
-		offset = 32+((sys16_bg_scrolly&0x1f8) >> 3); // 0x00..0x3f
-		offset2 = 32+((sys16_bg2_scrolly&0x1f8) >> 3); // 0x00..0x3f
-
-		for( i=0;i<29;i++ ){
-			orig_scroll = scroll2 = scroll = sys18_splittab_bg_x[i];
-			if((sys16_bg_scrollx  &0xff00) != 0x8000) scroll = sys16_bg_scrollx;
-			if((sys16_bg2_scrollx &0xff00) != 0x8000) scroll2 = sys16_bg2_scrollx;
-
-			if(orig_scroll&0x8000){ // background2
-				tilemap_set_scrollx( background , (i+offset)&0x3f, TILE_LINE_DISABLED );
-				tilemap_set_scrollx( background2, (i+offset2)&0x3f, -320-(scroll2&0x3ff)+sys16_bgxoffset );
-			}
-			else{ // background
-				tilemap_set_scrollx( background , (i+offset)&0x3f, -320-(scroll&0x3ff)+sys16_bgxoffset );
-				tilemap_set_scrollx( background2, (i+offset2)&0x3f, TILE_LINE_DISABLED );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrollx( background , 0, -320-(sys16_bg_scrollx&0x3ff)+sys16_bgxoffset );
-		tilemap_set_scrollx( background2, 0, -320-(sys16_bg2_scrollx&0x3ff)+sys16_bgxoffset );
-	}
-
-	tilemap_set_scrolly( background , 0, -256+sys16_bg_scrolly );
-	tilemap_set_scrolly( background2, 0, -256+sys16_bg2_scrolly );
-
-	if( sys18_splittab_fg_x ){
-		int offset,offset2, scroll,scroll2,orig_scroll;
-
-		offset = 32+((sys16_fg_scrolly&0x1f8) >> 3);
-		offset2 = 32+((sys16_fg2_scrolly&0x1f8) >> 3);
-
-		for( i=0;i<29;i++ ){
-			orig_scroll = scroll2 = scroll = sys18_splittab_fg_x[i];
-			if( (sys16_fg_scrollx &0xff00) != 0x8000 ) scroll = sys16_fg_scrollx;
-
-			if( (sys16_fg2_scrollx &0xff00) != 0x8000 ) scroll2 = sys16_fg2_scrollx;
-
-			if( orig_scroll&0x8000 ){
-				tilemap_set_scrollx( foreground , (i+offset)&0x3f, TILE_LINE_DISABLED );
-				tilemap_set_scrollx( foreground2, (i+offset2)&0x3f, -320-(scroll2&0x3ff)+sys16_fgxoffset );
-			}
-			else {
-				tilemap_set_scrollx( foreground , (i+offset)&0x3f, -320-(scroll&0x3ff)+sys16_fgxoffset );
-				tilemap_set_scrollx( foreground2 , (i+offset2)&0x3f, TILE_LINE_DISABLED );
-			}
-		}
-	}
-	else {
-		tilemap_set_scrollx( foreground , 0, -320-(sys16_fg_scrollx&0x3ff)+sys16_fgxoffset );
-		tilemap_set_scrollx( foreground2, 0, -320-(sys16_fg2_scrollx&0x3ff)+sys16_fgxoffset );
-	}
-
-
-	tilemap_set_scrolly( foreground , 0, -256+sys16_fg_scrolly );
-	tilemap_set_scrolly( foreground2, 0, -256+sys16_fg2_scrolly );
-
-	tilemap_set_enable( background2, sys18_bg2_active );
-	tilemap_set_enable( foreground2, sys18_fg2_active );
-}
-
-VIDEO_UPDATE( system16 ){
+VIDEO_UPDATE( system16 )
+{
 	if (!sys16_refreshenable)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
 		return 0;
 	}
 
-	if( sys16_update_proc ) sys16_update_proc();
 	update_page();
-	sys16_vh_refresh_helper(); /* set scroll registers */
 
 	bitmap_fill(priority_bitmap,cliprect,0);
 
-	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
-	if(sys16_bg_priority_mode) tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
-//  sprite_draw(sprite_list,3); // needed for Aurail
-	if( sys16_bg_priority_mode==2 ) tilemap_draw( bitmap,cliprect, background, 1, 0x01 );// body slam (& wrestwar??)
-//  sprite_draw(sprite_list,2);
-	else if( sys16_bg_priority_mode==1 ) tilemap_draw( bitmap,cliprect, background, 1, 0x03 );// alien syndrome / aurail
-	tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
-//  sprite_draw(sprite_list,1);
-	tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
-	if( sys16_textlayer_lo_max!=0 ) tilemap_draw( bitmap,cliprect, text_layer, 1, 7 );// needed for Body Slam
-//  sprite_draw(sprite_list,0);
+	// draw bg
+	{
+		tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
+		tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly );
+		
+		tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
+
+		if(sys16_bg_priority_mode)
+		{
+			tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
+		}
+
+		if( sys16_bg_priority_mode==2 )
+		{
+			tilemap_draw( bitmap,cliprect, background, 1, 0x01 );// body slam (& wrestwar??)
+		}
+		else if ( sys16_bg_priority_mode==1 )
+		{
+			tilemap_draw( bitmap,cliprect, background, 1, 0x03 );// alien syndrome / aurail
+		}
+	}
+	
+	// draw fg
+	{
+		tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
+		tilemap_set_scrolly( foreground, 0, -256+sys16_fg_scrolly );
+
+		tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
+		tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
+	}
+	
+	
+	if( sys16_textlayer_lo_max!=0 )
+	{
+		tilemap_draw( bitmap,cliprect, text_layer, 1, 7 );// needed for Body Slam
+	}
+
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
 	draw_sprites(screen->machine, bitmap,cliprect,0 );
@@ -1088,17 +1147,15 @@ VIDEO_UPDATE( system16 ){
 }
 
 
-VIDEO_UPDATE( system18old ){
+VIDEO_UPDATE( system18old )
+{
 	if (!sys16_refreshenable)
 	{
-		/* should it REALLY not clear the bitmap? ddcrew vdp gfx look ugly if i don't do it like this */
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
-	if( sys16_update_proc ) sys16_update_proc();
 	update_page();
-	sys18_vh_screenrefresh_helper(); /* set scroll registers */
 
 	bitmap_fill(priority_bitmap,NULL,0);
 	if(sys18_bg2_active)
@@ -1109,31 +1166,25 @@ VIDEO_UPDATE( system18old ){
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0 );
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0 );	//??
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 2, 0 );	//??
-
-	if (!strcmp(screen->machine->gamedrv->name,"astorm"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for astorm
-	/* ASTORM also draws some sprites with the vdp, needs to be higher priority..*/
-
-//  sprite_draw(sprite_list,3);
 	tilemap_draw( bitmap,cliprect, background, 1, 0x1 );
-//  sprite_draw(sprite_list,2);
 	tilemap_draw( bitmap,cliprect, background, 2, 0x3 );
 
-
-	if(sys18_fg2_active) tilemap_draw( bitmap,cliprect, foreground2, 0, 0x3 );
+	if(sys18_fg2_active)
+	{
+		tilemap_draw( bitmap,cliprect, foreground2, 0, 0x3 );
+	}
+	
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0x3 );
-//  sprite_draw(sprite_list,1);
-	if(sys18_fg2_active) tilemap_draw( bitmap,cliprect, foreground2, 1, 0x7 );
+	
+	if(sys18_fg2_active)
+	{
+		tilemap_draw( bitmap,cliprect, foreground2, 1, 0x7 );
+	}
+	
 	tilemap_draw( bitmap,cliprect, foreground, 1, 0x7 );
 
-	if (!strcmp(screen->machine->gamedrv->name,"ddcrew"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for ddcrew
-
 	tilemap_draw( bitmap,cliprect, text_layer, 1, 0x7 );
-//  sprite_draw(sprite_list,0);
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
-
-	if (!strcmp(screen->machine->gamedrv->name,"cltchitr"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-	if (!strcmp(screen->machine->gamedrv->name,"cltchtrj"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-//  if (!strcmp(screen->machine->gamedrv->name,"astorm"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for astorm
 
 	draw_sprites(screen->machine, bitmap,cliprect, 0 );
 	return 0;
