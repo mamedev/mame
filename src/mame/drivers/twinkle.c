@@ -11,6 +11,215 @@ dvd
 hard drive
 16seg led font
 
+
+
+Konami Twinkle Hardware Overview
+Konami 1999-2002
+
+The following games are known to exist on this hardware (there may be more)
+                                                                  Video CD      Security
+Game Title                       Year            Program CD     6/7/8 use DVD   Dongle      HDD label
+-----------------------------------------------------------------------------------------------------
+beatmania IIDX                 - Konami 1999     GQ863 A01        GQ863 A04    863 A02     ?
+beatmania IIDX (Japan)         - Konami 1999     GQ863-JA B01     GQ863 A04     "   "      C44 JA A03*
+beatmania IIDX + DDR Club Kit  - Konami 1999     896 JA ABM       ?            ?           ?
+beatmania IIDX Substream       - Konami 1999     ?                GC983 A04    ?           ?
+beatmania IIDX Club Version 2  - Konami 1999     GE984 A01(BM)    ?            984 A02     ?
+                                               + GE984 A01(DDR)
+beatmania IIDX 2nd Style       - Konami 1999     GC985 A01        GC985 A04    ?           ?
+beatmania IIDX 3rd Style       - Konami 2000     ?                ?            ?           ?
+beatmania IIDX 4th Style       - Konami 2000     A03 JA A01       A03 JA A02   A03         ?
+beatmania IIDX 5th Style       - Konami 2001     ?                ?            ?           ?
+beatmania IIDX 6th Style       - Konami 2001     B4U JA A01       ?            ?           ?
+beatmania IIDX 7th Style       - Konami 2002     B44 JA A01       ?            ?           ?
+beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C44         ?
+
+? = Undumped pieces. * = Came with beatmania IIDX main board but might be for 8th Style (i.e. game C44)?
+If you can help, please contact us at http://guru.mameworld.info or http://mamedev.org/contact.html
+
+
+The Konami Twinkle hardware basically consists of the following parts....
+3 PCBs sandwiched together in a metal box
+SCSI CDROM drive (for main program CD)
+External DVD player (plays VCD)
+CD disc (for main program)
+Security dongle
+IDE HDD (for audio)
+VCD disc (for video)
+
+The top board appears to be the main CPU/graphics board.
+The middle board appears to be for the video output/overlay.
+The bottom board appears to be for sound.
+
+
+PCB Layouts
+-----------
+
+(Top)
+
+TWINKLE/MAIN
+GQ751 PWB(A2)0000039085
+|-----------------------------------------------------------------------------|
+|CN11      CN1           CN8                   CN7      CN5                   |
+|PQ30RV21      32MHz                                                          |
+|      53CF96-2.13M              24MHz            TD62083         ADM238LJR   |
+|SW                                   SMC                         ADM238LJR   |
+|  LTC1232.10P          M66011FP      FDC37C665GT.12G                         |
+|                                                           MACH111.11C DSW(8)|
+|                                                                             |
+|                                                              RTC-65271.9B   |
+|                          |----------|                                       |
+|                          |          |                        863A03.7B      |
+|                          |SONY      |          D481850GF-A12.8E             |
+|              KM48V514.8L |CXD8561Q  |                                       |
+|                          |@8J       |                                       |
+|              KM48V514.7L |----------|          D481850GF-A12.6E             |
+|                      67.737MHz                                              |
+|              KM48V514.6L                                                    |
+|                     53.693MHz|----------|                                   |
+|              KM48V514.5L     |          |                                   |
+|                              |SONY      |      KM416V256BT-7.4E          LED|
+|              KM48V514.4L     |CXD8530CQ |                                LED|
+|                              |@4J       |                                LED|
+|78L05         KM48V514.3L     |----------|                                LED|
+|                                          |-------|           TD62083     LED|
+|     MC44200  KM48V514.2L                 |SONY   |           TD62083     LED|
+|                                          |CXD2925|                       LED|
+|              KM48V514.1L                 |-------|                       LED|
+|     CN12                          CNx     @3F                     CN9    LED|
+|-----------------------------------------------------------------------------|
+Notes:
+      CN1        - 50 pin SCSI connector for CDROM drive
+      CN5        - 9 pin DSUB RS-232 connector
+      CN7        - Panel/controls connector
+      CN8        - RJ45 network connector
+      CN9        - 40 pin flat cable I/O connector
+      CNx        - Security card connector. The security cart contains only
+                   one IC, a ST 2402W 2kbit serial I2C bus EEPROM (TSSOP8)
+                   It appears only the first 12 bytes are actually used in this chip. The earlier games
+                   (possibly from BMIIDX 2nd Style and before) use a similar IC but it is not directly
+                   readable like the 2402W. The chip is covered with epoxy so the actual type is unknown.
+      CN11       - DC power input connector
+      CN12       - 15 pin DSUB connector (computer-generated video graphics output)
+      SW         - Reset or test switch
+      MACH111    - AMD MACH111 high-performance electrically erasable CMOS programmable logic device, stamped '38471'
+      53CF96     - Symbios Logic 53CF96 SCSI chip
+      PQ30RV21   - Sharp PQ30RV21 voltage regulator
+      TD62083    - Toshiba TD62083 8ch darlington sink driver
+      ADM238LJR  - Analog Devices ADM238LJR 5V CMOS RS-232 driver/receiver
+      LTC1232    - Linear Technology Corporation LTC1232 microprocessor supervisory circuit (DIP8)
+      M66011FP   - Renesas M66011FP serial bus controller
+      FDC37C665GT- SMC FDC37C665/666GT high-performance multi-mode parallel port super I/O floppy disk controller
+      RTC-65271  - Epson Toyocom RTC-65271 real-time clock
+      D481850GF  - NEC D481850GF-A12 128k x 32Bit x 2 Banks SGRAM (QFP100)
+      CXD2925Q   - Sony CXD2925Q SPU (QFP100)
+      CXD8561Q   - Sony CXD8561Q GTE (QFP208)
+      CXD8530CQ  - Sony CXD8530CQ R3000-based CPU (QFP208)
+      MC44200FT  - Motorola MC44200FT Triple 8-bit Video DAC (QFP44)
+      KM48V514   - Samsung Electronics KM48V514BJ-6 512kx8 EDO DRAM (SOJ28)
+      KM416V256  - Samsung Electronics KM416V256BT-7 256kx16 DRAM (TSOP44/40)
+      863A03.7B  - 27C040 EPROM (DIP32)
+
+
+(Middle)
+
+TWINKLE/SUB2
+GQ860 PWB(A1)0000053591
+|-----------------------------------------------------------------------------|
+|  CN1                     CN11           RCA   CN7           RCA             |
+|                                                                             |
+|                             MC141685  MC141685      AD817  |--------| AD817 |
+|                                            AD724JR         |Bt812KPF|       |
+|                                                14.3182MHz  |VIDEO   |       |
+|                                                            |DECODER |       |
+|                                                            |--------|       |
+|                                                                   26.8465MHz|
+|                                                                             |
+|                                                            D42280GU-30.11B  |
+|                                                            D42280GU-30.11A  |
+|                                                            D42280GU-30.9B   |
+|                                                            D42280GU-30.9A   |
+|                 M5118165B-60J.9G                           D42280GU-30.7B   |
+|                                                            D42280GU-30.7A   |
+|                                                                             |
+|                 M5118165B-60J.7G                                            |
+|                                                                             |
+|                                                                             |
+|                                                                             |
+|                                                                             |
+|                                                                             |
+|                                       XC9572.5D                             |
+|                                                         XC9572.5B  XC9572.5A|
+|                                                                             |
+|                       XC9572.2F                                    XC9536.3A|
+|                 XC9436.2G    XC9536.2E                                      |
+|-----------------------------------------------------------------------------|
+Notes:
+      CN1      - DC power input connector
+      CN7      - 5 pin plug for connection and control of external DVD player for background video
+      CN11     - 15 pin DSUB connector
+      RCA      - Yellow RCA connectors for video (input and/or output?) from external DVD player
+      MC141685 - Motorola MC141685 low cost 3CH D/A convertor
+      AD817    - Analog Devices 18V high speed low power wide supply range amplifier
+      AD724JR  - Analog Devices 6V 800mW 250MHz RGB to NTSC/PAL encoder
+      Bt812KPF - Conexant Systems Inc. Bt812KPF NTSC/PAL to RGB/YCrCb decoder / video codec (QFP160)
+      D42280GU - NEC uPD42280 high-speed field buffer with 256kx8 FIFO memory (SOP28)
+      M5118165B- Oki Semiconductor M5118165B-60J 1M x 16 EDO DRAM
+      XC9572   - Xilinx XC9572 in-system-programmable CPLD (PLCC44)
+      XC9536   - Xilinx XC9536 in-system-programmable CPLD (PLCC44)
+
+
+(Bottom)
+
+TWINKLE/SPU
+GQ863 PWB(A2)0000057606
+|-----------------------------------------------------------------------------|
+|  CN5    7805       CN7   CN1                GM76C8128CLLFW70.18J            |
+|                                             GM76C8128CLLFW70.16J      DSW(8)|
+|               SM5875  SM5875 |-------|                                      |
+|SW                            |RICOH  |                                      |
+|                              |RF5C400|           HY5117404BJ-60.15J         |
+|                |-------|     |-------|           HY5117404BJ-60.15F         |
+|                |M65851 |      @16L               HY5117404BJ-60.15C         |
+|                |@14R   |                         HY5117404BJ-60.14J         |
+|                |-------|    33.8688MHz           HY5117404BJ-60.14F         |
+|                                                  HY5117404BJ-60.14C         |
+|                                                  HY5117404BJ-60.13J         |
+|                                                  HY5117404BJ-60.13F         |
+|                                                  HY5117404BJ-60.13C         |
+|                               CY7C131.10M        HY5117404BJ-60.12J         |
+|                                                  HY5117404BJ-60.12F         |
+|                                                  HY5117404BJ-60.12C         |
+|                                                                             |
+|                                                                             |
+|                                                                          LED|
+|                                                                          LED|
+|                               XC9572.6L                                  LED|
+|                                                                          LED|
+|       LTC1232.5W         XC9536.4N  XC9536.4K                            LED|
+|                32MHz                                                     LED|
+|GM76C8128CLLFW70.4Y  68000-16.3S                                          LED|
+|GM76C8128CLLFW70.4W                                                       LED|
+|863A05.2X                                                        CN4         |
+|-----------------------------------------------------------------------------|
+Notes:
+      CN1      - RCA left/right audio output
+      CN4      - 40 pin flat cable connector for HDD data cable
+      CN5      - DC power input connector
+      CN7      - RCA left/right audio output
+      SM5875   - Nippon Precision Circuits SM5875 2-channel D/A convertor (SSOP24)
+      RF5C400  - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz [33.8688/2]
+      M65851   - Mitsubishi M65851 single chip karaoke sound processor IC (QFP80)
+      HY5117404- Hyundai Semiconductor HY5117404BJ-60 4M x 4-Bit CMOS EDO DRAM
+      CY7C131  - Cypress Semiconductor CY7C131 1kx8 dual-port static RAM
+      XC9572   - Xilinx XC9572 in-system-programmable CPLD (PLCC44)
+      XC9536   - Xilinx XC9536 in-system-programmable CPLD (PLCC44)
+      LTC1232  - Linear Technology Corporation LTC1232 microprocessor supervisory circuit (DIP8)
+      68000    - Clock input 16.000MHz [32/2]
+      GM76C8128- LG GM76C8128CLLFW70 128kx8 low power CMOS static RAM
+      863A05.2X- 27C4096 EPROM (DIP40)
+
+
 */
 
 #include "driver.h"
