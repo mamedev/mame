@@ -5303,9 +5303,9 @@ UINT8 stv_get_vblank(running_machine *machine)
 static int get_vblank_duration(running_machine *machine)
 {
 	/* TODO: +64 is probably due of missing pixel clock/screen raw params hook-up.
-	         Problem is, I don't know if it's possible to handle that in MAME with
-	         all this dynamic resolution babblecrap...
-	         */
+             Problem is, I don't know if it's possible to handle that in MAME with
+             all this dynamic resolution babblecrap...
+             */
 
 	if(STV_VDP2_HRES & 4)
 	{

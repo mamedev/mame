@@ -1706,7 +1706,7 @@ static astring *quote_astring_expression(astring *string, int isattribute)
 	astring_replacec(string, 0, " <", " lt ");
 	astring_replacec(string, 0, "< ", " lt ");
 	astring_replacec(string, 0, "<", " lt ");
-	
+
 	astring_replacec(string, 0, " << ", " lshift ");
 	astring_replacec(string, 0, " <<", " lshift ");
 	astring_replacec(string, 0, "<< ", " lshift ");

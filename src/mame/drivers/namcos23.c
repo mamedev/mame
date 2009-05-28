@@ -1264,7 +1264,7 @@ static READ8_HANDLER(s23_mcu_p6_r)
 
 static WRITE8_HANDLER(s23_mcu_p6_w)
 {
-//	printf("%02x to port 6\n", data);
+//  printf("%02x to port 6\n", data);
 }
 
 static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
@@ -1339,8 +1339,8 @@ static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*
-	port 5 bit 2 = LED to indicate transmitting packet to main
-	port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
+    port 5 bit 2 = LED to indicate transmitting packet to main
+    port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 */
 static ADDRESS_MAP_START( s23iobrdiomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
@@ -1636,7 +1636,7 @@ ROM_START( timecrs2 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
-		
+
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 

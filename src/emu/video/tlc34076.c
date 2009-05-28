@@ -110,7 +110,7 @@ void tlc34076_state_save(running_machine *machine)
 	state_save_register_global_array(machine, local_paletteram);
 	state_save_register_global_array(machine, regs);
 	state_save_register_global_array(machine, pens);
-	
+
 	state_save_register_global(machine, writeindex);
 	state_save_register_global(machine, readindex);
 	state_save_register_global(machine, dacbits);

@@ -310,22 +310,22 @@ static int h8_get_priority(h83xx_state *h8, UINT8 bit)
 		if (h8->per_regs[0xF8]&0x10) res = 1; break;
 	case 53: // SCI0 Rx
 		if (!(h8->per_regs[0xB2]&0x40)) res = -2;
-		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break;
 	case 54: // SCI0 Tx Empty
 		if (!(h8->per_regs[0xB2]&0x80)) res = -2;
-		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break;
 	case 55: // SCI0 Tx End
 		if (!(h8->per_regs[0xB2]&0x04)) res = -2;
-		else if (h8->per_regs[0xF9]&0x08) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x08) res = 1; break;
 	case 57: // SCI1 Rx
 		if (!(h8->per_regs[0xBA]&0x40)) res = -2;
-		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break;
 	case 58: // SCI1 Tx Empty
 		if (!(h8->per_regs[0xBA]&0x80)) res = -2;
-		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break;
 	case 59: // SCI1 Tx End
 		if (!(h8->per_regs[0xBA]&0x04)) res = -2;
-		else if (h8->per_regs[0xF9]&0x04) res = 1; break; 
+		else if (h8->per_regs[0xF9]&0x04) res = 1; break;
 	}
 	return res;
 }

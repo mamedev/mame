@@ -905,7 +905,7 @@ static MACHINE_RESET( galaga )
 {
 	/* Reset all latches */
 	bosco_latch_reset(machine);
-	
+
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
@@ -1089,7 +1089,7 @@ static INPUT_PORTS_START( bosco )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1668,7 +1668,7 @@ static MACHINE_DRIVER_START( bosco )
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map)
-	
+
 	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */

@@ -1,28 +1,28 @@
 /***************************************************************************
 
-	System 16 / 18 bootleg video
-	
-	Bugs to check against real HW
-	
-	System16A Tilemap bootlegs
-	
-	- Shinobi (Datsu bootleg) has a black bar down the right hand side,
-	  which turns red on the high score table.  This is in the Text layer.
-	  According to other games this should be the correct alignment for
-	  this bootleg HW.
-	  
-	- After inserting a coin in Passing Shot (2p version) the layers are
-	  misaligned by 1 pixel (happens on non-bootlegs too)
-	  	  	
-	- Causing a 'fault' in the Passing Shot 2p bootleg (not hitting the ball
-      on your serve) causes the tilemaps to be erased and not updated
-	  properly (mirroring?, bootleg protection?, missed case in bootleg?)
+    System 16 / 18 bootleg video
 
-	System18 Tilemap bootlegs
-	
+    Bugs to check against real HW
+
+    System16A Tilemap bootlegs
+
+    - Shinobi (Datsu bootleg) has a black bar down the right hand side,
+      which turns red on the high score table.  This is in the Text layer.
+      According to other games this should be the correct alignment for
+      this bootleg HW.
+
+    - After inserting a coin in Passing Shot (2p version) the layers are
+      misaligned by 1 pixel (happens on non-bootlegs too)
+
+    - Causing a 'fault' in the Passing Shot 2p bootleg (not hitting the ball
+      on your serve) causes the tilemaps to be erased and not updated
+      properly (mirroring?, bootleg protection?, missed case in bootleg?)
+
+    System18 Tilemap bootlegs
+
     - Alien Storm Credit text for Player 1 is not displayed after inserting
-	  a coin.
-	  
+      a coin.
+
 ***************************************************************************/
 #include "driver.h"
 #include "system16.h"
@@ -112,16 +112,16 @@ static TILE_GET_INFO( get_system16b_bootleg_tile_info0 )
 	/* TILEMAP_MAPPER can't be dynamic, so we do the page lookup here */
 	int data, tile_number;
 	int page = 0;
-	
+
 	if (tile_index & 0x0040)
 		page+=1;
-		
+
 	if (tile_index & 0x1000)
 		page+=2;
-		
+
 	tile_index = ((tile_index & 0x03f) >> 0) |
 				 ((tile_index & 0xf80) >> 1);
-				 
+
 	tile_index += bg0_page[page] * 0x800;
 
 	data = sys16_tileram[tile_index];
@@ -139,16 +139,16 @@ static TILE_GET_INFO( get_system16b_bootleg_tile_info1 )
 	/* TILEMAP_MAPPER can't be dynamic, so we do the page lookup here */
 	int data, tile_number;
 	int page = 0;
-	
+
 	if (tile_index & 0x0040)
 		page+=1;
-		
+
 	if (tile_index & 0x1000)
 		page+=2;
-		
+
 	tile_index = ((tile_index & 0x03f) >> 0) |
 				 ((tile_index & 0xf80) >> 1);
-				 
+
 	tile_index += bg1_page[page] * 0x800;
 
 	data = sys16_tileram[tile_index];
@@ -463,7 +463,7 @@ WRITE16_HANDLER( sys16_paletteram_w )
 	UINT16 newword;
 	COMBINE_DATA( &paletteram16[offset] );
 	newword = paletteram16[offset];
-	
+
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */
 	{
@@ -871,19 +871,19 @@ VIDEO_START( system18old )
 
 /*****************************************************************************************
  System 16A bootleg video
- 
+
  The System16A bootlegs have extra RAM for 2 tilemaps.  The game code copies data from
  the usual 'tilemap ram' area to this new RAM and sets scroll registers as appropriate
  using additional registers not present on the original System 16A hardware.
- 
+
  For some unknown reason the 2p Passing Shot bootleg end up blanking this area at times,
  this could be an emulation flaw or a problem with the original bootlegs.  Inserting a
  coin at the incorrect time can also cause missing graphics on the initial entry screen.
  See note at top of driver
- 
+
  Sprites:
   ToDo
- 
+
 *****************************************************************************************/
 
 static tilemap *system16a_bootleg_bg_tilemaps[2];
@@ -899,13 +899,13 @@ int system16a_bootleg_fgscrollx;
 static TILE_GET_INFO( get_system16a_bootleg_tile_infotxt )
 {
 	int data, tile_number;
-	
+
 	data = sys16_textram[tile_index];
 	tile_number = data&0x1ff;
 
-		
-	
-	
+
+
+
 	SET_TILE_INFO(
 			0,
 			tile_number,
@@ -916,7 +916,7 @@ static TILE_GET_INFO( get_system16a_bootleg_tile_infotxt )
 static TILE_GET_INFO( get_system16a_bootleg_tile_info0 )
 {
 	int data, tile_number;
-	
+
 	data = system16a_bootleg_bg0_tileram[tile_index];
 	tile_number = data&0x1fff;
 
@@ -969,7 +969,7 @@ WRITE16_HANDLER( system16a_bootleg_tilemapselect_w )
 }
 
 
- 
+
 VIDEO_START( system16a_bootleg )
 {
 	/* Normal colors */
@@ -986,26 +986,26 @@ VIDEO_START( system16a_bootleg )
 		6, resistances_sh, weights[1][2], 0, 0
 		);
 
-	
-	
+
+
 	system16a_bootleg_text_tilemap = tilemap_create(machine, get_system16a_bootleg_tile_infotxt, tilemap_scan_rows, 8,8, 64,32 );
-	
+
 	// the system16a bootlegs have simple tilemaps instead of the paged system
 	system16a_bootleg_bg_tilemaps[0] = tilemap_create(machine, get_system16a_bootleg_tile_info0, tilemap_scan_rows, 8,8, 64,32 );
 	system16a_bootleg_bg_tilemaps[1] = tilemap_create(machine, get_system16a_bootleg_tile_info1, tilemap_scan_rows, 8,8, 64,32 );
-	
+
 	tilemap_set_transparent_pen( system16a_bootleg_text_tilemap, 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[0], 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[1], 0 );
 
-	
+
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
 VIDEO_UPDATE( system16a_bootleg )
 {
 	int offset_txtx, offset_txty, offset_bg1x, offset_bg1y, offset_bg0x, offset_bg0y;
-	
+
 	// passing shot
 	offset_txtx = 192;
 	offset_txty = 0;
@@ -1013,17 +1013,17 @@ VIDEO_UPDATE( system16a_bootleg )
 	offset_bg1y = 0;
 	offset_bg0x = 187;
 	offset_bg0y = 0;
-	
+
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	
+
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);		
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);		
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);
 
 	tilemap_set_scrollx( system16a_bootleg_text_tilemap, 0, offset_txtx );
 	tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, offset_txty );
-	
+
 	if ((system16a_bootleg_tilemapselect&0xff) == 0x12)
 	{
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrollx+offset_bg1x );
@@ -1033,7 +1033,7 @@ VIDEO_UPDATE( system16a_bootleg )
 
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0 );
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], 0, 0 );
-		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );		
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 	else if ((system16a_bootleg_tilemapselect&0xff) == 0x21)
 	{
@@ -1044,7 +1044,7 @@ VIDEO_UPDATE( system16a_bootleg )
 
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], TILEMAP_DRAW_OPAQUE, 0 );
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], 0, 0 );
-		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );	
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 
 	return 0;
@@ -1054,7 +1054,7 @@ VIDEO_UPDATE( system16a_bootleg )
 VIDEO_UPDATE( system16a_bootleg_passht4b )
 {
 	int offset_txtx, offset_txty, offset_bg1x, offset_bg1y, offset_bg0x, offset_bg0y;
-	
+
 	// passing shot
 	offset_txtx = 192;
 	offset_txty = 0;
@@ -1062,17 +1062,17 @@ VIDEO_UPDATE( system16a_bootleg_passht4b )
 	offset_bg1y = 32;
 	offset_bg0x = 5;
 	offset_bg0y = 32;
-	
+
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	
+
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);		
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);		
-	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);		
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[0]);
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_bg_tilemaps[1]);
+	tilemap_mark_all_tiles_dirty (system16a_bootleg_text_tilemap);
 
 	tilemap_set_scrollx( system16a_bootleg_text_tilemap, 0, offset_txtx );
 	tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, offset_txty );
-	
+
 	if ((system16a_bootleg_tilemapselect&0xff) == 0x12)
 	{
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, (system16a_bootleg_bgscrollx^0x7)+offset_bg1x );
@@ -1082,7 +1082,7 @@ VIDEO_UPDATE( system16a_bootleg_passht4b )
 
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0 );
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], 0, 0 );
-		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );		
+		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 
 	return 0;
@@ -1107,7 +1107,7 @@ VIDEO_UPDATE( system16 )
 	{
 		tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
 		tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly );
-		
+
 		tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
 
 		if(sys16_bg_priority_mode)
@@ -1124,7 +1124,7 @@ VIDEO_UPDATE( system16 )
 			tilemap_draw( bitmap,cliprect, background, 1, 0x03 );// alien syndrome / aurail
 		}
 	}
-	
+
 	// draw fg
 	{
 		tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
@@ -1133,8 +1133,8 @@ VIDEO_UPDATE( system16 )
 		tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
 		tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
 	}
-	
-	
+
+
 	if( sys16_textlayer_lo_max!=0 )
 	{
 		tilemap_draw( bitmap,cliprect, text_layer, 1, 7 );// needed for Body Slam
@@ -1173,14 +1173,14 @@ VIDEO_UPDATE( system18old )
 	{
 		tilemap_draw( bitmap,cliprect, foreground2, 0, 0x3 );
 	}
-	
+
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0x3 );
-	
+
 	if(sys18_fg2_active)
 	{
 		tilemap_draw( bitmap,cliprect, foreground2, 1, 0x7 );
 	}
-	
+
 	tilemap_draw( bitmap,cliprect, foreground, 1, 0x7 );
 
 	tilemap_draw( bitmap,cliprect, text_layer, 1, 0x7 );

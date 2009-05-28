@@ -174,7 +174,7 @@ static DEVICE_START( namco_54xx )
 	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
 	astring_free(tempstring);
-	
+
 	/* find the attached discrete sound device */
 	assert(config->discrete != NULL);
 	state->discrete = devtag_get_device(device->machine, config->discrete);
@@ -189,7 +189,7 @@ static DEVICE_START( namco_54xx )
 
 static DEVICE_RESET( namco_54xx )
 {
-//	namco_54xx_state *state = get_safe_token(device);
+//  namco_54xx_state *state = get_safe_token(device);
 }
 
 

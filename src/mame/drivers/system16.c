@@ -1,89 +1,89 @@
 /*
-	System 16 / 18 bootlegs
-	
-	Sega's System 16 and System 18 hardware was heavily bootlegged.
-	
-	Most of these bootlegs had significant modifications compared to the real hardware.
-	They still roughly reflect which system they have been bootlegged from however.
+    System 16 / 18 bootlegs
 
-	
-	Bootlegs
-	
-	Type 16B:
-	--------
-	
-	Encrypted / Protected bootlegs
-	 - Bay Route (set 1)
+    Sega's System 16 and System 18 hardware was heavily bootlegged.
+
+    Most of these bootlegs had significant modifications compared to the real hardware.
+    They still roughly reflect which system they have been bootlegged from however.
+
+
+    Bootlegs
+
+    Type 16B:
+    --------
+
+    Encrypted / Protected bootlegs
+     - Bay Route (set 1)
      - Golden Axe (set 1)
-	 
-	These share a common encryption, Bay Route is also proteceted, the Golden Axe set has a strange
-	unknown rom, maybe it's related to an MCU that isn't present on the GA board?
 
-	---
-	
-	Datsu bootlegs
-	 - Bay Route (set 2)
-	 - Flash Point (2 sets)
-	 - Dynamite Dux 
-	 - Tough Turf
-	 
-	The tilemap page select writes have been split across 4 8-bit registers on these
-	 
-	---
-	 
-	Other bootegs
-	 - Tetris
-	 - E-Swat
+    These share a common encryption, Bay Route is also proteceted, the Golden Axe set has a strange
+    unknown rom, maybe it's related to an MCU that isn't present on the GA board?
 
-	These appear to be a variation no the encrypted / protected bootlegs, but without the encryption
-	or protection
-	
-	- Golden Axe (set 2)
-	
-	Unique bootleg, tilemap paging is split across 8 registers, bits are inverted etc.
+    ---
 
-	---
-	
-	Type 16A:
-	---------
-	
-	Shinobi
-	Passing Shot (2 sets)
-	Wonderboy 3
-	
-	System 18 (more commplex tilemaps)
-	----------------------------------
-	
-	Alien Storm
-	Shadow Dancer
-	Moonwalker
-	
+    Datsu bootlegs
+     - Bay Route (set 2)
+     - Flash Point (2 sets)
+     - Dynamite Dux
+     - Tough Turf
 
-	
-	AMT Games
-	---------
-	
-	these aren't strictly bootlegs, but are clearly based on bootleg Tetris hardware with additional protection
-	- Beauty Block
-	- IQ Pipe
-	
-	
-	
-	ToDo
-	----
-	
-	Fully fix the tilemap banking and scrolling for all sets
-	Fix sprites (and check for bad roms)
-	Add support for custom sound HW used by the various bootlegs
-	Look at the system18 bootlegs
-	
-	Partially Done
-	--------------
-	
-	Strip out old hacks & obsolete comments (many related to the *original* system16/18 sets which have their own
-	driver now)
-	
-	
+    The tilemap page select writes have been split across 4 8-bit registers on these
+
+    ---
+
+    Other bootegs
+     - Tetris
+     - E-Swat
+
+    These appear to be a variation no the encrypted / protected bootlegs, but without the encryption
+    or protection
+
+    - Golden Axe (set 2)
+
+    Unique bootleg, tilemap paging is split across 8 registers, bits are inverted etc.
+
+    ---
+
+    Type 16A:
+    ---------
+
+    Shinobi
+    Passing Shot (2 sets)
+    Wonderboy 3
+
+    System 18 (more commplex tilemaps)
+    ----------------------------------
+
+    Alien Storm
+    Shadow Dancer
+    Moonwalker
+
+
+
+    AMT Games
+    ---------
+
+    these aren't strictly bootlegs, but are clearly based on bootleg Tetris hardware with additional protection
+    - Beauty Block
+    - IQ Pipe
+
+
+
+    ToDo
+    ----
+
+    Fully fix the tilemap banking and scrolling for all sets
+    Fix sprites (and check for bad roms)
+    Add support for custom sound HW used by the various bootlegs
+    Look at the system18 bootlegs
+
+    Partially Done
+    --------------
+
+    Strip out old hacks & obsolete comments (many related to the *original* system16/18 sets which have their own
+    driver now)
+
+
 */
 
 #include "driver.h"
@@ -613,7 +613,7 @@ static MACHINE_RESET( eswatbl )
 		2,3,	6,7,
 		10,11,	14,15
 	};
-	
+
 
 	sys16_obj_bank = bank;
 	sys16_sprxoffset = -0x23c;
@@ -781,26 +781,26 @@ static WRITE16_HANDLER( sys16bootleg_fgpage_w )
 
 static WRITE16_HANDLER( sys16bootleg_fgscrollx_bank_w )
 {
-	
+
 	int scroll = data & 0x1ff;
 	int bank = (data&0xc000)>>14;
 	scroll+=0x200;
 	set_tile_bank( bank );
-	
+
 	scroll+=3; // so that the character portraits in attract mode are properly aligned (alighnment on character select no longer matches original tho?)
 	sys16_fg_scrollx = -scroll;
 }
 
 static WRITE16_HANDLER( sys16bootleg_fgscrollx_w )
 {
-	
+
 	//data ^= 0x7; // 4 player passing shot
-	
+
 	int scroll = data & 0x1ff;
 	scroll+=0x200;
 	scroll+=3;
-	
-	
+
+
 	sys16_fg_scrollx = -scroll;
 }
 
@@ -817,7 +817,7 @@ static WRITE16_HANDLER( sys16bootleg_bgscrollx_w )
 	int scroll = data & 0x1ff;
 	scroll+=0x200;
 	scroll+=1; // so that the background fo the select screen is properly aligned
-	sys16_bg_scrollx = -scroll;	
+	sys16_bg_scrollx = -scroll;
 }
 
 static WRITE16_HANDLER( sys16bootleg_bgscrolly_w )
@@ -847,7 +847,7 @@ static ADDRESS_MAP_START( goldnaxe_b1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(SMH_NOP) // sound related?
 	AM_RANGE(0xc43000, 0xc43001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc43034, 0xc43035) AM_WRITE(SMH_NOP)	
+	AM_RANGE(0xc43034, 0xc43035) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -878,21 +878,21 @@ static UINT16 datsu_page[4];
 void datsu_set_pages(void)
 {
 	UINT16 page;
-	
+
 	page = ((datsu_page[0] & 0x00f0) >>0) |
 		   ((datsu_page[1] & 0x00f0) >>4) |
 		   ((datsu_page[2] & 0x00f0) <<8) |
-		   ((datsu_page[3] & 0x00f0) <<4);   
-		   
-		
+		   ((datsu_page[3] & 0x00f0) <<4);
+
+
 	set_fg_page( page );
-	
+
 	page = ((datsu_page[0] & 0x000f) <<4) |
 		   ((datsu_page[1] & 0x000f) <<0) |
 		   ((datsu_page[2] & 0x000f) <<12) |
-		   ((datsu_page[3] & 0x000f) <<8);  
+		   ((datsu_page[3] & 0x000f) <<8);
 
-	set_bg_page( page );	
+	set_bg_page( page );
 }
 
 static WRITE16_HANDLER( datsu_page0_w )
@@ -933,7 +933,7 @@ static ADDRESS_MAP_START( bayroute_b2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x718022, 0x718023) AM_WRITE(datsu_page1_w)
 	AM_RANGE(0x718024, 0x718025) AM_WRITE(datsu_page2_w)
 	AM_RANGE(0x718026, 0x718027) AM_WRITE(datsu_page3_w)
-	
+
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
@@ -956,7 +956,7 @@ static ADDRESS_MAP_START( dduxbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
-	
+
 	AM_RANGE(0xC46000, 0xC46001) AM_WRITE(sys16bootleg_fgscrolly_w)
 	AM_RANGE(0xC46008, 0xC46009) AM_WRITE(sys16bootleg_fgscrollx_w)
 	AM_RANGE(0xC46010, 0xC46011) AM_WRITE(sys16bootleg_bgscrolly_w)
@@ -965,7 +965,7 @@ static ADDRESS_MAP_START( dduxbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xC46022, 0xC46023) AM_WRITE(datsu_page1_w)
 	AM_RANGE(0xC46024, 0xC46025) AM_WRITE(datsu_page2_w)
 	AM_RANGE(0xC46026, 0xC46027) AM_WRITE(datsu_page3_w)
-	
+
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -976,7 +976,7 @@ static WRITE16_HANDLER( goldnax_b2_fgscrollx_w )
 {
 	int scroll = data & 0x1ff;
 	int bank = (data&0xc000)>>14;
-	set_tile_bank( bank );	
+	set_tile_bank( bank );
 	scroll +=0x1f6;
 	scroll &= 0x3ff;
 	sys16_fg_scrollx = -scroll;
@@ -987,7 +987,7 @@ static WRITE16_HANDLER( goldnax_b2_bgscrollx_w )
 	int scroll = data & 0x1ff;
 	scroll +=0x1f4;
 	scroll &= 0x3ff;
-	sys16_bg_scrollx = -scroll;	
+	sys16_bg_scrollx = -scroll;
 }
 
 
@@ -1007,15 +1007,15 @@ static WRITE16_HANDLER( goldnax_b2_bgscrolly_w )
 }
 
 static WRITE16_HANDLER( goldnax_b2_fgpage_w )
-{	
+{
 	UINT16 page;
 	COMBINE_DATA(&goldnax_b2_fgpage[offset]);
 
 	page = ((goldnax_b2_fgpage[1] & 0xf) << 0) |
-		   ((goldnax_b2_fgpage[0] & 0xf) << 4) | 
+		   ((goldnax_b2_fgpage[0] & 0xf) << 4) |
 		   ((goldnax_b2_fgpage[3] & 0xf) << 8) |
-		   ((goldnax_b2_fgpage[2] & 0xf) << 12); 
-	
+		   ((goldnax_b2_fgpage[2] & 0xf) << 12);
+
 	set_fg_page( page^0xffff );
 
 }
@@ -1026,10 +1026,10 @@ static WRITE16_HANDLER( goldnax_b2_bgpage_w )
 	COMBINE_DATA(&goldnax_b2_bgpage[offset]);
 
 	page = ((goldnax_b2_bgpage[1] & 0xf) << 0) |
-		   ((goldnax_b2_bgpage[0] & 0xf) << 4) | 
+		   ((goldnax_b2_bgpage[0] & 0xf) << 4) |
 		   ((goldnax_b2_bgpage[3] & 0xf) << 8) |
-		   ((goldnax_b2_bgpage[2] & 0xf) << 12); 
-	
+		   ((goldnax_b2_bgpage[2] & 0xf) << 12);
+
 	set_bg_page( page^0xffff );
 }
 
@@ -1179,7 +1179,7 @@ static ADDRESS_MAP_START( fpointbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE( sys16_tileram_w ) AM_BASE(&sys16_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE( sys16_textram_w ) AM_BASE(&sys16_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
-	
+
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
@@ -1194,12 +1194,12 @@ static ADDRESS_MAP_START( fpointbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xC46008, 0xC46009) AM_WRITE(sys16bootleg_fgscrollx_w)
 	AM_RANGE(0xC46010, 0xC46011) AM_WRITE(sys16bootleg_bgscrolly_w)
 	AM_RANGE(0xC46018, 0xC46019) AM_WRITE(sys16bootleg_bgscrollx_w)
-	
+
 	AM_RANGE(0xC46020, 0xC46021) AM_WRITE(datsu_page0_w)
 	AM_RANGE(0xc46022, 0xc46023) AM_WRITE(datsu_page1_w)
 	AM_RANGE(0xC46024, 0xC46025) AM_WRITE(datsu_page2_w)
 	AM_RANGE(0xC46026, 0xC46027) AM_WRITE(datsu_page3_w)
-	
+
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -1243,8 +1243,8 @@ static ADDRESS_MAP_START( eswatbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x418010, 0x418011) AM_WRITE(sys16bootleg_fgscrolly_w)
 	AM_RANGE(0x418018, 0x418019) AM_WRITE(sys16bootleg_fgscrollx_bank_w)
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(sys16bootleg_bgpage_w)
-	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_fgpage_w)	
-	
+	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_fgpage_w)
+
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
@@ -1278,12 +1278,12 @@ MACHINE_DRIVER_END
 
 static ADDRESS_MAP_START( system16a_bootleg_passsht_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	
+
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)	
-	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)	
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE(&sys16_textram)
-	
+
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w ) AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
@@ -1360,8 +1360,8 @@ static READ16_HANDLER( passht4b_io3_r )
 static ADDRESS_MAP_START( system16a_bootleg_passht4b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)	
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)		
+	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE(&sys16_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
@@ -1382,7 +1382,7 @@ static ADDRESS_MAP_START( system16a_bootleg_passht4b_map, ADDRESS_SPACE_PROGRAM,
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(system16a_bootleg_fgscrolly_w)
 	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(system16a_bootleg_fgscrollx_w)
 	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(system16a_bootleg_tilemapselect_w)
-	
+
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -1503,8 +1503,8 @@ static MACHINE_DRIVER_START( passsht )
 	MDRV_CPU_PROGRAM_MAP(system16a_bootleg_passsht_map)
 
 	MDRV_VIDEO_START( system16a_bootleg )
-	MDRV_VIDEO_UPDATE( system16a_bootleg )	
-	
+	MDRV_VIDEO_UPDATE( system16a_bootleg )
+
 	MDRV_MACHINE_RESET(passsht)
 MACHINE_DRIVER_END
 
@@ -1518,7 +1518,7 @@ static MACHINE_DRIVER_START( passht4b )
 
 	MDRV_VIDEO_START( system16a_bootleg )
 	MDRV_VIDEO_UPDATE( system16a_bootleg_passht4b )
-	
+
 	MDRV_MACHINE_RESET(passht4b)
 MACHINE_DRIVER_END
 
@@ -1558,8 +1558,8 @@ static ADDRESS_MAP_START( system16a_bootleg_shinobi_map, ADDRESS_SPACE_PROGRAM, 
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE(&sys16_textram)
-	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)	
-	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)	
+	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)
+	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_nmi_w)
@@ -1574,8 +1574,8 @@ static ADDRESS_MAP_START( system16a_bootleg_shinobi_map, ADDRESS_SPACE_PROGRAM, 
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(system16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(system16a_bootleg_fgscrolly_w)
 	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(system16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(system16a_bootleg_tilemapselect_w)	
-	AM_RANGE(0xC60000, 0xC60001) AM_READNOP	
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(system16a_bootleg_tilemapselect_w)
+	AM_RANGE(0xC60000, 0xC60001) AM_READNOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -1613,7 +1613,7 @@ static MACHINE_DRIVER_START( system16a_bootleg_shinobi )
 
 	MDRV_VIDEO_START( system16a_bootleg )
 	MDRV_VIDEO_UPDATE( system16a_bootleg )
-	
+
 	MDRV_MACHINE_RESET(shinobl)
 MACHINE_DRIVER_END
 
@@ -1630,7 +1630,7 @@ static ADDRESS_MAP_START( tetrisbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x418010, 0x418011) AM_WRITE(sys16bootleg_bgscrolly_w)
 	AM_RANGE(0x418018, 0x418019) AM_WRITE(sys16bootleg_bgscrollx_w)
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(sys16bootleg_fgpage_w)
-	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_bgpage_w)	
+	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_bgpage_w)
 
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
@@ -1670,8 +1670,8 @@ static ADDRESS_MAP_START( beautyb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x418010, 0x418011) AM_WRITE(sys16bootleg_fgscrolly_w)
 	AM_RANGE(0x418018, 0x418019) AM_WRITE(sys16bootleg_fgscrollx_w)
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(sys16bootleg_bgpage_w)
-	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_fgpage_w)	
-	
+	AM_RANGE(0x418028, 0x418029) AM_WRITE(sys16bootleg_fgpage_w)
+
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
 
@@ -1884,8 +1884,8 @@ static ADDRESS_MAP_START( wb3bbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)	
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)	
+	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE(&system16a_bootleg_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE(&system16a_bootleg_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE(&sys16_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE( sys16_paletteram_w )  AM_BASE(&paletteram16)
@@ -1901,7 +1901,7 @@ static ADDRESS_MAP_START( wb3bbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(system16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(system16a_bootleg_fgscrolly_w)
 	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(system16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(system16a_bootleg_tilemapselect_w)	
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(system16a_bootleg_tilemapselect_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -1939,7 +1939,7 @@ static MACHINE_DRIVER_START( system16a_bootleg_wb3 )
 
 	MDRV_VIDEO_START( system16a_bootleg )
 	MDRV_VIDEO_UPDATE( system16a_bootleg )
-	
+
 	MDRV_MACHINE_RESET(wb3bbl)
 MACHINE_DRIVER_END
 
@@ -1955,16 +1955,16 @@ ROM_START( bayrouteb1 )
 	ROM_LOAD16_BYTE( "br.2a",  0x080001, 0x10000, CRC(5ca1e3d2) SHA1(51ce67ed0a0054f9c9c4ac56c5775716c44d74b1) )
 	ROM_LOAD16_BYTE( "b8.bin", 0x0a0000, 0x10000, CRC(e7ca0331) SHA1(b255939576a84f4d266f31a7fde818e04ff35b24) )
 	ROM_LOAD16_BYTE( "b6.bin", 0x0a0001, 0x10000, CRC(2bc748a6) SHA1(9ab760377fde24cecb703726ee3e59ee23d60a3a) )
-	
+
 	// interrupt code, taken from the other bootleg set(!)
-	ROM_LOAD( "protdata", 0x0bf000, 0x01000, BAD_DUMP CRC(5474fd95) SHA1(1cbd47aa8f8b9641ba81942bcaae0bc768fd33fd) )	
-	
+	ROM_LOAD( "protdata", 0x0bf000, 0x01000, BAD_DUMP CRC(5474fd95) SHA1(1cbd47aa8f8b9641ba81942bcaae0bc768fd33fd) )
+
 	// there clearly should be some kind of MCU on this bootleg to put the interrupt code in RAM
 	// as the game code waits for this to happen, and the interrupt points there
 	ROM_REGION( 0xc0000, "mcu", 0 ) /* MCU code */
 	ROM_LOAD( "unknown.mcu", 0x0000, 0x1000, NO_DUMP )
 
-	
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE |ROMREGION_INVERT) /* tiles */
 	ROM_LOAD( "bs16.bin", 0x00000, 0x10000, CRC(a8a5b310) SHA1(8883e1ed48a3e0f7b4c36d83579f93e84e28568c) )
 	ROM_LOAD( "bs14.bin", 0x10000, 0x10000, CRC(6bc4d0a8) SHA1(90b9a61c7a140291d72554857ce26d54ebf03fc2) )
@@ -2126,7 +2126,7 @@ ROM_START( fpointbj )
 ROM_END
 
 static UINT8 *decrypted_region;
-   
+
 DRIVER_INIT( goldnabl )
 {
 	int i;
@@ -2134,29 +2134,29 @@ DRIVER_INIT( goldnabl )
 	UINT8* KEY = memory_region(machine, "decryption");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 data[0x1000];
-	
+
 	// the decryption key is in a rom (part of an MSDOS executable...)
 	for (i=0;i<0x800;i++)
 	{
 		KEY[i] = KEY[i] ^ 0xff;
 		data[(i*2)+0] = ((KEY[i] & 0x80) >> 1) | ((KEY[i] & 0x40) >> 2) | ((KEY[i] & 0x20) >> 3) | ((KEY[i] & 0x10) >> 4);
-		data[(i*2)+1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);	
+		data[(i*2)+1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);
 	}
-	
+
 	decrypted_region = auto_alloc_array(machine, UINT8, 0xc0000);
 	memcpy (decrypted_region, ROM, 0xc0000);
-	
+
 	for (i = 0;i < 0x40000;i++)
 	{
 		decrypted_region[i] = ROM[i] ^ data[(i&0xfff)^1];
 	}
-	
+
 	memory_set_decrypted_region(space, 0x00000, 0xbffff, decrypted_region);
 
 	MACHINE_RESET_CALL(sys16_onetime);
 }
-  
-  
+
+
 DRIVER_INIT( bayrouteb1 )
 {
 	// it has the same encryption as the golden axe bootleg!
@@ -2173,7 +2173,7 @@ DRIVER_INIT( bayrouteb1 )
 
 	ROM2 = (UINT16*)memory_region(machine, "maincpu");
 	decrypted_region2 = (UINT16*)decrypted_region;
-	
+
 	// patch interrupt vector
 	ROM2[0x0070/2] = 0x000b;
 	ROM2[0x0072/2] = 0xf000;
@@ -2181,8 +2181,8 @@ DRIVER_INIT( bayrouteb1 )
 	// patch check for code in RAM
 	decrypted_region2[0x107e/2] = 0x48e7;
 	decrypted_region2[0x1080/2] = 0x000b;
-	decrypted_region2[0x1082/2] = 0xf000;	
-}	
+	decrypted_region2[0x1082/2] = 0xf000;
+}
 
 static DRIVER_INIT( bayrouteb2 )
 {
@@ -2193,12 +2193,12 @@ static DRIVER_INIT( bayrouteb2 )
 
 this is a more complete dump of the old encrypted bootleg set
 
-Golden Axe (different HW bottleg) 
+Golden Axe (different HW bottleg)
 
-Anno	1989 
-Produttore	 
-N.revisione	 
-CPU	main PCB:
+Anno    1989
+Produttore
+N.revisione
+CPU main PCB:
 1x 68000 (main)(missing)
 1x LH0080B-Z80B-CPU (sound)
 1x D7759C (sound)
@@ -2207,8 +2207,8 @@ CPU	main PCB:
 1x UPC1241H (sound)
 1x oscillator 20.000 (close to main)
 1x oscillator 24.000MHz (close to sound)
-1x blue resonator 655K (close to sound) 
-ROMs	main PCB:
+1x blue resonator 655K (close to sound)
+ROMs    main PCB:
 2x NMC27C512 (1,3)
 2x NMC27C256 (2,12)
 8x TMS27PC512 (4,5,6,7,8,9,10,11)
@@ -2235,15 +2235,15 @@ main PCB:
 3x PAL16L8ACN (not dumped)
 
 roms PCB:
-1x PEEL18CV8P (not dumped) 
-Note	main PCB:
+1x PEEL18CV8P (not dumped)
+Note    main PCB:
 1x JAMMA edge connector
 2x 50 pins flat cable connector to roms PCB
 1x trimmer (volume)
 2x 8x2 switches dip
 
 roms PCB:
-2x 50 pins flat cable connector to roms PCB 
+2x 50 pins flat cable connector to roms PCB
 */
 
 ROM_START( goldnaxeb1 )
@@ -2259,7 +2259,7 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD16_BYTE( "10.10", 0xa0000, 0x10000, CRC(b69ab892) SHA1(9b426058a80abb8dd3d6c0c55574fdc841889a72) )
 	ROM_LOAD16_BYTE( "9.9",   0xa0001, 0x10000, CRC(3cf2f725) SHA1(1f620fcebe8533cba50736ae1d97c095abf1bc25) )
 
-	
+
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT ) /* tiles */
 	ROM_LOAD( "32.16",  0x00000, 0x10000, CRC(84587263) SHA1(3a88c8578a477a487a0a214a367042b9739f39eb) )
 	ROM_LOAD( "31.15", 0x10000, 0x10000, CRC(63d72388) SHA1(ba0a582b1daf3a1e316237efbad17fcc0381643f) )
@@ -2274,7 +2274,7 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD16_BYTE( "37.bin", 		0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) )
 	ROM_LOAD16_BYTE( "13.bin",  	0x120001, 0x10000, CRC(3d41b995) SHA1(913d2a0c9a2ac6d36589966d7eb5537120ea6ff0) )
 	//ROM_LOAD16_BYTE( "ga18.a9",     0x120001, 0x10000, CRC(de346006) SHA1(65aa489373b6d2cccbb024f13fc190a7cae86274) ) // the old set had this rom, with most of the data blanked out.. why? logo removed? bad?
-		
+
 	ROM_LOAD16_BYTE( "21.7", 		0x000000, 0x10000, CRC(ede51fe0) SHA1(c05a2b51095a322bac5a67ee8886aecc186cbdfe) )
 	ROM_LOAD16_BYTE( "22.8", 		0x020000, 0x10000, CRC(30989141) SHA1(f6e7ae258deedec11b1f80c19575c884aac26c56) )
 	ROM_LOAD16_BYTE( "38.bin", 		0x100000, 0x10000, CRC(38e4c92a) SHA1(8b8a596da0726bc02c412a68e5163770fe3e62e4) )
@@ -2304,7 +2304,7 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD( "2.3",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "3.1",     0x10000, 0x10000, CRC(50eb5a56) SHA1(d59ba04254000de5577e8a58d0b51c73112a4c80) )
 	ROM_LOAD( "1.2",     0x20000, 0x10000, CRC(b372eb94) SHA1(8f82530633589de003a5462b227335526a6a61a6) )
-	
+
 	ROM_REGION( 0x30000, "decryption", 0 ) // a 0x800 byte repeating rom containing part of an MS-DOS executable, used as the decryption key
 	ROM_LOAD( "12.12",     0x00000, 0x08000, CRC(81ce4576) SHA1(84eea0ab8d8ea8869c12f0b603b91b1188d0e288) )
 
@@ -2346,7 +2346,7 @@ ROM_START( goldnaxeb2 )
 	ROM_LOAD16_BYTE( "ic36.4", 0xa0000, 0x10000, CRC(b69ab892) SHA1(9b426058a80abb8dd3d6c0c55574fdc841889a72) )
 	ROM_LOAD16_BYTE( "ic50.8", 0xa0001, 0x10000, CRC(3cf2f725) SHA1(1f620fcebe8533cba50736ae1d97c095abf1bc25) )
 
-	
+
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT ) /* tiles */
 	ROM_LOAD( "ic4.35",  0x00000, 0x10000, CRC(84587263) SHA1(3a88c8578a477a487a0a214a367042b9739f39eb) )
 	ROM_LOAD( "ic18.38", 0x10000, 0x10000, CRC(63d72388) SHA1(ba0a582b1daf3a1e316237efbad17fcc0381643f) )
@@ -2506,7 +2506,7 @@ ROM_START( tturfbl )
 	ROM_LOAD( "tt1574b3.rom", 0x00000, 0x10000, CRC(e9e630da) SHA1(e8471dedbb25475e4814d78b56f579fe9110461e) )
 	ROM_LOAD( "tt16cf44.rom", 0x10000, 0x10000, CRC(4c467735) SHA1(8338b6605cbe2e076da0b3e3a47630409a79f002) )
 	ROM_LOAD( "tt17d59e.rom", 0x20000, 0x10000, CRC(60c0f2fe) SHA1(3fea4ed757d47628f59ff940e40cb86b3b5b443b) )
-	
+
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "12279.1b", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )
 	ROM_LOAD16_BYTE( "12283.5b", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )
@@ -3148,16 +3148,16 @@ static ADDRESS_MAP_START( mwalkbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* bootleg video regs */
 	/*AM_RANGE(0xc00000, 0xc00001) AM_NOP
-	AM_RANGE(0xc00002, 0xc00003) AM_NOP
-	AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
-	AM_RANGE(0xc00006, 0xc00007) AM_NOP
-	AM_RANGE(0xc44000, 0xc44001) AM_NOP	
-	AM_RANGE(0xc46000, 0xc46001) AM_NOP
-	AM_RANGE(0xc46200, 0xc46201) AM_NOP
-	AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
-	AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?	
-	*/
-	
+    AM_RANGE(0xc00002, 0xc00003) AM_NOP
+    AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
+    AM_RANGE(0xc00006, 0xc00007) AM_NOP
+    AM_RANGE(0xc44000, 0xc44001) AM_NOP
+    AM_RANGE(0xc46000, 0xc46001) AM_NOP
+    AM_RANGE(0xc46200, 0xc46201) AM_NOP
+    AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
+    AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?
+    */
+
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_nmi_w)
@@ -3220,18 +3220,18 @@ static ADDRESS_MAP_START( astormbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa02100, 0xa02101) AM_NOP
 	AM_RANGE(0xa03000, 0xa03001) AM_NOP
 	AM_RANGE(0xa03034, 0xa03035) AM_NOP
-	
+
 	/* bootleg video regs */
 	AM_RANGE(0xc00000, 0xc00001) AM_NOP
 	AM_RANGE(0xc00002, 0xc00003) AM_NOP
 	AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
 	AM_RANGE(0xc00006, 0xc00007) AM_NOP
-	AM_RANGE(0xc44000, 0xc44001) AM_NOP	
+	AM_RANGE(0xc44000, 0xc44001) AM_NOP
 	AM_RANGE(0xc46000, 0xc46001) AM_NOP
 	AM_RANGE(0xc46200, 0xc46201) AM_NOP
 	AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
 	AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?
-	
+
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
 	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM

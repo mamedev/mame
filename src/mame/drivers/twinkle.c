@@ -258,7 +258,7 @@ static UINT32 twinkle_unknown;
 
 static WRITE32_HANDLER( twinkle_unknown_w )
 {
-/*	printf( "set unknown data=%08x\n", data ); */
+/*  printf( "set unknown data=%08x\n", data ); */
 
 	twinkle_unknown = data;
 }
@@ -267,7 +267,7 @@ static READ32_HANDLER( twinkle_unknown_r )
 {
 	UINT32 data = twinkle_unknown;
 
-/*	printf( "get unknown data=%08x\n", data ); */
+/*  printf( "get unknown data=%08x\n", data ); */
 
 	return data;
 }
@@ -293,7 +293,7 @@ static int last_io_offset;
 #define LED_L 0x0800
 #define LED_M 0x1000
 
-//   A1  A2 
+//   A1  A2
 //  F H I J B
 //   G1  G2
 //  E M L K C
@@ -584,11 +584,11 @@ static WRITE32_HANDLER(twinkle_output_w)
 static WRITE32_HANDLER(serial_w)
 {
 /*
-	int _do = ( data >> 4 ) & 1;
-	int clock = ( data >> 5 ) & 1;
-	int reset = ( data >> 6 ) & 1;
+    int _do = ( data >> 4 ) & 1;
+    int clock = ( data >> 5 ) & 1;
+    int reset = ( data >> 6 ) & 1;
 
-	printf( "serial_w do=%d clock=%d reset=%d\n", _do, clock, reset );
+    printf( "serial_w do=%d clock=%d reset=%d\n", _do, clock, reset );
 */
 }
 
@@ -614,7 +614,7 @@ printf( "xx %08x %08x %08x\n", offset, mem_mask, data );
 static READ32_HANDLER(xx_r)
 {
 /*
-	printf( "xx %08x %08x\n", offset, mem_mask );
+    printf( "xx %08x %08x\n", offset, mem_mask );
 */
 	return 0;
 }
@@ -622,7 +622,7 @@ static READ32_HANDLER(xx_r)
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(xx_r, xx_w)
-//	AM_RANGE(0x1f000400, 0x1f0007ff) AM_RAM AM_SHARE(3) /* shared ram */
+//  AM_RANGE(0x1f000400, 0x1f0007ff) AM_RAM AM_SHARE(3) /* shared ram */
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
@@ -674,7 +674,7 @@ static READ32_HANDLER(yy_r)
 
 static READ32_HANDLER(zz_r)
 {
-//	printf( "zz %08x %08x\n", offset, mem_mask );
+//  printf( "zz %08x %08x\n", offset, mem_mask );
 	return 0;
 }
 
@@ -697,7 +697,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x220000, 0x220003) AM_WRITENOP
 	AM_RANGE(0x230000, 0x230003) AM_WRITENOP
 	AM_RANGE(0x280400, 0x2807ff) AM_READWRITE( ww_r, ww_w )
-//	AM_RANGE(0x280400, 0x2807ff) AM_RAM AM_SHARE(3) /* shared ram? */
+//  AM_RANGE(0x280400, 0x2807ff) AM_RAM AM_SHARE(3) /* shared ram? */
 	AM_RANGE(0x30000c, 0x30000f) AM_READ( zz_r )
 	AM_RANGE(0x400000, 0x400fff) AM_WRITENOP /* ide? */
 ADDRESS_MAP_END
@@ -944,8 +944,8 @@ ROM_START( bmiidx4 )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a03jaa01", 0, BAD_DUMP MD5(dccbe0158236453c27a9768d185ee275) SHA1(ee0f5989ed2bec3d174150a072e188bc10c15dcb) )
-//	DISK_IMAGE_READONLY( "a03jaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "a03jaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "a03jaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "a03jaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx6 )
@@ -956,8 +956,8 @@ ROM_START( bmiidx6 )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b4ujaa01", 0, BAD_DUMP MD5(c9397ff1399b268ceac98732e4d7b16d) SHA1(1e723c74fd93140881c00c5af402249e0a8b3f2f) )
-//	DISK_IMAGE_READONLY( "b4ujaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "b4ujaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "b4ujaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "b4ujaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx7 )
@@ -968,8 +968,8 @@ ROM_START( bmiidx7 )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b44jaa01", 0, BAD_DUMP MD5(3078c73d050bb6a513b329f3844e1208) SHA1(5910e557816ced2c5162c5458b5ccf6f8e6839f0) )
-//	DISK_IMAGE_READONLY( "b44jaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "b44jaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "b44jaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "b44jaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx8 )
@@ -980,8 +980,8 @@ ROM_START( bmiidx8 )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "c44jaa01", 0, BAD_DUMP MD5(43ae8f40ba8974d7d135e83c8e09112a) SHA1(b116775e47c7d5e2578b92811dccdc84f1cafe43) )
-//	DISK_IMAGE_READONLY( "c44jaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "c44jaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "c44jaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "c44jaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidxc )
@@ -992,8 +992,8 @@ ROM_START( bmiidxc )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "896jaabm", 0, MD5(f842277762e330d500fa3eb6755c1547) SHA1(965772160177df43ce7a94f0e12d8cf676e57228) )
-//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidxc2 )
@@ -1004,8 +1004,8 @@ ROM_START( bmiidxc2 )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "984a01bm", 0, MD5(61ada5db9fcbfa01971c5f06253ab5e1) SHA1(98d5e120d0cd08e8598bfde75b16ba62bf67a15b) )
-//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidxca )
@@ -1016,8 +1016,8 @@ ROM_START( bmiidxca )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "896jabbm", 0, MD5(46f8bd83e8fbe527f6e4512804b2ce1e) SHA1(b7fcf3e6b9c1cebedacbc65c77aa3509c66984a9) )
-//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
-//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
 
 GAME( 1999, gq863,   0,     twinkle, twinkle, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )

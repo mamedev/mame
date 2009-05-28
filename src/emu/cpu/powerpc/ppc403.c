@@ -612,13 +612,13 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 			if (ppc.spu.sprc & 0x80)	/* enable RX */
 			{
 				/*
-				int baud_rate;
-				if (ppc.iocr & 0x2) {
-					baud_rate = (3686400 / (ppc.spu.brd + 1)) / 16;
-				} else {
-					baud_rate = (33333333 / (ppc.spu.brd + 1)) / 16;
-				}
-				*/
+                int baud_rate;
+                if (ppc.iocr & 0x2) {
+                    baud_rate = (3686400 / (ppc.spu.brd + 1)) / 16;
+                } else {
+                    baud_rate = (33333333 / (ppc.spu.brd + 1)) / 16;
+                }
+                */
 
 				/* check if serial port is hooked to a DMA channel */
 				/* if so, do a DMA operation */

@@ -2345,7 +2345,7 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 	tile = (w1 >> 16) & 0x7;
 
 	r = 0xff;	g = 0xff;	b = 0xff;	a = 0xff;	z = 0;	s = 0;	t = 0;	w = 0;
-	//dr = 0;		dg = 0;		db = 0;		da = 0;
+	//dr = 0;       dg = 0;     db = 0;     da = 0;
 
 	if (shade)
 	{
@@ -2378,7 +2378,7 @@ static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 		dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+12] & 0x0000ffff);
 		dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
 		//dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
-		//dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+14] & 0x0000ffff);
+		//dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)   | (rdp_cmd_data[texture_base+14] & 0x0000ffff);
 		//dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
 	}
 	if (zbuffer)

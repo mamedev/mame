@@ -147,7 +147,7 @@ static CPU_INIT( mb88 )
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-	
+
 	cpustate->serial = timer_alloc(device->machine, serial_timer, (void *)device);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
@@ -212,18 +212,18 @@ static TIMER_CALLBACK( serial_timer )
 	mb88_state *cpustate = get_safe_token((const device_config *)ptr);
 
 	cpustate->SBcount++;
-	
+
 	/* if we get too many interrupts with no servicing, disable the timer
-	   until somebody does something */
+       until somebody does something */
 	if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
 		timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
 
 	/* only read if not full; this is needed by the Namco 52xx to ensure that
-	   the program can write to S and recover the value even if serial is enabled */
+       the program can write to S and recover the value even if serial is enabled */
 	if (!cpustate->sf)
 	{
 		cpustate->SB = (cpustate->SB >> 1) | (READPORT(MB88_PORTSI) ? 8 : 0);
-	
+
 		if (cpustate->SBcount >= 4)
 		{
 			cpustate->sf = 1;
@@ -266,7 +266,7 @@ static void update_pio_enable( mb88_state *cpustate, UINT8 newpio )
 		else
 			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
 	}
-	
+
 	cpustate->pio = newpio;
 }
 
@@ -327,7 +327,7 @@ void mb88_external_clock_w(const device_config *device, int state)
 	if (state != cpustate->ctr)
 	{
 		cpustate->ctr = state;
-		
+
 		/* on a falling clock, increment the timer, but only if enabled */
 		if (cpustate->ctr == 0 && (cpustate->pio & 0x40))
 			increment_timer(cpustate);

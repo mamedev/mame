@@ -1698,12 +1698,12 @@ ROM_START( robocop )
 /*
 MB7116E at 12C on CPU board - Removing this causes all sprites to disappear
 
-MB7124E at 12A on ROM Board (although the board 
-is screened as MB7130) - Removing this causes the 
-display to disappear, although coining up makes 
-the correct text appear (and sound to play), 
-intro graphics appear on starting a game, then 
-nothing, it won't even play blind (although the 
+MB7124E at 12A on ROM Board (although the board
+is screened as MB7130) - Removing this causes the
+display to disappear, although coining up makes
+the correct text appear (and sound to play),
+intro graphics appear on starting a game, then
+nothing, it won't even play blind (although the
 coin up sound still plays on coin insert)
 */
 	ROM_REGION( 0xc00, "proms", 0 )	/* PROMs */

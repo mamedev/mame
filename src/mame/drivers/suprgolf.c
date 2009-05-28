@@ -189,7 +189,7 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	suprgolf_bg_bank = (data & 0x1f);
 
 	//if(data & 0x60)
-	//	printf("Video regs with data %02x activated\n",data);
+	//  printf("Video regs with data %02x activated\n",data);
 }
 
 static UINT8 pen;
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
-//	AM_RANGE(0x03, 0x03)
+//  AM_RANGE(0x03, 0x03)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?

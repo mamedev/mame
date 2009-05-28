@@ -792,7 +792,7 @@ static READ32_HANDLER ( stv_io_r32 )
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
 //  popmessage("SEL: %02x MUX: %02x OFF: %02x",port_sel,mux_data,offset*4);
 
-//	printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
+//  printf("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
 
 	switch(offset)
 	{
@@ -907,7 +907,7 @@ static WRITE32_HANDLER ( stv_io_w32 )
 {
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
-//	printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
+//  printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
 	switch(offset)
 	{

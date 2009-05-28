@@ -1134,7 +1134,7 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
  }
- 
+
 
 /*
  * Naomi 1 address map
@@ -1249,7 +1249,7 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-	
+
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
 

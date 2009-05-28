@@ -71,7 +71,7 @@ WRITE16_HANDLER( f3_volume_w )
 static TIMER_CALLBACK( taito_en_timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
-	if (m68681_imr & 0x08) 
+	if (m68681_imr & 0x08)
 	{
 		cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 6, vector_reg);
 		cputag_set_input_line(machine, "audiocpu", 6, ASSERT_LINE);
@@ -86,7 +86,7 @@ void f3_68681_reset(running_machine *machine)
 
 READ16_HANDLER(f3_68681_r)
 {
-	if (offset == 0x05) 
+	if (offset == 0x05)
 	{
 		int ret = imr_status;
 		imr_status = 0;
@@ -97,7 +97,7 @@ READ16_HANDLER(f3_68681_r)
 		return 1;
 
 	/* IRQ ack */
-	if (offset == 0x0f) 
+	if (offset == 0x0f)
 	{
 		cputag_set_input_line(space->machine, "audiocpu", 6, CLEAR_LINE);
 		return 0;

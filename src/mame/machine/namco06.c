@@ -121,7 +121,7 @@ static TIMER_CALLBACK( nmi_generate )
 READ8_DEVICE_HANDLER( namco_06xx_data_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	
+
 	LOG(("%s: 06XX '%s' read offset %d\n",cpuexec_describe_context(device->machine),device->tag,offset));
 
 	if (!(state->command & 0x10))
@@ -227,13 +227,13 @@ static DEVICE_START( namco_06xx )
 	const namco_06xx_interface *config = (const namco_06xx_interface *)device->inline_config;
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
-	
+
 	assert(config != NULL);
-	
+
 	/* resolve our CPU */
 	state->nmicpu = cputag_get_cpu(device->machine, config->nmicpu);
 	assert(state->nmicpu != NULL);
-	
+
 	/* resolve our devices */
 	state->device[0] = (config->chip0 != NULL) ? devtag_get_device(device->machine, config->chip0) : NULL;
 	assert(state->device[0] != NULL || config->chip0 == NULL);
@@ -243,13 +243,13 @@ static DEVICE_START( namco_06xx )
 	assert(state->device[2] != NULL || config->chip2 == NULL);
 	state->device[3] = (config->chip3 != NULL) ? devtag_get_device(device->machine, config->chip3) : NULL;
 	assert(state->device[3] != NULL || config->chip3 == NULL);
-	
+
 	/* loop over devices and set their read/write handlers */
 	for (devnum = 0; devnum < 4; devnum++)
 		if (state->device[devnum] != NULL)
 		{
 			device_type type = state->device[devnum]->type;
-			
+
 			if (type == NAMCO_50XX)
 			{
 				state->read[devnum] = namco_50xx_read;
@@ -274,7 +274,7 @@ static DEVICE_START( namco_06xx )
 				fatalerror("Unknown device type %s connected to Namco 06xx", devtype_get_name(type));
 		}
 
-	/* allocate a timer */				
+	/* allocate a timer */
 	state->nmi_timer = timer_alloc(device->machine, nmi_generate, (void *)device);
 
 	state_save_register_device_item(device, 0, state->command);

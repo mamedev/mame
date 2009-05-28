@@ -1,8 +1,8 @@
-/* 
+/*
 
-	SYstem 18 bootlegs
-	
-	The system 18 bootlegs lack the VDP
+    SYstem 18 bootlegs
+
+    The system 18 bootlegs lack the VDP
 
 */
 

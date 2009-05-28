@@ -545,12 +545,12 @@ INPUT_PORTS_END
 
 /*
 static INPUT_PORTS_START( thndrxja ) // for Japanese later revision (not dumped yet)
-	PORT_INCLUDE( thnderxj )
+    PORT_INCLUDE( thnderxj )
 
-	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x08, 0x08, "All Stage Clear Loop" )	PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x08, "Game ends after 3 loops" )  // factory default
-	PORT_DIPSETTING(    0x00, "Endless" )
+    PORT_MODIFY("DSW3")
+    PORT_DIPNAME( 0x08, 0x08, "All Stage Clear Loop" )  PORT_DIPLOCATION("SW3:4")
+    PORT_DIPSETTING(    0x08, "Game ends after 3 loops" )  // factory default
+    PORT_DIPSETTING(    0x00, "Endless" )
 INPUT_PORTS_END
 */
 

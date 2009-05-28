@@ -890,7 +890,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				else if (strcmp(buffer, "lshift") == 0)
 					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LSHIFT, TIN_PRECEDENCE_5);
 				else if (strcmp(buffer, "rshift") == 0)
-					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_RSHIFT, TIN_PRECEDENCE_5);		
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_RSHIFT, TIN_PRECEDENCE_5);
 
 				/* process anything else as a number or string */
 				else

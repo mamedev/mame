@@ -414,7 +414,7 @@ static READ8_DEVICE_HANDLER( steering_changed_r )
 	UINT8 steer_new = input_port_read(device->machine, "STEER");
 	steer_accum += (INT8)(steer_new - steer_last);
 	steer_last = steer_new;
-	
+
 	/* if we have delta, clock things */
 	if (steer_accum < 0)
 	{
@@ -551,7 +551,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPNAME( 0x80, 0x80, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
-	
+
 	PORT_START("DSWA_HI")
 	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSWB_HI")
 	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
 
@@ -631,7 +631,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPNAME( 0x01, 0x01, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x01, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
-	
+
 	PORT_START("DSWA_HI")
 	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
@@ -709,7 +709,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPNAME( 0x80, 0x80, "Nr. of Laps" )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
-	
+
 	PORT_START("DSWA_HI")
 	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 
@@ -790,7 +790,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	/* docs say "freeze", but it doesn't seem to work */
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSWA_HI")
 	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
 

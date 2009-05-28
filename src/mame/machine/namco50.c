@@ -295,7 +295,7 @@ static DEVICE_START( namco_50xx )
 
 static DEVICE_RESET( namco_50xx )
 {
-//	namco_50xx_state *state = get_safe_token(device);
+//  namco_50xx_state *state = get_safe_token(device);
 }
 
 

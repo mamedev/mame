@@ -483,9 +483,9 @@ static READ32_HANDLER( randomrabbits )
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
 	UINT8 *dataroms = memory_region(space->machine, "gfx1");
-//	int bank;
+//  int bank;
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
-//	bank = data & 0x3ff;
+//  bank = data & 0x3ff;
 
 //  memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
 	memory_set_bankptr(space->machine, 1,&dataroms[0]);

@@ -104,7 +104,7 @@ VIDEO_START( cheekyms )
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
 	bitmap_buffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	
+
 	cheekyms_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(cheekyms_tilemap, 0);
 }
@@ -166,14 +166,14 @@ VIDEO_UPDATE( cheekyms )
 
 	/* draw the tilemap to a temp bitmap */
 	tilemap_draw(bitmap_buffer, cliprect, cheekyms_tilemap, 0, 0);
-	
+
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
 	for(y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		for(x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			int in_man_area;
-			
+
 			if(flip)
 			{
 				in_man_area = (x >= (32-12-1)*8 && x < (32-8)*8 && y > 5*8 && y < 27*8);
@@ -182,7 +182,7 @@ VIDEO_UPDATE( cheekyms )
 			{
 				in_man_area = (x >= 8*8 && x < 12*8 && y > 5*8 && y < 27*8);
 			}
-			
+
 			if(in_man_area)
 			{
 				if ((y + scrolly) < 27*8 && *BITMAP_ADDR16(bitmap_buffer, y + scrolly, x) != 0)
@@ -195,7 +195,7 @@ VIDEO_UPDATE( cheekyms )
 			}
 		}
 	}
-	
-	
+
+
 	return 0;
 }

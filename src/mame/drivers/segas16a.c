@@ -263,7 +263,7 @@ static MACHINE_RESET( system16a )
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
 		timer_call_after_resynch(machine, NULL, 0, suspend_i8751);
-	
+
 	mcu_control = 0x00;
 }
 
@@ -363,7 +363,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
 	if (((video_control ^ data) & 0x0c) && lamp_changed_w)
 		(*lamp_changed_w)(video_control ^ data, data);
 	video_control = data;
-	
+
 	segaic16_tilemap_set_flip(device->machine, 0, data & 0x80);
 	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
 
@@ -841,7 +841,7 @@ static WRITE8_HANDLER( mcu_control_w )
 	cpu_set_input_line(maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	for (irqline = 1; irqline <= 7; irqline++)
 		cpu_set_input_line(maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	if (data & 0x40)
 		segaic16_set_display_enable(space->machine, 1);
 
@@ -854,14 +854,14 @@ static WRITE8_HANDLER( mcu_control_w )
 
 static WRITE8_HANDLER( mcu_io_w )
 {
-	/* 
-		1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
-		1.00 1... = text RAM (accessed @ $8000+x)
-		1.01 1... = palette RAM
-		1.10 1... = checksum #0
-		1.11 0... = checksum #1
-		1.11 1... = checksum #2
-	*/
+	/*
+        1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
+        1.00 1... = text RAM (accessed @ $8000+x)
+        1.01 1... = palette RAM
+        1.10 1... = checksum #0
+        1.11 0... = checksum #1
+        1.11 1... = checksum #2
+    */
 	switch ((mcu_control >> 3) & 7)
 	{
 		case 0:
@@ -2043,7 +2043,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Action Fighter, Sega System 16A
-    CPU: FD1089A 317-0018Å@(dedicated cabinet version uses 317-0014)
+    CPU: FD1089A 317-0018?@(dedicated cabinet version uses 317-0014)
  */
 ROM_START( afighter )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -2930,8 +2930,8 @@ ROM_START( shinoblb )
 	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
 
 	ROM_REGION( 0x08000, "n7751data", 0 ) /* 7751 sound data */
-	ROM_LOAD( "b9", 0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )	
-	
+	ROM_LOAD( "b9", 0x0000, 0x8000, CRC(6d7966da) SHA1(90f55a99f784c21d7c135e630f4e8b1d4d043d66) )
+
 	ROM_REGION( 0x08000, "samples", 0 )
 	/* sound samples (played by what?, not the same as the original) */
 	/* marked as 'bad dump' pending investigation, we might actually be missing a cpu rom to play them */

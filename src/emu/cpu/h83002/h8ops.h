@@ -1923,13 +1923,13 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 					bitnr = (ext16>>4)&7;
 					h8_btst8(h8, bitnr, udata8);
 					break;
-				// bld.b #imm, @Rn                                              
+				// bld.b #imm, @Rn
 				case 0x77:
 					udata16 = h8_mem_read16(h8, h8->pc);
 					h8->pc += 2;
 					dstreg = (opcode>>4) & 7;
 					h8_bld8(h8, (udata16>>4) & 7, h8_mem_read8(h8_getreg16(h8, dstreg)));
-					H8_IFETCH_TIMING(1); 
+					H8_IFETCH_TIMING(1);
 					H8_WORD_TIMING(1, h8_getreg16(h8, dstreg));
 					break;
 

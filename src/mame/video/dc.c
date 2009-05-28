@@ -972,7 +972,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	mame_printf_verbose("PVRCTRL: [%08x=%x] write %llx to %x (reg %x), mask %llx\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
 	#endif
 
-//	pvrctrl_regs[reg] |= dat;
+//  pvrctrl_regs[reg] |= dat;
 	pvrctrl_regs[reg] = dat;
 
 }

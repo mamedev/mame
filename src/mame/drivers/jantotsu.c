@@ -243,7 +243,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 			adpcm_idle = 0;
 			msm5205_reset_w(device,0);
 			/* I don't think that this will ever happen, it's there just to be sure
-			   (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
+               (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
 			if(data & 0x20)
 				popmessage("ADPCM called with data = %02x, contact MAMEdev",data);
 //          printf("%02x 0\n",data);

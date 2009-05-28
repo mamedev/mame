@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
-	
+
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("ay", ay8910_address_w)
 //  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
@@ -5116,7 +5116,7 @@ static MACHINE_DRIVER_START( cherrys )
 
 	MDRV_IMPORT_FROM(ncb3)
 	MDRV_GFXDECODE(cherrys)
-	
+
 MACHINE_DRIVER_END
 
 /***************************************************************************

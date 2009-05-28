@@ -465,9 +465,9 @@ static void update_outputs(UINT16 which)
 		if (which & (1 << i))
 		{
 /*
-			int val;
+            int val;
 
-			val = i8279.ram[i] & 0xff;
+            val = i8279.ram[i] & 0xff;
 
             val = i8279.ram[i] & 0x0f;
             if (i8279.inhibit & 0x01)

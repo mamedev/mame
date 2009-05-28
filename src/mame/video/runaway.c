@@ -77,7 +77,7 @@ static TILE_GET_INFO( qwak_get_tile_info )
 VIDEO_START( runaway )
 {
 	bg_tilemap = tilemap_create(machine, runaway_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
-	
+
 	state_save_register_global(machine, tile_bank);
 }
 
@@ -85,7 +85,7 @@ VIDEO_START( runaway )
 VIDEO_START( qwak )
 {
 	bg_tilemap = tilemap_create(machine, qwak_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
-	
+
 	state_save_register_global(machine, tile_bank);
 }
 

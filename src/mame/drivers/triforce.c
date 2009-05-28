@@ -187,16 +187,16 @@ Notes:
       PIC16C621 - DIP18 socket and 4MHz OSC on a 90-degrees-mounted small PCB for
                   Microchip PIC16C621A protection key chip
 
-                  Usage:
-                  +-----------------------+-----------------+----------------+
-                  |                       |                 | Sega Security  |
-                  | Game                  | Sticker         | Part Number    |
-                  +-----------------------+-----------------+----------------+
-                  | Mario Kart Arcade GP  | 253-5509-5109   | 317-5109-COM   |
-                  | Nintendo/Namco, 2005  |                 |                |
-                  |                       |                 |                |
-                  | Namco Code: MKA2Ver.B |                 |                |
-                  +-----------------------+-----------------+----------------+
+ ? ? ? ? ? ? ? ? ?Usage:
+ ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
+ ? ? ? ? ? ? ? ? ?| ? ? ? ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ? | Sega Security ?|
+ ? ? ? ? ? ? ? ? ?| Game ? ? ? ? ? ? ? ? ?| Sticker ? ? ? ? | Part Number ? ?|
+ ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
+ ? ? ? ? ? ? ? ? ?| Mario Kart Arcade GP ?| 253-5509-5109 ? | 317-5109-COM ? |
+ ? ? ? ? ? ? ? ? ?| Nintendo/Namco, 2005 ?| ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
+ ? ? ? ? ? ? ? ? ?| ? ? ? ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
+ ? ? ? ? ? ? ? ? ?| Namco Code: MKA2Ver.B | ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
+ ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
 
 ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart version of the Media Board)
 ---------
@@ -288,7 +288,7 @@ Notes:
                    1-T SRAM: 13.5 x12 = 162MHz
                    16M ARAM: 13.5 x6  = 81MHz
       P1         - Motherboard Power Connector (located under the PCB)
-      P2	     - Digital Video Output Connector (not used)
+      P2         - Digital Video Output Connector (not used)
       P3         - Controller Pad Board Connector (tied to lower PCB to J8 with a small flat cable)
       P4         - Memory Card Slot Connector A  \ (not used)
       P5         - Memory Card Slot Connector B  /

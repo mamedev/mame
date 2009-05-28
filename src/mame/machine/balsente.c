@@ -1086,7 +1086,7 @@ WRITE8_HANDLER( balsente_chip_select_w )
 			double temp = 0;
 
 			/* remember the previous value */
-			temp = 				
+			temp =
 #endif
 				cem3394_get_parameter(cem_device[i], reg);
 

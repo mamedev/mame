@@ -1203,7 +1203,7 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 	byte_num = jvs_sdata[2];
 
 #if 0
-	length = 
+	length =
 #endif
 		jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
 #if 0

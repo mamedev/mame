@@ -1315,8 +1315,8 @@ DrawSpritesHelper(
 			{
 				struct SceneNode *node = NewSceneNode(machine, zcoord,eSCENENODE_SPRITE);
 
-//				printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
-//					i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
+//              printf("[%02d]: tile %x pri %x color %x flipX %d flipY %d cols %d rows %d link %d X %d Y %d sX %d sY %d trans %d cz %d\n",
+//                  i, tile, cz&0x80, color&0x7f, flipx, flipy, numcols, numrows, linkType, xpos, ypos, sizex, sizey, translucency, cz);
 
 				if (color == 0) color = 0x67;	// extreme hack for Tokyo Wars
 
@@ -1422,7 +1422,7 @@ DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *clipre
 
 	/* HACK for Tokyo Wars */
 	if (deltax == 0 && deltay == 0)
-	{	
+	{
 		deltax = 190;
 		deltay = 250;
 	}

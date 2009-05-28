@@ -121,9 +121,9 @@ READ8_DEVICE_HANDLER( namco_53xx_read )
 {
 	namco_53xx_state *state = get_safe_token(device);
 	UINT8 res = state->portO;
-	
+
 	namco_53xx_read_request(device);
-	
+
 	return res;
 }
 
@@ -161,7 +161,7 @@ static DEVICE_START( namco_53xx )
 	const namco_53xx_interface *config = (const namco_53xx_interface *)device->static_config;
 	namco_53xx_state *state = get_safe_token(device);
 	astring *tempstring = astring_alloc();
-	
+
 	assert(config != NULL);
 
 	/* find our CPU */
@@ -185,7 +185,7 @@ static DEVICE_START( namco_53xx )
 
 static DEVICE_RESET( namco_53xx )
 {
-//	namco_53xx_state *state = get_safe_token(device);
+//  namco_53xx_state *state = get_safe_token(device);
 }
 
 

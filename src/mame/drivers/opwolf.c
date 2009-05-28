@@ -166,7 +166,7 @@ Notes:
       -------
               M  Connector               H  Connector           G  Connector
               ------------               ------------           ------------
-              1  BUTTON	2 (grenade)      1  GND                Solder   Parts
+              1  BUTTON 2 (grenade)      1  GND                Solder   Parts
               2  not used                2  GND                GND  A   1  GND
               3  +12V (to motor in gun)  3  GND          VIDEO GND  B   2  RED
               4  -12V (to motor in gun)  4  GND               BLUE  C   3  GREEN

@@ -296,7 +296,7 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 	if (h8->h8uiflag == 0)
 		h8_set_ccr(h8, h8_get_ccr(h8) | 0x40);
 	h8->pc = h8_mem_read16(h8, vectornr * 2) & 0xffff;
-	
+
 	// these timings are still approximations but much better than before
 	H8_IFETCH_TIMING(8);	// 24 cycles
 	H8_STACK_TIMING(3);	// 12 cycles
@@ -406,7 +406,7 @@ static void recalc_8bit_timer(h83xx_state *h8, int t)
 
 	// if "no clock source", stop
 	if (div < 2)
-	{	  
+	{
 		timer_adjust_oneshot(h8->timer[(t*2)], attotime_never, 0);
 		timer_adjust_oneshot(h8->timer[(t*2)+1], attotime_never, 0);
 		return;
@@ -463,7 +463,7 @@ static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 
 		case 3:	// clear on external reset input signal (not implemented)
 			logerror("H8: external reset not implemented for 8-bit timers\n");
-			break;			
+			break;
 	}
 }
 

@@ -666,7 +666,7 @@ static CPU_RESET( m68k )
 	m68ki_jump(m68k, REG_PC);
 
 	m68k->run_mode = RUN_MODE_NORMAL;
-	
+
 	m68k->reset_cycles = m68k->cyc_exception[EXCEPTION_RESET];
 }
 

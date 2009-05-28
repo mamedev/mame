@@ -256,6 +256,6 @@ VIDEO_UPDATE( tryout )
 		draw_sprites(screen->machine, bitmap,cliprect);
 	}
 
-//	popmessage("%02x %02x %02x %02x",tryout_gfx_control[0],tryout_gfx_control[1],tryout_gfx_control[2],scrollx);
+//  popmessage("%02x %02x %02x %02x",tryout_gfx_control[0],tryout_gfx_control[1],tryout_gfx_control[2],scrollx);
 	return 0;
 }

@@ -154,7 +154,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 	timer_call_after_resynch(device->machine, (void *)device, data, namco_52xx_latch_callback);
 
 	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);
-	
+
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
 	// The input clock to the 06XX interface chip is 64H, that is
@@ -162,7 +162,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 	// asserted for one clock cycle ~= 21us.
 
 	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
-	   a timer interrupt, so we need to ensure the IRQ line is held long enough */
+       a timer interrupt, so we need to ensure the IRQ line is held long enough */
 	timer_set(device->machine, ATTOTIME_IN_USEC(5*21), (void *)device, 0, namco_52xx_irq_clear);
 }
 
@@ -217,17 +217,17 @@ static DEVICE_START( namco_52xx )
 	state->cpu = cputag_get_cpu(device->machine, device_build_tag(tempstring, device, "mcu"));
 	assert(state->cpu != NULL);
 	astring_free(tempstring);
-	
+
 	/* find the attached discrete sound device */
 	assert(intf->discrete != NULL);
 	state->discrete = devtag_get_device(device->machine, intf->discrete);
 	assert(state->discrete != NULL);
 	state->basenode = intf->firstnode;
-	
+
 	/* resolve our read/write callbacks */
 	devcb_resolve_read8(&state->romread, &intf->romread, device);
 	devcb_resolve_read8(&state->si, &intf->si, device);
-	
+
 	/* start the external clock */
 	if (intf->extclock != 0)
 		timer_pulse(device->machine, attotime_make(0, intf->extclock), (void *)device, 0, external_clock_pulse);
@@ -240,7 +240,7 @@ static DEVICE_START( namco_52xx )
 
 static DEVICE_RESET( namco_52xx )
 {
-//	namco_52xx_state *state = get_safe_token(device);
+//  namco_52xx_state *state = get_safe_token(device);
 }
 
 
