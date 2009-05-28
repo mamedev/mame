@@ -7,8 +7,9 @@
 typedef struct _namco_53xx_interface namco_53xx_interface;
 struct _namco_53xx_interface
 {
+	devcb_read8		k;			/* read handlers for K port */
 	devcb_read8 	in[4];		/* read handlers for ports A-D */
-	devcb_write8 	out[2];		/* write handlers for ports A-B */
+	devcb_write8	p;			/* write handler for P port */
 };
 
 
@@ -20,6 +21,7 @@ struct _namco_53xx_interface
 	MDRV_DEVICE_REMOVE(_tag)
 
 
+void namco_53xx_read_request(const device_config *device);
 READ8_DEVICE_HANDLER( namco_53xx_read );
 
 

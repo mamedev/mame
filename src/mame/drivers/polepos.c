@@ -229,6 +229,12 @@ Notes:
 #define POLEPOS_TOGGLE	PORT_TOGGLE
 
 
+static UINT8 steer_last;
+static UINT8 steer_delta;
+static INT16 steer_accum;
+
+
+
 /*************************************************************************************/
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
@@ -372,18 +378,52 @@ static const namco_51xx_interface namco_51xx_intf =
 	}
 };
 
+
+static READ8_DEVICE_HANDLER( namco_53xx_k_r )
+{
+	/* hardwired to 0 */
+	return 0;
+}
+
+static READ8_DEVICE_HANDLER( steering_changed_r )
+{
+	/* read the current steering value and update our delta */
+	UINT8 steer_new = input_port_read(device->machine, "STEER");
+	steer_accum += (INT8)(steer_new - steer_last);
+	steer_last = steer_new;
+	
+	/* if we have delta, clock things */
+	if (steer_accum < 0)
+	{
+		steer_delta = 1;
+		steer_accum++;
+	}
+	else if (steer_accum > 0)
+	{
+		steer_delta = 0;
+		steer_accum--;
+	}
+	else
+		steer_delta ^= 1;
+
+	return steer_accum & 1;
+}
+
+static READ8_DEVICE_HANDLER( steering_delta_r )
+{
+	return steer_delta;
+}
+
 static const namco_53xx_interface namco_53xx_intf =
 {
-	{	/* port read handlers */
-		DEVCB_INPUT_PORT("STEER"),
-		DEVCB_INPUT_PORT("STEER_HI"),
-		DEVCB_INPUT_PORT("DSWA"),
-		DEVCB_INPUT_PORT("DSWA_HI")
+	DEVCB_HANDLER(namco_53xx_k_r),			/* K port */
+	{
+		DEVCB_HANDLER(steering_changed_r),	/* R0 port */
+		DEVCB_HANDLER(steering_delta_r),	/* R1 port */
+		DEVCB_INPUT_PORT("DSWA"),			/* R2 port */
+		DEVCB_INPUT_PORT("DSWA_HI")			/* R3 port */
 	},
-	{	/* port write handlers */
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
+	DEVCB_NULL								/* P port (connected to test socket) */
 };
 
 
@@ -529,9 +569,6 @@ static INPUT_PORTS_START( polepos )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
-	
-	PORT_START("STEER_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -612,9 +649,6 @@ static INPUT_PORTS_START( poleposa )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
-	
-	PORT_START("STEER_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -693,9 +727,6 @@ static INPUT_PORTS_START( topracra )
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
-	
-	PORT_START("STEER_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 
@@ -774,9 +805,6 @@ static INPUT_PORTS_START( polepos2 )
 
 	PORT_START("STEER")
 	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
-	
-	PORT_START("STEER_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "STEER")
 INPUT_PORTS_END
 
 

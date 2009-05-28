@@ -262,7 +262,10 @@ static DEVICE_START( namco_06xx )
 				state->write[devnum] = namco_51xx_write;
 			}
 			else if (type == NAMCO_53XX)
+			{
 				state->read[devnum] = namco_53xx_read;
+				state->readreq[devnum] = namco_53xx_read_request;
+			}
 			else if (type == NAMCO_54XX)
 				state->write[devnum] = namco_54xx_write;
 			else if (type == SOUND && sound_get_type(state->device[devnum]) == SOUND_NAMCO_52XX)

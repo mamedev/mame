@@ -713,6 +713,7 @@ TODO:
 
 
 static emu_timer *cpu3_interrupt_timer;
+static UINT8 custom_mod;
 
 
 
@@ -768,8 +769,15 @@ static WRITE8_HANDLER( bosco_latch_w )
 			break;
 
 		case 0x05:	/* MOD 0 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x01) | (bit << 0);
+			break;
+
 		case 0x06:	/* MOD 1 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x02) | (bit << 1);
+			break;
+
 		case 0x07:	/* MOD 2 (xevious: n.c.) */
+			custom_mod = (custom_mod & ~0x04) | (bit << 2);
 			break;
 	}
 }
@@ -803,18 +811,23 @@ static const namco_51xx_interface namco_51xx_intf =
 	}
 };
 
+
+static READ8_DEVICE_HANDLER( custom_mod_r )
+{
+	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
+	return custom_mod << 1;
+}
+
 static const namco_53xx_interface namco_53xx_intf =
 {
-	{	/* port read handlers */
-		DEVCB_INPUT_PORT("DSWA"),
-		DEVCB_INPUT_PORT("DSWA_HI"),
-		DEVCB_INPUT_PORT("DSWB"),
-		DEVCB_INPUT_PORT("DSWB_HI")
+	DEVCB_HANDLER(custom_mod_r),		/* K port */
+	{
+		DEVCB_INPUT_PORT("DSWA"),		/* R0 port */
+		DEVCB_INPUT_PORT("DSWA_HI"),	/* R1 port */
+		DEVCB_INPUT_PORT("DSWB"),		/* R2 port */
+		DEVCB_INPUT_PORT("DSWB_HI")		/* R3 port */
 	},
-	{	/* port write handlers */
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
+	DEVCB_NULL							/* P port */
 };
 
 

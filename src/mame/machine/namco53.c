@@ -4,9 +4,6 @@ Namco 53XX
 
 This custom chip is a Fujitsu MB8843 MCU programmed to act as an I/O device.
 
-The chip reads/writes the I/O ports when the /IRQ is pulled down. Pin 21
-determines whether a read or write should happen (1=R, 0=W).
-
         MB8843
        +------+
   EXTAL|1   42|Vcc
@@ -32,16 +29,13 @@ determines whether a read or write should happen (1=R, 0=W).
     GND|21  22|R0
        +------+
 
+Bits K1-K3 select one of 8 modes in which the input data is interpreted.
 
-commands:
-00: nop
-01 + 4 arguments: set coinage (xevious, possibly because of a bug, is different)
-02: go in "credit" mode and enable start buttons
-03: disable joystick remapping
-04: enable joystick remapping
-05: go in "switch" mode
-06: nop
-07: nop
+Pole Position is hard-wired to use mode 0, which reads 4 steering inputs
+and 4 DIP switches (only 1 of each is used).
+
+Dig Dug can control which mode to use via the MOD bit latches. It sets
+these values to mode 7 when running.
 
 ***************************************************************************/
 
@@ -54,17 +48,14 @@ commands:
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-#define READ_PORT(st,num) 			devcb_call_read8(&(st)->in[num], 0)
-#define WRITE_PORT(st,num,data) 	devcb_call_write8(&(st)->out[num], 0, data)
-
-
 typedef struct _namco_53xx_state namco_53xx_state;
 struct _namco_53xx_state
 {
 	const device_config *	cpu;
-	int in_count;
-	devcb_resolved_read8 in[4];
-	devcb_resolved_write8 out[2];
+	UINT8					portO;
+	devcb_resolved_read8 	k;
+	devcb_resolved_read8 	in[4];
+	devcb_resolved_write8 	p;
 };
 
 INLINE namco_53xx_state *get_safe_token(const device_config *device)
@@ -78,23 +69,63 @@ INLINE namco_53xx_state *get_safe_token(const device_config *device)
 
 
 
-READ8_DEVICE_HANDLER( namco_53xx_read )
+static READ8_HANDLER( namco_53xx_K_r )
 {
-	namco_53xx_state *state = get_safe_token(device);
+	namco_53xx_state *state = get_safe_token(space->cpu->owner);
+	return devcb_call_read8(&state->k, 0);
+}
 
-	LOG(("%s: custom 53XX read\n",cpuexec_describe_context(device->machine)));
+static READ8_HANDLER( namco_53xx_Rx_r )
+{
+	namco_53xx_state *state = get_safe_token(space->cpu->owner);
+	return devcb_call_read8(&state->in[offset], 0);
+}
 
-// digdug: ((state->in_count++) % 2)
-	switch ((state->in_count++) % 8)
-	{
-		case 0: return READ_PORT(state,0) | (READ_PORT(state,1) << 4);	// steering
-// digdug: case 1:
-		case 4: return READ_PORT(state,2) | (READ_PORT(state,3) << 4);	// dip switches
-		default: return 0xff;	// polepos2 hangs if 0 is returned
-	}
+static WRITE8_HANDLER( namco_53xx_O_w )
+{
+	namco_53xx_state *state = get_safe_token(space->cpu->owner);
+	UINT8 out = (data & 0x0f);
+	if (data & 0x10)
+		state->portO = (state->portO & 0x0f) | (out << 4);
+	else
+		state->portO = (state->portO & 0xf0) | (out);
+}
+
+static WRITE8_HANDLER( namco_53xx_P_w )
+{
+	namco_53xx_state *state = get_safe_token(space->cpu->owner);
+	devcb_call_write8(&state->p, 0, data);
 }
 
 
+static TIMER_CALLBACK( namco_53xx_irq_clear )
+{
+	namco_53xx_state *state = get_safe_token((const device_config *)ptr);
+	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
+}
+
+void namco_53xx_read_request(const device_config *device)
+{
+	namco_53xx_state *state = get_safe_token(device);
+	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);
+
+	// The execution time of one instruction is ~4us, so we must make sure to
+	// give the cpu time to poll the /IRQ input before we clear it.
+	// The input clock to the 06XX interface chip is 64H, that is
+	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
+	// asserted for one clock cycle ~= 21us.
+	timer_set(device->machine, ATTOTIME_IN_USEC(21), (void *)device, 0, namco_53xx_irq_clear);
+}
+
+READ8_DEVICE_HANDLER( namco_53xx_read )
+{
+	namco_53xx_state *state = get_safe_token(device);
+	UINT8 res = state->portO;
+	
+	namco_53xx_read_request(device);
+	
+	return res;
+}
 
 
 /***************************************************************************
@@ -102,17 +133,16 @@ READ8_DEVICE_HANDLER( namco_53xx_read )
 ***************************************************************************/
 
 ADDRESS_MAP_START( namco_53xx_map_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_53xx_K_r)
-//	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_53xx_O_w)
-//	AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_53xx_R0_r)
-//	AM_RANGE(MB88_PORTR2, MB88_PORTR2) AM_READ(namco_53xx_R2_r)
+	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_53xx_K_r)
+	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_53xx_O_w)
+	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE(namco_53xx_P_w)
+	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READ(namco_53xx_Rx_r)
 ADDRESS_MAP_END
 
 
 static MACHINE_DRIVER_START( namco_53xx )
 	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_IO_MAP(namco_53xx_map_io)
-	MDRV_CPU_FLAGS(CPU_DISABLE)
 MACHINE_DRIVER_END
 
 
@@ -139,17 +169,13 @@ static DEVICE_START( namco_53xx )
 	assert(state->cpu != NULL);
 	astring_free(tempstring);
 
-	/* resolve our read callbacks */
+	/* resolve our read/write callbacks */
+	devcb_resolve_read8(&state->k, &config->k, device);
 	devcb_resolve_read8(&state->in[0], &config->in[0], device);
 	devcb_resolve_read8(&state->in[1], &config->in[1], device);
 	devcb_resolve_read8(&state->in[2], &config->in[2], device);
 	devcb_resolve_read8(&state->in[3], &config->in[3], device);
-
-	/* resolve our write callbacks */
-	devcb_resolve_write8(&state->out[0], &config->out[0], device);
-	devcb_resolve_write8(&state->out[1], &config->out[1], device);
-	
-	state_save_register_device_item(device, 0, state->in_count);
+	devcb_resolve_write8(&state->p, &config->p, device);
 }
 
 
@@ -159,8 +185,7 @@ static DEVICE_START( namco_53xx )
 
 static DEVICE_RESET( namco_53xx )
 {
-	namco_53xx_state *state = get_safe_token(device);
-	state->in_count = 0;
+//	namco_53xx_state *state = get_safe_token(device);
 }
 
 
