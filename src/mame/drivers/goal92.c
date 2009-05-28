@@ -68,13 +68,13 @@ static ADDRESS_MAP_START( goal92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE(&goal92_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
 	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
 	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
-	AM_RANGE(0x180010, 0x180017) AM_WRITE(SMH_RAM) AM_BASE(&goal92_scrollram16)
+	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE(&goal92_scrollram16)
 	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
 ADDRESS_MAP_END
 
@@ -228,7 +228,8 @@ INPUT_PORTS_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	/* NMI writes to MSM ports *only*! -AS */
+	//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
