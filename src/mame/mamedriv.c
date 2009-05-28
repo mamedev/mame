@@ -9060,6 +9060,7 @@ Other Sun games
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3b )		/* (c) 199? Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
 	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */
@@ -9121,6 +9122,10 @@ Other Sun games
 	DRIVER( carb2002 )	/* bootleg */
 	DRIVER( carb2003 )	/* bootleg */
 	DRIVER( nfm )		/* bootleg */
+	DRIVER( unkch1 )	/* bootleg */
+	DRIVER( unkch2 )	/* bootleg */
+	DRIVER( unkch3 )	/* bootleg */
+	DRIVER( unkch4 )	/* bootleg */
 
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
