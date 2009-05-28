@@ -219,8 +219,8 @@ Notes:
 #include "machine/namco51.h"
 #include "machine/namco53.h"
 #include "sound/namco.h"
-#include "sound/namco52.h"
 #include "sound/samples.h"
+#include "audio/namco52.h"
 #include "audio/namco54.h"
 #include "polepos.h"
 
@@ -376,6 +376,29 @@ static const namco_51xx_interface namco_51xx_intf =
 		DEVCB_HANDLER(out_0),
 		DEVCB_HANDLER(out_1)
 	}
+};
+
+
+static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
+{
+	UINT32 length = memory_region_length(device->machine, "52xx");
+logerror("ROM @ %04X\n", offset);
+	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+}
+
+static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+{
+	/* pulled to +5V */
+	return 1;
+}
+
+static const namco_52xx_interface namco_52xx_intf =
+{
+	"discrete",							/* name of the discrete sound device */
+	NODE_04,							/* index of the first node */
+	0,									/* external clock rate */
+	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
 };
 
 
@@ -873,36 +896,6 @@ static const namco_interface namco_config =
 	1				/* stereo */
 };
 
-/* The 52xx output is 4Vpp.  After filtering it is 2Vpp.
- * The output of the 54xx is 4Vpp.  After filtering it is clamped to +1.5/-2.
- * So we need to make the 52xx volume 50% of the 54xx volume.
- * 52xx and 54xx ouputs are mixed together to create an output called GAINx.
- * This has a total resistance to the final op-amp of 13605 when the unemulated 4066
- * panning circuit is at full volume.  The engine sound has a resistance of 17492.
- * These values include 250 ohms of the 4066 when needed.
- * This all means that the engine sound is 77% of the 54xx.
- *
- * Jan 13/05 D.R. - not sure about the following info.
- * The Sound Buffers and Multiplexer circuit on sheet 7B is not emulated.
- * Basically it is a quadraphonic 16 level mixer with a 4-bit DAC (R81-85).
- * It mixes/pans the combined 52xx & 54xx output.
- * The 4 speaker sit down game uses the full quad output.
- * The 2 speaker stand up game combine RF-RR and LF-LR through the speakers.
- *
- * I set the base 54xx level at 80 and the other sounds realtive to that,
- * to allow headroom when more the one effect is played.
- */
-
-static const namco_52xx_interface namco_52xx_config =
-{
-	0,				/* Use internal Playback frequency */
-	100,			/* High pass filter fc */
-	0.3,			/* High pass filter Q */
-	1200,			/* Low pass filter fc */
-	0.8,			/* Low pass filter Q */
-	.5				/* Combined gain of both filters */
-};
-
 
 /*********************************************************************
  * Machine driver
@@ -925,10 +918,11 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_NAMCO_51XX_ADD("51xx", 18432000/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_52XX_ADD("52xx", 18432000/12, namco_52xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_53XX_ADD("53xx", 18432000/12, namco_53xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", "namco52", "54xx")
+	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", "52xx", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
@@ -960,11 +954,6 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-
-	MDRV_SOUND_ADD("namco52", NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -1053,7 +1042,7 @@ ROM_START( polepos )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",    0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",    0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",    0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1137,7 +1126,7 @@ ROM_START( poleposa )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1216,7 +1205,7 @@ ROM_START( polepos1 )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1392,7 +1381,7 @@ ROM_START( topracer )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1466,7 +1455,7 @@ ROM_START( topracra )
 	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",    0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",    0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",    0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1543,7 +1532,7 @@ ROM_START( topracrb )
 	ROM_LOAD( "tr15.a8",      0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
 	ROM_LOAD( "tr16.b9",      0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "tr11.b1",      0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1626,7 +1615,7 @@ ROM_START( polepos2 )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x8000, "namco52", 0 )
+	ROM_REGION( 0x8000, "52xx", 0 )
 	ROM_LOAD( "pp1_11.2e",     0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
 	ROM_LOAD( "pp1_12.2f",     0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
 	ROM_LOAD( "pp1_13.1e",     0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
@@ -1718,7 +1707,7 @@ ROM_START( poleps2a )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */
@@ -1802,7 +1791,7 @@ ROM_START( poleps2b )
 	ROM_LOAD( "136014.181",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 	ROM_LOAD( "136014.182",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
-	ROM_REGION( 0x6000, "namco52", 0 )
+	ROM_REGION( 0x6000, "52xx", 0 )
 	ROM_LOAD( "136014.106",   0x0000, 0x2000, CRC(5b4cf05e) SHA1(52342572940489175607bbf5b6cfd05ee9b0f004) )    /* voice */
 
 	/* unknown or unused (P)ROM data */

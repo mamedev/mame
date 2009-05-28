@@ -26,7 +26,8 @@ enum
 	MB88_PORTR0,	/* R0-R3, 4 bits */
 	MB88_PORTR1,	/* R4-R7, 4 bits */
 	MB88_PORTR2,	/* R8-R11, 4 bits */
-	MB88_PORTR3		/* R12-R15, 4 bits */
+	MB88_PORTR3,	/* R12-R15, 4 bits */
+	MB88_PORTSI		/* SI, 1 bit */
 };
 
 /***************************************************************************
@@ -77,5 +78,7 @@ CPU_GET_INFO( mb8844 );
 #define CPU_MB8844 CPU_GET_INFO_NAME( mb8844 )
 
 CPU_DISASSEMBLE( mb88 );
+
+void mb88_external_clock_w(const device_config *device, int state);
 
 #endif /* __MB88XX_H__ */

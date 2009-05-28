@@ -71,7 +71,7 @@ For the 54XX, see audio/namco54.c
 #include "machine/namco50.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "sound/namco52.h"
+#include "audio/namco52.h"
 #include "audio/namco54.h"
 
 
@@ -261,6 +261,8 @@ static DEVICE_START( namco_06xx )
 				state->read[devnum] = namco_51xx_read;
 				state->write[devnum] = namco_51xx_write;
 			}
+			else if (type == NAMCO_52XX)
+				state->write[devnum] = namco_52xx_write;
 			else if (type == NAMCO_53XX)
 			{
 				state->read[devnum] = namco_53xx_read;
@@ -268,8 +270,6 @@ static DEVICE_START( namco_06xx )
 			}
 			else if (type == NAMCO_54XX)
 				state->write[devnum] = namco_54xx_write;
-			else if (type == SOUND && sound_get_type(state->device[devnum]) == SOUND_NAMCO_52XX)
-				state->write[devnum] = namco_52xx_write;
 			else
 				fatalerror("Unknown device type %s connected to Namco 06xx", devtype_get_name(type));
 		}

@@ -6,6 +6,7 @@
 #include "streams.h"
 #include "sound/filter.h"
 #include "machine/rescap.h"
+#include "namco52.h"
 #include "namco54.h"
 #include "polepos.h"
 
@@ -253,7 +254,7 @@ DISCRETE_SOUND_START(polepos)
 	DISCRETE_INPUT_DATA(NAMCO_54XX_0_DATA(NODE_01))
 	DISCRETE_INPUT_DATA(NAMCO_54XX_1_DATA(NODE_01))
 	DISCRETE_INPUT_DATA(NAMCO_54XX_2_DATA(NODE_01))
-	DISCRETE_INPUT_DATA(NAMCO_54XX_P_DATA(NODE_01))
+	DISCRETE_INPUT_DATA(NAMCO_52XX_P_DATA(NODE_04))
 
 	/************************************************
      * CHANL1 sound
@@ -312,25 +313,24 @@ DISCRETE_SOUND_START(polepos)
 	/************************************************
      * CHANL4 sound
      ************************************************/
-	/* disabled until 52XX is emulated */
 	/* this circuit was simulated in SPICE and an equivalent filter circuit generated */
 	DISCRETE_DAC_R1(NODE_50,
-					0,			/* ENAB */
-					NAMCO_54XX_P_DATA(NODE_01),
+					1,			/* ENAB */
+					NAMCO_52XX_P_DATA(NODE_04),
 					4,			/* 4V - unmeasured*/
 					&polepos_52xx_dac)
 	/* fake it so 0 is now vRef */
 	DISCRETE_ADDER2(NODE_51,
-					0,			/* ENAB */
+					1,			/* ENAB */
 					NODE_50, -POLEPOS_VREF)
 	DISCRETE_FILTER2(NODE_52,
-					0,			/* ENAB */
+					1,			/* ENAB */
 					NODE_51,	/* INP0 */
 					100,		/* FREQ */
 					1.0 / 0.3,	/* DAMP */
 					DISC_FILTER_HIGHPASS)
 	DISCRETE_FILTER2(NODE_53,
-					0,			/* ENAB */
+					1,			/* ENAB */
 					NODE_52,	/* INP0 */
 					1200,		/* FREQ */
 					1.0 / 0.8,	/* DAMP */
@@ -340,7 +340,7 @@ DISCRETE_SOUND_START(polepos)
 					0.5			/* overall filter GAIN */)
 	/* clamp to the maximum of the op-amp shifted by vRef */
 	DISCRETE_CLAMP(POLEPOS_CHANL4_SND,
-					0,			/* ENAB */
+					1,			/* ENAB */
 					NODE_54,	/* IN0 */
 					0,			/* MIN */
 					5.0 - OP_AMP_VP_RAIL_OFFSET - POLEPOS_VREF,	/* MAX */
@@ -352,5 +352,5 @@ DISCRETE_SOUND_START(polepos)
 	DISCRETE_OUTPUT(POLEPOS_CHANL1_SND, 32767/2)
 	DISCRETE_OUTPUT(POLEPOS_CHANL2_SND, 32767/2)
 	DISCRETE_OUTPUT(POLEPOS_CHANL3_SND, 32767/2)
-//  DISCRETE_OUTPUT(POLEPOS_CHANL4_SND, 32767/2)
+	DISCRETE_OUTPUT(POLEPOS_CHANL4_SND, 32767/2)
 DISCRETE_SOUND_END

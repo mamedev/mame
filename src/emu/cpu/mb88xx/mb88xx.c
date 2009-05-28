@@ -16,6 +16,22 @@
 #include "debugger.h"
 #include "mb88xx.h"
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define SERIAL_PRESCALE			6		/* guess */
+#define TIMER_PRESCALE			32		/* guess */
+
+#define SERIAL_DISABLE_THRESH	1000	/* at this value, we give up driving the serial port */
+
+#define INT_CAUSE_SERIAL		0x01
+#define INT_CAUSE_TIMER			0x02
+#define INT_CAUSE_EXTERNAL		0x04
+
+
+
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
@@ -43,15 +59,19 @@ struct _mb88_state
     /* Timer registers */
     UINT8	TH;	/* Timer High: 4 bits */
     UINT8	TL;	/* Timer Low: 4 bits */
+    UINT8	TP; /* Timer Prescale: 6 bits? */
+    UINT8	ctr; /* current external counter value */
 
     /* Serial registers */
     UINT8	SB;	/* Serial buffer: 4 bits */
+    UINT16	SBcount;	/* number of bits received */
+    emu_timer *serial;
 
     /* PLA configuration */
     UINT8 *	PLA;
 
     /* IRQ handling */
-    int	pending_interrupt;
+    UINT8 pending_interrupt;
     cpu_irq_callback irqcallback;
     const device_config *device;
     const address_space *program;
@@ -72,6 +92,8 @@ INLINE mb88_state *get_safe_token(const device_config *device)
 		   cpu_get_type(device) == CPU_MB8844);
 	return (mb88_state *)device->token;
 }
+
+static TIMER_CALLBACK( serial_timer );
 
 /***************************************************************************
     MACROS
@@ -125,6 +147,8 @@ static CPU_INIT( mb88 )
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	
+	cpustate->serial = timer_alloc(device->machine, serial_timer, (void *)device);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->PA);
@@ -145,7 +169,10 @@ static CPU_INIT( mb88 )
 	state_save_register_device_item(device, 0, cpustate->pio);
 	state_save_register_device_item(device, 0, cpustate->TH);
 	state_save_register_device_item(device, 0, cpustate->TL);
+	state_save_register_device_item(device, 0, cpustate->TP);
+	state_save_register_device_item(device, 0, cpustate->ctr);
 	state_save_register_device_item(device, 0, cpustate->SB);
+	state_save_register_device_item(device, 0, cpustate->SBcount);
 	state_save_register_device_item(device, 0, cpustate->pending_interrupt);
 }
 
@@ -155,7 +182,6 @@ static CPU_RESET( mb88 )
 
 	/* zero registers and flags */
 	cpustate->PC = 0;
-	cpustate->PA = 0;
 	cpustate->PA = 0;
 	cpustate->SP[0] = cpustate->SP[1] = cpustate->SP[2] = cpustate->SP[3] = 0;
 	cpustate->SI = 0;
@@ -171,13 +197,41 @@ static CPU_RESET( mb88 )
 	cpustate->pio = 0;
 	cpustate->TH = 0;
 	cpustate->TL = 0;
+	cpustate->TP = 0;
 	cpustate->SB = 0;
+	cpustate->SBcount = 0;
 	cpustate->pending_interrupt = 0;
 }
 
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
+
+static TIMER_CALLBACK( serial_timer )
+{
+	mb88_state *cpustate = get_safe_token((const device_config *)ptr);
+
+	cpustate->SBcount++;
+	
+	/* if we get too many interrupts with no servicing, disable the timer
+	   until somebody does something */
+	if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
+		timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
+
+	/* only read if not full; this is needed by the Namco 52xx to ensure that
+	   the program can write to S and recover the value even if serial is enabled */
+	if (!cpustate->sf)
+	{
+		cpustate->SB = (cpustate->SB >> 1) | (READPORT(MB88_PORTSI) ? 8 : 0);
+	
+		if (cpustate->SBcount >= 4)
+		{
+			cpustate->sf = 1;
+			cpustate->pending_interrupt |= INT_CAUSE_SERIAL;
+		}
+	}
+
+}
 
 static int pla( mb88_state *cpustate, int inA, int inB )
 {
@@ -194,21 +248,65 @@ static void set_irq_line(mb88_state *cpustate, int state)
 	/* on falling edge trigger interrupt */
 	if ( (cpustate->pio & 0x04) && cpustate->nf && state == CLEAR_LINE )
 	{
-		cpustate->pending_interrupt = 1;
+		cpustate->pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
 
 	cpustate->nf = (state != CLEAR_LINE) ? 1 : 0;
 }
 
-static void update_pio( mb88_state *cpustate )
+static void update_pio_enable( mb88_state *cpustate, UINT8 newpio )
 {
-	/* update interrupts, serial and timer flags */
-
-	if ( (cpustate->pio & 0x04) && cpustate->pending_interrupt )
+	/* if the serial state has changed, configure the timer */
+	if ((cpustate->pio ^ newpio) & 0x30)
 	{
-		/* no vectors supported, just do the callback to clear irq_state if needed */
-		if (cpustate->irqcallback)
+		if ((newpio & 0x30) == 0)
+			timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
+		else if ((newpio & 0x30) == 0x20)
+			timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE));
+		else
+			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
+	}
+	
+	cpustate->pio = newpio;
+}
+
+static void increment_timer( mb88_state *cpustate )
+{
+	cpustate->TL = (cpustate->TL + 1) & 0x0f;
+	if (cpustate->TL == 0)
+	{
+		cpustate->TH = (cpustate->TH + 1) & 0x0f;
+		if (cpustate->TH == 0)
+		{
+			cpustate->vf = 1;
+			cpustate->pending_interrupt |= INT_CAUSE_TIMER;
+		}
+	}
+}
+
+static void update_pio( mb88_state *cpustate, int cycles )
+{
+	/* TODO: improve/validate serial and timer support */
+
+	/* internal clock enable */
+	if ( cpustate->pio & 0x80 )
+	{
+		cpustate->TP += cycles;
+		while (cpustate->TP >= TIMER_PRESCALE)
+		{
+			cpustate->TP -= TIMER_PRESCALE;
+			increment_timer(cpustate);
+		}
+	}
+
+	/* process pending interrupts */
+	if (cpustate->pending_interrupt & cpustate->pio)
+	{
+		/* if we have a live external source, call the irqcallback */
+		if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_EXTERNAL)
 			(*cpustate->irqcallback)(cpustate->device, 0);
+
+		cpustate->pending_interrupt = 0;
 
 		cpustate->SP[cpustate->SI] = GETPC();
 		cpustate->SP[cpustate->SI] |= TEST_CF() << 15;
@@ -219,13 +317,23 @@ static void update_pio( mb88_state *cpustate )
 		cpustate->PA = 0x00;
 		cpustate->st = 1;
 
-		cpustate->pending_interrupt = 0;
-
 		CYCLES(3); /* ? */
 	}
-
-	/* TODO: add support for serial and timer */
 }
+
+void mb88_external_clock_w(const device_config *device, int state)
+{
+	mb88_state *cpustate = get_safe_token(device);
+	if (state != cpustate->ctr)
+	{
+		cpustate->ctr = state;
+		
+		/* on a falling clock, increment the timer, but only if enabled */
+		if (cpustate->ctr == 0 && (cpustate->pio & 0x40))
+			increment_timer(cpustate);
+	}
+}
+
 
 static CPU_EXECUTE( mb88 )
 {
@@ -497,10 +605,19 @@ static CPU_EXECUTE( mb88 )
 
 			case 0x26: /* tstv ZCS:..x */
 				cpustate->st = cpustate->vf ^ 1;
+				cpustate->vf = 0;
 				break;
 
 			case 0x27: /* tsts ZCS:..x */
 				cpustate->st = cpustate->sf ^ 1;
+				if (cpustate->sf)
+				{
+					/* re-enable the timer if we disabled it previously */
+					if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
+						timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE));
+					cpustate->SBcount = 0;
+				}
+				cpustate->sf = 0;
 				break;
 
 			case 0x28: /* tstc ZCS:..x */
@@ -526,7 +643,7 @@ static CPU_EXECUTE( mb88 )
 			case 0x2c: /* rts ZCS:... */
 				cpustate->SI = ( cpustate->SI - 1 ) & 3;
 				cpustate->PC = cpustate->SP[cpustate->SI] & 0x3f;
-				cpustate->PA = cpustate->SP[cpustate->SI] >> 6;
+				cpustate->PA = (cpustate->SP[cpustate->SI] >> 6) & 0x1f;
 				cpustate->st = 1;
 				break;
 
@@ -572,7 +689,7 @@ static CPU_EXECUTE( mb88 )
 				/* restore address and saved state flags on the top bits of the stack */
 				cpustate->SI = ( cpustate->SI - 1 ) & 3;
 				cpustate->PC = cpustate->SP[cpustate->SI] & 0x3f;
-				cpustate->PA = cpustate->SP[cpustate->SI] >> 6;
+				cpustate->PA = (cpustate->SP[cpustate->SI] >> 6) & 0x1f;
 				cpustate->st = (cpustate->SP[cpustate->SI] >> 13)&1;
 				cpustate->zf = (cpustate->SP[cpustate->SI] >> 14)&1;
 				cpustate->cf = (cpustate->SP[cpustate->SI] >> 15)&1;
@@ -586,14 +703,14 @@ static CPU_EXECUTE( mb88 )
 				break;
 
 			case 0x3e: /* en imm ZCS:... */
-				cpustate->pio |= READOP(GETPC());
+				update_pio_enable(cpustate, cpustate->pio | READOP(GETPC()));
 				INCPC();
 				oc = 2;
 				cpustate->st = 1;
 				break;
 
 			case 0x3f: /* dis imm ZCS:... */
-				cpustate->pio &= ~(READOP(GETPC()));
+				update_pio_enable(cpustate, cpustate->pio & ~(READOP(GETPC())));
 				INCPC();
 				oc = 2;
 				cpustate->st = 1;
@@ -707,7 +824,7 @@ static CPU_EXECUTE( mb88 )
 			case 0xa4:	case 0xa5:	case 0xa6:	case 0xa7:
 			case 0xa8:	case 0xa9:	case 0xaa:	case 0xab:
 			case 0xac:	case 0xad:	case 0xae:	case 0xaf: /* cyi ZCS:xxx */
-				arg = cpustate->Y - (opcode & 0x0f);
+				arg = (opcode & 0x0f) - cpustate->Y;
 				UPDATE_CF(arg);
 				arg &= 0x0f;
 				UPDATE_ST_Z(arg);
@@ -718,7 +835,7 @@ static CPU_EXECUTE( mb88 )
 			case 0xb4:	case 0xb5:	case 0xb6:	case 0xb7:
 			case 0xb8:	case 0xb9:	case 0xba:	case 0xbb:
 			case 0xbc:	case 0xbd:	case 0xbe:	case 0xbf: /* ci ZCS:xxx */
-				arg = cpustate->A - (opcode & 0x0f);
+				arg = (opcode & 0x0f) - cpustate->A;
 				UPDATE_CF(arg);
 				arg &= 0x0f;
 				UPDATE_ST_Z(arg);
@@ -738,7 +855,7 @@ static CPU_EXECUTE( mb88 )
 		CYCLES( oc );
 
 		/* update interrupts, serial and timer flags */
-		update_pio(cpustate);
+		update_pio(cpustate, oc);
 	}
 
 	return cycles - cpustate->icount;

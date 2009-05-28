@@ -113,7 +113,7 @@ TODO:
 #include "machine/namco50.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "sound/namco52.h"
+#include "audio/namco52.h"
 #include "audio/namco54.h"
 
 

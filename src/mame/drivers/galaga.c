@@ -704,7 +704,7 @@ TODO:
 #include "machine/namco53.h"
 #include "includes/galaga.h"
 #include "sound/namco.h"
-#include "sound/namco52.h"
+#include "audio/namco52.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "audio/namco54.h"
@@ -809,6 +809,37 @@ static const namco_51xx_interface namco_51xx_intf =
 		DEVCB_HANDLER(out_0),
 		DEVCB_HANDLER(out_1)
 	}
+};
+
+
+static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
+{
+	UINT32 length = memory_region_length(device->machine, "52xx");
+//printf("ROM read %04X\n", offset);
+	if (!(offset & 0x1000))
+		offset = (offset & 0xfff) | 0x0000;
+	else if (!(offset & 0x2000))
+		offset = (offset & 0xfff) | 0x1000;
+	else if (!(offset & 0x4000))
+		offset = (offset & 0xfff) | 0x2000;
+	else if (!(offset & 0x8000))
+		offset = (offset & 0xfff) | 0x3000;
+	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+}
+
+static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+{
+	/* pulled to GND */
+	return 0;
+}
+
+static const namco_52xx_interface namco_52xx_intf =
+{
+	"discrete",							/* name of the discrete sound device */
+	NODE_04,							/* index of the first node */
+	ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))),	/* external clock rate */
+	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
 };
 
 
@@ -1608,20 +1639,6 @@ static const namco_interface namco_config =
 	0				/* stereo */
 };
 
-/* Only used by bosco.  After filtering the 4V 52xx output,
- * the signal is 1V, or 25%.  The relative volume between
- * 52xx & 54xx is the same.
- */
-static const namco_52xx_interface namco_52xx_config =
-{
-	4000,			/* Playback frequency - from 555 timer 6M */
-	80,				/* High pass filter fc */
-	0.3,			/* High pass filter Q */
-	2400,			/* Low pass filter fc */
-	0.9,			/* Low pass filter Q */
-	.25				/* Combined gain of both filters */
-};
-
 static const char *const battles_sample_names[] =
 {
 	"*battles",
@@ -1655,10 +1672,11 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/12, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/12, namco_52xx_intf)		/* 1.536 MHz */
 	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/12, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx_0", "maincpu", "51xx",   NULL,      "50xx_1", "54xx")
-	MDRV_NAMCO_06XX_ADD("06xx_1", "sub",     "50xx_2", "namco52", NULL,     NULL)
+	MDRV_NAMCO_06XX_ADD("06xx_0", "maincpu", "51xx",   NULL,   "50xx_1", "54xx")
+	MDRV_NAMCO_06XX_ADD("06xx_1", "sub",     "50xx_2", "52xx", NULL,     NULL)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1688,10 +1706,6 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
-
-	MDRV_SOUND_ADD("namco52", NAMCO_52XX, MASTER_CLOCK/12)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -1958,7 +1972,7 @@ ROM_START( bosco )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -1997,7 +2011,7 @@ ROM_START( boscoo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2036,7 +2050,7 @@ ROM_START( boscoo2 )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2082,7 +2096,7 @@ ROM_START( boscomd )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2124,7 +2138,7 @@ ROM_START( boscomdo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "52xx", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
