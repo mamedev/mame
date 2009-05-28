@@ -71,10 +71,11 @@ WRITE16_HANDLER( f3_volume_w )
 static TIMER_CALLBACK( taito_en_timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
-	if (m68681_imr&8) {
-		cpu_set_input_line_vector(machine->cpu[1], 6, vector_reg);
-		cpu_set_input_line(machine->cpu[1], 6, ASSERT_LINE);
-		imr_status|=0x8;
+	if (m68681_imr & 0x08) 
+	{
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 6, vector_reg);
+		cputag_set_input_line(machine, "audiocpu", 6, ASSERT_LINE);
+		imr_status |= 0x08;
 	}
 }
 
@@ -85,18 +86,20 @@ void f3_68681_reset(running_machine *machine)
 
 READ16_HANDLER(f3_68681_r)
 {
-	if (offset==0x5) {
-		int ret=imr_status;
-		imr_status=0;
+	if (offset == 0x05) 
+	{
+		int ret = imr_status;
+		imr_status = 0;
 		return ret;
 	}
 
-	if (offset==0xe)
+	if (offset == 0x0e)
 		return 1;
 
 	/* IRQ ack */
-	if (offset==0xf) {
-		cpu_set_input_line(space->machine->cpu[1], 6, CLEAR_LINE);
+	if (offset == 0x0f) 
+	{
+		cputag_set_input_line(space->machine, "audiocpu", 6, CLEAR_LINE);
 		return 0;
 	}
 
@@ -259,7 +262,7 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 
 	/* reset CPU to catch any banking of startup vectors */
 	device_reset(cputag_get_cpu(machine, "audiocpu"));
-	//cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 const es5505_interface es5505_taito_f3_config =
@@ -268,8 +271,3 @@ const es5505_interface es5505_taito_f3_config =
 	"ensoniq.0",	/* Bank 1: All games seem to use this */
 	NULL /* irq */
 };
-
-
-
-
-

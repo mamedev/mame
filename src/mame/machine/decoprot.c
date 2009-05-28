@@ -108,18 +108,19 @@ void decoprot_reset(running_machine *machine)
 
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
-	if (offset==(0x150/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0x150 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 
-	if (offset!=(0x150>>1) && offset!=(0x0>>1) && offset!=(0x110>>1) && offset!=(0x280>>1)
-		&& offset!=(0x290>>1) && offset!=(0x2b0>>1) && offset!=(0x370>>1) && offset!=(0x3c0>>1)
-		&& offset!=(0x370>>1) && offset!=(0x3c0>>1) && offset!=(0x430>>1) && offset!=(0x460>>1)
-		&& offset!=(0x5a0>>1) && offset!=(0x5b0>>1) && offset!=(0x6e0>>1) && offset!=(0x7d0>>1)
+	if (offset != (0x150 >> 1) && offset != (0x0 >> 1) && offset != (0x110 >> 1) && offset != (0x280 >> 1)
+		&& offset != (0x290 >> 1) && offset != (0x2b0 >> 1) && offset != (0x370 >> 1) && offset != (0x3c0 >> 1)
+		&& offset != (0x370 >> 1) && offset != (0x3c0 >> 1) && offset != (0x430 >> 1) && offset != (0x460 >> 1)
+		&& offset != (0x5a0 >> 1) && offset != (0x5b0 >> 1) && offset != (0x6e0 >> 1) && offset != (0x7d0 >> 1)
 		)
-		logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
+		logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n", cpu_get_pc(space->cpu), offset << 1, data);
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 }
@@ -226,9 +227,10 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 
 WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 {
-	if (offset==(0x64/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0x64 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
@@ -415,9 +417,10 @@ static int mutantf_port_0e_hack=0, mutantf_port_6a_hack=0,mutantf_port_e8_hack=0
 
 WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 {
-	if (offset==(0x64/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0x64 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 
@@ -601,9 +604,10 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 
 WRITE16_HANDLER( deco16_104_cninja_prot_w )
 {
-	if (offset==(0xa8/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0xa8 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 
@@ -663,9 +667,10 @@ WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 {
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 
-	if (offset == (0x10a >> 1)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0x10a >> 1)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 }
@@ -782,9 +787,10 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 	else
 		COMBINE_DATA(&deco16_prot_ram[offset]);
 
-	if (offset==(0xa8/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0xa8 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 
@@ -1211,9 +1217,10 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	const int sndport=0x260;
 	const int xorport=0x340;
 	const int maskport=0x6c0;
-	if (writeport==sndport) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (writeport == sndport) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
 
@@ -1635,12 +1642,12 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 WRITE32_HANDLER( deco16_146_fghthist_prot_w )
 {
-	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
 
-	decoprot_last_write=addr;
-	decoprot_last_write_val=data>>16;
+	decoprot_last_write = addr;
+	decoprot_last_write_val = data >> 16;
 
-	deco16_146_core_prot_w(space, addr, data>>16, mem_mask>>16);
+	deco16_146_core_prot_w(space, addr, data >> 16, mem_mask >> 16);
 }
 
 READ32_HANDLER( deco16_146_fghthist_prot_r )
@@ -1711,13 +1718,13 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 
 WRITE16_HANDLER( deco16_146_nitroball_prot_w )
 {
-	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 	deco16_146_core_prot_w(space, addr, data, mem_mask);
 }
 
 READ16_HANDLER( deco16_146_nitroball_prot_r )
 {
-	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 	return deco16_146_core_prot_r(space, addr, mem_mask);
 }
 
@@ -1739,12 +1746,13 @@ READ16_HANDLER( dietgo_104_prot_r )
 
 WRITE16_HANDLER( dietgo_104_prot_w )
 {
-	if (offset==(0x380/2)) {
-		soundlatch_w(space,0,data&0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	if (offset == (0x380 / 2)) 
+	{
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 		return;
 	}
-	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
+	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n", cpu_get_pc(space->cpu), offset << 1, data);
 }
 
 /**********************************************************************************/

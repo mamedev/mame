@@ -44,7 +44,7 @@ static void Interrupt_Controller(running_machine *machine)
 {
 	if ( tc0140syt.nmi_req && tc0140syt.nmi_enabled )
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 		tc0140syt.nmi_req = 0;
 	}
 }
@@ -98,10 +98,10 @@ WRITE8_HANDLER( taitosound_comm_w )
 //#endif
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 			else
 			{
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
                 cpu_spin(space->cpu); /* otherwise no sound in driftout */
             }
 			break;

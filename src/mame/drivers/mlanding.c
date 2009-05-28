@@ -74,7 +74,7 @@ static WRITE16_HANDLER(ml_subreset_w)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(const device_config *device)
@@ -314,7 +314,7 @@ INPUT_PORTS_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "z80", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static GFXDECODE_START( mlanding )
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_CPU_PROGRAM_MAP(mlanding_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("z80", Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_mem)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
@@ -396,7 +396,7 @@ ROM_START( mlanding )
 	ROM_LOAD16_BYTE( "ml_b0925.epr", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
 	ROM_LOAD16_BYTE( "ml_b0924.epr", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
-	ROM_REGION( 0x20000, "z80", 0 )	/* z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* z80 */
 	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x4000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
 	ROM_CONTINUE(             0x10000, 0x04000 )	/* banked stuff */
 	ROM_LOAD( "ml_b0936.epr", 0x14000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )

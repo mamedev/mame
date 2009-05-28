@@ -160,7 +160,7 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 	int credit_add = 0;
 	int credit_sub = 0;
 	int button;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
@@ -232,7 +232,7 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 
 static void namco_customio_56XX_run(running_machine *machine, int chip)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	LOG(("execute 56XX %d mode %d\n",chip,IORAM_READ(8)));
 
@@ -314,7 +314,7 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 
 static void namco_customio_59XX_run(running_machine *machine, int chip)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	LOG(("execute 59XX %d mode %d\n",chip,IORAM_READ(8)));
 
@@ -339,7 +339,7 @@ static void namco_customio_59XX_run(running_machine *machine, int chip)
 
 static void namco_customio_58XX_run(running_machine *machine, int chip)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	LOG(("execute 58XX %d mode %d\n",chip,IORAM_READ(8)));
 

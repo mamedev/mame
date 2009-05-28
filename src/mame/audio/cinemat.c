@@ -1518,7 +1518,7 @@ static const ay8910_interface demon_ay8910_interface_3 =
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
 
@@ -1610,7 +1610,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( qb3_sound_w )
 {
-	UINT16 rega = cpu_get_reg(space->machine->cpu[0], CCPU_A);
+	UINT16 rega = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), CCPU_A);
 	demon_sound_w(space->machine, 0x00 | (~rega & 0x0f), 0x10);
 }
 
@@ -1618,7 +1618,7 @@ static WRITE8_HANDLER( qb3_sound_w )
 static MACHINE_RESET( qb3_sound )
 {
 	MACHINE_RESET_CALL(demon_sound);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, qb3_sound_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, qb3_sound_w);
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */

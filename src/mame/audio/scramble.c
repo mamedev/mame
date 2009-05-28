@@ -78,7 +78,6 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 	return frogger_timer[(cputag_get_total_cycles(device->machine, "audiocpu")/512) % 10];
 }
 
-
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
@@ -87,13 +86,6 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 	/* bit 4 is sound disable */
 	sound_global_enable(~data & 0x10);
-}
-
-WRITE8_HANDLER( sfx_sh_irqtrigger_w )
-{
-	/* bit 1 is connected to the flip-flop's clock */
-	TTL7474_clock_w(3, data & 0x01);
-	TTL7474_update(space->machine, 3);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
@@ -110,7 +102,6 @@ WRITE8_HANDLER( froggrmc_sh_irqtrigger_w )
 	TTL7474_update(space->machine, 2);
 }
 
-
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
 	/* interrupt acknowledge clears the flip-flop --
@@ -125,44 +116,22 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
 	return 0xff;
 }
 
-static IRQ_CALLBACK(sfx_sh_irq_callback)
-{
-	/* interrupt acknowledge clears the flip-flop --
-       we need to pulse the CLR line because MAME's core never clears this
-       line, only asserts it */
-	TTL7474_clear_w(3, 0);
-	TTL7474_update(device->machine, 3);
-
-	TTL7474_clear_w(3, 1);
-	TTL7474_update(device->machine, 3);
-
-	return 0xff;
-}
-
-
 static void scramble_sh_7474_callback(running_machine *machine)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpu_set_input_line(machine->cpu[1], 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static void sfx_sh_7474_callback(running_machine *machine)
-{
-	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
-	/* we need to complement Q bar */
-	cpu_set_input_line(machine->cpu[2], 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
-	return soundlatch_r(cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM),0);
+	cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
+	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM),0);
 }
 
 static void filter_w(const device_config *device, int data)
@@ -196,36 +165,19 @@ WRITE8_HANDLER( frogger_filter_w )
 	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
 }
 
-
 static const struct TTL7474_interface scramble_sh_7474_intf =
 {
 	scramble_sh_7474_callback
 };
 
-static const struct TTL7474_interface sfx_sh_7474_intf =
-{
-	sfx_sh_7474_callback
-};
-
-
 void scramble_sh_init(running_machine *machine)
 {
-	cpu_set_irq_callback(machine->cpu[1], scramble_sh_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "audiocpu"), scramble_sh_irq_callback);
 
 	TTL7474_config(machine, 2, &scramble_sh_7474_intf);
 
 	/* PR is always 0, D is always 1 */
 	TTL7474_d_w(2, 1);
-}
-
-void sfx_sh_init(running_machine *machine)
-{
-	cpu_set_irq_callback(machine->cpu[2], sfx_sh_irq_callback);
-
-	TTL7474_config(machine, 3, &sfx_sh_7474_intf);
-
-	/* PR is always 0, D is always 1 */
-	TTL7474_d_w(3, 1);
 }
 
 

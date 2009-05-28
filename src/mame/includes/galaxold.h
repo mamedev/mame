@@ -174,8 +174,6 @@ DRIVER_INIT( mrkougb );
 DRIVER_INIT( ad2083 );
 
 MACHINE_RESET( scramble );
-MACHINE_RESET( sfx );
-MACHINE_RESET( monsterz );
 MACHINE_RESET( explorer );
 
 READ8_HANDLER( triplep_pip_r );
@@ -190,7 +188,6 @@ CUSTOM_INPUT( darkplnt_custom_r );
 /*----------- defined in audio/scramble.c -----------*/
 
 void scramble_sh_init(running_machine *machine);
-void sfx_sh_init(running_machine *machine);
 
 WRITE8_HANDLER( scramble_filter_w );
 WRITE8_HANDLER( frogger_filter_w );
@@ -201,7 +198,6 @@ READ8_DEVICE_HANDLER( frogger_portB_r );
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
-WRITE8_HANDLER( sfx_sh_irqtrigger_w );
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
 WRITE8_HANDLER( froggrmc_sh_irqtrigger_w );
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w );

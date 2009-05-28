@@ -26,32 +26,6 @@ MACHINE_RESET( scramble )
   security_2B_counter = 0;
 }
 
-MACHINE_RESET( sfx )
-{
-	MACHINE_RESET_CALL(scramble);
-
-	sfx_sh_init(machine);
-}
-
-static int monsterz_count = 0;
-MACHINE_RESET( monsterz )
-{
-/*
-// patch rom crc
-    UINT8 *ROM = memory_region(machine, "maincpu");
-    ROM[0x363f] = 0;
-    ROM[0x3640] = 0;
-    ROM[0x3641] = 0;
-
-    ROM[0xc5bc] = 0xaf;
-*/
-	MACHINE_RESET_CALL(scramble);
-
-	sfx_sh_init(machine);
-
-	monsterz_count = 0;
-}
-
 MACHINE_RESET( explorer )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
