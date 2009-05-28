@@ -2169,6 +2169,7 @@ src/mame/drivers/turbo.c svneol=native#text/plain
 src/mame/drivers/tutankhm.c svneol=native#text/plain
 src/mame/drivers/twin16.c svneol=native#text/plain
 src/mame/drivers/twincobr.c svneol=native#text/plain
+src/mame/drivers/twinkle.c svneol=native#text/plain
 src/mame/drivers/twins.c svneol=native#text/plain
 src/mame/drivers/tx1.c svneol=native#text/plain
 src/mame/drivers/uapce.c svneol=native#text/plain

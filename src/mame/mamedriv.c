@@ -3198,6 +3198,16 @@ V-V                           TP-027
 	DRIVER( ddrextrm )	/* 2002 - Dance Dance Revolution Extreme (G*C36 VER. JAA) */
 	DRIVER( gtfrk11m )	/* 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA) */
 
+	/* Konami Twinkle games */
+	DRIVER( gq863 )
+	DRIVER( bmiidxc )
+	DRIVER( bmiidxca )
+	DRIVER( bmiidxc2 )
+	DRIVER( bmiidx4 )
+	DRIVER( bmiidx6 )
+	DRIVER( bmiidx7 )
+	DRIVER( bmiidx8 )
+
 	/* Konami Viper games */
 	DRIVER( kviper )	/* 1999 */
 	DRIVER( ppp2nd )	/* 2001 */

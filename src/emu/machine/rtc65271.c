@@ -372,9 +372,18 @@ UINT8 rtc65271_r(int xramsel, offs_t offset)
 	return reply;
 }
 
+READ8_HANDLER( rtc65271_rtc_r )
+{
+	return rtc65271_r( 0, offset );
+}
+
+READ8_HANDLER( rtc65271_xram_r )
+{
+	return rtc65271_r( 1, offset );
+}
 
 /*
-    Read a byte from clock
+    Write a byte to clock
 
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
@@ -451,6 +460,16 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 			/* indirect address register */
 			rtc.cur_reg = data & 0x3f;
 	}
+}
+
+WRITE8_HANDLER( rtc65271_rtc_w )
+{
+	rtc65271_w( 0, offset, data );
+}
+
+WRITE8_HANDLER( rtc65271_xram_w )
+{
+	rtc65271_w( 1, offset, data );
 }
 
 static void field_interrupts(void)

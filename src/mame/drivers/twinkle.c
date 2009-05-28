@@ -1,0 +1,833 @@
+/*
+
+Twinkle System
+
+driver by smf
+
+TODO:
+
+sound
+dvd
+hard drive
+16seg led font
+
+*/
+
+#include "driver.h"
+#include "cpu/mips/psx.h"
+#include "cpu/m68000/m68000.h"
+#include "includes/psx.h"
+#include "machine/am53cf96.h"
+#include "machine/rtc65271.h"
+#include "machine/i2cmem.h"
+#include "sound/psx.h"
+#include "sound/cdda.h"
+
+
+/* RTC */
+
+static UINT8 xram[ 4096 ];
+
+static NVRAM_HANDLER(twinkle)
+{
+	if (read_or_write)
+	{
+		rtc65271_file_save(file);
+	}
+	else
+	{
+		if (file != NULL)
+		{
+			rtc65271_file_load(machine, file);
+		}
+	}
+
+	nvram_handler_i2cmem_0( machine, file, read_or_write );
+}
+
+static UINT32 twinkle_unknown;
+
+static WRITE32_HANDLER( twinkle_unknown_w )
+{
+/*	printf( "set unknown data=%08x\n", data ); */
+
+	twinkle_unknown = data;
+}
+
+static READ32_HANDLER( twinkle_unknown_r )
+{
+	UINT32 data = twinkle_unknown;
+
+/*	printf( "get unknown data=%08x\n", data ); */
+
+	return data;
+}
+
+static int io_offset;
+static int output_last[ 0x100 ];
+static int last_io_offset;
+
+#define LED_A1 0x0001
+#define LED_A2 0x0002
+#define LED_B 0x0004
+#define LED_C 0x0008
+#define LED_D1 0x0010
+#define LED_D2 0x0020
+#define LED_E 0x0040
+#define LED_F 0x0080
+#define LED_G1 0x0100
+#define LED_G2 0x0200
+#define LED_H 0x2000
+#define LED_I 0x0400
+#define LED_J 0x4000
+#define LED_K 0x8000
+#define LED_L 0x0800
+#define LED_M 0x1000
+
+//   A1  A2 
+//  F H I J B
+//   G1  G2
+//  E M L K C
+//   D2  D1
+
+
+static const UINT16 asciicharset[]=
+{
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_J | LED_M, // 0
+	LED_B | LED_C, // 1
+	LED_A1 | LED_A2 | LED_B | LED_D1 | LED_D2 | LED_E | LED_G1  | LED_G2, // 2
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_G2, // 3
+	LED_B | LED_C | LED_F | LED_G1 | LED_G2 , // 4
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_F | LED_G1 | LED_K, // 5
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_G1 | LED_G2, // 6
+	LED_A1 | LED_A2 | LED_B | LED_C, // 7
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // 8
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_F, // 9
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_E | LED_F, // A
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_G2 | LED_I | LED_L, // B
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F, // C
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_I | LED_L, // D
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F | LED_G1 | LED_G2, // E
+	LED_A1 | LED_A2 | LED_E | LED_F | LED_G1, // F
+// 16
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+// 32
+	0, // space
+	0, // !
+	0, // "
+	0, // #
+	0, // $
+	0, // %
+	0, // &
+	0, // '
+	0, // (
+	0, // )
+	0, // *
+	0, // +
+	0, // ,
+	0, // -
+	0, // .
+	0, // /
+// 48
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_J | LED_M, // 0
+	LED_B | LED_C, // 1
+	LED_A1 | LED_A2 | LED_B | LED_D1 | LED_D2 | LED_E | LED_G1  | LED_G2, // 2
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_G2, // 3
+	LED_B | LED_C | LED_F | LED_G1 | LED_G2 , // 4
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_F | LED_G1 | LED_K, // 5
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // 6
+	LED_A1 | LED_A2 | LED_B | LED_C, // 7
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // 8
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_F, // 9
+	0, // :
+	0, // ;
+	0, // <
+	0, // =
+	0, // >
+	0, // ?
+// 64
+	0, // @
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_E | LED_F, // A
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_G2 | LED_I | LED_L, // B
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F, // C
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_I | LED_L, // D
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F | LED_G1 | LED_G2, // E
+	LED_A1 | LED_A2 | LED_E | LED_F | LED_G1, // F
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_G2, // G
+	LED_B | LED_C | LED_E | LED_F | LED_G1 | LED_G2, // H
+	LED_I | LED_L, // I
+	LED_B | LED_C | LED_D1 | LED_D2 | LED_E, // J
+	LED_E | LED_F | LED_G1 | LED_J | LED_K, // K
+	LED_D1 | LED_D2 | LED_E | LED_F, // L
+	LED_B | LED_C | LED_E | LED_F | LED_H | LED_J, // M
+	LED_B | LED_C | LED_E | LED_F | LED_H | LED_K, // N
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // O
+	LED_A1 | LED_A2 | LED_B | LED_E | LED_F, // P
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_K, // Q
+	LED_A1 | LED_A2 | LED_B | LED_E | LED_F | LED_K, // R
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_F | LED_G1 | LED_G2, // S
+	LED_A1 | LED_A2 | LED_I | LED_L, // T
+	LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // O
+	LED_E | LED_F | LED_M | LED_J, // V
+	LED_B | LED_C | LED_E | LED_F | LED_M | LED_K, // W
+	LED_H | LED_J | LED_K | LED_M, // X
+	LED_H | LED_J | LED_L, // Y
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_J | LED_M, // Z
+	0, // [
+	0, // "\"
+	0, // ]
+	0, // ^
+	0, // _
+	0, // `
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_E | LED_F, // A
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_G2 | LED_I | LED_L, // B
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F, // C
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_I | LED_L, // D
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_E | LED_F | LED_G1 | LED_G2, // E
+	LED_A1 | LED_A2 | LED_E | LED_F | LED_G1, // F
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_G2, // G
+	LED_B | LED_C | LED_E | LED_F | LED_G1 | LED_G2, // H
+	LED_I | LED_L, // I
+	LED_B | LED_C | LED_D1 | LED_D2 | LED_E, // J
+	LED_E | LED_F | LED_G1 | LED_J | LED_K, // K
+	LED_D1 | LED_D2 | LED_E | LED_F, // L
+	LED_B | LED_C | LED_E | LED_F | LED_H | LED_J, // M
+	LED_B | LED_C | LED_E | LED_F | LED_H | LED_K, // N
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // O
+	LED_A1 | LED_A2 | LED_B | LED_E | LED_F, // P
+	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_K, // Q
+	LED_A1 | LED_A2 | LED_B | LED_E | LED_F | LED_K, // R
+	LED_A1 | LED_A2 | LED_C | LED_D1 | LED_D2 | LED_F | LED_G1 | LED_G2, // S
+	LED_A1 | LED_A2 | LED_I | LED_L, // T
+	LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F, // O
+	LED_E | LED_F | LED_M | LED_J, // V
+	LED_B | LED_C | LED_E | LED_F | LED_M | LED_K, // W
+	LED_H | LED_J | LED_K | LED_M, // X
+	LED_H | LED_J | LED_L, // Y
+	LED_A1 | LED_A2 | LED_D1 | LED_D2 | LED_J | LED_M, // Z
+	0, // {
+	0, // |
+	0, // }
+	0, // ~
+	0, //
+};
+
+static WRITE32_HANDLER( twinkle_io_w )
+{
+	if( ACCESSING_BITS_16_23 )
+	{
+		io_offset = ( data >> 16 ) & 0xff;
+	}
+	if( ACCESSING_BITS_0_7 )
+	{
+		if( output_last[ io_offset ] != ( data & 0xff ) )
+		{
+			output_last[ io_offset ] = ( data & 0xff );
+
+			switch( io_offset )
+			{
+				/* ? */
+			case 0x07:
+			case 0x0f:
+			case 0x17:
+			case 0x1f:
+			case 0x27:
+			case 0x2f:
+			case 0x37:
+
+				/* led */
+			case 0x3f:
+			case 0x47:
+			case 0x4f:
+			case 0x57:
+			case 0x5f:
+			case 0x67:
+			case 0x6f:
+			case 0x77:
+			case 0x7f:
+				output_set_indexed_value( "led", ( io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				break;
+
+			case 0x87:
+				output_set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
+				output_set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
+				output_set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
+				output_set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
+				output_set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
+				output_set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
+				output_set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
+				output_set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
+				break;
+
+			case 0x8f:
+				output_set_value( "neonlamp", ~data & 1 );
+
+				if( ( data & 0xfe ) != 0xfe )
+				{
+					printf("%02x = %02x\n", io_offset, data & 0xff );
+				}
+				break;
+
+			default:
+				printf( "unknown io %02x = %02x\n", io_offset, data & 0xff );
+				break;
+			}
+		}
+	}
+}
+
+static READ32_HANDLER(twinkle_io_r)
+{
+	UINT32 data = 0;
+
+	if( ACCESSING_BITS_0_7 )
+	{
+		switch( io_offset )
+		{
+			case 0x07:
+				data |= input_port_read( space->machine, "IN0" );
+				break;
+
+			case 0x0f:
+				data |= input_port_read( space->machine, "IN1" );
+				break;
+
+			case 0x17:
+				data |= input_port_read( space->machine, "IN2" );
+				break;
+
+			case 0x1f:
+				data |= input_port_read( space->machine, "IN3" );
+				break;
+
+			case 0x27:
+				data |= input_port_read( space->machine, "IN4" );
+				break;
+
+			case 0x2f:
+				data |= input_port_read( space->machine, "IN5" );
+				break;
+
+			default:
+				if( last_io_offset != io_offset )
+				{
+					last_io_offset = io_offset;
+					printf( "io_offset=%02x\n", io_offset );
+				}
+
+				break;
+		}
+	}
+
+	if( ACCESSING_BITS_8_15 )
+	{
+		/* led status? 1100 */
+	}
+
+	return data;
+}
+
+static WRITE32_HANDLER(twinkle_output_w)
+{
+	switch( offset )
+	{
+	case 0x00:
+		/* offset */
+		break;
+	case 0x02:
+		/* data */
+		break;
+	case 0x04:
+		/* ?? */
+		break;
+	case 0x08:
+		/* bit 0 = clock?? */
+		/* bit 1 = data?? */
+		/* bit 2 = reset?? */
+		break;
+	case 0x0c:
+		/* ?? */
+		break;
+	case 0x15:
+		/* ?? */
+		break;
+	case 0x24:
+		/* ?? */
+		break;
+	}
+}
+
+static WRITE32_HANDLER(serial_w)
+{
+/*
+	int _do = ( data >> 4 ) & 1;
+	int clock = ( data >> 5 ) & 1;
+	int reset = ( data >> 6 ) & 1;
+
+	printf( "serial_w do=%d clock=%d reset=%d\n", _do, clock, reset );
+*/
+}
+
+static WRITE32_HANDLER(security_w)
+{
+	i2cmem_write( space->machine, 0, I2CMEM_SCL, ( data >> 4 ) & 1 );
+	i2cmem_write( space->machine, 0, I2CMEM_SDA, ( data >> 3 ) & 1 );
+}
+
+static READ32_HANDLER(security_r)
+{
+	/* 0x4000 ?? */
+	return i2cmem_read( space->machine, 0, I2CMEM_SDA ) << 12;
+}
+
+static WRITE32_HANDLER(xx_w)
+{
+/*
+printf( "xx %08x %08x %08x\n", offset, mem_mask, data );
+*/
+}
+
+static READ32_HANDLER(xx_r)
+{
+/*
+	printf( "xx %08x %08x\n", offset, mem_mask );
+*/
+	return 0;
+}
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(xx_r, xx_w)
+//	AM_RANGE(0x1f000400, 0x1f0007ff) AM_RAM AM_SHARE(3) /* shared ram */
+	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
+	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
+	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITENOP /* sound irq? */
+	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE(twinkle_io_w)
+	AM_RANGE(0x1f220004, 0x1f220007) AM_READ(twinkle_io_r)
+	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
+	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
+	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITENOP
+
+
+	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
+	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE(security_w)
+	AM_RANGE(0x1f280000, 0x1f280003) AM_READ(security_r)
+	AM_RANGE(0x1f290000, 0x1f29007f) AM_READWRITE8(rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
+	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_READWRITE8(rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
+	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
+	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
+	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
+	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
+	AM_RANGE(0x1f80100c, 0x1f80100f) AM_WRITENOP
+	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
+	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD("spu", psx_spu_delay_r)
+	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(twinkle_unknown_r, twinkle_unknown_w)
+	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
+	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
+	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
+	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
+	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
+	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
+	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
+	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
+	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
+	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE(1) /* ram mirror */
+	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
+	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
+ADDRESS_MAP_END
+
+static READ32_HANDLER(yy_r)
+{
+	printf( "yy %08x %08x\n", offset, mem_mask );
+	return 0;
+}
+
+
+static READ32_HANDLER(zz_r)
+{
+//	printf( "zz %08x %08x\n", offset, mem_mask );
+	return 0;
+}
+
+static WRITE32_HANDLER(ww_w)
+{
+	printf( "ww %08x %08x %08x\n", offset, mem_mask, data );
+}
+
+static READ32_HANDLER(ww_r)
+{
+	printf( "ww %08x %08x\n", offset, mem_mask );
+	return 0;
+}
+
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM
+	AM_RANGE(0x200000, 0x200003) AM_READ( yy_r )
+	AM_RANGE(0x220000, 0x220003) AM_WRITENOP
+	AM_RANGE(0x230000, 0x230003) AM_WRITENOP
+	AM_RANGE(0x280400, 0x2807ff) AM_READWRITE( ww_r, ww_w )
+//	AM_RANGE(0x280400, 0x2807ff) AM_RAM AM_SHARE(3) /* shared ram? */
+	AM_RANGE(0x30000c, 0x30000f) AM_READ( zz_r )
+	AM_RANGE(0x400000, 0x400fff) AM_WRITENOP /* ide? */
+ADDRESS_MAP_END
+
+/* SCSI */
+
+static UINT8 sector_buffer[ 4096 ];
+
+static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
+{
+	int i;
+	int n_this;
+
+	while( n_size > 0 )
+	{
+		if( n_size > sizeof( sector_buffer ) / 4 )
+		{
+			n_this = sizeof( sector_buffer ) / 4;
+		}
+		else
+		{
+			n_this = n_size;
+		}
+		if( n_this < 2048 / 4 )
+		{
+			/* non-READ commands */
+			am53cf96_read_data( n_this * 4, sector_buffer );
+		}
+		else
+		{
+			/* assume normal 2048 byte data for now */
+			am53cf96_read_data( 2048, sector_buffer );
+			n_this = 2048 / 4;
+		}
+		n_size -= n_this;
+
+		i = 0;
+		while( n_this > 0 )
+		{
+			g_p_n_psxram[ n_address / 4 ] =
+				( sector_buffer[ i + 0 ] << 0 ) |
+				( sector_buffer[ i + 1 ] << 8 ) |
+				( sector_buffer[ i + 2 ] << 16 ) |
+				( sector_buffer[ i + 3 ] << 24 );
+			n_address += 4;
+			i += 4;
+			n_this--;
+		}
+	}
+}
+
+static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
+{
+	int i;
+	int n_this;
+
+	while( n_size > 0 )
+	{
+		if( n_size > sizeof( sector_buffer ) / 4 )
+		{
+			n_this = sizeof( sector_buffer ) / 4;
+		}
+		else
+		{
+			n_this = n_size;
+		}
+		n_size -= n_this;
+
+		i = 0;
+		while( n_this > 0 )
+		{
+			sector_buffer[ i + 0 ] = ( g_p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
+			sector_buffer[ i + 1 ] = ( g_p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
+			sector_buffer[ i + 2 ] = ( g_p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
+			sector_buffer[ i + 3 ] = ( g_p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
+			n_address += 4;
+			i += 4;
+			n_this--;
+		}
+
+		am53cf96_write_data( n_this * 4, sector_buffer );
+	}
+}
+
+static void scsi_irq(running_machine *machine)
+{
+	psx_irq_set(machine, 0x400);
+}
+
+static SCSIConfigTable dev_table =
+{
+	1, /* 1 SCSI device */
+	{
+		{ SCSI_ID_4, "cdrom0", SCSI_DEVICE_CDROM } /* SCSI ID 4, using CHD 0, and it's a CD-ROM */
+	}
+};
+
+static struct AM53CF96interface scsi_intf =
+{
+	&dev_table,		/* SCSI device table */
+	&scsi_irq,		/* command completion IRQ */
+};
+
+static DRIVER_INIT( twinkle )
+{
+	psx_driver_init(machine);
+	am53cf96_init(machine, &scsi_intf);
+	psx_dma_install_read_handler(5, scsi_dma_read);
+	psx_dma_install_write_handler(5, scsi_dma_write);
+
+	rtc65271_init(machine, xram, NULL);
+
+	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, memory_region_length( machine, "user2" ), memory_region( machine, "user2" ) );
+	i2cmem_write( machine, 0, I2CMEM_E0, 0 );
+	i2cmem_write( machine, 0, I2CMEM_E1, 0 );
+	i2cmem_write( machine, 0, I2CMEM_E2, 0 );
+	i2cmem_write( machine, 0, I2CMEM_WC, 0 );
+}
+
+static MACHINE_RESET( twinkle )
+{
+	psx_machine_init(machine);
+
+	/* also hook up CDDA audio to the CD-ROM drive */
+	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
+}
+
+static void spu_irq(const device_config *device, UINT32 data)
+{
+	psx_irq_set(device->machine, data);
+}
+
+static const psx_spu_interface twinkle_psxspu_interface =
+{
+	&g_p_n_psxram,
+	spu_irq,
+	psx_dma_install_read_handler,
+	psx_dma_install_write_handler
+};
+
+static MACHINE_DRIVER_START( twinkle )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_PROGRAM_MAP( main_map )
+	MDRV_CPU_VBLANK_INT( "mainscreen", psx_vblank )
+
+	MDRV_CPU_ADD("audiocpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
+	MDRV_CPU_PROGRAM_MAP( sound_map )
+
+	MDRV_MACHINE_RESET( twinkle )
+	MDRV_NVRAM_HANDLER( twinkle )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("mainscreen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE( 60 )
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE( 1024, 1024 )
+	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+
+	MDRV_PALETTE_LENGTH( 65536 )
+
+	MDRV_PALETTE_INIT( psx )
+	MDRV_VIDEO_START( psx_type2 )
+	MDRV_VIDEO_UPDATE( psx )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
+
+	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
+	MDRV_SOUND_CONFIG( twinkle_psxspu_interface )
+	MDRV_SOUND_ROUTE( 0, "speakerleft", 0.75 )
+	MDRV_SOUND_ROUTE( 1, "speakerright", 0.75 )
+
+	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "speakerleft", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "speakerright", 1.0 )
+MACHINE_DRIVER_END
+
+INPUT_PORTS_START( twinkle )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_NAME("VEFX")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_NAME("Effect")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_PLAYER(2) PORT_NAME("2P Table") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_PLAYER(1) PORT_NAME("1P Table") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0f, 0x00, IPT_AD_STICK_Y) PORT_NAME("Volume 1") PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xf0, 0x00, IPT_AD_STICK_Y) PORT_NAME("Volume 2") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0f, 0x00, IPT_AD_STICK_Y) PORT_NAME("Volume 3") PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xf0, 0x00, IPT_AD_STICK_Y) PORT_NAME("Volume 4") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+
+	PORT_START("IN5")
+	PORT_BIT( 0x0f, 0x00, IPT_AD_STICK_Y) PORT_NAME("Volume 5") PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+
+	PORT_START("IN6")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1-1 (SW1)" )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1-2 (SW2)" )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1-3 (SW3)" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(1) PORT_NAME("P1-4 (SW4)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("P1-5 (SW5)" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(1) PORT_NAME("P1-6 (SW6)" )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_PLAYER(1) PORT_NAME("P1-7 (SW7)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2-1 (SW8)" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2-2 (SW9)" )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2-3 (SW10)" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2) PORT_NAME("P2-4 (SW11)" )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(2) PORT_NAME("P2-5 (SW12)" )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(2) PORT_NAME("P2-6 (SW13)" )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_PLAYER(2) PORT_NAME("P2-7 (SW14)" )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+INPUT_PORTS_END
+
+#define TWINKLE_BIOS	\
+	ROM_REGION32_LE( 0x080000, "user1", 0 )\
+	ROM_LOAD( "863a03.7b",    0x000000, 0x080000, CRC(81498f73) SHA1(3599b40a5872eab3a00d345287635355fcb25a71) )\
+\
+	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
+	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )
+
+ROM_START( gq863 )
+	TWINKLE_BIOS
+ROM_END
+
+ROM_START( bmiidx4 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "a03j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1faf8d1b) SHA1(e8d9d216a8f5459598ff68692f9197e226a231e6) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "a03jaa01", 0, BAD_DUMP MD5(dccbe0158236453c27a9768d185ee275) SHA1(ee0f5989ed2bec3d174150a072e188bc10c15dcb) )
+//	DISK_IMAGE_READONLY( "a03jaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "a03jaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidx6 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "b4uj.pd",      0x000000, 0x000100, BAD_DUMP CRC(0ab15633) SHA1(df004ff41f35b16089f69808ccf53a5e5cc13ac3) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "b4ujaa01", 0, BAD_DUMP MD5(c9397ff1399b268ceac98732e4d7b16d) SHA1(1e723c74fd93140881c00c5af402249e0a8b3f2f) )
+//	DISK_IMAGE_READONLY( "b4ujaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "b4ujaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidx7 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "b44j.pd",      0x000000, 0x000100, BAD_DUMP CRC(5baf4761) SHA1(aa7e07eb2cada03b85bdf11ac6a3de65f4253eef) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "b44jaa01", 0, BAD_DUMP MD5(3078c73d050bb6a513b329f3844e1208) SHA1(5910e557816ced2c5162c5458b5ccf6f8e6839f0) )
+//	DISK_IMAGE_READONLY( "b44jaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "b44jaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidx8 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "c44j.pd",      0x000000, 0x000100, BAD_DUMP CRC(04c22349) SHA1(d1cb78911cb1ca660d393a81ed3ed07b24c51525) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "c44jaa01", 0, BAD_DUMP MD5(43ae8f40ba8974d7d135e83c8e09112a) SHA1(b116775e47c7d5e2578b92811dccdc84f1cafe43) )
+//	DISK_IMAGE_READONLY( "c44jaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "c44jaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidxc )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "896jaabm", 0, MD5(f842277762e330d500fa3eb6755c1547) SHA1(965772160177df43ce7a94f0e12d8cf676e57228) )
+//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidxc2 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "984j.pd",      0x000000, 0x000100, BAD_DUMP CRC(213843e5) SHA1(5571db155a60fa4087dd996af48e8e27fc1c518c) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "984a01bm", 0, MD5(61ada5db9fcbfa01971c5f06253ab5e1) SHA1(98d5e120d0cd08e8598bfde75b16ba62bf67a15b) )
+//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidxca )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "896jabbm", 0, MD5(46f8bd83e8fbe527f6e4512804b2ce1e) SHA1(b7fcf3e6b9c1cebedacbc65c77aa3509c66984a9) )
+//	DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
+//	DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
+ROM_END
+
+GAME( 1999, gq863,   0,     twinkle, twinkle, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
+
+/* VCD */
+/* 1999 - beatmania IIDX */
+/* find out what these use for security */
+GAME( 1999, bmiidxc,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, bmiidxca, bmiidxc, twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+/* 1999 - beatmania IIDX substream */
+GAME( 1999, bmiidxc2, gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX Substream 2 with DDR 2nd Club Version (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+
+/* 1999 - beatmania IIDX 2nd style */
+/* 2000 - beatmania IIDX 3rd style */
+/* these use i2c for security */
+GAME( 2000, bmiidx4,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+/* 2001 - beatmania IIDX 5th style */
+
+/* DVD */
+GAME( 2001, bmiidx6,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, bmiidx7,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, bmiidx8,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
