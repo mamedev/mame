@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 	buffer = (unsigned char *)malloc(bytes + 1);
 	if (buffer == NULL)
 	{
+		fclose(src);
 		fprintf(stderr, "Out of memory allocating %d byte buffer\n", bytes);
 		return 1;
 	}
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
 	dst = fopen(dstfile, "w");
 	if (dst == NULL)
 	{
+		free(buffer);
 		fprintf(stderr, "Unable to open output file '%s'\n", dstfile);
 		return 1;
 	}
