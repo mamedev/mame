@@ -1,18 +1,15 @@
-/***************************************************************************
+/************************************************************************************
 
- Super Golf
+ Super Crowns Golf
  preliminary WIP driver
- by Tomasz Slanina
+ by Tomasz Slanina & Angelo Salese
 
- maybe vidram banking
- plenty of things unknown still
+ TODO:
+ - fix input port $06 and remove the patch, it doesn't seem directly connected;
+ - fix background blitter;
+ - inputs (some kind of ad-stick / pedal);
 
- sometimes extra bits are written to bank registers..
-
- its a z80 game.. i wonder if there is a palette or it should have proms
-               -- the rest of the hardware makes me fear so
-
-***************************************************************************/
+************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -231,7 +228,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // directly related to the ad-stick / pedals or it's a banking return?
 //  AM_RANGE(0x03, 0x03)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
@@ -551,4 +548,12 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+static DRIVER_INIT( suprgolf )
+{
+	UINT8 *ROM = memory_region(machine, "user2");
+
+	ROM[0x74f4-0x4000] = 0x00;
+	ROM[0x74f5-0x4000] = 0x00;
+}
+
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
