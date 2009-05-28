@@ -132,7 +132,7 @@ DISCRETE_SOUND_START(bosco)
 	DISCRETE_INPUT_DATA(NAMCO_54XX_0_DATA(NODE_01))
 	DISCRETE_INPUT_DATA(NAMCO_54XX_1_DATA(NODE_01))
 	DISCRETE_INPUT_DATA(NAMCO_54XX_2_DATA(NODE_01))
-	DISCRETE_INPUT_DATA(NAMCO_52XX_P_DATA(NODE_01))
+	DISCRETE_INPUT_DATA(NAMCO_54XX_P_DATA(NODE_01))
 
 	/************************************************
      * CHANL1 sound
@@ -183,7 +183,7 @@ DISCRETE_SOUND_START(bosco)
 	/* this circuit was simulated in SPICE and an equivalent filter circuit generated */
 	DISCRETE_DAC_R1(NODE_50,
 					0,			/* ENAB */
-					NAMCO_52XX_P_DATA(NODE_01),
+					NAMCO_54XX_P_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&bosco_52xx_dac)
 	DISCRETE_FILTER2(NODE_51,

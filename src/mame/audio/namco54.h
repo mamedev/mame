@@ -33,7 +33,7 @@ DEVICE_GET_INFO( namco_54xx );
 #define NAMCO_54XX_0_DATA(base)		(NODE_RELATIVE(base, 0))
 #define NAMCO_54XX_1_DATA(base)		(NODE_RELATIVE(base, 1))
 #define NAMCO_54XX_2_DATA(base)		(NODE_RELATIVE(base, 2))
-#define NAMCO_52XX_P_DATA(base)		(NODE_RELATIVE(base, 3))
+#define NAMCO_54XX_P_DATA(base)		(NODE_RELATIVE(base, 3))
 
 
 #endif	/* NAMCO54_H */
