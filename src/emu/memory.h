@@ -776,7 +776,6 @@ union _addrmap64_token
 #define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
 #define AM_RAMBANK(_bank)					AM_READWRITE(SMH_BANK(_bank), SMH_BANK(_bank))
 #define AM_RAM_WRITE(_write)				AM_READWRITE(SMH_RAM, _write)
-#define AM_READONLY							AM_READ(SMH_RAM)
 #define AM_WRITEONLY						AM_WRITE(SMH_RAM)
 
 #define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
