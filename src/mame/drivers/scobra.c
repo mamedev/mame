@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteatgb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x0bff) AM_ROM
+	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x1171, 0x1171) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x1174, 0x1174) AM_WRITE(galaxold_stars_enable_w)

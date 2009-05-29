@@ -126,7 +126,7 @@ static void demonwld_dsp(running_machine *machine, int enable)
 		logerror("Turning DSP on and 68000 off\n");
 		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
 		cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
