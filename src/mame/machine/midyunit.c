@@ -292,25 +292,25 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 	{
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(machine);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, cvsd_protection_w);
+			memory_install_write8_handler(cputag_get_address_space(machine, "cvsdcpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, cvsd_protection_w);
 			cvsd_protection_base = memory_region(machine, "cvsdcpu") + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
 			williams_cvsd_init(machine);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, "cvsdcpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
 			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init(machine);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
 			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init(machine);
-			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, "narc1cpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
 			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
@@ -582,7 +582,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 			case SOUND_YAWDIM:
 				soundlatch_w(space, 0, data);
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

@@ -535,7 +535,7 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	debug_console_register_command(machine, "fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
 
 	/* set up the instruction hook */
-	debug_cpu_set_instruction_hook(machine->cpu[0], instruction_hook);
+	debug_cpu_set_instruction_hook(cputag_get_cpu(machine, "maincpu"), instruction_hook);
 
 	/* regenerate the key */
 	if (keydirty)

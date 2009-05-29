@@ -44,20 +44,20 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 
 	fd1094_state = state;
 
-	cpu_set_reg(machine->cpu[1], M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(cputag_get_cpu(machine, "sub"), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the s24_fd1094 state ready to decrypt.. */
 	state = fd1094_set_state(s24_fd1094_key,state) & 0xff;
 
 	/* first check the cache, if its cached we don't need to decrypt it, just copy */
-	for (i=0;i<S16_NUMCACHE;i++)
+	for (i = 0; i < S16_NUMCACHE; i++)
 	{
 		if (fd1094_cached_states[i] == state)
 		{
 			/* copy cached state */
-			s24_fd1094_userregion=s24_fd1094_cacheregion[i];
-			memory_set_decrypted_region(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-			m68k_set_encrypted_opcode_range(machine->cpu[1],0,s24_fd1094_cpuregionsize);
+			s24_fd1094_userregion = s24_fd1094_cacheregion[i];
+			memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+			m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "sub"), 0, s24_fd1094_cpuregionsize);
 
 			return;
 		}
@@ -66,26 +66,26 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 // mame_printf_debug("new state %04x\n",state);
 
 	/* mark it as cached (because it will be once we decrypt it) */
-	fd1094_cached_states[fd1094_current_cacheposition]=state;
+	fd1094_cached_states[fd1094_current_cacheposition] = state;
 
-	for (addr=0;addr<s24_fd1094_cpuregionsize/2;addr++)
+	for (addr = 0; addr < s24_fd1094_cpuregionsize / 2; addr++)
 	{
 		UINT16 dat;
-		dat = fd1094_decode(addr,s24_fd1094_cpuregion[addr],s24_fd1094_key,0);
-		s24_fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
+		dat = fd1094_decode(addr, s24_fd1094_cpuregion[addr], s24_fd1094_key, 0);
+		s24_fd1094_cacheregion[fd1094_current_cacheposition][addr] = dat;
 	}
 
 	/* copy newly decrypted data to user region */
-	s24_fd1094_userregion=s24_fd1094_cacheregion[fd1094_current_cacheposition];
-	memory_set_decrypted_region(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
-	m68k_set_encrypted_opcode_range(machine->cpu[1],0,s24_fd1094_cpuregionsize);
+	s24_fd1094_userregion = s24_fd1094_cacheregion[fd1094_current_cacheposition];
+	memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+	m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "sub"), 0, s24_fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
-	if (fd1094_current_cacheposition>=S16_NUMCACHE)
+	if (fd1094_current_cacheposition >= S16_NUMCACHE)
 	{
 		mame_printf_debug("out of cache, performance may suffer, incrase S16_NUMCACHE!\n");
-		fd1094_current_cacheposition=0;
+		fd1094_current_cacheposition = 0;
 	}
 }
 
@@ -116,8 +116,8 @@ static void s24_fd1094_kludge_reset_values(void)
 {
 	int i;
 
-	for (i = 0;i < 4;i++)
-		s24_fd1094_userregion[i] = fd1094_decode(i,s24_fd1094_cpuregion[i],s24_fd1094_key,1);
+	for (i = 0; i < 4; i++)
+		s24_fd1094_userregion[i] = fd1094_decode(i, s24_fd1094_cpuregion[i], s24_fd1094_key, 1);
 }
 
 
@@ -131,11 +131,11 @@ void s24_fd1094_machine_init(running_machine *machine)
 	s24_fd1094_setstate_and_decrypt(machine, FD1094_STATE_RESET);
 	s24_fd1094_kludge_reset_values();
 
-	m68k_set_cmpild_callback(machine->cpu[1], s24_fd1094_cmp_callback);
-	m68k_set_rte_callback(machine->cpu[1], s24_fd1094_rte_callback);
-	cpu_set_irq_callback(machine->cpu[1], s24_fd1094_int_callback);
+	m68k_set_cmpild_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_cmp_callback);
+	m68k_set_rte_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_rte_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "sub"), s24_fd1094_int_callback);
 
-	device_reset(machine->cpu[1]);
+	device_reset(cputag_get_cpu(machine, "sub"));
 }
 
 static STATE_POSTLOAD( s24_fd1094_postload )

@@ -612,59 +612,59 @@ static int has_write_handler(const device_config *cpu, write16_space_func handle
 
 int TC0100SCN_count(running_machine *machine)
 {
-	int mask = (has_write_handler(machine->cpu[0], TC0100SCN_word_0_w) ||
-		has_write_handler(machine->cpu[0], TC0100SCN_dual_screen_w) ||
-		has_write_handler(machine->cpu[0], TC0100SCN_triple_screen_w)) ? 1 : 0;
-	mask |= has_write_handler(machine->cpu[0], TC0100SCN_word_1_w) << 1;
-	mask |= has_write_handler(machine->cpu[0], TC0100SCN_word_2_w) << 2;
+	int mask = (has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0100SCN_word_0_w) ||
+		has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0100SCN_dual_screen_w) ||
+		has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0100SCN_triple_screen_w)) ? 1 : 0;
+	mask |= has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0100SCN_word_1_w) << 1;
+	mask |= has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0100SCN_word_2_w) << 2;
 
 	/* Catch illegal configurations */
 	/* TODO: we should give an appropriate warning */
 	assert_always(mask == 0 || mask == 1 || mask == 3 || mask == 7, "Invalid TC0110PCR configuration");
-	return BIT(mask,0) + BIT(mask,1) + BIT(mask,2);
+	return BIT(mask, 0) + BIT(mask, 1) + BIT(mask, 2);
 }
 
 
 int TC0110PCR_mask(running_machine *machine)
 {
-	int mask = (has_write_handler(machine->cpu[0], TC0110PCR_word_w) ||
-			has_write_handler(machine->cpu[0], TC0110PCR_step1_word_w) ||
-			has_write_handler(machine->cpu[0], TC0110PCR_step1_rbswap_word_w) ||
-			has_write_handler(machine->cpu[0], TC0110PCR_step1_4bpg_word_w)) ? 1 : 0;
-	mask |= has_write_handler(machine->cpu[0], TC0110PCR_step1_word_1_w) << 1;
-	mask |= has_write_handler(machine->cpu[0], TC0110PCR_step1_word_2_w) << 2;
+	int mask = (has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_word_w) ||
+			has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_step1_word_w) ||
+			has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_step1_rbswap_word_w) ||
+			has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_step1_4bpg_word_w)) ? 1 : 0;
+	mask |= has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_step1_word_1_w) << 1;
+	mask |= has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0110PCR_step1_word_2_w) << 2;
 	return mask;
 }
 
 int has_TC0150ROD(running_machine *machine)
 {
-	return	has_write_handler(machine->cpu[0], TC0150ROD_word_w) ||
-			has_write_handler(machine->cpu[1], TC0150ROD_word_w) ||
-			has_write_handler(machine->cpu[2], TC0150ROD_word_w);
+	return	has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0150ROD_word_w) ||
+			has_write_handler(cputag_get_cpu(machine, "audiocpu"), TC0150ROD_word_w) ||
+			has_write_handler(cputag_get_cpu(machine, "sub"), TC0150ROD_word_w);
 }
 
 
 int has_TC0280GRD(running_machine *machine)
 {
-	return	has_write_handler(machine->cpu[0], TC0280GRD_word_w);
+	return	has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0280GRD_word_w);
 }
 
 
 int has_TC0360PRI(running_machine *machine)
 {
-	return	has_write_handler8(machine->cpu[0], TC0360PRI_w);
+	return	has_write_handler8(cputag_get_cpu(machine, "maincpu"), TC0360PRI_w);
 }
 
 
 int has_TC0430GRW(running_machine *machine)
 {
-	return	has_write_handler(machine->cpu[0], TC0430GRW_word_w);
+	return	has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0430GRW_word_w);
 }
 
 
 int has_TC0480SCP(running_machine *machine)
 {
-	return	has_write_handler(machine->cpu[0], TC0480SCP_word_w);
+	return	has_write_handler(cputag_get_cpu(machine, "maincpu"), TC0480SCP_word_w);
 }
 
 

@@ -49,9 +49,12 @@ static UINT16 *sync_data;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+
+	if (cputag_get_cpu(machine, "extra") != NULL)
+		cputag_set_input_line(machine, "extra", 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+
+	cputag_set_input_line(machine, "maincpu", 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -111,13 +114,13 @@ static READ16_HANDLER( adc_r )
 
 static WRITE16_HANDLER( eprom_latch_w )
 {
-	if (ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_7 && (cputag_get_cpu(space->machine, "extra") != NULL))
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "extra", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 1-4: screen intensity */
 		eprom_screen_intensity = (data & 0x1e) >> 1;
@@ -726,8 +729,8 @@ static DRIVER_INIT( eprom )
 	atarijsa_init(machine, "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	sync_data = memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
-	sync_data = memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	sync_data = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	sync_data = memory_install_readwrite16_handler(cputag_get_address_space(machine, "extra", ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
 }
 
 

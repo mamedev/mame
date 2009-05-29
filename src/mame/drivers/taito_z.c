@@ -2788,7 +2788,7 @@ static void irqhandler(const device_config *device, int irq)
 static void irqhandlerb(const device_config *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
-//  cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

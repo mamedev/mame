@@ -309,7 +309,7 @@ static int sound_nmi_enabled;
 
 static void sound_nmi_callback( int param )
 {
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	sound_nmi_enabled = 0;
 }

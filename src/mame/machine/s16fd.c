@@ -43,7 +43,7 @@ static void set_decrypted_region(running_machine *machine)
 	if (fd1094_set_decrypted != NULL)
 		(*fd1094_set_decrypted)(machine, (UINT8 *)fd1094_userregion);
 	else
-		memory_set_decrypted_region(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, fd1094_cpuregionsize - 1, fd1094_userregion);
+		memory_set_decrypted_region(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, fd1094_cpuregionsize - 1, fd1094_userregion);
 }
 
 /* this function checks the cache to see if the current state is cached,
@@ -65,29 +65,29 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 
 	fd1094_state = state;
 
-	cpu_set_reg(machine->cpu[0], M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the FD1094 state ready to decrypt.. */
-	state = fd1094_set_state(fd1094_key,state) & 0xff;
+	state = fd1094_set_state(fd1094_key, state) & 0xff;
 
 	/* first check the cache, if its cached we don't need to decrypt it, just copy */
-	for (i=0;i<CACHE_ENTRIES;i++)
+	for (i = 0; i < CACHE_ENTRIES; i++)
 	{
 		if (fd1094_cached_states[i] == state)
 		{
 			/* copy cached state */
-			fd1094_userregion=fd1094_cacheregion[i];
+			fd1094_userregion = fd1094_cacheregion[i];
 			set_decrypted_region(machine);
-			m68k_set_encrypted_opcode_range(machine->cpu[0],0,fd1094_cpuregionsize);
+			m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "maincpu"), 0, fd1094_cpuregionsize);
 
 			return;
 		}
 	}
 
 	/* mark it as cached (because it will be once we decrypt it) */
-	fd1094_cached_states[fd1094_current_cacheposition]=state;
+	fd1094_cached_states[fd1094_current_cacheposition] = state;
 
-	for (addr=0;addr<fd1094_cpuregionsize/2;addr++)
+	for (addr = 0; addr < fd1094_cpuregionsize / 2; addr++)
 	{
 		UINT16 dat;
 		dat = fd1094_decode(addr,fd1094_cpuregion[addr],fd1094_key,0);
@@ -95,16 +95,16 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 	}
 
 	/* copy newly decrypted data to user region */
-	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];
+	fd1094_userregion = fd1094_cacheregion[fd1094_current_cacheposition];
 	set_decrypted_region(machine);
-	m68k_set_encrypted_opcode_range(machine->cpu[0],0,fd1094_cpuregionsize);
+	m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "maincpu"), 0, fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 
-	if (fd1094_current_cacheposition>=CACHE_ENTRIES)
+	if (fd1094_current_cacheposition >= CACHE_ENTRIES)
 	{
 		mame_printf_debug("out of cache, performance may suffer, incrase CACHE_ENTRIES!\n");
-		fd1094_current_cacheposition=0;
+		fd1094_current_cacheposition = 0;
 	}
 }
 
@@ -164,7 +164,7 @@ static STATE_POSTLOAD( fd1094_postload )
 		int selected_state = fd1094_selected_state;
 		int state = fd1094_state;
 
-		fd1094_machine_init(machine->cpu[0]);
+		fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 		fd1094_setstate_and_decrypt(machine, selected_state);
 		fd1094_setstate_and_decrypt(machine, state);
@@ -177,10 +177,10 @@ static void key_changed(running_machine *machine)
 	int addr;
 
 	/* re-decode the against the current parameter into cache entry 0 */
-	for (addr = 0; addr < fd1094_cpuregionsize/2; addr++)
+	for (addr = 0; addr < fd1094_cpuregionsize / 2; addr++)
 	{
 		UINT16 dat;
-		dat = fd1094_decode(addr,fd1094_cpuregion[addr],fd1094_key,0);
+		dat = fd1094_decode(addr, fd1094_cpuregion[addr], fd1094_key, 0);
 		fd1094_cacheregion[0][addr]=dat;
 	}
 
@@ -190,7 +190,7 @@ static void key_changed(running_machine *machine)
 	fd1094_current_cacheposition = 1;
 
 	/* flush the prefetch queue */
-	cpu_set_reg(machine->cpu[0], M68K_PREF_ADDR, 0x0010);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_ADDR, 0x0010);
 }
 
 
@@ -210,7 +210,7 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 
 	for (i = 0; i < CACHE_ENTRIES; i++)
 	{
-		fd1094_cacheregion[i] = auto_alloc_array(machine, UINT16, fd1094_cpuregionsize/2);
+		fd1094_cacheregion[i] = auto_alloc_array(machine, UINT16, fd1094_cpuregionsize / 2);
 		fd1094_cached_states[i] = -1;
 	}
   	fd1094_current_cacheposition = 0;

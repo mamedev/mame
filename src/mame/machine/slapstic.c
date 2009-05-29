@@ -807,7 +807,7 @@ static FILE *slapsticlog;
 
 void slapstic_init(running_machine *machine, int chip)
 {
-	cpu_type cputype = cpu_get_type(machine->cpu[0]);
+	cpu_type cputype = cpu_get_type(cputag_get_cpu(machine, "maincpu"));
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)

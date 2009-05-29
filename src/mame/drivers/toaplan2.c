@@ -298,14 +298,16 @@ static WRITE16_HANDLER( batsugun_share_w );
 static WRITE16_HANDLER( batsugun_share2_w );
 #endif
 
+static const device_config *sub_cpu = NULL;
+
 /***************************************************************************
   Initialisation handlers
 ***************************************************************************/
 
 static void toaplan2_reset(const device_config *device)
 {
-	if (device->machine->cpu[1] != NULL)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	if (sub_cpu != NULL)
+		cpu_set_input_line(sub_cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( toaplan2 )
@@ -368,18 +370,24 @@ static void register_state_save(running_machine *machine)
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
 {
 	toaplan2_sub_cpu = CPU_2_Z80;
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_Z180 )
 {
 	toaplan2_sub_cpu = CPU_2_HD647180;
+	sub_cpu = cputag_get_cpu(machine, "mcu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_V25 )
 {
 	toaplan2_sub_cpu = CPU_2_V25;
+	if (cputag_get_cpu(machine, "mcu") != NULL)
+		sub_cpu = cputag_get_cpu(machine, "mcu");
+	else if (cputag_get_cpu(machine, "audiocpu") != NULL)
+		sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -392,7 +400,7 @@ static DRIVER_INIT( T2_noZ80 )
 static DRIVER_INIT( fixeight )
 {
 	#if USE_V25
-
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	#else
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
 	memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
@@ -490,6 +498,7 @@ static DRIVER_INIT( pipibibi )
 	}
 
 	toaplan2_sub_cpu = CPU_2_Z80;
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -497,6 +506,7 @@ static DRIVER_INIT( batrider )
 {
 	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -505,6 +515,7 @@ static DRIVER_INIT( bbakraid )
 	bbakraid_unlimited_ver = 0;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -513,6 +524,7 @@ static DRIVER_INIT( bbakradu )
 	bbakraid_unlimited_ver = 1;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	sub_cpu = cputag_get_cpu(machine, "audiocpu");
 	register_state_save(machine);
 }
 
@@ -617,8 +629,8 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 		#if USE_V25
 		/* only the ram-based V25 based games access the following bits */
-		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		//cpu_set_input_line(sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -1016,7 +1028,7 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+		cpu_set_input_line(sub_cpu, 0, HOLD_LINE);
 	}
 }
 
@@ -1131,7 +1143,7 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1141,7 +1153,7 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch2_w(space, offset, data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1170,7 +1182,7 @@ static WRITE8_HANDLER( raizing_sndirq_w )
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(sub_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1495,7 +1507,7 @@ ADDRESS_MAP_END
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	/* 0x18 used */
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 
@@ -3342,7 +3354,8 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	if (sub_cpu != NULL)		// wouldn't tekipaki have problem without this? "mcu" is not generally added
+		cpu_set_input_line(sub_cpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -3832,7 +3845,7 @@ MACHINE_DRIVER_END
 static MACHINE_RESET(batsugun)
 {
 	#if USE_V25
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(sub_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	#endif
 }
 
@@ -5258,7 +5271,7 @@ GAME( 1998, batridk,  batrid,   batrider, batrider, batrider, ROT270, "Raizing /
 GAME( 1998, batridja, batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 
 // Battle Bakraid
-// the 'unlimited' version is a newer revisino of the code.
+// the 'unlimited' version is a newer revision of the code.
 GAME( 1999, bkraidu,  0,       bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1999, bkraiduj, bkraidu, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code

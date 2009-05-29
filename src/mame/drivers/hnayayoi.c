@@ -515,8 +515,8 @@ INPUT_PORTS_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-popmessage("irq");
-//  cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	popmessage("irq");
+//  cputag_set_input_line(device->machine, "maincpu",0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
