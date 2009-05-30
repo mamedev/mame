@@ -1,5 +1,37 @@
-extern void DS1302_RST(UINT8 val);
-extern void DS1302_DAT(UINT8 val);
-extern void DS1302_CLK(running_machine *machine, UINT8 val);
-extern UINT8 DS1302_RD(void);
+/**********************************************************************
 
+    DALLAS DS1302
+
+    RTC + BACKUP RAM
+
+**********************************************************************/
+
+#ifndef __DS1302_H__
+#define __DS1302_H__
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
+#define DS1302		DEVICE_GET_INFO_NAME(ds1302)
+
+#define MDRV_DS1302_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, DS1302, 0)
+
+#define MDRV_DS1302_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+/* device interface */
+DEVICE_GET_INFO( ds1302 );
+
+extern WRITE8_DEVICE_HANDLER( ds1302_dat_w );
+extern WRITE8_DEVICE_HANDLER( ds1302_clk_w );
+extern READ8_DEVICE_HANDLER( ds1302_read );
+
+
+#endif /* __DS1302_H__ */

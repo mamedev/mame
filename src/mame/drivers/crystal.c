@@ -337,18 +337,21 @@ static READ32_HANDLER(PIO_r)
 
 static WRITE32_HANDLER(PIO_w)
 {
-	UINT32 RST=data&0x01000000;
-	UINT32 CLK=data&0x02000000;
-	UINT32 DAT=data&0x10000000;
+	const device_config *ds1302 = devtag_get_device(space->machine, "rtc");
+	UINT32 RST = data & 0x01000000;
+	UINT32 CLK = data & 0x02000000;
+	UINT32 DAT = data & 0x10000000;
 
-	DS1302_RST(RST?1:0);
-	DS1302_DAT(DAT?1:0);
-	DS1302_CLK(space->machine, CLK?1:0);
+	if (!RST)
+		device_reset(ds1302);
 
-	if(DS1302_RD())
-		memory_write_dword(space,0x01802008,memory_read_dword(space,0x01802008)|0x10000000);
+	ds1302_dat_w(ds1302, 0, DAT ? 1 : 0);
+	ds1302_clk_w(ds1302, 0, CLK ? 1 : 0);
+
+	if (ds1302_read(ds1302, 0))
+		memory_write_dword(space, 0x01802008, memory_read_dword(space, 0x01802008) | 0x10000000);
 	else
-		memory_write_dword(space,0x01802008,memory_read_dword(space,0x01802008)&(~0x10000000));
+		memory_write_dword(space, 0x01802008, memory_read_dword(space, 0x01802008) & (~0x10000000));
 
 	COMBINE_DATA(&PIO);
 }
@@ -756,6 +759,8 @@ static MACHINE_DRIVER_START( crystal )
 
 	MDRV_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 	MDRV_PALETTE_LENGTH(65536)
+
+	MDRV_DS1302_ADD("rtc")
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
