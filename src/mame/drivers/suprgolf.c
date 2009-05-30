@@ -69,7 +69,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 
 static MACHINE_RESET( suprgolf )
 {
-
+	msm_nmi_mask = 0;
 }
 
 static VIDEO_START( suprgolf )
@@ -87,6 +87,7 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 {
 	int x,y,trans;
 	UINT32 count;
+	UINT16 alpha_val;
 
 	count = starting_offs<<16;
 	trans = starting_offs;
@@ -97,33 +98,52 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		{
 			UINT16 color;
 
-			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | ((suprgolf_bg_vram[count] & 0xf0)>>4);
-			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
-			//if((x)<video_screen_get_visible_area(machine)->max_x && ((y)+0)<video_screen_get_visible_area(machine)->max_y)
-			if(x+1 < 256)
+			color = ((suprgolf_bg_vram[count] & 0xf0)>>4);
+
+			if(suprgolf_bg_pen[count] & 0x80)
+				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
+			else
+			{
+				/* TODO */
+				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
+				//color |= 0x73<<4;//((suprgolf_bg_vram[count+0x10000] & 0x0f)<<4);
+			}
+
+			alpha_val =  0;//(paletteram[color*2]+256*paletteram[color*2+1]) & 0x8000;
+
+			if((x+1) >= 0 && (x+1) < 256 && (!(alpha_val)))
 			{
 				if(trans)
 				{
 					if((suprgolf_bg_vram[count] & 0xf0) != 0xf0)
-						*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
+						*BITMAP_ADDR16(bitmap, y, (x+1)) = machine->pens[(color & 0x7ff)];
 				}
 				else
-					*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
+					*BITMAP_ADDR16(bitmap, y, (x+1)) = machine->pens[(color & 0x7ff)];
 			}
 
-			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | (suprgolf_bg_vram[count] & 0x0f);
-			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
+			color = (suprgolf_bg_vram[count] & 0x0f);
 
-			//if((x+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-			if(x < 256)
+			if(suprgolf_bg_pen[count] & 0x80)
+				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
+			else
+			{
+				/* TODO */
+				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
+				//color |= 0x73<<4;//((suprgolf_bg_vram[count+0x10000] & 0x0f)<<4);
+			}
+
+			alpha_val = 0;//(paletteram[color*2]+256*paletteram[color*2+1]) & 0x8000;
+
+			if(x >= 0 && x < 256 && (!(alpha_val)))
 			{
 				if(trans)
 				{
 					if((suprgolf_bg_vram[count] & 0x0f) != 0x0f)
-						*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
+						*BITMAP_ADDR16(bitmap, y, x) = machine->pens[(color & 0x7ff)];
 				}
 				else
-					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
+					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[(color & 0x7ff)];
 			}
 
 			count++;
@@ -133,11 +153,11 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 static VIDEO_UPDATE( suprgolf )
 {
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bg_draw(screen->machine,bitmap,cliprect,0);
-	//bg_draw(screen->machine,bitmap,cliprect,1);
-	bg_draw(screen->machine,bitmap,cliprect,2); //this probably should be putted over the fg tilemap too.
-
 	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
+	bg_draw(screen->machine,bitmap,cliprect,2);
+
 	return 0;
 }
 
@@ -160,9 +180,9 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 		offset>>=1;
 		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
 
-		b=(datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
-		g=(datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
-		r=(datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
+		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
+		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
+		r = (datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
 
 		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -199,7 +219,7 @@ static READ8_HANDLER( suprgolf_bg_vram_r )
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
 	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
-	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = data ? pen : 0;
+	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = pen;
 }
 
 /* maybe bit 7 isn't actually for the pen? */
@@ -466,7 +486,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
