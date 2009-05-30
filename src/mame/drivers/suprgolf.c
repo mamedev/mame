@@ -6,7 +6,7 @@
 
  TODO:
  - fix input port $06 and remove the patch, it doesn't seem directly connected;
- - fix background blitter;
+ - fix the background blitter/framebuffer, needs rewriting;
  - inputs (some kind of ad-stick / pedal);
 
 ************************************************************************************/
@@ -218,7 +218,21 @@ static READ8_HANDLER( suprgolf_bg_vram_r )
 
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
-	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	static UINT8 hi_nibble,lo_nibble;
+
+	hi_nibble = data & 0xf0;
+	lo_nibble = data & 0x0f;
+
+	if(hi_nibble == 0xf0)
+		hi_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0;
+	if(lo_nibble == 0x0f)
+		lo_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f;
+
+	if(pen & 0x80)
+		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	else
+		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = hi_nibble|lo_nibble;
+
 	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = pen;
 }
 
