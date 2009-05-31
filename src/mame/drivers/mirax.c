@@ -75,6 +75,26 @@ static VIDEO_START(mirax)
 
 static VIDEO_UPDATE(mirax)
 {
+	const gfx_element *gfx = screen->machine->gfx[0];
+	int count = 0x00000;
+
+	int y,x;
+
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile = videoram[count];
+			//int colour = tile>>12;
+			drawgfx(bitmap,gfx,tile & 0xff,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+			count++;
+		}
+	}
+
+
+
 #ifdef MAME_DEBUG
 	//audio tester
 	if(input_code_pressed_once(KEYCODE_Q))
@@ -119,9 +139,19 @@ static WRITE8_DEVICE_HANDLER(ay_sel)
 	}
 }
 
+static READ8_HANDLER( unk_r )
+{
+	return mame_rand(space->machine);
+}
+
 static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP //shoudn't write there!
+	//AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	//AM_RANGE(0xc800, 0xcfff) AM_RAM //probably spriteram
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
+	//AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xf300, 0xf300) AM_READ(unk_r) //watchdog?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirax_io_map, ADDRESS_SPACE_IO, 8 )
@@ -213,10 +243,10 @@ PALETTE_INIT( mirax )
 }
 
 static MACHINE_DRIVER_START( mirax )
-	MDRV_CPU_ADD("maincpu", Z80, 12000000) // audio cpu ?
+	MDRV_CPU_ADD("maincpu", Z80, 12000000) // ceramic potted module, encrypted z80
 	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
 	MDRV_CPU_IO_MAP(mirax_io_map)
-	//MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	//MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000) // audio cpu ?
 	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
@@ -248,7 +278,7 @@ static MACHINE_DRIVER_START( mirax )
 MACHINE_DRIVER_END
 
 ROM_START( mirax )
-	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 ) // encrypted code
 	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
 	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
 	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
@@ -275,8 +305,8 @@ ROM_START( mirax )
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
 	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP )
-
 ROM_END
+
 
 static DRIVER_INIT( mirax )
 {
