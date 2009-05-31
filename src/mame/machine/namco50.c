@@ -297,7 +297,7 @@ static DEVICE_START( namco_50xx )
 static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##namco_50xx##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME		"Namco 50xx"
 #define DEVTEMPLATE_FAMILY		"Namco I/O"
 #include "devtempl.h"

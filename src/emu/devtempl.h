@@ -65,15 +65,16 @@ static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
 
 /* flag bits for DEVTEMPLATE_FEATURES */
-#define DT_HAS_RESET			0x0001
-#define DT_HAS_STOP				0x0002
-#define DT_HAS_EXECUTE			0x0004
-#define DT_HAS_NVRAM			0x0008
-#define DT_HAS_VALIDITY_CHECK	0x0010
-#define DT_HAS_CUSTOM_CONFIG	0x0020
-#define DT_HAS_ROM_REGION		0x0040
-#define DT_HAS_MACHINE_CONFIG	0x0080
-#define DT_HAS_INLINE_CONFIG	0x0100
+#define DT_HAS_START			0x0001
+#define DT_HAS_RESET			0x0002
+#define DT_HAS_STOP				0x0004
+#define DT_HAS_EXECUTE			0x0008
+#define DT_HAS_NVRAM			0x0010
+#define DT_HAS_VALIDITY_CHECK	0x0020
+#define DT_HAS_CUSTOM_CONFIG	0x0040
+#define DT_HAS_ROM_REGION		0x0080
+#define DT_HAS_MACHINE_CONFIG	0x0100
+#define DT_HAS_INLINE_CONFIG	0x0200
 
 
 /* verify core stuff is specified */
@@ -83,6 +84,10 @@ static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
 #ifndef DEVTEMPLATE_FEATURES
 #error DEVTEMPLATE_FEATURES must be specified!
+#endif
+
+#if ((DEVTEMPLATE_FEATURES & DT_HAS_START) == 0)
+#error Device start routine is required!
 #endif
 
 #ifndef DEVTEMPLATE_NAME
@@ -124,6 +129,7 @@ static const char *DEVTEMPLATE_SOURCE = __FILE__;
 #endif
 
 /* declare callback functions */
+static DEVICE_START( DEVTEMPLATE_ID(,) );
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_RESET)
 static DEVICE_RESET( DEVTEMPLATE_ID(,) );
 #endif
@@ -164,7 +170,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+#if ((DEVTEMPLATE_FEATURES) & DT_HAS_START)
 		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_ID(device_start_,); 					break;
+#endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_RESET)
 		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_ID(device_reset_,); 					break;
 #endif
@@ -198,6 +206,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 #else
 
 /* declare callback functions */
+#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_START)
+static DEVICE_START( DEVTEMPLATE_DERIVED_ID(,) );
+#endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_RESET)
 static DEVICE_RESET( DEVTEMPLATE_DERIVED_ID(,) );
 #endif
@@ -231,7 +242,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_START)
 		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_ID(device_start_,); 							break;
+#endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_RESET)
 		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_DERIVED_ID(device_reset_,); 					break;
 #endif
