@@ -4,8 +4,8 @@
 #include "devintrf.h"
 
 
-typedef struct _namco_06xx_interface namco_06xx_interface;
-struct _namco_06xx_interface
+typedef struct _namco_06xx_config namco_06xx_config;
+struct _namco_06xx_config
 {
 	const char *nmicpu;
 	const char *chip0;
@@ -15,13 +15,13 @@ struct _namco_06xx_interface
 };
 
 
-#define MDRV_NAMCO_06XX_ADD(_tag, _nmicpu, _chip0, _chip1, _chip2, _chip3) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_06XX, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_interface, nmicpu, _nmicpu) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_interface, chip0, _chip0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_interface, chip1, _chip1) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_interface, chip2, _chip2) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_interface, chip3, _chip3)
+#define MDRV_NAMCO_06XX_ADD(_tag, _clock, _nmicpu, _chip0, _chip1, _chip2, _chip3) \
+	MDRV_DEVICE_ADD(_tag, NAMCO_06XX, _clock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, nmicpu, _nmicpu) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip0, _chip0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip1, _chip1) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip2, _chip2) \
+	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip3, _chip3)
 
 #define MDRV_NAMCO_06XX_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag)

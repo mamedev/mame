@@ -917,12 +917,12 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_NAMCO_51XX_ADD("51xx", 18432000/12, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_52XX_ADD("52xx", 18432000/12, namco_52xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_53XX_ADD("53xx", 18432000/12, namco_53xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_54XX_ADD("54xx", 18432000/12, "discrete", NODE_01)	/* 1.536 MHz */
+	MDRV_NAMCO_51XX_ADD("51xx", 18432000/6/2, namco_51xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_52XX_ADD("52xx", 18432000/6/2, namco_52xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_53XX_ADD("53xx", 18432000/6/2, namco_53xx_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_54XX_ADD("54xx", 18432000/6/2, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", "maincpu", "51xx", "53xx", "52xx", "54xx")
+	MDRV_NAMCO_06XX_ADD("06xx", 18432000/6/64, "maincpu", "51xx", "53xx", "52xx", "54xx")
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 

@@ -518,6 +518,7 @@ src/emu/devcb.h svneol=native#text/plain
 src/emu/devconv.h svneol=native#text/plain
 src/emu/devintrf.c svneol=native#text/plain
 src/emu/devintrf.h svneol=native#text/plain
+src/emu/devtempl.h svneol=native#text/plain
 src/emu/drawgfx.c svneol=native#text/plain
 src/emu/drawgfx.h svneol=native#text/plain
 src/emu/drawgfxm.h svneol=native#text/plain

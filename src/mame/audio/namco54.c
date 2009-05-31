@@ -1,50 +1,49 @@
 /***************************************************************************
 
-Namco 54XX
+    Namco 54XX
 
-This custom chip is a Fujitsu MB8844 MCU programmed to act as a noise
-generator. It is used for explosions, the shoot sound in Bosconian, and the
-tire screech sound in Pole Position.
+    This custom chip is a Fujitsu MB8844 MCU programmed to act as a noise
+    generator. It is used for explosions, the shoot sound in Bosconian, 
+    and the tire screech sound in Pole Position.
 
-CMD = command from main CPU
-OUTn = sound outputs (3 channels)
+    CMD = command from main CPU
+    OUTn = sound outputs (3 channels)
 
-The chip reads the command when the /IRQ is pulled down.
+    The chip reads the command when the /IRQ is pulled down.
 
-      +------+
- EXTAL|1   28|Vcc
-  XTAL|2   27|CMD7
-/RESET|3   26|CMD6
-OUT0.0|4   25|CMD5
-OUT0.1|5   24|CMD4
-OUT0.2|6   23|/IRQ
-OUT0.3|7   22|n.c. [1]
-OUT1.0|8   21|n.c. [1]
-OUT1.1|9   20|OUT2.3
-OUT1.2|10  19|OUT2.2
-OUT1.3|11  18|OUT2.1
-  CMD0|12  17|OUT2.0
-  CMD1|13  16|CMD3
-   GND|14  15|CMD2
-      +------+
+                       +------+
+                     EX|1   28|Vcc
+                      X|2   27|K3 (CMD7)
+                 /RESET|3   26|K2 (CMD6)
+            (OUT0.0) O0|4   25|K1 (CMD5)
+            (OUT0.1) O1|5   24|K0 (CMD4)
+            (OUT0.2) O2|6   23|R10/IRQ
+            (OUT0.3) O3|7   22|R9/TC
+            (OUT1.0) O4|8   21|R8
+            (OUT1.1) O5|9   20|R7 (OUT2.3)
+            (OUT1.2) O6|10  19|R6 (OUT2.2)
+            (OUT1.3) O7|11  18|R5 (OUT2.1)
+              (CMD0) R0|12  17|R4 (OUT2.0)
+              (CMD1) R1|13  16|R3 (CMD3)
+                    GND|14  15|R2 (CMD2)
+                       +------+
+
+    [1] The RNG that drives the type A output is output on pin 21, and 
+    the one that drives the type B output is output on pin 22, but those 
+    pins are not connected on the board.
 
 
-[1] The RNG that drives the type A output is output on pin 21, and the one that
-drives the type B output is output on pin 22, but those pins are not connected
-on the board.
+    The command format is very simple:
 
-
-The command format is very simple:
-
-0x: nop
-1x: play sound type A
-2x: play sound type B
-3x: set parameters (type A) (followed by 4 bytes)
-4x: set parameters (type B) (followed by 4 bytes)
-5x: play sound type C
-6x: set parameters (type C) (followed by 5 bytes)
-7x: set volume for sound type C to x
-8x-Fx: nop
+    0x: nop
+    1x: play sound type A
+    2x: play sound type B
+    3x: set parameters (type A) (followed by 4 bytes)
+    4x: set parameters (type B) (followed by 4 bytes)
+    5x: play sound type C
+    6x: set parameters (type C) (followed by 5 bytes)
+    7x: set volume for sound type C to x
+    8x-Fx: nop
 
 ***************************************************************************/
 
@@ -184,41 +183,13 @@ static DEVICE_START( namco_54xx )
 
 
 /*-------------------------------------------------
-    device reset callback
+    device definition
 -------------------------------------------------*/
 
-static DEVICE_RESET( namco_54xx )
-{
-//  namco_54xx_state *state = get_safe_token(device);
-}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( namco_54xx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(namco_54xx_state);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(namco_54xx_config);			break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(namco_54xx);			break;
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(namco_54xx); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(namco_54xx); 	break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(namco_54xx); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Namco 54xx");					break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Namco I/O");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)		p##namco_54xx##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"Namco 54xx"
+#define DEVTEMPLATE_FAMILY		"Namco I/O"
+#include "devtempl.h"

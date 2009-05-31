@@ -1,37 +1,38 @@
 /***************************************************************************
 
-Namco 50XX
+    Namco 50XX
 
-This custom chip is a Fujitsu MB8842 MCU programmed to act as a protection
-device. It keeps track of the players scores, and checks if a high score has
-been obtained or bonus lives should be awarded. The main CPU has a range of
-commands to increment/decrement the score by various fixed amounts.
+    This custom chip is a Fujitsu MB8842 MCU programmed to act as a 
+    protection device. It keeps track of the players scores, and checks if 
+    a high score has been obtained or bonus lives should be awarded. The 
+    main CPU has a range of commands to increment/decrement the score by 
+    various fixed amounts.
 
-The device is used to its full potential only by Bosconian; Xevious uses it
-too, but only to do a protection check on startup.
+    The device is used to its full potential only by Bosconian; Xevious 
+    uses it too, but only to do a protection check on startup.
 
-CMD = command from main CPU
-ANS = answer to main CPU
+    CMD = command from main CPU
+    ANS = answer to main CPU
 
-The chip reads/writes the I/O ports when the /IRQ is pulled down. Pin 21
-determines whether a read or write should happen (1=R, 0=W).
+    The chip reads/writes the I/O ports when the /IRQ is pulled down. Pin 21
+    determines whether a read or write should happen (1=R, 0=W).
 
-      +------+
- EXTAL|1   28|Vcc
-  XTAL|2   27|CMD7
-/RESET|3   26|CMD6
-  ANS0|4   25|CMD5
-  ANS1|5   24|CMD4
-  ANS2|6   23|/IRQ
-  ANS3|7   22|n.c.
-  ANS4|8   21|R/W
-  ANS5|9   20|n.c.
-  ANS6|10  19|n.c.
-  ANS7|11  18|n.c.
-  CMD0|12  17|n.c.
-  CMD1|13  16|CMD3
-   GND|14  15|CMD2
-      +------+
+                  +------+
+                EX|1   28|Vcc
+                 X|2   27|K3 (CMD7)
+            /RESET|3   26|K2 (CMD6)
+         (ANS0) O0|4   25|K1 (CMD5)
+         (ANS1) O1|5   24|K0 (CMD4)
+         (ANS2) O2|6   23|R10/IRQ
+         (ANS3) O3|7   22|R9/TC (n.c.)
+         (ANS4) O4|8   21|R8 (R/W)
+         (ANS5) O5|9   20|R7 (n.c.)
+         (ANS6) O6|10  19|R6 (n.c.)
+         (ANS7) O7|11  18|R5 (n.c.)
+         (CMD0) R7|12  17|R4 (n.c.)
+         (CMD1) R0|13  16|R3 (CMD3) 
+               GND|14  15|R2 (CMD2)
+                  +------+
 
 
 
@@ -290,40 +291,13 @@ static DEVICE_START( namco_50xx )
 
 
 /*-------------------------------------------------
-    device reset callback
+    device definition
 -------------------------------------------------*/
 
-static DEVICE_RESET( namco_50xx )
-{
-//  namco_50xx_state *state = get_safe_token(device);
-}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( namco_50xx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(namco_50xx_state);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(namco_50xx);			break;
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(namco_50xx); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(namco_50xx); 	break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(namco_50xx); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Namco 50xx");					break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Namco I/O");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)		p##namco_50xx##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
+#define DEVTEMPLATE_NAME		"Namco 50xx"
+#define DEVTEMPLATE_FAMILY		"Namco I/O"
+#include "devtempl.h"

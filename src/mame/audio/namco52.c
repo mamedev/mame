@@ -1,55 +1,47 @@
 /***************************************************************************
 
-Namco 52XX
+    Namco 52XX
 
-This instance of the Fujitsu MB8843 MCU is programmed to act as a sample player.
-It is used by just two games: Bosconian and Pole Position.
+    This instance of the Fujitsu MB8843 MCU is programmed to act as a 
+    sample player. It is used by just two games: Bosconian and Pole 
+    Position.
 
-A0-A15 = address to read from sample ROMs
-D0-D7 = data freom sample ROMs
-CMD = command from CPU (sample to play, 0 = none)
-OUT = sound output
+    A0-A15 = address to read from sample ROMs
+    D0-D7 = data from sample ROMs
+    CMD0-CMD3 = command from CPU (sample to play, 0 = none)
+    OUT0-OUT3 = sound output
 
-      +------+
- EXTAL|1   42|Vcc
-  XTAL|2   41|CMD3
-/RESET|3   40|CMD2
-  /IRQ|4   39|CMD1
-  n.c.|5   38|CMD0
-  [2] |6   37|A7
-  n.c.|7   36|A6
-  [1] |8   35|A5
-  OUT0|9   34|A4
-  OUT1|10  33|A3
-  OUT2|11  32|A2
-  OUT3|12  31|A1
-    A8|13  30|A0
-    A9|14  29|D7
-   A10|15  28|D6
-   A11|16  27|D5
-[3]A12|17  26|D4
-[3]A13|18  25|D3
-[3]A14|19  24|D2
-[3]A15|20  23|D1
-   GND|21  22|D0
-      +------+
+                  +------+
+                EX|1   42|Vcc
+                 X|2   41|K3 (CMD3)
+            /RESET|3   40|K2 (CMD2)
+              /IRQ|4   39|K1 (CMD1)
+         (n.c.) SO|5   38|K0 (CMD0)
+            [1] SI|6   37|R15 (A7)
+     (n.c.) /SC/TO|7   36|R14 (A6)
+           [2] /TC|8   35|R13 (A5)
+         (OUT0) P0|9   34|R12 (A4)
+         (OUT1) P1|10  33|R11 (A3)
+         (OUT2) P2|11  32|R10 (A2)
+         (OUT3) P3|12  31|R9 (A1)
+           (A8) O0|13  30|R8 (A0)
+           (A9) O1|14  29|R7 (D7)
+          (A10) O2|15  28|R6 (D6)
+          (A11) O3|16  27|R5 (D5)
+          (A12) O4|17  26|R4 (D4)
+          (A13) O5|18  25|R3 (D3)
+          (A14) O6|19  24|R2 (D2)
+          (A15) O7|20  23|R1 (D1)
+               GND|21  22|R0 (D0)
+                  +------+
 
-[1] in polepos, GND; in bosco, 4kHz output from a 555 timer
-[2] in polepos, +5V; in bosco, GND
-[3] in polepos, these are true address lines, in bosco they are chip select lines
-    (each one select one of the four ROM chips). Behaviour related to [2]
+    [1] in polepos, +5V; in bosco, GND
+        this value controls the ROM addressing mode:
+           if 0 (GND), A12-A15 are direct active-low chip enables
+           if 1 (Vcc), A12-A15 are address lines
 
-
-CMD0-CMD3 -> K0-K3
-D0-D3     -> R0-R3
-D4-D7     -> R4-R7
-A0-A3     -> R8-R11
-A4-A7     -> R12-R15
-A8-A11    -> O0-O3
-A12-A15   -> O4-O7
-OUT0-OUT3 -> P0-P3
-/TC       -> [1]
-SI        -> [2]
+    [2] in polepos, GND; in bosco, output from a 555 timer
+        this value is an external timer, which is used for some samples
 
 ***************************************************************************/
 
@@ -235,40 +227,13 @@ static DEVICE_START( namco_52xx )
 
 
 /*-------------------------------------------------
-    device reset callback
+    device definition
 -------------------------------------------------*/
 
-static DEVICE_RESET( namco_52xx )
-{
-//  namco_52xx_state *state = get_safe_token(device);
-}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( namco_52xx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(namco_52xx_state);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(namco_52xx);			break;
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(namco_52xx); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(namco_52xx); 	break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(namco_52xx); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Namco 52xx");					break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Namco I/O");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)		p##namco_52xx##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
+#define DEVTEMPLATE_NAME		"Namco 52xx"
+#define DEVTEMPLATE_FAMILY		"Namco I/O"
+#include "devtempl.h"

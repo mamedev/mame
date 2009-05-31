@@ -1,68 +1,81 @@
 /***************************************************************************
 
-The following Namco custom chips are all instances of the same 4-bit MCU,
-the Fujitsu MB8843 (42-pin DIP package) and MB8842/MB8844 (28-pin DIP),
-differently programmed.
+	Namco 06XX
+	
+	This chip is used as an interface to up to 4 other custom chips.
+	It signals IRQs to the custom MCUs when writes happen, and generates
+	NMIs to the controlling CPU to drive reads based on a clock.
 
-chip  MCU   pins function
----- ------ ---- --------
-50XX MB8842  28  player score handling (protection)
-51XX MB8843  42  I/O (coin management built-in)
-52XX MB8843  42  sample playback
-53XX MB8843  42  I/O (steering wheel support)
-54XX MB8844  28  explosion (noise) generator
+	SD0-SD7 are data I/O lines connecting to the controlling CPU
+	SEL selects either control (1) or data (0), usually connected to
+	    an address line of the controlling CPU
+	/NMI is an NMI signal line for the controlling CPU
 
-06XX interface:
----------------
-Galaga                  51XX  ----  ----  54XX
-Bosconian (CPU board)   51XX  ----  50XX  54XX
-Bosconian (Video board) 50XX  52XX  ----  ----
-Xevious                 51XX  ----  50XX  54XX
-Dig Dug                 51XX  53XX  ----  ----
-Pole Position / PP II   51XX  53XX  52XX  54XX
+	ID0-ID7 are data I/O lines connecting to the other custom chips
+	/IO1-/IO4 are IRQ signal lines for each custom chip
 
+                   +------+
+                [1]|1   28|Vcc
+                ID7|2   27|SD7
+                ID6|3   26|SD6
+                ID5|4   25|SD5
+                ID4|5   24|SD4
+                ID3|6   23|SD3
+                ID2|7   22|SD2
+                ID1|8   21|SD1
+                ID0|9   20|SD0
+               /IO1|10  19|/NMI
+               /IO2|11  18|/CS
+               /IO3|12  17|CLOCK
+               /IO4|13  16|R/W
+                GND|14  15|SEL
+                   +------+
 
-Pinouts:
-
-        MB8843                   MB8842/MB8844
-       +------+                    +------+
-  EXTAL|1   42|Vcc            EXTAL|1   28|Vcc
-   XTAL|2   41|K3              XTAL|2   27|K3
- /RESET|3   40|K2            /RESET|3   26|K2
-   /IRQ|4   39|K1                O0|4   25|K1
-     SO|5   38|K0                O1|5   24|K0
-     SI|6   37|R15               O2|6   23|R10 /IRQ
-/SC /TO|7   36|R14               O3|7   22|R9 /TC
-    /TC|8   35|R13               O4|8   21|R8
-     P0|9   34|R12               O5|9   20|R7
-     P1|10  33|R11               O6|10  19|R6
-     P2|11  32|R10               O7|11  18|R5
-     P3|12  31|R9                R0|12  17|R4
-     O0|13  30|R8                R1|13  16|R3
-     O1|14  29|R7               GND|14  15|R2
-     O2|15  28|R6                  +------+
-     O3|16  27|R5
-     O4|17  26|R4
-     O5|18  25|R3
-     O6|19  24|R2
-     O7|20  23|R1
-    GND|21  22|R0
-       +------+
+	[1] on polepos, galaga, xevious, and bosco: connected to K3 of the 51xx
+		on bosco and xevious, connected to R8 of the 50xx
 
 
-      O  O  R  R  R  K
-50XX  O  O  I     I  I
-54XX  O  O  I  O     I
+	06XX interface:
+	---------------
+	Galaga                  51XX  ----  ----  54XX
+	Bosconian (CPU board)   51XX  ----  50XX  54XX
+	Bosconian (Video board) 50XX  52XX  ----  ----
+	Xevious                 51XX  ----  50XX  54XX
+	Dig Dug                 51XX  53XX  ----  ----
+	Pole Position / PP II   51XX  53XX  52XX  54XX
 
-      P  O  O  R  R  R  R  K
-51XX  O  O  O  I  I  I  I  I
-52XX  O  O  O  I  I  O  O  I
-53XX  O? O  O  I  I  I  I  I
+
+	Galaga writes:
+		control = 10(000), data = FF at startup
+		control = 71(011), read 3, control = 10
+		control = A1(101), write 4, control = 10
+		control = A8(101), write 12, control = 10
+
+	Xevious writes:
+		control = 10 at startup
+		control = A1(101), write 6, control = 10
+		control = 71(011), read 3, control = 10
+		control = 64(011), write 1, control = 10
+		control = 74(011), read 4, control = 10
+		control = 68(011), write 7, control = 10
+	
+	Dig Dug writes:
+		control = 10(000), data = 10 at startup
+		control = A1(101), write 3, control = 10
+		control = 71(011), read 3, control = 10
+		control = D2(110), read 2, control = 10
+		
+	Bosco writes:
+		control = 10(000), data = FF at startup
+		control = C8(110), write 17, control = 10
+		control = 61(011), write 1, control = 10
+		control = 71(011), read 3, control = 10
+		control = 94(100), read 4, control = 10
+		control = 64(011), write 1, control = 10
+		control = 84(100), write 5, control = 10
 
 
-For the 52XX, see sound/namco52.c
-
-For the 54XX, see audio/namco54.c
+		control = 34(001), write 1, control = 10
 
 ***************************************************************************/
 
@@ -83,7 +96,7 @@ For the 54XX, see audio/namco54.c
 typedef struct _namco_06xx_state namco_06xx_state;
 struct _namco_06xx_state
 {
-	UINT8 command;
+	UINT8 control;
 	emu_timer *nmi_timer;
 	const device_config *nmicpu;
 	const device_config *device[4];
@@ -121,50 +134,41 @@ static TIMER_CALLBACK( nmi_generate )
 READ8_DEVICE_HANDLER( namco_06xx_data_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
+	UINT8 result = 0xff;
+	int devnum;
 
 	LOG(("%s: 06XX '%s' read offset %d\n",cpuexec_describe_context(device->machine),device->tag,offset));
 
-	if (!(state->command & 0x10))
+	if (!(state->control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->command);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->control);
 		return 0;
 	}
 
-	switch (state->command & 0xf)
-	{
-		case 0x1: return (state->read[0] != NULL) ? (*state->read[0])(state->device[0],0) : 0xff;
-		case 0x2: return (state->read[1] != NULL) ? (*state->read[1])(state->device[1],0) : 0xff;
-		case 0x4: return (state->read[2] != NULL) ? (*state->read[2])(state->device[2],0) : 0xff;
-		case 0x8: return (state->read[3] != NULL) ? (*state->read[3])(state->device[3],0) : 0xff;
-		default:
-			logerror("%s: 06XX '%s' read in unsupported mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->command);
-			return 0xff;
-	}
+	for (devnum = 0; devnum < 4; devnum++)
+		if ((state->control & (1 << devnum)) && state->read[devnum] != NULL)
+			result &= (*state->read[devnum])(state->device[devnum], 0);
+
+	return result;
 }
 
 
 WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 {
 	namco_06xx_state *state = get_safe_token(device);
+	int devnum;
 
 	LOG(("%s: 06XX '%s' write offset %d = %02x\n",cpuexec_describe_context(device->machine),device->tag,offset,data));
 
-	if (state->command & 0x10)
+	if (state->control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->command);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->control);
 		return;
 	}
 
-	switch (state->command & 0xf)
-	{
-		case 0x1: if (state->write[0] != NULL) (*state->write[0])(state->device[0],0,data); break;
-		case 0x2: if (state->write[1] != NULL) (*state->write[1])(state->device[1],0,data); break;
-		case 0x4: if (state->write[2] != NULL) (*state->write[2])(state->device[2],0,data); break;
-		case 0x8: if (state->write[3] != NULL) (*state->write[3])(state->device[3],0,data); break;
-		default:
-			logerror("%s: 06XX '%s' write in unsupported mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->command);
-			break;
-	}
+	for (devnum = 0; devnum < 4; devnum++)
+		if ((state->control & (1 << devnum)) && state->write[devnum] != NULL)
+			(*state->write[devnum])(state->device[devnum], 0, data);
 }
 
 
@@ -172,18 +176,19 @@ READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
 	LOG(("%s: 06XX '%s' ctrl_r\n",cpuexec_describe_context(device->machine),device->tag));
-	return state->command;
+	return state->control;
 }
 
 WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 {
 	namco_06xx_state *state = get_safe_token(device);
+	int devnum;
 
-	LOG(("%s: 06XX '%s' command %02x\n",cpuexec_describe_context(device->machine),device->tag,data));
+	LOG(("%s: 06XX '%s' control %02x\n",cpuexec_describe_context(device->machine),device->tag,data));
 
-	state->command = data;
+	state->control = data;
 
-	if ((state->command & 0x0f) == 0)
+	if ((state->control & 0x0f) == 0)
 	{
 		LOG(("disabling nmi generate timer\n"));
 		timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
@@ -195,21 +200,13 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 		// this timing is critical. Due to a bug, Bosconian will stop responding to
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
-		// not have enough time to process the incoming commands.
+		// not have enough time to process the incoming controls.
 		timer_adjust_periodic(state->nmi_timer, ATTOTIME_IN_USEC(200), 0, ATTOTIME_IN_USEC(200));
 
-		if (state->command & 0x10)
-		{
-			switch (state->command & 0xf)
-			{
-				case 0x1: if (state->readreq[0] != NULL) (*state->readreq[0])(state->device[0]); break;
-				case 0x2: if (state->readreq[1] != NULL) (*state->readreq[1])(state->device[1]); break;
-				case 0x4: if (state->readreq[2] != NULL) (*state->readreq[2])(state->device[2]); break;
-				case 0x8: if (state->readreq[3] != NULL) (*state->readreq[3])(state->device[3]); break;
-				default:
-					logerror("%s: 06XX '%s' read in unsupported mode %02x\n",cpuexec_describe_context(device->machine),device->tag,state->command);
-			}
-		}
+		if (state->control & 0x10)
+			for (devnum = 0; devnum < 4; devnum++)
+				if ((state->control & (1 << devnum)) && state->readreq[devnum] != NULL)
+					(*state->readreq[devnum])(state->device[devnum]);
 	}
 }
 
@@ -224,7 +221,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 static DEVICE_START( namco_06xx )
 {
-	const namco_06xx_interface *config = (const namco_06xx_interface *)device->inline_config;
+	const namco_06xx_config *config = (const namco_06xx_config *)device->inline_config;
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
@@ -277,7 +274,7 @@ static DEVICE_START( namco_06xx )
 	/* allocate a timer */
 	state->nmi_timer = timer_alloc(device->machine, nmi_generate, (void *)device);
 
-	state_save_register_device_item(device, 0, state->command);
+	state_save_register_device_item(device, 0, state->control);
 }
 
 
@@ -288,32 +285,18 @@ static DEVICE_START( namco_06xx )
 static DEVICE_RESET( namco_06xx )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	state->command = 0;
+	state->control = 0;
 }
 
 
 /*-------------------------------------------------
-    device get info callback
+    device definition
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( namco_06xx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(namco_06xx_state);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(namco_06xx_interface);			break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(namco_06xx); 	break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(namco_06xx); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Namco 06xx");					break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Namco I/O");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)		p##namco_06xx##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_RESET | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"Namco 06xx"
+#define DEVTEMPLATE_FAMILY		"Namco I/O"
+#include "devtempl.h"

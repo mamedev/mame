@@ -1,41 +1,54 @@
 /***************************************************************************
 
-Namco 53XX
+    Namco 53XX
 
-This custom chip is a Fujitsu MB8843 MCU programmed to act as an I/O device.
+    This instance of the Fujitsu MB8843 MCU is programmed to act as an I/O 
+    device. It is used by just two games: Dig Dug and Pole Position.
+    
+    MOD0-MOD2 = input mode
+    CS0-CS3 = chip select lines used to select 1 of 4 input sources
+    OUT0-OUT7 = 8-bit final output data
+    P0.0-P0.3 = input port 0 data
+    P1.0-P1.3 = input port 1 data
+    P2.0-P2.3 = input port 2 data
+    P3.0-P3.3 = input port 3 data
 
-        MB8843
-       +------+
-  EXTAL|1   42|Vcc
-   XTAL|2   41|K3
- /RESET|3   40|K2
-   /IRQ|4   39|K1
-     SO|5   38|K0
-     SI|6   37|R15
-/SC /TO|7   36|R14
-    /TC|8   35|R13
-     P0|9   34|R12
-     P1|10  33|R11
-     P2|11  32|R10
-     P3|12  31|R9
-     O0|13  30|R8
-     O1|14  29|R7
-     O2|15  28|R6
-     O3|16  27|R5
-     O4|17  26|R4
-     O5|18  25|R3
-     O6|19  24|R2
-     O7|20  23|R1
-    GND|21  22|R0
-       +------+
+                   +------+
+                 EX|1   42|Vcc
+                  X|2   41|K3 (MOD2)
+             /RESET|3   40|K2 (MOD1)
+               /IRQ|4   39|K1 (MOD0)
+                 SO|5   38|K0
+                 SI|6   37|R15 (P3.3)
+            /SC /TO|7   36|R14 (P3.2)
+                /TC|8   35|R13 (P3.1)
+           (CS0) P0|9   34|R12 (P3.0)
+           (CS1) P1|10  33|R11 (P2.3)
+           (CS2) P2|11  32|R10 (P2.2)
+           (CS3) P3|12  31|R9 (P2.1)
+          (OUT0) O0|13  30|R8 (P2.0)
+          (OUT1) O1|14  29|R7 (P1.3)
+          (OUT2) O2|15  28|R6 (P1.2)
+          (OUT3) O3|16  27|R5 (P1.1)
+          (OUT4) O4|17  26|R4 (P1.0)
+          (OUT5) O5|18  25|R3 (P0.3)
+          (OUT6) O6|19  24|R2 (P0.2)
+          (OUT7) O7|20  23|R1 (P0.1)
+                GND|21  22|R0 (P0.0)
+                   +------+
 
-Bits K1-K3 select one of 8 modes in which the input data is interpreted.
+    MOD selects one of 8 modes in which the input data is interpreted.
 
-Pole Position is hard-wired to use mode 0, which reads 4 steering inputs
-and 4 DIP switches (only 1 of each is used).
+    Pole Position is hard-wired to use mode 0, which reads 4 steering 
+    inputs and 4 DIP switches (only 1 of each is used). The steering
+    inputs are clocked on P0 and direction on P1, 1 bit per analog input.
+    The DIP switches are connected to P2 and P3.
 
-Dig Dug can control which mode to use via the MOD bit latches. It sets
-these values to mode 7 when running.
+    Dig Dug can control which mode to use via the MOD bit latches. It sets
+    these values to mode 7 when running.
+
+	Unknowns:
+		SO is connected to IOSEL on Pole Position
 
 ***************************************************************************/
 
@@ -180,40 +193,13 @@ static DEVICE_START( namco_53xx )
 
 
 /*-------------------------------------------------
-    device reset callback
+    device definition
 -------------------------------------------------*/
 
-static DEVICE_RESET( namco_53xx )
-{
-//  namco_53xx_state *state = get_safe_token(device);
-}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( namco_53xx )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(namco_53xx_state);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(namco_53xx);			break;
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(namco_53xx); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(namco_53xx); 	break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(namco_53xx); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Namco 53xx");					break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Namco I/O");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)		p##namco_53xx##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
+#define DEVTEMPLATE_NAME		"Namco 53xx"
+#define DEVTEMPLATE_FAMILY		"Namco I/O"
+#include "devtempl.h"
