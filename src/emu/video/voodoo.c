@@ -4643,41 +4643,30 @@ static DEVICE_RESET( voodoo )
 
 
 /*-------------------------------------------------
-    device get info callback
+    device definition
 -------------------------------------------------*/
 
-DEVICE_GET_INFO( voodoo )
+INLINE const char *get_voodoo_name(const device_config *device)
 {
 	const voodoo_config *config = (device != NULL) ? (const voodoo_config *)device->inline_config : NULL;
-	switch (state)
+	switch (config->type)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(voodoo_state);			break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(voodoo_config);		break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(voodoo); break;
-		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(voodoo); break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(voodoo);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:
-			switch (config->type)
-			{
-				default:
-				case VOODOO_1:					strcpy(info->s, "3dfx Voodoo Graphics");break;
-				case VOODOO_2:					strcpy(info->s, "3dfx Voodoo 2");		break;
-				case VOODOO_BANSHEE:			strcpy(info->s, "3dfx Voodoo Banshee");	break;
-				case VOODOO_3:					strcpy(info->s, "3dfx Voodoo 3");		break;
-			}
-			break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "3dfx Voodoo Graphics");break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		default:
+		case VOODOO_1:					return "3dfx Voodoo Graphics";
+		case VOODOO_2:					return "3dfx Voodoo 2";
+		case VOODOO_BANSHEE:			return "3dfx Voodoo Banshee";
+		case VOODOO_3:					return "3dfx Voodoo 3";
 	}
 }
+
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##voodoo##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_STOP | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		get_voodoo_name(device)
+#define DEVTEMPLATE_FAMILY		"3dfx Voodoo Graphics"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
+#include "devtempl.h"
 
 
 
