@@ -79,7 +79,7 @@ static VIDEO_UPDATE(mirax)
 	//audio tester
 	if(input_code_pressed_once(KEYCODE_Q))
 	{
-		cputag_set_input_line(screen->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(screen->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 #endif
 	return 0;
@@ -112,14 +112,23 @@ static WRITE8_HANDLER(audio_w)
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
 {
-	if(cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu"))==0x309)
+	if(cpu_get_previouspc(cputag_get_cpu(device->machine, "audiocpu"))==0x309)
 	{
 		ay8910_address_w(device,0,nAyCtrl);
 		ay8910_data_w(device,0,nAyData);
 	}
 }
 
-static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mirax_io_map, ADDRESS_SPACE_IO, 8 )
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mirax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(snd_read)
@@ -136,7 +145,7 @@ static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mirax_sound_io_map, ADDRESS_SPACE_IO, 8 )
 
 ADDRESS_MAP_END
 
@@ -205,8 +214,13 @@ PALETTE_INIT( mirax )
 
 static MACHINE_DRIVER_START( mirax )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000) // audio cpu ?
-	MDRV_CPU_PROGRAM_MAP(memory_map)
-	MDRV_CPU_IO_MAP(io_map)
+	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
+	MDRV_CPU_IO_MAP(mirax_io_map)
+	//MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000) // audio cpu ?
+	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
+	MDRV_CPU_IO_MAP(mirax_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
 	/* video hardware */
@@ -234,7 +248,12 @@ static MACHINE_DRIVER_START( mirax )
 MACHINE_DRIVER_END
 
 ROM_START( mirax )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
+	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
+	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mxr2-4v.rom",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -252,11 +271,6 @@ ROM_START( mirax )
 	ROM_LOAD( "mxi3-4v.rom",   0x4000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
 	ROM_LOAD( "mxl3-4v.rom",   0x8000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
 
-	ROM_REGION( 0xc000, "user1", 0 )
-	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
-	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
-	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
-
 	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
@@ -264,4 +278,13 @@ ROM_START( mirax )
 
 ROM_END
 
-GAME( 1985, mirax,  0,		mirax, mirax, 0, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING)
+static DRIVER_INIT( mirax )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	int i;
+
+	for(i=0;i<0xc000;i++)
+		ROM[i] = BITSWAP8(ROM[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff;
+}
+
+GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING)
