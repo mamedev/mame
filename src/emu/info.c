@@ -65,6 +65,59 @@ static void print_game_switches(FILE *out, const game_driver *game, const input_
 			}
 }
 
+/*-------------------------------------------------
+    print_game_configs - print the Configuration
+    settings for a game
+-------------------------------------------------*/
+
+static void print_game_configs(FILE *out, const game_driver *game, const input_port_config *portlist)
+{
+	const input_port_config *port;
+	const input_field_config *field;
+
+	/* iterate looking for configurations */
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->type == IPT_CONFIG)
+			{
+				const input_setting_config *setting;
+
+				/* output the configuration name information */
+				fprintf(out, "\t\t<configuration name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+
+				/* loop over settings */
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					fprintf(out, "\t\t\t<confsetting name=\"%s\"", xml_normalize_string(setting->name));
+					if (setting->value == field->defvalue)
+						fprintf(out, " default=\"yes\"");
+					fprintf(out, "/>\n");
+				}
+
+				/* terminate the configuration entry */
+				fprintf(out, "\t\t</configuration>\n");
+			}
+}
+
+/*-------------------------------------------------
+    print_game_adjusters - print the Analog 
+	Adjusters for a game
+-------------------------------------------------*/
+
+static void print_game_adjusters(FILE *out, const game_driver *game, const input_port_config *portlist)
+{
+	const input_port_config *port;
+	const input_field_config *field;
+
+	/* iterate looking for Adjusters */
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->type == IPT_ADJUSTER)
+			{
+				/* output the adjuster information */
+				fprintf(out, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(input_field_name(field)), field->defvalue);
+			}
+}
 
 /*-------------------------------------------------
     print_game_input - print a summary of a game's
@@ -835,6 +888,11 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_sound(out, game, config);
 	print_game_input(out, game, portconfig);
 	print_game_switches(out, game, portconfig);
+	print_game_configs(out, game, portconfig);
+#ifdef MESS
+	print_game_categories(out, game, portconfig);
+#endif /* MESS */
+	print_game_adjusters(out, game, portconfig);
 	print_game_driver(out, game, config);
 #ifdef MESS
 	print_game_device(out, game, config);
@@ -865,9 +923,9 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 #ifdef MESS
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, driver?, device*, ramoption*)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*)>\n"
 #else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, driver?)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, driver?)>\n"
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
@@ -944,6 +1002,21 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ELEMENT dipvalue EMPTY>\n"
 		"\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
+		"\t\t<!ELEMENT configuration (confsetting*)>\n"
+		"\t\t\t<!ATTLIST configuration name CDATA #REQUIRED>\n"
+		"\t\t\t<!ELEMENT confsetting EMPTY>\n"
+		"\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
+		"\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
+#ifdef MESS
+		"\t\t<!ELEMENT category (item*)>\n"
+		"\t\t\t<!ATTLIST category name CDATA #REQUIRED>\n"
+		"\t\t\t<!ELEMENT item EMPTY>\n"
+		"\t\t\t\t<!ATTLIST item name CDATA #REQUIRED>\n"
+		"\t\t\t\t<!ATTLIST item default (yes|no) \"no\">\n"
+#endif
+		"\t\t<!ELEMENT adjuster EMPTY>\n"
+		"\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT driver EMPTY>\n"
 		"\t\t\t<!ATTLIST driver status (good|imperfect|preliminary) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>\n"
