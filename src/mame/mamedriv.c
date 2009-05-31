@@ -6724,7 +6724,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( crusnw20 )	/* (c) 1996 Midway */
 	DRIVER( crusnw17 )	/* (c) 1996 Midway */
 	DRIVER( crusnw13 )	/* (c) 1996 Midway */
-	DRIVER( offroadc )	/* (c) 1997 Midway (v1.40) */
+	DRIVER( offroadc )	/* (c) 1997 Midway (v1.63) */
+	DRIVER( offrodc4 )	/* (c) 1997 Midway (v1.40) */
 	DRIVER( offrodc3 )	/* (c) 1997 Midway (v1.30) */
 	DRIVER( offrodc1 )	/* (c) 1997 Midway (v1.10) */
 	DRIVER( wargods )	/* (c) 1996 Midway */
