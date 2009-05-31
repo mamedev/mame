@@ -5,8 +5,8 @@
  by Tomasz Slanina & Angelo Salese
 
  TODO:
- - fix input port $06 and remove the patch, it doesn't seem directly connected;
- - fix the background blitter/framebuffer, needs rewriting;
+ - remove the patch and understand what needs to be modified for the gfxs, game
+   doesn't crash anymore;
  - inputs (some kind of ad-stick / pedal);
 
 ************************************************************************************/
@@ -18,11 +18,12 @@
 
 static tilemap *suprgolf_tilemap;
 static UINT8 *suprgolf_bg_vram;
-static UINT8 *suprgolf_bg_pen;
+static UINT16 *suprgolf_bg_fb,*suprgolf_fg_fb;
 static int suprgolf_rom_bank;
 static UINT8 suprgolf_bg_bank;
-static UINT8 suprgolf_vreg;
+static UINT8 suprgolf_vreg_bank;
 static UINT8 msm5205next,msm_nmi_mask;
+static UINT8 suprgolf_vreg_pen;
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -36,127 +37,57 @@ static TILE_GET_INFO( get_tile_info )
 		0);
 }
 
-static READ8_HANDLER( rom_bank_select_r )
-{
-    return suprgolf_rom_bank;
-}
-
-static WRITE8_HANDLER( rom_bank_select_w )
-{
-	UINT8 *region_base = memory_region(space->machine, "user1");
-
-	suprgolf_rom_bank = data;
-
-	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
-
-	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
-
-	msm_nmi_mask = data & 0x40;
-	flip_screen_set(space->machine, data & 0x80);
-}
-
-static WRITE8_HANDLER( rom2_bank_select_w )
-{
-	UINT8 *region_base = memory_region(space->machine, "user2");
-	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-//  if(data == 0) data = 1; //test hack
-	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
-
-	if(data & 0xf0)
-		printf("Rom bank select 2 with data %02x activated\n",data);
-}
-
-static MACHINE_RESET( suprgolf )
-{
-	msm_nmi_mask = 0;
-}
-
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	suprgolf_bg_pen = auto_alloc_array(machine, UINT8, 0x2000*0x20);
+	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x4000*0x20);
+	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x4000*0x20);
 
 	tilemap_set_transparent_pen(suprgolf_tilemap,15);
 }
 
-/* TODO: fix this.*/
-static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,UINT8 starting_offs)
-{
-	int x,y,trans;
-	UINT32 count;
-	UINT16 alpha_val;
-
-	count = starting_offs<<16;
-	trans = starting_offs;
-
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<512;x+=2)
-		{
-			UINT16 color;
-
-			color = ((suprgolf_bg_vram[count] & 0xf0)>>4);
-
-			if(suprgolf_bg_pen[count] & 0x80)
-				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
-			else
-			{
-				/* TODO */
-				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
-				//color |= 0x73<<4;//((suprgolf_bg_vram[count+0x10000] & 0x0f)<<4);
-			}
-
-			alpha_val =  0;//(paletteram[color*2]+256*paletteram[color*2+1]) & 0x8000;
-
-			if((x+1) >= 0 && (x+1) < 256 && (!(alpha_val)))
-			{
-				if(trans)
-				{
-					if((suprgolf_bg_vram[count] & 0xf0) != 0xf0)
-						*BITMAP_ADDR16(bitmap, y, (x+1)) = machine->pens[(color & 0x7ff)];
-				}
-				else
-					*BITMAP_ADDR16(bitmap, y, (x+1)) = machine->pens[(color & 0x7ff)];
-			}
-
-			color = (suprgolf_bg_vram[count] & 0x0f);
-
-			if(suprgolf_bg_pen[count] & 0x80)
-				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
-			else
-			{
-				/* TODO */
-				color |= ((suprgolf_bg_pen[count] & 0x7f)<<4);
-				//color |= 0x73<<4;//((suprgolf_bg_vram[count+0x10000] & 0x0f)<<4);
-			}
-
-			alpha_val = 0;//(paletteram[color*2]+256*paletteram[color*2+1]) & 0x8000;
-
-			if(x >= 0 && x < 256 && (!(alpha_val)))
-			{
-				if(trans)
-				{
-					if((suprgolf_bg_vram[count] & 0x0f) != 0x0f)
-						*BITMAP_ADDR16(bitmap, y, x) = machine->pens[(color & 0x7ff)];
-				}
-				else
-					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[(color & 0x7ff)];
-			}
-
-			count++;
-		}
-	}
-}
-
 static VIDEO_UPDATE( suprgolf )
 {
+	int x,y,count,color;
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bg_draw(screen->machine,bitmap,cliprect,0);
+
+	{
+		count = 0;
+
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<512;x++)
+			{
+				color = suprgolf_bg_fb[count];
+
+				if(x <= cliprect->max_x && y <= cliprect->max_y)
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+
+				count++;
+			}
+		}
+	}
+
+	{
+		count = 0;
+
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<512;x++)
+			{
+				color = suprgolf_fg_fb[count];
+
+				if(((suprgolf_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
+					*BITMAP_ADDR16(bitmap, y, x) = screen->machine->pens[(color & 0x7ff)];
+
+				count++;
+			}
+		}
+	}
+
 	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
-	bg_draw(screen->machine,bitmap,cliprect,2);
 
 	return 0;
 }
@@ -195,21 +126,19 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 
 static READ8_HANDLER( suprgolf_vregs_r )
 {
-	return suprgolf_vreg;
+	return suprgolf_vreg_bank;
 }
 
 static WRITE8_HANDLER( suprgolf_vregs_w )
 {
 	//bits 0,1,2 and probably 3 controls the background vram banking
-	suprgolf_vreg = data;
+	suprgolf_vreg_bank = data;
 	palette_switch = (data & 0x80);
 	suprgolf_bg_bank = (data & 0x1f);
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
 }
-
-static UINT8 pen;
 
 static READ8_HANDLER( suprgolf_bg_vram_r )
 {
@@ -219,32 +148,86 @@ static READ8_HANDLER( suprgolf_bg_vram_r )
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
 	static UINT8 hi_nibble,lo_nibble;
+	static UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
 
 	hi_nibble = data & 0xf0;
 	lo_nibble = data & 0x0f;
+	hi_dirty_dot = 1;
+	lo_dirty_dot = 1;
 
 	if(hi_nibble == 0xf0)
+	{
 		hi_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0;
+		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+			hi_dirty_dot = 0;
+	}
 	if(lo_nibble == 0x0f)
+	{
 		lo_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f;
+		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
+			lo_dirty_dot = 0;
+	}
 
-	if(pen & 0x80)
+	if(suprgolf_vreg_pen & 0x80 || suprgolf_bg_bank & 0x10)
 		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
 	else
 		suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = hi_nibble|lo_nibble;
 
-	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = pen;
+	if(suprgolf_bg_bank & 0x10)
+	{
+		if(hi_dirty_dot)
+			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+		if(lo_dirty_dot)
+			suprgolf_fg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+	}
+	else
+	{
+		if(hi_dirty_dot)
+			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+1] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0xf0)>>4);
+		if(lo_dirty_dot)
+			suprgolf_bg_fb[(offset+(suprgolf_bg_bank & 0x0f)*0x2000)*2+0] = (suprgolf_vreg_pen & 0x7f)<<4 | ((suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f)>>0);
+	}
 }
 
-/* maybe bit 7 isn't actually for the pen? */
 static WRITE8_HANDLER( suprgolf_pen_w )
 {
-	pen = data;
+	suprgolf_vreg_pen = data;
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
 	msm5205next = data;
+}
+
+static READ8_HANDLER( rom_bank_select_r )
+{
+    return suprgolf_rom_bank;
+}
+
+static WRITE8_HANDLER( rom_bank_select_w )
+{
+	UINT8 *region_base = memory_region(space->machine, "user1");
+
+	suprgolf_rom_bank = data;
+
+	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
+
+	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
+	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
+
+	msm_nmi_mask = data & 0x40;
+	flip_screen_set(space->machine, data & 0x80);
+}
+
+static WRITE8_HANDLER( rom2_bank_select_w )
+{
+	UINT8 *region_base = memory_region(space->machine, "user2");
+	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
+//  if(data == 0) data = 1; //test hack
+	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
+
+	if(data & 0xf0)
+		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -484,6 +467,11 @@ static GFXDECODE_START( suprgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
+static MACHINE_RESET( suprgolf )
+{
+	msm_nmi_mask = 0;
+}
+
 static MACHINE_DRIVER_START( suprgolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000) /* guess */
@@ -505,7 +493,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 	MDRV_GFXDECODE(suprgolf)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(0x800)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
