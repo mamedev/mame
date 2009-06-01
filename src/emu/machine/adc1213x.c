@@ -20,13 +20,12 @@
 	TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adc1213x_state adc1213x_state;
-struct _adc1213x_state
+typedef struct _adc12138_state adc12138_state;
+struct _adc12138_state
 {
-	int type;
-
 	adc1213x_input_convert_func input_callback_r;
 
+	int type;
 	int cycle;
 	int data_out;
 	int data_in;
@@ -56,19 +55,19 @@ struct _adc1213x_state
 	INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE adc1213x_state *get_safe_token(const device_config *device)
+INLINE adc12138_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert((device->type == ADC1213X));
-	return (adc1213x_state *)device->token;
+	assert((device->type == ADC12130) || (device->type == ADC12132) || (device->type == ADC12138));
+	return (adc12138_state *)device->token;
 }
 
-INLINE const adc1213x_interface *get_interface(const device_config *device)
+INLINE const adc12138_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == ADC1213X));
-	return (const adc1213x_interface *) device->static_config;
+	assert((device->type == ADC12130) || (device->type == ADC12132) || (device->type == ADC12138));
+	return (const adc12138_interface *) device->static_config;
 }
 
 
@@ -82,7 +81,7 @@ INLINE const adc1213x_interface *get_interface(const device_config *device)
 
 WRITE8_DEVICE_HANDLER( adc1213x_di_w )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 	adc1213x->data_in = data & 1;
 }
 
@@ -92,7 +91,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_di_w )
 
 static void adc1213x_convert(const device_config *device, int channel, int bits16, int lsbfirst)
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 	int i;
 	int bits;
 	int input_value;
@@ -183,7 +182,7 @@ static void adc1213x_convert(const device_config *device, int channel, int bits1
 
 WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 
 	if (data)
 	{
@@ -261,7 +260,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
 
 WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 
 	if (data)
 	{
@@ -283,7 +282,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
 
 WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 	adc1213x->end_conv = 1;
 }
 
@@ -293,7 +292,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
 
 READ8_DEVICE_HANDLER( adc1213x_do_r )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 
 	//printf("ADC: DO\n");
 	return adc1213x->data_out;
@@ -305,7 +304,7 @@ READ8_DEVICE_HANDLER( adc1213x_do_r )
 
 READ8_DEVICE_HANDLER( adc1213x_eoc_r )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 	return adc1213x->end_conv;
 }
 
@@ -313,41 +312,44 @@ READ8_DEVICE_HANDLER( adc1213x_eoc_r )
 	DEVICE_START( adc1213x )
 -------------------------------------------------*/
 
-static DEVICE_START( adc1213x )
+static void adc1213x_common_start( const device_config *device )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
-	const adc1213x_interface *intf = get_interface(device);
-
-	/* validate configuration */
-	assert(intf->type >= ADC12130 && intf->type < MAX_ADC1213X_TYPES);
-
-	adc1213x->type = intf->type;
+	adc12138_state *adc1213x = get_safe_token(device);
+	const adc12138_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
 	adc1213x->input_callback_r = intf->input_callback_r;
 
 	/* register for state saving */
-	state_save_register_global(device->machine, adc1213x->cycle);
-	state_save_register_global(device->machine, adc1213x->data_out);
-	state_save_register_global(device->machine, adc1213x->data_in);
-	state_save_register_global(device->machine, adc1213x->conv_mode);
-	state_save_register_global(device->machine, adc1213x->auto_cal);
-	state_save_register_global(device->machine, adc1213x->auto_zero);
-	state_save_register_global(device->machine, adc1213x->acq_time);
-	state_save_register_global(device->machine, adc1213x->data_out_sign);
-	state_save_register_global(device->machine, adc1213x->mode);
-	state_save_register_global(device->machine, adc1213x->input_shift_reg);
-	state_save_register_global(device->machine, adc1213x->output_shift_reg);
-	state_save_register_global(device->machine, adc1213x->end_conv);
+	state_save_register_device_item(device, 0, adc1213x->cycle);
+	state_save_register_device_item(device, 0, adc1213x->data_out);
+	state_save_register_device_item(device, 0, adc1213x->data_in);
+	state_save_register_device_item(device, 0, adc1213x->conv_mode);
+	state_save_register_device_item(device, 0, adc1213x->auto_cal);
+	state_save_register_device_item(device, 0, adc1213x->auto_zero);
+	state_save_register_device_item(device, 0, adc1213x->acq_time);
+	state_save_register_device_item(device, 0, adc1213x->data_out_sign);
+	state_save_register_device_item(device, 0, adc1213x->mode);
+	state_save_register_device_item(device, 0, adc1213x->input_shift_reg);
+	state_save_register_device_item(device, 0, adc1213x->output_shift_reg);
+	state_save_register_device_item(device, 0, adc1213x->end_conv);
+}
+
+static DEVICE_START( adc12138 )
+{
+	adc12138_state *adc1213x = get_safe_token(device);
+
+	adc1213x->type = TYPE_ADC12138;
+	adc1213x_common_start(device);
 }
 
 /*-------------------------------------------------
 	DEVICE_RESET( adc1213x )
 -------------------------------------------------*/
 
-static DEVICE_RESET( adc1213x )
+static DEVICE_RESET( adc12138 )
 {
-	adc1213x_state *adc1213x = get_safe_token(device);
+	adc12138_state *adc1213x = get_safe_token(device);
 
 	adc1213x->conv_mode = ADC1213X_CONV_MODE_12_MSB_FIRST;
 	adc1213x->data_out_sign = 1;
@@ -362,9 +364,19 @@ static DEVICE_RESET( adc1213x )
 
 static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-#define DEVTEMPLATE_ID(p,s)		p##adc1213x##s
+#define DEVTEMPLATE_ID(p,s)		p##adc12138##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"A/D Converter 12138"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1213x"
 #define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc12130##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"A/D Converter 12130"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc12132##s
+#define DEVTEMPLATE_DERIVED_FEATURES	0
+#define DEVTEMPLATE_DERIVED_NAME		"A/D Converter 12132"
 #include "devtempl.h"

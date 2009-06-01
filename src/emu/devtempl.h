@@ -243,7 +243,7 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_START)
-		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_ID(device_start_,); 							break;
+		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_DERIVED_ID(device_start_,); 					break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_RESET)
 		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_DERIVED_ID(device_reset_,); 					break;

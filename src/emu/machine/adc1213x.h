@@ -19,23 +19,38 @@
 /* enumeration specifying which model we are emulating */
 enum
 {
-	ADC12130,
-	ADC12132,
-	ADC12138,
-	MAX_ADC1213X_TYPES
+	TYPE_ADC12130,
+	TYPE_ADC12132,
+	TYPE_ADC12138
 };
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ADC1213X		DEVICE_GET_INFO_NAME(adc1213x)
+#define ADC12130		DEVICE_GET_INFO_NAME(adc12130)
+#define ADC12132		DEVICE_GET_INFO_NAME(adc12132)
+#define ADC12138		DEVICE_GET_INFO_NAME(adc12138)
 
-#define MDRV_ADC1213X_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC1213X, 0) \
+#define MDRV_ADC12130_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, ADC12130, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC1213X_REMOVE(_tag) \
+#define MDRV_ADC12130_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+#define MDRV_ADC12132_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, ADC12132, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_ADC12132_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+#define MDRV_ADC12138_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, ADC12138, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_ADC12138_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag)
 
 
@@ -45,10 +60,9 @@ enum
 
 typedef double (*adc1213x_input_convert_func)(const device_config *device, UINT8 input);
 
-typedef struct _adc1213x_interface adc1213x_interface;
-struct _adc1213x_interface
+typedef struct _adc12138_interface adc12138_interface;
+struct _adc12138_interface
 {
-	int type;
 	adc1213x_input_convert_func input_callback_r;
 };
 
@@ -57,7 +71,9 @@ struct _adc1213x_interface
 ***************************************************************************/
 
 /* device interface */
-DEVICE_GET_INFO( adc1213x );
+DEVICE_GET_INFO( adc12130 );
+DEVICE_GET_INFO( adc12132 );
+DEVICE_GET_INFO( adc12138 );
 
 extern WRITE8_DEVICE_HANDLER( adc1213x_di_w );
 extern WRITE8_DEVICE_HANDLER( adc1213x_cs_w );

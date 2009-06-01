@@ -47,13 +47,12 @@ enum
 	TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _adc083x_state adc083x_state;
-struct _adc083x_state
+typedef struct _adc0831_state adc0831_state;
+struct _adc0831_state
 {
-	int type;
-
 	adc083x_input_convert_func input_callback_r;
 
+	int type;
 	INT32 cs;
 	INT32 clk;
 	INT32 di;
@@ -76,19 +75,19 @@ struct _adc083x_state
 	INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE adc083x_state *get_safe_token(const device_config *device)
+INLINE adc0831_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert((device->type == ADC083X));
-	return (adc083x_state *)device->token;
+	assert((device->type == ADC0831) || (device->type == ADC0832) || (device->type == ADC0834) || (device->type == ADC0838));
+	return (adc0831_state *)device->token;
 }
 
-INLINE const adc083x_interface *get_interface(const device_config *device)
+INLINE const adc0831_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == ADC083X));
-	return (const adc083x_interface *) device->static_config;
+	assert((device->type == ADC0831) || (device->type == ADC0832) || (device->type == ADC0834) || (device->type == ADC0838));
+	return (const adc0831_interface *) device->static_config;
 }
 
 
@@ -102,7 +101,7 @@ INLINE const adc083x_interface *get_interface(const device_config *device)
 
 WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	if (adc083x->cs != data)
 	{
@@ -112,7 +111,7 @@ WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 	if (adc083x->cs == 0 && data != 0)
 	{
 		adc083x->state = STATE_IDLE;
-		if (adc083x->type == ADC0834 || adc083x->type == ADC0838)
+		if (adc083x->type == TYPE_ADC0834 || adc083x->type == TYPE_ADC0838)
 		{
 			adc083x->sars = 1;
 		}
@@ -120,7 +119,7 @@ WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 	}
 	if (adc083x->cs != 0 && data == 0)
 	{
-		if (adc083x->type == ADC0831)
+		if (adc083x->type == TYPE_ADC0831)
 		{
 			adc083x->state = STATE_MUX_SETTLE;
 		}
@@ -129,7 +128,7 @@ WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 			adc083x->state = STATE_WAIT_FOR_START;
 		}
 
-		if (adc083x->type == ADC0834 || adc083x->type == ADC0838)
+		if (adc083x->type == TYPE_ADC0834 || adc083x->type == TYPE_ADC0838)
 		{
 			adc083x->sars = 1;
 		}
@@ -145,7 +144,7 @@ WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 
 static UINT8 adc083x_conversion( const device_config *device )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 	int result;
 	int positive_channel = ADC083X_AGND;
 	int negative_channel = ADC083X_AGND;
@@ -156,11 +155,11 @@ static UINT8 adc083x_conversion( const device_config *device )
 
 	switch (adc083x->type)
 	{
-	case ADC0831:
+	case TYPE_ADC0831:
 		positive_channel = ADC083X_CH0;
 		negative_channel = ADC083X_CH1;
 		break;
-	case ADC0832:
+	case TYPE_ADC0832:
 		positive_channel = ADC083X_CH0 + adc083x->odd;
 		if (adc083x->sgl == 0)
 		{
@@ -171,7 +170,7 @@ static UINT8 adc083x_conversion( const device_config *device )
 			negative_channel = ADC083X_AGND;
 		}
 		break;
-	case ADC0834:
+	case TYPE_ADC0834:
 		positive_channel = ADC083X_CH0 + adc083x->odd + (adc083x->sel1 * 2);
 		if (adc083x->sgl == 0)
 		{
@@ -182,7 +181,7 @@ static UINT8 adc083x_conversion( const device_config *device )
 			negative_channel = ADC083X_AGND;
 		}
 		break;
-	case ADC0838:
+	case TYPE_ADC0838:
 		positive_channel = ADC083X_CH0 + adc083x->odd + (adc083x->sel0 * 2) + (adc083x->sel1 * 4);
 		if (adc083x->sgl == 0)
 		{
@@ -224,7 +223,7 @@ static UINT8 adc083x_conversion( const device_config *device )
 
 WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	if (adc083x->clk != data)
 	{
@@ -294,7 +293,7 @@ WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 				break;
 			case STATE_WAIT_FOR_SE:
 				adc083x->sars = 0;
-				if (adc083x->type == ADC0838 && adc083x->se != 0)
+				if (adc083x->type == TYPE_ADC0838 && adc083x->se != 0)
 				{
 					verboselog(device->machine, 1, "adc083x %s not se\n", device->tag);
 				}
@@ -316,7 +315,7 @@ WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 				adc083x->output = adc083x_conversion(device);
 				adc083x->state = STATE_OUTPUT_MSB_FIRST;
 				adc083x->bit = 7;
-				if (adc083x->type == ADC0834 || adc083x->type == ADC0838)
+				if (adc083x->type == TYPE_ADC0834 || adc083x->type == TYPE_ADC0838)
 				{
 					adc083x->sars = 1;
 				}
@@ -328,7 +327,7 @@ WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 				adc083x->bit--;
 				if (adc083x->bit < 0)
 				{
-					if (adc083x->type == ADC0831)
+					if (adc083x->type == TYPE_ADC0831)
 					{
 						adc083x->state = STATE_FINISHED;
 					}
@@ -364,7 +363,7 @@ WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 
 WRITE8_DEVICE_HANDLER( adc083x_di_write )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	if (adc083x->di != data)
 	{
@@ -380,7 +379,7 @@ WRITE8_DEVICE_HANDLER( adc083x_di_write )
 
 WRITE8_DEVICE_HANDLER( adc083x_se_write )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	if (adc083x->se != data)
 	{
@@ -396,7 +395,7 @@ WRITE8_DEVICE_HANDLER( adc083x_se_write )
 
 READ8_DEVICE_HANDLER( adc083x_sars_read )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	verboselog(device->machine, 1, "adc083x_sars_read( %s ) %d\n", device->tag, adc083x->sars);
 	return adc083x->sars;
@@ -408,7 +407,7 @@ READ8_DEVICE_HANDLER( adc083x_sars_read )
 
 READ8_DEVICE_HANDLER( adc083x_do_read )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	verboselog(device->machine, 1, "adc083x_sars_read( %s ) %d\n", device->tag, adc083x->_do);
 	return adc083x->_do;
@@ -419,30 +418,26 @@ READ8_DEVICE_HANDLER( adc083x_do_read )
 	DEVICE_START( adc083x )
 -------------------------------------------------*/
 
-static DEVICE_START( adc083x )
+static void adc083x_common_start( const device_config *device )
 {
-	adc083x_state *adc083x = get_safe_token(device);
-	const adc083x_interface *intf = get_interface(device);
+	adc0831_state *adc083x = get_safe_token(device);
+	const adc0831_interface *intf = get_interface(device);
 
-	/* validate configuration */
-	assert(intf->type >= ADC0831 && intf->type < MAX_ADC083X_TYPES);
-
-	adc083x->type = intf->type;
 	switch (adc083x->type)
 	{
-		case ADC0831:
+		case TYPE_ADC0831:
 			adc083x->sars = 1;
 			adc083x->mux_bits = 0;
 			break;
-		case ADC0832:
+		case TYPE_ADC0832:
 			adc083x->sars = 1;
 			adc083x->mux_bits = 2;
 			break;
-		case ADC0834:
+		case TYPE_ADC0834:
 			adc083x->sars = 0;
 			adc083x->mux_bits = 3;
 			break;
-		case ADC0838:
+		case TYPE_ADC0838:
 			adc083x->sars = 0;
 			adc083x->mux_bits = 4;
 			break;
@@ -452,29 +447,61 @@ static DEVICE_START( adc083x )
 	adc083x->input_callback_r = intf->input_callback_r;
 
 	/* register for state saving */
-	state_save_register_global(device->machine, adc083x->cs);
-	state_save_register_global(device->machine, adc083x->clk);
-	state_save_register_global(device->machine, adc083x->di);
-	state_save_register_global(device->machine, adc083x->se);
-	state_save_register_global(device->machine, adc083x->sars);
-	state_save_register_global(device->machine, adc083x->_do);
-	state_save_register_global(device->machine, adc083x->sgl);
-	state_save_register_global(device->machine, adc083x->odd);
-	state_save_register_global(device->machine, adc083x->sel1);
-	state_save_register_global(device->machine, adc083x->sel0);
-	state_save_register_global(device->machine, adc083x->state);
-	state_save_register_global(device->machine, adc083x->bit);
-	state_save_register_global(device->machine, adc083x->output);
-	state_save_register_global(device->machine, adc083x->mux_bits);
+	state_save_register_device_item(device, 0, adc083x->cs);
+	state_save_register_device_item(device, 0, adc083x->clk);
+	state_save_register_device_item(device, 0, adc083x->di);
+	state_save_register_device_item(device, 0, adc083x->se);
+	state_save_register_device_item(device, 0, adc083x->sars);
+	state_save_register_device_item(device, 0, adc083x->_do);
+	state_save_register_device_item(device, 0, adc083x->sgl);
+	state_save_register_device_item(device, 0, adc083x->odd);
+	state_save_register_device_item(device, 0, adc083x->sel1);
+	state_save_register_device_item(device, 0, adc083x->sel0);
+	state_save_register_device_item(device, 0, adc083x->state);
+	state_save_register_device_item(device, 0, adc083x->bit);
+	state_save_register_device_item(device, 0, adc083x->output);
+	state_save_register_device_item(device, 0, adc083x->mux_bits);
+}
+
+static DEVICE_START( adc0831 )
+{
+	adc0831_state *adc083x = get_safe_token(device);
+
+	adc083x->type = TYPE_ADC0831;
+	adc083x_common_start(device);
+}
+
+static DEVICE_START( adc0832 )
+{
+	adc0831_state *adc083x = get_safe_token(device);
+
+	adc083x->type = TYPE_ADC0832;
+	adc083x_common_start(device);
+}
+
+static DEVICE_START( adc0834 )
+{
+	adc0831_state *adc083x = get_safe_token(device);
+
+	adc083x->type = TYPE_ADC0834;
+	adc083x_common_start(device);
+}
+
+static DEVICE_START( adc0838 )
+{
+	adc0831_state *adc083x = get_safe_token(device);
+
+	adc083x->type = TYPE_ADC0838;
+	adc083x_common_start(device);
 }
 
 /*-------------------------------------------------
 	DEVICE_RESET( adc083x )
 -------------------------------------------------*/
 
-static DEVICE_RESET( adc083x )
+static DEVICE_RESET( adc0831 )
 {
-	adc083x_state *adc083x = get_safe_token(device);
+	adc0831_state *adc083x = get_safe_token(device);
 
 	adc083x->cs = 0;
 	adc083x->clk = 0;
@@ -494,24 +521,26 @@ static DEVICE_RESET( adc083x )
     device definition
 -------------------------------------------------*/
 
-INLINE const char *get_adc083x_name(const device_config *device)
-{
-	const adc083x_interface *intf = get_interface(device);
-	switch (intf->type)
-	{
-		default:
-		case ADC0831:					return "A/D Converter 0831";
-		case ADC0832:					return "A/D Converter 0832";
-		case ADC0834:					return "A/D Converter 0834";
-		case ADC0838:					return "A/D Converter 0838";
-	}
-}
-
 static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-#define DEVTEMPLATE_ID(p,s)		p##adc083x##s
+#define DEVTEMPLATE_ID(p,s)		p##adc0831##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		get_adc083x_name(device)
+#define DEVTEMPLATE_NAME		"A/D Converters 0831"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 083x"
 #define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc0832##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0832"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc0834##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0834"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc0838##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0838"
 #include "devtempl.h"

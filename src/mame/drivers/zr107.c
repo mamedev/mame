@@ -705,8 +705,7 @@ static double adc0838_callback( const device_config *device, UINT8 input )
 }
 
 
-static const adc083x_interface zr107_adc_interface = {
-	ADC0838,
+static const adc0831_interface zr107_adc_interface = {
 	adc0838_callback
 };
 
@@ -771,7 +770,7 @@ static MACHINE_DRIVER_START( zr107 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_ADC083X_ADD("adc0838", zr107_adc_interface)
+	MDRV_ADC0838_ADD("adc0838", zr107_adc_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jetwave )
@@ -818,7 +817,7 @@ static MACHINE_DRIVER_START( jetwave )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_ADC083X_ADD("adc0838", zr107_adc_interface)
+	MDRV_ADC0838_ADD("adc0838", zr107_adc_interface)
 MACHINE_DRIVER_END
 
 /*****************************************************************************/

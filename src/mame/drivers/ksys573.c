@@ -2789,8 +2789,7 @@ static double analogue_inputs_callback( const device_config *device, UINT8 input
 }
 
 
-static const adc083x_interface konami573_adc_interface = {
-	ADC0834,
+static const adc0831_interface konami573_adc_interface = {
 	analogue_inputs_callback
 };
 
@@ -2831,7 +2830,7 @@ static MACHINE_DRIVER_START( konami573 )
 
 	MDRV_M48T58_ADD( "m48t58" )
 
-	MDRV_ADC083X_ADD( "adc0834", konami573_adc_interface )
+	MDRV_ADC0834_ADD( "adc0834", konami573_adc_interface )
 MACHINE_DRIVER_END
 
 

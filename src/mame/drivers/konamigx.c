@@ -874,8 +874,7 @@ static double adc0834_callback( const device_config *device, UINT8 input )
 	return 0;
 }
 
-static const adc083x_interface konamigx_adc_interface = {
-	ADC0834,
+static const adc0831_interface konamigx_adc_interface = {
 	adc0834_callback
 };
 
@@ -1400,7 +1399,7 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_ADC083X_ADD( "adc0834", konamigx_adc_interface )
+	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragoonj )

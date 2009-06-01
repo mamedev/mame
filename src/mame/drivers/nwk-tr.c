@@ -1025,8 +1025,7 @@ static double adc12138_input_callback( const device_config *device, UINT8 input 
 	return (double)(value) / 2047.0;
 }
 
-static const adc1213x_interface nwktr_adc_interface = {
-	ADC12138,
+static const adc12138_interface nwktr_adc_interface = {
 	adc12138_input_callback
 };
 
@@ -1080,7 +1079,7 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_M48T58_ADD( "m48t58" )
 
-	MDRV_ADC1213X_ADD( "adc12138", nwktr_adc_interface )
+	MDRV_ADC12138_ADD( "adc12138", nwktr_adc_interface )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
