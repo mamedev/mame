@@ -860,23 +860,23 @@ static WRITE32_HANDLER( adc0834_w )
 	adc083x_cs_write(adc0834, 0, (data >> 26) & 1);
 }
 
-static READ8_DEVICE_HANDLER( adc0834_callback )
+static double adc0834_callback( const device_config *device, UINT8 input )
 {
-	switch (offset)
+	switch (input)
 	{
 	case ADC083X_CH0:
-		return input_port_read(device->machine, "AN0"); // steer
+		return (double)(5 * input_port_read(device->machine, "AN0")) / 255.0; // steer
 	case ADC083X_CH1:
-		return input_port_read(device->machine, "AN1"); // gas
+		return (double)(5 * input_port_read(device->machine, "AN1")) / 255.0; // gas
 	case ADC083X_VREF:
-		return 255;
+		return 5;
 	}
 	return 0;
 }
 
 static const adc083x_interface konamigx_adc_interface = {
 	ADC0834,
-	DEVCB_HANDLER(adc0834_callback)
+	adc0834_callback
 };
 
 

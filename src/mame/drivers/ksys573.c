@@ -1644,84 +1644,83 @@ todo:
 
 static READ32_HANDLER( ge765pwbba_r )
 {
+	const device_config *upd4701 = devtag_get_device(space->machine, "upd4701");
 	UINT32 data = 0;
 
-	switch( offset )
+	switch (offset)
 	{
 	case 0x26:
-		uPD4701_y_add( 0, input_port_read_safe(space->machine,  "uPD4701_y", 0 ) );
-		uPD4701_switches_set( 0, input_port_read_safe(space->machine,  "uPD4701_switches", 0 ) );
+		upd4701_y_add(upd4701, 0, input_port_read_safe(space->machine, "uPD4701_y", 0), 0xffff);
+		upd4701_switches_set(upd4701, 0, input_port_read_safe(space->machine, "uPD4701_switches", 0));
 
-		uPD4701_cs_w( 0, 0 );
-		uPD4701_xy_w( 0, 1 );
+		upd4701_cs_w(upd4701, 0, 0);
+		upd4701_xy_w(upd4701, 0, 1);
 
-		if( ACCESSING_BITS_0_7 )
+		if (ACCESSING_BITS_0_7)
 		{
-			uPD4701_ul_w( 0, 0 );
-			data |= uPD4701_d_r( 0 ) << 0;
+			upd4701_ul_w(upd4701, 0, 0);
+			data |= upd4701_d_r(upd4701, 0, 0xffff) << 0;
 		}
 
-		if( ACCESSING_BITS_16_23 )
+		if (ACCESSING_BITS_16_23)
 		{
-			uPD4701_ul_w( 0, 1 );
-			data |= uPD4701_d_r( 0 ) << 16;
+			upd4701_ul_w(upd4701, 0, 1);
+			data |= upd4701_d_r(upd4701, 0, 0xffff) << 16;
 		}
 
-		uPD4701_cs_w( 0, 1 );
+		upd4701_cs_w(upd4701, 0, 1);
 		break;
 
 	default:
-		verboselog( space->machine, 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
+		verboselog(space->machine, 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask);
 		break;
 	}
 
-	verboselog( space->machine, 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog(space->machine, 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
 	return data;
 }
 
 static WRITE32_HANDLER( ge765pwbba_w )
 {
-	switch( offset )
+	const device_config *upd4701 = devtag_get_device(space->machine, "upd4701");
+	switch (offset)
 	{
 	case 0x04:
 		break;
 
 	case 0x20:
-		if( ACCESSING_BITS_0_7 )
+		if (ACCESSING_BITS_0_7)
 		{
-			output_set_value( "motor", data & 0xff );
+			output_set_value("motor", data & 0xff);
 		}
 		break;
 
 	case 0x22:
-		if( ACCESSING_BITS_0_7 )
+		if (ACCESSING_BITS_0_7)
 		{
-			output_set_value( "brake", data & 0xff );
+			output_set_value("brake", data & 0xff);
 		}
 		break;
 
 	case 0x28:
-		if( ACCESSING_BITS_0_7 )
+		if (ACCESSING_BITS_0_7)
 		{
-			uPD4701_resety_w( 0, 1 );
-			uPD4701_resety_w( 0, 0 );
+			upd4701_resety_w(upd4701, 0, 1);
+			upd4701_resety_w(upd4701, 0, 0);
 		}
 		break;
 
 	default:
-		verboselog( space->machine, 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
+		verboselog(space->machine, 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data);
 		break;
 	}
 
-	verboselog( space->machine, 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog(space->machine, 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
 }
 
 static DRIVER_INIT( ge765pwbba )
 {
 	DRIVER_INIT_CALL(konami573);
-
-	uPD4701_init( machine, 0 );
-
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
 
@@ -2769,22 +2768,22 @@ static DRIVER_INIT( salarymc )
 
 /* ADC0834 Interface */
 
-static READ8_DEVICE_HANDLER( analogue_inputs_callback )
+static double analogue_inputs_callback( const device_config *device, UINT8 input )
 {
-	switch (offset)
+	switch (input)
 	{
 	case ADC083X_CH0:
-		return input_port_read_safe(device->machine,  "analog0", 0);
+		return (double)(5 * input_port_read_safe(device->machine,  "analog0", 0)) / 255.0;
 	case ADC083X_CH1:
-		return input_port_read_safe(device->machine,  "analog1", 0);
+		return (double)(5 * input_port_read_safe(device->machine,  "analog1", 0)) / 255.0;
 	case ADC083X_CH2:
-		return input_port_read_safe(device->machine,  "analog2", 0);
+		return (double)(5 * input_port_read_safe(device->machine,  "analog2", 0)) / 255.0;
 	case ADC083X_CH3:
-		return input_port_read_safe(device->machine,  "analog3", 0);
+		return (double)(5 * input_port_read_safe(device->machine,  "analog3", 0)) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
-		return 255;
+		return 5;
 	}
 	return 0;
 }
@@ -2792,7 +2791,7 @@ static READ8_DEVICE_HANDLER( analogue_inputs_callback )
 
 static const adc083x_interface konami573_adc_interface = {
 	ADC0834,
-	DEVCB_HANDLER(analogue_inputs_callback)
+	analogue_inputs_callback
 };
 
 static MACHINE_DRIVER_START( konami573 )
@@ -2835,6 +2834,13 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_ADC083X_ADD( "adc0834", konami573_adc_interface )
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( k573bait )
+	MDRV_IMPORT_FROM(konami573)
+
+	/* Additional NEC Encoder */
+	MDRV_UPD4701_ADD( "upd4701" )
+MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( konami573 )
 	PORT_START("IN0")
@@ -4558,8 +4564,8 @@ ROM_END
 GAME( 1998, sys573,   0,        konami573, konami573, konami573,  ROT0, "Konami", "System 573 BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1998, darkhleg, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Dark Horse Legend (GX706 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, fbaitbc,  sys573,   konami573, fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bassangl, fbaitbc,  konami573, fbaitbc,   ge765pwbba, ROT0, "Konami", "Bass Angler (GE765 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, fbaitbc,  sys573,   k573bait,  fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bassangl, fbaitbc,  k573bait,  fbaitbc,   ge765pwbba, ROT0, "Konami", "Bass Angler (GE765 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, pbballex, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Powerful Pro Baseball EX (GX802 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, konam80s, sys573,   konami573, konami573, konami573,  ROT90, "Konami", "Konami 80's AC Special (GC826 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, konam80u, konam80s, konami573, konami573, konami573,  ROT90, "Konami", "Konami 80's AC Special (GC826 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4572,16 +4578,16 @@ GAME( 1998, ddrj,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami"
 GAME( 1998, ddrja,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1998, ddrjb,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddra,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GN845 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, fbait2bc, sys573,   konami573, fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, fbait2bc, sys573,   k573bait,  fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn,     sys573,   konami573, drmn,      drmn,       ROT0, "Konami", "DrumMania (GQ881 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, gtrfrks,  sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. EAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksu, gtrfrks,  konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. UAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksj, gtrfrks,  konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksa, gtrfrks,  konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. AAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, fbaitmc,  sys573,   konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. EA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, fbaitmcu, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, fbaitmcj, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, fbaitmca, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. AA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, fbaitmc,  sys573,   k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. EA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, fbaitmcu, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, fbaitmcj, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, fbaitmca, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. AA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddr2m,    sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddrbocd,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddr2ml,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

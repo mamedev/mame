@@ -52,7 +52,7 @@ struct _adc083x_state
 {
 	int type;
 
-	devcb_resolved_read8 input_callback_r;
+	input_convert_func input_callback_r;
 
 	INT32 cs;
 	INT32 clk;
@@ -151,8 +151,8 @@ static UINT8 adc083x_conversion( const device_config *device )
 	int negative_channel = ADC083X_AGND;
 	double positive = 0;
 	double negative = 0;
-	double vref = (double)(5 * devcb_call_read8(&adc083x->input_callback_r, ADC083X_VREF)) / 255.0;
-	UINT8 gnd = devcb_call_read8(&adc083x->input_callback_r, ADC083X_AGND);
+	double vref = adc083x->input_callback_r(device, ADC083X_VREF);
+	double gnd = adc083x->input_callback_r(device, ADC083X_VREF);
 
 	switch (adc083x->type)
 	{
@@ -197,11 +197,11 @@ static UINT8 adc083x_conversion( const device_config *device )
 
 	if (positive_channel != ADC083X_AGND)
 	{
-		positive = (double)(5 * (devcb_call_read8(&adc083x->input_callback_r, positive_channel) - gnd)) / 255.0;
+		positive = adc083x->input_callback_r(device, positive_channel) - gnd;
 	}
 	if (negative_channel != ADC083X_AGND)
 	{
-		negative = (double)(5 * (devcb_call_read8(&adc083x->input_callback_r, negative_channel) - gnd)) / 255.0;
+		negative = adc083x->input_callback_r(device, negative_channel) - gnd;
 	}
 
 	result = (int)(((positive - negative) * 255) / vref);
@@ -449,7 +449,7 @@ static DEVICE_START( adc083x )
 	}
 
 	/* resolve callbacks */
-	devcb_resolve_read8(&adc083x->input_callback_r, &intf->input_callback_r, device);
+	adc083x->input_callback_r = intf->input_callback_r;
 
 	/* register for state saving */
 	state_save_register_global(device->machine, adc083x->cs);

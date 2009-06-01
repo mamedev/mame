@@ -55,11 +55,13 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef double (*input_convert_func)(const device_config *device, UINT8 input);
+
 typedef struct _adc083x_interface adc083x_interface;
 struct _adc083x_interface
 {
 	int type;
-	devcb_read8 input_callback_r;
+	input_convert_func input_callback_r;
 };
 
 /***************************************************************************

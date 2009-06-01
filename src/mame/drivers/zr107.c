@@ -682,16 +682,16 @@ static const sharc_config sharc_cfg =
 
 /* ADC0838 Interface */
 
-static READ8_DEVICE_HANDLER( adc0838_callback )
+static double adc0838_callback( const device_config *device, UINT8 input )
 {
-	switch (offset)
+	switch (input)
 	{
 	case ADC083X_CH0:
-		return input_port_read(device->machine,  "ANALOG1");
+		return (double)(5 * input_port_read(device->machine, "ANALOG1")) / 255.0;
 	case ADC083X_CH1:
-		return input_port_read(device->machine,  "ANALOG2");
+		return (double)(5 * input_port_read(device->machine, "ANALOG2")) / 255.0;
 	case ADC083X_CH2:
-		return input_port_read(device->machine,  "ANALOG3");
+		return (double)(5 * input_port_read(device->machine, "ANALOG3")) / 255.0;
 	case ADC083X_CH3:
 		return 0;
 	case ADC083X_COM:
@@ -699,7 +699,7 @@ static READ8_DEVICE_HANDLER( adc0838_callback )
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
-		return 255;
+		return 5;
 	}
 	return 0;
 }
@@ -707,7 +707,7 @@ static READ8_DEVICE_HANDLER( adc0838_callback )
 
 static const adc083x_interface zr107_adc_interface = {
 	ADC0838,
-	DEVCB_HANDLER(adc0838_callback)
+	adc0838_callback
 };
 
 

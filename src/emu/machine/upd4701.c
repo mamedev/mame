@@ -1,14 +1,22 @@
-/*
- * uPD4701
- *
- * Incremental Encoder Control
- *
- */
+/***************************************************************************
+
+    NEC uPD4701 
+
+    Incremental Encoder Control
+
+    2009-06 Converted to be a device
+
+***************************************************************************/
 
 #include "driver.h"
-#include "machine/upd4701.h"
+#include "upd4701.h"
 
-struct uPD4701_chip
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _upd4701_state upd4701_state;
+struct _upd4701_state
 {
 	int cs;
 	int xy;
@@ -26,186 +34,190 @@ struct uPD4701_chip
 	int cf;
 };
 
-static struct uPD4701_chip uPD4701[ UPD4701_MAXCHIP ];
+/* x,y increments can be 12bit (see MASK_COUNTER), hence we need a couple of 
+16bit handlers in the following  */
 
 #define MASK_SWITCHES ( 7 )
 #define MASK_COUNTER ( 0xfff )
 
-void uPD4701_init( running_machine *machine, int chip )
+
+/***************************************************************************
+	INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE upd4701_state *get_safe_token(const device_config *device)
 {
-	struct uPD4701_chip *c;
-
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_init( machine, %d ) invalid chip\n", chip );
-		return;
-	}
-
-	c = &uPD4701[ chip ];
-
-	c->cs = 1;
-	c->xy = 0;
-	c->ul = 0;
-	c->resetx = 0;
-	c->resety = 0;
-	c->latchx = 0;
-	c->latchy = 0;
-	c->startx = 0;
-	c->starty = 0;
-	c->x = 0;
-	c->y = 0;
-	c->switches = 0;
-	c->latchswitches = 0;
-	c->cf = 1;
-
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->cs );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->xy );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->ul );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->resetx );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->resety );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchx );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchy );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->startx );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->starty );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->x );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->y );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->switches );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchswitches );
-	state_save_register_item( machine, "uPD4701", NULL, chip, c->cf );
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == UPD4701));
+	return (upd4701_state *)device->token;
 }
 
-void uPD4701_ul_w( int chip, int ul )
+
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+	upd4701_ul_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_ul_w )
 {
-	struct uPD4701_chip *c;
-
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_ul_w( %d ) invalid chip\n", chip );
-		return;
-	}
-
-	c = &uPD4701[ chip ];
-	c->ul = ul;
+	upd4701_state *upd4701 = get_safe_token(device);
+	upd4701->ul = data;
 }
 
-void uPD4701_xy_w( int chip, int xy )
+/*-------------------------------------------------
+	upd4701_xy_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_xy_w )
 {
-	struct uPD4701_chip *c;
-
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_xy_w( %d ) invalid chip\n", chip );
-		return;
-	}
-
-	c = &uPD4701[ chip ];
-	c->xy = xy;
+	upd4701_state *upd4701 = get_safe_token(device);
+	upd4701->xy = data;
 }
 
-void uPD4701_cs_w( int chip, int cs )
+/*-------------------------------------------------
+	upd4701_cs_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_cs_w )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
+	if (data != upd4701->cs)
 	{
-		logerror( "uPD4701_cs_w( %d ) invalid chip\n", chip );
-		return;
-	}
+		upd4701->cs = data;
 
-	c = &uPD4701[ chip ];
-	if( cs != c->cs )
-	{
-		c->cs = cs;
-
-		if( !c->cs )
+		if (!upd4701->cs)
 		{
-			c->latchx = ( c->x - c->startx ) & MASK_COUNTER;
-			c->latchy = ( c->y - c->starty ) & MASK_COUNTER;
+			upd4701->latchx = (upd4701->x - upd4701->startx) & MASK_COUNTER;
+			upd4701->latchy = (upd4701->y - upd4701->starty) & MASK_COUNTER;
 
-			c->latchswitches = ( ~c->switches ) & MASK_SWITCHES;
-			if( c->latchswitches != 0 )
+			upd4701->latchswitches = (~upd4701->switches) & MASK_SWITCHES;
+			if (upd4701->latchswitches != 0)
 			{
-				c->latchswitches |= 8;
+				upd4701->latchswitches |= 8;
 			}
 
-			c->cf = 1;
+			upd4701->cf = 1;
 		}
 	}
 }
 
-void uPD4701_resetx_w( int chip, int resetx )
+/*-------------------------------------------------
+	upd4701_resetx_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_resetx_w )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
+	if (upd4701->resetx != data)
 	{
-		logerror( "uPD4701_resetx_w( %d ) invalid chip\n", chip );
-		return;
-	}
+		upd4701->resetx = data;
 
-	c = &uPD4701[ chip ];
-	if( c->resetx != resetx )
-	{
-		c->resetx = resetx;
-
-		if( c->resetx )
+		if (upd4701->resetx)
 		{
-			c->startx = c->x;
+			upd4701->startx = upd4701->x;
 		}
 	}
 }
 
-void uPD4701_resety_w( int chip, int resety )
+/*-------------------------------------------------
+	upd4701_resety_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_resety_w )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
+	if (upd4701->resety != data)
 	{
-		logerror( "uPD4701_resety_w( %d ) invalid chip\n", chip );
-		return;
-	}
+		upd4701->resety = data;
 
-	c = &uPD4701[ chip ];
-	if( c->resety != resety )
-	{
-		c->resety = resety;
-
-		if( c->resety )
+		if (upd4701->resety)
 		{
-			c->starty = c->y;
+			upd4701->starty = upd4701->y;
 		}
 	}
 }
 
-int uPD4701_d_r( int chip )
+/*-------------------------------------------------
+	upd4701_x_add
+-------------------------------------------------*/
+
+WRITE16_DEVICE_HANDLER( upd4701_x_add )
 {
+	upd4701_state *upd4701 = get_safe_token(device);
+
+	if (!upd4701->resetx && data != 0)
+	{
+		upd4701->x += data;
+
+		if (upd4701->cs)
+		{
+			upd4701->cf = 0;
+		}
+	}
+}
+
+/*-------------------------------------------------
+	upd4701_y_add
+-------------------------------------------------*/
+
+WRITE16_DEVICE_HANDLER( upd4701_y_add )
+{
+	upd4701_state *upd4701 = get_safe_token(device);
+
+	if (!upd4701->resety && data != 0)
+	{
+		upd4701->y += data;
+
+		if (upd4701->cs)
+		{
+			upd4701->cf = 0;
+		}
+	}
+}
+
+/*-------------------------------------------------
+	upd4701_switches_set
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( upd4701_switches_set )
+{
+	upd4701_state *upd4701 = get_safe_token(device);
+	upd4701->switches = data;
+}
+
+/*-------------------------------------------------
+	upd4701_d_r
+-------------------------------------------------*/
+
+READ16_DEVICE_HANDLER( upd4701_d_r )
+{
+	upd4701_state *upd4701 = get_safe_token(device);
 	int data;
-	struct uPD4701_chip *c;
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_d_r( %d ) invalid chip\n", chip );
-		return 0;
-	}
-
-	c = &uPD4701[ chip ];
-	if( c->cs )
+	if (upd4701->cs)
 	{
 		return 0xff;
 	}
 
-	if( c->xy )
+	if (upd4701->xy)
 	{
-		data = c->latchy;
+		data = upd4701->latchy;
 	}
 	else
 	{
-		data = c->latchx;
+		data = upd4701->latchx;
 	}
 
-	data |= c->latchswitches << 12;
+	data |= upd4701->latchswitches << 12;
 
-	if( c->ul )
+	if (upd4701->ul)
 	{
 		return data >> 8;
 	}
@@ -215,18 +227,15 @@ int uPD4701_d_r( int chip )
 	}
 }
 
-int uPD4701_sf_r( int chip )
+/*-------------------------------------------------
+	upd4701_sf_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( upd4701_sf_r )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_sf_r( %d ) invalid chip\n", chip );
-		return 0;
-	}
-
-	c = &uPD4701[ chip ];
-	if( ( c->switches & MASK_SWITCHES ) != MASK_SWITCHES )
+	if ((upd4701->switches & MASK_SWITCHES) != MASK_SWITCHES)
 	{
 		return 0;
 	}
@@ -234,74 +243,74 @@ int uPD4701_sf_r( int chip )
 	return 1;
 }
 
-int uPD4701_cf_r( int chip )
+/*-------------------------------------------------
+	upd4701_cf_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( upd4701_cf_r )
 {
-	struct uPD4701_chip *c;
-
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_cf_r( %d ) invalid chip\n", chip );
-		return 0;
-	}
-
-	c = &uPD4701[ chip ];
-	return c->cf;
+	upd4701_state *upd4701 = get_safe_token(device);
+	return upd4701->cf;
 }
 
-void uPD4701_x_add( int chip, int dx )
+/*-------------------------------------------------
+	DEVICE_START( upd4701 )
+-------------------------------------------------*/
+
+static DEVICE_START( upd4701 )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_x_add( %d ) invalid chip\n", chip );
-		return;
-	}
-
-	c = &uPD4701[ chip ];
-	if( !c->resetx && dx != 0 )
-	{
-		c->x += dx;
-
-		if( c->cs )
-		{
-			c->cf = 0;
-		}
-	}
+	/* register for state saving */
+	state_save_register_global(device->machine, upd4701->cs);
+	state_save_register_global(device->machine, upd4701->xy);
+	state_save_register_global(device->machine, upd4701->ul);
+	state_save_register_global(device->machine, upd4701->resetx);
+	state_save_register_global(device->machine, upd4701->resety);
+	state_save_register_global(device->machine, upd4701->latchx);
+	state_save_register_global(device->machine, upd4701->latchy);
+	state_save_register_global(device->machine, upd4701->startx);
+	state_save_register_global(device->machine, upd4701->starty);
+	state_save_register_global(device->machine, upd4701->x);
+	state_save_register_global(device->machine, upd4701->y);
+	state_save_register_global(device->machine, upd4701->switches);
+	state_save_register_global(device->machine, upd4701->latchswitches);
+	state_save_register_global(device->machine, upd4701->cf);
 }
 
-void uPD4701_y_add( int chip, int dy )
+/*-------------------------------------------------
+	DEVICE_RESET( upd4701 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( upd4701 )
 {
-	struct uPD4701_chip *c;
+	upd4701_state *upd4701 = get_safe_token(device);
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_y_add( %d ) invalid chip\n", chip );
-		return;
-	}
-
-	c = &uPD4701[ chip ];
-	if( !c->resety && dy != 0 )
-	{
-		c->y += dy;
-
-		if( c->cs )
-		{
-			c->cf = 0;
-		}
-	}
+	upd4701->cs = 1;
+	upd4701->xy = 0;
+	upd4701->ul = 0;
+	upd4701->resetx = 0;
+	upd4701->resety = 0;
+	upd4701->latchx = 0;
+	upd4701->latchy = 0;
+	upd4701->startx = 0;
+	upd4701->starty = 0;
+	upd4701->x = 0;
+	upd4701->y = 0;
+	upd4701->switches = 0;
+	upd4701->latchswitches = 0;
+	upd4701->cf = 1;
 }
 
-void uPD4701_switches_set( int chip, int switches )
-{
-	struct uPD4701_chip *c;
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
 
-	if( chip < 0 || chip >= UPD4701_MAXCHIP )
-	{
-		logerror( "uPD4701_switches_set( %d ) invalid chip\n", chip );
-		return;
-	}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-	c = &uPD4701[ chip ];
-	c->switches = switches;
-}
+#define DEVTEMPLATE_ID(p,s)		p##upd4701##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME		"NEC uPD4701 Encoder"
+#define DEVTEMPLATE_FAMILY		"NEC uPD4701 Encoder"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"
