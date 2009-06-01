@@ -282,12 +282,14 @@ static VIDEO_UPDATE( zr107 )
 
 static CUSTOM_INPUT( adcdo_r )
 {
-	return adc083x_do_read(field->port->machine, 0);
+	const device_config *adc0838 = devtag_get_device(field->port->machine, "adc0838");
+	return adc083x_do_read(adc0838, 0);
 }
 
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
+	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	switch (offset)
@@ -306,7 +308,7 @@ static READ8_HANDLER( sysreg_r )
                 0x20 = SARS (A/D busy flag)
                 0x10 = EEPDO (EEPROM DO)
             */
-			r = (adc083x_sars_read(space->machine, 0) << 5) | (eeprom_read_bit() << 4);
+			r = (adc083x_sars_read(adc0838, 0) << 5) | (eeprom_read_bit() << 4);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -317,6 +319,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
+	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
+
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
@@ -365,9 +369,9 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			adc083x_cs_write(space->machine, 0, (data >> 2) & 1);
-			adc083x_di_write(space->machine, 0, (data >> 1) & 1);
-			adc083x_clk_write(space->machine, 0, (data >> 0) & 1);
+			adc083x_cs_write(adc0838, 0, (data >> 2) & 1);
+			adc083x_di_write(adc0838, 0, (data >> 1) & 1);
+			adc083x_clk_write(adc0838, 0, (data >> 0) & 1);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -380,28 +384,6 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 	}
-}
-
-static double adc0838_callback(running_machine *machine, int input)
-{
-	switch (input)
-	{
-		case ADC083X_CH0:
-			return (double)(5 * input_port_read(machine, "ANALOG1")) / 255.0;
-		case ADC083X_CH1:
-			return (double)(5 * input_port_read(machine, "ANALOG2")) / 255.0;
-		case ADC083X_CH2:
-			return (double)(5 * input_port_read(machine, "ANALOG3")) / 255.0;
-		case ADC083X_CH3:
-			return 0;
-		case ADC083X_COM:
-			return 0;
-		case ADC083X_AGND:
-			return 0;
-		case ADC083X_VREF:
-			return 5;
-	}
-	return 0;
 }
 
 static int ccu_vcth = 0;
@@ -697,6 +679,38 @@ static const sharc_config sharc_cfg =
 	BOOT_MODE_EPROM
 };
 
+
+/* ADC0838 Interface */
+
+static READ8_DEVICE_HANDLER( adc0838_callback )
+{
+	switch (offset)
+	{
+	case ADC083X_CH0:
+		return input_port_read(device->machine,  "ANALOG1");
+	case ADC083X_CH1:
+		return input_port_read(device->machine,  "ANALOG2");
+	case ADC083X_CH2:
+		return input_port_read(device->machine,  "ANALOG3");
+	case ADC083X_CH3:
+		return 0;
+	case ADC083X_COM:
+		return 0;
+	case ADC083X_AGND:
+		return 0;
+	case ADC083X_VREF:
+		return 255;
+	}
+	return 0;
+}
+
+
+static const adc083x_interface zr107_adc_interface = {
+	ADC0838,
+	DEVCB_HANDLER(adc0838_callback)
+};
+
+
 /* PowerPC interrupts
 
     IRQ0:  Vblank
@@ -756,6 +770,8 @@ static MACHINE_DRIVER_START( zr107 )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+
+	MDRV_ADC083X_ADD("adc0838", zr107_adc_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jetwave )
@@ -801,6 +817,8 @@ static MACHINE_DRIVER_START( jetwave )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+
+	MDRV_ADC083X_ADD("adc0838", zr107_adc_interface)
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -826,8 +844,6 @@ static void init_zr107(running_machine *machine)
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 0);
 
 	K056800_init(machine, sound_irq_callback);
-
-	adc083x_init(machine, 0, ADC0838, adc0838_callback);
 }
 
 static DRIVER_INIT(zr107)

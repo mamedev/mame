@@ -351,6 +351,7 @@ static READ32_HANDLER( mb89371_r )
 static READ32_HANDLER( jamma_r )
 {
 	running_machine *machine = space->machine;
+	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
 	UINT32 data = 0;
 
 	switch (offset)
@@ -368,7 +369,7 @@ static READ32_HANDLER( jamma_r )
 			data |= ds2401_read( machine, security_cart_number ) << 14;
 		}
 
-		data |= adc083x_do_read( machine, 0 ) << 16;
+		data |= adc083x_do_read(adc0834, 0) << 16;
 
 		switch( chiptype[ security_cart_number ] )
 		{
@@ -411,15 +412,16 @@ static READ32_HANDLER( jamma_r )
 static WRITE32_HANDLER( jamma_w )
 {
 	running_machine *machine = space->machine;
+	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
 	verboselog( machine, 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
 	case 0:
-		adc083x_cs_write( machine, 0, ( data >> 1 ) & 1 );
-		adc083x_clk_write( machine, 0, ( data >> 2 ) & 1 );
-		adc083x_di_write( machine, 0, ( data >> 0 ) & 1 );
-		adc083x_se_write( machine, 0, 0 );
+		adc083x_cs_write(adc0834, 0, (data >> 1) & 1);
+		adc083x_clk_write(adc0834, 0, (data >> 2) & 1);
+		adc083x_di_write(adc0834, 0, (data >> 0) & 1);
+		adc083x_se_write(adc0834, 0, 0);
 		break;
 
 	default:
@@ -1384,6 +1386,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
+
 static void flash_init( running_machine *machine )
 {
 	int i;
@@ -1438,26 +1441,6 @@ static void flash_init( running_machine *machine )
 
 	state_save_register_global(machine,  flash_bank );
 	state_save_register_global(machine,  control );
-}
-
-static double analogue_inputs_callback( running_machine *machine, int input )
-{
-	switch( input )
-	{
-	case ADC083X_CH0:
-		return (double) ( input_port_read_safe(machine,  "analog0", 0 ) * 5 ) / 255;
-	case ADC083X_CH1:
-		return (double) ( input_port_read_safe(machine,  "analog1", 0 ) * 5 ) / 255;
-	case ADC083X_CH2:
-		return (double) ( input_port_read_safe(machine,  "analog2", 0 ) * 5 ) / 255;
-	case ADC083X_CH3:
-		return (double) ( input_port_read_safe(machine,  "analog3", 0 ) * 5 ) / 255;
-	case ADC083X_AGND:
-		return 0;
-	case ADC083X_VREF:
-		return 5;
-	}
-	return 0;
 }
 
 static void *atapi_get_device(void)
@@ -1570,7 +1553,6 @@ static DRIVER_INIT( konami573 )
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_target );
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_start );
 
-	adc083x_init( machine, 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);
 }
 
@@ -2783,6 +2765,36 @@ static DRIVER_INIT( salarymc )
 	state_save_register_global(machine,  salarymc_lamp_clk );
 }
 
+
+
+/* ADC0834 Interface */
+
+static READ8_DEVICE_HANDLER( analogue_inputs_callback )
+{
+	switch (offset)
+	{
+	case ADC083X_CH0:
+		return input_port_read_safe(device->machine,  "analog0", 0);
+	case ADC083X_CH1:
+		return input_port_read_safe(device->machine,  "analog1", 0);
+	case ADC083X_CH2:
+		return input_port_read_safe(device->machine,  "analog2", 0);
+	case ADC083X_CH3:
+		return input_port_read_safe(device->machine,  "analog3", 0);
+	case ADC083X_AGND:
+		return 0;
+	case ADC083X_VREF:
+		return 255;
+	}
+	return 0;
+}
+
+
+static const adc083x_interface konami573_adc_interface = {
+	ADC0834,
+	DEVCB_HANDLER(analogue_inputs_callback)
+};
+
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
@@ -2819,7 +2831,10 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	MDRV_M48T58_ADD( "m48t58" )
+
+	MDRV_ADC083X_ADD( "adc0834", konami573_adc_interface )
 MACHINE_DRIVER_END
+
 
 static INPUT_PORTS_START( konami573 )
 	PORT_START("IN0")
@@ -3069,6 +3084,7 @@ static INPUT_PORTS_START( drmn )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON5 */
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
+
 
 #define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
 

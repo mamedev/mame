@@ -848,30 +848,37 @@ static WRITE32_HANDLER( sound020_w )
 
 static READ32_HANDLER( adc0834_r )
 {
-	return adc083x_do_read( space->machine, 0 ) << 24;
+	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
+	return adc083x_do_read(adc0834, 0) << 24;
 }
 
 static WRITE32_HANDLER( adc0834_w )
 {
-	running_machine *machine = space->machine;
-	adc083x_clk_write( machine, 0, ( data >> 24 ) & 1 );
-	adc083x_di_write( machine, 0, ( data >> 25 ) & 1 );
-	adc083x_cs_write( machine, 0, ( data >> 26 ) & 1 );
+	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
+	adc083x_clk_write(adc0834, 0, (data >> 24) & 1);
+	adc083x_di_write(adc0834, 0, (data >> 25) & 1);
+	adc083x_cs_write(adc0834, 0, (data >> 26) & 1);
 }
 
-static double adc0834_callback( running_machine *machine, int input )
+static READ8_DEVICE_HANDLER( adc0834_callback )
 {
-	switch( input )
+	switch (offset)
 	{
 	case ADC083X_CH0:
-		return ( (double)5 * input_port_read(machine,  "AN0" ) ) / 255; // steer
+		return input_port_read(device->machine, "AN0"); // steer
 	case ADC083X_CH1:
-		return ( (double)5 * input_port_read(machine,  "AN1" ) ) / 255; // gas
+		return input_port_read(device->machine, "AN1"); // gas
 	case ADC083X_VREF:
-		return 5;
+		return 255;
 	}
 	return 0;
 }
+
+static const adc083x_interface konamigx_adc_interface = {
+	ADC0834,
+	DEVCB_HANDLER(adc0834_callback)
+};
+
 
 static READ32_HANDLER( le2_gun_H_r )
 {
@@ -1392,6 +1399,8 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_ADC083X_ADD( "adc0834", konamigx_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragoonj )
@@ -3409,8 +3418,6 @@ static DRIVER_INIT(konamigx)
 {
 	int i, match;
 	int readback = 0;
-
-	adc083x_init( machine, 0, ADC0834, adc0834_callback );
 
 	konamigx_cfgport = -1;
 	last_prot_op = -1;
