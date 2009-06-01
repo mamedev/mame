@@ -1,39 +1,116 @@
-/*
- * mb3773 - Power Supply Monitor with Watch Dog Timer
- *
- * Todo:
- *  Calculate the timeout from parameters.
- *
- */
+/***************************************************************************
+
+	Fujitsu MB3773
+
+    Power Supply Monitor with Watch Dog Timer (i.e. Reset IC)
+
+
+    Todo:
+        Calculate the timeout from parameters.
+
+
+    2009-06 Converted to be a device
+
+***************************************************************************/
 
 #include "driver.h"
-#include "machine/mb3773.h"
+#include "mb3773.h"
 
-static emu_timer *watchdog_timer;
-static UINT8 ck = 0;
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _mb3773_state mb3773_state;
+struct _mb3773_state
+{
+	emu_timer *watchdog_timer;
+	UINT8 ck;
+};
+
+/***************************************************************************
+	INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE mb3773_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == MB3773));
+	return (mb3773_state *)device->token;
+}
+
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( watchdog_timeout )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( watchdog_timeout )
 {
 	mame_schedule_soft_reset(machine);
 }
 
-static void reset_timer( void )
+/*-------------------------------------------------
+    reset_timer
+-------------------------------------------------*/
+
+static void reset_timer( const device_config *device )
 {
-	timer_adjust_oneshot( watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0 );
+	mb3773_state *mb3773 = get_safe_token(device);
+	timer_adjust_oneshot(mb3773->watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0);
 }
 
-void mb3773_set_ck( UINT8 new_ck )
+/*-------------------------------------------------
+    mb3773_set_ck
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( mb3773_set_ck )
 {
-	if( new_ck == 0 && ck != 0 )
+	mb3773_state *mb3773 = get_safe_token(device);
+	if( data == 0 && mb3773->ck != 0 )
 	{
-		reset_timer();
+		reset_timer(device);
 	}
-	ck = new_ck;
+	mb3773->ck = data;
 }
 
-void mb3773_init( running_machine *machine )
+/*-------------------------------------------------
+    DEVICE_START( mb3773 )
+-------------------------------------------------*/
+
+static DEVICE_START( mb3773 )
 {
-	watchdog_timer = timer_alloc(machine, watchdog_timeout, NULL);
-	reset_timer();
-	state_save_register_global(machine,  ck );
+	mb3773_state *mb3773 = get_safe_token(device);
+
+	/* create the timer */
+	mb3773->watchdog_timer = timer_alloc(device->machine, watchdog_timeout, NULL);
+	reset_timer(device);
+
+	/* register for state saving */
+	state_save_register_global(device->machine, mb3773->ck);
 }
+
+/*-------------------------------------------------
+    DEVICE_RESET( mb3773 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( mb3773 )
+{
+	mb3773_state *mb3773 = get_safe_token(device);
+	mb3773->ck = 0;
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( mb3773 )
+-------------------------------------------------*/
+
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##mb3773##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME		"Fujistu MB3773"
+#define DEVTEMPLATE_FAMILY		"Fujistu Power Supply Monitor"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"

@@ -1133,7 +1133,8 @@ static UINT8 *taitofx1_eeprom2 = NULL;
 
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
-	mb3773_set_ck( ( data & 0x20 ) >> 5 );
+	const device_config *mb3773 = devtag_get_device(space->machine, "mb3773");	
+	mb3773_set_ck(mb3773, 0, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }
@@ -1170,7 +1171,6 @@ static DRIVER_INIT( coh1000ta )
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, (read32_space_func)SMH_BANK(2), (write32_space_func)SMH_BANK(2) );
 
 	zn_driver_init(machine);
-	mb3773_init(machine);
 }
 
 static MACHINE_RESET( coh1000ta )
@@ -1234,6 +1234,8 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+
+	MDRV_MB3773_ADD("mb3773")
 MACHINE_DRIVER_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
@@ -1267,7 +1269,6 @@ static DRIVER_INIT( coh1000tb )
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, (read32_space_func)SMH_BANK(3), (write32_space_func)SMH_BANK(3) );
 
 	zn_driver_init(machine);
-	mb3773_init(machine);
 }
 
 static MACHINE_RESET( coh1000tb )
@@ -1302,6 +1303,8 @@ static MACHINE_DRIVER_START( coh1000tb )
 
 	MDRV_MACHINE_RESET( coh1000tb )
 	MDRV_NVRAM_HANDLER( coh1000tb )
+
+	MDRV_MB3773_ADD("mb3773")
 MACHINE_DRIVER_END
 
 /*
