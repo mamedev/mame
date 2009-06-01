@@ -150,7 +150,7 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 	if (twin16_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (twin16_CPUA_register & 0x08))
-			cpu_set_input_line_and_vector(cputag_get_cpu(space->machine, "audiocpu"), 0, HOLD_LINE, 0xff);
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
 		if ((old & 0x40) && (twin16_CPUA_register & 0x40) == 0)
 			twin16_spriteram_process();
@@ -190,7 +190,7 @@ static WRITE16_HANDLER( fround_CPU_register_w )
 	if (twin16_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (twin16_CPUA_register & 0x08))
-			cpu_set_input_line_and_vector(cputag_get_cpu(space->machine, "audiocpu"), 0, HOLD_LINE, 0xff);	// trigger IRQ on sound CPU
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);	// trigger IRQ on sound CPU
 	}
 }
 

@@ -489,12 +489,12 @@ static PALETTE_INIT( dmnderby )
 /*Main Z80 is IM 0,HW-latched irqs. */
 static INTERRUPT_GEN( dderby_irq )
 {
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "maincpu"), 0, HOLD_LINE, 0xd7); /* RST 10h */
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 static INTERRUPT_GEN( dderby_timer_irq )
 {
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "maincpu"), 0, HOLD_LINE, 0xcf); /* RST 08h */
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_DRIVER_START( dderby )
