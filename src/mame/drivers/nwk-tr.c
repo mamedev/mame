@@ -675,23 +675,9 @@ static VIDEO_UPDATE( nwktr )
 
 /*****************************************************************************/
 
-static double adc12138_input_callback(running_machine *machine, int input)
-{
-	int value = 0;
-	switch (input)
-	{
-		case 0:		value = input_port_read(machine, "ANALOG1") - 0x800; break;
-		case 1:		value = input_port_read(machine, "ANALOG2"); break;
-		case 2:		value = input_port_read(machine, "ANALOG3"); break;
-		case 3:		value = input_port_read(machine, "ANALOG4"); break;
-		case 4:		value = input_port_read(machine, "ANALOG5"); break;
-	}
-
-	return (double)(value) / 2047.0;
-}
-
 static READ32_HANDLER( sysreg_r )
 {
+	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -709,7 +695,7 @@ static READ32_HANDLER( sysreg_r )
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= (adc1213x_do_r(0)) | (adc1213x_eoc_r(0) << 2);
+			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
 		}
 	}
 	else if (offset == 1)
@@ -724,6 +710,7 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
+	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -745,10 +732,10 @@ static WRITE32_HANDLER( sysreg_w )
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc1213x_cs_w(space->machine, 0, cs);
-			adc1213x_conv_w(0, conv);
-			adc1213x_di_w(0, di);
-			adc1213x_sclk_w(0, sclk);
+			adc1213x_cs_w(adc12138, 0, cs);
+			adc1213x_conv_w(adc12138, 0, conv);
+			adc1213x_di_w(adc12138, 0, di);
+			adc1213x_sclk_w(adc12138, 0, sclk);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -1022,6 +1009,28 @@ static const sharc_config sharc_cfg =
 	BOOT_MODE_EPROM
 };
 
+
+static double adc12138_input_callback( const device_config *device, UINT8 input ) 
+{
+	int value = 0;
+	switch (input)
+	{
+		case 0:		value = input_port_read(device->machine, "ANALOG1") - 0x800; break;
+		case 1:		value = input_port_read(device->machine, "ANALOG2"); break;
+		case 2:		value = input_port_read(device->machine, "ANALOG3"); break;
+		case 3:		value = input_port_read(device->machine, "ANALOG4"); break;
+		case 4:		value = input_port_read(device->machine, "ANALOG5"); break;
+	}
+
+	return (double)(value) / 2047.0;
+}
+
+static const adc1213x_interface nwktr_adc_interface = {
+	ADC12138,
+	adc12138_input_callback
+};
+
+
 static MACHINE_RESET( nwktr )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1070,6 +1079,8 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_M48T58_ADD( "m48t58" )
+
+	MDRV_ADC1213X_ADD( "adc12138", nwktr_adc_interface )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -1093,7 +1104,6 @@ static DRIVER_INIT(nwktr)
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
-	adc1213x_init(0, adc12138_input_callback);
 	lanc2_init(machine);
 }
 

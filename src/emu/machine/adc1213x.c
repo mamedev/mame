@@ -1,19 +1,32 @@
-/*
-    ADC12130/ADC12132/ADC12138
+/***************************************************************************
 
-    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX and Sample/Hold
+    National Semiconductor ADC12130 / ADC12132 / ADC12138
+
+    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX 
+        and Sample/Hold
 
     TODO:
         - Only ADC12138 currently supported
-*/
+
+    2009-06 Converted to be a device
+
+***************************************************************************/
 
 #include "driver.h"
 #include "adc1213x.h"
 
-#define MAX_ADC1213X_CHIPS		4
 
-typedef struct
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _adc1213x_state adc1213x_state;
+struct _adc1213x_state
 {
+	int type;
+
+	adc1213x_input_convert_func input_callback_r;
+
 	int cycle;
 	int data_out;
 	int data_in;
@@ -26,11 +39,8 @@ typedef struct
 	int input_shift_reg;
 	int output_shift_reg;
 	int end_conv;
+};
 
-	double (*input_callback)(running_machine *machine, int input);
-} ADC1213X;
-
-static ADC1213X adc1213x[MAX_ADC1213X_CHIPS];
 
 #define ADC1213X_CONV_MODE_12_MSB_FIRST			0
 #define ADC1213X_CONV_MODE_16_MSB_FIRST			1
@@ -42,23 +52,51 @@ static ADC1213X adc1213x[MAX_ADC1213X_CHIPS];
 #define ADC1213X_ACQUISITION_TIME_18_CCLK		2
 #define ADC1213X_ACQUISITION_TIME_34_CCLK		3
 
-int adc1213x_do_r(int chip)
+/***************************************************************************
+	INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE adc1213x_state *get_safe_token(const device_config *device)
 {
-	//printf("ADC: DO\n");
-	return adc1213x[chip].data_out;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == ADC1213X));
+	return (adc1213x_state *)device->token;
 }
 
-void adc1213x_di_w(int chip, int state)
+INLINE const adc1213x_interface *get_interface(const device_config *device)
 {
-	adc1213x[chip].data_in = state & 1;
+	assert(device != NULL);
+	assert((device->type == ADC1213X));
+	return (const adc1213x_interface *) device->static_config;
 }
 
-static void adc1213x_convert(running_machine *machine, int chip, int channel, int bits16, int lsbfirst)
+
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+	adc1213x_di_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( adc1213x_di_w )
 {
+	adc1213x_state *adc1213x = get_safe_token(device);
+	adc1213x->data_in = data & 1;
+}
+
+/*-------------------------------------------------
+	adc1213x_convert
+-------------------------------------------------*/
+
+static void adc1213x_convert(const device_config *device, int channel, int bits16, int lsbfirst)
+{
+	adc1213x_state *adc1213x = get_safe_token(device);
 	int i;
 	int bits;
 	int input_value;
-	double input;
+	double input = 0;
 
 	if (bits16)
 		fatalerror("ADC1213X: 16-bit mode not supported\n");
@@ -70,42 +108,42 @@ static void adc1213x_convert(running_machine *machine, int chip, int channel, in
 	{
 		case 0x8:		// H L L L - CH0 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 0);
+			input = adc1213x->input_callback_r(device, 0);
 			break;
 		}
 		case 0xc:		// H H L L - CH1 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 1);
+			input = adc1213x->input_callback_r(device, 1);
 			break;
 		}
 		case 0x9:		// H L L H - CH2 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 2);
+			input = adc1213x->input_callback_r(device, 2);
 			break;
 		}
 		case 0xd:		// H H L H - CH3 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 3);
+			input = adc1213x->input_callback_r(device, 3);
 			break;
 		}
 		case 0xa:		// H L H L - CH4 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 4);
+			input = adc1213x->input_callback_r(device, 4);
 			break;
 		}
 		case 0xe:		// H H H L - CH5 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 5);
+			input = adc1213x->input_callback_r(device, 5);
 			break;
 		}
 		case 0xb:		// H L H H - CH6 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 6);
+			input = adc1213x->input_callback_r(device, 6);
 			break;
 		}
 		case 0xf:		// H H H H - CH7 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(machine, 7);
+			input = adc1213x->input_callback_r(device, 7);
 			break;
 		}
 		default:
@@ -119,56 +157,62 @@ static void adc1213x_convert(running_machine *machine, int chip, int channel, in
 	bits = 12;
 
 	// sign-extend if needed
-	if (adc1213x[chip].data_out_sign)
+	if (adc1213x->data_out_sign)
 	{
 		input_value = input_value | ((input_value & 0x800) << 1);
 		bits++;
 	}
 
-	adc1213x[chip].output_shift_reg = 0;
+	adc1213x->output_shift_reg = 0;
 
 	for (i=0; i < bits; i++)
 	{
 		if (input_value & (1 << ((bits-1) - i)))
 		{
-			adc1213x[chip].output_shift_reg |= (1 << i);
+			adc1213x->output_shift_reg |= (1 << i);
 		}
 	}
 
-	adc1213x[chip].data_out = adc1213x[chip].output_shift_reg & 1;
-	adc1213x[chip].output_shift_reg >>= 1;
+	adc1213x->data_out = adc1213x->output_shift_reg & 1;
+	adc1213x->output_shift_reg >>= 1;
 }
 
-void adc1213x_cs_w(running_machine *machine, int chip, int state)
+/*-------------------------------------------------
+	adc1213x_cs_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
 {
-	if (state)
+	adc1213x_state *adc1213x = get_safe_token(device);
+
+	if (data)
 	{
 		//printf("ADC: CS\n");
 
-		if (adc1213x[chip].cycle >= 7)
+		if (adc1213x->cycle >= 7)
 		{
-			int mode = adc1213x[chip].input_shift_reg >> (adc1213x[chip].cycle - 8);
+			int mode = adc1213x->input_shift_reg >> (adc1213x->cycle - 8);
 
 			switch (mode & 0xf)
 			{
 				case 0x0:		// X X X X L L L L - 12 or 13 Bit MSB First conversion
 				{
-					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 0, 0);
+					adc1213x_convert(device, (mode >> 4) & 0xf, 0, 0);
 					break;
 				}
 				case 0x1:		// X X X X L L L H - 16 or 17 Bit MSB First conversion
 				{
-					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 1, 0);
+					adc1213x_convert(device, (mode >> 4) & 0xf, 1, 0);
 					break;
 				}
 				case 0x4:		// X X X X L H L L - 12 or 13 Bit LSB First conversion
 				{
-					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 0, 1);
+					adc1213x_convert(device, (mode >> 4) & 0xf, 0, 1);
 					break;
 				}
 				case 0x5:		// X X X X L H L H - 16 or 17 Bit LSB First conversion
 				{
-					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 1, 1);
+					adc1213x_convert(device, (mode >> 4) & 0xf, 1, 1);
 					break;
 				}
 
@@ -178,19 +222,19 @@ void adc1213x_cs_w(running_machine *machine, int chip, int state)
 					{
 						case 0x08:		// L L L L H L L L - Auto cal
 						{
-							adc1213x[chip].auto_cal = 1;
+							adc1213x->auto_cal = 1;
 							break;
 						}
 
 						case 0x0e:		// L L L L H H H L - Acquisition time 6 CCLK cycles
 						{
-							adc1213x[chip].acq_time = ADC1213X_ACQUISITION_TIME_6_CCLK;
+							adc1213x->acq_time = ADC1213X_ACQUISITION_TIME_6_CCLK;
 							break;
 						}
 
 						case 0x8d:		// H L L L H H L H - Data out with sign
 						{
-							adc1213x[chip].data_out_sign = 1;
+							adc1213x->data_out_sign = 1;
 							break;
 						}
 
@@ -204,48 +248,123 @@ void adc1213x_cs_w(running_machine *machine, int chip, int state)
 			}
 		}
 
-		adc1213x[chip].cycle = 0;
-		adc1213x[chip].input_shift_reg = 0;
+		adc1213x->cycle = 0;
+		adc1213x->input_shift_reg = 0;
 
-		adc1213x[chip].end_conv = 0;
+		adc1213x->end_conv = 0;
 	}
 }
 
-void adc1213x_sclk_w(int chip, int state)
+/*-------------------------------------------------
+	adc1213x_sclk_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
 {
-	if (state)
+	adc1213x_state *adc1213x = get_safe_token(device);
+
+	if (data)
 	{
-		//printf("ADC: cycle %d, DI = %d\n", adc1213x[chip].cycle, adc1213x[chip].data_in);
+		//printf("ADC: cycle %d, DI = %d\n", adc1213x->cycle, adc1213x->data_in);
 
-		adc1213x[chip].input_shift_reg <<= 1;
-		adc1213x[chip].input_shift_reg |= adc1213x[chip].data_in;
+		adc1213x->input_shift_reg <<= 1;
+		adc1213x->input_shift_reg |= adc1213x->data_in;
 
-		adc1213x[chip].data_out = adc1213x[chip].output_shift_reg & 1;
-		adc1213x[chip].output_shift_reg >>= 1;
+		adc1213x->data_out = adc1213x->output_shift_reg & 1;
+		adc1213x->output_shift_reg >>= 1;
 
-		adc1213x[chip].cycle++;
+		adc1213x->cycle++;
 	}
 }
 
-void adc1213x_conv_w(int chip, int state)
+/*-------------------------------------------------
+	adc1213x_conv_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
 {
-	adc1213x[chip].end_conv = 1;
+	adc1213x_state *adc1213x = get_safe_token(device);
+	adc1213x->end_conv = 1;
 }
 
-int adc1213x_eoc_r(int chip)
+/*-------------------------------------------------
+	adc1213x_do_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( adc1213x_do_r )
 {
-	return adc1213x[chip].end_conv;
+	adc1213x_state *adc1213x = get_safe_token(device);
+
+	//printf("ADC: DO\n");
+	return adc1213x->data_out;
 }
 
-void adc1213x_init(int chip, double (*input_callback)( running_machine *machine, int input ))
+/*-------------------------------------------------
+	adc1213x_eoc_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( adc1213x_eoc_r )
 {
-	memset(&adc1213x[chip], 0, sizeof(ADC1213X));
-
-	adc1213x[chip].conv_mode = ADC1213X_CONV_MODE_12_MSB_FIRST;
-	adc1213x[chip].data_out_sign = 1;
-	adc1213x[chip].auto_cal = 0;
-	adc1213x[chip].auto_zero = 0;
-	adc1213x[chip].acq_time = ADC1213X_ACQUISITION_TIME_10_CCLK;
-
-	adc1213x[chip].input_callback = input_callback;
+	adc1213x_state *adc1213x = get_safe_token(device);
+	return adc1213x->end_conv;
 }
+
+/*-------------------------------------------------
+	DEVICE_START( adc1213x )
+-------------------------------------------------*/
+
+static DEVICE_START( adc1213x )
+{
+	adc1213x_state *adc1213x = get_safe_token(device);
+	const adc1213x_interface *intf = get_interface(device);
+
+	/* validate configuration */
+	assert(intf->type >= ADC12130 && intf->type < MAX_ADC1213X_TYPES);
+
+	adc1213x->type = intf->type;
+
+	/* resolve callbacks */
+	adc1213x->input_callback_r = intf->input_callback_r;
+
+	/* register for state saving */
+	state_save_register_global(device->machine, adc1213x->cycle);
+	state_save_register_global(device->machine, adc1213x->data_out);
+	state_save_register_global(device->machine, adc1213x->data_in);
+	state_save_register_global(device->machine, adc1213x->conv_mode);
+	state_save_register_global(device->machine, adc1213x->auto_cal);
+	state_save_register_global(device->machine, adc1213x->auto_zero);
+	state_save_register_global(device->machine, adc1213x->acq_time);
+	state_save_register_global(device->machine, adc1213x->data_out_sign);
+	state_save_register_global(device->machine, adc1213x->mode);
+	state_save_register_global(device->machine, adc1213x->input_shift_reg);
+	state_save_register_global(device->machine, adc1213x->output_shift_reg);
+	state_save_register_global(device->machine, adc1213x->end_conv);
+}
+
+/*-------------------------------------------------
+	DEVICE_RESET( adc1213x )
+-------------------------------------------------*/
+
+static DEVICE_RESET( adc1213x )
+{
+	adc1213x_state *adc1213x = get_safe_token(device);
+
+	adc1213x->conv_mode = ADC1213X_CONV_MODE_12_MSB_FIRST;
+	adc1213x->data_out_sign = 1;
+	adc1213x->auto_cal = 0;
+	adc1213x->auto_zero = 0;
+	adc1213x->acq_time = ADC1213X_ACQUISITION_TIME_10_CCLK;
+}
+
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
+
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##adc1213x##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME		"A/D Converter 12138"
+#define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1213x"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"

@@ -52,7 +52,7 @@ struct _adc083x_state
 {
 	int type;
 
-	input_convert_func input_callback_r;
+	adc083x_input_convert_func input_callback_r;
 
 	INT32 cs;
 	INT32 clk;
@@ -469,7 +469,7 @@ static DEVICE_START( adc083x )
 }
 
 /*-------------------------------------------------
-	DEVICE_REseT( adc083x )
+	DEVICE_RESET( adc083x )
 -------------------------------------------------*/
 
 static DEVICE_RESET( adc083x )
