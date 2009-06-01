@@ -192,12 +192,12 @@ static DEVICE_START( ds1302 )
 	ds1302_state *ds1302 = get_safe_token(device);
 
 	/* register for state saving */
-    state_save_register_global(device->machine, ds1302->shift_in);
-    state_save_register_global(device->machine, ds1302->shift_out);
-    state_save_register_global(device->machine, ds1302->icount);
-	state_save_register_global(device->machine, ds1302->last_clk);
-    state_save_register_global(device->machine, ds1302->last_cmd);
-    state_save_register_global_array(device->machine, ds1302->sram);
+	state_save_register_device_item(device, 0, ds1302->shift_in);
+	state_save_register_device_item(device, 0, ds1302->shift_out);
+	state_save_register_device_item(device, 0, ds1302->icount);
+	state_save_register_device_item(device, 0, ds1302->last_clk);
+	state_save_register_device_item(device, 0, ds1302->last_cmd);
+	state_save_register_device_item_array(device, 0, ds1302->sram);
 }
 
 /*-------------------------------------------------

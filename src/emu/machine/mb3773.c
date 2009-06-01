@@ -89,7 +89,7 @@ static DEVICE_START( mb3773 )
 	reset_timer(device);
 
 	/* register for state saving */
-	state_save_register_global(device->machine, mb3773->ck);
+	state_save_register_device_item(device, 0, mb3773->ck);
 }
 
 /*-------------------------------------------------

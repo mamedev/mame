@@ -262,20 +262,20 @@ static DEVICE_START( upd4701 )
 	upd4701_state *upd4701 = get_safe_token(device);
 
 	/* register for state saving */
-	state_save_register_global(device->machine, upd4701->cs);
-	state_save_register_global(device->machine, upd4701->xy);
-	state_save_register_global(device->machine, upd4701->ul);
-	state_save_register_global(device->machine, upd4701->resetx);
-	state_save_register_global(device->machine, upd4701->resety);
-	state_save_register_global(device->machine, upd4701->latchx);
-	state_save_register_global(device->machine, upd4701->latchy);
-	state_save_register_global(device->machine, upd4701->startx);
-	state_save_register_global(device->machine, upd4701->starty);
-	state_save_register_global(device->machine, upd4701->x);
-	state_save_register_global(device->machine, upd4701->y);
-	state_save_register_global(device->machine, upd4701->switches);
-	state_save_register_global(device->machine, upd4701->latchswitches);
-	state_save_register_global(device->machine, upd4701->cf);
+	state_save_register_device_item(device, 0, upd4701->cs);
+	state_save_register_device_item(device, 0, upd4701->xy);
+	state_save_register_device_item(device, 0, upd4701->ul);
+	state_save_register_device_item(device, 0, upd4701->resetx);
+	state_save_register_device_item(device, 0, upd4701->resety);
+	state_save_register_device_item(device, 0, upd4701->latchx);
+	state_save_register_device_item(device, 0, upd4701->latchy);
+	state_save_register_device_item(device, 0, upd4701->startx);
+	state_save_register_device_item(device, 0, upd4701->starty);
+	state_save_register_device_item(device, 0, upd4701->x);
+	state_save_register_device_item(device, 0, upd4701->y);
+	state_save_register_device_item(device, 0, upd4701->switches);
+	state_save_register_device_item(device, 0, upd4701->latchswitches);
+	state_save_register_device_item(device, 0, upd4701->cf);
 }
 
 /*-------------------------------------------------

@@ -185,11 +185,11 @@ static DEVICE_START( rp5h01 )
 	rp5h01->data = &(memory_region(device->machine, intf->region)[intf->offset]);
 
 	/* register for state saving */
-	state_save_register_global(device->machine, rp5h01->counter);
-	state_save_register_global(device->machine, rp5h01->counter_mode);
-	state_save_register_global(device->machine, rp5h01->enabled);
-	state_save_register_global(device->machine, rp5h01->old_reset);
-	state_save_register_global(device->machine, rp5h01->old_clock);
+	state_save_register_device_item(device, 0, rp5h01->counter);
+	state_save_register_device_item(device, 0, rp5h01->counter_mode);
+	state_save_register_device_item(device, 0, rp5h01->enabled);
+	state_save_register_device_item(device, 0, rp5h01->old_reset);
+	state_save_register_device_item(device, 0, rp5h01->old_clock);
 }
 
 /*-------------------------------------------------
