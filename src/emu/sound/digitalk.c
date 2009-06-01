@@ -418,8 +418,9 @@ static void digitalker_step_mode_2(digitalker *dg)
 	digitalker_write(dg, &wpos, vol, dac);
 
 	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
 		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
-		for(l=3; l>=0; l--) {
+		for(l=3; l>=limit; l--) {
 			dac -= delta1[(bits >> (6+2*l)) & 15];
 			digitalker_write(dg, &wpos, vol, dac);
 		}
@@ -428,8 +429,9 @@ static void digitalker_step_mode_2(digitalker *dg)
 	digitalker_write(dg, &wpos, vol, dac);
 
 	for(k=1; k != 9; k++) {
+		int start = k == 1 ? 1 : 0;
 		bits |= dg->rom[dg->apos+k] << 8;
-		for(l=0; l<4; l++) {
+		for(l=start; l<4; l++) {
 			dac += delta1[(bits >> (6+2*l)) & 15];
 			digitalker_write(dg, &wpos, vol, dac);
 		}
@@ -439,8 +441,9 @@ static void digitalker_step_mode_2(digitalker *dg)
 	digitalker_write(dg, &wpos, vol, dac);
 
 	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
 		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
-		for(l=3; l>=0; l--) {
+		for(l=3; l>=limit; l--) {
 			dac -= delta1[(bits >> (6+2*l)) & 15];
 			digitalker_write(dg, &wpos, vol, dac);
 		}
