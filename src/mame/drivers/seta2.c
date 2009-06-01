@@ -412,6 +412,26 @@ U18 Mask rom (Samples 23C32000 32Mbit (read as 27C322))
 
 U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pin11 +5v & 27C322 with pin11 GND
 
+--------------------------------------------------------------------------
+
+From the WSC upgrade instruction sheet:
+
+ Wing Shooting Championship
+      Game Echancement
+          1/23/02
+
+New Program chip Ver. 2.00 For Wing Shooting Championship
+We are announcing NEW GAME FEATURES to enhance game play. Please refer below.
+
+NEW FEATURES
+------------
+
+ * Easier play for the first 3 hunting spots in every state with the addition of more birds.
+ * The "BEGINNER" weapon has been changed to the 5-shot PUMP SHOTGUN plus the "hit area"
+    for each shot has been increased. Same as the 3-shot SEMI-AUTO SHOTGUN.
+ * Player can now advance through all result screens faster by pulling gun trigger.
+ * The Auto Select bird is now GOOSE (easiest target) if player fails to choose bird as start of game.
+
 ***************************************************************************/
 
 /***************************************************************************
@@ -2725,8 +2745,8 @@ ROM_END
 
 ROM_START( wschamp ) /* Wing Shootiong Championship V2.00 (01/23/2002) */
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as1006e02.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
-	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
+	ROM_LOAD16_BYTE( "as1006e03.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
+	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
 
 	ROM_REGION( 0x2000000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
@@ -2741,8 +2761,8 @@ ROM_END
 
 ROM_START( wschampa ) /* Wing Shootiong Championship V1.01 */
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as1006e01.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) )
-	ROM_LOAD16_BYTE( "as1007e01.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) )
+	ROM_LOAD16_BYTE( "as1006e02.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) ) /* checksum 31EF printed on label */
+	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) ) /* checksum 615E printed on label */
 
 	ROM_REGION( 0x2000000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
@@ -2858,7 +2878,7 @@ GAME( 2000, deerhuna, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA C
 GAME( 2000, deerhunb, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunc, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_SOUND )
