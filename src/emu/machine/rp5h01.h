@@ -1,29 +1,50 @@
+/***************************************************************************
+
+    RP5H01
+
+
+***************************************************************************/
+
 #ifndef __RP5H01_H__
 #define __RP5H01_H__
 
-/* max simultaneous chips supported. change if you need more */
-#define MAX_RP5H01	1
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
-struct RP5H01_interface {
-	int num;					/* number of chips */
-	const char *region[MAX_RP5H01];		/* memory region where data resides */
-	int offset[MAX_RP5H01];		/* memory offset within the above region where data resides */
+#define RP5H01		DEVICE_GET_INFO_NAME(rp5h01)
+
+#define MDRV_RP5H01_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, RP5H01, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_RP5H01_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _rp5h01_interface rp5h01_interface;
+struct _rp5h01_interface
+{
+	const char *region;		/* memory region where data resides */
+	int offset;		/* memory offset within the above region where data resides */
 };
 
-int RP5H01_init( running_machine *machine, const struct RP5H01_interface *interface );
-void RP5H01_enable_w( int which, int data );				/* /CE */
-void RP5H01_reset_w( int which, int data );				/* RESET */
-void RP5H01_clock_w( int which, int data );				/* DATA CLOCK (active low) */
-void RP5H01_test_w( int which, int data );				/* TEST */
-int RP5H01_counter_r( int which );						/* COUNTER OUT */
-int RP5H01_data_r( int which );							/* DATA */
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-/* direct-access stubs */
-WRITE8_HANDLER( RP5H01_0_enable_w );
-WRITE8_HANDLER( RP5H01_0_reset_w );
-WRITE8_HANDLER( RP5H01_0_clock_w );
-WRITE8_HANDLER( RP5H01_0_test_w );
-READ8_HANDLER( RP5H01_0_counter_r );
-READ8_HANDLER( RP5H01_0_data_r );
+/* device interface */
+DEVICE_GET_INFO( rp5h01 );
+
+WRITE8_DEVICE_HANDLER( rp5h01_enable_w );	/* /CE */
+WRITE8_DEVICE_HANDLER( rp5h01_reset_w );	/* RESET */
+WRITE8_DEVICE_HANDLER( rp5h01_clock_w );	/* DATA CLOCK (active low) */
+WRITE8_DEVICE_HANDLER( rp5h01_test_w );		/* TEST */
+READ8_DEVICE_HANDLER( rp5h01_counter_r );	/* COUNTER OUT */
+READ8_DEVICE_HANDLER( rp5h01_data_r );		/* DATA */
 
 #endif /* __RP5H01_H__ */

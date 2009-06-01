@@ -28,8 +28,8 @@ static int MMC2_bank[4], MMC2_bank_latch[2];
  *************************************/
 MACHINE_RESET( pc10 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *ppu = devtag_get_device(machine, "ppu");
+	const device_config *rp5h01 = devtag_get_device(machine, "rp5h01");
 
 	/* initialize latches and flip-flops */
 	pc10_nmi_enable = pc10_dog_di = pc10_dispmask = pc10_sdcs = pc10_int_detect = 0;
@@ -46,10 +46,10 @@ MACHINE_RESET( pc10 )
 	MMC2_bank_latch[0] = MMC2_bank_latch[1] = 0xfe;
 
 	/* reset the security chip */
-	RP5H01_enable_w( 0, 0 );
-	RP5H01_0_reset_w( space, 0, 0 );
-	RP5H01_0_reset_w( space, 0, 1 );
-	RP5H01_enable_w( 0, 1 );
+	rp5h01_enable_w(rp5h01, 0, 0);
+	rp5h01_reset_w(rp5h01, 0, 0);
+	rp5h01_reset_w(rp5h01, 0, 1);
+	rp5h01_enable_w(rp5h01, 0, 1);
 
 	ppu2c0x_set_mirroring( ppu, mirroring );
 }
@@ -138,36 +138,38 @@ WRITE8_HANDLER( pc10_CARTSEL_w )
  *************************************/
 READ8_HANDLER( pc10_prot_r )
 {
+	const device_config *rp5h01 = devtag_get_device(space->machine, "rp5h01");
 	int data = 0xe7;
 
 	/* we only support a single cart connected at slot 0 */
-	if ( cart_sel == 0 )
+	if (cart_sel == 0)
 	{
-		RP5H01_0_enable_w( space, 0, 0 );
-		data |= ( ( ~RP5H01_counter_r( 0 ) ) << 4 ) & 0x10;	/* D4 */
-		data |= ( ( RP5H01_data_r( 0 ) ) << 3 ) & 0x08;		/* D3 */
-		RP5H01_0_enable_w( space, 0, 1 );
+		rp5h01_enable_w(rp5h01, 0, 0);
+		data |= ((~rp5h01_counter_r(rp5h01, 0)) << 4) & 0x10;	/* D4 */
+		data |= ((rp5h01_data_r(rp5h01, 0)) << 3) & 0x08;		/* D3 */
+		rp5h01_enable_w(rp5h01, 0, 1);
 	}
 	return data;
 }
 
 WRITE8_HANDLER( pc10_prot_w )
 {
+	const device_config *rp5h01 = devtag_get_device(space->machine, "rp5h01");
 	/* we only support a single cart connected at slot 0 */
-	if ( cart_sel == 0 )
+	if (cart_sel == 0)
 	{
-		RP5H01_0_enable_w( space, 0, 0 );
-		RP5H01_0_test_w( space, 0, data & 0x10 );		/* D4 */
-		RP5H01_0_clock_w( space, 0, data & 0x08 );		/* D3 */
-		RP5H01_0_reset_w( space, 0, ~data & 0x01 );	/* D0 */
-		RP5H01_0_enable_w( space, 0, 1 );
+		rp5h01_enable_w(rp5h01, 0, 0);
+		rp5h01_test_w(rp5h01, 0, data & 0x10);		/* D4 */
+		rp5h01_clock_w(rp5h01, 0, data & 0x08);		/* D3 */
+		rp5h01_reset_w(rp5h01, 0, ~data & 0x01);	/* D0 */
+		rp5h01_enable_w(rp5h01, 0, 1);
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region( space->machine, "maincpu" )[0xffff] = pc10_prot_r(space,0);
+		memory_region(space->machine, "maincpu")[0xffff] = pc10_prot_r(space, 0);
 	}
 }
 
@@ -255,13 +257,6 @@ READ8_HANDLER( pc10_in1_r )
 	return ret;
 }
 
-/* RP5H01 interface */
-static const struct RP5H01_interface rp5h01_interface =
-{
-	1,
-	{ "user1" },
-	{ 0 }
-};
 
 /*************************************
  *
@@ -270,12 +265,6 @@ static const struct RP5H01_interface rp5h01_interface =
  *************************************/
 DRIVER_INIT( playch10 )
 {
-	/* initialize the security chip */
-	if ( RP5H01_init( machine, &rp5h01_interface ) )
-	{
-		fatalerror("rp5h01_interface initualization failed");
-	}
-
 	/* set the controller to default */
 	pc10_gun_controller = 0;
 

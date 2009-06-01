@@ -1,10 +1,19 @@
+/***************************************************************************
+
+    RP5H01
+
+
+    2009-06 Converted to be a device
+
+***************************************************************************/
+
 #include "driver.h"
 #include "machine/rp5h01.h"
 
-/****************************************************************************/
 
-/* local copy of the interface pointer */
-static const struct RP5H01_interface *intf;
+/***************************************************************************
+	PARAMETERS
+***************************************************************************/
 
 /* these also work as the address masks */
 enum {
@@ -12,196 +21,201 @@ enum {
 	COUNTER_MODE_7_BITS = 0x7f
 };
 
-typedef struct _RP5H01 {
+
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _rp5h01_state rp5h01_state;
+struct _rp5h01_state
+{
 	int counter;
 	int counter_mode;	/* test pin */
 	int enabled;		/* chip enable */
 	int old_reset;		/* reset pin state (level-triggered) */
 	int old_clock;		/* clock pin state (level-triggered) */
 	UINT8 *data;
-} RP5H01;
+};
 
-static RP5H01 RP5H01_state[MAX_RP5H01];
+/***************************************************************************
+	INLINE FUNCTIONS
+***************************************************************************/
 
-/****************************************************************************/
-
-int RP5H01_init( running_machine *machine, const struct RP5H01_interface *interface ) {
-	int i;
-
-	/* setup our local copy of the interface */
-	intf = interface;
-
-	if ( intf->num > MAX_RP5H01 ) {
-		logerror( "Requested number of RP5H01's is bigger than the supported amount\n" );
-		return -1;
-	}
-
-	/* initialize the state */
-	for( i = 0; i < intf->num; i++ ) {
-		RP5H01_state[i].counter = 0;
-		RP5H01_state[i].counter_mode = COUNTER_MODE_6_BITS;
-		RP5H01_state[i].data = &( memory_region( machine, intf->region[i] )[ intf->offset[i] ] );
-		RP5H01_state[i].enabled = 0;
-		RP5H01_state[i].old_reset = -1;
-		RP5H01_state[i].old_clock = -1;
-	}
-
-	return 0;
+INLINE rp5h01_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == RP5H01));
+	return (rp5h01_state *)device->token;
 }
 
-/****************************************************************************/
+INLINE const rp5h01_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == RP5H01));
+	return (const rp5h01_interface *) device->static_config;
+}
 
-void RP5H01_enable_w( int which, int data ) {
-	RP5H01	*chip;
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return;
-	}
+/*-------------------------------------------------
+	rp5h01_enable_w
+-------------------------------------------------*/
 
-	/* get the chip */
-	chip = &RP5H01_state[which];
+WRITE8_DEVICE_HANDLER( rp5h01_enable_w )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
 
 	/* process the /CE signal and enable/disable the IC */
-	chip->enabled = ( data == 0 ) ? 1 : 0;
+	rp5h01->enabled = (data == 0) ? 1 : 0;
 }
 
-void RP5H01_reset_w( int which, int data ) {
-	RP5H01	*chip;
-	int		newstate = ( data == 0 ) ? 0 : 1;
+/*-------------------------------------------------
+	rp5h01_reset_w
+-------------------------------------------------*/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return;
-	}
-
-	/* get the chip */
-	chip = &RP5H01_state[which];
+WRITE8_DEVICE_HANDLER( rp5h01_reset_w )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+	int newstate = (data == 0) ? 0 : 1;
 
 	/* if it's not enabled, ignore */
-	if ( !chip->enabled )
+	if (!rp5h01->enabled)
 		return;
 
 	/* now look for a 0->1 transition */
-	if ( chip->old_reset == 0 && newstate == 1 ) {
+	if (rp5h01->old_reset == 0 && newstate == 1) 
+	{
 		/* reset the counter */
-		chip->counter = 0;
+		rp5h01->counter = 0;
 	}
 
 	/* update the pin */
-	chip->old_reset = newstate;
+	rp5h01->old_reset = newstate;
 }
 
-void RP5H01_clock_w( int which, int data ) {
-	RP5H01	*chip;
-	int		newstate = ( data == 0 ) ? 0 : 1;
+/*-------------------------------------------------
+	rp5h01_clock_w
+-------------------------------------------------*/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return;
-	}
-
-	/* get the chip */
-	chip = &RP5H01_state[which];
+WRITE8_DEVICE_HANDLER( rp5h01_clock_w )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+	int newstate = (data == 0) ? 0 : 1;
 
 	/* if it's not enabled, ignore */
-	if ( !chip->enabled )
+	if (!rp5h01->enabled)
 		return;
 
 	/* now look for a 1->0 transition */
-	if ( chip->old_clock == 1 && newstate == 0 ) {
+	if (rp5h01->old_clock == 1 && newstate == 0) 
+	{
 		/* increment the counter, and mask it with the mode */
-		chip->counter++;
+		rp5h01->counter++;
 	}
 
 	/* update the pin */
-	chip->old_clock = newstate;
+	rp5h01->old_clock = newstate;
 }
 
-void RP5H01_test_w( int which, int data ) {
-	RP5H01	*chip;
+/*-------------------------------------------------
+	rp5h01_test_w
+-------------------------------------------------*/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return;
-	}
-
-	/* get the chip */
-	chip = &RP5H01_state[which];
+WRITE8_DEVICE_HANDLER( rp5h01_test_w )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
 
 	/* if it's not enabled, ignore */
-	if ( !chip->enabled )
+	if (!rp5h01->enabled)
 		return;
 
 	/* process the test signal and change the counter mode */
-	chip->counter_mode = ( data == 0 ) ? COUNTER_MODE_6_BITS : COUNTER_MODE_7_BITS;
+	rp5h01->counter_mode = (data == 0) ? COUNTER_MODE_6_BITS : COUNTER_MODE_7_BITS;
 }
 
-int RP5H01_counter_r( int which ) {
-	RP5H01	*chip;
+/*-------------------------------------------------
+	rp5h01_counter_r
+-------------------------------------------------*/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return 0;
-	}
-
-	/* get the chip */
-	chip = &RP5H01_state[which];
+READ8_DEVICE_HANDLER( rp5h01_counter_r )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
 
 	/* if it's not enabled, ignore */
-	if ( !chip->enabled )
+	if (!rp5h01->enabled)
 		return 0; /* ? (should be high impedance) */
 
 	/* return A5 */
-	return ( chip->counter >> 5 ) & 1;
+	return (rp5h01->counter >> 5) & 1;
 }
 
-int RP5H01_data_r( int which ) {
-	RP5H01	*chip;
-	int		byte, bit;
+/*-------------------------------------------------
+	rp5h01_data_r
+-------------------------------------------------*/
 
-	if ( which >= intf->num ) {
-		logerror( "RP5H01_enable: trying to access an unmapped chip\n" );
-		return 0;
-	}
-
-	/* get the chip */
-	chip = &RP5H01_state[which];
+READ8_DEVICE_HANDLER( rp5h01_data_r )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+	int byte, bit;
 
 	/* if it's not enabled, ignore */
-	if ( !chip->enabled )
+	if (!rp5h01->enabled)
 		return 0; /* ? (should be high impedance) */
 
 	/* get the byte offset and bit offset */
-	byte = ( chip->counter & chip->counter_mode) >> 3;
-	bit = 7 - ( chip->counter & 7 );
+	byte = (rp5h01->counter & rp5h01->counter_mode) >> 3;
+	bit = 7 - (rp5h01->counter & 7);
 
 	/* return the data */
-	return ( chip->data[byte] >> bit ) & 1;
+	return (rp5h01->data[byte] >> bit) & 1;
 }
 
-/****************************************************************************/
+/*-------------------------------------------------
+	DEVICE_START( rp5h01 )
+-------------------------------------------------*/
 
-WRITE8_HANDLER( RP5H01_0_enable_w ) {
-	RP5H01_enable_w( 0, data );
+static DEVICE_START( rp5h01 )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+	const rp5h01_interface *intf = get_interface(device);
+
+	rp5h01->data = &(memory_region(device->machine, intf->region)[intf->offset]);
+
+	/* register for state saving */
+	state_save_register_global(device->machine, rp5h01->counter);
+	state_save_register_global(device->machine, rp5h01->counter_mode);
+	state_save_register_global(device->machine, rp5h01->enabled);
+	state_save_register_global(device->machine, rp5h01->old_reset);
+	state_save_register_global(device->machine, rp5h01->old_clock);
 }
 
-WRITE8_HANDLER( RP5H01_0_reset_w ) {
-	RP5H01_reset_w( 0, data );
+/*-------------------------------------------------
+	DEVICE_RESET( rp5h01 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( rp5h01 )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+
+	rp5h01->counter = 0;
+	rp5h01->counter_mode = COUNTER_MODE_6_BITS;
+	rp5h01->enabled = 0;
+	rp5h01->old_reset = -1;
+	rp5h01->old_clock = -1;
 }
 
-WRITE8_HANDLER( RP5H01_0_clock_w ) {
-	RP5H01_clock_w( 0, data );
-}
+/*-------------------------------------------------
+	device definition
+-------------------------------------------------*/
 
-WRITE8_HANDLER( RP5H01_0_test_w ) {
-	RP5H01_test_w( 0, data );
-}
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
-READ8_HANDLER( RP5H01_0_counter_r ) {
-	return RP5H01_counter_r( 0 );
-}
-
-READ8_HANDLER( RP5H01_0_data_r ) {
-	return RP5H01_data_r( 0 );
-}
+#define DEVTEMPLATE_ID(p,s)		p##rp5h01##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME		"RP5H01"
+#define DEVTEMPLATE_FAMILY		"RP5H01"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"
