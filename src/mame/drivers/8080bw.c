@@ -1993,8 +1993,8 @@ ROM_START( moonbase )
 	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
 
 	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
-	ROM_LOAD( "n02prm.6a",    0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
-	ROM_LOAD( "n01prm.6b",    0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
 
 ROM_START( invrvnge )
