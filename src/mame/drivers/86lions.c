@@ -17,6 +17,11 @@ TODO:
     - Understand inputs / via mapping properly;
     - Finish the mc6845 conversion;
 
+Changes 02/06/2009 - Palindrome
+- Fixed VIA address map to 5000 - 0x501f ( now generates required FIRQ_LINE timer interrupt,
+  call attendant msg no longer displayed)
+
+
 *******************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz	/* guess */
@@ -86,7 +91,7 @@ static ADDRESS_MAP_START( lions_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x5000, 0x500f) AM_READWRITE(lions_via_r, lions_via_w)
+	AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_READWRITE(lions_via_r, lions_via_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
 	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
