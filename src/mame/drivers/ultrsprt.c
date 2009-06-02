@@ -2,6 +2,10 @@
 
     Driver by Ville Linde
 
+TODO:
+- sound cpu irqs generation is unknown and very prone to get broken (i.e. if 4G and 2G returns as bad in POST screen).
+- sound is lagged, reason is probably the same as above.
+
 */
 
 #include "driver.h"
@@ -234,7 +238,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 	if (irq == 0)
 		/*generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
 	else
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ6, HOLD_LINE);
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static DRIVER_INIT( ultrsprt )
