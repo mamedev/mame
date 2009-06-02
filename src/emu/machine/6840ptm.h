@@ -1,16 +1,33 @@
-/**********************************************************************
+/***************************************************************************
 
-    Motorola 6840 PTM interface and emulation
+    Motorola 6840 (PTM)
 
-    This function is a simple emulation of up to 4 MC6840 PTM
-    (Programmable Timer Module)
+    Programmable Timer Module
 
-**********************************************************************/
+***************************************************************************/
 
-#ifndef PTM_6840
-#define PTM_6840
+#ifndef __6840PTM_H__
+#define __6840PTM_H__
 
-#define PTM_6840_MAX 4		// maximum number of chips to emulate
+#include "devcb.h"
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
+#define PTM6840		DEVICE_GET_INFO_NAME(ptm6840)
+
+#define MDRV_PTM6840_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, PTM6840, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_PTM6840_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 
 typedef struct _ptm6840_interface ptm6840_interface;
 struct _ptm6840_interface
@@ -18,61 +35,32 @@ struct _ptm6840_interface
 	int internal_clock;
 	int external_clock[3];
 
-	write8_space_func	out_func[3];	// function to call when output[idx] changes
-
-	void (*irq_func)(running_machine *machine, int state);	// function called if IRQ line changes
+	devcb_write8 out_func[3];	// function to call when output[idx] changes
+	devcb_write_line irq_func;	// function called if IRQ line changes
 };
 
-void ptm6840_config( running_machine *machine, int which, const ptm6840_interface *intf);
-void ptm6840_reset(  int which);
-int  ptm6840_read(   running_machine *machine, int which, int offset);
-void ptm6840_write(  running_machine *machine, int which, int offset, int data);
 
-int ptm6840_get_status(int which, int clock);	// get whether timer is enabled
-int ptm6840_get_irq(int which);					// get IRQ state
-UINT16 ptm6840_get_count(int which,int counter);// get counter value
-void ptm6840_set_ext_clock(int which, int counter, int clock); // set clock frequency
-int ptm6840_get_ext_clock(int which, int counter);// get clock frequency
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-void ptm6840_set_g1(running_machine *machine, int which, int state);		// set gate1  state
-void ptm6840_set_c1(running_machine *machine, int which, int state);		// set clock1 state
+/* device interface */
+DEVICE_GET_INFO( ptm6840 );
 
-void ptm6840_set_g2(running_machine *machine, int which, int state);		// set gate2  state
-void ptm6840_set_c2(running_machine *machine, int which, int state);		// set clock2 state
+int ptm6840_get_status( const device_config *device, int clock );	// get whether timer is enabled
+int ptm6840_get_irq( const device_config *device );					// get IRQ state
+UINT16 ptm6840_get_count( const device_config *device, int counter );// get counter value
+void ptm6840_set_ext_clock( const device_config *device, int counter, int clock ); // set clock frequency
+int ptm6840_get_ext_clock( const device_config *device, int counter );// get clock frequency
 
-void ptm6840_set_g3(running_machine *machine, int which, int state);		// set gate3  state
-void ptm6840_set_c3(running_machine *machine, int which, int state);		// set clock3 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_g1 );	// set gate1 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_g2 );	// set gate2 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_g3 );	// set gate3 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_c1 );	// set clock1 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_c2 );	// set clock2 state
+WRITE8_DEVICE_HANDLER( ptm6840_set_c3 );	// set clock3 state
 
-/*-------------------------------------------------------------------------*/
+WRITE8_DEVICE_HANDLER( ptm6840_write );
+READ8_DEVICE_HANDLER( ptm6840_read );
 
-READ8_HANDLER( ptm6840_0_r );
-READ8_HANDLER( ptm6840_1_r );
-READ8_HANDLER( ptm6840_2_r );
-READ8_HANDLER( ptm6840_3_r );
-
-READ16_HANDLER( ptm6840_0_lsb_r );
-READ16_HANDLER( ptm6840_1_lsb_r );
-READ16_HANDLER( ptm6840_2_lsb_r );
-READ16_HANDLER( ptm6840_3_lsb_r );
-
-READ16_HANDLER( ptm6840_0_msb_r );
-READ16_HANDLER( ptm6840_1_msb_r );
-READ16_HANDLER( ptm6840_2_msb_r );
-READ16_HANDLER( ptm6840_3_msb_r );
-
-WRITE8_HANDLER( ptm6840_0_w );
-WRITE8_HANDLER( ptm6840_1_w );
-WRITE8_HANDLER( ptm6840_2_w );
-WRITE8_HANDLER( ptm6840_3_w );
-
-WRITE16_HANDLER( ptm6840_0_lsb_w );
-WRITE16_HANDLER( ptm6840_1_lsb_w );
-WRITE16_HANDLER( ptm6840_2_lsb_w );
-WRITE16_HANDLER( ptm6840_3_lsb_w );
-
-WRITE16_HANDLER( ptm6840_0_msb_w );
-WRITE16_HANDLER( ptm6840_1_msb_w );
-WRITE16_HANDLER( ptm6840_2_msb_w );
-WRITE16_HANDLER( ptm6840_3_msb_w );
-
-#endif /* PTM_6840 */
+#endif /* __6840PTM_H__ */

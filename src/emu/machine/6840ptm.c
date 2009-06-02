@@ -1,10 +1,8 @@
-/**********************************************************************
+/***************************************************************************
 
+    Motorola 6840 (PTM)
 
-    Motorola 6840 PTM interface and emulation
-
-    This function is a simple emulation of up to 4 MC6840
-    Programmable Timer Modules
+    Programmable Timer Module
 
     Written By J.Wallace based on previous work by Aaron Giles,
    'Re-Animator' and Mathis Rosenhauer.
@@ -30,15 +28,21 @@
     should be used instead if necessary (This should allow the VBLANK
     clock on the MCR units to operate).
 
-**********************************************************************/
+
+    2009-06 Converted to be a device
+
+***************************************************************************/
 
 #include "driver.h"
 #include "6840ptm.h"
 
-// Defines /////////////////////////////////////////////////////////////
 
 #define PTMVERBOSE 0
 #define PLOG(x) do { if (PTMVERBOSE) logerror x; } while (0)
+
+/***************************************************************************
+    PARAMETERS / PROTOTYPES
+***************************************************************************/
 
 enum
 {
@@ -53,10 +57,31 @@ enum
 	PTM_6840_LSB3    = 7,
 };
 
-
-typedef struct _ptm6840
+static const char *const opmode[] =
 {
-	const ptm6840_interface *intf;
+	"000 continous mode",
+	"001 freq comparison mode",
+	"010 continous mode",
+	"011 pulse width comparison mode",
+	"100 single shot mode",
+	"101 freq comparison mode",
+	"110 single shot mode",
+	"111 pulse width comparison mode"
+};
+
+static void ptm6840_timeout(const device_config *device, int idx);
+
+/***************************************************************************
+	TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _ptm6840_state ptm6840_state;
+struct _ptm6840_state
+{
+	int internal_clock;
+	int external_clock[3];
+	devcb_resolved_write8 out_func[3];	// function to call when output[idx] changes
+	devcb_resolved_write_line irq_func;	// function called if IRQ line changes
 
 	UINT8 control_reg[3];
 	UINT8 output[3]; /* Output states */
@@ -73,85 +98,79 @@ typedef struct _ptm6840
 	UINT8 lsb_buffer;
 	UINT8 msb_buffer;
 
-	int internal_clock;
-	int external_clock[3];
-
 	/* Each PTM has 3 timers */
 	emu_timer *timer[3];
 
 	UINT16 latch[3];
 	UINT16 counter[3];
-} ptm6840;
-
-// Local prototypes ///////////////////////////////////////////////////////
-
-static void ptm6840_timeout(running_machine *machine, int which, int idx);
-static TIMER_CALLBACK( ptm6840_timer_cb );
-
-// Local vars /////////////////////////////////////////////////////////////
-
-static ptm6840 ptm[PTM_6840_MAX];
-
-static const char *const opmode[] =
-{
-	"000 continous mode",
-	"001 freq comparison mode",
-	"010 continous mode",
-	"011 pulse width comparison mode",
-	"100 single shot mode",
-	"101 freq comparison mode",
-	"110 single shot mode",
-	"111 pulse width comparison mode"
 };
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Get enabled status                                                    //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
 
-int ptm6840_get_status(int which, int clock)
+/***************************************************************************
+	INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE ptm6840_state *get_safe_token(const device_config *device)
 {
-	ptm6840 *p = ptm + which;
-	return p->enabled[clock - 1];
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == PTM6840));
+	return (ptm6840_state *)device->token;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_get_irq: get IRQ state                                        //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
-
-int ptm6840_get_irq(int which)
+INLINE const ptm6840_interface *get_interface(const device_config *device)
 {
-	ptm6840 *p = ptm + which;
-	return p->IRQ;
+	assert(device != NULL);
+	assert((device->type == PTM6840));
+	return (const ptm6840_interface *) device->static_config;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Subtract from Counter                                                 //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
 
-static void subtract_from_counter(running_machine *machine, int which, int counter, int count)
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+	ptm6840_get_status - Get enabled status
+-------------------------------------------------*/
+
+int ptm6840_get_status( const device_config *device, int clock )
 {
+	ptm6840_state *ptm6840 = get_safe_token(device);
+	return ptm6840->enabled[clock - 1];
+}
+
+/*-------------------------------------------------
+	ptm6840_get_irq - Get IRQ state
+-------------------------------------------------*/
+
+int ptm6840_get_irq( const device_config *device )
+{
+	ptm6840_state *ptm6840 = get_safe_token(device);
+	return ptm6840->IRQ;
+}
+
+/*-------------------------------------------------
+	subtract_from_counter - Subtract from Counter
+-------------------------------------------------*/
+
+static void subtract_from_counter( const device_config *device, int counter, int count )
+{
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int clock;
 	attotime duration;
 
-	ptm6840 *currptr = ptm + which;
-
 	/* Determine the clock frequency for this timer */
-	if (currptr->control_reg[counter] & 0x02)
-		clock = currptr->internal_clock;
+	if (ptm6840->control_reg[counter] & 0x02)
+		clock = ptm6840->internal_clock;
 	else
-		clock = currptr->external_clock[counter];
+		clock = ptm6840->external_clock[counter];
 
 	/* Dual-byte mode */
-	if (currptr->control_reg[counter] & 0x04)
+	if (ptm6840->control_reg[counter] & 0x04)
 	{
-		int lsb = currptr->counter[counter] & 0xff;
-		int msb = currptr->counter[counter] >> 8;
+		int lsb = ptm6840->counter[counter] & 0xff;
+		int msb = ptm6840->counter[counter] >> 8;
 
 		/* Count the clocks */
 		lsb -= count;
@@ -160,25 +179,25 @@ static void subtract_from_counter(running_machine *machine, int which, int count
 		while (lsb < 0)
 		{
 			/* Borrow from the MSB */
-			lsb += (currptr->latch[counter] & 0xff) + 1;
+			lsb += (ptm6840->latch[counter] & 0xff) + 1;
 			msb--;
 
 			/* If MSB goes less than zero, we've expired */
 			if (msb < 0)
 			{
-				ptm6840_timeout(machine, which, counter);
-				msb = (currptr->latch[counter] >> 8) + 1;
+				ptm6840_timeout(device, counter);
+				msb = (ptm6840->latch[counter] >> 8) + 1;
 			}
 		}
 
 		/* Store the result */
-		currptr->counter[counter] = (msb << 8) | lsb;
+		ptm6840->counter[counter] = (msb << 8) | lsb;
 	}
 
 	/* Word mode */
 	else
 	{
-		int word = currptr->counter[counter];
+		int word = ptm6840->counter[counter];
 
 		/* Count the clocks */
 		word -= count;
@@ -187,281 +206,196 @@ static void subtract_from_counter(running_machine *machine, int which, int count
 		while (word < 0)
 		{
 			/* Borrow from the MSB */
-			word += currptr->latch[counter] + 1;
+			word += ptm6840->latch[counter] + 1;
 
 			/* We've expired */
-			ptm6840_timeout(machine, which, counter);
+			ptm6840_timeout(device, counter);
 		}
 
 		/* Store the result */
-		currptr->counter[counter] = word;
+		ptm6840->counter[counter] = word;
 	}
 
-	if (currptr->enabled[counter])
+	if (ptm6840->enabled[counter])
 	{
-		duration = attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]);
+		duration = attotime_mul(ATTOTIME_IN_HZ(clock), ptm6840->counter[counter]);
 
 		if (counter == 2)
-			duration = attotime_mul(duration, currptr->t3_divisor);
+			duration = attotime_mul(duration, ptm6840->t3_divisor);
 
-		timer_adjust_oneshot(currptr->timer[counter], duration, which);
+		timer_adjust_oneshot(ptm6840->timer[counter], duration, 0);
 	}
 }
 
-static void ptm_tick(running_machine *machine, int which, int counter, int count)
+/*-------------------------------------------------
+	ptm_tick
+-------------------------------------------------*/
+
+static void ptm_tick( const device_config *device, int counter, int count )
 {
-	ptm6840 *currptr = ptm + which;
+	ptm6840_state *ptm6840 = get_safe_token(device);
 
 	if (counter == 2)
 	{
-		currptr->t3_scaler += count;
+		ptm6840->t3_scaler += count;
 
-		if ( currptr->t3_scaler > currptr->t3_divisor - 1)
+		if ( ptm6840->t3_scaler > ptm6840->t3_divisor - 1)
 		{
-			subtract_from_counter(machine, which, counter, 1);
-			currptr->t3_scaler = 0;
+			subtract_from_counter(device, counter, 1);
+			ptm6840->t3_scaler = 0;
 		}
 	}
 	else
 	{
-		subtract_from_counter(machine, which, counter, count);
+		subtract_from_counter(device, counter, count);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Update Internal Interrupts                                            //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	update_interrupts - Update Internal Interrupts
+-------------------------------------------------*/
 
-INLINE void update_interrupts(running_machine *machine, int which)
+INLINE void update_interrupts( const device_config *device )
 {
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int new_state;
-	ptm6840 *currptr = ptm + which;
 
-	new_state = ((currptr->status_reg & 0x01) && (currptr->control_reg[0] & 0x40)) ||
-				((currptr->status_reg & 0x02) && (currptr->control_reg[1] & 0x40)) ||
-				((currptr->status_reg & 0x04) && (currptr->control_reg[2] & 0x40));
+	new_state = ((ptm6840->status_reg & 0x01) && (ptm6840->control_reg[0] & 0x40)) ||
+				((ptm6840->status_reg & 0x02) && (ptm6840->control_reg[1] & 0x40)) ||
+				((ptm6840->status_reg & 0x04) && (ptm6840->control_reg[2] & 0x40));
 
-//  if (new_state != currptr->IRQ)
+//  if (new_state != ptm6840->IRQ)
 	{
-		currptr->IRQ = new_state;
+		ptm6840->IRQ = new_state;
 
-		if (currptr->IRQ)
-			currptr->status_reg |= 0x80;
+		if (ptm6840->IRQ)
+			ptm6840->status_reg |= 0x80;
 		else
-			currptr->status_reg &= ~0x80;
+			ptm6840->status_reg &= ~0x80;
 
-		if (currptr->intf->irq_func)
-			(currptr->intf->irq_func)(machine, currptr->IRQ);
+		devcb_call_write_line(&ptm6840->irq_func, ptm6840->IRQ);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Compute Counter                                                       //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	compute_counter - Compute Counter
+-------------------------------------------------*/
 
-static UINT16 compute_counter(int which, int counter)
+static UINT16 compute_counter( const device_config *device, int counter )
 {
-	ptm6840 *currptr = ptm + which;
-
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int clock;
-	int remaining=0;
+	int remaining = 0;
 
 	/* If there's no timer, return the count */
-	if (!currptr->enabled[counter])
+	if (!ptm6840->enabled[counter])
 	{
-		PLOG(("MC6840 #%d: read counter(%d): %d\n", which, counter, currptr->counter[counter]));
-		return currptr->counter[counter];
+		PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag, counter, ptm6840->counter[counter]));
+		return ptm6840->counter[counter];
 	}
 
 	/* determine the clock frequency for this timer */
-	if (currptr->control_reg[counter] & 0x02)
+	if (ptm6840->control_reg[counter] & 0x02)
 	{
-		clock = currptr->internal_clock;
-		PLOG(("MC6840 #%d: %d internal clock freq %d \n", which, counter, clock));
+		clock = ptm6840->internal_clock;
+		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag, counter, clock));
 	}
 	else
 	{
-		clock = currptr->external_clock[counter];
-		PLOG(("MC6840 #%d: %d external clock freq %d \n", which, counter, clock));
+		clock = ptm6840->external_clock[counter];
+		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag, counter, clock));
 	}
 	/* See how many are left */
-	remaining = attotime_to_double(attotime_mul(timer_timeleft(currptr->timer[counter]), clock));
+	remaining = attotime_to_double(attotime_mul(timer_timeleft(ptm6840->timer[counter]), clock));
 
 	/* Adjust the count for dual byte mode */
-	if (currptr->control_reg[counter] & 0x04)
+	if (ptm6840->control_reg[counter] & 0x04)
 	{
-		int divisor = (currptr->counter[counter] & 0xff) + 1;
+		int divisor = (ptm6840->counter[counter] & 0xff) + 1;
 		int msb = remaining / divisor;
 		int lsb = remaining % divisor;
 		remaining = (msb << 8) | lsb;
 	}
-	PLOG(("MC6840 #%d: read counter(%d): %d\n", which, counter, remaining));
+	PLOG(("MC6840 #%s: read counter(%d): %d\n", device->tag, counter, remaining));
 	return remaining;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Reload Counter                                                        //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	reload_count - Reload Counter
+-------------------------------------------------*/
 
-static void reload_count(running_machine *machine, int which, int idx)
+static void reload_count( const device_config *device, int idx )
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int clock;
 	int count;
 	attotime duration;
-	ptm6840 *currptr = ptm + which;
 
 	/* Copy the latched value in */
-	currptr->counter[idx] = currptr->latch[idx];
+	ptm6840->counter[idx] = ptm6840->latch[idx];
 
 	/* Determine the clock frequency for this timer */
-	if (currptr->control_reg[idx] & 0x02)
+	if (ptm6840->control_reg[idx] & 0x02)
 	{
-		clock = currptr->internal_clock;
-		PLOG(("MC6840 #%d: %d internal clock freq %d \n", which,idx, clock));
+		clock = ptm6840->internal_clock;
+		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag, idx, clock));
 	}
 	else
 	{
-		clock = currptr->external_clock[idx];
-		PLOG(("MC6840 #%d: %d external clock freq %d \n", which,idx, clock));
+		clock = ptm6840->external_clock[idx];
+		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag, idx, clock));
 	}
 
 	/* Determine the number of clock periods before we expire */
-	count = currptr->counter[idx];
-	if (currptr->control_reg[idx] & 0x04)
+	count = ptm6840->counter[idx];
+	if (ptm6840->control_reg[idx] & 0x04)
 		count = ((count >> 8) + 1) * ((count & 0xff) + 1);
 	else
 		count = count + 1;
 
-	currptr->fired[idx]=0;
+	ptm6840->fired[idx] = 0;
 
-	if ((currptr->mode[idx] == 4)||(currptr->mode[idx] == 6))
+	if ((ptm6840->mode[idx] == 4) || (ptm6840->mode[idx] == 6))
 	{
-		currptr->output[idx] = 1;
-		if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](space, 0, currptr->output[idx]);
+		ptm6840->output[idx] = 1;
+		if (ptm6840->out_func[idx].write != NULL)
+			devcb_call_write8(&ptm6840->out_func[idx], 0, ptm6840->output[idx]);
 	}
 
 	/* Set the timer */
-	PLOG(("MC6840 #%d: reload_count(%d): clock = %d  count = %d\n", which, idx, clock, count));
+	PLOG(("MC6840 #%s: reload_count(%d): clock = %d  count = %d\n", device->tag, idx, clock, count));
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
-	if (idx == 2) duration = attotime_mul(duration, currptr->t3_divisor);
-	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, attotime_to_double(duration)));
+	if (idx == 2) 
+		duration = attotime_mul(duration, ptm6840->t3_divisor);
 
-	if (!(currptr->control_reg[idx] & 0x02))
+	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", device->tag, idx, attotime_to_double(duration)));
+
+	if (!(ptm6840->control_reg[idx] & 0x02))
 	{
-		if (!currptr->intf->external_clock[idx])
+		if (!ptm6840->external_clock[idx])
 		{
-			currptr->enabled[idx] = 0;
-			timer_enable(currptr->timer[idx],FALSE);
+			ptm6840->enabled[idx] = 0;
+			timer_enable(ptm6840->timer[idx],FALSE);
 		}
 	}
 	else
 	{
-		currptr->enabled[idx] = 1;
-		timer_adjust_oneshot(currptr->timer[idx], duration, which);
-		timer_enable(currptr->timer[idx],TRUE);
+		ptm6840->enabled[idx] = 1;
+		timer_adjust_oneshot(ptm6840->timer[idx], duration, 0);
+		timer_enable(ptm6840->timer[idx], TRUE);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Configure Timer                                                       //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
 
-void ptm6840_config(running_machine *machine, int which, const ptm6840_interface *intf)
+/*-------------------------------------------------
+	ptm6840_read - Read Timer
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( ptm6840_read )
 {
-	int i;
-	ptm6840 *currptr = ptm + which;
-
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call ptm6840_config at init time!");
-	assert_always((which >= 0) && (which < PTM_6840_MAX), "ptm6840_config called on an invalid PTM!");
-	assert_always(intf, "ptm6840_config called with an invalid interface!");
-	ptm[which].intf = intf;
-	ptm[which].internal_clock = currptr->intf->internal_clock;
-
-	for (i = 0; i < 3; i++)
-	{
-		if ( currptr->intf->external_clock[i] )
-			ptm[which].external_clock[i] = currptr->intf->external_clock[i];
-		else
-			ptm[which].external_clock[i] = 1;
-	}
-
-	for (i = 0; i < 3; i++)
-	{
-		ptm[which].timer[i] = timer_alloc(machine, ptm6840_timer_cb, (void*)(FPTR)i);
-		timer_enable(ptm[which].timer[i], FALSE);
-	}
-
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->lsb_buffer);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->msb_buffer);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->status_read_since_int);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->status_reg);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->t3_divisor);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->t3_scaler);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->internal_clock);
-	state_save_register_item(machine, "6840ptm", NULL, which, currptr->IRQ);
-
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->control_reg);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->output);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->gate);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->clock);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->mode);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->fired);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->enabled);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->external_clock);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->counter);
-	state_save_register_item_array(machine, "6840ptm", NULL, which, currptr->latch);
-
-	ptm6840_reset(which);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Reset Timer                                                           //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
-
-void ptm6840_reset(int which)
-{
-	int i;
-
-	ptm[which].control_reg[2]		 = 0;
-	ptm[which].control_reg[1]		 = 0;
-	ptm[which].control_reg[0]		 = 1;
-	ptm[which].status_reg			 = 0;
-	ptm[which].t3_divisor			 = 1;
-	ptm[which].status_read_since_int = 0;
-	ptm[which].IRQ                   = 0;
-
-	for (i = 0; i < 3; i++)
-	{
-		ptm[which].counter[i] = 0xffff;
-		ptm[which].latch[i]   = 0xffff;
-		ptm[which].output[i]  = 0;
-		ptm[which].fired[i]   = 0;
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Read Timer                                                            //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
-
-int ptm6840_read(running_machine *machine, int which, int offset)
-{
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int val;
-	ptm6840 *currptr = ptm + which;
 
 	switch ( offset )
 	{
@@ -473,9 +407,9 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%s: MC6840 #%d: Status read = %04X\n", cpuexec_describe_context(machine), which, currptr->status_reg));
-			currptr->status_read_since_int |= currptr->status_reg & 0x07;
-			val = currptr->status_reg;
+			PLOG(("%s: MC6840 #%s: Status read = %04X\n", cpuexec_describe_context(device->machine), device->tag, ptm6840->status_reg));
+			ptm6840->status_read_since_int |= ptm6840->status_reg & 0x07;
+			val = ptm6840->status_reg;
 			break;
 		}
 
@@ -484,18 +418,18 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 		case PTM_6840_MSBBUF3:
 		{
 			int idx = (offset - 2) / 2;
-			int result = compute_counter(which, idx);
+			int result = compute_counter(device, idx);
 
 			/* Clear the interrupt if the status has been read */
-			if (currptr->status_read_since_int & (1 << idx))
+			if (ptm6840->status_read_since_int & (1 << idx))
 			{
-				currptr->status_reg &= ~(1 << idx);
-				update_interrupts(machine, which);
+				ptm6840->status_reg &= ~(1 << idx);
+				update_interrupts(device);
 			}
 
-			currptr->lsb_buffer = result & 0xff;
+			ptm6840->lsb_buffer = result & 0xff;
 
-			PLOG(("%s: MC6840 #%d: Counter %d read = %04X\n", cpuexec_describe_context(machine), which, idx, result >> 8));
+			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", cpuexec_describe_context(device->machine), device->tag, idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -504,7 +438,7 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 		case PTM_6840_LSB2:
 		case PTM_6840_LSB3:
 		{
-			val = currptr->lsb_buffer;
+			val = ptm6840->lsb_buffer;
 			break;
 		}
 
@@ -518,18 +452,13 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 	return val;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// Write Timer                                                           //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	ptm6840_write - Write Timer
+-------------------------------------------------*/
 
-void ptm6840_write (running_machine *machine, int which, int offset, int data)
+WRITE8_DEVICE_HANDLER( ptm6840_write )
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	ptm6840 *currptr = ptm + which;
-
+	ptm6840_state *ptm6840 = get_safe_token(device);
 	int idx;
 	int i;
 	UINT8 diffs;
@@ -539,25 +468,22 @@ void ptm6840_write (running_machine *machine, int which, int offset, int data)
 		case PTM_6840_CTRL1:
 		case PTM_6840_CTRL2:
 		{
-			idx = (offset == 1) ? 1 : (currptr->control_reg[1] & 0x01) ? 0 : 2;
-			diffs = data ^ currptr->control_reg[idx];
-			currptr->t3_divisor = (currptr->control_reg[2] & 0x01) ? 8 : 1;
-			currptr->mode[idx] = (data >> 3) & 0x07;
-			currptr->control_reg[idx] = data;
+			idx = (offset == 1) ? 1 : (ptm6840->control_reg[1] & 0x01) ? 0 : 2;
+			diffs = data ^ ptm6840->control_reg[idx];
+			ptm6840->t3_divisor = (ptm6840->control_reg[2] & 0x01) ? 8 : 1;
+			ptm6840->mode[idx] = (data >> 3) & 0x07;
+			ptm6840->control_reg[idx] = data;
 
-			PLOG(("MC6840 #%d : Control register %d selected\n", which, idx));
-			PLOG(("operation mode   = %s\n", opmode[ currptr->mode[idx] ]));
-			PLOG(("value            = %04X\n", currptr->control_reg[idx]));
-			PLOG(("t3divisor        = %d\n", currptr->t3_divisor));
+			PLOG(("MC6840 #%s : Control register %d selected\n", device->tag, idx));
+			PLOG(("operation mode   = %s\n", opmode[ ptm6840->mode[idx] ]));
+			PLOG(("value            = %04X\n", ptm6840->control_reg[idx]));
+			PLOG(("t3divisor        = %d\n", ptm6840->t3_divisor));
 
-			if (!(currptr->control_reg[idx] & 0x80 ))
+			if (!(ptm6840->control_reg[idx] & 0x80 ))
 			{
 				/* Output cleared */
-				if ( currptr->intf )
-				{
-					if ( currptr->intf->out_func[idx] )
-						currptr->intf->out_func[idx](space, 0, 0);
-				}
+				if (ptm6840->out_func[idx].write != NULL)
+					devcb_call_write8(&ptm6840->out_func[idx], 0, 0);
 			}
 			/* Reset? */
 			if (idx == 0 && (diffs & 0x01))
@@ -565,26 +491,26 @@ void ptm6840_write (running_machine *machine, int which, int offset, int data)
 				/* Holding reset down */
 				if (data & 0x01)
 				{
-					PLOG(("MC6840 #%d : Timer reset\n", which));
+					PLOG(("MC6840 #%s : Timer reset\n", device->tag));
 					for (i = 0; i < 3; i++)
 					{
-						timer_enable(currptr->timer[i], FALSE);
-						currptr->enabled[i] = 0;
+						timer_enable(ptm6840->timer[i], FALSE);
+						ptm6840->enabled[i] = 0;
 					}
 				}
 				/* Releasing reset */
 				else
 				{
 					for (i = 0; i < 3; i++)
-						reload_count(machine, which, i);
+						reload_count(device, i);
 				}
 
-				currptr->status_reg = 0;
-				update_interrupts(machine, which);
+				ptm6840->status_reg = 0;
+				update_interrupts(device);
 
 				/* Changing the clock source? (e.g. Zwackery) */
 				if (diffs & 0x02)
-					reload_count(machine, which, idx);
+					reload_count(device, idx);
 			}
 			break;
 		}
@@ -593,8 +519,8 @@ void ptm6840_write (running_machine *machine, int which, int offset, int data)
 		case PTM_6840_MSBBUF2:
 		case PTM_6840_MSBBUF3:
 		{
-			PLOG(("MC6840 #%d msbbuf%d = %02X\n", which, offset / 2, data));
-			currptr->msb_buffer = data;
+			PLOG(("MC6840 #%s msbbuf%d = %02X\n", device->tag, offset / 2, data));
+			ptm6840->msb_buffer = data;
 			break;
 		}
 
@@ -603,148 +529,189 @@ void ptm6840_write (running_machine *machine, int which, int offset, int data)
 		case PTM_6840_LSB3:
 		{
 			idx = (offset - 3) / 2;
-			currptr->latch[idx] = (currptr->msb_buffer << 8) | (data & 0xff);
+			ptm6840->latch[idx] = (ptm6840->msb_buffer << 8) | (data & 0xff);
 
 			/* Clear the interrupt */
-			currptr->status_reg &= ~(1 << idx);
-			update_interrupts(machine, which);
+			ptm6840->status_reg &= ~(1 << idx);
+			update_interrupts(device);
 
 			/* Reload the count if in an appropriate mode */
-			if (!(currptr->control_reg[idx] & 0x10))
-				reload_count(machine, which,idx);
+			if (!(ptm6840->control_reg[idx] & 0x10))
+				reload_count(device,idx);
 
-			PLOG(("%s:MC6840 #%d: Counter %d latch = %04X\n", cpuexec_describe_context(machine), which, idx, currptr->latch[idx]));
+			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", cpuexec_describe_context(device->machine), device->tag, idx, ptm6840->latch[idx]));
 			break;
 		}
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_timeout: called if timer is mature                            //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	ptm6840_timeout - Called if timer is mature
+-------------------------------------------------*/
 
-static void ptm6840_timeout(running_machine *machine, int which, int idx)
+static void ptm6840_timeout( const device_config *device, int idx )
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	ptm6840 *p = ptm + which;
+	ptm6840_state *ptm6840 = get_safe_token(device);
 
-	PLOG(("**ptm6840 %d t%d timeout**\n", which, idx + 1));
+	PLOG(("**ptm6840 %s t%d timeout**\n", device->tag, idx + 1));
 
-	if ( p->control_reg[idx] & 0x40 )
+	if ( ptm6840->control_reg[idx] & 0x40 )
 	{
 		/* Interrupt enabled */
-		p->status_reg |= (1 << idx);
-		p->status_read_since_int &= ~(1 << idx);
-		update_interrupts(machine, which);
+		ptm6840->status_reg |= (1 << idx);
+		ptm6840->status_read_since_int &= ~(1 << idx);
+		update_interrupts(device);
 	}
 
-	if ( p->control_reg[idx] & 0x80 )
+	if ( ptm6840->control_reg[idx] & 0x80 )
 	{
-		/* Output enabled */
-		if ( p->intf )
+		if ((ptm6840->mode[idx] == 0)||(ptm6840->mode[idx] == 2))
 		{
-			if ((p->mode[idx] == 0)||(p->mode[idx] == 2))
+			ptm6840->output[idx] = ptm6840->output[idx] ? 0 : 1;
+			PLOG(("**ptm6840 %s t%d output %d **\n", device->tag, idx + 1, ptm6840->output[idx]));
+
+			if (ptm6840->out_func[idx].write != NULL)
+				devcb_call_write8(&ptm6840->out_func[idx], 0, ptm6840->output[idx]);
+		}
+		if ((ptm6840->mode[idx] == 4)||(ptm6840->mode[idx] == 6))
+		{
+			if (!ptm6840->fired[idx])
 			{
-				p->output[idx] = p->output[idx]?0:1;
-				PLOG(("**ptm6840 %d t%d output %d **\n", which, idx + 1, p->output[idx]));
+				ptm6840->output[idx] = 1;
+				PLOG(("**ptm6840 %s t%d output %d **\n", device->tag, idx + 1, ptm6840->output[idx]));
 
-				if ( p->intf->out_func[idx] )
-					p->intf->out_func[idx](space, 0, p->output[idx]);
-			}
-			if ((p->mode[idx] == 4)||(p->mode[idx] == 6))
-			{
-				if (!p->fired[idx])
-				{
-					p->output[idx] = 1;
-					PLOG(("**ptm6840 %d t%d output %d **\n", which, idx + 1, p->output[idx]));
+				if (ptm6840->out_func[idx].write != NULL)
+					devcb_call_write8(&ptm6840->out_func[idx], 0, ptm6840->output[idx]);
 
-					if ( p->intf->out_func[idx] )
-						p->intf->out_func[idx](space, 0, p->output[idx]);
-
-					/* No changes in output until reinit */
-					p->fired[idx] = 1;
-				}
+				/* No changes in output until reinit */
+				ptm6840->fired[idx] = 1;
 			}
 		}
 	}
-	p->enabled[idx]= 0;
-	reload_count(machine, which, idx);
+	ptm6840->enabled[idx]= 0;
+	reload_count(device, idx);
 }
 
-static TIMER_CALLBACK( ptm6840_timer_cb ) { ptm6840_timeout(machine, param, (int)(FPTR)ptr); }
+/*-------------------------------------------------
+	TIMER_CALLBACKs for Timer 1, 2 & 3
+-------------------------------------------------*/
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_set_gate: set gate status (0 or 1)                            //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+static TIMER_CALLBACK( ptm6840_timer1_cb ) 
+{ 
+	const device_config *device = (const device_config *)ptr;
+	ptm6840_timeout(device, 0); 
+}
 
-INLINE void ptm6840_set_gate(running_machine *machine, int which, int state, int idx)
+static TIMER_CALLBACK( ptm6840_timer2_cb )
+{ 
+	const device_config *device = (const device_config *)ptr;
+	ptm6840_timeout(device, 1); 
+}
+
+static TIMER_CALLBACK( ptm6840_timer3_cb )
+{ 
+	const device_config *device = (const device_config *)ptr;
+	ptm6840_timeout(device, 2); 
+}
+
+
+/*-------------------------------------------------
+	ptm6840_set_gate - set gate status (0 or 1)
+-------------------------------------------------*/
+
+INLINE void ptm6840_set_gate( const device_config *device, int state, int idx )
 {
-	ptm6840 *p = ptm + which;
+	ptm6840_state *ptm6840 = get_safe_token(device);
 
-	if ( (p->mode[idx] == 0) || (p->mode[idx] == 2) || (p->mode[0] == 4) || (p->mode[idx] == 6) )
+	if ( (ptm6840->mode[idx] == 0) || (ptm6840->mode[idx] == 2) || (ptm6840->mode[0] == 4) || (ptm6840->mode[idx] == 6) )
 	{
-		if (state == 0 && p->gate[idx])
-			reload_count(machine, which,idx);
+		if (state == 0 && ptm6840->gate[idx])
+			reload_count(device,idx);
 	}
-	p->gate[idx] = state;
+	ptm6840->gate[idx] = state;
 }
 
-void ptm6840_set_g1(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 0); }
-void ptm6840_set_g2(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 1); }
-void ptm6840_set_g3(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 2); }
+/*-------------------------------------------------
+	WRITE8_DEVICE_HANDLERs for Gate 1, 2 & 3
+-------------------------------------------------*/
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_set_clock: set clock status (0 or 1)                          //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+WRITE8_DEVICE_HANDLER( ptm6840_set_g1 )
+{ 
+	ptm6840_set_gate(device, data, 0);
+}
 
-INLINE void ptm6840_set_clock(running_machine *machine, int which, int state, int idx)
+WRITE8_DEVICE_HANDLER( ptm6840_set_g2 )
+{ 
+	ptm6840_set_gate(device, data, 1);
+}
+
+WRITE8_DEVICE_HANDLER( ptm6840_set_g3 )
+{ 
+	ptm6840_set_gate(device, data, 2);
+}
+
+/*-------------------------------------------------
+	ptm6840_set_clock - set clock status (0 or 1)
+-------------------------------------------------*/
+
+INLINE void ptm6840_set_clock( const device_config *device, int state, int idx )
 {
-	ptm6840 *p = ptm + which;
+	ptm6840_state *ptm6840 = get_safe_token(device);
 
-	p->clock[idx] = state;
+	ptm6840->clock[idx] = state;
 
-	if (!(p->control_reg[idx] & 0x02))
+	if (!(ptm6840->control_reg[idx] & 0x02))
 	{
 		if (state)
-			ptm_tick(machine, which, idx, 1);
+			ptm_tick(device, idx, 1);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_get_count: get count value                                    //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	WRITE8_DEVICE_HANDLERs for Clock 1, 2 & 3
+-------------------------------------------------*/
 
-UINT16 ptm6840_get_count(int which,int counter)
-{
-	return compute_counter(which, counter);
+WRITE8_DEVICE_HANDLER( ptm6840_set_c1 )
+{ 
+	ptm6840_set_clock(device, data, 0); 
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_set_ext_clock: set external clock frequency                   //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+WRITE8_DEVICE_HANDLER( ptm6840_set_c2 )
+{ 
+	ptm6840_set_clock(device, data, 1); 
+}
 
-void ptm6840_set_ext_clock(int which, int counter, int clock)
+WRITE8_DEVICE_HANDLER( ptm6840_set_c3 )
+{ 
+	ptm6840_set_clock(device, data, 2); 
+}
+
+
+/*-------------------------------------------------
+	ptm6840_get_count - get count value
+-------------------------------------------------*/
+
+UINT16 ptm6840_get_count( const device_config *device, int counter )
 {
-	ptm6840 *currptr = ptm + which;
-	currptr->external_clock[counter] = clock;
+	return compute_counter(device, counter);
+}
 
-	if (!(currptr->control_reg[counter] & 0x02))
+/*------------------------------------------------------------
+	ptm6840_set_ext_clock - set external clock frequency
+------------------------------------------------------------*/
+
+void ptm6840_set_ext_clock( const device_config *device, int counter, int clock )
+{
+	ptm6840_state *ptm6840 = get_safe_token(device);
+
+	ptm6840->external_clock[counter] = clock;
+
+	if (!(ptm6840->control_reg[counter] & 0x02))
 	{
-		if (!currptr->intf->external_clock[counter])
+		if (!ptm6840->external_clock[counter])
 		{
-			currptr->enabled[counter] = 0;
-			timer_enable(currptr->timer[counter], FALSE);
+			ptm6840->enabled[counter] = 0;
+			timer_enable(ptm6840->timer[counter], FALSE);
 		}
 	}
 	else
@@ -753,9 +720,9 @@ void ptm6840_set_ext_clock(int which, int counter, int clock)
 		attotime duration;
 
 		/* Determine the number of clock periods before we expire */
-		count = currptr->counter[counter];
+		count = ptm6840->counter[counter];
 
-		if (currptr->control_reg[counter] & 0x04)
+		if (ptm6840->control_reg[counter] & 0x04)
 			count = ((count >> 8) + 1) * ((count & 0xff) + 1);
 		else
 			count = count + 1;
@@ -763,58 +730,120 @@ void ptm6840_set_ext_clock(int which, int counter, int clock)
 		duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 
 		if (counter == 2)
-			duration = attotime_mul(duration, currptr->t3_divisor);
+			duration = attotime_mul(duration, ptm6840->t3_divisor);
 
-		currptr->enabled[counter] = 1;
-		timer_adjust_oneshot(currptr->timer[counter], duration, which);
-		timer_enable(currptr->timer[counter], TRUE);
+		ptm6840->enabled[counter] = 1;
+		timer_adjust_oneshot(ptm6840->timer[counter], duration, 0);
+		timer_enable(ptm6840->timer[counter], TRUE);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// ptm6840_get_ext_clock: get external clock frequency                   //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
+/*------------------------------------------------------------
+	ptm6840_get_ext_clock - get external clock frequency
+------------------------------------------------------------*/
 
-int ptm6840_get_ext_clock(int which, int counter)
+int ptm6840_get_ext_clock( const device_config *device, int counter )
 {
-	ptm6840 *currptr = ptm + which;
-	return currptr->external_clock[counter];
+	ptm6840_state *ptm6840 = get_safe_token(device);
+	return ptm6840->external_clock[counter];
 }
 
-void ptm6840_set_c1(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 0); }
-void ptm6840_set_c2(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 1); }
-void ptm6840_set_c3(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 2); }
 
-/////////////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------
+	DEVICE_START( ptm6840 )
+-------------------------------------------------*/
 
-READ8_HANDLER( ptm6840_0_r ) { return ptm6840_read(space->machine, 0, offset); }
-READ8_HANDLER( ptm6840_1_r ) { return ptm6840_read(space->machine, 1, offset); }
-READ8_HANDLER( ptm6840_2_r ) { return ptm6840_read(space->machine, 2, offset); }
-READ8_HANDLER( ptm6840_3_r ) { return ptm6840_read(space->machine, 3, offset); }
+static DEVICE_START( ptm6840 )
+{
+	ptm6840_state *ptm6840 = get_safe_token(device);
+	const ptm6840_interface *intf = get_interface(device);
+	int i;
 
-WRITE8_HANDLER( ptm6840_0_w ) { ptm6840_write(space->machine, 0, offset, data); }
-WRITE8_HANDLER( ptm6840_1_w ) { ptm6840_write(space->machine, 1, offset, data); }
-WRITE8_HANDLER( ptm6840_2_w ) { ptm6840_write(space->machine, 2, offset, data); }
-WRITE8_HANDLER( ptm6840_3_w ) { ptm6840_write(space->machine, 3, offset, data); }
+	ptm6840->internal_clock = intf->internal_clock;
 
-READ16_HANDLER( ptm6840_0_msb_r ) { return ptm6840_read(space->machine, 0, offset) << 8; }
-READ16_HANDLER( ptm6840_1_msb_r ) { return ptm6840_read(space->machine, 1, offset) << 8; }
-READ16_HANDLER( ptm6840_2_msb_r ) { return ptm6840_read(space->machine, 2, offset) << 8; }
-READ16_HANDLER( ptm6840_3_msb_r ) { return ptm6840_read(space->machine, 3, offset) << 8; }
+	/* resolve callbacks */
+	for (i = 0; i < 3; i++)
+	{
+		devcb_resolve_write8(&ptm6840->out_func[i], &intf->out_func[i], device);
+	}
 
-WRITE16_HANDLER( ptm6840_0_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(space->machine, 0, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_1_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(space->machine, 1, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_2_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(space->machine, 2, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_3_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(space->machine, 3, offset, data >> 8); }
+	for (i = 0; i < 3; i++)
+	{
+		if ( intf->external_clock[i] )
+			ptm6840->external_clock[i] = intf->external_clock[i];
+		else
+			ptm6840->external_clock[i] = 1;
+	}
 
-READ16_HANDLER( ptm6840_0_lsb_r ) { return ptm6840_read(space->machine, 0, offset); }
-READ16_HANDLER( ptm6840_1_lsb_r ) { return ptm6840_read(space->machine, 1, offset); }
-READ16_HANDLER( ptm6840_2_lsb_r ) { return ptm6840_read(space->machine, 2, offset); }
-READ16_HANDLER( ptm6840_3_lsb_r ) { return ptm6840_read(space->machine, 3, offset); }
 
-WRITE16_HANDLER( ptm6840_0_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(space->machine, 0, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_1_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(space->machine, 1, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_2_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(space->machine, 2, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_3_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(space->machine, 3, offset, data & 0xff); }
+	ptm6840->timer[0] = timer_alloc(device->machine, ptm6840_timer1_cb, (void *)device);
+	ptm6840->timer[1] = timer_alloc(device->machine, ptm6840_timer2_cb, (void *)device);
+	ptm6840->timer[2] = timer_alloc(device->machine, ptm6840_timer3_cb, (void *)device);
+
+	for (i = 0; i < 3; i++)
+	{
+		timer_enable(ptm6840->timer[i], FALSE);
+	}
+
+	devcb_resolve_write_line(&ptm6840->irq_func, &intf->irq_func, device);
+
+	/* register for state saving */
+	state_save_register_device_item(device, 0, ptm6840->lsb_buffer);
+	state_save_register_device_item(device, 0, ptm6840->msb_buffer);
+	state_save_register_device_item(device, 0, ptm6840->status_read_since_int);
+	state_save_register_device_item(device, 0, ptm6840->status_reg);
+	state_save_register_device_item(device, 0, ptm6840->t3_divisor);
+	state_save_register_device_item(device, 0, ptm6840->t3_scaler);
+	state_save_register_device_item(device, 0, ptm6840->internal_clock);
+	state_save_register_device_item(device, 0, ptm6840->IRQ);
+
+	state_save_register_device_item_array(device, 0, ptm6840->control_reg);
+	state_save_register_device_item_array(device, 0, ptm6840->output);
+	state_save_register_device_item_array(device, 0, ptm6840->gate);
+	state_save_register_device_item_array(device, 0, ptm6840->clock);
+	state_save_register_device_item_array(device, 0, ptm6840->mode);
+	state_save_register_device_item_array(device, 0, ptm6840->fired);
+	state_save_register_device_item_array(device, 0, ptm6840->enabled);
+	state_save_register_device_item_array(device, 0, ptm6840->external_clock);
+	state_save_register_device_item_array(device, 0, ptm6840->counter);
+	state_save_register_device_item_array(device, 0, ptm6840->latch);
+}
+
+/*-------------------------------------------------
+	DEVICE_RESET( ptm6840 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( ptm6840 )
+{
+	ptm6840_state *ptm6840 = get_safe_token(device);
+	int i;
+
+	ptm6840->control_reg[2]		 = 0;
+	ptm6840->control_reg[1]		 = 0;
+	ptm6840->control_reg[0]		 = 1;
+	ptm6840->status_reg			 = 0;
+	ptm6840->t3_divisor			 = 1;
+	ptm6840->status_read_since_int = 0;
+	ptm6840->IRQ                   = 0;
+
+	for (i = 0; i < 3; i++)
+	{
+		ptm6840->counter[i] = 0xffff;
+		ptm6840->latch[i]   = 0xffff;
+		ptm6840->output[i]  = 0;
+		ptm6840->fired[i]   = 0;
+	}
+}
+
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
+
+static const char *DEVTEMPLATE_SOURCE = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##ptm6840##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME		"6840 PTM"
+#define DEVTEMPLATE_FAMILY		"Motorola Programmable Timer Modules"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"

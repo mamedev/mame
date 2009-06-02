@@ -76,17 +76,17 @@ static int _fbsel = 1;
  *
  *************************************/
 
-static void ptm_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 {
-	cputag_set_input_line(machine, "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
 {
 	XTAL_8MHz / 4,
 	{ 0, 0, 0 },
-	{ NULL, NULL, NULL },
-	ptm_irq
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	DEVCB_LINE(ptm_irq)
 };
 
 
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
 	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
-	AM_RANGE(0x2020, 0x2027) AM_READWRITE(ptm6840_0_r, ptm6840_0_w)
+	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
@@ -679,8 +679,6 @@ static DRIVER_INIT( esripsys )
 	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
-
-	ptm6840_config(machine, 0, &ptm_intf);
 
 	memory_set_bankptr(machine, 2, &rom[0x0000]);
 	memory_set_bankptr(machine, 3, &rom[0x4000]);
@@ -768,6 +766,9 @@ static MACHINE_DRIVER_START( esripsys )
 
 	MDRV_SOUND_ADD("tms5220nl", TMS5220, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* 6840 PTM */
+	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
 MACHINE_DRIVER_END
 
 

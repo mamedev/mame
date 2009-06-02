@@ -57,17 +57,17 @@ enum int_levels
  *
  *************************************/
 
-static void ptm_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 {
-	cputag_set_input_line(machine, "maincpu", INT_6840PTM, state);
+	cputag_set_input_line(device->machine, "maincpu", INT_6840PTM, state);
 }
 
 static const ptm6840_interface ptm_intf =
 {
 	1000000,
 	{ 0, 0, 0 },
-	{ 0, 0, 0 },
-	ptm_irq
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	DEVCB_LINE(ptm_irq)
 };
 
 
@@ -661,7 +661,7 @@ static ADDRESS_MAP_START( guab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c007f) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
 	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
-	AM_RANGE(0x0c00c0, 0x0c00cf) AM_READWRITE(ptm6840_0_lsb_r, ptm6840_0_lsb_w)
+	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_read, ptm6840_write, 0xff)
 	AM_RANGE(0x0c00e0, 0x0c00e7) AM_READWRITE(wd1770_r, wd1770_w)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x100000, 0x100003) AM_READWRITE(ef9369_r, ef9369_w)
@@ -752,7 +752,6 @@ INPUT_PORTS_END
  static MACHINE_START( guab )
 {
 	fdc_timer = timer_alloc(machine, fdc_data_callback, NULL);
-	ptm6840_config(machine, 0, &ptm_intf);
 }
 
 static MACHINE_RESET( guab )
@@ -786,6 +785,9 @@ static MACHINE_DRIVER_START( guab )
 	/* TODO: Verify clock */
 	MDRV_SOUND_ADD("sn", SN76489, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* 6840 PTM */
+	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
 MACHINE_DRIVER_END
 
 

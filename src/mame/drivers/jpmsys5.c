@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
 	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8("acia6850_0", acia6850_stat_r, acia6850_ctrl_w, 0xff)
 	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8("acia6850_0", acia6850_data_r, acia6850_data_w, 0xff)
-	AM_RANGE(0x046040, 0x04604f) AM_READWRITE(ptm6840_0_lsb_r, ptm6840_0_lsb_w)
+	AM_RANGE(0x046040, 0x04604f) AM_DEVREADWRITE8("6840ptm", ptm6840_read, ptm6840_write, 0xff)
 	AM_RANGE(0x046060, 0x046061) AM_READ_PORT("DIRECT") AM_WRITENOP
 	AM_RANGE(0x046062, 0x046063) AM_WRITENOP
 	AM_RANGE(0x046064, 0x046065) AM_WRITENOP
@@ -458,17 +458,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void ptm_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 {
-	cputag_set_input_line(machine, "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
 {
 	1000000,
 	{ 0, 0, 0 },
-	{ 0, 0, 0 },
-	ptm_irq
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	DEVCB_LINE(ptm_irq)
 };
 
 
@@ -576,7 +576,6 @@ static ACIA6850_INTERFACE( acia2_if )
 static MACHINE_START( jpmsys5v )
 {
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
-	ptm6840_config(machine, 0, &ptm_intf);
 	touch_timer = timer_alloc(machine, touch_cb, NULL);
 }
 
@@ -625,6 +624,9 @@ static MACHINE_DRIVER_START( jpmsys5v )
 	/* Earlier revisions use an SAA1099 */
 	MDRV_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* 6840 PTM */
+	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
 MACHINE_DRIVER_END
 
 
