@@ -15,15 +15,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* enumeration specifying which model we are emulating */
-enum
-{
-	TYPE_ADC0831,
-	TYPE_ADC0832,
-	TYPE_ADC0834,
-	TYPE_ADC0838
-};
-
 #define ADC083X_CH0		0
 #define ADC083X_CH1		1
 #define ADC083X_CH2		2

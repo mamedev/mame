@@ -25,7 +25,6 @@ struct _adc12138_state
 {
 	adc1213x_input_convert_func input_callback_r;
 
-	int type;
 	int cycle;
 	int data_out;
 	int data_in;
@@ -312,7 +311,7 @@ READ8_DEVICE_HANDLER( adc1213x_eoc_r )
 	DEVICE_START( adc1213x )
 -------------------------------------------------*/
 
-static void adc1213x_common_start( const device_config *device )
+static DEVICE_START( adc12138 )
 {
 	adc12138_state *adc1213x = get_safe_token(device);
 	const adc12138_interface *intf = get_interface(device);
@@ -335,13 +334,6 @@ static void adc1213x_common_start( const device_config *device )
 	state_save_register_device_item(device, 0, adc1213x->end_conv);
 }
 
-static DEVICE_START( adc12138 )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-
-	adc1213x->type = TYPE_ADC12138;
-	adc1213x_common_start(device);
-}
 
 /*-------------------------------------------------
 	DEVICE_RESET( adc1213x )
