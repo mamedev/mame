@@ -7,7 +7,7 @@
  TODO:
  - remove the patch and understand what needs to be modified for the gfxs, game
    doesn't crash anymore;
- - inputs (some kind of ad-stick / pedal);
+ - inputs not fully understood, sometimes analog inputs gets stuck;
 
 ************************************************************************************/
 
@@ -42,8 +42,8 @@ static VIDEO_START( suprgolf )
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x4000*0x20);
-	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x4000*0x20);
+	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
 
 	tilemap_set_transparent_pen(suprgolf_tilemap,15);
 }
@@ -129,12 +129,16 @@ static READ8_HANDLER( suprgolf_vregs_r )
 	return suprgolf_vreg_bank;
 }
 
+static UINT8 suprgolf_bg_vreg_test;
+
 static WRITE8_HANDLER( suprgolf_vregs_w )
 {
 	//bits 0,1,2 and probably 3 controls the background vram banking
 	suprgolf_vreg_bank = data;
 	palette_switch = (data & 0x80);
 	suprgolf_bg_bank = (data & 0x1f);
+
+	suprgolf_bg_vreg_test = data & 0x20;
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
@@ -161,6 +165,7 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 		if(!(suprgolf_vreg_pen & 0x80) && (!(suprgolf_bg_bank & 0x10)))
 			hi_dirty_dot = 0;
 	}
+
 	if(lo_nibble == 0x0f)
 	{
 		lo_nibble = suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] & 0x0f;
@@ -230,6 +235,29 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
+static READ8_HANDLER( pedal_extra_bits_r )
+{
+	static UINT8 p1_pedal_hi,p1_sht_sw,p2_pedal_hi,p2_sht_sw;
+
+	/* TODO: check this */
+	p1_pedal_hi = (input_port_read(space->machine, "P1_PEDAL") & 0x10)>>3;
+	p2_sht_sw = (input_port_read(space->machine, "P1_PEDAL") & 0x80)>>7;
+	p2_pedal_hi = (input_port_read(space->machine, "P2_PEDAL") & 0x10)<<1;
+	p2_sht_sw = (input_port_read(space->machine, "P2_PEDAL") & 0x80)>>3;
+
+	return p2_pedal_hi | p1_sht_sw | p1_pedal_hi | p1_sht_sw | 0x66;
+}
+
+static READ8_HANDLER( p1_r )
+{
+	return (input_port_read(space->machine, "P1") & 0xf0) | ((input_port_read(space->machine, "P1_PEDAL") & 0xf));
+}
+
+static READ8_HANDLER( p2_r )
+{
+	return (input_port_read(space->machine, "P2") & 0xf0) | ((input_port_read(space->machine, "P2_PEDAL") & 0xf));
+}
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
@@ -241,15 +269,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // directly related to the ad-stick / pedals or it's a banking return?
+	AM_RANGE(0x00, 0x00) AM_READ(p1_r)
+	AM_RANGE(0x01, 0x01) AM_READ(p2_r)
+	AM_RANGE(0x02, 0x02) AM_READ(pedal_extra_bits_r)
 //  AM_RANGE(0x03, 0x03)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
+	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w )
 //  AM_RANGE(0x07, 0x07)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
@@ -257,58 +286,26 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x01, 0x01, "0" ) //USED!
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P1 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	    /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)	    /* D.R */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			/* SEL */
 
+	PORT_START("P1_PEDAL")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)			/* release power? */
+
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) //USED!
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P2 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)	    /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)	    /* D.R */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)			/* SEL */
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P2_PEDAL")
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)			/* release power? */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               			/* 1P */
@@ -562,7 +559,7 @@ ROM_START( suprgolf )
 
 	ROM_REGION( 0x70000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
-	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0))
+	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0) )
 	ROM_LOAD( "cg16.5g",0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )
 	ROM_LOAD( "cg15.5j",0x30000, 0x10000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
 	ROM_LOAD( "cg14.5k",0x20000, 0x10000, CRC(ca12e01d) SHA1(9c627fb527c8966e16dc6bdb99ec0b9728b5c5f9) )
@@ -578,4 +575,4 @@ static DRIVER_INIT( suprgolf )
 	ROM[0x74f5-0x4000] = 0x00;
 }
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
