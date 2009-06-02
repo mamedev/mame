@@ -1337,7 +1337,7 @@ static DRIVER_INIT( tm7k )
 /*
 Protection starts:
 
- 816ee: addi.w  #$384, D0       0640 0384
+ 816ee: addi.w  #$76c, D0       0640 076C
  816f2: move.w  D0, $20718c.l   33C0 0020 718C
  816f8: moveq   #$f, D0         700F
  816fa: and.w   (A4), D0        C054
@@ -1378,7 +1378,7 @@ static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-0
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
 
-	ROM[0x8946c/2] = 0x6004;
+	ROM[0x8946c/2] = 0x6002;
 	ROM[0x89494/2] = 0x6002;
 /*
 Protection starts:
