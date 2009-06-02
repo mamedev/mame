@@ -2730,7 +2730,7 @@ ROM_START( warofbug )
 	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
 ROM_END
 
-ROM_START( redufo )
+ROM_START( redufo ) /* Galaxian bootleg hardware known as Artic Multi-System */
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "ru1a",         0x0000, 0x0800, CRC(5a8e4f37) SHA1(c0957ede91e2dc3f80e4912b877843aed5d15779) )
 	ROM_LOAD( "ru2a",         0x0800, 0x0800, CRC(c624f52d) SHA1(119a660513ad33e35c9bdaecd588219bf8026d82) )
@@ -3026,7 +3026,7 @@ ROM_START( streakng )
 	ROM_LOAD( "sk.bpr",       0x0000, 0x0020, CRC(bce79607) SHA1(49d60fde149240bcd025f721b0fbbbdbc549a42f) )
 ROM_END
 
-ROM_START( pacmanbl )
+ROM_START( pacmanbl ) /* Galaxian bootleg hardware known as Artic Multi-System */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "blpac1b",      0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
 	ROM_LOAD( "blpac2b",      0x0800, 0x0800, CRC(33be3648) SHA1(50175889cf37fe8a81c931e009b55d10f8d0444a) )
