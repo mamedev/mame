@@ -6779,8 +6779,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tm3ka )		/* (c) 1997 Midway Games */
 	DRIVER( tm4k )		/* (c) 1998 Midway Games */
 	DRIVER( tm5k )		/* (c) 1998 Midway Games */
+	DRIVER( tm5kca )	/* (c) 1998 Midway Games */
 	DRIVER( tm7k )		/* (c) 1999 Midway Games */
 	DRIVER( tm7ka )		/* (c) 1999 Midway Games */
+	DRIVER( tm7keval )	/* (c) 1999 Midway Games */
 	DRIVER( tm8k )		/* (c) 2000 Midway Games */
 	DRIVER( galgbios )  /* (c) 1998 Creative Electonics & Software (CES) */
 
