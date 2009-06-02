@@ -430,7 +430,7 @@ NEW FEATURES
  * The "BEGINNER" weapon has been changed to the 5-shot PUMP SHOTGUN plus the "hit area"
     for each shot has been increased. Same as the 3-shot SEMI-AUTO SHOTGUN.
  * Player can now advance through all result screens faster by pulling gun trigger.
- * The Auto Select bird is now GOOSE (easiest target) if player fails to choose bird as start of game.
+ * The Auto Select bird is now GOOSE (easiest target) if player fails to choose bird at start of game.
 
 ***************************************************************************/
 
