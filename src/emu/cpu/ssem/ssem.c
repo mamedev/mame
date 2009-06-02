@@ -32,8 +32,8 @@ INLINE ssem_state *get_safe_token(const device_config *device)
     return (ssem_state *)device->token;
 }
 
-#define INSTR       (op & 7)
-#define ADDR        ((op >> 3) & 0x1f)
+#define INSTR       ((op >> 13) & 7)
+#define ADDR        (op & 0x1f)
 
 /*****************************************************************************/
 
@@ -144,7 +144,7 @@ INLINE void WRITE32(ssem_state *cpustate, UINT32 address, UINT32 data)
 static CPU_INIT( ssem )
 {
     ssem_state *cpustate = get_safe_token(device);
-    cpustate->pc = 0;
+    cpustate->pc = 1;
     cpustate->a = 0;
     cpustate->halt = 0;
 
@@ -160,7 +160,7 @@ static CPU_RESET( ssem )
 {
     ssem_state *cpustate = get_safe_token(device);
 
-    cpustate->pc = 0;
+    cpustate->pc = 1;
     cpustate->a = 0;
     cpustate->halt = 0;
 }
@@ -172,7 +172,7 @@ static CPU_EXECUTE( ssem )
 
     cpustate->icount = cycles;
 
-    cpustate->pc &= 0x1fff;
+    cpustate->pc &= 0x1f;
 
     while (cpustate->icount > 0)
     {

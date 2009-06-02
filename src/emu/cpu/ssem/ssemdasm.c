@@ -37,8 +37,8 @@ INLINE UINT32 reverse(UINT32 v)
 
 offs_t ssem_dasm_one(char *buffer, offs_t pc, UINT32 op)
 {
-    UINT8 instr = reverse(op) & 7;
-    UINT8 addr = (reverse(op) >> 3) & 0x1f;
+    UINT8 instr = (reverse(op) >> 13) & 7;
+    UINT8 addr = reverse(op) & 0x1f;
 
     output = buffer;
 
