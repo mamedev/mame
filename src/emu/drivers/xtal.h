@@ -60,6 +60,7 @@ enum
 	XTAL_4_608MHz		= 4608000,		/* Luxor ABC-77 keyboard */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
+	XTAL_5_0688MHz		= 5068800,		/* Xerox 820 */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
 	XTAL_6MHz    		= 6000000,		/* American Poker II */
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
@@ -76,6 +77,7 @@ enum
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_10_6875MHz 	= 10687500,		/* BBC Bridge Companion */
+	XTAL_10_69425MHz	= 10694250,		/* Xerox 820 */
 	XTAL_10_730MHz   	= 10730000,		/* Ruleta RE-900 VDP Clock */
 	XTAL_10_733MHz   	= 10733000,		/* The Fairyland Story */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
