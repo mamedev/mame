@@ -532,6 +532,20 @@ WRITE8_DEVICE_HANDLER(z80pio_w)
 		z80pio_d_w(device, offset & 1, data);
 }
 
+READ8_DEVICE_HANDLER(z80pio_alt_r)
+{
+	int channel = BIT(offset, 1);
+	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
+}
+
+WRITE8_DEVICE_HANDLER(z80pio_alt_w)
+{
+	int channel = BIT(offset, 1);
+	if (offset & 1)
+		z80pio_c_w(device, channel, data);
+	else
+		z80pio_d_w(device, channel, data);
+}
 
 static DEVICE_START( z80pio )
 {

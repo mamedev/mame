@@ -104,6 +104,8 @@ void z80pio_bstb_w(const device_config *device, int state);
 ***************************************************************************/
 READ8_DEVICE_HANDLER(z80pio_r);
 WRITE8_DEVICE_HANDLER(z80pio_w);
+READ8_DEVICE_HANDLER(z80pio_alt_r);
+WRITE8_DEVICE_HANDLER(z80pio_alt_w);
 
 
 /* ----- device interface ----- */
