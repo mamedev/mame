@@ -1337,7 +1337,7 @@ static DRIVER_INIT( tm7k )
 /*
 Protection starts:
 
- 816ee: addi.w  #$76c, D0       0640 076C
+ 816ee: addi.w  #$384, D0       0640 0384
  816f2: move.w  D0, $20718c.l   33C0 0020 718C
  816f8: moveq   #$f, D0         700F
  816fa: and.w   (A4), D0        C054
@@ -1366,6 +1366,29 @@ Protection starts:
  8155E: and.w   (A4), D0        C054
  81560: cmpi.w  #$3, D0         0C40 0003
  81564: bcs     $8156A          6504          <-- First patch goes here
+
+*/
+
+}
+
+static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+
+	// protection
+	ROM[0x8949e/2] = 0x4e75;
+
+	ROM[0x8946c/2] = 0x6004;
+	ROM[0x89494/2] = 0x6002;
+/*
+Protection starts:
+
+ 8945A: addi.w  #$384, D0       0640 0384
+ 8945E: move.w  D0, $2074E4.l   33C0 0020 74E4
+ 89464: moveq   #$f, D0         700F
+ 89466: and.w   (A4), D0        C054
+ 89468: cmpi.w  #$3, D0         0C40 0003
+ 8946C: bcs     $89470          6502          <-- First patch goes here
 
 */
 
@@ -1413,6 +1436,6 @@ GAME( 1998, tm5k,     0,    tm3k,     tmaster,  tm5k,     ROT0, "Midway",       
 GAME( 1998, tm5kca,   tm5k, tm3k,     tmaster,  tm5kca,   ROT0, "Midway",                         "Touchmaster 5000 (v7.10 California)",  0 )
 GAME( 1999, tm7k,     0,    tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.04 Standard)",  0 )
 GAME( 1999, tm7ka,    tm7k, tm3k,     tmaster,  tm7ka,    ROT0, "Midway",                         "Touchmaster 7000 (v8.00 Standard)",  0 )
-GAME( 1999, tm7keval, tm7k, tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 7000 (v8.1X Evaluation)",  0 )
+GAME( 1999, tm7keval, tm7k, tm3k,     tmaster,  tm7keval, ROT0, "Midway",                         "Touchmaster 7000 (v8.1X Evaluation)",  0 )
 GAME( 2000, tm8k,     0,    tm3k,     tmaster,  tm8k,     ROT0, "Midway",                         "Touchmaster 8000 (v9.04 Standard)",  0 )
 GAME( 1998, galgbios, 0,    galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )
