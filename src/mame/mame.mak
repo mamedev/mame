@@ -30,7 +30,8 @@ OBJDIRS += \
 
 #-------------------------------------------------
 # specify available CPU cores; some of these are
-# only for MESS and so aren't included
+# only for MESS, but are included so that they get
+# updated with any MAME core changes
 #-------------------------------------------------
 
 CPUS += Z80
@@ -109,7 +110,7 @@ CPUS += LR35902
 CPUS += TMS7000
 CPUS += SM8500
 CPUS += MINX
-
+CPUS += SSEM
 
 
 #-------------------------------------------------
