@@ -52,7 +52,7 @@ VIDEO_START(moo)
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 
-	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"))
+	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua") || !strcmp(machine->gamedrv->name, "buckyaa"))
 	{
 		// Bucky doesn't chain tilemaps
 		K056832_set_LayerAssociation(0);

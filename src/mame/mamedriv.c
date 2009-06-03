@@ -5341,6 +5341,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( moobl )		/* bootleg */
 	DRIVER( bucky )		/* GX173 (c) 1992 (World) */
 	DRIVER( buckyua )	/* GX173 (c) 1992 (US) */
+	DRIVER( buckyaa )	/* GX173 (c) 1992 (Asia) */
 	DRIVER( gaiapols )	/* GX123 (c) 1993 (Europe) */
 	DRIVER( gaiapolu )	/* GX123 (c) 1993 (US) */
 	DRIVER( gaiapolj )	/* GX123 (c) 1993 (Japan) */
