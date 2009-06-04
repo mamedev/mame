@@ -290,7 +290,7 @@ DEVICE_GET_INFO( amiga_sound )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(amiga_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Amiga Custom");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Amiga Paula");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 	}
 }
