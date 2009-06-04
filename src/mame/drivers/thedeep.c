@@ -352,16 +352,16 @@ static INTERRUPT_GEN( thedeep_interrupt )
 static MACHINE_DRIVER_START( thedeep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)		/* 6MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
 
- 	MDRV_CPU_ADD("audiocpu", M65C02, 2000000)	/* 2MHz */
+ 	MDRV_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
-	/* CPU3 is a i8751 */
-
+	/* CPU3 is a i8751 running at 8Mhz (8mhz xtal)*/
+  
 	MDRV_MACHINE_RESET(thedeep)
 
 	/* video hardware */
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( thedeep )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(thedeep_ym2203_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
