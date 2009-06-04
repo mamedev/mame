@@ -1010,7 +1010,7 @@ static const sharc_config sharc_cfg =
 };
 
 
-static double adc12138_input_callback( const device_config *device, UINT8 input ) 
+static double adc12138_input_callback( const device_config *device, UINT8 input )
 {
 	int value = 0;
 	switch (input)

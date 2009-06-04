@@ -689,7 +689,7 @@ $(CPUOBJ)/lh5801/lh5801.o:	$(CPUSRC)/lh5801/lh5801.c \
 
 
 #-------------------------------------------------
-# Manchester Small-Scale Experimental Machine       
+# Manchester Small-Scale Experimental Machine
 #-------------------------------------------------
 
 ifneq ($(filter SSEM,$(CPUS)),)

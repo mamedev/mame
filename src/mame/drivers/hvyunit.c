@@ -460,10 +460,10 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/*copied from DJ Boy, WRONG
 
-HEAVY UNIT	
+HEAVY UNIT
 Manufacturer: Taito
 Year: 1988 - Genre: Shooter
-Orientation: Horizontal 
+Orientation: Horizontal
 Conversion Class: JAMMA
 DIP Switch Settings:
 SW#1
@@ -476,13 +476,13 @@ CABINET TYPE       TABLE             OFF
 VIDEO SCREEN       NORMAL                OFF
                    FLIP                  ON
 --------------------------------------------------------------------
-TEST MODE          NORMAL                    OFF     
+TEST MODE          NORMAL                    OFF
                    TEST                      ON
 --------------------------------------------------------------------
 COIN/CREDIT
 COIN #1            1C/1P                             OFF OFF
                    1C/2P                             ON  OFF
-                   2C/1P                             OFF ON                 
+                   2C/1P                             OFF ON
                    2C/3P                             ON  ON
 
 COIN #2            1C/1P                                     OFF OFF
@@ -505,7 +505,7 @@ DIFFICULTY         NORMAL            OFF OFF
 --------------------------------------------------------------------
 CONTINUE           YES                       OFF
                    NO                        ON
--------------------------------------------------------------------- 
+--------------------------------------------------------------------
 BONUS              NO                            OFF
                    YES                           ON
 --------------------------------------------------------------------

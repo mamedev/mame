@@ -45,7 +45,7 @@
 #define END_BIT		0x04
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _upd4990a_state upd4990a_state;
@@ -79,7 +79,7 @@ struct _upd4990a_state
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE upd4990a_state *get_safe_token(const device_config *device)
@@ -97,11 +97,11 @@ INLINE UINT8 convert_to_bcd(int val)
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	upd4990a_increment_month
+    upd4990a_increment_month
 -------------------------------------------------*/
 
 void upd4990a_increment_month( const device_config *device )
@@ -124,7 +124,7 @@ void upd4990a_increment_month( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_increment_day
+    upd4990a_increment_day
 -------------------------------------------------*/
 
 void upd4990a_increment_day( const device_config *device )
@@ -182,7 +182,7 @@ void upd4990a_increment_day( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_addretrace
+    upd4990a_addretrace
 -------------------------------------------------*/
 
 void upd4990a_addretrace( const device_config *device )
@@ -235,7 +235,7 @@ void upd4990a_addretrace( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_testbit_r
+    upd4990a_testbit_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( upd4990a_testbit_r )
@@ -245,7 +245,7 @@ READ8_DEVICE_HANDLER( upd4990a_testbit_r )
 }
 
 /*-------------------------------------------------
-	upd4990a_databit_r
+    upd4990a_databit_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( upd4990a_databit_r )
@@ -255,7 +255,7 @@ READ8_DEVICE_HANDLER( upd4990a_databit_r )
 }
 
 /*-------------------------------------------------
-	upd4990a_readbit
+    upd4990a_readbit
 -------------------------------------------------*/
 
 static void upd4990a_readbit( const device_config *device )
@@ -297,7 +297,7 @@ static void upd4990a_readbit( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_resetbitstream
+    upd4990a_resetbitstream
 -------------------------------------------------*/
 
 static void upd4990a_resetbitstream( const device_config *device )
@@ -310,7 +310,7 @@ static void upd4990a_resetbitstream( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_writebit
+    upd4990a_writebit
 -------------------------------------------------*/
 
 static void upd4990a_writebit( const device_config *device , UINT8 bit )
@@ -323,7 +323,7 @@ static void upd4990a_writebit( const device_config *device , UINT8 bit )
 }
 
 /*-------------------------------------------------
-	upd4990a_nextbit
+    upd4990a_nextbit
 -------------------------------------------------*/
 
 static void upd4990a_nextbit( const device_config *device )
@@ -343,7 +343,7 @@ static void upd4990a_nextbit( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_getcommand
+    upd4990a_getcommand
 -------------------------------------------------*/
 
 static UINT8 upd4990a_getcommand( const device_config *device )
@@ -358,7 +358,7 @@ static UINT8 upd4990a_getcommand( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_update_date
+    upd4990a_update_date
 -------------------------------------------------*/
 
 static void upd4990a_update_date( const device_config *device )
@@ -375,7 +375,7 @@ static void upd4990a_update_date( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_process_command
+    upd4990a_process_command
 -------------------------------------------------*/
 
 static void upd4990a_process_command( const device_config *device )
@@ -409,7 +409,7 @@ static void upd4990a_process_command( const device_config *device )
 }
 
 /*-------------------------------------------------
-	upd4990a_serial_control
+    upd4990a_serial_control
 -------------------------------------------------*/
 
 static void upd4990a_serial_control( const device_config *device, UINT8 data )
@@ -432,7 +432,7 @@ static void upd4990a_serial_control( const device_config *device, UINT8 data )
 }
 
 /*-------------------------------------------------
-	upd4990a_control_16_w
+    upd4990a_control_16_w
 -------------------------------------------------*/
 
 WRITE16_DEVICE_HANDLER( upd4990a_control_16_w )
@@ -442,7 +442,7 @@ WRITE16_DEVICE_HANDLER( upd4990a_control_16_w )
 
 
 /*-------------------------------------------------
-	DEVICE_START( upd4990a )
+    DEVICE_START( upd4990a )
 -------------------------------------------------*/
 
 static DEVICE_START( upd4990a )
@@ -498,7 +498,7 @@ static DEVICE_START( upd4990a )
 
 
 /*-------------------------------------------------
-	DEVICE_RESET( upd4990a )
+    DEVICE_RESET( upd4990a )
 -------------------------------------------------*/
 
 static DEVICE_RESET( upd4990a )

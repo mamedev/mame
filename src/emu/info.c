@@ -100,8 +100,8 @@ static void print_game_configs(FILE *out, const game_driver *game, const input_p
 }
 
 /*-------------------------------------------------
-    print_game_adjusters - print the Analog 
-	Adjusters for a game
+    print_game_adjusters - print the Analog
+    Adjusters for a game
 -------------------------------------------------*/
 
 static void print_game_adjusters(FILE *out, const game_driver *game, const input_port_config *portlist)

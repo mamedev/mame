@@ -5471,14 +5471,14 @@ ROM_END
  |      8  ROM10  ROM9                                 |
  | DIP8 0  ROM12  ROM11                                |
  |      0                                              |
- | DIP8 0                                              |		
+ | DIP8 0                                              |
  |------------------------------------------------------
-	
+
    *1 = 12.000 Mhz
    *2 = 3.579545 Mhz
-   *3 = 16.000 Mhz   
-   
-*/											 
+   *3 = 16.000 Mhz
+
+*/
 ROM_START( sf2ebbl )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "12.bin",   0x00000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
@@ -5509,14 +5509,14 @@ ROM_START( sf2ebbl )
 	ROM_CONTINUE(        0x400005, 0x10000 )
 	ROMX_LOAD( "08.bin", 0x400003, 0x10000, CRC(81c9550f) SHA1(2d75e329148caadfff35c8f2f91b352f14dbe08a) , ROM_SKIP(7) )
 	ROM_CONTINUE(        0x400007, 0x10000 )
-	
+
 	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "03.bin",    0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* unknown (bootleg priority?) */
-	ROM_LOAD( "04.bin",    0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )	
-	
+	ROM_LOAD( "04.bin",    0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "02.bin",    0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
 	ROM_LOAD( "01.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )

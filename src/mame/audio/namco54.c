@@ -3,7 +3,7 @@
     Namco 54XX
 
     This custom chip is a Fujitsu MB8844 MCU programmed to act as a noise
-    generator. It is used for explosions, the shoot sound in Bosconian, 
+    generator. It is used for explosions, the shoot sound in Bosconian,
     and the tire screech sound in Pole Position.
 
     CMD = command from main CPU
@@ -28,8 +28,8 @@
                     GND|14  15|R2 (CMD2)
                        +------+
 
-    [1] The RNG that drives the type A output is output on pin 21, and 
-    the one that drives the type B output is output on pin 22, but those 
+    [1] The RNG that drives the type A output is output on pin 21, and
+    the one that drives the type B output is output on pin 22, but those
     pins are not connected on the board.
 
 

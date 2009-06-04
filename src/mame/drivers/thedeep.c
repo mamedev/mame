@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( thedeep )
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* CPU3 is a i8751 running at 8Mhz (8mhz xtal)*/
-  
+
 	MDRV_MACHINE_RESET(thedeep)
 
 	/* video hardware */

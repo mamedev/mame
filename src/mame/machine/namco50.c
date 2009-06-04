@@ -2,13 +2,13 @@
 
     Namco 50XX
 
-    This custom chip is a Fujitsu MB8842 MCU programmed to act as a 
-    protection device. It keeps track of the players scores, and checks if 
-    a high score has been obtained or bonus lives should be awarded. The 
-    main CPU has a range of commands to increment/decrement the score by 
+    This custom chip is a Fujitsu MB8842 MCU programmed to act as a
+    protection device. It keeps track of the players scores, and checks if
+    a high score has been obtained or bonus lives should be awarded. The
+    main CPU has a range of commands to increment/decrement the score by
     various fixed amounts.
 
-    The device is used to its full potential only by Bosconian; Xevious 
+    The device is used to its full potential only by Bosconian; Xevious
     uses it too, but only to do a protection check on startup.
 
     CMD = command from main CPU
@@ -30,7 +30,7 @@
          (ANS6) O6|10  19|R6 (n.c.)
          (ANS7) O7|11  18|R5 (n.c.)
          (CMD0) R7|12  17|R4 (n.c.)
-         (CMD1) R0|13  16|R3 (CMD3) 
+         (CMD1) R0|13  16|R3 (CMD3)
                GND|14  15|R2 (CMD2)
                   +------+
 

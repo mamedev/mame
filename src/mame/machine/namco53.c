@@ -2,9 +2,9 @@
 
     Namco 53XX
 
-    This instance of the Fujitsu MB8843 MCU is programmed to act as an I/O 
+    This instance of the Fujitsu MB8843 MCU is programmed to act as an I/O
     device. It is used by just two games: Dig Dug and Pole Position.
-    
+
     MOD0-MOD2 = input mode
     CS0-CS3 = chip select lines used to select 1 of 4 input sources
     OUT0-OUT7 = 8-bit final output data
@@ -39,7 +39,7 @@
 
     MOD selects one of 8 modes in which the input data is interpreted.
 
-    Pole Position is hard-wired to use mode 0, which reads 4 steering 
+    Pole Position is hard-wired to use mode 0, which reads 4 steering
     inputs and 4 DIP switches (only 1 of each is used). The steering
     inputs are clocked on P0 and direction on P1, 1 bit per analog input.
     The DIP switches are connected to P2 and P3.
@@ -47,8 +47,8 @@
     Dig Dug can control which mode to use via the MOD bit latches. It sets
     these values to mode 7 when running.
 
-	Unknowns:
-		SO is connected to IOSEL on Pole Position
+    Unknowns:
+        SO is connected to IOSEL on Pole Position
 
 ***************************************************************************/
 

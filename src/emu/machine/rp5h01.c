@@ -12,7 +12,7 @@
 
 
 /***************************************************************************
-	PARAMETERS
+    PARAMETERS
 ***************************************************************************/
 
 /* these also work as the address masks */
@@ -23,7 +23,7 @@ enum {
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _rp5h01_state rp5h01_state;
@@ -38,7 +38,7 @@ struct _rp5h01_state
 };
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE rp5h01_state *get_safe_token(const device_config *device)
@@ -57,11 +57,11 @@ INLINE const rp5h01_interface *get_interface(const device_config *device)
 }
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	rp5h01_enable_w
+    rp5h01_enable_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( rp5h01_enable_w )
@@ -73,7 +73,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_enable_w )
 }
 
 /*-------------------------------------------------
-	rp5h01_reset_w
+    rp5h01_reset_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( rp5h01_reset_w )
@@ -86,7 +86,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_reset_w )
 		return;
 
 	/* now look for a 0->1 transition */
-	if (rp5h01->old_reset == 0 && newstate == 1) 
+	if (rp5h01->old_reset == 0 && newstate == 1)
 	{
 		/* reset the counter */
 		rp5h01->counter = 0;
@@ -97,7 +97,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_reset_w )
 }
 
 /*-------------------------------------------------
-	rp5h01_clock_w
+    rp5h01_clock_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( rp5h01_clock_w )
@@ -110,7 +110,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_clock_w )
 		return;
 
 	/* now look for a 1->0 transition */
-	if (rp5h01->old_clock == 1 && newstate == 0) 
+	if (rp5h01->old_clock == 1 && newstate == 0)
 	{
 		/* increment the counter, and mask it with the mode */
 		rp5h01->counter++;
@@ -121,7 +121,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_clock_w )
 }
 
 /*-------------------------------------------------
-	rp5h01_test_w
+    rp5h01_test_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( rp5h01_test_w )
@@ -137,7 +137,7 @@ WRITE8_DEVICE_HANDLER( rp5h01_test_w )
 }
 
 /*-------------------------------------------------
-	rp5h01_counter_r
+    rp5h01_counter_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( rp5h01_counter_r )
@@ -153,7 +153,7 @@ READ8_DEVICE_HANDLER( rp5h01_counter_r )
 }
 
 /*-------------------------------------------------
-	rp5h01_data_r
+    rp5h01_data_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( rp5h01_data_r )
@@ -174,7 +174,7 @@ READ8_DEVICE_HANDLER( rp5h01_data_r )
 }
 
 /*-------------------------------------------------
-	DEVICE_START( rp5h01 )
+    DEVICE_START( rp5h01 )
 -------------------------------------------------*/
 
 static DEVICE_START( rp5h01 )
@@ -193,7 +193,7 @@ static DEVICE_START( rp5h01 )
 }
 
 /*-------------------------------------------------
-	DEVICE_RESET( rp5h01 )
+    DEVICE_RESET( rp5h01 )
 -------------------------------------------------*/
 
 static DEVICE_RESET( rp5h01 )
@@ -208,7 +208,7 @@ static DEVICE_RESET( rp5h01 )
 }
 
 /*-------------------------------------------------
-	device definition
+    device definition
 -------------------------------------------------*/
 
 static const char *DEVTEMPLATE_SOURCE = __FILE__;

@@ -537,8 +537,8 @@ static const ptm6840_interface ptm_ic2_intf =
 {
 	MPU4_MASTER_CLOCK / 4,
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(ic2_o1_callback), 
-	  DEVCB_HANDLER(ic2_o2_callback), 
+	{ DEVCB_HANDLER(ic2_o1_callback),
+	  DEVCB_HANDLER(ic2_o2_callback),
 	  DEVCB_HANDLER(ic2_o3_callback) },
 	DEVCB_LINE(cpu0_irq_m6840)
 };

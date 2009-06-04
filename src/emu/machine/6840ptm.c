@@ -72,7 +72,7 @@ static const char *const opmode[] =
 static void ptm6840_timeout(const device_config *device, int idx);
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _ptm6840_state ptm6840_state;
@@ -107,7 +107,7 @@ struct _ptm6840_state
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE ptm6840_state *get_safe_token(const device_config *device)
@@ -127,11 +127,11 @@ INLINE const ptm6840_interface *get_interface(const device_config *device)
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	ptm6840_get_status - Get enabled status
+    ptm6840_get_status - Get enabled status
 -------------------------------------------------*/
 
 int ptm6840_get_status( const device_config *device, int clock )
@@ -141,7 +141,7 @@ int ptm6840_get_status( const device_config *device, int clock )
 }
 
 /*-------------------------------------------------
-	ptm6840_get_irq - Get IRQ state
+    ptm6840_get_irq - Get IRQ state
 -------------------------------------------------*/
 
 int ptm6840_get_irq( const device_config *device )
@@ -151,7 +151,7 @@ int ptm6840_get_irq( const device_config *device )
 }
 
 /*-------------------------------------------------
-	subtract_from_counter - Subtract from Counter
+    subtract_from_counter - Subtract from Counter
 -------------------------------------------------*/
 
 static void subtract_from_counter( const device_config *device, int counter, int count )
@@ -228,7 +228,7 @@ static void subtract_from_counter( const device_config *device, int counter, int
 }
 
 /*-------------------------------------------------
-	ptm_tick
+    ptm_tick
 -------------------------------------------------*/
 
 static void ptm_tick( const device_config *device, int counter, int count )
@@ -252,7 +252,7 @@ static void ptm_tick( const device_config *device, int counter, int count )
 }
 
 /*-------------------------------------------------
-	update_interrupts - Update Internal Interrupts
+    update_interrupts - Update Internal Interrupts
 -------------------------------------------------*/
 
 INLINE void update_interrupts( const device_config *device )
@@ -278,7 +278,7 @@ INLINE void update_interrupts( const device_config *device )
 }
 
 /*-------------------------------------------------
-	compute_counter - Compute Counter
+    compute_counter - Compute Counter
 -------------------------------------------------*/
 
 static UINT16 compute_counter( const device_config *device, int counter )
@@ -321,7 +321,7 @@ static UINT16 compute_counter( const device_config *device, int counter )
 }
 
 /*-------------------------------------------------
-	reload_count - Reload Counter
+    reload_count - Reload Counter
 -------------------------------------------------*/
 
 static void reload_count( const device_config *device, int idx )
@@ -366,7 +366,7 @@ static void reload_count( const device_config *device, int idx )
 	PLOG(("MC6840 #%s: reload_count(%d): clock = %d  count = %d\n", device->tag, idx, clock, count));
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
-	if (idx == 2) 
+	if (idx == 2)
 		duration = attotime_mul(duration, ptm6840->t3_divisor);
 
 	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", device->tag, idx, attotime_to_double(duration)));
@@ -389,7 +389,7 @@ static void reload_count( const device_config *device, int idx )
 
 
 /*-------------------------------------------------
-	ptm6840_read - Read Timer
+    ptm6840_read - Read Timer
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( ptm6840_read )
@@ -453,7 +453,7 @@ READ8_DEVICE_HANDLER( ptm6840_read )
 }
 
 /*-------------------------------------------------
-	ptm6840_write - Write Timer
+    ptm6840_write - Write Timer
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( ptm6840_write )
@@ -546,7 +546,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_write )
 }
 
 /*-------------------------------------------------
-	ptm6840_timeout - Called if timer is mature
+    ptm6840_timeout - Called if timer is mature
 -------------------------------------------------*/
 
 static void ptm6840_timeout( const device_config *device, int idx )
@@ -593,30 +593,30 @@ static void ptm6840_timeout( const device_config *device, int idx )
 }
 
 /*-------------------------------------------------
-	TIMER_CALLBACKs for Timer 1, 2 & 3
+    TIMER_CALLBACKs for Timer 1, 2 & 3
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( ptm6840_timer1_cb ) 
-{ 
+static TIMER_CALLBACK( ptm6840_timer1_cb )
+{
 	const device_config *device = (const device_config *)ptr;
-	ptm6840_timeout(device, 0); 
+	ptm6840_timeout(device, 0);
 }
 
 static TIMER_CALLBACK( ptm6840_timer2_cb )
-{ 
+{
 	const device_config *device = (const device_config *)ptr;
-	ptm6840_timeout(device, 1); 
+	ptm6840_timeout(device, 1);
 }
 
 static TIMER_CALLBACK( ptm6840_timer3_cb )
-{ 
+{
 	const device_config *device = (const device_config *)ptr;
-	ptm6840_timeout(device, 2); 
+	ptm6840_timeout(device, 2);
 }
 
 
 /*-------------------------------------------------
-	ptm6840_set_gate - set gate status (0 or 1)
+    ptm6840_set_gate - set gate status (0 or 1)
 -------------------------------------------------*/
 
 INLINE void ptm6840_set_gate( const device_config *device, int state, int idx )
@@ -632,26 +632,26 @@ INLINE void ptm6840_set_gate( const device_config *device, int state, int idx )
 }
 
 /*-------------------------------------------------
-	WRITE8_DEVICE_HANDLERs for Gate 1, 2 & 3
+    WRITE8_DEVICE_HANDLERs for Gate 1, 2 & 3
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g1 )
-{ 
+{
 	ptm6840_set_gate(device, data, 0);
 }
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g2 )
-{ 
+{
 	ptm6840_set_gate(device, data, 1);
 }
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g3 )
-{ 
+{
 	ptm6840_set_gate(device, data, 2);
 }
 
 /*-------------------------------------------------
-	ptm6840_set_clock - set clock status (0 or 1)
+    ptm6840_set_clock - set clock status (0 or 1)
 -------------------------------------------------*/
 
 INLINE void ptm6840_set_clock( const device_config *device, int state, int idx )
@@ -668,27 +668,27 @@ INLINE void ptm6840_set_clock( const device_config *device, int state, int idx )
 }
 
 /*-------------------------------------------------
-	WRITE8_DEVICE_HANDLERs for Clock 1, 2 & 3
+    WRITE8_DEVICE_HANDLERs for Clock 1, 2 & 3
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_c1 )
-{ 
-	ptm6840_set_clock(device, data, 0); 
+{
+	ptm6840_set_clock(device, data, 0);
 }
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_c2 )
-{ 
-	ptm6840_set_clock(device, data, 1); 
+{
+	ptm6840_set_clock(device, data, 1);
 }
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_c3 )
-{ 
-	ptm6840_set_clock(device, data, 2); 
+{
+	ptm6840_set_clock(device, data, 2);
 }
 
 
 /*-------------------------------------------------
-	ptm6840_get_count - get count value
+    ptm6840_get_count - get count value
 -------------------------------------------------*/
 
 UINT16 ptm6840_get_count( const device_config *device, int counter )
@@ -697,7 +697,7 @@ UINT16 ptm6840_get_count( const device_config *device, int counter )
 }
 
 /*------------------------------------------------------------
-	ptm6840_set_ext_clock - set external clock frequency
+    ptm6840_set_ext_clock - set external clock frequency
 ------------------------------------------------------------*/
 
 void ptm6840_set_ext_clock( const device_config *device, int counter, int clock )
@@ -739,7 +739,7 @@ void ptm6840_set_ext_clock( const device_config *device, int counter, int clock 
 }
 
 /*------------------------------------------------------------
-	ptm6840_get_ext_clock - get external clock frequency
+    ptm6840_get_ext_clock - get external clock frequency
 ------------------------------------------------------------*/
 
 int ptm6840_get_ext_clock( const device_config *device, int counter )
@@ -750,7 +750,7 @@ int ptm6840_get_ext_clock( const device_config *device, int counter )
 
 
 /*-------------------------------------------------
-	DEVICE_START( ptm6840 )
+    DEVICE_START( ptm6840 )
 -------------------------------------------------*/
 
 static DEVICE_START( ptm6840 )
@@ -810,7 +810,7 @@ static DEVICE_START( ptm6840 )
 }
 
 /*-------------------------------------------------
-	DEVICE_RESET( ptm6840 )
+    DEVICE_RESET( ptm6840 )
 -------------------------------------------------*/
 
 static DEVICE_RESET( ptm6840 )

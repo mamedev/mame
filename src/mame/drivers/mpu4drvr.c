@@ -404,7 +404,7 @@ static const ptm6840_interface ptm_vid_intf =
 {
 	VIDEO_MASTER_CLOCK / 10, /* 68k E clock */
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(vid_o1_callback), 
+	{ DEVCB_HANDLER(vid_o1_callback),
 	  DEVCB_HANDLER(vid_o2_callback),
 	  DEVCB_HANDLER(vid_o3_callback) },
 	DEVCB_LINE(cpu1_ptm_irq)

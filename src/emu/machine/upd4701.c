@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    NEC uPD4701 
+    NEC uPD4701
 
     Incremental Encoder Control
 
@@ -12,7 +12,7 @@
 #include "upd4701.h"
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _upd4701_state upd4701_state;
@@ -34,7 +34,7 @@ struct _upd4701_state
 	int cf;
 };
 
-/* x,y increments can be 12bit (see MASK_COUNTER), hence we need a couple of 
+/* x,y increments can be 12bit (see MASK_COUNTER), hence we need a couple of
 16bit handlers in the following  */
 
 #define MASK_SWITCHES ( 7 )
@@ -42,7 +42,7 @@ struct _upd4701_state
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE upd4701_state *get_safe_token(const device_config *device)
@@ -55,11 +55,11 @@ INLINE upd4701_state *get_safe_token(const device_config *device)
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	upd4701_ul_w
+    upd4701_ul_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_ul_w )
@@ -69,7 +69,7 @@ WRITE8_DEVICE_HANDLER( upd4701_ul_w )
 }
 
 /*-------------------------------------------------
-	upd4701_xy_w
+    upd4701_xy_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_xy_w )
@@ -79,7 +79,7 @@ WRITE8_DEVICE_HANDLER( upd4701_xy_w )
 }
 
 /*-------------------------------------------------
-	upd4701_cs_w
+    upd4701_cs_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_cs_w )
@@ -107,7 +107,7 @@ WRITE8_DEVICE_HANDLER( upd4701_cs_w )
 }
 
 /*-------------------------------------------------
-	upd4701_resetx_w
+    upd4701_resetx_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_resetx_w )
@@ -126,7 +126,7 @@ WRITE8_DEVICE_HANDLER( upd4701_resetx_w )
 }
 
 /*-------------------------------------------------
-	upd4701_resety_w
+    upd4701_resety_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_resety_w )
@@ -145,7 +145,7 @@ WRITE8_DEVICE_HANDLER( upd4701_resety_w )
 }
 
 /*-------------------------------------------------
-	upd4701_x_add
+    upd4701_x_add
 -------------------------------------------------*/
 
 WRITE16_DEVICE_HANDLER( upd4701_x_add )
@@ -164,7 +164,7 @@ WRITE16_DEVICE_HANDLER( upd4701_x_add )
 }
 
 /*-------------------------------------------------
-	upd4701_y_add
+    upd4701_y_add
 -------------------------------------------------*/
 
 WRITE16_DEVICE_HANDLER( upd4701_y_add )
@@ -183,7 +183,7 @@ WRITE16_DEVICE_HANDLER( upd4701_y_add )
 }
 
 /*-------------------------------------------------
-	upd4701_switches_set
+    upd4701_switches_set
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( upd4701_switches_set )
@@ -193,7 +193,7 @@ WRITE8_DEVICE_HANDLER( upd4701_switches_set )
 }
 
 /*-------------------------------------------------
-	upd4701_d_r
+    upd4701_d_r
 -------------------------------------------------*/
 
 READ16_DEVICE_HANDLER( upd4701_d_r )
@@ -228,7 +228,7 @@ READ16_DEVICE_HANDLER( upd4701_d_r )
 }
 
 /*-------------------------------------------------
-	upd4701_sf_r
+    upd4701_sf_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( upd4701_sf_r )
@@ -244,7 +244,7 @@ READ8_DEVICE_HANDLER( upd4701_sf_r )
 }
 
 /*-------------------------------------------------
-	upd4701_cf_r
+    upd4701_cf_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( upd4701_cf_r )
@@ -254,7 +254,7 @@ READ8_DEVICE_HANDLER( upd4701_cf_r )
 }
 
 /*-------------------------------------------------
-	DEVICE_START( upd4701 )
+    DEVICE_START( upd4701 )
 -------------------------------------------------*/
 
 static DEVICE_START( upd4701 )
@@ -279,7 +279,7 @@ static DEVICE_START( upd4701 )
 }
 
 /*-------------------------------------------------
-	DEVICE_RESET( upd4701 )
+    DEVICE_RESET( upd4701 )
 -------------------------------------------------*/
 
 static DEVICE_RESET( upd4701 )

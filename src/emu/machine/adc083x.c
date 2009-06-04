@@ -44,7 +44,7 @@ enum
 };
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _adc0831_state adc0831_state;
@@ -71,7 +71,7 @@ struct _adc0831_state
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE adc0831_state *get_safe_token(const device_config *device)
@@ -91,11 +91,11 @@ INLINE const adc0831_interface *get_interface(const device_config *device)
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	adc083x_cs_write
+    adc083x_cs_write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc083x_cs_write )
@@ -138,7 +138,7 @@ WRITE8_DEVICE_HANDLER( adc083x_cs_write )
 }
 
 /*-------------------------------------------------
-	adc083x_conversion
+    adc083x_conversion
 -------------------------------------------------*/
 
 static UINT8 adc083x_conversion( const device_config *device )
@@ -219,7 +219,7 @@ static UINT8 adc083x_conversion( const device_config *device )
 }
 
 /*-------------------------------------------------
-	adc083x_clk_write
+    adc083x_clk_write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc083x_clk_write )
@@ -359,7 +359,7 @@ WRITE8_DEVICE_HANDLER( adc083x_clk_write )
 }
 
 /*-------------------------------------------------
-	adc083x_di_write
+    adc083x_di_write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc083x_di_write )
@@ -375,7 +375,7 @@ WRITE8_DEVICE_HANDLER( adc083x_di_write )
 }
 
 /*-------------------------------------------------
-	adc083x_se_write
+    adc083x_se_write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc083x_se_write )
@@ -391,7 +391,7 @@ WRITE8_DEVICE_HANDLER( adc083x_se_write )
 }
 
 /*-------------------------------------------------
-	adc083x_sars_read
+    adc083x_sars_read
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( adc083x_sars_read )
@@ -403,7 +403,7 @@ READ8_DEVICE_HANDLER( adc083x_sars_read )
 }
 
 /*-------------------------------------------------
-	adc083x_do_read
+    adc083x_do_read
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( adc083x_do_read )
@@ -416,7 +416,7 @@ READ8_DEVICE_HANDLER( adc083x_do_read )
 
 
 /*-------------------------------------------------
-	DEVICE_START( adc083x )
+    DEVICE_START( adc083x )
 -------------------------------------------------*/
 
 static DEVICE_START( adc0831 )
@@ -467,7 +467,7 @@ static DEVICE_START( adc0831 )
 
 
 /*-------------------------------------------------
-	DEVICE_RESET( adc083x )
+    DEVICE_RESET( adc083x )
 -------------------------------------------------*/
 
 static DEVICE_RESET( adc0831 )

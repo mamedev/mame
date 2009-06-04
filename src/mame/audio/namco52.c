@@ -2,8 +2,8 @@
 
     Namco 52XX
 
-    This instance of the Fujitsu MB8843 MCU is programmed to act as a 
-    sample player. It is used by just two games: Bosconian and Pole 
+    This instance of the Fujitsu MB8843 MCU is programmed to act as a
+    sample player. It is used by just two games: Bosconian and Pole
     Position.
 
     A0-A15 = address to read from sample ROMs

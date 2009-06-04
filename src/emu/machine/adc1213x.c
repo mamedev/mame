@@ -2,7 +2,7 @@
 
     National Semiconductor ADC12130 / ADC12132 / ADC12138
 
-    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX 
+    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX
         and Sample/Hold
 
     TODO:
@@ -17,7 +17,7 @@
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef struct _adc12138_state adc12138_state;
@@ -51,7 +51,7 @@ struct _adc12138_state
 #define ADC1213X_ACQUISITION_TIME_34_CCLK		3
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE adc12138_state *get_safe_token(const device_config *device)
@@ -71,11 +71,11 @@ INLINE const adc12138_interface *get_interface(const device_config *device)
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-	adc1213x_di_w
+    adc1213x_di_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc1213x_di_w )
@@ -85,7 +85,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_di_w )
 }
 
 /*-------------------------------------------------
-	adc1213x_convert
+    adc1213x_convert
 -------------------------------------------------*/
 
 static void adc1213x_convert(const device_config *device, int channel, int bits16, int lsbfirst)
@@ -176,7 +176,7 @@ static void adc1213x_convert(const device_config *device, int channel, int bits1
 }
 
 /*-------------------------------------------------
-	adc1213x_cs_w
+    adc1213x_cs_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
@@ -254,7 +254,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
 }
 
 /*-------------------------------------------------
-	adc1213x_sclk_w
+    adc1213x_sclk_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
@@ -276,7 +276,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
 }
 
 /*-------------------------------------------------
-	adc1213x_conv_w
+    adc1213x_conv_w
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
@@ -286,7 +286,7 @@ WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
 }
 
 /*-------------------------------------------------
-	adc1213x_do_r
+    adc1213x_do_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( adc1213x_do_r )
@@ -298,7 +298,7 @@ READ8_DEVICE_HANDLER( adc1213x_do_r )
 }
 
 /*-------------------------------------------------
-	adc1213x_eoc_r
+    adc1213x_eoc_r
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( adc1213x_eoc_r )
@@ -308,7 +308,7 @@ READ8_DEVICE_HANDLER( adc1213x_eoc_r )
 }
 
 /*-------------------------------------------------
-	DEVICE_START( adc1213x )
+    DEVICE_START( adc1213x )
 -------------------------------------------------*/
 
 static DEVICE_START( adc12138 )
@@ -336,7 +336,7 @@ static DEVICE_START( adc12138 )
 
 
 /*-------------------------------------------------
-	DEVICE_RESET( adc1213x )
+    DEVICE_RESET( adc1213x )
 -------------------------------------------------*/
 
 static DEVICE_RESET( adc12138 )

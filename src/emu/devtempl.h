@@ -9,57 +9,57 @@
 
 ****************************************************************************
 
-	Typical usage is as follows:
-	
+    Typical usage is as follows:
+
 static const char *DEVTEMPLATE_SOURCE = __FILE__;
 
 // for a primary device....
-#define DEVTEMPLATE_ID(p,s)				p##devicenameprefix##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_xxx | DT_HAS_yyy | ...
-#define DEVTEMPLATE_NAME				"Device Name String"
-#define DEVTEMPLATE_FAMILY				"Device Family String"
-#define DEVTEMPLATE_CLASS				DEVICE_CLASS_xxxx
+#define DEVTEMPLATE_ID(p,s)             p##devicenameprefix##s
+#define DEVTEMPLATE_FEATURES            DT_HAS_xxx | DT_HAS_yyy | ...
+#define DEVTEMPLATE_NAME                "Device Name String"
+#define DEVTEMPLATE_FAMILY              "Device Family String"
+#define DEVTEMPLATE_CLASS               DEVICE_CLASS_xxxx
 #include "devtempl.h"
 
 // for a derived device....
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##derivednameprefix##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_xxx | DT_HAS_yyy | ...
-#define DEVTEMPLATE_NAME				"Derived Name String"
+#define DEVTEMPLATE_DERIVED_ID(p,s)     p##derivednameprefix##s
+#define DEVTEMPLATE_DERIVED_FEATURES    DT_HAS_xxx | DT_HAS_yyy | ...
+#define DEVTEMPLATE_NAME                "Derived Name String"
 #include "devtempl.h"
 
 ****************************************************************************
 
-	Parameters are as follows:
-	
-	DEVTEMPLATE_ID(p,s) - required - macro to produce device function and
-		type names with a prefix of 'p' and a suffix of 's'
-	
-	DEVTEMPLATE_FEATURES - required - bitmask consisting of one of the
-		DT_HAS_* flags, indicating which standard-named callbacks or
-		pointers are specified by this device (everything else is assumed
-		to be NULL, which is the default)
-	
-	DEVTEMPLATE_NAME - required - a string describing the device
-	
-	DEVTEMPLATE_FAMILY - required - a string describing the device family
-		name
-	
-	DEVTEMPLATE_STATE - optional - the name of the device's state 
-		structure; by default, this is assumed to be 
-		DEVTEMPLATE_ID(,_state)
-	
-	DEVTEMPLATE_CLASS - optional - the device's class (default is
-		DEVICE_CLASS_PERIPHERAL)
-	
-	DEVTEMPLATE_VERSION - optional - the device's version string (default
-		is "1.0")
-	
-	DEVTEMPLATE_CREDITS - optional - the device's credit string (default
-		is "Copyright Nicola Salmoria and the MAME Team")
-	
-	DEVTEMPLATE_INLINE_CONFIG - optional - the name of the device's
-		inline configuration structure; by default, it is assumed the
-		device does not have any inline configuration
+    Parameters are as follows:
+
+    DEVTEMPLATE_ID(p,s) - required - macro to produce device function and
+        type names with a prefix of 'p' and a suffix of 's'
+
+    DEVTEMPLATE_FEATURES - required - bitmask consisting of one of the
+        DT_HAS_* flags, indicating which standard-named callbacks or
+        pointers are specified by this device (everything else is assumed
+        to be NULL, which is the default)
+
+    DEVTEMPLATE_NAME - required - a string describing the device
+
+    DEVTEMPLATE_FAMILY - required - a string describing the device family
+        name
+
+    DEVTEMPLATE_STATE - optional - the name of the device's state
+        structure; by default, this is assumed to be
+        DEVTEMPLATE_ID(,_state)
+
+    DEVTEMPLATE_CLASS - optional - the device's class (default is
+        DEVICE_CLASS_PERIPHERAL)
+
+    DEVTEMPLATE_VERSION - optional - the device's version string (default
+        is "1.0")
+
+    DEVTEMPLATE_CREDITS - optional - the device's credit string (default
+        is "Copyright Nicola Salmoria and the MAME Team")
+
+    DEVTEMPLATE_INLINE_CONFIG - optional - the name of the device's
+        inline configuration structure; by default, it is assumed the
+        device does not have any inline configuration
 
 ***************************************************************************/
 
@@ -160,7 +160,7 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(DEVTEMPLATE_ID(,_config));						break;
 #endif
 		case DEVINFO_INT_CLASS:					info->i = DEVTEMPLATE_CLASS;									break;
-		
+
 		/* --- the following bits of info are returned as pointers --- */
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_ROM_REGION)
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_ID(rom_,);						break;

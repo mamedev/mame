@@ -1,18 +1,18 @@
 /***************************************************************************
 
-	Namco 06XX
-	
-	This chip is used as an interface to up to 4 other custom chips.
-	It signals IRQs to the custom MCUs when writes happen, and generates
-	NMIs to the controlling CPU to drive reads based on a clock.
+    Namco 06XX
 
-	SD0-SD7 are data I/O lines connecting to the controlling CPU
-	SEL selects either control (1) or data (0), usually connected to
-	    an address line of the controlling CPU
-	/NMI is an NMI signal line for the controlling CPU
+    This chip is used as an interface to up to 4 other custom chips.
+    It signals IRQs to the custom MCUs when writes happen, and generates
+    NMIs to the controlling CPU to drive reads based on a clock.
 
-	ID0-ID7 are data I/O lines connecting to the other custom chips
-	/IO1-/IO4 are IRQ signal lines for each custom chip
+    SD0-SD7 are data I/O lines connecting to the controlling CPU
+    SEL selects either control (1) or data (0), usually connected to
+        an address line of the controlling CPU
+    /NMI is an NMI signal line for the controlling CPU
+
+    ID0-ID7 are data I/O lines connecting to the other custom chips
+    /IO1-/IO4 are IRQ signal lines for each custom chip
 
                    +------+
                 [1]|1   28|Vcc
@@ -31,51 +31,51 @@
                 GND|14  15|SEL
                    +------+
 
-	[1] on polepos, galaga, xevious, and bosco: connected to K3 of the 51xx
-		on bosco and xevious, connected to R8 of the 50xx
+    [1] on polepos, galaga, xevious, and bosco: connected to K3 of the 51xx
+        on bosco and xevious, connected to R8 of the 50xx
 
 
-	06XX interface:
-	---------------
-	Galaga                  51XX  ----  ----  54XX
-	Bosconian (CPU board)   51XX  ----  50XX  54XX
-	Bosconian (Video board) 50XX  52XX  ----  ----
-	Xevious                 51XX  ----  50XX  54XX
-	Dig Dug                 51XX  53XX  ----  ----
-	Pole Position / PP II   51XX  53XX  52XX  54XX
+    06XX interface:
+    ---------------
+    Galaga                  51XX  ----  ----  54XX
+    Bosconian (CPU board)   51XX  ----  50XX  54XX
+    Bosconian (Video board) 50XX  52XX  ----  ----
+    Xevious                 51XX  ----  50XX  54XX
+    Dig Dug                 51XX  53XX  ----  ----
+    Pole Position / PP II   51XX  53XX  52XX  54XX
 
 
-	Galaga writes:
-		control = 10(000), data = FF at startup
-		control = 71(011), read 3, control = 10
-		control = A1(101), write 4, control = 10
-		control = A8(101), write 12, control = 10
+    Galaga writes:
+        control = 10(000), data = FF at startup
+        control = 71(011), read 3, control = 10
+        control = A1(101), write 4, control = 10
+        control = A8(101), write 12, control = 10
 
-	Xevious writes:
-		control = 10 at startup
-		control = A1(101), write 6, control = 10
-		control = 71(011), read 3, control = 10
-		control = 64(011), write 1, control = 10
-		control = 74(011), read 4, control = 10
-		control = 68(011), write 7, control = 10
-	
-	Dig Dug writes:
-		control = 10(000), data = 10 at startup
-		control = A1(101), write 3, control = 10
-		control = 71(011), read 3, control = 10
-		control = D2(110), read 2, control = 10
-		
-	Bosco writes:
-		control = 10(000), data = FF at startup
-		control = C8(110), write 17, control = 10
-		control = 61(011), write 1, control = 10
-		control = 71(011), read 3, control = 10
-		control = 94(100), read 4, control = 10
-		control = 64(011), write 1, control = 10
-		control = 84(100), write 5, control = 10
+    Xevious writes:
+        control = 10 at startup
+        control = A1(101), write 6, control = 10
+        control = 71(011), read 3, control = 10
+        control = 64(011), write 1, control = 10
+        control = 74(011), read 4, control = 10
+        control = 68(011), write 7, control = 10
+
+    Dig Dug writes:
+        control = 10(000), data = 10 at startup
+        control = A1(101), write 3, control = 10
+        control = 71(011), read 3, control = 10
+        control = D2(110), read 2, control = 10
+
+    Bosco writes:
+        control = 10(000), data = FF at startup
+        control = C8(110), write 17, control = 10
+        control = 61(011), write 1, control = 10
+        control = 71(011), read 3, control = 10
+        control = 94(100), read 4, control = 10
+        control = 64(011), write 1, control = 10
+        control = 84(100), write 5, control = 10
 
 
-		control = 34(001), write 1, control = 10
+        control = 34(001), write 1, control = 10
 
 ***************************************************************************/
 

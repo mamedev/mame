@@ -1,56 +1,56 @@
 /***************************************************************************
 
-	Namco 51XX
+    Namco 51XX
 
-	This custom chip is a Fujitsu MB8843 MCU programmed to act as an I/O 
-	device with built-in coin management. It is also apparently used as a
-	protection device. It keeps track of the players scores, and checks 
-	if a high score has been obtained or bonus lives should be awarded. 
-	The main CPU has a range of commands to increment/decrement the score 
-	by various fixed amounts.
+    This custom chip is a Fujitsu MB8843 MCU programmed to act as an I/O
+    device with built-in coin management. It is also apparently used as a
+    protection device. It keeps track of the players scores, and checks
+    if a high score has been obtained or bonus lives should be awarded.
+    The main CPU has a range of commands to increment/decrement the score
+    by various fixed amounts.
 
-	The device is used to its full potential only by Bosconian; Xevious 
-	uses it too, but only to do a protection check on startup.
+    The device is used to its full potential only by Bosconian; Xevious
+    uses it too, but only to do a protection check on startup.
 
-	CMD = command from main CPU
-	ANS = answer to main CPU
+    CMD = command from main CPU
+    ANS = answer to main CPU
 
-	The chip reads/writes the I/O ports when the /IRQ is pulled down. 
-	Pin 21 determines whether a read or write should happen (1=R, 0=W).
+    The chip reads/writes the I/O ports when the /IRQ is pulled down.
+    Pin 21 determines whether a read or write should happen (1=R, 0=W).
 
-		       +------+
-		     EX|1   42|Vcc
-		      X|2   41|K3
-		 /RESET|3   40|K2
-		   /IRQ|4   39|K1
-		     SO|5   38|K0
-		     SI|6   37|R15
-		/SC /TO|7   36|R14
-		    /TC|8   35|R13
-		     P0|9   34|R12
-		     P1|10  33|R11
-		     P2|11  32|R10
-		     P3|12  31|R9
-		     O0|13  30|R8
-		     O1|14  29|R7
-		     O2|15  28|R6
-		     O3|16  27|R5
-		     O4|17  26|R4
-		     O5|18  25|R3
-		     O6|19  24|R2
-		     O7|20  23|R1
-		    GND|21  22|R0
-		       +------+
+               +------+
+             EX|1   42|Vcc
+              X|2   41|K3
+         /RESET|3   40|K2
+           /IRQ|4   39|K1
+             SO|5   38|K0
+             SI|6   37|R15
+        /SC /TO|7   36|R14
+            /TC|8   35|R13
+             P0|9   34|R12
+             P1|10  33|R11
+             P2|11  32|R10
+             P3|12  31|R9
+             O0|13  30|R8
+             O1|14  29|R7
+             O2|15  28|R6
+             O3|16  27|R5
+             O4|17  26|R4
+             O5|18  25|R3
+             O6|19  24|R2
+             O7|20  23|R1
+            GND|21  22|R0
+               +------+
 
-	commands:
-	00: nop
-	01 + 4 arguments: set coinage (xevious, possibly because of a bug, is different)
-	02: go in "credit" mode and enable start buttons
-	03: disable joystick remapping
-	04: enable joystick remapping
-	05: go in "switch" mode
-	06: nop
-	07: nop
+    commands:
+    00: nop
+    01 + 4 arguments: set coinage (xevious, possibly because of a bug, is different)
+    02: go in "credit" mode and enable start buttons
+    03: disable joystick remapping
+    04: enable joystick remapping
+    05: go in "switch" mode
+    06: nop
+    07: nop
 
 ***************************************************************************/
 

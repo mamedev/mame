@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Fujistu MB3773
+    Fujistu MB3773
 
     Power Supply Monitor with Watch Dog Timer (i.e. Reset IC)
 

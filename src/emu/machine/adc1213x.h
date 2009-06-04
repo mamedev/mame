@@ -2,7 +2,7 @@
 
     National Semiconductor ADC12130 / ADC12132 / ADC12138
 
-    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX 
+    Self-calibrating 12-bit Plus Sign Serial I/O A/D Converters with MUX
         and Sample/Hold
 
 ***************************************************************************/
