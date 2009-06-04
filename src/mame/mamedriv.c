@@ -2519,6 +2519,7 @@ V-V                           TP-027
 	DRIVER( nemoj )		/* 20/11/1990 (c) 1990 (Japan) */
 	DRIVER( sf2 )		/* 22/05/1991 (c) 1991 (World) */
 	DRIVER( sf2eb )		/* 14/02/1991 (c) 1991 (World) */
+	DRIVER( sf2ebbl )	/* 14/02/1991 (c) 1991 (World, bootleg) */
 	DRIVER( sf2ua )		/* 06/02/1991 (c) 1991 (US)    */
 	DRIVER( sf2ub )		/* 14/02/1991 (c) 1991 (US)    */
 	DRIVER( sf2ud )		/* 18/03/1991 (c) 1991 (US)    */
