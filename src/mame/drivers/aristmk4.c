@@ -332,7 +332,6 @@ static INPUT_PORTS_START(aristmk4)
 INPUT_PORTS_END
 
 
-/* TODO: order of bitplanes is wrong. */
 static const gfx_layout layout8x8x6 =
 {
 	8,8,
@@ -340,10 +339,10 @@ static const gfx_layout layout8x8x6 =
 	6,
 	{
 		RGN_FRAC(5,6),
-		RGN_FRAC(4,6),
-		RGN_FRAC(3,6),
 		RGN_FRAC(2,6),
+		RGN_FRAC(4,6),
 		RGN_FRAC(1,6),
+		RGN_FRAC(3,6),
 		RGN_FRAC(0,6)
 	},
 	{ STEP8(0,1) },
@@ -527,4 +526,4 @@ static DRIVER_INIT( aristmk4 )
 	//...
 }
 
-GAME( 1994, eforest,0, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_WRONG_COLORS )
+GAME( 1994, eforest,0, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING|GAME_NO_SOUND )
