@@ -607,7 +607,7 @@ static READ32_HANDLER(security_r)
 static WRITE32_HANDLER(xx_w)
 {
 /*
-printf( "xx %08x %08x %08x\n", offset, mem_mask, data );
+    printf( "xx %08x %08x %08x\n", offset, mem_mask, data );
 */
 }
 
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
-	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITENOP /* sound irq? */
+	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE(watchdog_reset32_w) /* LTC1232 */
 	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE(twinkle_io_w)
 	AM_RANGE(0x1f220004, 0x1f220007) AM_READ(twinkle_io_r)
 	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
@@ -667,25 +667,25 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER(yy_r)
 {
-	printf( "yy %08x %08x\n", offset, mem_mask );
+/*  printf( "yy %08x %08x\n", offset, mem_mask ); */
 	return 0;
 }
 
 
 static READ32_HANDLER(zz_r)
 {
-//  printf( "zz %08x %08x\n", offset, mem_mask );
+/*  printf( "zz %08x %08x\n", offset, mem_mask ); */
 	return 0;
 }
 
 static WRITE32_HANDLER(ww_w)
 {
-	printf( "ww %08x %08x %08x\n", offset, mem_mask, data );
+/*  printf( "ww %08x %08x %08x\n", offset, mem_mask, data ); */
 }
 
 static READ32_HANDLER(ww_r)
 {
-	printf( "ww %08x %08x\n", offset, mem_mask );
+/*  printf( "ww %08x %08x\n", offset, mem_mask ); */
 	return 0;
 }
 
@@ -846,6 +846,8 @@ static MACHINE_DRIVER_START( twinkle )
 
 	MDRV_CPU_ADD("audiocpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
 	MDRV_CPU_PROGRAM_MAP( sound_map )
+
+	MDRV_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
 
 	MDRV_MACHINE_RESET( twinkle )
 	MDRV_NVRAM_HANDLER( twinkle )
