@@ -12,10 +12,11 @@ NOTES:
   - CRTC is using 4 pixels by memory address.
   - Xtal and crtc CLK are accurate.
   - Seems to be 1 DSW bank tied to VIA, and another to ay8910.
+  - Maybe this is "Aristocrat Mark-III" HW?
 
 TODO:
-    - Understand inputs / via mapping properly;
-    - Finish the mc6845 conversion;
+  - Understand inputs / via mapping properly;
+  - Finish the mc6845 conversion;
 
 Changes 02/06/2009 - Palindrome
 - Fixed VIA address map to 5000 - 0x501f ( now generates required FIRQ_LINE timer interrupt,
@@ -193,20 +194,25 @@ static INPUT_PORTS_START( lions )
 INPUT_PORTS_END
 
 
-static const gfx_layout layout8x8x3 =
+static const gfx_layout layout8x8x6 =
 {
 	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3), }, // Trusted, see MT 03190
+	RGN_FRAC(1,6),
+	6,
+	{ RGN_FRAC(3,6),
+	  RGN_FRAC(0,6),
+	  RGN_FRAC(4,6),
+	  RGN_FRAC(1,6),
+	  RGN_FRAC(5,6),
+	  RGN_FRAC(2,6)
+	},
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
 };
 
 static GFXDECODE_START( lions )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x3, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8x3, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x6, 0, 1 )
 GFXDECODE_END
 
 static const ay8910_interface ay8910_config =
@@ -320,6 +326,31 @@ static const mc6845_interface mc6845_intf =
 	NULL	/* VSYNC callback */
 };
 
+/* same as Aristocrat Mark-IV HW color offset 7 */
+static PALETTE_INIT( lions )
+{
+	int i;
+
+	for (i = 0;i < machine->config->total_colors;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+		bit0 = (i >> 0) & 0x01;
+		bit1 = (i >> 1) & 0x01;
+		b = 0x4f * bit0 + 0xa8 * bit1;
+		bit0 = (i >> 1) & 0x01;
+		bit1 = (i >> 2) & 0x01;
+		bit2 = (i >> 3) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (i >> 3) & 0x01;
+		bit1 = (i >> 4) & 0x01;
+		bit2 = (i >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( lions )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
@@ -335,7 +366,8 @@ static MACHINE_DRIVER_START( lions )
 	MDRV_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
 
 	MDRV_GFXDECODE(lions)
-	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(64)
+	MDRV_PALETTE_INIT(lions)
 
 	MDRV_VIDEO_START(lions)
 	MDRV_VIDEO_UPDATE(lions)
@@ -356,19 +388,17 @@ ROM_START( 86lions )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lion_std.u9", 0xe000, 0x2000, CRC(994842b0) SHA1(72fc31c577ee70b07ce9a4f2e864fe113d32affe) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "rd0.u13", 0x00000, 0x1000, CRC(38c57504) SHA1(cc3ac1df644abc4586fc9f0e88531ba146b86b48) )
 	ROM_LOAD( "gn0.u10", 0x01000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
 	ROM_LOAD( "bl0.u8",  0x02000, 0x1000, CRC(00ef4724) SHA1(714fafd035e2befbb35c6d00df52845745e58a93) )
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "rd1.u12", 0x00000, 0x1000, CRC(350dd017) SHA1(ba273d4231e7e4c44922898cf5a70e8b1d6e2f9d) )
-	ROM_LOAD( "gn1.u11", 0x01000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
-	ROM_LOAD( "bl1.u9",  0x02000, 0x1000, CRC(675e164a) SHA1(99346ca70bfe673b31d71dc6b3bbc3b8f961e87f) )
+	ROM_LOAD( "rd1.u12", 0x03000, 0x1000, CRC(350dd017) SHA1(ba273d4231e7e4c44922898cf5a70e8b1d6e2f9d) )
+	ROM_LOAD( "gn1.u11", 0x04000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
+	ROM_LOAD( "bl1.u9",  0x05000, 0x1000, CRC(675e164a) SHA1(99346ca70bfe673b31d71dc6b3bbc3b8f961e87f) )
 
 //  ROM_REGION( 0x20, "proms", 0 )
 //  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 
-GAME( 1985, 86lions, 0, lions, lions, 0, ROT0, "Aristocrat",  "86 Lions", GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1985, 86lions, 0, lions, lions, 0, ROT0, "Aristocrat",  "86 Lions", GAME_NOT_WORKING )
