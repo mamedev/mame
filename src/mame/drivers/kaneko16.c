@@ -644,6 +644,9 @@ static ADDRESS_MAP_START( gtmr_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x600000, 0x60000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x680000, 0x68000f) AM_RAM_WRITE(kaneko16_layers_1_regs_w) AM_BASE(&kaneko16_layers_1_regs)	// Layers 1 Regs
+
+	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(kaneko16_sprites_regs_r, kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs)	// Sprites Regs
+
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)					// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
 
