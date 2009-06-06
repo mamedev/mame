@@ -92,14 +92,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		color = spriteram[count+2] & 0x7;
 
 		/* TODO: understand this */
-		if(spriteram[count+2] & 0x80)
-			spr_offs+=0x200;
-
-		if(spriteram[count+2] & 0x40)
-			spr_offs+=0x80;
-
-		if(spriteram[count+2] & 0x20)
-			spr_offs+=0x100;
+		spr_offs += 2*(spriteram[count+2] & 0xf0);
 
 		y = 0x100 - spriteram[count];
 		x = spriteram[count+3];
@@ -112,9 +105,7 @@ static VIDEO_UPDATE(mirax)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x00000;
-
 	int y,x;
-
 
 	for (y=0;y<32;y++)
 	{
@@ -124,6 +115,8 @@ static VIDEO_UPDATE(mirax)
 			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile|= ((color & 0x80)<<3) | ((color & 0x20)<<3);
+
+			if(color & 0x40) { tile+= 0x200; }
 
 			//int colour = tile>>12;
 			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
