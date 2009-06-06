@@ -79,21 +79,25 @@ static VIDEO_START(mirax)
 {
 }
 
+/* might or might not be stars, needs that the game does more. */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	#if 0
 	int count;
 
 	for(count=0;count<0x100;count+=4)
 	{
 		int spr_offs,x,y;
-		spr_offs = (0x350) | (spriteram[count+1] & 0x3);
+
+		spr_offs = (0x40) | (spriteram[count+1] & 0xff) | ((spriteram[count+2] & 0xf)<<8);
+
+		if(spr_offs == 0x40)
+			continue;
+
 		x = spriteram[count];
 		y = spriteram[count+3];
 
-		drawgfx(bitmap,machine->gfx[0],spr_offs,6,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0],spr_offs,1,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
-	#endif
 }
 
 static VIDEO_UPDATE(mirax)
@@ -110,8 +114,11 @@ static VIDEO_UPDATE(mirax)
 		{
 			int tile = videoram[count];
 			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
+			int x_scroll = (color & 0xff00)>>8;
+			tile|= ((color & 0x80)<<3) | ((color & 0x20)<<3);
+
 			//int colour = tile>>12;
-			drawgfx(bitmap,gfx,tile & 0xff,color & 7,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
 
 			count++;
 		}
@@ -172,11 +179,11 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&spriteram) // spriteram? backgrounds?
 	AM_RANGE(0xe900, 0xe9ff) AM_RAM // spriteram?
 	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(&colorram) //per-column color + bank bits for the videoram
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
-	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("IN1")
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("IN2")
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
+	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf300, 0xf300) AM_READ(unk_r) //watchdog? value is always read then discarded
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("IN3")
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
 //	AM_RANGE(0xf500, 0xf500) //coin counter
 	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
 //	AM_RANGE(0xf506, 0xf506)
@@ -241,7 +248,7 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 static INPUT_PORTS_START( mirax )
-	PORT_START("IN0") //player-1
+	PORT_START("P1") //player-1
 	PORT_DIPNAME( 0x01, 0x00, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -260,7 +267,8 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_START("IN1") //player-2
+
+	PORT_START("P2") //player-2
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -283,13 +291,14 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN2") //dip-sw bank 1
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* note: one of these dips is for Invincibility, check which one */
+	PORT_START("DSW1") //dip-sw bank 1
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -308,16 +317,17 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN3") //dip-sw bank 2
+
+	PORT_START("DSW2") //dip-sw bank 2
 	PORT_DIPNAME( 0x01, 0x01, "IN3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -409,7 +419,7 @@ ROM_START( mirax )
 
 	ROM_REGION( 0xc000, "data_code", 0 ) // encrypted code for the main cpu
 	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
-	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, BAD_DUMP CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
+	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
 	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -443,12 +453,15 @@ static DRIVER_INIT( mirax )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	int i;
 
-	for(i=0;i<0xc000;i++)
-	{
+	for(i=0x0000;i<0x4000;i++)
 		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
-	}
 
-	ROM[0x1d] = 0xb3; //patch rom 2 checksum, should return 0xee! Might be bad decryption or bad dump.
+	for(i=0x4000;i<0x8000;i++)
+		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 2, 1, 0, 6, 7, 5, 3, 4) ^ 0xff);
+
+	for(i=0x8000;i<0xc000;i++)
+		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
+
 }
 
 GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING)
