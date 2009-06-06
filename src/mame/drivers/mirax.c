@@ -8,7 +8,8 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
-- check if the 2nd rom decryption is correct or it's a bad dump;
+- sprite banking;
+- emulate sound properly;
 
 ====================================================
 
@@ -79,24 +80,31 @@ static VIDEO_START(mirax)
 {
 }
 
-/* might or might not be stars, needs that the game does more. */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int count;
 
-	for(count=0;count<0x100;count+=4)
+	for(count=0;count<0x200;count+=4)
 	{
-		int spr_offs,x,y;
+		int spr_offs,x,y,color;
 
-		spr_offs = (0x40) | (spriteram[count+1] & 0xff) | ((spriteram[count+2] & 0xf)<<8);
+		spr_offs = (spriteram[count+1] & 0xff);
+		color = spriteram[count+2] & 0x7;
 
-		if(spr_offs == 0x40)
-			continue;
+		/* TODO: understand this */
+		if(spriteram[count+2] & 0x80)
+			spr_offs+=0x200;
 
-		x = spriteram[count];
-		y = spriteram[count+3];
+		if(spriteram[count+2] & 0x40)
+			spr_offs+=0x80;
 
-		drawgfx(bitmap,machine->gfx[0],spr_offs,1,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		if(spriteram[count+2] & 0x20)
+			spr_offs+=0x100;
+
+		y = 0x100 - spriteram[count];
+		x = spriteram[count+3];
+
+		drawgfx(bitmap,machine->gfx[1],spr_offs,color,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -119,6 +127,7 @@ static VIDEO_UPDATE(mirax)
 
 			//int colour = tile>>12;
 			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256,cliprect,TRANSPARENCY_NONE,0);
 
 			count++;
 		}
@@ -176,8 +185,7 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&spriteram) // spriteram? backgrounds?
-	AM_RANGE(0xe900, 0xe9ff) AM_RAM // spriteram?
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(&colorram) //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
@@ -189,7 +197,7 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0xf506, 0xf506)
 //	AM_RANGE(0xf507, 0xf507)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
-//	AM_RANGE(0xf900, 0xf900)
+//	AM_RANGE(0xf900, 0xf900) //sound cmd mirror?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirax_io_map, ADDRESS_SPACE_IO, 8 )
@@ -244,27 +252,16 @@ static const gfx_layout layout8 =
 static GFXDECODE_START( mirax )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
-	GFXDECODE_ENTRY( "gfx3", 0, layout16,    0, 8 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( mirax )
 	PORT_START("P1") //player-1
-	PORT_DIPNAME( 0x01, 0x00, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
@@ -430,15 +427,13 @@ ROM_START( mirax )
 	ROM_LOAD( "mxh3-4v.rom",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
 	ROM_LOAD( "mxk3-4v.rom",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "mxe2-4v.rom",   0x0000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
-	ROM_LOAD( "mxf2-4v.rom",   0x4000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
-	ROM_LOAD( "mxh2-4v.rom",   0x8000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
-
-	ROM_REGION( 0xc000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "mxf3-4v.rom",   0x0000, 0x4000, CRC(14b1ca85) SHA1(775a4c81a81b78490d45095af31e24c16886f0a2) )
-	ROM_LOAD( "mxi3-4v.rom",   0x4000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
-	ROM_LOAD( "mxl3-4v.rom",   0x8000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "mxe2-4v.rom",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
+	ROM_LOAD( "mxf2-4v.rom",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
+	ROM_LOAD( "mxh2-4v.rom",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
+	ROM_LOAD( "mxf3-4v.rom",   0x00000, 0x4000, CRC(14b1ca85) SHA1(775a4c81a81b78490d45095af31e24c16886f0a2) )
+	ROM_LOAD( "mxi3-4v.rom",   0x08000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
+	ROM_LOAD( "mxl3-4v.rom",   0x10000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
 
 	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
