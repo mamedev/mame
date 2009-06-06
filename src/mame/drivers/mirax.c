@@ -92,7 +92,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		color = spriteram[count+2] & 0x7;
 
 		/* TODO: understand this */
-		spr_offs += 2*(spriteram[count+2] & 0xf0);
+		spr_offs += 2*(spriteram[count+2] & 0xe0);
+
+		if(spriteram[count+2] & 0x10)
+			spr_offs+=0x200;
 
 		y = 0x100 - spriteram[count];
 		x = spriteram[count+3];
