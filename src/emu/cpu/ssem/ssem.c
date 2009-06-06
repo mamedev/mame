@@ -82,7 +82,7 @@ static void unimplemented_opcode(ssem_state *cpustate, UINT32 op)
                 fprintf(dasm, "%02X: %08X    %s\n", i, opcode, string);
             }
 
-            fclose(dasm);
+            fclose(disasm);
         }
     }
 #endif
@@ -186,7 +186,7 @@ static CPU_EXECUTE( ssem )
         }
         else
         {
-            op = 7;
+            op = 0x0000e000;
         }
 
         switch (INSTR)
