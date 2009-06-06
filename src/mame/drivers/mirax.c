@@ -145,9 +145,9 @@ static READ8_HANDLER( unk_r )
 }
 
 static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP //shoudn't write there!
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	//AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	//AM_RANGE(0xc800, 0xcfff) AM_RAM //probably spriteram
+	//AM_RANGE(0xc800, 0xcfff) AM_RAM // reads there and puts stuff to the $e800-$efff
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	//AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
@@ -233,10 +233,9 @@ PALETTE_INIT( mirax )
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
@@ -278,7 +277,9 @@ static MACHINE_DRIVER_START( mirax )
 MACHINE_DRIVER_END
 
 ROM_START( mirax )
-	ROM_REGION( 0xc000, "maincpu", 0 ) // encrypted code
+	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00 ) // put decrypted code there
+
+	ROM_REGION( 0xc000, "data_code", 0 ) // encrypted code for the main cpu
 	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
 	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
 	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
@@ -310,11 +311,14 @@ ROM_END
 
 static DRIVER_INIT( mirax )
 {
+	UINT8 *DATA = memory_region(machine, "data_code");
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	int i;
 
 	for(i=0;i<0xc000;i++)
-		ROM[i] = BITSWAP8(ROM[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff;
+	{
+		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
+	}
 }
 
 GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING)
