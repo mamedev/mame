@@ -3384,6 +3384,18 @@ ROM_START( openmj )
 	ROM_LOAD( "82s123.prm", 0x00, 0x20, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+ROM_START( janputer )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+ 	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(f36f4222) SHA1(ce18c273a59f86cb17ea6ba8a3daefc3d750df1e) )
+ 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(7d57cb48) SHA1(38b97c5d02e3ab6187e5e0f86c06b8a3747b51a8) )
+ 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(fb481d9a) SHA1(122e2b0d11fe1fe8cf219da9c8f96fe5a1016bb6) )
+ 	ROM_LOAD( "7.bin",   0x6000, 0x1000, NO_DUMP ) // reads from here for the gfx data.
+
+ 	ROM_REGION( 0x20, "proms", 0 )
+ 	/* taken from Royal Mahjong, might or might not be the same. */
+ 	ROM_LOAD( "82s123.prm", 0x00, 0x20, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
 /***************************************************************************
 Janyou Part II
 (c)1984 Cosmo Denshi
@@ -4611,6 +4623,7 @@ GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0,   "Nichibut
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1981,  janputer, 0,        royalmah, royalmah, 0,        ROT0,   "Taito Corporation",          "Janputer (Japan)",                      0 )
 GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        GAME_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   0,        ROT180, "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -7825,6 +7825,7 @@ Other Sun games
 	DRIVER( openmj )	/* (c) 1982 Nichibutsu */
 	DRIVER( royalmah )	/* Falcon bootleg */
 	DRIVER( janyoup2 )	/* Falcon bootleg */
+	DRIVER( janputer )  /* (c) 1982 Taito */
 	DRIVER( janoh )		/* (c) 1984 Toaplan */
 	DRIVER( janoha )	/* (c) 1984 Toaplan */
 	DRIVER( jansou )	/* (c) 1985 Dyna */
