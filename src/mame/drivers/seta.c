@@ -1287,6 +1287,29 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 ***************************************************************************/
 
+/***************************************************************************
+
+Jockey Club
+^^^^^^^^^^^
+Dumped by Andrew Welburn on the evening of 05/06/09
+
+http://www.andys-arcade.com
+
+*************************************************
+**Do not seperate this text file from the roms.**
+*************************************************
+
+Take a look at the photos in the archive, the roms
+should be failry explanatory, and you should be
+able to pick out the chips it uses.
+
+Most of the romset matches mame except for the
+two eproms, see the mame -romident dump.
+
+enjoy..
+
+***************************************************************************/
+
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -2632,6 +2655,68 @@ static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
+static UINT8 jockeyc_key_select;
+
+static READ16_HANDLER( jockeyc_mux_r )
+{
+	switch( jockeyc_key_select )
+	{
+		case 0x08:	return input_port_read(space->machine, "BET0");
+		case 0x10:	return input_port_read(space->machine, "BET1");
+		case 0x20:	return input_port_read(space->machine, "BET2");
+		case 0x40:	return input_port_read(space->machine, "BET3");
+		case 0x80:	return input_port_read(space->machine, "BET4");
+	}
+
+	return 0xffff;
+}
+
+static WRITE16_HANDLER( jockeyc_mux_w )
+{
+	/* other bits used too */
+	jockeyc_key_select = data & 0xf8;
+}
+
+static READ16_HANDLER( unk_r )
+{
+	return 0xffff;//mame_rand(space->machine);
+}
+
+/* same as International Toote but without the protection and different RTC hook-up */
+static ADDRESS_MAP_START( jockeyc_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
+
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(jockeyc_mux_r,jockeyc_mux_w)
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("P1")
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("P2") AM_WRITENOP
+
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(watchdog_reset16_w)	// Watchdog
+
+	AM_RANGE(0x300002, 0x300003) AM_WRITENOP
+
+	AM_RANGE(0x300010, 0x300011) AM_WRITENOP	// lev1 ack
+	AM_RANGE(0x300020, 0x300021) AM_WRITENOP	// lev2 ack
+	AM_RANGE(0x300040, 0x300041) AM_WRITENOP	// lev4 ack
+	AM_RANGE(0x300060, 0x300061) AM_WRITENOP	// lev6 ack
+
+	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
+	AM_RANGE(0x600000, 0x600003) AM_READ(unk_r)
+
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
+
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1", seta_sound_word_r, seta_sound_word_w)	// Sound
+
+	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_BASE(&seta_vctrl_0)	// VRAM 0&1 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0)	// VRAM 0&1
+	AM_RANGE(0xb04000, 0xb0ffff) AM_WRITENOP // likely left-over
+
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM		// ? 0x4000
+
+	AM_RANGE(0xd00000, 0xd00607) AM_RAM	AM_BASE(&spriteram16)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE(&spriteram16_2)	// Sprites Code + X + Attr
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM	// RAM
+ADDRESS_MAP_END
 
 /***************************************************************************
 
@@ -6038,6 +6123,101 @@ static INPUT_PORTS_START( inttoote )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jockeyc )
+	PORT_INCLUDE( inttoote )
+
+	PORT_MODIFY("BET1")	// 200000.w (0x10)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Credit")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Credit")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )
+
+	/* many service switches actually */
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Drop - 1P" )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Hopper Overflow - 1P" )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, "Coin Out" )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Att Pay - 1P" )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B - 1P")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A - 1P")
+	PORT_DIPNAME( 0x0040, 0x0040, "Coin Sense 2 - 1P" )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin Sense 1 - 1P" )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "Coin Drop - 2P" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Sel Sense" )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Att Pay - 2P" )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Coin B - 2P")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin A - 2P")
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Sense 2 - 2P" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Coin Sense 1 - 2P" )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Door Open") PORT_TOGGLE
+	PORT_DIPNAME( 0x0002, 0x0002, "SYSTEM" )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Tilt ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Special Test Mode Item?" )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Call SW" )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )	// Function menu (electronic key switch, fitted beneath the front panel)
+	PORT_DIPNAME( 0x2000, 0x2000, "Analyzer" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset SW")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // Battery (0 = OK, 1 = NG)
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -7868,6 +8048,13 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( jockeyc )
+	MDRV_IMPORT_FROM( inttoote )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(jockeyc_map)
+MACHINE_DRIVER_END
+
+
 
 /***************************************************************************
 
@@ -8968,6 +9155,43 @@ ROM_START( crazyfgt )
 	ROM_LOAD( "rom.u85",  0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
 ROM_END
 
+ROM_START( jockeyc )
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "ya-007-002-u23.bin", 0x000000, 0x10000, CRC(c499bf4d) SHA1(2417eac2972bbb0f8f0a4a1fd72c9d78537367c7) )
+	ROM_LOAD16_BYTE( "ya-007-003-u33.bin", 0x000001, 0x10000, CRC(e7b0677e) SHA1(90dbd710623ff57b953483240e1006c9bda3fc91) )
+	ROM_FILL(                                     0x020000, 0x60000, 0xff )
+	ROM_LOAD16_WORD_SWAP( "ya_002_001.u18",       0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
+	ROM_FILL(                                     0x180000, 0x80000, 0xff )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "ya_011_004.u10",             0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
+	//ROM_LOAD( "p523.v01_horse_fore_1.u135", 0x070000, 0x10000, CRC(3a75df30) SHA1(f3b3a7428e3e125921686bc9aacde6b28b1947b5) )
+
+	ROM_LOAD( "ya_011_005.u17",             0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	//ROM_LOAD( "p523.v01_horse_fore_2.u134", 0x0f0000, 0x10000, CRC(26fb0339) SHA1(a134ecef00f690c82c8bddf26498b357ccf8d5c3) )
+
+	ROM_LOAD( "ya_011_006.u22",             0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	//ROM_LOAD( "p523.v01_horse_fore_3.u133", 0x170000, 0x10000, CRC(c38596af) SHA1(d27141e28d8f8352f065c55121412e604c199a9a) )
+
+	ROM_LOAD( "ya_011_007.u27",             0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	//ROM_LOAD( "p523.v01_horse_fore_4.u132", 0x1f0000, 0x10000, CRC(64ef345e) SHA1(ef5d9f293ded44a2be91278549f5db8673fc7571) )
+
+	ROM_REGION( 0xc0000, "gfx2", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_LOAD( "ya_011_008.u35",             0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	//ROM_LOAD( "p523.v01_horse_back_1.u137", 0x040000, 0x20000, CRC(39b221ea) SHA1(3b3367430733ed36d6a981cd2ec6df731d07c089) )
+
+	ROM_LOAD( "ya_011_009.u41",             0x060000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	//ROM_LOAD( "p523.v01_horse_back_2.u136", 0x0a0000, 0x20000, CRC(9c5e32a0) SHA1(964734a626b5c7b9d7130addc642895df520dcb7) )
+
+	ROM_REGION( 0x400, "proms", 0 )	/* Colours */
+	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
+	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
+
+	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
+	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
+ROM_END
+
 ROM_START( inttoote )
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "p523.v01_horse_prog_2.002", 0x000000, 0x10000, CRC(6ce6f1ad) SHA1(82e7100721ca5b1a736f6523610b1f1edf225c12) )
@@ -9280,6 +9504,8 @@ GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, 0,        ROT0,   "Seta",   
 GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "[Seta] (Visco license)", "Jockey Club", 0 )
+GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1991, rezon,    0,        rezon,    rezon,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )
 GAME( 1992, rezont,   rezon,    rezon,    rezont,   rezon,    ROT0,   "Allumer (Taito license)","Rezon (Taito)", 0 )
 GAME( 1991, stg,      0,        drgnunit, stg,      0,        ROT270, "Athena / Tecmo",         "Strike Gunner S.T.G", 0 )
@@ -9313,5 +9539,4 @@ GAME( 1995, gundhara, 0,        gundhara, gundhara, 0,        ROT270, "Banpresto
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, zombraid, 0,        gundhara, zombraid, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, inttoote, 0,        inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 

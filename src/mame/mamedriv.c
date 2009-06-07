@@ -7417,6 +7417,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wits )		/* (c) 1989 Athena (Visco license) */
 	DRIVER( thunderl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) */
 	DRIVER( wiggie )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
+	DRIVER( jockeyc )	/* (c) 1990 [Seta] (Visco license) */
 	DRIVER( rezon )		/* (c) 1991 Allumer */
 	DRIVER( rezont )	/* (c) 1991 Allumer / Taito */
 	DRIVER( stg )		/* (c) 1991 Athena / Tecmo */
