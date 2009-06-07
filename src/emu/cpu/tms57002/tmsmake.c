@@ -51,7 +51,7 @@ typedef struct {
   int ppos[4];
 } pinf;
 
-const static pdesc pp_r[] = {
+static const pdesc pp_r[] = {
   { "a",    0, PA   },
   { "c",    0, PC   },
   { "d",    0, PD   },
@@ -82,7 +82,7 @@ typedef struct {
 
 enum { IxCMODE, IxDMODE, IxSFAI, IxCRM, IxDBP, IxSFAO, IxSFMO, IxRND, IxMOVM, IxSFMA, IxCOUNT };
 
-static vinfo vinf[] = {
+static const vinfo vinf[] = {
   { I_CMODE, 3, "cmode", "xmode(opcode, 'c')" },
   { I_DMODE, 3, "dmode", "xmode(opcode, 'd')" },
   { I_SFAI,  2, "sfai",  "sfai(s->st1)"       },
@@ -95,6 +95,17 @@ static vinfo vinf[] = {
   { I_SFMA,  4, "sfma",  "sfma(s->st1)"       },
   { 0 }
 };
+
+static char *xstrdup(const char *str)
+{
+  char *cpy = NULL;
+  if (str != NULL) {
+    cpy = (char *)malloc(strlen(str) + 1);
+    if (cpy != NULL)
+      strcpy(cpy, str);
+  }
+  return cpy;
+}
 
 static char *sconcat(char *dest, const char *src)
 {
@@ -156,7 +167,7 @@ static void load(const char *fname)
 	p = buf;
 	while(*p == ' ' || *p == '\t')
 	  p++;
-	i->dasm = strdup(p);
+	i->dasm = xstrdup(p);
       }
     } else {
       char *name=0, *cat=0, *id=0, *cyc=0, *rep=0, *type=0;
@@ -224,7 +235,7 @@ static void load(const char *fname)
 	exit(1);
       }
 
-      i->name = strdup(name);
+      i->name = xstrdup(name);
       i->line = line;
       i->cycles = strtol(cyc, 0, 10);
       i->flags = flags;
@@ -399,7 +410,7 @@ static void scs(char **str, const char *s)
 
 static void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
 {
-  const static pdesc pp[] = {
+  static const pdesc pp[] = {
     { "c", 0, PC },
     { "d", 0, PD },
     { "i", 0, PI },
