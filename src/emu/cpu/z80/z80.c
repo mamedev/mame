@@ -3324,7 +3324,7 @@ static void take_interrupt(z80_state *z80)
 				PUSH(z80, pc);
 				z80->PCD = irq_vector & 0x0038;
 				/* RST $xx + 2 cycles */
-				z80->icount -= z80->cc_op[z80->0xff] + z80->cc_ex[z80->0xff];
+				z80->icount -= z80->cc_op[0xff] + z80->cc_ex[0xff];
 				break;
 		}
 	}
