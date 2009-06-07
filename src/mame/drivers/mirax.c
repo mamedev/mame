@@ -2,13 +2,14 @@
 ****************************************************
 Mirax (C)1985 Current Technologies
 
-preliminary WIP driver by
+driver by
 Tomasz Slanina analog[AT]op[DOT]pl
 Angelo Salese
 Olivier Galibert
 
 TODO:
-- sprite banking;
+- sprite offsets?
+- score / credits display should stay above the sprites?
 - emulate sound properly;
 
 ====================================================
@@ -86,21 +87,23 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for(count=0;count<0x200;count+=4)
 	{
-		int spr_offs,x,y,color;
+		int spr_offs,x,y,color,fx,fy;
 
-		spr_offs = (spriteram[count+1] & 0xff);
+		if(spriteram[count] == 0x00 && spriteram[count+3] == 0x00)
+			continue;
+
+		spr_offs = (spriteram[count+1] & 0x3f);
 		color = spriteram[count+2] & 0x7;
+		fx = spriteram[count+1] & 0x40; //<- guess
+		fy = spriteram[count+1] & 0x80;
 
-		/* TODO: understand this */
-		spr_offs += 2*(spriteram[count+2] & 0xe0);
-
-		if(spriteram[count+2] & 0x10)
-			spr_offs+=0x200;
+		spr_offs += (spriteram[count+2] & 0xe0)<<1;
+		spr_offs += (spriteram[count+2] & 0x10)<<5;
 
 		y = 0x100 - spriteram[count];
 		x = spriteram[count+3];
 
-		drawgfx(bitmap,machine->gfx[1],spr_offs,color,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[1],spr_offs,color,fx,fy,x,y-16,cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -117,12 +120,10 @@ static VIDEO_UPDATE(mirax)
 			int tile = videoram[count];
 			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
-			tile|= ((color & 0x80)<<3) | ((color & 0x20)<<3);
+			tile |= ((color & 0xe0)<<3);
 
-			if(color & 0x40) { tile+= 0x200; }
-
-			//int colour = tile>>12;
 			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
+			/* wrap-around */
 			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256,cliprect,TRANSPARENCY_NONE,0);
 
 			count++;
@@ -193,11 +194,7 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0xf506, 0xf506)
 //	AM_RANGE(0xf507, 0xf507)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
-//	AM_RANGE(0xf900, 0xf900) //sound cmd mirror?
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mirax_io_map, ADDRESS_SPACE_IO, 8 )
-
+//	AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -214,11 +211,6 @@ static ADDRESS_MAP_START( mirax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe403, 0xe403) AM_WRITENOP
 
 	AM_RANGE(0xf900, 0xf9ff) AM_WRITE(audio_w)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mirax_sound_io_map, ADDRESS_SPACE_IO, 8 )
-
 ADDRESS_MAP_END
 
 static const gfx_layout layout16 =
@@ -251,41 +243,27 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 static INPUT_PORTS_START( mirax )
+	/* up/down directions are trusted according of the continue screen */
 	PORT_START("P1") //player-1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("P2") //player-2
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	/* note: one of these dips is for Invincibility, check which one */
 	PORT_START("DSW1") //dip-sw bank 1
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
@@ -298,12 +276,11 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -312,7 +289,7 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2") //dip-sw bank 2
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW_BANK2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -321,12 +298,13 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	/* this dip makes the game to behave like attract mode, even if you insert a coin */
+	PORT_DIPNAME( 0x10, 0x00, "Auto-Play Mode (Debug)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -373,14 +351,12 @@ static INTERRUPT_GEN( mirax_vblank_irq )
 }
 
 static MACHINE_DRIVER_START( mirax )
-	MDRV_CPU_ADD("maincpu", Z80, 12000000) // ceramic potted module, encrypted z80
+	MDRV_CPU_ADD("maincpu", Z80, 12000000/2) // ceramic potted module, encrypted z80
 	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
-	MDRV_CPU_IO_MAP(mirax_io_map)
 	MDRV_CPU_VBLANK_INT("screen",mirax_vblank_irq)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000) // audio cpu ?
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000/2) // audio cpu ?
 	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
-	MDRV_CPU_IO_MAP(mirax_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
 	/* video hardware */
@@ -389,7 +365,7 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
 	MDRV_PALETTE_LENGTH(0x40)
 	MDRV_PALETTE_INIT(mirax)
@@ -404,8 +380,8 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/6 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
 MACHINE_DRIVER_END
+
 
 ROM_START( mirax )
 	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00 ) // put decrypted code there
@@ -455,4 +431,4 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_NOT_WORKING)
+GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
