@@ -1,18 +1,21 @@
 /************************************************************************************
 
- Super Crowns Golf
- preliminary WIP driver
- by Tomasz Slanina & Angelo Salese
+ Super Crowns Golf (c) 1989 Nasco Japan
+
+ driver by Tomasz Slanina & Angelo Salese
 
  TODO:
  - remove the patch and understand what needs to be modified for the gfxs, game
    doesn't crash anymore;
- - inputs not fully understood, sometimes analog inputs gets stuck;
+ - Some weird framebuffer vertical gaps with some object, namely the green and the
+   trees (zooming?)
+ - not sure if the analog inputs are handled correctly;
+ - Fix the framebuffer display in cocktail mode;
 
  Notes:
  - The game uses special control panel with 1 golf club shaped device to select shot
- strength (0,1,2,3), and 6 buttons (direction L&R, select angle of club head, club
- select, shot, and power to use items). -YO
+   strength (0,1,2,3), and 6 buttons (direction L&R, select angle of club head, club
+   select, shot, and power to use items). -YO
 
 ************************************************************************************/
 
@@ -233,7 +236,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-//  if(data == 0) data = 1; //test hack
+
 	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
 
 	if(data & 0xf0)
@@ -242,25 +245,22 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 
 static READ8_HANDLER( pedal_extra_bits_r )
 {
-	static UINT8 p1_pedal_hi,p1_sht_sw,p2_pedal_hi,p2_sht_sw;
+	static UINT8 p1_sht_sw,p2_sht_sw;
 
-	/* TODO: check this */
-	p1_pedal_hi = (input_port_read(space->machine, "P1_PEDAL") & 0x10)>>3;
-	p1_sht_sw = (input_port_read(space->machine, "P1_PEDAL") & 0x80)>>7;
-	p2_pedal_hi = (input_port_read(space->machine, "P2_PEDAL") & 0x10)<<1;
-	p2_sht_sw = (input_port_read(space->machine, "P2_PEDAL") & 0x80)>>3;
+	p1_sht_sw = (input_port_read(space->machine, "P1_RELEASE") & 0x80)>>7;
+	p2_sht_sw = (input_port_read(space->machine, "P2_RELEASE") & 0x80)>>6;
 
-	return p1_pedal_hi | p1_sht_sw | p2_pedal_hi | p2_sht_sw;
+	return p1_sht_sw | p2_sht_sw;
 }
 
 static READ8_HANDLER( p1_r )
 {
-	return (input_port_read(space->machine, "P1") & 0xf0) | ((input_port_read(space->machine, "P1_PEDAL") & 0xf));
+	return (input_port_read(space->machine, "P1") & 0xf0) | ((input_port_read(space->machine, "P1_ANALOG") & 0xf));
 }
 
 static READ8_HANDLER( p2_r )
 {
-	return (input_port_read(space->machine, "P2") & 0xf0) | ((input_port_read(space->machine, "P2_PEDAL") & 0xf));
+	return (input_port_read(space->machine, "P2") & 0xf0) | ((input_port_read(space->machine, "P2_ANALOG") & 0xf));
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -297,9 +297,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			/* SEL */
 
-	PORT_START("P1_PEDAL")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)			/* release power? */
+	PORT_START("P1_ANALOG")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	/* simulate spring throttle with the following button */
+	PORT_START("P1_RELEASE")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* release power? */
 
 	PORT_START("P2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P2 Pedal */
@@ -308,9 +311,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT - shot switch */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)			/* SEL */
 
-	PORT_START("P2_PEDAL")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)			/* release power? */
+	PORT_START("P2_ANALOG")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+	/* simulate spring throttle with the following button */
+	PORT_START("P2_RELEASE")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	/* release power? */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               			/* 1P */
@@ -547,4 +553,4 @@ static DRIVER_INIT( suprgolf )
 	ROM[0x74f5-0x4000] = 0x00;
 }
 
-GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
