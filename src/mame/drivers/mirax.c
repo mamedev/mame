@@ -8,9 +8,9 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
+- emulate sound properly;
 - sprite offsets?
 - score / credits display should stay above the sprites?
-- emulate sound properly;
 
 ====================================================
 
@@ -89,7 +89,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int spr_offs,x,y,color,fx,fy;
 
-		if(spriteram[count] == 0x00 && spriteram[count+3] == 0x00)
+		if(spriteram[count] == 0x00 || spriteram[count+3] == 0x00)
 			continue;
 
 		spr_offs = (spriteram[count+1] & 0x3f);
@@ -131,6 +131,29 @@ static VIDEO_UPDATE(mirax)
 	}
 
 	draw_sprites(screen->machine,bitmap,cliprect);
+
+	count = 0x00000;
+
+	/* draw score and credit displays above the sprites */
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile = videoram[count];
+			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
+			int x_scroll = (color & 0xff00)>>8;
+			tile |= ((color & 0xe0)<<3);
+
+			if(x <= 1 || x >= 30)
+			{
+				drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
+				/* wrap-around */
+				drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256,cliprect,TRANSPARENCY_NONE,0);
+			}
+
+			count++;
+		}
+	}
 
 	return 0;
 }
@@ -431,4 +454,4 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_IMPERFECT_SOUND )
