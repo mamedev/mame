@@ -8454,8 +8454,8 @@ Other Sun games
 	DRIVER( bbprot )	/* unfinished prototype */
 	DRIVER( flower )	/* (c) 1986 Komax */
 	DRIVER( flowers )	/* (c) 1986 Sega/Alpha */
-	DRIVER( beaminv )	/* (c) 1979 Teknon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
-	DRIVER( beaminva )	/* (c) 1979 Teknon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
+	DRIVER( beaminv )	/* (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
+	DRIVER( beaminva )	/* (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
 	DRIVER( mcatadv )	/* (c) 1993 Wintechno */
 	DRIVER( mcatadvj )	/* (c) 1993 Wintechno */
 	DRIVER( catt )		/* (c) 1993 Wintechno */
