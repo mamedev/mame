@@ -6517,6 +6517,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wwfwfstj )	/* TA-0031 (c) 1991 (Japan) */
 	DRIVER( shadfrce )	/* TA-0032 (c) 1993 (US) */
 	DRIVER( shadfrcj )	/* TA-0032 (c) 1993 (Japan) */
+	DRIVER( shadfrcjv2 )	/* TA-0032 (c) 1993 (Japan) */
 
 	/* Stern "Berzerk hardware" games */
 	DRIVER( berzerk )	/* (c) 1980 */

@@ -21,6 +21,66 @@ Stephh's notes :
 
 *******************************************************************************
 
+Shadow Force
+Technos 1993
+
+PCB Layout
+----------
+
+TA-0032-P1-24
+MADE IN JAPAN
+|--------------------------------------------------------|
+|LA4460 MB3615 YM3012  3.579545MHz 32J8-0.32             |
+|VOL    MB3615 YM2151  Z80            32J7-0.25          |
+|              M6295                     32J6-0.24       |
+|   32J9-0.76         32J10.42              32J5-0.13    |
+|                     6116                     32J4-0.12 |
+|                                           |-------|    |
+|                                           |TECHNOS|    |
+|J                            62256         |TJ-005 |    |
+|A          62256             13.4952MHz    |       |    |
+|M          62256             28MHz         |-------|    |
+|M          32J11-0.55                       6116        |
+|A                 |-------|    |-------|    6116        |
+|                  |TECHNOS|    |TECHNOS|                |
+|                  |TJ-004 |    |TJ-002 |   32J3-0.6     |
+|DSW3              |       |    |       |   32J2-0.5     |
+|DSW2              |-------|    |-------|   32J1-0.4     |
+|DSW1           32A12-0.34                               |
+|CN2                32A14-0.33                           |
+|                62256  32A13-0.26     62256   A1010     |
+|        68000   62256      32J15-0.14 62256             |
+|--------------------------------------------------------|
+Notes:
+      68000    - Clock 14.000MHz [28/2]
+      Z80      - Clock 3.579545MHz
+      YM2151   - Clock 3.579545MHz
+      YM3012   - Clock 1.7897725MHz [3.579545/2]
+      M6295    - Clock 1.6869MHz [13.4952/8]. Pin 7 HIGH (5.0V)
+      A1010    - Actel A1010A-1 FPGA labelled 'TJ32A 92.11.30' (PLCC68)
+      LA4460   - Audio Power Amp
+      CN2      - 9 pin connector for extra buttons
+      MB3615   - Fujitsu MB3615 Quad Operational Amplifier (like TL074 except pin 11 tied to GND, not -5V)
+      6116     - 2k x8 SRAM (DIP24)
+      62256    - 32k x8 SRAM (DIP28)
+      DSW1/2/3 - 8-position dip switches
+
+      ROMs
+      ----
+      32J1 thru 32J8  - 16M mask ROM (DIP42)
+      32A12/13/14/J15 - 27C2001 EPROM (DIP32)
+      32J9            - 4M mask ROM (DIP32)
+      32J10           - 27C512 EPROM (DIP28)
+      32J11           - 27C010 EPROM (DIP32)
+
+      Measurements
+      ------------
+      X1     - 27.99987MHz
+      X2     - 3.57899MHz
+      X4     - 13.4894MHz
+      VSync  - 57.4446Hz
+      HSync  - 15.6248kHz
+
 -- Read Me --
 
 Shadow Force (c)1993 Technos
@@ -548,7 +608,7 @@ MACHINE_DRIVER_END
 
 ROM_START( shadfrce )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "32a12-01.34", 0x00001, 0x40000, CRC(04501198) SHA1(50f981c13f9ed19d681d494376018ba86464ea13) )
+	ROM_LOAD16_BYTE( "32a12-01.34", 0x00001, 0x40000, CRC(04501198) SHA1(50f981c13f9ed19d681d494376018ba86464ea13) ) /* US Version 2 */
 	ROM_LOAD16_BYTE( "32a13-01.26", 0x00000, 0x40000, CRC(b8f8a05c) SHA1(bd9d4218a7cf57b56aec1f7e710e02af8471f9d7) )
 	ROM_LOAD16_BYTE( "32a14-0.33",  0x80001, 0x40000, CRC(08279be9) SHA1(1833526b23feddb58b21874070ad2bf3b6be8dca) )
 	ROM_LOAD16_BYTE( "32a15-0.14",  0x80000, 0x40000, CRC(bfcadfea) SHA1(1caa9fc30d8622ce4c7221039c446e99cc8f5346) )
@@ -577,16 +637,45 @@ ROM_END
 
 ROM_START( shadfrcj )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "32j12-01.ic34", 0x00001, 0x40000, CRC(38fdbe1d) SHA1(476d8ef2c0d2a8c568ce44631f93f8c730f91b08) )
-	ROM_LOAD16_BYTE( "32j13-01.ic26", 0x00000, 0x40000, CRC(6e1df6f1) SHA1(c165553fe967b437413dd7ddc87a267548dd0ca9) )
-	ROM_LOAD16_BYTE( "32j14-01.ic33", 0x80001, 0x40000, CRC(89e3fb60) SHA1(90de38558d63215a0079079030e8b1097599c9e5) )
-	ROM_LOAD16_BYTE( "32j15-01.ic14", 0x80000, 0x40000, CRC(3dc3a84a) SHA1(166ad91b93192d94e3f6d2fe6dde02f59d334f75) )
+	ROM_LOAD16_BYTE( "32a12-011.34", 0x00001, 0x40000, CRC(0c041e08) SHA1(7b9d52cb1f6bc217c6e64287bd9630aa37243513) ) /* Japan Version 3 */
+	ROM_LOAD16_BYTE( "32a13-010.26", 0x00000, 0x40000, CRC(00985361) SHA1(e9da1b096b25a6ee46bab6230dda66dccdd4bed8) )
+	ROM_LOAD16_BYTE( "32a14-010.33", 0x80001, 0x40000, CRC(ea03ca25) SHA1(7af1ee7c36c70f80ba1e096473b5786b205ab00b) )
+	ROM_LOAD16_BYTE( "32j15-01.14",  0x80000, 0x40000, CRC(3dc3a84a) SHA1(166ad91b93192d94e3f6d2fe6dde02f59d334f75) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
-	ROM_LOAD( "32j11-0.ic55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
+	ROM_LOAD( "32j11-0.55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
+
+	ROM_REGION( 0xa00000, "gfx2", ROMREGION_DISPOSE ) /* Sprite Tiles */
+	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
+	ROM_LOAD( "32j5-0.13",  0x200000, 0x200000, CRC(600026b5) SHA1(5641246300d7e20dcff1eae004647faaee6cd1c6) )
+	ROM_LOAD( "32j6-0.24",  0x400000, 0x200000, CRC(6cde8ebe) SHA1(750933798235951fe24b2e667c33f692612c0aa0) )
+	ROM_LOAD( "32j7-0.25",  0x600000, 0x200000, CRC(bcb37922) SHA1(f3eee73c8b9f4873a7f1cc42e334e7502eaee3c8) )
+	ROM_LOAD( "32j8-0.32",  0x800000, 0x200000, CRC(201bebf6) SHA1(c89d2895ea5b19daea1f88542419f4e10f437c73) )
+
+	ROM_REGION( 0x300000, "gfx3", ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_LOAD( "32j1-0.4",  0x000000, 0x100000, CRC(f1cca740) SHA1(339079b95ca137e66b4f032ad67a0adf58cca100) )
+	ROM_LOAD( "32j2-0.5",  0x100000, 0x100000, CRC(5fac3e01) SHA1(20c30f4c76e303285ae37e596afe86aa4812c3b9) )
+	ROM_LOAD( "32j3-0.6",  0x200000, 0x100000, CRC(d297925e) SHA1(5bc4d37bf0dc54114884c816b94a64ef1ccfeda5) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "32j9-0.76",  0x000000, 0x080000, CRC(16001e81) SHA1(67928d2024f963aee91f1498b6f4c76101d2f3b8) )
+ROM_END
+
+ROM_START( shadfrcjv2 )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "32j12-01.34", 0x00001, 0x40000, CRC(38fdbe1d) SHA1(476d8ef2c0d2a8c568ce44631f93f8c730f91b08) ) /* Japan Version 2 */
+	ROM_LOAD16_BYTE( "32j13-01.26", 0x00000, 0x40000, CRC(6e1df6f1) SHA1(c165553fe967b437413dd7ddc87a267548dd0ca9) )
+	ROM_LOAD16_BYTE( "32j14-01.33", 0x80001, 0x40000, CRC(89e3fb60) SHA1(90de38558d63215a0079079030e8b1097599c9e5) )
+	ROM_LOAD16_BYTE( "32j15-01.14", 0x80000, 0x40000, CRC(3dc3a84a) SHA1(166ad91b93192d94e3f6d2fe6dde02f59d334f75) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
+	ROM_LOAD( "32j11-0.55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
 
 	ROM_REGION( 0xa00000, "gfx2", ROMREGION_DISPOSE ) /* Sprite Tiles */
 	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
@@ -605,5 +694,6 @@ ROM_START( shadfrcj )
 ROM_END
 
 
-GAME( 1993, shadfrce, 0,        shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
-GAME( 1993, shadfrcj, shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrcj,   shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 3)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrcjv2, shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )
