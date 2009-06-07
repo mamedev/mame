@@ -353,5 +353,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 19??, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE) // what's the real title ?

@@ -4522,7 +4522,7 @@ GAME( 1997, zerogunj,  zerogun, model2b, model2, zerogun, ROT0, "Psikyo", "Zero 
 GAME( 1998, dynmcopb, dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamite Cop (Export, Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndek2b, dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamite Deka 2 (Japan, Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,         0, model2b, model2, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 199?, rchase2,         0, model2b, model2, 0,       ROT0, "Sega", "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, rchase2,         0, model2b, model2, 0,       ROT0, "Sega", "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

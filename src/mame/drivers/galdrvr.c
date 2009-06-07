@@ -4997,7 +4997,7 @@ GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM"
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole,  galaxian, ROT90,  "TDS", "Black Hole", GAME_SUPPORTS_SAVE )
-GAME( 19??, orbitron, 0,        galaxian, orbitron, galaxian, ROT270, "Signatron USA", "Orbitron", GAME_SUPPORTS_SAVE )
+GAME( 1982, orbitron, 0,        galaxian, orbitron, galaxian, ROT270, "Signatron USA", "Orbitron", GAME_SUPPORTS_SAVE )
 GAME( 1980, luctoday, 0,        galaxian, luctoday, galaxian, ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian, ROT90,  "unknown", "Chewing Gum", GAME_SUPPORTS_SAVE )
 GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian, ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
@@ -5005,7 +5005,7 @@ GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?"
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
-GAME( 19??, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
+GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
 GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "Subelectro", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
 
 /* different bullet color */
@@ -5155,7 +5155,7 @@ GAME( 19??, scorpnmc, scorpion, mooncrst, scorpnmc, scorpnmc, ROT90,  "Dorneer",
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
 GAME( 1983, skelagon, sfx,      sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
-GAME( 198?, monsterz, 0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1982, monsterz, 0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 
 /* scobra */

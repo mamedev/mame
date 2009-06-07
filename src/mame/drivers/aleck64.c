@@ -627,8 +627,8 @@ GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64, ROT0, "Hudson/Seta",
 GAME( 1998, vivdolls, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2003, twrshaft, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, hipai,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, doncdoon, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Donchan no Hanabi de Doon", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, kurufev,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Kurukuru Fever", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, mayjin3,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta?", "Mayjinsen 3", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, hipai,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, doncdoon, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Donchan no Hanabi de Doon", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, kurufev,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Kurukuru Fever", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta", "Mayjinsen 3", GAME_NOT_WORKING|GAME_NO_SOUND )
 

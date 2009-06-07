@@ -353,4 +353,4 @@ ROM_START( gal3 )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
 
-GAME( 199?, gal3,    0,        gal3,    gal3,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1992, gal3,    0,        gal3,    gal3,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", GAME_NOT_WORKING | GAME_NO_SOUND )

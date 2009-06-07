@@ -167,7 +167,7 @@ const game_driver * const drivers[] =
 	DRIVER( skyraidr )	/* bootleg */
 	DRIVER( batman2 )	/* bootleg */
 	DRIVER( warofbug )	/* (c) 1981 Armenia */
-	DRIVER( redufo )	/* bootleg - original should be (c) Artic */
+	DRIVER( redufo )	/* bootleg - original should be (c) Artic / Arcade TV Game List (P.104, Left, 25 from top) */
 	DRIVER( exodus )	/* Subelectro - bootleg? */
 	DRIVER( streakng )	/* [1980] Shoei */
 	DRIVER( pacmanbl )	/* bootleg */
@@ -178,7 +178,7 @@ const game_driver * const drivers[] =
 	DRIVER( jumpbugb )	/* (c) 1981 Sega */
 	DRIVER( levers )	/* (c) 1983 Rock-ola */
 	DRIVER( azurian )	/* (c) 1982 Rait Electronics Ltd */
-	DRIVER( orbitron )	/* Signatron USA */
+	DRIVER( orbitron )	/* (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top) */
 	DRIVER( mooncrgx )	/* bootleg */
 	DRIVER( mooncrst )	/* (c) 1980 Nichibutsu */
 	DRIVER( mooncrsu )	/* (c) 1980 Nichibutsu USA */
@@ -232,9 +232,9 @@ const game_driver * const drivers[] =
 	DRIVER( luctoday )	/* 1980 Sigma */
 	DRIVER( chewing )	/* ?? unknown */
 	DRIVER( catacomb )	/* 1982 MTM Games */
-	DRIVER( ckongg )    /* 1981 bootleg */
-	DRIVER( kkgalax )   /* 1981 bootleg */
-	DRIVER( porter )    /* 19?? bootleg */
+	DRIVER( ckongg )	/* 1981 bootleg */
+	DRIVER( kkgalax )	/* 1981 bootleg */
+	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
 
 	/* Has some similarities with Moon Cresta but Board is very different */
 	DRIVER( rockclim )	/* (c)1981 Taito */
@@ -273,7 +273,7 @@ const game_driver * const drivers[] =
 	DRIVER( cavelon )	/* (c) 1983 Jetsoft */
 	DRIVER( sfx )		/* (c) 1983 Nichibutsu */
 	DRIVER( skelagon )	/* (c) 1983 Nichibutsu USA */
-	DRIVER( monsterz )	/* (c) 198? Nihon */
+	DRIVER( monsterz )	/* (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top) */
 	DRIVER( mimonscr )	/* Universal Video Games */
 	DRIVER( mimonkey )	/* bootleg */
 	DRIVER( mimonsco )	/* bootleg */
@@ -867,7 +867,7 @@ const game_driver * const drivers[] =
 	DRIVER( cybsledj )	/* (c) 1993 */
 
 	/* Galaxian 3 HW */
-	DRIVER( gal3 )
+	DRIVER( gal3 )		/* (c) 1992 (Arcade TV Game List - P.73, Right, 6 from top) */
 
 	/* Namco System 22 games */
 	DRIVER( ridgerac )	/* (c) 1993 */
@@ -1383,13 +1383,13 @@ const game_driver * const drivers[] =
 	/* Irem games */
 	/* trivia: IREM means "International Rental Electronics Machines" */
 	DRIVER( andromed )	/* (c) 1979 */
-	DRIVER( ipminvad )	/* M10 no copyright notice */
+	DRIVER( ipminvad )	/* M10 no copyright notice (Arcade TV Game List - P.67, Left, 26 from top) */
 	DRIVER( ipminva1 )	/* M10 incomplete dump */
 	DRIVER( ptrmj )		/* M14 (c) 1979  */
 	DRIVER( skychut )	/* Irem [1980] */
 	DRIVER( spacbeam )	/* M15 no copyright notice */
 	DRIVER( greenber )	/* Irem */
-	DRIVER( headoni )	/* Irem no copyright notice */
+	DRIVER( headoni )	/* Irem no copyright notice (1979 - Arcade TV Game List - P.98, Left, 7 from top ) */
 
 	DRIVER( redalert )	/* (c) 1981 + "GDI presents" */
 	DRIVER( demoneye )	/* (c) 1981 */
@@ -2319,7 +2319,7 @@ V-V                           TP-027
 	DRIVER( flashgla )	/* (c) 1985 Sega */
 	DRIVER( srdmissn )	/* (c) 1986 Taito Corporation */
 	DRIVER( fx )		/* bootleg */
-	DRIVER( legend )	/* no copyright notice [1986 Sega/Coreland?] */
+	DRIVER( legend )	/* no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top) */
 	DRIVER( airwolf )	/* (c) 1987 Kyugo */
 	DRIVER( airwolfa )	/* (c) 1987 Kyugo */
 	DRIVER( skywolf )	/* bootleg */
@@ -4059,7 +4059,7 @@ DokiDoki Penguin Land *not confirmed
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
 	DRIVER( vstriker )	/* 1995.05 virtua Striker */
 	DRIVER( vstrikro )
-	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 */
+	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top) */
 	DRIVER( indy500 )	/* 1995.07 Indy 500 */
 	DRIVER( indy500d )
 	DRIVER( skytargt )	/* 1995.10 Sky Target */
@@ -4410,7 +4410,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
-	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi */
+	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2005.03 Melty Blood Act Cadenza */
@@ -6393,8 +6393,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( buriki )	/* 007 1999/05/21 Buriki One */
 
 	/* Alpha Denshi games */
-	DRIVER( shougi )
-	DRIVER( shougi2 )
+	DRIVER( shougi )	/* (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top) */
+	DRIVER( shougi2 )	/* (c) 1982 (Arcade TV Game List - P.80, Left, 10 from top) */
 	DRIVER( champbas )	/* (c) 1983 Sega */
 	DRIVER( champbbj )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( champbja )	/* (c) 1983 Alpha Denshi Co. */
@@ -6442,7 +6442,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Technos games */
 	DRIVER( scregg )	/* TA-0001 (c) 1983 */
 	DRIVER( eggs )		/* TA-0002 (c) 1983 Universal USA */
-	DRIVER( dommy )		/* TA-00?? (c) */
+	DRIVER( dommy )		/* TA-00?? (c) 1983 (Arcade TV Game List - P.90, Left, 13 from top) */
 	DRIVER( bigprowr )	/* TA-0007 (c) 1983 */
 	DRIVER( tagteam )	/* TA-0007 (c) 1983 + Data East license */
 	DRIVER( ssozumo )	/* TA-0008 (c) 1984 */
@@ -6450,7 +6450,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( myststno )	/* TA-0010 (c) 1984 */
 	DRIVER( dogfgt )	/* TA-0011 (c) 1984 */
 	DRIVER( dogfgtj )	/* TA-0011 (c) 1984 */
-	DRIVER( bogeyman )	/* -0204-0 (Data East part number) (c) [1985?] */
+	DRIVER( bogeyman )	/* -0204-0 (Data East part number) (c) 1985 (Arcade TV Game List - P.96, Right, 8 from top) */
 	DRIVER( matmania )	/* TA-0015 (c) 1985 + Taito America license */
 	DRIVER( excthour )	/* TA-0015 (c) 1985 + Taito license */
 	DRIVER( maniach )	/* TA-0017 (c) 1986 + Taito America license */
@@ -6566,15 +6566,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ninjakun )	/* UPL-84003 (c) 1984 Taito Corporation */
 	DRIVER( raiders5 )	/* UPL-85004 (c) 1985 */
 	DRIVER( raidrs5t )	/* UPL-85004 (c) 1985 Taito license */
-	DRIVER( pkunwar )	/* UPL-????? [1985?] */
-	DRIVER( pkunwarj )	/* UPL-????? [1985?] */
+	DRIVER( pkunwar )	/* UPL-????? (c) 1985 (Arcade Game TV List - P.98, Left, 22 from top) */
+	DRIVER( pkunwarj )	/* UPL-????? (c) 1985 (Arcade Game TV List - P.98, Left, 22 from top) */
 	DRIVER( xxmissio )	/* UPL-86001 [1986] */
 	DRIVER( ninjakd2 )	/* UPL-????? (c) 1987 */
 	DRIVER( ninjak2a )	/* UPL-????? (c) 1987 */
 	DRIVER( ninjak2b )	/* UPL-????? (c) 1987 */
 	DRIVER( rdaction )	/* UPL-87003?(c) 1987 + World Games license */
 	DRIVER( mnight )	/* UPL-????? (c) 1987 distributed by Kawakus */
-	DRIVER( arkarea )	/* UPL-87007 (c) [1987] */
+	DRIVER( arkarea )	/* UPL-87007 (c) 1988 (Arcade TV Game List - P.67, Right, 2 from top)*/
 	DRIVER( robokid )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokidj )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokdj2 )	/* UPL-88013 (c) 1988 */
@@ -7312,7 +7312,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
     */
 
 	/* Galeco PC based games */
-	DRIVER( tokyocop )
+	DRIVER( tokyocop )	/* (c) 2003 (Arcade TV Game List - P.168, Right, 19 from bottom) */
 
 	/* Kaneko games */
 	DRIVER( hvyunit )	/* (c) 1988 Kaneko */
@@ -7527,10 +7527,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vivdolls )	/* (c) 1998 Visco */
 	DRIVER( srmvs )		/* (c) 1999 Seta */
 	DRIVER( twrshaft )	/* (c) 2003 Aruze */
-	DRIVER( hipai )
-	DRIVER( doncdoon )
-	DRIVER( kurufev )
-	DRIVER( mayjin3 )
+	DRIVER( hipai )		/* (c) 2003 Seta/Aruze (Arcade TV Game List - P.92, Right, 16 from top) */
+	DRIVER( doncdoon )	/* (c) 2003 Aruze (Arcade TV Game List - P.90, Right, 8 from bottom) */
+	DRIVER( kurufev )	/* (c) 2003 Aruze (Arcade TV Game List - P.75, Right, 1st entry on top) */
+	DRIVER( mayjin3 )	/* (c) 2000 Seta (Arcade TV Game List - P.101, Right, 9 from top) */
+
 
 	/* Atlus games */
 	DRIVER( powerins )	/* (c) 1993 Atlus (USA) */
@@ -7696,8 +7697,8 @@ Other Sun games
 
 	/* Metro games */
 	DRIVER( karatour )	/* (c) 1992 Mitchell */
-	DRIVER( ladykill )	/* Yanyaka + Mitchell license */
-	DRIVER( moegonta )	/* Yanyaka (Japan) */
+	DRIVER( ladykill )	/* (c) 1993 Yanyaka + Mitchell license - (Arcade TV Game List - P.101, Right, 2 from Bottom) */
+	DRIVER( moegonta )	/* (c) 1993 Yanyaka (Japan) (Arcade TV Game List - P.101, Right, 2 from Bottom) */
 	DRIVER( pangpoms )	/* (c) 1992 */
 	DRIVER( pangpomm )	/* (c) 1992 Mitchell / Metro */
 	DRIVER( skyalert )	/* (c) 1992 */
@@ -7729,7 +7730,7 @@ Other Sun games
 	DRIVER( gstrik2 )	/* (c) 1996 Human Amusement */
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
-	DRIVER( magerror )	/* (c) 199? Technosoft (Japan) */
+	DRIVER( magerror )	/* (c) 1994 Technosoft (Japan) (Arcade TV Game List - P.100, Left, 13 from Bottom) */
 	DRIVER( puzzlet )	/* (c) 2000 Yunizu Corporation (Japan) */
 
 	/* Venture Line games */
@@ -8061,7 +8062,7 @@ Other Sun games
 	DRIVER( starcrus )	/* (c) 1977 Ramtek */
 
 	/* Omori games */
-	DRIVER( shuttlei )	/* (c) 197? Omori */
+	DRIVER( shuttlei )	/* (c) 1979 Omori (Arcade Tv Game List - P.79, Left, 6 from bottom) */
 	DRIVER( battlex )	/* (c) 1982 Omori E. Co., Ltd. */
 	DRIVER( carjmbre )	/* (c) 1983 Omori Electric Co., Ltd. */
 	DRIVER( popper )	/* (c) 1983 Omori Electric Co., Ltd. */
@@ -8453,8 +8454,8 @@ Other Sun games
 	DRIVER( bbprot )	/* unfinished prototype */
 	DRIVER( flower )	/* (c) 1986 Komax */
 	DRIVER( flowers )	/* (c) 1986 Sega/Alpha */
-	DRIVER( beaminv )	/* Tekunon Kougyou */
-	DRIVER( beaminva )	/* Tekunon Kougyou */
+	DRIVER( beaminv )	/* (c) 1979 Teknon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
+	DRIVER( beaminva )	/* (c) 1979 Teknon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
 	DRIVER( mcatadv )	/* (c) 1993 Wintechno */
 	DRIVER( mcatadvj )	/* (c) 1993 Wintechno */
 	DRIVER( catt )		/* (c) 1993 Wintechno */
@@ -8657,7 +8658,7 @@ Other Sun games
 	DRIVER( megat5 )	/* (c) 1997 Merit */
 	DRIVER( megat5nj )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */
-	DRIVER( suprgolf )	/* (c) 19?? Nasco */
+	DRIVER( suprgolf )	/* (c) 1989 Nasco */
 	DRIVER( hotblock )	/* (c) 1993 Nics? / Nix? */
 	DRIVER( pntnpuzl )	/* Century? */
 	DRIVER( trucocl )	/* (c) 1991 Miky SRL */
@@ -8674,7 +8675,7 @@ Other Sun games
 	DRIVER( mdrawpkr )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( laserbsa )	/* (c) 1981 Amstar/HOEI */
-	DRIVER( futflash )	/* (c) 19?? HOEI */
+	DRIVER( futflash )	/* (c) 1981 HOEI (Arcade TV Game List - P.96, Right, 18 from top) */
 	DRIVER( turbosub )	/* (c) 1985 Entertainment Sciences */
 	DRIVER( turbosb7 )	/* (c) 1985 Entertainment Sciences */
 	DRIVER( turbosb6 )	/* (c) 1985 Entertainment Sciences */

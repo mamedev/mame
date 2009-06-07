@@ -4480,7 +4480,7 @@ GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi,    naomi,   ROT270, "Amedio (T
 //GDL-0018 Azumanga Daioh Puzzle Bobble
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    ggxxrl,  ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Success",                "Tetris Kiwamemichi (GDL-0020)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, tetkiwam,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Success",                "Tetris Kiwamemichi (GDL-0020)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Alpha System",           "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, usagui,    naomigd,  naomigd,  naomi_mp, naomi_mp,ROT0,   "Warashi / Taito / Mahjong Kobo", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0023 Border Down

@@ -1474,7 +1474,7 @@ GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ni
 GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
 GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", 0 )
-GAME( 1987, arkarea,  0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
+GAME( 1988, arkarea,  0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
 GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
 GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
 GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
