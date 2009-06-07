@@ -548,6 +548,13 @@ Notes:
       U16        - 27C801 8MBit EPROM
       U20        - 29F040 EEPROM
       IC42S16800 - ISSI IC42S16800 4(2)M x 8(16) Bits x 4 Banks (128MBit) SDRAM
+
+      QS1000     - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
+                   see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
+      QS1001A    - QDSP QS1001A 512k x8 MaskROM (SOP32)
+
+      qs1001a.u17 was not dumped from this PCB, but is a standard sample rom found on many Eolith games
+                  see eolith.c and vegaeo.c drivers
 */
 
 ROM_START( bballoon )
@@ -558,8 +565,11 @@ ROM_START( bballoon )
 	ROM_REGION( 0x080000, "user2", 0 )
 	ROM_LOAD( "b2.u20",       0x000000, 0x080000, CRC(0a12334c) SHA1(535b5b34f28435517218100d70147d87809f485a) )
 
-	ROM_REGION( 0x100000, "unknown", 0 ) // sound wave
+	ROM_REGION( 0x100000, "sfx", 0 ) /* QDSP samples (SFX) */
 	ROM_LOAD( "b1.u16",       0x000000, 0x100000, CRC(c42c1c85) SHA1(e1f49d556ffd6bc27142a7784c3bb8e37999857d) )
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u17",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 static DRIVER_INIT( bballoon )
