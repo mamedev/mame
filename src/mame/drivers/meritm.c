@@ -52,20 +52,41 @@
 
   * indicates that game needs to be dumped or redumped
 
-Custom Program Versions (from Super Megatouch IV manual):
+Custom Program Versions (from different Megatouch manuals):
 
 PROGRAM#    Program Version      Program Differences
 ---------------------------------------------------------------------------------------------
-9255-41-01  Standard Version     Includes all Options, no Restrictions
-9255-41-02  Minnesota Version    Excludes Casino Games
-9255-41-06  California Version   Excludes Poker Double-up feature & No Free Game in Solitaire
-9255-41-07  New Jersey Version   Includes 2-Coin Limit with Lockout Coil
-9255-41-50  Bi-Lingual ENG/GER   Same as Standard Version, Without Word/Casino Games
-9255-41-57  Internation Version  Same as Standard Version, Without Word Games
-9255-41-60  Bi-Lingual ENG/FRE   Same as Standard Version, Without Word/Casino Games
-9255-41-62  No Free Credit       Same as Standard Version, With No Free Credit
-9255-41-70  Australia Version    Same as Standard Version with Special Question Set
-9255-41-71  South Africa Ver.    Same as Standard Version with Special Question Set
+9255-xx-01  Standard Version     Includes all Options, no Restrictions
+9255-xx-02  Minnesota Version    Excludes Casino Games
+9255-xx-03  Louisiana Version    Excludes all Poker Games
+9255-xx-04  Wisconsin Version    Game Connot End if Player Busts; 1,000 Points are Added to End of Each Hand
+9255-xx-06  California Version   Excludes Poker Double-up feature & No Free Game in Solitaire
+9255-xx-07  New Jersey Version   Includes 2-Coin Limit with Lockout Coil
+9255-xx-50  Bi-Lingual ENG/GER   Same as Standard Version, Without Word/Casino Games
+9255-xx-54  Bi-Lingual ENG/SPA   Same as Standard Version, Without Word Games
+9255-xx-56  No Free Credits      Same as Standard Version, Without Word Games and No Free Credits
+9255-xx-57  Internation Version  Same as Standard Version, Without Word Games
+9255-xx-60  Bi-Lingual ENG/FRE   Same as Standard Version, Without Word/Casino Games
+9255-xx-62  No Free Credit       Same as Standard Version, With No Free Credit (see regional notes below)
+9255-xx-62  Croatia              Same as Standard Version, With No Free Credit (see regional notes below)
+9255-xx-70  Australia Version    Same as Standard Version with Special Question Set
+9255-xx-71  South Africa Ver.    Same as Standard Version with Special Question Set
+
+xx = game/version code:
+
+ 20 - Megatouch 3
+ 30 - Megatouch 3 Tournament
+ 40 - Megatouch 4
+ 41 - Megatouch Super 4
+ 50 - Megatouch 4 Tournament
+ 51 - Megatouch Super 4 Tournament
+ 60 - Megatouch 5
+ 70 - Megatouch 5 Tournament??
+ 80 - Megatouch 6
+
+Not all regional versions are available for each Megatouch series
+ For Megatouch 4,       set 9255-40-62 is Croatia
+ For Megatouch Super 4, set 9255-41-62 is No Free Credit
 
   Notes/ToDo:
   - offset for top V9938 layer is hardcoded, probably should be taken from V9938 setup
