@@ -2090,7 +2090,6 @@ src/mame/drivers/suprslam.c svneol=native#text/plain
 src/mame/drivers/surpratk.c svneol=native#text/plain
 src/mame/drivers/system1.c svneol=native#text/plain
 src/mame/drivers/system16.c svneol=native#text/plain
-src/mame/drivers/system18.c svneol=native#text/plain
 src/mame/drivers/tagteam.c svneol=native#text/plain
 src/mame/drivers/tail2nos.c svneol=native#text/plain
 src/mame/drivers/taito_b.c svneol=native#text/plain
