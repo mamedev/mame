@@ -652,13 +652,13 @@ static MACHINE_DRIVER_START( jumpcoas )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jumpcoas_map)
 
-	MDRV_CPU_REMOVE("audiocpu")
+	MDRV_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
 	MDRV_GFXDECODE(jumpcoas)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("ay8910.2")
+	MDRV_DEVICE_REMOVE("ay8910.2")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( imago )

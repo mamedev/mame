@@ -19,9 +19,6 @@
 #define MDRV_MB3773_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, MB3773, 0)
 
-#define MDRV_MB3773_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     PROTOTYPES

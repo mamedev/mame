@@ -79,10 +79,6 @@ struct _latch8_config
 	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, read_handler, _handler) \
 
-/* remove device */
-#define MDRV_LATCH8_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 /* Accessor macros */
 
 #define AM_LATCH8_READ(_tag) \

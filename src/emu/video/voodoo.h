@@ -88,9 +88,6 @@ struct _voodoo_config
 #define MDRV_3DFX_VOODOO_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 
-#define MDRV_3DFX_VOODOO_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /***************************************************************************

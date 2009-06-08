@@ -871,7 +871,7 @@ MACHINE_DRIVER_START( jsa_iii_mono_noadpcm )
 	MDRV_IMPORT_FROM(jsa_iii_mono)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("adpcm")
+	MDRV_DEVICE_REMOVE("adpcm")
 MACHINE_DRIVER_END
 
 

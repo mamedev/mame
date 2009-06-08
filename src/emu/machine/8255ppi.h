@@ -43,9 +43,6 @@ struct _ppi8255_interface
 	MDRV_DEVICE_MODIFY(_tag) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPI8255_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /* device interface */

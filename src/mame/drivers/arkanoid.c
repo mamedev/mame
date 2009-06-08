@@ -802,7 +802,7 @@ static MACHINE_DRIVER_START( bootleg )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 
-	MDRV_CPU_REMOVE("mcu")
+	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
 

@@ -1767,13 +1767,13 @@ static MACHINE_DRIVER_START( galagab )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaga)
 
-	MDRV_NAMCO_54XX_REMOVE("54xx")
+	MDRV_DEVICE_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_mem4)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("discrete")
+	MDRV_DEVICE_REMOVE("discrete")
 MACHINE_DRIVER_END
 
 
@@ -1833,8 +1833,8 @@ static MACHINE_DRIVER_START( battles )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( xevious )
 
-	MDRV_NAMCO_50XX_REMOVE("50xx")
-	MDRV_NAMCO_54XX_REMOVE("54xx")
+	MDRV_DEVICE_REMOVE("50xx")
+	MDRV_DEVICE_REMOVE("54xx")
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(battles_mem4)
@@ -1846,7 +1846,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_PALETTE_INIT(battles)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("discrete")
+	MDRV_DEVICE_REMOVE("discrete")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(battles_samples_interface)

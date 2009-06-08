@@ -24,22 +24,13 @@
 	MDRV_DEVICE_ADD(_tag, ADC12130, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC12130_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_ADC12132_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC12132, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC12132_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_ADC12138_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC12138, 0) \
 	MDRV_DEVICE_CONFIG(_config)
-
-#define MDRV_ADC12138_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

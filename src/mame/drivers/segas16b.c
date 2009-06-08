@@ -3270,14 +3270,14 @@ static MACHINE_DRIVER_START( atomicp )
 	MDRV_IMPORT_FROM(system16b)
 
 	/* basic machine hardware */
-	MDRV_CPU_REMOVE("soundcpu")
+	MDRV_DEVICE_REMOVE("soundcpu")
 	MDRV_MACHINE_RESET(atomicp)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym", YM2413, 5000000) /* 20MHz OSC divided by 4 */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REMOVE("upd")
+	MDRV_DEVICE_REMOVE("upd")
 MACHINE_DRIVER_END
 
 

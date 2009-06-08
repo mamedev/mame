@@ -26,9 +26,6 @@
 	MDRV_DEVICE_CLOCK(_clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_TMS9927_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /* interface */

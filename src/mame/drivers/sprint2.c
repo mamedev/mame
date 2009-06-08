@@ -530,11 +530,11 @@ static MACHINE_DRIVER_START( sprint1 )
 	MDRV_IMPORT_FROM(sprint2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_REMOVE("lspeaker")
-	MDRV_SPEAKER_REMOVE("rspeaker")
+	MDRV_DEVICE_REMOVE("lspeaker")
+	MDRV_DEVICE_REMOVE("rspeaker")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_REMOVE("discrete")
+	MDRV_DEVICE_REMOVE("discrete")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint1)
@@ -547,11 +547,11 @@ static MACHINE_DRIVER_START( dominos )
 	MDRV_IMPORT_FROM(sprint2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_REMOVE("lspeaker")
-	MDRV_SPEAKER_REMOVE("rspeaker")
+	MDRV_DEVICE_REMOVE("lspeaker")
+	MDRV_DEVICE_REMOVE("rspeaker")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_REMOVE("discrete")
+	MDRV_DEVICE_REMOVE("discrete")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dominos)

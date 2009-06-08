@@ -959,7 +959,7 @@ static MACHINE_DRIVER_START( spyhunt2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mcr68)
 	MDRV_IMPORT_FROM(sounds_good)
-	MDRV_SPEAKER_REMOVE("mono")
+	MDRV_DEVICE_REMOVE("mono")
 	MDRV_IMPORT_FROM(turbo_chip_squeak)
 MACHINE_DRIVER_END
 

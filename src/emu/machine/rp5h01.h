@@ -18,9 +18,6 @@
 	MDRV_DEVICE_ADD(_tag, RP5H01, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_RP5H01_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     TYPE DEFINITIONS

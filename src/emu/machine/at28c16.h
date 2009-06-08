@@ -21,9 +21,6 @@ DEVICE_GET_INFO(at28c16);
 	MDRV_DEVICE_ADD(_tag, AT28C16, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(at28c16_config, id, _id)
 
-#define MDRV_AT28C16_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 extern void at28c16_a9_12v( const device_config *device, int a9_12v );
 extern void at28c16_oe_12v( const device_config *device, int a9_12v );

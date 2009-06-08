@@ -30,11 +30,9 @@
 	MDRV_DEVICE_ADD(_tag, ACIA6850, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ACIA6850_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define ACIA6850_INTERFACE(_name) \
 	const acia6850_interface(_name) =
+
 
 /***************************************************************************
     TYPE DEFINITIONS

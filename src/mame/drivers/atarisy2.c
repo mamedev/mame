@@ -1194,7 +1194,7 @@ static MACHINE_DRIVER_START( sprint )
 	MDRV_IMPORT_FROM(atarisy2)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("tms")
+	MDRV_DEVICE_REMOVE("tms")
 MACHINE_DRIVER_END
 
 

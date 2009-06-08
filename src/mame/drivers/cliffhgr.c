@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_IMPORT_FROM(tms9928a)
 
 	/* override video rendering and raw screen info */
-	MDRV_SCREEN_REMOVE("screen")
+	MDRV_DEVICE_REMOVE("screen")
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	/* sound hardware */

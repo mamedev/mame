@@ -18,9 +18,6 @@
 #define MDRV_DS1302_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, DS1302, 0)
 
-#define MDRV_DS1302_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     PROTOTYPES

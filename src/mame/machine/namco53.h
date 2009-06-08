@@ -17,9 +17,6 @@ struct _namco_53xx_interface
 	MDRV_DEVICE_ADD(_tag, NAMCO_53XX, _clock) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define MDRV_NAMCO_53XX_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 void namco_53xx_read_request(const device_config *device);
 READ8_DEVICE_HANDLER( namco_53xx_read );

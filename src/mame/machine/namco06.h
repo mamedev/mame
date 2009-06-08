@@ -23,9 +23,6 @@ struct _namco_06xx_config
 	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip2, _chip2) \
 	MDRV_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip3, _chip3)
 
-#define MDRV_NAMCO_06XX_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 READ8_DEVICE_HANDLER( namco_06xx_data_r );
 WRITE8_DEVICE_HANDLER( namco_06xx_data_w );

@@ -1724,7 +1724,7 @@ static MACHINE_DRIVER_START( spclforc )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(s2650)
-	MDRV_CPU_REMOVE("soundcpu")
+	MDRV_DEVICE_REMOVE("soundcpu")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spclforc)

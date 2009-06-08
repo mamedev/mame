@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( leprechn )
 	MDRV_IMPORT_FROM(leprechn_video)
 
 	/* via */
-	MDRV_VIA6522_REMOVE("via6522_0")
+	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
 MACHINE_DRIVER_END
 

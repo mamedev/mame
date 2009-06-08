@@ -53,9 +53,6 @@ DEVICE_GET_INFO(eeprom);
 	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, default_data, &_data) \
 	MDRV_DEVICE_CONFIG_DATA32(eeprom_config, default_data_size, _size)
 
-#define MDRV_EEPROM_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, EEPROM)
-
 
 void eepromdev_write_bit( const device_config *device, int bit );
 int eepromdev_read_bit( const device_config *device );

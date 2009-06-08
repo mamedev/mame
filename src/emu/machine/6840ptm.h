@@ -21,8 +21,6 @@
 	MDRV_DEVICE_ADD(_tag, PTM6840, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_PTM6840_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 /***************************************************************************
     TYPE DEFINITIONS

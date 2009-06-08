@@ -2150,7 +2150,7 @@ static MACHINE_DRIVER_START( sys1pio )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(system1_pio_io_map)
 
-	MDRV_PPI8255_REMOVE("ppi")
+	MDRV_DEVICE_REMOVE("ppi")
 	MDRV_Z80PIO_ADD("pio", pio_interface)
 MACHINE_DRIVER_END
 

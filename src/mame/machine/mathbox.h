@@ -13,9 +13,6 @@
 #define MDRV_MATHBOX_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, MATHBOX, 0)
 
-#define MDRV_MATHBOX_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /***************************************************************************

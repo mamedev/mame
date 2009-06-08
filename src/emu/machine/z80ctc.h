@@ -46,9 +46,6 @@ struct _z80ctc_interface
 	MDRV_DEVICE_ADD(_tag, Z80CTC, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_Z80CTC_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /***************************************************************************

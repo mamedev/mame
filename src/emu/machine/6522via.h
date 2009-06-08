@@ -27,9 +27,6 @@
 	MDRV_DEVICE_ADD(_tag, VIA6522, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_VIA6522_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define	VIA_PB	    0
 #define	VIA_PA	    1
 #define	VIA_DDRB    2

@@ -131,9 +131,6 @@ struct _timer_execution_state
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, first_vpos, _first_vpos) \
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
 
-#define MDRV_TIMER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_TIMER_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 

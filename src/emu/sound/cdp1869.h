@@ -92,9 +92,6 @@
 	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_CDP1869) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CDP1869_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define CDP1869_INTERFACE(_name) const cdp1869_interface (_name) =
 
 #define CDP1869_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma, UINT8 cma)

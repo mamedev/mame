@@ -17,9 +17,6 @@ struct _namco_54xx_config
 	MDRV_DEVICE_CONFIG_DATAPTR(namco_54xx_config, discrete, _discrete) \
 	MDRV_DEVICE_CONFIG_DATA32(namco_54xx_config, firstnode, _firstnode)
 
-#define MDRV_NAMCO_54XX_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 WRITE8_DEVICE_HANDLER( namco_54xx_write );
 

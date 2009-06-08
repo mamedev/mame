@@ -37,9 +37,6 @@ struct _riot6532_interface
 	MDRV_DEVICE_ADD(_tag, RIOT6532, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_RIOT6532_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /***************************************************************************

@@ -3335,7 +3335,7 @@ static MACHINE_DRIVER_START( s2650games )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(pacman)
 
-	MDRV_CPU_REMOVE("maincpu")
+	MDRV_DEVICE_REMOVE("maincpu")
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MDRV_CPU_PROGRAM_MAP(s2650games_map)
 	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)

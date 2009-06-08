@@ -40,29 +40,17 @@
 	MDRV_DEVICE_ADD(_tag, ADC0831, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC0831_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_ADC0832_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC0832, 0) \
 	MDRV_DEVICE_CONFIG(_config)
-
-#define MDRV_ADC0832_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_ADC0834_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC0834, 0) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC0834_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_ADC0838_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC0838, 0) \
 	MDRV_DEVICE_CONFIG(_config)
-
-#define MDRV_ADC0838_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

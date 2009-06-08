@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( sexygal )
 	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SOUND_REMOVE("ay")
+	MDRV_DEVICE_REMOVE("ay")
 
 	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ay8910_config)

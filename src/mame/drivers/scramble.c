@@ -1360,8 +1360,8 @@ static MACHINE_DRIVER_START( hotshock )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hotshock_map)
 
-	MDRV_PPI8255_REMOVE( "ppi8255_0" )
-	MDRV_PPI8255_REMOVE( "ppi8255_1" )
+	MDRV_DEVICE_REMOVE( "ppi8255_0" )
+	MDRV_DEVICE_REMOVE( "ppi8255_1" )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_IO_MAP(hotshock_sound_io_map)
@@ -1411,7 +1411,7 @@ static MACHINE_DRIVER_START( triplep )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(triplep_io_map)
 
-	MDRV_CPU_REMOVE("audiocpu")
+	MDRV_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
@@ -1423,7 +1423,7 @@ static MACHINE_DRIVER_START( triplep )
 	MDRV_SOUND_CONFIG(triplep_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REMOVE("8910.2")
+	MDRV_DEVICE_REMOVE("8910.2")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mariner )

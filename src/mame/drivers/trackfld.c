@@ -742,7 +742,7 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("vlm")
+	MDRV_DEVICE_REMOVE("vlm")
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)

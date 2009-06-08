@@ -90,9 +90,6 @@ struct _speaker_config
 	MDRV_DEVICE_ADD(_tag, SOUND, _clock) \
 	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_##_type)
 
-#define MDRV_SOUND_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_SOUND_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 
@@ -131,9 +128,6 @@ struct _speaker_config
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, x, _x, 24) \
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, y, _y, 24) \
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, z, _z, 24)
-
-#define MDRV_SPEAKER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_SPEAKER_STANDARD_MONO(_tag) \
 	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)

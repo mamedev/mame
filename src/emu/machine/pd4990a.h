@@ -19,9 +19,6 @@
 #define MDRV_UPD4990A_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, UPD4990A, 0)
 
-#define MDRV_UPD4990A_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 /***************************************************************************
     PROTOTYPES

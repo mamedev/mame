@@ -42,9 +42,6 @@ struct _i8243_config
 	MDRV_DEVICE_CONFIG_DATAPTR(i8243_config, readhandler, _read) \
 	MDRV_DEVICE_CONFIG_DATAPTR(i8243_config, writehandler, _write)
 
-#define MDRV_I8243_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 
 
 /***************************************************************************

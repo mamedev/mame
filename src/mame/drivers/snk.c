@@ -4036,7 +4036,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 
 	// apparently, no "ym1" in tdfever2
 	// (registers are written to but they cause sound not to work)
-	MDRV_SOUND_REMOVE("ym1")
+	MDRV_DEVICE_REMOVE("ym1")
 MACHINE_DRIVER_END
 
 

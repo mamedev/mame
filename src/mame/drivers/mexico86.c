@@ -444,7 +444,7 @@ static MACHINE_DRIVER_START( knightb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mexico86)
 
-	MDRV_CPU_REMOVE("sub")
+	MDRV_DEVICE_REMOVE("sub")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(kikikai)
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( kikikai )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
-	MDRV_CPU_REMOVE("mcu")	// we don't have code for the MC6801U4
+	MDRV_DEVICE_REMOVE("mcu")	// we don't have code for the MC6801U4
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(kikikai)

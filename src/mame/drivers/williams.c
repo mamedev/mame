@@ -1676,7 +1676,7 @@ static MACHINE_DRIVER_START( joust2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(williams2)
-	MDRV_SPEAKER_REMOVE("mono")
+	MDRV_DEVICE_REMOVE("mono")
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	MDRV_MACHINE_START(joust2)

@@ -25,15 +25,9 @@
 	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CIA6526_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_CIA8520_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, CIA8520, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
-
-#define MDRV_CIA8520_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 
 

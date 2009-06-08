@@ -1134,11 +1134,11 @@ static MACHINE_DRIVER_START( toffy )
 	MDRV_IMPORT_FROM(ddragon)
 
 	/* basic machine hardware */
-	MDRV_CPU_REMOVE("sub")
+	MDRV_DEVICE_REMOVE("sub")
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("adpcm1")
-	MDRV_SOUND_REMOVE("adpcm2")
+	MDRV_DEVICE_REMOVE("adpcm1")
+	MDRV_DEVICE_REMOVE("adpcm2")
 MACHINE_DRIVER_END
 
 

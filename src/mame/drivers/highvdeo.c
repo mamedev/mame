@@ -924,7 +924,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ciclone )
 	MDRV_IMPORT_FROM(tv_tcf)
 
-	MDRV_CPU_REMOVE("maincpu")
+	MDRV_DEVICE_REMOVE("maincpu")
 
 	MDRV_CPU_ADD("maincpu", I80186, 20000000/2 )	// ?
 	MDRV_CPU_PROGRAM_MAP(tv_tcf_map)

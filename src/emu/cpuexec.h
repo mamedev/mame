@@ -91,9 +91,6 @@ struct _cpu_class_header
 	MDRV_DEVICE_ADD(_tag, CPU, _clock) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type)
 
-#define MDRV_CPU_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_CPU_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 

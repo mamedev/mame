@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( blktigerbl )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(blktigerbl_io_map)
 
-	MDRV_CPU_REMOVE("mcu")
+	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
 /***************************************************************************

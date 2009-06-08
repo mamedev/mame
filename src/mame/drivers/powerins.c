@@ -407,14 +407,14 @@ static MACHINE_DRIVER_START( powerina )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-	MDRV_CPU_REMOVE("soundcpu")
+	MDRV_DEVICE_REMOVE("soundcpu")
 
 	MDRV_SOUND_REPLACE("oki1", OKIM6295, 990000) // pin7 not verified
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REMOVE("oki2")
-	MDRV_SOUND_REMOVE("ym2203")
+	MDRV_DEVICE_REMOVE("oki2")
+	MDRV_DEVICE_REMOVE("ym2203")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( powerinb )
@@ -429,7 +429,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_CPU_IO_MAP(powerinb_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
-	MDRV_SOUND_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
+	MDRV_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
 MACHINE_DRIVER_END
 
 

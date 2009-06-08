@@ -760,13 +760,13 @@ static MACHINE_DRIVER_START( boblbobl )
 	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
 
-	MDRV_CPU_REMOVE("mcu")
+	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( bub68705 )
 	MDRV_IMPORT_FROM(bublbobl)
-	MDRV_CPU_REMOVE("mcu")
+	MDRV_DEVICE_REMOVE("mcu")
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map)

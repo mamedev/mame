@@ -812,7 +812,7 @@ static MACHINE_DRIVER_START( jngolady )
 
 	/* sound hardware */
 	MDRV_SOUND_START(NULL)
-	MDRV_SOUND_REMOVE("cvsd")
+	MDRV_DEVICE_REMOVE("cvsd")
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MDRV_SOUND_CONFIG(msm5205_config)
@@ -827,11 +827,11 @@ static MACHINE_DRIVER_START( cntrygrl )
 	MDRV_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
 	MDRV_CPU_IO_MAP(cntrygrl_cpu0_io )
 
-	MDRV_CPU_REMOVE("cpu1")
+	MDRV_DEVICE_REMOVE("cpu1")
 
 	/* sound hardware */
 	MDRV_SOUND_START(NULL)
-	MDRV_SOUND_REMOVE("cvsd")
+	MDRV_DEVICE_REMOVE("cvsd")
 MACHINE_DRIVER_END
 
 /*

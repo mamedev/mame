@@ -969,7 +969,7 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_VIDEO_START(mnight)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("pcm")
+	MDRV_DEVICE_REMOVE("pcm")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( arkarea )
@@ -984,7 +984,7 @@ static MACHINE_DRIVER_START( arkarea )
 	MDRV_VIDEO_START(arkarea)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("pcm")
+	MDRV_DEVICE_REMOVE("pcm")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( robokid )

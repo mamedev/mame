@@ -35,9 +35,6 @@ DEVICE_GET_INFO(i2cmem);
 	MDRV_DEVICE_CONFIG_DATA32(i2cmem_config, data_size, _data_size) \
 	MDRV_DEVICE_CONFIG_DATAPTR(i2cmem_config, data, _data)
 
-#define MDRV_I2CMEM_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, I2CMEM)
-
 
 void i2cmemdev_write( const device_config *device, int line, int data );
 int i2cmemdev_read( const device_config *device, int line );

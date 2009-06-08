@@ -114,9 +114,6 @@ int pia6821_get_irq_b(const device_config *device);
 	MDRV_DEVICE_MODIFY(_tag) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PIA6821_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
-
 #define MDRV_PIA6822_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, PIA6822, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
@@ -124,8 +121,5 @@ int pia6821_get_irq_b(const device_config *device);
 #define MDRV_PIA6822_MODIFY(_tag, _intrf) \
 	MDRV_DEVICE_MODIFY(_tag) \
 	MDRV_DEVICE_CONFIG(_intrf)
-
-#define MDRV_PIA6822_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
 
 #endif /* __6821NEW_H__ */

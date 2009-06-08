@@ -2523,7 +2523,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_VIDEO_EOF(vbowl)	// trackball
 //  MDRV_GFXDECODE(chmplst2)
 
-	MDRV_SOUND_REMOVE("oki")
+	MDRV_DEVICE_REMOVE("oki")
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
 	MDRV_SOUND_CONFIG(vbowl_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
