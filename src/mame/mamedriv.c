@@ -9088,6 +9088,8 @@ Other Sun games
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
 	DRIVER( enchfrst )	/* (c) 1995 */
+	DRIVER( dolphntr )	/* (c) 1996 */
+	DRIVER( dolphtra )	/* (c) 1996 */	
 	DRIVER( dmdtouch )	/* (c) 1997 */
 	DRIVER( goldprmd )	/* (c) 1997 */
 	DRIVER( qotn )		/* (c) 1997 */

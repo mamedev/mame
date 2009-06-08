@@ -398,7 +398,7 @@ static void update_lamps(void)
 	}
 
 	/* Lamp smoothing, this draws lamps only at the peaks of the AC power that would light them */
-	if ((multiplex_smooth == (input_strobe - 1))||((multiplex_smooth == 7) && (input_strobe == 0))||(multiplex_smooth == input_strobe))
+	if ((multiplex_smooth == (input_strobe - 1))||((multiplex_smooth == 7) && (input_strobe == 0)))
 	{
 		draw_lamps();
 		mpu4_draw_led(input_strobe, led_segs[input_strobe]);
