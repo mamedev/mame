@@ -34,6 +34,8 @@
 #define ARCHIMEDES_FIQ_PODULE        (0x40)
 #define ARCHIMEDES_FIQ_FORCE         (0x80)
 
+/*----------- defined in machine/archimds.c -----------*/
+
 extern UINT32 *memc_physmem;
 
 void archimedes_init(running_machine *machine);			// call at MACHINE_INIT

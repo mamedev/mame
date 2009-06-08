@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/wiping.h"
 
 
 static int flipscreen;

@@ -787,7 +787,7 @@ static void scsi_irq(running_machine *machine)
 	psx_irq_set(machine, 0x400);
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
@@ -795,7 +795,7 @@ static SCSIConfigTable dev_table =
 	}
 };
 
-static struct AM53CF96interface scsi_intf =
+static const struct AM53CF96interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
@@ -879,7 +879,7 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_SOUND_ROUTE( 1, "speakerright", 1.0 )
 MACHINE_DRIVER_END
 
-INPUT_PORTS_START( twinkle )
+static INPUT_PORTS_START( twinkle )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)

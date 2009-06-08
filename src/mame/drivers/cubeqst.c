@@ -456,7 +456,7 @@ static MACHINE_RESET( cubeqst )
 /* Called by the sound CPU emulation */
 static void sound_dac_w(const device_config *device, UINT16 data)
 {
-	static const char *dacs[] =
+	static const char *const dacs[] =
 	{
 		"rdac0", "ldac0",
 		"rdac1", "ldac1",

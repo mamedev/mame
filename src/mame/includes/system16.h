@@ -124,12 +124,6 @@ extern MACHINE_RESET( sys16_onetime );
 #define SYS16_MRA16_SPRITERAM		SMH_RAM
 #define SYS16_MWA16_SPRITERAM		SMH_RAM
 
-#define SYS16_MRA16_TILERAM		sys16_tileram_r
-#define SYS16_MWA16_TILERAM		sys16_tileram_w
-
-#define SYS16_MRA16_TEXTRAM		sys16_textram_r
-#define SYS16_MWA16_TEXTRAM		sys16_textram_w
-
 #define SYS16_MRA16_EXTRAM		SMH_RAM
 #define SYS16_MWA16_EXTRAM		SMH_RAM
 
@@ -149,10 +143,19 @@ GFXDECODE_EXTERN( sys16 );
 
 /*----------- defined in video/system16.c -----------*/
 
+extern VIDEO_START( system16a_bootleg );
+extern VIDEO_UPDATE( system16a_bootleg );
+extern VIDEO_UPDATE( system16a_bootleg_passht4b );
+extern WRITE16_HANDLER( system16a_bootleg_tilemapselect_w );
+extern WRITE16_HANDLER( system16a_bootleg_bgscrolly_w );
+extern WRITE16_HANDLER( system16a_bootleg_bgscrollx_w );
+extern WRITE16_HANDLER( system16a_bootleg_fgscrolly_w );
+extern WRITE16_HANDLER( system16a_bootleg_fgscrollx_w );
+extern UINT16* system16a_bootleg_bg0_tileram;
+extern UINT16* system16a_bootleg_bg1_tileram;
+
 /* video hardware */
-extern READ16_HANDLER( sys16_tileram_r );
 extern WRITE16_HANDLER( sys16_tileram_w );
-extern READ16_HANDLER( sys16_textram_r );
 extern WRITE16_HANDLER( sys16_textram_w );
 extern WRITE16_HANDLER( sys16_paletteram_w );
 
@@ -163,9 +166,6 @@ extern VIDEO_UPDATE( system16 );
 /* system18 video hardware */
 extern VIDEO_START( system18old );
 extern VIDEO_UPDATE( system18old );
-
-/* callback to poll video registers */
-extern void (* sys16_update_proc)( void );
 
 extern UINT16 *sys16_tileram;
 extern UINT16 *sys16_textram;

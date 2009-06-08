@@ -392,7 +392,7 @@ static READ16_HANDLER( ninjaw_sound_r )
 static int ninjaw_pandata[4];
 static WRITE8_HANDLER( ninjaw_pancontrol )
 {
-	static const char *fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
+	static const char *const fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
 	offset = offset&3;
 	ninjaw_pandata[offset] = (float)data * (100.f / 255.0f);
 	//popmessage(" pan %02x %02x %02x %02x", ninjaw_pandata[0], ninjaw_pandata[1], ninjaw_pandata[2], ninjaw_pandata[3] );

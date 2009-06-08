@@ -306,7 +306,7 @@ static DEVICE_RESET( upd4701 )
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##upd4701##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET

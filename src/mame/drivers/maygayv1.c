@@ -486,7 +486,7 @@ static void update_outputs(UINT16 which)
 
 static READ16_HANDLER( maygay_8279_r )
 {
-	static const char *portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
+	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 	UINT8 result = 0xff;
 	UINT8 addr;
 

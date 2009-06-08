@@ -78,6 +78,8 @@ struct _naomibd_config
     MDRV_DEVICE_CONFIG_DATA32(naomibd_config, tmumem##_tmu, _tmumem)*/
 
 
+/*----------- defined in machine/naomibd.c -----------*/
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/

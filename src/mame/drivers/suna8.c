@@ -963,7 +963,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( brickzn_pcm_w )
 {
-	static const char *dacs[] = { "dac1", "dac2", "dac3", "dac4" };
+	static const char *const dacs[] = { "dac1", "dac2", "dac3", "dac4" };
 	dac_signed_data_w( devtag_get_device(space->machine, dacs[offset & 3]), (data & 0xf) * 0x11 );
 }
 

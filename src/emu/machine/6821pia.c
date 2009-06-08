@@ -1322,7 +1322,7 @@ int pia6821_get_irq_b(const device_config *device)
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)				p##pia6821##s
 #define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET

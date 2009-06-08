@@ -106,7 +106,7 @@ static DEVICE_RESET( mb3773 )
     DEVICE_GET_INFO( mb3773 )
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##mb3773##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET

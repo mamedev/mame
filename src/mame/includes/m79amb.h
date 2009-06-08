@@ -1,7 +1,7 @@
 #include "sound/discrete.h"
 
 
-/*----------- defined in sndhrdw/m79amb.c -----------*/
+/*----------- defined in audio/m79amb.c -----------*/
 
 DISCRETE_SOUND_EXTERN( m79amb );
 

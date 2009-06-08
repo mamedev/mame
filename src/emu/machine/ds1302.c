@@ -219,7 +219,7 @@ static DEVICE_RESET( ds1302 )
     DEVICE_GET_INFO( ds1302 )
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##ds1302##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET

@@ -1,5 +1,6 @@
 /*----------- defined in drivers/tatsumi.c -----------*/
 
+extern UINT16 *apache3_g_ram;
 extern UINT16 bigfight_a40000[2];
 
 extern UINT8* tatsumi_rom_sprite_lookup1;
@@ -39,7 +40,6 @@ extern UINT16 *tatsumi_68k_ram;
 extern UINT8 *apache3_z80_ram;
 extern UINT16 tatsumi_control_word;
 extern UINT16 apache3_rotate_ctrl[12];
-extern UINT16 *apache3_g_ram;
 
 void tatsumi_reset(running_machine *machine);
 

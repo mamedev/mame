@@ -29,7 +29,6 @@ void okim6258_set_clock(const device_config *device, int val);
 int okim6258_get_vclk(const device_config *device);
 
 READ8_DEVICE_HANDLER( okim6258_status_r );
-READ8_DEVICE_HANDLER( okim6258_data_r );
 WRITE8_DEVICE_HANDLER( okim6258_data_w );
 WRITE8_DEVICE_HANDLER( okim6258_ctrl_w );
 

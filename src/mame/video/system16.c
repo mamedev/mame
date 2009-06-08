@@ -891,10 +891,10 @@ static tilemap *system16a_bootleg_text_tilemap;
 static UINT16 system16a_bootleg_tilemapselect;
 
 
-int system16a_bootleg_bgscrolly;
-int system16a_bootleg_bgscrollx;
-int system16a_bootleg_fgscrolly;
-int system16a_bootleg_fgscrollx;
+static int system16a_bootleg_bgscrolly;
+static int system16a_bootleg_bgscrollx;
+static int system16a_bootleg_fgscrolly;
+static int system16a_bootleg_fgscrollx;
 
 static TILE_GET_INFO( get_system16a_bootleg_tile_infotxt )
 {

@@ -55,7 +55,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 VIDEO_UPDATE( fantland );
 
-static const char *msm_name[4] = { "msm1", "msm2", "msm3", "msm4" };
+static const char *const msm_name[4] = { "msm1", "msm2", "msm3", "msm4" };
 
 /***************************************************************************
 

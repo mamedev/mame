@@ -1447,7 +1447,7 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
-	static const char *fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
+	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
 
 //  static UINT8 taitoz_pandata[4];
 

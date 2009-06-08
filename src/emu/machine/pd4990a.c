@@ -104,7 +104,7 @@ INLINE UINT8 convert_to_bcd(int val)
     upd4990a_increment_month
 -------------------------------------------------*/
 
-void upd4990a_increment_month( const device_config *device )
+static void upd4990a_increment_month( const device_config *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -127,7 +127,7 @@ void upd4990a_increment_month( const device_config *device )
     upd4990a_increment_day
 -------------------------------------------------*/
 
-void upd4990a_increment_day( const device_config *device )
+static void upd4990a_increment_day( const device_config *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 	int real_year;
@@ -526,7 +526,7 @@ static DEVICE_RESET( upd4990a )
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##upd4990a##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET

@@ -64,9 +64,6 @@ void crosshair_init(running_machine *machine);
 /* draws crosshair(s) in a given screen, if neccessary */
 void crosshair_render(const device_config *screen);
 
-/* toggles crosshair visibility */
-void crosshair_toggle(running_machine *machine);
-
 /* sets the screen(s) for a given player's crosshair */
 void crosshair_set_screen(running_machine *machine, int player, const device_config *screen);
 

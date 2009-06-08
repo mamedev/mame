@@ -198,7 +198,7 @@ static int ninjaw_pandata[4];		/**** sound pan control ****/
 
 static WRITE8_HANDLER( warriorb_pancontrol )
 {
-	static const char *fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
+	static const char *const fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
 
 	offset = offset&3;
 	ninjaw_pandata[offset] = (data<<1) + data;   /* original volume*3 */

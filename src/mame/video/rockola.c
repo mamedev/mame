@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/rockola.h"
 
 
 UINT8 *rockola_videoram2;

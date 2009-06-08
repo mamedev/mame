@@ -398,7 +398,7 @@ static void h8_check_irqs(h83xx_state *h8)
 //  peripherals
 static void recalc_8bit_timer(h83xx_state *h8, int t)
 {
-	static INT32 dividers[8] = { 0, 0, 8, 2, 64, 32, 1024, 256 };
+	static const INT32 dividers[8] = { 0, 0, 8, 2, 64, 32, 1024, 256 };
 	int div;
 	INT32 time;
 
@@ -428,7 +428,7 @@ static void recalc_8bit_timer(h83xx_state *h8, int t)
 // IRQs: timer 0: 19 A 20 B 21 OV  timer1: 22 A 23 B 24 OV
 static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 {
-	static int irqbase[2] = { 19, 22 };
+	static const int irqbase[2] = { 19, 22 };
 
 	timer_adjust_oneshot(h8->timer[(t*2)+sel], attotime_never, 0);
 
@@ -512,7 +512,7 @@ static READ8_HANDLER( h8330_itu_r )
 	UINT8 val;
 	UINT8 reg;
 	UINT64 frc;
-	static UINT64 divider[4] = { 2, 8, 32, 1 };
+	static const UINT64 divider[4] = { 2, 8, 32, 1 };
 	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
 
 	reg = (offset + 0x88) & 0xff;

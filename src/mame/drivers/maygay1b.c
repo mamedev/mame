@@ -114,7 +114,7 @@ static void update_outputs(i8279_state *chip, UINT16 which)
 static READ8_HANDLER( m1_8279_r )
 {
 	i8279_state *chip = i8279 + 0;
-	static const char *portnames[] = { "SW1","STROBE5","STROBE7","STROBE3","SW2","STROBE4","STROBE6","STROBE2" };
+	static const char *const portnames[] = { "SW1","STROBE5","STROBE7","STROBE3","SW2","STROBE4","STROBE6","STROBE2" };
 	UINT8 result = 0xff;
 	UINT8 addr;
 

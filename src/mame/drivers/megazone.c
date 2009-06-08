@@ -56,7 +56,7 @@ static READ8_DEVICE_HANDLER( megazone_portA_r )
 
 static WRITE8_DEVICE_HANDLER( megazone_portB_w )
 {
-	static const char *fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
+	static const char *const fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
 	int i;
 
 

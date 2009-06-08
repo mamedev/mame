@@ -340,7 +340,7 @@ static INPUT_PORTS_START( mirax )
 INPUT_PORTS_END
 
 
-PALETTE_INIT( mirax )
+static PALETTE_INIT( mirax )
 {
 	int i;
 

@@ -492,7 +492,7 @@ static DEVICE_RESET( adc0831 )
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##adc0831##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET

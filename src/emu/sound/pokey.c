@@ -946,7 +946,7 @@ READ8_DEVICE_HANDLER( pokey_r )
 
 READ8_HANDLER( quad_pokey_r )
 {
-	static const char *devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
@@ -1332,7 +1332,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 WRITE8_HANDLER( quad_pokey_w )
 {
-	static const char *devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
     int pokey_num = (offset >> 3) & ~0x04;
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;

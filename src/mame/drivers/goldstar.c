@@ -5069,12 +5069,12 @@ static MACHINE_DRIVER_START( nfm )
 MACHINE_DRIVER_END
 
 
-VIDEO_START( unkch )
+static VIDEO_START( unkch )
 {
 
 }
 
-VIDEO_UPDATE( unkch )
+static VIDEO_UPDATE( unkch )
 {
 	return 0;
 }
@@ -7855,7 +7855,7 @@ static DRIVER_INIT( match133 )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
 }
 
-DRIVER_INIT(cherrys)
+static DRIVER_INIT(cherrys)
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");

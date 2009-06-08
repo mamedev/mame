@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "includes/wiping.h"
 
 
 /* 8 voices max */

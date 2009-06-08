@@ -2,6 +2,7 @@
 #include "sound/vlm5030.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "includes/trackfld.h"
 
 
 #define TIMER_RATE (4096/4)

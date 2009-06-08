@@ -413,7 +413,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
 static WRITE8_HANDLER( konami_sound_filter_w )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "konami");
-	static const char *ayname[2] = { "8910.0", "8910.1" };
+	static const char *const ayname[2] = { "8910.0", "8910.1" };
 	int which, chan;
 
 	/* the offset is used as data, 6 channels * 2 bits each */

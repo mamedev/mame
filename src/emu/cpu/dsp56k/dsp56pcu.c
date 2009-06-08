@@ -107,7 +107,7 @@ static UINT8 SE_bit(dsp56k_core* cpustate) { return (SP & 0x0010) >> 4; }
 //static void SE_bit_set(dsp56k_core* cpustate, UINT8 value) {};
 
 
-UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
+static UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
 {
 	return ((MB_bit(cpustate) << 1) | MA_bit(cpustate));
 }

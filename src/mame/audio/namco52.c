@@ -171,7 +171,7 @@ static TIMER_CALLBACK( external_clock_pulse )
     DEVICE INTERFACE
 ***************************************************************************/
 
-ADDRESS_MAP_START( namco_52xx_map_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( namco_52xx_map_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_52xx_K_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_52xx_O_w)
 	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE(namco_52xx_P_w)
@@ -230,7 +230,7 @@ static DEVICE_START( namco_52xx )
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##namco_52xx##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG

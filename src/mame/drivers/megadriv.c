@@ -1484,7 +1484,7 @@ void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, U
 
 */
 
-INPUT_PORTS_START( md_common )
+static INPUT_PORTS_START( md_common )
 	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1675,8 +1675,8 @@ static void megadrive_init_io(running_machine *machine)
 static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
-	static const char *pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
-	static const char *pad6names[] = { "EXTRA1", "EXTRA2", "IN0", "UNK" };
+	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
+	static const char *const pad6names[] = { "EXTRA1", "EXTRA2", "IN0", "UNK" };
 
 	if (megadrive_io_data_regs[portnum] & 0x40)
 	{
@@ -1727,7 +1727,7 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
-	static const char *pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
+	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
 	if (megadrive_io_data_regs[portnum] & 0x40)
 	{

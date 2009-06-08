@@ -3,9 +3,6 @@
 extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
 extern UINT32 *skns_palette_ram;
 extern UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
-extern UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
-extern UINT32 skns_v3t_4bppdirty[0x8000]; // allocate this elsewhere?
-extern int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
 
 /*----------- defined in video/suprnova.c -----------*/
 

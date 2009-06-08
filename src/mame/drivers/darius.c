@@ -351,7 +351,7 @@ static void update_fm1( running_machine *machine )
 
 static void update_psg0( running_machine *machine, int port )
 {
-	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
+	static const char *const fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
 	const device_config *lvol = devtag_get_device(machine, fltname[port][0]);
 	const device_config *rvol = devtag_get_device(machine, fltname[port][1]);
 	int left, right;
@@ -365,7 +365,7 @@ static void update_psg0( running_machine *machine, int port )
 
 static void update_psg1( running_machine *machine, int port )
 {
-	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
+	static const char *const fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
 	const device_config *lvol = devtag_get_device(machine, fltname[port][0]);
 	const device_config *rvol = devtag_get_device(machine, fltname[port][1]);
 	int left, right;

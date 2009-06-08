@@ -26,7 +26,6 @@ READ8_HANDLER( tnzs_mcu_r );
 WRITE8_HANDLER( tnzs_mcu_w );
 INTERRUPT_GEN( arknoid2_interrupt );
 MACHINE_RESET( tnzs );
-WRITE8_HANDLER( tnzs_sharedram_w );
 WRITE8_HANDLER( tnzs_bankswitch_w );
 WRITE8_HANDLER( tnzs_bankswitch1_w );
 

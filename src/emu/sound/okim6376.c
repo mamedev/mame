@@ -53,7 +53,7 @@ static int diff_lookup[49*16];
 
 /* volume lookup table. Upon configuration, the number of ST pulses determine how much
    attenuation to apply to the sound signal. */
-static int volume_table[4] =
+static const int volume_table[4] =
 {
 	0x20,	//   0 dB
 	0x10,	//  -6.0 dB

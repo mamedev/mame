@@ -11,7 +11,7 @@
 
     Typical usage is as follows:
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 // for a primary device....
 #define DEVTEMPLATE_ID(p,s)             p##devicenameprefix##s

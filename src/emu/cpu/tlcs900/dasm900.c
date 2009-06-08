@@ -35,7 +35,7 @@ enum e_mnemonics
 };
 
 
-static const char *s_mnemonic[] =
+static const char *const s_mnemonic[] =
 {
 	"adc", "add", "and", "andcf", "bit", "bs1b",
 	"bs1f", "call", "calr", "ccf", "chg", "cp",
@@ -1358,11 +1358,11 @@ static const tlcs900inst mnemonic[256] =
 
 
 
-static const char *s_reg8[8] = { "W", "A", "B", "C", "D", "E", "H", "L" };
-static const char *s_reg16[8] = { "WA", "BC", "DE", "HL", "IX", "IY", "IZ", "SP" };
-static const char *s_reg32[8] = { "XWA", "XBC", "XDE", "XHL", "XIX", "XIY", "XIZ", "XSP" };
-static const char *s_mulreg16[8] = { "??", "WA", "??", "BC", "??", "DE", "??", "HL" };
-static const char *s_allreg8[256] =
+static const char *const s_reg8[8] = { "W", "A", "B", "C", "D", "E", "H", "L" };
+static const char *const s_reg16[8] = { "WA", "BC", "DE", "HL", "IX", "IY", "IZ", "SP" };
+static const char *const s_reg32[8] = { "XWA", "XBC", "XDE", "XHL", "XIX", "XIY", "XIZ", "XSP" };
+static const char *const s_mulreg16[8] = { "??", "WA", "??", "BC", "??", "DE", "??", "HL" };
+static const char *const s_allreg8[256] =
 {
 	"RA0" ,"RW0" ,"QA0" ,"QW0" ,"RC0" ,"RB0" ,"QC0" ,"QB0" ,"RE0" ,"RD0" ,"QE0" ,"QD0" ,"RL0" ,"RH0" ,"QL0" ,"QH0" ,
 	"RA1" ,"RW1" ,"QA1" ,"QW1" ,"RC1" ,"RB1" ,"QC1" ,"QB1" ,"RE1" ,"RD1" ,"QE1" ,"QD1" ,"RL1" ,"RH1" ,"QL1" ,"QH1" ,
@@ -1383,7 +1383,7 @@ static const char *s_allreg8[256] =
 };
 
 
-static const char *s_allreg16[256] =
+static const char *const s_allreg16[256] =
 {
 	"RWA0","r01W","QWA0","r03W","RBC0","r05W","QBC0","r07W","RDE0","r09W","QDE0","r0BW","RHL0","r0DW","QHL0","r0FW",
 	"RWA1","r11W","QWA1","r13W","RBC1","r15W","QBC1","r17W","RDE1","r19W","QDE1","r1BW","RHL1","r1DW","QHL1","r1FW",
@@ -1404,7 +1404,7 @@ static const char *s_allreg16[256] =
 };
 
 
-static const char *s_allreg32[256] =
+static const char *const s_allreg32[256] =
 {
 	"XWA0","XWA0","XWA0","r03L","XBC0","XBC0","XBC0","r07L","XDE0","XDE0","XDE0","r0BL","XHL0","XHL0","XHL0","r0FL",
 	"XWA1","XWA1","XWA1","r13L","XBC1","XBC1","XBC1","r17L","XDE1","XDE1","XDE1","r1BL","XHL1","XHL1","XHL1","r1FL",
@@ -1425,7 +1425,7 @@ static const char *s_allreg32[256] =
 };
 
 
-static const char *s_cond[16] =
+static const char *const s_cond[16] =
 {
 	"F","LT","LE","ULE","PE/OV","M/MI","Z","C","T","GE","GT","UGT","PO/NOV","P/PL","NZ","NC"
 };

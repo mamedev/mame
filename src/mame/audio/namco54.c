@@ -138,7 +138,7 @@ WRITE8_DEVICE_HANDLER( namco_54xx_write )
     DEVICE INTERFACE
 ***************************************************************************/
 
-ADDRESS_MAP_START( namco_54xx_map_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( namco_54xx_map_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_54xx_K_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_54xx_O_w)
 	AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_54xx_R0_r)
@@ -186,7 +186,7 @@ static DEVICE_START( namco_54xx )
     device definition
 -------------------------------------------------*/
 
-static const char *DEVTEMPLATE_SOURCE = __FILE__;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##namco_54xx##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG | DT_HAS_INLINE_CONFIG

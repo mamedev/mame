@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/trackfld.h"
 
 UINT8 *trackfld_scroll;
 UINT8 *trackfld_scroll2;

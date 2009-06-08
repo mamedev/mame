@@ -68,7 +68,6 @@ extern int ssv_sprites_offsx, ssv_sprites_offsy;
 extern int ssv_tilemap_offsx, ssv_tilemap_offsy;
 
 extern UINT16 *eaglshot_gfxram, *gdfs_tmapram, *gdfs_tmapscroll;
-extern char eaglshot_dirty, *eaglshot_dirty_tile;
 
 READ16_HANDLER( ssv_vblank_r );
 WRITE16_HANDLER( ssv_scroll_w );

@@ -119,10 +119,6 @@ extern UINT16* galsnew_bg_pixram;
 extern UINT16* galsnew_fg_pixram;
 
 
-/*----------- defined in drivers/galpani2.c -----------*/
-
-void galpani2_mcu_run(running_machine *machine);
-
 /*----------- defined in video/galpani2.c -----------*/
 
 extern UINT16 *galpani2_bg8_0,         *galpani2_bg8_1;

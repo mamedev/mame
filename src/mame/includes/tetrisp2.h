@@ -19,10 +19,8 @@ extern UINT16 *rocknms_sub_priority;
 
 WRITE16_HANDLER( tetrisp2_palette_w );
 WRITE16_HANDLER( rocknms_sub_palette_w );
-READ16_HANDLER( tetrisp2_priority_r );
 WRITE16_HANDLER( tetrisp2_priority_w );
 WRITE16_HANDLER( rockn_priority_w );
-READ16_HANDLER( rocknms_sub_priority_r );
 WRITE16_HANDLER( rocknms_sub_priority_w );
 READ16_HANDLER( nndmseal_priority_r );
 

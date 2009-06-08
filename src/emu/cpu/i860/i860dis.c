@@ -388,7 +388,7 @@ typedef struct
 
 
 /* First-level decode table (i.e., for the 6 primary opcode bits).  */
-static decode_tbl_t decode_tbl[64] =
+static const decode_tbl_t decode_tbl[64] =
 {
 	/* A slight bit of decoding for loads and stores is done in the
        execution routines (operand size and addressing mode), which
@@ -461,7 +461,7 @@ static decode_tbl_t decode_tbl[64] =
 
 
 /* Second-level decode table (i.e., for the 3 core escape opcode bits).  */
-static decode_tbl_t core_esc_decode_tbl[8] =
+static const decode_tbl_t core_esc_decode_tbl[8] =
 {
 	{ 0,         0          , 0           },
 	{ int_0,     DEC_DECODED, "lock"      }, /* lock.           */
@@ -475,7 +475,7 @@ static decode_tbl_t core_esc_decode_tbl[8] =
 
 
 /* Second-level decode table (i.e., for the 7 FP extended opcode bits).  */
-static decode_tbl_t fp_decode_tbl[128] =
+static const decode_tbl_t fp_decode_tbl[128] =
 {
 	/* Floating point instructions.  The least significant 7 bits are
        the (extended) opcode and bits 10:7 are P,D,S,R respectively

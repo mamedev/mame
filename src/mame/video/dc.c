@@ -250,7 +250,7 @@ INLINE UINT32 bl75(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, s)); }
 INLINE UINT32 bl76(UINT32 s, UINT32 d) { return bls(blia(s, d), bla(d, d)); }
 INLINE UINT32 bl77(UINT32 s, UINT32 d) { return bls(blia(s, d), blia(d, d)); }
 
-static UINT32 (*blend_functions[64])(UINT32 s, UINT32 d) = {
+static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d) = {
 	bl00, bl01, bl02, bl03, bl04, bl05, bl06, bl07,
 	bl10, bl11, bl12, bl13, bl14, bl15, bl16, bl17,
 	bl20, bl21, bl22, bl23, bl24, bl25, bl26, bl27,

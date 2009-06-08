@@ -38,7 +38,6 @@ READ16_HANDLER( tx1_spcs_ram_r );
 WRITE16_HANDLER( tx1_spcs_ram_w );
 READ16_HANDLER( tx1_math_r );
 WRITE16_HANDLER( tx1_math_w );
-MACHINE_START( tx1 );
 MACHINE_RESET( tx1 );
 
 
@@ -49,8 +48,6 @@ READ16_HANDLER( buggyboy_math_r );
 WRITE16_HANDLER( buggyboy_math_w );
 MACHINE_RESET( buggybjr );
 MACHINE_RESET( buggyboy );
-MACHINE_START( buggybjr );
-MACHINE_START( buggyboy );
 
 /*----------- defined in audio/tx1.c -----------*/
 READ8_HANDLER( tx1_pit8253_r );
