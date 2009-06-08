@@ -29,7 +29,7 @@ MACHINE_RESET( pce ) {
 /* todo: how many input ports does the PCE have? */
 WRITE8_HANDLER ( pce_joystick_w )
 {
-	h6280io_set_buffer((device_config*)space->cpu, data);
+	h6280io_set_buffer(space->cpu, data);
     /* bump counter on a low-to-high transition of bit 1 */
     if((!joystick_data_select) && (data & JOY_CLOCK))
     {

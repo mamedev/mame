@@ -2555,6 +2555,7 @@ src/mame/includes/vsnes.h svneol=native#text/plain
 src/mame/includes/warpwarp.h svneol=native#text/plain
 src/mame/includes/wc90.h svneol=native#text/plain
 src/mame/includes/williams.h svneol=native#text/plain
+src/mame/includes/wiping.h svneol=native#text/plain
 src/mame/includes/wrally.h svneol=native#text/plain
 src/mame/includes/wwfwfest.h svneol=native#text/plain
 src/mame/includes/xmen.h svneol=native#text/plain

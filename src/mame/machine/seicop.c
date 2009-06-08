@@ -73,7 +73,7 @@ static UINT16 cop_clearfill_lasttrigger = 0;
 
 static UINT16 copd2_offs = 0;
 
-static void copd2_set_tableoffset(UINT16 data, running_machine *machine)
+static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 {
 	logerror("mcu_offs %04x\n", data);
 	copd2_offs = data;
@@ -122,7 +122,7 @@ static void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 
 }
 
-static void copd2_set_tabledata(UINT16 data, running_machine *machine)
+static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 {
 	copd2_table[copd2_offs] = data;
 	logerror("mcu_data %04x\n", data);
@@ -1153,8 +1153,8 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x024/2): { prot_bcd[2] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 
 		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { copd2_set_tabledata(data, space->machine); break; }
-		case (0x034/2): { copd2_set_tableoffset(data, space->machine); break; }
+		case (0x032/2): { copd2_set_tabledata(space->machine, data); break; }
+		case (0x034/2): { copd2_set_tableoffset(space->machine, data); break; }
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }

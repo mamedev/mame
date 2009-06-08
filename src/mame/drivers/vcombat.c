@@ -189,13 +189,13 @@ static READ16_HANDLER( control_3_r )
 	return (input_port_read(space->machine, "IN2") << 8);
 }
 
-static void wiggle_i860_common(int n, UINT16 data, const device_config *device)
+static void wiggle_i860_common(const device_config *device, UINT16 data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
-	assert(n >= 0 && n < 2);
 	if (!device)
 		return;
+
 	if (bus_hold)
 	{
 		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag);
@@ -218,12 +218,12 @@ static void wiggle_i860_common(int n, UINT16 data, const device_config *device)
 
 static WRITE16_HANDLER( wiggle_i860p0_pins_w )
 {
-	wiggle_i860_common(0, data, cputag_get_cpu(space->machine, "vid_0"));
+	wiggle_i860_common(cputag_get_cpu(space->machine, "vid_0"), data);
 }
 
 static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 {
-	wiggle_i860_common(1, data, cputag_get_cpu(space->machine, "vid_1"));
+	wiggle_i860_common(cputag_get_cpu(space->machine, "vid_1"), data);
 }
 
 static READ16_HANDLER( main_irqiack_r )

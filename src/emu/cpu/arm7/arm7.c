@@ -86,7 +86,7 @@ static CPU_INIT( arm7 )
 	arm_state *cpustate = get_safe_token(device);
 
 	// must call core
-	arm7_core_init("arm7", device);
+	arm7_core_init(device, "arm7");
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

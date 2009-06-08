@@ -120,9 +120,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset - 0x0100);
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset - 0x0200);
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset - 0x0200);
 
 	return 0xff;
 }

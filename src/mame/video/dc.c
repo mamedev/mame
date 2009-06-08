@@ -47,7 +47,7 @@ static emu_timer *endofrender_timer_video;
 
 static int scanline;
 static bitmap_t *fakeframebuffer_bitmap;
-static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
+static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
@@ -1854,7 +1854,7 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 	render_tri_sorted(bitmap, ti, v+i0, v+i1, v+i2);
 }
 
-static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int cs,rs,ns;

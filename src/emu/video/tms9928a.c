@@ -100,17 +100,17 @@ static const rgb_t TMS9928A_palette[16] =
 /*
 ** Forward declarations of internal functions.
 */
-static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode0 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode1 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode2 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode12 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode3 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode23 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_modebogus (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
 static void change_register (running_machine *machine, int reg, UINT8 data);
 
-static void (*const ModeHandlers[])(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) = {
+static void (*const ModeHandlers[])(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
         draw_modebogus };
@@ -403,7 +403,7 @@ VIDEO_UPDATE( tms9928a )
 		bitmap_fill(bitmap, cliprect, screen->machine->pens[BackColour]);
 	else
 	{
-		(*ModeHandlers[TMS_MODE])(screen->machine, tms.tmpbmp, cliprect);
+		(*ModeHandlers[TMS_MODE])(screen, tms.tmpbmp, cliprect);
 
 		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect);
 		{
@@ -421,9 +421,9 @@ VIDEO_UPDATE( tms9928a )
 			bitmap_fill (bitmap, &rt, BackColour);
 			rt.min_x = LEFT_BORDER+256; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
 			bitmap_fill (bitmap, &rt, BackColour);
-	    }
+                }
 		if (TMS_SPRITES_ENABLED)
-			draw_sprites(screen->machine, bitmap, cliprect);
+			draw_sprites(screen, bitmap, cliprect);
 	}
 
 	return 0;
@@ -449,13 +449,15 @@ int TMS9928A_interrupt(running_machine *machine) {
     return b;
 }
 
-static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode1 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
-	rectangle rt;
+    rectangle rt;
+    const pen_t *pens;
 
-    fg = machine->pens[tms.Regs[7] / 16];
-    bg = machine->pens[tms.Regs[7] & 15];
+    pens = screen->machine->pens;
+    fg = pens[tms.Regs[7] / 16];
+    bg = pens[tms.Regs[7] & 15];
 
 	/* colours at sides must be reset */
 	rt.min_y = 0; rt.max_y = 191;
@@ -482,13 +484,15 @@ static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectan
     }
 }
 
-static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode12 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
-	rectangle rt;
+    const pen_t *pens;
+    rectangle rt;
 
-    fg = machine->pens[tms.Regs[7] / 16];
-    bg = machine->pens[tms.Regs[7] & 15];
+    pens = screen->machine->pens;
+    fg = pens[tms.Regs[7] / 16];
+    bg = pens[tms.Regs[7] & 15];
 
 	/* colours at sides must be reset */
 	rt.min_y = 0; rt.max_y = 191;
@@ -515,10 +519,12 @@ static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const recta
     }
 }
 
-static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode0 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode,colour;
     UINT8 fg,bg,*patternptr;
+    const pen_t *pens;
 
+    pens = screen->machine->pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -526,8 +532,8 @@ static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectan
             name++;
             patternptr = tms.vMem + tms.pattern + charcode*8;
             colour = tms.vMem[tms.colour+charcode/8];
-            fg = machine->pens[colour / 16];
-            bg = machine->pens[colour & 15];
+            fg = pens[colour / 16];
+            bg = pens[colour & 15];
             for (yy=0;yy<8;yy++) {
                 pattern=*patternptr++;
                 for (xx=0;xx<8;xx++) {
@@ -539,11 +545,13 @@ static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectan
     }
 }
 
-static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode2 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int colour,name,x,y,yy,pattern,xx,charcode;
     UINT8 fg,bg;
+    const pen_t *pens;
     UINT8 *colourptr,*patternptr;
 
+    pens = screen->machine->pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -556,8 +564,8 @@ static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectan
             for (yy=0;yy<8;yy++) {
                 pattern = *patternptr++;
                 colour = *colourptr++;
-                fg = machine->pens[colour / 16];
-                bg = machine->pens[colour & 15];
+                fg = pens[colour / 16];
+                bg = pens[colour & 15];
                 for (xx=0;xx<8;xx++) {
 					*BITMAP_ADDR16(bitmap, y*8+yy, x*8+xx) = (pattern & 0x80) ? fg : bg;
                     pattern *= 2;
@@ -567,10 +575,12 @@ static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectan
     }
 }
 
-static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode3 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
+    const pen_t *pens;
 
+    pens = screen->machine->pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -578,8 +588,8 @@ static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectan
             name++;
             patternptr = tms.vMem+tms.pattern+charcode*8+(y&3)*2;
             for (yy=0;yy<2;yy++) {
-                fg = machine->pens[(*patternptr / 16)];
-                bg = machine->pens[((*patternptr++) & 15)];
+                fg = pens[(*patternptr / 16)];
+                bg = pens[((*patternptr++) & 15)];
                 for (yyy=0;yyy<4;yyy++) {
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+0) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
@@ -595,10 +605,12 @@ static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectan
     }
 }
 
-static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode23 (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
+    const pen_t *pens;
 
+    pens = screen->machine->pens;
     name = 0;
     for (y=0;y<24;y++) {
         for (x=0;x<32;x++) {
@@ -607,8 +619,8 @@ static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const recta
             patternptr = tms.vMem + tms.pattern +
                 ((charcode+(y&3)*2+(y/8)*256)&tms.patternmask)*8;
             for (yy=0;yy<2;yy++) {
-                fg = machine->pens[(*patternptr / 16)];
-                bg = machine->pens[((*patternptr++) & 15)];
+                fg = pens[(*patternptr / 16)];
+                bg = pens[((*patternptr++) & 15)];
                 for (yyy=0;yyy<4;yyy++) {
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+0) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
@@ -624,12 +636,14 @@ static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const recta
     }
 }
 
-static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_modebogus (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 fg,bg;
     int x,y,n,xx;
+    const pen_t *pens;
 
-    fg = machine->pens[tms.Regs[7] / 16];
-    bg = machine->pens[tms.Regs[7] & 15];
+    pens = screen->machine->pens;
+    fg = pens[tms.Regs[7] / 16];
+    bg = pens[tms.Regs[7] & 15];
 
     for (y=0;y<192;y++) {
         xx=0;
@@ -651,12 +665,14 @@ static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const re
 **
 ** This code should be optimized. One day.
 */
-static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_sprites (const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 *attributeptr,*patternptr,c;
     int p,x,y,size,i,j,large,yy,xx,limit[192],
         illegalsprite,illegalspriteline;
     UINT16 line,line2;
+    const pen_t *pens;
 
+    pens = screen->machine->pens;
     attributeptr = tms.vMem + tms.spriteattribute;
     size = (tms.Regs[1] & 2) ? 16 : 8;
     large = (int)(tms.Regs[1] & 1);
@@ -710,10 +726,10 @@ static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rect
                             }
                             if (c && ! (tms.dBackMem[yy*256+xx] & 0x02))
                             {
-                            	tms.dBackMem[yy*256+xx] |= 0x02;
-                            	if (bitmap)
-                            		*BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = machine->pens[c];
-							}
+                                tms.dBackMem[yy*256+xx] |= 0x02;
+                                if (bitmap)
+                                    *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
+                            }
                         }
                     }
                     line *= 2;
@@ -747,12 +763,12 @@ static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rect
                                     } else {
                                         tms.dBackMem[yy*256+xx] = 0x01;
                                     }
-		                            if (c && ! (tms.dBackMem[yy*256+xx] & 0x02))
-        		                    {
-                		            	tms.dBackMem[yy*256+xx] |= 0x02;
+                                    if (c && ! (tms.dBackMem[yy*256+xx] & 0x02))
+                                    {
+                                        tms.dBackMem[yy*256+xx] |= 0x02;
                                         if (bitmap)
-		                            		*BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = machine->pens[c];
-                		            }
+                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx) = pens[c];
+                                    }
                                 }
                                 if (((xx+1) >=0) && ((xx+1) < 256)) {
                                     if (tms.dBackMem[yy*256+xx+1]) {
@@ -760,12 +776,12 @@ static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rect
                                     } else {
                                         tms.dBackMem[yy*256+xx+1] = 0x01;
                                     }
-		                            if (c && ! (tms.dBackMem[yy*256+xx+1] & 0x02))
-        		                    {
-                		            	tms.dBackMem[yy*256+xx+1] |= 0x02;
+                                    if (c && ! (tms.dBackMem[yy*256+xx+1] & 0x02))
+                                    {
+                                        tms.dBackMem[yy*256+xx+1] |= 0x02;
                                         if (bitmap)
-		                            		*BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx+1) = machine->pens[c];
-									}
+                                            *BITMAP_ADDR16(bitmap, TOP_BORDER+yy, LEFT_BORDER+xx+1) = pens[c];
+                                    }
                                 }
                             }
                             line *= 2;

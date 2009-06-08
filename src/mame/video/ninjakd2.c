@@ -90,7 +90,7 @@ static TILEMAP_MAPPER( omegaf_bg_scan )
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
-static void robokid_get_bg_tile_info(running_machine* const machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
+static void robokid_get_bg_tile_info(running_machine* machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
 {
 	int const lo = videoram[(tile_index << 1)];
 	int const hi = videoram[(tile_index << 1) | 1];
@@ -127,7 +127,7 @@ static TILE_GET_INFO( robokid_get_bg2_tile_info )
  *
  *************************************/
 
-static void videoram_alloc(running_machine* const machine, int const size)
+static void videoram_alloc(running_machine* machine, int const size)
 {
 	if (size)
 	{
@@ -355,7 +355,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
+static void draw_sprites(running_machine* machine, bitmap_t* bitmap)
 {
 	const gfx_element* const gfx = machine->gfx[1];
 	int const big_xshift = robokid_sprites ? 1 : 0;
@@ -451,7 +451,7 @@ static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
 // This is very hackish.
 // (Is there a possibility that software can't select it but hardware can?)
 
-static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
+static void erase_sprites(running_machine* machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	if (!next_sprite_overdraw_enabled)
@@ -473,7 +473,7 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 }
 
 
-static void update_sprites(running_machine* const machine)
+static void update_sprites(running_machine* machine)
 {
 	erase_sprites(machine, sp_bitmap, 0);
 	draw_sprites(machine, sp_bitmap);

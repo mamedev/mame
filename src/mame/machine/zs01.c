@@ -664,7 +664,7 @@ int zs01_sda_read( running_machine *machine, int chip )
 	return c->sdar;
 }
 
-static void nvram_handler_zs01( int chip, running_machine *machine, mame_file *file, int read_or_write )
+static void nvram_handler_zs01( running_machine *machine, mame_file *file, int read_or_write, int chip )
 {
 	struct zs01_chip *c;
 
@@ -686,5 +686,5 @@ static void nvram_handler_zs01( int chip, running_machine *machine, mame_file *f
 	}
 }
 
-NVRAM_HANDLER( zs01_0 ) { nvram_handler_zs01( 0, machine, file, read_or_write ); }
-NVRAM_HANDLER( zs01_1 ) { nvram_handler_zs01( 1, machine, file, read_or_write ); }
+NVRAM_HANDLER( zs01_0 ) { nvram_handler_zs01( machine, file, read_or_write, 0 ); }
+NVRAM_HANDLER( zs01_1 ) { nvram_handler_zs01( machine, file, read_or_write, 1 ); }

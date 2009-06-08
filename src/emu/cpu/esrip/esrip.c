@@ -368,7 +368,7 @@ static int get_lbrm(esrip_state *cpustate)
 	return (val >> sel) & 1;
 }
 
-INLINE int check_jmp(esrip_state *cpustate, running_machine *machine, UINT8 jmp_ctrl)
+INLINE int check_jmp(esrip_state *cpustate, UINT8 jmp_ctrl)
 {
 	int ret = 0;
 
@@ -382,7 +382,7 @@ INLINE int check_jmp(esrip_state *cpustate, running_machine *machine, UINT8 jmp_
 			/* T3 */      case 6: ret = BIT(cpustate->t, 2);  break;
 			/* T4 */      case 1: ret = BIT(cpustate->t, 3);  break;
 			/* /LBRM */   case 5: ret = !get_lbrm(cpustate);  break;
-			/* /HBLANK */ case 3: ret = !get_hblank(machine); break;
+			/* /HBLANK */ case 3: ret = !get_hblank(cpustate->device->machine); break;
 			/* JMP */     case 7: ret = 0;                    break;
 		}
 
@@ -1762,7 +1762,7 @@ static CPU_EXECUTE( esrip )
 
 		if ((((cpustate->l5 >> 3) & 0x1f) & 0x18) != 0x18)
 		{
-			if ( check_jmp(cpustate, device->machine, (cpustate->l5 >> 3) & 0x1f) )
+			if ( check_jmp(cpustate, (cpustate->l5 >> 3) & 0x1f) )
 				next_pc = cpustate->l1;
 			else
 				next_pc = cpustate->pc + 1;

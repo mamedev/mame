@@ -243,9 +243,9 @@ typedef struct
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-void  dsp56k_host_interface_write(device_config* device, UINT8 offset, UINT8 data);
-UINT8 dsp56k_host_interface_read(device_config* device, UINT8 offset);
+void  dsp56k_host_interface_write(const device_config* device, UINT8 offset, UINT8 data);
+UINT8 dsp56k_host_interface_read(const device_config* device, UINT8 offset);
 
-UINT16 dsp56k_get_peripheral_memory(device_config* device, UINT16 addr);
+UINT16 dsp56k_get_peripheral_memory(const device_config* device, UINT16 addr);
 
 #endif /* __DSP56K_H__ */

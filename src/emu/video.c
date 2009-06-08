@@ -1343,7 +1343,7 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	device_config *screen = (device_config *)ptr;
+	const device_config *screen = (const device_config *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* reset the starting VBLANK time */
@@ -1363,7 +1363,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 
 	/* if no VBLANK period, call the VBLANK end callback immedietely, otherwise reset the timer */
 	if (state->vblank_period == 0)
-		vblank_end_callback(machine, screen, 0);
+		vblank_end_callback(machine, ptr, 0);
 	else
 		timer_adjust_oneshot(state->vblank_end_timer, video_screen_get_time_until_vblank_end(screen), 0);
 }

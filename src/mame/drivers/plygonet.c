@@ -230,7 +230,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
 	if (mem_mask == 0xff000000) {}				/* High byte */
 
-	value = dsp56k_host_interface_read((device_config*)cputag_get_cpu(space->machine, "dsp"), hi_addr);
+	value = dsp56k_host_interface_read(cputag_get_cpu(space->machine, "dsp"), hi_addr);
 
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
@@ -299,7 +299,7 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
-	dsp56k_host_interface_write((device_config*)cputag_get_cpu(space->machine, "dsp"), hi_addr, hi_data);
+	dsp56k_host_interface_write(cputag_get_cpu(space->machine, "dsp"), hi_addr, hi_data);
 }
 
 
@@ -375,7 +375,7 @@ enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
 static UINT8 dsp56k_bank_group(const device_config* cpu)
 {
-	UINT16 portC = dsp56k_get_peripheral_memory((device_config*)cpu, 0xffe3);
+	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
 	/* If bank group B is on, it overrides bank group A */
 	if (portC & 0x0002)
@@ -388,7 +388,7 @@ static UINT8 dsp56k_bank_group(const device_config* cpu)
 
 static UINT8 dsp56k_bank_num(const device_config* cpu, UINT8 bank_group)
 {
-	UINT16 portC = dsp56k_get_peripheral_memory((device_config*)cpu, 0xffe3);
+	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
 	if (bank_group == BANK_GROUP_A)
 	{
@@ -413,8 +413,8 @@ static UINT8 dsp56k_bank_num(const device_config* cpu, UINT8 bank_group)
 /* BANK HANDLERS */
 static READ16_HANDLER( dsp56k_ram_bank00_read )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	return dsp56k_bank00_ram[driver_bank_offset + offset];
@@ -422,8 +422,8 @@ static READ16_HANDLER( dsp56k_ram_bank00_read )
 
 static WRITE16_HANDLER( dsp56k_ram_bank00_write )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	COMBINE_DATA(&dsp56k_bank00_ram[driver_bank_offset + offset]);
@@ -432,8 +432,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank00_write )
 
 static READ16_HANDLER( dsp56k_ram_bank01_read )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	return dsp56k_bank01_ram[driver_bank_offset + offset];
@@ -441,8 +441,8 @@ static READ16_HANDLER( dsp56k_ram_bank01_read )
 
 static WRITE16_HANDLER( dsp56k_ram_bank01_write )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	COMBINE_DATA(&dsp56k_bank01_ram[driver_bank_offset + offset]);
@@ -454,8 +454,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank01_write )
 
 static READ16_HANDLER( dsp56k_ram_bank02_read )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	return dsp56k_bank02_ram[driver_bank_offset + offset];
@@ -463,8 +463,8 @@ static READ16_HANDLER( dsp56k_ram_bank02_read )
 
 static WRITE16_HANDLER( dsp56k_ram_bank02_write )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	COMBINE_DATA(&dsp56k_bank02_ram[driver_bank_offset + offset]);
@@ -473,8 +473,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank02_write )
 
 static READ16_HANDLER( dsp56k_shared_ram_read )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	return dsp56k_shared_ram_16[driver_bank_offset + offset];
@@ -482,8 +482,8 @@ static READ16_HANDLER( dsp56k_shared_ram_read )
 
 static WRITE16_HANDLER( dsp56k_shared_ram_write )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	COMBINE_DATA(&dsp56k_shared_ram_16[driver_bank_offset + offset]);
@@ -501,8 +501,8 @@ static WRITE16_HANDLER( dsp56k_shared_ram_write )
 
 static READ16_HANDLER( dsp56k_ram_bank04_read )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	return dsp56k_bank04_ram[driver_bank_offset + offset];
@@ -510,8 +510,8 @@ static READ16_HANDLER( dsp56k_ram_bank04_read )
 
 static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 {
-	UINT8 en_group = dsp56k_bank_group((device_config*)space->cpu);
-	UINT8 bank_num = dsp56k_bank_num((device_config*)space->cpu, en_group);
+	UINT8 en_group = dsp56k_bank_group(space->cpu);
+	UINT8 bank_num = dsp56k_bank_num(space->cpu, en_group);
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	COMBINE_DATA(&dsp56k_bank04_ram[driver_bank_offset + offset]);

@@ -458,7 +458,7 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const device_config *screen, int catagory)
+static void sfbonus_draw_reel_layer(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
 {
 	int zz;
 	int i;
@@ -612,7 +612,7 @@ static VIDEO_UPDATE(sfbonus)
 	bitmap_fill(temp_reel_bitmap,cliprect,screen->machine->pens[0]);
 
 	/* render reels to bitmap */
-	sfbonus_draw_reel_layer(screen->machine,temp_reel_bitmap,cliprect, screen, 0);
+	sfbonus_draw_reel_layer(screen,temp_reel_bitmap,cliprect,0);
 
 	{
 		int y,x;

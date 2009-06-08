@@ -338,11 +338,10 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 	pix[NUM][3][0] = prom_a[0];			pix[NUM][3][1] = prom_b[0];			pix[NUM][3][2] = prom_c[0]; \
 }
 
-INLINE void tx1_draw_road_pixel(int screen, UINT8 *bmpaddr,
+INLINE void tx1_draw_road_pixel(running_machine *machine, int screen, UINT8 *bmpaddr,
 								UINT8 apix[3], UINT8 bpix[3], UINT32 pixnuma, UINT32 pixnumb,
 								UINT8 stl, UINT8 sld, UINT8 selb,
-								UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr,
-								running_machine *machine)
+								UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr)
 {
 	UINT8 a0 = BIT(apix[0], pixnuma);
 	UINT8 a1 = BIT(apix[1], pixnuma);
@@ -784,10 +783,10 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 				else
 					b = 3;
 
-				tx1_draw_road_pixel(0, bmpaddr,
+				tx1_draw_road_pixel(machine, 0, bmpaddr,
 						 &pix[0][a][0], &pix[1][b][0],
 						 pixnum0, pixnum1,
-						 stl, sld, selb, bnkls, rorevls, ebls, rl, delrl, machine);
+						 stl, sld, selb, bnkls, rorevls, ebls, rl, delrl);
 			}
 			else
 				*(bmpaddr) = (bnkls << 6) | (rl << 5);
@@ -806,10 +805,10 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 				else
 					b = 3;
 
-				tx1_draw_road_pixel(1, bmpaddr,
+				tx1_draw_road_pixel(machine, 1, bmpaddr,
 						 &pix[0][a][0], &pix[1][b][0],
 						 pixnum0, pixnum1,
-						 stl, sld, selb, bnkcs, rorevcs, ebcs, rc, delrc, machine);
+						 stl, sld, selb, bnkcs, rorevcs, ebcs, rc, delrc);
 			}
 			else
 				*(bmpaddr + 256) = (bnkcs << 6) | (rc << 5);
@@ -828,10 +827,10 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 				else
 					b = 3;
 
-				tx1_draw_road_pixel(2, bmpaddr,
+				tx1_draw_road_pixel(machine, 2, bmpaddr,
 						 &pix[0][a][0], &pix[1][b][0],
 						 pixnum0, pixnum1,
-						 stl, sld, selb, bnkrs, rorevrs, ebrs, rr, delrr, machine);
+						 stl, sld, selb, bnkrs, rorevrs, ebrs, rr, delrr);
 			}
 			else
 				*(bmpaddr + 512) = (bnkrs << 6) | (rr << 5);

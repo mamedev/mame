@@ -303,7 +303,7 @@ static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int st
 	}
 }
 
-static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, running_machine *machine, int timer)
+static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 {
 	int tval;
 	static const int tcr[8] = { 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d };
@@ -505,7 +505,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 				if ((data & (1<<i)) && !(cpustate->m37710_regs[offset] & (1<<i)))
 				{
 					cpustate->m37710_regs[offset] |= (1<<i);
-					m37710_recalc_timer(cpustate, cpustate->device->machine, i);
+					m37710_recalc_timer(cpustate, i);
 				}
 			}
 
