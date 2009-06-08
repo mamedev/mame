@@ -189,7 +189,6 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP
-	AM_RANGE(0xc000, 0xffff) AM_ROM		/* Super Bagman only */
 
 #if 0
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
