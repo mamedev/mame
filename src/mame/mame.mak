@@ -368,6 +368,7 @@ $(MAMEOBJ)/amiga.a: \
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/86lions.o \
 	$(DRIVERS)/caswin.o \
+	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/aristmk5.o \
 	$(MACHINE)/archimds.o \
 

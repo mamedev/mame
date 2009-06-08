@@ -382,10 +382,10 @@ static const ay8910_interface ay8910_config2 =
 /*
 static const via6522_interface via_interface =
 {
-	// DEVCB_HANDLER(via_a_in), DEVCB_HANDLER(via_b_in),
-	// DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
-	/// DEVCB_NULL, DEVCB_HANDLER(output_b),
-	// DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
+    // DEVCB_HANDLER(via_a_in), DEVCB_HANDLER(via_b_in),
+    // DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
+    /// DEVCB_NULL, DEVCB_HANDLER(output_b),
+    // DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
    //  DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
 }; */
 

@@ -1637,7 +1637,7 @@ INPUT_PORTS_START( aladbl )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
     PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-//	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )			/* to avoid it being changed and corrupting Coinage settings */
+//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */
@@ -1683,14 +1683,14 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		if (io_stage[portnum] == 2)
 		{
 			/* here we read B, C & the additional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper) | 
-						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x30) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper) |
+						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x30) |
 							(input_port_read_safe(machine, pad6names[portnum], 0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper) |
 						((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) & ~helper);
 		}
 	}
@@ -1699,20 +1699,20 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		if (io_stage[portnum] == 1)
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
-			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper) |
 						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
-			retdata = (megadrive_io_data_regs[portnum] & helper) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper) |
 						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (megadrive_io_data_regs[portnum] & helper) | 
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+			retdata = (megadrive_io_data_regs[portnum] & helper) |
+						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
 							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03)) & ~helper);
 		}
 	}
@@ -1732,14 +1732,14 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int p
 	if (megadrive_io_data_regs[portnum] & 0x40)
 	{
 		/* here we read B, C & the directional buttons */
-		retdata = (megadrive_io_data_regs[portnum] & helper) | 
+		retdata = (megadrive_io_data_regs[portnum] & helper) |
 					(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
-		retdata = (megadrive_io_data_regs[portnum] & helper) | 
-					((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+		retdata = (megadrive_io_data_regs[portnum] & helper) |
+					((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
 						(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper);
 	}
 
@@ -1754,7 +1754,7 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl)
 	if (ctrl == 0x55)
 	{
 			/* A keys */
-			retdata = ((input_port_read(machine, "PAD1") & 0x40) >> 2) | 
+			retdata = ((input_port_read(machine, "PAD1") & 0x40) >> 2) |
 				((input_port_read(machine, "PAD2") & 0x40) >> 4) | 0xeb;
 	}
 	else
@@ -5925,7 +5925,7 @@ VIDEO_EOF(megadriv)
 	megadrive_imode_odd_frame^=1;
 //  cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (input_port_read_safe(machine, "RESET", 0x00) & 0x01)  
+	if (input_port_read_safe(machine, "RESET", 0x00) & 0x01)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*

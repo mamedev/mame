@@ -9085,11 +9085,14 @@ Other Sun games
 	DRIVER( 86lions )	/* (c) 1985? */
 	DRIVER( caswin )	/* (c) 1985 */
 
+	/* Aristocrat Mk4 hardware */
+	DRIVER( eforest )	/* (c) 1994 */
+
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
 	DRIVER( enchfrst )	/* (c) 1995 */
 	DRIVER( dolphntr )	/* (c) 1996 */
-	DRIVER( dolphtra )	/* (c) 1996 */	
+	DRIVER( dolphtra )	/* (c) 1996 */
 	DRIVER( dmdtouch )	/* (c) 1997 */
 	DRIVER( goldprmd )	/* (c) 1997 */
 	DRIVER( qotn )		/* (c) 1997 */

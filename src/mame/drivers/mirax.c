@@ -212,12 +212,12 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf300, 0xf300) AM_READ(unk_r) //watchdog? value is always read then discarded
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
-//	AM_RANGE(0xf500, 0xf500) //coin counter
+//  AM_RANGE(0xf500, 0xf500) //coin counter
 	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
-//	AM_RANGE(0xf506, 0xf506)
-//	AM_RANGE(0xf507, 0xf507)
+//  AM_RANGE(0xf506, 0xf506)
+//  AM_RANGE(0xf507, 0xf507)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
-//	AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
+//  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
