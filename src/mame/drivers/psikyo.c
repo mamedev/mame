@@ -1184,11 +1184,11 @@ static const ym2610_interface sngkace_ym2610_interface =
 static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(psikyo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sngkace_sound_map)
 	MDRV_CPU_IO_MAP(sngkace_sound_io_map)
 
@@ -1212,7 +1212,7 @@ static MACHINE_DRIVER_START( sngkace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, XTAL_32MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
