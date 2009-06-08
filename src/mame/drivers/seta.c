@@ -1287,29 +1287,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 ***************************************************************************/
 
-/***************************************************************************
-
-Jockey Club
-^^^^^^^^^^^
-Dumped by Andrew Welburn on the evening of 05/06/09
-
-http://www.andys-arcade.com
-
-*************************************************
-**Do not seperate this text file from the roms.**
-*************************************************
-
-Take a look at the photos in the archive, the roms
-should be failry explanatory, and you should be
-able to pick out the chips it uses.
-
-Most of the romset matches mame except for the
-two eproms, see the mame -romident dump.
-
-enjoy..
-
-***************************************************************************/
-
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
