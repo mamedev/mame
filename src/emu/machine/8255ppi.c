@@ -117,12 +117,15 @@ struct _ppi8255
 	UINT8 ibf_b;
 	UINT8 inte_a;
 	UINT8 inte_b;
+	UINT8 inte_1;
+	UINT8 inte_2;
 
-	UINT8 in_mask[3];		/* input mask */
+	UINT8 in_mask[3];	/* input mask */
 	UINT8 out_mask[3];	/* output mask */
 	UINT8 read[3];		/* data read from ports */
 	UINT8 latch[3];		/* data written to ports */
 	UINT8 output[3];	/* actual output data */
+	UINT8 control;		/* mode control word */
 };
 
 
@@ -161,16 +164,16 @@ INLINE void ppi8255_get_handshake_signals(ppi8255_t *ppi8255, int is_read, UINT8
 	}
 	else if (ppi8255->group_a_mode == 2)
   	{
-		handshake |= ppi8255->inte_a ? 0x08 : 0x00;
 		handshake |= ppi8255->obf_a ? 0x00 : 0x80;
 		handshake |= ppi8255->ibf_a ? 0x20 : 0x00;
+		handshake |= ((ppi8255->obf_a && ppi8255->inte_1) || (ppi8255->ibf_a && ppi8255->inte_2)) ? 0x08 : 0x00;
 		mask |= 0xA8;
 	}
 
 	/* group B */
 	if (ppi8255->group_b_mode == 1)
   	{
-		if (ppi8255->port_a_dir)
+		if (ppi8255->port_b_dir)
 		{
 			handshake |= ppi8255->ibf_b ? 0x02 : 0x00;
 			handshake |= (ppi8255->ibf_b && ppi8255->inte_b) ? 0x01 : 0x00;
@@ -210,12 +213,32 @@ static void ppi8255_input(const device_config *device, int port, UINT8 data)
 			}
 		}
 
+		if (((ppi8255->group_a_mode == 1) && (ppi8255->port_a_dir == 1)) || (ppi8255->group_a_mode == 2))
+		{
+			/* is !STBA asserted? */
+			if (!ppi8255->ibf_a && !(data & 0x10))
+			{
+				ppi8255->ibf_a = 1;
+				changed = 1;
+			}
+		}
+
 		if ((ppi8255->group_b_mode == 1) && (ppi8255->port_b_dir == 0))
 		{
 			/* is !ACKB asserted? */
 			if (ppi8255->obf_b && !(data & 0x04))
 			{
 				ppi8255->obf_b = 0;
+				changed = 1;
+			}
+		}
+
+		if ((ppi8255->group_b_mode == 1) && (ppi8255->port_b_dir == 1))
+		{
+			/* is !STBB asserted? */
+			if (!ppi8255->ibf_b && !(data & 0x04))
+			{
+				ppi8255->ibf_b = 1;
 				changed = 1;
 			}
 		}
@@ -241,9 +264,23 @@ static UINT8 ppi8255_read_port(const device_config *device, int port)
 	}
 	result |= ppi8255->latch[port] & ppi8255->out_mask[port];
 
-	/* read special port 2 signals */
-	if (port == 2)
+	switch (port)
+	{
+	case 0:
+		/* clear input buffer full flag */
+		ppi8255->ibf_a = 0;
+		break;
+
+	case 1:
+		/* clear input buffer full flag */
+		ppi8255->ibf_b = 0;
+		break;
+
+	case 2:
+		/* read special port 2 signals */
 		ppi8255_get_handshake_signals(ppi8255, 1, &result);
+		break;
+	}
 
 	return result;
 }
@@ -252,6 +289,7 @@ static UINT8 ppi8255_read_port(const device_config *device, int port)
 
 READ8_DEVICE_HANDLER( ppi8255_r )
 {
+	ppi8255_t	*ppi8255 = get_safe_token(device);
 	UINT8 result = 0;
 
 	offset %= 4;
@@ -265,7 +303,7 @@ READ8_DEVICE_HANDLER( ppi8255_r )
 			break;
 
 		case 3: /* Control word */
-			result = 0xFF;
+			result = ppi8255->control;
 			break;
 	}
 
@@ -340,9 +378,15 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 	  			bit = (data >> 1) & 0x07;
 
 	  			if (data & 1)
-					ppi8255->latch[2] |= (1<<bit);		/* set bit */
+					ppi8255->latch[2] |= (1<<bit);	/* set bit */
 	  			else
 					ppi8255->latch[2] &= ~(1<<bit);	/* reset bit */
+
+				if (bit == 2 && ppi8255->group_b_mode == 1)	ppi8255->inte_b = data & 1;
+				if (bit == 4 && ppi8255->group_a_mode == 1 && ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
+				if (bit == 6 && ppi8255->group_a_mode == 1 && !ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
+				if (bit == 4 && ppi8255->group_a_mode == 2) ppi8255->inte_2 = data & 1;
+				if (bit == 6 && ppi8255->group_a_mode == 2) ppi8255->inte_1 = data & 1;
 
 				ppi8255_write_port(device, 2);
 			}
@@ -472,6 +516,14 @@ static void set_mode(const device_config *device, int data, int call_handlers)
 		for (i = 0; i < 3; i++)
 			ppi8255_write_port(device, i);
 	}
+
+	/* reset flip-flops */
+	ppi8255->obf_a = ppi8255->ibf_a = 0;
+	ppi8255->obf_b = ppi8255->ibf_b = 0;
+	ppi8255->inte_a = ppi8255->inte_b = ppi8255->inte_1 = ppi8255->inte_2 = 0;
+
+	/* store control word */
+	ppi8255->control = data;
 }
 
 
@@ -524,6 +576,8 @@ static DEVICE_START( ppi8255 ) {
 	state_save_register_device_item(device, 0, ppi8255->ibf_b);
 	state_save_register_device_item(device, 0, ppi8255->inte_a);
 	state_save_register_device_item(device, 0, ppi8255->inte_b);
+	state_save_register_device_item(device, 0, ppi8255->inte_1);
+	state_save_register_device_item(device, 0, ppi8255->inte_2);
 	state_save_register_device_item_array(device, 0, ppi8255->in_mask);
 	state_save_register_device_item_array(device, 0, ppi8255->out_mask);
 	state_save_register_device_item_array(device, 0, ppi8255->read);
@@ -541,14 +595,15 @@ static DEVICE_RESET( ppi8255 ) {
 	ppi8255->port_b_dir = 0;
 	ppi8255->port_ch_dir = 0;
 	ppi8255->port_cl_dir = 0;
-	ppi8255->obf_a = ppi8255->ibf_a = ppi8255->inte_a = 0;
-	ppi8255->obf_b = ppi8255->ibf_b = ppi8255->inte_b = 0;
+	ppi8255->obf_a = ppi8255->ibf_a = 0;
+	ppi8255->obf_b = ppi8255->ibf_b = 0;
+	ppi8255->inte_a = ppi8255->inte_b = ppi8255->inte_1 = ppi8255->inte_2 = 0;
 
 	for ( i = 0; i < 3; i++ ) {
 		ppi8255->in_mask[i] = ppi8255->out_mask[i] = ppi8255->read[i] = ppi8255->latch[i] = ppi8255->output[i] = 0;
 	}
 
-	set_mode(device, 0x1b, 0);   /* Mode 0, all ports set to input */
+	set_mode(device, 0x9b, 0);   /* Mode 0, all ports set to input */
 }
 
 
