@@ -75,6 +75,7 @@ static const char *DEVTEMPLATE_SOURCE = __FILE__;
 #define DT_HAS_ROM_REGION		0x0080
 #define DT_HAS_MACHINE_CONFIG	0x0100
 #define DT_HAS_INLINE_CONFIG	0x0200
+#define DT_HAS_CONTRACT_LIST	0x0400
 
 
 /* verify core stuff is specified */
@@ -168,6 +169,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_MACHINE_CONFIG)
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_ID(machine_config_,);		break;
 #endif
+#if ((DEVTEMPLATE_FEATURES) & DT_HAS_CONTRACT_LIST)
+		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_ID(device_contract_list_,);	break;
+#endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_START)
@@ -239,6 +243,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_MACHINE_CONFIG)
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_DERIVED_ID(machine_config_,); 		break;
+#endif
+#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_CONTRACT_LIST)
+		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_DERIVED_ID(contract_list_,); 			break;
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

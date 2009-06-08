@@ -246,6 +246,28 @@ const char *device_inherit_tag(astring *dest, const char *sourcetag, const char 
 }
 
 
+/*-------------------------------------------------
+    device_get_contract - find a given contract 
+    on a device
+-------------------------------------------------*/
+
+const device_contract *device_get_contract(const device_config *device, const char *name)
+{
+	const device_contract *contract = (const device_contract *)device_get_info_ptr(device, DEVINFO_PTR_CONTRACT_LIST);
+
+	/* if no contracts, obviously we don't have it */
+	if (contract == NULL)
+		return NULL;
+		
+	/* scan forward through the array looking for a match */
+	for ( ; contract->name != NULL; contract++)
+		if (strcmp(name, contract->name) == 0)
+			return contract;
+
+	return NULL;
+}
+
+
 
 /***************************************************************************
     TYPE-BASED DEVICE ACCESS

@@ -60,6 +60,7 @@ enum
 
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
 		DEVINFO_PTR_MACHINE_CONFIG,						/* R/O: pointer to device-specific machine config */
+		DEVINFO_PTR_CONTRACT_LIST,						/* R/O: pointer to list of supported device contracts */
 
 	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
@@ -126,13 +127,22 @@ enum
 
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
 #define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
-#define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK(name)(driver, device)
+#define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_CUSTOM_CONFIG_NAME(name)		device_custom_config_##name
 #define DEVICE_CUSTOM_CONFIG(name)			const union _machine_config_token *DEVICE_CUSTOM_CONFIG_NAME(name)(const device_config *device, UINT32 entrytype, const union _machine_config_token *tokens)
-#define DEVICE_CUSTOM_CONFIG_CALL(name)		DEVICE_CUSTOM_CONFIG(name)(device, entrytype, tokens)
+#define DEVICE_CUSTOM_CONFIG_CALL(name)		DEVICE_CUSTOM_CONFIG_NAME(name)(device, entrytype, tokens)
 
 
+/* device contract lists */
+#define DEVICE_CONTRACT_LIST_NAME(name)		device_contract_list_##name
+
+#define DEVICE_CONTRACT_LIST_START(name)	static const device_contract DEVICE_CONTRACT_LIST_NAME(name)[] = {
+#define DEVICE_CONTRACT_ENTRY(type, var)	{ type, sizeof(var), &(var) },
+#define DEVICE_CONTRACT_LIST_END			{ NULL, 0, NULL } };
+
+
+/* macro for specifying a clock derived from an owning device */
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
 
@@ -181,6 +191,16 @@ typedef union _deviceinfo deviceinfo;
 typedef struct _device_config device_config;
 
 
+/* a device contract */
+typedef struct _device_contract device_contract;
+struct _device_contract
+{
+	const char *	name;			/* name of this contract */
+	UINT32			size;			/* size of this contract in bytes */
+	const void *	contract;		/* pointer to the contract struct itself */
+};
+
+
 /* device interface function types */
 typedef void (*device_get_info_func)(const device_config *device, UINT32 state, deviceinfo *info);
 typedef void (*device_start_func)(const device_config *device);
@@ -213,6 +233,7 @@ union _deviceinfo
 	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
 	const union _machine_config_token *machine_config;/* DEVINFO_PTR_MACHINE_CONFIG */
+	const device_contract *	contract_list;			/* DEVINFO_PTR_CONTRACT_LIST */
 };
 
 
@@ -269,6 +290,9 @@ const char *device_build_tag(astring *dest, const device_config *device, const c
 
 /* build a tag with the same device prefix as the source tag*/
 const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag);
+
+/* find a given contract on a device */
+const device_contract *device_get_contract(const device_config *device, const char *name);
 
 
 
