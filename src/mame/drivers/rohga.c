@@ -218,8 +218,9 @@ static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_WRITE(deco16_buffered_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x390008, 0x390009) AM_WRITE(deco16_palette_dma_w)
 
-	AM_RANGE(0xfec000, 0xffffff) AM_RAM
+	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( schmeisr_map, ADDRESS_SPACE_PROGRAM, 16 )
