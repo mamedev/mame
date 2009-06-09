@@ -1,4 +1,18 @@
-/***************************************************************
+/****************************************************************************************
+
+18 Holes Pro Golf (c) 1981 Data East
+
+driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
+
+TODO:
+- We need to patch a rom to get the games to do more, there's also a "rom test error 6"
+  in service mode, so a rom might be bad or the decryption isn't complete.
+- Hazards doesn't have any effect, might be the same issue as above;
+- Framebuffer "chars" leaves trails;
+- Sound in service mode loops without apparent reason;
+- progolfa: decryption isn't yet correct;
+
+=========================================================================================
 
 Pro Golf
 Data East 1981
@@ -37,7 +51,7 @@ Two 6116 rams.
 
 Twenty four 8116 rams.
 
-****************************************************************/
+****************************************************************************************/
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
@@ -156,8 +170,8 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -187,8 +201,8 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -317,7 +331,7 @@ MACHINE_DRIVER_END
 ROM_START( progolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
-	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
+	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, BAD_DUMP CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) ) //bit-rotted?
 	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
@@ -371,6 +385,28 @@ static DRIVER_INIT( progolf )
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xb000;A < 0x10000;A++)
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
+
+	/*
+	CE12: B1 66         lda  ($66),y
+	CE14: 20 39 A7      jsr  $C759
+		C759: E6 66         inc  $66
+		C75B: D0 02         bne  $C75F
+		C75D: E6 67         inc  $67
+		C75F: 60            rts
+	CE17: C9 FD         cmp  #$FD
+	CE19: F0 44         beq  $CE3F
+	CE1B: C9 FE         cmp  #$FE
+	CE1D: F0 13         beq  $CE32
+	CE1F: C9 FF         cmp  #$FF
+	CE21: F0 4C         beq  $CE4F <- might go out there, this is the only branch in the entire rom that points to the rts
+	...
+	CE48: 90 A3         bcc  $CE0D
+	CE4A: E6 69         inc  $69
+	CE4C: 4C 0D AE      jmp  $CE0D
+	CE4F: 60            rts
+	*/
+
+	decrypted[0xce21] = 0xd0;
 }
 
 static DRIVER_INIT( progolfa )
@@ -408,5 +444,5 @@ static DRIVER_INIT( progolfa )
 }
 
 /*Maybe progolf is a bootleg and progolfa is the original (with Deco C10707 as CPU)?*/
-GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING ) // doesn't display anything
+GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // doesn't display anything
