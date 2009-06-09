@@ -382,11 +382,22 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 	  			else
 					ppi8255->latch[2] &= ~(1<<bit);	/* reset bit */
 
-				if (bit == 2 && ppi8255->group_b_mode == 1)	ppi8255->inte_b = data & 1;
-				if (bit == 4 && ppi8255->group_a_mode == 1 && ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
-				if (bit == 6 && ppi8255->group_a_mode == 1 && !ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
-				if (bit == 4 && ppi8255->group_a_mode == 2) ppi8255->inte_2 = data & 1;
-				if (bit == 6 && ppi8255->group_a_mode == 2) ppi8255->inte_1 = data & 1;
+				if (ppi8255->group_b_mode == 1)
+				{
+					if (bit == 2) ppi8255->inte_b = data & 1;
+				}
+
+				if (ppi8255->group_a_mode == 1)
+				{
+					if (bit == 4 && ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
+					if (bit == 6 && !ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
+				}
+
+				if (ppi8255->group_a_mode == 2)
+				{
+					if (bit == 4) ppi8255->inte_2 = data & 1;
+					if (bit == 6) ppi8255->inte_1 = data & 1;
+				}
 
 				ppi8255_write_port(device, 2);
 			}
@@ -451,10 +462,13 @@ static void set_mode(const device_config *device, int data, int call_handlers)
 		ppi8255->group_a_mode = 2;
 
   	/* Port A direction */
-	if (ppi8255->port_a_dir)
-		ppi8255->in_mask[0] = 0xFF, ppi8255->out_mask[0] = 0x00;	/* input */
-    else
-		ppi8255->in_mask[0] = 0x00, ppi8255->out_mask[0] = 0xFF; 	/* output */
+	if (ppi8255->group_a_mode == 2)
+		ppi8255->in_mask[0] = 0xFF, ppi8255->out_mask[0] = 0xFF;	/* bidirectional */
+	else
+		if (ppi8255->port_a_dir)
+			ppi8255->in_mask[0] = 0xFF, ppi8255->out_mask[0] = 0x00;	/* input */
+		else
+			ppi8255->in_mask[0] = 0x00, ppi8255->out_mask[0] = 0xFF; 	/* output */
 
   	/* Port B direction */
 	if (ppi8255->port_b_dir)
