@@ -14,6 +14,7 @@ extern UINT8 *bnj_backgroundram;
 extern size_t bnj_backgroundram_size;
 extern UINT8 *zoar_scrollram;
 extern UINT8 *deco_charram;
+extern UINT8 *progolf_fg_fb;
 
 PALETTE_INIT( btime );
 PALETTE_INIT( lnc );
