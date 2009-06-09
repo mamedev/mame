@@ -590,6 +590,34 @@ VIDEO_UPDATE( disco )
 VIDEO_UPDATE( progolf )
 {
 	draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
+
+	/* 8x8 chars arranged like a bitmap (plus some annoying fancy bitplane stuff that isn't yet handled) */
+	{
+		static int count,color,x,y,xi,yi;
+
+		count = 0x4000;
+
+		for(y=0;y<256;y+=8)
+		{
+			for(x=0;x<256;x+=8)
+			{
+				for (yi=0;yi<8;yi++)
+				{
+					for (xi=0;xi<8;xi++)
+					{
+						color = deco_charram[count]>>(7-xi);
+
+						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
+							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[color & 1];
+					}
+
+					count++;
+				}
+
+			}
+		}
+	}
+
 //  draw_sprites(screen->machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
 
 	return 0;

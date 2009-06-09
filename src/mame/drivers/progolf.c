@@ -44,17 +44,21 @@ Twenty four 8116 rams.
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
+static READ8_HANDLER( test_r )
+{
+	return mame_rand(space->machine) & 0x3f;
+}
+
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM //AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_BASE(&deco_charram) //AM_WRITE(deco_charram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP //video control?
-	AM_RANGE(0x9000, 0x9000) AM_READNOP
-	AM_RANGE(0x9200, 0x9200) AM_WRITENOP
-	AM_RANGE(0x9400, 0x9400) AM_WRITENOP
-	AM_RANGE(0x9600, 0x9600) AM_WRITENOP
-	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0")     /* VBLANK */
-	AM_RANGE(0x9800, 0x9800) AM_READNOP
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP //likely to be charram banking / video registers
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2")
+	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("IN1") AM_WRITENOP //p1 inputs
+	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("IN3") AM_WRITENOP //p2 inputs
+	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0") AM_WRITENOP   /* VBLANK */
+	AM_RANGE(0x9800, 0x9800) AM_READ(test_r) //mc6845 read-back?
 	AM_RANGE(0x9800, 0x9801) AM_WRITENOP // mc6845 regs
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9a00, 0x9a00) AM_READNOP
@@ -89,7 +93,30 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("IN1")
-	/* */
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -100,6 +127,32 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 ) PORT_IMPULSE(2)
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -172,19 +225,19 @@ static GFXDECODE_START( progolf )
 GFXDECODE_END
 
 
-#ifdef UNUSED_FUNCTION
+//#ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( progolf_interrupt )
 {
 	//if (input_port_read(machine, "IN2") & 0xc0)
 		cpu_set_input_line(device, /*0*/INPUT_LINE_NMI, /*HOLD_LINE*/PULSE_LINE);
 }
-#endif
+//#endif
 
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
-//  MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
+  MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
 
   	MDRV_CPU_ADD("audiocpu", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
