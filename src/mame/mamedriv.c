@@ -3638,9 +3638,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( dumpmtmt )	/* (c) 1986 (Japan) */
 	DRIVER( mjleague )	/* (c) 1985 */
 	DRIVER( quartet )	/* (c) 1986 (8751) */
-	DRIVER( quartet1 )	/* (c) 1986 (8751) */
-	DRIVER( quart21 )	/* (c) 1986 (8751) */
-	DRIVER( quart2 )	/* (c) 1986 */
+	DRIVER( quarteta )	/* (c) 1986 (8751) */
+	DRIVER( quartet2 )	/* (c) 1986 (8751) */
+	DRIVER( quarte2a )	/* (c) 1986 */
 
 	/* System16A */
 	DRIVER( aceattaa )	/* (c) 1988 (FD1094, decrypted) */

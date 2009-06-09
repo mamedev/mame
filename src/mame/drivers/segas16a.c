@@ -2621,7 +2621,7 @@ ROM_END
     CPU: 68000
     i8751 315-5194
  */
-ROM_START( quartet1 )
+ROM_START( quarteta )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7458.9b",  0x000000, 0x8000, CRC(0096499f) SHA1(dcf8e33513ce7c6660ea546c8e1c574fde629a22) )
 	ROM_LOAD16_BYTE( "epr-7455.6b",  0x000001, 0x8000, CRC(da934390) SHA1(d40eb65b6a36a4c1ebeadb76e47a61bd8b2e4b89) )
@@ -2677,7 +2677,7 @@ ROM_END
     CPU/Video/Sound Board: 171-5335
     ROM Board:             171-5336
  */
-ROM_START( quart21 )
+ROM_START( quartet2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7695.b9",  0x000000, 0x8000, CRC(67177cd8) SHA1(c4ea001dfbeeb29a09d597fb50d71f54e4e9572a) )
 	ROM_LOAD16_BYTE( "epr-7692.b6",  0x000001, 0x8000, CRC(50f50b08) SHA1(646c0d545150b95e5d8d47bf63360f7326add08f) )
@@ -2721,7 +2721,7 @@ ROM_END
     Quartet 2, pre-System 16
     CPU: 68000
  */
-ROM_START( quart2 )
+ROM_START( quarte2a )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7728.b9",  0x000000, 0x8000, CRC(56a8c88e) SHA1(33eaca5272f3588058952ca0b1fa298b89418e81) )
 	ROM_LOAD16_BYTE( "epr-7725.b6",  0x000001, 0x8000, CRC(ee15fcc9) SHA1(70d9755145245537f6aeb0d39abeda7811749b8c) )
@@ -3394,9 +3394,9 @@ GAME( 1986, bodyslam, 0,        system16a_8751,   bodyslam, generic_16a, ROT0,  
 GAME( 1986, dumpmtmt, bodyslam, system16a_8751,   bodyslam, dumpmtmt,    ROT0,   "Sega",           "Dump Matsumoto (Japan, 8751 317-unknown)", GAME_UNEMULATED_PROTECTION )
 GAME( 1985, mjleague, 0,        system16a,        mjleague, mjleague,    ROT270, "Sega",           "Major League", 0 )
 GAME( 1986, quartet,  0,        system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION )
-GAME( 1986, quartet1, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION )
-GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
-GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
+GAME( 1986, quarteta, quartet,  system16a_8751,   quartet,  quartet,     ROT0,   "Sega",           "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION )
+GAME( 1986, quartet2, quartet,  system16a_8751,   quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (8751 317-0010)", 0 )
+GAME( 1986, quarte2a, quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
 GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, fd1089b_16a, ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", 0 )
