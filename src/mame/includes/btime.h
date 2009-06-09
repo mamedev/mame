@@ -22,7 +22,7 @@ MACHINE_RESET( lnc );
 
 VIDEO_START( btime );
 VIDEO_START( bnj );
-
+VIDEO_START( progolf );
 
 VIDEO_UPDATE( btime );
 VIDEO_UPDATE( cookrace );

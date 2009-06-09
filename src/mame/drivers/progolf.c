@@ -44,16 +44,57 @@ Twenty four 8116 rams.
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
+static UINT8 char_pen;
+extern UINT8 *progolf_fg_fb;
+
 static READ8_HANDLER( test_r )
 {
 	return mame_rand(space->machine) & 0x3f;
 }
 
+static READ8_HANDLER( progolf_charram_r )
+{
+	return deco_charram[offset];
+}
+
+static WRITE8_HANDLER( progolf_charram_w )
+{
+	deco_charram[offset] = data;
+
+	if(char_pen == 7)
+	{
+		progolf_fg_fb[offset*8+0] = data & 0x80 ? progolf_fg_fb[offset*8+0] : 0;
+		progolf_fg_fb[offset*8+1] = data & 0x40 ? progolf_fg_fb[offset*8+1] : 0;
+		progolf_fg_fb[offset*8+2] = data & 0x20 ? progolf_fg_fb[offset*8+2] : 0;
+		progolf_fg_fb[offset*8+3] = data & 0x10 ? progolf_fg_fb[offset*8+3] : 0;
+		progolf_fg_fb[offset*8+4] = data & 0x08 ? progolf_fg_fb[offset*8+4] : 0;
+		progolf_fg_fb[offset*8+5] = data & 0x04 ? progolf_fg_fb[offset*8+5] : 0;
+		progolf_fg_fb[offset*8+6] = data & 0x02 ? progolf_fg_fb[offset*8+6] : 0;
+		progolf_fg_fb[offset*8+7] = data & 0x01 ? progolf_fg_fb[offset*8+7] : 0;
+	}
+	else
+	{
+		progolf_fg_fb[offset*8+0] = data & 0x80 ? progolf_fg_fb[offset*8+0]|char_pen : progolf_fg_fb[offset*8+0];
+		progolf_fg_fb[offset*8+1] = data & 0x40 ? progolf_fg_fb[offset*8+1]|char_pen : progolf_fg_fb[offset*8+1];
+		progolf_fg_fb[offset*8+2] = data & 0x20 ? progolf_fg_fb[offset*8+2]|char_pen : progolf_fg_fb[offset*8+2];
+		progolf_fg_fb[offset*8+3] = data & 0x10 ? progolf_fg_fb[offset*8+3]|char_pen : progolf_fg_fb[offset*8+3];
+		progolf_fg_fb[offset*8+4] = data & 0x08 ? progolf_fg_fb[offset*8+4]|char_pen : progolf_fg_fb[offset*8+4];
+		progolf_fg_fb[offset*8+5] = data & 0x04 ? progolf_fg_fb[offset*8+5]|char_pen : progolf_fg_fb[offset*8+5];
+		progolf_fg_fb[offset*8+6] = data & 0x02 ? progolf_fg_fb[offset*8+6]|char_pen : progolf_fg_fb[offset*8+6];
+		progolf_fg_fb[offset*8+7] = data & 0x01 ? progolf_fg_fb[offset*8+7]|char_pen : progolf_fg_fb[offset*8+7];
+	}
+}
+
+static WRITE8_HANDLER( progolf_charbank_w )
+{
+	char_pen = data & 0x07;
+}
+
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_BASE(&deco_charram) //AM_WRITE(deco_charram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP //likely to be charram banking / video registers
+	AM_RANGE(0x1000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(progolf_charram_r,progolf_charram_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(progolf_charbank_w) //likely to be charram banking / video registers
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2")
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("IN1") AM_WRITENOP //p1 inputs
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("IN3") AM_WRITENOP //p2 inputs
@@ -217,11 +258,6 @@ static const gfx_layout progolf_spritelayout2 =
 #endif
 static GFXDECODE_START( progolf )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, progolf_charlayout, 0, 8 ) /* sprites */
-	GFXDECODE_ENTRY( NULL,           0x2000, charlayout,           0, 4 ) /* char set #1 */
-	GFXDECODE_ENTRY( NULL,           0x2000, spritelayout,         0, 4 ) /* sprites */
-
-//  GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
-//  GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
 GFXDECODE_END
 
 
@@ -256,7 +292,7 @@ static MACHINE_DRIVER_START( progolf )
 
 	MDRV_PALETTE_INIT(btime)
 
-	MDRV_VIDEO_START(btime)
+	MDRV_VIDEO_START(progolf)
 	MDRV_VIDEO_UPDATE(progolf)
 
 	/* sound hardware */

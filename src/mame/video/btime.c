@@ -4,7 +4,7 @@
 
     Functions to emulate the video hardware of the machine.
 
-This file is also used by scregg.c
+This file is also used by scregg.c and progolf.c
 
 ***************************************************************************/
 
@@ -19,6 +19,7 @@ UINT8 *lnc_charbank;
 UINT8 *bnj_backgroundram;
 UINT8 *zoar_scrollram;
 UINT8 *deco_charram;
+UINT8 *progolf_fg_fb;
 size_t bnj_backgroundram_size;
 
 static UINT8 btime_palette = 0;
@@ -586,16 +587,26 @@ VIDEO_UPDATE( disco )
 	return 0;
 }
 
+VIDEO_START( progolf )
+{
+    bnj_scroll1 = 0;
+    bnj_scroll2 = 0;
+    btime_palette = 0;
+
+	deco_charram = auto_alloc_array(machine, UINT8, 0x2000);
+	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
+}
+
 
 VIDEO_UPDATE( progolf )
 {
 	draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
 
-	/* 8x8 chars arranged like a bitmap (plus some annoying fancy bitplane stuff that isn't yet handled) */
+	/* framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling. */
 	{
-		static int count,color,x,y,xi,yi;
+		int count,color,x,y,xi,yi;
 
-		count = 0x4000;
+		count = 0;
 
 		for(y=0;y<256;y+=8)
 		{
@@ -605,15 +616,15 @@ VIDEO_UPDATE( progolf )
 				{
 					for (xi=0;xi<8;xi++)
 					{
-						color = deco_charram[count]>>(7-xi);
+						color = progolf_fg_fb[(xi+yi*8)+count*0x40];
 
 						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
-							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[color & 1];
+							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[(color & 0x7)];
 					}
 
-					count++;
 				}
 
+				count++;
 			}
 		}
 	}
