@@ -43,6 +43,7 @@ Twenty four 8116 rams.
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "includes/btime.h"
+#include "video/mc6845.h"
 
 static UINT8 char_pen;
 extern UINT8 *progolf_fg_fb;
@@ -100,17 +101,16 @@ static READ8_HANDLER( audio_command_r )
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(progolf_charram_r,progolf_charram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(progolf_charbank_w) //likely to be charram banking / video registers
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2")
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("IN1") //AM_WRITENOP //p1 inputs
-	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("IN3") //AM_WRITENOP //p2 inputs
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_charbank_w)
+	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(bnj_scroll1_w) //p1 inputs
+	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(bnj_scroll2_w) //p2 inputs
 	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0") //AM_WRITENOP   /* VBLANK */
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("IN4") //mc6845 read-back?
-	AM_RANGE(0x9800, 0x9801) AM_WRITENOP // mc6845 regs
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("IN5") AM_WRITE(audio_command_w)
-	AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x800) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x800) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	//AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -127,22 +127,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( progolf )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -163,21 +153,18 @@ static INPUT_PORTS_START( progolf )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-
-	PORT_START("IN3")
 	PORT_DIPNAME( 0x01, 0x01, "IN3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -196,64 +183,65 @@ static INPUT_PORTS_START( progolf )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x01, "IN5" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout progolf_charlayout =
@@ -275,20 +263,29 @@ GFXDECODE_END
 //#ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( progolf_interrupt )
 {
-	//if (input_port_read(machine, "IN2") & 0xc0)
-	//	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 //#endif
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",/* screen we are acting on */
+	8,		/* number of pixels per video memory address */
+	NULL,	/* before pixel update callback */
+	NULL,	/* row update callback */
+	NULL,	/* after pixel update callback */
+	NULL,	/* callback for display state changes */
+	NULL,	/* HSYNC callback */
+	NULL	/* VSYNC callback */
+};
+
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
-  MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
+ 	MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
 
   	MDRV_CPU_ADD("audiocpu", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
-//  MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -300,19 +297,19 @@ static MACHINE_DRIVER_START( progolf )
 
 	MDRV_GFXDECODE(progolf)
 	MDRV_PALETTE_LENGTH(32*3)
-
 	MDRV_PALETTE_INIT(btime)
 
+	MDRV_MC6845_ADD("crtc", MC6845, 3000000/4, mc6845_intf)	/* hand tuned to get ~57 fps */
 	MDRV_VIDEO_START(progolf)
 	MDRV_VIDEO_UPDATE(progolf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 12000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END
 
@@ -372,7 +369,7 @@ static DRIVER_INIT( progolf )
 	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
 
 	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0;A < 0x10000;A++)
+	for (A = 0xb000;A < 0x10000;A++)
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
 }
 

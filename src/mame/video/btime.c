@@ -403,7 +403,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		offs_t offs;
         offs_t tileoffset = tmap[i & 3] * 0x100;
 
-        // Skip if this title is completely off the screen
+        // Skip if this tile is completely off the screen
         if (scroll > 256)  break;
         if (scroll < -256) continue;
 
@@ -600,12 +600,29 @@ VIDEO_START( progolf )
 
 VIDEO_UPDATE( progolf )
 {
-	draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
+	int count,color,x,y,xi,yi;
+
+	{
+		int scroll = (bnj_scroll2 | ((bnj_scroll1 & 0x03) << 8));
+
+		count = 0;
+
+		for(x=0;x<128;x++)
+		{
+			for(y=0;y<32;y++)
+			{
+				int tile = btime_videoram[count];
+
+				drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,(256-x*8)+scroll,y*8,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,(256-x*8)+scroll-1024,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+				count++;
+			}
+		}
+	}
 
 	/* framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling. */
 	{
-		int count,color,x,y,xi,yi;
-
 		count = 0;
 
 		for(y=0;y<256;y+=8)
@@ -621,7 +638,6 @@ VIDEO_UPDATE( progolf )
 						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
 							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[(color & 0x7)];
 					}
-
 				}
 
 				count++;
