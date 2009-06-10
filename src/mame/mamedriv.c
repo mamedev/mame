@@ -3640,7 +3640,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( quartet )	/* (c) 1986 (8751) */
 	DRIVER( quarteta )	/* (c) 1986 (8751) */
 	DRIVER( quartet2 )	/* (c) 1986 (8751) */
-	DRIVER( quarte2a )	/* (c) 1986 */
+	DRIVER( quartet2a )	/* (c) 1986 */
 
 	/* System16A */
 	DRIVER( aceattaa )	/* (c) 1988 (FD1094, decrypted) */
