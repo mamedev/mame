@@ -14,7 +14,6 @@ extern UINT8 *bnj_backgroundram;
 extern size_t bnj_backgroundram_size;
 extern UINT8 *zoar_scrollram;
 extern UINT8 *deco_charram;
-extern UINT8 *progolf_fg_fb;
 
 PALETTE_INIT( btime );
 PALETTE_INIT( lnc );
@@ -23,7 +22,6 @@ MACHINE_RESET( lnc );
 
 VIDEO_START( btime );
 VIDEO_START( bnj );
-VIDEO_START( progolf );
 
 VIDEO_UPDATE( btime );
 VIDEO_UPDATE( cookrace );
@@ -32,7 +30,6 @@ VIDEO_UPDATE( lnc );
 VIDEO_UPDATE( zoar );
 VIDEO_UPDATE( disco );
 VIDEO_UPDATE( eggs );
-VIDEO_UPDATE( progolf );
 
 WRITE8_HANDLER( btime_paletteram_w );
 WRITE8_HANDLER( bnj_background_w );

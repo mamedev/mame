@@ -9,7 +9,7 @@ TODO:
   in service mode, so a rom might be bad or the decryption isn't complete.
 - Hazards doesn't have any effect, might be the same issue as above;
 - Map displays are currently wrong, they are drawn with the framebuffer;
-- Sound in service mode loops without apparent reason;
+- Flip screen support;
 - progolfa: decryption isn't yet correct;
 
 =========================================================================================
@@ -56,21 +56,80 @@ Twenty four 8116 rams.
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "includes/btime.h"
 #include "video/mc6845.h"
 
-static UINT8 char_pen;
-extern UINT8 *progolf_fg_fb;
+static UINT8 char_pen,char_pen_vreg;
+static UINT8 *progolf_fg_fb;
+static UINT8 *progolf_fbram;
+static UINT8 scrollx_hi;
+static UINT8 scrollx_lo;
 
-static READ8_HANDLER( progolf_charram_r )
+static UINT8 sound_cmd;
+
+static VIDEO_START( progolf )
 {
-	return deco_charram[offset];
+    scrollx_hi = 0;
+    scrollx_lo = 0;
+
+	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
+}
+
+
+static VIDEO_UPDATE( progolf )
+{
+	int count,color,x,y,xi,yi;
+
+	{
+		int scroll = (scrollx_lo | ((scrollx_hi & 0x03) << 8));
+
+		count = 0;
+
+		for(x=0;x<128;x++)
+		{
+			for(y=0;y<32;y++)
+			{
+				int tile = videoram[count];
+
+				drawgfx(bitmap,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8,cliprect,TRANSPARENCY_NONE,0);
+				/* wrap-around */
+				drawgfx(bitmap,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+				count++;
+			}
+		}
+	}
+
+	/* framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling. */
+	{
+		count = 0;
+
+		for(y=0;y<256;y+=8)
+		{
+			for(x=0;x<256;x+=8)
+			{
+				for (yi=0;yi<8;yi++)
+				{
+					for (xi=0;xi<8;xi++)
+					{
+						color = progolf_fg_fb[(xi+yi*8)+count*0x40];
+
+						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
+							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[(color & 0x7)];
+					}
+				}
+
+				count++;
+			}
+		}
+	}
+
+	return 0;
 }
 
 static WRITE8_HANDLER( progolf_charram_w )
 {
 	int i;
-	deco_charram[offset] = data;
+	progolf_fbram[offset] = data;
 
 	if(char_pen == 7)
 	{
@@ -89,36 +148,55 @@ static WRITE8_HANDLER( progolf_charram_w )
 	}
 }
 
-static WRITE8_HANDLER( progolf_charbank_w )
+static WRITE8_HANDLER( progolf_char_vregs_w )
 {
 	char_pen = data & 0x07;
+	if(data & 0xf0)
+		char_pen_vreg = data & 0xf0;
+}
+
+static WRITE8_HANDLER( progolf_scrollx_lo_w )
+{
+	scrollx_lo = data;
+}
+
+static WRITE8_HANDLER( progolf_scrollx_hi_w )
+{
+	scrollx_hi = data;
+}
+
+static WRITE8_HANDLER( progolf_flip_screen_w )
+{
+	flip_screen_set(space->machine, data & 1);
+	if(data & 0xfe)
+		printf("$9600 with data = %02x used\n",data);
 }
 
 static WRITE8_HANDLER( audio_command_w )
 {
-	soundlatch_w(space,offset,data);
+	sound_cmd = data;
 	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( audio_command_r )
 {
 	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(space,offset);
+	return sound_cmd;
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(progolf_charram_r,progolf_charram_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_charbank_w)
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(bnj_scroll1_w) //p1 inputs
-	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(bnj_scroll2_w) //p2 inputs
-	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0") //AM_WRITENOP   /* VBLANK */
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE(&progolf_fbram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_char_vregs_w)
+	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(progolf_scrollx_hi_w) //p1 inputs
+	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(progolf_scrollx_lo_w) //p2 inputs
+	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0") AM_WRITE(progolf_flip_screen_w)   /* VBLANK */
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
-	//AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//	AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -128,8 +206,7 @@ static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(audio_command_r) AM_WRITENOP
-	AM_RANGE(0x9000, 0xafff) AM_READNOP
+	AM_RANGE(0x8000, 0x8fff) AM_READ(audio_command_r) AM_WRITENOP //volume control?
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -286,6 +363,34 @@ static const mc6845_interface mc6845_intf =
 	NULL	/* VSYNC callback */
 };
 
+static PALETTE_INIT( progolf )
+{
+	int i;
+
+	for (i = 0;i < machine->config->total_colors;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+	}
+}
+
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
@@ -294,6 +399,8 @@ static MACHINE_DRIVER_START( progolf )
 
   	MDRV_CPU_ADD("audiocpu", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
+
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -305,7 +412,7 @@ static MACHINE_DRIVER_START( progolf )
 
 	MDRV_GFXDECODE(progolf)
 	MDRV_PALETTE_LENGTH(32*3)
-	MDRV_PALETTE_INIT(btime)
+	MDRV_PALETTE_INIT(progolf)
 
 	MDRV_MC6845_ADD("crtc", MC6845, 3000000/4, mc6845_intf)	/* hand tuned to get ~57 fps */
 	MDRV_VIDEO_START(progolf)
@@ -438,5 +545,5 @@ static DRIVER_INIT( progolfa )
 }
 
 /*Maybe progolf is a bootleg and progolfa is the original (with Deco C10707 as CPU)?*/
-GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // doesn't display anything
+GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // doesn't display anything

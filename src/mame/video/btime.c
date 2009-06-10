@@ -4,7 +4,7 @@
 
     Functions to emulate the video hardware of the machine.
 
-This file is also used by scregg.c and progolf.c
+This file is also used by scregg.c
 
 ***************************************************************************/
 
@@ -583,69 +583,6 @@ VIDEO_UPDATE( disco )
 {
     draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette, -1);
     draw_sprites(screen->machine, bitmap, cliprect, btime_palette, 0, 0, spriteram, 1);
-
-	return 0;
-}
-
-VIDEO_START( progolf )
-{
-    bnj_scroll1 = 0;
-    bnj_scroll2 = 0;
-    btime_palette = 0;
-
-	deco_charram = auto_alloc_array(machine, UINT8, 0x2000);
-	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
-}
-
-
-VIDEO_UPDATE( progolf )
-{
-	int count,color,x,y,xi,yi;
-
-	{
-		int scroll = (bnj_scroll2 | ((bnj_scroll1 & 0x03) << 8));
-
-		count = 0;
-
-		for(x=0;x<128;x++)
-		{
-			for(y=0;y<32;y++)
-			{
-				int tile = btime_videoram[count];
-
-				drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,(256-x*8)+scroll,y*8,cliprect,TRANSPARENCY_NONE,0);
-				drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,(256-x*8)+scroll-1024,y*8,cliprect,TRANSPARENCY_NONE,0);
-
-				count++;
-			}
-		}
-	}
-
-	/* framebuffer is 8x8 chars arranged like a bitmap + a register that controls the pen handling. */
-	{
-		count = 0;
-
-		for(y=0;y<256;y+=8)
-		{
-			for(x=0;x<256;x+=8)
-			{
-				for (yi=0;yi<8;yi++)
-				{
-					for (xi=0;xi<8;xi++)
-					{
-						color = progolf_fg_fb[(xi+yi*8)+count*0x40];
-
-						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
-							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine->pens[(color & 0x7)];
-					}
-				}
-
-				count++;
-			}
-		}
-	}
-
-//  draw_sprites(screen->machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
 
 	return 0;
 }
