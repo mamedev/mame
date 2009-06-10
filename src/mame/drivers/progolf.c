@@ -69,61 +69,23 @@ static READ8_HANDLER( progolf_charram_r )
 
 static WRITE8_HANDLER( progolf_charram_w )
 {
+	int i;
 	deco_charram[offset] = data;
 
-	/* TODO: simplify this */
 	if(char_pen == 7)
 	{
-		progolf_fg_fb[offset*8+0] = 0;
-		progolf_fg_fb[offset*8+1] = 0;
-		progolf_fg_fb[offset*8+2] = 0;
-		progolf_fg_fb[offset*8+3] = 0;
-		progolf_fg_fb[offset*8+4] = 0;
-		progolf_fg_fb[offset*8+5] = 0;
-		progolf_fg_fb[offset*8+6] = 0;
-		progolf_fg_fb[offset*8+7] = 0;
+		for(i=0;i<8;i++)
+			progolf_fg_fb[offset*8+i] = 0;
 	}
 	else
 	{
-		if(progolf_fg_fb[offset*8+0] == char_pen)
-			progolf_fg_fb[offset*8+0] = data & 0x80 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+0] = data & 0x80 ? progolf_fg_fb[offset*8+0]|char_pen : progolf_fg_fb[offset*8+0];
-
-		if(progolf_fg_fb[offset*8+1] == char_pen)
-			progolf_fg_fb[offset*8+1] = data & 0x40 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+1] = data & 0x40 ? progolf_fg_fb[offset*8+1]|char_pen : progolf_fg_fb[offset*8+1];
-
-		if(progolf_fg_fb[offset*8+2] == char_pen)
-			progolf_fg_fb[offset*8+2] = data & 0x20 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+2] = data & 0x20 ? progolf_fg_fb[offset*8+2]|char_pen : progolf_fg_fb[offset*8+2];
-
-		if(progolf_fg_fb[offset*8+3] == char_pen)
-			progolf_fg_fb[offset*8+3] = data & 0x10 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+3] = data & 0x10 ? progolf_fg_fb[offset*8+3]|char_pen : progolf_fg_fb[offset*8+3];
-
-		if(progolf_fg_fb[offset*8+4] == char_pen)
-			progolf_fg_fb[offset*8+4] = data & 0x08 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+4] = data & 0x08 ? progolf_fg_fb[offset*8+4]|char_pen : progolf_fg_fb[offset*8+4];
-
-		if(progolf_fg_fb[offset*8+5] == char_pen)
-			progolf_fg_fb[offset*8+5] = data & 0x04 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+5] = data & 0x04 ? progolf_fg_fb[offset*8+5]|char_pen : progolf_fg_fb[offset*8+5];
-
-		if(progolf_fg_fb[offset*8+6] == char_pen)
-			progolf_fg_fb[offset*8+6] = data & 0x02 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+6] = data & 0x02 ? progolf_fg_fb[offset*8+6]|char_pen : progolf_fg_fb[offset*8+6];
-
-		if(progolf_fg_fb[offset*8+7] == char_pen)
-			progolf_fg_fb[offset*8+7] = data & 0x01 ? char_pen : 0;
-		else
-			progolf_fg_fb[offset*8+7] = data & 0x01 ? progolf_fg_fb[offset*8+7]|char_pen : progolf_fg_fb[offset*8+7];
+		for(i=0;i<8;i++)
+		{
+			if(progolf_fg_fb[offset*8+i] == char_pen)
+				progolf_fg_fb[offset*8+i] = data & (1<<(7-i)) ? char_pen : 0;
+			else
+				progolf_fg_fb[offset*8+i] = data & (1<<(7-i)) ? progolf_fg_fb[offset*8+i]|char_pen : progolf_fg_fb[offset*8+i];
+		}
 	}
 }
 
