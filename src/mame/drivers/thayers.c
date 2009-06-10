@@ -300,7 +300,7 @@ static WRITE8_HANDLER( control2_w )
 
     */
 
-	if (!BIT(data, 2) & cart_present)
+	if ((!BIT(data, 2)) & cart_present)
 	{
 		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}

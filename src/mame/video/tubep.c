@@ -192,6 +192,10 @@ PALETTE_INIT( tubep )
 	double weights_txt_rg[3];
 	double weights_txt_b[2];
 
+	memset(weights_r, 0, sizeof(weights_r));
+	memset(weights_g, 0, sizeof(weights_g));
+	memset(weights_b, 0, sizeof(weights_b));
+
 	compute_resistor_weights(0,	255,	-1.0,
 			3,	resistors_txt_rg,	weights_txt_rg,	470,	0,
 			2,	resistors_txt_b,	weights_txt_b,	470,	0,

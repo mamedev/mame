@@ -86,7 +86,7 @@ PALETTE_INIT( arabian )
         -------------------------------------------------------------------------*/
 
 		int rhi = planea ? ar : enb ? bz : 0;
-		int rlo = planea ? ((!arhf & az) ? 0 : ar) : enb ? br : 0;
+		int rlo = planea ? (((!arhf) & az) ? 0 : ar) : enb ? br : 0;
 
 		/*-------------------------------------------------------------------------
             green derivation:
@@ -117,7 +117,7 @@ PALETTE_INIT( arabian )
         -------------------------------------------------------------------------*/
 
 		int ghi = planea ? ag : enb ? bb : 0;
-		int glo = planea ? ((!aghf & az) ? 0 : ag) : enb ? bg : 0;
+		int glo = planea ? (((!aghf) & az) ? 0 : ag) : enb ? bg : 0;
 
 		/*-------------------------------------------------------------------------
             blue derivation:
@@ -138,7 +138,7 @@ PALETTE_INIT( arabian )
         -------------------------------------------------------------------------*/
 
 		int bhi = ab;
-		int bbase = (!abhf & az) ? 0 : ab;
+		int bbase = ((!abhf) & az) ? 0 : ab;
 
 		/* convert an RGB color -
            there are effectively 6 bits of color: 2 red, 2 green, 2 blue */

@@ -601,14 +601,14 @@ DRIVER_INIT( billiard )
 			bits[i] = (A >> i) & 1;
 
 		xormask = 0x55;
-		if (bits[2] ^ ( bits[3] &  bits[6])) xormask ^= 0x01;
-		if (bits[4] ^ ( bits[5] &  bits[7])) xormask ^= 0x02;
-		if (bits[0] ^ ( bits[7] & !bits[3])) xormask ^= 0x04;
-		if (bits[3] ^ (!bits[0] &  bits[2])) xormask ^= 0x08;
-		if (bits[5] ^ (!bits[4] &  bits[1])) xormask ^= 0x10;
-		if (bits[6] ^ (!bits[2] & !bits[5])) xormask ^= 0x20;
-		if (bits[1] ^ (!bits[6] & !bits[4])) xormask ^= 0x40;
-		if (bits[7] ^ (!bits[1] &  bits[0])) xormask ^= 0x80;
+		if (bits[2] ^ (( bits[3]) & ( bits[6]))) xormask ^= 0x01;
+		if (bits[4] ^ (( bits[5]) & ( bits[7]))) xormask ^= 0x02;
+		if (bits[0] ^ (( bits[7]) & (!bits[3]))) xormask ^= 0x04;
+		if (bits[3] ^ ((!bits[0]) & ( bits[2]))) xormask ^= 0x08;
+		if (bits[5] ^ ((!bits[4]) & ( bits[1]))) xormask ^= 0x10;
+		if (bits[6] ^ ((!bits[2]) & (!bits[5]))) xormask ^= 0x20;
+		if (bits[1] ^ ((!bits[6]) & (!bits[4]))) xormask ^= 0x40;
+		if (bits[7] ^ ((!bits[1]) & ( bits[0]))) xormask ^= 0x80;
 
 		rom[A] ^= xormask;
 
