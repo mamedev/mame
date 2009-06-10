@@ -8319,7 +8319,13 @@ Other Sun games
 
 	/* JPM Give us a Break hardware */
 	DRIVER( guab )		/* (c) 1986 */
-	DRIVER( guab3 )		/* (c) 1986 */
+	DRIVER( guab3a )	/* (c) 1986 */
+	DRIVER( guab4 )		/* (c) 1986 */
+	DRIVER( guab6 )		/* (c) 1986 */
+	DRIVER( guab6a )	/* (c) 1986 */
+	DRIVER( guab7 )		/* (c) 1986 */
+	DRIVER( guab21 )	/* (c) 1986 */
+	DRIVER( guab43 )	/* (c) 1986 */
 	DRIVER( tenup )		/* (c) 1988 */
 	DRIVER( tenup3 )	/* (c) 1988 */
 

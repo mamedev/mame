@@ -5,7 +5,7 @@
     preliminary driver by Phil Bennett
 
     Games supported:
-        * Give us a Break [2 sets]
+        * Give us a Break [8 sets]
         * Ten Up [2 sets]
 
     Looking for:
@@ -805,10 +805,10 @@ ROM_START( guab )
 	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
 
 	ROM_REGION( 0xb4000, "user1", 0 )
-	ROM_LOAD( "guabf6.dsk", 0x00000, 0xb4000, CRC(08804c28) SHA1(608d89d598b7acb133814540dba98cea29c6cad6) )
+	ROM_LOAD( "guab3.dsk", 0x00000, 0xb4000, CRC(ecb41e06) SHA1(2900a95046b38312c6035ea394b04b62c1d29f42) )
 ROM_END
 
-ROM_START( guab3 )
+ROM_START( guab3a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
 	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
@@ -816,7 +816,73 @@ ROM_START( guab3 )
 	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
 
 	ROM_REGION( 0xb4000, "user1", 0 )
-	ROM_LOAD( "guab3.dsk", 0x00000, 0xb4000, CRC(ecb41e06) SHA1(2900a95046b38312c6035ea394b04b62c1d29f42) )
+	ROM_LOAD( "guab7c.dsk", 0x00000, 0xb4000, CRC(f5f10f87) SHA1(80e540339efbfe59b656d6cd4f466a17df84c123) )
+ROM_END
+
+ROM_START( guab4 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guab8d.dsk", 0x00000, 0xb4000, CRC(b87c55ce) SHA1(20debbefae194276b0813518634cf52bed093e73) )
+ROM_END
+
+ROM_START( guab6 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guabf6.dsk", 0x00000, 0xb4000, CRC(08804c28) SHA1(608d89d598b7acb133814540dba98cea29c6cad6) )
+ROM_END
+
+ROM_START( guab6a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guab9f.dsk", 0x00000, 0xb4000, CRC(85329fe9) SHA1(f5ca1956c37b786fa0a4f8f0607a0a2b19d3fbb0) )
+ROM_END
+
+ROM_START( guab7 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guab9g.dsk", 0x00000, 0xb4000, CRC(6b8c36f9) SHA1(1d9f4d943f2962603bbe39e5b58befe15954a6d6) )
+ROM_END
+
+ROM_START( guab21 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guab21.dsk", 0x00000, 0xb4000, CRC(558ee009) SHA1(d2a02662216e10f80a215044f1929df7255b6136) )
+ROM_END
+
+ROM_START( guab43 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
+	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
+	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
+	ROM_LOAD16_BYTE( "guab2b1.rom", 0x10001, 0x8000, CRC(29aa26a0) SHA1(8d425ad845ccfcd8995dbf6adc1ca17989a5d3ea) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "guab43.dsk", 0x00000, 0xb3f00, CRC(96167357) SHA1(9d5f66e05ed1086be9699c4149071038f6986e0c) )
 ROM_END
 
 ROM_START( tenup )
@@ -848,7 +914,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, guab,   0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)", 0 )
-GAME( 1986, guab3,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)", 0 )
-GAME( 1988, tenup,  0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",        0 )
-GAME( 1988, tenup3, tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",         0 )
+GAME( 1986, guab,   0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)",      0 )
+GAME( 1986, guab3a, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition alt?)", 0 )
+GAME( 1986, guab4,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (4th edition)",      0 )
+GAME( 1986, guab6,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)",      0 )
+GAME( 1986, guab6a, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition alt?)", 0 )
+GAME( 1986, guab7,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (7th edition)",      0 )
+GAME( 1986, guab21, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (21st edition)",     0 )
+GAME( 1986, guab43, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (43rd edition)",     0 )
+GAME( 1988, tenup,  0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",             0 )
+GAME( 1988, tenup3, tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",              0 )
