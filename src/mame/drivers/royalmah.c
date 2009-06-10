@@ -3389,7 +3389,7 @@ ROM_START( janputer )
  	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(f36f4222) SHA1(ce18c273a59f86cb17ea6ba8a3daefc3d750df1e) )
  	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(7d57cb48) SHA1(38b97c5d02e3ab6187e5e0f86c06b8a3747b51a8) )
  	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(fb481d9a) SHA1(122e2b0d11fe1fe8cf219da9c8f96fe5a1016bb6) )
- 	ROM_LOAD( "7.bin",   0x6000, 0x1000, NO_DUMP ) // reads from here for the gfx data.
+ 	ROM_LOAD( "7.bin",   0x6000, 0x1000, CRC(bb00fb9e) SHA1(4d2965a0339328d1700b39c166a5a92a96b05e67) )
 
  	ROM_REGION( 0x20, "proms", 0 )
  	/* taken from Royal Mahjong, might or might not be the same. */
@@ -4341,8 +4341,8 @@ ROM_START( janoha )
 	ROM_LOAD( "c8",       0x0000, 0x2000, CRC(a37ed493) SHA1(a3246c635ee77f96afd96285ef7091f6fc0d7636) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "18s030.45",  0x0000, 0x0020, CRC(c6a24ae9) SHA1(ec7a4dee2fec2f7151ddc39e40a3eee6a1c4992d) )
-	ROM_LOAD( "18s030.44",  0x0020, 0x0020, CRC(d4eabf78) SHA1(f14778b552ff483e36e7c30ee67e8e2075790ea2) )
+	ROM_LOAD( "18s030.44",  0x0000, 0x0020, CRC(d4eabf78) SHA1(f14778b552ff483e36e7c30ee67e8e2075790ea2) )
+	ROM_LOAD( "18s030.45",  0x0020, 0x0020, CRC(c6a24ae9) SHA1(ec7a4dee2fec2f7151ddc39e40a3eee6a1c4992d) ) // another color prom?
 ROM_END
 
 /*
@@ -4623,7 +4623,7 @@ GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0,   "Nichibut
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
-GAME( 1981,  janputer, 0,        royalmah, royalmah, 0,        ROT0,   "Taito Corporation",          "Janputer (Japan)",                      GAME_NOT_WORKING )
+GAME( 1981,  janputer, 0,        royalmah, royalmah, 0,        ROT0,   "Ps Ltd. \ Mes",              "New Double Bet Mahjong (Japan)",        0 )
 GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        GAME_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   0,        ROT180, "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
