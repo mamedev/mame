@@ -1,9 +1,28 @@
-#pragma once
+/**********************************************************************
 
-#ifndef __SP0256_H__
-#define __SP0256_H__
+    SP0256 Narrator Speech Processor emulation
 
-#include "devcb.h"
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+                            _____   _____
+				   Vss   1 |*    \_/     | 28  OSC 2
+                _RESET   2 |             | 27  OSC 1
+           ROM DISABLE   3 |             | 26  ROM CLOCK
+                    C1   4 |             | 25  _SBY RESET
+                    C2   5 |             | 24  DIGITAL OUT
+                    C3   6 |		     | 23  Vdi
+                   Vdd   7 |	SP0256	 | 22  TEST
+                   SBY   8 |             | 21  SER IN
+                  _LRQ   9 |             | 20  _ALD
+					A8  10 |             | 19  SE
+					A7  11 |             | 18  A1
+               SER OUT  12 |             | 17  A2
+					A6  13 |             | 16  A3
+					A5  14 |_____________| 15  A4
+
+**********************************************************************/
 
 /*
    GI SP0256 Narrator Speech Processor
@@ -24,6 +43,13 @@
  - This entire notice must remain in the source code.
 
 */
+
+#pragma once
+
+#ifndef __SP0256_H__
+#define __SP0256_H__
+
+#include "devcb.h"
 
 typedef struct _sp0256_interface sp0256_interface;
 struct _sp0256_interface
