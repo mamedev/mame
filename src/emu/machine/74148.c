@@ -81,21 +81,21 @@ void TTL74148_update(running_machine *machine, int which)
 		int bit0, bit1, bit2;
 
 		/* this comes straight off the data sheet schematics */
-		bit0 = !((!chips[which].input_lines[1] &
+		bit0 = !(((!chips[which].input_lines[1]) &
 		           chips[which].input_lines[2] &
 		           chips[which].input_lines[4] &
 		           chips[which].input_lines[6])  |
-		         (!chips[which].input_lines[3] &
+		         ((!chips[which].input_lines[3]) &
 		           chips[which].input_lines[4] &
 		           chips[which].input_lines[6])  |
-		         (!chips[which].input_lines[5] &
+		         ((!chips[which].input_lines[5]) &
 		           chips[which].input_lines[6])  |
 		         (!chips[which].input_lines[7]));
 
-		bit1 = !((!chips[which].input_lines[2] &
+		bit1 = !(((!chips[which].input_lines[2]) &
 		           chips[which].input_lines[4] &
 		           chips[which].input_lines[5])  |
-		         (!chips[which].input_lines[3] &
+		         ((!chips[which].input_lines[3]) &
 		           chips[which].input_lines[4] &
 		           chips[which].input_lines[5])  |
 		         (!chips[which].input_lines[6])  |

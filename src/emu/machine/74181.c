@@ -74,18 +74,18 @@ static void TTL74181_update(int which)
 	UINT8 mp = !c->inputs[TTL74181_INPUT_M];
 
 	UINT8 ap0 = !(a0 | (b0 & s0) | (s1 & !b0));
-	UINT8 bp0 = !((!b0 & s2 & a0) | (a0 & b0 & s3));
+	UINT8 bp0 = !(((!b0) & s2 & a0) | (a0 & b0 & s3));
 	UINT8 ap1 = !(a1 | (b1 & s0) | (s1 & !b1));
-	UINT8 bp1 = !((!b1 & s2 & a1) | (a1 & b1 & s3));
+	UINT8 bp1 = !(((!b1) & s2 & a1) | (a1 & b1 & s3));
 	UINT8 ap2 = !(a2 | (b2 & s0) | (s1 & !b2));
-	UINT8 bp2 = !((!b2 & s2 & a2) | (a2 & b2 & s3));
+	UINT8 bp2 = !(((!b2) & s2 & a2) | (a2 & b2 & s3));
 	UINT8 ap3 = !(a3 | (b3 & s0) | (s1 & !b3));
-	UINT8 bp3 = !((!b3 & s2 & a3) | (a3 & b3 & s3));
+	UINT8 bp3 = !(((!b3) & s2 & a3) | (a3 & b3 & s3));
 
-	UINT8 fp0 = !(cp & mp) ^ (!ap0 & bp0);
-	UINT8 fp1 = (!((mp & ap0) | (mp & bp0 & cp))) ^ (!ap1 & bp1);
-	UINT8 fp2 = (!((mp & ap1) | (mp & ap0 & bp1) | (mp & cp & bp0 & bp1))) ^ (!ap2 & bp2);
-	UINT8 fp3 = (!((mp & ap2) | (mp & ap1 & bp2) | (mp & ap0 & bp1 & bp2) | (mp & cp & bp0 & bp1 & bp2))) ^ (!ap3 & bp3);
+	UINT8 fp0 = !(cp & mp) ^ ((!ap0) & bp0);
+	UINT8 fp1 = (!((mp & ap0) | (mp & bp0 & cp))) ^ ((!ap1) & bp1);
+	UINT8 fp2 = (!((mp & ap1) | (mp & ap0 & bp1) | (mp & cp & bp0 & bp1))) ^ ((!ap2) & bp2);
+	UINT8 fp3 = (!((mp & ap2) | (mp & ap1 & bp2) | (mp & ap0 & bp1 & bp2) | (mp & cp & bp0 & bp1 & bp2))) ^ ((!ap3) & bp3);
 
 	UINT8 aeqb = fp0 & fp1 & fp2 & fp3;
 	UINT8 pp = !(bp0 & bp1 & bp2 & bp3);
