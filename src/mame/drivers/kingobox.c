@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( kingofb )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map)
-	MDRV_CPU_IO_MAP(ringking_sound_io_map)
+	MDRV_CPU_IO_MAP(kingobox_sound_io_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
