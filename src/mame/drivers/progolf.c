@@ -8,7 +8,7 @@ TODO:
 - We need to patch a rom to get the games to do more, there's also a "rom test error 6"
   in service mode, so a rom might be bad or the decryption isn't complete.
 - Hazards doesn't have any effect, might be the same issue as above;
-- Framebuffer "chars" leaves trails;
+- Map displays are currently wrong, they are drawn with the framebuffer;
 - Sound in service mode loops without apparent reason;
 - progolfa: decryption isn't yet correct;
 
@@ -71,6 +71,7 @@ static WRITE8_HANDLER( progolf_charram_w )
 {
 	deco_charram[offset] = data;
 
+	/* TODO: simplify this */
 	if(char_pen == 7)
 	{
 		progolf_fg_fb[offset*8+0] = 0;
@@ -84,14 +85,45 @@ static WRITE8_HANDLER( progolf_charram_w )
 	}
 	else
 	{
-		progolf_fg_fb[offset*8+0] = data & 0x80 ? progolf_fg_fb[offset*8+0]|char_pen : progolf_fg_fb[offset*8+0];
-		progolf_fg_fb[offset*8+1] = data & 0x40 ? progolf_fg_fb[offset*8+1]|char_pen : progolf_fg_fb[offset*8+1];
-		progolf_fg_fb[offset*8+2] = data & 0x20 ? progolf_fg_fb[offset*8+2]|char_pen : progolf_fg_fb[offset*8+2];
-		progolf_fg_fb[offset*8+3] = data & 0x10 ? progolf_fg_fb[offset*8+3]|char_pen : progolf_fg_fb[offset*8+3];
-		progolf_fg_fb[offset*8+4] = data & 0x08 ? progolf_fg_fb[offset*8+4]|char_pen : progolf_fg_fb[offset*8+4];
-		progolf_fg_fb[offset*8+5] = data & 0x04 ? progolf_fg_fb[offset*8+5]|char_pen : progolf_fg_fb[offset*8+5];
-		progolf_fg_fb[offset*8+6] = data & 0x02 ? progolf_fg_fb[offset*8+6]|char_pen : progolf_fg_fb[offset*8+6];
-		progolf_fg_fb[offset*8+7] = data & 0x01 ? progolf_fg_fb[offset*8+7]|char_pen : progolf_fg_fb[offset*8+7];
+		if(progolf_fg_fb[offset*8+0] == char_pen)
+			progolf_fg_fb[offset*8+0] = data & 0x80 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+0] = data & 0x80 ? progolf_fg_fb[offset*8+0]|char_pen : progolf_fg_fb[offset*8+0];
+
+		if(progolf_fg_fb[offset*8+1] == char_pen)
+			progolf_fg_fb[offset*8+1] = data & 0x40 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+1] = data & 0x40 ? progolf_fg_fb[offset*8+1]|char_pen : progolf_fg_fb[offset*8+1];
+
+		if(progolf_fg_fb[offset*8+2] == char_pen)
+			progolf_fg_fb[offset*8+2] = data & 0x20 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+2] = data & 0x20 ? progolf_fg_fb[offset*8+2]|char_pen : progolf_fg_fb[offset*8+2];
+
+		if(progolf_fg_fb[offset*8+3] == char_pen)
+			progolf_fg_fb[offset*8+3] = data & 0x10 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+3] = data & 0x10 ? progolf_fg_fb[offset*8+3]|char_pen : progolf_fg_fb[offset*8+3];
+
+		if(progolf_fg_fb[offset*8+4] == char_pen)
+			progolf_fg_fb[offset*8+4] = data & 0x08 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+4] = data & 0x08 ? progolf_fg_fb[offset*8+4]|char_pen : progolf_fg_fb[offset*8+4];
+
+		if(progolf_fg_fb[offset*8+5] == char_pen)
+			progolf_fg_fb[offset*8+5] = data & 0x04 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+5] = data & 0x04 ? progolf_fg_fb[offset*8+5]|char_pen : progolf_fg_fb[offset*8+5];
+
+		if(progolf_fg_fb[offset*8+6] == char_pen)
+			progolf_fg_fb[offset*8+6] = data & 0x02 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+6] = data & 0x02 ? progolf_fg_fb[offset*8+6]|char_pen : progolf_fg_fb[offset*8+6];
+
+		if(progolf_fg_fb[offset*8+7] == char_pen)
+			progolf_fg_fb[offset*8+7] = data & 0x01 ? char_pen : 0;
+		else
+			progolf_fg_fb[offset*8+7] = data & 0x01 ? progolf_fg_fb[offset*8+7]|char_pen : progolf_fg_fb[offset*8+7];
 	}
 }
 
