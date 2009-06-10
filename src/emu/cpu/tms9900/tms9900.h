@@ -31,6 +31,9 @@
                           /* This chip is available in several variants (tms99105, tms99110...), */
                           /* which are similar but emulate additional instructions thanks */
                           /* to the so-called macrostore feature. */
+#define TMS99105A_ID	11
+#define TMS99110A_ID	12
+
 
 /* NPW 25-May-2002 - Added these to get it to compile under windows */
 #define TI9940_ID		TMS9940_ID
