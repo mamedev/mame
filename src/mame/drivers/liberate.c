@@ -440,6 +440,20 @@ static const gfx_layout tiles2 =
 	64*8
 };
 
+static const gfx_layout prosoccr_bg_gfx =
+{
+	16,16,
+	128,
+	4,
+	{ 0x2000*8+0, 0x2000*8+4, 0x0000*8+0 , 0x0000*8+4 },
+	{
+		24,25,26,27, 16,17,18,19, 8,9,10,11, 0,1,2,3
+	},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	64*8
+};
+
 static GFXDECODE_START( liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
@@ -452,6 +466,12 @@ static GFXDECODE_START( prosport )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x00800, pro_tiles,   0, 4 )
+GFXDECODE_END
+
+static GFXDECODE_START( prosoccr )
+	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
+	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   0, 1 )
 GFXDECODE_END
 
 /*************************************
@@ -549,6 +569,8 @@ static MACHINE_DRIVER_START( prosoccr )
 	MDRV_CPU_PROGRAM_MAP(liberate_map)
 	MDRV_CPU_IO_MAP(deco16_io_map)
 
+	MDRV_GFXDECODE(prosoccr)
+
 	MDRV_VIDEO_START(prosoccr)
 	MDRV_VIDEO_UPDATE(prosoccr)
 MACHINE_DRIVER_END
@@ -607,17 +629,32 @@ ROM_START( prosoccr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "am06.10a", 0xe000, 0x2000, CRC(37a0c74f) SHA1(5757b9eaf5b1129ee2d03b0ab6c3b15c120cf43c) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "shared_gfx", 0 ) // gfxs for foreground and sprites
 	ROM_LOAD( "am00.2b",  0x0000, 0x2000, CRC(f3c8b649) SHA1(d2d42484e80d9241dac77a78c68314f88e0cbe5d) )
 	ROM_LOAD( "am01.5b",  0x2000, 0x2000, CRC(24785bda) SHA1(536bdda766b46771223f01e463fa4c61e0dd545c) )
 	ROM_LOAD( "am02.7b",  0x4000, 0x2000, CRC(c5af58ea) SHA1(a73d537b88befb76d67cc17d241e78c572c5b737) )
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "fg_gfx", ROMREGION_ERASE00 ) // filled in DRIVER_INIT
+	//ROM_COPY( "shared_gfx", 0x0000, 0x0000, 0x2000 )
+	//ROM_COPY( "shared_gfx", 0x2000, 0x2000, 0x2000 )
+	//ROM_COPY( "shared_gfx", 0x4000, 0x4000, 0x2000 )
+
+	//ROM_FILL( 0x0000, 0x0800, 0x00 )
+	//ROM_FILL( 0x2000, 0x0800, 0x00 )
+	//ROM_FILL( 0x4000, 0x0800, 0x00 )
+
+	ROM_REGION( 0x6000, "sp_gfx", 0 )
+	ROM_COPY( "shared_gfx", 0x0000, 0x0000, 0x2000 )
+	ROM_COPY( "shared_gfx", 0x2000, 0x2000, 0x2000 )
+	ROM_COPY( "shared_gfx", 0x4000, 0x4000, 0x2000 )
+
+	ROM_REGION( 0x4000, "bg_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "am03.10b", 0x0000, 0x2000, CRC(47dc31dc) SHA1(7f492477e30a0353251a43e7e726551c3861b63f) )
 	ROM_LOAD( "am04.c10", 0x2000, 0x2000, CRC(e057d827) SHA1(81ca4351777de5c32f4cf65547287c8169ba1494) )
 
 	ROM_REGION(0x04000, "user1", 0 )
 	ROM_LOAD( "am05.d12", 0x0000, 0x2000,  CRC(f63e5a73) SHA1(50e7a1a0eb3bf8df3264bcba441c5fbd7dec52f4) )
+	//ROM_RELOAD(           0x2000, 0x2000 )
 
 	ROM_REGION( 64, "proms", 0 )
 	ROM_LOAD( "k1",    0, 32,  CRC(ebdc8343) SHA1(c9ae04da662f40237de24f5f01e97051e99e8c15) ) /* Colour */
@@ -952,6 +989,23 @@ static DRIVER_INIT( prosport )
 	sound_cpu_decrypt(machine);
 }
 
+static DRIVER_INIT( prosoccr )
+{
+	UINT8 *FG_ROM = memory_region(machine, "fg_gfx");
+	UINT8 *GFX_ROM = memory_region(machine, "shared_gfx");
+	int i;
+
+	DRIVER_INIT_CALL(prosport);
+
+	/* TODO: address lines are scrambled on the foreground gfxs, understand how. */
+	for(i=0x0000;i<0x2000;i++)
+	{
+		FG_ROM[BITSWAP16(i+0x0000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x0000];
+		FG_ROM[BITSWAP16(i+0x2000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x2000];
+		FG_ROM[BITSWAP16(i+0x4000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x4000];
+	}
+}
+
 static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
@@ -986,7 +1040,7 @@ static DRIVER_INIT( liberate )
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  liberate, prosport, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING )
+GAME( 1983, prosoccr,  0,        prosoccr,  liberate, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING )
 GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING )
 GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
