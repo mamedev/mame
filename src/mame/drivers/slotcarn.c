@@ -137,27 +137,29 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static MC6845_ON_HSYNC_CHANGED(hsync_changed)
+static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
 {
 	/* update any video up to the current scanline */
 	video_screen_update_now(device->machine->primary_screen);
 }
 
-static MC6845_ON_VSYNC_CHANGED(vsync_changed)
+static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	begin_update,			/* before pixel update callback */
-	update_row,				/* row update callback */
-	0,						/* after pixel update callback */
-	0,						/* callback for display state changes */
-	hsync_changed,			/* HSYNC callback */
-	vsync_changed			/* VSYNC callback */
+	"screen",					/* screen we are acting on */
+	8,							/* number of pixels per video memory address */
+	begin_update,				/* before pixel update callback */
+	update_row,					/* row update callback */
+	NULL,						/* after pixel update callback */
+	DEVCB_NULL,					/* callback for display state changes */
+	DEVCB_NULL,					/* callback for cursor state changes */
+	DEVCB_LINE(hsync_changed),	/* HSYNC callback */
+	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
+	NULL						/* update address callback */
 };
 
 

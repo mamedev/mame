@@ -72,7 +72,7 @@ WRITE8_HANDLER( qix_68705_portC_w );
 
 WRITE8_DEVICE_HANDLER( qix_pia_w );
 
-MC6845_ON_VSYNC_CHANGED( qix_vsync_changed );
+WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed );
 
 
 /*----------- defined in video/qix.c -----------*/

@@ -1633,9 +1633,9 @@ static VIDEO_UPDATE(dealem)
 }
 
 
-static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
+static WRITE_LINE_DEVICE_HANDLER( dealem_vsync_changed )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, vsync);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, state);
 }
 
 /*************************************
@@ -1646,14 +1646,16 @@ static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 
 static const mc6845_interface hd6845_intf =
 {
-	"screen",					/* screen we are acting on */
-	8,							/* number of pixels per video memory address */
-	NULL,						/* before pixel update callback */
-	NULL,						/* row update callback */
-	NULL,						/* after pixel update callback */
-	NULL,						/* callback for display state changes */
-	NULL,						/* HSYNC callback */
-	dealem_vsync_changed		/* VSYNC callback */
+	"screen",							/* screen we are acting on */
+	8,									/* number of pixels per video memory address */
+	NULL,								/* before pixel update callback */
+	NULL,								/* row update callback */
+	NULL,								/* after pixel update callback */
+	DEVCB_NULL,							/* callback for display state changes */
+	DEVCB_NULL,							/* callback for cursor state changes */
+	DEVCB_NULL,							/* HSYNC callback */
+	DEVCB_LINE(dealem_vsync_changed),	/* VSYNC callback */
+	NULL								/* update address callback */
 };
 
 

@@ -31,7 +31,7 @@
 
 static MC6845_BEGIN_UPDATE( begin_update );
 static MC6845_UPDATE_ROW( update_row );
-static MC6845_ON_DE_CHANGED( display_enable_changed );
+static WRITE_LINE_DEVICE_HANDLER( display_enable_changed );
 
 
 
@@ -63,18 +63,18 @@ static VIDEO_START( qix )
  *
  *************************************/
 
-static MC6845_ON_DE_CHANGED( display_enable_changed )
+static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *driver_state = (qix_state *)device->machine->driver_data;
 
 	/* on the rising edge, latch the scanline */
-	if (display_enabled)
+	if (state)
 	{
 		UINT16 ma = mc6845_get_ma(device);
 		UINT8 ra = mc6845_get_ra(device);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
-		*state->scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
+		*driver_state->scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
 	}
 }
 
@@ -427,14 +427,16 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	begin_update,			/* before pixel update callback */
-	update_row,				/* row update callback */
-	NULL,					/* after pixel update callback */
-	display_enable_changed,	/* callback for display state changes */
-	NULL,					/* HSYNC callback */
-	qix_vsync_changed		/* VSYNC callback */
+	"screen",							/* screen we are acting on */
+	8,									/* number of pixels per video memory address */
+	begin_update,						/* before pixel update callback */
+	update_row,							/* row update callback */
+	NULL,								/* after pixel update callback */
+	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_NULL,							/* callback for cursor state changes */
+	DEVCB_NULL,							/* HSYNC callback */
+	DEVCB_LINE(qix_vsync_changed),		/* VSYNC callback */
+	NULL								/* update address callback */
 };
 
 

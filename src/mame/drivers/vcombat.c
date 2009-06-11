@@ -528,22 +528,24 @@ static INPUT_PORTS_START( shadfgtr )
 INPUT_PORTS_END
 
 
-static MC6845_ON_HSYNC_CHANGED(sound_update)
+static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(cputag_get_cpu(device->machine, "soundcpu"), M68K_IRQ_1, hsync ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(cputag_get_cpu(device->machine, "soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",		/* screen we are acting on */
-	16,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	NULL,		/* callback for display state changes */
-	sound_update,		/* HSYNC callback */
-	NULL		/* VSYNC callback */
+	"screen",					/* screen we are acting on */
+	16,							/* number of pixels per video memory address */
+	NULL,						/* before pixel update callback */
+	NULL,						/* row update callback */
+	NULL,						/* after pixel update callback */
+	DEVCB_NULL,					/* callback for display state changes */
+	DEVCB_NULL,					/* callback for cursor state changes */
+	DEVCB_LINE(sound_update),	/* HSYNC callback */
+	DEVCB_NULL,					/* VSYNC callback */
+	NULL						/* update address callback */
 };
 
 

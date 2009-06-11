@@ -250,10 +250,10 @@ MACHINE_START( qixmcu )
  *
  *************************************/
 
-MC6845_ON_VSYNC_CHANGED( qix_vsync_changed )
+WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
 {
 	const device_config *pia = devtag_get_device(device->machine, "sndpia0");
-	pia6821_cb1_w(pia, 0, vsync);
+	pia6821_cb1_w(pia, 0, state);
 }
 
 

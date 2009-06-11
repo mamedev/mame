@@ -397,9 +397,9 @@ static MC6845_END_UPDATE( end_update )
 }
 
 
-static MC6845_ON_DE_CHANGED( display_enable_changed )
+static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, "ic48_1"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic48_1"), 0, state);
 }
 
 
@@ -410,9 +410,11 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	end_update,				/* after pixel update callback */
-	display_enable_changed,	/* callback for display state changes */
-	NULL,					/* HSYNC callback */
-	NULL					/* VSYNC callback */
+	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_NULL,				/* callback for cursor state changes */
+	DEVCB_NULL,				/* HSYNC callback */
+	DEVCB_NULL,				/* VSYNC callback */
+	NULL					/* update address callback */
 };
 
 

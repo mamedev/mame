@@ -10,6 +10,7 @@
 #ifndef __MC6845__
 #define __MC6845__
 
+#include "devcb.h"
 
 #define MC6845		DEVICE_GET_INFO_NAME(mc6845)
 #define MC6845_1	DEVICE_GET_INFO_NAME(mc6845_1)
@@ -25,7 +26,6 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 
-
 /* callback definitions */
 typedef void * (*mc6845_begin_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 #define MC6845_BEGIN_UPDATE(name)	void *name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
@@ -34,20 +34,11 @@ typedef void (*mc6845_update_row_func)(const device_config *device, bitmap_t *bi
 					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
 					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 #define MC6845_UPDATE_ROW(name)		void name(const device_config *device, bitmap_t *bitmap,	\
-					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
+					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,	\
 					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 typedef void (*mc6845_end_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
 #define MC6845_END_UPDATE(name)		void name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)
-
-typedef void (*mc6845_on_de_changed_func)(const device_config *device, int display_enabled);
-#define MC6845_ON_DE_CHANGED(name)	void name(const device_config *device, int display_enabled)
-
-typedef void (*mc6845_on_hsync_changed_func)(const device_config *device, int hsync);
-#define MC6845_ON_HSYNC_CHANGED(name)	void name(const device_config *device, int hsync)
-
-typedef void (*mc6845_on_vsync_changed_func)(const device_config *device, int vsync);
-#define MC6845_ON_VSYNC_CHANGED(name)	void name(const device_config *device, int vsync)
 
 typedef void (*mc6845_on_update_addr_changed_func)(const device_config *device, int address, int strobe);
 #define MC6845_ON_UPDATE_ADDR_CHANGED(name)	void name(const device_config *device, int address, int strobe)
@@ -74,13 +65,16 @@ struct _mc6845_interface
 	mc6845_end_update_func			end_update;
 
 	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
-	mc6845_on_de_changed_func		on_de_changed;
+	devcb_write_line				out_de_func;
+
+	/* if specified, this gets called for every change of the cursor pin (pin 19) */
+	devcb_write_line				out_cur_func;
 
 	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
-	mc6845_on_hsync_changed_func	on_hsync_changed;
+	devcb_write_line				out_hsync_func;
 
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
-	mc6845_on_vsync_changed_func	on_vsync_changed;
+	devcb_write_line				out_vsync_func;
 
 	/* Called whenenever the update address changes
      * For vblank/hblank timing strobe indicates the physical update.
@@ -132,6 +126,5 @@ void mc6845_set_hpixels_per_column(const device_config *device, int hpixels_per_
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
 void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-
 
 #endif

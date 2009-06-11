@@ -64,6 +64,11 @@ static const int supports_transparent[NUM_TYPES]       = { FALSE,      FALSE,   
 typedef struct _mc6845_t mc6845_t;
 struct _mc6845_t
 {
+	devcb_resolved_write_line			out_de_func;
+	devcb_resolved_write_line			out_cur_func;
+	devcb_resolved_write_line			out_hsync_func;
+	devcb_resolved_write_line			out_vsync_func;
+
 	int device_type;
 	const mc6845_interface *intf;
 	const device_config *screen;
@@ -95,6 +100,8 @@ struct _mc6845_t
 
 	/* timers */
 	emu_timer *de_changed_timer;
+	emu_timer *cur_on_timer;
+	emu_timer *cur_off_timer;
 	emu_timer *hsync_on_timer;
 	emu_timer *hsync_off_timer;
 	emu_timer *vsync_on_timer;
@@ -119,6 +126,7 @@ struct _mc6845_t
 static STATE_POSTLOAD( mc6845_state_save_postload );
 static void recompute_parameters(mc6845_t *mc6845, int postload);
 static void update_de_changed_timer(mc6845_t *mc6845);
+static void update_cur_changed_timers(mc6845_t *mc6845);
 static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
 
@@ -365,6 +373,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 			mc6845->vsync_off_pos = vsync_off_pos;
 
 			update_de_changed_timer(mc6845);
+			update_cur_changed_timers(mc6845);
 			update_hsync_changed_timers(mc6845);
 			update_vsync_changed_timers(mc6845);
 		}
@@ -427,6 +436,27 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 	}
 }
 
+static void update_cur_changed_timers(mc6845_t *mc6845)
+{
+	if (mc6845->has_valid_parameters && (mc6845->cur_on_timer != NULL))
+	{
+		UINT16 cur_on_row = ((mc6845->cursor_addr - mc6845->disp_start_addr) / mc6845->horiz_disp) * (mc6845->max_ras_addr + 1);
+		UINT16 cur_on_y = cur_on_row + mc6845->cursor_start_ras;
+		UINT16 cur_off_y = cur_on_row + mc6845->cursor_end_ras;
+		UINT16 cur_on_pos = ((mc6845->cursor_addr - mc6845->disp_start_addr) % mc6845->horiz_disp) * mc6845->intf->hpixels_per_column;
+		UINT16 cur_off_pos = cur_on_pos + mc6845->intf->hpixels_per_column;
+		UINT16 next_y;
+		UINT16 y = video_screen_get_vpos(mc6845->screen);
+
+		if ((y >= cur_on_y) && (y < cur_off_y))
+			next_y = y + 1;
+		else
+			next_y = cur_on_y;
+
+		timer_adjust_oneshot(mc6845->cur_on_timer,  video_screen_get_time_until_pos(mc6845->screen, next_y, cur_on_pos) , 0);
+		timer_adjust_oneshot(mc6845->cur_off_timer, video_screen_get_time_until_pos(mc6845->screen, next_y, cur_off_pos), 0);
+	}
+}
 
 static void update_hsync_changed_timers(mc6845_t *mc6845)
 {
@@ -464,9 +494,31 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_de_changed(device, is_display_enabled(mc6845));
+	devcb_call_write_line(&mc6845->out_de_func, is_display_enabled(mc6845));
 
 	update_de_changed_timer(mc6845);
+}
+
+
+static TIMER_CALLBACK( cur_on_timer_cb )
+{
+	const device_config *device = (const device_config *)ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
+
+	/* call the callback function -- we know it exists */
+	devcb_call_write_line(&mc6845->out_cur_func, TRUE);
+}
+
+
+static TIMER_CALLBACK( cur_off_timer_cb )
+{
+	const device_config *device = (const device_config *)ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
+
+	/* call the callback function -- we know it exists */
+	devcb_call_write_line(&mc6845->out_cur_func, FALSE);
+
+	update_cur_changed_timers(mc6845);
 }
 
 
@@ -476,7 +528,7 @@ static TIMER_CALLBACK( vsync_on_timer_cb )
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(device, TRUE);
+	devcb_call_write_line(&mc6845->out_vsync_func, TRUE);
 }
 
 
@@ -486,7 +538,7 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(device, FALSE);
+	devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
 
 	update_vsync_changed_timers(mc6845);
 }
@@ -498,7 +550,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(device, TRUE);
+	devcb_call_write_line(&mc6845->out_hsync_func, TRUE);
 }
 
 
@@ -508,7 +560,7 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(device, FALSE);
+	devcb_call_write_line(&mc6845->out_hsync_func, FALSE);
 
 	update_hsync_changed_timers(mc6845);
 }
@@ -751,6 +803,12 @@ static void common_start(const device_config *device, int device_type)
 		assert(device->clock > 0);
 		assert(mc6845->intf->hpixels_per_column > 0);
 
+		/* resolve callbacks */
+		devcb_resolve_write_line(&mc6845->out_de_func, &mc6845->intf->out_de_func, device);
+		devcb_resolve_write_line(&mc6845->out_cur_func, &mc6845->intf->out_cur_func, device);
+		devcb_resolve_write_line(&mc6845->out_hsync_func, &mc6845->intf->out_hsync_func, device);
+		devcb_resolve_write_line(&mc6845->out_vsync_func, &mc6845->intf->out_vsync_func, device);
+
 		/* copy the initial parameters */
 		mc6845->clock = device->clock;
 		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
@@ -760,16 +818,24 @@ static void common_start(const device_config *device, int device_type)
 		assert(mc6845->screen != NULL);
 
 		/* create the timers */
-		if (mc6845->intf->on_de_changed != NULL)
+		if (mc6845->out_de_func.target != NULL)
+		{
 			mc6845->de_changed_timer = timer_alloc(device->machine, de_changed_timer_cb, (void *)device);
+		}
 
-		if (mc6845->intf->on_hsync_changed != NULL)
+		if (mc6845->out_cur_func.target != NULL)
+		{
+			mc6845->cur_on_timer = timer_alloc(device->machine, cur_on_timer_cb, (void *)device);
+			mc6845->cur_off_timer = timer_alloc(device->machine, cur_off_timer_cb, (void *)device);
+		}
+
+		if (mc6845->out_hsync_func.target != NULL)
 		{
 			mc6845->hsync_on_timer = timer_alloc(device->machine, hsync_on_timer_cb, (void *)device);
 			mc6845->hsync_off_timer = timer_alloc(device->machine, hsync_off_timer_cb, (void *)device);
 		}
 
-		if (mc6845->intf->on_vsync_changed != NULL)
+		if (mc6845->out_vsync_func.target != NULL)
 		{
 			mc6845->vsync_on_timer = timer_alloc(device->machine, vsync_on_timer_cb, (void *)device);
 			mc6845->vsync_off_timer = timer_alloc(device->machine, vsync_off_timer_cb, (void *)device);
@@ -848,14 +914,14 @@ static DEVICE_RESET( mc6845 )
 	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
-		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->intf->on_de_changed(device, FALSE);
+		if (mc6845->out_de_func.target != NULL)
+			devcb_call_write_line(&mc6845->out_de_func, FALSE);
 
-		if (mc6845->intf->on_hsync_changed != NULL)
-			mc6845->intf->on_hsync_changed(device, FALSE);
+		if (mc6845->out_hsync_func.target != NULL)
+			devcb_call_write_line(&mc6845->out_hsync_func, FALSE);
 
-		if (mc6845->intf->on_vsync_changed != NULL)
-			mc6845->intf->on_vsync_changed(device, FALSE);
+		if (mc6845->out_vsync_func.target != NULL)
+			devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
 	}
 
 	mc6845->light_pen_latched = FALSE;

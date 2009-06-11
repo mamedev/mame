@@ -86,14 +86,16 @@ static MC6845_UPDATE_ROW( update_row )
 
 static const mc6845_interface mc6845_intf =
 {
-		"screen",
-		8,
-		NULL,
-		update_row,
-		NULL,
-		NULL,
-		NULL,
-		NULL
+	"screen",
+	8,
+	NULL,						/* before pixel update callback */
+	update_row,					/* row update callback */
+	NULL,						/* after pixel update callback */
+	DEVCB_NULL,					/* callback for display state changes */
+	DEVCB_NULL,					/* callback for cursor state changes */
+	DEVCB_NULL,					/* HSYNC callback */
+	DEVCB_NULL,					/* VSYNC callback */
+	NULL						/* update address callback */
 };
 
 static WRITE8_HANDLER(ssingles_videoram_w)

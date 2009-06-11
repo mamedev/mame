@@ -218,7 +218,7 @@ static int sda_dir = 0;
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
 /* prototypes */
-static MC6845_ON_VSYNC_CHANGED(crtc_vsync);
+static WRITE_LINE_DEVICE_HANDLER(crtc_vsync);
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 static const mc6845_interface mc6845_intf =
@@ -228,9 +228,10 @@ static const mc6845_interface mc6845_intf =
 	NULL,					/* before pixel update callback */
 	NULL,					/* row update callback */
 	NULL,					/* after pixel update callback */
-	NULL,					/* callback for display state changes */
-	NULL,					/* HSYNC callback */
-	crtc_vsync,				/* VSYNC callback */
+	DEVCB_NULL,				/* callback for display state changes */
+	DEVCB_NULL,				/* callback for cursor state changes */
+	DEVCB_NULL,				/* HSYNC callback */
+	DEVCB_LINE(crtc_vsync),	/* VSYNC callback */
 	crtc_addr				/* update address callback */
 };
 
@@ -344,9 +345,9 @@ static void handle_lightpen( const device_config *device )
      timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
  }
 
-static MC6845_ON_VSYNC_CHANGED(crtc_vsync)
+static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }
 

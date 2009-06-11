@@ -360,9 +360,9 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static MC6845_ON_DE_CHANGED( display_enable_changed )
+static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, "74123"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "74123"), 0, state);
 }
 
 
@@ -372,10 +372,12 @@ static const mc6845_interface mc6845_intf =
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
-	0,						/* after pixel update callback */
-	display_enable_changed,	/* callback for display state changes */
-	NULL,					/* HSYNC callback */
-	NULL					/* VSYNC callback */
+	NULL,					/* after pixel update callback */
+	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_NULL,				/* callback for cursor state changes */
+	DEVCB_NULL,				/* HSYNC callback */
+	DEVCB_NULL,				/* VSYNC callback */
+	NULL					/* update address callback */
 };
 
 
