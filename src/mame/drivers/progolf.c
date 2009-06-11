@@ -6,8 +6,10 @@ driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Hay
 
 TODO:
 - We need to patch a rom to get the games to do more, there's also a "rom test error 6"
-  in service mode, so a rom might be bad or the decryption isn't complete.
+  in service mode (that is the g2-m.6a rom), so a rom might be bad or the decryption
+  isn't complete.
 - Hazards doesn't have any effect, might be the same issue as above;
+- There's no "rough" display on the sides on the screen, might be the same issue as above;
 - Map displays are currently wrong, they are drawn with the framebuffer;
 - Flip screen support;
 - progolfa: decryption isn't yet correct;
@@ -432,8 +434,8 @@ MACHINE_DRIVER_END
 ROM_START( progolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
-	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, BAD_DUMP CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) ) //bit-rotted?
-	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
+	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
+	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, BAD_DUMP CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) ) //bit-rotted?
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
@@ -452,7 +454,7 @@ ROM_START( progolf )
 ROM_END
 
 ROM_START( progolfa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // custom DECO CPU-6 module
 	ROM_LOAD( "g4-m.a3",      0xb000, 0x1000, CRC(015a08d9) SHA1(671d5cd708e098dbda3e495a8b4ce3393c6971da) )
 	ROM_LOAD( "g3-m.a4",      0xc000, 0x1000, CRC(c1339da5) SHA1(e9728dcc5f67fbe79eea818ba48421c46d9e63e9) )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
@@ -544,6 +546,6 @@ static DRIVER_INIT( progolfa )
 	}
 }
 
-/*Maybe progolf is a bootleg and progolfa is the original (with Deco C10707 as CPU)?*/
+/* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
 GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // doesn't display anything
