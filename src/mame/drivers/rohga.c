@@ -9,9 +9,6 @@
 
     This hardware is capable of alpha-blending on sprites and playfields
 
-    Todo:  On Wizard Fire when you insert a coin and press start, the start
-    button being held seems to select the knight right away.  Emulation bug.
-
     Todo:  Sprite priority errors in Nitro Ball.
 
     Todo:  There is some kind of full-screen flash in Rohga when you die,
@@ -125,6 +122,20 @@ VIDEO_UPDATE( wizdfire );
 VIDEO_UPDATE( nitrobal );
 WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
+static READ16_HANDLER( rohga_irq_ack_r )
+{
+	cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+	return 0;
+}
+
+static WRITE16_HANDLER( wizdfire_irq_ack_w )
+{
+	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
+	   except when a credit is inserted (writes 6 twice).
+	   Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
+	cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+}
+
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -142,7 +153,7 @@ static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31000a, 0x31000b) AM_WRITE(deco16_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
 	AM_RANGE(0x322000, 0x322001) AM_WRITE(deco16_priority_w)
-	AM_RANGE(0x321100, 0x321101) AM_READNOP /* Irq ack?  Value not used */
+	AM_RANGE(0x321100, 0x321101) AM_READ(rohga_irq_ack_r) /* Irq ack?  Value not used */
 
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x3c2000, 0x3c2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
@@ -176,7 +187,7 @@ static ADDRESS_MAP_START( wizdfire_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(deco16_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
-	AM_RANGE(0x320004, 0x320005) AM_WRITENOP /* VBL IRQ ack */
+	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x350000, 0x350001) AM_WRITE(buffer_spriteram16_w) /* Triggers DMA for spriteram */
@@ -208,7 +219,7 @@ static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_WRITE(deco16_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
-	AM_RANGE(0x320004, 0x320005) AM_WRITENOP /* VBL IRQ ack */
+	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x350000, 0x350001) AM_WRITE(buffer_spriteram16_w) /* Triggers DMA for spriteram */
@@ -236,7 +247,7 @@ static ADDRESS_MAP_START( schmeisr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31000a, 0x31000b) AM_WRITE(deco16_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
 	AM_RANGE(0x322000, 0x322001) AM_WRITE(deco16_priority_w)
-	AM_RANGE(0x321100, 0x321101) AM_READNOP /* Irq ack?  Value not used */
+	AM_RANGE(0x321100, 0x321101) AM_WRITE(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
 
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x3c2000, 0x3c2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
@@ -428,7 +439,7 @@ static INPUT_PORTS_START( wizdfire )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x3000, 0x3000, "Magic Guage Speed" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Magic Gauge Speed" )
 	PORT_DIPSETTING(      0x0000, "Very Slow" )
 	PORT_DIPSETTING(      0x1000, "Slow" )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
@@ -738,7 +749,7 @@ static MACHINE_DRIVER_START( rohga )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(rohga_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
@@ -783,7 +794,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(wizdfire_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
@@ -828,7 +839,7 @@ static MACHINE_DRIVER_START( nitrobal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(nitrobal_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
@@ -873,7 +884,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(schmeisr_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
