@@ -211,7 +211,13 @@ ADDRESS_MAP_END
  *
  *  Port definitions
  *
+ *  Dips Manual Verified and Defaults
+ *  set for starwars and esb - 06/2009
+ *
  *************************************/
+
+
+
 
 static INPUT_PORTS_START( starwars )
 	PORT_START("IN0")
@@ -237,43 +243,45 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(matrix_flag_r, NULL)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x00, "Starting Shields" )
+	PORT_DIPNAME( 0x03, 0x02, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x02, "8" )
 	PORT_DIPSETTING(    0x03, "9" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("10D:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, "Moderate" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus Shields" )
+	PORT_DIPNAME( 0x30, 0x10, "Bonus Shields" )  PORT_DIPLOCATION("10D:5,6")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("10D:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )  PORT_DIPLOCATION("10D:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )  PORT_DIPLOCATION("10EF:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+        /* Manual shows Coin_B (Right) as Bit 4,5 - actually Bit 3,4 */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("10EF:3,4") 
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x04, "*4" )
 	PORT_DIPSETTING(    0x08, "*5" )
 	PORT_DIPSETTING(    0x0c, "*6" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
+        /* Manual shows Coin_A (Left) as Bit 3 - actually Bit 5 */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("10EF:5")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x10, "*2" )
-	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coinage" )
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coin Adder" )  PORT_DIPLOCATION("10EF:6,7,8")
 	PORT_DIPSETTING(    0x20, "2 gives 1" )
 	PORT_DIPSETTING(    0x60, "4 gives 2" )
 	PORT_DIPSETTING(    0xa0, "3 gives 1" )
@@ -281,6 +289,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING(    0x80, "5 gives 1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	/* 0xc0 and 0xe0 None */
+
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
@@ -294,12 +303,12 @@ static INPUT_PORTS_START( esb )
 	PORT_INCLUDE( starwars )
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, "Starting Shields" )
+	PORT_DIPNAME( 0x03, 0x03, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Jedi-Letter Mode" )
+	PORT_DIPNAME( 0x30, 0x30, "Jedi-Letter Mode" )  PORT_DIPLOCATION("10D:5,6")
 	PORT_DIPSETTING(    0x00, "Level Only" )
 	PORT_DIPSETTING(    0x10, "Level" )
 	PORT_DIPSETTING(    0x20, "Increment Only" )
