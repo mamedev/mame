@@ -136,17 +136,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-#if 0
 static ADDRESS_MAP_START( prosoccr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-#endif
 
 static ADDRESS_MAP_START( liberate_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
@@ -565,9 +564,12 @@ static MACHINE_DRIVER_START( prosoccr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(3000000)
+//	MDRV_CPU_CLOCK(3000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_map)
 	MDRV_CPU_IO_MAP(deco16_io_map)
+
+	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_PROGRAM_MAP(prosoccr_sound_map)
 
 	MDRV_GFXDECODE(prosoccr)
 
@@ -995,15 +997,58 @@ static DRIVER_INIT( prosoccr )
 	UINT8 *GFX_ROM = memory_region(machine, "shared_gfx");
 	int i;
 
+	#define GFX_PAL_DESCRAMBLE(_dst_,_src_,_len_) \
+	for(i=0;i<_len_*8;i++) \
+	{ \
+		FG_ROM[i+0x0000+_dst_*8] = GFX_ROM[i+0x0000+_src_*8]; \
+		FG_ROM[i+0x2000+_dst_*8] = GFX_ROM[i+0x2000+_src_*8]; \
+		FG_ROM[i+0x4000+_dst_*8] = GFX_ROM[i+0x4000+_src_*8]; \
+	} \
+
 	DRIVER_INIT_CALL(prosport);
 
-	/* TODO: address lines are scrambled on the foreground gfxs, understand how. */
-	for(i=0x0000;i<0x2000;i++)
+	for(i=0x0800;i<0x2000;i++)
 	{
-		FG_ROM[BITSWAP16(i+0x0000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x0000];
-		FG_ROM[BITSWAP16(i+0x2000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x2000];
-		FG_ROM[BITSWAP16(i+0x4000, 15,14,13, 12,11,10,9, 8,7,6,5,4,3,2,1,0)] = GFX_ROM[i+0x4000];
+		FG_ROM[i+0x0000] = GFX_ROM[i+0x0000];
+		FG_ROM[i+0x2000] = GFX_ROM[i+0x2000];
+		FG_ROM[i+0x4000] = GFX_ROM[i+0x4000];
 	}
+
+	/* TODO: gfxs offsets are heavily scrambled on the foreground gfxs for protection. */
+	GFX_PAL_DESCRAMBLE(0x000,0x370,0x10);
+	GFX_PAL_DESCRAMBLE(0x010,0x390,0x10);
+
+	GFX_PAL_DESCRAMBLE(0x021,0x070,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x024,0x078,0x02);
+	GFX_PAL_DESCRAMBLE(0x027,0x028,0x02);
+	GFX_PAL_DESCRAMBLE(0x02a,0x230,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x02d,0x238,0x02); //*
+
+	GFX_PAL_DESCRAMBLE(0x041,0x072,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x044,0x07a,0x02);
+	GFX_PAL_DESCRAMBLE(0x047,0x02a,0x02);
+	GFX_PAL_DESCRAMBLE(0x04a,0x232,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x04d,0x23a,0x02); //*
+
+	GFX_PAL_DESCRAMBLE(0x061,0x074,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x064,0x07c,0x02);
+	GFX_PAL_DESCRAMBLE(0x067,0x02c,0x02);
+	GFX_PAL_DESCRAMBLE(0x06a,0x234,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x06d,0x23c,0x02); //*
+
+	GFX_PAL_DESCRAMBLE(0x081,0x076,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x084,0x07e,0x02);
+	GFX_PAL_DESCRAMBLE(0x087,0x02e,0x02);
+	GFX_PAL_DESCRAMBLE(0x08a,0x236,0x02); //*
+	GFX_PAL_DESCRAMBLE(0x08d,0x23e,0x02); //*
+
+	GFX_PAL_DESCRAMBLE(0x038,0x3b0,0x08);
+	GFX_PAL_DESCRAMBLE(0x058,0x3b8,0x08);
+
+	GFX_PAL_DESCRAMBLE(0x070,0x3d0,0x10);
+	GFX_PAL_DESCRAMBLE(0x090,0x3f0,0x10);
+
+	#undef GFX_PAL_DESCRAMBLE
 }
 
 static DRIVER_INIT( yellowcb )
@@ -1040,7 +1085,7 @@ static DRIVER_INIT( liberate )
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  liberate, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING )
+GAME( 1983, prosoccr,  0,        prosoccr,  liberate, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING )
 GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
