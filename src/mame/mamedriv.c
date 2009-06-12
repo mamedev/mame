@@ -3201,6 +3201,7 @@ V-V                           TP-027
 
 	/* Konami Twinkle games */
 	DRIVER( gq863 )
+	DRIVER( bmiidx )
 	DRIVER( bmiidxc )
 	DRIVER( bmiidxca )
 	DRIVER( bmiidxc2 )
@@ -4506,14 +4507,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
-						/* 2002.12 Sports Shooting USA */
+	DRIVER( sprtshot )			/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 						/* 2003.08 Dolphin Blue */
 						/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
 						/* 2004.03 The Rumble Fish */
-						/* 2004.03 Ranger Mission */
+	DRIVER( rangrmsn )			/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
 						/* 2004.07 The King of Fighters Neo Wave */
 						/* 2004.09 Extreme Hunting */
