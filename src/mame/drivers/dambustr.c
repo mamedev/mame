@@ -15,7 +15,7 @@ Dip locations verified with manual
 
 #include "cpu/z80/z80.h"
 #include "includes/galaxian.h"
-#include "galaxold.h"
+#include "includes/galaxold.h"
 
 
 static int noise_data = 0;
@@ -215,53 +215,79 @@ MACHINE_DRIVER_END
 
 ROM_START( dambustr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "db8a",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
-	ROM_LOAD( "db6a",   0x5000, 0x1000, CRC(448db54b) SHA1(c9afbf02bf4d4ac2972ab7ac6adfa4e951ae79c2) )
-	ROM_LOAD( "db7a",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
-	ROM_LOAD( "db5a",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
+	ROM_LOAD( "db8a.pr8",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
+	ROM_LOAD( "db6a.pr6",   0x5000, 0x1000, CRC(448db54b) SHA1(c9afbf02bf4d4ac2972ab7ac6adfa4e951ae79c2) )
+	ROM_LOAD( "db7a.pr7",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
+	ROM_LOAD( "db5a.pr5",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
 
 	ROM_REGION( 0x10000,"user1",0)
- 	ROM_LOAD( "db11a",   0x0000, 0x1000, CRC(427bd3fb) SHA1(cdbaef4040fa2e0598a086e320d51ecb26a591dd) )
-	ROM_LOAD( "db9a",    0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
-	ROM_LOAD( "db10a",   0x2000, 0x1000, CRC(075b9c5e) SHA1(ff6ce873897004c0e796813725e260df85a520f9) )
-	ROM_LOAD( "db12a",   0x3000, 0x1000, CRC(ed01a68b) SHA1(9dd37c2a25865717a7acdd7e2a3bef26a4cef3d9) )
+ 	ROM_LOAD( "db11a.pr11",  0x0000, 0x1000, CRC(427bd3fb) SHA1(cdbaef4040fa2e0598a086e320d51ecb26a591dd) )
+	ROM_LOAD( "db9a.pr9",    0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
+	ROM_LOAD( "db10a.pr10",  0x2000, 0x1000, CRC(075b9c5e) SHA1(ff6ce873897004c0e796813725e260df85a520f9) )
+	ROM_LOAD( "db12a.pr12",  0x3000, 0x1000, CRC(ed01a68b) SHA1(9dd37c2a25865717a7acdd7e2a3bef26a4cef3d9) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "db1a",   0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
-	ROM_LOAD( "db2a",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
-	ROM_LOAD( "db3a",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
-	ROM_LOAD( "db4a",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
+	ROM_LOAD( "db3a.pr3",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
+	ROM_LOAD( "db1a.pr1",   0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
+	ROM_LOAD( "db4a.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
+	ROM_LOAD( "db2a.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 
-	// This ROM needs to be dumped, only a guess at the moment:
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "dambustr.clr", 0x0000, 0x0020, BAD_DUMP CRC(cda7b558) SHA1(2977967917970dffa91e69db19c62ba8ff6c3053) )
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
+	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
+ROM_END
+
+
+ROM_START( dambusta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "db8a.pr8",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
+	ROM_LOAD( "db6.pr6",    0x5000, 0x1000, CRC(56d301a9) SHA1(a0839767af822ab1b8df1a7d0767e72b494974c6) ) /* This single rom had a yellow label, while all the rest were white */
+	ROM_LOAD( "db7a.pr7",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
+	ROM_LOAD( "db5a.pr5",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
+
+	ROM_REGION( 0x10000,"user1",0)
+ 	ROM_LOAD( "db11.pr11",   0x0000, 0x1000, CRC(427bd3fb) SHA1(cdbaef4040fa2e0598a086e320d51ecb26a591dd) )
+	ROM_LOAD( "db9a.pr9",    0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
+	ROM_LOAD( "db10a.pr10",  0x2000, 0x1000, CRC(075b9c5e) SHA1(ff6ce873897004c0e796813725e260df85a520f9) ) /* Had a hand drawn "PLUS" symbol on the rom label */
+	ROM_LOAD( "db12a.pr12",  0x3000, 0x1000, CRC(ed01a68b) SHA1(9dd37c2a25865717a7acdd7e2a3bef26a4cef3d9) )
+
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "db3a.rom",   0x0000, 0x1000, CRC(2347e26e) SHA1(85909c6cca7a5249d28668291a28e24d5b90293b) ) /* All roms, except for 6 & 11, had a hand drawn "A" on the label */
+	ROM_LOAD( "db1a.pr1",   0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
+	ROM_LOAD( "db4a.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
+	ROM_LOAD( "db2a.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
+	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
 
 
 ROM_START( dambust )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "db08.bin",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
-	ROM_LOAD( "db06p.bin",  0x5000, 0x1000, CRC(35dcee01) SHA1(2c23c727d9b38322a6d0548dfe6a2a254f3530af) )
-	ROM_LOAD( "db07.bin",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
-	ROM_LOAD( "db05.bin",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
+	ROM_LOAD( "db8.pr8",    0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
+	ROM_LOAD( "db6p.bin",   0x5000, 0x1000, CRC(35dcee01) SHA1(2c23c727d9b38322a6d0548dfe6a2a254f3530af) )
+	ROM_LOAD( "db7.pr7",    0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
+	ROM_LOAD( "db5.pr5",    0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
 
 	ROM_REGION( 0x10000,"user1",0)
  	ROM_LOAD( "db11.bin",   0x0000, 0x1000, CRC(9e6b34fe) SHA1(5cf47f5a5280ac53490240df220edf6178e87f4f) )
-	ROM_LOAD( "db09.bin",   0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
+	ROM_LOAD( "db9.pr9",    0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
 	ROM_LOAD( "db10p.bin",  0x2000, 0x1000, CRC(c129c57b) SHA1(c25abd7ee97b71941d9fa6acd0d92c116f1ff408) )
 	ROM_LOAD( "db12.bin",   0x3000, 0x1000, CRC(ea4c65f5) SHA1(cb761e0543cacd6b437c6e88615f97df83245a34) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "db1ap.bin",  0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
-	ROM_LOAD( "db02.bin",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
-	ROM_LOAD( "db03.bin",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
-	ROM_LOAD( "db04.bin",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
+	ROM_LOAD( "db3.pr3",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
+	ROM_LOAD( "db1ap.pr1", 0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
+	ROM_LOAD( "db4.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
+	ROM_LOAD( "db2.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 
-	// This ROM needs to be dumped, only a guess at the moment:
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "dambustr.clr", 0x0000, 0x0020, BAD_DUMP CRC(cda7b558) SHA1(2977967917970dffa91e69db19c62ba8ff6c3053) )
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
+	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
 
 
-GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US)", 0 )
-GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", GAME_WRONG_COLORS )
+GAME( 1981, dambusta, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", GAME_WRONG_COLORS )
+GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", GAME_WRONG_COLORS )

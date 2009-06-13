@@ -8676,8 +8676,9 @@ Other Sun games
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
 	DRIVER( imolagp )	/* (c) 1981 Leante Games */
-	DRIVER( dambust )	/* (c) 19?? GAT */
-	DRIVER( dambustr )	/* (c) 19?? GAT */
+	DRIVER( dambustr )	/* (c) 1981 South West Research */
+	DRIVER( dambusta )	/* (c) 1981 South West Research */
+	DRIVER( dambust )	/* (c) 1981 South West Research */
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
