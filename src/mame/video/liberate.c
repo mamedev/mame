@@ -15,6 +15,7 @@
 static int background_color, background_disable;
 static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
+extern UINT8 *prosoccr_charram;
 
 #if 0
 void debug_print(bitmap_t *bitmap)
@@ -155,6 +156,9 @@ VIDEO_START( prosoccr )
 	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
+
+	prosoccr_charram = auto_alloc_array(machine, UINT8, 0x1800*2);
+
 }
 
 VIDEO_START( boomrang )

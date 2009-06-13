@@ -30,6 +30,7 @@ VIDEO_START( liberate );
 
 static int deco16_bank;
 static UINT8 *scratchram;
+UINT8 *prosoccr_charram;
 
 WRITE8_HANDLER( deco16_io_w );
 WRITE8_HANDLER( prosoccr_io_w );
@@ -82,6 +83,66 @@ static WRITE8_HANDLER( deco16_bank_w )
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, (read8_space_func)SMH_BANK(1));
 }
 
+static UINT8 char_bank;
+
+static READ8_HANDLER( prosoccr_charram_r )
+{
+	return prosoccr_charram[offset+char_bank*0x1800];
+}
+
+static WRITE8_HANDLER( prosoccr_charram_w )
+{
+	UINT8 *FG_GFX = memory_region(space->machine, "fg_gfx");
+
+	if(deco16_bank)
+	{
+		prosoccr_io_w(space,offset & 0xf,data);
+	}
+	else
+	{
+		prosoccr_charram[offset+char_bank*0x1800] = data;
+
+		switch(offset & 0x1800)
+		{
+			case 0x0000:
+				FG_GFX[(offset & 0x7ff)+(0x0000)+0x0000] = data;
+				break;
+			case 0x0800:
+				FG_GFX[(offset & 0x7ff)+(0x0000)+0x2000] = data;
+				break;
+			case 0x1000:
+				FG_GFX[(offset & 0x7ff)+(0x0000)+0x4000] = data;
+				break;
+		}
+	}
+
+	offset&=0x7ff;
+
+	/* dirty char */
+    gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
+    gfx_element_mark_dirty(space->machine->gfx[0], (offset|0x1800) >> 3);
+
+}
+
+static WRITE8_HANDLER( prosoccr_char_bank_w )
+{
+	/* TODO: what banks this? */
+	char_bank = data & 1;
+	if(data & 0xfe)
+		printf("%02x\n",data);
+}
+
+static WRITE8_HANDLER( prosoccr_io_bank_w )
+{
+	deco16_bank = data & 1;
+
+	if (deco16_bank)
+		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+	else
+		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
+
+}
+
 /*************************************
  *
  *  Memory handlers
@@ -117,13 +178,17 @@ static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
-	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosoccr_io_w)
-	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r,prosoccr_charram_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(prosoccr_char_bank_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( deco16_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( prosoccr_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(prosoccr_io_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -633,7 +698,7 @@ static MACHINE_DRIVER_START( prosoccr )
 	MDRV_CPU_MODIFY("maincpu")
 //	MDRV_CPU_CLOCK(3000000)
 	MDRV_CPU_PROGRAM_MAP(prosoccr_map)
-	MDRV_CPU_IO_MAP(deco16_io_map)
+	MDRV_CPU_IO_MAP(prosoccr_io_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(prosoccr_sound_map)
@@ -690,7 +755,6 @@ MACHINE_DRIVER_END
 
 ROM_START( prosoccr )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "am07.7e",  0x8000, 0x2000, CRC(55415fb5) SHA1(676feb07d4fbd76aae8349b46f7edc8f357f2ddf) )
 	ROM_LOAD( "am08.9e",  0xa000, 0x2000, CRC(73d45d0d) SHA1(07736286087478af404bd9c6b279d631a01cf4e2) )
 	ROM_LOAD( "am09.10e", 0xc000, 0x2000, CRC(a7ee0b3a) SHA1(87e487f863bd90c5b979c2d3c4317869ba1d71d9) )
 	ROM_LOAD( "am10.11e", 0xe000, 0x2000, CRC(5571bdb8) SHA1(a3740650453c9e4f78dcc7826eb112d0d9f65b22) )
@@ -722,8 +786,8 @@ ROM_START( prosoccr )
 	ROM_LOAD( "am04.c10", 0x2000, 0x2000, CRC(e057d827) SHA1(81ca4351777de5c32f4cf65547287c8169ba1494) )
 
 	ROM_REGION(0x04000, "user1", 0 )
-	ROM_LOAD( "am05.d12", 0x0000, 0x2000,  CRC(f63e5a73) SHA1(50e7a1a0eb3bf8df3264bcba441c5fbd7dec52f4) )
-	ROM_COPY( "maincpu",  0x8000, 0x2000, 0x2000 )
+	ROM_LOAD( "am05.d12", 0x0000, 0x2000, CRC(f63e5a73) SHA1(50e7a1a0eb3bf8df3264bcba441c5fbd7dec52f4) )
+	ROM_LOAD( "am07.7e",  0x2000, 0x2000, CRC(55415fb5) SHA1(676feb07d4fbd76aae8349b46f7edc8f357f2ddf) )
 
 	ROM_REGION( 64, "proms", 0 )
 	ROM_LOAD( "k1",    0, 32,  CRC(ebdc8343) SHA1(c9ae04da662f40237de24f5f01e97051e99e8c15) ) /* Colour */
@@ -1064,58 +1128,14 @@ static DRIVER_INIT( prosoccr )
 	UINT8 *GFX_ROM = memory_region(machine, "shared_gfx");
 	int i;
 
-	#define GFX_PAL_DESCRAMBLE(_dst_,_src_,_len_) \
-	for(i=0;i<_len_*8;i++) \
-	{ \
-		FG_ROM[i+0x0000+_dst_*8] = GFX_ROM[i+0x0000+_src_*8]; \
-		FG_ROM[i+0x2000+_dst_*8] = GFX_ROM[i+0x2000+_src_*8]; \
-		FG_ROM[i+0x4000+_dst_*8] = GFX_ROM[i+0x4000+_src_*8]; \
-	} \
-
 	DRIVER_INIT_CALL(prosport);
 
-	for(i=0x0800;i<0x2000;i++)
+	for(i=0x0000;i<0x2000;i++)
 	{
 		FG_ROM[i+0x0000] = GFX_ROM[i+0x0000];
 		FG_ROM[i+0x2000] = GFX_ROM[i+0x2000];
 		FG_ROM[i+0x4000] = GFX_ROM[i+0x4000];
 	}
-
-	/* TODO: gfxs offsets are heavily scrambled on the foreground gfxs for protection. */
-	GFX_PAL_DESCRAMBLE(0x000,0x370,0x10);
-	GFX_PAL_DESCRAMBLE(0x010,0x390,0x10);
-
-	GFX_PAL_DESCRAMBLE(0x021,0x070,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x024,0x078,0x02);
-	GFX_PAL_DESCRAMBLE(0x027,0x028,0x02);
-	GFX_PAL_DESCRAMBLE(0x02a,0x230,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x02d,0x238,0x02); //*
-
-	GFX_PAL_DESCRAMBLE(0x041,0x072,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x044,0x07a,0x02);
-	GFX_PAL_DESCRAMBLE(0x047,0x02a,0x02);
-	GFX_PAL_DESCRAMBLE(0x04a,0x232,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x04d,0x23a,0x02); //*
-
-	GFX_PAL_DESCRAMBLE(0x061,0x074,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x064,0x07c,0x02);
-	GFX_PAL_DESCRAMBLE(0x067,0x02c,0x02);
-	GFX_PAL_DESCRAMBLE(0x06a,0x234,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x06d,0x23c,0x02); //*
-
-	GFX_PAL_DESCRAMBLE(0x081,0x076,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x084,0x07e,0x02);
-	GFX_PAL_DESCRAMBLE(0x087,0x02e,0x02);
-	GFX_PAL_DESCRAMBLE(0x08a,0x236,0x02); //*
-	GFX_PAL_DESCRAMBLE(0x08d,0x23e,0x02); //*
-
-	GFX_PAL_DESCRAMBLE(0x038,0x3b0,0x08);
-	GFX_PAL_DESCRAMBLE(0x058,0x3b8,0x08);
-
-	GFX_PAL_DESCRAMBLE(0x070,0x3d0,0x10);
-	GFX_PAL_DESCRAMBLE(0x090,0x3f0,0x10);
-
-	#undef GFX_PAL_DESCRAMBLE
 }
 
 static DRIVER_INIT( yellowcb )
