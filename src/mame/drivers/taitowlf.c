@@ -365,6 +365,15 @@ static WRITE8_HANDLER(at_page8_w)
 }
 
 
+static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
+{
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	dma8237_set_hlda( device, state );
+}
+
+
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -387,23 +396,23 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	"maincpu",
-	1.0e-6, // 1us
+	XTAL_14_31818MHz/3,
 
+	pc_dma_hrq_changed,
 	pc_dma_read_byte,
 	pc_dma_write_byte,
 
-	{ 0, 0, NULL, NULL },
-	{ 0, 0, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
 	NULL
 };
 
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	"maincpu",
-	1.0e-6, // 1us
+	XTAL_14_31818MHz/3,
 
+	NULL,
 	NULL,
 	NULL,
 
