@@ -364,7 +364,9 @@ OP(2f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR2 ZPG ?? */
 OP(4f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR4 ZPG ?? */
 OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
 OP(8f) { int tmp; cpustate->icount -= 1; RD_IMM;
+	#ifdef MAME_DEBUG
 	logerror("%04x: BANK (8F) %02x\n",PCW,tmp);
+	#endif
 
 	memory_write_byte_8le(cpustate->io,0,tmp);
 
