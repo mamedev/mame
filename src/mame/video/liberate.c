@@ -113,6 +113,34 @@ WRITE8_HANDLER( deco16_io_w )
 	}
 }
 
+WRITE8_HANDLER( prosoccr_io_w )
+{
+	deco16_io_ram[offset] = data;
+	if (offset > 1 && offset < 6)
+		tilemap_mark_all_tiles_dirty(background_tilemap);
+
+	//popmessage("%02x",deco16_io_ram[7]);
+
+	switch (offset)
+	{
+		case 6: /* unused here */
+			break;
+		case 7:
+			background_disable = ~data & 0x10;
+			//sprite_priority = (data & 0x80)>>7;
+			/* -x-- --xx used during gameplay */
+			/* x--- ---- used on the attract mode */
+			break;
+		case 8: /* Irq ack */
+			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
+			break;
+		case 9: /* Sound */
+			soundlatch_w(space, 0, data);
+			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+			break;
+	}
+}
+
 WRITE8_HANDLER( liberate_videoram_w )
 {
 	videoram[offset] = data;
@@ -191,7 +219,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	int offs;
 
 	/* Sprites */
-	for (offs = 0;offs < 0x800;offs += 4)
+	for (offs = 0x400;offs < 0x800;offs += 4)
 	{
 		int multi,fx,fy,sx,sy,sy2,code,color;
 
@@ -369,6 +397,29 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
+static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	int offs,code,fx,fy,sx,sy;
+
+	for (offs = 0x400;offs < 0x800;offs += 4)
+	{
+		if ((spriteram[offs+0]&1)!=1) continue;
+
+		code = spriteram[offs+1];
+		sy = 240 - spriteram[offs+2];
+		sx = 240 - spriteram[offs+3];
+		fx = spriteram[offs+0] & 4;
+		fy = spriteram[offs+0] & 2;
+
+    	drawgfx(bitmap,machine->gfx[1],
+        		code,
+				0,
+				fx,fy,
+				sx,sy,
+				cliprect,TRANSPARENCY_PEN,0);
+	}
+}
+
 /***************************************************************************/
 
 VIDEO_UPDATE( prosoccr )
@@ -380,8 +431,10 @@ VIDEO_UPDATE( prosoccr )
 		bitmap_fill(bitmap,cliprect,32);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
-	boomrang_draw_sprites(screen->machine,bitmap,cliprect,0);
+
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
+	prosoccr_draw_sprites(screen->machine,bitmap,cliprect);
+
 	return 0;
 }
 

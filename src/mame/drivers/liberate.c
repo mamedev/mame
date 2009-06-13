@@ -32,6 +32,7 @@ static int deco16_bank;
 static UINT8 *scratchram;
 
 WRITE8_HANDLER( deco16_io_w );
+WRITE8_HANDLER( prosoccr_io_w );
 WRITE8_HANDLER( prosport_paletteram_w );
 WRITE8_HANDLER( liberate_videoram_w );
 
@@ -105,6 +106,18 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
+	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
+	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosoccr_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -364,6 +377,60 @@ static INPUT_PORTS_START( liberatb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( prosoccr )
+	PORT_INCLUDE( generic_input )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) //maybe reversed coins actually?
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Graphics definitions
@@ -470,7 +537,7 @@ GFXDECODE_END
 static GFXDECODE_START( prosoccr )
 	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
 	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   0, 1 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   0, 2 )
 GFXDECODE_END
 
 /*************************************
@@ -565,7 +632,7 @@ static MACHINE_DRIVER_START( prosoccr )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 //	MDRV_CPU_CLOCK(3000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_map)
+	MDRV_CPU_PROGRAM_MAP(prosoccr_map)
 	MDRV_CPU_IO_MAP(deco16_io_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
@@ -656,7 +723,7 @@ ROM_START( prosoccr )
 
 	ROM_REGION(0x04000, "user1", 0 )
 	ROM_LOAD( "am05.d12", 0x0000, 0x2000,  CRC(f63e5a73) SHA1(50e7a1a0eb3bf8df3264bcba441c5fbd7dec52f4) )
-	//ROM_RELOAD(           0x2000, 0x2000 )
+	ROM_COPY( "maincpu",  0x8000, 0x2000, 0x2000 )
 
 	ROM_REGION( 64, "proms", 0 )
 	ROM_LOAD( "k1",    0, 32,  CRC(ebdc8343) SHA1(c9ae04da662f40237de24f5f01e97051e99e8c15) ) /* Colour */
@@ -1085,7 +1152,7 @@ static DRIVER_INIT( liberate )
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  liberate, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING )
 GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
