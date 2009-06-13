@@ -255,12 +255,10 @@ PALETTE_INIT( tubep )
 	for (i=0; i<6; i++) active_resistors_b[ 6+i] = resistors_2[i];
 
 	/* calculate and store the scaler */
-/*
-    output_scaler = compute_resistor_weights(0, 255,    -1.0,
+    /*output_scaler = */compute_resistor_weights(0, 255,    -1.0,
                 3*6,    active_resistors_r, weights_r,  470,    0,
                 3*6,    active_resistors_g, weights_g,  470,    0,
                 2*6,    active_resistors_b, weights_b,  470,    0);
-*/
 
 /*  compute_resistor_weights(0, 255,    output_scaler,
                 3*6,    active_resistors_r, weights_r,  470,    0,
