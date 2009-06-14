@@ -206,7 +206,8 @@ static WRITE8_HANDLER( prosport_charram_w )
 	offset&=0x7ff;
 
 	/* dirty char */
-    gfx_element_mark_dirty(space->machine->gfx[0], (offset+0x800) >> 3);
+    gfx_element_mark_dirty(space->machine->gfx[3], (offset+0x800) >> 3);
+    gfx_element_mark_dirty(space->machine->gfx[3+4], (offset+0x800) >> 5);
 }
 
 
@@ -219,7 +220,7 @@ static WRITE8_HANDLER( prosport_charram_w )
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0000, 0x07ff) AM_SHARE(2) AM_RAM
-	AM_RANGE(0x0800, 0x1fff) AM_RAM_WRITE(prosport_charram_w)
+	AM_RANGE(0x0800, 0x1fff) AM_RAM_WRITE(prosport_charram_w) //0x1e00-0x1ff isn't charram!
 //	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
 	AM_RANGE(0x2000, 0x27ff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x2800, 0x281f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
