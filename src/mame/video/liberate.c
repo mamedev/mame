@@ -142,6 +142,26 @@ WRITE8_HANDLER( prosoccr_io_w )
 	}
 }
 
+/* completely different i/o...*/
+WRITE8_HANDLER( prosport_io_w )
+{
+	deco16_io_ram[offset] = data;
+
+	switch (offset)
+	{
+		case 0:
+			background_disable = ~data & 0x80;
+			break;
+		case 2: /* Sound */
+			soundlatch_w(space, 0, data);
+			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+			break;
+		case 4: /* Irq ack */
+			cputag_set_input_line(space->machine, "maincpu", DECO16_IRQ_LINE, CLEAR_LINE);
+			break;
+	}
+}
+
 WRITE8_HANDLER( liberate_videoram_w )
 {
 	videoram[offset] = data;
