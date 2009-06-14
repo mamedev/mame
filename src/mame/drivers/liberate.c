@@ -87,6 +87,21 @@ static UINT8 char_bank;
 
 static READ8_HANDLER( prosoccr_charram_r )
 {
+	UINT8 *SRC_GFX = memory_region(space->machine, "shared_gfx");
+
+	if(char_bank)
+	{
+		switch(offset & 0x1800)
+		{
+			case 0x0000:
+				return SRC_GFX[(offset & 0x7ff)+(0x0000)+0x0000];
+			case 0x0800:
+				return SRC_GFX[(offset & 0x7ff)+(0x0000)+0x2000];
+			case 0x1000:
+				return SRC_GFX[(offset & 0x7ff)+(0x0000)+0x4000];
+		}
+	}
+
 	return prosoccr_charram[offset+char_bank*0x1800];
 }
 
@@ -106,12 +121,15 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 		{
 			case 0x0000:
 				FG_GFX[(offset & 0x7ff)+(0x0000)+0x0000] = data;
+				//FG_GFX[(offset & 0x7ff)+(0x1800)+0x0000] = data;
 				break;
 			case 0x0800:
 				FG_GFX[(offset & 0x7ff)+(0x0000)+0x2000] = data;
+				//FG_GFX[(offset & 0x7ff)+(0x1800)+0x2000] = data;
 				break;
 			case 0x1000:
 				FG_GFX[(offset & 0x7ff)+(0x0000)+0x4000] = data;
+				//FG_GFX[(offset & 0x7ff)+(0x1800)+0x4000] = data;
 				break;
 		}
 	}
@@ -120,8 +138,7 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 
 	/* dirty char */
     gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
-    gfx_element_mark_dirty(space->machine->gfx[0], (offset|0x1800) >> 3);
-
+//  gfx_element_mark_dirty(space->machine->gfx[0], (offset|0x1800) >> 3);
 }
 
 static WRITE8_HANDLER( prosoccr_char_bank_w )
@@ -574,9 +591,9 @@ static const gfx_layout tiles2 =
 static const gfx_layout prosoccr_bg_gfx =
 {
 	16,16,
-	128,
-	4,
-	{ 0x2000*8+0, 0x2000*8+4, 0x0000*8+0 , 0x0000*8+4 },
+	RGN_FRAC(1,2),
+	3,
+	{ RGN_FRAC(0,2)+4, RGN_FRAC(0,2)+0, RGN_FRAC(1,2)+4 },
 	{
 		24,25,26,27, 16,17,18,19, 8,9,10,11, 0,1,2,3
 	},
@@ -584,6 +601,7 @@ static const gfx_layout prosoccr_bg_gfx =
 			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	64*8
 };
+
 
 static GFXDECODE_START( liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
@@ -602,7 +620,7 @@ GFXDECODE_END
 static GFXDECODE_START( prosoccr )
 	GFXDECODE_ENTRY( "fg_gfx", 0x00000, charlayout,        0, 4 )
 	GFXDECODE_ENTRY( "sp_gfx", 0x00000, sprites,           0, 4 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   0, 2 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x00000, prosoccr_bg_gfx,   8, 2 )
 GFXDECODE_END
 
 /*************************************
@@ -696,7 +714,7 @@ static MACHINE_DRIVER_START( prosoccr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-//	MDRV_CPU_CLOCK(3000000)
+	MDRV_CPU_CLOCK(12000000/8) //xtal is 12 Mhz, divider is unknown
 	MDRV_CPU_PROGRAM_MAP(prosoccr_map)
 	MDRV_CPU_IO_MAP(prosoccr_io_map)
 
@@ -1130,7 +1148,7 @@ static DRIVER_INIT( prosoccr )
 
 	DRIVER_INIT_CALL(prosport);
 
-	for(i=0x0000;i<0x2000;i++)
+	for(i=0x0800;i<0x2000;i++)
 	{
 		FG_ROM[i+0x0000] = GFX_ROM[i+0x0000];
 		FG_ROM[i+0x2000] = GFX_ROM[i+0x2000];
@@ -1172,7 +1190,7 @@ static DRIVER_INIT( liberate )
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING )
 GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
