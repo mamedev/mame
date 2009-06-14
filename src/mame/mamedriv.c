@@ -3201,7 +3201,7 @@ V-V                           TP-027
 
 	/* Konami Twinkle games */
 	DRIVER( gq863 )
-//	DRIVER( bmiidx )
+	DRIVER( bmiidx )
 	DRIVER( bmiidxc )
 	DRIVER( bmiidxca )
 	DRIVER( bmiidxc2 )

@@ -2,11 +2,11 @@
 
 Twinkle System
 
-driver by smf
+driver by smf and R. Belmont
 
 TODO:
 
-sound
+sound (IDE DMA, finish comms)
 dvd
 hard drive
 16seg led font
@@ -222,7 +222,6 @@ Notes:
       863A05.2X- 27C4096 EPROM (DIP40)
 
 
-
 */
 
 #include "driver.h"
@@ -232,9 +231,13 @@ Notes:
 #include "machine/am53cf96.h"
 #include "machine/rtc65271.h"
 #include "machine/i2cmem.h"
+#include "machine/idectrl.h"
 #include "sound/psx.h"
 #include "sound/cdda.h"
+#include "sound/rf5c400.h"
 
+static UINT16 twinkle_spu_ctrl;		// SPU board control register
+static UINT8 twinkle_spu_shared[0x400];	// SPU/PSX shared dual-ported RAM
 
 /* RTC */
 
@@ -539,7 +542,6 @@ static READ32_HANDLER(twinkle_io_r)
 				if( last_io_offset != io_offset )
 				{
 					last_io_offset = io_offset;
-					printf( "io_offset=%02x\n", io_offset );
 				}
 
 				break;
@@ -607,25 +609,40 @@ static READ32_HANDLER(security_r)
 	return i2cmem_read( space->machine, 0, I2CMEM_SDA ) << 12;
 }
 
-static WRITE32_HANDLER(xx_w)
+static WRITE32_HANDLER(shared_psx_w)
 {
-/*
-    printf( "xx %08x %08x %08x\n", offset, mem_mask, data );
-*/
+	if (mem_mask == 0xff)
+	{
+		twinkle_spu_shared[offset*2] = data;
+//		printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(space->cpu));
+	}
+	else if (mem_mask == 0xff0000)
+	{
+		twinkle_spu_shared[(offset*2)+1] = data;
+//		printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(space->cpu));
+	}
+	else
+	{
+		fatalerror("shared_psx_w: Unknown mask %x\n", mem_mask);
+	}
 }
 
-static READ32_HANDLER(xx_r)
+static READ32_HANDLER(shared_psx_r)
 {
-/*
-    printf( "xx %08x %08x\n", offset, mem_mask );
-*/
-	return 0;
+	UINT32 result;
+
+	result = twinkle_spu_shared[offset*2] | twinkle_spu_shared[(offset*2)+1]<<16;
+
+//	printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(space->cpu));
+
+	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
+
+	return result;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
-	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(xx_r, xx_w)
-//  AM_RANGE(0x1f000400, 0x1f0007ff) AM_RAM AM_SHARE(3) /* shared ram */
+	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
@@ -668,41 +685,107 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static READ32_HANDLER(yy_r)
+/* SPU board */
+
+static void ide_interrupt(const device_config *device, int state)
 {
-/*  printf( "yy %08x %08x\n", offset, mem_mask ); */
-	return 0;
+	if ((state) && (twinkle_spu_ctrl & 0x0400))
+	{
+		cputag_set_input_line(device->machine, "audiocpu", M68K_IRQ_6, ASSERT_LINE);
+	}
 }
 
-
-static READ32_HANDLER(zz_r)
+static READ16_DEVICE_HANDLER( twinkle_ide_r )
 {
-/*  printf( "zz %08x %08x\n", offset, mem_mask ); */
-	return 0;
+	if (offset == 0)
+	{
+		return ide_controller_r(device, offset+0x1f0, 2);
+	}
+	else
+	{
+		return ide_controller_r(device, offset+0x1f0, 1);	
+	}
 }
 
-static WRITE32_HANDLER(ww_w)
+static WRITE16_DEVICE_HANDLER( twinkle_ide_w )
 {
-/*  printf( "ww %08x %08x %08x\n", offset, mem_mask, data ); */
+	ide_controller_w(device, offset+0x1f0, 1, data);
 }
 
-static READ32_HANDLER(ww_r)
+/*
+	System control register (Konami always has one)
+
+	bit 7  = write 0 to ack IRQ 1, write 1 to enable (IRQ 1 appears to be vblank)
+	bit 8  = write 0 to ack IRQ 2, write 1 to enable (IRQ 2 appears to be DMA completion)
+	bit 9  = write 0 to ack IRQ 4, write 1 to enable (IRQ 4 appears to be "command sent", unsure how the MIPS causes it yet however)
+	bit 10 = write 0 to ack IRQ 6, write 1 to enable (IRQ 6 is IDE)
+	bit 11 = watchdog toggle?
+
+	Other bits unknown.
+*/
+static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 {
-/*  printf( "ww %08x %08x\n", offset, mem_mask ); */
-	return 0;
+	if ((!(data & 0x0080)) && (twinkle_spu_ctrl & 0x0080))
+	{
+		cpu_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
+	}
+	else if ((!(data & 0x0100)) && (twinkle_spu_ctrl & 0x0100))
+	{
+		cpu_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
+	}
+	else if ((!(data & 0x0200)) && (twinkle_spu_ctrl & 0x0200))
+	{
+		cpu_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
+	}
+	else if ((!(data & 0x0400)) && (twinkle_spu_ctrl & 0x0400))
+	{
+		cpu_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
+	}
+
+	twinkle_spu_ctrl = data;
 }
 
+static READ16_HANDLER( twinkle_waveram_r )
+{
+	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rf");
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 32 )
+	return waveram[offset];
+}
+
+static WRITE16_HANDLER( twinkle_waveram_w )
+{
+	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rf");
+
+	COMBINE_DATA(&waveram[offset]);
+}
+
+static READ16_HANDLER( shared_68k_r )
+{
+//	printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
+
+	return twinkle_spu_shared[offset];
+}
+
+static WRITE16_HANDLER( shared_68k_w )
+{
+//	printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
+
+	twinkle_spu_shared[offset] = data & 0xff;
+}
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200003) AM_READ( yy_r )
-	AM_RANGE(0x220000, 0x220003) AM_WRITENOP
-	AM_RANGE(0x230000, 0x230003) AM_WRITENOP
-	AM_RANGE(0x280400, 0x2807ff) AM_READWRITE( ww_r, ww_w )
-//  AM_RANGE(0x280400, 0x2807ff) AM_RAM AM_SHARE(3) /* shared ram? */
-	AM_RANGE(0x30000c, 0x30000f) AM_READ( zz_r )
-	AM_RANGE(0x400000, 0x400fff) AM_WRITENOP /* ide? */
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM
+	// 220000 = LEDs?
+	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
+	// 240000 = top 16 bits of DMA address?
+	// 250000 = write to initiate DMA?
+	// 260000 = ???
+	AM_RANGE(0x280000, 0x280fff) AM_READWRITE( shared_68k_r, shared_68k_w )
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ide", twinkle_ide_r, twinkle_ide_w)
+	// 34000E = ???
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf", rf5c400_r, rf5c400_w)
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -847,13 +930,15 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_CPU_PROGRAM_MAP( main_map )
 	MDRV_CPU_VBLANK_INT( "mainscreen", psx_vblank )
 
-	MDRV_CPU_ADD("audiocpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
+	MDRV_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16.000 MHz */
 	MDRV_CPU_PROGRAM_MAP( sound_map )
 
 	MDRV_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
 
 	MDRV_MACHINE_RESET( twinkle )
 	MDRV_NVRAM_HANDLER( twinkle )
+
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("mainscreen", RASTER)
@@ -876,6 +961,10 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_SOUND_CONFIG( twinkle_psxspu_interface )
 	MDRV_SOUND_ROUTE( 0, "speakerleft", 0.75 )
 	MDRV_SOUND_ROUTE( 1, "speakerright", 0.75 )
+
+	MDRV_SOUND_ADD("rf", RF5C400, 32000000/2)
+	MDRV_SOUND_ROUTE(0, "speakerleft", 1.0)
+	MDRV_SOUND_ROUTE(1, "speakerright", 1.0)
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "speakerleft", 1.0 )
@@ -935,20 +1024,37 @@ INPUT_PORTS_END
 	ROM_LOAD( "863a03.7b",    0x000000, 0x080000, CRC(81498f73) SHA1(3599b40a5872eab3a00d345287635355fcb25a71) )\
 \
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
-	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )
+	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
+\
+	ROM_REGION(0x1800000, "rf", ROMREGION_ERASE00)
 
 ROM_START( gq863 )
 	TWINKLE_BIOS
 ROM_END
 
-ROM_START( bmiidx3 )
+ROM_START( bmiidx )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
-	ROM_LOAD( "992j.pd",      0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
+	ROM_REGION( 0x100, "user2", ROMREGION_ERASE00 )		/* security */
 
-	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
+	DISK_REGION( "cdrom0" )	// program
+	DISK_IMAGE_READONLY("863jaa01", 0, SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
+
+	DISK_REGION( "cdrom1" ) // video CD
+	DISK_IMAGE_READONLY("863jaa04", 0, SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) )	// was part of a 1st mix machine, but "c44" indicates 8th mix?
+ROM_END
+
+ROM_START( bmiidx3 )
+ TWINKLE_BIOS
+
+ ROM_REGION( 0x100, "user2", 0 )
+ ROM_LOAD( "992j.pd",      0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
+
+ DISK_REGION( "cdrom0" )
+ DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
 //  DISK_IMAGE_READONLY( "992jaahd", 1, NO_DUMP )
 //  DISK_IMAGE_READONLY( "992jaa02", 2, NO_DUMP )
 ROM_END
@@ -957,7 +1063,7 @@ ROM_START( bmiidx4 )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x100, "user2", 0 )
-	ROM_LOAD( "a03j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1faf8d1b) SHA1(e8d9d216a8f5459598ff68692f9197e226a231e6) )
+	ROM_LOAD( "a03j.pd",      0x000000, 0x000100, CRC(1faf8d1b) SHA1(e8d9d216a8f5459598ff68692f9197e226a231e6) )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a03jaa01", 0, BAD_DUMP SHA1(2a587b5524bac6f03d26b55247a0acd22aad6c3a) )
@@ -1040,7 +1146,7 @@ ROM_END
 GAME( 1999, gq863,   0,     twinkle, twinkle, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
 
 /* VCD */
-/* 1999 - beatmania IIDX */
+GAME( 1999, bmiidx,   gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX (863 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 /* find out what these use for security */
 GAME( 1999, bmiidxc,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, bmiidxca, bmiidxc, twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
