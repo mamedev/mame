@@ -224,6 +224,7 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
 	AM_RANGE(0x2000, 0x27ff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x2800, 0x281f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
+//	AM_RANGE(0x2800, 0x2fff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_SHARE(1) AM_RAM
@@ -707,6 +708,13 @@ static INTERRUPT_GEN( deco16_interrupt )
 	}
 }
 
+
+static INTERRUPT_GEN( prosport_interrupt )
+{
+	/* ??? */
+	cpu_set_input_line(device, DECO16_IRQ_LINE, HOLD_LINE);
+}
+
 /*************************************
  *
  *  Machine driver(s)
@@ -798,7 +806,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(prosport_map)
 	MDRV_CPU_IO_MAP(deco16_io_map)
-	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", prosport_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
