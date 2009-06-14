@@ -142,7 +142,7 @@ OP(14) { RD_DUM; ILL; }									/* 2 ILL / 3 trb zpg ?? */
 OP(34) { RD_DUM; ILL; }									/* 2 ILL / 4 bit zpx ?? */
 OP(54) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(74) { RD_DUM; ILL; }									/* 2 ILL / 4 stz zpx ?? */
-OP(94) { RD_DUM; ILL; }									/* 2 ILL / 4 sty zpx ?? */
+#define deco16_94 m6502_94								/* 4 sty zpx */
 #define deco16_b4 m6502_b4								/* 4 ldy zpx */
 OP(d4) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(f4) { RD_DUM; ILL; }	 								/* 2 ILL */
