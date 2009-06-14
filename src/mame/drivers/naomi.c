@@ -768,39 +768,35 @@ MROM PCB
 |----------------------------|
 Notes:
            * - Denotes those devices are on the other side of the PCB
-      CN1    - This connector plugs into the main board.
+         CN1 - This connector plugs into the main board.
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
                F01 = CPLD/protection device and M01 = MASKROM
 
-               Game (sorted by code)            Code
-               ------------------------------------------
-               Dolphin Blue                     AX0401F01
-               Demolish Fist                    AX0601F01
-               Guilt Gear Isuka                 AX1201F01
-               Knights Of Valour Seven Spirits  AX1301F01
-               Salaryman Kintaro                AX1401F01
-               Fist Of The North Star           AX1901F01
-               King Of Fighters NEOWAVE         AX2201F01
-
+               Game (sorted by code)                 Code
+               -----------------------------------------------
+               Sports Shooting USA                   AX0101F01
+               Dolphin Blue                          AX0401F01
+               Demolish Fist                         AX0601F01
+               Guilt Gear Isuka                      AX1201F01
+               Knights Of Valour Seven Spirits       AX1301F01
+               Salaryman Kintaro                     AX1401F01
+               Ranger Mission                        AX1601F01
+               Rumble Fish                           AX1801F01
+               Fist Of The North Star                AX1901F01
+               Victory Furlong : Horse Racing        AX2001F01
+               King Of Fighters NEOWAVE              AX2201F01
 
         IC18 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
                The name in the archive has been devised purely for convenience.
                This ROM holds the main program.
 
-IC10 to IC17 - Custom-badged 128M TSOP48 maskROMs. I suspect they are Macronix
+IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                ROMs because the ROM on the main board is also a custom Macronix
                ROM and they have a history of producing custom ROMs for other
                companies that hide their ROM types like Nintendo etc.
-               The ROMs match a pinout that is identical to....
-               Macronix MX26F128J3 (TSOP48)
-               Oki MR27V12800 (TSOP48)
-               More importantly the size is standard TSOP48 20mm long.
-               They have been read as Oki MR27V12800
-               The pinout also matches the same ROMs found on Namco Mr Driller 2
-               and some Namco and Capcom NAOMI carts where these ROMs are used,
-               although in all cases those ROMs are 18mm long, not 20mm.
+               They could also be Oki MR27V12800.
 
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
@@ -813,17 +809,20 @@ IC10 to IC17 - Custom-badged 128M TSOP48 maskROMs. I suspect they are Macronix
 
                ROM Codes
                ---------
-                                                                          Number
-               Game (sorted by code)            Code                      of ROMs
-               ------------------------------------------------------------------
-               Dolphin Blue                     AX0401M01 to AX0405M01    5
-               Demolish Fist                    AX0601M01 to AX0607M01    7
-               Guilty Gear Isuka                AX1201M01 to AX1208M01    8
-               Knights Of Valour Seven Spirits  AX1301M01 to AX1307M01    7
-               Salaryman Kintaro                AX1401M01 to AX1407M01    7
-               Fist Of The North Star           AX1901M01 to AX1907M01    7
-               King Of Fighters NEOWAVE         AX2201M01 to AX2206M01    6
-
+                                                                               Number
+               Game (sorted by code)                 Code                      of ROMs
+               -----------------------------------------------------------------------
+               Sports Shooting USA                   AX0101M01 to AX0104M01    4
+               Dolphin Blue                          AX0401M01 to AX0405M01    5
+               Demolish Fist                         AX0601M01 to AX0607M01    7
+               Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
+               Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
+               Salaryman Kintaro                     AX1401M01 to AX1407M01    7
+               Ranger Mission                        AX1601M01 to AX1605M01    5
+               Rumble Fish                           AX1801M01 to AX1807M01    7
+               Fist Of The North Star                AX1901M01 to AX1907M01    7
+               Victory Furlong : Horse Racing        AX2001M01 to AX2007M01    7
+               King Of Fighters NEOWAVE              AX2201M01 to AX2206M01    6
 
 
 Type 2 ROM Board:
@@ -855,10 +854,11 @@ Notes:
                The last 3 digits seems to be for the usage.
                F01 = CPLD/protection device and M01 = MASKROM
 
-               Game (sorted by code)            Code
-               ------------------------------------------
-               Neogeo Battle Coliseum           AX3301F01
-
+               Game (sorted by code)                 Code
+               -----------------------------------------------
+               Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
+               Neogeo Battle Coliseum                AX3301F01
+               Rumble Fish 2                         AX3401F01
 
  FMEM1/FMEM2 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
                The name in the archive has been devised purely for convenience.
@@ -867,15 +867,37 @@ Notes:
                is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
                are not connected to anything.
 
-       MROM* - Custom-badged SSOP70 maskROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
+       MROM* - Custom-badged SSOP70 mask ROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
                or possibly 26V51253 (512M) or something else similar.
 
                ROM Codes
                ---------
-                                                                          Number
-               Game (sorted by code)            Code                      of ROMs
-               ------------------------------------------------------------------
-               Neogeo Battle Coliseum           AX3301M01 to AX3307M01    7
+                                                                               Number
+               Game (sorted by code)                 Code                      of ROMs
+               -----------------------------------------------------------------------
+               Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
+               Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
+               Rumble Fish 2                         AX3401M01 to AX3405M01    5
+
+
+               Other games not dumped (some may have been cancelled)
+               ----------------------
+               Chase 1929
+               Dirty Pigskin
+               Extreme Hunting
+               Extreme Hunting 2: Tournament Edition
+               Faster Than Speed
+               Force Five
+               Guilty Gear X Version 1.5
+               Kenju
+               Maximum Speed
+               Metal Slug 6
+               Premier Eleven
+               Sushi Bar
+               The King Of Fighters XI
+
+
+
 
 
 */
