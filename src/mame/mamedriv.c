@@ -3205,6 +3205,7 @@ V-V                           TP-027
 	DRIVER( bmiidxc )
 	DRIVER( bmiidxca )
 	DRIVER( bmiidxc2 )
+	DRIVER( bmiidx3 )
 	DRIVER( bmiidx4 )
 	DRIVER( bmiidx6 )
 	DRIVER( bmiidx7 )

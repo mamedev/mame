@@ -941,6 +941,18 @@ ROM_START( gq863 )
 	TWINKLE_BIOS
 ROM_END
 
+ROM_START( bmiidx3 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "user2", 0 )
+	ROM_LOAD( "992j.pd",      0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
+//  DISK_IMAGE_READONLY( "992jaahd", 1, NO_DUMP )
+//  DISK_IMAGE_READONLY( "992jaa02", 2, NO_DUMP )
+ROM_END
+
 ROM_START( bmiidx4 )
 	TWINKLE_BIOS
 
@@ -1036,8 +1048,8 @@ GAME( 1999, bmiidxca, bmiidxc, twinkle, twinkle, twinkle, ROT0, "Konami", "beatm
 GAME( 1999, bmiidxc2, gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX Substream 2 with DDR 2nd Club Version (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* 1999 - beatmania IIDX 2nd style */
-/* 2000 - beatmania IIDX 3rd style */
 /* these use i2c for security */
+GAME( 2000, bmiidx3,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 3th style (GC992 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, bmiidx4,  gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 /* 2001 - beatmania IIDX 5th style */
 
