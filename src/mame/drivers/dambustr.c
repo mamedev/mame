@@ -232,9 +232,11 @@ ROM_START( dambustr )
 	ROM_LOAD( "db4a.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
 	ROM_LOAD( "db2a.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
-	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
+
+	ROM_REGION( 0x0020, "unk_prom", 0 ) //timing?
+	ROM_LOAD( "mi-7603-5.ic3", 0x0000, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
 
 
@@ -257,9 +259,11 @@ ROM_START( dambusta )
 	ROM_LOAD( "db4a.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
 	ROM_LOAD( "db2a.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
-	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
+
+	ROM_REGION( 0x0020, "unk_prom", 0 ) //timing?
+	ROM_LOAD( "mi-7603-5.ic3", 0x0000, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
 
 
@@ -282,12 +286,14 @@ ROM_START( dambust )
 	ROM_LOAD( "db4.pr3",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
 	ROM_LOAD( "db2.pr2",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mi-7603-5.ic4", 0x0000, 0x0020, CRC(f131f92f) SHA1(8b0f623d2ea09b5612dde0f330c5e473a7d72e06) ) /* near DB5 - DB8 */
-	ROM_LOAD( "mi-7603-5.ic3", 0x0020, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
+
+	ROM_REGION( 0x0020, "unk_prom", 0 ) //timing?
+	ROM_LOAD( "mi-7603-5.ic3", 0x0000, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
 
 
-GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", GAME_WRONG_COLORS )
-GAME( 1981, dambusta, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", GAME_WRONG_COLORS )
-GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", GAME_WRONG_COLORS )
+GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambusta, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )

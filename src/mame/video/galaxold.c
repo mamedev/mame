@@ -403,14 +403,45 @@ PALETTE_INIT( mariner )
 	}
 }
 
-
+/* swapped r/g/b hook-up */
 PALETTE_INIT( dambustr )
 {
 	int base = BACKGROUND_COLOR_BASE;
-	int i;
+	int i, len;
 
-	PALETTE_INIT_CALL(galaxold);
+	/* first, the character/sprite palette */
+	len = memory_region_length(machine, "proms");
 
+	for (i = 0;i < len;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+		/* red component */
+		bit0 = BIT(*color_prom,0);
+		bit1 = BIT(*color_prom,1);
+		bit2 = BIT(*color_prom,2);
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = BIT(*color_prom,3);
+		bit1 = BIT(*color_prom,4);
+		bit2 = BIT(*color_prom,5);
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = BIT(*color_prom,6);
+		bit1 = BIT(*color_prom,7);
+		g = 0x4f * bit0 + 0xa8 * bit1;
+
+		palette_set_color_rgb(machine,i,r,g,b);
+		color_prom++;
+	}
+
+
+	galaxold_init_stars(machine, STARS_COLOR_BASE);
+
+
+	/* bullets - yellow and white */
+	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
+	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
 
 	/*
     Assumption (not clear from the schematics):
