@@ -36,6 +36,7 @@ WRITE8_HANDLER( deco16_io_w );
 WRITE8_HANDLER( prosoccr_io_w );
 WRITE8_HANDLER( prosport_paletteram_w );
 WRITE8_HANDLER( liberate_videoram_w );
+WRITE8_HANDLER( liberate_colorram_w );
 
 /*************************************
  *
@@ -52,7 +53,8 @@ static READ8_HANDLER( deco16_bank_r )
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset<0x800) return videoram[offset];
+	if (offset<0x400) return colorram[offset];
+	if (offset<0x800) return videoram[offset-0x400];
 	if (offset<0x1000) return spriteram[offset-0x800];
 	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
 	if (offset<0x2800) return scratchram[offset-0x2200];
@@ -83,13 +85,33 @@ static WRITE8_HANDLER( deco16_bank_w )
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, (read8_space_func)SMH_BANK(1));
 }
 
-static UINT8 char_bank;
+static UINT8 gfx_rom_readback;
+
+static READ8_HANDLER( prosoccr_bank_r )
+{
+	const UINT8 *ROM = memory_region(space->machine, "user1");
+
+	/* The tilemap bank can be swapped into main memory */
+	if (deco16_bank)
+		return ROM[offset];
+
+	/* Else the handler falls through to read the usual address */
+	if (offset<0x400) return colorram[offset];
+	if (offset<0x800) return videoram[offset-0x400];
+	if (offset<0xc00) return colorram[offset-0x800];
+	if (offset<0x1000) return spriteram[offset-0xc00];
+	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
+	if (offset<0x2800) return scratchram[offset-0x2200];
+
+	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset);
+	return 0;
+}
 
 static READ8_HANDLER( prosoccr_charram_r )
 {
 	UINT8 *SRC_GFX = memory_region(space->machine, "shared_gfx");
 
-	if(char_bank)
+	if(gfx_rom_readback)
 	{
 		switch(offset & 0x1800)
 		{
@@ -102,7 +124,8 @@ static READ8_HANDLER( prosoccr_charram_r )
 		}
 	}
 
-	return prosoccr_charram[offset+char_bank*0x1800];
+	/* note: gfx_rom_readback == 1 never happens. */
+	return prosoccr_charram[offset+gfx_rom_readback*0x1800];
 }
 
 static WRITE8_HANDLER( prosoccr_charram_w )
@@ -115,7 +138,8 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 	}
 	else
 	{
-		prosoccr_charram[offset+char_bank*0x1800] = data;
+		/* note: gfx_rom_readback == 1 never happens. */
+		prosoccr_charram[offset+gfx_rom_readback*0x1800] = data;
 
 		switch(offset & 0x1800)
 		{
@@ -143,8 +167,7 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 
 static WRITE8_HANDLER( prosoccr_char_bank_w )
 {
-	/* TODO: what banks this? */
-	char_bank = data & 1;
+	gfx_rom_readback = data & 1; //enable GFX rom read-back
 	if(data & 0xfe)
 		printf("%02x\n",data);
 }
@@ -169,7 +192,8 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
@@ -180,7 +204,8 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
@@ -191,9 +216,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r,prosoccr_charram_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(prosoccr_char_bank_w)
@@ -213,7 +239,8 @@ static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE(&spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE(&scratchram)
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
@@ -721,6 +748,9 @@ static MACHINE_DRIVER_START( prosoccr )
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(prosoccr_sound_map)
 
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
+
 	MDRV_GFXDECODE(prosoccr)
 
 	MDRV_VIDEO_START(prosoccr)
@@ -785,14 +815,10 @@ ROM_START( prosoccr )
 	ROM_LOAD( "am01.5b",  0x2000, 0x2000, CRC(24785bda) SHA1(536bdda766b46771223f01e463fa4c61e0dd545c) )
 	ROM_LOAD( "am02.7b",  0x4000, 0x2000, CRC(c5af58ea) SHA1(a73d537b88befb76d67cc17d241e78c572c5b737) )
 
-	ROM_REGION( 0x6000, "fg_gfx", ROMREGION_ERASE00 ) // filled in DRIVER_INIT
-	//ROM_COPY( "shared_gfx", 0x0000, 0x0000, 0x2000 )
-	//ROM_COPY( "shared_gfx", 0x2000, 0x2000, 0x2000 )
-	//ROM_COPY( "shared_gfx", 0x4000, 0x4000, 0x2000 )
-
-	//ROM_FILL( 0x0000, 0x0800, 0x00 )
-	//ROM_FILL( 0x2000, 0x0800, 0x00 )
-	//ROM_FILL( 0x4000, 0x0800, 0x00 )
+	ROM_REGION( 0x6000, "fg_gfx", ROMREGION_ERASE00 )
+	ROM_COPY( "shared_gfx", 0x0800, 0x0800, 0x1800 )
+	ROM_COPY( "shared_gfx", 0x2800, 0x2800, 0x1800 )
+	ROM_COPY( "shared_gfx", 0x4800, 0x4800, 0x1800 )
 
 	ROM_REGION( 0x6000, "sp_gfx", 0 )
 	ROM_COPY( "shared_gfx", 0x0000, 0x0000, 0x2000 )
@@ -1140,22 +1166,6 @@ static DRIVER_INIT( prosport )
 	sound_cpu_decrypt(machine);
 }
 
-static DRIVER_INIT( prosoccr )
-{
-	UINT8 *FG_ROM = memory_region(machine, "fg_gfx");
-	UINT8 *GFX_ROM = memory_region(machine, "shared_gfx");
-	int i;
-
-	DRIVER_INIT_CALL(prosport);
-
-	for(i=0x0800;i<0x2000;i++)
-	{
-		FG_ROM[i+0x0000] = GFX_ROM[i+0x0000];
-		FG_ROM[i+0x2000] = GFX_ROM[i+0x2000];
-		FG_ROM[i+0x4000] = GFX_ROM[i+0x4000];
-	}
-}
-
 static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
@@ -1190,7 +1200,7 @@ static DRIVER_INIT( liberate )
  *
  *************************************/
 
-GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosoccr, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosport, ROT270, "Data East Corporation", "Pro Soccer", 0 )
 GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING )
 GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )

@@ -71,8 +71,8 @@ static TILE_GET_INFO( get_fix_tile_info )
 {
 	int tile, color;
 
-	tile = videoram[tile_index + 0x400] + ((videoram[tile_index] & 0x7) << 8);
-	color = (videoram[tile_index] & 0x70) >> 4;
+	tile = videoram[tile_index] + ((colorram[tile_index] & 0x7) << 8);
+	color = (colorram[tile_index] & 0x70) >> 4;
 
 //if (tile & 0x300) tile -= 0x000;
 //else if(tile & 0x200) tile -= 0x100;
@@ -120,7 +120,7 @@ WRITE8_HANDLER( prosoccr_io_w )
 	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(background_tilemap);
 
-	//popmessage("%02x",deco16_io_ram[7]);
+//	popmessage("%02x %02x",deco16_io_ram[6],deco16_io_ram[7]);
 
 	switch (offset)
 	{
@@ -145,7 +145,13 @@ WRITE8_HANDLER( prosoccr_io_w )
 WRITE8_HANDLER( liberate_videoram_w )
 {
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fix_tilemap, offset & 0x3ff);
+	tilemap_mark_tile_dirty(fix_tilemap, offset);
+}
+
+WRITE8_HANDLER( liberate_colorram_w )
+{
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(fix_tilemap, offset);
 }
 
 /***************************************************************************/
@@ -223,7 +229,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	int offs;
 
 	/* Sprites */
-	for (offs = 0x400;offs < 0x800;offs += 4)
+	for (offs = 0x000;offs < 0x800;offs += 4)
 	{
 		int multi,fx,fy,sx,sy,sy2,code,color;
 
@@ -405,7 +411,7 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 {
 	int offs,code,fx,fy,sx,sy;
 
-	for (offs = 0x400;offs < 0x800;offs += 4)
+	for (offs = 0x000;offs < 0x400;offs += 4)
 	{
 		if ((spriteram[offs+0]&1)!=1) continue;
 
@@ -452,7 +458,7 @@ VIDEO_UPDATE( prosport )
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
-		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
+		tile=colorram[offs]+((videoram[offs]&0x3)<<8);
 
 		tile+=((deco16_io_ram[0]&0x30)<<6);
 
