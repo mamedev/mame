@@ -183,6 +183,33 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 
 }
 
+static WRITE8_HANDLER( prosport_charram_w )
+{
+	UINT8 *FG_GFX = memory_region(space->machine, "progolf_fg_gfx");
+
+	switch(offset & 0x1800)
+	{
+		case 0x0000:
+			FG_GFX[(offset & 0x7ff)+(0x0800)+0x0000] = data;
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x0000] = data;
+			break;
+		case 0x0800:
+			FG_GFX[(offset & 0x7ff)+(0x0800)+0x2000] = data;
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x2000] = data;
+			break;
+		case 0x1000:
+			FG_GFX[(offset & 0x7ff)+(0x0800)+0x4000] = data;
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x4000] = data;
+			break;
+	}
+
+	offset&=0x7ff;
+
+	/* dirty char */
+    gfx_element_mark_dirty(space->machine->gfx[0], (offset+0x800) >> 3);
+}
+
+
 /*************************************
  *
  *  Memory handlers
@@ -191,10 +218,14 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY AM_BASE(&spriteram)
+	AM_RANGE(0x0000, 0x07ff) AM_SHARE(2) AM_RAM
+	AM_RANGE(0x0800, 0x1fff) AM_RAM_WRITE(prosport_charram_w)
+//	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
+	AM_RANGE(0x2000, 0x27ff) AM_SHARE(2) AM_RAM
+	AM_RANGE(0x2800, 0x281f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_SHARE(1) AM_RAM
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -569,22 +600,6 @@ static const gfx_layout sprites =
 	16*16
 };
 
-static const gfx_layout pro_tiles =
-{
-	16,16,
-	16,
-	2,
-	{ 0, 4 },
-	{
- 		24,25,26,27, 16,17,18,19, 8,9,10,11, 0,1,2,3
-	},
-	{
-		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32
-	},
-	64*8
-};
-
 static const gfx_layout tiles1 =
 {
 	16,16,
@@ -629,6 +644,20 @@ static const gfx_layout prosoccr_bg_gfx =
 	64*8
 };
 
+static const gfx_layout pro_tiles =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	3,
+ 	{ 4,0, RGN_FRAC(1,2)+4 },
+	{ 384+0, 384+1, 384+2, 384+3,
+	  256+0, 256+1, 256+2, 256+3,
+	  128+0, 128+1, 128+2, 128+3,
+	  0,1,2,3 },
+	{ 0*8, 1*8, 2*8, 3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	512
+};
+
 
 static GFXDECODE_START( liberate )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
@@ -638,10 +667,15 @@ static GFXDECODE_START( liberate )
 GFXDECODE_END
 
 static GFXDECODE_START( prosport )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 4 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, sprites,     0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0x00800, pro_tiles,   0, 4 )
+	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, charlayout,  0, 4 )
+	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, charlayout,  0, 4 )
+	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, charlayout,  0, 4 )
+	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, charlayout,  0, 4 )
+	GFXDECODE_ENTRY( "prosport_fg_gfx",  0x00000, sprites,  0, 4 )
+	GFXDECODE_ENTRY( "protenns_fg_gfx",  0x00000, sprites,  0, 4 )
+	GFXDECODE_ENTRY( "probowl_fg_gfx",   0x00000, sprites,  0, 4 )
+	GFXDECODE_ENTRY( "progolf_fg_gfx",   0x00000, sprites,  0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, pro_tiles,   0, 4 ) //backgrounds
 GFXDECODE_END
 
 static GFXDECODE_START( prosoccr )
@@ -763,6 +797,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(prosport_map)
 	MDRV_CPU_IO_MAP(deco16_io_map)
+	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
@@ -851,7 +886,7 @@ ROM_START( prosport )
 	ROM_LOAD( "ic43ar16.bin", 0xc000, 0x2000,  CRC(113a4f89) SHA1(abbc7f5ad543f3500c0194100d236ac942e4739f) )
 	ROM_LOAD( "ic42ar15.bin", 0xe000, 0x2000,  CRC(635425a6) SHA1(2b95c3252046462f8886a309d02ea3a15b693780) )
 
-	ROM_REGION( 0x12000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x12000, "fg_gfx_src", 0 )
 	ROM_LOAD( "ic52ar00.bin",   0x00000, 0x2000, CRC(1e16adde) SHA1(229f68a687cbc9ac0d393e4db49d91f646eea7a6) )
 	ROM_LOAD( "ic53ar01.bin",   0x02000, 0x2000, CRC(4b7a6431) SHA1(a8a23dffc3bf9fb3b806985272822904578e460e) )
 	ROM_LOAD( "ic54ar02.bin",   0x04000, 0x2000, CRC(039eba80) SHA1(bd15f707f4d5dded8dd3373de5cb2a8d91a731d6) )
@@ -864,9 +899,40 @@ ROM_START( prosport )
 	ROM_LOAD( "ic59ar07.bin",   0x0e000, 0x2000, CRC(e6527838) SHA1(e40acbcfda7d73ce4c1faa1c05e17d21bfc7f0d4) )
 	ROM_LOAD( "ic60ar08.bin",   0x10000, 0x2000, CRC(ff1e6b01) SHA1(4561b718be41c67d713f6d7f10decc4d2eed9acc) )
 
+	/* 0 - Title Screen */
+	ROM_REGION( 0x6000, "prosport_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x04000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0a000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x10000, 0x04000, 0x2000 )
+
+	/* 4 - Pro Tennis*/
+	ROM_REGION( 0x6000, "protenns_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x08000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0e000, 0x04000, 0x2000 )
+
+	/* 8 - Pro Bowling */
+	ROM_REGION( 0x6000, "probowl_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x00000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x06000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0c000, 0x04000, 0x2000 )
+
+	/* c - Pro Golf */
+	ROM_REGION( 0x6000, "progolf_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x04000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0a000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x10000, 0x04000, 0x2000 )
+	/* the following is WRONG! */
+	ROM_COPY( "fg_gfx_src", 0x05000, 0x01800, 0x0800 )
+	ROM_COPY( "fg_gfx_src", 0x0b000, 0x03800, 0x0800 )
+	ROM_COPY( "fg_gfx_src", 0x11000, 0x05800, 0x0800 )
+
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ic46ar18.bin",   0x00000, 0x1000, CRC(d23998d3) SHA1(4d3545a0e1df2eb7927ec6fa4a35abd21321016c) )
 	ROM_LOAD( "ic45ar17.bin",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
+
+	ROM_REGION(0x02000, "user1", 0 )
+	ROM_COPY( "gfx2", 0x0000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( prosporta )
@@ -882,7 +948,7 @@ ROM_START( prosporta )
 	ROM_LOAD( "ar16.43", 0xc000, 0x2000,  CRC(113a4f89) SHA1(abbc7f5ad543f3500c0194100d236ac942e4739f) )
 	ROM_LOAD( "ar15.42", 0xe000, 0x2000,  CRC(635425a6) SHA1(2b95c3252046462f8886a309d02ea3a15b693780) )
 
-	ROM_REGION( 0x12000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x12000, "fg_gfx_src", ROMREGION_DISPOSE )
 	ROM_LOAD( "ar00.52",   0x00000, 0x2000, CRC(1e16adde) SHA1(229f68a687cbc9ac0d393e4db49d91f646eea7a6) )
 	ROM_LOAD( "ar01.53",   0x02000, 0x2000, CRC(4b7a6431) SHA1(a8a23dffc3bf9fb3b806985272822904578e460e) )
 	ROM_LOAD( "ar02.54",   0x04000, 0x2000, CRC(cb22c60a) SHA1(0c83c15781cedb17ade7d48a606d1c49e8b80819) )
@@ -895,9 +961,40 @@ ROM_START( prosporta )
 	ROM_LOAD( "ar07.59",   0x0e000, 0x2000, CRC(e6527838) SHA1(e40acbcfda7d73ce4c1faa1c05e17d21bfc7f0d4) )
 	ROM_LOAD( "ar08.60",   0x10000, 0x2000, CRC(37a2178b) SHA1(28655d0ebe5813b4fc7eb6dae2a64575214ebc6a) )
 
+	/* 0 - Title Screen */
+	ROM_REGION( 0x6000, "prosport_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x04000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0a000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x10000, 0x04000, 0x2000 )
+
+	/* 4 - Pro Tennis*/
+	ROM_REGION( 0x6000, "protenns_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x08000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0e000, 0x04000, 0x2000 )
+
+	/* 8 - Pro Bowling */
+	ROM_REGION( 0x6000, "probowl_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x00000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x06000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0c000, 0x04000, 0x2000 )
+
+	/* c - Pro Golf */
+	ROM_REGION( 0x6000, "progolf_fg_gfx", 0 )
+	ROM_COPY( "fg_gfx_src", 0x04000, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x0a000, 0x02000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x10000, 0x04000, 0x2000 )
+	/* the following is WRONG! */
+	ROM_COPY( "fg_gfx_src", 0x05000, 0x01800, 0x0800 )
+	ROM_COPY( "fg_gfx_src", 0x0b000, 0x03800, 0x0800 )
+	ROM_COPY( "fg_gfx_src", 0x11000, 0x05800, 0x0800 )
+
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ar18.46",   0x00000, 0x1000, CRC(d23998d3) SHA1(4d3545a0e1df2eb7927ec6fa4a35abd21321016c) )
 	ROM_LOAD( "ar17.45",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
+
+	ROM_REGION(0x02000, "user1", 0 )
+	ROM_COPY( "gfx2", 0x0000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( boomrang )

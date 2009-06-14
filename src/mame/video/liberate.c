@@ -294,14 +294,20 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
+	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color,gfx_region;
 
 	for (offs = 0x000;offs < 0x800;offs += 4)
 	{
-	//  if ((spriteram[offs+0]&1)!=1) continue;
+	  	if ((spriteram[offs+0]&1)!=1) continue;
 
 		code = spriteram[offs+1] + ((spriteram[offs+0]&0x3)<<8);
 		code2=code+1;
+
+		if(deco16_io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
+			gfx_region = 3+4;
+		else
+			gfx_region = ((deco16_io_ram[0]&0x30)>>4)+4;
+
 
 		multi = spriteram[offs+0] & 0x10;
 
@@ -313,12 +319,12 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		color = 1;//(spriteram[offs+0]&0x4)>>2;
 
-		fx = 0;
+		fx = spriteram[offs+0] & 0x02;
 		fy = spriteram[offs+0] & 0x04;
 		multi = 0;// spriteram[offs+0] & 0x10;
 
 //      if (multi) sy-=16;
-		if (fy && multi) { code2=code; code++; }
+		if ((fy && multi) || (fx && multi)) { code2=code; code++; }
 
 		if (flip_screen_get(machine))
 		{
@@ -333,14 +339,14 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,machine->gfx[1],
+    	drawgfx(bitmap,machine->gfx[gfx_region],
         		code,
 				color,
 				fx,fy,
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
-    		drawgfx(bitmap,machine->gfx[1],
+    		drawgfx(bitmap,machine->gfx[gfx_region],
 				code2,
 				color,
 				fx,fy,
@@ -450,28 +456,33 @@ VIDEO_UPDATE( prosoccr )
 
 VIDEO_UPDATE( prosport )
 {
-	int mx,my,tile,color,offs;
+	int mx,my,tile,color,offs,gfx_region;
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	prosport_draw_sprites(screen->machine,bitmap,cliprect);
+	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
+	,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
-		tile=colorram[offs]+((videoram[offs]&0x3)<<8);
+		tile=videoram[offs]+((colorram[offs]&0x3)<<8);
 
-		tile+=((deco16_io_ram[0]&0x30)<<6);
-
-		if (!tile) continue;
+		if(deco16_io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
+			gfx_region = 3;
+		else
+			gfx_region = ((deco16_io_ram[0]&0x30)>>4);
 
 		color=1;//(videoram[offs]&0x70)>>4;
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[gfx_region],
 				tile,1,0,0,248-8*mx,8*my,
 				cliprect,TRANSPARENCY_PEN,0);
 	}
+
+	prosport_draw_sprites(screen->machine,bitmap,cliprect);
+
 	return 0;
 }
 
