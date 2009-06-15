@@ -356,7 +356,7 @@ ROM_END
 
 static TIMER_CALLBACK( polyplay_timer_callback )
 {
-	cputag_set_input_line_and_vector(machine, "audiocpu", 0, HOLD_LINE, 0x4c);
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */
