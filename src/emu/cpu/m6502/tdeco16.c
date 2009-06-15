@@ -272,9 +272,9 @@ OP(0b) { int tmp; cpustate->icount -= 1; RD_IMM;
 	  			}
 OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(4b) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: OP4B %02x\n",PCW,tmp);
-
-//  cpustate->a=memory_read_byte_8le(cpustate->io,0);
+	//logerror("%04x: OP4B %02x\n",PCW,tmp);
+	/* TODO: Maybe it's just read I/O 0 and do a logic AND with bit 1? */
+	cpustate->a=memory_read_byte_8le(cpustate->io,1);
 
 //tilt??
 
