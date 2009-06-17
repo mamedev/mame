@@ -6741,6 +6741,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( invasnab )	/* (c) 1999 Midway */
 	DRIVER( invasnv4 )	/* (c) 1999 Midway */
 	DRIVER( crusnexo )	/* (c) 1999 Midway */
+	DRIVER( crusnexa )	/* (c) 1999 Midway */
 	DRIVER( thegrid )	/* (c) 2001 Midway */
 	DRIVER( thegrida )	/* (c) 2001 Midway */
 
