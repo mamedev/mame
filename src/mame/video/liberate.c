@@ -151,7 +151,7 @@ WRITE8_HANDLER( prosport_io_w )
 	switch (offset)
 	{
 		case 0:
-			background_disable = ~data & 0x80;
+			//background_disable = ~data & 0x80;
 			break;
 		case 2: /* Sound */
 			soundlatch_w(space, 0, data);
@@ -209,8 +209,10 @@ VIDEO_START( liberate )
 
 WRITE8_HANDLER( prosport_paletteram_w )
 {
+	paletteram[offset] = data;
+
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(space,offset,~data);
+	palette_set_color_rgb(space->machine, offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
 }
 
 PALETTE_INIT( liberate )
@@ -338,7 +340,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      sy = (240-spriteram[offs+2]);//-16;
 		sy = 240-sy;
 
-		color = 1;//(spriteram[offs+0]&0x4)>>2;
+		color = 1;//(deco16_io_ram[4] & 2)+1;//(spriteram[offs+0]&0x4)>>2;
 
 		fx = spriteram[offs+0] & 0x02;
 		fy = spriteram[offs+0] & 0x04;
@@ -477,59 +479,63 @@ VIDEO_UPDATE( prosoccr )
 
 VIDEO_UPDATE( prosport )
 {
-	int mx,my,tile,color,offs,gfx_region;
+	int mx,my,tile,offs,gfx_region;
+	int scrollx;
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	offs = 0;
+//	popmessage("%d",scrollx);
 
-	/* TODO: enough for showing something for Pro Bowling, not enough at all for Pro Golf...*/
+	offs = 0;
+//	scrollx = ((deco16_io_ram[0] & 0xf)<<8)+deco16_io_ram[1];
+	scrollx = 0;//((deco16_io_ram[0] & 0x3)<<8)+deco16_io_ram[1];
+
+	/* TODO: enough for showing something for Pro Bowling, not enough yet for Pro Golf...*/
 	for(mx = 0;mx < 32;mx++)
 	{
 		for(my = 0;my < 16;my++)
 		{
-//			#if 0
 			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
-			tile+=0x20;
+
+			if(deco16_io_ram[4] & 0x80)
+				tile+=0x20;
 
 			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,248-16*(mx+0),16*(my+0),
+				tile,0,0,0,256-16*(mx+0)+scrollx,16*(my+0),
 				cliprect,TRANSPARENCY_NONE,0);
-//#endif
-			#if 0
-			tile = (prosport_bg_vram[offs] & 0x0f);
-			tile+=0x20;
-
 			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,248-16*(mx+0),16*(my),
+				tile,0,0,0,256-16*(mx+0)+scrollx+512,16*(my+0),
 				cliprect,TRANSPARENCY_NONE,0);
-			#endif
+
 			offs++;
 		}
 	}
 
-	#if 0
-	offs = 0;
-
+//	#if 0
 	for(mx = 0;mx < 32;mx++)
 	{
-		for(my = 0;my < 16;my++)
+		for(my = 16;my < 32;my++)
 		{
-			tile = (prosport_bg_vram[offs] & 0x0f);
-			//tile+=0x20;
+			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
+
+			if(deco16_io_ram[4] & 0x80)
+				tile+=0x20;
 
 			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,248-16*(mx+0),16*(my),
-				cliprect,TRANSPARENCY_PEN,0);
+				tile,0,0,0,256-16*(mx+0)+scrollx,16*(my+0),
+				cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[8],
+				tile,0,0,0,256-16*(mx+0)+scrollx+512,16*(my+0),
+				cliprect,TRANSPARENCY_NONE,0);
 
 			offs++;
 		}
 	}
-	#endif
+//	#endif
 
 	//return 0;
 
-//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
+//	popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //	,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
 	for (offs = 0;offs < 0x400;offs++)
@@ -541,7 +547,6 @@ VIDEO_UPDATE( prosport )
 		else
 			gfx_region = ((deco16_io_ram[0]&0x30)>>4);
 
-		color=1;//(videoram[offs]&0x70)>>4;
 		my = (offs) % 32;
 		mx = (offs) / 32;
 

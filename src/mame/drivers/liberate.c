@@ -249,11 +249,11 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1ff isn't charram!
 //	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
 	AM_RANGE(0x2000, 0x23ff) AM_SHARE(2) AM_RAM
-	AM_RANGE(0x2800, 0x283f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM
 //	AM_RANGE(0x2800, 0x2fff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_SHARE(1) AM_RAM
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
