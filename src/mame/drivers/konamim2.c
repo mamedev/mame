@@ -14,7 +14,7 @@ Game                                                 Year    CD Codes     Konami
 --------------------------------------------------------------------------------------
 Battle Tryst                                         1998    636JAC02
 Evil Night                                           1998    810UBA02
-Hell Night ((alt. Region title, same as Evil Night)  1998    810EAA02
+Hell Night (alt. Region title, same as Evil Night)   1998    810EAA02
 Heat Of Eleven '98                                   1998    703EAA02
 Polystars                                            1997    623JAA02     003894
 Total Vice                                           1997    639AAB01
@@ -1209,7 +1209,7 @@ ROM_START( hellngt )
 	ROM_REGION( 0x1000, "timekeep", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
 
-	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board. NOTE: May not be the same as evilngt! */
+	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
 	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
@@ -1218,7 +1218,7 @@ ROM_END
 
 ROM_START( totlvice )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
