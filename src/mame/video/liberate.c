@@ -16,6 +16,7 @@ static int background_color, background_disable;
 static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 extern UINT8 *prosoccr_charram;
+extern UINT8 *prosport_bg_vram;
 
 #if 0
 void debug_print(bitmap_t *bitmap)
@@ -480,8 +481,56 @@ VIDEO_UPDATE( prosport )
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
-	,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
+	offs = 0;
+
+	/* TODO: enough for showing something for Pro Bowling, not enough at all for Pro Golf...*/
+	for(mx = 0;mx < 32;mx++)
+	{
+		for(my = 0;my < 16;my++)
+		{
+//			#if 0
+			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
+			tile+=0x20;
+
+			drawgfx(bitmap,screen->machine->gfx[8],
+				tile,0,0,0,248-16*(mx+0),16*(my+0),
+				cliprect,TRANSPARENCY_NONE,0);
+//#endif
+			#if 0
+			tile = (prosport_bg_vram[offs] & 0x0f);
+			tile+=0x20;
+
+			drawgfx(bitmap,screen->machine->gfx[8],
+				tile,0,0,0,248-16*(mx+0),16*(my),
+				cliprect,TRANSPARENCY_NONE,0);
+			#endif
+			offs++;
+		}
+	}
+
+	#if 0
+	offs = 0;
+
+	for(mx = 0;mx < 32;mx++)
+	{
+		for(my = 0;my < 16;my++)
+		{
+			tile = (prosport_bg_vram[offs] & 0x0f);
+			//tile+=0x20;
+
+			drawgfx(bitmap,screen->machine->gfx[8],
+				tile,0,0,0,248-16*(mx+0),16*(my),
+				cliprect,TRANSPARENCY_PEN,0);
+
+			offs++;
+		}
+	}
+	#endif
+
+	//return 0;
+
+//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
+//	,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
 	for (offs = 0;offs < 0x400;offs++)
 	{

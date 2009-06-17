@@ -31,6 +31,7 @@ VIDEO_START( liberate );
 static int deco16_bank;
 static UINT8 *scratchram;
 UINT8 *prosoccr_charram;
+UINT8 *prosport_bg_vram;
 
 WRITE8_HANDLER( deco16_io_w );
 WRITE8_HANDLER( prosoccr_io_w );
@@ -184,6 +185,26 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 
 }
 
+static READ8_HANDLER( prosport_charram_r )
+{
+	UINT8 *FG_GFX = memory_region(space->machine, "progolf_fg_gfx");
+
+	switch(offset & 0x1800)
+	{
+		case 0x0000:
+			return FG_GFX[(offset & 0x7ff)+(0x0800)+0x0000];
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x0000] = data;
+		case 0x0800:
+			return FG_GFX[(offset & 0x7ff)+(0x0800)+0x2000];
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x2000] = data;
+		case 0x1000:
+			return FG_GFX[(offset & 0x7ff)+(0x0800)+0x4000];
+			//FG_GFX[(offset & 0x7ff)+(0x1800)+0x4000] = data;
+	}
+
+	return 0;
+}
+
 static WRITE8_HANDLER( prosport_charram_w )
 {
 	UINT8 *FG_GFX = memory_region(space->machine, "progolf_fg_gfx");
@@ -220,11 +241,15 @@ static WRITE8_HANDLER( prosport_charram_w )
 
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0000, 0x07ff) AM_SHARE(2) AM_RAM
-	AM_RANGE(0x0800, 0x1fff) AM_RAM_WRITE(prosport_charram_w) //0x1e00-0x1ff isn't charram!
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE(&prosport_bg_vram)
+	AM_RANGE(0x0000, 0x03ff) AM_SHARE(2) AM_RAM
+//	AM_RANGE(0x0e00, 0x0fff) AM_RAM
+//	AM_RANGE(0x1600, 0x17ff) AM_RAM
+//	AM_RANGE(0x1e00, 0x1fff) AM_RAM
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1ff isn't charram!
 //	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
-	AM_RANGE(0x2000, 0x27ff) AM_SHARE(2) AM_RAM
-	AM_RANGE(0x2800, 0x281f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x2000, 0x23ff) AM_SHARE(2) AM_RAM
+	AM_RANGE(0x2800, 0x283f) AM_SHARE(1) AM_RAM AM_BASE(&spriteram)
 //	AM_RANGE(0x2800, 0x2fff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
@@ -1321,8 +1346,8 @@ static DRIVER_INIT( liberate )
  *************************************/
 
 GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, prosport, ROT270, "Data East Corporation", "Pro Soccer", 0 )
-GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1983, prosport,  0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, prosporta, prosport, prosport,  liberate, prosport, ROT270, "Data East Corporation", "Pro. Sports (alternate)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
 GAME( 1983, boomranga, boomrang, boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", 0 )
 GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", 0 )
