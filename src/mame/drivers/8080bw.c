@@ -1558,6 +1558,79 @@ static MACHINE_DRIVER_START( indianbt )
 
 MACHINE_DRIVER_END
 
+/*******************************************************/
+/*                                                     */
+/* Taito "Steel Worker"                                */
+/*                                                     */
+/*******************************************************/
+
+static ADDRESS_MAP_START( stelwrkr_io_map, ADDRESS_SPACE_IO, 8 )
+    AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+    AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+    AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mb14241_0_shift_count_w)
+    AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invadpt2_sh_port_1_w)
+    AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+    AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITENOP /* ? */
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( stelwrkr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )										PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
+INPUT_PORTS_END
+
+
+/* same as regular invaders, but with a color board added */
+
+static MACHINE_DRIVER_START( stelwrkr )
+
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(mw8080bw_root)
+    MDRV_CPU_MODIFY("maincpu")
+    MDRV_CPU_IO_MAP(stelwrkr_io_map)
+    MDRV_MACHINE_START(extra_8080bw)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(invadpt2)
+
+    /* sound hardware */
+	MDRV_IMPORT_FROM(invaders_samples_audio)
+
+MACHINE_DRIVER_END
+
 /*****************************************************
 
  Omori "Shuttle Invader" ??
@@ -2027,6 +2100,10 @@ ROM_START( intruder )
 	ROM_LOAD( "la02-1.35",    0x0800, 0x0800, CRC(43bc65c5) SHA1(5f9827c02c2d221e1607359c840374ff7fb92fbf) )
 	ROM_LOAD( "la03-1.34",    0x1000, 0x0800, CRC(278ef9cf) SHA1(74a9c1d3500ea28e50d07363a547c381999c84fa) )
 	ROM_LOAD( "la04-1.33",    0x1800, 0x0800, CRC(5116b234) SHA1(b165b2574cbcb26a5bb43f91df5f8be5f111f486) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_LOAD( "01.bin",       0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.bin",       0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( laser )
@@ -2537,6 +2614,22 @@ ROM_START( astropal )
 	ROM_LOAD( "2708.7a",   0x1c00, 0x0400, CRC(aeca51c1) SHA1(767bca1e6bca41327b9ff6c3570edcabe46dec21) )
 ROM_END
 
+ROM_START( stelwrkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.36",     		  0x0000, 0x0400, CRC(5d78873a) SHA1(293cbc067937668148181453877239cb5ed57600) )
+	ROM_LOAD( "2.35",     		  0x0400, 0x0400, CRC(99cd70c6) SHA1(a08bf4db6b39d22dfcf052cc6603aab041db0208) )
+	ROM_LOAD( "3.34",     		  0x0800, 0x0400, CRC(18103b67) SHA1(45929ea56ab15769fc68873570aab3d403e8e913) )
+	ROM_LOAD( "4.33",     		  0x0c00, 0x0400, CRC(c413ae82) SHA1(302b933b45b2aaa515434b5268fd74aec4160e3f) )
+	ROM_LOAD( "5.32",     		  0x1000, 0x0400, CRC(ca7b07b5) SHA1(cbea221c4daf84825f99bbef6d731fc2ef88feeb) )
+	ROM_LOAD( "6.31",     		  0x1400, 0x0400, CRC(f8181fa0) SHA1(a907611529a1500a2ae118e834c2d4b6d11974f1) )
+	ROM_LOAD( "7.42",     		  0x1800, 0x0400, CRC(a35f113e) SHA1(53073037db55c14055810c0bee7b85eb75bbaa72) )
+	ROM_LOAD( "8.41",     		  0x1c00, 0x0400, CRC(af208370) SHA1(ccbd002accda26cc0a02987d9801a47e5f49921a) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 (not used, but they were on the board) */
+	ROM_LOAD( "la05.1",         0x0000, 0x0400, CRC(98f31392) SHA1(ccdd1bd2ddd24bd6b1f8255a87e138f937eaf5b4) )
+	ROM_LOAD( "la06.2",         0x0400, 0x0400, CRC(98f31392) SHA1(ccdd1bd2ddd24bd6b1f8255a87e138f937eaf5b4) )
+ROM_END
+
 /* board #  rom       parent    machine   inp */
 
 /* Taito games */
@@ -2564,6 +2657,7 @@ GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris
 GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )    /* missing clouds */
 GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE )
+GAME( 1980, stelwrkr, 0,        stelwrkr, stelwrkr, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE )
 
 /* Misc. manufacturers */
 
@@ -2593,7 +2687,7 @@ GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Mo
 GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )
-GAME( 1980, intruder, spclaser, invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Intruder", GAME_SUPPORTS_SAVE )
+GAME( 1980, intruder, spclaser, invadpt2, spclaser, 0, ROT270, "GamePlan (Taito)", "Intruder", GAME_SUPPORTS_SAVE )
 GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", GAME_SUPPORTS_SAVE )
 GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
 GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_SUPPORTS_SAVE )

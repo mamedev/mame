@@ -1224,6 +1224,7 @@ const game_driver * const drivers[] =
 	DRIVER( polarisa )	/* PS  (c) 1980 Taito */
 	DRIVER( ballbomb )	/* TN  (c) 1980 Taito */
 	DRIVER( indianbt )	/* (c) 1980 Taito */
+	DRIVER( stelwrkr )	/* (c) 1980 Taito */
 	DRIVER( m79amb )	/* (c) 1977 RamTek */
 	DRIVER( alieninv )	/* bootleg */
 	DRIVER( tst_invd )	/* Test ROM */
