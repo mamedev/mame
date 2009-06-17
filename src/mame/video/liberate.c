@@ -497,7 +497,7 @@ VIDEO_UPDATE( prosport )
 		{
 			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
 
-			if(deco16_io_ram[4] & 0x80)
+			if(deco16_io_ram[0]&0x20)
 				tile+=0x20;
 
 			drawgfx(bitmap,screen->machine->gfx[8],
