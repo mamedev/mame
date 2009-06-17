@@ -1564,7 +1564,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( stelwrkr_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( steelwkr_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
     AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
     AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mb14241_0_shift_count_w)
@@ -1574,7 +1574,7 @@ static ADDRESS_MAP_START( stelwrkr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( stelwrkr )
+static INPUT_PORTS_START( steelwkr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1615,12 +1615,12 @@ INPUT_PORTS_END
 
 /* same as regular invaders, but with a color board added */
 
-static MACHINE_DRIVER_START( stelwrkr )
+static MACHINE_DRIVER_START( steelwkr )
 
     /* basic machine hardware */
     MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(stelwrkr_io_map)
+    MDRV_CPU_IO_MAP(steelwkr_io_map)
     MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
@@ -2614,7 +2614,7 @@ ROM_START( astropal )
 	ROM_LOAD( "2708.7a",   0x1c00, 0x0400, CRC(aeca51c1) SHA1(767bca1e6bca41327b9ff6c3570edcabe46dec21) )
 ROM_END
 
-ROM_START( stelwrkr )
+ROM_START( steelwkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.36",     		  0x0000, 0x0400, CRC(5d78873a) SHA1(293cbc067937668148181453877239cb5ed57600) )
 	ROM_LOAD( "2.35",     		  0x0400, 0x0400, CRC(99cd70c6) SHA1(a08bf4db6b39d22dfcf052cc6603aab041db0208) )
@@ -2657,7 +2657,7 @@ GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris
 GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )    /* missing clouds */
 GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE )
-GAME( 1980, stelwrkr, 0,        stelwrkr, stelwrkr, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE )
+GAME( 1980, steelwkr, 0,        steelwkr, steelwkr, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE )
 
 /* Misc. manufacturers */
 
