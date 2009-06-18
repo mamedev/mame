@@ -27,6 +27,107 @@
 #include "driver.h"
 #include "system16.h"
 #include "video/resnet.h"
+#include "video/segaic16.h"
+
+int system16_bootleg_spritebank_type = -1;
+int system16_bootleg_back_tilemap_yscroll = 0;
+int system16_bootleg_fore_tilemap_yscroll = 0;
+int system16_bootleg_text_tilemap_yscroll = 0;
+int system16_bootleg_sprite_xoffs = 0;
+
+/* A config table for per-game offsets and bank types */
+struct system15_bootleg_config
+{
+	const char *name;             /* game driver name */
+	int spritebank_type;
+	int back_tilemap_yscroll;
+	int fore_tilemap_yscroll;
+	int text_tilemap_yscroll;
+	int sprite_xoffs;
+};
+
+
+static const struct system15_bootleg_config config_table[] =
+{
+	/* 16A bootlegs */
+	{ "shinobld",       1, 0,0,0,	 117 },
+	{ "passshtb",       1, 3,0,0,	 117 },
+	{ "passht4b",       1, 0,0,0,	 117 },
+	{ "wb3bbl",         1, 2,2,0,	 117 },
+
+	/* 16B bootlegs */
+	{ "bayrouteb1",     0, 0,0,0,	 107 },
+	{ "bayrouteb2",     0, 0,0,0,	 107 },
+	{ "goldnaxeb1",     1, 0,0,0,	 121 },
+	{ "goldnaxeb2",     1, 0,0,0,	 121 },
+	{ "tturfbl",        0, 0,0,0,	 107 },
+	{ "dduxbl",         0, 0,0,0,	 112 },
+	{ "eswatbl",        1, 0,0,0,	 124 },
+	{ "fpointbl",       0, 2,2,0,	 107 },
+	{ "fpointbj",       0, 2,2,0,	 107 },
+	{ "tetrisbl",       0, 0,0,0,	 112 },
+
+	/* 18 bootlegs */
+	{ "astormbl",       1, 0,0,0,	 107 },
+	{ "astormb2",       1, 0,0,0,	 107 },
+	{ "mwalkbl",        1, 0,0,0,	 107 },
+	{ "shdancbl",       1, 0,0,0,	 107 },
+	
+	/* Tetris-based hardware */
+	{ "beautyb",        0, 0,0,0,	 112 },
+	{ "iqpipe",         0, 0,0,0,	 112 },
+
+	
+	
+	{ NULL, 0 }	// end of table
+};
+
+
+
+
+void setup_system16_bootleg_video(running_machine* machine)
+{
+	const char *gamename = machine->gamedrv->name;
+	const struct system15_bootleg_config *k = &config_table[0];
+	int found = 0;
+	while (k->name)
+	{
+		if (strcmp(k->name, gamename) == 0)
+		{
+			system16_bootleg_spritebank_type = k->spritebank_type;	
+			system16_bootleg_back_tilemap_yscroll = k->back_tilemap_yscroll;
+			system16_bootleg_fore_tilemap_yscroll = k->fore_tilemap_yscroll;
+			system16_bootleg_text_tilemap_yscroll = k->text_tilemap_yscroll;
+			system16_bootleg_sprite_xoffs = k->sprite_xoffs;
+			found = 1;
+			break;
+		}
+		++k;
+	}
+	
+	if (!found) fatalerror("system16 bootleg not in system15_bootleg_config config_table[]!\n");
+}
+
+void setup_system16_bootleg_spritebanking(running_machine* machine)
+{
+
+	if (system16_bootleg_spritebank_type == 1)
+	{
+		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+		int i;
+		for (i = 0; i < 16; i++)
+			segaic16_sprites_set_bank(machine, 0, i, default_banklist[i]);
+	}
+	else
+	{
+		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+		int i;
+		for (i = 0; i < 16; i++)
+			segaic16_sprites_set_bank(machine, 0, i, alternate_banklist[i]);
+			
+	}	
+
+}
 
 
 UINT16* system16a_bootleg_bg0_tileram;
@@ -45,7 +146,7 @@ int sys16_MaxShadowColors;
 
 /* video driver constants (potentially different for each game) */
 int sys16_gr_bitmap_width;
-int (*sys16_spritesystem)( struct sys16_sprite_attributes *sprite, const UINT16 *source, int bJustGetColor );
+
 const int *sys16_obj_bank;
 int sys16_sprxoffset;
 int sys16_bgxoffset;
@@ -166,254 +267,6 @@ static TILE_GET_INFO( get_system16b_bootleg_tile_info1 )
 /***************************************************************************/
 
 
-/*
-    We mark the priority buffer as follows:
-        text    (0xf)
-        fg (hi) (0x7)
-        fg (lo) (0x3)
-        bg (hi) (0x1)
-        bg (lo) (0x0)
-
-    Each sprite has 4 levels of priority, specifying where they are placed between bg(lo) and text.
-*/
-
-static void draw_sprite(running_machine *machine,
-	bitmap_t *bitmap,
-	const rectangle *cliprect,
-	const UINT8 *addr, int pitch,
-	pen_t pen_base,
-	int x0, int y0, int screen_width, int screen_height,
-	int width, int height,
-	int flipx, int flipy,
-	int priority,
-	int shadow,
-	int shadow_pen, int eos )
-{
-	pen_t shadow_pen_base = machine->gfx[0]->color_base + (machine->config->total_colors/2);
-	const UINT8 *source;
-	int full_shadow=shadow&SYS16_SPR_SHADOW;
-	int partial_shadow=shadow&SYS16_SPR_PARTIAL_SHADOW;
-	int shadow_mask=(machine->config->total_colors/2)-1;
-	int sx, x, xcount;
-	int sy, y, ycount = 0;
-	int dx,dy;
-	UINT16 *dest;
-	UINT8 *pri;
-	unsigned pen, data;
-
-	priority = 1<<priority;
-
-	if( flipy ){
-		dy = -1;
-		y0 += screen_height-1;
-	}
-	else {
-		dy = 1;
-	}
-
-	if( flipx ){
-		dx = -1;
-		x0 += screen_width-1;
-	}
-	else {
-		dx = 1;
-	}
-
-	if (!eos)
-	{
-		sy = y0;
-		for( y=height; y; y-- ){
-			ycount += screen_height;
-			while( ycount>=height ){
-				if( sy>=cliprect->min_y && sy<=cliprect->max_y ){
-					source = addr;
-					dest = BITMAP_ADDR16(bitmap, sy, 0);
-					pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-					sx = x0;
-					xcount = 0;
-					for( x=width; x; x-=2 ){
-						data = (unsigned)*source++; /* next 2 pixels */
-						pen = data>>4;
-						xcount += screen_width;
-						while( xcount>=width )
-						{
-							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x ){
-								if(!(pri[sx]&priority)){
-									if (full_shadow)
-										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
-									else if (partial_shadow && pen==shadow_pen)
-										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
-									else
-										dest[sx] = pen_base + pen;
-								}
-							}
-							xcount -= width;
-							sx+=dx;
-						}
-						pen = data&0xf;
-						xcount += screen_width;
-						while( xcount>=width )
-						{
-							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x ){
-								if(!(pri[sx]&priority)){
-									if (full_shadow)
-										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
-									else if (partial_shadow && pen==shadow_pen)
-										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
-									else
-										dest[sx] = pen_base + pen;
-								}
-							}
-							xcount -= width;
-							sx+=dx;
-						}
-					}
-				}
-				ycount -= height;
-				sy+=dy;
-			}
-			addr += pitch;
-		}
-	}
-	else
-	{
-		sy = y0;
-		for( y=height; y; y-- ){
-			ycount += screen_height;
-			while( ycount>=height ){
-				if( sy>=cliprect->min_y && sy<=cliprect->max_y ){
-					source = addr;
-					dest = BITMAP_ADDR16(bitmap, sy, 0);
-					pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-					sx = x0;
-					xcount = 0;
-					for( x=width; x; x-=2 ){
-						data = (unsigned)*source++; /* next 2 pixels */
-						pen = data>>4;
-						if (pen==0xf) break;
-						xcount += screen_width;
-						while( xcount>=width )
-						{
-							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x )
-								if(!(pri[sx]&priority)) dest[sx] = pen_base + pen;
-							xcount -= width;
-							sx+=dx;
-						}
-						pen = data&0xf;
-						xcount += screen_width;
-						while( xcount>=width )
-						{
-							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x )
-								if(!(pri[sx]&priority)) dest[sx] = pen_base + pen;
-							xcount -= width;
-							sx+=dx;
-						}
-					}
-				}
-				ycount -= height;
-				sy+=dy;
-			}
-			addr += pitch;
-		}
-	}
-}
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int b3d ) //*
-{
-	pen_t pen_base = machine->gfx[0]->color_base;
-	const UINT8 *base_gfx = memory_region(machine, "gfx2");
-	const int gfx_rom_size = memory_region_length(machine, "gfx2");
-	const UINT16 *source = sys16_spriteram;
-	struct sys16_sprite_attributes sprite;
-	int xpos, ypos, screen_width, width, logical_height, pitch, flipy, flipx;
-	int i, mod_h, mod_x, eos;
-	unsigned gfx;
-
-	memset(&sprite, 0x00, sizeof(sprite));
-
-	for(i=0; i<num_sprites; i++)
-	{
-		sprite.flags = 0;
-		if (sys16_spritesystem(&sprite, source, 0)) return; /* end-of-spritelist */
-		source += 8;
-
-		if( sprite.flags & SYS16_SPR_VISIBLE )
-		{
-			xpos = sprite.x;
-			flipx = sprite.flags & SYS16_SPR_FLIPX;
-			ypos = sprite.y;
-			pitch = sprite.pitch;
-			flipy = pitch & 0x80;
-			width = pitch & 0x7f;
-			if (pitch & 0x80) width = 0x80 - width;
-			pitch = width << 1;
-			width <<= 2;
-			eos = 0;
-
-			if( b3d ) // outrun/aburner
-			{
-				if (b3d == 2) eos = 1;
-				if (xpos < 0 && flipx) continue;
-				if (ypos >= 240) ypos -= 256;
-				sprite.screen_height++;
-				logical_height = (sprite.screen_height<<4)*sprite.zoomy/0x2000;
-				screen_width = width*0x200/sprite.zoomx;
-
-				if (flipx && flipy) { mod_h = -logical_height;   mod_x = 4; }
-				else if     (flipx) { mod_h = -1; xpos++;        mod_x = 4; }
-				else if     (flipy) { mod_h = -logical_height;   mod_x = 0; }
-				else                { mod_h = 0;                 mod_x = 0; }
-
-				if( sprite.flags & SYS16_SPR_DRAW_TO_TOP )
-				{
-					ypos -= sprite.screen_height;
-					flipy = !flipy;
-				}
-
-				if( sprite.flags & SYS16_SPR_DRAW_TO_LEFT )
-				{
-					xpos -= screen_width;
-					flipx = !flipx;
-				}
-			}
-			else
-			{
-				if (!width) { width = 512; eos = 1; } // used by fantasy zone for laser
-				screen_width = width;
-				logical_height = sprite.screen_height;
-
-				if (sprite.zoomy) logical_height = logical_height*(0x400 + sprite.zoomy)/0x400 - 1;
-				if (sprite.zoomx) screen_width = screen_width*(0x800 - sprite.zoomx)/0x800 + 2;
-
-// fix, 5-bit zoom field
-//              if (sprite.zoomy) logical_height = logical_height*(0x20 + sprite.zoomy)/0x20 - 1;
-//              if (sprite.zoomx) screen_width = screen_width*(0x40 - sprite.zoomx)/0x40 + 2;
-
-				if (flipx && flipy) { mod_h = -logical_height-1; mod_x = 2; }
-				else if     (flipx) { mod_h = 0;                 mod_x = 2; }
-				else if     (flipy) { mod_h = -logical_height;   mod_x = 0; }
-				else                { mod_h = 1;                 mod_x = 0; }
-			}
-
-			gfx = sprite.gfx + pitch * mod_h + mod_x;
-			if (gfx >= gfx_rom_size) gfx %= gfx_rom_size;
-
-			gfx &= 0x1fffff; // temp kludge to stop line of fire crashing
-
-			draw_sprite(machine,
-				bitmap,cliprect,
-				base_gfx + gfx, pitch,
-				pen_base + (sprite.color<<4),
-				xpos, ypos, screen_width, sprite.screen_height,
-				width, logical_height,
-				flipx, flipy,
-				sprite.priority,
-				sprite.flags,
-				sprite.shadow_pen, eos);
-		}
-	}
-}
-
 /***************************************************************************/
 
 static TILEMAP_MAPPER( sys16_bg_map )
@@ -458,6 +311,7 @@ static const int resistances_normal[6] = {3900, 2000, 1000, 1000/2, 1000/4, 0};
 static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 static double weights[2][3][6];
 
+#if 0
 WRITE16_HANDLER( sys16_paletteram_w )
 {
 	UINT16 newword;
@@ -504,7 +358,7 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		palette_set_color( space->machine, offset+space->machine->config->total_colors/2,MAKE_RGB(rs,gs,bs));
 	}
 }
-
+#endif
 
 static void update_page( void ){
 	int all_dirty = 0;
@@ -564,39 +418,11 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&sys16_tilebank_switch)?sys16_tile_bank1:sys16_tile_bank0);
 
-	if (!shinobl_kludge)
-	{
-		SET_TILE_INFO(
-				0,
-				tile_number,
-				(data>>6)&0x7f,
-				0);
-	}
-	else
-	{
-		SET_TILE_INFO(
-				0,
-				tile_number,
-				(data>>5)&0x7f,
-				0);
-	}
-
-	switch(sys16_bg_priority_mode) {
-	case 1: // Alien Syndrome
-		tileinfo->category = (data&0x8000)?1:0;
-		break;
-	case 2: // Body Slam / wrestwar
-		tileinfo->category = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
-		break;
-	case 3: // sys18 games
-		if( data&0x8000 ){
-			tileinfo->category = 2;
-		}
-		else {
-			tileinfo->category = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
-		}
-		break;
-	}
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info ){
@@ -604,38 +430,11 @@ static TILE_GET_INFO( get_fg_tile_info ){
 	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&sys16_tilebank_switch)?sys16_tile_bank1:sys16_tile_bank0);
 
-	if (!shinobl_kludge)
-	{
-		SET_TILE_INFO(
-				0,
-				tile_number,
-				(data>>6)&0x7f,
-				0);
-	}
-	else
-	{
-		SET_TILE_INFO(
-				0,
-				tile_number,
-				(data>>5)&0x7f,
-				0);
-	}
-
-	switch(sys16_fg_priority_mode){
-	case 1: // alien syndrome
-		tileinfo->category = (data&0x8000)?1:0;
-		break;
-
-	case 3:
-		tileinfo->category = ((data&0xff00) >= sys16_fg_priority_value)?1:0;
-		break;
-
-	default:
-		if( sys16_fg_priority_mode>=0 ){
-			tileinfo->category = (data&0x8000)?1:0;
-		}
-		break;
-	}
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			(data>>6)&0x7f,
+			0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info ){
@@ -648,8 +447,6 @@ static TILE_GET_INFO( get_bg2_tile_info ){
 			tile_number,
 			(data>>6)&0x7f,
 			0);
-
-	tileinfo->category = 0;
 }
 
 static TILE_GET_INFO( get_fg2_tile_info ){
@@ -662,9 +459,6 @@ static TILE_GET_INFO( get_fg2_tile_info ){
 			tile_number,
 			(data>>6)&0x7f,
 			0);
-
-	if((data&0xff00) >= sys16_fg_priority_value) tileinfo->category = 1;
-	else tileinfo->category = 0;
 }
 
 WRITE16_HANDLER( sys16_tileram_w ){
@@ -735,15 +529,9 @@ WRITE16_HANDLER( sys16_textram_w ){
 
 /***************************************************************************/
 
-VIDEO_START( system16 ){
-	static const int bank_default[16] = {
-		0x0,0x1,0x2,0x3,
-		0x4,0x5,0x6,0x7,
-		0x8,0x9,0xa,0xb,
-		0xc,0xd,0xe,0xf
-	};
-	if (!sys16_obj_bank)
-		sys16_obj_bank = bank_default;
+VIDEO_START( system16 )
+{
+	setup_system16_bootleg_video(machine);
 
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
@@ -807,9 +595,7 @@ VIDEO_START( system16 ){
 		sys16_refreshenable = 1;
 
 		/* common defaults */
-		sys16_spritesystem = sys16_sprite_shinobi;
-		if (!sys16_sprxoffset)
-			sys16_sprxoffset = -0xb8;
+
 		sys16_bgxoffset = 0;
 		sys16_bg_priority_mode=0;
 		sys16_fg_priority_mode=0;
@@ -823,10 +609,18 @@ VIDEO_START( system16 ){
 
 		sys16_18_mode=0;
 	}
+	
+	segaic16_palette_init(0x800);
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400,system16_bootleg_sprite_xoffs);	
+	setup_system16_bootleg_spritebanking(machine);
+
+
 }
 
 VIDEO_START( system18old )
 {
+	VIDEO_START_CALL(system16);
+
 	sys16_bg1_trans=1;
 
 	background2 = tilemap_create(machine,
@@ -843,7 +637,6 @@ VIDEO_START( system18old )
 		8,8,
 		64*2,32*2 );
 
-	VIDEO_START_CALL(system16);
 
 	tilemap_set_transparent_pen( foreground2, 0 );
 
@@ -866,6 +659,8 @@ VIDEO_START( system18old )
 	sys16_fg_priority_mode=3;
 	sys16_bg_priority_value=0x1800;
 	sys16_fg_priority_value=0x2000;
+	
+
 }
 
 
@@ -972,6 +767,8 @@ WRITE16_HANDLER( system16a_bootleg_tilemapselect_w )
 
 VIDEO_START( system16a_bootleg )
 {
+	setup_system16_bootleg_video(machine);
+
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_normal, weights[0][0], 0, 0,
@@ -997,8 +794,30 @@ VIDEO_START( system16a_bootleg )
 	tilemap_set_transparent_pen( system16a_bootleg_text_tilemap, 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[0], 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[1], 0 );
+	
+	segaic16_palette_init(0x800);
 
+}
 
+VIDEO_START( system16a_bootleg_wb3bl )
+{
+	VIDEO_START_CALL(system16a_bootleg);
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL, 0x400, system16_bootleg_sprite_xoffs);		
+	setup_system16_bootleg_spritebanking(machine);
+}
+
+VIDEO_START( system16a_bootleg_shinobi )
+{
+	VIDEO_START_CALL(system16a_bootleg);
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD, 0x400, system16_bootleg_sprite_xoffs);		
+	setup_system16_bootleg_spritebanking(machine);
+}
+
+VIDEO_START( system16a_bootleg_passsht )
+{
+	VIDEO_START_CALL(system16a_bootleg);
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL, 0x400, system16_bootleg_sprite_xoffs);		
+	setup_system16_bootleg_spritebanking(machine);
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
@@ -1027,26 +846,35 @@ VIDEO_UPDATE( system16a_bootleg )
 	if ((system16a_bootleg_tilemapselect&0xff) == 0x12)
 	{
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrollx+offset_bg1x );
-		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrolly+offset_bg1y );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_bgscrolly+offset_bg1y+system16_bootleg_back_tilemap_yscroll );
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrollx+offset_bg0x );
-		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrolly+offset_bg0y );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_fgscrolly+offset_bg0y+system16_bootleg_fore_tilemap_yscroll );
 
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0 );
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], 0, 0 );
+
+		tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, system16_bootleg_text_tilemap_yscroll );
+
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 	else if ((system16a_bootleg_tilemapselect&0xff) == 0x21)
 	{
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_bgscrollx+187 );
-		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_bgscrolly );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[0], 0, system16a_bootleg_bgscrolly+system16_bootleg_back_tilemap_yscroll );
 		tilemap_set_scrollx( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_fgscrollx+187 );
-		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_fgscrolly+1 );
+		tilemap_set_scrolly( system16a_bootleg_bg_tilemaps[1], 0, system16a_bootleg_fgscrolly+1+system16_bootleg_fore_tilemap_yscroll );
 
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[1], TILEMAP_DRAW_OPAQUE, 0 );
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_bg_tilemaps[0], 0, 0 );
+
+		tilemap_set_scrolly( system16a_bootleg_text_tilemap, 0, system16_bootleg_text_tilemap_yscroll );
+
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 
+	/* draw the sprites */
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);	
+	
 	return 0;
 }
 
@@ -1085,6 +913,9 @@ VIDEO_UPDATE( system16a_bootleg_passht4b )
 		tilemap_draw( bitmap,cliprect, system16a_bootleg_text_tilemap, 0, 0 );
 	}
 
+	/* draw the sprites */
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);	
+	
 	return 0;
 }
 
@@ -1103,38 +934,40 @@ VIDEO_UPDATE( system16 )
 
 	bitmap_fill(priority_bitmap,cliprect,0);
 
-	// draw bg
+	tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
+	tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly+system16_bootleg_back_tilemap_yscroll );
+	tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
+	tilemap_set_scrolly( foreground, 0, -256+sys16_fg_scrolly+system16_bootleg_fore_tilemap_yscroll );
+
+	tilemap_set_scrollx( text_layer, 0, 0 );
+	tilemap_set_scrolly( text_layer, 0, 0+system16_bootleg_text_tilemap_yscroll );
+
+	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
+
+	/* Background */
+	
+	if(sys16_bg_priority_mode)
 	{
-		tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
-		tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly );
-
-		tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
-
-		if(sys16_bg_priority_mode)
-		{
-			tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
-		}
-
-		if( sys16_bg_priority_mode==2 )
-		{
-			tilemap_draw( bitmap,cliprect, background, 1, 0x01 );// body slam (& wrestwar??)
-		}
-		else if ( sys16_bg_priority_mode==1 )
-		{
-			tilemap_draw( bitmap,cliprect, background, 1, 0x03 );// alien syndrome / aurail
-		}
+		tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
 	}
 
-	// draw fg
+	if( sys16_bg_priority_mode==2 )
 	{
-		tilemap_set_scrollx( foreground, 0, -320-sys16_fg_scrollx+sys16_fgxoffset );
-		tilemap_set_scrolly( foreground, 0, -256+sys16_fg_scrolly );
-
-		tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
-		tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
+		tilemap_draw( bitmap,cliprect, background, 1, 0x01 );// body slam (& wrestwar??)
+	}
+	else if ( sys16_bg_priority_mode==1 )
+	{
+		tilemap_draw( bitmap,cliprect, background, 1, 0x03 );// alien syndrome / aurail
 	}
 
+	/* Foreground */
+	
+	tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
+	tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
 
+
+	/* Text Layer */
+	
 	if( sys16_textlayer_lo_max!=0 )
 	{
 		tilemap_draw( bitmap,cliprect, text_layer, 1, 7 );// needed for Body Slam
@@ -1142,7 +975,10 @@ VIDEO_UPDATE( system16 )
 
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
-	draw_sprites(screen->machine, bitmap,cliprect,0 );
+	//draw_sprites(screen->machine, bitmap,cliprect,0 );
+	
+	/* draw the sprites */
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -1186,6 +1022,8 @@ VIDEO_UPDATE( system18old )
 	tilemap_draw( bitmap,cliprect, text_layer, 1, 0x7 );
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
-	draw_sprites(screen->machine, bitmap,cliprect, 0 );
+	/* draw the sprites */
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	
 	return 0;
 }

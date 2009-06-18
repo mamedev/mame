@@ -144,6 +144,9 @@ GFXDECODE_EXTERN( sys16 );
 /*----------- defined in video/system16.c -----------*/
 
 extern VIDEO_START( system16a_bootleg );
+extern VIDEO_START( system16a_bootleg_wb3bl );
+extern VIDEO_START( system16a_bootleg_shinobi );
+extern VIDEO_START( system16a_bootleg_passsht );
 extern VIDEO_UPDATE( system16a_bootleg );
 extern VIDEO_UPDATE( system16a_bootleg_passht4b );
 extern WRITE16_HANDLER( system16a_bootleg_tilemapselect_w );

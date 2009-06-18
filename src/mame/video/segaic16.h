@@ -54,6 +54,9 @@ WRITE16_HANDLER( segaic16_textram_0_w );
 #define SEGAIC16_SPRITES_XBOARD		5
 #define SEGAIC16_SPRITES_YBOARD		6
 #define SEGAIC16_SPRITES_YBOARD_16B	7
+#define SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL 8
+#define SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL 9
+#define SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD 10
 
 void segaic16_sprites_init(running_machine *machine, int which, int type, int colorbase, int xoffs);
 void segaic16_sprites_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which);

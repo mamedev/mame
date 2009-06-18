@@ -2016,7 +2016,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 	{
 		int bottom  = data[0] >> 8;
 		int top     = data[0] & 0xff;
-		int xpos    = (data[1] & 0x1ff) - 0xb8;
+		int xpos    = (data[1] & 0x1ff);
 		int hide    = data[2] & 0x4000;
 		int flip    = data[2] & 0x100;
 		int pitch   = (INT8)(data[2] & 0xff);
@@ -2028,7 +2028,14 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 		int hzoom   = data[5] & 0x1f;
 		const UINT16 *spritedata;
 		int x, y, pix, xdelta = 1;
-
+		
+		/* some bootlegs have offset sprites */
+		xpos += info->xoffs;
+		xpos &= 0x1ff;
+		
+		/* originals all have this offset */
+		xpos -= 0xb8;
+					
 		/* initialize the end address to the start address */
 		data[7] = addr;
 
@@ -2056,7 +2063,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 
 		/* loop from top to bottom */
 		for (y = top; y < bottom; y++)
-		{
+		{						
 			/* advance a row */
 			addr += pitch;
 
@@ -2651,7 +2658,201 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 	}
 }
 
+/* bootlegs */
 
+/*
+
+ the system16a bootleg sprite hardware differs in subtle ways on a per game basis
+ with each game having the words swapped around.
+ 
+ there are also some subtle, but important changes when compared to the original
+ system16a sprites, mainly the increment of the address not happening until
+ the end of the loop
+
+*/
+
+/* ignores the sprite priority until we understand priority better on the bootlegs */
+#define system16a_bootleg_draw_pixel()												\
+	/* only draw if onscreen, not 0 or 15 */								\
+	if (x >= cliprect->min_x && x <= cliprect->max_x && pix != 0 && pix != 15) \
+	{																		\
+		/* are we high enough priority to be visible? */					\
+		if (sprpri || 1)												\
+		{																	\
+			/* shadow/hilight mode? */										\
+			if (color == info->colorbase + (0x3f << 4))						\
+				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+																			\
+			/* regular draw */												\
+			else															\
+				dest[x] = pix | color;										\
+		}																	\
+																			\
+		/* always mark priority so no one else draws here */				\
+		pri[x] = 0xff;														\
+	}																		\
+
+	
+/* make this an actual function */
+#define system16a_bootleg_draw_core()													\
+	{																					\
+		const UINT16 *spritedata; 														\
+		int x, y, pix, xdelta = 1; 														\
+																						\
+		xpos += info->xoffs;															\
+		xpos &= 0x1ff;																	\
+																						\
+		xpos -= 0xbd;																	\
+																						\
+		/* initialize the end address to the start address */							\
+		data[7] = addr;																\
+																						\
+		/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */		\
+		if ((top >= bottom) || bank == 255)												\
+			continue;																	\
+																						\
+		/* clamp to within the memory region size */									\
+		if (numbanks)																	\
+			bank %= numbanks;															\
+		spritedata = spritebase + 0x8000 * bank;										\
+																						\
+		/* adjust positions for screen flipping */										\
+		if (info->flip)																	\
+		{																				\
+			int temp = top;																\
+			top = 224 - bottom;															\
+			bottom = 224 - temp;														\
+			xpos = 320 - xpos;															\
+			xdelta = -1;																\
+		}																				\
+																						\
+		/* loop from top to bottom */													\
+		for (y = top; y < bottom; y++)													\
+		{																				\
+																						\
+			/* skip drawing if not within the cliprect */								\
+			if (y >= cliprect->min_y && y <= cliprect->max_y)							\
+			{																			\
+				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);								\
+				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);						\
+																						\
+				/* note that the System 16A sprites have a design flaw that allows the address */		\
+				/* to carry into the flip flag, which is the topmost bit -- it is very important */		\
+				/* to emulate this as the games compensate for it */									\
+																										\
+				/* non-flipped case */																	\
+				if (!(addr & 0x8000))																	\
+				{																						\
+					/* start at the word before because we preincrement below */						\
+					data[7] = addr - 1;																\
+					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )											\
+					{																					\
+						UINT16 pixels = spritedata[++data[7] & 0x7fff];									\
+																										\
+						/* draw four pixels */															\
+						pix = (pixels >> 12) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >>  8) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >>  4) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >>  0) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+																										\
+						/* stop if the last pixel in the group was 0xf */								\
+						if (pix == 15)																	\
+							break;																		\
+					}																					\
+				}																						\
+																										\
+				/* flipped case */																		\
+				else																					\
+				{																						\
+					/* start at the word after because we predecrement below */							\
+					data[7] = addr + 1;																	\
+					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )											\
+					{																					\
+						UINT16 pixels = spritedata[--data[7] & 0x7fff];									\
+																										\
+						/* draw four pixels */															\
+						pix = (pixels >>  0) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >>  4) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >>  8) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+						pix = (pixels >> 12) & 0xf; system16a_bootleg_draw_pixel(); x += xdelta;		\
+																										\
+						/* stop if the last pixel in the group was 0xf */								\
+						if (pix == 15)																	\
+							break;																		\
+					}																					\
+				}																						\
+			}																							\
+																										\
+			/* advance a row - must be done at the end on the bootlegs! */								\
+			addr += pitch;																				\
+		}																								\
+	}																									\
+
+																										
+	
+static void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
+	UINT16 *data;
+
+	for (data = info->spriteram; data < info->spriteram+ info->ramsize/2; data += 8)
+	{		
+		int bottom  = (data[4] >> 8);
+		int top     = (data[4] & 0xff);
+		int xpos    = (data[0]);
+		int pitch   = (INT16)data[5];
+		UINT16 addr = data[1];
+		int color   = info->colorbase + (((data[6] >> 8) & 0x3f) << 4);
+		int bank    = info->bank[(data[6] >> 4) & 0x7];
+		int sprpri  = 1 << ((data[6] >> 0) & 0x3);		
+
+		system16a_bootleg_draw_core();
+	}
+}
+
+/* 4 player passing shot is different to this.. */
+static void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
+{
+UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
+	UINT16 *data;
+
+	for (data = info->spriteram; data < info->spriteram+ info->ramsize/2; data += 8)
+	{
+		int bottom  = (data[1] >> 8)-1;
+		int top     = (data[1] & 0xff)-1;
+		int xpos    = (data[0]);
+		int pitch   = (INT16)data[3];
+		UINT16 addr = data[2];
+		int color   = info->colorbase + (((data[5] >> 8) & 0x3f) << 4);
+		int bank    = info->bank[(data[5] >> 4) & 0x7];
+		int sprpri  = 1 << ((data[5] >> 0) & 0x3);		
+		
+		system16a_bootleg_draw_core();
+	}
+}
+
+static void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
+	UINT16 *data;
+
+	for (data = info->spriteram; data < info->spriteram+ info->ramsize/2; data += 8)
+	{
+		int bottom  = (data[0] >> 8)-1;
+		int top     = (data[0] & 0xff)-1;
+		int xpos    = (data[1]);
+		int pitch   = (INT16)data[2];
+		UINT16 addr = data[3];
+		int color   = info->colorbase + (((data[4] >> 8) & 0x3f) << 4);
+		int bank    = info->bank[(data[4] >> 4) & 0x7];
+		int sprpri  = 1 << ((data[4] >> 0) & 0x3);	
+		
+		system16a_bootleg_draw_core();
+	}
+}
 
 /*************************************
  *
@@ -2671,6 +2872,8 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 	for (i = 0; i < 16; i++)
 		info->bank[i] = i;
 	info->colorbase = colorbase;
+	
+	/* some bootlegs have offset sprites */
 	info->xoffs = xoffs;
 
 	/* set up based on which sprite system */
@@ -2700,7 +2903,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 			info->draw = segaic16_sprites_16a_draw;
 			info->ramsize = 0x800;
 			break;
-
+			
 		case SEGAIC16_SPRITES_16B:
 			info->draw = segaic16_sprites_16b_draw;
 			info->ramsize = 0x800;
@@ -2728,6 +2931,21 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 			info->ramsize = 0x800;
 			break;
 
+		case SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL:
+			info->draw = segaic16_sprites_16a_bootleg_wb3bl_draw;
+			info->ramsize = 0x800;
+			break;	
+
+		case SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL:
+			info->draw = segaic16_sprites_16a_bootleg_passhtb_draw;
+			info->ramsize = 0x800;
+			break;				
+			
+		case SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD:
+			info->draw = segaic16_sprites_16a_bootleg_shinobld_draw;
+			info->ramsize = 0x800;
+			break;
+			
 		default:
 			fatalerror("Invalid sprite system specified in segaic16_sprites_init");
 	}
@@ -2741,6 +2959,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 	state_save_register_item_array(machine, "segaic16_sp", NULL, which, info->bank);
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->colorbase);
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->xoffs);
+
 	if (buffer)
 		state_save_register_item_pointer(machine, "segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
