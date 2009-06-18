@@ -15,14 +15,13 @@ DIP SWITCH:8BIT x 3
 
 ============================================================================
 
-Skeleton driver, the main issue is to decrypt/identify the main CPU.
-ADPCM & remaining ROM space is pretty much identical to Jantotsu, maybe
-there's a correlation? Or the dump is bad/missing something?
+Skeleton driver, just the main CPU was identified (TMS9980).
+Many thanks to Olivier Galibert and Wilbert Pol for the identify effort ;-)
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
+#include "cpu/tms9900/tms9900.h"
 #include "sound/msm5205.h"
 
 static VIDEO_START( pachifev )
@@ -40,7 +39,7 @@ static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachifev_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
 ADDRESS_MAP_END
 
 
@@ -90,7 +89,7 @@ static MACHINE_RESET( pachifev )
 static MACHINE_DRIVER_START( pachifev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu", TMS9980, 12000000/4) /* unknown divider */
 	MDRV_CPU_PROGRAM_MAP(pachifev_map)
 	MDRV_CPU_IO_MAP(pachifev_io)
 //  MDRV_CPU_FLAGS(CPU_DISABLE)
@@ -135,4 +134,8 @@ ROM_START( pachifev )
 	ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev,  0, ROT0, "Sanki Denshi Kogyo", "Pachi Fever", GAME_NOT_WORKING )
+static DRIVER_INIT( pachifev )
+{
+}
+
+GAME( 1983, pachifev,  0,       pachifev,  pachifev,  pachifev, ROT0, "Sanki Denshi Kogyo", "Pachi Fever", GAME_NOT_WORKING )

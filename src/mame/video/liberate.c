@@ -365,8 +365,8 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		color = 1;//(deco16_io_ram[4] & 2)+1;//(spriteram[offs+0]&0x4)>>2;
 
-		fx = spriteram[offs+0] & 0x02;
-		fy = spriteram[offs+0] & 0x04;
+		fy = spriteram[offs+0] & 0x02;
+		fx = spriteram[offs+0] & 0x04;
 		multi = 0;// spriteram[offs+0] & 0x10;
 
 //      if (multi) sy-=16;

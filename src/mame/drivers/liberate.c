@@ -819,12 +819,15 @@ static MACHINE_DRIVER_START( prosoccr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(12000000/8) //xtal is 12 Mhz, divider is unknown
+	MDRV_CPU_CLOCK(10000000/8) //xtal is unknown?
 	MDRV_CPU_PROGRAM_MAP(prosoccr_map)
 	MDRV_CPU_IO_MAP(prosoccr_io_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
 	MDRV_CPU_PROGRAM_MAP(prosoccr_sound_map)
+
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
