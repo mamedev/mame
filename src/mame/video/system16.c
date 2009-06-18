@@ -72,13 +72,13 @@ static const struct system15_bootleg_config config_table[] =
 	{ "astormb2",       1, 0,0,0,	 107 },
 	{ "mwalkbl",        1, 0,0,0,	 107 },
 	{ "shdancbl",       1, 0,0,0,	 107 },
-	
+
 	/* Tetris-based hardware */
 	{ "beautyb",        0, 0,0,0,	 112 },
 	{ "iqpipe",         0, 0,0,0,	 112 },
 
-	
-	
+
+
 	{ NULL, 0 }	// end of table
 };
 
@@ -94,7 +94,7 @@ void setup_system16_bootleg_video(running_machine* machine)
 	{
 		if (strcmp(k->name, gamename) == 0)
 		{
-			system16_bootleg_spritebank_type = k->spritebank_type;	
+			system16_bootleg_spritebank_type = k->spritebank_type;
 			system16_bootleg_back_tilemap_yscroll = k->back_tilemap_yscroll;
 			system16_bootleg_fore_tilemap_yscroll = k->fore_tilemap_yscroll;
 			system16_bootleg_text_tilemap_yscroll = k->text_tilemap_yscroll;
@@ -104,7 +104,7 @@ void setup_system16_bootleg_video(running_machine* machine)
 		}
 		++k;
 	}
-	
+
 	if (!found) fatalerror("system16 bootleg not in system15_bootleg_config config_table[]!\n");
 }
 
@@ -124,8 +124,8 @@ void setup_system16_bootleg_spritebanking(running_machine* machine)
 		int i;
 		for (i = 0; i < 16; i++)
 			segaic16_sprites_set_bank(machine, 0, i, alternate_banklist[i]);
-			
-	}	
+
+	}
 
 }
 
@@ -609,9 +609,9 @@ VIDEO_START( system16 )
 
 		sys16_18_mode=0;
 	}
-	
+
 	segaic16_palette_init(0x800);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400,system16_bootleg_sprite_xoffs);	
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400,system16_bootleg_sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 
 
@@ -659,7 +659,7 @@ VIDEO_START( system18old )
 	sys16_fg_priority_mode=3;
 	sys16_bg_priority_value=0x1800;
 	sys16_fg_priority_value=0x2000;
-	
+
 
 }
 
@@ -794,7 +794,7 @@ VIDEO_START( system16a_bootleg )
 	tilemap_set_transparent_pen( system16a_bootleg_text_tilemap, 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[0], 0 );
 	tilemap_set_transparent_pen( system16a_bootleg_bg_tilemaps[1], 0 );
-	
+
 	segaic16_palette_init(0x800);
 
 }
@@ -802,21 +802,21 @@ VIDEO_START( system16a_bootleg )
 VIDEO_START( system16a_bootleg_wb3bl )
 {
 	VIDEO_START_CALL(system16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL, 0x400, system16_bootleg_sprite_xoffs);		
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL, 0x400, system16_bootleg_sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( system16a_bootleg_shinobi )
 {
 	VIDEO_START_CALL(system16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD, 0x400, system16_bootleg_sprite_xoffs);		
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD, 0x400, system16_bootleg_sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( system16a_bootleg_passsht )
 {
 	VIDEO_START_CALL(system16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL, 0x400, system16_bootleg_sprite_xoffs);		
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL, 0x400, system16_bootleg_sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
@@ -873,8 +873,8 @@ VIDEO_UPDATE( system16a_bootleg )
 	}
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);	
-	
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+
 	return 0;
 }
 
@@ -914,8 +914,8 @@ VIDEO_UPDATE( system16a_bootleg_passht4b )
 	}
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);	
-	
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+
 	return 0;
 }
 
@@ -945,7 +945,7 @@ VIDEO_UPDATE( system16 )
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
 
 	/* Background */
-	
+
 	if(sys16_bg_priority_mode)
 	{
 		tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
@@ -961,13 +961,13 @@ VIDEO_UPDATE( system16 )
 	}
 
 	/* Foreground */
-	
+
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0x03 );
 	tilemap_draw( bitmap,cliprect, foreground, 1, 0x07 );
 
 
 	/* Text Layer */
-	
+
 	if( sys16_textlayer_lo_max!=0 )
 	{
 		tilemap_draw( bitmap,cliprect, text_layer, 1, 7 );// needed for Body Slam
@@ -976,7 +976,7 @@ VIDEO_UPDATE( system16 )
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
 	//draw_sprites(screen->machine, bitmap,cliprect,0 );
-	
+
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
@@ -1024,6 +1024,6 @@ VIDEO_UPDATE( system18old )
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
-	
+
 	return 0;
 }

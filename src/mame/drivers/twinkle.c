@@ -34,7 +34,7 @@ beatmania IIDX 6th Style       - Konami 2001     B4U JA A01       B4U JA A02   ?
 beatmania IIDX 7th Style       - Konami 2002     B44 JA A01       B44 JA A02   ?           ?
 beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C44         ?
 
-? = Undumped pieces. 
+? = Undumped pieces.
 # = Dumped but code unknown.
 * = Came with beatmania IIDX main board but might be for 8th Style (i.e. game C44)?
 If you can help, please contact us at http://guru.mameworld.info or http://mamedev.org/contact.html
@@ -614,12 +614,12 @@ static WRITE32_HANDLER(shared_psx_w)
 	if (mem_mask == 0xff)
 	{
 		twinkle_spu_shared[offset*2] = data;
-//		printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(space->cpu));
 	}
 	else if (mem_mask == 0xff0000)
 	{
 		twinkle_spu_shared[(offset*2)+1] = data;
-//		printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(space->cpu));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(space->cpu));
 	}
 	else
 	{
@@ -633,7 +633,7 @@ static READ32_HANDLER(shared_psx_r)
 
 	result = twinkle_spu_shared[offset*2] | twinkle_spu_shared[(offset*2)+1]<<16;
 
-//	printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(space->cpu));
+//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(space->cpu));
 
 	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 
@@ -703,7 +703,7 @@ static READ16_DEVICE_HANDLER( twinkle_ide_r )
 	}
 	else
 	{
-		return ide_controller_r(device, offset+0x1f0, 1);	
+		return ide_controller_r(device, offset+0x1f0, 1);
 	}
 }
 
@@ -713,15 +713,15 @@ static WRITE16_DEVICE_HANDLER( twinkle_ide_w )
 }
 
 /*
-	System control register (Konami always has one)
+    System control register (Konami always has one)
 
-	bit 7  = write 0 to ack IRQ 1, write 1 to enable (IRQ 1 appears to be vblank)
-	bit 8  = write 0 to ack IRQ 2, write 1 to enable (IRQ 2 appears to be DMA completion)
-	bit 9  = write 0 to ack IRQ 4, write 1 to enable (IRQ 4 appears to be "command sent", unsure how the MIPS causes it yet however)
-	bit 10 = write 0 to ack IRQ 6, write 1 to enable (IRQ 6 is IDE)
-	bit 11 = watchdog toggle?
+    bit 7  = write 0 to ack IRQ 1, write 1 to enable (IRQ 1 appears to be vblank)
+    bit 8  = write 0 to ack IRQ 2, write 1 to enable (IRQ 2 appears to be DMA completion)
+    bit 9  = write 0 to ack IRQ 4, write 1 to enable (IRQ 4 appears to be "command sent", unsure how the MIPS causes it yet however)
+    bit 10 = write 0 to ack IRQ 6, write 1 to enable (IRQ 6 is IDE)
+    bit 11 = watchdog toggle?
 
-	Other bits unknown.
+    Other bits unknown.
 */
 static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 {
@@ -761,14 +761,14 @@ static WRITE16_HANDLER( twinkle_waveram_w )
 
 static READ16_HANDLER( shared_68k_r )
 {
-//	printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
+//  printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
 
 	return twinkle_spu_shared[offset];
 }
 
 static WRITE16_HANDLER( shared_68k_w )
 {
-//	printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
+//  printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
 
 	twinkle_spu_shared[offset] = data & 0xff;
 }

@@ -396,7 +396,7 @@ static void calc3_mcu_run(running_machine *machine)
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
 	//calc3_mcu_status = 0;
-	
+
 	mcu_command = kaneko16_mcu_ram[calc3_mcu_command_offset/2 + 0];
 
 	if (mcu_command == 0) return;
@@ -404,13 +404,13 @@ static void calc3_mcu_run(running_machine *machine)
 	logerror("%s : MCU executed command at %04X: %04X\n",
 	 	cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
 
-		
+
 	switch (mcu_command)
 	{
 
 		case 0x00ff:
 		{
-	
+
 
 			int param1 = kaneko16_mcu_ram[(0>>1) + 1];
 			int param2 = kaneko16_mcu_ram[(0>>1) + 2];
@@ -450,19 +450,19 @@ static void calc3_mcu_run(running_machine *machine)
 			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+5] = 0x0000;
 			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+6] = 0x0000;
 			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+7] = 0x0000;
-			
+
 			calc3_mcu_command_offset = param3;	// where next command will be written?
 
-			
+
 		}
 		break;
-	
+
 		// the 'case' seems to be the number of commands in the list
-		// there are parts of the code where i've seen up to '5' specified, and the game uploads 5 transfer commands 
+		// there are parts of the code where i've seen up to '5' specified, and the game uploads 5 transfer commands
 		//
 
 		case 0x0001:
-		{	
+		{
 			int i;
 			int param1 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 1];
 			int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2];
@@ -475,8 +475,8 @@ static void calc3_mcu_run(running_machine *machine)
 			UINT32 writebackaddress = (param1&0x00ff) | (param2&0xff00);
 			UINT8  command1tabl = (param1&0xff00) >> 8;
 			UINT16 command1addr = (param1&0x00ff) | (param2&0xff00);
-			
-			
+
+
 			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
 			param1,param2,param3,param4,param5,param6,param7);
 			logerror("command 1 addr %04x command 1 table %02x\n", command1addr, command1tabl);
@@ -484,43 +484,43 @@ static void calc3_mcu_run(running_machine *machine)
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset>>1] = 0x0000;
 
-			
-			
+
+
 			// execute the command:
 
 			// param1 ?
-			//kaneko16_mcu_ram[param2/2 + 0] = 0x0000;		// ?
-			//kaneko16_mcu_ram[param2/2 + 1] = 0x0000;		// ?
-			//kaneko16_mcu_ram[param2/2 + 2] = 0x0000;		// ?
-			//kaneko16_mcu_ram[param2/2 + 3] = 0x0000;		// ? addr.l
-			//kaneko16_mcu_ram[param2/2 + 4] = 0x00e0;		// 0000e0: 4e73 rte
+			//kaneko16_mcu_ram[param2/2 + 0] = 0x0000;      // ?
+			//kaneko16_mcu_ram[param2/2 + 1] = 0x0000;      // ?
+			//kaneko16_mcu_ram[param2/2 + 2] = 0x0000;      // ?
+			//kaneko16_mcu_ram[param2/2 + 3] = 0x0000;      // ? addr.l
+			//kaneko16_mcu_ram[param2/2 + 4] = 0x00e0;      // 0000e0: 4e73 rte
 
 			//UINT32 writeaddress = (param2);
-				
-	
-	
+
+
+
 			writeaddress&=0xffff;
 
 
 			for(i=0;i<sizeof(shogwarr_snip_) / 2;i++)
 			{
-		//		printf("writes\n %08x", (writeaddress+i)*2);
+		//      printf("writes\n %08x", (writeaddress+i)*2);
 				kaneko16_mcu_ram[(writeaddress/2)+i] = shogwarr_snip_[i];
 			}
 
 			kaneko16_mcu_ram[(writebackaddress/2)+0] = 0x0020;
 			kaneko16_mcu_ram[(writebackaddress/2)+1] = writeaddress;
-			
-		//	calc3_mcu_command_offset = param3;	// where next command will be written?
-		//	calc3_mcu_status  =0;
-			
+
+		//  calc3_mcu_command_offset = param3;  // where next command will be written?
+		//  calc3_mcu_status  =0;
+
 		}
 		break;
 
 		case 0x0002:
 		{
 
-		
+
 			int param1 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 1];
 			int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2];
 			int param3 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 3];
@@ -529,7 +529,7 @@ static void calc3_mcu_run(running_machine *machine)
 			int param6 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 6];
 			int param7 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+ 7];
 
-	
+
 			UINT8  command1tabl = (param1&0xff00) >> 8;
 			UINT16 command1addr = (param1&0x00ff) | (param2&0xff00);
 			UINT8  command2tabl = (param3&0xff00) >> 8;
@@ -538,7 +538,7 @@ static void calc3_mcu_run(running_machine *machine)
 			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
 			param1,param2,param3,param4,param5,param6,param7);
 			logerror("command 1 addr %04x command 1 table %02x | command 2 addr %04x command 2 table %02x\n", command1addr, command1tabl, command2addr, command2tabl);
-			
+
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset>>1] = 0x0000;
 
@@ -546,10 +546,10 @@ static void calc3_mcu_run(running_machine *machine)
 ;
 		}
 		break;
-		
+
 		case 0x0003:
 		{
-	
+
 			int param1 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 1];
 			int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2];
 			int param3 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 3];
@@ -558,7 +558,7 @@ static void calc3_mcu_run(running_machine *machine)
 			int param6 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 6];
 			int param7 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+ 7];
 
-	
+
 			UINT8  command1tabl = (param1&0xff00) >> 8;
 			UINT16 command1addr = (param1&0x00ff) | (param2&0xff00);
 			UINT8  command2tabl = (param3&0xff00) >> 8;
@@ -569,7 +569,7 @@ static void calc3_mcu_run(running_machine *machine)
 			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
 			param1,param2,param3,param4,param5,param6,param7);
 			logerror("command 1 addr %04x command 1 table %02x | command 2 addr %04x command 2 table %02x | command 3 addr %04x command 3 table %02x\n", command1addr, command1tabl, command2addr, command2tabl, command3addr, command3tabl);
-			
+
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset>>1] = 0x0000;
 

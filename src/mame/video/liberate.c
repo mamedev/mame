@@ -121,7 +121,7 @@ WRITE8_HANDLER( prosoccr_io_w )
 	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(background_tilemap);
 
-//	popmessage("%02x %02x",deco16_io_ram[6],deco16_io_ram[7]);
+//  popmessage("%02x %02x",deco16_io_ram[6],deco16_io_ram[7]);
 
 	switch (offset)
 	{
@@ -484,10 +484,10 @@ VIDEO_UPDATE( prosport )
 
 	bitmap_fill(bitmap,cliprect,0);
 
-//	popmessage("%d",scrollx);
+//  popmessage("%d",scrollx);
 
 	offs = 0;
-//	scrollx = ((deco16_io_ram[0] & 0xf)<<8)+deco16_io_ram[1];
+//  scrollx = ((deco16_io_ram[0] & 0xf)<<8)+deco16_io_ram[1];
 	scrollx = 0;//((deco16_io_ram[0] & 0x3)<<8)+deco16_io_ram[1];
 
 	/* TODO: enough for showing something for Pro Bowling, not enough yet for Pro Golf...*/
@@ -511,7 +511,7 @@ VIDEO_UPDATE( prosport )
 		}
 	}
 
-//	#if 0
+//  #if 0
 	for(mx = 0;mx < 32;mx++)
 	{
 		for(my = 16;my < 32;my++)
@@ -531,12 +531,12 @@ VIDEO_UPDATE( prosport )
 			offs++;
 		}
 	}
-//	#endif
+//  #endif
 
 	//return 0;
 
-//	popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
-//	,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
+//  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
+//  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
 
 	for (offs = 0;offs < 0x400;offs++)
 	{

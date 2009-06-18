@@ -945,6 +945,4 @@ GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0,  "Konami", "T
 GAME( 1988, thnderxa, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 2)", 0 )
 GAME( 1988, thnderxb, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 3)", 0 )
 GAME( 1988, thnderxj, thunderx, thunderx, thnderxj, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 )
-/*
-GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, scontra, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", 0 )
-*/
+//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, scontra, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", 0 )

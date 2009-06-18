@@ -243,14 +243,14 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE(&prosport_bg_vram)
 	AM_RANGE(0x0000, 0x03ff) AM_SHARE(2) AM_RAM
-//	AM_RANGE(0x0e00, 0x0fff) AM_RAM
-//	AM_RANGE(0x1600, 0x17ff) AM_RAM
-//	AM_RANGE(0x1e00, 0x1fff) AM_RAM
+//  AM_RANGE(0x0e00, 0x0fff) AM_RAM
+//  AM_RANGE(0x1600, 0x17ff) AM_RAM
+//  AM_RANGE(0x1e00, 0x1fff) AM_RAM
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1ff isn't charram!
-//	AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
+//  AM_RANGE(0x2000, 0x2fff) AM_RAM //likely i/o
 	AM_RANGE(0x2000, 0x23ff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
-//	AM_RANGE(0x2800, 0x2fff) AM_SHARE(2) AM_RAM
+//  AM_RANGE(0x2800, 0x2fff) AM_SHARE(2) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(&spriteram)

@@ -706,4 +706,4 @@ GAME( 200?, tfupdate, triforce, triforcegd,    triforce,    0, ROT0, "Sega",    
 GAME( 2004, vs4j,     triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vs4,      triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, avalon20, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )
+//GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )

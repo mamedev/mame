@@ -27,7 +27,7 @@
 typedef enum {
 	DMA8237_SI,			/* Idle state */
 	DMA8237_S0,			/* HRQ has been triggered, waiting to receive HLDA */
-//	DMA8237_SW,			/* Wait state */
+//  DMA8237_SW,         /* Wait state */
 
 	/* Normal transfer states */
 	DMA8237_S1,			/* Output A8-A15; only used when A8-A15 really needs to be output */
@@ -37,13 +37,13 @@ typedef enum {
 
 	/* Memory to memory transfer states */
 	DMA8237_S11,		/* Output A8-A15 */
-//	DMA8237_S12,		/* Output A0-A7 */
-//	DMA8237_S13,		/* Initiate read */
-//	DMA8237_S14,		/* Perform read/write */
-//	DMA8237_S21,		/* Output A8-A15 */
-//	DMA8237_S22,		/* Output A0-A7 */
-//	DMA8237_S23,		/* Initiate read */
-//	DMA8237_S24,		/* Perform read/write */
+//  DMA8237_S12,        /* Output A0-A7 */
+//  DMA8237_S13,        /* Initiate read */
+//  DMA8237_S14,        /* Perform read/write */
+//  DMA8237_S21,        /* Output A8-A15 */
+//  DMA8237_S22,        /* Output A0-A7 */
+//  DMA8237_S23,        /* Initiate read */
+//  DMA8237_S24,        /* Perform read/write */
 } dma8237_state;
 
 
@@ -229,7 +229,7 @@ static TIMER_CALLBACK( dma8237_timerproc )
 		/* Check if a new DMA request has been received. */
 		{
 			/* Bit 6 of the command register determines whether the DREQ signals are active
-			  high or active low. */
+              high or active low. */
 			UINT16 pending_request = ( ( dma8237->command & 0x40 ) ? ~dma8237->drq : dma8237->drq ) & ~dma8237->mask;
 
 			if ( pending_request & 0x0f )
@@ -263,7 +263,7 @@ static TIMER_CALLBACK( dma8237_timerproc )
 
 	case DMA8237_S0:
 		/* S0 is the first of the DMA service. We have requested a hold but are waiting
-		  for confirmation. */
+          for confirmation. */
 		if ( dma8237->hlda )
 		{
 			if ( dma8237->command & 0x01 )

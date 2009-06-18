@@ -503,7 +503,7 @@ ROM_START( pcdi910m )
     ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
 ROM_END
 
-GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, pcdi490, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 490 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, pcdi910m,0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 910 (Memorex-Tandy) BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+//GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+//GAME( 199?, pcdi490, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 490 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
+//GAME( 199?, pcdi910m,0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 910 (Memorex-Tandy) BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
 */

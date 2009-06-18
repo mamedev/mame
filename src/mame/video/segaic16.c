@@ -2028,14 +2028,14 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 		int hzoom   = data[5] & 0x1f;
 		const UINT16 *spritedata;
 		int x, y, pix, xdelta = 1;
-		
+
 		/* some bootlegs have offset sprites */
 		xpos += info->xoffs;
 		xpos &= 0x1ff;
-		
+
 		/* originals all have this offset */
 		xpos -= 0xb8;
-					
+
 		/* initialize the end address to the start address */
 		data[7] = addr;
 
@@ -2063,7 +2063,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 
 		/* loop from top to bottom */
 		for (y = top; y < bottom; y++)
-		{						
+		{
 			/* advance a row */
 			addr += pitch;
 
@@ -2664,7 +2664,7 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 
  the system16a bootleg sprite hardware differs in subtle ways on a per game basis
  with each game having the words swapped around.
- 
+
  there are also some subtle, but important changes when compared to the original
  system16a sprites, mainly the increment of the address not happening until
  the end of the loop
@@ -2692,7 +2692,7 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 		pri[x] = 0xff;														\
 	}																		\
 
-	
+
 /* make this an actual function */
 #define system16a_bootleg_draw_core()													\
 	{																					\
@@ -2788,8 +2788,8 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 		}																								\
 	}																									\
 
-																										
-	
+
+
 static void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
@@ -2797,7 +2797,7 @@ static void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, st
 	UINT16 *data;
 
 	for (data = info->spriteram; data < info->spriteram+ info->ramsize/2; data += 8)
-	{		
+	{
 		int bottom  = (data[4] >> 8);
 		int top     = (data[4] & 0xff);
 		int xpos    = (data[0]);
@@ -2805,7 +2805,7 @@ static void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, st
 		UINT16 addr = data[1];
 		int color   = info->colorbase + (((data[6] >> 8) & 0x3f) << 4);
 		int bank    = info->bank[(data[6] >> 4) & 0x7];
-		int sprpri  = 1 << ((data[6] >> 0) & 0x3);		
+		int sprpri  = 1 << ((data[6] >> 0) & 0x3);
 
 		system16a_bootleg_draw_core();
 	}
@@ -2827,8 +2827,8 @@ UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 		UINT16 addr = data[2];
 		int color   = info->colorbase + (((data[5] >> 8) & 0x3f) << 4);
 		int bank    = info->bank[(data[5] >> 4) & 0x7];
-		int sprpri  = 1 << ((data[5] >> 0) & 0x3);		
-		
+		int sprpri  = 1 << ((data[5] >> 0) & 0x3);
+
 		system16a_bootleg_draw_core();
 	}
 }
@@ -2848,8 +2848,8 @@ static void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine,
 		UINT16 addr = data[3];
 		int color   = info->colorbase + (((data[4] >> 8) & 0x3f) << 4);
 		int bank    = info->bank[(data[4] >> 4) & 0x7];
-		int sprpri  = 1 << ((data[4] >> 0) & 0x3);	
-		
+		int sprpri  = 1 << ((data[4] >> 0) & 0x3);
+
 		system16a_bootleg_draw_core();
 	}
 }
@@ -2872,7 +2872,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 	for (i = 0; i < 16; i++)
 		info->bank[i] = i;
 	info->colorbase = colorbase;
-	
+
 	/* some bootlegs have offset sprites */
 	info->xoffs = xoffs;
 
@@ -2903,7 +2903,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 			info->draw = segaic16_sprites_16a_draw;
 			info->ramsize = 0x800;
 			break;
-			
+
 		case SEGAIC16_SPRITES_16B:
 			info->draw = segaic16_sprites_16b_draw;
 			info->ramsize = 0x800;
@@ -2934,18 +2934,18 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 		case SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL:
 			info->draw = segaic16_sprites_16a_bootleg_wb3bl_draw;
 			info->ramsize = 0x800;
-			break;	
+			break;
 
 		case SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL:
 			info->draw = segaic16_sprites_16a_bootleg_passhtb_draw;
 			info->ramsize = 0x800;
-			break;				
-			
+			break;
+
 		case SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD:
 			info->draw = segaic16_sprites_16a_bootleg_shinobld_draw;
 			info->ramsize = 0x800;
 			break;
-			
+
 		default:
 			fatalerror("Invalid sprite system specified in segaic16_sprites_init");
 	}

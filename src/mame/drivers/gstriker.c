@@ -689,8 +689,8 @@ ROM_START( gstrikea )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ym", 0 )                                                                             
-	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) ) 
+	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
       /* PALs were protected on this version, used the ones from the "gstriker" set */
 	ROM_REGION( 0x1000, "plds", 0 )

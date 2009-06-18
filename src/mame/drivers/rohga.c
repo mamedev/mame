@@ -131,8 +131,8 @@ static READ16_HANDLER( rohga_irq_ack_r )
 static WRITE16_HANDLER( wizdfire_irq_ack_w )
 {
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
-	   except when a credit is inserted (writes 6 twice).
-	   Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
+       except when a credit is inserted (writes 6 twice).
+       Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
 	cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 }
 

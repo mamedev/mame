@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
-//	AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -493,24 +493,24 @@ static DRIVER_INIT( progolf )
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
 
 	/*
-	CE12: B1 66         lda  ($66),y
-	CE14: 20 39 A7      jsr  $C759
-		C759: E6 66         inc  $66
-		C75B: D0 02         bne  $C75F
-		C75D: E6 67         inc  $67
-		C75F: 60            rts
-	CE17: C9 FD         cmp  #$FD
-	CE19: F0 44         beq  $CE3F
-	CE1B: C9 FE         cmp  #$FE
-	CE1D: F0 13         beq  $CE32
-	CE1F: C9 FF         cmp  #$FF
-	CE21: F0 4C         beq  $CE4F <- might go out there, this is the only branch in the entire rom that points to the rts
-	...
-	CE48: 90 A3         bcc  $CE0D
-	CE4A: E6 69         inc  $69
-	CE4C: 4C 0D AE      jmp  $CE0D
-	CE4F: 60            rts
-	*/
+    CE12: B1 66         lda  ($66),y
+    CE14: 20 39 A7      jsr  $C759
+        C759: E6 66         inc  $66
+        C75B: D0 02         bne  $C75F
+        C75D: E6 67         inc  $67
+        C75F: 60            rts
+    CE17: C9 FD         cmp  #$FD
+    CE19: F0 44         beq  $CE3F
+    CE1B: C9 FE         cmp  #$FE
+    CE1D: F0 13         beq  $CE32
+    CE1F: C9 FF         cmp  #$FF
+    CE21: F0 4C         beq  $CE4F <- might go out there, this is the only branch in the entire rom that points to the rts
+    ...
+    CE48: 90 A3         bcc  $CE0D
+    CE4A: E6 69         inc  $69
+    CE4C: 4C 0D AE      jmp  $CE0D
+    CE4F: 60            rts
+    */
 
 	decrypted[0xce21] = 0xd0;
 }

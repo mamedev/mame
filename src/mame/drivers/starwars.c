@@ -272,7 +272,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
         /* Manual shows Coin_B (Right) as Bit 4,5 - actually Bit 3,4 */
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("10EF:3,4") 
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("10EF:3,4")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x04, "*4" )
 	PORT_DIPSETTING(    0x08, "*5" )

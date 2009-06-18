@@ -3615,8 +3615,8 @@ followed by several tables in the following format
 
 OFFSET 0 - the location of a word which specifies the size of the block
          - this is usually '3', but if it's larger than 3 it enables an 'inline encryption' mode, whereby the decryption table is stored in the
-		 - right before the length register
-		 
+         - right before the length register
+
 OFFSET 1 - a 'mode' register of some sort, usually 0,1,2 or 3 for used data, shogun also called a 'blank' command (length 0) with mode 8
 
 OFFSET 2 - unknown, might be some kind of 'step' register
@@ -3629,7 +3629,7 @@ OFFSET 4-5 (or after the inline decryption table) - the length of the current bl
 
 OFFSET 6-size - data for thie block
 
-this continues for the number of blocks specified 
+this continues for the number of blocks specified
 after all the blocks there is a 0x1000 block of data which is the same between games
 
 where games specify the same decryption key the table used is the same, I don't know where these tables come from.
@@ -3644,7 +3644,7 @@ DRIVER_INIT( calc3 )
 
 	int x;
 	int offset = 0;
-	UINT8 numregions; 
+	UINT8 numregions;
 
 	calc3_mcu_crc = 0;
 	for (x=0;x<0x20000;x++)
@@ -3657,9 +3657,9 @@ DRIVER_INIT( calc3 )
 	rom++;
 
 
-	
-	
-	
+
+
+
 	for (x=0;x<numregions;x++)
 	{
 		int length;
@@ -3671,13 +3671,13 @@ DRIVER_INIT( calc3 )
 		int inline_table_size = 0;
 		UINT8 mode = rom[offset+1];
 		UINT8 unknown = rom[offset+2];
-	
-		
+
+
 		printf("%04x keydat %02x - bsofs:%02x m:%02x u:%02x k:%02x | ", startoffset, x, blocksize_offset,mode,unknown,decryption_key_byte);
-		
+
 		// if blocksize_offset > 3, it seems to specify the decryption table (or _a_ decryption table) inline of specified length, which loops over the data
 		if (blocksize_offset>3)
-		{	
+		{
 			inline_table_base = offset+4;
 			inline_table_size = blocksize_offset-3;
 			for (xx=0;xx<blocksize_offset-3;xx++)
@@ -3685,17 +3685,17 @@ DRIVER_INIT( calc3 )
 				printf("%02x ", rom[inline_table_base+xx]);
 			}
 		}
-		
-		
+
+
 		offset+= blocksize_offset+1;
 		length = rom[offset+0] | (rom[offset+1]<<8);
-	
+
 		printf("(length %04x)", length);
-		
+
 		printf("\n");
 
 		offset+=2;
-		
+
 		//if (x==0x2d)
 		{
 			if (length != 0)
@@ -3703,7 +3703,7 @@ DRIVER_INIT( calc3 )
 
 				if (blocksize_offset==3)
 				{
-					
+
 					// these tables are guessed, where do they come from? internal mcu rom? 0x1000 block at the end? are they related?
 					UINT8* table = 0;
 
@@ -3714,9 +3714,9 @@ DRIVER_INIT( calc3 )
 						0x20,0x1c,0x1f,0xc1,0x25,0x2e,0x49,0xe7,0x90,0x1b,0xb4,0xcf,0x1e,0x61,0xd7,0x46,
 						0xda,0x89,0x08,0x77,0xb1,0x81,0x6b,0x2d,0xb6,0xbc,0x99,0xc9,0x35,0x0a,0x0f,0x01
 					};
-				
-					
-									
+
+
+
 					/* ok */
 					UINT8 table15[64] = {
 						0x0C,0xEB,0x30,0x25,0xA8,0xED,0xE3,0x23,0xAC,0x2B,0x8D,0x34,0x88,0x9F,0x55,0xB5,
@@ -3724,17 +3724,17 @@ DRIVER_INIT( calc3 )
 						0x84,0x1B,0xD1,0xB2,0xB5,0xA7,0x0C,0xA0,0x51,0xE6,0x5E,0xC0,0xEB,0x68,0x22,0xD6,
 						0xC8,0xB6,0xCF,0x46,0x4B,0xF0,0x15,0xD7,0xB0,0xB5,0x29,0xB8,0xFD,0x43,0x5C,0xC0
 					};
-									
+
 
 					/* used by shogun & brapboys */
-					unsigned char table31[64] = {	
+					unsigned char table31[64] = {
                         // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
 						0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xaf, 0x00, 0x00, 0x00, 0x3a, 0x00, 0x00, 0x00, 0x3b,
 						0x00, 0x00, 0x00, 0xbb, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xb1, 0x00, 0x00, 0x00, 0xdc,
 						0x00, 0x00, 0x00, 0xb5, 0x00, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00, 0xde,
 						0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, 0x00, 0x26, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x00, 0xb1
 					};
-			
+
 					/* not ok */
 					unsigned char table3f[64] = {
 						0x29,0x34,0xD9,0x20,0x61,0x54,0x5F,0x6C,0x21,0x7E,0x5A,0x0F,0xD0,0x35,0x3B,0x2E,
@@ -3743,9 +3743,9 @@ DRIVER_INIT( calc3 )
 						0x43,0x02,0xC3,0xF5,0x7E,0x18,0xF1,0x82,0xE7,0xE7,0xDC,0x01,0x4F,0x36,0xCA,0x13
 						};
 
-	
-					
-					unsigned char tableb0[64] = {	
+
+
+					unsigned char tableb0[64] = {
                         // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
 						0x00, 0x00, 0x00, 0x5e, 0x00, 0x00, 0x00, 0x44, 0x00, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x81,
 						0x00, 0x00, 0x00, 0x85, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x32,
@@ -3753,15 +3753,15 @@ DRIVER_INIT( calc3 )
 						0x00, 0x00, 0x00, 0xb2, 0x00, 0x00, 0x00, 0xe4, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x5b
 					};
 
-					unsigned char tableb7[64] = {	
+					unsigned char tableb7[64] = {
                         // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
 						0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x00, 0x00, 0xd7,
 						0x00, 0x00, 0x00, 0xe7, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x82,
 						0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xa2, 0x00, 0x00, 0x00, 0xb4, 0x00, 0x00, 0x00, 0x26,
 						0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x9d, 0x00, 0x00, 0x00, 0x33
 					};
-					
-					unsigned char tablebb[64] = {	
+
+					unsigned char tablebb[64] = {
                         // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
 						0x00, 0x00, 0x00, 0x62, 0x00, 0x00, 0x00, 0x4a, 0x00, 0x00, 0x00, 0xf8, 0x00, 0x00, 0x00, 0x3d,
 						0x00, 0x00, 0x00, 0xec, 0x00, 0x00, 0x00, 0x99, 0x00, 0x00, 0x00, 0xa0, 0x00, 0x00, 0x00, 0x69,
@@ -3775,7 +3775,7 @@ DRIVER_INIT( calc3 )
 						0x29, 0xD3, 0x78, 0x21,	0xF7, 0xFC, 0xF1, 0xCD, 0x69, 0x04, 0xDD, 0x4D, 0xC4, 0x08, 0x7C, 0x2F,
 						0x1D, 0x95, 0x6C, 0x1C, 0xE7, 0x55, 0x98, 0xA6, 0x3D, 0xEE, 0xE1, 0x40,	0xF4, 0x27, 0x8E, 0x8E
 					};
-					
+
 					if (decryption_key_byte == 0x01) table = table01;
 					if (decryption_key_byte == 0x15) table = table15;
 					if (decryption_key_byte == 0x31) table = table31;
@@ -3784,7 +3784,7 @@ DRIVER_INIT( calc3 )
 					if (decryption_key_byte == 0xb7) table = tableb7;
 					if (decryption_key_byte == 0xbb) table = tablebb;
 					if (decryption_key_byte == 0xbf) table = tablebf;
-		
+
 					if (table)
 					{
 						int l;
@@ -3800,27 +3800,27 @@ DRIVER_INIT( calc3 )
 					for (l=0;l<length;l++)
 					{
 						rom[offset+l] -= rom[inline_table_base + (l%inline_table_size)];
-					}			
+					}
 				}
 				else
 				{
 					printf("blocksize offset < 3??\n");
-				
-				}			
-			
+
+				}
+
 				// dump out file
 				{
 					FILE *fp;
 					char filename[256];
-					
+
 					sprintf(filename,"data_%s_tableno%02x_key%02x_inlineoffset%02x_length%04x",
 					machine->gamedrv->name,
 					x,
 					decryption_key_byte,
 					blocksize_offset,
 					length);
-					
-					
+
+
 					fp=fopen(filename, "w+b");
 					if (fp)
 					{
@@ -3828,13 +3828,13 @@ DRIVER_INIT( calc3 )
 						fclose(fp);
 					}
 				}
-			
+
 			}
 		}
-		
-		offset+=length;		
+
+		offset+=length;
 	}
-	
+
 	// dump out the 0x1000 sized block at the end
 	{
 		FILE *fp;
@@ -3850,7 +3850,7 @@ DRIVER_INIT( calc3 )
 			fclose(fp);
 		}
 	}
-	
+
 	DRIVER_INIT_CALL(kaneko16);
     //  MCU is a 78K series III type CPU
 }
