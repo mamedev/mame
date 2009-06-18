@@ -918,6 +918,7 @@ static ADDRESS_MAP_START( bayroute_b2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE( segaic16_paletteram_w )  AM_BASE(&paletteram16)
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x900006, 0x900007) AM_WRITE(sound_command_w)
 	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE") AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -1098,6 +1099,28 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
+static MACHINE_DRIVER_START( sys16_datsu_sound_cfg )
+	/* TODO:
+    - other games might use this sound configuration
+    - speaker is likely to be mono for the bootlegs, not stereo.
+    - check msm5205 frequency.
+    */
+	MDRV_CPU_ADD("soundcpu",Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(tturfbl_sound_map)
+	MDRV_CPU_IO_MAP(tturfbl_sound_io_map)
+
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.32)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.32)
+
+	MDRV_SOUND_ADD("5205", MSM5205, 220000)
+	MDRV_SOUND_CONFIG(tturfbl_msm5205_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( goldnaxe_b1 )
 
 	/* basic machine hardware */
@@ -1143,6 +1166,8 @@ static MACHINE_DRIVER_START( bayrouteb2 )
 	MDRV_IMPORT_FROM(goldnaxe_b1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bayroute_b2_map)
+
+	MDRV_IMPORT_FROM(sys16_datsu_sound_cfg)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dduxbl )
@@ -1953,8 +1978,8 @@ ROM_START( bayrouteb2 )
 	ROM_LOAD16_BYTE( "bs7.bin",     0x60000, 0x10000, CRC(0c91abcc) SHA1(d25608f3cbacd1bd169f1a2247f007ac8bc8dda0) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "br_01", 0x00000, 0x10000, CRC(b87156ec) SHA1(bdfef2ab5a4d3cac4077c92ce1ef4604b4c11cf8) )
-	ROM_LOAD( "br_02", 0x10000, 0x10000, CRC(ef63991b) SHA1(4221741780f88c80b3213ddca949bee7d4c1469a) )
+	ROM_LOAD( "br_01", 0x10000, 0x10000, CRC(b87156ec) SHA1(bdfef2ab5a4d3cac4077c92ce1ef4604b4c11cf8) )
+	ROM_LOAD( "br_02", 0x20000, 0x10000, CRC(ef63991b) SHA1(4221741780f88c80b3213ddca949bee7d4c1469a) )
 ROM_END
 
 // sys16B
@@ -2127,7 +2152,12 @@ static DRIVER_INIT( bayrouteb1 )
 
 static DRIVER_INIT( bayrouteb2 )
 {
+	UINT8 *mem;
+
 	MACHINE_RESET_CALL(sys16_onetime);
+
+	mem = memory_region(machine, "soundcpu");
+	memcpy(mem, mem+0x10000, 0x8000);
 }
 
 /*
@@ -2488,7 +2518,7 @@ ROM_END
 
 // System 16B based bootlegs
 GAME( 1989, bayrouteb1, bayroute, bayrouteb1, bayroute, bayrouteb1, ROT0,   "bootleg", "Bay Route (encrypted, protected bootleg)", GAME_NO_SOUND | GAME_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
-GAME( 1989, bayrouteb2, bayroute, bayrouteb2, bayroute, bayrouteb2, ROT0,   "bootleg", "Bay Route (Datsu bootleg)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1989, bayrouteb2, bayroute, bayrouteb2, bayroute, bayrouteb2, ROT0,   "bootleg", "Bay Route (Datsu bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, goldnaxeb1, goldnaxe, goldnaxe_b1, goldnaxe, goldnabl, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1989, goldnaxeb2, goldnaxe, goldnaxe_b2, goldnaxe, goldnab2, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1989, tturfbl,  tturf,    tturfbl,  tturf,    tturfbl,  ROT0,   "bootleg", "Tough Turf (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
