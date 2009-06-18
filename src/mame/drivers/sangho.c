@@ -93,18 +93,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexyboom_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ym", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-	AM_RANGE( 0xf0, 0xf0) AM_READ( v9938_0_vram_r )
-	AM_RANGE( 0xf1, 0xf1) AM_READ( v9938_0_status_r )
-
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ym", ym2413_w )
-	AM_RANGE( 0xf0, 0xf0) AM_WRITE( v9938_0_vram_w )
-	AM_RANGE( 0xf1, 0xf1) AM_WRITE( v9938_0_command_w )
+	AM_RANGE( 0xf0, 0xf0) AM_READWRITE( v9938_0_vram_r,v9938_0_vram_w )
+	AM_RANGE( 0xf1, 0xf1) AM_READWRITE( v9938_0_status_r,v9938_0_command_w )
 	AM_RANGE( 0xf2, 0xf2) AM_WRITE( v9938_0_palette_w )
 	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_0_register_w )
+	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 	//bank f8-ff ???
 ADDRESS_MAP_END
 
