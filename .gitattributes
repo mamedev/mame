@@ -1599,6 +1599,7 @@ src/mame/drivers/highvdeo.c svneol=native#text/plain
 src/mame/drivers/hikaru.c svneol=native#text/plain
 src/mame/drivers/himesiki.c svneol=native#text/plain
 src/mame/drivers/hitme.c svneol=native#text/plain
+src/mame/drivers/hitpoker.c svneol=native#text/plain
 src/mame/drivers/hnayayoi.c svneol=native#text/plain
 src/mame/drivers/hng64.c svneol=native#text/plain
 src/mame/drivers/holeland.c svneol=native#text/plain

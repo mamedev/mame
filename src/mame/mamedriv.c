@@ -9537,4 +9537,7 @@ Other Sun games
 
 	DRIVER( roul )
 
+	/* Accept LTD. */
+	DRIVER( hitpoker ) /* (c) 1997 */
+
 #endif	/* DRIVER_RECURSIVE */
