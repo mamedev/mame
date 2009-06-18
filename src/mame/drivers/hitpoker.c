@@ -16,15 +16,15 @@ DIP 1X4
 
 ============================================================================
 
-Skeleton driver, the main issue is to decrypt/identify the main CPU
-(something with 0x10-0x40 irq table vectors at the end?).
+Skeleton driver, just the main CPU has been identified (a MC68HC11). This one
+requires some mods to the cpu core in order to start to work...
+Many thanks to Olivier Galibert for the identify effort ;-)
 
 ***************************************************************************/
 
 
 #include "driver.h"
-#include "cpu/m6502/m6502.h"
-
+#include "cpu/mc68hc11/mc68hc11.h"
 
 VIDEO_START(hitpoker)
 {
@@ -37,7 +37,11 @@ VIDEO_UPDATE(hitpoker)
 }
 
 
+/* overlap empty rom addresses */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
+	AM_RANGE(0x1000, 0x103f) AM_RAM // hw regs?
+	AM_RANGE(0xb600, 0xbeff) AM_RAM // vram / paletteram?
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -61,14 +65,25 @@ static const gfx_layout hitpoker_layout =
 	8*64
 };
 
+static PALETTE_INIT( hitpoker )
+{
+	int x,r,g,b;
 
+	for(x=0;x<0x100;x++)
+	{
+		r = (x & 0xf)*0x10;
+		g = ((x & 0x3c)>>2)*0x10;
+		b = ((x & 0xf0)>>4)*0x10;
+		palette_set_color(machine,x,MAKE_RGB(r,g,b));
+	}
+}
 
 static GFXDECODE_START( hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout,   0x0, 2  )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( hitpoker )
-	MDRV_CPU_ADD("maincpu", M65C02,2000000) /* Wrong, NOT z80 */
+	MDRV_CPU_ADD("maincpu", MC68HC11,2000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 //	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -82,6 +97,7 @@ static MACHINE_DRIVER_START( hitpoker )
 
 	MDRV_GFXDECODE(hitpoker)
 	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(hitpoker)
 
 	MDRV_VIDEO_START(hitpoker)
 	MDRV_VIDEO_UPDATE(hitpoker)
