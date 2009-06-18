@@ -171,6 +171,11 @@ static READ8_HANDLER( custom_cpu_r )
 	return 0;
 }
 
+static WRITE8_HANDLER( custom_cpu_w )
+{
+ 	custom_cpu_ram[0x7f0 + offset] = data;
+}
+
 
 static void update_flip_state(void)
 {
@@ -217,7 +222,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE(&custom_cpu_ram)
-	AM_RANGE(0xd7f0, 0xd7ff) AM_READ(custom_cpu_r) AM_WRITENOP
+	AM_RANGE(0xd7f0, 0xd7ff) AM_READWRITE(custom_cpu_r, custom_cpu_w)
 	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE(&arabian_blitter)
 ADDRESS_MAP_END
 
