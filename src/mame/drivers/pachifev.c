@@ -15,7 +15,8 @@ DIP SWITCH:8BIT x 3
 
 ============================================================================
 
-Skeleton driver, just the main CPU was identified (TMS9980).
+Skeleton driver, just the main CPU was identified (TMS9900). Can't get it
+to upload a vram / blitter list at all :-/
 Many thanks to Olivier Galibert and Wilbert Pol for the identify effort ;-)
 
 ***************************************************************************/
@@ -34,12 +35,14 @@ static VIDEO_UPDATE( pachifev )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachifev_io, ADDRESS_SPACE_IO, 8 )
-
+//  AM_RANGE(0x0f70, 0x0f70) AM_WRITE()
+//	AM_RANGE(0x0f71, 0x0f71) AM_WRITE()
 ADDRESS_MAP_END
 
 
@@ -86,14 +89,17 @@ static MACHINE_RESET( pachifev )
 	adpcm_pos = 0;
 }
 
+static INTERRUPT_GEN( pachifev_vblank_irq )
+{
+}
+
 static MACHINE_DRIVER_START( pachifev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS9980, 12000000/4) /* unknown divider */
+	MDRV_CPU_ADD("maincpu", TMS9900, 12000000/4) /* unknown divider */
 	MDRV_CPU_PROGRAM_MAP(pachifev_map)
 	MDRV_CPU_IO_MAP(pachifev_io)
-//  MDRV_CPU_FLAGS(CPU_DISABLE)
-//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen",pachifev_vblank_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -122,13 +128,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pachifev )
-	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "ic42.00",   0x0000, 0x2000, CRC(9653546e) SHA1(0836d01118241d38bbf61732275afe3ae47d0622) )
-	ROM_LOAD( "ic43.01",   0x2000, 0x2000, CRC(5572dce5) SHA1(fad45b33e095ac6e3ed3d7cdc3d8678c153a1b38) )
-	ROM_LOAD( "ic44.02",   0x4000, 0x2000, CRC(98b3841f) SHA1(0563139877bf01e1673767ee1798bbcf68adadea) )
-	ROM_LOAD( "ic45.03",   0x6000, 0x2000, CRC(6b76e6fa) SHA1(5be10ab0b76e2061fc7e9c77649572955bee7661) )
-	ROM_LOAD( "ic46.04",   0x8000, 0x2000, CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
-	ROM_LOAD( "ic48.50",   0xa000, 0x2000, CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic42.00",   0x00000, 0x2000, CRC(9653546e) SHA1(0836d01118241d38bbf61732275afe3ae47d0622) )
+	ROM_LOAD( "ic43.01",   0x02000, 0x2000, CRC(5572dce5) SHA1(fad45b33e095ac6e3ed3d7cdc3d8678c153a1b38) )
+	ROM_LOAD( "ic44.02",   0x04000, 0x2000, CRC(98b3841f) SHA1(0563139877bf01e1673767ee1798bbcf68adadea) )
+	ROM_LOAD( "ic45.03",   0x06000, 0x2000, CRC(6b76e6fa) SHA1(5be10ab0b76e2061fc7e9c77649572955bee7661) )
+	ROM_LOAD( "ic46.04",   0x08000, 0x2000, CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
+	ROM_LOAD( "ic48.50",   0x0a000, 0x2000, CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
 
 	ROM_REGION( 0x4000, "adpcm", 0 ) //msm code
 	ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
