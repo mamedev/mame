@@ -1,107 +1,107 @@
 #undef OP
-#define OP(nn) INLINE void minx_CE_##nn(void)
+#define OP(nn) INLINE void minx_CE_##nn(minx_state *minx)
 
-OP(00) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | ADD8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(01) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | ADD8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(02) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | ADD8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(03) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | ADD8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(04) { AD1_IHL; WR( addr1, ADD8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(05) { AD1_IHL; WR( addr1, ADD8( RD( addr1 ), rdop() ) ); }
-OP(06) { AD1_IHL; AD2_XIX; WR( addr1, ADD8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(07) { AD1_IHL; AD2_YIY; WR( addr1, ADD8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(08) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | ADDC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(09) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | ADDC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(0A) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | ADDC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(0B) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | ADDC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(0C) { AD1_IHL; WR( addr1, ADDC8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(0D) { AD1_IHL; WR( addr1, ADDC8( RD( addr1 ), rdop() ) ); }
-OP(0E) { AD1_IHL; AD2_XIX; WR( addr1, ADDC8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(0F) { AD1_IHL; AD2_YIY; WR( addr1, ADDC8( RD( addr1 ), RD( addr2 ) ) ); }
+OP(00) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | ADD8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(01) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | ADD8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(02) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | ADD8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(03) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | ADD8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(04) { AD1_IHL; WR( addr1, ADD8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(05) { AD1_IHL; WR( addr1, ADD8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(06) { AD1_IHL; AD2_XIX; WR( addr1, ADD8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(07) { AD1_IHL; AD2_YIY; WR( addr1, ADD8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(08) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | ADDC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(09) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | ADDC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(0A) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | ADDC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(0B) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | ADDC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(0C) { AD1_IHL; WR( addr1, ADDC8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(0D) { AD1_IHL; WR( addr1, ADDC8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(0E) { AD1_IHL; AD2_XIX; WR( addr1, ADDC8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(0F) { AD1_IHL; AD2_YIY; WR( addr1, ADDC8( minx, RD( addr1 ), RD( addr2 ) ) ); }
 
-OP(10) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(11) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(12) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(13) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(14) { AD1_IHL; WR( addr1, SUB8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(15) { AD1_IHL; WR( addr1, SUB8( RD( addr1 ), rdop() ) ); }
-OP(16) { AD1_IHL; AD2_XIX; WR( addr1, SUB8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(17) { AD1_IHL; AD2_YIY; WR( addr1, SUB8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(18) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | SUBC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(19) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | SUBC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(1A) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | SUBC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(1B) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | SUBC8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(1C) { AD1_IHL; WR( addr1, SUBC8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(1D) { AD1_IHL; WR( addr1, SUBC8( RD( addr1 ), rdop() ) ); }
-OP(1E) { AD1_IHL; AD2_XIX; WR( addr1, SUBC8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(1F) { AD1_IHL; AD2_YIY; WR( addr1, SUBC8( RD( addr1 ), RD( addr2 ) ) ); }
+OP(10) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(11) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(12) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(13) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(14) { AD1_IHL; WR( addr1, SUB8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(15) { AD1_IHL; WR( addr1, SUB8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(16) { AD1_IHL; AD2_XIX; WR( addr1, SUB8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(17) { AD1_IHL; AD2_YIY; WR( addr1, SUB8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(18) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | SUBC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(19) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | SUBC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(1A) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | SUBC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(1B) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | SUBC8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(1C) { AD1_IHL; WR( addr1, SUBC8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(1D) { AD1_IHL; WR( addr1, SUBC8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(1E) { AD1_IHL; AD2_XIX; WR( addr1, SUBC8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(1F) { AD1_IHL; AD2_YIY; WR( addr1, SUBC8( minx, RD( addr1 ), RD( addr2 ) ) ); }
 
-OP(20) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | AND8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(21) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | AND8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(22) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | AND8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(23) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | AND8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(24) { AD1_IHL; WR( addr1, AND8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(25) { AD1_IHL; WR( addr1, AND8( RD( addr1 ), rdop() ) ); }
-OP(26) { AD1_IHL; AD2_XIX; WR( addr1, AND8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(27) { AD1_IHL; AD2_YIY; WR( addr1, AND8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(28) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | OR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(29) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | OR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(2A) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | OR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(2B) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | OR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(2C) { AD1_IHL; WR( addr1, OR8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(2D) { AD1_IHL; WR( addr1, OR8( RD( addr1 ), rdop() ) ); }
-OP(2E) { AD1_IHL; AD2_XIX; WR( addr1, OR8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(2F) { AD1_IHL; AD2_YIY; WR( addr1, OR8( RD( addr1 ), RD( addr2 ) ) ); }
+OP(20) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | AND8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(21) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | AND8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(22) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | AND8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(23) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | AND8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(24) { AD1_IHL; WR( addr1, AND8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(25) { AD1_IHL; WR( addr1, AND8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(26) { AD1_IHL; AD2_XIX; WR( addr1, AND8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(27) { AD1_IHL; AD2_YIY; WR( addr1, AND8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(28) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | OR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(29) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | OR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(2A) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | OR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(2B) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | OR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(2C) { AD1_IHL; WR( addr1, OR8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(2D) { AD1_IHL; WR( addr1, OR8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(2E) { AD1_IHL; AD2_XIX; WR( addr1, OR8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(2F) { AD1_IHL; AD2_YIY; WR( addr1, OR8( minx, RD( addr1 ), RD( addr2 ) ) ); }
 
-OP(30) { AD2_X8; SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(31) { AD2_Y8; SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(32) { AD2_XL; SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(33) { AD2_YL; SUB8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(34) { AD1_IHL; SUB8( RD( addr1 ), ( regs.BA & 0x00FF ) ); }
-OP(35) { AD1_IHL; SUB8( RD( addr1 ), rdop() ); }
-OP(36) { AD1_IHL; AD2_XIX; SUB8( RD( addr1 ), RD( addr2 ) ); }
-OP(37) { AD1_IHL; AD2_YIY; SUB8( RD( addr1 ), RD( addr2 ) ); }
-OP(38) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | XOR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(39) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | XOR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(3A) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | XOR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(3B) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | XOR8( ( regs.BA & 0x00FF ), RD( addr2 ) ); }
-OP(3C) { AD1_IHL; WR( addr1, XOR8( RD( addr1 ), ( regs.BA & 0x00FF ) ) ); }
-OP(3D) { AD1_IHL; WR( addr1, XOR8( RD( addr1 ), rdop() ) ); }
-OP(3E) { AD1_IHL; AD2_XIX; WR( addr1, XOR8( RD( addr1 ), RD( addr2 ) ) ); }
-OP(3F) { AD1_IHL; AD2_YIY; WR( addr1, XOR8( RD( addr1 ), RD( addr2 ) ) ); }
+OP(30) { AD2_X8; SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(31) { AD2_Y8; SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(32) { AD2_XL; SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(33) { AD2_YL; SUB8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(34) { AD1_IHL; SUB8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ); }
+OP(35) { AD1_IHL; SUB8( minx, RD( addr1 ), rdop(minx) ); }
+OP(36) { AD1_IHL; AD2_XIX; SUB8( minx, RD( addr1 ), RD( addr2 ) ); }
+OP(37) { AD1_IHL; AD2_YIY; SUB8( minx, RD( addr1 ), RD( addr2 ) ); }
+OP(38) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | XOR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(39) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | XOR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(3A) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | XOR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(3B) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | XOR8( minx, ( minx->BA & 0x00FF ), RD( addr2 ) ); }
+OP(3C) { AD1_IHL; WR( addr1, XOR8( minx, RD( addr1 ), ( minx->BA & 0x00FF ) ) ); }
+OP(3D) { AD1_IHL; WR( addr1, XOR8( minx, RD( addr1 ), rdop(minx) ) ); }
+OP(3E) { AD1_IHL; AD2_XIX; WR( addr1, XOR8( minx, RD( addr1 ), RD( addr2 ) ) ); }
+OP(3F) { AD1_IHL; AD2_YIY; WR( addr1, XOR8( minx, RD( addr1 ), RD( addr2 ) ) ); }
 
-OP(40) { AD2_X8; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(41) { AD2_Y8; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(42) { AD2_XL; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(43) { AD2_YL; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(44) { AD1_X8; WR( addr1, ( regs.BA & 0x00FF ) ); }
-OP(45) { AD1_Y8; WR( addr1, ( regs.BA & 0x00FF ) ); }
-OP(46) { AD1_XL; WR( addr1, ( regs.BA & 0x00FF ) ); }
-OP(47) { AD1_YL; WR( addr1, ( regs.BA & 0x00FF ) ); }
-OP(48) { AD2_X8; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(49) { AD2_Y8; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(4A) { AD2_XL; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(4B) { AD2_YL; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(4C) { AD1_X8; WR( addr1, ( regs.BA >> 8 ) ); }
-OP(4D) { AD1_Y8; WR( addr1, ( regs.BA >> 8 ) ); }
-OP(4E) { AD1_XL; WR( addr1, ( regs.BA >> 8 ) ); }
-OP(4F) { AD1_YL; WR( addr1, ( regs.BA >> 8 ) ); }
+OP(40) { AD2_X8; minx->BA = ( minx->BA & 0xFF00 ) | RD( addr2 ); }
+OP(41) { AD2_Y8; minx->BA = ( minx->BA & 0xFF00 ) | RD( addr2 ); }
+OP(42) { AD2_XL; minx->BA = ( minx->BA & 0xFF00 ) | RD( addr2 ); }
+OP(43) { AD2_YL; minx->BA = ( minx->BA & 0xFF00 ) | RD( addr2 ); }
+OP(44) { AD1_X8; WR( addr1, ( minx->BA & 0x00FF ) ); }
+OP(45) { AD1_Y8; WR( addr1, ( minx->BA & 0x00FF ) ); }
+OP(46) { AD1_XL; WR( addr1, ( minx->BA & 0x00FF ) ); }
+OP(47) { AD1_YL; WR( addr1, ( minx->BA & 0x00FF ) ); }
+OP(48) { AD2_X8; minx->BA = ( minx->BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(49) { AD2_Y8; minx->BA = ( minx->BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(4A) { AD2_XL; minx->BA = ( minx->BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(4B) { AD2_YL; minx->BA = ( minx->BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(4C) { AD1_X8; WR( addr1, ( minx->BA >> 8 ) ); }
+OP(4D) { AD1_Y8; WR( addr1, ( minx->BA >> 8 ) ); }
+OP(4E) { AD1_XL; WR( addr1, ( minx->BA >> 8 ) ); }
+OP(4F) { AD1_YL; WR( addr1, ( minx->BA >> 8 ) ); }
 
-OP(50) { AD2_X8; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(51) { AD2_Y8; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(52) { AD2_XL; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(53) { AD2_YL; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(54) { AD1_X8; WR( addr1, ( regs.HL & 0x00FF ) ); }
-OP(55) { AD1_Y8; WR( addr1, ( regs.HL & 0x00FF ) ); }
-OP(56) { AD1_XL; WR( addr1, ( regs.HL & 0x00FF ) ); }
-OP(57) { AD1_YL; WR( addr1, ( regs.HL & 0x00FF ) ); }
-OP(58) { AD2_X8; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(59) { AD2_Y8; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(5A) { AD2_XL; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(5B) { AD2_YL; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(5C) { AD1_X8; WR( addr1, ( regs.HL >> 8 ) ); }
-OP(5D) { AD1_Y8; WR( addr1, ( regs.HL >> 8 ) ); }
-OP(5E) { AD1_XL; WR( addr1, ( regs.HL >> 8 ) ); }
-OP(5F) { AD1_YL; WR( addr1, ( regs.HL >> 8 ) ); }
+OP(50) { AD2_X8; minx->HL = ( minx->HL & 0xFF00 ) | RD( addr2 ); }
+OP(51) { AD2_Y8; minx->HL = ( minx->HL & 0xFF00 ) | RD( addr2 ); }
+OP(52) { AD2_XL; minx->HL = ( minx->HL & 0xFF00 ) | RD( addr2 ); }
+OP(53) { AD2_YL; minx->HL = ( minx->HL & 0xFF00 ) | RD( addr2 ); }
+OP(54) { AD1_X8; WR( addr1, ( minx->HL & 0x00FF ) ); }
+OP(55) { AD1_Y8; WR( addr1, ( minx->HL & 0x00FF ) ); }
+OP(56) { AD1_XL; WR( addr1, ( minx->HL & 0x00FF ) ); }
+OP(57) { AD1_YL; WR( addr1, ( minx->HL & 0x00FF ) ); }
+OP(58) { AD2_X8; minx->HL = ( minx->HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(59) { AD2_Y8; minx->HL = ( minx->HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(5A) { AD2_XL; minx->HL = ( minx->HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(5B) { AD2_YL; minx->HL = ( minx->HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(5C) { AD1_X8; WR( addr1, ( minx->HL >> 8 ) ); }
+OP(5D) { AD1_Y8; WR( addr1, ( minx->HL >> 8 ) ); }
+OP(5E) { AD1_XL; WR( addr1, ( minx->HL >> 8 ) ); }
+OP(5F) { AD1_YL; WR( addr1, ( minx->HL >> 8 ) ); }
 
 OP(60) { AD1_IHL; AD2_X8; WR( addr1, RD( addr2 ) ); }
 OP(61) { AD1_IHL; AD2_Y8; WR( addr1, RD( addr2 ) ); }
@@ -137,101 +137,101 @@ OP(7D) { /* illegal operation? */ }
 OP(7E) { /* illegal operation? */ }
 OP(7F) { /* illegal operation? */ }
 
-OP(80) { regs.BA = ( regs.BA & 0xFF00 ) | SAL8( regs.BA & 0x00FF ); }
-OP(81) { regs.BA = ( regs.BA & 0x00FF ) | ( SAL8( regs.BA >> 8 )<< 8 ); }
-OP(82) { AD1_IN8; WR( addr1, SAL8( RD( addr1 ) ) ); }
-OP(83) { AD1_IHL; WR( addr1, SAL8( RD( addr1 ) ) ); }
-OP(84) { regs.BA = ( regs.BA & 0xFF00 ) | SHL8( regs.BA & 0x00FF ); }
-OP(85) { regs.BA = ( regs.BA & 0x00FF ) | ( SHL8( regs.BA >> 8 ) << 8 ); }
-OP(86) { AD1_IN8; WR( addr1, SHL8( RD( addr1 ) ) ); }
-OP(87) { AD1_IHL; WR( addr1, SHL8( RD( addr1 ) ) ); }
-OP(88) { regs.BA = ( regs.BA & 0xFF00 ) | SAR8( regs.BA & 0x00FF ); }
-OP(89) { regs.BA = ( regs.BA & 0x00FF ) | ( SAR8( regs.BA >> 8 ) << 8 ); }
-OP(8A) { AD1_IN8; WR( addr1, SAR8( RD( addr1 ) ) ); }
-OP(8B) { AD1_IHL; WR( addr1, SAR8( RD( addr1 ) ) ); }
-OP(8C) { regs.BA = ( regs.BA & 0xFF00 ) | SHR8( regs.BA & 0x00FF ); }
-OP(8D) { regs.BA = ( regs.BA & 0x00FF ) | ( SHR8( regs.BA >> 8 ) << 8 ); }
-OP(8E) { AD1_IN8; WR( addr1, SHR8( RD( addr1 ) ) ); }
-OP(8F) { AD1_IHL; WR( addr1, SHR8( RD( addr1 ) ) ); }
+OP(80) { minx->BA = ( minx->BA & 0xFF00 ) | SAL8( minx, minx->BA & 0x00FF ); }
+OP(81) { minx->BA = ( minx->BA & 0x00FF ) | ( SAL8( minx, minx->BA >> 8 )<< 8 ); }
+OP(82) { AD1_IN8; WR( addr1, SAL8( minx, RD( addr1 ) ) ); }
+OP(83) { AD1_IHL; WR( addr1, SAL8( minx, RD( addr1 ) ) ); }
+OP(84) { minx->BA = ( minx->BA & 0xFF00 ) | SHL8( minx, minx->BA & 0x00FF ); }
+OP(85) { minx->BA = ( minx->BA & 0x00FF ) | ( SHL8( minx, minx->BA >> 8 ) << 8 ); }
+OP(86) { AD1_IN8; WR( addr1, SHL8( minx, RD( addr1 ) ) ); }
+OP(87) { AD1_IHL; WR( addr1, SHL8( minx, RD( addr1 ) ) ); }
+OP(88) { minx->BA = ( minx->BA & 0xFF00 ) | SAR8( minx, minx->BA & 0x00FF ); }
+OP(89) { minx->BA = ( minx->BA & 0x00FF ) | ( SAR8( minx, minx->BA >> 8 ) << 8 ); }
+OP(8A) { AD1_IN8; WR( addr1, SAR8( minx, RD( addr1 ) ) ); }
+OP(8B) { AD1_IHL; WR( addr1, SAR8( minx, RD( addr1 ) ) ); }
+OP(8C) { minx->BA = ( minx->BA & 0xFF00 ) | SHR8( minx, minx->BA & 0x00FF ); }
+OP(8D) { minx->BA = ( minx->BA & 0x00FF ) | ( SHR8( minx, minx->BA >> 8 ) << 8 ); }
+OP(8E) { AD1_IN8; WR( addr1, SHR8( minx, RD( addr1 ) ) ); }
+OP(8F) { AD1_IHL; WR( addr1, SHR8( minx, RD( addr1 ) ) ); }
 
-OP(90) { regs.BA = ( regs.BA & 0xFF00 ) | ROLC8( regs.BA & 0x00FF ); }
-OP(91) { regs.BA = ( regs.BA & 0x00FF ) | ( ROLC8( regs.BA >> 8 ) << 8 ); }
-OP(92) { AD1_IN8; WR( addr1, ROLC8( RD( addr1 ) ) ); }
-OP(93) { AD1_IHL; WR( addr1, ROLC8( RD( addr1 ) ) ); }
-OP(94) { regs.BA = ( regs.BA & 0xFF00 ) | ROL8( regs.BA & 0x00FF ); }
-OP(95) { regs.BA = ( regs.BA & 0x00FF ) | ( ROL8( regs.BA >> 8 ) << 8 ); }
-OP(96) { AD1_IN8; WR( addr1, ROL8( RD( addr1 ) ) ); }
-OP(97) { AD1_IHL; WR( addr1, ROL8( RD( addr1 ) ) ); }
-OP(98) { regs.BA = ( regs.BA & 0xFF00 ) | RORC8( regs.BA & 0x00FF ); }
-OP(99) { regs.BA = ( regs.BA & 0x00FF ) | ( RORC8( regs.BA >> 8 ) << 8 ); }
-OP(9A) { AD1_IN8; WR( addr1, RORC8( RD( addr1 ) ) ); }
-OP(9B) { AD1_IHL; WR( addr1, RORC8( RD( addr1 ) ) ); }
-OP(9C) { regs.BA = ( regs.BA & 0xFF00 ) | ROR8( regs.BA & 0x00FF ); }
-OP(9D) { regs.BA = ( regs.BA & 0x00FF ) | ( ROR8( regs.BA >> 8 ) << 8 ); }
-OP(9E) { AD1_IN8; WR( addr1, ROR8( RD( addr1 ) ) ); }
-OP(9F) { AD1_IHL; WR( addr1, ROR8( RD( addr1 ) ) ); }
+OP(90) { minx->BA = ( minx->BA & 0xFF00 ) | ROLC8( minx, minx->BA & 0x00FF ); }
+OP(91) { minx->BA = ( minx->BA & 0x00FF ) | ( ROLC8( minx, minx->BA >> 8 ) << 8 ); }
+OP(92) { AD1_IN8; WR( addr1, ROLC8( minx, RD( addr1 ) ) ); }
+OP(93) { AD1_IHL; WR( addr1, ROLC8( minx, RD( addr1 ) ) ); }
+OP(94) { minx->BA = ( minx->BA & 0xFF00 ) | ROL8( minx, minx->BA & 0x00FF ); }
+OP(95) { minx->BA = ( minx->BA & 0x00FF ) | ( ROL8( minx, minx->BA >> 8 ) << 8 ); }
+OP(96) { AD1_IN8; WR( addr1, ROL8( minx, RD( addr1 ) ) ); }
+OP(97) { AD1_IHL; WR( addr1, ROL8( minx, RD( addr1 ) ) ); }
+OP(98) { minx->BA = ( minx->BA & 0xFF00 ) | RORC8( minx, minx->BA & 0x00FF ); }
+OP(99) { minx->BA = ( minx->BA & 0x00FF ) | ( RORC8( minx, minx->BA >> 8 ) << 8 ); }
+OP(9A) { AD1_IN8; WR( addr1, RORC8( minx, RD( addr1 ) ) ); }
+OP(9B) { AD1_IHL; WR( addr1, RORC8( minx, RD( addr1 ) ) ); }
+OP(9C) { minx->BA = ( minx->BA & 0xFF00 ) | ROR8( minx, minx->BA & 0x00FF ); }
+OP(9D) { minx->BA = ( minx->BA & 0x00FF ) | ( ROR8( minx, minx->BA >> 8 ) << 8 ); }
+OP(9E) { AD1_IN8; WR( addr1, ROR8( minx, RD( addr1 ) ) ); }
+OP(9F) { AD1_IHL; WR( addr1, ROR8( minx, RD( addr1 ) ) ); }
 
-OP(A0) { regs.BA = ( regs.BA & 0xFF00 ) | NOT8( regs.BA & 0x00FF ); }
-OP(A1) { regs.BA = ( regs.BA & 0x00FF ) | ( NOT8( regs.BA >> 8 ) << 8 ); }
-OP(A2) { AD1_IN8; WR( addr1, NOT8( RD( addr1 ) ) ); }
-OP(A3) { AD1_IHL; WR( addr1, NOT8( RD( addr1 ) ) ); }
-OP(A4) { regs.BA = ( regs.BA & 0xFF00 ) | NEG8( regs.BA & 0x00FF ); }
-OP(A5) { regs.BA = ( regs.BA & 0x00FF ) | ( NEG8( regs.BA >> 8 ) << 8 ); }
-OP(A6) { AD1_IN8; WR( addr1, NEG8( RD( addr1 ) ) ); }
-OP(A7) { AD1_IHL; WR( addr1, NEG8( RD( addr1 ) ) ); }
-OP(A8) { regs.BA = ( ( regs.BA & 0x0080 ) ? ( 0xFF00 | regs.BA ) : ( regs.BA & 0x00FF ) ); }
+OP(A0) { minx->BA = ( minx->BA & 0xFF00 ) | NOT8( minx, minx->BA & 0x00FF ); }
+OP(A1) { minx->BA = ( minx->BA & 0x00FF ) | ( NOT8( minx, minx->BA >> 8 ) << 8 ); }
+OP(A2) { AD1_IN8; WR( addr1, NOT8( minx, RD( addr1 ) ) ); }
+OP(A3) { AD1_IHL; WR( addr1, NOT8( minx, RD( addr1 ) ) ); }
+OP(A4) { minx->BA = ( minx->BA & 0xFF00 ) | NEG8( minx, minx->BA & 0x00FF ); }
+OP(A5) { minx->BA = ( minx->BA & 0x00FF ) | ( NEG8( minx, minx->BA >> 8 ) << 8 ); }
+OP(A6) { AD1_IN8; WR( addr1, NEG8( minx, RD( addr1 ) ) ); }
+OP(A7) { AD1_IHL; WR( addr1, NEG8( minx, RD( addr1 ) ) ); }
+OP(A8) { minx->BA = ( ( minx->BA & 0x0080 ) ? ( 0xFF00 | minx->BA ) : ( minx->BA & 0x00FF ) ); }
 OP(A9) { /* illegal operation? */ }
 OP(AA) { /* illegal operation? */ }
 OP(AB) { /* illegal operation? */ }
 OP(AC) { /* illegal operation? */ }
 OP(AD) { /* illegal operation? */ }
-OP(AE) { /* HALT */ regs.halted = 1; }
+OP(AE) { /* HALT */ minx->halted = 1; }
 OP(AF) { }
 
-OP(B0) { regs.BA = ( regs.BA & 0x00FF ) | ( AND8( ( regs.BA >> 8 ), rdop() ) << 8 ); }
-OP(B1) { regs.HL = ( regs.HL & 0xFF00 ) | AND8( ( regs.HL & 0x00FF ), rdop() ); }
-OP(B2) { regs.HL = ( regs.HL & 0x00FF ) | ( AND8( ( regs.HL >> 8 ), rdop() ) << 8 ); }
+OP(B0) { minx->BA = ( minx->BA & 0x00FF ) | ( AND8( minx, ( minx->BA >> 8 ), rdop(minx) ) << 8 ); }
+OP(B1) { minx->HL = ( minx->HL & 0xFF00 ) | AND8( minx, ( minx->HL & 0x00FF ), rdop(minx) ); }
+OP(B2) { minx->HL = ( minx->HL & 0x00FF ) | ( AND8( minx, ( minx->HL >> 8 ), rdop(minx) ) << 8 ); }
 OP(B3) { /* illegal operation? */ }
-OP(B4) { regs.BA = ( regs.BA & 0x00FF ) | ( OR8( ( regs.BA >> 8 ), rdop() ) << 8 ); }
-OP(B5) { regs.HL = ( regs.HL & 0xFF00 ) | OR8( ( regs.HL & 0x00FF ), rdop() ); }
-OP(B6) { regs.HL = ( regs.HL & 0x00FF ) | ( OR8( ( regs.HL >> 8 ), rdop() ) << 8 ); }
+OP(B4) { minx->BA = ( minx->BA & 0x00FF ) | ( OR8( minx, ( minx->BA >> 8 ), rdop(minx) ) << 8 ); }
+OP(B5) { minx->HL = ( minx->HL & 0xFF00 ) | OR8( minx, ( minx->HL & 0x00FF ), rdop(minx) ); }
+OP(B6) { minx->HL = ( minx->HL & 0x00FF ) | ( OR8( minx, ( minx->HL >> 8 ), rdop(minx) ) << 8 ); }
 OP(B7) { /* illegal operation? */ }
-OP(B8) { regs.BA = ( regs.BA & 0x00FF ) | ( XOR8( ( regs.BA >> 8 ), rdop() ) << 8 ); }
-OP(B9) { regs.HL = ( regs.HL & 0xFF00 ) | XOR8( ( regs.HL & 0x00FF ), rdop() ); }
-OP(BA) { regs.HL = ( regs.HL & 0x00FF ) | ( XOR8( ( regs.HL >> 8 ), rdop() ) << 8 ); }
+OP(B8) { minx->BA = ( minx->BA & 0x00FF ) | ( XOR8( minx, ( minx->BA >> 8 ), rdop(minx) ) << 8 ); }
+OP(B9) { minx->HL = ( minx->HL & 0xFF00 ) | XOR8( minx, ( minx->HL & 0x00FF ), rdop(minx) ); }
+OP(BA) { minx->HL = ( minx->HL & 0x00FF ) | ( XOR8( minx, ( minx->HL >> 8 ), rdop(minx) ) << 8 ); }
 OP(BB) { /* illegal operation? */ }
-OP(BC) { SUB8( ( regs.BA >> 8 ), rdop() ); }
-OP(BD) { SUB8( ( regs.HL & 0x00FF), rdop() ); }
-OP(BE) { SUB8( ( regs.HL >> 8 ), rdop() ); }
-OP(BF) { SUB8( regs.N, rdop() ); }
+OP(BC) { SUB8( minx, ( minx->BA >> 8 ), rdop(minx) ); }
+OP(BD) { SUB8( minx, ( minx->HL & 0x00FF), rdop(minx) ); }
+OP(BE) { SUB8( minx, ( minx->HL >> 8 ), rdop(minx) ); }
+OP(BF) { SUB8( minx, minx->N, rdop(minx) ); }
 
-OP(C0) { regs.BA = ( regs.BA & 0xFF00 ) | regs.N; }
-OP(C1) { regs.BA = ( regs.BA & 0xFF00 ) | regs.F; }
-OP(C2) { regs.N = ( regs.BA & 0x00FF ); }
-OP(C3) { regs.F = ( regs.BA & 0x00FF ); }
-OP(C4) { regs.U = rdop(); }
-OP(C5) { regs.I = rdop(); }
-OP(C6) { regs.XI = rdop(); }
-OP(C7) { regs.YI = rdop(); }
-OP(C8) { regs.BA = ( regs.BA & 0xFF00 ) | regs.V; }
-OP(C9) { regs.BA = ( regs.BA & 0xFF00 ) | regs.I; }
-OP(CA) { regs.BA = ( regs.BA & 0xFF00 ) | regs.XI; }
-OP(CB) { regs.BA = ( regs.BA & 0xFF00 ) | regs.YI; }
-OP(CC) { regs.U = ( regs.BA & 0x00FF ); }
-OP(CD) { regs.I = ( regs.BA & 0x00FF ); }
-OP(CE) { regs.XI = ( regs.BA & 0x00FF ); }
-OP(CF) { regs.YI = ( regs.BA & 0x00FF ); }
+OP(C0) { minx->BA = ( minx->BA & 0xFF00 ) | minx->N; }
+OP(C1) { minx->BA = ( minx->BA & 0xFF00 ) | minx->F; }
+OP(C2) { minx->N = ( minx->BA & 0x00FF ); }
+OP(C3) { minx->F = ( minx->BA & 0x00FF ); }
+OP(C4) { minx->U = rdop(minx); }
+OP(C5) { minx->I = rdop(minx); }
+OP(C6) { minx->XI = rdop(minx); }
+OP(C7) { minx->YI = rdop(minx); }
+OP(C8) { minx->BA = ( minx->BA & 0xFF00 ) | minx->V; }
+OP(C9) { minx->BA = ( minx->BA & 0xFF00 ) | minx->I; }
+OP(CA) { minx->BA = ( minx->BA & 0xFF00 ) | minx->XI; }
+OP(CB) { minx->BA = ( minx->BA & 0xFF00 ) | minx->YI; }
+OP(CC) { minx->U = ( minx->BA & 0x00FF ); }
+OP(CD) { minx->I = ( minx->BA & 0x00FF ); }
+OP(CE) { minx->XI = ( minx->BA & 0x00FF ); }
+OP(CF) { minx->YI = ( minx->BA & 0x00FF ); }
 
-OP(D0) { AD2_I16; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(D1) { AD2_I16; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(D2) { AD2_I16; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(D3) { AD2_I16; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(D4) { AD1_I16; WR( addr1, ( regs.BA & 0x00FF ) ); }
-OP(D5) { AD1_I16; WR( addr1, ( regs.BA >> 8 ) ); }
-OP(D6) { AD1_I16; WR( addr1, ( regs.HL & 0x00FF ) ); }
-OP(D7) { AD1_I16; WR( addr1, ( regs.HL >> 8 ) ); }
-OP(D8) { regs.HL = ( regs.HL & 0x00FF ) * ( regs.BA & 0x00FF );  }
-OP(D9) { int d = regs.HL / ( regs.BA & 0x00FF ); regs.HL = ( ( regs.HL - ( ( regs.BA & 0x00FF ) * d ) ) << 8 ) | d; }
+OP(D0) { AD2_I16; minx->BA = ( minx->BA & 0xFF00 ) | RD( addr2 ); }
+OP(D1) { AD2_I16; minx->BA = ( minx->BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(D2) { AD2_I16; minx->HL = ( minx->HL & 0xFF00 ) | RD( addr2 ); }
+OP(D3) { AD2_I16; minx->HL = ( minx->HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(D4) { AD1_I16; WR( addr1, ( minx->BA & 0x00FF ) ); }
+OP(D5) { AD1_I16; WR( addr1, ( minx->BA >> 8 ) ); }
+OP(D6) { AD1_I16; WR( addr1, ( minx->HL & 0x00FF ) ); }
+OP(D7) { AD1_I16; WR( addr1, ( minx->HL >> 8 ) ); }
+OP(D8) { minx->HL = ( minx->HL & 0x00FF ) * ( minx->BA & 0x00FF );  }
+OP(D9) { int d = minx->HL / ( minx->BA & 0x00FF ); minx->HL = ( ( minx->HL - ( ( minx->BA & 0x00FF ) * d ) ) << 8 ) | d; }
 OP(DA) { /* illegal operation? */ }
 OP(DB) { /* illegal operation? */ }
 OP(DC) { /* illegal operation? */ }
@@ -239,41 +239,41 @@ OP(DD) { /* illegal operation? */ }
 OP(DE) { /* illegal operation? */ }
 OP(DF) { /* illegal operation? */ }
 
-OP(E0) { INT8 d8 = rdop(); if ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E1) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_Z ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E2) { INT8 d8 = rdop(); if ( !( regs.F & FLAG_Z ) && ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E3) { INT8 d8 = rdop(); if ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E4) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_O ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E5) { INT8 d8 = rdop(); if ( ! ( regs.F & FLAG_O ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E6) { INT8 d8 = rdop(); if ( ! ( regs.F & FLAG_S ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E7) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_S ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E8) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X0 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(E9) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X1 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(EA) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X2 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(EB) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_DZ ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(EC) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X0 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(ED) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X1 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(EE) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X2 ) ) { JMP( regs.PC + d8 - 1 ); } }
-OP(EF) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_DZ ) ) { JMP( regs.PC + d8 - 1 ); } }
+OP(E0) { INT8 d8 = rdop(minx); if ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E1) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_Z ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E2) { INT8 d8 = rdop(minx); if ( !( minx->F & FLAG_Z ) && ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E3) { INT8 d8 = rdop(minx); if ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E4) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_O ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E5) { INT8 d8 = rdop(minx); if ( ! ( minx->F & FLAG_O ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E6) { INT8 d8 = rdop(minx); if ( ! ( minx->F & FLAG_S ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E7) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_S ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E8) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X0 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(E9) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X1 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(EA) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X2 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(EB) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_DZ ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(EC) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X0 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(ED) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X1 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(EE) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X2 ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
+OP(EF) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_DZ ) ) { JMP( minx, minx->PC + d8 - 1 ); } }
 
-OP(F0) { INT8 d8 = rdop(); if ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F1) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_Z ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F2) { INT8 d8 = rdop(); if ( !( regs.F & FLAG_Z ) && ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F3) { INT8 d8 = rdop(); if ( ( ( regs.F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( regs.F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { CALL( regs.PC + d8 - 1 ); } }
-OP(F4) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_O ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F5) { INT8 d8 = rdop(); if ( ! ( regs.F & FLAG_O ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F6) { INT8 d8 = rdop(); if ( ! ( regs.F & FLAG_S ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F7) { INT8 d8 = rdop(); if ( ( regs.F & FLAG_S ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F8) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X0 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(F9) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X1 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FA) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_X2 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FB) { INT8 d8 = rdop(); if ( ! ( regs.E & EXEC_DZ ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FC) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X0 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FD) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X1 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FE) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X2 ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
-OP(FF) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_DZ ) ) { CALL( regs.PC + d8 - 1 ); minx_icount -= 12; } }
+OP(F0) { INT8 d8 = rdop(minx); if ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F1) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_Z ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_S ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == FLAG_O ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F2) { INT8 d8 = rdop(minx); if ( !( minx->F & FLAG_Z ) && ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F3) { INT8 d8 = rdop(minx); if ( ( ( minx->F & ( FLAG_S | FLAG_O ) ) == 0 ) || ( ( minx->F & ( FLAG_S | FLAG_O ) ) == ( FLAG_S | FLAG_O ) ) ) { CALL( minx, minx->PC + d8 - 1 ); } }
+OP(F4) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_O ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F5) { INT8 d8 = rdop(minx); if ( ! ( minx->F & FLAG_O ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F6) { INT8 d8 = rdop(minx); if ( ! ( minx->F & FLAG_S ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F7) { INT8 d8 = rdop(minx); if ( ( minx->F & FLAG_S ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F8) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X0 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(F9) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X1 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FA) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_X2 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FB) { INT8 d8 = rdop(minx); if ( ! ( minx->E & EXEC_DZ ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FC) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X0 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FD) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X1 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FE) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_X2 ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
+OP(FF) { INT8 d8 = rdop(minx); if ( ( minx->E & EXEC_DZ ) ) { CALL( minx, minx->PC + d8 - 1 ); minx->icount -= 12; } }
 
-static void (*const insnminx_CE[256])(void) = {
+static void (*const insnminx_CE[256])(minx_state *minx) = {
 	minx_CE_00, minx_CE_01, minx_CE_02, minx_CE_03, minx_CE_04, minx_CE_05, minx_CE_06, minx_CE_07,
 	minx_CE_08, minx_CE_09, minx_CE_0A, minx_CE_0B, minx_CE_0C, minx_CE_0D, minx_CE_0E, minx_CE_0F,
 	minx_CE_10, minx_CE_11, minx_CE_12, minx_CE_13, minx_CE_14, minx_CE_15, minx_CE_16, minx_CE_17,

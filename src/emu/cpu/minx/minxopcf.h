@@ -1,22 +1,22 @@
 #undef OP
-#define OP(nn) INLINE void minx_CF_##nn(void)
+#define OP(nn) INLINE void minx_CF_##nn(minx_state *minx)
 
-OP(00) { regs.BA = ADD16( regs.BA, regs.BA ); }
-OP(01) { regs.BA = ADD16( regs.BA, regs.HL ); }
-OP(02) { regs.BA = ADD16( regs.BA, regs.X ); }
-OP(03) { regs.BA = ADD16( regs.BA, regs.Y ); }
-OP(04) { regs.BA = ADDC16( regs.BA, regs.BA ); }
-OP(05) { regs.BA = ADDC16( regs.BA, regs.HL ); }
-OP(06) { regs.BA = ADDC16( regs.BA, regs.X ); }
-OP(07) { regs.BA = ADDC16( regs.BA, regs.Y ); }
-OP(08) { regs.BA = SUB16( regs.BA, regs.BA ); }
-OP(09) { regs.BA = SUB16( regs.BA, regs.HL ); }
-OP(0A) { regs.BA = SUB16( regs.BA, regs.X ); }
-OP(0B) { regs.BA = SUB16( regs.BA, regs.Y ); }
-OP(0C) { regs.BA = SUBC16( regs.BA, regs.BA ); }
-OP(0D) { regs.BA = SUBC16( regs.BA, regs.HL ); }
-OP(0E) { regs.BA = SUBC16( regs.BA, regs.X ); }
-OP(0F) { regs.BA = SUBC16( regs.BA, regs.Y ); }
+OP(00) { minx->BA = ADD16( minx, minx->BA, minx->BA ); }
+OP(01) { minx->BA = ADD16( minx, minx->BA, minx->HL ); }
+OP(02) { minx->BA = ADD16( minx, minx->BA, minx->X ); }
+OP(03) { minx->BA = ADD16( minx, minx->BA, minx->Y ); }
+OP(04) { minx->BA = ADDC16( minx, minx->BA, minx->BA ); }
+OP(05) { minx->BA = ADDC16( minx, minx->BA, minx->HL ); }
+OP(06) { minx->BA = ADDC16( minx, minx->BA, minx->X ); }
+OP(07) { minx->BA = ADDC16( minx, minx->BA, minx->Y ); }
+OP(08) { minx->BA = SUB16( minx, minx->BA, minx->BA ); }
+OP(09) { minx->BA = SUB16( minx, minx->BA, minx->HL ); }
+OP(0A) { minx->BA = SUB16( minx, minx->BA, minx->X ); }
+OP(0B) { minx->BA = SUB16( minx, minx->BA, minx->Y ); }
+OP(0C) { minx->BA = SUBC16( minx, minx->BA, minx->BA ); }
+OP(0D) { minx->BA = SUBC16( minx, minx->BA, minx->HL ); }
+OP(0E) { minx->BA = SUBC16( minx, minx->BA, minx->X ); }
+OP(0F) { minx->BA = SUBC16( minx, minx->BA, minx->Y ); }
 
 OP(10) { /* illegal instruction? */ }
 OP(11) { /* illegal instruction? */ }
@@ -26,31 +26,31 @@ OP(14) { /* illegal instruction? */ }
 OP(15) { /* illegal instruction? */ }
 OP(16) { /* illegal instruction? */ }
 OP(17) { /* illegal instruction? */ }
-OP(18) { SUB16( regs.BA, regs.BA ); }
-OP(19) { SUB16( regs.BA, regs.HL ); }
-OP(1A) { SUB16( regs.BA, regs.X ); }
-OP(1B) { SUB16( regs.BA, regs.Y ); }
+OP(18) { SUB16( minx, minx->BA, minx->BA ); }
+OP(19) { SUB16( minx, minx->BA, minx->HL ); }
+OP(1A) { SUB16( minx, minx->BA, minx->X ); }
+OP(1B) { SUB16( minx, minx->BA, minx->Y ); }
 OP(1C) { /* illegal instruction? */ }
 OP(1D) { /* illegal instruction? */ }
 OP(1E) { /* illegal instruction? */ }
 OP(1F) { /* illegal instruction? */ }
 
-OP(20) { regs.HL = ADD16( regs.HL, regs.BA ); }
-OP(21) { regs.HL = ADD16( regs.HL, regs.HL ); }
-OP(22) { regs.HL = ADD16( regs.HL, regs.X ); }
-OP(23) { regs.HL = ADD16( regs.HL, regs.Y ); }
-OP(24) { regs.HL = ADDC16( regs.HL, regs.BA ); }
-OP(25) { regs.HL = ADDC16( regs.HL, regs.HL ); }
-OP(26) { regs.HL = ADDC16( regs.HL, regs.X ); }
-OP(27) { regs.HL = ADDC16( regs.HL, regs.Y ); }
-OP(28) { regs.HL = SUB16( regs.HL, regs.BA ); }
-OP(29) { regs.HL = SUB16( regs.HL, regs.HL ); }
-OP(2A) { regs.HL = SUB16( regs.HL, regs.X ); }
-OP(2B) { regs.HL = SUB16( regs.HL, regs.Y ); }
-OP(2C) { regs.HL = SUBC16( regs.HL, regs.BA ); }
-OP(2D) { regs.HL = SUBC16( regs.HL, regs.HL ); }
-OP(2E) { regs.HL = SUBC16( regs.HL, regs.X ); }
-OP(2F) { regs.HL = SUBC16( regs.HL, regs.Y ); }
+OP(20) { minx->HL = ADD16( minx, minx->HL, minx->BA ); }
+OP(21) { minx->HL = ADD16( minx, minx->HL, minx->HL ); }
+OP(22) { minx->HL = ADD16( minx, minx->HL, minx->X ); }
+OP(23) { minx->HL = ADD16( minx, minx->HL, minx->Y ); }
+OP(24) { minx->HL = ADDC16( minx, minx->HL, minx->BA ); }
+OP(25) { minx->HL = ADDC16( minx, minx->HL, minx->HL ); }
+OP(26) { minx->HL = ADDC16( minx, minx->HL, minx->X ); }
+OP(27) { minx->HL = ADDC16( minx, minx->HL, minx->Y ); }
+OP(28) { minx->HL = SUB16( minx, minx->HL, minx->BA ); }
+OP(29) { minx->HL = SUB16( minx, minx->HL, minx->HL ); }
+OP(2A) { minx->HL = SUB16( minx, minx->HL, minx->X ); }
+OP(2B) { minx->HL = SUB16( minx, minx->HL, minx->Y ); }
+OP(2C) { minx->HL = SUBC16( minx, minx->HL, minx->BA ); }
+OP(2D) { minx->HL = SUBC16( minx, minx->HL, minx->HL ); }
+OP(2E) { minx->HL = SUBC16( minx, minx->HL, minx->X ); }
+OP(2F) { minx->HL = SUBC16( minx, minx->HL, minx->Y ); }
 
 OP(30) { /* illegal instruction? */ }
 OP(31) { /* illegal instruction? */ }
@@ -60,29 +60,29 @@ OP(34) { /* illegal instruction? */ }
 OP(35) { /* illegal instruction? */ }
 OP(36) { /* illegal instruction? */ }
 OP(37) { /* illegal instruction? */ }
-OP(38) { SUB16( regs.HL, regs.BA ); }
-OP(39) { SUB16( regs.HL, regs.HL ); }
-OP(3A) { SUB16( regs.HL, regs.X ); }
-OP(3B) { SUB16( regs.HL, regs.Y ); }
+OP(38) { SUB16( minx, minx->HL, minx->BA ); }
+OP(39) { SUB16( minx, minx->HL, minx->HL ); }
+OP(3A) { SUB16( minx, minx->HL, minx->X ); }
+OP(3B) { SUB16( minx, minx->HL, minx->Y ); }
 OP(3C) { /* illegal instruction? */ }
 OP(3D) { /* illegal instruction? */ }
 OP(3E) { /* illegal instruction? */ }
 OP(3F) { /* illegal instruction? */ }
 
-OP(40) { regs.X = ADD16( regs.X, regs.BA ); }
-OP(41) { regs.X = ADD16( regs.X, regs.HL ); }
-OP(42) { regs.Y = ADD16( regs.Y, regs.BA ); }
-OP(43) { regs.Y = ADD16( regs.Y, regs.HL ); }
-OP(44) { regs.SP = ADD16( regs.SP, regs.BA ); }
-OP(45) { regs.SP = ADD16( regs.SP, regs.HL ); }
+OP(40) { minx->X = ADD16( minx, minx->X, minx->BA ); }
+OP(41) { minx->X = ADD16( minx, minx->X, minx->HL ); }
+OP(42) { minx->Y = ADD16( minx, minx->Y, minx->BA ); }
+OP(43) { minx->Y = ADD16( minx, minx->Y, minx->HL ); }
+OP(44) { minx->SP = ADD16( minx, minx->SP, minx->BA ); }
+OP(45) { minx->SP = ADD16( minx, minx->SP, minx->HL ); }
 OP(46) { /* illegal instruction? */ }
 OP(47) { /* illegal instruction? */ }
-OP(48) { regs.X = SUB16( regs.X, regs.BA ); }
-OP(49) { regs.X = SUB16( regs.X, regs.HL ); }
-OP(4A) { regs.Y = SUB16( regs.Y, regs.BA ); }
-OP(4B) { regs.Y = SUB16( regs.Y, regs.HL ); }
-OP(4C) { regs.SP = SUB16( regs.SP, regs.BA ); }
-OP(4D) { regs.SP = SUB16( regs.SP, regs.HL ); }
+OP(48) { minx->X = SUB16( minx, minx->X, minx->BA ); }
+OP(49) { minx->X = SUB16( minx, minx->X, minx->HL ); }
+OP(4A) { minx->Y = SUB16( minx, minx->Y, minx->BA ); }
+OP(4B) { minx->Y = SUB16( minx, minx->Y, minx->HL ); }
+OP(4C) { minx->SP = SUB16( minx, minx->SP, minx->BA ); }
+OP(4D) { minx->SP = SUB16( minx, minx->SP, minx->HL ); }
 OP(4E) { /* illegal instruction? */ }
 OP(4F) { /* illegal instruction? */ }
 
@@ -98,41 +98,41 @@ OP(58) { /* illegal instruction? */ }
 OP(59) { /* illegal instruction? */ }
 OP(5A) { /* illegal instruction? */ }
 OP(5B) { /* illegal instruction? */ }
-OP(5C) { SUB16( regs.SP, regs.BA ); }
-OP(5D) { SUB16( regs.SP, regs.HL ); }
+OP(5C) { SUB16( minx, minx->SP, minx->BA ); }
+OP(5D) { SUB16( minx, minx->SP, minx->HL ); }
 OP(5E) { /* illegal instruction? */ }
 OP(5F) { /* illegal instruction? */ }
 
-OP(60) { ADDC16( regs.BA, rdop16() ); /* ??? */ }
-OP(61) { ADDC16( regs.HL, rdop16() ); /* ??? */ }
-OP(62) { ADDC16( regs.X, rdop16() ); /* ??? */ }
-OP(63) { ADDC16( regs.Y, rdop16() ); /* ??? */ }
+OP(60) { ADDC16( minx, minx->BA, rdop16(minx) ); /* ??? */ }
+OP(61) { ADDC16( minx, minx->HL, rdop16(minx) ); /* ??? */ }
+OP(62) { ADDC16( minx, minx->X, rdop16(minx) ); /* ??? */ }
+OP(63) { ADDC16( minx, minx->Y, rdop16(minx) ); /* ??? */ }
 OP(64) { /* illegal instruction? */ }
 OP(65) { /* illegal instruction? */ }
 OP(66) { /* illegal instruction? */ }
 OP(67) { /* illegal instruction? */ }
-OP(68) { regs.SP = ADD16( regs.SP, rdop16() ); }
+OP(68) { minx->SP = ADD16( minx, minx->SP, rdop16(minx) ); }
 OP(69) { /* illegal instruction? */ }
-OP(6A) { regs.SP = SUB16( regs.SP, rdop16() ); }
+OP(6A) { minx->SP = SUB16( minx, minx->SP, rdop16(minx) ); }
 OP(6B) { /* illegal instruction? */ }
-OP(6C) { SUB16( regs.SP, rdop16() ); }
+OP(6C) { SUB16( minx, minx->SP, rdop16(minx) ); }
 OP(6D) { /* illegal instruction? */ }
-OP(6E) { regs.SP = rdop16(); }
+OP(6E) { minx->SP = rdop16(minx); }
 OP(6F) { /* illegal instruction? */ }
 
-OP(70) { UINT8 ofs8 = rdop(); regs.BA = rd16( regs.SP + ofs8 ); }
-OP(71) { UINT8 ofs8 = rdop(); regs.HL = rd16( regs.SP + ofs8 ); }
-OP(72) { UINT8 ofs8 = rdop(); regs.X = rd16( regs.SP + ofs8 ); }
-OP(73) { UINT8 ofs8 = rdop(); regs.Y = rd16( regs.SP + ofs8 ); }
-OP(74) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.BA ); }
-OP(75) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.HL ); }
-OP(76) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.X ); }
-OP(77) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.Y ); }
-OP(78) { AD2_I16; regs.SP = rd16( addr2 ); }
+OP(70) { UINT8 ofs8 = rdop(minx); minx->BA = rd16( minx, minx->SP + ofs8 ); }
+OP(71) { UINT8 ofs8 = rdop(minx); minx->HL = rd16( minx, minx->SP + ofs8 ); }
+OP(72) { UINT8 ofs8 = rdop(minx); minx->X = rd16( minx, minx->SP + ofs8 ); }
+OP(73) { UINT8 ofs8 = rdop(minx); minx->Y = rd16( minx, minx->SP + ofs8 ); }
+OP(74) { UINT8 ofs8 = rdop(minx); wr16( minx, minx->SP + ofs8, minx->BA ); }
+OP(75) { UINT8 ofs8 = rdop(minx); wr16( minx, minx->SP + ofs8, minx->HL ); }
+OP(76) { UINT8 ofs8 = rdop(minx); wr16( minx, minx->SP + ofs8, minx->X ); }
+OP(77) { UINT8 ofs8 = rdop(minx); wr16( minx, minx->SP + ofs8, minx->Y ); }
+OP(78) { AD2_I16; minx->SP = rd16( minx, addr2 ); }
 OP(79) { /* illegal instruction? */ }
 OP(7A) { /* illegal instruction? */ }
 OP(7B) { /* illegal instruction? */ }
-OP(7C) { AD1_I16; wr16( addr1, regs.SP ); }
+OP(7C) { AD1_I16; wr16( minx, addr1, minx->SP ); }
 OP(7D) { /* illegal instruction? */ }
 OP(7E) { /* illegal instruction? */ }
 OP(7F) { /* illegal instruction? */ }
@@ -188,31 +188,31 @@ OP(AD) { /* illegal instruction? */ }
 OP(AE) { /* illegal instruction? */ }
 OP(AF) { /* illegal instruction? */ }
 
-OP(B0) { PUSH8( regs.BA & 0x00FF ); }
-OP(B1) { PUSH8( regs.BA >> 8 ); }
-OP(B2) { PUSH8( regs.HL & 0x00FF ); }
-OP(B3) { PUSH8( regs.HL >> 8 ); }
-OP(B4) { regs.BA = ( regs.BA & 0xFF00 ) | POP8(); }
-OP(B5) { regs.BA = ( regs.BA & 0x00FF ) | ( POP8() << 8 ); }
-OP(B6) { regs.HL = ( regs.HL & 0xFF00 ) | POP8(); }
-OP(B7) { regs.HL = ( regs.HL & 0x00FF ) | ( POP8() << 8 ); }
-OP(B8) { PUSH16( regs.BA ); PUSH16( regs.HL ); PUSH16( regs.X ); PUSH16( regs.Y ); PUSH8( regs.N ); }
-OP(B9) { PUSH16( regs.BA ); PUSH16( regs.HL ); PUSH16( regs.X ); PUSH16( regs.Y ); PUSH8( regs.N ); PUSH8( regs.I ); PUSH8( regs.XI ); PUSH8( regs.YI ); }
+OP(B0) { PUSH8( minx, minx->BA & 0x00FF ); }
+OP(B1) { PUSH8( minx, minx->BA >> 8 ); }
+OP(B2) { PUSH8( minx, minx->HL & 0x00FF ); }
+OP(B3) { PUSH8( minx, minx->HL >> 8 ); }
+OP(B4) { minx->BA = ( minx->BA & 0xFF00 ) | POP8(minx); }
+OP(B5) { minx->BA = ( minx->BA & 0x00FF ) | ( POP8(minx) << 8 ); }
+OP(B6) { minx->HL = ( minx->HL & 0xFF00 ) | POP8(minx); }
+OP(B7) { minx->HL = ( minx->HL & 0x00FF ) | ( POP8(minx) << 8 ); }
+OP(B8) { PUSH16( minx, minx->BA ); PUSH16( minx, minx->HL ); PUSH16( minx, minx->X ); PUSH16( minx, minx->Y ); PUSH8( minx, minx->N ); }
+OP(B9) { PUSH16( minx, minx->BA ); PUSH16( minx, minx->HL ); PUSH16( minx, minx->X ); PUSH16( minx, minx->Y ); PUSH8( minx, minx->N ); PUSH8( minx, minx->I ); PUSH8( minx, minx->XI ); PUSH8( minx, minx->YI ); }
 OP(BA) { /* illegal instruction? */ }
 OP(BB) { /* illegal instruction? */ }
-OP(BC) { regs.N = POP8(); regs.Y = POP16(); regs.X = POP16(); regs.HL = POP16(); regs.BA = POP16(); }
-OP(BD) { regs.YI = POP8(); regs.XI = POP8(); regs.I = POP8(); regs.N = POP8(); regs.Y = POP16(); regs.X = POP16(); regs.HL = POP16(); regs.BA = POP16(); }
+OP(BC) { minx->N = POP8(minx); minx->Y = POP16(minx); minx->X = POP16(minx); minx->HL = POP16(minx); minx->BA = POP16(minx); }
+OP(BD) { minx->YI = POP8(minx); minx->XI = POP8(minx); minx->I = POP8(minx); minx->N = POP8(minx); minx->Y = POP16(minx); minx->X = POP16(minx); minx->HL = POP16(minx); minx->BA = POP16(minx); }
 OP(BE) { /* illegal instruction? */ }
 OP(BF) { /* illegal instruction? */ }
 
-OP(C0) { AD2_IHL; regs.BA = rd16( addr2 ); }
-OP(C1) { AD2_IHL; regs.HL = rd16( addr2 ); }
-OP(C2) { AD2_IHL; regs.X = rd16( addr2 ); }
-OP(C3) { AD2_IHL; regs.Y = rd16( addr2 ); }
-OP(C4) { AD1_IHL; wr16( addr1, regs.BA ); }
-OP(C5) { AD1_IHL; wr16( addr1, regs.HL ); }
-OP(C6) { AD1_IHL; wr16( addr1, regs.X ); }
-OP(C7) { AD1_IHL; wr16( addr1, regs.Y ); }
+OP(C0) { AD2_IHL; minx->BA = rd16( minx, addr2 ); }
+OP(C1) { AD2_IHL; minx->HL = rd16( minx, addr2 ); }
+OP(C2) { AD2_IHL; minx->X = rd16( minx, addr2 ); }
+OP(C3) { AD2_IHL; minx->Y = rd16( minx, addr2 ); }
+OP(C4) { AD1_IHL; wr16( minx, addr1, minx->BA ); }
+OP(C5) { AD1_IHL; wr16( minx, addr1, minx->HL ); }
+OP(C6) { AD1_IHL; wr16( minx, addr1, minx->X ); }
+OP(C7) { AD1_IHL; wr16( minx, addr1, minx->Y ); }
 OP(C8) { /* illegal instruction? */ }
 OP(C9) { /* illegal instruction? */ }
 OP(CA) { /* illegal instruction? */ }
@@ -222,58 +222,58 @@ OP(CD) { /* illegal instruction? */ }
 OP(CE) { /* illegal instruction? */ }
 OP(CF) { /* illegal instruction? */ }
 
-OP(D0) { AD2_XIX; regs.BA = rd16( addr2 ); }
-OP(D1) { AD2_XIX; regs.HL = rd16( addr2 ); }
-OP(D2) { AD2_XIX; regs.X = rd16( addr2 ); }
-OP(D3) { AD2_XIX; regs.Y = rd16( addr2 ); }
-OP(D4) { AD1_XIX; wr16( addr1, regs.BA ); }
-OP(D5) { AD1_XIX; wr16( addr1, regs.HL ); }
-OP(D6) { AD1_XIX; wr16( addr1, regs.X ); }
-OP(D7) { AD1_XIX; wr16( addr1, regs.Y ); }
-OP(D8) { AD2_YIY; regs.BA = rd16( addr2 ); }
-OP(D9) { AD2_YIY; regs.HL = rd16( addr2 ); }
-OP(DA) { AD2_YIY; regs.X = rd16( addr2 ); }
-OP(DB) { AD2_YIY; regs.Y = rd16( addr2 ); }
-OP(DC) { AD1_YIY; wr16( addr1, regs.BA ); }
-OP(DD) { AD1_YIY; wr16( addr1, regs.HL ); }
-OP(DE) { AD1_YIY; wr16( addr1, regs.X ); }
-OP(DF) { AD1_YIY; wr16( addr1, regs.Y ); }
+OP(D0) { AD2_XIX; minx->BA = rd16( minx, addr2 ); }
+OP(D1) { AD2_XIX; minx->HL = rd16( minx, addr2 ); }
+OP(D2) { AD2_XIX; minx->X = rd16( minx, addr2 ); }
+OP(D3) { AD2_XIX; minx->Y = rd16( minx, addr2 ); }
+OP(D4) { AD1_XIX; wr16( minx, addr1, minx->BA ); }
+OP(D5) { AD1_XIX; wr16( minx, addr1, minx->HL ); }
+OP(D6) { AD1_XIX; wr16( minx, addr1, minx->X ); }
+OP(D7) { AD1_XIX; wr16( minx, addr1, minx->Y ); }
+OP(D8) { AD2_YIY; minx->BA = rd16( minx, addr2 ); }
+OP(D9) { AD2_YIY; minx->HL = rd16( minx, addr2 ); }
+OP(DA) { AD2_YIY; minx->X = rd16( minx, addr2 ); }
+OP(DB) { AD2_YIY; minx->Y = rd16( minx, addr2 ); }
+OP(DC) { AD1_YIY; wr16( minx, addr1, minx->BA ); }
+OP(DD) { AD1_YIY; wr16( minx, addr1, minx->HL ); }
+OP(DE) { AD1_YIY; wr16( minx, addr1, minx->X ); }
+OP(DF) { AD1_YIY; wr16( minx, addr1, minx->Y ); }
 
-OP(E0) { regs.BA = regs.BA; }
-OP(E1) { regs.BA = regs.HL; }
-OP(E2) { regs.BA = regs.X; }
-OP(E3) { regs.BA = regs.Y; }
-OP(E4) { regs.HL = regs.BA; }
-OP(E5) { regs.HL = regs.HL; }
-OP(E6) { regs.HL = regs.X; }
-OP(E7) { regs.HL = regs.Y; }
-OP(E8) { regs.X = regs.BA; }
-OP(E9) { regs.X = regs.HL; }
-OP(EA) { regs.X = regs.X; }
-OP(EB) { regs.X = regs.Y; }
-OP(EC) { regs.Y = regs.BA; }
-OP(ED) { regs.Y = regs.HL; }
-OP(EE) { regs.Y = regs.X; }
-OP(EF) { regs.Y = regs.Y; }
+OP(E0) { minx->BA = minx->BA; }
+OP(E1) { minx->BA = minx->HL; }
+OP(E2) { minx->BA = minx->X; }
+OP(E3) { minx->BA = minx->Y; }
+OP(E4) { minx->HL = minx->BA; }
+OP(E5) { minx->HL = minx->HL; }
+OP(E6) { minx->HL = minx->X; }
+OP(E7) { minx->HL = minx->Y; }
+OP(E8) { minx->X = minx->BA; }
+OP(E9) { minx->X = minx->HL; }
+OP(EA) { minx->X = minx->X; }
+OP(EB) { minx->X = minx->Y; }
+OP(EC) { minx->Y = minx->BA; }
+OP(ED) { minx->Y = minx->HL; }
+OP(EE) { minx->Y = minx->X; }
+OP(EF) { minx->Y = minx->Y; }
 
-OP(F0) { regs.SP = regs.BA; }
-OP(F1) { regs.SP = regs.HL; }
-OP(F2) { regs.SP = regs.X; }
-OP(F3) { regs.SP = regs.Y; }
-OP(F4) { regs.HL = regs.SP; }
-OP(F5) { regs.HL = regs.PC; }
+OP(F0) { minx->SP = minx->BA; }
+OP(F1) { minx->SP = minx->HL; }
+OP(F2) { minx->SP = minx->X; }
+OP(F3) { minx->SP = minx->Y; }
+OP(F4) { minx->HL = minx->SP; }
+OP(F5) { minx->HL = minx->PC; }
 OP(F6) { /* illegal instruction? */ }
 OP(F7) { /* illegal instruction? */ }
-OP(F8) { regs.BA = regs.SP; }
-OP(F9) { regs.BA = regs.PC; }
-OP(FA) { regs.X = regs.SP; }
+OP(F8) { minx->BA = minx->SP; }
+OP(F9) { minx->BA = minx->PC; }
+OP(FA) { minx->X = minx->SP; }
 OP(FB) { /* illegal instruction? */ }
 OP(FC) { /* illegal instruction? */ }
 OP(FD) { /* illegal instruction? */ }
-OP(FE) { regs.Y = regs.SP; }
+OP(FE) { minx->Y = minx->SP; }
 OP(FF) { /* illegal instruction? */ }
 
-static void (*const insnminx_CF[256])(void) = {
+static void (*const insnminx_CF[256])(minx_state *minx) = {
 	minx_CF_00, minx_CF_01, minx_CF_02, minx_CF_03, minx_CF_04, minx_CF_05, minx_CF_06, minx_CF_07,
 	minx_CF_08, minx_CF_09, minx_CF_0A, minx_CF_0B, minx_CF_0C, minx_CF_0D, minx_CF_0E, minx_CF_0F,
 	minx_CF_10, minx_CF_11, minx_CF_12, minx_CF_13, minx_CF_14, minx_CF_15, minx_CF_16, minx_CF_17,
