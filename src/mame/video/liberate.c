@@ -75,12 +75,20 @@ static TILE_GET_INFO( get_fix_tile_info )
 	tile = videoram[tile_index] + ((colorram[tile_index] & 0x7) << 8);
 	color = (colorram[tile_index] & 0x70) >> 4;
 
-//if (tile & 0x300) tile -= 0x000;
-//else if(tile & 0x200) tile -= 0x100;
-//else if (tile & 0x100) tile -= 0x100;
-//else tile += 0x200;
-
 	SET_TILE_INFO(0, tile, color, 0);
+}
+
+static TILE_GET_INFO( prosport_get_back_tile_info )
+{
+	int tile;
+
+	/* TODO: bits 0-3 are used and there's an unimplemented per-tile flip y / +0x10 tile banking, understand where. */
+
+	tile = (prosport_bg_vram[tile_index] & 0xf0)>>4;
+//	if(!(tile & 0x08)) { tile+=0x10; }
+	tile+= deco16_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
+
+	SET_TILE_INFO(8, tile, 0, 0);
 }
 
 /***************************************************************************/
@@ -152,6 +160,8 @@ WRITE8_HANDLER( prosport_io_w )
 	{
 		case 0:
 			//background_disable = ~data & 0x80;
+			flip_screen_set(space->machine, data & 0x80);
+			tilemap_mark_all_tiles_dirty(background_tilemap);
 			break;
 		case 2: /* Sound */
 			soundlatch_w(space, 0, data);
@@ -175,6 +185,12 @@ WRITE8_HANDLER( liberate_colorram_w )
 	tilemap_mark_tile_dirty(fix_tilemap, offset);
 }
 
+WRITE8_HANDLER( prosport_bg_vram_w )
+{
+	prosport_bg_vram[offset] = data;
+	tilemap_mark_tile_dirty(background_tilemap, offset);
+}
+
 /***************************************************************************/
 
 VIDEO_START( prosoccr )
@@ -185,7 +201,6 @@ VIDEO_START( prosoccr )
 	tilemap_set_transparent_pen(fix_tilemap,0);
 
 	prosoccr_charram = auto_alloc_array(machine, UINT8, 0x1800*2);
-
 }
 
 VIDEO_START( boomrang )
@@ -200,6 +215,14 @@ VIDEO_START( boomrang )
 VIDEO_START( liberate )
 {
 	background_tilemap = tilemap_create(machine, get_back_tile_info,back_scan,16,16,32,32);
+	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
+
+	tilemap_set_transparent_pen(fix_tilemap,0);
+}
+
+VIDEO_START( prosport )
+{
+	background_tilemap = tilemap_create(machine, prosport_get_back_tile_info,back_scan,16,16,32,32);
 	fix_tilemap = tilemap_create(machine, get_fix_tile_info,fix_scan,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
@@ -480,60 +503,19 @@ VIDEO_UPDATE( prosoccr )
 VIDEO_UPDATE( prosport )
 {
 	int mx,my,tile,offs,gfx_region;
-	int scrollx;
+	int scrollx,scrolly;
 
 	bitmap_fill(bitmap,cliprect,0);
 
-//  popmessage("%d",scrollx);
-
 	offs = 0;
-//  scrollx = ((deco16_io_ram[0] & 0xf)<<8)+deco16_io_ram[1];
-	scrollx = 0;//((deco16_io_ram[0] & 0x3)<<8)+deco16_io_ram[1];
+	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
+    scrolly = ((deco16_io_ram[0] & 0x8)<<5);
+	scrollx = ((deco16_io_ram[0] & 0x2)<<7) | (deco16_io_ram[1]);
 
-	/* TODO: enough for showing something for Pro Bowling, not enough yet for Pro Golf...*/
-	for(mx = 0;mx < 32;mx++)
-	{
-		for(my = 0;my < 16;my++)
-		{
-			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
+	tilemap_set_scrolly(background_tilemap,0,scrolly);
+	tilemap_set_scrollx(background_tilemap,0,-scrollx);
 
-			if(deco16_io_ram[0]&0x20)
-				tile+=0x20;
-
-			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,256-16*(mx+0)+scrollx,16*(my+0),
-				cliprect,TRANSPARENCY_NONE,0);
-			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,256-16*(mx+0)+scrollx+512,16*(my+0),
-				cliprect,TRANSPARENCY_NONE,0);
-
-			offs++;
-		}
-	}
-
-//  #if 0
-	for(mx = 0;mx < 32;mx++)
-	{
-		for(my = 16;my < 32;my++)
-		{
-			tile = (prosport_bg_vram[offs] & 0xf0)>>4;
-
-			if(deco16_io_ram[4] & 0x80)
-				tile+=0x20;
-
-			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,256-16*(mx+0)+scrollx,16*(my+0),
-				cliprect,TRANSPARENCY_NONE,0);
-			drawgfx(bitmap,screen->machine->gfx[8],
-				tile,0,0,0,256-16*(mx+0)+scrollx+512,16*(my+0),
-				cliprect,TRANSPARENCY_NONE,0);
-
-			offs++;
-		}
-	}
-//  #endif
-
-	//return 0;
+	tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
 
 //  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
