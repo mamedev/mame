@@ -4778,6 +4778,46 @@ ROM_START( gstrik2 )
 	/* ROM7.27 not populated?  */
 ROM_END
 
+ROM_START( gstrik2e )
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 */
+	ROM_LOAD16_BYTE( "hum_003_g2f.rom1.u107", 0x000000, 0x80000, CRC(2712d9ca) SHA1(efa967de931728534a663fa1529e92003afbb3e9) )
+	ROM_LOAD16_BYTE( "hum_003_g2f.rom2.u108", 0x000001, 0x80000, CRC(86785c64) SHA1(ef172d6e859a68eb80f7c127b61883d50eefb0fe) )
+	ROM_LOAD16_BYTE( "prg2.109", 0x100000, 0x80000, BAD_DUMP CRC(ead86919) SHA1(eb9b68dff4e08d90ac90043c7f3021914caa007d) )
+	ROM_LOAD16_BYTE( "prg3.110", 0x100001, 0x80000, BAD_DUMP CRC(e0b026e3) SHA1(05f75c0432efda3dec0372199382e310bb268fba) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 */
+	ROM_LOAD( "sprg.30", 0x0000, 0x20000, BAD_DUMP CRC(aeef6045) SHA1(61b8c89ca495d3aac79e53413a85dd203db816f3) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "chr0.80", 0x0000000, 0x200000, BAD_DUMP CRC(f63a52a9) SHA1(1ad52bb3a051eaffe8fb6ba49d4fc1d0b6144156) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr1.79", 0x0000002, 0x200000, BAD_DUMP CRC(4110c184) SHA1(90ccb3d50eff7a655336cfa9c072f7213589e64c) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr2.78", 0x0000004, 0x200000, BAD_DUMP CRC(ddb4b9ee) SHA1(0e2c151c3690b9c3d298dda8842e283660d37386) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr3.77", 0x0000006, 0x200000, BAD_DUMP CRC(5ab367db) SHA1(adf8749451f4583f8e9e00ab61f3408d804a7265) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr4.84", 0x0800000, 0x200000, BAD_DUMP CRC(77d7ef99) SHA1(8f5cf72f5919fe9363e7549e0bb1b3ee633cec3b) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr5.83", 0x0800002, 0x200000, BAD_DUMP CRC(a4d49e95) SHA1(9789bacba7876100e0f0293f54c81def545ed068) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr6.82", 0x0800004, 0x200000, BAD_DUMP CRC(32eb33b0) SHA1(2ea06484ca326b44a35ee470343147a9d91d5626) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "chr7.81", 0x0800006, 0x200000, BAD_DUMP CRC(2d30a21e) SHA1(749e86b7935ef71556eaee4caf6f954634e9bcbf) , ROM_GROUPWORD | ROM_SKIP(6))
+	/* not populated */
+//  ROMX_LOAD( "chr8.88", 0x1000000, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr9.87", 0x1000002, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr10.86", 0x1000004, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr11.85", 0x1000006, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr12.92", 0x1800000, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr13.91", 0x1800002, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr14.90", 0x1800004, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+//  ROMX_LOAD( "chr15.89", 0x1800006, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* 053936 gfx data */
+	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  BAD_DUMP CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
+
+	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
+	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, BAD_DUMP CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
+
+	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
+	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, BAD_DUMP CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
+	/* ROM7.27 not populated?  */
+ROM_END
+
 /***************************************************************************
 
 Daitoride
@@ -5852,6 +5892,7 @@ GAME( 1996, 3kokushi, 0,        3kokushi, 3kokushi, karatour, ROT0,   "Mitchell"
 GAME( 1996, balcube,  0,        balcube,  balcube,  balcube,  ROT0,   "Metro",                                  "Bal Cube",                          0 )
 GAME( 1996, bangball, 0,        bangball, bangball, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse", "Bang Bang Ball (v1.05)",            0 )
 GAME( 1996, gstrik2,  0,        gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Japan)",           GAME_IMPERFECT_GRAPHICS ) // priority between rounds
+GAME( 1996, gstrik2e, gstrik2,  gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Europe and Oceania)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, batlbubl, bangball, batlbubl, batlbubl, balcube,  ROT0,   "Limenko",                                "Battle Bubble (v2.00)",             0 )
 GAME( 1996, mouja,    0,        mouja,    mouja,    mouja,    ROT0,   "Etona",                                  "Mouja (Japan)",                     GAME_NO_COCKTAIL )
 GAME( 1997, gakusai,  0,        gakusai,  gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai (Japan)",         GAME_IMPERFECT_GRAPHICS )

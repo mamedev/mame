@@ -7096,6 +7096,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bigstrik )	/* (c) 1992 */
 	DRIVER( bigstrkb )	/* bootleg on different hardware */
 	DRIVER( bestleag )	/* bootleg, by Playmark? */
+	DRIVER( bestleaw )	/* bootleg */
 	DRIVER( chimerab )	/* (c) 1993 */
 	DRIVER( cybattlr )	/* (c) 1993 */
 	DRIVER( hayaosi1 )	/* (c) 1993 */
@@ -7180,6 +7181,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( taotaido )	/* (c) 1993 Video System Co. */
 	DRIVER( taotaida )	/* (c) 1993 Video System Co. */
 	DRIVER( gstriker )	/* (c) [1993] Human */
+	DRIVER( gstrikea )	/* (c) [1993] Human */
 	DRIVER( vgoalsoc )	/* (c) 199? Temco */
 	DRIVER( vgoalsca )	/* (c) 199? Temco */
 	DRIVER( twrldc94 )      /* (c) 1994 Tecmo */
@@ -7733,6 +7735,7 @@ Other Sun games
 	DRIVER( gakusai2 )	/* (c) 1998 MakeSoft */
 	DRIVER( blzntrnd )	/* (c) 1994 Human Amusement */
 	DRIVER( gstrik2 )	/* (c) 1996 Human Amusement */
+	DRIVER( gstrik2e )
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 1994 Technosoft (Japan) (Arcade TV Game List - P.100, Left, 13 from Bottom) */

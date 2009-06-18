@@ -633,25 +633,25 @@ ROM_START( gstriker )
 	ROM_LOAD16_WORD_SWAP( "human-1.u58",  0x00000, 0x80000, CRC(45cf4857) SHA1(8133a9a7bdd547cc3d69140a68a1a5a7341e9f5b) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
-	ROM_LOAD( "human-3.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
+	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
-	ROM_LOAD( "human-2.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
+	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tilemap
-	ROM_LOAD( "scrgs105.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
-	ROM_LOAD( "scrgs105.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
 
 	ROM_REGION( 0x1000000, "gfx3", 0 )
-	ROM_LOAD( "scrgs101.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
-	ROM_LOAD( "scrgs102.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
-	ROM_LOAD( "scrgs103.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
-	ROM_LOAD( "scrgs104.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
-	ROM_LOAD( "human-4.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) )
+	ROM_LOAD( "human_scr-gs-101_m531602c-40_3405351.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
+	ROM_LOAD( "human_scr-gs-102_m531602c-41_3405355.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
+	ROM_LOAD( "human_scr-gs-103_m531602c-42_3405353.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
+	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
+	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) )
 
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
-	ROM_LOAD( "scrgs106.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
+	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
 	ROM_REGION( 0x100000, "ym", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
@@ -663,6 +663,45 @@ ROM_START( gstriker )
 	ROM_LOAD( "pal16l8.s204a.u89",   0x0600, 0x0104, CRC(eb997577) SHA1(504a2499c8a96c74607d06aefb0a062612a78b38) )
 	ROM_LOAD( "pal16l8.s205a.u109",  0x0800, 0x0104, CRC(0d644e59) SHA1(bb8f4ab47d7bc9b9b37f636f8fa9c419f17630ad) )
 ROM_END
+
+ROM_START( gstrikea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "human-1_27c4002.u58",  0x00000, 0x80000, CRC(7cf45320) SHA1(4127c93fe5f863cecf0a005c66129c0eb660f5dd) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
+	ROM_RELOAD(               0x10000, 0x20000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
+	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tilemap
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
+
+	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_LOAD( "human_scr-gs-101_m531602c-40_3405351.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
+	ROM_LOAD( "human_scr-gs-102_m531602c-41_3405355.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
+	ROM_LOAD( "human_scr-gs-103_m531602c-42_3405353.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
+	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
+	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) )
+
+	ROM_REGION( 0x40000, "ym.deltat", 0 )
+	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
+
+	ROM_REGION( 0x100000, "ym", 0 )                                                                             
+	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) ) 
+
+      /* PALs were protected on this version, used the ones from the "gstriker" set */
+	ROM_REGION( 0x1000, "plds", 0 )
+	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
+	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
+	ROM_LOAD( "pal16l8.s203a.u75",   0x0400, 0x0104, CRC(ad197e2d) SHA1(e0691b79b8433285a0bafea1d52b0166f6417c20) )
+	ROM_LOAD( "pal16l8.s204a.u89",   0x0600, 0x0104, CRC(eb997577) SHA1(504a2499c8a96c74607d06aefb0a062612a78b38) )
+	ROM_LOAD( "pal16l8.s205a.u109",  0x0800, 0x0104, CRC(0d644e59) SHA1(bb8f4ab47d7bc9b9b37f636f8fa9c419f17630ad) )
+ROM_END
+
+
 
 ROM_START( vgoalsoc )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -1018,6 +1057,8 @@ static DRIVER_INIT( vgoalsoc )
 /*** GAME DRIVERS ************************************************************/
 
 GAME( 1993, gstriker, 0,        gstriker, gstriker, 0,        ROT0, "Human", "Grand Striker", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gstrikea, gstriker, gstriker, gstriker, 0,        ROT0, "Human", "Grand Striker (Americas)", GAME_IMPERFECT_GRAPHICS )
+
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
 GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 1)", GAME_NOT_WORKING )
