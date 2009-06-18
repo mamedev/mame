@@ -289,6 +289,29 @@ IC Type       27C2048   27C2048   27C4200   27C4200   27C1000   27C160    27C160
 Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR15021  EPR15022  EPR15023  EPR15024  EPR15025  EPR15026  EPR15027  EPR15028  EPR15029  EPR15031  EPR15032  -
 
 
+*********************************************************************************************
+
+
+On "Super Visual Football: European Sega Cup" and "JLEAGUE" : 
+ 
+JLEAGUE was the original code developed and released in early 
+1994 in Japan which than got translated and updated to be 
+released as the European Sega Cup. 
+ 
+So, JLEAGUE is the Original. 
+and 
+"Super Visual Football: European Sega Cup" is the clone. 
+ 
+My source of information? 
+I wrote the simulation ( in assembly ) while working in the SEGA 
+Haneda ( Tokyo ) office in 1993. We even filed a patent on the 
+team/individual player task synchronization. After I finished JLEAGE, 
+we handed it off to the satellite groups for localization. 
+ 
+Cheers, 
+ 
+MIB.42  
+
 ***************************************************************************/
 
 #include "driver.h"
