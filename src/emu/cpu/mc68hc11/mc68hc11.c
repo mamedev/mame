@@ -256,7 +256,8 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 			return;
 
 	}
-	fatalerror("HC11: regs_w %02X, %02X", reg, value);
+
+	logerror("HC11: regs_w %02X, %02X\n", reg, value);
 }
 
 /*****************************************************************************/

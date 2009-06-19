@@ -1388,6 +1388,21 @@ static void HC11OP(iny)(hc11_state *cpustate)
 	CYCLES(cpustate, 4);
 }
 
+/* JMP IND X        0x6E */
+static void HC11OP(jmp_indx)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH(cpustate);
+	SET_PC(cpustate, cpustate->ix + adr);
+	CYCLES(cpustate, 3);
+}
+
+/* JMP IND Y        0x18 0x6E */
+static void HC11OP(jmp_indy)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH(cpustate);
+	SET_PC(cpustate, cpustate->iy + adr);
+	CYCLES(cpustate, 4);
+}
 
 /* JMP EXT          0x7E */
 static void HC11OP(jmp_ext)(hc11_state *cpustate)
