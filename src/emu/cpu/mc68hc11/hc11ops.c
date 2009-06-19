@@ -2202,6 +2202,33 @@ static void HC11OP(tst_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* TSX              0x30 */
+static void HC11OP(tsx)(hc11_state *cpustate)
+{
+	cpustate->ix = cpustate->sp + 1;
+	CYCLES(cpustate, 3);
+}
+
+/* TSY              0x18 0x30 */
+static void HC11OP(tsy)(hc11_state *cpustate)
+{
+	cpustate->iy = cpustate->sp + 1;
+	CYCLES(cpustate, 4);
+}
+
+/* TXS              0x35 */
+static void HC11OP(txs)(hc11_state *cpustate)
+{
+	cpustate->sp = cpustate->ix - 1;
+	CYCLES(cpustate, 3);
+}
+
+/* TYS              0x18 0x35 */
+static void HC11OP(tys)(hc11_state *cpustate)
+{
+	cpustate->sp = cpustate->iy - 1;
+	CYCLES(cpustate, 4);
+}
 
 /* XGDX             0x8F */
 static void HC11OP(xgdx)(hc11_state *cpustate)
