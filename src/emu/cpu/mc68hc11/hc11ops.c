@@ -735,6 +735,16 @@ static void HC11OP(bitb_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+/* BCC              0x24 */
+static void HC11OP(bcc)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if ((cpustate->ccr & CC_C) == 0)	/* Branch if C flag clear */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
 
 /* BCS              0x25 */
 static void HC11OP(bcs)(hc11_state *cpustate)
@@ -785,6 +795,16 @@ static void HC11OP(ble)(hc11_state *cpustate)
 	CYCLES(cpustate, 3);
 }
 
+/* BMI              0x2B */
+static void HC11OP(bmi)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if (cpustate->ccr & CC_N)		/* Branch if N flag set */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
 
 /* BPL              0x2A */
 static void HC11OP(bpl)(hc11_state *cpustate)
@@ -806,6 +826,13 @@ static void HC11OP(bra)(hc11_state *cpustate)
 	CYCLES(cpustate, 3);
 }
 
+/* BRN              0x21 */
+static void HC11OP(brn)(hc11_state *cpustate)
+{
+	/* with this opcode, the branch condition is always false. */
+	SET_PC(cpustate, cpustate->ppc + 2);
+	CYCLES(cpustate, 3);
+}
 
 /* BSR              0x8D */
 static void HC11OP(bsr)(hc11_state *cpustate)
@@ -817,6 +844,27 @@ static void HC11OP(bsr)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* BVC              0x28 */
+static void HC11OP(bvc)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if ((cpustate->ccr & CC_V) == 0)	/* Branch if V flag clear */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
+
+/* BVS              0x29 */
+static void HC11OP(bvs)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if (cpustate->ccr & CC_V)	/* Branch if V flag set */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
 
 /* CLI              0x0E */
 static void HC11OP(cli)(hc11_state *cpustate)
