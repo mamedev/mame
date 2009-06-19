@@ -1908,7 +1908,7 @@ static void HC11OP(mul)(hc11_state *cpustate)
 	REG_D = (UINT8)REG_A * (UINT8)REG_B;
 	CLEAR_C(cpustate);
 	cpustate->ccr |= (REG_B & 0x80) ? CC_C : 0;
-	CYCLES(cpustate, 3);
+	CYCLES(cpustate, 10);
 }
 
 /* PSHA             0x36 */
