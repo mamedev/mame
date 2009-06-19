@@ -20,11 +20,20 @@ Skeleton driver, just the main CPU has been identified (a MC68HC11). This one
 requires some mods to the cpu core in order to start to work...
 Many thanks to Olivier Galibert for the identify effort ;-)
 
+How to initialize this:
+- let it run then soft reset (it wants that ram at 0-0xff is equal to 0xff,
+  nvram maybe?);
+- set a bp 10c5 then pc=10c8, it currently fails the rom checksum for
+  whatever reason (should be 0 and it returns 0x89), note that area
+  0xf00-0xfff isn't tested at all, maybe that belongs to somewhere else?
+
 ***************************************************************************/
 
 
 #include "driver.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+
+static UINT8 *work_ram;
 
 VIDEO_START(hitpoker)
 {
@@ -33,25 +42,63 @@ VIDEO_START(hitpoker)
 
 VIDEO_UPDATE(hitpoker)
 {
+	UINT8 *VRAM = memory_region(screen->machine, "vram");
+	const gfx_element *gfx = screen->machine->gfx[0];
+	int count = 0;
+	int y,x;
+
+	bitmap_fill(bitmap, cliprect, 0);
+
+	for (x=0;x<64;x++)
+	{
+		for (y=0;y<42;y+=2)
+		{
+			int tile;
+			tile = ((VRAM[count]<<8)|(VRAM[count+1])) & 0x1fff;
+			drawgfx(bitmap,gfx,tile,0,0,0,x*16,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
+
+			tile = ((VRAM[count+2]<<8)|(VRAM[count+3])) & 0x1fff;
+			drawgfx(bitmap,gfx,tile,0,0,0,x*16,(y+1)*8,cliprect,TRANSPARENCY_NONE,0);
+
+			count+=4;
+		}
+	}
+
 	return 0;
 }
 
 /* It wants that the even/odd memory is equal for this, 8-bit vram on a 16-bit wide bus? */
-static READ8_HANDLER( hitpoker_vram_r )
+static READ8_HANDLER( hitpoker_work_ram_r )
 {
-	return videoram[offset & ~1];
+	return work_ram[offset & ~1];
+}
+
+static WRITE8_HANDLER( hitpoker_work_ram_w )
+{
+	work_ram[offset & ~1] = data;
 }
 
 static WRITE8_HANDLER( hitpoker_vram_w )
 {
-	videoram[offset & ~1] = data;
+	UINT8 *VRAM = memory_region(space->machine, "vram");
+
+	VRAM[offset] = data;
+}
+
+static WRITE8_HANDLER( hitpoker_cram_w )
+{
+	UINT8 *CRAM = memory_region(space->machine, "cram");
+
+	CRAM[offset] = data;
 }
 
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // hw regs?
-	AM_RANGE(0xb600, 0xbeff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w) AM_BASE(&videoram) // vram / paletteram?
+	AM_RANGE(0xb600, 0xbeff) AM_READWRITE(hitpoker_work_ram_r,hitpoker_work_ram_w) AM_BASE(&work_ram)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(hitpoker_vram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(hitpoker_cram_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -77,6 +124,7 @@ static const gfx_layout hitpoker_layout =
 
 static PALETTE_INIT( hitpoker )
 {
+	#if 0
 	int x,r,g,b;
 
 	for(x=0;x<0x100;x++)
@@ -86,6 +134,7 @@ static PALETTE_INIT( hitpoker )
 		b = ((x & 0xf0)>>4)*0x10;
 		palette_set_color(machine,x,MAKE_RGB(r,g,b));
 	}
+	#endif
 }
 
 static GFXDECODE_START( hitpoker )
@@ -95,15 +144,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,2000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
-//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MDRV_SCREEN_SIZE(1024, 512)
+	MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 512-1)
 
 	MDRV_GFXDECODE(hitpoker)
 	MDRV_PALETTE_LENGTH(0x100)
@@ -117,6 +166,11 @@ MACHINE_DRIVER_END
 ROM_START( hitpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u4.bin",         0x0000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
+
+	ROM_REGION( 0x1000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1000, "cram", ROMREGION_ERASE00 )
+
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) // tile 0x4c8 seems to contain something non-gfx related, could be tilemap / colour data, check!
 	ROM_LOAD16_BYTE( "u42.bin",         0x00001, 0x40000, CRC(cbe56fec) SHA1(129bfd10243eaa7fb6a087f96de90228e6030353) )

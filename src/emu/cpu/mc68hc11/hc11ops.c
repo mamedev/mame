@@ -2103,6 +2103,12 @@ static void HC11OP(rts)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+/* SEC              0x0D */
+static void HC11OP(sec)(hc11_state *cpustate)
+{
+	cpustate->ccr |= CC_C;
+	CYCLES(cpustate, 2);
+}
 
 /* SEI              0x0F */
 static void HC11OP(sei)(hc11_state *cpustate)
@@ -2111,6 +2117,12 @@ static void HC11OP(sei)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+/* SEV              0x0B */
+static void HC11OP(sev)(hc11_state *cpustate)
+{
+	cpustate->ccr |= CC_V;
+	CYCLES(cpustate, 2);
+}
 
 /* STAA DIR         0x97 */
 static void HC11OP(staa_dir)(hc11_state *cpustate)
