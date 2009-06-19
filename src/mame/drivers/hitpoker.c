@@ -36,12 +36,22 @@ VIDEO_UPDATE(hitpoker)
 	return 0;
 }
 
+/* It wants that the even/odd memory is equal for this, 8-bit vram on a 16-bit wide bus? */
+static READ8_HANDLER( hitpoker_vram_r )
+{
+	return videoram[offset & ~1];
+}
+
+static WRITE8_HANDLER( hitpoker_vram_w )
+{
+	videoram[offset & ~1] = data;
+}
 
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // hw regs?
-	AM_RANGE(0xb600, 0xbeff) AM_RAM // vram / paletteram?
+	AM_RANGE(0xb600, 0xbeff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w) AM_BASE(&videoram) // vram / paletteram?
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

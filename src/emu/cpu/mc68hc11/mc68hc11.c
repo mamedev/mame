@@ -87,6 +87,8 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTA);
 		case 0x01:		/* DDRA */
 			return 0;
+		case 0x02:		/* PIOC */
+			return 0;
 		case 0x09:		/* DDRD */
 			return 0;
 		case 0x28:		/* SPCR1 */
@@ -167,7 +169,7 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return 0;
 	}
 
-	fatalerror("HC11: regs_r %02X", reg);
+	logerror("HC11: regs_r %02X\n", reg);
 	return 0; // Dummy
 }
 
