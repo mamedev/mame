@@ -10,6 +10,7 @@
 #define SET_C8(x)			(cpustate->ccr |= ((x) & 0x100) ? CC_C : 0)
 #define SET_C16(x)			(cpustate->ccr |= ((x) & 0x10000) ? CC_C : 0)
 #define CLEAR_Z(cpustate)			(cpustate->ccr &= ~(CC_Z))
+#define CLEAR_C(cpustate)			(cpustate->ccr &= ~(CC_C))
 #define CLEAR_NZV(cpustate)			(cpustate->ccr &= ~(CC_N | CC_Z | CC_V))
 #define CLEAR_NZVC(cpustate)		(cpustate->ccr &= ~(CC_N | CC_Z | CC_V | CC_C))
 #define CLEAR_HNZVC(cpustate)		(cpustate->ccr &= ~(CC_H | CC_N | CC_Z | CC_V | CC_C))
@@ -615,6 +616,43 @@ static void HC11OP(andb_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+/* ASLA             0x48 */
+static void HC11OP(asla)(hc11_state *cpustate)
+{
+	UINT16 r = REG_A << 1;
+	CLEAR_NZVC(cpustate);
+	SET_C8(r);
+	REG_A = (UINT16)(r);
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
+
+/* ASLB             0x58 */
+static void HC11OP(aslb)(hc11_state *cpustate)
+{
+	UINT16 r = REG_B << 1;
+	CLEAR_NZVC(cpustate);
+	SET_C8(r);
+	REG_B = (UINT16)(r);
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
 
 /* BITA IMM         0x85 */
 static void HC11OP(bita_imm)(hc11_state *cpustate)
@@ -1228,6 +1266,29 @@ static void HC11OP(cpy_imm)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+/* DECA             0x4A */
+static void HC11OP(deca)(hc11_state *cpustate)
+{
+	CLEAR_NZV(cpustate);
+	if (REG_A == 0x80)
+		SET_VFLAG(cpustate);
+	REG_A--;
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
+	CYCLES(cpustate, 2);
+}
+
+/* DECB             0x5A */
+static void HC11OP(decb)(hc11_state *cpustate)
+{
+	CLEAR_NZV(cpustate);
+	if (REG_B == 0x80)
+		SET_VFLAG(cpustate);
+	REG_B--;
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+	CYCLES(cpustate, 2);
+}
 
 /* DEX              0x09 */
 static void HC11OP(dex)(hc11_state *cpustate)
@@ -1841,6 +1902,14 @@ static void HC11OP(lsld)(hc11_state *cpustate)
 	CYCLES(cpustate, 3);
 }
 
+/* MUL              0x3d */
+static void HC11OP(mul)(hc11_state *cpustate)
+{
+	REG_D = (UINT8)REG_A * (UINT8)REG_B;
+	CLEAR_C(cpustate);
+	cpustate->ccr |= (REG_B & 0x80) ? CC_C : 0;
+	CYCLES(cpustate, 3);
+}
 
 /* PSHA             0x36 */
 static void HC11OP(psha)(hc11_state *cpustate)
@@ -2176,6 +2245,19 @@ static void HC11OP(std_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* STY              0x1A 0xEF */
+static void HC11OP(sty_indx)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH(cpustate);
+	UINT16 r = cpustate->iy;
+	CLEAR_NZV(cpustate);
+	WRITE8(cpustate, cpustate->ix + adr, (r & 0xff00) >> 8);
+	WRITE8(cpustate, cpustate->ix + adr + 1, (r & 0xff));
+	SET_N16(r);
+	SET_Z16(r);
+	CYCLES(cpustate, 6);
+}
+
 /* SUBA IMM         0x80 */
 static void HC11OP(suba_imm)(hc11_state *cpustate)
 {
@@ -2222,6 +2304,16 @@ static void HC11OP(tap)(hc11_state *cpustate)
 {
 	UINT8 ccr = cpustate->ccr;
 	cpustate->ccr = (REG_A & 0xbf) | (ccr & 0x40);
+	CYCLES(cpustate, 2);
+}
+
+/* TBA              0x17 */
+static void HC11OP(tba)(hc11_state *cpustate)
+{
+	CLEAR_NZV(cpustate);
+	REG_A = REG_B;
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
 	CYCLES(cpustate, 2);
 }
 
