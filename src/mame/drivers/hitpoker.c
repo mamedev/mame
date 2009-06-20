@@ -20,12 +20,16 @@ Skeleton driver, just the main CPU has been identified (a MC68HC11). This one
 requires some mods to the cpu core in order to start to work...
 Many thanks to Olivier Galibert for the identify effort ;-)
 
-How to initialize this:
-- let it run then soft reset (it wants that ram at 0-0xff is equal to 0xff,
-  nvram maybe?);
+Some debug tricks (let's test this CPU as more as possible):
+- let it run then soft reset (it wants that ram at 0-0xff is equal to 0xff);
 - set a bp 10c5 then pc=10c8, it currently fails the rom checksum for
   whatever reason (should be 0 and it returns 0x89), note that area
   0xf00-0xfff isn't tested at all, maybe that belongs to somewhere else?
+- set a bp 1119 then pc=11a8 for more testing, then jump the tight loop with
+  a direct pc += 2;
+
+* Bugs are caused by a weird I/O setting, maybe this one isn't actually
+  MC68HC11 but something without the I/O stuff?
 
 ***************************************************************************/
 
@@ -49,7 +53,7 @@ VIDEO_UPDATE(hitpoker)
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	for (x=0;x<64;x++)
+	for (x=0;x<42;x++)
 	{
 		for (y=0;y<42;y+=2)
 		{
@@ -102,6 +106,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( hitpoker )
 INPUT_PORTS_END
 
@@ -144,6 +151,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,2000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_IO_MAP(main_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -170,7 +178,6 @@ ROM_START( hitpoker )
 	ROM_REGION( 0x1000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000, "cram", ROMREGION_ERASE00 )
-
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) // tile 0x4c8 seems to contain something non-gfx related, could be tilemap / colour data, check!
 	ROM_LOAD16_BYTE( "u42.bin",         0x00001, 0x40000, CRC(cbe56fec) SHA1(129bfd10243eaa7fb6a087f96de90228e6030353) )

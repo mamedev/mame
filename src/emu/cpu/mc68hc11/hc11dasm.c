@@ -463,7 +463,7 @@ static const M68HC11_OPCODE opcode_table_page2[256] =
 	{ "?",				0,						},
 	{ "?",				0,						},
 	{ "?",				0,						},
-	{ "cpy",			EA_IMM8,				},
+	{ "cpy",			EA_IMM16,				},
 	{ "?",				0,						},
 	{ "?",				0,						},
 	{ "xgdy",			0,						},
