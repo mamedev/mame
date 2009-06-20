@@ -4923,7 +4923,23 @@ static const struct AtomiswaveKey df_key = {
     {1,6,4,3,5,2,7,0}
 };
 
+struct AtomiswaveKey ssu_key = {
+    {1,3,7,8,10,2,4,5,11,0,6,12,15,9,13,14},
+    {7,8,12,0,3,11,1,15,6,10,9,14,4,5,2,13},
+    {4,16,23,11,3,10,28,2,12,30,29,22,20,7,6,9,8,31,24,27,18,17,15,25,14,0,21,5,26,1,13,19},
+    {13,5,1,12,3,11,15,6,0,4,9,14,2,8,10,7},
+    {7,5,4,3,0,8,12,1,13,9,6,2,15,11,10,14},
+    {4,1,0,2,5,3,7,6}
+};
 
+struct AtomiswaveKey rm_key = {
+    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
+    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
+    {3,6,0,19,14,30,17,22,13,23,2,11,29,24,28,4,10,7,15,12,31,1,20,16,9,8,18,26,25,21,27,5},
+    {2,6,3,7,11,4,12,0,10,9,15,14,13,5,1,8},
+    {1,13,12,15,8,7,0,5,11,3,4,14,9,10,6,2},
+    {6,0,7,4,5,3,1,2}
+};
 static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
 {
     int b0,b1,b2,b3;
@@ -5019,7 +5035,7 @@ static DRIVER_INIT(sprtshot)
 
 	for(i=0; i<rom_size/2; i++)
 	{
-		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);	// $$$TODO: need key
+		src[i] = atomiswave_decrypt(src[i], i*2, &ssu_key);
 	}
 }
 
@@ -5032,7 +5048,7 @@ static DRIVER_INIT(rangrmsn)
 
 	for(i=0; i<rom_size/2; i++)
 	{
-		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);	// $$$TODO: need key
+		src[i] = atomiswave_decrypt(src[i], i*2, &rm_key);
 	}
 }
 
