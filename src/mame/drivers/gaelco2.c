@@ -15,7 +15,7 @@
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
     Maniac Square  | 1996 | Unknown   | ???      | DS5002FP, but unprotected version available
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
-    Bang!          | 1998 | CG-1V 388 | ???      | No
+    Bang!          | 1998 | CG-1V 388 | 980921/1 | No
 
 ***************************************************************************/
 
@@ -309,60 +309,109 @@ static MACHINE_DRIVER_START( bang )
 MACHINE_DRIVER_END
 
 
+/*
+PCB Layout:
+
+REF: 980921/1
++--------------------------------------------------------------------+
+|                                                                    | Plug-In Daughterboard:
+|                      TDA1543          KM428C256TR (x2)             | +--------------------------+
+|              POT1                                         IC43*  +-| |                          |
++--+                                                               | | | IC1     IC9     IC16   +-|
+   |                                                        IC44*  |J| | IC2     IC10    IC17   | |
+   |                               +----------+                    |P| | IC3     IC11    IC18   |J| JP1 - 50 pin (dual in-line) header
++--+                               |          |             IC45*  |1| | IC4*    IC12*   IC19*  |P| * Denotes unpopulated sockets
+|                                  |  CG-1V   |                    |0| | IC5     IC13    IC20   |1| All roms are 27C040 type
+|                     CY7C199      |   388    |             IC46*  | | | IC6*    IC14    IC21   | |
+|                     CY7C199      |          |                    | | |                        +-|
+| J                                +----------+             IC47*  +-| | 74LS139N   74LS373N x3   |
+| A                                                                  | +--------------------------+
+| M                                                                  |
+| M                                                                  |
+| A                                                                  |
+|                         30.000MHz                         CY7C199  |
+|        93C66N           30.000MHz       +---------+       CY7C199  |
+|                                         | Lattice |       CY7C199  |
++--+                                      | IspLSI  |                |
+   |                                      |  1016E  |      IC53      |
+   |  J J                                 +---------+                |
++--+  P P                               +-----------+       CY7C199  |
+|     2 3                               |           |                |
+|                                       | MC68HC000 |      IC55      |
+|                                       |   FN16    |                |
+|                                       +-----------+                |
++--------------------------------------------------------------------+
+
+   CPU: MC68HC000FN16
+Custom: CG-1V 388 (System chip, Graphics & Sound)
+   OSC: 30.000MHz (x2)
+EEPROM: 93C66N
+
+RAM: CY7C199-15PC (IC12, IC13, IC50, IC51, IC52 & IC54)
+     KM428C256TR-7 (IC32 & IC33)
+
+* IC42 through IC47 unpopulated
+
+JP10 - 50 pin (dual in-line) header for Plug-In Daughterboard
+JP2  - 4 pin light gun header (player 1)
+JP3  - 4 pin light gun header (player 2)
+
+*/
+
 ROM_START( bang )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "bang.u53",	0x000000, 0x080000, CRC(014bb939) SHA1(bb245acf7a3bd4a56b3559518bcb8d0ae39dbaf4) )
-	ROM_LOAD16_BYTE( "bang.u55",	0x000001, 0x080000, CRC(582f8b1e) SHA1(c9b0d4c1dee71cdb2c01d49f20ffde32eddc9583) )
+	ROM_LOAD16_BYTE( "bang53.ic53",	0x000000, 0x080000, CRC(014bb939) SHA1(bb245acf7a3bd4a56b3559518bcb8d0ae39dbaf4) )
+	ROM_LOAD16_BYTE( "bang55.ic55",	0x000001, 0x080000, CRC(582f8b1e) SHA1(c9b0d4c1dee71cdb2c01d49f20ffde32eddc9583) )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
-	ROM_LOAD( "bang.u16",	0x0000000, 0x0080000, CRC(6ee4b878) SHA1(f646380d95650a60b5a17973bdfd3b80450a4d3b) )	/* GFX only */
-	ROM_LOAD( "bang.u17",	0x0080000, 0x0080000, CRC(0c35aa6f) SHA1(df0474b1b9466d3c199e5aade39b7233f0cb45ee) )	/* GFX only */
-	ROM_LOAD( "bang.u18",	0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )	/* Sound only */
-	ROM_FILL(				0x0180000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang.u9",	0x0200000, 0x0080000, CRC(078195dc) SHA1(362ff194e2579346dfc7af88559b0718bc36ec8a) )	/* GFX only */
-	ROM_LOAD( "bang.u10",	0x0280000, 0x0080000, CRC(06711eeb) SHA1(3662ffe730fb54ee48925de9765f88be1abd5e4e) )	/* GFX only */
-	ROM_LOAD( "bang.u11",	0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )	/* Sound only */
-	ROM_FILL(				0x0380000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang.u1",	0x0400000, 0x0080000, CRC(e7b97b0f) SHA1(b5503687ae3ca0a0faa4b867a267d89dac788d6d) )	/* GFX only */
-	ROM_LOAD( "bang.u2",	0x0480000, 0x0080000, CRC(ff297a8f) SHA1(28819a9d7b3cb177e7a7db3fe23a94f5cba33049) )	/* GFX only */
-	ROM_LOAD( "bang.u3",	0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )	/* Sound only */
-	ROM_FILL(				0x0580000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang.u20",	0x0600000, 0x0080000, CRC(a1145df8) SHA1(305cda041a6f201cb011982f1bf1fc6a4153a669) )	/* GFX only */
-	ROM_LOAD( "bang.u13",	0x0680000, 0x0080000, CRC(fe3e8d07) SHA1(7a37561b1cf422b47cddb8751a6b6d57dec8baae) )	/* GFX only */
-	ROM_LOAD( "bang.u5",	0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )	/* Sound only */
-	ROM_FILL(				0x0780000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang.u21",	0x0800000, 0x0080000, CRC(fd93d7f2) SHA1(ff9d8eb5ac8d9757132aa6d79d2f7662c14cd650) )	/* GFX only */
-	ROM_LOAD( "bang.u14",	0x0880000, 0x0080000, CRC(858fcbf9) SHA1(1e67431c8775666f4839bdc427fabf59ffc708c0) )	/* GFX only */
-	ROM_FILL(				0x0900000, 0x0100000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang16.ic16", 0x0000000, 0x0080000, CRC(6ee4b878) SHA1(f646380d95650a60b5a17973bdfd3b80450a4d3b) )	/* GFX only */
+	ROM_LOAD( "bang17.ic17", 0x0080000, 0x0080000, CRC(0c35aa6f) SHA1(df0474b1b9466d3c199e5aade39b7233f0cb45ee) )	/* GFX only */
+	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )	/* Sound only */
+	ROM_FILL(                0x0180000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang9.ic9",   0x0200000, 0x0080000, CRC(078195dc) SHA1(362ff194e2579346dfc7af88559b0718bc36ec8a) )	/* GFX only */
+	ROM_LOAD( "bang10.ic10", 0x0280000, 0x0080000, CRC(06711eeb) SHA1(3662ffe730fb54ee48925de9765f88be1abd5e4e) )	/* GFX only */
+	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )	/* Sound only */
+	ROM_FILL(                0x0380000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang1.ic1",   0x0400000, 0x0080000, CRC(e7b97b0f) SHA1(b5503687ae3ca0a0faa4b867a267d89dac788d6d) )	/* GFX only */
+	ROM_LOAD( "bang2.ic2",   0x0480000, 0x0080000, CRC(ff297a8f) SHA1(28819a9d7b3cb177e7a7db3fe23a94f5cba33049) )	/* GFX only */
+	ROM_LOAD( "bang3.ic3",	 0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )	/* Sound only */
+	ROM_FILL(                0x0580000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang20.ic20", 0x0600000, 0x0080000, CRC(a1145df8) SHA1(305cda041a6f201cb011982f1bf1fc6a4153a669) )	/* GFX only */
+	ROM_LOAD( "bang13.ic13", 0x0680000, 0x0080000, CRC(fe3e8d07) SHA1(7a37561b1cf422b47cddb8751a6b6d57dec8baae) )	/* GFX only */
+	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )	/* Sound only */
+	ROM_FILL(                0x0780000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang21.ic21", 0x0800000, 0x0080000, CRC(fd93d7f2) SHA1(ff9d8eb5ac8d9757132aa6d79d2f7662c14cd650) )	/* GFX only */
+	ROM_LOAD( "bang14.ic14", 0x0880000, 0x0080000, CRC(858fcbf9) SHA1(1e67431c8775666f4839bdc427fabf59ffc708c0) )	/* GFX only */
+	ROM_FILL(                0x0900000, 0x0100000, 0x0 )			/* Empty */
 ROM_END
 
 
 
 ROM_START( bangj )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "bang-a.u53",	0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
-	ROM_LOAD16_BYTE( "bang-a.u55",	0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
+	ROM_LOAD16_BYTE( "bang-a.ic53",	0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
+	ROM_LOAD16_BYTE( "bang-a.ic55",	0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
-	ROM_LOAD( "bang-a.u16",	0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )	/* GFX only */
-	ROM_LOAD( "bang-a.u17",	0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )	/* GFX only */
-	ROM_LOAD( "bang.u18",	0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )	/* Sound only */
-	ROM_FILL(				0x0180000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang-a.u9",	0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )	/* GFX only */
-	ROM_LOAD( "bang-a.u10",	0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )	/* GFX only */
-	ROM_LOAD( "bang.u11",	0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )	/* Sound only */
-	ROM_FILL(				0x0380000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang-a.u1",	0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )	/* GFX only */
-	ROM_LOAD( "bang-a.u2",	0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )	/* GFX only */
-	ROM_LOAD( "bang.u3",	0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )	/* Sound only */
-	ROM_FILL(				0x0580000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang-a.u20",	0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )	/* GFX only */
-	ROM_LOAD( "bang-a.u13",	0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )	/* GFX only */
-	ROM_LOAD( "bang.u5",	0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )	/* Sound only */
-	ROM_FILL(				0x0780000, 0x0080000, 0x0 )			/* Empty */
-	ROM_LOAD( "bang-a.u21",	0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )	/* GFX only */
-	ROM_LOAD( "bang-a.u14",	0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )	/* GFX only */
-	ROM_FILL(				0x0900000, 0x0100000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )	/* GFX only */
+	ROM_LOAD( "bang-a.ic17", 0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )	/* GFX only */
+	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )	/* Sound only */
+	ROM_FILL(                0x0180000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang-a.ic9",  0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )	/* GFX only */
+	ROM_LOAD( "bang-a.ic10", 0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )	/* GFX only */
+	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )	/* Sound only */
+	ROM_FILL(                0x0380000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang-a.ic1",  0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )	/* GFX only */
+	ROM_LOAD( "bang-a.ic2",  0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )	/* GFX only */
+	ROM_LOAD( "bang3.ic3",	 0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )	/* Sound only */
+	ROM_FILL(                0x0580000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang-a.ic20", 0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )	/* GFX only */
+	ROM_LOAD( "bang-a.ic13", 0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )	/* GFX only */
+	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )	/* Sound only */
+	ROM_FILL(                0x0780000, 0x0080000, 0x0 )			/* Empty */
+	ROM_LOAD( "bang-a.ic21", 0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )	/* GFX only */
+	ROM_LOAD( "bang-a.ic14", 0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )	/* GFX only */
+	ROM_FILL(                0x0900000, 0x0100000, 0x0 )			/* Empty */
 ROM_END
 
 
@@ -952,7 +1001,7 @@ REF: 960419/1
    |         SW1                                                   IC43      |
    |                   34.000MHz          |----------|                       |
 |---        93C66                         |          |             IC44      |
-|                                         | GC-1V    |                       |
+|                                         |  CG-1V   |                       |
 | J                            6264       |   366    |             IC45      |
 |                              6264       |          |                       |
 | A                                       |----------|             IC46      |
@@ -965,11 +1014,11 @@ REF: 960419/1
 |                                            |----------|                    |
 |                                30.000MHz   | Lattice  |                    |
 |---                                         | IspLSI   |                    |
-   |                                         |   1016   |          SB55      |
+   |                                         |   1016   |          SB53      |
    |                                         |----------|                    |
 |---                                        |------------|           62256   |
 |                                           |            |                   |
-|                                           |  MC68HC000 |         SB53      |
+|                                           |  MC68HC000 |         SB55      |
 |                                           |    FN16    |                   |
 |                                           |------------|                   |
 -----------------------------------------------------------------------------|
