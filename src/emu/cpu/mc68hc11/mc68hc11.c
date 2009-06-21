@@ -410,7 +410,7 @@ static CPU_SET_INFO( mc68hc11 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:							cpustate->pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + HC11_PC:			cpustate->pc = info->i; 						break;
+		case CPUINFO_INT_REGISTER + HC11_PC:			cpustate->pc = info->i; 					break;
 		case CPUINFO_INT_REGISTER + HC11_SP:			cpustate->sp = info->i;						break;
 		case CPUINFO_INT_REGISTER + HC11_A:				cpustate->d.d8.a = info->i;					break;
 		case CPUINFO_INT_REGISTER + HC11_B:				cpustate->d.d8.b = info->i;					break;

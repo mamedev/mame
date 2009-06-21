@@ -2268,12 +2268,119 @@ static void HC11OP(puly)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* ROLA             0x49 */
+static void HC11OP(rola)(hc11_state *cpustate)
+{
+	UINT8 c = (REG_A & 0x80);
+	UINT16 r = ((REG_A & 0x7f) << 1) | (cpustate->ccr & CC_C ? 1 : 0);
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (c & 0x80) ? CC_C : 0;
+	REG_A = (UINT16)(r);
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
+
+/* ROLB             0x59 */
+static void HC11OP(rolb)(hc11_state *cpustate)
+{
+	UINT8 c = (REG_B & 0x80);
+	UINT16 r = (REG_B << 1) | (cpustate->ccr & CC_C ? 1 : 0);
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (c & 0x80) ? CC_C : 0;
+	REG_B = (UINT16)(r);
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
 
 /* RTS              0x39 */
 static void HC11OP(rts)(hc11_state *cpustate)
 {
 	UINT16 rt_adr = POP16(cpustate);
 	SET_PC(cpustate, rt_adr);
+	CYCLES(cpustate, 5);
+}
+
+/* SBCA IND, X      0xA2 */
+static void HC11OP(sbca_indx)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + offset);
+	UINT16 r = REG_A - i - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_A);
+	SET_C8(r);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 4);
+}
+
+/* SBCA IND, Y      0x18, 0xA2 */
+static void HC11OP(sbca_indy)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + offset);
+	UINT16 r = REG_A - i - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_A);
+	SET_C8(r);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 5);
+}
+
+/* SBCB IND, X      0xE2 */
+static void HC11OP(sbcb_indx)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + offset);
+	UINT16 r = REG_B - i - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
+	CYCLES(cpustate, 4);
+}
+
+/* SBCB IND, Y      0x18, 0xE2 */
+static void HC11OP(sbcb_indy)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + offset);
+	UINT16 r = REG_B - i - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
 	CYCLES(cpustate, 5);
 }
 
@@ -2578,6 +2685,36 @@ static void HC11OP(subd_imm)(hc11_state *cpustate)
 	CYCLES(cpustate, 4);
 }
 
+/* SUBD INDX        0xA3 */
+static void HC11OP(subd_indx)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT16 i = READ16(cpustate, cpustate->ix + offset);
+	UINT32 r = REG_D - i;
+	CLEAR_NZVC(cpustate);
+	SET_N16(r);
+	SET_Z16(r);
+	SET_V_SUB16(r, i, REG_D);
+	SET_C16(r);
+	REG_D = (UINT16)r;
+	CYCLES(cpustate, 6);
+}
+
+/* SUBD INDY        0x18 0xA3 */
+static void HC11OP(subd_indy)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT16 i = READ16(cpustate, cpustate->iy + offset);
+	UINT32 r = REG_D - i;
+	CLEAR_NZVC(cpustate);
+	SET_N16(r);
+	SET_Z16(r);
+	SET_V_SUB16(r, i, REG_D);
+	SET_C16(r);
+	REG_D = (UINT16)r;
+	CYCLES(cpustate, 7);
+}
+
 /* TAB              0x16 */
 static void HC11OP(tab)(hc11_state *cpustate)
 {
@@ -2606,6 +2743,18 @@ static void HC11OP(tba)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+/* TEST              0x00 */
+static void HC11OP(test)(hc11_state *cpustate)
+{
+//	if(cpustate->test_mode)
+		SET_PC(cpustate, cpustate->ppc); // Note: docs says "incremented" but the behaviour makes me think that's actually "decremented".
+//	else
+//	{
+//		TODO: execute an illegal opcode exception here (NMI)
+//	}
+
+	CYCLES(cpustate, 1);
+}
 
 /* TPA              0x07 */
 static void HC11OP(tpa)(hc11_state *cpustate)
