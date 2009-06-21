@@ -30,4 +30,7 @@ CPU_GET_INFO( mc68hc11 );
 #define MC68HC11_IO_AD6				0x16
 #define MC68HC11_IO_AD7				0x17
 
+#define MC68HC11_IRQ_LINE			0
+
+
 #endif /* __MC68HC11_H__ */
