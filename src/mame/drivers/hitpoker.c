@@ -7,6 +7,7 @@ Many thanks to Olivier Galibert for the CPU identify effort ;-)
 
 TODO:
 - Fix the CPU core bugs! (too many to list)
+- at some point it jumps to illegal ROM addresses, why?
 - video HW looks awkward;
 - paletteram format is wrong;
 - sound;
@@ -63,9 +64,10 @@ Some debug tricks (let's test this CPU as more as possible):
 
 #include "driver.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "sound/ay8910.h"
 
-static UINT8 *work_ram;
 static UINT8 *hitpoker_sys_regs;
+static UINT8 hitpoker_pic_data;
 
 VIDEO_START(hitpoker)
 {
@@ -99,22 +101,11 @@ VIDEO_UPDATE(hitpoker)
 	return 0;
 }
 
-/* It wants that the even/odd memory is equal for this, 8-bit vram on a 16-bit wide bus? */
-static READ8_HANDLER( hitpoker_work_ram_r )
-{
-	return work_ram[offset & ~1];
-}
-
-static WRITE8_HANDLER( hitpoker_work_ram_w )
-{
-	work_ram[offset & ~1] = data;
-}
-
 static READ8_HANDLER( hitpoker_vram_r )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if(hitpoker_sys_regs[0x00] & 0x10)
+	if(hitpoker_pic_data & 0x10)
 		return videoram[offset];
 	else
 		return ROM[offset+0x8000];
@@ -132,7 +123,7 @@ static READ8_HANDLER( hitpoker_cram_r )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	if(hitpoker_sys_regs[0x00] & 0x10)
+	if(hitpoker_pic_data & 0x10)
 		return paletteram[offset];
 	else
 		return ROM[offset+0xbf00];
@@ -174,15 +165,37 @@ static READ8_HANDLER( rtc_r )
 	return 0x80; //kludge it for now
 }
 
+static READ8_HANDLER( hitpoker_pic_r )
+{
+//	logerror("R\n");
+
+	if(cpu_get_pc(space->cpu) == 0x3143 ||
+	   cpu_get_pc(space->cpu) == 0x314e ||
+	   cpu_get_pc(space->cpu) == 0x3164 ||
+	   cpu_get_pc(space->cpu) == 0x3179)
+		return hitpoker_pic_data;
+
+	return (hitpoker_pic_data & 0x7f) | (hitpoker_pic_data & 0x40 ? 0x80 : 0x00);
+}
+
+static WRITE8_HANDLER( hitpoker_pic_w )
+{
+	hitpoker_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
+//	logerror("%02x W\n",data);
+}
+
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
+	AM_RANGE(0x1000, 0x1000) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) // protection
 	AM_RANGE(0x1000, 0x103f) AM_RAM AM_BASE(&hitpoker_sys_regs) // hw regs?
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
+	AM_RANGE(0xbe0c, 0xbe0c) AM_READNOP //irq ack?
 	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
+//	AM_RANGE(0xbe0a, 0xbe5f) AM_READ(test_r)
 	AM_RANGE(0xbe80, 0xbe81) AM_WRITE(hitpoker_crtc_w)
-	AM_RANGE(0xbe90, 0xbe91) AM_READWRITE(hitpoker_work_ram_r,hitpoker_work_ram_w) AM_BASE(&work_ram) //???
+	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM
@@ -194,6 +207,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )
 	PORT_START("VBLANK")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //scanline counter probably
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -235,6 +251,12 @@ static MACHINE_DRIVER_START( hitpoker )
 
 	MDRV_VIDEO_START(hitpoker)
 	MDRV_VIDEO_UPDATE(hitpoker)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+//	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 DRIVER_INIT(hitpoker)
@@ -273,7 +295,7 @@ DRIVER_INIT(hitpoker)
 
 ROM_START( hitpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u4.bin",         0x0000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
+	ROM_LOAD( "u4.bin",         0x00000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) // tile 0x4c8 seems to contain something non-gfx related, could be tilemap / colour data, check!
 	ROM_LOAD16_BYTE( "u42.bin",         0x00001, 0x40000, CRC(cbe56fec) SHA1(129bfd10243eaa7fb6a087f96de90228e6030353) )

@@ -824,6 +824,18 @@ static void HC11OP(beq)(hc11_state *cpustate)
 }
 
 
+/* BHI              0x22 */
+static void HC11OP(bhi)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if (((cpustate->ccr & CC_C) == 0) && ((cpustate->ccr & CC_Z) == 0))	/* Branch if C and Z flag clear */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
+
+
 /* BNE              0x26 */
 static void HC11OP(bne)(hc11_state *cpustate)
 {
@@ -843,6 +855,17 @@ static void HC11OP(ble)(hc11_state *cpustate)
 	UINT8 v = (cpustate->ccr & CC_V) ? 1 : 0;
 	INT8 rel = FETCH(cpustate);
 	if ((cpustate->ccr & CC_Z) || (n ^ v))	/* Branch if Z flag set or (N ^ V) */
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 2);
+	}
+	CYCLES(cpustate, 3);
+}
+
+/* BLS              0x23 */
+static void HC11OP(bls)(hc11_state *cpustate)
+{
+	INT8 rel = FETCH(cpustate);
+	if (cpustate->ccr & CC_C || cpustate->ccr & CC_Z)	/* Branch if C or Z flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -1485,6 +1508,22 @@ static void HC11OP(decb)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+/* DEC EXT          0x7A */
+static void HC11OP(dec_ext)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH16(cpustate);
+	UINT8 i = READ8(cpustate, adr);
+
+	CLEAR_NZV(cpustate);
+	if (i == 0x80)
+		SET_VFLAG(cpustate);
+	i--;
+	SET_N8(i);
+	SET_Z8(i);
+	WRITE8(cpustate, adr, i);
+	CYCLES(cpustate, 6);
+}
+
 /* DEX              0x09 */
 static void HC11OP(dex)(hc11_state *cpustate)
 {
@@ -2123,6 +2162,32 @@ static void HC11OP(lsld)(hc11_state *cpustate)
 	CYCLES(cpustate, 3);
 }
 
+/* LSRA              0x44 */
+static void HC11OP(lsra)(hc11_state *cpustate)
+{
+	UINT16 r = REG_A >> 1;
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (REG_A & 1) ? CC_C : 0;
+	REG_A = (UINT8)(r);
+	cpustate->ccr |= ((cpustate->ccr & CC_C) == CC_C) ? CC_V : 0;
+	SET_Z8(REG_A);
+
+	CYCLES(cpustate, 2);
+}
+
+/* LSRB              0x54 */
+static void HC11OP(lsrb)(hc11_state *cpustate)
+{
+	UINT16 r = REG_B >> 1;
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (REG_B & 1) ? CC_C : 0;
+	REG_B = (UINT8)(r);
+	cpustate->ccr |= ((cpustate->ccr & CC_C) == CC_C) ? CC_V : 0;
+	SET_Z8(REG_B);
+
+	CYCLES(cpustate, 2);
+}
+
 /* LSRD             0x04 */
 static void HC11OP(lsrd)(hc11_state *cpustate)
 {
@@ -2147,6 +2212,33 @@ static void HC11OP(mul)(hc11_state *cpustate)
 	cpustate->ccr |= (REG_B & 0x80) ? CC_C : 0;
 	CYCLES(cpustate, 10);
 }
+
+/* NEGA              0x40 */
+static void HC11OP(nega)(hc11_state *cpustate)
+{
+	INT8 r = 0x00 - REG_A;
+	REG_A = r;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= (REG_A == 0x80) ? CC_V : 0;
+	cpustate->ccr |= (REG_A == 0x00) ? CC_C : 0;
+	CYCLES(cpustate, 2);
+}
+
+/* NEGB              0x50 */
+static void HC11OP(negb)(hc11_state *cpustate)
+{
+	INT8 r = 0x00 - REG_B;
+	REG_B = r;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= (REG_B == 0x80) ? CC_V : 0;
+	cpustate->ccr |= (REG_B == 0x00) ? CC_C : 0;
+	CYCLES(cpustate, 2);
+}
+
 
 /* NOP              0x01 */
 static void HC11OP(nop)(hc11_state *cpustate)
