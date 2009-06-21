@@ -399,6 +399,7 @@ static void check_irq_lines(hc11_state *cpustate)
 		PUSH8(cpustate, cpustate->ccr);
 		pc_vector = READ16(cpustate, 0xfff2);
 		SET_PC(cpustate, pc_vector);
+		cpustate->ccr |= CC_I; //irq taken, mask the flag
 		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_IRQ_LINE);
 	}
 }
