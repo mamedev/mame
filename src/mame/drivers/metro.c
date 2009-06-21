@@ -869,7 +869,8 @@ static READ16_HANDLER( balcube_dsw_r )
 static ADDRESS_MAP_START( balcube_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM													// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM													// RAM
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("ymf", ymf278b_r,ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
+	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)					// Sound
 	AM_RANGE(0x400000, 0x41ffff) AM_READ(balcube_dsw_r)									// DSW x 3
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")									// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")									//
@@ -903,7 +904,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daitoa_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM													// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM 												// RAM
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("ymf", ymf278b_r,ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)					// Sound
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)									// DSW x 3
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0	)	// Layer 0
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
@@ -937,7 +939,8 @@ static ADDRESS_MAP_START( bangball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM													// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM													// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_RAM													// RAM (bug in the ram test routine)
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("ymf", ymf278b_r,ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)					// Sound
+	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)					// Sound
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(balcube_dsw_r)									// DSW x 3
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")									// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")									//
