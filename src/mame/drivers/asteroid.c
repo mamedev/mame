@@ -27,8 +27,19 @@ Kits are available immediately from your Atari Distributor.  To determine which 
   require, check ROMs on your Asteroids PCB.  If ROM code is "-01" order kit no. 08-0303009.
   If ROM code is "-02", order no. 08-0303008.
 
-*** It looks like both current sets are the older "easier" version.  We need dumps of the updates
-    for both sets.
+For kit 08-0303009 (from rev 01) swap the following:
+
+ 035127-01 --> 035127-02
+ 035143-01 --> 035143-02
+ 035144-01 --> 034144-04E
+ 035145-01 --> 034145-04E
+
+For kit 08-0303008 (from rev 02) swap the following:
+
+ 035144-02 --> 034144-04E
+ 035145-02 --> 034145-04E
+
+There is not a rev 3 known, mentioned or dumped
 
     Asteroids-deluxe state-prom added by HIGHWAYMAN.
     The prom pcb location is:C8 and is 256x4
@@ -678,11 +689,25 @@ MACHINE_DRIVER_END
 
 ROM_START( asteroid )
 	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "035145.04e",   0x6800, 0x0800, CRC(b503eaf7) SHA1(5369dcfe01c0b9e48b15a96a0de8d23ee8ef9145) )
+	ROM_LOAD( "035144.04e",   0x7000, 0x0800, CRC(25233192) SHA1(51b2865fa897cdaa84ac6500c4b4833a80827019) )
+	ROM_LOAD( "035143.02",    0x7800, 0x0800, CRC(312caa02) SHA1(1ce2eac1ab90b972e3f1fc3d250908f26328d6cb) )
+	/* Vector ROM */
+	ROM_LOAD( "035127.02",    0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+ROM_END
+
+ROM_START( asteroi2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145.02",    0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
 	ROM_LOAD( "035144.02",    0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
 	ROM_LOAD( "035143.02",    0x7800, 0x0800, CRC(312caa02) SHA1(1ce2eac1ab90b972e3f1fc3d250908f26328d6cb) )
 	/* Vector ROM */
 	ROM_LOAD( "035127.02",    0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -695,6 +720,7 @@ ROM_START( asteroi1 )
 	ROM_LOAD( "035143.01",    0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
 	/* Vector ROM */
 	ROM_LOAD( "035127.01",    0x5000, 0x0800, CRC(99699366) SHA1(9b2828fc1cef7727f65fa65e1e11e309b7c98792) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -723,6 +749,7 @@ ROM_START( asterock )
 	/* Vector ROM */
 	ROM_LOAD( "sidamas.0",    0x5000, 0x0400, CRC(6bd2053f) SHA1(790f2858f44bbb1854e2d9d549e29f4815c4665b) )
 	ROM_LOAD( "sidamas.1",    0x5400, 0x0400, CRC(231ce201) SHA1(710f4c19864d725ba1c9ea447a97e84001a679f7) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -735,6 +762,7 @@ ROM_START( meteorts )
 	ROM_LOAD( "m2_j1.bin",    0x7800, 0x0800, CRC(64bd0408) SHA1(141d053cb4cce3fece98293136928b527d3ade0f) )
 	/* Vector ROM */
 	ROM_LOAD( "mv_np3.bin",   0x5000, 0x0800, CRC(11d1c4ae) SHA1(433c2c05b92094bbe102c356d7f1a907db13da67) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -751,6 +779,7 @@ ROM_START( meteorho )
 	/* Vector ROM */
 	ROM_LOAD( "a.bin",    0x5000, 0x0400, CRC(d7822110) SHA1(bf6c5e622fdc16c39a1d8f23fc029abaa1e99b19) )
 	ROM_LOAD( "b.bin",    0x5400, 0x0400, CRC(d62b2887) SHA1(8832953c7166d2f0ed1067c43ebf369db4a4aa70) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "prom.bin",	0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
@@ -766,6 +795,7 @@ ROM_START( astdelux )
 	/* Vector ROM */
 	ROM_LOAD( "036800.02",    0x4800, 0x0800, CRC(bb8cabe1) SHA1(cebaa1b91b96e8b80f2b2c17c6fd31fa9f156386) )
 	ROM_LOAD( "036799.01",    0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -780,6 +810,7 @@ ROM_START( astdelu2 )
 	/* Vector ROM */
 	ROM_LOAD( "036800.01",    0x4800, 0x0800, CRC(3b597407) SHA1(344fea2e5d84acce365d76daed61e96b9b6b37cc) )
 	ROM_LOAD( "036799.01",    0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -832,6 +863,7 @@ ROM_START( astdelu1 )
 	/* Vector ROM */
 	ROM_LOAD( "036800.01",    0x4800, 0x0800, CRC(3b597407) SHA1(344fea2e5d84acce365d76daed61e96b9b6b37cc) )
 	ROM_LOAD( "036799.01",    0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
+
 	/* DVG PROM */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -850,6 +882,7 @@ ROM_START( llander )
 	/* This _should_ be the rom for international versions. */
 	/* Unfortunately, is it not currently available. */
 	ROM_LOAD( "034597.01",    0x5800, 0x0800, NO_DUMP )
+
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",	0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
@@ -900,14 +933,15 @@ static DRIVER_INIT( asterock )
  *
  *************************************/
 
-GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 2)",							   GAME_SUPPORTS_SAVE				  )
-GAME( 1979, asteroi1, asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 1)",							   GAME_SUPPORTS_SAVE				  )
-GAME( 1979, asteroib, asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE				  )
-GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "Sidam",   "Asterock",									   GAME_SUPPORTS_SAVE				  )
-GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "VGG",     "Meteorites",								   GAME_SUPPORTS_SAVE				  )
-GAME( 1980, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "Hoei",    "Meteor",									   GAME_SUPPORTS_SAVE				  )
-GAMEL(1980, astdelux, 0,        astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 3)",					   GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelu2, astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 2)",					   GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelu1, astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 1)",					   GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAME( 1979, llander,  0,        llander,  llander,  0,        ROT0, "Atari",   "Lunar Lander (rev 2)",						   GAME_SUPPORTS_SAVE				  )
-GAME( 1979, llander1, llander,  llander,  llander1, 0,        ROT0, "Atari",   "Lunar Lander (rev 1)",						   GAME_SUPPORTS_SAVE				  )
+GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 4)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroi2, asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroi1, asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroib, asteroid, asteroid, asteroib, asteroib, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "Sidam",   "Asterock",                 GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "VGG",     "Meteorites",               GAME_SUPPORTS_SAVE )
+GAME( 1980, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "Hoei",    "Meteor",                   GAME_SUPPORTS_SAVE )
+GAMEL(1980, astdelux, 0,        astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, astdelu2, astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, astdelu1, astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAME( 1979, llander,  0,        llander,  llander,  0,        ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, llander1, llander,  llander,  llander1, 0,        ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )

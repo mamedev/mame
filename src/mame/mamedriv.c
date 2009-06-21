@@ -5622,6 +5622,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( llander )	/* 0345xx           no copyright notice */
 	DRIVER( llander1 )	/* 0345xx           no copyright notice */
 	DRIVER( asteroid )	/* 035127-035145    (c) 1979 */
+	DRIVER( asteroi2 )	/* 035127-035145    (c) 1979 */
 	DRIVER( asteroi1 )	/* 035127-035145    no copyright notice */
 	DRIVER( asteroib )	/* (bootleg) */
 	DRIVER( asterock )	/* Sidam bootleg    (c) 1979 */
