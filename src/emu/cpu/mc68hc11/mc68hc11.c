@@ -1,7 +1,7 @@
 /*
    Motorola MC68HC11 emulator
 
-   Written by Ville Linde
+   Written by Ville Linde & Angelo Salese
  */
 
 #include "debugger.h"

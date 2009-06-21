@@ -880,6 +880,23 @@ static void HC11OP(bra)(hc11_state *cpustate)
 	CYCLES(cpustate, 3);
 }
 
+/* BRCLR DIR       0x13 */
+static void HC11OP(brclr_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT8 mask = FETCH(cpustate);
+	INT8 rel = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, d);
+
+	if(!(i & mask))
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 4);
+	}
+
+	CYCLES(cpustate, 6);
+}
+
+
 /* BRCLR INDX       0x1F */
 static void HC11OP(brclr_indx)(hc11_state *cpustate)
 {
@@ -895,6 +912,23 @@ static void HC11OP(brclr_indx)(hc11_state *cpustate)
 
 	CYCLES(cpustate, 7);
 }
+
+/* BRSET DIR       0x12 */
+static void HC11OP(brset_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT8 mask = FETCH(cpustate);
+	INT8 rel = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, d);
+
+	if(i & mask)
+	{
+		SET_PC(cpustate, cpustate->ppc + rel + 4);
+	}
+
+	CYCLES(cpustate, 6);
+}
+
 
 /* BRSET INDX       0x1E */
 static void HC11OP(brset_indx)(hc11_state *cpustate)
@@ -1045,6 +1079,14 @@ static void HC11OP(clr_indy)(hc11_state *cpustate)
 }
 
 
+/* CLV              0x0A */
+static void HC11OP(clv)(hc11_state *cpustate)
+{
+	cpustate->ccr &= ~CC_V;
+	CYCLES(cpustate, 2);
+}
+
+
 /* CMPA IMM         0x81 */
 static void HC11OP(cmpa_imm)(hc11_state *cpustate)
 {
@@ -1182,6 +1224,32 @@ static void HC11OP(cmpb_indy)(hc11_state *cpustate)
 	SET_V_SUB8(r, i, REG_B);
 	SET_C8(r);
 	CYCLES(cpustate, 5);
+}
+
+
+/* COMA		         , 0x43 */
+static void HC11OP(coma)(hc11_state *cpustate)
+{
+	UINT16 r = 0xff - REG_A;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= CC_C; //always set for M6800 compatibility
+	REG_A = r;
+	CYCLES(cpustate, 2);
+}
+
+
+/* COMB		         , 0x53 */
+static void HC11OP(comb)(hc11_state *cpustate)
+{
+	UINT16 r = 0xff - REG_B;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= CC_C; //always set for M6800 compatibility
+	REG_B = r;
+	CYCLES(cpustate, 2);
 }
 
 
@@ -2306,6 +2374,23 @@ static void HC11OP(rolb)(hc11_state *cpustate)
 	}
 
 	CYCLES(cpustate, 2);
+}
+
+/* RTI              0x3B */
+static void HC11OP(rti)(hc11_state *cpustate)
+{
+	UINT16 rt_adr;
+	UINT8 x_flag = cpustate->ccr & CC_X;
+	cpustate->ccr = POP8(cpustate);
+	if(x_flag == 0 && cpustate->ccr & CC_X) //X flag cannot do a 0->1 transition with this instruction.
+		cpustate->ccr &= ~CC_X;
+	REG_B = POP8(cpustate);
+	REG_A = POP8(cpustate);
+	cpustate->ix = POP16(cpustate);
+	cpustate->iy = POP16(cpustate);
+	rt_adr = POP16(cpustate);
+	SET_PC(cpustate, rt_adr);
+	CYCLES(cpustate, 12);
 }
 
 /* RTS              0x39 */
