@@ -91,8 +91,8 @@ VIDEO_UPDATE(hitpoker)
 		{
 			int tile;
 
-			tile = (((videoram[count]<<8)|(videoram[count+1])) & 0x1fff);
-			drawgfx(bitmap,gfx,tile,1,0,0,(x-1)*8,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
+			tile = (((videoram[count]<<8)|(videoram[count+1])) & 0x3fff);
+			drawgfx(bitmap,gfx,tile,0,0,0,(x-1)*8,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
 
 			count+=2;
 		}
@@ -126,7 +126,7 @@ static READ8_HANDLER( hitpoker_cram_r )
 	if(hitpoker_pic_data & 0x10)
 		return paletteram[offset];
 	else
-		return ROM[offset+0xbf00];
+		return ROM[offset+0xc000];
 }
 
 static WRITE8_HANDLER( hitpoker_cram_w )
@@ -137,11 +137,15 @@ static WRITE8_HANDLER( hitpoker_cram_w )
 	datax=256*paletteram[offset*2]+paletteram[offset*2+1];
 
 	/* TODO: format is wrong */
-	b = ((datax)&0x001f)>>0;
-	g = ((datax)&0x03e0)>>5;
-	r = ((datax)&0xfc00)>>10;
+	b = ((datax)&0xe000)>>13;
+	g = ((datax)&0x1c00)>>10;
+	r = ((datax)&0x0380)>>7;
 
-	palette_set_color_rgb(space->machine, offset, pal6bit(r), pal5bit(g), pal5bit(b));
+	b|= ((datax)&0x0004)<<1;
+	g|= ((datax)&0x0002)<<2;
+	r|= ((datax)&0x0001)<<3;
+
+	palette_set_color_rgb(space->machine, offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 static WRITE8_HANDLER( hitpoker_crtc_w )
@@ -163,6 +167,11 @@ static WRITE8_HANDLER( hitpoker_crtc_w )
 static READ8_HANDLER( rtc_r )
 {
 	return 0x80; //kludge it for now
+}
+
+static READ8_HANDLER( test_r )
+{
+	return mame_rand(space->machine); //kludge it for now
 }
 
 static READ8_HANDLER( hitpoker_pic_r )
@@ -193,10 +202,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
 	AM_RANGE(0xbe0c, 0xbe0c) AM_READNOP //irq ack?
 	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
-//	AM_RANGE(0xbe0a, 0xbe5f) AM_READ(test_r)
 	AM_RANGE(0xbe80, 0xbe81) AM_WRITE(hitpoker_crtc_w)
 	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
+	AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
@@ -296,6 +305,9 @@ DRIVER_INIT(hitpoker)
 ROM_START( hitpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u4.bin",         0x00000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
+
+	ROM_REGION( 0x10000, "pic", 0 )
+	ROM_LOAD( "pic",			0x00000, 0x1000, NO_DUMP ) // unknown type
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) // tile 0x4c8 seems to contain something non-gfx related, could be tilemap / colour data, check!
 	ROM_LOAD16_BYTE( "u42.bin",         0x00001, 0x40000, CRC(cbe56fec) SHA1(129bfd10243eaa7fb6a087f96de90228e6030353) )

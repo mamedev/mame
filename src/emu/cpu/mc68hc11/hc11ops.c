@@ -2468,6 +2468,46 @@ static void HC11OP(rolb)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+/* RORA             0x46 */
+static void HC11OP(rora)(hc11_state *cpustate)
+{
+	UINT8 c = (REG_A & 1);
+	UINT16 r = ((REG_A & 0x7f) >> 1) | (cpustate->ccr & CC_C ? 0x80 : 0);
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (c & 1) ? CC_C : 0;
+	REG_A = (UINT16)(r);
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
+
+/* RORB             0x56 */
+static void HC11OP(rorb)(hc11_state *cpustate)
+{
+	UINT8 c = (REG_B & 1);
+	UINT16 r = ((REG_B & 0x7f) >> 1) | (cpustate->ccr & CC_C ? 0x80 : 0);
+	CLEAR_NZVC(cpustate);
+	cpustate->ccr |= (c & 1) ? CC_C : 0;
+	REG_B = (UINT16)(r);
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+
+	if (((cpustate->ccr & CC_N) == CC_N && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C) == CC_C))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 2);
+}
+
 /* RTI              0x3B */
 static void HC11OP(rti)(hc11_state *cpustate)
 {
@@ -2715,6 +2755,8 @@ static void HC11OP(std_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+
+
 /* STX EXT          0xFF */
 static void HC11OP(stx_ext)(hc11_state *cpustate)
 {
@@ -2752,6 +2794,27 @@ static void HC11OP(sty_indx)(hc11_state *cpustate)
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(cpustate, 6);
+}
+
+/* STOP              0xCF */
+static void HC11OP(stop)(hc11_state *cpustate)
+{
+	if(cpustate->stop_state == 0 && ((cpustate->ccr & CC_S) == 0))
+	{
+		cpustate->stop_state = 1;
+	}
+
+	if(cpustate->stop_state == 1)
+	{
+		SET_PC(cpustate, cpustate->ppc); // wait for an exception
+	}
+
+	if(cpustate->stop_state == 2)
+	{
+		cpustate->stop_state = 0;
+	}
+
+	CYCLES(cpustate, 2);
 }
 
 /* SUBA DIR         0xd0 */
@@ -2892,6 +2955,23 @@ static void HC11OP(subd_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 7);
 }
 
+/* SWI              0x3F */
+static void HC11OP(swi)(hc11_state *cpustate)
+{
+	UINT16 pc_vector;
+	//cpustate->pc++;
+	PUSH16(cpustate, cpustate->pc);
+	PUSH16(cpustate, cpustate->iy);
+	PUSH16(cpustate, cpustate->ix);
+	PUSH8(cpustate, REG_A);
+	PUSH8(cpustate, REG_B);
+	PUSH8(cpustate, cpustate->ccr);
+	pc_vector = READ16(cpustate, 0xfff6);
+	SET_PC(cpustate, pc_vector);
+	cpustate->ccr |= CC_I; //irq taken, mask the flag
+	CYCLES(cpustate, 14);
+}
+
 /* TAB              0x16 */
 static void HC11OP(tab)(hc11_state *cpustate)
 {
@@ -3018,6 +3098,33 @@ static void HC11OP(tys)(hc11_state *cpustate)
 {
 	cpustate->sp = cpustate->iy - 1;
 	CYCLES(cpustate, 4);
+}
+
+/* WAI              0x3E */
+static void HC11OP(wai)(hc11_state *cpustate)
+{
+	if(cpustate->wait_state == 0)
+	{
+		/* TODO: the following is bogus, pushes regs HERE in an instruction that wants an irq to go out? */
+		PUSH16(cpustate, cpustate->pc);
+		PUSH16(cpustate, cpustate->iy);
+		PUSH16(cpustate, cpustate->ix);
+		PUSH8(cpustate, REG_A);
+		PUSH8(cpustate, REG_B);
+		PUSH8(cpustate, cpustate->ccr);
+		CYCLES(cpustate, 14);
+		cpustate->wait_state = 1;
+	}
+	if(cpustate->wait_state == 1)
+	{
+		SET_PC(cpustate, cpustate->ppc); // wait for an exception
+		CYCLES(cpustate, 1);
+	}
+	if(cpustate->wait_state == 2)
+	{
+		cpustate->wait_state = 0;
+		CYCLES(cpustate, 1);
+	}
 }
 
 /* XGDX             0x8F */

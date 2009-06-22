@@ -6,6 +6,9 @@
 TODO:
 - Interrupts handling is really bare-bones, just to make Hit Poker happy;
 - Complete opcodes hook-up;
+- Add config-selectable I/O / internal RAM and the ability to enable/disable it;
+- Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
+
  */
 
 #include "debugger.h"
@@ -66,6 +69,7 @@ struct _hc11_state
 	int reg_position;
 	UINT8 *internal_ram;
 	int internal_ram_size;
+	UINT8 wait_state,stop_state;
 };
 
 INLINE hc11_state *get_safe_token(const device_config *device)
@@ -378,6 +382,8 @@ static CPU_RESET( hc11 )
 {
 	hc11_state *cpustate = get_safe_token(device);
 	cpustate->pc = READ16(cpustate, 0xfffe);
+	cpustate->wait_state = 0;
+	cpustate->stop_state = 0;
 }
 
 static CPU_EXIT( hc11 )
@@ -385,21 +391,51 @@ static CPU_EXIT( hc11 )
 
 }
 
+/*
+IRQ table vectors:
+0xffd6: SCI
+0xffd8: SPI
+0xffda: Pulse Accumulator Input Edge
+0xffdc: Pulse Accumulator Overflow
+0xffde: Timer Overflow
+0xffe0: Timer Output Capture 5
+0xffe2: Timer Output Capture 4
+0xffe4: Timer Output Capture 3
+0xffe6: Timer Output Capture 2
+0xffe8: Timer Output Capture 1
+0xffea: Timer Input Capture 3
+0xffec: Timer Input Capture 2
+0xffee: Timer Input Capture 1
+0xfff0: Real Time Int
+0xfff2: IRQ
+0xfff4: XIRQ
+0xfff6: SWI (Trap IRQ)
+0xfff8: Illegal Opcode (NMI)
+0xfffa: CO-Processor Fail
+0xfffc: Clock Monitor
+0xfffe: RESET
+*/
+
 static void check_irq_lines(hc11_state *cpustate)
 {
 	if( cpustate->irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(cpustate->ccr & CC_I)) )
 	{
 		UINT16 pc_vector;
 
-		PUSH16(cpustate, cpustate->pc);
-		PUSH16(cpustate, cpustate->iy);
-		PUSH16(cpustate, cpustate->ix);
-		PUSH8(cpustate, REG_A);
-		PUSH8(cpustate, REG_B);
-		PUSH8(cpustate, cpustate->ccr);
+		if(cpustate->wait_state == 0)
+		{
+			PUSH16(cpustate, cpustate->pc);
+			PUSH16(cpustate, cpustate->iy);
+			PUSH16(cpustate, cpustate->ix);
+			PUSH8(cpustate, REG_A);
+			PUSH8(cpustate, REG_B);
+			PUSH8(cpustate, cpustate->ccr);
+		}
 		pc_vector = READ16(cpustate, 0xfff2);
 		SET_PC(cpustate, pc_vector);
 		cpustate->ccr |= CC_I; //irq taken, mask the flag
+		if(cpustate->wait_state == 1) { cpustate->wait_state = 2; }
+		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
 		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_IRQ_LINE);
 	}
 }
