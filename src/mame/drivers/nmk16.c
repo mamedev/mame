@@ -5741,28 +5741,27 @@ ROM_END
 
 ROM_START( hachamf )
 	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_BYTE( "hmf_07.rom",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) )
-	ROM_LOAD16_BYTE( "hmf_06.rom",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
+	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) )
+	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* unknown  - sound cpu ?????? */
-	ROM_LOAD( "hmf_01.rom",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
+	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "hmf_05.rom",  0x000000, 0x020000, CRC(29fb04a2) SHA1(9654b90a66d0e2a0f9cd369cab29cdd0c6f77869) )	/* 8x8 tiles */
+	ROM_LOAD( "5.95",  0x000000, 0x020000, CRC(29fb04a2) SHA1(9654b90a66d0e2a0f9cd369cab29cdd0c6f77869) )	/* 8x8 tiles */
 
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE ) /* 16x16 tiles */
-	// the first half of this rom is missing, the game uses 2 banks, most of the graphics needed aren't present
-	ROM_LOAD( "hmf_04.rom",  0x080000, 0x080000, BAD_DUMP CRC(05a624e3) SHA1(e1b686b36c0adedfddf70eeb6411671bbcd897d8) )
+	ROM_LOAD( "91076-4.101",  0x000000, 0x100000, CRC(df9653a4) SHA1(4a3204a98d7738c7895169fcece922fdf355f4fa) )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD16_WORD_SWAP( "hmf_08.rom",  0x000000, 0x100000, CRC(7fd0f556) SHA1(d1b4bec0946869d3d7bcb870d9ae3bd17395a231) )	/* Sprites */
+	ROM_LOAD16_WORD_SWAP( "91076-8.57",  0x000000, 0x100000, CRC(7fd0f556) SHA1(d1b4bec0946869d3d7bcb870d9ae3bd17395a231) )	/* Sprites */
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
-	ROM_LOAD( "hmf_02.rom",   0x00000, 0x20000, CRC(3f1e67f2) SHA1(413e78587d8a043a0eb94447313ba1b3c5b35be5) )
+	ROM_LOAD( "91076-2.46",   0x00000, 0x20000, CRC(3f1e67f2) SHA1(413e78587d8a043a0eb94447313ba1b3c5b35be5) )
 	ROM_CONTINUE(             0x40000, 0x60000 )	/* banked */
 
 	ROM_REGION( 0x0a0000, "oki2", 0 )	/* OKIM6295 samples */
-	ROM_LOAD( "hmf_03.rom",   0x00000, 0x20000, CRC(b25ed93b) SHA1(d7bc686bbccf982f40420a11158aa8e5dd4207c5) )
+	ROM_LOAD( "91076-3.45",   0x00000, 0x20000, CRC(b25ed93b) SHA1(d7bc686bbccf982f40420a11158aa8e5dd4207c5) )
 	ROM_CONTINUE(             0x40000, 0x60000 )	/* banked */
 ROM_END
 
