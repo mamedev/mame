@@ -7,10 +7,8 @@ Many thanks to Olivier Galibert for the CPU identify effort ;-)
 
 TODO:
 - Fix the CPU core bugs! (too many to list)
-- at some point it jumps to illegal ROM addresses, why?
 - video HW looks awkward;
-- paletteram format is wrong;
-- sound;
+- sound (I've heard something reasonable during tests, so it could be OK);
 
 ============================================================================
 
@@ -32,29 +30,11 @@ DIP 1X4
 
 Some debug tricks (let's test this CPU as more as possible):
 - let it run then soft reset (it wants that ram at 0-0xff is equal to 0xff); *
-- set a bp 10c5 then pc=10c8, it currently fails the rom checksum *
-- set a bp 1128 then pc=11a8 for more testing, then jump the tight loop with
-  a direct pc += 2. It crashes at that specific sub-routine due of a bea0
-  check:
-12B0: CE 00 00         ldx 0x0000
-12B3: B6 BE A0         ldaa (0xBEA0)
-12B6: 85 80            bita 0x80
-12B8: 27 06            beq [0x12C0]
-12BA: 09               dex
-12BB: 26 F6            bne [0x12B3]
-12BD: 0D               sec
-12BE: 20 0E            bra [0x12CE]
-12C0: B6 BE A0         ldaa (0xBEA0)
-12C3: 85 80            bita 0x80
-12C5: 26 06            bne [0x12CD]
-12C7: 09               dex
-12C8: 26 F6            bne [0x12C0]
-12CA: 0D               sec
-12CB: 20 01            bra [0x12CE]
-12CD: 0C               clc
-  It looks like that it wants an irq...
-- sub-routine at 0x1143 is failing the nvram check, it wants that the 8-bit
-  bus should be disabled?
+- set a bp at 10c5 then pc=10c8, it currently fails the rom checksum *
+- set a bp at 1185, the "bad crc 000" msg is caused by this routine. (DONE)
+- set a bp at 121f then pc=1223
+- set a bp at 3a50 then pc+=2, it should now enter into attract mode
+  (at last!)
 
 * If you disable the MC68HC11 internal ram / I/O regs it'll pass the ROM
   checksum, maybe it isn't a MC68HC11 but something without the I/O stuff?
@@ -72,7 +52,8 @@ static UINT8 hitpoker_pic_data;
 VIDEO_START(hitpoker)
 {
 	videoram = auto_alloc_array(machine, UINT8, 0x35ff);
-	paletteram = auto_alloc_array(machine, UINT8, 0x3000);
+	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	colorram = auto_alloc_array(machine, UINT8, 0x2000);
 
 }
 
@@ -89,10 +70,11 @@ VIDEO_UPDATE(hitpoker)
 		count+=2;
 		for (x=1;x<81;x++) //it's probably 80 + 1 global line attribute at the start of each line
 		{
-			int tile;
+			int tile,color;
 
 			tile = (((videoram[count]<<8)|(videoram[count+1])) & 0x3fff);
-			drawgfx(bitmap,gfx,tile,0,0,0,(x-1)*8,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
+			color = (((colorram[count]<<8)|(colorram[count+1])) & 0xe000)>>13;
+			drawgfx(bitmap,gfx,tile,color,0,0,(x-1)*8,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
 
 			count+=2;
 		}
@@ -124,12 +106,27 @@ static READ8_HANDLER( hitpoker_cram_r )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if(hitpoker_pic_data & 0x10)
-		return paletteram[offset];
+		return colorram[offset];
 	else
 		return ROM[offset+0xc000];
 }
 
 static WRITE8_HANDLER( hitpoker_cram_w )
+{
+	colorram[offset] = data;
+}
+
+static READ8_HANDLER( hitpoker_paletteram_r )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+	if(hitpoker_pic_data & 0x10)
+		return paletteram[offset];
+	else
+		return ROM[offset+0xe000];
+}
+
+static WRITE8_HANDLER( hitpoker_paletteram_w )
 {
 	int r,g,b,datax;
 	paletteram[offset] = data;
@@ -137,15 +134,11 @@ static WRITE8_HANDLER( hitpoker_cram_w )
 	datax=256*paletteram[offset*2]+paletteram[offset*2+1];
 
 	/* TODO: format is wrong */
-	b = ((datax)&0xe000)>>13;
-	g = ((datax)&0x1c00)>>10;
-	r = ((datax)&0x0380)>>7;
+	b = ((datax)&0xf800)>>11;
+	g = ((datax)&0x07e0)>>5;
+	r = ((datax)&0x001f)>>0;
 
-	b|= ((datax)&0x0004)<<1;
-	g|= ((datax)&0x0002)<<2;
-	r|= ((datax)&0x0001)<<3;
-
-	palette_set_color_rgb(space->machine, offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal6bit(g), pal5bit(b));
 }
 
 static WRITE8_HANDLER( hitpoker_crtc_w )
@@ -169,9 +162,35 @@ static READ8_HANDLER( rtc_r )
 	return 0x80; //kludge it for now
 }
 
-static READ8_HANDLER( test_r )
+static UINT8 eeprom_data[0x200];
+static UINT16 eeprom_index;
+
+/* tests 0x180, what EEPROM is this one??? */
+static WRITE8_HANDLER( eeprom_w )
 {
-	return mame_rand(space->machine); //kludge it for now
+	if(offset == 0)
+	{
+		eeprom_index = (eeprom_index & 0x100)|(data & 0xff);
+		printf("W INDEX %02x\n",data);
+	}
+	if(offset == 1)
+	{
+		eeprom_index = (eeprom_index & 0xff)|((data & 0x1)<<8);
+		//data & 0x4: eeprom clock
+		printf("W CLOCK + INDEX %02x\n",data);
+	}
+}
+
+static READ8_HANDLER( eeprom_r )
+{
+	static UINT8 tmp;
+	tmp = eeprom_data[eeprom_index];
+	if((eeprom_index & 0x1f) == 0x1f)
+		tmp = 0xaa;
+	printf("%02x\n",eeprom_index);
+	eeprom_index++;
+	//eeprom_index&=0x1f;
+	return tmp;
 }
 
 static READ8_HANDLER( hitpoker_pic_r )
@@ -193,6 +212,13 @@ static WRITE8_HANDLER( hitpoker_pic_w )
 //	logerror("%02x W\n",data);
 }
 
+#if 0
+static READ8_HANDLER( test_r )
+{
+	return mame_rand(space->machine);
+}
+#endif
+
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
@@ -202,11 +228,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
 	AM_RANGE(0xbe0c, 0xbe0c) AM_READNOP //irq ack?
 	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
+	AM_RANGE(0xbe50, 0xbe51) AM_WRITE(eeprom_w)
+	AM_RANGE(0xbe53, 0xbe53) AM_READ(eeprom_r)
 	AM_RANGE(0xbe80, 0xbe81) AM_WRITE(hitpoker_crtc_w)
 	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
-	AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
-	AM_RANGE(0xc000, 0xefff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
+//	AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -230,19 +259,17 @@ static const gfx_layout hitpoker_layout =
 	RGN_FRAC(1,2),
 	8,
 	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+12,0,4,8,12 },
-	{ 0,1,2,3,
-	  16,17,18,19 },
+	{ 0,1,2,3,16,17,18,19 },
 	{ 0*32, 1*32, 2*32, 3*32,4*32,5*32,6*32,7*32 },
-
 	8*32
 };
 
 static GFXDECODE_START( hitpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout,   0x1000, 2  )
+	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout,   0, 8  )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( hitpoker )
-	MDRV_CPU_ADD("maincpu", MC68HC11,2000000)
+	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

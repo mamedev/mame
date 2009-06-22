@@ -1524,6 +1524,38 @@ static void HC11OP(dec_ext)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* DEC INDX          0x6A */
+static void HC11OP(dec_indx)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + offset);
+
+	CLEAR_NZV(cpustate);
+	if (i == 0x80)
+		SET_VFLAG(cpustate);
+	i--;
+	SET_N8(i);
+	SET_Z8(i);
+	WRITE8(cpustate, cpustate->ix + offset, i);
+	CYCLES(cpustate, 6);
+}
+
+/* DEC INDY          0x18 0x6A */
+static void HC11OP(dec_indy)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + offset);
+
+	CLEAR_NZV(cpustate);
+	if (i == 0x80)
+		SET_VFLAG(cpustate);
+	i--;
+	SET_N8(i);
+	SET_Z8(i);
+	WRITE8(cpustate, cpustate->iy + offset, i);
+	CYCLES(cpustate, 7);
+}
+
 /* DEX              0x09 */
 static void HC11OP(dex)(hc11_state *cpustate)
 {
@@ -1730,6 +1762,40 @@ static void HC11OP(inc_ext)(hc11_state *cpustate)
 	WRITE8(cpustate, adr, i);
 	CYCLES(cpustate, 6);
 }
+
+/* INC INDX          0x6C */
+static void HC11OP(inc_indx)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + offset);
+
+	CLEAR_NZV(cpustate);
+	if (i == 0x7f)
+		SET_VFLAG(cpustate);
+	i++;
+	SET_N8(i);
+	SET_Z8(i);
+	WRITE8(cpustate, cpustate->ix + offset, i);
+	CYCLES(cpustate, 6);
+}
+
+
+/* INC INDY          0x18 0x6C */
+static void HC11OP(inc_indy)(hc11_state *cpustate)
+{
+	UINT8 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + offset);
+
+	CLEAR_NZV(cpustate);
+	if (i == 0x7f)
+		SET_VFLAG(cpustate);
+	i++;
+	SET_N8(i);
+	SET_Z8(i);
+	WRITE8(cpustate, cpustate->iy + offset, i);
+	CYCLES(cpustate, 7);
+}
+
 
 /* INX              0x08 */
 static void HC11OP(inx)(hc11_state *cpustate)
@@ -2240,6 +2306,57 @@ static void HC11OP(negb)(hc11_state *cpustate)
 }
 
 
+/* NEG EXT           0x70 */
+static void HC11OP(neg_ext)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH16(cpustate);
+	UINT8 i = READ8(cpustate, adr);
+	INT8 r = 0x00 - i;
+	i = r;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= (i == 0x80) ? CC_V : 0;
+	cpustate->ccr |= (i == 0x00) ? CC_C : 0;
+	WRITE8(cpustate, adr, i);
+	CYCLES(cpustate, 6);
+}
+
+
+/* NEG INDX           0x60 */
+static void HC11OP(neg_indx)(hc11_state *cpustate)
+{
+	UINT16 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + offset);
+	INT8 r = 0x00 - i;
+	i = r;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= (i == 0x80) ? CC_V : 0;
+	cpustate->ccr |= (i == 0x00) ? CC_C : 0;
+	WRITE8(cpustate, cpustate->ix + offset, i);
+	CYCLES(cpustate, 6);
+}
+
+
+/* NEG INDY           0x18 0x60 */
+static void HC11OP(neg_indy)(hc11_state *cpustate)
+{
+	UINT16 offset = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + offset);
+	INT8 r = 0x00 - i;
+	i = r;
+	CLEAR_NZVC(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	cpustate->ccr |= (i == 0x80) ? CC_V : 0;
+	cpustate->ccr |= (i == 0x00) ? CC_C : 0;
+	WRITE8(cpustate, cpustate->iy + offset, i);
+	CYCLES(cpustate, 7);
+}
+
+
 /* NOP              0x01 */
 static void HC11OP(nop)(hc11_state *cpustate)
 {
@@ -2533,15 +2650,47 @@ static void HC11OP(rts)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+
+/* SBA              0x10 */
+static void HC11OP(sba)(hc11_state *cpustate)
+{
+	UINT16 r = REG_A - REG_B;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, REG_B, REG_A);
+	cpustate->ccr|= (REG_B > REG_A) ? CC_C : 0;
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 2);
+}
+
+
+/* SBCA IMM         0x82 */
+static void HC11OP(sbca_imm)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 i = FETCH(cpustate);
+	UINT16 r = (REG_A - i) - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_A);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_A);
+	SET_C8(r);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 2);
+}
+
 /* SBCA IND, X      0xA2 */
 static void HC11OP(sbca_indx)(hc11_state *cpustate)
 {
 	int c = (cpustate->ccr & CC_C) ? 1 : 0;
 	UINT8 offset = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
-	UINT16 r = REG_A - i - c;
+	UINT16 r = (REG_A - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_B);
+//	SET_H(r, i-c, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_A);
@@ -2556,9 +2705,9 @@ static void HC11OP(sbca_indy)(hc11_state *cpustate)
 	int c = (cpustate->ccr & CC_C) ? 1 : 0;
 	UINT8 offset = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->iy + offset);
-	UINT16 r = REG_A - i - c;
+	UINT16 r = (REG_A - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_B);
+//	SET_H(r, i-c, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_A);
@@ -2567,13 +2716,29 @@ static void HC11OP(sbca_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 5);
 }
 
+/* SBCB IMM         0xC2 */
+static void HC11OP(sbcb_imm)(hc11_state *cpustate)
+{
+	int c = (cpustate->ccr & CC_C) ? 1 : 0;
+	UINT8 i = FETCH(cpustate);
+	UINT16 r = (REG_B - i) - c;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i-c, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i-c, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
+	CYCLES(cpustate, 2);
+}
+
 /* SBCB IND, X      0xE2 */
 static void HC11OP(sbcb_indx)(hc11_state *cpustate)
 {
 	int c = (cpustate->ccr & CC_C) ? 1 : 0;
 	UINT8 offset = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
-	UINT16 r = REG_B - i - c;
+	UINT16 r = (REG_B - i) - c;
 	CLEAR_NZVC(cpustate);
 //	SET_H(r, i-c, REG_B);
 	SET_N8(r);
@@ -2590,7 +2755,7 @@ static void HC11OP(sbcb_indy)(hc11_state *cpustate)
 	int c = (cpustate->ccr & CC_C) ? 1 : 0;
 	UINT8 offset = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->iy + offset);
-	UINT16 r = REG_B - i - c;
+	UINT16 r = (REG_B - i) - c;
 	CLEAR_NZVC(cpustate);
 //	SET_H(r, i-c, REG_B);
 	SET_N8(r);
@@ -2817,29 +2982,14 @@ static void HC11OP(stop)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
-/* SUBA DIR         0xd0 */
-static void HC11OP(suba_dir)(hc11_state *cpustate)
-{
-	UINT8 d = FETCH(cpustate);
-	UINT8 i = READ8(cpustate, d);
-	UINT16 r = REG_A - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_A);
-	SET_N8(r);
-	SET_Z8(r);
-	SET_V_SUB8(r, i, REG_A);
-	SET_C8(r);
-	REG_B = (UINT8)r;
-	CYCLES(cpustate, 3);
-}
 
 /* SUBA IMM         0x80 */
 static void HC11OP(suba_imm)(hc11_state *cpustate)
 {
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = REG_A - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_A);
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -2848,45 +2998,82 @@ static void HC11OP(suba_imm)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+
+/* SUBA DIR         0xd0 */
+static void HC11OP(suba_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, d);
+	UINT16 r = REG_A - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_A);
+	SET_C8(r);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 3);
+}
+
+
+/* SUBA EXT         0xE0 */
+static void HC11OP(suba_ext)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH16(cpustate);
+	UINT8 i = READ8(cpustate, adr);
+	UINT16 r = REG_A - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_A);
+	SET_C8(r);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 4);
+}
+
+
 /* SUBA INDX        0xA0 */
 static void HC11OP(suba_indx)(hc11_state *cpustate)
 {
 	UINT16 adr = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->ix + adr);
 	UINT16 r = REG_A - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_A);
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
 	SET_C8(r);
-	REG_B = (UINT8)r;
+	REG_A = (UINT8)r;
 	CYCLES(cpustate, 4);
 }
 
-/* SUBB DIR         0xD0 */
-static void HC11OP(subb_dir)(hc11_state *cpustate)
+
+/* SUBA INDY        0x18 0xA0 */
+static void HC11OP(suba_indy)(hc11_state *cpustate)
 {
-	UINT8 d = FETCH(cpustate);
-	UINT8 i = READ8(cpustate, d);
-	UINT16 r = REG_B - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_B);
+	UINT16 adr = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + adr);
+	UINT16 r = REG_A - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
-	SET_V_SUB8(r, i, REG_B);
+	SET_V_SUB8(r, i, REG_A);
 	SET_C8(r);
-	REG_B = (UINT8)r;
-	CYCLES(cpustate, 3);
+	REG_A = (UINT8)r;
+	CYCLES(cpustate, 5);
 }
+
 
 /* SUBB IMM         0xC0 */
 static void HC11OP(subb_imm)(hc11_state *cpustate)
 {
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = REG_B - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_B);
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -2895,20 +3082,71 @@ static void HC11OP(subb_imm)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
-/* SUBB INDX        0xE0 */
-static void HC11OP(subb_indx)(hc11_state *cpustate)
+
+/* SUBB DIR         0xD0 */
+static void HC11OP(subb_dir)(hc11_state *cpustate)
 {
-	UINT16 adr = FETCH(cpustate);
-	UINT8 i = READ8(cpustate, cpustate->ix + adr);
+	UINT8 d = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, d);
 	UINT16 r = REG_B - i;
-	CLEAR_HNZVC(cpustate);
-	SET_H(r, i, REG_B);
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
+	CYCLES(cpustate, 3);
+}
+
+
+/* SUBB EXT         0xF0 */
+static void HC11OP(subb_ext)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH16(cpustate);
+	UINT8 i = READ8(cpustate, adr);
+	UINT16 r = REG_B - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
 	SET_C8(r);
 	REG_B = (UINT8)r;
 	CYCLES(cpustate, 4);
+}
+
+
+/* SUBB INDX        0xE0 */
+static void HC11OP(subb_indx)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->ix + adr);
+	UINT16 r = REG_B - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
+	CYCLES(cpustate, 4);
+}
+
+/* SUBB INDY        0x18 0xE0 */
+static void HC11OP(subb_indy)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH(cpustate);
+	UINT8 i = READ8(cpustate, cpustate->iy + adr);
+	UINT16 r = REG_B - i;
+	CLEAR_NZVC(cpustate);
+//	SET_H(r, i, REG_B);
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_B);
+	SET_C8(r);
+	REG_B = (UINT8)r;
+	CYCLES(cpustate, 5);
 }
 
 /* SUBD IMM         0x83 */
