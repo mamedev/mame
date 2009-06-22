@@ -1057,7 +1057,7 @@ WRITE8_HANDLER( lupin3_sh_port_2_w )
 	if (rising_bits & 0x08) sample_start(samples, 3, 0, 0);		/* start intermission, end game */
 	//if (rising_bits & 0x10) sample_start(samples, 3, 9, 0);        /* Dog barking */
 
-	c8080bw_flip_screen_w(space, data & 0x20);
+	lupin3_flip_screen_w(space, data & 0x60);
 
 	port_2_last_extra = data;
 }

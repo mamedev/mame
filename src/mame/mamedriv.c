@@ -1216,6 +1216,7 @@ const game_driver * const drivers[] =
 	DRIVER( schaser )	/* RT  Taito */
 	DRIVER( schasrcv )	/* RT  Taito */
 	DRIVER( lupin3 )	/* LP  (c) 1980 Taito */
+	DRIVER( lupin3a )	/* LP  (c) 1980 Taito */
 	DRIVER( intruder )	/* (c) 1980 GamePlan (Taito) */
 	DRIVER( spclaser )	/* (c) 1980 GamePlan (Taito) */
 	DRIVER( laser )		/* (c) 1980 Leisure Time Electronics Inc. */

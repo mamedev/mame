@@ -41,6 +41,13 @@ void c8080bw_flip_screen_w(const address_space *space, int data)
 }
 
 
+void lupin3_flip_screen_w(const address_space *space, int data)
+{
+	color_map = data & 0x40;
+	c8080bw_flip_screen = (data & 0x20) && (input_port_read(space->machine, "IN2") & 0x04);
+}
+
+
 void c8080bw_screen_red_w(int data)
 {
 	screen_red = data;

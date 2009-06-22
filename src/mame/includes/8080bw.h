@@ -76,6 +76,7 @@ extern UINT8 *c8080bw_colorram;
 MACHINE_START( extra_8080bw_vh );
 
 void c8080bw_flip_screen_w(const address_space *space, int data);
+void lupin3_flip_screen_w(const address_space *space, int data);
 void c8080bw_screen_red_w(int data);
 void schaser_background_control_w(int data);
 
