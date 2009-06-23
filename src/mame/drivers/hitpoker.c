@@ -1,4 +1,4 @@
-/***************************************************************************
+/******************************************************************************
 
 Hit Poker (c) 1997 Accept LTD
 
@@ -6,11 +6,16 @@ preliminary driver by Angelo Salese & David Haywood
 Many thanks to Olivier Galibert for the CPU identify effort ;-)
 
 TODO:
-- Fix the CPU core bugs! (too many to list)
-- video HW looks awkward;
+- Fix the remaining CPU core bugs (for example the i/o & internal RAM disable to
+  avoid the soft reset thing)
+- Protection controls inputs
+- Understand & fix EEPROM emulation;
+- complete video HW (unknown bits and hblank);
+- 24Khz monitor isn't supported, it changes the resolution to 648 x 480 and
+  changes the register 9 (raster lines x character lines) from 7 to 0xf.
 - sound (I've heard something reasonable during tests, so it could be OK);
 
-============================================================================
+================================================================================
 
 'Hit Poker'?
 
@@ -45,36 +50,38 @@ Some debug tricks (let's test this CPU as more as possible):
 #include "driver.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
 
 static UINT8 *hitpoker_sys_regs;
 static UINT8 hitpoker_pic_data;
+
+#define CRTC_CLOCK XTAL_3_579545MHz
 
 VIDEO_START(hitpoker)
 {
 	videoram = auto_alloc_array(machine, UINT8, 0x35ff);
 	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	colorram = auto_alloc_array(machine, UINT8, 0x2000);
-
 }
 
 VIDEO_UPDATE(hitpoker)
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0;
 	int y,x;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	for (y=0;y<30;y++)
+	for (y=0;y<31;y++)
 	{
-		count+=2;
-		for (x=1;x<81;x++) //it's probably 80 + 1 global line attribute at the start of each line
+		for (x=0;x<81;x++) //it's probably 80 + 1 global line attribute at the start of each line
 		{
-			int tile,color;
+			int tile,color,gfx_bpp;
 
 			tile = (((videoram[count]<<8)|(videoram[count+1])) & 0x3fff);
-			color = (((colorram[count]<<8)|(colorram[count+1])) & 0xe000)>>13;
-			drawgfx(bitmap,gfx,tile,color,0,0,(x-1)*8,(y+0)*8,cliprect,TRANSPARENCY_NONE,0);
+			gfx_bpp = (colorram[count] & 0x80)>>7; //flag between 4 and 8 bpp
+			color = gfx_bpp ? ((colorram[count] & 0x70)>>4) : (colorram[count] & 0xf);
+
+			drawgfx(bitmap,screen->machine->gfx[gfx_bpp],tile,color,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 
 			count+=2;
 		}
@@ -133,28 +140,12 @@ static WRITE8_HANDLER( hitpoker_paletteram_w )
 	offset>>=1;
 	datax=256*paletteram[offset*2]+paletteram[offset*2+1];
 
-	/* TODO: format is wrong */
+	/* RGB565 */
 	b = ((datax)&0xf800)>>11;
 	g = ((datax)&0x07e0)>>5;
 	r = ((datax)&0x001f)>>0;
 
 	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal6bit(g), pal5bit(b));
-}
-
-static WRITE8_HANDLER( hitpoker_crtc_w )
-{
-	static UINT8 address;
-
-	if(offset == 0)
-		address = data;
-	else
-	{
-		switch(address)
-		{
-			default:
-				logerror("Video Register %02x called with %02x data\n",address,data);
-		}
-	}
 }
 
 static READ8_HANDLER( rtc_r )
@@ -171,13 +162,13 @@ static WRITE8_HANDLER( eeprom_w )
 	if(offset == 0)
 	{
 		eeprom_index = (eeprom_index & 0x100)|(data & 0xff);
-		printf("W INDEX %02x\n",data);
+		//printf("W INDEX %02x\n",data);
 	}
 	if(offset == 1)
 	{
 		eeprom_index = (eeprom_index & 0xff)|((data & 0x1)<<8);
 		//data & 0x4: eeprom clock
-		printf("W CLOCK + INDEX %02x\n",data);
+		//printf("W CLOCK + INDEX %02x\n",data);
 	}
 }
 
@@ -187,7 +178,7 @@ static READ8_HANDLER( eeprom_r )
 	tmp = eeprom_data[eeprom_index];
 	if((eeprom_index & 0x1f) == 0x1f)
 		tmp = 0xaa;
-	printf("%02x\n",eeprom_index);
+	//printf("%02x\n",eeprom_index);
 	eeprom_index++;
 	//eeprom_index&=0x1f;
 	return tmp;
@@ -197,19 +188,26 @@ static READ8_HANDLER( hitpoker_pic_r )
 {
 //	logerror("R\n");
 
-	if(cpu_get_pc(space->cpu) == 0x3143 ||
-	   cpu_get_pc(space->cpu) == 0x314e ||
-	   cpu_get_pc(space->cpu) == 0x3164 ||
-	   cpu_get_pc(space->cpu) == 0x3179)
-		return hitpoker_pic_data;
+	if(offset == 0)
+	{
+		if(cpu_get_pc(space->cpu) == 0x3143 ||
+		   cpu_get_pc(space->cpu) == 0x314e ||
+		   cpu_get_pc(space->cpu) == 0x3164 ||
+		   cpu_get_pc(space->cpu) == 0x3179)
+			return hitpoker_pic_data;
 
-	return (hitpoker_pic_data & 0x7f) | (hitpoker_pic_data & 0x40 ? 0x80 : 0x00);
+		return (hitpoker_pic_data & 0x7f) | (hitpoker_pic_data & 0x40 ? 0x80 : 0x00);
+	}
+
+	return hitpoker_sys_regs[offset];
 }
 
 static WRITE8_HANDLER( hitpoker_pic_w )
 {
-	hitpoker_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
+	if(offset == 0)
+		hitpoker_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //	logerror("%02x W\n",data);
+	hitpoker_sys_regs[offset] = data;
 }
 
 #if 0
@@ -220,17 +218,19 @@ static READ8_HANDLER( test_r )
 #endif
 
 /* overlap empty rom addresses */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hitpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
-	AM_RANGE(0x1000, 0x1000) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) // protection
-	AM_RANGE(0x1000, 0x103f) AM_RAM AM_BASE(&hitpoker_sys_regs) // hw regs?
+	AM_RANGE(0x1000, 0x103f) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE(&hitpoker_sys_regs) // protection
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
-	AM_RANGE(0xbe0c, 0xbe0c) AM_READNOP //irq ack?
+	AM_RANGE(0xbe0a, 0xbe0a) AM_READ_PORT("IN0")
+	AM_RANGE(0xbe0c, 0xbe0c) AM_READ_PORT("IN2") //irq ack?
 	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
+	AM_RANGE(0xbe0e, 0xbe0e) AM_READ_PORT("IN1")
 	AM_RANGE(0xbe50, 0xbe51) AM_WRITE(eeprom_w)
 	AM_RANGE(0xbe53, 0xbe53) AM_READ(eeprom_r)
-	AM_RANGE(0xbe80, 0xbe81) AM_WRITE(hitpoker_crtc_w)
+	AM_RANGE(0xbe80, 0xbe80) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
 //	AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
@@ -240,38 +240,222 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
+/* unused, to be removed */
+static ADDRESS_MAP_START( hitpoker_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )
 	PORT_START("VBLANK")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //scanline counter probably
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) //resets the game?
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "H-Blank" ) //scanline counter probably
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Monitor" ) //a JP probably
+	PORT_DIPSETTING(    0x40, "15KHz" )
+	PORT_DIPSETTING(    0x00, "24KHz" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
+static const gfx_layout hitpoker_layout_4bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,4,8,12 },
+	{ 0,1,2,3,16,17,18,19 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
 
-static const gfx_layout hitpoker_layout =
+static const gfx_layout hitpoker_layout_8bpp =
 {
 	8,8,
 	RGN_FRAC(1,2),
 	8,
 	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+12,0,4,8,12 },
 	{ 0,1,2,3,16,17,18,19 },
-	{ 0*32, 1*32, 2*32, 3*32,4*32,5*32,6*32,7*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
 
 static GFXDECODE_START( hitpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout,   0, 8  )
+	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_4bpp,   0, 0x100  )
+	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
+
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_io)
+	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
+	MDRV_CPU_IO_MAP(hitpoker_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -279,11 +463,13 @@ static MACHINE_DRIVER_START( hitpoker )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 224-1)
+	MDRV_SCREEN_SIZE(648, 480) //setted with
+	MDRV_SCREEN_VISIBLE_AREA(0, 648-1, 0, 480-1)
+
+	MDRV_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
 
 	MDRV_GFXDECODE(hitpoker)
-	MDRV_PALETTE_LENGTH(0x3000)
+	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(hitpoker)
 	MDRV_VIDEO_UPDATE(hitpoker)
@@ -291,7 +477,7 @@ static MACHINE_DRIVER_START( hitpoker )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
-//	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -302,30 +488,12 @@ DRIVER_INIT(hitpoker)
 	ROM[0x10c6] = 0x01;
 	ROM[0x10c7] = 0x01; //patch the checksum routine for now...
 
-	#if 0
-	ROM[0x1128] = 0x01;
-	ROM[0x1129] = 0x01;
-	ROM[0x112a] = 0x01;
-
-	ROM[0x1143] = 0x01;
-	ROM[0x1144] = 0x01;
-	ROM[0x1145] = 0x01;
-
-	ROM[0x1152] = 0x01;
-	ROM[0x1153] = 0x01;
-	ROM[0x1154] = 0x01;
-
-	ROM[0x115e] = 0x01;
-	ROM[0x115f] = 0x01;
-	ROM[0x1160] = 0x01;
-
-	ROM[0x1167] = 0x01;
-	ROM[0x1168] = 0x01;
-	ROM[0x1169] = 0x01;
-
-	ROM[0x1170] = 0x01;
-	ROM[0x1171] = 0x01;
-	ROM[0x1172] = 0x01;
+	#if 1
+	ROM[0x1220] = 0x01;
+	ROM[0x1221] = 0x01;
+	ROM[0x1222] = 0x01;
+	ROM[0x3a50] = 0x01;
+	ROM[0x3a51] = 0x01;
 	#endif
 }
 
