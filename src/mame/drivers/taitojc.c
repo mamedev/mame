@@ -1293,6 +1293,13 @@ static INTERRUPT_GEN( taitojc_int6 )
 	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
+static const hc11_config taitojc_config =
+{
+	1, //has internal I/O
+	1280 //internal RAM size
+};
+
+
 static MACHINE_DRIVER_START( taitojc )
 	MDRV_CPU_ADD("maincpu", M68040, 25000000)
 	MDRV_CPU_PROGRAM_MAP(taitojc_map)
@@ -1301,9 +1308,10 @@ static MACHINE_DRIVER_START( taitojc )
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
-	MDRV_CPU_ADD("sub", MC68HC11, 4000000)
+	MDRV_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MDRV_CPU_IO_MAP(hc11_io_map)
+	MDRV_CPU_CONFIG(taitojc_config)
 
 	MDRV_CPU_ADD("dsp", TMS32051, 50000000)
 	MDRV_CPU_PROGRAM_MAP(tms_program_map)

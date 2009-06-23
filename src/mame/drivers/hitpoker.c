@@ -6,10 +6,10 @@ preliminary driver by Angelo Salese & David Haywood
 Many thanks to Olivier Galibert for the CPU identify effort ;-)
 
 TODO:
-- Fix the remaining CPU core bugs (for example the i/o & internal RAM disable to
-  avoid the soft reset thing)
-- Protection controls inputs
+- CPU core bugs?
+- Protection controls inputs;
 - Understand & fix EEPROM emulation;
+- Hangs during attract mode, eeprom or protection?
 - complete video HW (unknown bits and hblank);
 - 24Khz monitor isn't supported, it changes the resolution to 648 x 480 and
   changes the register 9 (raster lines x character lines) from 7 to 0xf.
@@ -34,15 +34,10 @@ DIP 1X4
 ============================================================================
 
 Some debug tricks (let's test this CPU as more as possible):
-- let it run then soft reset (it wants that ram at 0-0xff is equal to 0xff); *
-- set a bp at 10c5 then pc=10c8, it currently fails the rom checksum *
-- set a bp at 1185, the "bad crc 000" msg is caused by this routine. (DONE)
+- set a bp at 1185, the "bad crc 000" msg is caused by this routine.
+  (kludged to work)
 - set a bp at 121f then pc=1223
 - set a bp at 3a50 then pc+=2, it should now enter into attract mode
-  (at last!)
-
-* If you disable the MC68HC11 internal ram / I/O regs it'll pass the ROM
-  checksum, maybe it isn't a MC68HC11 but something without the I/O stuff?
 
 ***************************************************************************/
 
@@ -452,10 +447,18 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+/* For whatever reason the MCU capabilities are disabled, might be a version without it or the engineers programmed the MCU to not have it. */
+static const hc11_config hitpoker_config =
+{
+	0, //has internal I/O
+	0  //internal RAM size
+};
+
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
 	MDRV_CPU_IO_MAP(hitpoker_io)
+	MDRV_CPU_CONFIG(hitpoker_config)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -463,8 +466,8 @@ static MACHINE_DRIVER_START( hitpoker )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(648, 480) //setted with
-	MDRV_SCREEN_VISIBLE_AREA(0, 648-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(648, 480) //setted by the CRTC
+	MDRV_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
 
 	MDRV_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
 
@@ -485,15 +488,13 @@ DRIVER_INIT(hitpoker)
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	ROM[0x10c6] = 0x01;
-	ROM[0x10c7] = 0x01; //patch the checksum routine for now...
-
 	#if 1
-	ROM[0x1220] = 0x01;
+	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;
 	ROM[0x1222] = 0x01;
-	ROM[0x3a50] = 0x01;
-	ROM[0x3a51] = 0x01;
+
+	ROM[0x10c6] = 0x01;
+	ROM[0x10c7] = 0x01; //patch the checksum routine
 	#endif
 }
 

@@ -6,7 +6,6 @@
 TODO:
 - Interrupts handling is really bare-bones, just to make Hit Poker happy;
 - Complete opcodes hook-up;
-- Add config-selectable I/O / internal RAM and the ability to enable/disable it;
 - Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
 
  */
@@ -68,6 +67,7 @@ struct _hc11_state
 	int ram_position;
 	int reg_position;
 	UINT8 *internal_ram;
+	int has_io; // I/O enable flag
 	int internal_ram_size;
 	UINT8 wait_state,stop_state;
 };
@@ -288,7 +288,7 @@ INLINE UINT16 FETCH16(hc11_state *cpustate)
 
 INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
 	{
 		return hc11_regs_r(cpustate, address);
 	}
@@ -301,7 +301,7 @@ INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 
 INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100)
+	if(address >= cpustate->reg_position && address < cpustate->reg_position+0x100 && cpustate->has_io)
 	{
 		hc11_regs_w(cpustate, address, value);
 		return;
@@ -340,6 +340,8 @@ static CPU_INIT( hc11 )
 	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
+	const hc11_config *conf = (const hc11_config *)device->static_config;
+
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {
 		hc11_optable[i] = HC11OP(invalid);
@@ -367,7 +369,18 @@ static CPU_INIT( hc11 )
 		}
 	}
 
-	cpustate->internal_ram_size = 1280;		/* FIXME: this is for MC68HC11M0 */
+	if(conf)
+	{
+		cpustate->has_io = conf->has_io;
+		cpustate->internal_ram_size = conf->internal_ram_size;
+	}
+	else
+	{
+		/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
+		cpustate->has_io = 1;
+		cpustate->internal_ram_size = 1280;
+	}
+
 	cpustate->internal_ram = auto_alloc_array(device->machine, UINT8, cpustate->internal_ram_size);
 
 	cpustate->reg_position = 0;
