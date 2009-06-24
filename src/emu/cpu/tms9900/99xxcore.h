@@ -1495,35 +1495,7 @@ static CPU_EXECUTE( tms99xx )
 			}
 		}
 
-		if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
-		{
-			#if 0		/* Trace */
-			logerror("> PC %4.4x :%4.4x %4.4x : R=%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x :T=%d\n",cpustate->PC,cpustate->STATUS,cpustate->WP,cpustate->FR[0],cpustate->FR[1],cpustate->FR[2],cpustate->FR[3],cpustate->FR[4],cpustate->FR[5],cpustate->FR[6],cpustate->FR[7],cpustate->FR[8],cpustate->FR[9],cpustate->FR[10],cpustate->FR[11],cpustate->FR[12],cpustate->FR[13],cpustate->FR[14],cpustate->FR[15],cpustate->icount);
-				#if 0	/* useful with TI99/4a driver */
-				#ifdef MESS
-				if (cpustate->PC == 0x0078)
-				{
-					extern struct
-					{
-						/* pointer to GROM data */
-						UINT8 *data_ptr;
-						/* current address pointer for the active GROM in port (16 bits) */
-						unsigned int addr;
-						/* GROM data buffer */
-						UINT8 buf;
-						/* internal flip-flops that are set after the first access to the GROM
-                       address so that next access is mapped to the LSB, and cleared after each
-                       data access */
-						char raddr_LSB, waddr_LSB;
-					} console_GROMs;
-					logerror("> GPL pointer %4.4X\n", console_GROMs.addr);
-				}
-				#endif
-				#endif
-			#endif
-
-			debugger_instruction_hook(device, cpustate->IR);
-		}
+		debugger_instruction_hook(device, cpustate->PC);
 
 		if (cpustate->IDLE)
 		{	/* IDLE instruction has halted execution */
