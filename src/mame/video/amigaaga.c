@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Amiga hardware
+    Amiga AGA hardware
 
     Driver by: Ernesto Corvi, Mariusz Wojcieszek, Aaron Giles
 
@@ -9,10 +9,11 @@ Done:
     - bitplane data fetching
     - support for up to 8 standard bitplanes
     - HAM8 mode
+	- preliminary sprites
 
 To do:
-    - sprites (current implementation is incomplete - see CD32 logo)
     - incorrect hstart/hstop values in CD32 logo, lsrquiz & lsrquiz2
+    - sprite collisions
 
 ***************************************************************************/
 
@@ -59,6 +60,7 @@ static UINT64 aga_bpldat[8];
 static UINT8 sprite_comparitor_enable_mask;
 static UINT8 sprite_dma_reload_mask;
 static UINT8 sprite_dma_live_mask;
+static UINT8 sprite_ctl_written;
 static UINT32 sprite_shiftreg[8];
 static UINT8 sprite_remain[8];
 static UINT16 aga_sprdata[8][4];
@@ -208,6 +210,8 @@ VIDEO_START( amiga_aga )
 
 	/* reset the genlock color */
 	genlock_color = 0xffff;
+
+	sprite_ctl_written = 0;
 }
 
 
@@ -398,6 +402,7 @@ static int copper_execute_next(running_machine *machine, int xpos)
 
 void amiga_aga_sprite_dma_reset(int which)
 {
+	if (LOG_SPRITE_DMA) logerror("sprite %d dma reset\n", which );
 	sprite_dma_reload_mask |= 1 << which;
 	sprite_dma_live_mask |= 1 << which;
 }
@@ -405,13 +410,17 @@ void amiga_aga_sprite_dma_reset(int which)
 
 void amiga_aga_sprite_enable_comparitor(int which, int enable)
 {
+	if (LOG_SPRITE_DMA) logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
 	if (enable)
 	{
 		sprite_comparitor_enable_mask |= 1 << which;
 		sprite_dma_live_mask &= ~(1 << which);
 	}
 	else
+	{
 		sprite_comparitor_enable_mask &= ~(1 << which);
+		sprite_ctl_written |= (1 << which);
+	}
 }
 
 
@@ -422,7 +431,7 @@ void amiga_aga_sprite_enable_comparitor(int which, int enable)
  *
  *************************************/
 
-INLINE void fetch_sprite_data(int sprite)
+INLINE void fetch_sprite_data(int scanline, int sprite)
 {
 	switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
 	{
@@ -431,31 +440,39 @@ INLINE void fetch_sprite_data(int sprite)
 			aga_sprdatb[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			aga_sprite_fetched_words = 1;
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, aga_sprdata[sprite][0], aga_sprdatb[sprite][0]);
 			break;
 		case 1:
 		case 2:
 			aga_sprdata[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			aga_sprdatb[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			aga_sprdata[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			aga_sprdata[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			aga_sprdatb[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
 			aga_sprdatb[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			aga_sprite_fetched_words = 2;
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, aga_sprdata[sprite][0], aga_sprdatb[sprite][0], aga_sprdata[sprite][1], aga_sprdatb[sprite][1] );
 			break;
 		case 3:
 			aga_sprdata[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			aga_sprdatb[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
-			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			aga_sprdata[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			aga_sprdatb[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			aga_sprdata[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			aga_sprdata[sprite][2] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-			aga_sprdatb[sprite][2] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			aga_sprdata[sprite][3] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-			aga_sprdata[sprite][3] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			aga_sprdatb[sprite][0] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+			aga_sprdatb[sprite][1] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
+			aga_sprdatb[sprite][2] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
 			aga_sprdatb[sprite][3] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			aga_sprite_fetched_words = 4;
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n", 
+										scanline, sprite, 
+										aga_sprdata[sprite][0], aga_sprdatb[sprite][0], 
+										aga_sprdata[sprite][1], aga_sprdatb[sprite][1],
+										aga_sprdata[sprite][2], aga_sprdatb[sprite][2],
+										aga_sprdata[sprite][3], aga_sprdatb[sprite][3]);
 			break;
 	}
 	aga_sprite_dma_used_words[sprite] = 0;
@@ -478,7 +495,7 @@ static void update_sprite_dma(int scanline)
 		int vstart, vstop;
 
 		/* if we are == VSTOP, fetch new control words */
-		if (dmaenable && (sprite_dma_live_mask & bitmask) && (sprite_dma_reload_mask & bitmask))
+		if (dmaenable && (sprite_dma_live_mask & bitmask) && (sprite_dma_reload_mask & bitmask) && !(sprite_ctl_written & bitmask))
 		{
 			/* disable the sprite */
 			sprite_comparitor_enable_mask &= ~bitmask;
@@ -488,6 +505,19 @@ static void update_sprite_dma(int scanline)
 			CUSTOM_REG(REG_SPR0POS + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
 			CUSTOM_REG(REG_SPR0CTL + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
+			/* fetch additional words */
+			switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
+			{
+				case 0:
+					break;
+				case 1:
+				case 2:
+					CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
+					break;
+				case 3:
+					CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 3*4;
+					break;
+			}
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
@@ -505,6 +535,7 @@ static void update_sprite_dma(int scanline)
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
 		if (scanline == vstop)
 		{
+			sprite_ctl_written &= ~bitmask;
 			sprite_comparitor_enable_mask &= ~bitmask;
 			sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;		/* just a guess */
@@ -518,8 +549,7 @@ static void update_sprite_dma(int scanline)
 			//CUSTOM_REG(REG_SPR0DATA + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
 			//CUSTOM_REG(REG_SPR0DATB + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			//CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-			fetch_sprite_data(num);
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, num, CUSTOM_REG(REG_SPR0DATA + 4 * num), CUSTOM_REG(REG_SPR0DATB + 4 * num));
+			fetch_sprite_data(scanline, num);
 		}
 	}
 }
@@ -573,7 +603,7 @@ static int get_sprite_pixel(int x)
 					if (aga_sprite_dma_used_words[num] < aga_sprite_fetched_words)
 					{
 						sprite_remain[num] = 16;
-						sprite_shiftreg[num] = interleave_sprite_data(aga_sprdata[aga_sprite_dma_used_words[num]][0], aga_sprdatb[aga_sprite_dma_used_words[num]][0]);
+						sprite_shiftreg[num] = interleave_sprite_data(aga_sprdata[num][aga_sprite_dma_used_words[num]], aga_sprdatb[num][aga_sprite_dma_used_words[num]]);
 						aga_sprite_dma_used_words[num]++;
 					}
 				}
@@ -594,6 +624,10 @@ static int get_sprite_pixel(int x)
 			0x0000, 0x0800, 0x2000, 0x2a00, 0x4000, 0x4c00, 0x7000, 0x7e00
 		};
 		int collide;
+		int esprm, osprm;
+
+		esprm = CUSTOM_REG(REG_BPLCON4) & 0x00f0;
+		osprm = (CUSTOM_REG(REG_BPLCON4) & 0x000f) << 4;
 
 		/* OR the two sprite bits together so we only have 1 bit per sprite */
 		collide = pixels | (pixels >> 1);
@@ -612,22 +646,22 @@ static int get_sprite_pixel(int x)
 			if (pixels & 0x0f)
 			{
 				/* final result is:
-                    topmost sprite color in bits 0-5
-                    sprite present bitmask in bits 6-9
-                    topmost sprite pair index in bits 10-11
+                    topmost sprite color in bits 0-7
+                    sprite present bitmask in bits 8-9
+                    topmost sprite pair index in bits 12-11
                 */
 
 				/* attached case */
 				if (CUSTOM_REG(REG_SPR1CTL + 8 * pair) & 0x0080)
-					return (pixels & 0xf) | 0x10 | (collide << 6) | (pair << 10);
+					return (pixels & 0xf) | osprm | (collide << 8) | (pair << 12);
 
 				/* lower-numbered sprite of pair */
 				else if (pixels & 3)
-					return (pixels & 3) | 0x10 | (pair << 2) | (collide << 6) | (pair << 10);
+					return (pixels & 3) | esprm | (pair << 2) | (collide << 8) | (pair << 12);
 
 				/* higher-numbered sprite of pair */
 				else
-					return ((pixels >> 2) & 3) | 0x10 | (pair << 2) | (collide << 6) | (pair << 10);
+					return ((pixels >> 2) & 3) | osprm | (pair << 2) | (collide << 8) | (pair << 12);
 			}
 	}
 
@@ -1014,7 +1048,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					if (sprpix && pf1pri > (sprpix >> 10))
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = aga_palette[sprpix & 0x1f];
+						dst[x*2+1] = aga_palette[sprpix & 0xff];
 					}
 
 					/* playfield has priority */
@@ -1034,9 +1068,9 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					pix = sprpix & 0x1f;
 					if (pix)
 					{
-						if ((pfpix0 & 0x15) && pf1pri <= (sprpix >> 10))
+						if ((pfpix0 & 0x15) && pf1pri <= (sprpix >> 12))
 							pix = 0;
-						if ((pfpix0 & 0x2a) && pf2pri <= (sprpix >> 10))
+						if ((pfpix0 & 0x2a) && pf2pri <= (sprpix >> 12))
 							pix = 0;
 					}
 
@@ -1047,12 +1081,12 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 						dst[x*2+0] = aga_palette[separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]];
 
 					/* mask out the sprite if it doesn't have priority */
-					pix = sprpix & 0x1f;
+					pix = sprpix & 0xff;
 					if (pix)
 					{
-						if ((pfpix1 & 0x15) && pf1pri <= (sprpix >> 10))
+						if ((pfpix1 & 0x15) && pf1pri <= (sprpix >> 12))
 							pix = 0;
-						if ((pfpix1 & 0x2a) && pf2pri <= (sprpix >> 10))
+						if ((pfpix1 & 0x2a) && pf2pri <= (sprpix >> 12))
 							pix = 0;
 					}
 
@@ -1067,10 +1101,10 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				else
 				{
 					/* sprite has priority */
-					if (sprpix && pf1pri > (sprpix >> 10))
+					if (sprpix && pf1pri > (sprpix >> 12))
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = aga_palette[(sprpix & 0x1f)];
+						dst[x*2+1] = aga_palette[(sprpix & 0xff)];
 					}
 
 					/* playfield has priority */

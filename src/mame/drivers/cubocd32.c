@@ -1,7 +1,8 @@
 /* Cubo CD32 (Original hardware by Commodore, additional hardware and games by CD Express, Milan, Italy)
 
-   Preliminary driver by Mariusz Wojcieszek
+   Driver by Mariusz Wojcieszek
    CD-ROM controller by Ernesto Corvi
+   Inputs by Stephane Humbert
 
    This is basically a CD32 (Amiga 68020, AGA based games system) hacked up to run arcade games.
    see http://ninjaw.ifrance.com/cd32/cubo/ for a brief overview.
@@ -23,9 +24,6 @@
     * Gamepad, Serial port, 2 Gameports, Interfaces for keyboard
 
 
-   ToDo:
-      Inputs
-
 
    Known Games:
    Title                | rev. | year
@@ -40,6 +38,139 @@
    Odeon Twister        |      | 199x
    Odeon Twister 2      |202.19| 1999
 
+
+   ToDo:
+   - remove the hack needed to make inputs working
+   - settings are not saved
+
+
+   Stephh notes:
+
+   Harem Challenge:
+
+settings (A5=0x00a688 & A2= 0x0028e8) :
+
+  -                      : photo level - soft* / erotic / porno
+  - 002906.b (A2 + 0x1e) : difficulty (2) - 1 = LOW / 2 = NORMAL / 3 = HIGH
+  - 0028fc.b (A2 + 0x14) : deadly selftouch (0) - 0 = NO / 1 = YES
+  - 0028ff.b (A2 + 0x17) : energy supply - 100%* / 0% / 50%
+  - 002900.b (A2 + 0x18) : area to cover 1P - 75% / 80%* / 85%
+  - 002901.b (A2 + 0x19) : area to cover 2P - 70% / 75%* / 80%
+  - 002902.w (A2 + 0x1a) : level time (00C8) - 0096 = 1:00 / 00C8 = 1:20 / 00FA = 1:40
+  - 002904.b (A2 + 0x1c) : tournament mode (2) - 0 = NO CHALLENGE / 2 = BEST OF 3 / 3 = BEST OF 5
+  -                      : reset hi-score - NO* / YES
+  - 0028fd.b (A2 + 0x15) : coin x 1 play (1) <=> number of credits used for each play
+  - 0028fe.b (A2 + 0x16) : play x credit (1) <=> credits awarded for each coin
+  -                      : demo photo level - soft* / erot
+
+useful addresses :
+
+  - 002907.b (-$7f00,A5 -> $1f,A2) : must be 0x0000 instead of 0x0001 to accept coins !
+  - 00278c.w (-$7efc,A5) : player 2 inputs
+  - 00278e.w (-$7efa,A5) : player 1 inputs
+  - 002790.b (-$7ef8,A5) : credits
+
+  - 0028e8.b (A2       ) : level - range (0x01 - 0x09 and 0x00 when in "attract mode")
+  - 0028ea.w (A2 + 0x02) : time (not used for "continue play") - range (0x0000 - 0x0014 with 0x0000 being max)
+
+  - 026fe8.l (-$7fa0,A5 -> A2 + $18 x 0 + 0x00) : player 1 energy (in MSW after swap) - range (0x00000000 - 0x00270000)
+  - 026fec.l (-$7fa0,A5 -> A2 + $18 x 0 + 0x04) : player 1 score
+  - 026ff8.w (-$7fa0,A5 -> A2 + $18 x 0 + 0x10) : player 1 girls
+  - 027000.l (-$7fa0,A5 -> A2 + $18 x 1 + 0x00) : player 2 energy (in MSW after swap) - range (0x00000000 - 0x00270000)
+  - 027004.l (-$7fa0,A5 -> A2 + $18 x 1 + 0x04) : player 2 score
+  - 027010.w (-$7fa0,A5 -> A2 + $18 x 1 + 0x10) : player 2 girls
+
+routines :
+
+  - 04a5de : inputs read
+  - 061928 : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 04a692 : coin verification
+  - 050b8c : start buttons verification
+
+
+  Laser Strixx 2
+
+settings (A5=0x00a688 & A2= 0x0027f8) :
+
+  -                      : photo level - soft* / erotic / porno
+  - 002910.l (A2 + 0x18) : difficulty (00010000) - 00008000 = LOW / 00010000 = NORMAL / 00018000 = HIGH
+  - 002818.b (A2 + 0x20) : deadly selftouch (0) - 0 = NO / 1 = YES
+  - 00281b.b (A2 + 0x23) : energy supply - 100%* / 0% / 50%
+  - 002819.b (A2 + 0x21) : coin x 1 play (1) <=> number of credits used for each play
+  - 00281a.b (A2 + 0x22) : play x credit (1) <=> credits awarded for each coin
+
+useful addresses :
+
+  - 00281c.b (-$7fa2,A5 -> $24,A2) : must be 0x0000 instead of 0x0001 to accept coins !
+  - 0026f4.w (-$7f94,A5) : player 1 inputs (in MSW after swap)
+  - 0026ee.b (-$7f9a,A5) : credits
+
+  - 0027f8.l (A2 + 0x00) : player 1 energy (in MSW after swap) - range (0x00000000 - 0x00270000)
+  - 0027fc.b (A2 + 0x04) : level - range (0x01 - 0x09 and 0x00 when in "attract mode")
+  - 0027fe.w (A2 + 0x06) : time (not used for "continue play") - range (0x0000 - 0x0014 with 0x0000 being max)
+  - 002800.l (A2 + 0x08) : player 1 score
+  - 00280a.b (A2 + 0x12) : mouth status (0x00 = not out - 0x01 = out - 0x02 = captured = LIVE STRIP at the end of level)
+  - 00280b.b (A2 + 0x13) : strip phase (0x01 - n with 0x01 being last phase)
+                             Ann : n = 0x05
+                             Eva : n = 0x04
+                             Jo  : n = 0x06
+                             Sue : n = 0x04
+                             Bob : n = 0x05
+
+routines :
+
+  - 04d1ae : inputs read
+  - 058340 : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 04d1da : coin verification
+
+
+	Candy Puzzle
+
+settings (A5=0x059ac0) :
+
+  - 051ba0.w (-$7f20,A5) : difficulty player 1 (0)
+  - 051ba2.w (-$7f1e,A5) : difficulty player 2 (0)
+  - 051ba4.w (-$7f1c,A5) : challenge rounds (3)
+  - 051ba6.w (-$7f1a,A5) : death in 2P mode (0) - 0 = NO / 1 = YES
+  - 051ba8.w (-$7f18,A5) : play x credit (1)
+  - 051bac.w (-$7f14,A5) : coin x 1 play (1)
+  - 051bb0.w (-$7f10,A5) : maxpalleattack (2)
+  -                      : reset high score - NO* / YES
+  - 051baa.w (-$7f16,A5) : 1 coin 2 players (1) - 0 = NO / 1 = YES
+
+useful addresses :
+
+  - 051c02.w (-$7ebe,A5) : must be 0x0000 instead of 0x0001 to accept coins !
+  - 051c04.b (-$7ebc,A5) : credits
+  - 051c10.l (-$7eb0,A5) : basic address for inputs = 0006fd18 :
+      * BA + 1 x 6 + 4 : start 2 (bit 5) and coin (bit 2)
+      * BA + 1 x 6 + 0 : player 2 L/R (-1/0/1)
+      * BA + 1 x 6 + 2 : player 2 U/D (-1/0/1)
+      * BA + 0 x 6 + 4 : start 1 (bit 5)
+      * BA + 0 x 6 + 0 : player 1 L/R (-1/0/1)
+      * BA + 0 x 6 + 2 : player 1 U/D (-1/0/1)
+
+routines :
+
+  - 07acae : inputs read
+  - 092c8a : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+  - 092baa : joy read - test bits 1 and 9 : 1 if bit 1, -1 if bit 9, 0 if none
+      * D0 = 0 : read JOY0DAT (player 2)
+      * D0 = 1 : read JOY1DAT (player 1)
+  - 092bd4 : joy read - test bits 0 and 8 : 1 if bit 0, -1 if bit 8, 0 if none ("eor.w read, read >> 1" before test)
+      * D0 = 0 : read JOY0DAT (player 2)
+      * D0 = 1 : read JOY1DAT (player 1)
+
+  - 07ada4 : coin verification
+  - 07d0fe : start buttons verification
 
 */
 
@@ -138,14 +269,22 @@ static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
 ADDRESS_MAP_END
 
-//int cubo_input_port_val = 0;
-//int cubo_input_select = 0;
+/*************************************
+ *
+ *  Inputs
+ *
+ *************************************/
+
 static UINT16 potgo_value = 0;
 static int cd32_shifter[2];
+static void (*cubocd32_input_hack)(running_machine *machine) = 0;
 
 static void cubocd32_potgo_w(running_machine *machine, UINT16 data)
 {
 	int i;
+
+	if (cubocd32_input_hack != NULL)
+		cubocd32_input_hack(machine);
 
 	potgo_value = potgo_value & 0x5500;
 	potgo_value |= data & 0xaa00;
@@ -165,9 +304,8 @@ static void cubocd32_potgo_w(running_machine *machine, UINT16 data)
 	    UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 	    UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
 	    if ((potgo_value & p5dir) && (potgo_value & p5dat))
-		cd32_shifter[i] = 8;
+			cd32_shifter[i] = 8;
     }
-
 }
 
 static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
@@ -180,6 +318,7 @@ static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+
 		if (!(potgo_value & p5dir) || !(potgo_value & p5dat))
 		{
 			if ((dra & but) && (pra & but) != oldstate[i])
@@ -198,6 +337,7 @@ static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
 
 static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 {
+	static const char *const player_portname[] = { "P2", "P1" };
     int i;
 
     for (i = 0; i < 2; i++)
@@ -218,9 +358,8 @@ static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 	    /* shift at 1 == return one, >1 = return button states */
 	    if (cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (i == 0)
-			if (cd32_shifter[i] >= 2 && (input_port_read(machine, "IN0") & (1 << (cd32_shifter[i] - 2))))
-				potgor &= ~p9dat;
+		if (cd32_shifter[i] >= 2 && (input_port_read(machine, player_portname[i]) & (1 << (cd32_shifter[i] - 2))))
+			potgor &= ~p9dat;
     }
     return potgor;
 }
@@ -233,41 +372,34 @@ static CUSTOM_INPUT(cubo_input)
 
 static INPUT_PORTS_START( cd32 )
 	PORT_START("CIA0PORTA")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("CIA0PORTB")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
-	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("JOY1DAT")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_START("JOY1DAT")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("POTGO")
-	PORT_BIT( 0x4400, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cubo_input, 0)
-	PORT_BIT( 0xaaff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cubo_input, 0)
+	PORT_BIT( 0xbbff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("P2JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("DIPSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
@@ -293,19 +425,108 @@ static INPUT_PORTS_START( cd32 )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* COIN1 */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)    /* BUTTON1 & START1 */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)    /* BUTTON1 & START2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cndypuzl )
+	PORT_INCLUDE( cd32 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and launch bubble */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* START2 and launch bubble */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( haremchl )
+	PORT_INCLUDE( cd32 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* fire */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and draw */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* retract */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)    /* fire */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* START2 and draw */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)    /* retract */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lasstixx )
+	PORT_INCLUDE( cd32 )
+
+	PORT_MODIFY("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and draw */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* retract */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+INPUT_PORTS_END
 /*************************************
  *
  *  Sound definitions
@@ -463,6 +684,45 @@ static DRIVER_INIT( cd32 )
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);
+
+	/* input hack */
+	cubocd32_input_hack = NULL;
+}
+
+static void haremchl_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+		amiga_chip_ram_w(0x2906, 0x00);
+}
+
+static DRIVER_INIT(haremchl)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = haremchl_input_hack;
+}
+
+static void cndypuzl_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+		amiga_chip_ram_w(0x051c02, 0x00);
+}
+
+static DRIVER_INIT(cndypuzl)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = cndypuzl_input_hack;
+}
+
+static void lasstixx_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+		amiga_chip_ram_w(0x0281c, 0x00);
+}
+
+static DRIVER_INIT(lasstixx)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = lasstixx_input_hack;
 }
 
 /***************************************************************************************************/
@@ -470,10 +730,10 @@ static DRIVER_INIT( cd32 )
 /* BIOS */
 GAME( 1993, cd32, 0, cd32, cd32, cd32,   ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, cndypuzl, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, haremchl, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Harem Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, lsrquiz,  cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, lsrquiz2, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz '2' Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, mgprem11, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, lasstixx, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Strixx", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, mgnumber, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Number", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Laser Quiz Italy", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lsrquiz2, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, mgprem11, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, mgnumber, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Number", GAME_NOT_WORKING|GAME_NO_SOUND )
