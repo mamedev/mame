@@ -1070,7 +1070,7 @@ static ADDRESS_MAP_START( lupin3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, lupin3_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(lupin3_sh_port_2_w)
-    AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -1612,26 +1612,22 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
+static WRITE8_HANDLER( steelwkr_sh_port_3_w )
+{
+	coin_lockout_global_w(!(~data & 0x03));		/* possibly */
+}
+
 static ADDRESS_MAP_START( steelwkr_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-    AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-    AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mb14241_0_shift_count_w)
-    AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invadpt2_sh_port_1_w)
-    AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
-    AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITENOP /* ? */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invadpt2_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(steelwkr_sh_port_3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( steelwkr )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* PORT_START("IN0") - never read */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -1644,12 +1640,12 @@ static INPUT_PORTS_START( steelwkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )										PORT_DIPLOCATION("SW1:3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )			PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
@@ -1661,20 +1657,18 @@ static INPUT_PORTS_START( steelwkr )
 INPUT_PORTS_END
 
 
-/* same as regular invaders, but with a color board added */
-
 static MACHINE_DRIVER_START( steelwkr )
 
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(mw8080bw_root)
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(steelwkr_io_map)
-    MDRV_MACHINE_START(extra_8080bw)
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mw8080bw_root)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(steelwkr_io_map)
+	MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(invadpt2)
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
