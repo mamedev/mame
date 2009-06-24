@@ -113,11 +113,14 @@ static TIMER_CALLBACK( a310_audio_tick )
 
 static void a310_set_timer(int tmr)
 {
-	double freq = 2000000.0 / (double)ioc_timercnt[tmr];
+	double freq;
 
-//  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
-
-	timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+	if((double)ioc_timercnt[tmr] != 0) // FIXME: dmdtouch does a divide by zero?
+	{
+		freq = 2000000.0 / (double)ioc_timercnt[tmr];
+	//  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
+		timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+	}
 }
 
 // param
@@ -366,6 +369,7 @@ WRITE32_HANDLER(ioc_w)
 	#ifdef MESS
 	const device_config *fdc = (const device_config *)devtag_get_device(space->machine, "wd1772");
 	#endif
+
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
 //      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
