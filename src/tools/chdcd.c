@@ -61,7 +61,7 @@ static int tokenize( const char *linebuffer, int i, int linebuffersize, char *to
 	int singlequote = 0;
 	int doublequote = 0;
 
-	while ((i < linebuffersize) && isspace(linebuffer[i]))
+	while ((i < linebuffersize) && isspace((UINT8)linebuffer[i]))
 	{
 		i++;
 	}
@@ -76,7 +76,7 @@ static int tokenize( const char *linebuffer, int i, int linebuffersize, char *to
 		{
 			singlequote = !singlequote;
 		}
-		else if (!singlequote && !doublequote && isspace(linebuffer[i]))
+		else if (!singlequote && !doublequote && isspace((UINT8)linebuffer[i]))
 		{
 			break;
 		}
@@ -298,7 +298,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					/* it's a decimal offset, use it */
 					f = strtoul(&token[1], NULL, 10);
 				}
-				else if (isdigit(token[0]))
+				else if (isdigit((UINT8)token[0]))
 				{
 					/* convert the time to an offset */
 					f = msf_to_frames( token );
@@ -314,14 +314,14 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				TOKENIZE
 
-				if (isdigit(token[0]))
+				if (isdigit((UINT8)token[0]))
 				{
 					// this could be the length or an offset from the previous field.
 					f = msf_to_frames( token );
 
 					TOKENIZE
 
-					if (isdigit(token[0]))
+					if (isdigit((UINT8)token[0]))
 					{
 						// it was an offset.
 						f *= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);

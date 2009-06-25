@@ -278,7 +278,7 @@ static int hash_compare_checksum(const char* chk1, const char* chk2, int length)
 		c1 = *chk1++;
 		c2 = *chk2++;
 
-		if (tolower(c1) != tolower(c2))
+		if (tolower((UINT8)c1) != tolower((UINT8)c2))
 			return 0;
 		if (!c1)
 			return 0;
@@ -381,7 +381,7 @@ int hash_data_extract_printable_checksum(const char* data, unsigned int function
 
 	// Copy the checksum (and make it lowercase)
 	for (i=0;i<info->size*2;i++)
-		checksum[i] = tolower(data[i]);
+		checksum[i] = tolower((UINT8)data[i]);
 
 	checksum[info->size*2] = '\0';
 
@@ -395,7 +395,7 @@ static int hex_string_to_binary(unsigned char* binary, const char* data, int siz
 
 	for (i = 0; i < size * 2; i++)
 	{
-		c = tolower(*data++);
+		c = tolower((UINT8)*data++);
 
 		if (c >= '0' && c <= '9')
 			c -= '0';
@@ -590,7 +590,7 @@ void hash_data_print(const char* data, unsigned int functions, char* buffer)
 
 			strcpy(temp, hash_function_name(func));
 			for (j = 0; temp[j]; j++)
-				temp[j] = toupper(temp[j]);
+				temp[j] = toupper((UINT8)temp[j]);
 			strcat(buffer, temp);
 			strcat(buffer, "(");
 
@@ -637,7 +637,7 @@ int hash_verify_string(const char *hash)
 
 			for (i = 0; (hash[i] != '#') && (i < len); i++)
 			{
-				if (!isxdigit(hash[i]))
+				if (!isxdigit((UINT8)hash[i]))
 					return FALSE;
 			}
 			if (hash[i] != '#')

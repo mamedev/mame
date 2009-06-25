@@ -197,12 +197,12 @@ static CMDERR internal_execute_command(running_machine *machine, int execute, in
 		return CMDERR_NONE;
 
 	/* the first parameter has the command and the real first parameter; separate them */
-	for (p = param[0]; *p && isspace(*p); p++) { }
-	for (command = p; *p && !isspace(*p); p++) { }
+	for (p = param[0]; *p && isspace((UINT8)*p); p++) { }
+	for (command = p; *p && !isspace((UINT8)*p); p++) { }
 	if (*p != 0)
 	{
 		*p++ = 0;
-		for ( ; *p && isspace(*p); p++) { }
+		for ( ; *p && isspace((UINT8)*p); p++) { }
 		if (*p != 0)
 			param[0] = p;
 		else
@@ -302,7 +302,7 @@ static CMDERR internal_parse_command(running_machine *machine, const char *origi
 					case '+':	if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
 					case '=':	if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
 					case 0:		foundend = TRUE; break;
-					default:	*p = tolower(c); break;
+					default:	*p = tolower((UINT8)c); break;
 				}
 			}
 		}
@@ -321,7 +321,7 @@ static CMDERR internal_parse_command(running_machine *machine, const char *origi
 		command_start = params[0];
 
 		/* allow for "do" commands */
-		if (tolower(command_start[0] == 'd') && tolower(command_start[1] == 'o') && isspace(command_start[2]))
+		if (tolower((UINT8)command_start[0] == 'd') && tolower((UINT8)command_start[1] == 'o') && isspace((UINT8)command_start[2]))
 		{
 			isexpr = TRUE;
 			command_start += 3;

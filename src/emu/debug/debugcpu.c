@@ -235,8 +235,8 @@ void debug_cpu_init(running_machine *machine)
 
 			/* strip all spaces from the name and convert to lowercase */
 			for (charnum = 0; charnum < sizeof(symname) - 1 && str < colon; str++)
-				if (!isspace(*str))
-					symname[charnum++] = tolower(*str);
+				if (!isspace((UINT8)*str))
+					symname[charnum++] = tolower((UINT8)*str);
 			symname[charnum] = 0;
 
 			/* add the symbol to the table */
@@ -2133,7 +2133,7 @@ static void process_source_file(running_machine *machine)
 
 		/* strip whitespace */
 		i = (int)strlen(buf);
-		while((i > 0) && (isspace(buf[i-1])))
+		while((i > 0) && (isspace((UINT8)buf[i-1])))
 			buf[--i] = '\0';
 
 		/* execute the command */

@@ -313,7 +313,7 @@ static int do_createhd(int argc, char *argv[], int param)
 
 		/* if there are any non-digits in the 'offset', then treat it as a ident file */
 		for (scan = argv[4]; *scan != 0; scan++)
-			if (!isdigit(*scan))
+			if (!isdigit((UINT8)*scan))
 				break;
 		if (*scan != 0)
 		{

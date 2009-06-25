@@ -103,7 +103,7 @@ static const char *copystring_lower(const char *input)
 	if (newstr != NULL)
 	{
 		for (i = 0; input[i] != 0; i++)
-			newstr[i] = tolower(input[i]);
+			newstr[i] = tolower((UINT8)input[i]);
 		newstr[i] = 0;
 	}
 
@@ -710,11 +710,11 @@ static void expat_element_end(void *data, const XML_Char *name)
 		char *end = start + strlen(start);
 
 		/* first strip leading spaces */
-		while (*start && isspace(*start))
+		while (*start && isspace((UINT8)*start))
 			start++;
 
 		/* then strip trailing spaces */
-		while (end > start && isspace(end[-1]))
+		while (end > start && isspace((UINT8)end[-1]))
 			end--;
 
 		/* if nothing left, just free it */

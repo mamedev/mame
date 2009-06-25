@@ -627,7 +627,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 	while (string[0] != 0 && token - expr->token < MAX_TOKENS)
 	{
 		/* ignore any whitespace */
-		while (string[0] != 0 && isspace(string[0]))
+		while (string[0] != 0 && isspace((UINT8)string[0]))
 			string++;
 		if (string[0] == 0)
 			break;
@@ -637,7 +637,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 		token->offset = string - stringstart;
 
 		/* switch off the first character */
-		switch (tolower(string[0]))
+		switch (tolower((UINT8)string[0]))
 		{
 			case '(':
 				SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_LPAREN, TIN_PRECEDENCE_0);
@@ -827,7 +827,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				/* accumulate a lower-case version of the symbol */
 				while (1)
 				{
-					char val = tolower(string[0]);
+					char val = tolower((UINT8)string[0]);
 					if (val == 0 || strchr(valid, val) == NULL)
 						break;
 					buffer[bufindex++] = val;
@@ -925,7 +925,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 						value = 0;
 						while (buffer[bufindex] != 0)
 						{
-							const char *ptr = strchr(numbers, tolower(buffer[bufindex]));
+							const char *ptr = strchr(numbers, tolower((UINT8)buffer[bufindex]));
 							int digit;
 
 							if (ptr == NULL)
@@ -1967,7 +1967,7 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 	all_digits = TRUE;
 	for (i = 0; name[i]; i++)
 	{
-		if (!isdigit(name[i]))
+		if (!isdigit((UINT8)name[i]))
 		{
 			all_digits = FALSE;
 			break;
@@ -1999,7 +1999,7 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 
 	/* copy the string, converting to lowercase */
 	for (strindex = 0; name[strindex] != 0; strindex++)
-		newstring[strindex] = tolower(name[strindex]);
+		newstring[strindex] = tolower((UINT8)name[strindex]);
 	newstring[strindex] = 0;
 
 	/* fill in the details */

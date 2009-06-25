@@ -191,16 +191,16 @@ int main(int argc, char *argv[])
 	/* does the source end in '.jed'? */
 	len = strlen(srcfile);
 	src_is_jed = (srcfile[len - 4] == '.' &&
-	             tolower(srcfile[len - 3]) == 'j' &&
-	             tolower(srcfile[len - 2]) == 'e' &&
-	             tolower(srcfile[len - 1]) == 'd');
+	             tolower((UINT8)srcfile[len - 3]) == 'j' &&
+	             tolower((UINT8)srcfile[len - 2]) == 'e' &&
+	             tolower((UINT8)srcfile[len - 1]) == 'd');
 
 	/* does the destination end in '.jed'? */
 	len = strlen(dstfile);
 	dst_is_jed = (dstfile[len - 4] == '.' &&
-	             tolower(dstfile[len - 3]) == 'j' &&
-	             tolower(dstfile[len - 2]) == 'e' &&
-	             tolower(dstfile[len - 1]) == 'd');
+	             tolower((UINT8)dstfile[len - 3]) == 'j' &&
+	             tolower((UINT8)dstfile[len - 2]) == 'e' &&
+	             tolower((UINT8)dstfile[len - 1]) == 'd');
 
 	/* error if neither or both are .jed */
 	if (!src_is_jed && !dst_is_jed)

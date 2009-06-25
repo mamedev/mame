@@ -465,7 +465,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	{
 		if (description != NULL)
 		{
-			while (isspace(**description))
+			while (isspace((UINT8)**description))
 				*description += 1;
 			if (**description == 0)
 				*description = MENU_SEPARATOR_ITEM;

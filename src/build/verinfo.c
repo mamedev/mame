@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef unsigned char UINT8;
+
 #define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))
 #define BUILD_WINDOWS		(0)
 #define BUILD_WINUI			(1)
@@ -123,13 +125,13 @@ static int parse_version_digit(const char *str, int *position)
 {
 	int value = 0;
 
-	while (str[*position] != 0 && !isspace(str[*position]) && !isdigit(str[*position]))
+	while (str[*position] != 0 && !isspace((UINT8)str[*position]) && !isdigit((UINT8)str[*position]))
 		(*position)++;
 
-	if (str[*position] != 0 && isdigit(str[*position]))
+	if (str[*position] != 0 && isdigit((UINT8)str[*position]))
 	{
 		sscanf(&str[*position], "%d", &value);
-		while (isdigit(str[*position]))
+		while (isdigit((UINT8)str[*position]))
 			(*position)++;
 	}
 	return value;

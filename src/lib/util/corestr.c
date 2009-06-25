@@ -10,6 +10,7 @@
 ****************************************************************************/
 
 #include "corestr.h"
+#include "osdcore.h"
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -22,8 +23,8 @@ int core_stricmp(const char *s1, const char *s2)
 {
 	for (;;)
  	{
-		int c1 = tolower(*s1++);
-		int c2 = tolower(*s2++);
+		int c1 = tolower((UINT8)*s1++);
+		int c2 = tolower((UINT8)*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
  	}
@@ -39,8 +40,8 @@ int core_strnicmp(const char *s1, const char *s2, size_t n)
 	size_t i;
 	for (i = 0; i < n; i++)
  	{
-		int c1 = tolower(*s1++);
-		int c2 = tolower(*s2++);
+		int c1 = tolower((UINT8)*s1++);
+		int c2 = tolower((UINT8)*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
  	}

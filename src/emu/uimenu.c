@@ -3244,9 +3244,9 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 					/* look for files ending in .png with a name not larger then 9 chars*/
 					if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
 						dir->name[length - 4] == '.' &&
-						tolower(dir->name[length - 3]) == 'p' &&
-						tolower(dir->name[length - 2]) == 'n' &&
-						tolower(dir->name[length - 1]) == 'g')
+						tolower((UINT8)dir->name[length - 3]) == 'p' &&
+						tolower((UINT8)dir->name[length - 2]) == 'n' &&
+						tolower((UINT8)dir->name[length - 1]) == 'g')
 
 					{
 						/* remove .png from length */
@@ -3557,7 +3557,7 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 
 			/* build a name for it */
 			for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
-				*dst++ = tolower(*src);
+				*dst++ = tolower((UINT8)*src);
 			*dst = 0;
 
 			/* find it in the array */

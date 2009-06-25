@@ -205,7 +205,7 @@ static int penalty_compare(const char *source, const char *target)
 	for ( ; *source && *target; target++)
 	{
 		/* do a case insensitive match */
-		int match = (tolower(*source) == tolower(*target));
+		int match = (tolower((UINT8)*source) == tolower((UINT8)*target));
 
 		/* if we matched, advance the source */
 		if (match)

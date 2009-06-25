@@ -483,7 +483,7 @@ int options_parse_ini_file(core_options *opts, core_file *inifile, int priority)
 
 		/* find the name */
 		for (optionname = buffer; *optionname != 0; optionname++)
-			if (!isspace(*optionname))
+			if (!isspace((UINT8)*optionname))
 				break;
 
 		/* skip comments */
@@ -492,7 +492,7 @@ int options_parse_ini_file(core_options *opts, core_file *inifile, int priority)
 
 		/* scan forward to find the first space */
 		for (temp = optionname; *temp != 0; temp++)
-			if (isspace(*temp))
+			if (isspace((UINT8)*temp))
 				break;
 
 		/* if we hit the end early, print a warning and continue */
@@ -973,9 +973,9 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 	int i;
 
 	/* strip off leading/trailing spaces */
-	while (isspace(*datastart) && datastart <= dataend)
+	while (isspace((UINT8)*datastart) && datastart <= dataend)
 		datastart++;
-	while (isspace(*dataend) && datastart <= dataend)
+	while (isspace((UINT8)*dataend) && datastart <= dataend)
 		dataend--;
 
 	/* strip off quotes */

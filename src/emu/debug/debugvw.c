@@ -1147,13 +1147,13 @@ static void registers_view_add_register(debug_view *view, int regnum, const char
 	}
 
 	/* now trim spaces */
-	while (isspace(str[tagstart]) && taglen > 0)
+	while (isspace((UINT8)str[tagstart]) && taglen > 0)
 		tagstart++, taglen--;
-	while (isspace(str[tagstart + taglen - 1]) && taglen > 0)
+	while (isspace((UINT8)str[tagstart + taglen - 1]) && taglen > 0)
 		taglen--;
-	while (isspace(str[valstart]) && vallen > 0)
+	while (isspace((UINT8)str[valstart]) && vallen > 0)
 		valstart++, vallen--;
-	while (isspace(str[valstart + vallen - 1]) && vallen > 0)
+	while (isspace((UINT8)str[valstart + vallen - 1]) && vallen > 0)
 		vallen--;
 	if (str[valstart] == '!')
 		valstart++, vallen--;

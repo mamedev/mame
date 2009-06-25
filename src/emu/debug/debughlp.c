@@ -1048,7 +1048,7 @@ const char *debug_get_help(const char *tag)
 
 	/* make a lowercase copy of the tag */
 	for (i = 0; i <= taglen; i++)
-		tagcopy[i] = tolower(tag[i]);
+		tagcopy[i] = tolower((UINT8)tag[i]);
 
 	/* find a match */
 	for (i = 0; i < sizeof(static_help_list) / sizeof(static_help_list[0]); i++)

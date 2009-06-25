@@ -527,7 +527,7 @@ int input_seq_from_tokens(const char *string, input_seq *seq)
 		char *strtemp;
 
 		/* trim any leading spaces */
-		while (*str != 0 && isspace(*str))
+		while (*str != 0 && isspace((UINT8)*str))
 			str++;
 
 		/* bail if we're done */
@@ -538,8 +538,8 @@ int input_seq_from_tokens(const char *string, input_seq *seq)
 		}
 
 		/* find the end of the token and make it upper-case along the way */
-		for (strtemp = str; *strtemp != 0 && !isspace(*strtemp); strtemp++)
-			*strtemp = toupper(*strtemp);
+		for (strtemp = str; *strtemp != 0 && !isspace((UINT8)*strtemp); strtemp++)
+			*strtemp = toupper((UINT8)*strtemp);
 		origspace = *strtemp;
 		*strtemp = 0;
 

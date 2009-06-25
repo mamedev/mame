@@ -177,12 +177,12 @@ INLINE char *trim_string(char *string)
 	int length;
 
 	/* trim leading spaces */
-	while (*string != 0 && isspace(*string))
+	while (*string != 0 && isspace((UINT8)*string))
 		string++;
 
 	/* trim trailing spaces */
 	length = strlen(string);
-	while (length > 0 && isspace(string[length - 1]))
+	while (length > 0 && isspace((UINT8)string[length - 1]))
 		string[--length] = 0;
 
 	return string;
@@ -400,7 +400,7 @@ static int read_summary_log(const char *filename, int index)
 			{
 				/* find the end of the line and normalize it with a CR */
 				for (curptr = linestart; *curptr != 0 && *curptr != '\n' && *curptr != '\r'; curptr++)
-					if (!isspace(*curptr))
+					if (!isspace((UINT8)*curptr))
 						foundchars = 1;
 				*curptr++ = '\n';
 				*curptr = 0;
@@ -434,7 +434,7 @@ static int read_summary_log(const char *filename, int index)
 			char *end;
 
 			/* find the end */
-			for (end = start; !isspace(*end); end++) ;
+			for (end = start; !isspace((UINT8)*end); end++) ;
 			*end = 0;
 			strcpy(lists[index].version, start);
 			fprintf(stderr, "Parsing results from version %s\n", lists[index].version);

@@ -373,7 +373,7 @@ static void InitDasm32025(void)
 			fatalerror("not enough bits in encoding '%s %s' %d",
 				ops[0],ops[1],bit);
 		}
-		while (isspace(*p)) p++;
+		while (isspace((UINT8)*p)) p++;
 		if (*p) Op[i].extcode = *p;
 		Op[i].bits = bits;
 		Op[i].mask = mask;

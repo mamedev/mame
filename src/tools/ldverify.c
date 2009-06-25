@@ -680,9 +680,9 @@ int main(int argc, char *argv[])
 	srcfilelen = strlen(srcfile);
 	if (srcfilelen < 4)
 		return usage();
-	if (tolower(srcfile[srcfilelen-3]) == 'a' && tolower(srcfile[srcfilelen-2]) == 'v' && tolower(srcfile[srcfilelen-1]) == 'i')
+	if (tolower((UINT8)srcfile[srcfilelen-3]) == 'a' && tolower((UINT8)srcfile[srcfilelen-2]) == 'v' && tolower((UINT8)srcfile[srcfilelen-1]) == 'i')
 		isavi = TRUE;
-	else if (tolower(srcfile[srcfilelen-3]) == 'c' && tolower(srcfile[srcfilelen-2]) == 'h' && tolower(srcfile[srcfilelen-1]) == 'd')
+	else if (tolower((UINT8)srcfile[srcfilelen-3]) == 'c' && tolower((UINT8)srcfile[srcfilelen-2]) == 'h' && tolower((UINT8)srcfile[srcfilelen-1]) == 'd')
 		isavi = FALSE;
 	else
 		return usage();
