@@ -1038,9 +1038,7 @@ static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 }
 
 static UINT32 m_n_security_control;
-static void (*security_bit7_write)( running_machine *machine, int data );
-static void (*security_bit6_write)( running_machine *machine, int data );
-static void (*security_bit5_write)( running_machine *machine, int data );
+static void (*security_callback)( running_machine *machine, int data );
 
 static WRITE32_HANDLER( security_w )
 {
@@ -1079,19 +1077,9 @@ static WRITE32_HANDLER( security_w )
 			ds2401_write( machine, security_cart_number, !( ( data >> 4 ) & 1 ) );
 		}
 
-		if( security_bit5_write != NULL )
+		if( security_callback != NULL )
 		{
-			security_bit5_write( machine, ( data >> 5 ) & 1 );
-		}
-
-		if( security_bit6_write != NULL )
-		{
-			security_bit6_write( machine, ( data >> 6 ) & 1 );
-		}
-
-		if( security_bit7_write != NULL )
-		{
-			security_bit7_write( machine, ( data >> 7 ) & 1 );
+			security_callback( machine, data & 0xff );
 		}
 	}
 }
@@ -2695,37 +2683,29 @@ static DRIVER_INIT( dmx )
 
 static int salarymc_lamp_bits;
 static int salarymc_lamp_shift;
-static int salarymc_lamp_data;
 static int salarymc_lamp_clk;
 
-static void salarymc_lamp_data_write( running_machine *machine, int data )
+static void salarymc_lamp_callback( running_machine *machine, int data )
 {
-	salarymc_lamp_data = data;
-}
+	int d = ( data >> 7 ) & 1;
+	int rst = ( data >> 6 ) & 1;
+	int clk = ( data >> 5 ) & 1;
 
-static void salarymc_lamp_rst_write( running_machine *machine, int data )
-{
-	if( data )
+	if( rst )
 	{
 		salarymc_lamp_bits = 0;
 		salarymc_lamp_shift = 0;
 	}
-}
 
-static void salarymc_lamp_clk_write( running_machine *machine, int data )
-{
-	if( salarymc_lamp_clk != data )
+	if( salarymc_lamp_clk != clk )
 	{
-		salarymc_lamp_clk = data;
+		salarymc_lamp_clk = clk;
 
 		if( salarymc_lamp_clk )
 		{
 			salarymc_lamp_shift <<= 1;
 
-			if( salarymc_lamp_data )
-			{
-				salarymc_lamp_shift |= 1;
-			}
+			salarymc_lamp_shift |= d;
 
 			salarymc_lamp_bits++;
 			if( salarymc_lamp_bits == 16 )
@@ -2754,16 +2734,54 @@ static DRIVER_INIT( salarymc )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	security_bit7_write = salarymc_lamp_data_write;
-	security_bit6_write = salarymc_lamp_rst_write;
-	security_bit5_write = salarymc_lamp_clk_write;
+	security_callback = salarymc_lamp_callback;
 
 	state_save_register_global(machine,  salarymc_lamp_bits );
 	state_save_register_global(machine,  salarymc_lamp_shift );
-	state_save_register_global(machine,  salarymc_lamp_data );
 	state_save_register_global(machine,  salarymc_lamp_clk );
 }
 
+/* Hyper Bishi Bashi Champ */
+
+static int hyperbbc_lamp_strobe1;
+static int hyperbbc_lamp_strobe2;
+
+static void hyperbbc_lamp_callback( running_machine *machine, int data )
+{
+	int red = ( data >> 6 ) & 1;
+	int blue = ( data >> 5 ) & 1;
+	int green = ( data >> 4 ) & 1;
+	int strobe1 = ( data >> 3 ) & 1;
+	int strobe2 = ( data >> 0 ) & 1;
+
+	if( strobe1 && !hyperbbc_lamp_strobe1 )
+	{
+		output_set_value( "player 1 red", red );
+		output_set_value( "player 1 green", green );
+		output_set_value( "player 1 blue", blue );
+	}
+
+	hyperbbc_lamp_strobe1 = strobe1;
+
+	if( strobe2 && !hyperbbc_lamp_strobe2 )
+	{
+		output_set_value( "player 2 red", red );
+		output_set_value( "player 2 green", green );
+		output_set_value( "player 2 blue", blue );
+	}
+
+	hyperbbc_lamp_strobe2 = strobe2;
+}
+
+static DRIVER_INIT( hyperbbc )
+{
+	DRIVER_INIT_CALL(konami573);
+
+	security_callback = hyperbbc_lamp_callback;
+
+	state_save_register_global(machine,  hyperbbc_lamp_strobe1 );
+	state_save_register_global(machine,  hyperbbc_lamp_strobe2 );
+}
 
 
 /* ADC0834 Interface */
@@ -3090,6 +3108,12 @@ static INPUT_PORTS_START( drmn )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hyperbbc )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 ) /* P1 UP */
+INPUT_PORTS_END
 
 #define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
 
@@ -4435,6 +4459,34 @@ ROM_START( gtfrk11m )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
 ROM_END
 
+ROM_START( hyperbbc )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gx908ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(fb6c0635) SHA1(0d974462a0a244ffb1a651adb316242cde427756) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
+ROM_END
+
+ROM_START( hyperbbck )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gx908ka.u1",  0x000000, 0x000084, BAD_DUMP CRC(f4f37fe1) SHA1(30f90cdb2d092e4f8d6c14cfd4ca4945e6d352cb) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
+ROM_END
+
 ROM_START( konam80a )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4603,6 +4655,8 @@ GAME( 1999, ddr3mj,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
+GAME( 1999, hyperbbc, sys573,   konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, hyperbbck,hyperbbc, konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
@@ -4613,7 +4667,7 @@ GAME( 2000, dsem,     sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, salarymc, sys573,   konami573, konami573, salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, salarymc, sys573,   konami573, hyperbbc,  salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, ddr3mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m, sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, drmn3m,   pcnfrk3m, konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 3rd Mix (G*A23 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */

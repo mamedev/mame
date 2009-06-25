@@ -3166,6 +3166,8 @@ V-V                           TP-027
 	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
 	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
 	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
+	DRIVER( hyperbbc )	/* 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA) */
+	DRIVER( hyperbbck )	/* 1999 - Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA) */
 	DRIVER( dsfdct )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JCA) */
 	DRIVER( dsfdcta )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JAA) */
 	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAB) */
