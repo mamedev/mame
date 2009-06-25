@@ -133,9 +133,107 @@ static WRITE16_HANDLER( ml_to_sound_w )
 		taitosound_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 		taitosound_comm_w (space, 0, data & 0xff);
 	}
+}
+
+static WRITE8_HANDLER( ml_sound_to_main_w )
+{
+	if (offset == 0)
+		taitosound_slave_port_w (space, 0, data & 0xff);
+	else if (offset == 1)
+	{
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+		taitosound_slave_comm_w (space, 0, data & 0xff);
+	}
+}
+
+static READ16_HANDLER( ml_analog1_lsb_r )
+{
+	return input_port_read(space->machine, "STICKX") & 0xff;
+}
+
+static READ16_HANDLER( ml_analog2_lsb_r )
+{
+	return input_port_read(space->machine, "STICKY") & 0xff;
+}
+
+static READ16_HANDLER( ml_analog3_lsb_r )
+{
+	return (input_port_read(space->machine, "STICKZ") & 0xff);
+}
+
+/*
+	PORT_START("IN3")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+*/
+
+/* high bits of analog inputs + "limiters"/ADC converters. */
+static READ16_HANDLER( ml_analog1_msb_r )
+{
+	return ((input_port_read(space->machine, "STICKY") & 0xf00)>>8) | (input_port_read(space->machine, "IN2") & 0xf0);
+}
+
+static READ16_HANDLER( ml_analog2_msb_r )
+{
+	static UINT8 res;
+	static UINT16 y_adc,x_adc;
+
+	y_adc = input_port_read(space->machine, "STICKY");
+	x_adc = input_port_read(space->machine, "STICKZ");
+
+	res = 0;
+
+	if(x_adc >= 0x07ff)
+		res = 0x20;
+
+	if(y_adc == 0x07ff)
+		res|= 0x50;
+	else if(y_adc < 0x07ff)
+		res|= 0x10;
+	else
+		res|= 0x40;
+
+	return ((input_port_read(space->machine, "STICKZ") & 0xf00)>>8) | res;
+}
+
+static READ16_HANDLER( ml_analog3_msb_r )
+{
+	static UINT8 z_adc,res;
+	static UINT16 x_adc;
+
+	z_adc = input_port_read(space->machine, "STICKX");
+	x_adc = input_port_read(space->machine, "STICKZ");
+
+	res = 0;
+
+	if(z_adc == 0)
+		res = 0x60;
+	else if(z_adc & 0x80)
+		res = 0x20;
+	else
+		res = 0x40;
+
+	if(x_adc <= 0x07ff)
+		res|= 0x10;
+
+	return ((input_port_read(space->machine, "STICKX") & 0xf00)>>8) | res;
 }
 
 static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -155,7 +253,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
 	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff)
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)//AM_SHARE(2)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM // is it shared with mecha ? tested around $940
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
@@ -165,17 +263,22 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
 
-	/* are we sure that these are for an analog stick? */
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ_PORT("STICKX")		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ_PORT("STICKY")		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0006, 0x2b0007) AM_READNOP // tested in service mode, dips?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("STICKZ")		//-60 .. 60 analog controls ?
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ_PORT("IN3")
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ_PORT("IN2")		// IN2/IN3 could be switched
+	/*  */
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog1_msb_r) // tested in service mode, dips?
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
+	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog2_msb_r)
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)		// IN2/IN3 could be switched
 ADDRESS_MAP_END
 
 
 /* Sub CPU Map */
+static READ16_HANDLER( ml_sub_kludge_r )
+{
+	/* bit 15 == status bit? */
+	return 0;
+}
 
 static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
@@ -183,6 +286,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM // palette?
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x200814, 0x200815) AM_READ(ml_sub_kludge_r)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
 
@@ -191,8 +295,8 @@ static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r) AM_WRITE(taitosound_slave_comm_w)
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
@@ -305,6 +409,8 @@ static VIDEO_UPDATE(mlanding)
 	popmessage("%04x %04x %04x %04x|%04x %04x %04x %04x|%04x %04x %04x",ml_dotram[0x800/2],ml_dotram[0x802/2],ml_dotram[0x804/2],ml_dotram[0x806/2],
 	                    ml_dotram[0x808/2],ml_dotram[0x80a/2],ml_dotram[0x80c/2],ml_dotram[0x80e/2],
 	                    ml_dotram[0x810/2],ml_dotram[0x812/2],ml_dotram[0x814/2]);
+
+//	popmessage("%04x %04x %04x",input_port_read(screen->machine, "STICKX"),input_port_read(screen->machine, "STICKY"),input_port_read(screen->machine, "STICKZ"));
 	return 0;
 }
 
@@ -351,18 +457,22 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" ) //high bits of counter 2
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 1
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
@@ -370,19 +480,8 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" ) //high bits of counter 3
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN4")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
@@ -390,14 +489,14 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("STICKX")		/* Stick 1 (3) */
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xffd8,0x28) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	PORT_START("STICKX")	/* Stick 1 (3) */
+	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
 
 	PORT_START("STICKY")	/* Stick 2 (4) */
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xffd8,0x28) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0000,0x0fff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START("STICKZ")	/* Stick 3 (5) */
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0xffc4,0x3c) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0000,0x0fff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static void irq_handler(const device_config *device, int irq)
@@ -511,9 +610,9 @@ ROM_END
 
 static DRIVER_INIT(mlanding)
 {
-	UINT8 *rom = memory_region(machine, "sub");
-	rom[0x88b]=0x4e;
-	rom[0x88a]=0x71;
+//	UINT8 *rom = memory_region(machine, "sub");
+//	rom[0x88b]=0x4e;
+//	rom[0x88a]=0x71;
 }
 
 GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_NO_SOUND )
