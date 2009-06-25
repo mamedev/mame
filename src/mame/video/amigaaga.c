@@ -9,7 +9,7 @@ Done:
     - bitplane data fetching
     - support for up to 8 standard bitplanes
     - HAM8 mode
-	- preliminary sprites
+    - preliminary sprites
 
 To do:
     - incorrect hstart/hstop values in CD32 logo, lsrquiz & lsrquiz2
@@ -467,9 +467,9 @@ INLINE void fetch_sprite_data(int scanline, int sprite)
 			aga_sprdatb[sprite][3] = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			aga_sprite_fetched_words = 4;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n", 
-										scanline, sprite, 
-										aga_sprdata[sprite][0], aga_sprdatb[sprite][0], 
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
+										scanline, sprite,
+										aga_sprdata[sprite][0], aga_sprdatb[sprite][0],
 										aga_sprdata[sprite][1], aga_sprdatb[sprite][1],
 										aga_sprdata[sprite][2], aga_sprdatb[sprite][2],
 										aga_sprdata[sprite][3], aga_sprdatb[sprite][3]);

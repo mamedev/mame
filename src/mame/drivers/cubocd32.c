@@ -130,7 +130,7 @@ routines :
   - 04d1da : coin verification
 
 
-	Candy Puzzle
+    Candy Puzzle
 
 settings (A5=0x059ac0) :
 

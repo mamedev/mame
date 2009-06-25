@@ -144,7 +144,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BPLCON3		(0x106/2)	/* W    D    Bit plane control reg (enhanced features) */
 #define REG_BPL1MOD		(0x108/2)	/* W  A      Bit plane modulo (odd planes) */
 #define REG_BPL2MOD		(0x10A/2)	/* W  A      Bit Plane modulo (even planes) */
-#define REG_BPLCON4		(0x10C/2)	/* W    D    Bit plane control reg. (display masks) */ 
+#define REG_BPLCON4		(0x10C/2)	/* W    D    Bit plane control reg. (display masks) */
 #define REG_BPL1DAT		(0x110/2)	/* W    D    Bit plane 1 data (parallel-to-serial convert) */
 #define REG_BPL2DAT		(0x112/2)	/* W    D    Bit plane 2 data (parallel-to-serial convert) */
 #define REG_BPL3DAT		(0x114/2)	/* W    D    Bit plane 3 data (parallel-to-serial convert) */

@@ -635,7 +635,7 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 
 		UINT32 primask = kaneko16_priority.sprite[curr_pri];
 
-		kaneko16_draw_sprites_custom(	
+		kaneko16_draw_sprites_custom(
 										bitmap,cliprect,machine->gfx[0],
 										s->code,
 										s->color,

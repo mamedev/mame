@@ -2619,7 +2619,7 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	dest++;						\
 	pri++;
 
-INLINE void f3_drawgfx( 
+INLINE void f3_drawgfx(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,

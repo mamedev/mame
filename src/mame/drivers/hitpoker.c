@@ -97,9 +97,9 @@ static READ8_HANDLER( hitpoker_vram_r )
 
 static WRITE8_HANDLER( hitpoker_vram_w )
 {
-//	UINT8 *ROM = memory_region(space->machine, "maincpu");
+//  UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-//	if(hitpoker_sys_regs[0x00] & 0x10)
+//  if(hitpoker_sys_regs[0x00] & 0x10)
 	videoram[offset] = data;
 }
 
@@ -181,7 +181,7 @@ static READ8_HANDLER( eeprom_r )
 
 static READ8_HANDLER( hitpoker_pic_r )
 {
-//	logerror("R\n");
+//  logerror("R\n");
 
 	if(offset == 0)
 	{
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( hitpoker_pic_w )
 {
 	if(offset == 0)
 		hitpoker_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
-//	logerror("%02x W\n",data);
+//  logerror("%02x W\n",data);
 	hitpoker_sys_regs[offset] = data;
 }
 
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( hitpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
-//	AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
+//  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM

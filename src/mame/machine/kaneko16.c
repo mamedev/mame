@@ -325,7 +325,7 @@ static void calc3_mcu_run(running_machine *machine)
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
 	//calc3_mcu_status = 0;
-	
+
 	mcu_command = kaneko16_mcu_ram[calc3_mcu_command_offset/2 + 0];
 
 	if (mcu_command == 0) return;
@@ -333,13 +333,13 @@ static void calc3_mcu_run(running_machine *machine)
 	logerror("%s : MCU executed command at %04X: %04X\n",
 	 	cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
 
-		
+
 	switch (mcu_command)
 	{
 
 		case 0x00ff:
 		{
-	
+
 
 			int param1 = kaneko16_mcu_ram[(0>>1) + 1];
 			int param2 = kaneko16_mcu_ram[(0>>1) + 2];
@@ -373,20 +373,20 @@ static void calc3_mcu_run(running_machine *machine)
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+0] = 0x0000;
 			/*
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+1] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+2] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+3] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+4] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+5] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+6] = 0x0000;
-			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+7] = 0x0000;
-			*/
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+1] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+2] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+3] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+4] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+5] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+6] = 0x0000;
+            kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+7] = 0x0000;
+            */
 			calc3_mcu_command_offset = param3;	// where next command will be written?
 
-			
+
 		}
 		break;
-	
+
 		case 0x0001:
 		case 0x0002:
 		case 0x0003:
@@ -395,40 +395,40 @@ static void calc3_mcu_run(running_machine *machine)
 		case 0x0006:
 		case 0x0007:
 		// the 'case' seems to be the number of commands in the list
-		// there are parts of the code where i've seen up to '5' specified, and the game uploads 5 transfer commands 
+		// there are parts of the code where i've seen up to '5' specified, and the game uploads 5 transfer commands
 		//
 		{
 			int num_transfers = mcu_command;
 			int i;
-			
+
 			logerror("Calc3 transfer request, %d transfers\n", num_transfers);
-			
+
 			for (i=0;i<num_transfers;i++)
 			{
 				int param1 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 1 + (2*i)];
-				int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2 + (2*i)];	
+				int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2 + (2*i)];
 				UINT8  commandtabl = (param1&0xff00) >> 8;
 				UINT16 commandaddr = (param1&0x00ff) | (param2&0xff00);
 				UINT32 fakeoffs;
-				
+
 				logerror("transfer %d table %02x writeback address %04x\n", i, commandtabl, commandaddr);
-				
+
 				// the data SHOULD be written somewhere to main ram, probably related to the writeaddress set in command 0xff
 				// but I'm not sure how, for now write it back to a FAKE region instead
 				fakeoffs = 0x1e00*commandtabl;
-				
+
 				calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_calc3_fakeram, fakeoffs);
-				
+
 				// write back WHERE we wrote the data to the address specified so that the code can jump to it etc.
 				fakeoffs+=0xf00000;
 				fakeoffs+=2;// the first 2 bytes don't seem to be the offset it expects to jump to..
-				
+
 				printf("writing back fake address %08x to %08x\n", fakeoffs, commandaddr);
 				kaneko16_mcu_ram[(commandaddr>>1)+0] = (fakeoffs>>16)&0xffff;
 				kaneko16_mcu_ram[(commandaddr>>1)+1] = (fakeoffs&0xffff);
 
 			}
-		
+
 			// reset 'number of commands' to 0 to indicate processing complete to the main cpu.
 			kaneko16_mcu_ram[calc3_mcu_command_offset>>1] = 0x0000;;
 		}

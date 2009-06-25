@@ -2,12 +2,12 @@
   Dual 68k + 2xZ80
   no other hardware info..but it doesn't seem related to taitoair.c at all
 
-	TODO:
-	- Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
-	- Comms between the four CPUs;
-	- understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu (this might need a side-by-side);
-	- Fix "sound cpu error" msg;
-	- Inputs, particularly needed for a game like this one;
+    TODO:
+    - Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
+    - Comms between the four CPUs;
+    - understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu (this might need a side-by-side);
+    - Fix "sound cpu error" msg;
+    - Inputs, particularly needed for a game like this one;
 */
 
 #include "driver.h"
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(sound_reset_w) //sound reset ??
 
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
-//	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0xff00) AM_WRITE8(taitosound_comm_w, 0x00ff)
+//  AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0xff00) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff) AM_WRITE8(taitosound_comm_w, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)//AM_SHARE(2)

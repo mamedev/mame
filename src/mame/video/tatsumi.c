@@ -247,7 +247,7 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
-INLINE void roundupt_drawgfxzoomrotate( 
+INLINE void roundupt_drawgfxzoomrotate(
 		bitmap_t *dest_bmp, const rectangle *clip, const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )

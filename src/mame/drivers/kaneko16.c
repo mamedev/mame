@@ -1979,7 +1979,7 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 	{
 		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
 		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		
+
 		// the code for this interupt is provided by the MCU..
 		//case 0:  cpu_set_input_line(device, 4, HOLD_LINE); break;
 		case 0:
@@ -1989,7 +1989,7 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 			{
 				kaneko16_mainram[0x2dfe/2]=0x0000;
 			}
-	
+
 		}
 	}
 }
@@ -3631,8 +3631,8 @@ followed by several tables in the following format
 
 OFFSET 0 - the location of a word which specifies the size of the block
          - this is usually '3', but if it's larger than 3 it enables an 'inline encryption' mode, whereby the decryption table is stored in the
-		 - right before the length register
-		 
+         - right before the length register
+
 OFFSET 1 - a 'mode' register of some sort, usually 0,1,2 or 3 for used data, shogun also called a 'blank' command (length 0) with mode 8
 
 OFFSET 2 - unknown, might be some kind of 'step' register
@@ -3645,7 +3645,7 @@ OFFSET 4-5 (or after the inline decryption table) - the length of the current bl
 
 OFFSET 6-size - data for thie block
 
-this continues for the number of blocks specified 
+this continues for the number of blocks specified
 after all the blocks there is a 0x1000 block of data which is the same between games
 
 where games specify the same decryption key the table used is the same, I don't know where these tables come from.
@@ -3671,7 +3671,7 @@ static UINT8 calc3_table01[64] = {
 	0x20,0x1c,0x1f,0xc1,0x25,0x2e,0x49,0xe7,0x90,0x1b,0xb4,0xcf,0x1e,0x61,0xd7,0x46,
 	0xda,0x89,0x08,0x77,0xb1,0x81,0x6b,0x2d,0xb6,0xbc,0x99,0xc9,0x35,0x0a,0x0f,0x01
 };
-				
+
 /* ok */
 static UINT8 calc3_table15[64] = {
 	0x0C,0xEB,0x30,0x25,0xA8,0xED,0xE3,0x23,0xAC,0x2B,0x8D,0x34,0x88,0x9F,0x55,0xB5,
@@ -3681,37 +3681,37 @@ static UINT8 calc3_table15[64] = {
 };
 
 /* partial guessed tables
-unsigned char table31[64] = {	
-	// x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
-	0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xaf, 0x00, 0x00, 0x00, 0x3a, 0x00, 0x00, 0x00, 0x3b,
-	0x00, 0x00, 0x00, 0xbb, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xb1, 0x00, 0x00, 0x00, 0xdc,
-	0x00, 0x00, 0x00, 0xb5, 0x00, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00, 0xde,
-	0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, 0x00, 0x26, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x00, 0xb1
+unsigned char table31[64] = {
+    // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
+    0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xaf, 0x00, 0x00, 0x00, 0x3a, 0x00, 0x00, 0x00, 0x3b,
+    0x00, 0x00, 0x00, 0xbb, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xb1, 0x00, 0x00, 0x00, 0xdc,
+    0x00, 0x00, 0x00, 0xb5, 0x00, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00, 0xde,
+    0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, 0x00, 0x26, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x00, 0xb1
 };
 
-			
-unsigned char tableb0[64] = {	
-	// x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
-	0x00, 0x00, 0x00, 0x5e, 0x00, 0x00, 0x00, 0x44, 0x00, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x81,
-	0x00, 0x00, 0x00, 0x85, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x32,
-	0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00, 0xb2, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0xb2, 0x00, 0x00, 0x00, 0xe4, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x5b
+
+unsigned char tableb0[64] = {
+    // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
+    0x00, 0x00, 0x00, 0x5e, 0x00, 0x00, 0x00, 0x44, 0x00, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x81,
+    0x00, 0x00, 0x00, 0x85, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x32,
+    0x00, 0x00, 0x00, 0x76, 0x00, 0x00, 0x00, 0xb2, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0xb2, 0x00, 0x00, 0x00, 0xe4, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x5b
 };
 
-unsigned char tableb7[64] = {	
-	// x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
-	0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x00, 0x00, 0xd7,
-	0x00, 0x00, 0x00, 0xe7, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x82,
-	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xa2, 0x00, 0x00, 0x00, 0xb4, 0x00, 0x00, 0x00, 0x26,
-	0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x9d, 0x00, 0x00, 0x00, 0x33
+unsigned char tableb7[64] = {
+    // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
+    0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0xe0, 0x00, 0x00, 0x00, 0xd7,
+    0x00, 0x00, 0x00, 0xe7, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x82,
+    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xa2, 0x00, 0x00, 0x00, 0xb4, 0x00, 0x00, 0x00, 0x26,
+    0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x9d, 0x00, 0x00, 0x00, 0x33
 };
 
-unsigned char tablebb[64] = {	
-	// x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
-	0x00, 0x00, 0x00, 0x62, 0x00, 0x00, 0x00, 0x4a, 0x00, 0x00, 0x00, 0xf8, 0x00, 0x00, 0x00, 0x3d,
-	0x00, 0x00, 0x00, 0xec, 0x00, 0x00, 0x00, 0x99, 0x00, 0x00, 0x00, 0xa0, 0x00, 0x00, 0x00, 0x69,
-	0x00, 0x00, 0x00, 0xeb, 0x00, 0x00, 0x00, 0x6f, 0x00, 0x00, 0x00, 0x97, 0x00, 0x00, 0x00, 0x9e,
-	0x00, 0x00, 0x00, 0xe1, 0x00, 0x00, 0x00, 0x9f, 0x00, 0x00, 0x00, 0xfd, 0x00, 0x00, 0x00, 0x4d
+unsigned char tablebb[64] = {
+    // x     x     x    ok     x     x     x    ok     x     x     x    ok     x     x     x    ok
+    0x00, 0x00, 0x00, 0x62, 0x00, 0x00, 0x00, 0x4a, 0x00, 0x00, 0x00, 0xf8, 0x00, 0x00, 0x00, 0x3d,
+    0x00, 0x00, 0x00, 0xec, 0x00, 0x00, 0x00, 0x99, 0x00, 0x00, 0x00, 0xa0, 0x00, 0x00, 0x00, 0x69,
+    0x00, 0x00, 0x00, 0xeb, 0x00, 0x00, 0x00, 0x6f, 0x00, 0x00, 0x00, 0x97, 0x00, 0x00, 0x00, 0x9e,
+    0x00, 0x00, 0x00, 0xe1, 0x00, 0x00, 0x00, 0x9f, 0x00, 0x00, 0x00, 0xfd, 0x00, 0x00, 0x00, 0x4d
 };
 */
 
@@ -3727,67 +3727,67 @@ static UINT16 calc3_database;
 int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 	UINT8* rom = memory_region(machine,"cpu1");
-	UINT8 numregions; 
+	UINT8 numregions;
 	UINT16 length;
 	int x;
 	int offset = 0;
 	numregions = rom[offset+0];
-	
+
 	if (tabnum > numregions)
 	{
 		printf("CALC3 error, requested table > num tables!\n");
 		return 0;
 	}
-	
+
 	rom++;
-	
+
 	// scan through the linked list to find the start of the requested table info
 	for (x=0;x<tabnum;x++)
 	{
-		UINT8 blocksize_offset = rom[offset+0]; // location of the 'block length'	
+		UINT8 blocksize_offset = rom[offset+0]; // location of the 'block length'
 		offset+= blocksize_offset+1;
 		length = rom[offset+0] | (rom[offset+1]<<8);
-		offset+=length+2;				
+		offset+=length+2;
 	}
 
 	// we're at the start of the block, get the info about it
-	{	
+	{
 		UINT16 inline_table_base = 0;
 		UINT16 inline_table_size = 0;
 		calc3_database = offset;
-		calc3_blocksize_offset =    rom[offset+0]; // location of the 'block length'	
+		calc3_blocksize_offset =    rom[offset+0]; // location of the 'block length'
 		calc3_mode =                rom[offset+1];
 		calc3_unknown =             rom[offset+2];
 		calc3_decryption_key_byte = rom[offset+3];
 
-		
+
 		// if blocksize_offset > 3, it appears to specify the encryption table as 'inline' which can be of any size (odd or even) and loops over the bytes to decrypt
 		// the decryption key specified seems to be ignored?
 		if (calc3_blocksize_offset>3)
-		{	
+		{
 			inline_table_base = offset+4;
 			inline_table_size = calc3_blocksize_offset-3;
 		}
-	
+
 		offset+= calc3_blocksize_offset+1;
 		length = rom[offset+0] | (rom[offset+1]<<8);
 		offset+=2;
-		
+
 		if (inline_table_size)
 		{
 			printf("Block %02x Found Base %04x - Inline Encryption (size %02x) - Mode? %02x Unknown %02x Key (unused?) %02x Length %04x\n", tabnum, calc3_database, inline_table_size, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);
 		}
 		else
 		{
-			printf("Block %02x Found Base %04x - Mode? %02x Unknown %02x Key (unused?) %02x Length %04x\n", tabnum, calc3_database, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);	
+			printf("Block %02x Found Base %04x - Mode? %02x Unknown %02x Key (unused?) %02x Length %04x\n", tabnum, calc3_database, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);
 		}
-		
-		
+
+
 		// copy + decrypt the table to the specified memory area
 		if (dstram)
 		{
 			int i;
-			
+
 			if (length==0x00)
 			{
 				// shogwarr does this with 'mode' as 0x08, which probably has some special meaning
@@ -3801,19 +3801,19 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 					UINT8 dat = rom[offset+i];
 					dat -= rom[inline_table_base + (i%inline_table_size)];
 					dstram[(dstoffset+i)^1] = dat;
-				}		
+				}
 			}
 			else
 			{
 				UINT8* table = calc3_table00;
-				
+
 				// 0x00 seems to have no 'encryption'
 				if (calc3_decryption_key_byte == 0x00) table = calc3_table00;
-	
+
 				// currently only handle 2 of the formats :-(
 				if (calc3_decryption_key_byte == 0x01) table = calc3_table01;
 				if (calc3_decryption_key_byte == 0x15) table = calc3_table15;
-			
+
 				for (i=0;i<length;i++)
 				{
 					UINT8 dat = rom[offset+i];
@@ -3822,12 +3822,12 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				}
 			}
 		}
-		
+
 		calc3_dataend = offset+length+1;
 	}
-	
+
 	//printf("data base %04x data end %04x\n", calc3_database, calc3_dataend);
-	
+
 	return length;
 
 }
@@ -3840,7 +3840,7 @@ static UINT8 calc3_blocksize_offset;
 DRIVER_INIT( calc3 )
 {
 	UINT8* rom = memory_region(machine,"cpu1");
-	UINT8 numregions; 
+	UINT8 numregions;
 
 	int x;
 
@@ -3851,48 +3851,48 @@ DRIVER_INIT( calc3 )
 	}
 	printf("crc %04x\n",calc3_mcu_crc);
 	numregions = rom[0];
-	
+
 	for (x=0;x<numregions;x++)
 	{
 		UINT8* tmpdstram = malloc(0x2000);
 		int length;
 		memset(tmpdstram, 0x00,0x2000);
 		length = calc3_decompress_table(machine, x, tmpdstram, 0);
-		
+
 		// dump to file
 		if (length)
 		{
 			FILE *fp;
 			char filename[256];
-			
+
 			if (calc3_blocksize_offset==3)
-			{	
+			{
 				sprintf(filename,"data_%s_table_%04x k%02x m%02x u%02x length %04x",
 						machine->gamedrv->name,
-						x, calc3_decryption_key_byte, calc3_mode, calc3_unknown, length);	
+						x, calc3_decryption_key_byte, calc3_mode, calc3_unknown, length);
 			}
 			else
 			{
 				sprintf(filename,"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
 					machine->gamedrv->name,
-					x, calc3_decryption_key_byte, calc3_blocksize_offset-3, calc3_mode, calc3_unknown, length);			
+					x, calc3_decryption_key_byte, calc3_blocksize_offset-3, calc3_mode, calc3_unknown, length);
 			}
-			
+
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{
 				fwrite(tmpdstram, length, 1, fp);
 				fclose(fp);
 			}
-		}	
+		}
 
 		free(tmpdstram);
 	}
-	
+
 	// there is also a 0x1000 block of data at the end.. same on both games, maybe it's related to the decryption tables??
 	// the calc3_dataend points to the data after the last block processed, as we process all the blocks in the above loop, we assume this points
 	// to that extra block of data
-	
+
 	// dump out the 0x1000 sized block at the end
 	{
 		FILE *fp;

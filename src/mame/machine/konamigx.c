@@ -305,8 +305,8 @@ void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rec
     pri     : 0 = topmost, 255 = backmost (pixel priority)
 */
 
-INLINE void zdrawgfxzoom32GP( 
-		bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, 
+INLINE void zdrawgfxzoom32GP(
+		bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {

@@ -1250,7 +1250,7 @@ static void HC11OP(cmpb_indy)(hc11_state *cpustate)
 }
 
 
-/* COMA		         , 0x43 */
+/* COMA              , 0x43 */
 static void HC11OP(coma)(hc11_state *cpustate)
 {
 	UINT16 r = 0xff - REG_A;
@@ -1263,7 +1263,7 @@ static void HC11OP(coma)(hc11_state *cpustate)
 }
 
 
-/* COMB		         , 0x53 */
+/* COMB              , 0x53 */
 static void HC11OP(comb)(hc11_state *cpustate)
 {
 	UINT16 r = 0xff - REG_B;
@@ -2656,7 +2656,7 @@ static void HC11OP(sba)(hc11_state *cpustate)
 {
 	UINT16 r = REG_A - REG_B;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, REG_B, REG_A);
@@ -2673,7 +2673,7 @@ static void HC11OP(sbca_imm)(hc11_state *cpustate)
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = (REG_A - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_A);
+//  SET_H(r, i-c, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_A);
@@ -2690,7 +2690,7 @@ static void HC11OP(sbca_indx)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
 	UINT16 r = (REG_A - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_A);
+//  SET_H(r, i-c, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_A);
@@ -2707,7 +2707,7 @@ static void HC11OP(sbca_indy)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->iy + offset);
 	UINT16 r = (REG_A - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_A);
+//  SET_H(r, i-c, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_A);
@@ -2723,7 +2723,7 @@ static void HC11OP(sbcb_imm)(hc11_state *cpustate)
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = (REG_B - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_B);
+//  SET_H(r, i-c, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_B);
@@ -2740,7 +2740,7 @@ static void HC11OP(sbcb_indx)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
 	UINT16 r = (REG_B - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_B);
+//  SET_H(r, i-c, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_B);
@@ -2757,7 +2757,7 @@ static void HC11OP(sbcb_indy)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->iy + offset);
 	UINT16 r = (REG_B - i) - c;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i-c, REG_B);
+//  SET_H(r, i-c, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i-c, REG_B);
@@ -3030,7 +3030,7 @@ static void HC11OP(suba_imm)(hc11_state *cpustate)
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = REG_A - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -3047,7 +3047,7 @@ static void HC11OP(suba_dir)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, d);
 	UINT16 r = REG_A - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -3064,7 +3064,7 @@ static void HC11OP(suba_ext)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, adr);
 	UINT16 r = REG_A - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -3081,7 +3081,7 @@ static void HC11OP(suba_indx)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->ix + adr);
 	UINT16 r = REG_A - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -3098,7 +3098,7 @@ static void HC11OP(suba_indy)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->iy + adr);
 	UINT16 r = REG_A - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_A);
+//  SET_H(r, i, REG_A);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_A);
@@ -3114,7 +3114,7 @@ static void HC11OP(subb_imm)(hc11_state *cpustate)
 	UINT8 i = FETCH(cpustate);
 	UINT16 r = REG_B - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_B);
+//  SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -3131,7 +3131,7 @@ static void HC11OP(subb_dir)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, d);
 	UINT16 r = REG_B - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_B);
+//  SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -3148,7 +3148,7 @@ static void HC11OP(subb_ext)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, adr);
 	UINT16 r = REG_B - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_B);
+//  SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -3165,7 +3165,7 @@ static void HC11OP(subb_indx)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->ix + adr);
 	UINT16 r = REG_B - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_B);
+//  SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -3181,7 +3181,7 @@ static void HC11OP(subb_indy)(hc11_state *cpustate)
 	UINT8 i = READ8(cpustate, cpustate->iy + adr);
 	UINT16 r = REG_B - i;
 	CLEAR_NZVC(cpustate);
-//	SET_H(r, i, REG_B);
+//  SET_H(r, i, REG_B);
 	SET_N8(r);
 	SET_Z8(r);
 	SET_V_SUB8(r, i, REG_B);
@@ -3282,12 +3282,12 @@ static void HC11OP(tba)(hc11_state *cpustate)
 /* TEST              0x00 */
 static void HC11OP(test)(hc11_state *cpustate)
 {
-//	if(cpustate->test_mode)
+//  if(cpustate->test_mode)
 		SET_PC(cpustate, cpustate->ppc); // Note: docs says "incremented" but the behaviour makes me think that's actually "decremented".
-//	else
-//	{
-//		TODO: execute an illegal opcode exception here (NMI)
-//	}
+//  else
+//  {
+//      TODO: execute an illegal opcode exception here (NMI)
+//  }
 
 	CYCLES(cpustate, 1);
 }

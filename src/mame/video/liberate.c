@@ -85,7 +85,7 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 	/* TODO: bits 0-3 are used and there's an unimplemented per-tile flip y / +0x10 tile banking, understand where. */
 
 	tile = (prosport_bg_vram[tile_index] & 0xf0)>>4;
-//	if(!(tile & 0x08)) { tile+=0x10; }
+//  if(!(tile & 0x08)) { tile+=0x10; }
 	tile+= deco16_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
 	SET_TILE_INFO(8, tile, 0, 0);

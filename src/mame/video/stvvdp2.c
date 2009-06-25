@@ -2392,7 +2392,7 @@ INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
 
 }
 
-static void stv_vdp2_drawgfxzoom( 
+static void stv_vdp2_drawgfxzoom(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,int scalex, int scaley,
