@@ -1,14 +1,23 @@
-/* Taito Midnight Landing
-  Dual 68k + 2xZ80
-  no other hardware info..but it doesn't seem related to taitoair.c at all
+/***********************************************************************************************************
 
-	TODO:
-	- Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
-	- Comms between the four CPUs;
-	- understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu (this might need a side-by-side);
-	- Inputs, particularly needed for a game like this one;
-	- Needs a custom artwork for the cloche status;
-*/
+Midnight Landing (c) 1987 Taito Corporation
+
+driver by Tomasz Slanina, Phil Bennett & Angelo Salese, based on early work by David Haywood
+
+Dual 68k + 2xZ80
+no other hardware info..but it doesn't seem related to taitoair.c at all
+
+TODO:
+- Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
+- Comms between the four CPUs;
+- understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu
+  (this might need a side-by-side);
+- Gameplay looks stiff;
+- Needs a custom artwork for the cloche status;
+- Sound is nowhere near to be perfect;
+- clean-ups!
+
+************************************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -20,38 +29,167 @@
 
 
 static UINT16 * ml_tileram;
-static UINT16 * ml_spriteram;
+static UINT16 *g_ram;
 static UINT16 * ml_dotram;
-static bitmap_t *ml_bitmap[8];
-#define ML_CHARS 0x2000
+static UINT16 *dma_ram;
 static int status_bit;
 static int adpcm_pos;
 static int adpcm_data;
 static UINT8 pal_fg_bank;
+static int dma_active;
 
-
-static const gfx_layout tiles8x8_layout =
+static VIDEO_START(mlanding)
 {
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 16, 24, 0, 8 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
+}
+
+// 000: ???????
+// 256: Cockpit
+// 512: control centre screen
+// 768: plane landing sequence
+static VIDEO_UPDATE(mlanding)
+{
+	int x, y;
+
+	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	{
+		UINT16 *src = &g_ram[y * 512/2 + cliprect->min_x];
+		UINT16 *dst = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
+
+		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
+		{
+			UINT16 srcpix = *src++;
+
+			*dst++ = screen->machine->pens[256 + (srcpix & 0xff)+(pal_fg_bank << 8)];
+			*dst++ = screen->machine->pens[256 + (srcpix >> 8)+(pal_fg_bank << 8)];
+		}
+	}
+	return 0;
+}
+
+/* Return the number of pixels processed for timing purposes? */
+int start_dma(void)
+{
+	/* Traverse the DMA RAM list */
+	int offs;
+
+	for (offs = 0; offs < 0x2000; offs +=4)
+	{
+		UINT16 code;
+		UINT16 x;
+		UINT16 y;
+		UINT16 colour;
+		UINT16 dx;
+		UINT16 dy;
+
+		int j, k;
+
+		UINT16 attr = dma_ram[offs];
+
+		if (attr == 0)
+			continue;
+
+		x = dma_ram[offs + 1];
+		y = dma_ram[offs + 2];
+		colour = dma_ram[offs + 3];//|(pal_fg_bank & 1 ? 0x20 : 0x10);
+
+		dx = x >> 11;
+		dy = y >> 11;
+		dx &= 0x1f;
+		dy &= 0x1f;
+		dx++;
+		dy++;
+
+		x &= 0x1ff;
+		y &= 0x1ff;
+
+#if 0
+		printf("OFFS: %.8x\n", offs*2);
+		printf("CODE: %.4x %s\n", attr, ~attr & 0x8000 ? "TRANS" : "    ");
+		printf("X   : %.3d\n", x);
+		printf("Y   : %.3d\n", y);
+		printf("DX  : %.3d (%d)\n", dx, dx*8);
+		printf("DY  : %.3d (%d)\n", dy, dx*8);
+		printf("COL : %.4x\n", colour);
+#endif
+
+		code = attr & 0x1fff;
+
+		if (code)
+		{
+			for(j = 0; j < dx; j++)
+			{
+				for(k = 0; k < dy; k++)
+				{
+					int x1, y1;
+
+					// Draw the 8x8 chunk
+					for (y1 = 0; y1 < 8; ++y1)
+					{
+						UINT16 *src = &ml_tileram[(code * 2 * 8) + y1*2];
+						UINT16 *dst = &g_ram[(y + k*8+y1)*512/2 + (j*8+x)/2];
+
+						UINT8 p2 = *src & 0xff;
+						UINT8 p1 = *src++ >> 8;
+						UINT8 p4 = *src;
+						UINT8 p3 = *src++ >> 8;
+
+						// DRAW 8 pixels
+						for (x1 = 0; x1 < 8; x1++)
+						{
+							UINT16 pix1, pix2;
+
+							pix1 = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
+							x1++;
+							pix2 = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
+
+							if (~attr & 0x8000)
+							{
+								if (pix1)
+									*dst = (*dst & 0xff00) | ((colour << 4) | pix1);
+								if (pix2)
+									*dst = (*dst & 0x00ff) | (((colour << 4) | pix2) << 8);
+							}
+							else
+							{
+								*dst = (((colour << 4) | pix2) << 8) | ((colour << 4) | pix1);
+							}
+
+							dst++;
+						}
+					}
+					code++;
+				}
+			}
+		}
+		else
+		{
+			int y1;
+			UINT16 clear_colour = (colour << 12) | (colour << 4);
+
+			for(y1 = 0; y1 < dy*8; y1++)
+			{
+				int x1;
+				UINT16 *dst = &g_ram[((y + y1) * 512/2) + x/2];
+
+				for(x1 = 0; x1 < dx*8; x1+=2)
+				{
+					*dst++ = clear_colour;
+				}
+			}
+		}
+	}
+	return 1;
+}
 
 static WRITE16_HANDLER(ml_tileram_w)
 {
 	COMBINE_DATA(&ml_tileram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[0], offset>>4);
 }
 
 static READ16_HANDLER(ml_tileram_r)
 {
 	return ml_tileram[offset];
 }
-
 
 
 static READ16_HANDLER( io1_r ) //240006
@@ -65,9 +203,9 @@ static READ16_HANDLER( io1_r ) //240006
     x                 - video status
         other bits = language(german, japan, english), video test
     */
+// multiplexed? or just overriden?
 
-	int retval= (status_bit|1|0x07fff);
-	status_bit=0x8000;
+	int retval = (dma_active << 15) | (input_port_read(space->machine, "DSW") & 0x7ffe) | 1;
 	return retval;
 }
 
@@ -121,9 +259,24 @@ static WRITE8_DEVICE_HANDLER( ml_msm5205_stop_w )
 	adpcm_pos &= 0xff00;
 }
 
+static TIMER_CALLBACK( dma_complete )
+{
+	dma_active = 0;
+}
+
 /* TODO: this uses many bits */
 static WRITE16_HANDLER( ml_sub_reset_w )
 {
+	int pixels;
+
+	// Return the number of pixels drawn?
+	pixels = start_dma();
+
+	if (pixels)
+	{
+		dma_active = 1;
+		timer_set(space->machine, ATTOTIME_IN_MSEC(20), NULL, 0, dma_complete);
+	}
 	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
@@ -236,18 +389,22 @@ static READ16_HANDLER( ml_analog3_msb_r )
 	return ((input_port_read(space->machine, "STICKX") & 0xf00)>>8) | res;
 }
 
+static WRITE16_HANDLER( ml_nmi_to_sound_w )
+{
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(&g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(&ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM AM_BASE(&ml_spriteram)
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_BASE(&dma_ram)
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITENOP //sound reset ??
+	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
 
 	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
@@ -277,7 +434,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( ml_sub_kludge_r )
 {
 	/* bit 15 == status bit? */
-	return 0;
+	return dma_active<<15;
 }
 
 static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -316,106 +473,57 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9803) AM_RAM
 ADDRESS_MAP_END
 
-static VIDEO_START(mlanding)
-{
-	int i;
-
-	gfx_element_set_source(machine->gfx[0], (UINT8 *) ml_tileram);
-
-	for	(i=0;i<8;i++)
-		ml_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-}
-
-static VIDEO_UPDATE(mlanding)
-{
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-
-//	popmessage("%02x",test);
-
-	{
-		int i,dx,dy,j,k,num;
-		for(i=0;i<0x1000;i+=4)
-		{
-			int x,y,code,color;
-			code=ml_spriteram[i] & 0x1fff;
-			x=ml_spriteram[i+1];
-			y=ml_spriteram[i+2];
-			color=(ml_spriteram[i+3] & 0xf)|(pal_fg_bank ? 0x20 : 0x10); //TODO: this will be simplified in the end...
-
-			color&=0x3f;
-
-			dx=x>>11;
-			dy=y>>11;
-			dx&=0x1f;
-			dy&=0x1f;
-			dx++;
-			dy++;
-
-			x&=0x1ff;
-			y&=0x1ff;
-
-			num=code>>14;
-			code&=0x1fff;
-
-
-			for(j=0;j<dx;j++)
-			{
-				for(k=0;k<dy;k++)
-				{
-				//test
-					if(code)
-					{
-						drawgfx_opaque(ml_bitmap[num],cliprect,screen->machine->gfx[0],
-							code++,
-							color,
-							0,0,
-							x+j*8,y+k*8);
-					}
-					else
-					{
-						 int xx,yy;
-						 for(yy=0;yy<8;yy++)
-						 	for(xx=0;xx<8;xx++)
-							{
-								*BITMAP_ADDR16(ml_bitmap[num], y+yy+k*8, x+xx+j*8) = 0; //test only .. ugly
-							}
-					}
-				}
-			}
-		}
-	}
-
-	{
-		int i;
-		for(i=0;i<7;i++)
-		{
-			copybitmap_trans(bitmap,ml_bitmap[i], 0, 0, 0, 0, cliprect, 0);
-		}
-	}
-	status_bit=0; //FIXME: emulation variable in VIDEO_UPDATE()
-	{
-	/*  int i;
-        for(i=0;i<0x8000;i++)
-        {
-            *BITMAP_ADDR16(bitmap, 156+( ml_unk[i]>>8), ml_unk[i]&0xff) = 0x207;
-        }
-        */
-	}
-	/*
-	0x810 - Y value
-	0x812 - Z value
-	0x814 - End marker?
-	*/
-	popmessage("%04x %04x %04x %04x|%04x %04x %04x %04x|%04x %04x %04x",ml_dotram[0x800/2],ml_dotram[0x802/2],ml_dotram[0x804/2],ml_dotram[0x806/2],
-	                    ml_dotram[0x808/2],ml_dotram[0x80a/2],ml_dotram[0x80c/2],ml_dotram[0x80e/2],
-	                    ml_dotram[0x810/2],ml_dotram[0x812/2],ml_dotram[0x814/2]);
-
-//	popmessage("%04x %04x %04x",input_port_read(screen->machine, "STICKX"),input_port_read(screen->machine, "STICKY"),input_port_read(screen->machine, "STICKZ"));
-	return 0;
-}
-
-
 static INPUT_PORTS_START( mlanding )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "$2000-0")
+	PORT_DIPSETTING(	0x01, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x02, 0x02, "$2000-1")
+	PORT_DIPSETTING(	0x02, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x04, 0x04, "Test Mode")
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "$2000-3")
+	PORT_DIPSETTING(	0x08, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x10, 0x10, "$2000-4")
+	PORT_DIPSETTING(	0x10, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x20, 0x20, "$2000-5")
+	PORT_DIPSETTING(	0x20, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x40, 0x40, "$2000-6")
+	PORT_DIPSETTING(	0x40, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x80, 0x80, "$2000-7")
+	PORT_DIPSETTING(	0x80, "H" )
+	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x0100, 0x0100, "$2000-0")
+	PORT_DIPSETTING(	0x0100, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x0200, 0x0200, "$2000-1")
+	PORT_DIPSETTING(	0x0200, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(	0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "$2000-3")
+	PORT_DIPSETTING(	0x0800, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Test Mode 2")
+	PORT_DIPSETTING(	0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "$2000-5")
+	PORT_DIPSETTING(	0x2000, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x4000, 0x4000, "$2000-6")
+	PORT_DIPSETTING(	0x4000, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x8000, 0x8000, "$2000-7")
+	PORT_DIPSETTING(	0x8000, "H" )
+	PORT_DIPSETTING(	0x0000, "L" )
+
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -504,10 +612,6 @@ static void irq_handler(const device_config *device, int irq)
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static GFXDECODE_START( mlanding )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16*16 )
-GFXDECODE_END
-
 static const msm5205_interface msm5205_config =
 {
 	ml_msm5205_vck,	/* VCK function */
@@ -523,6 +627,7 @@ static const ym2151_interface ym2151_config =
 static MACHINE_RESET( mlanding )
 {
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	status_bit = 0;
 	adpcm_pos = 0;
 	adpcm_data = -1;
@@ -556,7 +661,6 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 14*8, 511)
 
-	MDRV_GFXDECODE(mlanding)
 	MDRV_PALETTE_LENGTH(512*16)
 
 	MDRV_VIDEO_START(mlanding)
