@@ -94,11 +94,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (y > 240)
 			y = y - 256;
 
-		drawgfx(sprite_bitmap,machine->gfx[1],
+		drawgfx_transmask(sprite_bitmap,cliprect, machine->gfx[1],
 				code, color,
 				ikki_flipscreen,ikki_flipscreen,
 				x,y,
-				cliprect, TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 
@@ -177,12 +176,11 @@ VIDEO_UPDATE( ikki )
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 			videoram[offs*2+1] + bank,
 			color,
 			ikki_flipscreen,ikki_flipscreen,
-			x,y,
-			cliprect,TRANSPARENCY_NONE,0);
+			x,y);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -213,12 +211,11 @@ VIDEO_UPDATE( ikki )
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				videoram[offs*2+1] + bank,
 				color,
 				ikki_flipscreen,ikki_flipscreen,
-				x,y,
-				cliprect,TRANSPARENCY_NONE,0);
+				x,y);
 		}
 	}
 

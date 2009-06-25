@@ -269,7 +269,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 

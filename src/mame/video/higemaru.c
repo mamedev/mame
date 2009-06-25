@@ -122,20 +122,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx,sy,15);
 
 		/* draw again with wraparound */
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				col,
 				flipx,flipy,
-				sx - 256,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx - 256,sy,15);
 	}
 }
 

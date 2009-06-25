@@ -116,12 +116,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 
 			if (color)
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					tile,
 					color,
 					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
+					mx,my,0);
 
 			if (flipscreen)
 				my=(my-16)&0x1ff;
@@ -257,12 +256,11 @@ static void draw_sprites_V(running_machine *machine, bitmap_t *bitmap, const rec
 			}
 
 			if (color)
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					tile,
 					color,
 					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
+					mx,my,0);
 
 			if (flipscreen)
 				my=(my-16)&0x1ff;
@@ -350,8 +348,7 @@ static void draw_sprites_I(running_machine *machine, bitmap_t *bitmap, const rec
 			fy = data & 0x4000;
 			color = color_prom[tile<<1|data>>15];
 
-			drawgfx(bitmap, gfx, tile, color, 0, fy, mx, my,
-					cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, tile, color, 0, fy, mx, my, 0);
 
 			my = (my + 8) & 0xff;
 		}
@@ -473,8 +470,7 @@ static void kyros_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 					tile = (data>>3 & 0x400) | (data & 0x3ff);
 					alpha68k_video_banking(&bank, data);
-					drawgfx(bitmap, machine->gfx[bank], tile, color, fx, fy, mx, my,
-							cliprect, TRANSPARENCY_PEN, 0);
+					drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], tile, color, fx, fy, mx, my, 0);
 				}
 			}
 //ZT
@@ -532,8 +528,7 @@ static void sstingry_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				color = (data>>7 & 0x18) | (data>>13 & 7);
 				tile = data & 0x3ff;
 				bank = data>>10 & 3;
-				drawgfx(bitmap, machine->gfx[bank], tile, color, fx, fy, mx, my,
-						cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], tile, color, fx, fy, mx, my, 0);
 			}
 //ZT
 			if(flipscreen)

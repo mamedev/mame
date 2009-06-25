@@ -515,12 +515,11 @@ static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *
 					b=1;
 				}
 			}
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				tile+(bank+bank2)*128,
 				0,
 				0, 0,
-				x*8,y*8,
-				cliprect,TRANSPARENCY_PEN,0);
+				x*8,y*8,0);
 		}
 	}
 }

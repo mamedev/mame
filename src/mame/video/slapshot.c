@@ -410,13 +410,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			}
 			else
 			{
-				drawgfxzoom(bitmap,machine->gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
 						sprite_ptr->x,sprite_ptr->y,
-						cliprect,TRANSPARENCY_PEN,0,
-						sprite_ptr->zoomx,sprite_ptr->zoomy);
+						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
 			}
 		}
 	}
@@ -427,14 +426,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,machine->gfx[0],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				cliprect,TRANSPARENCY_PEN,0,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				sprite_ptr->primask);
+				priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 

@@ -85,7 +85,7 @@ static void himesiki_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				y -= 0x100;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],code,col,fx,fy,x,y,cliprect,TRANSPARENCY_PEN,15);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,col,fx,fy,x,y,15);
 	}
 
 	for (offs = 0; offs<0x100; offs+=4)
@@ -114,7 +114,7 @@ static void himesiki_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		if (y > 0xf0)
 			y -= 0x100;
 
-		drawgfx(bitmap,machine->gfx[2],code,col,f,f,x,y,cliprect,TRANSPARENCY_PEN,15);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],code,col,f,f,x,y,15);
 	}
 }
 

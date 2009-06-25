@@ -46,20 +46,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 			for (chain_pos = chain;chain_pos >= 0;chain_pos--)
 			{
-				drawgfx(bitmap, machine->gfx[0],
+				drawgfx_transpen(bitmap, cliprect,machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
-						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0);
+						curx,cury,0);
 
 				/* wrap around y */
-				drawgfx(bitmap, machine->gfx[0],
+				drawgfx_transpen(bitmap, cliprect,machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
-						curx,cury+256,
-						cliprect,TRANSPARENCY_PEN,0);
+						curx,cury+256,0);
 
 				code++;
 

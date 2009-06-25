@@ -164,15 +164,14 @@ static void draw_ship(running_machine *machine, bitmap_t* bitmap, const rectangl
 
 	int chop = (scaler[wolfpack_ship_size >> 2] * wolfpack_ship_h_precess) >> 16;
 
-	drawgfxzoom(bitmap, machine->gfx[1],
+	drawgfxzoom_transpen(bitmap, cliprect,
+		machine->gfx[1],
 		wolfpack_ship_pic,
 		0,
 		wolfpack_ship_reflect, 0,
 		2 * (wolfpack_ship_h - chop),
 		128,
-		cliprect,
-		TRANSPARENCY_PEN, 0,
-		2 * scaler[wolfpack_ship_size >> 2], scaler[wolfpack_ship_size >> 2]);
+		2 * scaler[wolfpack_ship_size >> 2], scaler[wolfpack_ship_size >> 2], 0);
 }
 
 
@@ -183,14 +182,13 @@ static void draw_torpedo(running_machine *machine, bitmap_t* bitmap, const recta
 	int x;
 	int y;
 
-	drawgfx(bitmap, machine->gfx[3],
+	drawgfx_transpen(bitmap, cliprect,
+		machine->gfx[3],
 		wolfpack_torpedo_pic,
 		0,
 		0, 0,
 		2 * (244 - wolfpack_torpedo_h),
-		224 - wolfpack_torpedo_v,
-		cliprect,
-		TRANSPARENCY_PEN, 0);
+		224 - wolfpack_torpedo_v, 0);
 
 	for (y = 16; y < 224 - wolfpack_torpedo_v; y++)
 	{
@@ -220,23 +218,21 @@ static void draw_pt(running_machine *machine, bitmap_t* bitmap, const rectangle*
 	if (!(wolfpack_pt_pic & 0x10))
 		rect.max_x = 255;
 
-	drawgfx(bitmap, machine->gfx[2],
+	drawgfx_transpen(bitmap, &rect,
+		machine->gfx[2],
 		wolfpack_pt_pic,
 		0,
 		0, 0,
 		2 * wolfpack_pt_horz,
-		wolfpack_pt_pos_select ? 0x70 : 0xA0,
-		&rect,
-		TRANSPARENCY_PEN, 0);
+		wolfpack_pt_pos_select ? 0x70 : 0xA0, 0);
 
-	drawgfx(bitmap, machine->gfx[2],
+	drawgfx_transpen(bitmap, &rect,
+		machine->gfx[2],
 		wolfpack_pt_pic,
 		0,
 		0, 0,
 		2 * wolfpack_pt_horz - 512,
-		wolfpack_pt_pos_select ? 0x70 : 0xA0,
-		&rect,
-		TRANSPARENCY_PEN, 0);
+		wolfpack_pt_pos_select ? 0x70 : 0xA0, 0);
 }
 
 
@@ -283,14 +279,13 @@ VIDEO_UPDATE( wolfpack )
 		{
 			int code = wolfpack_alpha_num_ram[32 * i + j];
 
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_opaque(bitmap, cliprect,
+				screen->machine->gfx[0],
 				code,
 				wolfpack_video_invert,
 				0, 0,
 				16 * j,
-				192 + 8 * i,
-				cliprect,
-				TRANSPARENCY_NONE, 0);
+				192 + 8 * i);
 		}
 
 	draw_pt(screen->machine, bitmap, cliprect);

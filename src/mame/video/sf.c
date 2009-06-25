@@ -172,34 +172,30 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				t = c2; c2 = c4; c4 = t;
 			}
 
-			drawgfx(bitmap,
-					machine->gfx[2],
+			drawgfx_transpen(bitmap,
+					cliprect, machine->gfx[2],
 					sf_invert(c1),
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					machine->gfx[2],
+					sx,sy, 15);
+			drawgfx_transpen(bitmap,
+					cliprect, machine->gfx[2],
 					sf_invert(c2),
 					color,
 					flipx,flipy,
-					sx+16,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					machine->gfx[2],
+					sx+16,sy, 15);
+			drawgfx_transpen(bitmap,
+					cliprect, machine->gfx[2],
 					sf_invert(c3),
 					color,
 					flipx,flipy,
-					sx,sy+16,
-					cliprect, TRANSPARENCY_PEN, 15);
-			drawgfx(bitmap,
-					machine->gfx[2],
+					sx,sy+16, 15);
+			drawgfx_transpen(bitmap,
+					cliprect, machine->gfx[2],
 					sf_invert(c4),
 					color,
 					flipx,flipy,
-					sx+16,sy+16,
-					cliprect, TRANSPARENCY_PEN, 15);
+					sx+16,sy+16, 15);
 		}
 		else
 		{
@@ -211,13 +207,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,
-					machine->gfx[2],
+			drawgfx_transpen(bitmap,
+					cliprect, machine->gfx[2],
 					sf_invert(c),
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect, TRANSPARENCY_PEN, 15);
+					sx,sy, 15);
 		}
 	}
 }

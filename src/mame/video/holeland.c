@@ -132,12 +132,11 @@ static void holeland_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				2*sx,2*sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				2*sx,2*sy,0);
 	}
 }
 
@@ -170,12 +169,11 @@ static void crzrally_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

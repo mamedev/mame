@@ -131,13 +131,12 @@ VIDEO_UPDATE( sprint2 )
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			get_sprite_code(i),
 			i,
 			0, 0,
 			get_sprite_x(i),
-			get_sprite_y(i),
-			cliprect, TRANSPARENCY_PEN, 0);
+			get_sprite_y(i), 0);
 	}
 	return 0;
 }
@@ -179,13 +178,12 @@ VIDEO_EOF( sprint2 )
 
 		tilemap_draw(helper, &rect, bg_tilemap, 0, 0);
 
-		drawgfx(helper, machine->gfx[1],
+		drawgfx_transpen(helper, &rect, machine->gfx[1],
 			get_sprite_code(i),
 			0,
 			0, 0,
 			get_sprite_x(i),
-			get_sprite_y(i),
-			&rect, TRANSPARENCY_PEN, 1);
+			get_sprite_y(i), 1);
 
 		collision[i] |= collision_check(machine->colortable, &rect);
 
@@ -194,22 +192,20 @@ VIDEO_EOF( sprint2 )
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx(helper, machine->gfx[1],
+				drawgfx_transpen(helper, &rect, machine->gfx[1],
 					get_sprite_code(j),
 					1,
 					0, 0,
 					get_sprite_x(j),
-					get_sprite_y(j),
-					&rect, TRANSPARENCY_PEN, 0);
+					get_sprite_y(j), 0);
 			}
 
-		drawgfx(helper, machine->gfx[1],
+		drawgfx_transpen(helper, &rect, machine->gfx[1],
 			get_sprite_code(i),
 			0,
 			0, 0,
 			get_sprite_x(i),
-			get_sprite_y(i),
-			&rect, TRANSPARENCY_PEN, 1);
+			get_sprite_y(i), 1);
 
 		collision[i] |= collision_check(machine->colortable, &rect);
 	}

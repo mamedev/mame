@@ -215,12 +215,11 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 						if (flipy) dy = sy + sizey-15 - dy;
 						else dy = sy + dy;
 
-						drawgfx(rawbitmap,space->machine->gfx[0],
+						drawgfx_transpen(rawbitmap,&myclip,space->machine->gfx[0],
 								(tile & 0x0fff) | (code & 0xf000),
 								(tile >> 12) | (color & 0x70),
 								flipx,flipy,
-								dx,dy,
-								&myclip,TRANSPARENCY_PEN,15);
+								dx,dy,15);
 					}
 				}
 			}

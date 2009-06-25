@@ -86,12 +86,11 @@ VIDEO_UPDATE( bublbobl )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
-						x,y,
-						cliprect,TRANSPARENCY_PEN,15);
+						x,y,15);
 			}
 		}
 

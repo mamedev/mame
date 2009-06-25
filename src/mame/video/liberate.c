@@ -322,19 +322,17 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				sy2=sy+16;
 		}
 
-	    	drawgfx(bitmap,machine->gfx[1],
+	    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 	        		code,
 					color,
 					fx,fy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 	        if (multi)
-	    		drawgfx(bitmap,machine->gfx[1],
+	    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code+1,
 					color,
 					fx,fy,
-					sx,sy2,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy2,0);
 	}
 }
 
@@ -385,19 +383,17 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,machine->gfx[gfx_region],
+    	drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
         		code,
 				color,
 				fx,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
         if (multi)
-    		drawgfx(bitmap,machine->gfx[gfx_region],
+    		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
 				code2,
 				color,
 				fx,fy,
-				sx,sy2,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy2,0);
 	}
 }
 
@@ -443,19 +439,17 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,machine->gfx[1],
+    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
         		code,
 				color,
 				fx,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
         if (multi)
-    		drawgfx(bitmap,machine->gfx[1],
+    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code2,
 				color,
 				fx,fy,
-				sx,sy2,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy2,0);
 	}
 }
 
@@ -473,12 +467,11 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		fx = spriteram[offs+0] & 4;
 		fy = spriteram[offs+0] & 2;
 
-    	drawgfx(bitmap,machine->gfx[1],
+    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
         		code,
 				0,
 				fx,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 
@@ -532,9 +525,8 @@ VIDEO_UPDATE( prosport )
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx(bitmap,screen->machine->gfx[gfx_region],
-				tile,1,0,0,248-8*mx,8*my,
-				cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx_region],
+				tile,1,0,0,248-8*mx,8*my,0);
 	}
 
 	prosport_draw_sprites(screen->machine,bitmap,cliprect);

@@ -361,12 +361,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		pdrawgfx(bitmap,machine->gfx[0],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 		 		 code,
 				 color,
 				 flipx,0,
 				 sx + xoffset,sy + yoffset,
-				 cliprect,TRANSPARENCY_PEN,0,pri_masks[pri]);
+				 priority_bitmap,pri_masks[pri],0);
 	}
 }
 

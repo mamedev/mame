@@ -133,12 +133,11 @@ VIDEO_UPDATE( carjmbre )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,screen->machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 						spriteram[troffs+1],
 						spriteram[troffs+2]&0x07,
 						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 			}
 		}
 	}

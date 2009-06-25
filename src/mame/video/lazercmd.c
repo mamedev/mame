@@ -70,11 +70,10 @@ VIDEO_UPDATE( lazercmd )
 		sx *= HORZ_CHR;
 		sy *= VERT_CHR;
 
-		drawgfx(bitmap, screen->machine->gfx[0],
+		drawgfx_opaque(bitmap, cliprect,screen->machine->gfx[0],
 				videoram[i], video_inverted ? 1 : 0,
 				0,0,
-				sx,sy,
-				cliprect,TRANSPARENCY_NONE,0);
+				sx,sy);
 	}
 
 	x = marker_x - 1;             /* normal video lags marker by 1 pixel */

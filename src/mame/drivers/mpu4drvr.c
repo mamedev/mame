@@ -524,7 +524,7 @@ static VIDEO_UPDATE( mpu4_vid )
 			colattr = tiledat >>12;
 			tiledat &= 0x0fff;
 
-			drawgfx(bitmap,screen->machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8);
 
 			count++;
 		}
@@ -1625,7 +1625,7 @@ static VIDEO_UPDATE(dealem)
 		{
 			int tile = dealem_videoram[count + 0x1000] | (dealem_videoram[count] << 8);
 			count++;
-			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x * 8,y * 8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x * 8,y * 8);
 		}
 	}
 

@@ -225,10 +225,9 @@ static void splash_draw_sprites(running_machine *machine, bitmap_t *bitmap,const
 
 		if (attr2 & 0x80) sx += 256;
 
-		drawgfx(bitmap,gfx,number,
+		drawgfx_transpen(bitmap,cliprect,gfx,number,
 			0x10 + (attr2 & 0x0f),attr & 0x40,attr & 0x80,
-			sx-8,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx-8,sy,0);
 	}
 }
 
@@ -244,10 +243,9 @@ static void funystrp_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		int attr2 = splash_spriteram[i+0x400] >> splash_sprite_attr2_shift;
 		int number = (splash_spriteram[i] & 0xff) + (attr & 0xf)*256;
 
-		drawgfx(bitmap,gfx,number,
+		drawgfx_transpen(bitmap,cliprect,gfx,number,
 			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
-			sx-8,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx-8,sy,0);
 	}
 }
 

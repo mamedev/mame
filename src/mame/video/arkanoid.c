@@ -153,18 +153,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8) + 1024 * gfxbank;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),
-				cliprect,TRANSPARENCY_PEN,0);
-		drawgfx(bitmap,machine->gfx[0],
+				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code + 1,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

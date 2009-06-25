@@ -210,50 +210,44 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (spriteram[offs] & 0x10)	/* double height */
 			{
-				drawgfx(bitmap,machine->gfx[9],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code & ~1,
 						color,
 						flipscreen,flipscreen,
-						sx,flipscreen? sy + 16 : sy - 16,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[9],
+						sx,flipscreen? sy + 16 : sy - 16,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code | 1,
 						color,
 						flipscreen,flipscreen,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 
 				/* redraw with wraparound */
-				drawgfx(bitmap,machine->gfx[9],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code & ~1,
 						color,
 						flipscreen,flipscreen,
-						sx,(flipscreen? sy + 16 : sy - 16) + 256,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[9],
+						sx,(flipscreen? sy + 16 : sy - 16) + 256,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code | 1,
 						color,
 						flipscreen,flipscreen,
-						sx,sy + 256,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy + 256,0);
 
 			}
 			else
 			{
-				drawgfx(bitmap,machine->gfx[9],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code,
 						color,
 						flipscreen,flipscreen,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 
 				/* redraw with wraparound */
-				drawgfx(bitmap,machine->gfx[9],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[9],
 						code,
 						color,
 						flipscreen,flipscreen,
-						sx,sy + 256,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy + 256,0);
 
 			}
 			}

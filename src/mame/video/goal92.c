@@ -125,10 +125,9 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 		y = 256-(y+7);
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,15);
+				color,fx,fy,x,y,15);
 	}
 }
 

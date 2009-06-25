@@ -179,8 +179,9 @@ static TILE_GET_INFO( get_fg_tile_info )
  *
  *************************************/
 
-static void draw_sprites(mystston_state *state, gfx_element **gfx, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip)
 {
+	mystston_state *state = (mystston_state *)gfx->machine->driver_data;
 	int offs;
 
 	for (offs = 0; offs < 0x60; offs += 4)
@@ -204,7 +205,7 @@ static void draw_sprites(mystston_state *state, gfx_element **gfx, bitmap_t *bit
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, gfx[2],	code, color, flipx, flipy, x, y, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
 		}
 	}
 }
@@ -266,7 +267,7 @@ static VIDEO_UPDATE( mystston )
 	tilemap_set_flip(ALL_TILEMAPS, flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(state, screen->machine->gfx, bitmap, cliprect, flip);
+	draw_sprites(bitmap, cliprect, screen->machine->gfx[2], flip);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;

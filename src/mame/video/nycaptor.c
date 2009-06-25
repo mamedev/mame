@@ -166,22 +166,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
 			flipy = ((nycaptor_spriteram[offs+1]&0x80)>>7);
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code,
 					pal,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 
 			if(nycaptor_spriteram[offs+3]>240)
 			{
 				sx = (nycaptor_spriteram[offs+3]-256);
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
         				code,
 				        pal,
 				        flipx,flipy,
-					      sx,sy,
-					      cliprect,TRANSPARENCY_PEN,15);
+					      sx,sy,15);
 					}
 				}
 		}

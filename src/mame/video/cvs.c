@@ -235,11 +235,10 @@ VIDEO_UPDATE( cvs )
 
 		int gfxnum = (code < ram_based_char_start_indices[character_banking_mode]) ? 0 : 1;
 
-		drawgfx(background_bitmap, screen->machine->gfx[gfxnum],
+		drawgfx_opaque(background_bitmap, 0, screen->machine->gfx[gfxnum],
 				code, color,
 				0, 0,
-				x, y,
-				0, TRANSPARENCY_NONE, 0);
+				x, y);
 
 		/* foreground for collision detection */
 		if (color & 0x80)
@@ -252,11 +251,10 @@ VIDEO_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx(cvs_collision_background, screen->machine->gfx[gfxnum],
+		drawgfx_opaque(cvs_collision_background, 0, screen->machine->gfx[gfxnum],
 				code, collision_color,
 				0, 0,
-				x, y,
-				0, TRANSPARENCY_NONE, 0);
+				x, y);
 	}
 
 

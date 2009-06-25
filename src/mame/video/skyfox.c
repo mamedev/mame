@@ -199,12 +199,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 #define DRAW_SPRITE(DX,DY,CODE) \
-		drawgfx(bitmap,machine->gfx[0], \
+		drawgfx_transpen(bitmap,\
+				cliprect,machine->gfx[0], \
 				(CODE), \
 				0, \
 				flipx,flipy, \
-				x + (DX),y + (DY), \
-				cliprect,TRANSPARENCY_PEN, 0xff); \
+				x + (DX),y + (DY), 0xff); \
 
 		if (skyfox_bg_ctrl & 1)	// flipscreen
 		{

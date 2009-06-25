@@ -97,10 +97,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		ypos = (source[0] & 0x00ff) >> 0;
 		tileno = (source2[0] & 0x7ffe) >> 1;
 		xpos |=  (source2[0] & 0x0001) << 8;
-		drawgfx(bitmap,gfx, tileno,1,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,0);
-		drawgfx(bitmap,gfx, tileno,1,0,0,xpos,ypos-0x100,cliprect,TRANSPARENCY_PEN,0); // wrap
-		drawgfx(bitmap,gfx, tileno,1,0,0,xpos-0x200,ypos,cliprect,TRANSPARENCY_PEN,0); // wrap
-		drawgfx(bitmap,gfx, tileno,1,0,0,xpos-0x200,ypos-0x100,cliprect,TRANSPARENCY_PEN,0); // wrap
+		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos,ypos,0);
+		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos,ypos-0x100,0); // wrap
+		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos-0x200,ypos,0); // wrap
+		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos-0x200,ypos-0x100,0); // wrap
 
 		source++;source2++;
 	}

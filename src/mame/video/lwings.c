@@ -211,11 +211,10 @@ static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code,color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 		}
 	}
 }
@@ -260,11 +259,10 @@ static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code,color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 		}
 	}
 }

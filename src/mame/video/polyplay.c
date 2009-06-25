@@ -60,9 +60,8 @@ VIDEO_UPDATE( polyplay )
 		int sy = offs >> 6 << 3;
 		UINT8 code = videoram[offs];
 
-		drawgfx(bitmap,screen->machine->gfx[(code >> 7) & 0x01],
-				code, 0, 0, 0, sx, sy,
-				cliprect, TRANSPARENCY_NONE, 0);
+		drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[(code >> 7) & 0x01],
+				code, 0, 0, 0, sx, sy);
 	}
 
 	return 0;

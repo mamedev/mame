@@ -135,12 +135,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			y = 240 - y;
 		}
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
 				spriteram[offs+1],
 				spriteram[offs+2] & 0x07,
 				flip_screen_get(machine), flip_screen_get(machine),
-				((x + 8) & 0xff) - 8, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+				((x + 8) & 0xff) - 8, y, 0);
 	}
 }
 

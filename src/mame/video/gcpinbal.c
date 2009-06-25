@@ -231,13 +231,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 			for (chain_pos = chain;chain_pos >= 0;chain_pos--)
 			{
-				pdrawgfx(bitmap, machine->gfx[0],
+				pdrawgfx_transpen(bitmap, cliprect,machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
 						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0,
-						priority ? 0xfc : 0xf0);
+						priority_bitmap,
+						priority ? 0xfc : 0xf0,0);
 
 				code++;
 

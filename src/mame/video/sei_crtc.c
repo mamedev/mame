@@ -235,15 +235,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					drawgfx(bitmap,machine->gfx[0],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						sprite++,
-						color,fx,fy,x+ax*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15);
+						color,fx,fy,x+ax*16,y+ay*16,15);
 				else
-					drawgfx(bitmap,machine->gfx[0],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						sprite++,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15);
+						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
 			}
 	}
 }

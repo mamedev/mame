@@ -303,12 +303,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (spriteram[offs+2] & 0xe0)
 			color = mame_rand(machine)&0xf;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx+fortyl_xoffset,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+fortyl_xoffset,sy,0);
 	}
 
 	/* spriteram #2 */
@@ -332,12 +331,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (spriteram_2[offs+2] & 0xe0)
 			color = mame_rand(machine)&0xf;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx+fortyl_xoffset,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+fortyl_xoffset,sy,0);
 	}
 }
 

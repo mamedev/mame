@@ -131,14 +131,13 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 	if( which==0 )
 	{
 		/* draw the current player sprite into a work bitmap */
-		drawgfx( state->work_bitmap,
+		drawgfx_opaque( state->work_bitmap,
+			0,
 			machine->gfx[4],
 			state->cpu0_out[4]&0xf,
 			1, /* color */
 			0,0,
-			0,0,
-			0,
-			TRANSPARENCY_NONE, 0 );
+			0,0 );
 	}
 
 	for( y = 0; y <32; y++ )
@@ -199,14 +198,13 @@ static void draw_sprites(running_machine *machine, grchamp_state *state, bitmap_
 		int sy = 240-source[0];
 		int color = source[2];
 		int code = source[1];
-		drawgfx(bitmap, gfx,
+		drawgfx_transpen(bitmap, cliprect,
+			gfx,
 			bank + (code & 0x3f),
 			color,
 			code & 0x40,
 			code & 0x80,
-			sx,sy,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			sx,sy, 0);
 		source += 4;
 	}
 }

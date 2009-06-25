@@ -38,12 +38,11 @@ VIDEO_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,screen->machine->gfx[3],
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],
 					taxidrvr_vram3[offs],
 					0,
 					0,0,
-					(sx*8-taxidrvr_scroll[0])&0xff,(sy*8-taxidrvr_scroll[1])&0xff,
-					cliprect,TRANSPARENCY_NONE,0);
+					(sx*8-taxidrvr_scroll[0])&0xff,(sy*8-taxidrvr_scroll[1])&0xff);
 		}
 
 		for (offs = 0;offs < 0x400;offs++)
@@ -51,12 +50,11 @@ VIDEO_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,screen->machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 					taxidrvr_vram2[offs]+256*taxidrvr_vram2[offs+0x400],
 					0,
 					0,0,
-					(sx*8-taxidrvr_scroll[2])&0xff,(sy*8-taxidrvr_scroll[3])&0xff,
-					cliprect,TRANSPARENCY_PEN,0);
+					(sx*8-taxidrvr_scroll[2])&0xff,(sy*8-taxidrvr_scroll[3])&0xff,0);
 		}
 
 		if (spritectrl[2] & 4)
@@ -118,12 +116,11 @@ VIDEO_UPDATE( taxidrvr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 					taxidrvr_vram1[offs],
 					0,
 					0,0,
-					sx*8,sy*8,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx*8,sy*8,0);
 		}
 
 		for (offs = 0;offs < 0x2000;offs++)
@@ -146,12 +143,11 @@ VIDEO_UPDATE( taxidrvr )
 		sx = offs % 32;
 		sy = offs / 32;
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 				taxidrvr_vram0[offs],
 				0,
 				0,0,
-				sx*8,sy*8,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx*8,sy*8,0);
 	}
 	return 0;
 }

@@ -41,13 +41,12 @@ static VIDEO_UPDATE( cball )
 
 	/* draw sprite */
 
-	drawgfx(bitmap, screen->machine->gfx[1],
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 		cball_video_ram[0x399] >> 4,
 		0,
 		0, 0,
 		240 - cball_video_ram[0x390],
-		240 - cball_video_ram[0x398],
-		cliprect, TRANSPARENCY_PEN, 0);
+		240 - cball_video_ram[0x398], 0);
 	return 0;
 }
 

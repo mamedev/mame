@@ -131,10 +131,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		if (!color_effect) {
-			drawgfx(bitmap,gfx,number,
+			drawgfx_transpen(bitmap,cliprect,gfx,number,
 					0x20 + color,xflip,yflip,
-					sx - 0x0f,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx - 0x0f,sy,0);
 		} else {
 			/* get a pointer to the current sprite's gfx data */
 			const UINT8 *gfx_src = gfx_element_get_data(gfx, number % gfx->total_elements);

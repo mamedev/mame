@@ -35,7 +35,7 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap->width; x += 16)
-			drawgfx(bitmap, machine->gfx[0], *p++, 0, 0, 0, 	x, y, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], *p++, 0, 0, 0, 	x, y, 0);
 	}
 }
 
@@ -89,9 +89,9 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 		vert -= 31;
 
 		if (flag & 1)
-			drawgfx(bitmap, machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
 				code ^ 15, code >> 3, 0, 0,
-				horz / 2, vert, cliprect, TRANSPARENCY_PEN, 2);
+				horz / 2, vert, 2);
 	}
 }
 
@@ -111,9 +111,9 @@ static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rect
 		vert -= 15;
 		horz -= 31;
 
-		drawgfx(bitmap, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
 			code ^ 15, 0, 0, 0,
-			horz / 2, vert, cliprect, TRANSPARENCY_PEN, 0);
+			horz / 2, vert, 0);
 	}
 }
 

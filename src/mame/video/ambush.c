@@ -159,11 +159,10 @@ VIDEO_UPDATE( ambush )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
 				code, col | ((*ambush_colorbank & 0x03) << 4),
 				flipx, flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 
 

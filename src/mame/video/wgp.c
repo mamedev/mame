@@ -435,14 +435,13 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					zx = x + (((k+1)*zoomx)/2) - curx;
 					zy = y + (((j+1)*zoomy)/2) - cury;
 
-					pdrawgfxzoom(bitmap, machine->gfx[0],
+					pdrawgfxzoom_transpen(bitmap, cliprect,machine->gfx[0],
 							code,
 							col,
 							flipx, flipy,
 							curx,cury,
-							cliprect,TRANSPARENCY_PEN,0,
 							zx << 12, zy << 12,
-							primasks[((priority >> 1) &1)]);	/* maybe >> 2 or 0...? */
+							priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
 				}
 			}
 			else
@@ -467,14 +466,13 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					zx = x + (((k+1)*zoomx)/4) - curx;
 					zy = y + (((j+1)*zoomy)/4) - cury;
 
-					pdrawgfxzoom(bitmap, machine->gfx[0],
+					pdrawgfxzoom_transpen(bitmap, cliprect,machine->gfx[0],
 							code,
 							col,
 							flipx, flipy,
 							curx,cury,
-							cliprect,TRANSPARENCY_PEN,0,
 							zx << 12, zy << 12,
-							primasks[((priority >> 1) &1)]);	/* maybe >> 2 or 0...? */
+							priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
 				}
 			}
 		}

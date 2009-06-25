@@ -143,9 +143,9 @@ Note: press Z to show some info on each sprite (debug builds only)
 
 static int shadow_pen_mask, shadow_pen_shift;
 
-static void ssv_drawgfx(	bitmap_t *bitmap, const gfx_element *gfx,
+static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
-					const rectangle *cliprect, int shadow	)
+					int shadow )
 {
 	const UINT8 *addr, *source;
 	UINT8 pen;
@@ -701,12 +701,12 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 			{
 				for (ty = ystart; ty != yend; ty += yinc)
 				{
-					ssv_drawgfx( bitmap,	machine->gfx[gfx],
+					ssv_drawgfx( bitmap, &clip, machine->gfx[gfx],
 											code++,
 											color,
 											flipx, flipy,
 											sx + tx * 16, sy + ty * 8,
-											&clip, shadow	);
+											shadow	);
 				} /* ty */
 			} /* tx */
 
@@ -890,12 +890,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					for (y = ystart; y != yend; y += yinc)
 					{
-						ssv_drawgfx( bitmap,	machine->gfx[gfx],
+						ssv_drawgfx( bitmap, cliprect, machine->gfx[gfx],
 												code++,
 												color,
 												flipx, flipy,
 												sx + x * 16, sy + y * 8,
-												cliprect, shadow	);
+												shadow	);
 					}
 				}
 
@@ -1067,13 +1067,12 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					drawgfxzoom(	bitmap,	machine->gfx[2],
+					drawgfxzoom_transpen( bitmap, cliprect, machine->gfx[2],
 									code++,
 									color,
 									flipx, flipy,
 									(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-									cliprect, TRANSPARENCY_PEN, 0,
-									xscale, yscale
+									xscale, yscale, 0
 					);
 				}
 			}

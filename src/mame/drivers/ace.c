@@ -77,35 +77,32 @@ static VIDEO_UPDATE( ace )
 	bitmap_fill(bitmap, cliprect, 0);
 
 
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],
 				0,
 				0,
 				0,0,
-				objpos[0],objpos[1],
-				cliprect,TRANSPARENCY_NONE,0);
+				objpos[0],objpos[1]);
 
-		drawgfx(bitmap,screen->machine->gfx[2],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[2],
 				0,
 				0,
 				0,0,
-				objpos[2],objpos[3],
-				cliprect,TRANSPARENCY_NONE,0);
+				objpos[2],objpos[3]);
 
-		drawgfx(bitmap,screen->machine->gfx[3],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],
 				0,
 				0,
 				0,0,
-				objpos[4],objpos[5],
-				cliprect,TRANSPARENCY_NONE,0);
+				objpos[4],objpos[5]);
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		drawgfx(bitmap,screen->machine->gfx[4],
+		drawgfx_opaque(bitmap,/* ?? */
+				cliprect,screen->machine->gfx[4],
 				offs,
 				0,
 				0,0,
-				10*8+offs*16,256-16, /* ?? */
-				cliprect,TRANSPARENCY_NONE,0);
+				10*8+offs*16,256-16);
 	}
 	return 0;
 }

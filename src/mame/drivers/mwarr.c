@@ -354,44 +354,44 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for(i=0;i<=dy;i++)
 			{
-				pdrawgfx( bitmap,
+				pdrawgfx_transpen( bitmap,
+						  cliprect,
 						  gfx,
 						  source[2]+i,
 						  color,
 						  flipx,0,
 						  x,y+i*16,
-						  cliprect,
-						  TRANSPARENCY_PEN,0,pri_mask );
+						  priority_bitmap,pri_mask,0 );
 
 				/* wrap around x */
-				pdrawgfx( bitmap,
+				pdrawgfx_transpen( bitmap,
+						  cliprect,
 						  gfx,
 						  source[2]+i,
 						  color,
 						  flipx,0,
 						  x-1024,y+i*16,
-						  cliprect,
-						  TRANSPARENCY_PEN,0,pri_mask );
+						  priority_bitmap,pri_mask,0 );
 
 				/* wrap around y */
-				pdrawgfx( bitmap,
-						  gfx,
+				pdrawgfx_transpen( bitmap,
+						  cliprect,
+						 gfx,
 						  source[2]+i,
 						  color,
 						  flipx,0,
 						  x,y-512+i*16,
-						 cliprect,
-						 TRANSPARENCY_PEN,0,pri_mask );
+						 priority_bitmap,pri_mask,0 );
 
 				/* wrap around x & y */
-				pdrawgfx( bitmap,
+				pdrawgfx_transpen( bitmap,
+						  cliprect,
 						  gfx,
 						  source[2]+i,
 						  color,
 						  flipx,0,
 						  x-1024,y-512+i*16,
-						  cliprect,
-						  TRANSPARENCY_PEN,0,pri_mask );
+						  priority_bitmap,pri_mask,0 );
 			}
 		}
 

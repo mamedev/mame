@@ -175,21 +175,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if( flip_screen_get(machine) )
 		{
-			drawgfx( bitmap,gfx,
+			drawgfx_transpen( bitmap,cliprect,gfx,
 				sprite_number&0x7f,
 				color,
 				1,(sprite_number&0x80)?0:1,
-				256-32-sx,256-32-sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+				256-32-sx,256-32-sy,0 );
 		}
 		else
 		{
-			drawgfx( bitmap,gfx,
+			drawgfx_transpen( bitmap,cliprect,gfx,
 				sprite_number&0x7f,
 				color,
 				0,sprite_number&0x80,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+				sx,sy,0 );
 		}
 
 		source -= 4;

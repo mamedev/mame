@@ -134,7 +134,7 @@ READ8_HANDLER( gyruss_scanline_r )
 }
 
 
-static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx)
 {
 	int offs;
 
@@ -149,7 +149,7 @@ static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *c
 		int flip_x = ~gyruss_spriteram[offs + 2] & 0x40;
 		int flip_y =  gyruss_spriteram[offs + 2] & 0x80;
 
-		drawgfx(bitmap, gfx[gfx_bank], code, color, flip_x, flip_y, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, gfx[gfx_bank], code, color, flip_x, flip_y, x, y, 0);
 	}
 }
 
@@ -163,7 +163,7 @@ VIDEO_UPDATE( gyruss )
 	}
 
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen->machine->gfx, bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, screen->machine->gfx);
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, 0, 0);
 
 	return 0;

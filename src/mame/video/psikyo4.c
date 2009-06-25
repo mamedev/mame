@@ -112,7 +112,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (j = ystart; j != yend; j += yinc) {
 				for (i = xstart; i != xend; i += xinc) {
-					drawgfx(bitmap,gfx,tnum+loopnum,colr,flipx,flipy,xpos+16*i,ypos+16*j,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,tnum+loopnum,colr,flipx,flipy,xpos+16*i,ypos+16*j,0);
 					loopnum++;
 				}
 			}

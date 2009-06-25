@@ -94,7 +94,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
-					drawgfxzoom(bitmap,
+					drawgfxzoom_transpen(bitmap,
+					            cliprect,
 					            machine->gfx[0],
 					            c,
 					            color,
@@ -102,18 +103,17 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 					            flipy,
 					            sx,
 					            sy,
-					            cliprect,
-					            TRANSPARENCY_PEN,
-					            0,
 					            (zw << 16) / 16,
-					            (zh << 16) / 16);
+					            (zh << 16) / 16,
+					            0);
 				}
 				else
 				{
 					int sx = ox + (x << 4);
 					int sy = oy + (y << 4);
 
-					drawgfx(bitmap,
+					drawgfx_transpen(bitmap,
+					        cliprect,
 					        machine->gfx[0],
 					        c,
 					        color,
@@ -121,8 +121,6 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 					        flipy,
 					        sx,
 					        sy,
-					        cliprect,
-					        TRANSPARENCY_PEN,
 					        0);
 				}
 			}

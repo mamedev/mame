@@ -292,19 +292,17 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 			for (x = 0;x <= size;x++)
 			{
 				UINT32 transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f);
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transmask(bitmap,&spritevisiblearea,machine->gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
-					((sx + 16*x) & 0xff), sy + 16*y,
-					&spritevisiblearea,TRANSPARENCY_PENS,transmask);
+					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transmask(bitmap,&spritevisiblearea,machine->gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
-					((sx + 16*x) & 0xff) + 0x100, sy + 16*y,
-					&spritevisiblearea,TRANSPARENCY_PENS,transmask);
+					((sx + 16*x) & 0xff) + 0x100, sy + 16*y,transmask);
 			}
 		}
 	}

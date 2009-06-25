@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(xdrw=0;xdrw<=chainx;xdrw++)
 			{
-				drawgfxzoom(bitmap,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),cliprect,TRANSPARENCY_PEN,0,zoomx,zoomy/*0x10000*/);
+				drawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,0);
 				tileno++;
 			}
 		}

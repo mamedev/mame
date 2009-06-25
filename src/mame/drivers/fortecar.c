@@ -257,7 +257,7 @@ static VIDEO_UPDATE(fortecar)
 			tile = fortecar_ram[(count*4)+1] | (fortecar_ram[(count*4)+2]<<8);
 			color = fortecar_ram[(count*4)+3];
 
-			drawgfx(bitmap,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
 			count++;
 
 		}

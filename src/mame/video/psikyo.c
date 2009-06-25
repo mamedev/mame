@@ -380,22 +380,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				int addr	=	(code*2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					pdrawgfx(bitmap,machine->gfx[0],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							cliprect,TRANSPARENCY_PEN,trans_pen,
-							pri[(attr & 0xc0) >> 6]);
+							priority_bitmap,
+							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					pdrawgfxzoom(bitmap,machine->gfx[0],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
-								cliprect,TRANSPARENCY_PEN,trans_pen,
 								zoomx << 11,zoomy << 11,
-								pri[(attr & 0xc0) >> 6]);
+								priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}

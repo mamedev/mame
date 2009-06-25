@@ -147,12 +147,11 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,machine->gfx[bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
 			videoram[offs],
 			col + 8 * palette_bank,
 			flipx,flipy,
-			8*sx,scroll,
-			cliprect,TRANSPARENCY_PEN,0);
+			8*sx,scroll,0);
 	}
 }
 
@@ -186,12 +185,11 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,machine->gfx[char_bank[1]],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[char_bank[1]],
 			wiz_videoram2[offs],
 			col + 8 * palette_bank,
 			flipx,flipy,
-			8*sx,scroll,
-			cliprect,TRANSPARENCY_PEN,0);
+			8*sx,scroll,0);
 	}
 }
 
@@ -214,12 +212,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,
 		if ( flipx) sx = 240 - sx;
 		if (!flipy) sy = 240 - sy;
 
-		drawgfx(bitmap,machine->gfx[bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
 				sprite_ram[offs + 1],
 				(sprite_ram[offs + 2] & 0x07) + 8 * palette_bank,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

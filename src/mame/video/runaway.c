@@ -109,19 +109,17 @@ VIDEO_UPDATE( runaway )
 
 		code |= (runaway_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			code,
 			0,
 			flipx, flipy,
-			x, 240 - y,
-			cliprect, TRANSPARENCY_PEN, 0);
+			x, 240 - y, 0);
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			code,
 			0,
 			flipx, flipy,
-			x - 256, 240 - y,
-			cliprect, TRANSPARENCY_PEN, 0);
+			x - 256, 240 - y, 0);
 	}
 	return 0;
 }
@@ -145,19 +143,17 @@ VIDEO_UPDATE( qwak )
 
 		code |= (runaway_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			code,
 			0,
 			flipx, flipy,
-			x, 240 - y,
-			cliprect, TRANSPARENCY_PEN, 0);
+			x, 240 - y, 0);
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			code,
 			0,
 			flipx, flipy,
-			x - 256, 240 - y,
-			cliprect, TRANSPARENCY_PEN, 0);
+			x - 256, 240 - y, 0);
 	}
 	return 0;
 }

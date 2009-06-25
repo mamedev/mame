@@ -180,10 +180,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		number = ((number & 0x03) << 14) | ((number & 0x0fffc) >> 2);
 
-		drawgfx(bitmap,gfx,number,
+		drawgfx_transpen(bitmap,cliprect,gfx,number,
 				0x10 + (color & 0x0f),xflip,yflip,
-				sx-0x0f,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx-0x0f,sy,0);
 	}
 }
 

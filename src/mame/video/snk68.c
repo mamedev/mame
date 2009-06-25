@@ -247,12 +247,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					fy = !fy;
 				}
 
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect, machine->gfx[1],
 						tile,
 						color,
 						fx, fy,
-						mx, my,
-						cliprect, TRANSPARENCY_PEN, 0);
+						mx, my, 0);
 			}
 			else
 			{

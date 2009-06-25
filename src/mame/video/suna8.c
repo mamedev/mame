@@ -322,12 +322,11 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 				{	sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;	}
 
-				drawgfx(	bitmap,machine->gfx[0],
+				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							((attr >> 2) & 0xf) | colorbank,	// hardhea2 player2
 							tile_flipx, tile_flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15);
+							sx, sy,15);
 			}
 		}
 
@@ -387,12 +386,11 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 				{	sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;	}
 
-				drawgfx(	bitmap,machine->gfx[0],
+				drawgfx_transpen(	bitmap,cliprect,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15);
+							sx, sy,15);
 			}
 		}
 

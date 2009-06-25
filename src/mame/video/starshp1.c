@@ -212,13 +212,12 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 	{
 		int code = (starshp1_obj_ram[i] & 0xf) ^ 0xf;
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
 			code % 8,
 			code / 8,
 			0, 0,
 			get_sprite_hpos(i),
-			get_sprite_vpos(i),
-			cliprect, TRANSPARENCY_PEN, 0);
+			get_sprite_vpos(i), 0);
 	}
 }
 
@@ -239,13 +238,12 @@ static void draw_spaceship(running_machine *machine, bitmap_t* bitmap, const rec
 	if (y <= 0)
 		y -= (yzoom * starshp1_ship_voffset) >> 16;
 
-	drawgfxzoom(bitmap, machine->gfx[2],
+	drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[2],
 		starshp1_ship_picture & 0x03,
 		starshp1_ship_explode,
 		starshp1_ship_picture & 0x80, 0,
 		x, y,
-		cliprect, TRANSPARENCY_PEN, 0,
-		xzoom, yzoom);
+		xzoom, yzoom, 0);
 }
 
 

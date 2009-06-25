@@ -357,12 +357,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		if (spriteram[offs] != 0)
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 	}
 }
 

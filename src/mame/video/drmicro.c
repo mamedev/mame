@@ -154,21 +154,19 @@ VIDEO_UPDATE( drmicro )
 			else
 				x = (240-x) & 0xff;
 
-			drawgfx(bitmap,screen->machine->gfx[3-g],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[3-g],
 					chr,
 					col,
 					fx,fy,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y,0);
 
 			if (x>240)
 			{
-				drawgfx(bitmap,screen->machine->gfx[3-g],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[3-g],
 						chr,
 						col,
 						fx,fy,
-						x-256,y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x-256,y,0);
 			}
 		}
 	}

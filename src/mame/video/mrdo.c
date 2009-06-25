@@ -241,11 +241,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	{
 		if (spriteram[offs + 1] != 0)
 		{
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					spriteram[offs],spriteram[offs + 2] & 0x0f,
 					spriteram[offs + 2] & 0x10,spriteram[offs + 2] & 0x20,
-					spriteram[offs + 3],256 - spriteram[offs + 1],
-					cliprect,TRANSPARENCY_PEN,0);
+					spriteram[offs + 3],256 - spriteram[offs + 1],0);
 		}
 	}
 }

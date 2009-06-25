@@ -118,12 +118,11 @@ static VIDEO_UPDATE( skyarmy )
 		sy = 242-spriteram[offs];
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 		spriteram[offs+1]&0x3f,
 		pal,
 		flipx,flipy,
-		sx,sy,
-		cliprect,TRANSPARENCY_PEN,0);
+		sx,sy,0);
 	}
 	return 0;
 }

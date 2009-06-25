@@ -137,11 +137,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				tilenum,color,
 				0,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 
 		source += 0x10;
 	}

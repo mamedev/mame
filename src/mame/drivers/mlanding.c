@@ -240,12 +240,11 @@ static VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
+						drawgfx_opaque(ml_bitmap[num],cliprect,screen->machine->gfx[0],
 							code++,
 							color,
 							0,0,
-							x+j*8,y+k*8,
-							cliprect,TRANSPARENCY_NONE,0);
+							x+j*8,y+k*8);
 					}
 					else
 					{

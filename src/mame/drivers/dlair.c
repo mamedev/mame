@@ -168,7 +168,7 @@ static VIDEO_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx(bitmap, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
 	return 0;

@@ -211,14 +211,13 @@ static void draw_drones(running_machine *machine, bitmap_t* bitmap, const rectan
 
 		y = 0xf0 - drones_vert[i >> 1];
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect,
+			machine->gfx[1],
 			code[i] ^ toggle,
 			0,
 			0, 0,
 			x,
-			y,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			y, 0);
 	}
 }
 
@@ -242,14 +241,13 @@ static void draw_driver(running_machine *machine, bitmap_t* bitmap, const rectan
 
 	y = 0xf0 - driver_vert;
 
-	drawgfx(bitmap, machine->gfx[0],
+	drawgfx_transpen(bitmap, cliprect,
+		machine->gfx[0],
 		driver_pic,
 		0,
 		0, 0,
 		x,
-		y,
-		cliprect,
-		TRANSPARENCY_PEN, 0);
+		y, 0);
 }
 
 

@@ -197,22 +197,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,0x80ff,
-				0x00);
+				priority_bitmap,
+				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,0x7fff,
-				0x02);
+				priority_bitmap,
+				0x02,0x7fff);
 	}
 }
 

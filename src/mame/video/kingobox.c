@@ -237,11 +237,10 @@ static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[2 + bank],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2 + bank],
 			code, color,
 			flipx, flipy,
-			sx, sy,
-			cliprect, TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 	}
 }
 
@@ -297,11 +296,10 @@ static void ringking_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[2 + bank],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2 + bank],
 			code, color,
 			flipx, flipy,
-			sx, sy,
-			cliprect, TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 	}
 }
 

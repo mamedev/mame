@@ -240,21 +240,19 @@ VIDEO_UPDATE( pacman )
 			sy = spriteram_2[offs] - 31;
 			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
 
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy,
-					&spriteclip,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx - 256,sy,
-					&spriteclip,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
@@ -268,21 +266,19 @@ VIDEO_UPDATE( pacman )
 			sy = spriteram_2[offs] - 31;
 			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
 
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					color,
 					spriteram[offs] & 2,spriteram[offs] & 1,
 					sx - 256,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 		}
 	}
@@ -410,12 +406,11 @@ VIDEO_UPDATE( s2650games )
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 	}
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
@@ -431,12 +426,11 @@ VIDEO_UPDATE( s2650games )
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + xoffsethack,
-				cliprect,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 	}
 	return 0;

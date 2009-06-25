@@ -121,10 +121,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
 
-		drawgfx(bitmap,gfx,number,
+		drawgfx_transpen(bitmap,cliprect,gfx,number,
 				0x20 + color,xflip,yflip,
-				sx - 0x0f,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx - 0x0f,sy,0);
 	}
 }
 

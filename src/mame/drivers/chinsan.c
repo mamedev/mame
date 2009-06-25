@@ -68,7 +68,7 @@ static VIDEO_UPDATE(chinsan)
 			int tileno,colour;
 			tileno = chinsan_video[count] | (chinsan_video[count+0x800]<<8);
 			colour = chinsan_video[count+0x1000]>>3;
-			drawgfx(bitmap,screen->machine->gfx[0],tileno,colour,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}

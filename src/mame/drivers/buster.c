@@ -32,7 +32,7 @@ static VIDEO_UPDATE(buster)
 		{
 			int tile = (buster_vram[count+1])|(buster_vram[count]<<8);
 			//int colour = tile>>12;
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*4,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*4);
 
 			count+=2;
 		}

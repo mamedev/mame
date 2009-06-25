@@ -159,10 +159,10 @@ static void draw_object(running_machine* machine, bitmap_t *bitmap, const rectan
 	else
 		sx = 91 - (part_h_shift & 0x7f);
 
-	drawgfx(bitmap, machine->gfx[3], 0, color, 0, 0, sx + 64, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, machine->gfx[3], 0, color, 0, 1, sx + 64, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx_transpen(bitmap, cliprect, machine->gfx[3], 0, color, 0, 0, sx + 64, sy, 0);
+	drawgfx_transpen(bitmap, cliprect, machine->gfx[3], 1, color, 0, 0, sx, sy, 0);
+	drawgfx_transpen(bitmap, cliprect, machine->gfx[3], 0, color, 0, 1, sx + 64, sy - 64, 0);
+	drawgfx_transpen(bitmap, cliprect, machine->gfx[3], 1, color, 0, 1, sx, sy - 64, 0);
 }
 
 static void draw_center(bitmap_t *bitmap, const rectangle *cliprect)
@@ -426,22 +426,20 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 		sy -= sprite_y_adjust;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[1],
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx,sy, 0);
 
 		sy += (flip_screen_get(machine) ? -256 : 256);
 
 		// Wrap around
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[1],
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx,sy, 0);
 	}
 }
 

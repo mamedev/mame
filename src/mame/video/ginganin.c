@@ -233,12 +233,11 @@ int offs;
 			flipx = !flipx; 	flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,
-				x,y,
-				cliprect,TRANSPARENCY_PEN,15);
+				x,y,15);
 
 	}
 }

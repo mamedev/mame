@@ -69,13 +69,12 @@ static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectan
 		}
 		for( sy=0; sy<256; sy+=8 )
 		{
-			drawgfx( bitmap, gfx,
+			drawgfx_opaque( bitmap, cliprect,
+				gfx,
 				*source++,
 				0, /* color */
 				0,0, /* no flip */
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_NONE, 0 );
+				sx,sy );
 		}
 	}
 }
@@ -101,12 +100,11 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		{
 			for( col=0; col<4; col++ )
 			{
-				drawgfx( tmpbitmap,gfx,
+				drawgfx_opaque( tmpbitmap,0, gfx,
 					rom[col+tile_number*4+row*0x400],
 					mnchmobl_palette_bank,
 					0,0, /* flip */
-					sx+col*8, sy+row*8,
-					0, TRANSPARENCY_NONE, 0 );
+					sx+col*8, sy+row*8 );
 			}
 		}
 	}
@@ -143,12 +141,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
 				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
-				drawgfx( bitmap, gfx,
+				drawgfx_transpen( bitmap, cliprect, gfx,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
 					0,0, 							/* no flip */
-					sx,sy,
-					cliprect, TRANSPARENCY_PEN, 7 );
+					sx,sy, 7 );
 			}
 		}
 	}

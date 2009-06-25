@@ -36,7 +36,7 @@ static VIDEO_UPDATE(chsuper)
 			tile ^=chsuper_tilexor;
 			//int colour = tile>>12;
 
-			drawgfx(bitmap,gfx,tile,0,0,0,x*4,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}

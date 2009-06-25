@@ -113,11 +113,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,machine->gfx[2+gfx_bank],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[2+gfx_bank],
 			code, color,
 			flipx, flipy,
-			sx, sy,
-			cliprect, TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 	}
 }
 
@@ -136,11 +135,10 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 		if (flip)
 			sy = 248 - sy;
 
-		drawgfx(bitmap,machine->gfx[gfx_bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_bank],
 				code, color,
 				flip, flip,
-				sx, sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx, sy,0);
 
 		code = videoram[0x1d00 + offs];
 		color = colorram[0x1f11] & 0x03;
@@ -150,11 +148,10 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 		if (flip)
 			sy = 248 - sy;
 
-		drawgfx(bitmap,machine->gfx[gfx_bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_bank],
 				code, color,
 				flip, flip,
-				sx, sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx, sy,0);
 	}
 }
 

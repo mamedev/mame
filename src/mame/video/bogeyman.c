@@ -126,21 +126,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, machine->gfx[2],
+			drawgfx_transpen(bitmap, cliprect,
+				machine->gfx[2],
 				code, color,
 				flipx, flipy,
-				sx, sy,
-				cliprect,
-				TRANSPARENCY_PEN, 0);
+				sx, sy, 0);
 
 			if (multi)
 			{
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,
+					machine->gfx[2],
 					code + 1, color,
 					flipx, flipy,
-					sx, sy + (flip_screen_get(machine) ? -16 : 16),
-					cliprect,
-					TRANSPARENCY_PEN, 0);
+					sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
 			}
 		}
 	}

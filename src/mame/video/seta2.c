@@ -285,12 +285,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						{
 							for (tx = 0; tx <= tilesize; tx++)
 							{
-								drawgfx(bitmap, machine->gfx[gfx],
+								drawgfx_transpen(bitmap, cliprect,machine->gfx[gfx],
 										code ^ tx ^ (ty<<1),
 										color,
 										flipx, flipy,
-										px + (flipx ? tilesize-tx : tx) * 8, py + (flipy ? tilesize-ty : ty) * 8,
-										cliprect,TRANSPARENCY_PEN,0 );
+										px + (flipx ? tilesize-tx : tx) * 8, py + (flipy ? tilesize-ty : ty) * 8,0 );
 							}
 						}
 
@@ -328,12 +327,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				{
 					for (x = 0; x <= sizex; x++)
 					{
-						drawgfx(bitmap, machine->gfx[gfx],
+						drawgfx_transpen(bitmap, cliprect,machine->gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
-								sx + (flipx ? sizex-x : x) * 8, sy + (flipy ? sizey-y : y) * 8,
-								cliprect,TRANSPARENCY_PEN,0 );
+								sx + (flipx ? sizex-x : x) * 8, sy + (flipy ? sizey-y : y) * 8,0 );
 					}
 				}
 			}

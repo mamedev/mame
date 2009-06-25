@@ -801,12 +801,11 @@ twineagl:   000 027 00 0f   (test mode)
 			color	=	( color >> (16-5) ) % total_color_codes;
 			code	=	(code & 0x3fff) + (bank * 0x4000);
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx, flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,
-					cliprect,TRANSPARENCY_PEN,0);
+					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,0);
 		}
 	/* next column */
 	}
@@ -863,12 +862,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = max_y - y;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
-				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8,
-				cliprect,TRANSPARENCY_PEN,0);
+				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8,0);
 	}
 
 }

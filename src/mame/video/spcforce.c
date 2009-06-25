@@ -45,11 +45,10 @@ VIDEO_UPDATE( spcforce )
 			sy = 248 - sy;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 				code, col,
 				flip_screen_get(screen->machine), flip_screen_get(screen->machine),
-				sx, sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx, sy,0);
 	}
 	return 0;
 }

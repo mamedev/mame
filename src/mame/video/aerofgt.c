@@ -383,13 +383,12 @@ static void aerofgt_draw_sprites(running_machine *machine, bitmap_t *bitmap,cons
 					else
 						code = aerofgt_spriteram2[map_start & 0x1fff] & 0x1fff;
 
-					drawgfxzoom(bitmap,machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)],
+					drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + (map_start >= 0x2000 ? 1 : 0)],
 							code,
 							color,
 							flipx,flipy,
 							sx,sy,
-							cliprect,TRANSPARENCY_PEN,15,
-							zoomx << 11, zoomy << 11);
+							zoomx << 11, zoomy << 11,15);
 					map_start++;
 				}
 			}
@@ -455,14 +454,13 @@ static void turbofrc_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				else
 					code = aerofgt_spriteram2[map_start % (aerofgt_spriteram2_size/2)];
 
-				pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + chip],
 							 code,
 							 color,
 							 flipx,flipy,
 							 sx,sy,
-							 cliprect,TRANSPARENCY_PEN,15,
 							 zoomx << 11, zoomy << 11,
-							 pri ? 0 : 2);
+							 priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 
@@ -530,14 +528,13 @@ static void spinlbrk_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				else
 					code = aerofgt_spriteram2[map_start % (aerofgt_spriteram2_size/2)];
 
-				pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + chip],
 							 code,
 							 color,
 							 flipx,flipy,
 							 sx,sy,
-							 cliprect,TRANSPARENCY_PEN,15,
 							 zoomx << 11, zoomy << 11,
-							 pri ? 2 : 0);
+							 priority_bitmap,pri ? 2 : 0,15);
 				map_start++;
 			}
 
@@ -606,14 +603,13 @@ static void aerfboo2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				else
 					code = aerofgt_spriteram2[map_start % (aerofgt_spriteram2_size/2)];
 
-				pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + chip],
 							 code,
 							 color,
 							 flipx,flipy,
 							 sx,sy,
-							 cliprect,TRANSPARENCY_PEN,15,
 							 zoomx << 11, zoomy << 11,
-							 pri ? 0 : 2);
+							 priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 
@@ -642,20 +638,18 @@ static void pspikesb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipx = aerofgt_spriteram3[i + 1] & 0x0800;
 		color = aerofgt_spriteram3[i + 1] & 0x000f;
 
-		drawgfx(bitmap,machine->gfx[sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[sprite_gfx],
 				code,
 				color,
 				flipx,flipy,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx(bitmap,machine->gfx[sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[sprite_gfx],
 				code,
 				color,
 				flipx,flipy,
-				xpos,ypos + 512,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos,ypos + 512,15);
 
 	}
 }
@@ -685,20 +679,18 @@ static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
-		drawgfx(bitmap,machine->gfx[sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[sprite_gfx],
 				realcode,
 				color,
 				flipx,flipy,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx(bitmap,machine->gfx[sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[sprite_gfx],
 				realcode,
 				color,
 				flipx,flipy,
-				xpos,ypos + 512,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos,ypos + 512,15);
 	}
 }
 
@@ -733,14 +725,13 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15,
 				zoomx << 11,zoomy << 11,
-				pri ? 0 : 2);
+				priority_bitmap,pri ? 0 : 2,15);
 
 	}
 
@@ -771,14 +762,13 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15,
 				zoomx << 11,zoomy << 11,
-				pri ? 0 : 2);
+				priority_bitmap,pri ? 0 : 2,15);
 
 	}
 }
@@ -861,12 +851,11 @@ VIDEO_UPDATE( spikes91 )
 		{
 			UINT16 tileno = spikes91_tx_tilemap_ram[count]&0x1fff;
 			UINT16 colour = spikes91_tx_tilemap_ram[count]&0xe000;
-			drawgfx(bitmap,gfx,
+			drawgfx_transpen(bitmap,cliprect,gfx,
 					tileno,
 					colour>>13,
 					0,0,
-					(x*8)+24,(y*8)+8,
-					cliprect,TRANSPARENCY_PEN,15);
+					(x*8)+24,(y*8)+8,15);
 
 			count++;
 

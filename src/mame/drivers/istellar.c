@@ -64,10 +64,10 @@ static VIDEO_UPDATE( istellar )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 					tile_ram[current_screen_character],
 					(tile_control_ram[current_screen_character] & 0x0f),
-					0, 0, charx*8, chary*8, cliprect, TRANSPARENCY_PEN, 0);
+					0, 0, charx*8, chary*8, 0);
 		}
 	}
 

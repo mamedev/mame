@@ -239,15 +239,14 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
 	     {
 		int code;
 		code=ssrj_vram3[(i*5+k)*64+(31-j)*2]+256*ssrj_vram3[(i*5+k)*64+(31-j)*2+1];
-		drawgfx(bitmap,
-			machine->gfx[0],
+		drawgfx_transpen(bitmap,
+			cliprect,machine->gfx[0],
 			code&1023,
 			((code>>12)&0x3)+8,
 			code&0x8000,
 			code&0x4000,
 			(247-(x+(j<<3)))&0xff,
 			y,
-			cliprect,TRANSPARENCY_PEN,
 			0);
 	     }
 	}

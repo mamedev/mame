@@ -620,14 +620,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				code  = spritedata[0x0E/2] + objectdata[0x06/2];
 				color = (attr & color_mask);
 
-				pdrawgfx(bitmap,machine->gfx[3],
+				pdrawgfx_transpen(bitmap,cliprect,
+						machine->gfx[3],
 						(code & 0xfff ) + ((megasys1_sprite_bank & 1) << 12),
 						color,
 						flipx, flipy,
 						sx, sy,
-						cliprect,
-						TRANSPARENCY_PEN,15,
-						(attr & 0x08) ? 0x0c : 0x0a);
+						priority_bitmap,
+						(attr & 0x08) ? 0x0c : 0x0a,15);
 			}	/* sprite */
 		}	/* offs */
 	}	/* non Z hw */
@@ -660,14 +660,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				sx = 240-sx;		sy = 240-sy;
 			}
 
-			pdrawgfx(bitmap,machine->gfx[2],
+			pdrawgfx_transpen(bitmap,cliprect,
+					machine->gfx[2],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					cliprect,
-					TRANSPARENCY_PEN,15,
-					(attr & 0x08) ? 0x0c : 0x0a);
+					priority_bitmap,
+					(attr & 0x08) ? 0x0c : 0x0a,15);
 		}	/* sprite */
 	}	/* Z hw */
 

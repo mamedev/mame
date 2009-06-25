@@ -58,12 +58,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y + mult * multi,0);
 
 			multi--;
 		}
@@ -123,7 +122,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tileno^0x1000,colour,0,0,x,y,0);
 	}
 
 	for (offset = 0x1600/2;offset<0x2000/2;offset+=8)
@@ -137,7 +136,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tileno^0x4000,colour,0,0,x,y,0);
 	}
 
 	for (offset = 0x2000/2;offset<0x4000/2;offset+=8)
@@ -151,7 +150,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tileno^0x3000,colour,0,0,x,y,0);
 	}
 
 	return 0;

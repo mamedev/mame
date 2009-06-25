@@ -127,13 +127,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			sy = 240 - spriteram[offs + 1];
 
-			drawgfx( bitmap, machine->gfx[17], code,
+			drawgfx_transpen( bitmap, cliprect,machine->gfx[17], code,
 					flags >> 4, /* color */
 					bank & 1,   /* flipx */
 					bank & 2,   /* flipy */
 					sx,
-					sy,
-					cliprect,TRANSPARENCY_PEN,15 );
+					sy,15 );
 		}
 	}
 }

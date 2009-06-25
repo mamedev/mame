@@ -180,14 +180,13 @@ VIDEO_UPDATE( darkmist)
 
 		palette+=32;
 
-		drawgfx(
-               bitmap,screen->machine->gfx[2],
+		drawgfx_transpen(
+               bitmap,cliprect,
+               screen->machine->gfx[2],
                tile,
                palette,
                fx,fy,
-               spriteram[i+3],spriteram[i+2],
-               cliprect,
-               TRANSPARENCY_PEN,0 );
+               spriteram[i+3],spriteram[i+2],0 );
 		}
 
 	}

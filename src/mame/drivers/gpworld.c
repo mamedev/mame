@@ -71,8 +71,8 @@ static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const 
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx(bitmap, machine->gfx[0], tile_RAM[current_screen_character],
-					characterY, 0, 0, characterX*8, characterY*8, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], tile_RAM[current_screen_character],
+					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
 }

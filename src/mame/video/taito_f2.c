@@ -367,9 +367,9 @@ WRITE16_HANDLER( koshien_spritebank_w )
 	spritebank_buffered[7] = spritebank_buffered[6] + 0x400;
 }
 
-static void taito_f2_tc360_spritemixdraw( bitmap_t *dest_bmp,const gfx_element *gfx,
+static void taito_f2_tc360_spritemixdraw( bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int scalex, int scaley)
+		int scalex, int scaley)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
@@ -857,13 +857,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			}
 			else
 			{
-				drawgfxzoom(bitmap,machine->gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
 						sprite_ptr->x,sprite_ptr->y,
-						cliprect,TRANSPARENCY_PEN,0,
-						sprite_ptr->zoomx,sprite_ptr->zoomy);
+						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
 			}
 		}
 	}
@@ -875,21 +874,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sprite_ptr--;
 
 		if (!uses_tc360_mixer)
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
-					cliprect,TRANSPARENCY_PEN,0,
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
-					sprite_ptr->primask);
+					priority_bitmap,sprite_ptr->primask,0);
 		else
-			taito_f2_tc360_spritemixdraw(bitmap,machine->gfx[0],
+			taito_f2_tc360_spritemixdraw(bitmap,cliprect,machine->gfx[0],
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
-					cliprect,
 					sprite_ptr->zoomx,sprite_ptr->zoomy);
 	}
 }

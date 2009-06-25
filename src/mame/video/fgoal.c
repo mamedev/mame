@@ -53,37 +53,33 @@ VIDEO_UPDATE( fgoal )
 
 	if (fgoal_player == 1 && (input_port_read(screen->machine, "IN1") & 0x40))
 	{
-		drawgfxzoom(fgbitmap, screen->machine->gfx[0],
+		drawgfxzoom_opaque(fgbitmap, cliprect, screen->machine->gfx[0],
 			0, (fgoal_player << 2) | current_color,
 			1, 1,
 			0, 16,
-			cliprect, TRANSPARENCY_NONE, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom(bgbitmap, screen->machine->gfx[1],
+		drawgfxzoom_opaque(bgbitmap, cliprect, screen->machine->gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
-			cliprect, TRANSPARENCY_NONE, 0,
 			0x40000,
 			0x40000);
 	}
 	else
 	{
-		drawgfxzoom(fgbitmap, screen->machine->gfx[0],
+		drawgfxzoom_opaque(fgbitmap, cliprect, screen->machine->gfx[0],
 			0, (fgoal_player << 2) | current_color,
 			0, 0,
 			0, 0,
-			cliprect, TRANSPARENCY_NONE, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom(bgbitmap, screen->machine->gfx[1],
+		drawgfxzoom_opaque(bgbitmap, cliprect, screen->machine->gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,
-			cliprect, TRANSPARENCY_NONE, 0,
 			0x40000,
 			0x40000);
 	}

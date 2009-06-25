@@ -2392,10 +2392,10 @@ INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
 
 }
 
-static void stv_vdp2_drawgfxzoom( running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+static void stv_vdp2_drawgfxzoom( 
+		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
+		int transparency,int transparent_color,int scalex, int scaley,
 		int sprite_screen_width, int sprite_screen_height, int alpha)
 {
 	rectangle myclip;
@@ -2449,7 +2449,7 @@ static void stv_vdp2_drawgfxzoom( running_machine *machine,
 
 	if( gfx )
 	{
-		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		//int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -2726,8 +2726,8 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(UINT16 *rgb, int cor)
 	*rgb = (_r << 10) |  (_g << 5) | _b;
 }
 
-static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, UINT32 code, int flipx, int flipy,
-									 int sx, int sy, const rectangle *clip, int transparency, int alpha)
+static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, const rectangle *clip, UINT32 code, int flipx, int flipy,
+									 int sx, int sy, int transparency, int alpha)
 {
 	rectangle myclip;
 	UINT8* gfxdata;
@@ -3711,15 +3711,15 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 				if (stv2_current_tilemap.tile_size==1)
 				{
 					/* normal */
-					stv_vdp2_drawgfxzoom(machine,bitmap,machine->gfx[gfx],tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16, drawypos >> 16,cliprect,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
-					stv_vdp2_drawgfxzoom(machine,bitmap,machine->gfx[gfx],tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex) >> 16,drawypos >> 16,cliprect,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
-					stv_vdp2_drawgfxzoom(machine,bitmap,machine->gfx[gfx],tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16,(drawypos+tilesizey) >> 16,cliprect,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
-					stv_vdp2_drawgfxzoom(machine,bitmap,machine->gfx[gfx],tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex)>> 16,(drawypos+tilesizey) >> 16,cliprect,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
+					stv_vdp2_drawgfxzoom(bitmap,cliprect,machine->gfx[gfx],tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+					stv_vdp2_drawgfxzoom(bitmap,cliprect,machine->gfx[gfx],tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex) >> 16,drawypos >> 16,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+					stv_vdp2_drawgfxzoom(bitmap,cliprect,machine->gfx[gfx],tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
+					stv_vdp2_drawgfxzoom(bitmap,cliprect,machine->gfx[gfx],tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex)>> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
 
 				}
 				else
 				{
-					stv_vdp2_drawgfxzoom(machine,bitmap,machine->gfx[gfx],tilecode,pal,flipyx&1,flipyx&2, drawxpos >> 16, drawypos >> 16,cliprect,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X,SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+					stv_vdp2_drawgfxzoom(bitmap,cliprect,machine->gfx[gfx],tilecode,pal,flipyx&1,flipyx&2, drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,0,scalex,scaley,SCR_TILESIZE_X,SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
 				}
 			}
 			else
@@ -3732,10 +3732,10 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 					if ( stv2_current_tilemap.colour_depth == 3 )
 					{
 						/* normal */
-						stv_vdp2_drawgfx_rgb555(bitmap,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,cliprect,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_rgb555(bitmap,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,cliprect,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_rgb555(bitmap,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,cliprect,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_rgb555(bitmap,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,cliprect,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
 
 					}
 					else if (stv2_current_tilemap.transparency == STV_TRANSPARENCY_ALPHA)
@@ -3761,7 +3761,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 				{
 					if ( stv2_current_tilemap.colour_depth == 3 )
 					{
-						stv_vdp2_drawgfx_rgb555(bitmap,tilecode,flipyx&1,flipyx&2,drawxpos,drawypos,cliprect,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_rgb555(bitmap,cliprect,tilecode,flipyx&1,flipyx&2,drawxpos,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
 					}
 					else
 					{

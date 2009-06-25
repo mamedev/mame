@@ -240,9 +240,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bmp, const rectangl
 
 		// single/double
 		if (!(attrib & 0x10))
-			drawgfx(bmp, gfx, code, color, fx, fy, x, y, clip, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bmp, clip, gfx, code, color, fx, fy, x, y, 0);
 		else
-			drawgfxzoom(bmp, gfx, code, color, fx, fy, x, y, clip, TRANSPARENCY_PEN, 0, 1<<16, 2<<16);
+			drawgfxzoom_transpen(bmp, clip, gfx, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
 	}
 }
 

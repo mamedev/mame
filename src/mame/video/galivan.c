@@ -376,12 +376,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 //      code = spriteram[offs+1] + ((attr & 0x02) << 7);
 		code = spriteram[offs+1] + ((attr & 0x06) << 7);	// for ninjemak, not sure ?
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 				code,
 				color + 16 * (spritepalettebank[code >> 2] & 0x0f),
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx,sy,15);
 	}
 }
 

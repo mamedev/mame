@@ -2619,13 +2619,12 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	dest++;						\
 	pri++;
 
-INLINE void f3_drawgfx( running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfx( 
+		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
 		int sx,int sy,
-		const rectangle *clip,
 		UINT8 pri_dst)
 {
 	rectangle myclip;
@@ -2651,7 +2650,7 @@ INLINE void f3_drawgfx( running_machine *machine,
 
 	if( gfx )
 	{
-		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
@@ -2783,13 +2782,12 @@ INLINE void f3_drawgfx( running_machine *machine,
 #undef NEXT_P
 
 
-INLINE void f3_drawgfxzoom(running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfxzoom(
+		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
 		int sx,int sy,
-		const rectangle *clip,
 		int scalex, int scaley,
 		UINT8 pri_dst)
 {
@@ -2816,7 +2814,7 @@ INLINE void f3_drawgfxzoom(running_machine *machine,
 
 	if( gfx )
 	{
-		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
@@ -3206,22 +3204,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sprite_pri_usage|=1<<pri;
 
 		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
-			f3_drawgfx(machine,
-					bitmap,sprite_gfx,
+			f3_drawgfx(
+					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
 					sprite_ptr->color & (~sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
-					cliprect,
 					pri);
 		else
-			f3_drawgfxzoom(machine,
-					bitmap,sprite_gfx,
+			f3_drawgfxzoom(
+					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
 					sprite_ptr->color & (~sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
-					cliprect,
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
 					pri);
 	}

@@ -187,79 +187,79 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 			for (ay=0; ay<dy; ay++) {
 				if (!fx && !fy)
 				{
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 + 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 - 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 				}
 				else if (fx && !fy)
 				{
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 + 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 - 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 				}
 				else if (!fx && fy)
 				{
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 + 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 - 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 				}
 				else
 				{
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 + 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx(bitmap,machine->gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 - 512,
-						cliprect,TRANSPARENCY_PEN,15,pri_mask);
+						priority_bitmap,pri_mask,15);
 				}
 
 				inc++;

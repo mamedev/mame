@@ -320,7 +320,7 @@ VIDEO_RESET( bombsa )
   Screen refresh
 ***************************************************************************/
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(machine, bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine->gfx[0], code, color, flipx, flipy, sx, sy, TRANSPARENCY_PEN, 15);
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {

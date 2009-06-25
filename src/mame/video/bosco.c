@@ -224,12 +224,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int color = spriteram_2[offs + 1] & 0x3f;
 		if (flip_screen_get(machine)) sx += 32-2;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x0f));
 	}
 }
@@ -247,12 +246,11 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 		y = 253 - bosco_radary[offs];
 		if (flip_screen_get(machine)) x -= 3;
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 				((bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
 				0,
 				0,0,
-				x,y,
-				cliprect,TRANSPARENCY_PENS,0xf0);
+				x,y,0xf0);
 	}
 }
 

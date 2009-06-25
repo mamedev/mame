@@ -145,17 +145,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for (y = 0;y < height;y++)
 		{
-			pdrawgfx(
+			pdrawgfx_transpen(
 				bitmap,
+				cliprect,
 				machine->gfx[1],
 				sprite_number ^ y,
 				color,
 				flipx,flipy,
 				sx&0xff,
 				sy + 16*y,
-				cliprect,
-				TRANSPARENCY_PEN,0,
-				priority_mask );
+				priority_bitmap,
+				priority_mask,0 );
 		}
 		source+=4;
 	}

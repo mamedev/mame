@@ -99,14 +99,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			zx = x + (((k+1)*zoomx)/8) - curx;
 			zy = y + (((j+1)*zoomy)/16) - cury;
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
 					zx<<12,zy<<13,
-					primasks[priority]);
+					priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)

@@ -138,16 +138,15 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 		{
 			sx = xpos+(c^xflip)*width;
 			sy = ypos+(r^yflip)*height;
-			drawgfxzoom(
+			drawgfxzoom_transpen(
 				bitmap,
+				cliprect,
 				gfx,
 				tile+c*8+r,
 				color,
 				xflip,yflip,
 				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,transparent_pen,
-				(width<<16)/16, (height<<16)/16 );
+				(width<<16)/16, (height<<16)/16,transparent_pen );
 		}
 	}
 }
@@ -286,15 +285,14 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		sx = videoram[0x1381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
-		drawgfx(
+		drawgfx_transpen(
 				bitmap,
+				cliprect,
 				machine->gfx[1],
 				bank*0x40 + (tile&0x3f),
 				color,
 				tile&0x80,tile&0x40, /* flipx,flipy */
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,3 );
+				sx,sy,3 );
 	}
 }
 

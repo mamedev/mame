@@ -88,12 +88,11 @@ if (offs >= mexico86_objectram_size+0x1c0) continue;
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
-						x,y,
-						cliprect,TRANSPARENCY_PEN,15);
+						x,y,15);
 			}
 		}
 	}
@@ -145,22 +144,20 @@ VIDEO_UPDATE( kikikai )
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
-					sx&0xff,y,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx&0xff,y,15);
 
 			code = mexico86_videoram[goffs] + ((mexico86_videoram[goffs + 1] & 0x1f) << 8);
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
-					(sx+8)&0xff,y,
-					cliprect,TRANSPARENCY_PEN,15);
+					(sx+8)&0xff,y,15);
 		}
 	}
 	return 0;

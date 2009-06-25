@@ -60,7 +60,7 @@ static VIDEO_UPDATE(aristmk4)
 			int flipx = ((mkiv_vram[count]) & 0x04);
 			// 0x0800 probably flipy
 
-			drawgfx(bitmap,gfx,tile,color,flipx,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,0,x*8,y*8);
 			count+=2;
 		}
 	}

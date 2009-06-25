@@ -101,18 +101,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		fx = spriteram[offs]&4;
 		fy = 0; /* ? */
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				color,fx,fy,x,y,0);
 
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				sprite+1,
-				color,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+				color,fx,fy,x,y+16,0);
 		}
 	}
 }

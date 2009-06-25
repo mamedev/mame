@@ -338,21 +338,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40)	/* 16x16 */
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
-							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),
-							cliprect,TRANSPARENCY_PEN,0);
+							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
 				else	/* 8x8 */
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
-							offs / 4 + (spriteram[offs + i] & 0x0f),
-							cliprect,TRANSPARENCY_PEN,0);
+							offs / 4 + (spriteram[offs + i] & 0x0f),0);
 			}
 		}
 	}

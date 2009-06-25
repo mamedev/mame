@@ -437,10 +437,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
-		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy - 0x100, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy - 0x100, 0);
 	}
 }
 

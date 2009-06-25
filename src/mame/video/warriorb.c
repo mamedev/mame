@@ -88,12 +88,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (x>0x3c0) x -= 0x400;
 		if (y>0x180) y -= 0x200;
 
-		pdrawgfx(bitmap,machine->gfx[0],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 		  		 tilenum,
 				 color,
 				 flipx,flipy,
 				 x,y,
-				 cliprect,TRANSPARENCY_PEN,0,pri_mask);
+				 priority_bitmap,pri_mask,0);
 	}
 
 #ifdef MAME_DEBUG

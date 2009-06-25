@@ -161,8 +161,7 @@ static void gberet_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_PENS,
+			drawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}
@@ -213,8 +212,7 @@ static void gberetb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_PENS,
+			drawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}

@@ -105,12 +105,11 @@ static VIDEO_UPDATE( missb2 )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 						code,
 						0,
 						flipx,flipy,
-						x,y,
-						cliprect,TRANSPARENCY_PEN,0xff);
+						x,y,0xff);
 			}
 		}
 

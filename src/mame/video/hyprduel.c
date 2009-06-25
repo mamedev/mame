@@ -530,14 +530,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
-				pdrawgfxzoom(	bitmap,&gfx,
+				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,
 								color_start >> 4,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 255,
 								zoom, zoom,
-								primask[pri]);
+								priority_bitmap,primask[pri], 255);
 			}
 			else
 			{
@@ -547,14 +546,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width/2, 0, 16, GFX_ELEMENT_PACKED);
 
-				pdrawgfxzoom(	bitmap,&gfx,
+				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,
 								color + color_start,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 15,
 								zoom, zoom,
-								primask[pri]);
+								priority_bitmap,primask[pri], 15);
 			}
 #if 0
 {	/* Display priority + zoom on each sprite */

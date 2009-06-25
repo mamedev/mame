@@ -314,23 +314,21 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	/* this may not be correct */
 	ypos = ypos + (22 - 8);
 
-	drawgfx(bitmap, machine->gfx[image],
+	drawgfx_transpen(bitmap, cliprect,
+		machine->gfx[image],
 		0, 0,
 		flip_screen_get(machine),
 		flip_screen_get(machine),
 		xpos,
-		ypos,
-		cliprect,
-		TRANSPARENCY_PEN, 0);
+		ypos, 0);
 
-	drawgfx(bitmap, machine->gfx[image],
+	drawgfx_transpen(bitmap, cliprect,
+		machine->gfx[image],
 		0, 0,
 		flip_screen_get(machine),
 		flip_screen_get(machine),
 		xpos - 256,
-		ypos,
-		cliprect,
-		TRANSPARENCY_PEN, 0);
+		ypos, 0);
 
 	rect.min_x = visarea->min_x;
 	rect.max_x = visarea->max_x;
@@ -419,9 +417,8 @@ VIDEO_UPDATE( m52 )
 		clip = *cliprect;
 #endif
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transmask(bitmap, &clip, screen->machine->gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			&clip, TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 512+32));
 	}
 	return 0;

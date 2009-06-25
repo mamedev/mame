@@ -900,13 +900,12 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			}
 
 			if (priority != pri)
-				jal_blend_drawgfx(machine,
-							bitmap,machine->gfx[0],
+				jal_blend_drawgfx(
+							bitmap,cliprect,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
 							sx, sy,
-							cliprect,
 							TRANSPARENCY_PEN, 15);
 		}
 	}
@@ -1033,13 +1032,12 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				flipy = !flipy;
 			}
 
-			jal_blend_drawgfx(machine,
-						bitmap,machine->gfx[0],
+			jal_blend_drawgfx(
+						bitmap,cliprect,machine->gfx[0],
 						tile,
 						color,
 						flipx, flipy,
 						sx, sy,
-						cliprect,
 						TRANSPARENCY_PEN, 15);
 		}
 	}
@@ -1084,13 +1082,12 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 			if ((offs >= 0x100 && offs <= 0x2ff) || (offs >= 0x400 && offs <= 0x57f))
 			{
-				jal_blend_drawgfx(machine,
-							bitmap,machine->gfx[0],
+				jal_blend_drawgfx(
+							bitmap,cliprect,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
 							sx, sy,
-							cliprect,
 							TRANSPARENCY_PEN, 7);
 			}
 			else if ((offs >= 0x000 && offs <= 0x0ff) || (offs >= 0x300 && offs <= 0x3ff))
@@ -1099,13 +1096,12 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				{
 					td = (fx) ? (1 - i) : i;
 
-					jal_blend_drawgfx(machine,
-								bitmap,machine->gfx[0],
+					jal_blend_drawgfx(
+								bitmap,cliprect,machine->gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
 								sx + i * 16, sy,
-								cliprect,
 								TRANSPARENCY_PEN, 7);
 				}
 			}
@@ -1120,13 +1116,12 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (fx) ? (i * 2) + 1 - j : i * 2 + j;
 
-						jal_blend_drawgfx(machine,
-									bitmap,machine->gfx[0],
+						jal_blend_drawgfx(
+									bitmap,cliprect,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
 									sx + j * 16, sy - i * 16,
-									cliprect,
 									TRANSPARENCY_PEN, 7);
 					}
 				}
@@ -1142,13 +1137,12 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (fx) ? (i * 4) + 3 - j : i * 4 + j;
 
-						jal_blend_drawgfx(machine,
-									bitmap,machine->gfx[0],
+						jal_blend_drawgfx(
+									bitmap,cliprect,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
 									sx + j * 16, sy - i * 16,
-									cliprect,
 									TRANSPARENCY_PEN, 7);
 					}
 				}

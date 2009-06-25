@@ -213,7 +213,7 @@ VIDEO_UPDATE( suprridr )
 			fy = !fy;
 			y = 240 - y;
 		}
-		drawgfx(bitmap, screen->machine->gfx[2], code, color, fx, fy, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, fx, fy, x, y, 0);
 	}
 	return 0;
 }

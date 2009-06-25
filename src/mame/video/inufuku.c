@@ -143,14 +143,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 					code  = ((inufuku_spriteram2[map_start] & 0x0007) << 16) + inufuku_spriteram2[map_start + 1];
 
-					pdrawgfxzoom(bitmap, machine->gfx[2],
+					pdrawgfxzoom_transpen(bitmap, cliprect, machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
 							sx - 16, sy - 16,
-							cliprect, TRANSPARENCY_PEN, 15,
 							zoomx << 11, zoomy << 11,
-							priority_mask);
+							priority_bitmap,priority_mask, 15);
 
 					map_start += 2;
 				}

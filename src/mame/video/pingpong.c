@@ -137,12 +137,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		color = spriteram[offs] & 0x1f;
 		schar = spriteram[offs + 2] & 0x7f;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transmask(bitmap,&spritevisiblearea,machine->gfx[1],
 				schar,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&spritevisiblearea,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }

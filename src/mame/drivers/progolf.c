@@ -92,9 +92,9 @@ static VIDEO_UPDATE( progolf )
 			{
 				int tile = videoram[count];
 
-				drawgfx(bitmap,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				drawgfx(bitmap,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}

@@ -51,21 +51,19 @@ static VIDEO_UPDATE( mgolf )
 
 	for (i = 0; i < 2; i++)
 	{
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			mgolf_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
 			mgolf_video_ram[0x390 + 2 * i] - 7,
-			mgolf_video_ram[0x398 + 4 * i] - 16,
-			cliprect, TRANSPARENCY_PEN, 0);
+			mgolf_video_ram[0x398 + 4 * i] - 16, 0);
 
-		drawgfx(bitmap, screen->machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 			mgolf_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,
 			mgolf_video_ram[0x390 + 2 * i] - 15,
-			mgolf_video_ram[0x39a + 4 * i] - 16,
-			cliprect, TRANSPARENCY_PEN, 0);
+			mgolf_video_ram[0x39a + 4 * i] - 16, 0);
 	}
 	return 0;
 }

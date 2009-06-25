@@ -170,13 +170,13 @@ static void bloodbro_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		{
 			for (y = 0;y <= height;y++)
 			{
-				pdrawgfx(bitmap,machine->gfx[3],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						tile_number++,
 						color,
 						flipx,flipy,
 						flipx ? (sx + 16*(width-x)) : (sx + 16*x),flipy ? (sy + 16*(height-y)) : (sy + 16*y),
-						cliprect,TRANSPARENCY_PEN,15,
-						pri_mask);
+						priority_bitmap,
+						pri_mask,15);
 			}
 		}
 	}
@@ -214,13 +214,13 @@ static void weststry_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
 
-		pdrawgfx(bitmap,machine->gfx[3],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15,
-				pri_mask);
+				priority_bitmap,
+				pri_mask,15);
 	}
 }
 

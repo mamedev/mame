@@ -299,13 +299,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				{
 					bitmap_fill( tmpbitmap0, &spritetile_clip , 0);
 					bitmap_fill( tmpbitmap1, &spritetile_clip , 0);
-					drawgfxzoom(	tmpbitmap0,machine->gfx[gfx],
+					drawgfxzoom_transpen(	tmpbitmap0,&spritetile_clip,machine->gfx[gfx],
 									code++,
 									color,
 									flipx, flipy,
 									0,0,
-									&spritetile_clip,TRANSPARENCY_PEN,0,
-									(rot & 1 ? scaley : scalex) << 12, (rot & 1 ? scalex : scaley) << 12);
+									(rot & 1 ? scaley : scalex) << 12, (rot & 1 ? scalex : scaley) << 12,0);
 
 					// peek at the unrotated sprite
 					// copybitmap_trans( bitmap,tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, 0 );
@@ -362,13 +361,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						break;
 
 					default:
-						drawgfxzoom(	bitmap,machine->gfx[gfx],
+						drawgfxzoom_transpen(	bitmap,cliprect,machine->gfx[gfx],
 										code++,
 										color,
 										flipx, flipy,
 										currx, curry,
-										cliprect,TRANSPARENCY_PEN,0,
-										scalex << 12, scaley << 12);
+										scalex << 12, scaley << 12,0);
 						break;
 				}
 
@@ -443,13 +441,12 @@ static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom(	bitmap,machine->gfx[gfx],
+				drawgfxzoom_transpen(	bitmap,cliprect,machine->gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
 								currx, curry,
-								cliprect,TRANSPARENCY_PEN,0,
-								scalex << 12, scaley << 12);
+								scalex << 12, scaley << 12,0);
 			}
 		}
 	}

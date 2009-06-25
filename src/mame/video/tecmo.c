@@ -225,13 +225,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					pdrawgfx(bitmap,machine->gfx[1],
+					pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,
 							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0,
-							priority_mask);
+							priority_bitmap,
+							priority_mask,0);
 				}
 			}
 		}

@@ -501,17 +501,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			x -= 64;
 			y -= 78;
 
-			drawgfxzoom(bitmap,
+			drawgfxzoom_transmask(bitmap,
+			            cliprect,
 			            machine->gfx[gfx],
 			            code,
 			            color,
 			            flipx, flipy,
 			            x, y,
-			            cliprect,
-			            TRANSPARENCY_PENS,
-			            colortable_get_transpen_mask(machine->colortable, machine->gfx[gfx], color, SPR_TRANS_COLOR),
 			            scalex,
-			            scaley);
+			            scaley,
+			            colortable_get_transpen_mask(machine->colortable, machine->gfx[gfx], color, SPR_TRANS_COLOR));
 		}
 	}
 

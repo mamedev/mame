@@ -103,12 +103,11 @@ static void kickgoal_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		ypos = 0x200-ypos;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transpen(bitmap,cliprect,gfx,
 				tileno,
 				0x30 + color,
 				flipx,0,
-				xpos-16+4,ypos-32,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos-16+4,ypos-32,15);
 	}
 }
 
@@ -226,12 +225,11 @@ static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		ypos = 0x110-ypos;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transpen(bitmap,cliprect,gfx,
 				tileno+0x4000,
 				0x30 + color,
 				flipx,0,
-				xpos-16+4,ypos-32,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos-16+4,ypos-32,15);
 	}
 }
 

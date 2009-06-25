@@ -85,12 +85,11 @@ VIDEO_UPDATE( videopin )
 				{
 					for (j = 0; j < 2; j++)
 					{
-						drawgfx(bitmap, screen->machine->gfx[1],
+						drawgfx_transpen(bitmap, &rect, screen->machine->gfx[1],
 							0, 0,
 							0, 0,
 							x + 16 * i,
-							y + 16 * j,
-							&rect, TRANSPARENCY_PEN, 0);
+							y + 16 * j, 0);
 					}
 				}
 

@@ -147,7 +147,7 @@ static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,con
 		colour = cps1_gfxram[base+pos+1]&0x1f;
 		ypos = 256-ypos;
 
-		pdrawgfx(bitmap,machine->gfx[2],tileno,colour,flipx,flipy,xpos+49,ypos-16,cliprect,TRANSPARENCY_PEN,15,0x02);
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],tileno,colour,flipx,flipy,xpos+49,ypos-16,priority_bitmap,0x02,15);
 
 	}
 

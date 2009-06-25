@@ -243,13 +243,12 @@ static void contcirc_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
-					zx<<12,zy<<13,primasks[priority]);
+					zx<<12,zy<<13,priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -338,14 +337,13 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,machine->gfx[0],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0,
 						zx<<12,zy<<12,
-						primasks[priority]);
+						priority_bitmap,primasks[priority],0);
 			}
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
@@ -382,14 +380,13 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,machine->gfx[2],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[2],
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0,
 						zx<<12,zy<<12,
-						primasks[priority]);
+						priority_bitmap,primasks[priority],0);
 			}
 		}
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
@@ -426,14 +423,13 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,machine->gfx[2],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[2],
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						cliprect,TRANSPARENCY_PEN,0,
 						zx<<12,zy<<12,
-						primasks[priority]);
+						priority_bitmap,primasks[priority],0);
 			}
 		}
 
@@ -520,14 +516,13 @@ static void bshark_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
 					zx<<12,zy<<13,
-					primasks[priority]);
+					priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -622,14 +617,13 @@ static void sci_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,con
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
 					zx<<12,zy<<13,
-					primasks[priority]);
+					priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -714,14 +708,13 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
 					zx<<12,zy<<13,
-					primasks[priority]);
+					priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -806,14 +799,13 @@ static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,machine->gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
-					cliprect,TRANSPARENCY_PEN,0,
 					zx<<12,zy<<13,
-					primasks[priority]);
+					priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)

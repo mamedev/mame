@@ -407,7 +407,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx(bitmap,gfx,code,color,fx,fy,x,y,&clip,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,&clip,gfx,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -460,7 +460,7 @@ static void draw_sprites_aoh(const device_config *screen, bitmap_t *bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx(bitmap,gfx,code,color,fx,fy,x,y,&clip,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,&clip,gfx,code,color,fx,fy,x,y,0);
 		}
 	}
 }

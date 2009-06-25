@@ -233,12 +233,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (flip_screen_x_get(machine)) sx = 233 - sx;
 		if (flip_screen_y_get(machine)) sy = 244 - sy;
 
-		drawgfx(bitmap, machine->gfx[2],
+		drawgfx_transpen(bitmap, &clip,
+			machine->gfx[2],
 			code, 0,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
-			sx,sy,
-			&clip,
-			TRANSPARENCY_PEN, 0);
+			sx,sy, 0);
 	}
 }
 

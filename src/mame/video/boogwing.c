@@ -117,13 +117,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(machine,
-					bitmap,machine->gfx[gfx_region],
+			deco16_pdrawgfx(
+					bitmap, cliprect, machine->gfx[gfx_region],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect, 0, pri, spri, 0, alpha);
+					0, pri, spri, 0, alpha);
 
 			multi--;
 		}

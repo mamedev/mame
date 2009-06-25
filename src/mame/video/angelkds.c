@@ -177,52 +177,48 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	if (enable & enable_n)
 	{
-			drawgfx(
+			drawgfx_transpen(
 					bitmap,
+					cliprect,
 					gfx,
 					tile_no,
 					color*4,
 					flipx,flipy,
-					xpos,ypos,
-					cliprect,
-					TRANSPARENCY_PEN,15
+					xpos,ypos,15
 					);
 			/* wraparound */
 			if (xpos > 240)
-				drawgfx(
+				drawgfx_transpen(
 						bitmap,
+						cliprect,
 						gfx,
 						tile_no,
 						color*4,
 						flipx,flipy,
-						xpos-256,ypos,
-						cliprect,
-						TRANSPARENCY_PEN,15
+						xpos-256,ypos,15
 						);
 			/* wraparound */
 			if (ypos > 240)
 			{
-				drawgfx(
+				drawgfx_transpen(
 						bitmap,
+						cliprect,
 						gfx,
 						tile_no,
 						color*4,
 						flipx,flipy,
-						xpos,ypos-256,
-						cliprect,
-						TRANSPARENCY_PEN,15
+						xpos,ypos-256,15
 						);
 				/* wraparound */
 				if (xpos > 240)
-							drawgfx(
+							drawgfx_transpen(
 									bitmap,
+									cliprect,
 									gfx,
 									tile_no,
 									color*4,
 									flipx,flipy,
-									xpos-256,ypos-256,
-									cliprect,
-									TRANSPARENCY_PEN,15
+									xpos-256,ypos-256,15
 									);
 			}
 

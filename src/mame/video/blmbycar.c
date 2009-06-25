@@ -200,13 +200,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		x	=	(x & 0x1ff) - 0x10;
 		y	=	0xf0 - ((y & 0xff)  - (y & 0x100));
 
-		pdrawgfx(	bitmap, machine->gfx[0],
+		pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
 					code,
 					0x20 + (attr & 0xf),
 					flipx, flipy,
 					x, y,
-					cliprect, TRANSPARENCY_PEN,0,
-					pri_mask	);
+					priority_bitmap,
+					pri_mask,0	);
 	}
 }
 

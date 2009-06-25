@@ -94,8 +94,8 @@ static VIDEO_START(vroulet)
 static VIDEO_UPDATE(vroulet)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	drawgfx(bitmap, screen->machine->gfx[0], 0x320, 1, 0, 0,
-		vroulet_ball[1], vroulet_ball[0] - 12, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], 0x320, 1, 0, 0,
+		vroulet_ball[1], vroulet_ball[0] - 12, 0);
 	return 0;
 }
 

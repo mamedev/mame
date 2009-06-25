@@ -78,8 +78,8 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 		hpos <<= 1;
 		vpos <<= 1;
 
-		drawgfxzoom(bitmap, machine->gfx[layout], code, 0, flip_x, flip_y,
-			hpos, vpos, cliprect, TRANSPARENCY_PEN, 0, zoom_x, zoom_y);
+		drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[layout], code, 0, flip_x, flip_y,
+			hpos, vpos, zoom_x, zoom_y, 0);
 	}
 }
 

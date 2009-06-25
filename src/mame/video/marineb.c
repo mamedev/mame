@@ -202,12 +202,11 @@ VIDEO_UPDATE( marineb )
 			sx++;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 	return 0;
 }
@@ -248,12 +247,11 @@ VIDEO_UPDATE( changes )
 			sx++;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 
 	/* draw the big sprite */
@@ -278,21 +276,19 @@ VIDEO_UPDATE( changes )
 
 	code >>= 4;
 
-	drawgfx(bitmap,screen->machine->gfx[2],
+	drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
-			sx,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx,sy,0);
 
 	/* draw again for wrap around */
 
-	drawgfx(bitmap,screen->machine->gfx[2],
+	drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
-			sx-256,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx-256,sy,0);
 	return 0;
 }
 
@@ -350,12 +346,11 @@ VIDEO_UPDATE( springer )
 			sx--;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 	return 0;
 }
@@ -398,12 +393,11 @@ VIDEO_UPDATE( hoccer )
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 	return 0;
 }
@@ -461,12 +455,11 @@ VIDEO_UPDATE( hopprobo )
 			sx--;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 	return 0;
 }

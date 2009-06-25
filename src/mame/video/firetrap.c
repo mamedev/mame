@@ -239,49 +239,43 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			if (flip_screen_get(machine)) sy -= 16;
 
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
-					sx,flipy ? sy : sy + 16,
-					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,machine->gfx[3],
+					sx,flipy ? sy : sy + 16,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
-					sx,flipy ? sy + 16 : sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,flipy ? sy + 16 : sy,0);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
-					sx - 256,flipy ? sy : sy + 16,
-					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,machine->gfx[3],
+					sx - 256,flipy ? sy : sy + 16,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
-					sx - 256,flipy ? sy + 16 : sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx - 256,flipy ? sy + 16 : sy,0);
 		}
 		else
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
-					sx - 256,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx - 256,sy,0);
 		}
 	}
 }

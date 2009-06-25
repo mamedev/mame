@@ -146,9 +146,9 @@ VIDEO_UPDATE( m10 )
 
 	for (i=0;i<4;i++)
 		if (state->flip)
-			drawgfx(bitmap, back_gfx, i, color[i], 1, 1, 31*8 - xpos[i], 6, cliprect, 0, 0);
+			drawgfx_opaque(bitmap, cliprect, back_gfx, i, color[i], 1, 1, 31*8 - xpos[i], 6);
 		else
-			drawgfx(bitmap, back_gfx, i, color[i], 0, 0, xpos[i], 0, cliprect, 0, 0);
+			drawgfx_opaque(bitmap, cliprect, back_gfx, i, color[i], 0, 0, xpos[i], 0);
 
 	if (state->bottomline)
 	{

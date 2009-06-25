@@ -670,8 +670,8 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 ------------------------------------------------------------------------*/
 
 // blends two 8x8x16bpp direct RGB tilemaps
-static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
-				 gfx_element *gfx,
+static void draw_cloud(bitmap_t *bitmap,
+				 const gfx_element *gfx,
 				 UINT16 *tm_base,
 				 int x0, int y0,				// target coordinate
 				 int xcount, int ycount,		// number of tiles to draw in x and y
@@ -707,7 +707,7 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 
 	dst_base = BITMAP_ADDR32(bitmap, y0+dy, x0+dx);
 
-	pal_base = machine->pens + pal_offset * gfx->color_granularity;
+	pal_base = gfx->machine->pens + pal_offset * gfx->color_granularity;
 
 	alpha <<= 6;
 
@@ -827,12 +827,11 @@ static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code++,
 					color,
 					0,0,
-					((sx-scrollx)&0x3ff)-(384-32),sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					((sx-scrollx)&0x3ff)-(384-32),sy,0);
 		}
 	}
 
@@ -1098,7 +1097,7 @@ VIDEO_UPDATE ( wecleman )
 		((pen_t *)mrct)[0] = ((pen_t *)mrct)[0x40] = ((pen_t *)mrct)[0x200] = ((pen_t *)mrct)[0x205];
 
 		if (video_on)
-			draw_cloud(screen->machine,
+			draw_cloud(
 			bitmap,
 			screen->machine->gfx[0],
 			wecleman_pageram+0x1800,

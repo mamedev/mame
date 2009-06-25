@@ -83,12 +83,11 @@ static void jack_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				num,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 
@@ -164,12 +163,11 @@ static void joinem_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				num,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

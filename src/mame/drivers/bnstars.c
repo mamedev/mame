@@ -368,7 +368,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize, xzoom, yzoom;
-	int code, attr, color, size, pri, pri_mask, trans;
+	int code, attr, color, size, pri, pri_mask;
 	gfx_element *gfx = machine->gfx[region];
 
 	UINT32		*source	= sprram_top;
@@ -422,7 +422,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		yzoom = 0x1000000/yzoom;
 		xzoom = 0x1000000/xzoom;
 
-		trans = TRANSPARENCY_PEN; // there are surely also shadows (see gametngk) but how they're enabled we don't know
+		//trans = TRANSPARENCY_PEN; // there are surely also shadows (see gametngk) but how they're enabled we don't know
 
 		if (flipscreen)
 		{
@@ -443,13 +443,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			pri_mask = 0xfe;
 
 		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
-		pdrawgfxzoom(bitmap, gfx,
+		pdrawgfxzoom_transpen(bitmap, cliprect, gfx,
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				cliprect, trans, 0,
-				xzoom, yzoom, pri_mask);
+				xzoom, yzoom, priority_bitmap,pri_mask, 0);
 	}	/* end sprite loop */
 }
 

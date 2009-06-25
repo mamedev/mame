@@ -28,42 +28,37 @@ VIDEO_UPDATE( copsnrob )
 		sx = 31 - (offs % 32);
 		sy = offs / 32;
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				videoram[offs] & 0x3f,0,
 				0,0,
-				8*sx,8*sy,
-				cliprect,TRANSPARENCY_NONE,0);
+				8*sx,8*sy);
     }
 
 
     /* Draw the cars. Positioning was based on a screen shot */
     if (copsnrob_cary[0])
-        drawgfx(bitmap,screen->machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
                 copsnrob_carimage[0],0,
                 1,0,
-                0xe4,256-copsnrob_cary[0],
-                cliprect,TRANSPARENCY_PEN,0);
+                0xe4,256-copsnrob_cary[0],0);
 
     if (copsnrob_cary[1])
-        drawgfx(bitmap,screen->machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
                 copsnrob_carimage[1],0,
                 1,0,
-                0xc4,256-copsnrob_cary[1],
-                cliprect,TRANSPARENCY_PEN,0);
+                0xc4,256-copsnrob_cary[1],0);
 
     if (copsnrob_cary[2])
-        drawgfx(bitmap,screen->machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
                 copsnrob_carimage[2],0,
                 0,0,
-                0x24,256-copsnrob_cary[2],
-                cliprect,TRANSPARENCY_PEN,0);
+                0x24,256-copsnrob_cary[2],0);
 
     if (copsnrob_cary[3])
-        drawgfx(bitmap,screen->machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
                 copsnrob_carimage[3],0,
                 0,0,
-                0x04,256-copsnrob_cary[3],
-                cliprect,TRANSPARENCY_PEN,0);
+                0x04,256-copsnrob_cary[3],0);
 
 
     /* Draw the beer truck. Positioning was based on a screen shot.
@@ -89,11 +84,10 @@ VIDEO_UPDATE( copsnrob )
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
                    end may be off the top of the screen, but we don't care. */
-				drawgfx(bitmap,screen->machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 						0,0,
 						0,0,
-						0x80,256-(y+31),
-						cliprect,TRANSPARENCY_PEN,0);
+						0x80,256-(y+31),0);
 				/* Skip past this truck's front end so we don't draw this
                 truck twice. */
 				y += 31;
@@ -102,11 +96,10 @@ VIDEO_UPDATE( copsnrob )
 			{
 				/* We missed a truck's back end (it was off the bottom of the
                    screen) but have hit its front end, so draw the truck. */
-				drawgfx(bitmap,screen->machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 						0,0,
 						0,0,
-						0x80,256-y,
-						cliprect,TRANSPARENCY_PEN,0);
+						0x80,256-y,0);
 			}
 		}
     }

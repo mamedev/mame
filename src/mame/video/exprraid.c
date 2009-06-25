@@ -114,21 +114,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, 0, machine->gfx[1],
 			code, color,
 			flipx, flipy,
-			sx, sy,
-			0, TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 
 		/* double height */
 
 		if (attr & 0x10)
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect, machine->gfx[1],
 				code + 1, color,
 				flipx, flipy,
-				sx, sy + (flip_screen_get(machine) ? -16 : 16),
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
 		}
 	}
 }

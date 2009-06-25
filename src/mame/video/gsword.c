@@ -196,12 +196,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			drawgfx(bitmap,machine->gfx[1+spritebank],
+			drawgfx_transmask(bitmap,cliprect,machine->gfx[1+spritebank],
 					tile,
 					color,
 					flipx,flipy,
 					sx,sy,
-					cliprect,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(machine->colortable, machine->gfx[1+spritebank], color, 0x8f));
 		}
 	}

@@ -360,12 +360,12 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, screen->machine->gfx[2], code, color, 0, 0,
-									x + xt * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
+							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 0,
+									x + xt * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom(bitmap, screen->machine->gfx[2], code, color, 0, 0,
-									x + xt * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-									0x1000 * xzoom, 0x1000 * yzoom);
+							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 0,
+									x + xt * xzoom, y + yt * yzoom,
+									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
 
 			/* xflipped case */
@@ -374,12 +374,12 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, screen->machine->gfx[2], code, color, 1, 0,
-									x + (xtiles - 1 - xt) * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
+							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 0,
+									x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom(bitmap, screen->machine->gfx[2], code, color, 1, 0,
-									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-									0x1000 * xzoom, 0x1000 * yzoom);
+							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 0,
+									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
+									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
 
 			/* yflipped case */
@@ -388,12 +388,12 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, screen->machine->gfx[2], code, color, 0, 1,
-									x + xt * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
+							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 1,
+									x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom(bitmap, screen->machine->gfx[2], code, color, 0, 1,
-									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-									0x1000 * xzoom, 0x1000 * yzoom);
+							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 1,
+									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
+									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
 
 			/* x & yflipped case */
@@ -402,12 +402,12 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, screen->machine->gfx[2], code, color, 1, 1,
-									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
+							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 1,
+									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom(bitmap, screen->machine->gfx[2], code, color, 1, 1,
-									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-									0x1000 * xzoom, 0x1000 * yzoom);
+							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 1,
+									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
+									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
 		}
 	}

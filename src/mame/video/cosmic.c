@@ -297,18 +297,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
             if (spriteram[offs] & 0x80)
                 /* 16x16 sprite */
-			    drawgfx(bitmap,machine->gfx[0],
+			    drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					    code, color,
 					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],
-				        cliprect,TRANSPARENCY_PEN,0);
+				    	256-spriteram[offs+2],spriteram[offs+1],0);
             else
                 /* 32x32 sprite */
-			    drawgfx(bitmap,machine->gfx[1],
+			    drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					    code >> 2, color,
 					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],
-				        cliprect,TRANSPARENCY_PEN,0);
+				    	256-spriteram[offs+2],spriteram[offs+1],0);
         }
 	}
 }

@@ -78,30 +78,26 @@ VIDEO_UPDATE( subs )
 		if (screen == left_screen)
 		{
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 						charcode, 1,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_NONE,0);
+						0,0,sx,sy);
 			else
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 						0, 1,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_NONE,0);
+						0,0,sx,sy);
 		}
 
 		/* draw the right screen */
 		if (screen == right_screen)
 		{
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 						charcode, 0,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_NONE,0);
+						0,0,sx,sy);
 			else
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 						0, 0,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_NONE,0);
+						0,0,sx,sy);
 		}
 	}
 
@@ -128,11 +124,10 @@ VIDEO_UPDATE( subs )
 		if (screen == left_screen)
 		{
 			if ((offs!=0) || (sub_enable))
-				drawgfx(bitmap,screen->machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						0,0,sx,sy,0);
 		}
 
 
@@ -140,11 +135,10 @@ VIDEO_UPDATE( subs )
 		if (screen == right_screen)
 		{
 			if ((offs!=1) || (sub_enable))
-				drawgfx(bitmap,screen->machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
-						0,0,sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						0,0,sx,sy,0);
 		}
 	}
 

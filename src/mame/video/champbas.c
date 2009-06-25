@@ -210,21 +210,19 @@ static void champbas_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		int sx = spriteram_2[offs + 1] - 16;
 		int sy = 255 - spriteram_2[offs];
 
-		drawgfx(bitmap, gfx,
+		drawgfx_transmask(bitmap, cliprect,
+				gfx,
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				cliprect,
-				TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
 
 		// wraparound
-		drawgfx(bitmap, gfx,
+		drawgfx_transmask(bitmap, cliprect,
+				gfx,
 				code, color,
 				flipx, flipy,
 				sx + 256, sy,
-				cliprect,
-				TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
 	}
 }
@@ -250,13 +248,12 @@ static void exctsccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		color = ( obj1[offs+1] ) & 0x0f;
 		bank = ( ( obj1[offs+1] >> 4 ) & 1 );
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,
+				machine->gfx[1],
 				code + (bank << 6),
 				color,
 				flipx, flipy,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 
 	obj1 = spriteram_2;
@@ -274,13 +271,12 @@ static void exctsccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		flipy = ( ~obj1[offs] ) & 0x02;
 		color = ( obj1[offs+1] ) & 0x0f;
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transmask(bitmap,cliprect,
+				machine->gfx[2],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				cliprect,
-				TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0x10));
 	}
 }

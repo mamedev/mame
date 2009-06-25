@@ -174,12 +174,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				sprcros2_spriteram[offs],
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}

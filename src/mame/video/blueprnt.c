@@ -106,8 +106,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		// sprites are slightly misplaced, regardless of the screen flip
-		drawgfx(bitmap, machine->gfx[1], code, 0, flipx, flipy, 2+sx, sy-1,
-			cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, 0, flipx, flipy, 2+sx, sy-1, 0);
 	}
 }
 

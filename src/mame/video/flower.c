@@ -106,13 +106,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				if (xblock) sxoffs+=xblocksizeinpixels;
 				if (yblock) syoffs+=yblocksizeinpixels;
 
-				drawgfxzoom(bitmap,gfx,
+				drawgfxzoom_transpen(bitmap,cliprect,gfx,
 						code+yoffs+xoffs,
 						color,
 						flipx,flipy,
 						sx+sxoffs,sy+syoffs,
-						cliprect,TRANSPARENCY_PEN,15,
-						zoomx,zoomy);
+						zoomx,zoomy,15);
 			}
 		}
 		source -= 8;

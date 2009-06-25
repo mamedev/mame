@@ -219,12 +219,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					cliprect,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0xff));
 			}
 		}

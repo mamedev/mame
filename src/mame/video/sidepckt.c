@@ -123,19 +123,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		flipx = spriteram[offs+1] & 0x08;
 		flipy = spriteram[offs+1] & 0x04;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 		/* wraparound */
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx-256,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx-256,sy,0);
 	}
 }
 

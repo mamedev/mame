@@ -449,8 +449,8 @@ static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, cons
 		for (x=0;x<xnum;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, cliprect, TRANSPARENCY_PEN, CG10103_cur_chip->transpen, xfact, yfact);
-			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, cliprect, TRANSPARENCY_PEN, CG10103_cur_chip->transpen, xfact, yfact);
+			drawgfxzoom_transpen(screen, cliprect, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, CG10103_cur_chip->transpen);
 			xp += xstep;
 			tile++;
 		}

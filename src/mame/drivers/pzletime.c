@@ -103,7 +103,7 @@ static VIDEO_UPDATE( pzletime )
 
 			// is spriteram16[offs+0] & 0x200 flipy? it's always set
 
-			drawgfx(bitmap,screen->machine->gfx[1],spr_offs,colour,0,1,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,colour,0,1,sx,sy,0);
 		}
 	}
 

@@ -201,7 +201,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
 	int bank_base = (bank == 0) ? 0x4000 * (gfx_bank & 1) : 0;
-	K007121_sprites_draw(bank,bitmap,machine->gfx,machine->colortable,cliprect,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);
+	K007121_sprites_draw(bank,bitmap,cliprect,machine->gfx,machine->colortable,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);
 }
 
 /*****************************************************************************/

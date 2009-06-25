@@ -360,7 +360,7 @@ static VIDEO_UPDATE( ddayjlc )
 
 		code=(code&0x7f)|((flags&0x30)<<3);
 
-		drawgfx(bitmap, screen->machine->gfx[0], code, 1, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], code, 1, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -370,9 +370,9 @@ static VIDEO_UPDATE( ddayjlc )
 			{
 				c=videoram[y*32+x];
 				if(x>1&&x<30)
-					drawgfx(bitmap, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_PEN, 0);
+					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx(bitmap, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, cliprect, TRANSPARENCY_NONE, 0);
+					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8);
 		}
 	}
 	return 0;

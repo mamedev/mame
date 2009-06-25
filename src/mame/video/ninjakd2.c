@@ -410,12 +410,11 @@ static void draw_sprites(running_machine* machine, bitmap_t* bitmap)
 					{
 						int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
-						drawgfx(bitmap, gfx,
+						drawgfx_transpen(bitmap, 0, gfx,
 								tile,
 								color,
 								flipx,flipy,
-								sx + 16*x, sy + 16*y,
-								0, TRANSPARENCY_PEN, 15);
+								sx + 16*x, sy + 16*y, 15);
 
 						++sprites_drawn;
 						if (sprites_drawn >= 96)

@@ -145,12 +145,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		flipx = spriteram16[offs + 2] & 0x1000;
 		flipy = spriteram16[offs + 2] & 0x0800;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,/* placement relative to zoom layer verified on the real thing */
+				cliprect,machine->gfx[1],
 				code,
 				40 + color,
 				flipx,flipy,
-				sx+3,sy+1,	/* placement relative to zoom layer verified on the real thing */
-				cliprect,TRANSPARENCY_PEN,15);
+				sx+3,sy+1,15);
 	}
 }
 

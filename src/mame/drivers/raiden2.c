@@ -240,15 +240,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (ytiles = 0; ytiles < ytlim; ytiles++)
 			{
-				drawgfx(
+				drawgfx_transpen(
 						bitmap,
+						cliprect,
 						gfx,
 						tile_number,
 						colr,
 						yflip,xflip,
-						sx+xstep*xtiles,sy+ystep*ytiles,
-						cliprect,
-						TRANSPARENCY_PEN,15);
+						sx+xstep*xtiles,sy+ystep*ytiles,15);
 
 				tile_number++;
 			}

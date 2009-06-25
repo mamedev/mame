@@ -468,20 +468,18 @@ static VIDEO_UPDATE( marinedt )
 	tilemap_draw(tile, cliprect, tx_tilemap, 0, 0);
 
 	bitmap_fill(obj1, NULL, 0);
-	drawgfx(obj1, screen->machine->gfx[1],
+	drawgfx_transpen(obj1, NULL, screen->machine->gfx[1],
 			OBJ_CODE(marinedt_obj1_a),
 			OBJ_COLOR(marinedt_obj1_a),
 			OBJ_FLIPX(marinedt_obj1_a), OBJ_FLIPY(marinedt_obj1_a),
-			0, 0,
-			NULL, TRANSPARENCY_PEN, 0);
+			0, 0, 0);
 
 	bitmap_fill(obj2, NULL, 0);
-	drawgfx(obj2, screen->machine->gfx[2],
+	drawgfx_transpen(obj2, NULL, screen->machine->gfx[2],
 			OBJ_CODE(marinedt_obj2_a),
 			OBJ_COLOR(marinedt_obj2_a),
 			OBJ_FLIPX(marinedt_obj2_a), OBJ_FLIPY(marinedt_obj2_a),
-			0, 0,
-			NULL, TRANSPARENCY_PEN, 0);
+			0, 0, 0);
 
 	bitmap_fill(bitmap, NULL, 0);
 

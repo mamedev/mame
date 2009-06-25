@@ -199,9 +199,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-			(flip_screen_x_get(machine) ? &flip_spritevisiblearea : &spritevisiblearea),
-			TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, (flip_screen_x_get(machine) ? &flip_spritevisiblearea : &spritevisiblearea),
+			machine->gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -299,8 +298,7 @@ VIDEO_EOF( mermaid )
 
 		tilemap_draw(helper, &rect, bg_tilemap, 0, 0);
 
-		drawgfx(helper2, machine->gfx[1], code, 0, flipx, flipy, sx, sy,
-			&rect,TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		coll_bit2 |= collision_check(machine->colortable, &rect);
 
@@ -311,8 +309,7 @@ VIDEO_EOF( mermaid )
 
 		tilemap_draw(helper, &rect, fg_tilemap, 0, 0);
 
-		drawgfx(helper2, machine->gfx[1], code, 0, flipx, flipy, sx, sy,
-			&rect,TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		coll_bit1 |= collision_check(machine->colortable, &rect);
 
@@ -350,12 +347,10 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx(helper, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2,
-					&rect,TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx(helper2, machine->gfx[1], code, 0, flipx, flipy, sx, sy,
-				&rect,TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		coll_bit0 |= collision_check(machine->colortable, &rect);
 	}
@@ -440,12 +435,10 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx(helper, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2,
-					&rect,TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx(helper2, machine->gfx[1], code, 0, flipx, flipy, sx, sy,
-				&rect,TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		coll_bit3 |= collision_check(machine->colortable, &rect);
 	}
@@ -530,12 +523,10 @@ VIDEO_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx(helper, machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2,
-					&rect,TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(helper, &rect,machine->gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx(helper2, machine->gfx[1], code, 0, flipx, flipy, sx, sy,
-				&rect,TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(helper2, &rect,machine->gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		coll_bit6 |= collision_check(machine->colortable, &rect);
 	}

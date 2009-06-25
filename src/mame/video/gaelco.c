@@ -172,10 +172,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				ex = xflip ? (spr_size-1-x) : x;
 				ey = yflip ? (spr_size-1-y) : y;
 
-				pdrawgfx(bitmap,gfx,number + x_offset[ex] + y_offset[ey],
+				pdrawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						cliprect,TRANSPARENCY_PEN,0,pri_mask);
+						priority_bitmap,pri_mask,0);
 			}
 		}
 	}

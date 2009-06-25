@@ -473,13 +473,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				pdrawgfx(bitmap, machine->gfx[gfxnum],
+				pdrawgfx_transpen(bitmap, &clip,
+						machine->gfx[gfxnum],
 						code++,
 						color,
 						flipx, flipy,
 						sx + x * 8, sy + y * 8,
-						&clip,
-						TRANSPARENCY_PEN, 0, primask);
+						priority_bitmap, primask, 0);
 			}
 			code	+=	(0x100/8) - xnum;
 		}

@@ -835,15 +835,15 @@ void deco16_clear_sprite_priority_bitmap(void)
 }
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
-void deco16_pdrawgfx(running_machine *machine,
-		bitmap_t *dest,const gfx_element *gfx,
+void deco16_pdrawgfx(
+		bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha)
+		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha)
 {
 	int ox,oy,cx,cy;
 	int x_index,y_index,x,y;
 
-	const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	/* check bounds */

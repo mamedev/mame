@@ -138,13 +138,12 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 			sy = 31 - row;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,
+			machine->gfx[0],
 			gotya_videoram2[row * 32 + col],
 			gotya_videoram2[row * 32 + col + 0x10] & 0x0f,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
-			8 * sx, 8 * sy,
-			cliprect,
-			TRANSPARENCY_NONE, 0);
+			8 * sx, 8 * sy);
 	}
 }
 
@@ -164,12 +163,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,
+			machine->gfx[1],
 			code, color,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
-			sx, sy,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 	}
 }
 

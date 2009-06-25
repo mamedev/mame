@@ -105,13 +105,12 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bit
 				else sx = ((xpos + xzoom * x / 2 + 16) & 0x1ff) - 16;
 
 
-			drawgfxzoom(bitmap,gfx,
+			drawgfxzoom_transpen(bitmap,cliprect,gfx,
 						realtile,
 						color,
 						xflip,yflip,
 						sx,sy,
-						cliprect,TRANSPARENCY_PEN,15,
-						xzoom << 11, yzoom << 11);
+						xzoom << 11, yzoom << 11,15);
 
 			tile++;
 

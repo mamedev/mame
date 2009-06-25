@@ -99,7 +99,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				realy = ypos+incy*y;
 				realnumber = number+x+y*16;
 
-				drawgfx(bitmap,gfx,realnumber,colr,flipx,flipy,realx,realy,cliprect,TRANSPARENCY_PEN,15);
+				drawgfx_transpen(bitmap,cliprect,gfx,realnumber,colr,flipx,flipy,realx,realy,15);
 
 			}
 		}

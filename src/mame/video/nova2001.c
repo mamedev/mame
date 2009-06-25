@@ -285,12 +285,11 @@ static void nova2001_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, gfx,
+		drawgfx_transpen(bitmap, cliprect, gfx,
 				tile,
 				color,
 				flipx, flipy,
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx, sy, 0);
 	}
 }
 
@@ -322,20 +321,18 @@ static void pkunwar_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, gfx,
+		drawgfx_transpen(bitmap, cliprect, gfx,
 				tile,
 				color,
 				flipx, flipy,
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx, sy, 0);
 
 		// there's no X MSB, so draw with wraparound (fixes title screen)
-		drawgfx(bitmap, gfx,
+		drawgfx_transpen(bitmap, cliprect, gfx,
 				tile,
 				color,
 				flipx, flipy,
-				sx - 256, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx - 256, sy, 0);
 	}
 }
 

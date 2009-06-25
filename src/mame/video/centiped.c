@@ -431,8 +431,7 @@ VIDEO_UPDATE( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
-				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, &spriteclip, screen->machine->gfx[1], code, color, flipx, flipy, x, y, penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -476,8 +475,7 @@ VIDEO_UPDATE( warlords )
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], code, color, flipx, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -507,8 +505,7 @@ VIDEO_UPDATE( bullsdrt )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, screen->machine->gfx[1], code, color & 0x3f, 1, flipy, x, y,
-				&spriteclip, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, &spriteclip, screen->machine->gfx[1], code, color & 0x3f, 1, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -544,8 +541,7 @@ VIDEO_UPDATE( milliped )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
-				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, &spriteclip, screen->machine->gfx[1], code, color, flipx, flipy, x, y, penmask[color & 0x3f]);
 	}
 	return 0;
 }

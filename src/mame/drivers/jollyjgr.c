@@ -353,11 +353,10 @@ static VIDEO_UPDATE( jollyjgr )
 
 		if (offs < 3*4)  sy++;
 
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 				code,color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 
 	}
 	return 0;

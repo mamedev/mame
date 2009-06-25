@@ -198,12 +198,11 @@ VIDEO_UPDATE( jumping )
 			data1 = spriteram16[offs+3];
 			color = (spriteram16[offs+4] & 0x0f) | sprite_colbank;
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					tile,
 					color,
 					data1 & 0x40, data1 & 0x80,
-					sx,sy+1,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy+1,15);
 		}
 	}
 

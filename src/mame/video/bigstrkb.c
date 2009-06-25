@@ -44,7 +44,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		flipx = attr & 0x0100;
 		col = attr & 0x000f;
 
-		drawgfx(bitmap,gfx,num,col,flipx,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,15);
+		drawgfx_transpen(bitmap,cliprect,gfx,num,col,flipx,0,xpos,ypos,15);
 		source+=8;
 	}
 }

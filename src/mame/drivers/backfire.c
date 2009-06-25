@@ -153,12 +153,12 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,machine->gfx[region],
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[region],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+					priority_bitmap,pri,0);
 
 			multi--;
 		}

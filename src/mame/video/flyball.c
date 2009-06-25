@@ -73,8 +73,8 @@ VIDEO_UPDATE( flyball )
 
 	/* draw pitcher */
 
-	drawgfx(bitmap, screen->machine->gfx[1], flyball_pitcher_pic ^ 0xf,
-		0, 1, 0, pitcherx, pitchery, cliprect, TRANSPARENCY_PEN, 1);
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], flyball_pitcher_pic ^ 0xf,
+		0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 

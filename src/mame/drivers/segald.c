@@ -45,8 +45,8 @@ static void astron_draw_characters(running_machine *machine, bitmap_t *bitmap,co
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx(bitmap, machine->gfx[0], fix_RAM[current_screen_character],
-					1, 0, 0, characterX*8, characterY*8, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[0], fix_RAM[current_screen_character],
+					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
 }

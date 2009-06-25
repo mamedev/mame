@@ -159,36 +159,32 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 					sx -= xscroll;
 
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0 );
+							sx,sy,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
-							sx,sy-0x200,
-							cliprect,TRANSPARENCY_PEN,0 );
+							sx,sy-0x200,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
-							sx-0x400,sy,
-							cliprect,TRANSPARENCY_PEN,0 );
+							sx-0x400,sy,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
-							sx-0x400,sy-0x200,
-							cliprect,TRANSPARENCY_PEN,0 );
+							sx-0x400,sy-0x200,0 );
 
 
 

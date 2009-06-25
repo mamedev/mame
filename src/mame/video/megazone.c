@@ -135,12 +135,11 @@ VIDEO_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx(tmpbitmap,screen->machine->gfx[1],
+		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
 				((int)videoram[offs]) + ((colorram[offs] & (1<<7) ? 256 : 0) ),
 				(colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+				8*sx,8*sy);
 	}
 
 	/* copy the temporary bitmap to the screen */
@@ -182,12 +181,11 @@ VIDEO_UPDATE( megazone )
 			else
 				sx = sx + 32;
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[0],
 					spriteram[offs + 2],
 					color,
 					flipx,flipy,
 					sx,sy,
-					cliprect,TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[0], color, 0));
 		}
 	}
@@ -216,12 +214,11 @@ VIDEO_UPDATE( megazone )
 
 
 
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],
 					((int)megazone_videoram2[offs]) + ((megazone_colorram2[offs] & (1<<7) ? 256 : 0) ),
 					(megazone_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,
-					8*sx,8*sy,
-					cliprect,TRANSPARENCY_NONE,0);
+					8*sx,8*sy);
 			offs++;
 		}
 	}

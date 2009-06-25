@@ -34,7 +34,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (end) break;
 		if (prio == layer)
-		  drawgfx(bitmap,gfx,number,colr,xflip,yflip,xpos,ypos,cliprect,TRANSPARENCY_PEN,0);
+		  drawgfx_transpen(bitmap,cliprect,gfx,number,colr,xflip,yflip,xpos,ypos,0);
 
 		source+=4;
 	}

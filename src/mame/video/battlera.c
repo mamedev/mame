@@ -285,20 +285,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,clip,machine->gfx[1],
 				code,
 				colour,
 				fx,fy,
-				mx,my,
-				clip,TRANSPARENCY_PEN,0);
+				mx,my,0);
 
 			if (cgx)
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,clip,machine->gfx[1],
 						code2,
 						colour,
 						fx,fy,
-						mx+16,my,
-						clip,TRANSPARENCY_PEN,0);
+						mx+16,my,0);
 			my += yinc;
 			/* if (cgx) */ /* Different from console? */
 			code += 2;
@@ -333,24 +331,21 @@ VIDEO_UPDATE( battlera )
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (vram_dirty[offs/2]) {
 			vram_dirty[offs/2]=0;
-	        drawgfx(tile_bitmap,screen->machine->gfx[0],
+	        drawgfx_opaque(tile_bitmap,0,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
-					8*mx,8*my,
-					0,TRANSPARENCY_NONE,0);
-			drawgfx(front_bitmap,screen->machine->gfx[2],
+					8*mx,8*my);
+			drawgfx_opaque(front_bitmap,0,screen->machine->gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
-					8*mx,8*my,
-					0,TRANSPARENCY_NONE,0);
-	        drawgfx(front_bitmap,screen->machine->gfx[0],
+					8*mx,8*my);
+	        drawgfx_transmask(front_bitmap,0,screen->machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
-					8*mx,8*my,
-					0,TRANSPARENCY_PENS,0x1);
+					8*mx,8*my,0x1);
 			}
 	}
 

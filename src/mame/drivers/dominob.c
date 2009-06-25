@@ -55,18 +55,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8)  ;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code,
 				((spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),
-				cliprect,TRANSPARENCY_PEN,0);
-		drawgfx(bitmap,machine->gfx[0],
+				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code + 1,
 				((spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 
@@ -80,14 +78,13 @@ static VIDEO_UPDATE( dominob )
 		for(y=0;y<256/32;y++)
 	 		for(x=0;x<256/32;x++)
 	 		{
-	 			drawgfx(	bitmap,
-									screen->machine->gfx[1],
+	 			drawgfx_opaque(	bitmap,
+									cliprect,
+						screen->machine->gfx[1],
 									bgram[index]+256*(bgram[index+1]&0xf),
 						bgram[index+1]>>4,
 						0, 0,
-						x*32,y*32,
-						cliprect,
-						TRANSPARENCY_NONE,0);
+						x*32,y*32);
 				index+=2;
 	 		}
 	}
@@ -97,14 +94,13 @@ static VIDEO_UPDATE( dominob )
 		for(y=0;y<32;y++)
 	 		for(x=0;x<32;x++)
 	 		{
-	 			drawgfx(	bitmap,
+	 			drawgfx_transpen(	bitmap,
+						cliprect,
 						screen->machine->gfx[0],
 						videoram[(y*32+x)*2+1]+(videoram[(y*32+x)*2]&7)*256,
 						(videoram[(y*32+x)*2]>>3),
 						0, 0,
-						x*8,y*8,
-						cliprect,
-						TRANSPARENCY_PEN,0);
+						x*8,y*8,0);
 	 		}
 	}
 

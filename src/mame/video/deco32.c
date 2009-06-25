@@ -279,20 +279,20 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,machine->gfx[gfxbank],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						cliprect,TRANSPARENCY_PEN,0,prival);
+						priority_bitmap,prival,0);
 
 				// wrap-around y
-				pdrawgfx(bitmap,machine->gfx[gfxbank],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y) - 512,
-						cliprect,TRANSPARENCY_PEN,0,prival);
+						priority_bitmap,prival,0);
 			}
 		}
 	}
@@ -346,13 +346,13 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(machine,
-					bitmap,machine->gfx[gfxbank],
+			deco16_pdrawgfx(
+					bitmap,cliprect,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,0,pri,1<<gfxbank, 1, alpha);
+					0,pri,1<<gfxbank, 1, alpha);
 
 			multi--;
 		}
@@ -364,9 +364,8 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
     Bottom 8 bits per pixel is palettised sprite data, top 8 is
     colour/alpha/priority.
 */
-static void deco32_draw_sprite(bitmap_t *dest,const gfx_element *gfx,
-		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip)
+static void deco32_draw_sprite(bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
+		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy)
 {
 	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 	int ox,oy,cx,cy;
@@ -462,22 +461,21 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		while (multi >= 0)
 		{
-			deco32_draw_sprite(bitmap,machine->gfx[gfxbank],
+			deco32_draw_sprite(bitmap,cliprect,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
-					cliprect);
+					x,y + mult * multi);
 
 			multi--;
 		}
 	}
 }
 
-INLINE void dragngun_drawgfxzoom( running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void dragngun_drawgfxzoom(
+		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparent_color,
+		int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height, UINT8 alpha )
 {
 	rectangle myclip;
@@ -510,7 +508,7 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -821,13 +819,13 @@ static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 				sprite&=0x7fff;
 
 				if (zoomx!=0x10000 || zoomy!=0x10000)
-					dragngun_drawgfxzoom(machine,
-						bitmap,machine->gfx[bank],
+					dragngun_drawgfxzoom(
+						bitmap,cliprect,machine->gfx[bank],
 						sprite,
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						cliprect,15,zoomx,zoomy,NULL,0,
+						15,zoomx,zoomy,NULL,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha );
 				else
 					drawgfx_alpha(bitmap,cliprect,machine->gfx[bank],
@@ -1443,11 +1441,12 @@ VIDEO_UPDATE( fghthist )
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 */
-static void mixDualAlphaSprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
+static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pal0 = &machine->pens[gfx0->color_base];
-	const pen_t *pal1 = &machine->pens[gfx1->color_base];
-	const pen_t *pal2 = &machine->pens[(deco32_pri&1) ? machine->gfx[1]->color_base : machine->gfx[2]->color_base];
+	const pen_t *pens = gfx0->machine->pens;
+	const pen_t *pal0 = &pens[gfx0->color_base];
+	const pen_t *pal1 = &pens[gfx1->color_base];
+	const pen_t *pal2 = &pens[gfx0->machine->gfx[(deco32_pri&1) ? 1 : 2]->color_base];
 	int x,y;
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
@@ -1653,7 +1652,7 @@ VIDEO_UPDATE( nslasher )
 		}
 	}
 
-	mixDualAlphaSprites(screen->machine, bitmap, cliprect, screen->machine->gfx[3], screen->machine->gfx[4], alphaTilemap);
+	mixDualAlphaSprites(bitmap, cliprect, screen->machine->gfx[3], screen->machine->gfx[4], alphaTilemap);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;

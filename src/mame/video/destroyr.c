@@ -43,8 +43,8 @@ VIDEO_UPDATE( destroyr )
 				continue;
 		}
 
-		drawgfx(bitmap, screen->machine->gfx[2], num, 0, flipx, 0,
-			horz, 16 * i, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], num, 0, flipx, 0,
+			horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -55,8 +55,8 @@ VIDEO_UPDATE( destroyr )
 		{
 			int num = destroyr_alpha_num_ram[32 * i + j];
 
-			drawgfx(bitmap, screen->machine->gfx[0], num, 0, 0, 0,
-				8 * j, 8 * i, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], num, 0, 0, 0,
+				8 * j, 8 * i, 0);
 		}
 	}
 
@@ -67,16 +67,16 @@ VIDEO_UPDATE( destroyr )
 		int horz = 256 - destroyr_minor_obj_ram[i + 2];
 		int vert = 256 - destroyr_minor_obj_ram[i + 4];
 
-		drawgfx(bitmap, screen->machine->gfx[1], destroyr_minor_obj_ram[i + 0], 0, 0, 0,
-			horz, vert, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], destroyr_minor_obj_ram[i + 0], 0, 0, 0,
+			horz, vert, 0);
 	}
 
 	/* draw waves */
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx(bitmap, screen->machine->gfx[3], destroyr_wavemod ? 1 : 0, 0, 0, 0,
-			64 * i, 0x4e, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3], destroyr_wavemod ? 1 : 0, 0, 0, 0,
+			64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */

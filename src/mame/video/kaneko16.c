@@ -432,9 +432,9 @@ else
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void kaneko16_draw_sprites_custom(running_machine *machine, bitmap_t *dest_bmp,const gfx_element *gfx,
+static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int priority)
+		int priority)
 {
 	pen_t pen_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
@@ -635,13 +635,12 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 
 		UINT32 primask = kaneko16_priority.sprite[curr_pri];
 
-		kaneko16_draw_sprites_custom(	machine,
-										bitmap,machine->gfx[0],
+		kaneko16_draw_sprites_custom(	
+										bitmap,cliprect,machine->gfx[0],
 										s->code,
 										s->color,
 										s->flipx, s->flipy,
 										s->x, s->y,
-										cliprect,
 										primask );
 	}
 }

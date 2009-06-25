@@ -105,12 +105,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			sprite_ptr->x = curx;
 			sprite_ptr->y = cury;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
-					sprite_ptr->x,sprite_ptr->y,
-					cliprect,TRANSPARENCY_PEN,0);
+					sprite_ptr->x,sprite_ptr->y,0);
 		}
 	}
 }

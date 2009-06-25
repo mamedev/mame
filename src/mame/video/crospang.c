@@ -176,12 +176,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x-xsproff,y-ysproff + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					x-xsproff,y-ysproff + mult * multi,0);
 
 			multi--;
 		}

@@ -118,7 +118,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy) drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+#define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 
 static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
 {

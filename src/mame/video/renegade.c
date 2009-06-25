@@ -104,23 +104,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (attributes & 0x80) /* big sprite */
 			{
 				sprite_number &= ~1;
-				drawgfx(bitmap, machine->gfx[sprite_bank],
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[sprite_bank],
 					sprite_number + 1,
 					color,
 					xflip, flip_screen_get(machine),
-					sx, sy + (flip_screen_get(machine) ? -16 : 16),
-					cliprect, TRANSPARENCY_PEN, 0);
+					sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
 			}
 			else
 			{
 				sy += (flip_screen_get(machine) ? -16 : 16);
 			}
-			drawgfx(bitmap, machine->gfx[sprite_bank],
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[sprite_bank],
 				sprite_number,
 				color,
 				xflip, flip_screen_get(machine),
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
+				sx, sy, 0);
 		}
 		source += 4;
 	}

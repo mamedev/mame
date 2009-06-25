@@ -135,30 +135,26 @@ VIDEO_UPDATE( finalizr )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,gfx1,
+				drawgfx_transpen(bitmap,cliprect,gfx1,
 						code,
 						color,
 						flipx,flipy,
-						flipx?sx+16:sx,flipy?sy+16:sy,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx1,
+						flipx?sx+16:sx,flipy?sy+16:sy,0);
+				drawgfx_transpen(bitmap,cliprect,gfx1,
 						code + 1,
 						color,
 						flipx,flipy,
-						flipx?sx:sx+16,flipy?sy+16:sy,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx1,
+						flipx?sx:sx+16,flipy?sy+16:sy,0);
+				drawgfx_transpen(bitmap,cliprect,gfx1,
 						code + 2,
 						color,
 						flipx,flipy,
-						flipx?sx+16:sx,flipy?sy:sy+16,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx1,
+						flipx?sx+16:sx,flipy?sy:sy+16,0);
+				drawgfx_transpen(bitmap,cliprect,gfx1,
 						code + 3,
 						color,
 						flipx,flipy,
-						flipx?sx:sx+16,flipy?sy:sy+16,
-						cliprect,TRANSPARENCY_PEN,0);
+						flipx?sx:sx+16,flipy?sy:sy+16,0);
 			}
 			else
 			{
@@ -172,12 +168,11 @@ VIDEO_UPDATE( finalizr )
 
 				if (size == 0x00)	/* 16x16 */
 				{
-					drawgfx(bitmap,gfx1,
+					drawgfx_transpen(bitmap,cliprect,gfx1,
 							code,
 							color,
 							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,sy,0);
 				}
 				else
 				{
@@ -185,42 +180,37 @@ VIDEO_UPDATE( finalizr )
 
 					if (size == 0x04)	/* 16x8 */
 					{
-						drawgfx(bitmap,gfx2,
+						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code & ~1,
 								color,
 								flipx,flipy,
-								flipx?sx+8:sx,sy,
-								cliprect,TRANSPARENCY_PEN,0);
-						drawgfx(bitmap,gfx2,
+								flipx?sx+8:sx,sy,0);
+						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code | 1,
 								color,
 								flipx,flipy,
-								flipx?sx:sx+8,sy,
-								cliprect,TRANSPARENCY_PEN,0);
+								flipx?sx:sx+8,sy,0);
 					}
 					else if (size == 0x08)	/* 8x16 */
 					{
-						drawgfx(bitmap,gfx2,
+						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code & ~2,
 								color,
 								flipx,flipy,
-								sx,flipy?sy+8:sy,
-								cliprect,TRANSPARENCY_PEN,0);
-						drawgfx(bitmap,gfx2,
+								sx,flipy?sy+8:sy,0);
+						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code | 2,
 								color,
 								flipx,flipy,
-								sx,flipy?sy:sy+8,
-								cliprect,TRANSPARENCY_PEN,0);
+								sx,flipy?sy:sy+8,0);
 					}
 					else if (size == 0x0c)	/* 8x8 */
 					{
-						drawgfx(bitmap,gfx2,
+						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code,
 								color,
 								flipx,flipy,
-								sx,sy,
-								cliprect,TRANSPARENCY_PEN,0);
+								sx,sy,0);
 					}
 				}
 			}

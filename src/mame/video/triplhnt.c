@@ -84,9 +84,9 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx(helper, machine->gfx[triplhnt_sprite_zoom],
+		drawgfx_opaque(helper, cliprect, machine->gfx[triplhnt_sprite_zoom],
 			2 * code + triplhnt_sprite_bank, 0, code & 8, 0,
-			rect.min_x, rect.min_y, cliprect, TRANSPARENCY_NONE, 0);
+			rect.min_x, rect.min_y);
 
 		if (rect.min_x < cliprect->min_x)
 			rect.min_x = cliprect->min_x;

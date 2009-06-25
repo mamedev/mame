@@ -271,9 +271,9 @@ VIDEO_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx(spritebitmap, screen->machine->gfx[0], which, color, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(spritebitmap, cliprect, screen->machine->gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx(spritebitmap, screen->machine->gfx[0], which, color, xflip, yflip, x - 256, y, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(spritebitmap, cliprect, screen->machine->gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

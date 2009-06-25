@@ -103,7 +103,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		y = 0x100 - spriteram[count];
 		x = spriteram[count+3];
 
-		drawgfx(bitmap,machine->gfx[1],spr_offs,color,fx,fy,x,y-16,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],spr_offs,color,fx,fy,x,y-16,0);
 	}
 }
 
@@ -122,9 +122,9 @@ static VIDEO_UPDATE(mirax)
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
-			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll);
 			/* wrap-around */
-			drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256);
 
 			count++;
 		}
@@ -146,9 +146,9 @@ static VIDEO_UPDATE(mirax)
 
 			if(x <= 1 || x >= 30)
 			{
-				drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll);
 				/* wrap-around */
-				drawgfx(bitmap,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256);
 			}
 
 			count++;

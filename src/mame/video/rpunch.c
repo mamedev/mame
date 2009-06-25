@@ -230,8 +230,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		drawgfx(bitmap, machine->gfx[2],
-				code, color + (rpunch_sprite_palette / 16), xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 15);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
+				code, color + (rpunch_sprite_palette / 16), xflip, yflip, x, y, 15);
 	}
 }
 

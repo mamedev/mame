@@ -53,7 +53,7 @@ static VIDEO_UPDATE(lions)
 			int tile = lions_vram[count+1]|lions_vram[count]<<8;
 			tile&=0x1ff;
 			//int colour = tile>>12;
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
 			count+=2;
 		}

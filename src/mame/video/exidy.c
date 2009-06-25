@@ -248,9 +248,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int sx = 236 - *exidy_sprite2_xpos - 4;
 	int sy = 244 - *exidy_sprite2_ypos - 4;
 
-	drawgfx(bitmap, machine->gfx[0],
+	drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
 			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 1,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			0, 0, sx, sy, 0);
 
 	/* draw sprite 1 next */
 	if (sprite_1_enabled())
@@ -262,9 +262,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (sy < 0) sy = 0;
 
-		drawgfx(bitmap, machine->gfx[0],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
 				(*exidy_spriteno & 0x0f) + 16 * sprite_set_1, 0,
-				0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+				0, 0, sx, sy, 0);
 	}
 
 }
@@ -319,18 +319,18 @@ static void check_collision(running_machine *machine)
 	{
 		org_1_x = 236 - *exidy_sprite1_xpos - 4;
 		org_1_y = 244 - *exidy_sprite1_ypos - 4;
-		drawgfx(motion_object_1_vid, machine->gfx[0],
+		drawgfx_transpen(motion_object_1_vid, &clip, machine->gfx[0],
 				(*exidy_spriteno & 0x0f) + 16 * sprite_set_1, 0,
-				0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
+				0, 0, 0, 0, 0);
 	}
 
 	/* draw sprite 2 */
 	bitmap_fill(motion_object_2_vid, &clip, 0xff);
 	org_2_x = 236 - *exidy_sprite2_xpos - 4;
 	org_2_y = 244 - *exidy_sprite2_ypos - 4;
-	drawgfx(motion_object_2_vid, machine->gfx[0],
+	drawgfx_transpen(motion_object_2_vid, &clip, machine->gfx[0],
 			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
+			0, 0, 0, 0, 0);
 
 	/* draw sprite 2 clipped to sprite 1's location */
 	bitmap_fill(motion_object_2_clip, &clip, 0xff);
@@ -338,9 +338,9 @@ static void check_collision(running_machine *machine)
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		drawgfx(motion_object_2_clip, machine->gfx[0],
+		drawgfx_transpen(motion_object_2_clip, &clip, machine->gfx[0],
 				((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
-				0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
+				0, 0, sx, sy, 0);
 	}
 
 	/* scan for collisions */

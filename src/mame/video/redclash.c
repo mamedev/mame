@@ -200,19 +200,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					{
 						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
 
-						drawgfx(bitmap,machine->gfx[3],
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 								code,
 								color,
 								0,0,
-								sx,sy - 16,
-								cliprect,TRANSPARENCY_PEN,0);
+								sx,sy - 16,0);
 						/* wraparound */
-						drawgfx(bitmap,machine->gfx[3],
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 								code,
 								color,
 								0,0,
-								sx - 256,sy - 16,
-								cliprect,TRANSPARENCY_PEN,0);
+								sx - 256,sy - 16,0);
 						break;
 					}
 
@@ -222,33 +220,30 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
-							drawgfx(bitmap,machine->gfx[4+bank],
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[4+bank],
 									code,
 									color,
 									0,0,
-									sx,sy - 16,
-									cliprect,TRANSPARENCY_PEN,0);
+									sx,sy - 16,0);
 						}
 						else
 						{
 							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
 
-							drawgfx(bitmap,machine->gfx[2],
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 									code,
 									color,
 									0,0,
-									sx,sy - 16,
-									cliprect,TRANSPARENCY_PEN,0);
+									sx,sy - 16,0);
 						}
 						break;
 
 					case 1:	/* 8x8 */
-						drawgfx(bitmap,machine->gfx[1],
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
-								sx,sy - 16,
-								cliprect,TRANSPARENCY_PEN,0);
+								sx,sy - 16,0);
 						break;
 
 					case 0:

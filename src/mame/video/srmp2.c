@@ -107,13 +107,12 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		if (srmp2_color_bank) color |= 0x20;
 
-		drawgfx(bitmap, machine->gfx[0],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				cliprect, TRANSPARENCY_PEN, 15);
+				max_y - ((y + yoffs) & 0x0ff), 15);
 	}
 }
 
@@ -173,12 +172,12 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 			code = code & 0x1fff;
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, machine->gfx[0], \
+			drawgfx_transpen(bitmap, \
+					cliprect, machine->gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
-					_x_, _y_, \
-					cliprect, TRANSPARENCY_PEN, 0);
+					_x_, _y_, 0);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -264,13 +263,12 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				cliprect, TRANSPARENCY_PEN, 0);
+				max_y - ((y + yoffs) & 0x0ff), 0);
 	}
 }
 
@@ -337,12 +335,12 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 			code	=	(code & 0x3fff) + (gfxbank ? 0x4000 : 0);
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, machine->gfx[0], \
+			drawgfx_transpen(bitmap, \
+					cliprect, machine->gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
-					_x_, _y_, \
-					cliprect, TRANSPARENCY_PEN, 0);
+					_x_, _y_, 0);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -421,13 +419,12 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff),
-				cliprect, TRANSPARENCY_PEN, 0);
+				max_y - ((y + yoffs) & 0x0ff), 0);
 	}
 }
 

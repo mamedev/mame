@@ -332,13 +332,12 @@ static void draw_shell(running_machine *machine,
 		{
 			for( sy=0; sy<256; sy+=16 )
 			{
-				drawgfx( bitmap, machine->gfx[1],
+				drawgfx_transpen( bitmap, cliprect,
+					machine->gfx[1],
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
-					sx,sy,
-					cliprect,
-					TRANSPARENCY_PEN,0 );
+					sx,sy,0 );
 			}
 		}
 	}
@@ -358,13 +357,12 @@ static void draw_shell(running_machine *machine,
             vstop       = 0x00
 
     */
-	drawgfx( bitmap, machine->gfx[1],
+	drawgfx_transpen( bitmap, cliprect,
+			machine->gfx[1],
 			picture_code,
 			0, /* color */
 			0,0, /* flip */
-			255-hposition-16,vstart-32,
-			cliprect,
-			TRANSPARENCY_PEN,0 );
+			255-hposition-16,vstart-32,0 );
 }
 
 VIDEO_UPDATE( tunhunt )

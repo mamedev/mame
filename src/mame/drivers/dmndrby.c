@@ -363,13 +363,13 @@ can we draw it with the tilemap? maybe not, the layout is a litle strange
 			int chr = racetrack_tilemap_rom[off];
 			int col = racetrack_tilemap_rom[off+0x2000]&0x1f;
 			int flipx = racetrack_tilemap_rom[off+0x2000]&0x40;
-			drawgfx(bitmap,track,chr,col,flipx,0,y*16+scrolly,x*16,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16+scrolly,x*16);
 			// draw another bit of track
 			// a rubbish way of doing it
 			chr = racetrack_tilemap_rom[off-0x100];
 			col = racetrack_tilemap_rom[off+0x1f00]&0x1f;
 			flipx = racetrack_tilemap_rom[off+0x1f00]&0x40;
-			drawgfx(bitmap,track,chr,col,flipx,0,y*16-256+scrolly,x*16,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16-256+scrolly,x*16);
 			off++;
 		}
 	}
@@ -399,13 +399,13 @@ wouldnt like to say its the most effective way though...
 		for (a=0;a<8 ;a++)
 		{
 			for(b=0;b<7;b++) {
-				drawgfx(bitmap,sprites,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,sprites,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,0);
 			}
 		}
 		// draw the horse number
 		a=3;
 		b=3;
-		drawgfx(bitmap,sprites,anim+horse,col,0,0,sprx+a*8,spry+b*8,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,sprites,anim+horse,col,0,0,sprx+a*8,spry+b*8,0);
 
 
 	}

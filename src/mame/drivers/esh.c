@@ -58,10 +58,10 @@ static VIDEO_UPDATE( esh )
 			//int blinkLine = (tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 					tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
-					0, 0, charx*8, chary*8, cliprect, TRANSPARENCY_PEN, 0);
+					0, 0, charx*8, chary*8, 0);
 		}
 	}
 

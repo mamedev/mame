@@ -65,12 +65,11 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 
         /* Draw first sprite */
 
-	    drawgfx(spritebitmap,machine->gfx[expand],
+	    drawgfx_opaque(spritebitmap,0, machine->gfx[expand],
 			    first * 2,
 			    0,
 			    0,0,
-			    fx,fy,
-			    0, TRANSPARENCY_NONE, 0);
+			    fx,fy);
 
         /* Get fingerprint */
 
@@ -92,12 +91,11 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 
         /* Blackout second sprite */
 
-	    drawgfx(spritebitmap,machine->gfx[1],
+	    drawgfx_transpen(spritebitmap,0, machine->gfx[1],
 			    second * 2,
 			    1,
 			    0,0,
-			    (zac2650_s2636_0_ram[second * 0x10 + 10] * 4)-22,(zac2650_s2636_0_ram[second * 0x10 + 12] * 3) + 3,
-			    0, TRANSPARENCY_PEN, 0);
+			    (zac2650_s2636_0_ram[second * 0x10 + 10] * 4)-22,(zac2650_s2636_0_ram[second * 0x10 + 12] * 3) + 3, 0);
 
         /* Remove fingerprint */
 
@@ -119,12 +117,11 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 
         /* Zero bitmap */
 
-	    drawgfx(spritebitmap,machine->gfx[expand],
+	    drawgfx_opaque(spritebitmap,0, machine->gfx[expand],
 			    first * 2,
 			    1,
 			    0,0,
-			    fx,fy,
-			    0, TRANSPARENCY_NONE, 0);
+			    fx,fy);
     }
 
 	return Checksum;
@@ -181,12 +178,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
             int x,y;
 
             /* Sprite->Background collision detection */
-			drawgfx(bitmap,machine->gfx[expand],
+			drawgfx_transpen(bitmap,0, machine->gfx[expand],
 				    spriteno,
 					1,
 				    0,0,
-				    bx,by,
-				    0, TRANSPARENCY_PEN, 0);
+				    bx,by, 0);
 
 	        for (x = bx; x < bx + machine->gfx[expand]->width; x++)
 	        {
@@ -208,12 +204,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
                 }
 	        }
 
-			drawgfx(bitmap,machine->gfx[expand],
+			drawgfx_transpen(bitmap,0, machine->gfx[expand],
 				    spriteno,
 					0,
 				    0,0,
-				    bx,by,
-				    0, TRANSPARENCY_PEN, 0);
+				    bx,by, 0);
         }
     }
 

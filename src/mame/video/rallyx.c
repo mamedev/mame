@@ -543,14 +543,13 @@ static void rallyx_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen_get(machine)) sx -= 2*displacement;
 
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0),
-				0x02);
+				priority_bitmap,0x02,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
 
@@ -565,14 +564,13 @@ static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
 				color,
 				flip,flip,
 				sx,sy,
-				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0),
-				0x02);
+				priority_bitmap,0x02,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
 

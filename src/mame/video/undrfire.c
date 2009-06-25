@@ -192,13 +192,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				}
 				else
 				{
-					drawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+					drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_ptr->gfx],
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
 							sprite_ptr->x,sprite_ptr->y,
-							cliprect,TRANSPARENCY_PEN,0,
-							sprite_ptr->zoomx,sprite_ptr->zoomy);
+							sprite_ptr->zoomx,sprite_ptr->zoomy,0);
 				}
 			}
 		}
@@ -212,14 +211,13 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				cliprect,TRANSPARENCY_PEN,0,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				sprite_ptr->primask);
+				priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -331,13 +329,12 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 			}
 			else
 			{
-				drawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+				drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_ptr->gfx],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
 						sprite_ptr->x,sprite_ptr->y,
-						cliprect,TRANSPARENCY_PEN,0,
-						sprite_ptr->zoomx,sprite_ptr->zoomy);
+						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
 			}
 		}
 	}
@@ -347,14 +344,13 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				cliprect,TRANSPARENCY_PEN,0,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				sprite_ptr->primask);
+				priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 

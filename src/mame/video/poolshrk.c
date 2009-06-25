@@ -44,8 +44,8 @@ VIDEO_UPDATE( poolshrk )
 		int hpos = poolshrk_hpos_ram[i];
 		int vpos = poolshrk_vpos_ram[i];
 
-		drawgfx(bitmap, screen->machine->gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
-			248 - hpos, vpos - 15, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
+			248 - hpos, vpos - 15, 0);
 	}
 
 	/* draw playfield */

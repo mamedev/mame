@@ -244,8 +244,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		drawgfx(rabbit_sprite_bitmap,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,&rabbit_sprite_clip,TRANSPARENCY_PEN,0);
-//      drawgfx(bitmap,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(rabbit_sprite_bitmap,&rabbit_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,0);
+//      drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
 		source-=2;

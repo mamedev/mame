@@ -54,7 +54,7 @@ static VIDEO_UPDATE(jackpool)
 				int attr = (sc1_vram[count+0x800] & 0x1f00)>>8;
 				//int t_pen = (sc1_vram[count+0x800] & 0x2000);
 				//int colour = tile>>12;
-				drawgfx(bitmap,gfx,tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 
 				count++;
 			}
@@ -87,7 +87,7 @@ static VIDEO_UPDATE(jackpool)
 				int attr = (sc2_vram[count+0x800] & 0x1f00)>>8;
 				//int t_pen = (sc1_vram[count+0x800] & 0x2000);
 				//int colour = tile>>12;
-				drawgfx(bitmap,gfx,tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 
 				count++;
 			}

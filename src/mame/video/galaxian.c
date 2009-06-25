@@ -640,12 +640,11 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		/* draw */
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, &clip,
+				machine->gfx[1],
 				code, color,
 				flipx, flipy,
-				GALAXIAN_H0START + GALAXIAN_XSCALE * sx, sy,
-				&clip,
-				TRANSPARENCY_PEN, 0);
+				GALAXIAN_H0START + GALAXIAN_XSCALE * sx, sy, 0);
 	}
 }
 

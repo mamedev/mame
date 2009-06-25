@@ -146,17 +146,17 @@ static void zerotrgt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
         {
 			if(fy)
 			{
-				drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,0);
 			}
 			else
 			{
-        		drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
-        		drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy-16,0);
+        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy,0);
 			}
 		}
 		else
-		   	drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+		   	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
 	}
 }
 
@@ -201,17 +201,17 @@ static void cntsteer_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
         {
 			if(fy)
 			{
-				drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,0);
 			}
 			else
 			{
-        		drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
-        		drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy-16,0);
+        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy,0);
 			}
 		}
 		else
-		   	drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+		   	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
 	}
 }
 

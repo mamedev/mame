@@ -316,7 +316,7 @@ static VIDEO_UPDATE( sbrkout )
 		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
 		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
 
-		drawgfx(bitmap, screen->machine->gfx[1], code, 0, 0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], code, 0, 0, 0, sx, sy, 0);
 	}
 	return 0;
 }

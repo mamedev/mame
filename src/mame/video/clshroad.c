@@ -312,12 +312,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				attr & 0x0f,
 				flipx,flipy,
-				x,y,
-				cliprect,TRANSPARENCY_PEN,15 );
+				x,y,15 );
 	}
 }
 

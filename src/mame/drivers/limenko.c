@@ -241,9 +241,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
-static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
+static void draw_single_sprite(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int priority)
+		int priority)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
@@ -388,16 +388,16 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 		/* prepare GfxElement on the fly */
 		gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
-		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y,cliprect,pri);
+		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
 		// wrap around x
-		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y,cliprect,pri);
+		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
 
 		// wrap around y
-		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y-512,cliprect,pri);
+		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
 
 		// wrap around x and y
-		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y-512,cliprect,pri);
+		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
 	}
 }
 

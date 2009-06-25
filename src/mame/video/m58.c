@@ -216,7 +216,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
  *
  *************************************/
 
-#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PENS, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512));
+#define DRAW_SPRITE(code, sy) drawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512));
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {

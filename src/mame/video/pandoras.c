@@ -157,12 +157,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transmask(bitmap,cliprect,machine->gfx[0],
 			sr[offs + 2],
 			color,
 			!nflipx,!nflipy,
 			sx,sy,
-			cliprect,TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 	}
 }

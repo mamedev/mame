@@ -823,20 +823,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		for (y = 0;y < height;y++)
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
-					sx & 0x1ff,248 - ((sy + 0x10 * (height - y)) & 0x1ff),
-					cliprect,TRANSPARENCY_PEN,0);
+					sx & 0x1ff,248 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
 
 			/* wrap around */
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
-					(sx & 0x1ff) - 512,248 - ((sy + 0x10 * (height - y)) & 0x1ff),
-					cliprect,TRANSPARENCY_PEN,0);
+					(sx & 0x1ff) - 512,248 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
 		}
 	}
 }

@@ -230,12 +230,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (((buffered_spriteram16[offs+0] & 0x3000) >> 12) == priority)
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
 				color,
  				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx,sy,15);
 		}
 	}
 }

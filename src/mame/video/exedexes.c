@@ -204,12 +204,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 		}
 	}
 }

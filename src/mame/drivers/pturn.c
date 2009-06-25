@@ -158,12 +158,11 @@ static VIDEO_UPDATE(pturn)
 
 		if(sx|sy)
 		{
-			drawgfx(bitmap, screen->machine->gfx[2],
+			drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[2],
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,
-			sx,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx,sy,0);
 		}
 	}
 	tilemap_draw(bitmap,cliprect,pturn_fgmap,0,0);

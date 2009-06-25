@@ -206,13 +206,14 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* bit 7 unknown (used) */
 }
 
-static void appoooh_draw_sprites(running_machine *machine,
+static void appoooh_draw_sprites(
 		bitmap_t *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
         UINT8 *sprite)
 {
 	int offs;
+	int flipy = flip_screen_get(gfx->machine);
 
 	for (offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
@@ -224,29 +225,29 @@ static void appoooh_draw_sprites(running_machine *machine,
 
 		if(sx>=248) sx -= 256;
 
-		if (flip_screen_get(machine))
+		if (flipy)
 		{
 			sx = 239 - sx;
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		drawgfx( dest_bmp, gfx,
+		drawgfx_transpen( dest_bmp, cliprect,
+				gfx,
 				code,
 				color,
-				flipx,flip_screen_get(machine),
-				sx, sy,
-				cliprect,
-				TRANSPARENCY_PEN , 0);
+				flipx,flipy,
+				sx, sy, 0);
 	 }
 }
 
-static void robowres_draw_sprites(running_machine *machine,
+static void robowres_draw_sprites(
 		bitmap_t *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
         UINT8 *sprite)
 {
 	int offs;
+	int flipy = flip_screen_get(gfx->machine);
 
 	for (offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
@@ -258,19 +259,18 @@ static void robowres_draw_sprites(running_machine *machine,
 
 		if(sx>=248) sx -= 256;
 
-		if (flip_screen_get(machine))
+		if (flipy)
 		{
 			sx = 239 - sx;
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		drawgfx( dest_bmp, gfx,
+		drawgfx_transpen( dest_bmp, cliprect,
+				gfx,
 				code,
 				color,
-				flipx,flip_screen_get(machine),
-				sx, sy,
-				cliprect,
-				TRANSPARENCY_PEN , 0);
+				flipx,flipy,
+				sx, sy, 0);
 	 }
 }
 
@@ -286,16 +286,16 @@ VIDEO_UPDATE( appoooh )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */
@@ -314,16 +314,16 @@ VIDEO_UPDATE( robowres )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites( screen->machine, bitmap, cliprect, screen->machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */

@@ -468,42 +468,35 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					drawgfx(bitmap,machine->gfx[bank],
+					drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 							code+3,color,flipx,flipy,
-							flipx ? sx : sx+16,flipy ? sy-16 : sy,
-							cliprect,TRANSPARENCY_PENS,transmask);
-					drawgfx(bitmap,machine->gfx[bank],
+							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
+					drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 							code+1,color,flipx,flipy,
-							flipx ? sx : sx+16,flipy ? sy : sy-16,
-							cliprect,TRANSPARENCY_PENS,transmask);
+							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				drawgfx(bitmap,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 						code+2,color,flipx,flipy,
-						flipx ? sx+16 : sx,flipy ? sy-16 : sy,
-						cliprect,TRANSPARENCY_PENS,transmask);
-				drawgfx(bitmap,machine->gfx[bank],
+						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 						code,color,flipx,flipy,
-						flipx ? sx+16 : sx,flipy ? sy : sy-16,
-						cliprect,TRANSPARENCY_PENS,transmask);
+						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				drawgfx(bitmap,machine->gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 						code,color,flipx,flipy,
-						flipx ? sx+16 : sx,flipy ? sy-16 : sy,
-						cliprect,TRANSPARENCY_PENS,transmask);
-				drawgfx(bitmap,machine->gfx[bank],
+						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
 						code+1,color,flipx,flipy,
-						flipx ? sx : sx+16,flipy ? sy-16 : sy,
-						cliprect,TRANSPARENCY_PENS,transmask);
+						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else	/* normal */
 			{
-				drawgfx(bitmap,machine->gfx[bank],
-						code,color,flipx,flipy,sx,sy,
-						cliprect,TRANSPARENCY_PENS,transmask);
+				drawgfx_transmask(bitmap,cliprect,machine->gfx[bank],
+						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}
 	}

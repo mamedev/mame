@@ -190,12 +190,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx(	bitmap, machine->gfx[gfx],
+				drawgfx_transpen(	bitmap, cliprect,machine->gfx[gfx],
 							(tile & 0x3fff) + bank*0x4000,
 							attr + (color_bank << 4),
 							tile_flipx, tile_flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15	);
+							sx, sy,15	);
 
 				tile_x += tile_xinc;
 			}

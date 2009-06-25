@@ -656,7 +656,7 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
-			drawgfx(bitmap, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, cliprect, TRANSPARENCY_PENS, transparent_pens[tile >> 4]);
+			drawgfx_transmask(bitmap, cliprect, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, transparent_pens[tile >> 4]);
 		}
 	}
 }

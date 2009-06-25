@@ -1416,11 +1416,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 					if (flipx) sx = sx_base - dim_x;
 					else       sx = sx_base + dim_x;
 
-					drawgfx(bitmap,gfx,sprite,
+					drawgfx_transpen(bitmap,cliprect,gfx,sprite,
 						color,
 						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 
 					sprite++ ;
 				}

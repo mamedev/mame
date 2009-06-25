@@ -405,12 +405,11 @@ static void nmk16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code,
 							color,
 							flip_screen_get(machine), flip_screen_get(machine),
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
-							cliprect,TRANSPARENCY_PEN,15);
+							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
 					code++;
 					x += delta;
 				} while (--xx >= 0);
@@ -465,12 +464,11 @@ static void nmk16_draw_sprites_flipsupported(running_machine *machine, bitmap_t 
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
-							cliprect,TRANSPARENCY_PEN,15);
+							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
 
 					code++;
 					x +=delta * ( flipx?-1:1 );
@@ -627,22 +625,20 @@ VIDEO_UPDATE( bioship )
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx(background_bitmap,screen->machine->gfx[3],
+				drawgfx_opaque(background_bitmap,0,screen->machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
-						16*sx,16*sy,
-						0,TRANSPARENCY_NONE,0);
+						16*sx,16*sy);
 
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx(background_bitmap,screen->machine->gfx[3],
+				drawgfx_opaque(background_bitmap,0,screen->machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
-						16*sx,(16*sy)+256,
-						0,TRANSPARENCY_NONE,0);
+						16*sx,(16*sy)+256);
 
 				sy++;
 				if (sy==16) {sy=0; sx++;}

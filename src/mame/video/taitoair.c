@@ -173,14 +173,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom( bitmap, machine -> gfx[0],
+						drawgfxzoom_transpen( bitmap, cliprect,
+								 machine -> gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
 								 x, y,
-								 cliprect,
-								 TRANSPARENCY_PEN, 0,
-								 zx, zy
+								 zx, zy, 0
 						);
 					}
 					tile_offs ++;

@@ -226,12 +226,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (sx >= 256-8) sx -= 256;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transpen(bitmap,&clip,gfx,
 				code,
 				color,
 				flipx,flipy,
-				sx,sy,
-				&clip,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

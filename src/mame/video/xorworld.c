@@ -102,8 +102,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		drawgfx(bitmap, machine->gfx[1], code, color, 0, 0, sx, sy,
-			cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0, sx, sy, 0);
 	}
 }
 

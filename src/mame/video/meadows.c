@@ -88,7 +88,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int bank = i;							/* that fixes it for now :-/ */
 		int flip = spriteram[i+8] >> 5;			/* bit #5 flip vertical flag */
 
-		drawgfx(bitmap, machine->gfx[bank + 1], code, 0, flip, 0, x, y, clip, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, clip, machine->gfx[bank + 1], code, 0, flip, 0, x, y, 0);
 	}
 }
 

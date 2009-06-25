@@ -150,14 +150,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int x = get_x_pos(i);
 		int y = get_y_pos(i);
 
-		drawgfx(bitmap, machine->gfx[(code & 0x04) ? 2 : 3],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[(code & 0x04) ? 2 : 3],
 			code & 0x03,
 			i,
 			code & 0x10,
 			code & 0x08,
 			x,
-			y,
-			cliprect, TRANSPARENCY_PEN, 0);
+			y, 0);
 	}
 }
 

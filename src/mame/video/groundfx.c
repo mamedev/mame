@@ -203,14 +203,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		else
 			clipper=cliprect;
 
-		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,clipper,machine->gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				clipper,TRANSPARENCY_PEN,0,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				primasks[sprite_ptr->pri]);
+				priority_bitmap,primasks[sprite_ptr->pri],0);
 	}
 }
 

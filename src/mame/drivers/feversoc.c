@@ -92,7 +92,7 @@ static VIDEO_UPDATE( feversoc )
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_PEN,0x3f);
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
 	}
 
 	return 0;

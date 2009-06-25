@@ -230,13 +230,12 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 					ex = flipx ? (width-1-x) : x;
 					ey = flipy ? (height-1-y) : y;
 
-					drawgfx(bitmap,gfx,
+					drawgfx_transpen(bitmap,cliprect,
+						gfx,
 						(number)+x_offset[ex]+y_offset[ey],
 						color,
 						flipx, flipy,
-						sx+x*16,sy+y*16,
-						cliprect,
-						TRANSPARENCY_PEN, 0);
+						sx+x*16,sy+y*16, 0);
 				}
 			}
 		}

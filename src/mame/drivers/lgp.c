@@ -99,10 +99,10 @@ static VIDEO_UPDATE( lgp )
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 					tile_ram[current_screen_character],
 					0,
-					0, 0, charx*8, chary*8, cliprect, TRANSPARENCY_PEN, 0);
+					0, 0, charx*8, chary*8, 0);
 		}
 	}
 

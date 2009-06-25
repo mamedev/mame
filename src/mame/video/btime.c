@@ -371,22 +371,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
         y = y - sprite_y_adjust;
 
-        drawgfx(bitmap,machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
                 sprite_ram[offs + interleave],
                 color,
                 flipx,flipy,
-                x, y,
-                cliprect,TRANSPARENCY_PEN,0);
+                x, y,0);
 
         y = y + (flip_screen_get(machine) ? -256 : 256);
 
         // Wrap around
-        drawgfx(bitmap,machine->gfx[1],
+        drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
                 sprite_ram[offs + interleave],
                 color,
                 flipx,flipy,
-                x,y,
-                cliprect,TRANSPARENCY_PEN,0);
+                x,y,0);
     }
 }
 
@@ -418,12 +416,11 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
                 y = 256 - y;
             }
 
-            drawgfx(bitmap, machine->gfx[2],
+            drawgfx_opaque(bitmap, cliprect,machine->gfx[2],
                     gfx[tileoffset + offs],
                     color,
                     flip_screen_get(machine),flip_screen_get(machine),
-                    x,y,
-                    cliprect,TRANSPARENCY_NONE,0);
+                    x,y);
         }
     }
 }
@@ -517,12 +514,11 @@ VIDEO_UPDATE( bnj )
                 sy = 256 - sy;
             }
 
-            drawgfx(background_bitmap, screen->machine->gfx[2],
+            drawgfx_opaque(background_bitmap, 0, screen->machine->gfx[2],
                     (bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
                     0,
                     flip_screen_get(screen->machine), flip_screen_get(screen->machine),
-                    sx, sy,
-                    0, TRANSPARENCY_NONE, 0);
+                    sx, sy);
         }
 
         /* copy the background bitmap to the screen */
@@ -564,12 +560,11 @@ VIDEO_UPDATE( cookrace )
             sy = 33 - sy;
         }
 
-        drawgfx(bitmap, screen->machine->gfx[2],
+        drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[2],
                 bnj_backgroundram[offs],
                 0,
                 flip_screen_get(screen->machine), flip_screen_get(screen->machine),
-                8*sx,8*sy,
-                cliprect, TRANSPARENCY_NONE, 0);
+                8*sx,8*sy);
     }
 
     draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, -1);

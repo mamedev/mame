@@ -144,23 +144,21 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			tile =  (vga_vram[offs] & 0x00ff0000)>>16;
 			color = (vga_vram[offs] & 0xff000000)>>24;
 
-			drawgfx(bitmap,machine->gfx[gfx_num],
+			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
 					color,
 					0,0,
-					(x+1)*8,y*8,
-					cliprect,TRANSPARENCY_NONE,0);
+					(x+1)*8,y*8);
 
 
 			tile =  (vga_vram[offs] & 0x000000ff);
 			color = (vga_vram[offs] & 0x0000ff00)>>8;
 
-			drawgfx(bitmap,machine->gfx[gfx_num],
+			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
 					color,
 					0,0,
-					(x+0)*8,y*8,
-					cliprect,TRANSPARENCY_NONE,0);
+					(x+0)*8,y*8);
 
 			offs++;
 		}

@@ -158,33 +158,29 @@ static VIDEO_UPDATE(cshooter)
 			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3],spriteram[i+2],
-							cliprect,TRANSPARENCY_PEN,3);
+							spriteram[i+3],spriteram[i+2],3);
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3]+8,spriteram[i+2],
-							cliprect,TRANSPARENCY_PEN,3);
+							spriteram[i+3]+8,spriteram[i+2],3);
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3]+8,spriteram[i+2]+8,
-							cliprect,TRANSPARENCY_PEN,3);
+							spriteram[i+3]+8,spriteram[i+2]+8,3);
 
-				drawgfx(bitmap,screen->machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3],spriteram[i+2]+8,
-							cliprect,TRANSPARENCY_PEN,3);
+							spriteram[i+3],spriteram[i+2]+8,3);
 			}
 		}
 	}

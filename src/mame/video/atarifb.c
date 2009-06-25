@@ -153,18 +153,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			shade = ((spriteram[obj*2+1 + 0x20]) & 0x07);
 
-			drawgfx(bitmap,machine->gfx[gfx + 1],
+			drawgfx_transpen(bitmap,&bigfield_area,machine->gfx[gfx + 1],
 				charcode, shade,
-				flipx,flipy,sx,sy,
-				&bigfield_area,TRANSPARENCY_PEN,0);
+				flipx,flipy,sx,sy,0);
 
 			shade = ((spriteram[obj*2+1 + 0x20]) & 0x08) >> 3;
 		}
 
-		drawgfx(bitmap,machine->gfx[gfx],
+		drawgfx_transpen(bitmap,&bigfield_area,machine->gfx[gfx],
 				charcode, shade,
-				flipx,flipy,sx,sy,
-				&bigfield_area,TRANSPARENCY_PEN,0);
+				flipx,flipy,sx,sy,0);
 
 		/* If this isn't soccer, handle the multiplexed sprites */
 		if (!is_soccer)
@@ -174,10 +172,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if ((charcode == 0x11) && (sy == 0x07))
 			{
 				sy = 0xf1; /* When multiplexed, it's 0x10...why? */
-				drawgfx(bitmap,machine->gfx[gfx],
+				drawgfx_transpen(bitmap,&bigfield_area,machine->gfx[gfx],
 					charcode, 0,
-					flipx,flipy,sx,sy,
-					&bigfield_area,TRANSPARENCY_PEN,0);
+					flipx,flipy,sx,sy,0);
 			}
 		}
 	}

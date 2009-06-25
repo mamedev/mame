@@ -139,10 +139,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		height++;
 		if (enable)	{
 			for (hcount=0;hcount<height;hcount++) {
-				pdrawgfx(bitmap,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,cliprect,TRANSPARENCY_PEN,0,pri_mask);
-				pdrawgfx(bitmap,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,cliprect,TRANSPARENCY_PEN,0,pri_mask);
-				pdrawgfx(bitmap,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,cliprect,TRANSPARENCY_PEN,0,pri_mask);
-				pdrawgfx(bitmap,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,cliprect,TRANSPARENCY_PEN,0,pri_mask);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,priority_bitmap,pri_mask,0);
 			}
 		}
 		source-=8;

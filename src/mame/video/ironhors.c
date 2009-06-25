@@ -183,58 +183,52 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		switch (sr[offs+4] & 0x0c)
 		{
 			case 0x00:	/* 16x16 */
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code/4,
 						color,
 						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 				break;
 
 			case 0x04:	/* 16x8 */
 				{
 					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
 
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
-							flipx?sx+8:sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+							flipx?sx+8:sx,sy,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
-							flipx?sx:sx+8,sy,
-							cliprect,TRANSPARENCY_PEN,0);
+							flipx?sx:sx+8,sy,0);
 				}
 				break;
 
 			case 0x08:	/* 8x16 */
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
-							sx,flipy?sy+8:sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+							sx,flipy?sy+8:sy,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
-							sx,flipy?sy:sy+8,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,flipy?sy:sy+8,0);
 				}
 				break;
 
 			case 0x0c:	/* 8x8 */
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code,
 							color,
 							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,sy,0);
 				}
 				break;
 		}
@@ -306,58 +300,52 @@ static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		switch (sr[offs+3] & 0x0c)
 		{
 			case 0x00:	/* 16x16 */
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code/4,
 						color,
 						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 				break;
 
 			case 0x04:	/* 16x8 */
 				{
 					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
 
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
-							flipx?sx+8:sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+							flipx?sx+8:sx,sy,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
-							flipx?sx:sx+8,sy,
-							cliprect,TRANSPARENCY_PEN,0);
+							flipx?sx:sx+8,sy,0);
 				}
 				break;
 
 			case 0x08:	/* 8x16 */
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
-							sx,flipy?sy+8:sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+							sx,flipy?sy+8:sy,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
-							sx,flipy?sy:sy+8,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,flipy?sy:sy+8,0);
 				}
 				break;
 
 			case 0x0c:	/* 8x8 */
 				{
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 							code,
 							color,
 							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,sy,0);
 				}
 				break;
 		}

@@ -121,12 +121,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx( bitmap,gfx,
+		drawgfx_transpen( bitmap,cliprect,gfx,
 			tile_number,
 			color,
 			flipx,flipy,
-			sx,sy,
-			cliprect,TRANSPARENCY_PEN,7);
+			sx,sy,7);
 
 		source+=4;
 	}

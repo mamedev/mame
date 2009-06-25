@@ -396,14 +396,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						flipx = !flipx;
 						flipy = !flipy;
 					}
-					pdrawgfxzoom(bitmap,machine->gfx[char_type],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[char_type],
 						code,
 						color,
 						flipx,flipy,
 						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0,
 						zoom,zoom,
-						0xffcc );
+						priority_bitmap,0xffcc,0 );
 				}
 			} /* if sprite */
 		} /* for loop */

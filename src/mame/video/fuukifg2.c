@@ -202,22 +202,21 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 			for (x = xstart; x != xend; x += xinc)
 			{
 				if (xzoom == (16*8) && yzoom == (16*8))
-					pdrawgfx(		bitmap,screen->machine->gfx[0],
+					pdrawgfx_transpen(		bitmap,cliprect,screen->machine->gfx[0],
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
 									sx + x * 16, sy + y * 16,
-									cliprect,TRANSPARENCY_PEN,15,
-									pri_mask	);
+									priority_bitmap,
+									pri_mask,15	);
 				else
-					pdrawgfxzoom(	bitmap,screen->machine->gfx[0],
+					pdrawgfxzoom_transpen(	bitmap,cliprect,screen->machine->gfx[0],
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
 									sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-									cliprect,TRANSPARENCY_PEN,15,
-									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),	// nearest greater integer value to avoid holes
-									pri_mask	);
+									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),	priority_bitmap,// nearest greater integer value to avoid holes
+									pri_mask,15	);
 			}
 		}
 

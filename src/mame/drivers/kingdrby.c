@@ -164,13 +164,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),cliprect,TRANSPARENCY_PEN,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),cliprect,TRANSPARENCY_PEN,0);
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
 		}
 	}
 }

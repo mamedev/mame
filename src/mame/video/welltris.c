@@ -80,12 +80,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, machine->gfx[1], code, color, 0, 0,
-								x + xt * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
+						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0,
+								x + xt * 16, y + yt * 16, 15);
 					else
-						drawgfxzoom(bitmap, machine->gfx[1], code, color, 0, 0,
-								x + xt * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 0,
+								x + xt * xzoom, y + yt * yzoom,
+								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
@@ -99,12 +99,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, machine->gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
+						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 0,
+								x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
 					else
-						drawgfxzoom(bitmap, machine->gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 0,
+								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
+								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
@@ -118,12 +118,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, machine->gfx[1], code, color, 0, 1,
-								x + xt * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
+						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 1,
+								x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom(bitmap, machine->gfx[1], code, color, 0, 1,
-								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 0, 1,
+								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
+								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;
@@ -137,12 +137,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, machine->gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
+						drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 1,
+								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom(bitmap, machine->gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
-								0x1000 * xzoom, 0x1000 * yzoom);
+						drawgfxzoom_transpen(bitmap, cliprect, machine->gfx[1], code, color, 1, 1,
+								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
+								0x1000 * xzoom, 0x1000 * yzoom, 15);
 				}
 				if (xtiles == 3) code += 1;
 				if (xtiles == 5) code += 3;

@@ -144,12 +144,11 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, screen->machine->gfx[0],
+				drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 						code & 0x3fff,
 						color,
 						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
-						x, y,
-						cliprect, TRANSPARENCY_PEN, 15);
+						x, y, 15);
 				goffs += 2;
 			}
 			gfx_offs += height << 1;
@@ -214,12 +213,11 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, screen->machine->gfx[1],
+				drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 						code & 0x3fff,
 						color,
 						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
-						x, y,
-						cliprect, TRANSPARENCY_PEN, 15);
+						x, y, 15);
 				goffs += 2;
 			}
 			gfx_offs += height << 1;

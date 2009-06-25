@@ -203,12 +203,11 @@ VIDEO_UPDATE( magmax )
 			if (code & 0x80)	/* sprite bankswitch */
 				code += (*magmax_vreg & 0x30) * 0x8;
 
-			drawgfx(bitmap, screen->machine->gfx[1],
+			drawgfx_transmask(bitmap, cliprect, screen->machine->gfx[1],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					cliprect, TRANSPARENCY_PENS,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 0x1f));
 		}
 	}
@@ -234,12 +233,11 @@ VIDEO_UPDATE( magmax )
 				sy = 31 - sy;
 			}
 
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 					code,
 					0,
 					flipscreen, flipscreen,
-					8 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN, 0x0f);
+					8 * sx, 8 * sy, 0x0f);
 		}
 	}
 	return 0;

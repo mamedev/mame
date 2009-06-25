@@ -556,9 +556,8 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 mydrawgfxzoom(
-	bitmap_t *dest_bmp,const gfx_element *gfx,
+	bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-	const rectangle *clip,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
 {
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -650,7 +649,7 @@ ApplyGamma( running_machine *machine, bitmap_t *bitmap )
 } /* ApplyGamma */
 
 static void
-poly3d_Draw3dSprite( bitmap_t *bitmap, gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
+poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
 {
    int flipx = 0;
    int flipy = 0;
@@ -661,12 +660,12 @@ poly3d_Draw3dSprite( bitmap_t *bitmap, gfx_element *gfx, int tileNumber, int col
    clip.max_y = 480-1;
    mydrawgfxzoom(
       bitmap,
+      &clip,
       gfx,
       tileNumber,
       color,
       flipx, flipy,
       sx, sy,
-      &clip,
       (width<<16)/32,
       (height<<16)/32,
       zc, pri, 0xff - translucency );

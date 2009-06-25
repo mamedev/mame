@@ -194,12 +194,11 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 			y = (30 * 8) - y;
 		}
 
-		drawgfx(bitmap, gfx,
+		drawgfx_transpen(bitmap, cliprect,
+			gfx,
 			code, color,
 			flipx, flipy,
-			x, y,
-			cliprect,
-			TRANSPARENCY_PEN, 15);
+			x, y, 15);
 	}
 }
 

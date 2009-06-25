@@ -929,9 +929,9 @@ static void toaplan1_log_vram(void)
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const gfx_element *gfx,
+static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int priority)
+		int priority)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
@@ -1080,11 +1080,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					toaplan1_draw_sprite_custom(bitmap,machine->gfx[1],
+					toaplan1_draw_sprite_custom(bitmap,cliprect,machine->gfx[1],
 							                   sprite,color,
 							                   fcu_flipscreen,fcu_flipscreen,
 							                   sx,sy,
-							                   cliprect,priority);
+							                   priority);
 
 					sprite++ ;
 				}
@@ -1115,12 +1115,11 @@ static void rallybik_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				flipx = attrib & 0x100;
 				if (flipx) sx -= 15;
 				flipy = attrib & 0x200;
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					sprite,
 					color,
 					flipx,flipy,
-					sx-31,sy-16,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx-31,sy-16,0);
 			}
 		}
 	}

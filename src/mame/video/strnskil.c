@@ -111,12 +111,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (sx > 248)
 			sx = sx - 256;
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transmask(bitmap, cliprect,
+			machine->gfx[1],
 			code, color,
 			flipx, flipy,
 			px, py,
-			cliprect,
-			TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }

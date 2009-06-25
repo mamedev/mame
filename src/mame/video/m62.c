@@ -389,11 +389,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			do
 			{
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code + i * incr,col,
 						flipx,flipy,
-						sx,sy + 16 * i,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy + 16 * i,0);
 
 				i--;
 			} while (i >= 0);

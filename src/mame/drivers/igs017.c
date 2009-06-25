@@ -180,11 +180,10 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 
 	gfx_element_build_temporary(&gfx, machine, sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32, 0);
 
-	drawgfx(	bitmap,&gfx,
+	drawgfx_transpen(	bitmap,cliprect, &gfx,
 				0, color,
 				flipx, flipy,
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0x1f	);
+				sx, sy, 0x1f	);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)

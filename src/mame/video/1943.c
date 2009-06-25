@@ -250,16 +250,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
-					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
+					sx, sy, 0);
 			}
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
-					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
+					sx, sy, 0);
 			}
 		}
 	}

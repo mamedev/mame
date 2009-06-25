@@ -152,22 +152,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		sy += 1;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transmask(bitmap,cliprect,
+			machine->gfx[0],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			cliprect,
-			TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 
 		/* redraw with wraparound */
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transmask(bitmap,cliprect,
+			machine->gfx[0],
 			code, color,
 			flipx, flipy,
 			sx - 256, sy,
-			cliprect,
-			TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 	}
 }

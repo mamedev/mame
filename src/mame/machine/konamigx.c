@@ -305,8 +305,8 @@ void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rec
     pri     : 0 = topmost, 255 = backmost (pixel priority)
 */
 
-INLINE void zdrawgfxzoom32GP( running_machine *machine,
-		bitmap_t *bitmap, const gfx_element *gfx, const rectangle *cliprect,
+INLINE void zdrawgfxzoom32GP( 
+		bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, 
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -371,8 +371,8 @@ INLINE void zdrawgfxzoom32GP( running_machine *machine,
 	src_fh    = 16;
 	src_base  = gfx_element_get_data(gfx, code % gfx->total_elements);
 
-	pal_base  = machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
-	shd_base  = machine->shadow_table;
+	pal_base  = gfx->machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
+	shd_base  = gfx->machine->shadow_table;
 
 	dst_ptr   = (UINT32 *)bitmap->base;
 	dst_pitch = bitmap->rowpixels;
@@ -1662,8 +1662,8 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 				if (nozoom) { scaley = scalex = 0x10000; } else { scalex = zw << 12; scaley = zh << 12; };
 
-				zdrawgfxzoom32GP(machine,
-						bitmap, K053247_gfx, cliprect,
+				zdrawgfxzoom32GP(
+						bitmap, cliprect, K053247_gfx,
 						temp,
 						color,
 						temp1,temp2,

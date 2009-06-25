@@ -177,12 +177,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		spritecode = tiamc1_spriteram_n[offs] ^ 0xff;
 
 		if (!(tiamc1_spriteram_a[offs] & 0x01))
-			drawgfx(bitmap, machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[1],
 				spritecode,
 				0,
 				flipx, flipy,
-				sx, sy,
-				cliprect, TRANSPARENCY_PEN, 15);
+				sx, sy, 15);
 	}
 }
 

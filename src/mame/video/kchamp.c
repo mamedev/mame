@@ -88,8 +88,7 @@ static void kchamp_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			flipy = !flipy;
 		}
 
-        drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy,
-            cliprect, TRANSPARENCY_PEN, 0);
+        drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -116,8 +115,7 @@ static void kchampvs_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			flipy = !flipy;
 		}
 
-        drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy,
-            cliprect, TRANSPARENCY_PEN, 0);
+        drawgfx_transpen(bitmap, cliprect, machine->gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 

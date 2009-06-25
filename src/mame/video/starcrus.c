@@ -214,26 +214,22 @@ static int collision_check_s1s2(running_machine *machine)
 	org_y = s1_y;
 
 	/* Draw ship 1 */
-    drawgfx(ship1_vid,
+    drawgfx_opaque(ship1_vid,
+            &clip,
             machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
-            s1_x-org_x,s1_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+            s1_x-org_x,s1_y-org_y);
 
 	/* Draw ship 2 */
-    drawgfx(ship2_vid,
+    drawgfx_opaque(ship2_vid,
+            &clip,
             machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
-            s2_x-org_x,s2_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+            s2_x-org_x,s2_y-org_y);
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
@@ -274,29 +270,25 @@ static int collision_check_p1p2(running_machine *machine)
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
 	{
 		/* Draw score/projectile 1 */
-		drawgfx(proj1_vid,
+		drawgfx_opaque(proj1_vid,
+				&clip,
 				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p1_x-org_x,p1_y-org_y);
 	}
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
 	{
 		/* Draw score/projectile 2 */
-		drawgfx(proj2_vid,
+		drawgfx_opaque(proj2_vid,
+				&clip,
 				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p2_x-org_x,p2_y-org_y);
 	}
 
     /* Now check for collisions */
@@ -337,42 +329,36 @@ static int collision_check_s1p1p2(running_machine *machine)
 	org_y = s1_y;
 
 	/* Draw ship 1 */
-    drawgfx(ship1_vid,
+    drawgfx_opaque(ship1_vid,
+            &clip,
             machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
-            s1_x-org_x,s1_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+            s1_x-org_x,s1_y-org_y);
 
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
-		drawgfx(proj1_vid,
+		drawgfx_opaque(proj1_vid,
+				&clip,
 				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p1_x-org_x,p1_y-org_y);
 	}
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
-		drawgfx(proj2_vid,
+		drawgfx_opaque(proj2_vid,
+				&clip,
 				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p2_x-org_x,p2_y-org_y);
 	}
 
     /* Now check for collisions */
@@ -419,42 +405,36 @@ static int collision_check_s2p1p2(running_machine *machine)
 	org_y = s2_y;
 
 	/* Draw ship 2 */
-    drawgfx(ship2_vid,
+    drawgfx_opaque(ship2_vid,
+            &clip,
             machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
-            s2_x-org_x,s2_y-org_y,
-            &clip,
-            TRANSPARENCY_NONE,
-            0);
+            s2_x-org_x,s2_y-org_y);
 
 	if (p1_sprite & 0x08)	/* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
-		drawgfx(proj1_vid,
+		drawgfx_opaque(proj1_vid,
+				&clip,
 				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p1_x-org_x,p1_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p1_x-org_x,p1_y-org_y);
 	}
 
 	if (p2_sprite & 0x08)	/* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
-		drawgfx(proj2_vid,
+		drawgfx_opaque(proj2_vid,
+				&clip,
 				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
-				p2_x-org_x,p2_y-org_y,
-				&clip,
-				TRANSPARENCY_NONE,
-				0);
+				p2_x-org_x,p2_y-org_y);
 	}
 
     /* Now check for collisions */
@@ -478,47 +458,43 @@ VIDEO_UPDATE( starcrus )
     bitmap_fill(bitmap,cliprect,0);
 
 	/* Draw ship 1 */
-    drawgfx(bitmap,
+    drawgfx_transpen(bitmap,
+            cliprect,
             screen->machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
             s1_x,s1_y,
-            cliprect,
-            TRANSPARENCY_PEN,
             0);
 
 	/* Draw ship 2 */
-    drawgfx(bitmap,
+    drawgfx_transpen(bitmap,
+            cliprect,
             screen->machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
             s2_x,s2_y,
-            cliprect,
-            TRANSPARENCY_PEN,
             0);
 
 	/* Draw score/projectile 1 */
-	drawgfx(bitmap,
+	drawgfx_transpen(bitmap,
+            cliprect,
             screen->machine->gfx[(p1_sprite&0x0c)>>2],
             (p1_sprite&0x03)^0x03,
             0,
             0,0,
             p1_x,p1_y,
-            cliprect,
-            TRANSPARENCY_PEN,
             0);
 
 	/* Draw score/projectile 2 */
-	drawgfx(bitmap,
+	drawgfx_transpen(bitmap,
+            cliprect,
             screen->machine->gfx[4+((p2_sprite&0x0c)>>2)],
             (p2_sprite&0x03)^0x03,
             0,
             0,0,
             p2_x,p2_y,
-            cliprect,
-            TRANSPARENCY_PEN,
             0);
 
     /* Collision detection */

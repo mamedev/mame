@@ -186,55 +186,54 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			switch(attributes&3)
 			{
 			case 0: /* flipx==0 && flipy==0 */
-				drawgfx(bitmap,gfx,
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number+1,color,
 					flipx,flipy,
-					sx,sy-16,cliprect,TRANSPARENCY_PEN,0 );
-				drawgfx(bitmap,gfx,
+					sx,sy-16,0 );
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number,color,
 					flipx,flipy,
-					sx,sy,cliprect,TRANSPARENCY_PEN,0 );
+					sx,sy,0 );
 				break;
 			case 1: /* flipx==1 && flipy==0 */
-				drawgfx(bitmap,gfx,
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number+1,color,
 					flipx,flipy,
-					sx,sy-16,cliprect,TRANSPARENCY_PEN,0 );
-				drawgfx(bitmap,gfx,
+					sx,sy-16,0 );
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number,color,
 					flipx,flipy,
-					sx,sy,cliprect,TRANSPARENCY_PEN,0 );
+					sx,sy,0 );
 				break;
 			case 2: /* flipx==0 && flipy==1 */
-				drawgfx(bitmap,gfx,
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number,color,
 					flipx,flipy,
-					sx,sy-16,cliprect,TRANSPARENCY_PEN,0 );
-				drawgfx(bitmap,gfx,
+					sx,sy-16,0 );
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number+1,color,
 					flipx,flipy,
-					sx,sy,cliprect,TRANSPARENCY_PEN,0 );
+					sx,sy,0 );
 				break;
 			case 3: /* flipx==1 && flipy==1 */
-				drawgfx(bitmap,gfx,
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number,color,
 					flipx,flipy,
-					sx,sy-16,cliprect,TRANSPARENCY_PEN,0 );
-				drawgfx(bitmap,gfx,
+					sx,sy-16,0 );
+				drawgfx_transpen(bitmap,cliprect,gfx,
 					sprite_number+1,color,
 					flipx,flipy,
-					sx,sy,cliprect,TRANSPARENCY_PEN,0 );
+					sx,sy,0 );
 				break;
 			}
 		}
 		else
 		{
-			drawgfx(bitmap,gfx,
+			drawgfx_transpen(bitmap,cliprect,gfx,
 				sprite_number,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+				sx,sy,0 );
 		}
 		source -= 4;
 	}

@@ -116,12 +116,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
-				sx + (flip_screen_get(machine) ? scroll : -scroll), sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx + (flip_screen_get(machine) ? scroll : -scroll), sy,0);
 	}
 }
 

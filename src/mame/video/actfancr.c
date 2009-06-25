@@ -211,12 +211,11 @@ VIDEO_UPDATE( actfancr )
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y + mult * multi,0);
 			multi--;
 		}
 	}
@@ -296,12 +295,11 @@ VIDEO_UPDATE( triothep )
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y + mult * multi,0);
 			multi--;
 		}
 	}

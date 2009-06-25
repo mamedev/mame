@@ -35,25 +35,23 @@ static void draw_boxer(running_machine *machine, bitmap_t* bitmap, const rectang
 
 				code = p[32 * l + 4 * i + j];
 
-				drawgfx(bitmap, machine->gfx[n],
+				drawgfx_transpen(bitmap, cliprect,
+					machine->gfx[n],
 					code,
 					0,
 					code & 0x80, 0,
 					x + 8 * j,
-					y + 8 * i,
-					cliprect,
-					TRANSPARENCY_PEN, 1);
+					y + 8 * i, 1);
 
 				code = p[32 * r + 4 * i - j + 3];
 
-				drawgfx(bitmap, machine->gfx[n],
+				drawgfx_transpen(bitmap, cliprect,
+					machine->gfx[n],
 					code,
 					0,
 					!(code & 0x80), 0,
 					x + 8 * j + 32,
-					y + 8 * i,
-					cliprect,
-					TRANSPARENCY_PEN, 1);
+					y + 8 * i, 1);
 			}
 		}
 	}
@@ -73,14 +71,13 @@ VIDEO_UPDATE( boxer )
 		{
 			UINT8 code = boxer_tile_ram[32 * i + j];
 
-			drawgfx(bitmap, screen->machine->gfx[2],
+			drawgfx_transpen(bitmap, cliprect,
+				screen->machine->gfx[2],
 				code,
 				0,
 				code & 0x40, code & 0x40,
 				8 * j + 4,
-				8 * (i % 2) + 32 * (i / 2),
-				cliprect,
-				TRANSPARENCY_PEN, 0);
+				8 * (i % 2) + 32 * (i / 2), 0);
 		}
 	}
 

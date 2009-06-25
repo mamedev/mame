@@ -157,31 +157,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			if (!flip_screen_get(machine))
 				sy = 224 - sy;
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 			/* redraw with wraparound */
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
-					sx,sy+256,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy+256,0);
 		}
 		else
 		{
 			if (!flip_screen_get(machine))
 				sy = 240 - sy;
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 		}
 	}
 }

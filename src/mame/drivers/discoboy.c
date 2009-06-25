@@ -94,12 +94,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			}
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				 code,
 				 color,
 				 flipscreen,0,
-				 sx,sy,
-				 cliprect,TRANSPARENCY_PEN,15);
+				 sx,sy,15);
 	}
 }
 
@@ -156,7 +155,7 @@ static VIDEO_UPDATE( discoboy )
 
 			}
 
-			drawgfx(bitmap,screen->machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8);
 			count+=2;
 		}
 	}

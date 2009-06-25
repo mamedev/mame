@@ -87,12 +87,11 @@ VIDEO_UPDATE( mouser )
 		/* Note: this is _not_ dependant on flipping */
 		color_offs = offs%32 + ((256 + 8*(offs/32) - spriteram[offs%32])%256)/8*32;
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				videoram[offs] | (colorram[color_offs]>>5)*256 | ((colorram[color_offs]>>4)&1)*512,
 				colorram[color_offs]%16,
 				flip_screen_x_get(screen->machine),flip_screen_y_get(screen->machine),
-				8*sx,scrolled_y_position,
-				cliprect,TRANSPARENCY_NONE,0);
+				8*sx,scrolled_y_position);
 	}
 
 	/* There seem to be two sets of sprites, each decoded identically */
@@ -119,12 +118,11 @@ VIDEO_UPDATE( mouser )
 		}
 
 		if ((spriteram[offs+1]&0x10)>>4)
-			drawgfx(bitmap,screen->machine->gfx[1+((spriteram[offs+1]&0x20)>>5)],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1+((spriteram[offs+1]&0x20)>>5)],
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 	}
 
 	/* This is the second set of 8 sprites */
@@ -149,12 +147,11 @@ VIDEO_UPDATE( mouser )
 		}
 
 		if ((spriteram[offs+1]&0x10)>>4)
-			drawgfx(bitmap,screen->machine->gfx[1+((spriteram[offs+1]&0x20)>>5)],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1+((spriteram[offs+1]&0x20)>>5)],
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 	}
 
 	return 0;

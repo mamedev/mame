@@ -110,7 +110,7 @@ VIDEO_START( cheekyms )
 }
 
 
-static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip)
 {
 	offs_t offs;
 
@@ -130,19 +130,19 @@ static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *c
 			if (!flip)
 				code++;
 
-			drawgfx(bitmap, gfx[1], code, color, 0, 0, x, y, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code, color, 0, 0, x, y, 0);
 		}
 		else
 		{
 			if (cheekyms_spriteram[offs + 0] & 0x02)
 			{
-				drawgfx(bitmap, gfx[1], code | 0x20, color, 0, 0,        x, y, cliprect, TRANSPARENCY_PEN, 0);
-				drawgfx(bitmap, gfx[1], code | 0x21, color, 0, 0, 0x10 + x, y, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0,        x, y, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
 			}
 			else
 			{
-				drawgfx(bitmap, gfx[1], code | 0x20, color, 0, 0, x,        y, cliprect, TRANSPARENCY_PEN, 0);
-				drawgfx(bitmap, gfx[1], code | 0x21, color, 0, 0, x, 0x10 + y, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0, x,        y, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
 			}
 		}
 	}
@@ -162,7 +162,7 @@ VIDEO_UPDATE( cheekyms )
 	bitmap_fill(bitmap_buffer, cliprect, 0);
 
 	/* sprites go under the playfield */
-	draw_sprites(screen->machine->gfx, bitmap, cliprect, flip);
+	draw_sprites(bitmap, cliprect, screen->machine->gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
 	tilemap_draw(bitmap_buffer, cliprect, cheekyms_tilemap, 0, 0);

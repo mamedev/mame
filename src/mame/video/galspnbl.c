@@ -75,12 +75,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					int x = sx + 8*(flipx?(size-1-col):col);
 					int y = sy + 8*(flipy?(size-1-row):row);
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code + layout[row][col],
 						color,
 						flipx,flipy,
-						x,y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x,y,0);
 				}
 			}
 		}
@@ -125,13 +124,12 @@ VIDEO_UPDATE( galspnbl )
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
 //                  16*sx + screenscroll,8*sy,
-					16*sx,8*sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					16*sx,8*sy,0);
 		}
 	}
 

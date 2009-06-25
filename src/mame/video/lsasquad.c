@@ -34,19 +34,17 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 			code = videoram[base + 2*y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flip_screen_get(machine),flip_screen_get(machine),
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 			if (sx > 248)	/* wraparound */
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flip_screen_get(machine),flip_screen_get(machine),
-						sx-256,sy,
-						cliprect,TRANSPARENCY_PEN,15);
+						sx-256,sy,15);
 		}
 	}
 }
@@ -122,19 +120,17 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 
 			if((type==0 && color!=0x0d) || (type !=0 && color==0x0d))
 				{
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					code,
 					color,
 					flip_screen_get(machine),flip_screen_get(machine),
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 			if (sx > 248)	/* wraparound */
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flip_screen_get(machine),flip_screen_get(machine),
-						sx-256,sy,
-						cliprect,TRANSPARENCY_PEN,15);
+						sx-256,sy,15);
 					}
 		}
 	}
@@ -184,19 +180,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx,sy,15);
 		/* wraparound */
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
-				sx-256,sy,
-				cliprect,TRANSPARENCY_PEN,15);
+				sx-256,sy,15);
 	}
 }
 

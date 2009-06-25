@@ -172,20 +172,18 @@ static void draw_foreground(running_machine *machine,
 			if ((sy == 0) && (code == 0)) sy += 240;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
-				sx,sy+2,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy+2,0);
 
 		/* wrap around x */
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
-				sx + 512,sy+2,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx + 512,sy+2,0);
 	}
 }
 

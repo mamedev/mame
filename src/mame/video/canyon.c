@@ -44,14 +44,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int y = canyon_videoram[0x3d0 + 2 * i + 0x8];
 		int c = canyon_videoram[0x3d0 + 2 * i + 0x9];
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx_transpen(bitmap, cliprect,
+			machine->gfx[1],
 			c >> 3,
 			i,
 			!(c & 0x80), 0,
 			224 - x,
-			240 - y,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			240 - y, 0);
 	}
 }
 

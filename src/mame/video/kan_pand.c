@@ -142,12 +142,11 @@ static void pandora_draw(running_machine *machine, bitmap_t *bitmap, const recta
 		if (sx&0x100) sx-=0x200;
 		if (sy&0x100) sy-=0x200;
 
-		drawgfx(bitmap,machine->gfx[pandora_region],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[pandora_region],
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

@@ -206,16 +206,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			if (sizey)
 			{
-				drawgfx(bitmap,gfx, code & ~1, color, flipx,flipy,
-						sx, sy + (flipy ? 0 : -16) + wrapy, cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx, code & ~1, color, flipx,flipy,
+						sx, sy + (flipy ? 0 : -16) + wrapy,0);
 
-				drawgfx(bitmap,gfx, code |  1, color, flipx,flipy,
-						sx,sy + (flipy ? -16 : 0) + wrapy, cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx, code |  1, color, flipx,flipy,
+						sx,sy + (flipy ? -16 : 0) + wrapy,0);
 			}
 			else
 			{
-				drawgfx(bitmap,gfx, code, color, flipx,flipy,
-						sx,sy + wrapy, cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx, code, color, flipx,flipy,
+						sx,sy + wrapy,0);
 			}
 		}
 	}

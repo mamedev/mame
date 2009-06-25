@@ -44,28 +44,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			if (flipx)
 			{
-				drawgfx(bitmap,gfx,number,  colr,1,0,xpos+8,ypos,  cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+1,colr,1,0,xpos+8,ypos+8,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+2,colr,1,0,xpos,  ypos,  cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+3,colr,1,0,xpos,  ypos+8,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number,  colr,1,0,xpos+8,ypos,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+1,colr,1,0,xpos+8,ypos+8,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+2,colr,1,0,xpos,  ypos,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+3,colr,1,0,xpos,  ypos+8,0);
 			}
 			else
 			{
-				drawgfx(bitmap,gfx,number,  colr,0,0,xpos,  ypos,  cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+1,colr,0,0,xpos,  ypos+8,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+2,colr,0,0,xpos+8,ypos,  cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,number+3,colr,0,0,xpos+8,ypos+8,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number,  colr,0,0,xpos,  ypos,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+1,colr,0,0,xpos,  ypos+8,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+2,colr,0,0,xpos+8,ypos,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number+3,colr,0,0,xpos+8,ypos+8,0);
 			}
 		}
 		else
 		{
 			if (flipx)
 			{
-				drawgfx(bitmap,gfx,number ^ 2,colr,1,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number ^ 2,colr,1,0,xpos,ypos,0);
 			}
 			else
 			{
-				drawgfx(bitmap,gfx,number,colr,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,number,colr,0,0,xpos,ypos,0);
 			}
 		}
 

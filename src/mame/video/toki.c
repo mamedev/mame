@@ -208,12 +208,11 @@ static void toki_draw_sprites(running_machine *machine, bitmap_t *bitmap,const r
 				flipy=1;
 			}
 
-			drawgfx (bitmap,machine->gfx[1],
+			drawgfx_transpen (bitmap,cliprect,machine->gfx[1],
 					tile,
 					color,
 					flipx,flipy,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,15);
+					x,y,15);
 		}
 	}
 }
@@ -247,12 +246,11 @@ static void tokib_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 			tile    = sprite_word[1] & 0x1fff;
 			color   = sprite_word[2] >> 12;
 
-			drawgfx (bitmap,machine->gfx[1],
+			drawgfx_transpen (bitmap,cliprect,machine->gfx[1],
 					tile,
 					color,
 					flipx,0,
-					x,y-1,
-					cliprect,TRANSPARENCY_PEN,15);
+					x,y-1,15);
 		}
 	}
 }

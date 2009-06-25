@@ -87,14 +87,13 @@ VIDEO_UPDATE( rollrace )
 			if(ra_flipy)
 				sy = 31-sy ;
 
-			drawgfx(bitmap,
-				screen->machine->gfx[RA_BGCHAR_BASE],
+			drawgfx_transpen(bitmap,
+				cliprect,screen->machine->gfx[RA_BGCHAR_BASE],
 				mem[offs + ( ra_bkgpage * 1024 )]
 				+ ((( mem[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				ra_bkgcol,
 				ra_flipx,(ra_bkgflip^ra_flipy),
-				sx*8,sy*8,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx*8,sy*8,0);
 
 
 		}
@@ -127,12 +126,11 @@ VIDEO_UPDATE( rollrace )
 		if(bank)
 			bank += ra_spritebank;
 
-		drawgfx(bitmap, screen->machine->gfx[ RA_SP_BASE + bank ],
+		drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
 			ra_flipx,!(s_flipy^ra_flipy),
-			sx,sy,
-			cliprect,TRANSPARENCY_PEN,0);
+			sx,sy,0);
 		}
 	}
 
@@ -156,12 +154,11 @@ VIDEO_UPDATE( rollrace )
 
 		if (ra_flipx) sx = 31 - sx;
 
-		drawgfx(bitmap,screen->machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
 			videoram[ offs ]  ,
 			col,
 			ra_flipx,ra_flipy,
-			8*sx,scroll,
-			cliprect,TRANSPARENCY_PEN,0);
+			8*sx,scroll,0);
 
 	}
 

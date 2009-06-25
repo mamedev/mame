@@ -89,12 +89,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy^=1;
 		}
 
-			drawgfx(bitmap,gfx,
+			drawgfx_transpen(bitmap,cliprect,gfx,
 				tile&0x7f,
 				(attributes) & 7,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0 );
+				sx,sy,0 );
 
 		source -= 4;
 	}

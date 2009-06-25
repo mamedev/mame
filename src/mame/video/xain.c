@@ -195,27 +195,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (attr & 0x80)	/* double height */
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					numtile,
 					color,
 					flipx,flipy,
-					sx,flipy ? sy+16:sy-16,
-					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,machine->gfx[3],
+					sx,flipy ? sy+16:sy-16,0);
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					numtile+1,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 		}
 		else
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					numtile,
 					color,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy,0);
 		}
 	}
 }

@@ -76,12 +76,11 @@ static void comad_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 		sx = (sx&0x1ff) - (sx&0x200);
 		sy = (sy&0x1ff) - (sy&0x200);
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

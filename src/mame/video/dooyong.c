@@ -424,13 +424,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for (y = 0; y <= height; y++)
 		{
-			pdrawgfx(bitmap, machine->gfx[1],
+			pdrawgfx_transpen(bitmap, cliprect, machine->gfx[1],
 					code + y,
 					color,
 					flipx, flipy,
 					sx, sy + (16 * (flipy ? (height - y) : y)),
-					cliprect, TRANSPARENCY_PEN, 15,
-					pri);
+					priority_bitmap,
+					pri, 15);
 		}
 	}
 }
@@ -490,13 +490,13 @@ static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				for (x = 0; x <= width; x++)
 				{
 					int _x = sx + (16 * (flipx ? (width - x) : x));
-					pdrawgfx(bitmap, machine->gfx[0],
+					pdrawgfx_transpen(bitmap, cliprect, machine->gfx[0],
 							code,
 							color,
 							flipx, flipy,
 							_x, _y,
-							cliprect, TRANSPARENCY_PEN, 15,
-							pri);
+							priority_bitmap,
+							pri, 15);
 					code++;
 				}
 			}

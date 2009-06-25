@@ -649,21 +649,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (state->flip)
 			{
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
 						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
 						!(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
-						x-15, scanline-y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x-15, scanline-y,0);
 			}
 			else
 			{
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
 						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
 						(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
-						x, scanline-y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x, scanline-y,0);
 			}
 
 			num_sprt++;
@@ -1016,12 +1014,11 @@ VIDEO_UPDATE( pestplce )
 	{
 		if (state->sprite_ram[offs])
 		{
-			drawgfx(bitmap,screen->machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 					state->sprite_ram[offs + 2],
 					(state->sprite_ram[offs + 1] & 0x0f) + 16 * state->palette_bank,
 					state->sprite_ram[offs + 1] & 0x80,state->sprite_ram[offs + 1] & 0x40,
-					state->sprite_ram[offs + 3] - 8,240 - state->sprite_ram[offs] + 8,
-					cliprect,TRANSPARENCY_PEN,0);
+					state->sprite_ram[offs + 3] - 8,240 - state->sprite_ram[offs] + 8,0);
 		}
 	}
 	return 0;

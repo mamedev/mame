@@ -64,11 +64,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			for (x = 0 ; x < dimx ; x++)
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect, machine->gfx[0],
 						code++, 0,
 						0, 0,
-						sx + x * 16, sy + y * 16,
-						cliprect, TRANSPARENCY_PEN, 0xff);
+						sx + x * 16, sy + y * 16, 0xff);
 			}
 		}
 	}

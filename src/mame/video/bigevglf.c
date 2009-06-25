@@ -79,12 +79,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = bigevglf_spriteram2[i+3];
 		sy = 200-bigevglf_spriteram2[i];
 		for(j=0;j<16;j++)
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				bigevglf_spriteram1[(code<<4)+j]+((bigevglf_spriteram1[0x400+(code<<4)+j]&0xf)<<8),
 				bigevglf_spriteram2[i+2] & 0xf,
 				0,0,
-				sx+((j&1)<<3),sy+((j>>1)<<3),
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+((j&1)<<3),sy+((j>>1)<<3),0);
 	}
 }
 

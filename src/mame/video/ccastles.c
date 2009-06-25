@@ -288,7 +288,7 @@ VIDEO_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs+2] >> 7;
 
-		drawgfx(spritebitmap, screen->machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
+		drawgfx_transpen(spritebitmap, cliprect, screen->machine->gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

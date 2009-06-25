@@ -132,7 +132,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (x >= 0x180)		x -= 0x200;
 
-		drawgfx(bitmap,machine->gfx[0], code,color, flipx,flipy, x,y, cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0], code,color, flipx,flipy, x,y,0);
 	}
 }
 

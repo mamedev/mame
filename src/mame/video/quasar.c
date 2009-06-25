@@ -139,24 +139,22 @@ VIDEO_UPDATE( quasar )
 
 		/* Main Screen */
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 				code,
 				cvs_color_ram[offs] & 0x3f,
 				0,0,
-				x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				x,y,0);
 
 
 		/* background for Collision Detection (it can only hit certain items) */
 
 		if((cvs_color_ram[offs] & 7) == 0)
 		{
-			drawgfx(cvs_collision_background,screen->machine->gfx[0],
+			drawgfx_opaque(cvs_collision_background,cliprect,screen->machine->gfx[0],
 					code,
 					64,
 					0,0,
-					x,y,
-					cliprect,TRANSPARENCY_NONE,0);
+					x,y);
 		}
 	}
 

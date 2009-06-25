@@ -111,12 +111,11 @@ static void circus_draw_fg(running_machine *machine, bitmap_t *bitmap, const rec
 	draw_line (bitmap,cliprect,0,193,17,193,0);
 	draw_line (bitmap,cliprect,231,193,248,193,0);
 
-	drawgfx(bitmap,machine->gfx[1],
+	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 			clown_z,
 			0,
 			0,0,
-			clown_y,clown_x,
-			cliprect,TRANSPARENCY_PEN,0);
+			clown_y,clown_x,0);
 }
 
 VIDEO_UPDATE( circus )
@@ -161,12 +160,12 @@ static void robotbwl_draw_bowling_alley(bitmap_t *bitmap, const rectangle *clipr
 
 static void robotbwl_draw_ball(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	drawgfx(bitmap,machine->gfx[1],
+	drawgfx_transpen(bitmap,/* Y is horizontal position */
+			cliprect,machine->gfx[1],
 			clown_z,
 			0,
 			0,0,
-			clown_y+8,clown_x+8, /* Y is horizontal position */
-			cliprect,TRANSPARENCY_PEN,0);
+			clown_y+8,clown_x+8,0);
 }
 
 VIDEO_UPDATE( robotbwl )
@@ -180,12 +179,12 @@ VIDEO_UPDATE( robotbwl )
 
 static void crash_draw_car(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	drawgfx(bitmap,machine->gfx[1],
+	drawgfx_transpen(bitmap,/* Y is horizontal position */
+		cliprect,machine->gfx[1],
 		clown_z,
 		0,
 		0,0,
-		clown_y,clown_x, /* Y is horizontal position */
-		cliprect,TRANSPARENCY_PEN,0);
+		clown_y,clown_x,0);
 }
 
 VIDEO_UPDATE( crash )

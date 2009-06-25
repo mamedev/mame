@@ -207,12 +207,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 
 
-			drawgfx( bitmap, machine->gfx[2],
+			drawgfx_transpen( bitmap, cliprect,machine->gfx[2],
 					 code,
 					 color,
 					 flipx,flipy,
-					 sx,flipscreen ? sy - 16*y : sy + 16*y,
-					 cliprect,TRANSPARENCY_PEN, 0 );
+					 sx,flipscreen ? sy - 16*y : sy + 16*y, 0 );
 		 }
 	}
 }

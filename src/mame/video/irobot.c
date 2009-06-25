@@ -362,11 +362,10 @@ VIDEO_UPDATE( irobot )
 			int code = videoram[offs] & 0x3f;
 			int color = ((videoram[offs] & 0xc0) >> 6) | (irobot_alphamap >> 3);
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					code, color,
 					0,0,
-					8*x,8*y,
-					cliprect,TRANSPARENCY_PEN,0);
+					8*x,8*y,0);
 		}
 	return 0;
 }

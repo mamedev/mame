@@ -28,7 +28,7 @@ static VIDEO_UPDATE(mpoker)
 		{
 			UINT16 dat = mpoker_video[count];
 			UINT16 col = mpoker_video[count+0x400];
-			drawgfx(bitmap,gfx,dat,col,0,0,x*16,y*16,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}
 

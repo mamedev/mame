@@ -78,13 +78,12 @@ VIDEO_UPDATE( ultratnk )
 
 		if (!(attr & 0x80))
 		{
-			drawgfx(bitmap, screen->machine->gfx[1],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 				(code >> 3) | bank,
 				i,
 				0, 0,
 				horz - 15,
-				vert - 15,
-				cliprect, TRANSPARENCY_PEN, 0);
+				vert - 15, 0);
 		}
 	}
 
@@ -125,13 +124,12 @@ VIDEO_EOF( ultratnk )
 		if (code & 4)
 			bank = 32;
 
-		drawgfx(helper, machine->gfx[1],
+		drawgfx_transpen(helper, &rect, machine->gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
 			horz - 15,
-			vert - 15,
-			&rect, TRANSPARENCY_PEN, 1);
+			vert - 15, 1);
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)

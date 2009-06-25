@@ -37,13 +37,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (!flipx) {
 			for (wcount=0;wcount<width;wcount++) {
-			pdrawgfx(bitmap,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,cliprect,TRANSPARENCY_PEN,0,pri_mask);
+			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,priority_bitmap,pri_mask,0);
 			}
 
 		} else {
 
 			for (wcount=width;wcount>0;wcount--) {
-			pdrawgfx(bitmap,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,cliprect,TRANSPARENCY_PEN,0,pri_mask);
+			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,priority_bitmap,pri_mask,0);
 			}
 
 		}

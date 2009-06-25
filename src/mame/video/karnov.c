@@ -90,13 +90,11 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		color = tile >> 12;
 		tile = tile&0x7ff;
 		if (flipscreen)
-			drawgfx(bitmap_f,machine->gfx[1],tile,
-				color, fx, fy, 496-16*mx,496-16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap_f,0,machine->gfx[1],tile,
+				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			drawgfx(bitmap_f,machine->gfx[1],tile,
-				color, fx, fy, 16*mx,16*my,
-		 		0,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap_f,0,machine->gfx[1],tile,
+				color, fx, fy, 16*mx,16*my);
 	}
 
 	if (!flipscreen) {
@@ -152,17 +150,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		}
 		else sprite2=sprite+1;
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 				sprite,
-				colour,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				colour,fx,fy,x,y,0);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx(bitmap,machine->gfx[2],
+    		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 				sprite2,
-				colour,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+				colour,fx,fy,x,y+16,0);
 	}
 }
 

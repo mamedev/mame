@@ -195,12 +195,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (y = 0; y < ny; y++)
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code + (flipy ? (ny - y - 1) :  y),
 						color,
 						flipx,flipy,
-						sx + x * (flipx ? 16 : -16), sy + y * 16,
-						cliprect,TRANSPARENCY_PEN,0 );
+						sx + x * (flipx ? 16 : -16), sy + y * 16,0 );
 			}
 		}
 	}

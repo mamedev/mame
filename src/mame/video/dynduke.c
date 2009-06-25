@@ -161,10 +161,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx(bitmap,machine->gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,15);
+				color,fx,fy,x,y,15);
 	}
 }
 

@@ -79,12 +79,11 @@ static void tumblepb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					sprite_xoffset + x,sprite_yoffset + y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					sprite_xoffset + x,sprite_yoffset + y + mult * multi,0);
 
 			multi--;
 		}
@@ -141,12 +140,12 @@ static void jumpkids_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,// x-1 for bcstory .. realign other layers?
+					cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					sprite_xoffset+x,sprite_yoffset + y + mult * multi, // x-1 for bcstory .. realign other layers?
-					cliprect,TRANSPARENCY_PEN,0);
+					sprite_xoffset+x,sprite_yoffset + y + mult * multi,0);
 
 			multi--;
 		}
@@ -203,12 +202,11 @@ static void fncywld_draw_sprites(running_machine *machine, bitmap_t *bitmap,cons
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					sprite_xoffset+x,sprite_yoffset+ y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,15);
+					sprite_xoffset+x,sprite_yoffset+ y + mult * multi,15);
 
 			multi--;
 		}

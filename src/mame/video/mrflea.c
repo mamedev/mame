@@ -47,18 +47,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int ypos = source[0]-16+3;
 		int tile_number = source[2]+source[3]*0x100;
 
-		drawgfx( bitmap, gfx,
+		drawgfx_transpen( bitmap, &clip,gfx,
 			tile_number,
 			0, /* color */
 			0,0, /* no flip */
-			xpos,ypos,
-			&clip,TRANSPARENCY_PEN,0 );
-		drawgfx( bitmap, gfx,
+			xpos,ypos,0 );
+		drawgfx_transpen( bitmap, &clip,gfx,
 			tile_number,
 			0, /* color */
 			0,0, /* no flip */
-			xpos,256+ypos,
-			&clip,TRANSPARENCY_PEN,0 );
+			xpos,256+ypos,0 );
 		source+=4;
 	}
 }
@@ -75,13 +73,12 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		for( sx=0; sx<256; sx+=8 ){
 			int tile_number = base+source[0]+source[0x400]*0x100;
 			source++;
-			drawgfx( bitmap, gfx,
+			drawgfx_opaque( bitmap, cliprect,
+				gfx,
 				tile_number,
 				0, /* color */
 				0,0, /* no flip */
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_NONE,0 );
+				sx,sy );
 		}
 	}
 }

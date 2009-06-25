@@ -160,29 +160,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		for (i = 0;i < y_multi;i++)
 
 			if (m90_video_control_data[7] & 0x01)
-				pdrawgfx(bitmap,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					cliprect,TRANSPARENCY_PEN,0,
-					(colour & 0x08) ? 0x00 : 0x02);
+					priority_bitmap,
+					(colour & 0x08) ? 0x00 : 0x02,0);
 			else if (m90_video_control_data[7] & 0x02)
-				pdrawgfx(bitmap,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					cliprect,TRANSPARENCY_PEN,0,
-					((colour & 0x0c)==0x0c) ? 0x00 : 0x02);
+					priority_bitmap,
+					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
 			else
-				pdrawgfx(bitmap,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					cliprect,TRANSPARENCY_PEN,0,
-					0x02);
+					priority_bitmap,
+					0x02,0);
 	}
 }
 
@@ -214,13 +214,13 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				cliprect,TRANSPARENCY_PEN,0,
-				(colour & 0x08) ? 0x00 : 0x02);
+				priority_bitmap,
+				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
 
@@ -251,13 +251,13 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				cliprect,TRANSPARENCY_PEN,0,
-				(colour & 0x08) ? 0x00 : 0x02);
+				priority_bitmap,
+				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
 

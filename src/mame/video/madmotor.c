@@ -204,12 +204,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			{
 				if ((color & pri_mask) == pri_val &&
 							(!flash || (video_screen_get_frame_number(machine->primary_screen) & 1)))
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code - y * incy + h * x,
 							color,
 							flipx,flipy,
-							sx + mult * x,sy + mult * y,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx + mult * x,sy + mult * y,0);
 			}
 
 			offs += 4;

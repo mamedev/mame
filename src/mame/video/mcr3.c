@@ -233,22 +233,22 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
+			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
+					priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
+			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
+					priority_bitmap, 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx(bitmap, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
+			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+					priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx(bitmap, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
+			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+					priority_bitmap, 0x02, 0xfeff);
 		}
 	}
 }

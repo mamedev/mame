@@ -75,15 +75,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				if (!flipx) {
 					for (xcnt = 0; xcnt < wide+1; xcnt ++)	{
 						int tileno = suprslam_sp_videoram[word_offset+loopno];
-						drawgfxzoom(bitmap, gfx, tileno, col, 0, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2, cliprect, TRANSPARENCY_PEN, 15,xzoom << 11, yzoom << 11);
-						drawgfxzoom(bitmap, gfx, tileno, col, 0, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2, cliprect, TRANSPARENCY_PEN, 15,xzoom << 11, yzoom << 11);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 0, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 0, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
 						loopno ++;
 					}
 				} else {
 					for (xcnt = wide; xcnt >= 0; xcnt --)	{
 						int tileno = suprslam_sp_videoram[word_offset+loopno];
-						drawgfxzoom(bitmap, gfx, tileno, col, 1, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2, cliprect, TRANSPARENCY_PEN, 15,xzoom << 11, yzoom << 11);
-						drawgfxzoom(bitmap, gfx, tileno, col, 1, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2, cliprect, TRANSPARENCY_PEN, 15,xzoom << 11, yzoom << 11);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 1, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 1, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
 						loopno ++;
 					}
 				}

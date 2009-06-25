@@ -226,11 +226,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		do
 		{
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code + i,col,
 					flip_screen_get(machine),flip_screen_get(machine),
-					sx,sy + 16 * i * dir,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy + 16 * i * dir,15);
 
 			i--;
 		} while (i >= 0);

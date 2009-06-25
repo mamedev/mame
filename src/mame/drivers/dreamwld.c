@@ -138,10 +138,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for (xct=0;xct<xsize;xct++)
 			{
-				drawgfx(bitmap,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,ypos+yct*16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,ypos+yct*16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,(ypos+yct*16)-0x200,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,(ypos+yct*16)-0x200,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,ypos+yct*16,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,ypos+yct*16,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,(ypos+yct*16)-0x200,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,(ypos+yct*16)-0x200,0);
 
 				tileno++;
 			}

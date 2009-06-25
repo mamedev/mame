@@ -104,7 +104,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,gfx,tile,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,gfx,tile,color,flipx,flipy,sx,sy,0);
 
 		source += 4;
 	}

@@ -394,13 +394,11 @@ VIDEO_UPDATE( exerion )
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx(bitmap, gfx, code2, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_PENS,
+			drawgfx_transmask(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height,
 			        colortable_get_transpen_mask(screen->machine->colortable, gfx, color, 0x10));
 		}
 
-		drawgfx(bitmap, gfx, code, color, xflip, yflip, x, y,
-			    cliprect, TRANSPARENCY_PENS,
+		drawgfx_transmask(bitmap, cliprect, gfx, code, color, xflip, yflip, x, y,
 			    colortable_get_transpen_mask(screen->machine->colortable, gfx, color, 0x10));
 
 		if (doubled) i += 4;
@@ -414,11 +412,10 @@ VIDEO_UPDATE( exerion )
 			int y = exerion_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 				videoram[offs] + 256 * char_bank,
 				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
-				exerion_cocktail_flip, exerion_cocktail_flip, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+				exerion_cocktail_flip, exerion_cocktail_flip, x, y, 0);
 		}
 
 	return 0;

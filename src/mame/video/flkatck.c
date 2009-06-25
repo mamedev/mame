@@ -173,7 +173,7 @@ popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%0
 
 	/* draw the graphics */
 	tilemap_draw(bitmap,&final_clip[0],k007121_tilemap[0],0,0);
-	K007121_sprites_draw(0,bitmap,screen->machine->gfx,NULL,cliprect,&k007121_ram[0x1000],0,40,0,-1);
+	K007121_sprites_draw(0,bitmap,cliprect,screen->machine->gfx,NULL,&k007121_ram[0x1000],0,40,0,-1);
 	tilemap_draw(bitmap,&final_clip[1],k007121_tilemap[1],0,0);
 	return 0;
 }

@@ -175,7 +175,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 					UINT16 tile = (src[count]&0x0fff);
 					UINT16 colr = (src[count]&0xf000)>>12;
 					count++;
-					drawgfx(bitmap,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,15);
 				}
 			}
 			count = 0;
@@ -188,7 +188,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 					UINT16 tile = (src[count]&0x0fff);
 					UINT16 colr = (src[count]&0xf000)>>12;
 					count++;
-					drawgfx(bitmap,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,15);
 				}
 			}
 		}
@@ -207,7 +207,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 					UINT16 tile = (src[count]&0x0fff);
 					UINT16 colr = (src[count]&0xf000)>>12;
 					count++;
-					drawgfx(bitmap,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,15);
 				}
 			}
 			count = 0;
@@ -220,7 +220,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 					UINT16 tile = (src[count]&0x0fff);
 					UINT16 colr = (src[count]&0xf000)>>12;
 					count++;
-					drawgfx(bitmap,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,15);
 				}
 			}
 		}

@@ -122,13 +122,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						vy = 240 - vy;
 					}
 
-					pdrawgfx(bitmap,gfx,
+					pdrawgfx_transpen(bitmap,cliprect,gfx,
 						number,
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						cliprect,TRANSPARENCY_PEN,0,
-						priority_mask);
+						priority_bitmap,
+						priority_mask,0);
 
 					number++;
 					sy += 16;
@@ -141,13 +141,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					vy = 240 - vy;
 				}
 
-				pdrawgfx(bitmap,gfx,
+				pdrawgfx_transpen(bitmap,cliprect,gfx,
 						number,
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						cliprect,TRANSPARENCY_PEN,0,
-						priority_mask);
+						priority_bitmap,
+						priority_mask,0);
 				}
 		}
 		source -= 4;

@@ -199,15 +199,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			for (count=0;count<chain;count++) {
 				if (flip_screen_get(machine)) {
 					if (!flipy) {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),cliprect,TRANSPARENCY_PEN,0);
+						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
 					} else {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,cliprect,TRANSPARENCY_PEN,0);
+						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,0);
 					}
 				} else {
 						if (flipy) {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),cliprect,TRANSPARENCY_PEN,0);
+						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),0);
 					} else {
-						drawgfx(bitmap,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,cliprect,TRANSPARENCY_PEN,0);
+						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,0);
 					}
 				}
 			}

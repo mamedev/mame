@@ -72,7 +72,7 @@ static VIDEO_UPDATE( blackt96 )
 		for (y=0;y<32;y++)
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (0x2000/2)+1]);
-			drawgfx(bitmap,gfxbg,tile,6,0,0,x*16,y*16,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,gfxbg,tile,6,0,0,x*16,y*16);
 			count++;
 		}
 	}
@@ -88,7 +88,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -102,7 +102,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -116,7 +116,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -130,7 +130,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -143,7 +143,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -156,7 +156,7 @@ static VIDEO_UPDATE( blackt96 )
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
 			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
 
-			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
 		}
 	}
@@ -168,7 +168,7 @@ static VIDEO_UPDATE( blackt96 )
 		for (y=0;y<32;y++)
 		{
 			UINT16 tile = (blackt96_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
 			count++;
 		}
 

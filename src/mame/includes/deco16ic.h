@@ -37,10 +37,10 @@ void deco16_tilemap_4_draw(const device_config *screen, bitmap_t *bitmap, const 
 void deco16_tilemap_34_combine_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
 void deco16_clear_sprite_priority_bitmap(void);
-void deco16_pdrawgfx(running_machine *machine,
-		bitmap_t *dest,const gfx_element *gfx,
+void deco16_pdrawgfx(
+		bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha);
+		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha);
 
 tilemap *deco16_get_tilemap(int pf, int size);
 

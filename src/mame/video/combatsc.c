@@ -479,7 +479,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int base_color = (circuit*4)*16+(K007121_ctrlram[circuit][6]&0x10)*2;
 
-	K007121_sprites_draw(circuit,bitmap,machine->gfx,machine->colortable,cliprect,source,base_color,0,0,pri_mask);
+	K007121_sprites_draw(circuit,bitmap,cliprect,machine->gfx,machine->colortable,source,base_color,0,0,pri_mask);
 }
 
 
@@ -630,11 +630,10 @@ static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 //          if(combasc_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(combasc_vreg == 0x66 ) color += 2*16;
 
-			drawgfx( bitmap, gfx,
+			drawgfx_transpen( bitmap, cliprect, gfx,
 				number, color,
 				attributes & 0x10,0, /* flip */
-				x,y,
-				cliprect, TRANSPARENCY_PEN, 15 );
+				x,y, 15 );
 		}
 		source -= 8;
 	}

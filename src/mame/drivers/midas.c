@@ -146,13 +146,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			UINT16 code		=	codes[y*2];
 			UINT16 attr		=	codes[y*2+1];
 
-			drawgfxzoom(	bitmap,	machine->gfx[0],
+			drawgfxzoom_transpen(	bitmap,	cliprect, machine->gfx[0],
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
 							sx / 0x10000, ((sy + y * ydim) / 0x10000)&0x1ff,
-							cliprect, TRANSPARENCY_PEN, 0,
-							xscale, yscale			);
+							xscale, yscale, 0			);
 		}
 	}
 }

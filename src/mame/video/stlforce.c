@@ -114,14 +114,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			ypos = 512-ypos;
 
-			drawgfx( bitmap,
+			drawgfx_transpen( bitmap,
+					 cliprect,
 					 gfx,
 					 num,
 					 64+attr,
 					 0,0,
-					 xpos+stlforce_sprxoffs,ypos,
-					 cliprect,
-					 TRANSPARENCY_PEN,0 );
+					 xpos+stlforce_sprxoffs,ypos,0 );
 		}
 
 		source += 0x4;

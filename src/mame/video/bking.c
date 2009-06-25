@@ -258,28 +258,25 @@ VIDEO_UPDATE( bking )
 
 	/* draw the balls */
 
-	drawgfx(bitmap, screen->machine->gfx[2],
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2],
 		ball1_pic,
 		palette_bank,
 		0, 0,
-		xld1, yld1,
-		cliprect, TRANSPARENCY_PEN, 0);
+		xld1, yld1, 0);
 
-	drawgfx(bitmap, screen->machine->gfx[3],
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3],
 		ball2_pic,
 		palette_bank,
 		0, 0,
-		xld2, yld2,
-		cliprect, TRANSPARENCY_PEN, 0);
+		xld2, yld2, 0);
 
 	/* draw the crow */
 
-	drawgfx(bitmap, screen->machine->gfx[1],
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
 		crow_pic,
 		palette_bank,
 		crow_flip, crow_flip,
-		crow_flip ? xld3 - 16 : 256 - xld3, crow_flip ? yld3 - 16 : 256 - yld3,
-		cliprect, TRANSPARENCY_PEN, 0);
+		crow_flip ? xld3 - 16 : 256 - xld3, crow_flip ? yld3 - 16 : 256 - yld3, 0);
 	return 0;
 }
 
@@ -298,12 +295,11 @@ VIDEO_EOF( bking )
 		xld = xld1;
 		yld = yld1;
 
-		drawgfx(helper1, machine->gfx[2],
+		drawgfx_opaque(helper1, &rect, machine->gfx[2],
 			ball1_pic,
 			0,
 			0, 0,
-			0, 0,
-			&rect, TRANSPARENCY_NONE, 0);
+			0, 0);
 
 		latch = 0x0C00;
 	}
@@ -313,12 +309,11 @@ VIDEO_EOF( bking )
 		xld = xld2;
 		yld = yld2;
 
-		drawgfx(helper1, machine->gfx[3],
+		drawgfx_opaque(helper1, &rect, machine->gfx[3],
 			ball2_pic,
 			0,
 			0, 0,
-			0, 0,
-			&rect, TRANSPARENCY_NONE, 0);
+			0, 0);
 
 		latch = 0x0400;
 	}

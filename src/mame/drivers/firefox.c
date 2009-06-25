@@ -188,7 +188,7 @@ static VIDEO_UPDATE( firefox )
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), cliprect, TRANSPARENCY_PEN, 0 );
+				drawgfx_transpen( bitmap, cliprect, screen->machine->gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}

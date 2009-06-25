@@ -130,12 +130,12 @@ static void rohga_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,machine->gfx[3],
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+					priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -416,13 +416,13 @@ sprite 2:
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				deco16_pdrawgfx(machine,
-						bitmap,machine->gfx[gfxbank],
+				deco16_pdrawgfx(
+						bitmap,cliprect,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						cliprect,0,tilemap_pri,sprite_pri,1,alpha);
+						0,tilemap_pri,sprite_pri,1,alpha);
 			}
 		}
 

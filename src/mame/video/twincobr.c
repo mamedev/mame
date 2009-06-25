@@ -470,12 +470,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					flipx = attribute & 0x100;
 					if (flipx) sx -= 14;		/* should really be 15 */
 					flipy = attribute & 0x200;
-					drawgfx(bitmap,machine->gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						sprite,
 						color,
 						flipx,flipy,
-						sx-32,sy-16,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx-32,sy-16,0);
 				}
 			}
 		}

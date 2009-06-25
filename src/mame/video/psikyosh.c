@@ -342,7 +342,7 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-//              drawgfx(zoom_bitmap,gfx,tileno,colour,0,0,(16*sx)&0x1ff,((16*sy)&(width-1)),NULL,TRANSPARENCY_PEN,0);
+//              drawgfx_transpen(zoom_bitmap,NULL,gfx,tileno,colour,0,0,(16*sx)&0x1ff,((16*sy)&(width-1)),0);
 
 				drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),alpha); /* normal */
 				if(scrollx)
@@ -421,10 +421,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 /* sx and sy is top-left of entire sprite regardless of flip */
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
-static void psikyosh_drawgfxzoom( running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+static void psikyosh_drawgfxzoom( 
+		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
-		const rectangle *clip,int alpha,
+		int alpha,
 		int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
 	rectangle myclip; /* Clip to screen boundaries */
@@ -471,7 +471,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 			{
 				for (xtile = xstart; xtile != xend; xtile += xinc )
 				{
-					const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+					const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 					const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
 
 					int x_index_base, y_index, sx, sy, ex, ey;
@@ -735,7 +735,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 		/* Start drawing */
 		if( gfx )
 		{
-			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 
 			int sprite_screen_height = ((high*gfx->height*(0x400*0x400))/zoomy + 0x200)>>10; /* Round up to nearest pixel */
 			int sprite_screen_width = ((wide*gfx->width*(0x400*0x400))/zoomx + 0x200)>>10;
@@ -1046,7 +1046,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			/* start drawing */
 			if( zoom_table[BYTE_XOR_BE(zoomy)] && zoom_table[BYTE_XOR_BE(zoomx)] ) /* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
 			{
-				psikyosh_drawgfxzoom(machine, bitmap,gfx,tnum,colr,flpx,flpy,xpos,ypos,cliprect,alpha,
+				psikyosh_drawgfxzoom(bitmap,cliprect,gfx,tnum,colr,flpx,flpy,xpos,ypos,alpha,
 									(UINT32)zoom_table[BYTE_XOR_BE(zoomx)], (UINT32)zoom_table[BYTE_XOR_BE(zoomy)], wide, high, listcntr);
 
 #if 0

@@ -201,7 +201,7 @@ VIDEO_UPDATE( labyrunr )
 		}
 
 		tilemap_draw(bitmap,&finalclip0,layer0,TILEMAP_DRAW_OPAQUE,0);
-		K007121_sprites_draw(0,bitmap,screen->machine->gfx,screen->machine->colortable,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		K007121_sprites_draw(0,bitmap,cliprect,screen->machine->gfx,screen->machine->colortable,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		tilemap_draw(bitmap,&finalclip1,layer1,TILEMAP_DRAW_OPAQUE,0);
 	}
@@ -269,7 +269,7 @@ VIDEO_UPDATE( labyrunr )
 		tilemap_draw(bitmap,&finalclip1,layer1,0,1);
 		if(use_clip3[1]) tilemap_draw(bitmap,&finalclip3,layer1,0,1);
 
-		K007121_sprites_draw(0,bitmap,screen->machine->gfx,screen->machine->colortable,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		K007121_sprites_draw(0,bitmap,cliprect,screen->machine->gfx,screen->machine->colortable,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
 	}
 	return 0;
 }

@@ -310,13 +310,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy++;	/* sprites are buffered and delayed by one scanline */
 
 		gfx_element_set_source_clip(gfx, tx, sizex, ty, sizey);
-		pdrawgfx( bitmap, gfx,
+		pdrawgfx_transpen( bitmap, cliprect,gfx,
 				sprite,
 				color,
 				flipx,flipy,
 				sx & 0x1ff,
 				((sy + 16) & 0xff) - 16,
-				cliprect,TRANSPARENCY_PEN,0xf, pri_mask);
+				priority_bitmap, pri_mask,0xf);
 
 		source -= 0x10;
 	}

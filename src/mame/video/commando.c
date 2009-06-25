@@ -121,8 +121,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		if (bank < 3)
-			drawgfx(bitmap,machine->gfx[2], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_PEN, 15);
+			drawgfx_transpen(bitmap,cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy, 15);
 	}
 }
 

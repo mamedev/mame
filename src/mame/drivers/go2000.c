@@ -170,7 +170,7 @@ static VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -182,7 +182,7 @@ static VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0xf);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,0xf);
 			count++;
 		}
 	}
@@ -261,12 +261,11 @@ static VIDEO_UPDATE(go2000)
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx(	bitmap, screen->machine->gfx[0],
+				drawgfx_transpen(	bitmap, cliprect,screen->machine->gfx[0],
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,
-							sx, sy,
-							cliprect,TRANSPARENCY_PEN,15	);
+							sx, sy,15	);
 
 				tile_x += tile_xinc;
 			}

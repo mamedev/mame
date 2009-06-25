@@ -11,8 +11,8 @@ extern UINT8 K007121_ctrlram[MAX_K007121][8];
 void K007121_ctrl_w(int chip,int offset,int data);
 WRITE8_HANDLER( K007121_ctrl_0_w );
 WRITE8_HANDLER( K007121_ctrl_1_w );
-void K007121_sprites_draw(int chip,bitmap_t *bitmap,gfx_element **gfxs, colortable_t *ctable,
-						  const rectangle *cliprect, const UINT8 *source,int base_color,
+void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, gfx_element **gfxs, colortable_t *ctable,
+						  const UINT8 *source,int base_color,
 						  int global_x_offset,int bank_base, UINT32 pri_mask);
 
 

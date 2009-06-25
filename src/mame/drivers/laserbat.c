@@ -554,12 +554,11 @@ static VIDEO_UPDATE( laserbat )
 	}
 
 	if(sprite_info.enable)
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
 		        sprite_info.code,
 				sprite_info.color,
 				0,0,
-				sprite_info.x - 6,sprite_info.y,
-				cliprect,TRANSPARENCY_PEN,0);
+				sprite_info.x - 6,sprite_info.y,0);
 
 	return 0;
 }

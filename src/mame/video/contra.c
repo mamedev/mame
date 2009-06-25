@@ -275,7 +275,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	if (bank==0) source=private_spriteram;
 	else source=private_spriteram_2;
 
-	K007121_sprites_draw(bank,bitmap,machine->gfx,machine->colortable,cliprect,source,base_color,40,0,-1);
+	K007121_sprites_draw(bank,bitmap,cliprect,machine->gfx,machine->colortable,source,base_color,40,0,-1);
 }
 
 VIDEO_UPDATE( contra )

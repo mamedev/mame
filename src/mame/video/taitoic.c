@@ -1320,13 +1320,13 @@ void PC090OJ_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rect
 		x += PC090OJ_xoffs;
 		y += PC090OJ_yoffs;
 
-		pdrawgfx(bitmap,machine->gfx[PC090OJ_gfxnum],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[PC090OJ_gfxnum],
 				code,
 				color,
 				flipx,flipy,
 				x,y,
-				cliprect,TRANSPARENCY_PEN,0,
-				priority ? 0xfc : 0xf0);
+				priority_bitmap,
+				priority ? 0xfc : 0xf0,0);
 	}
 }
 

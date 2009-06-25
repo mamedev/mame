@@ -67,7 +67,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (source[1] & 0x20) {	if (xpos < 0xe0) xpos += 0x100; }
 		// bits 0x40 and 0x10 not used?...
 
-		drawgfx(bitmap,machine->gfx[1],tile,0,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,255);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],tile,0,0,0,xpos,ypos,255);
 
 		source -= 0x20;
 	}
@@ -92,7 +92,7 @@ VIDEO_UPDATE(funybubl)
 			int data;
 
 			data = funybubl_banked_videoram[offs] | (funybubl_banked_videoram[offs+1] << 8);
-			drawgfx(bitmap,screen->machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,0);
 			offs+=2;
 		}
 	}

@@ -273,13 +273,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx( bitmap, machine->gfx[3],
+					drawgfx_transpen( bitmap, cliprect,machine->gfx[3],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						-71 + ((sx + 16*x) & 0x1ff),
-						1 + ((sy + 16*y) & 0xff),
-						cliprect,TRANSPARENCY_PEN,0xf);
+						1 + ((sy + 16*y) & 0xff),0xf);
 				}
 			}
 		}

@@ -511,12 +511,11 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 
 				 	if(priority)
 				 	{
-				 		drawgfx(bitmap,gfx,
+				 		drawgfx_transpen(bitmap,cliprect,gfx,
 										code,
 										color,
 										flipx,flipy,
-										x*8+spr_dx,y*8+spr_dy,
-										cliprect,TRANSPARENCY_PEN,0);
+										x*8+spr_dx,y*8+spr_dy,0);
 					}
 					else
 					{

@@ -111,12 +111,11 @@ static void draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		if (flip_screen_x_get(machine)) sx = 31 - sx;
 		if (flip_screen_y_get(machine)) sy = 31 - sy;
 
-		drawgfx(tmpbitmap1,machine->gfx[0],
+		drawgfx_opaque(tmpbitmap1,NULL,machine->gfx[0],
 				code,
 				2,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				8*sx,8*sy,
-				NULL,TRANSPARENCY_NONE,0);
+				8*sx,8*sy);
 	}
 
 	/* first copy to a temp bitmap doing column scroll */

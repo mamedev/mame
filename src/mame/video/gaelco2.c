@@ -383,11 +383,10 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 
 					/* normal sprite, pen 0 transparent */
 					if (color_effect == 0){
-						drawgfx(bitmap, gfx, number,
+						drawgfx_transpen(bitmap, cliprect, gfx, number,
 							color, xflip, yflip,
 							((sx + ex*16) & 0x3ff) + spr_x_adjust,
-							((sy + ey*16) & 0x1ff),
-							cliprect, TRANSPARENCY_PEN, 0);
+							((sy + ey*16) & 0x1ff), 0);
 
 					} else { /* last palette entry is reserved for shadows and highlights */
 

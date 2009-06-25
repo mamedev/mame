@@ -205,12 +205,12 @@ static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,machine->gfx[3],
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+					priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -273,12 +273,12 @@ static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,machine->gfx[3],
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0,pri);
+					priority_bitmap,pri,0);
 
 			multi--;
 		}

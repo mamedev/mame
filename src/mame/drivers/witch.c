@@ -707,29 +707,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			color  =  flags & 0x0f;
 
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				tileno, color,
 				flipx, flipy,
-				sx+8*flipx,sy+8*flipy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+8*flipx,sy+8*flipy,0);
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				tileno+1, color,
 				flipx, flipy,
-				sx+8-8*flipx,sy+8*flipy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+8-8*flipx,sy+8*flipy,0);
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				tileno+2, color,
 				flipx, flipy,
-				sx+8*flipx,sy+8-8*flipy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+8*flipx,sy+8-8*flipy,0);
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				tileno+3, color,
 				flipx, flipy,
-				sx+8-8*flipx,sy+8-8*flipy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx+8-8*flipx,sy+8-8*flipy,0);
 
 		}
 	}

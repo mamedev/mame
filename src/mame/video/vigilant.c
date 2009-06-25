@@ -77,13 +77,12 @@ static void update_background(running_machine *machine)
 		{
 			for( col=0; col<512; col+=32 )
 			{
-				drawgfx(bg_bitmap,
-						machine->gfx[2],
+				drawgfx_opaque(bg_bitmap,
+						0,machine->gfx[2],
 						charcode,
 						row < 128 ? 0 : 1,
 						0,0,
-						512*page + col,row,
-						0,TRANSPARENCY_NONE,0);
+						512*page + col,row);
 				charcode++;
 			}
 		}
@@ -202,12 +201,11 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 				{
 					sx = (sx + scroll) & 0x1ff;
 
-					drawgfx(bitmap,machine->gfx[0],
+					drawgfx_transmask(bitmap,&bottomvisiblearea,machine->gfx[0],
 							tile_number,
 							color,
 							0,0,
-							sx,sy,
-							&bottomvisiblearea,TRANSPARENCY_PENS,0x00ff);
+							sx,sy,0x00ff);
 				}
 			}
 		}
@@ -269,12 +267,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			if (flipy) c += h-1-y;
 			else c += y;
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					c,
 					color,
 					flipx,flipy,
-					sx,sy + 16*y,
-					cliprect,TRANSPARENCY_PEN,0);
+					sx,sy + 16*y,0);
 		}
 	}
 }
@@ -331,12 +328,11 @@ VIDEO_UPDATE( kikcubic )
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				tile_number,
 				color,
 				0,0,
-				sx,sy,
-				cliprect,TRANSPARENCY_NONE,0);
+				sx,sy);
 	}
 
 	draw_sprites(screen->machine,bitmap,cliprect);

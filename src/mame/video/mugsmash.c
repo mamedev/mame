@@ -48,15 +48,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		xpos -= 28;
 		ypos -= 16;
 
-		drawgfx(
+		drawgfx_transpen(
 				bitmap,
+				cliprect,
 				gfx,
 				num,
 				colour,
 				flipx,0,
-				xpos,ypos,
-				cliprect,
-				TRANSPARENCY_PEN,0
+				xpos,ypos,0
 				);
 
 		source += 0x8;

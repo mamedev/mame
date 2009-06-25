@@ -289,7 +289,7 @@ VIDEO_UPDATE( goldstar )
 			int girlyscroll = (INT8)((cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((cm_girl_scroll & 0x0f)<<4);
 
-			drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll),cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
+			drawgfxzoom_transpen(bitmap,cliprect,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
 		}
 	}
 

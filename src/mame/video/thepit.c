@@ -287,12 +287,11 @@ static void draw_sprites(running_machine *machine,
 			/* sprites 0-3 are drawn one pixel down */
 			if (offs < 16) y++;
 
-			drawgfx(bitmap, machine->gfx[2 * graphics_bank + 1],
+			drawgfx_transpen(bitmap, thepit_flip_screen_x ? &spritevisibleareaflipx : &spritevisiblearea,
+					machine->gfx[2 * graphics_bank + 1],
 					thepit_spriteram[offs + 1] & 0x3f,
 					thepit_spriteram[offs + 2],
-					flipx, flipy, x, y,
-					thepit_flip_screen_x ? &spritevisibleareaflipx : &spritevisiblearea,
-					TRANSPARENCY_PEN, 0);
+					flipx, flipy, x, y, 0);
 		}
 	}
 }

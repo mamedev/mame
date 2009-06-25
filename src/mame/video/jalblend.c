@@ -60,9 +60,9 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	return MAKE_RGB(r,g,b);
 }
 
-void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_element *gfx,
+void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
-							const rectangle *clip,int transparency,int transparent_color)
+							int transparency,int transparent_color)
 {
 	if (jal_blend_table == NULL)
 	{
@@ -73,7 +73,7 @@ void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_ele
 	/* Start drawing */
 	if (gfx)
 	{
-		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 		int x_index_base, y_index, sx, sy, ex, ey;

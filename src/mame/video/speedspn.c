@@ -78,12 +78,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		tileno += ((attr & 0xe0) >> 5) * 0x100;
 		color = attr & 0x0f;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transpen(bitmap,cliprect,gfx,
 				tileno,
 				color,
 				0,0,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,15);
+				xpos,ypos,15);
 
 		source +=4;
 	}

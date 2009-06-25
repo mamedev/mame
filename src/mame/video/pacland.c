@@ -323,19 +323,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			for (x = 0;x <= sizex;x++)
 			{
 				if (whichmask != 0)
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PENS,transmask[whichmask][color]);
+						sx + 16*x,sy + 16*y,transmask[whichmask][color]);
 				else
-					pdrawgfx(bitmap,machine->gfx[2],
+					pdrawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PENS,transmask[whichmask][color],0);
+						priority_bitmap,0,transmask[whichmask][color]);
 			}
 		}
 	}

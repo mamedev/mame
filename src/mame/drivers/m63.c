@@ -281,22 +281,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect,
+			machine->gfx[2],
 			code, color,
 			flipx, flipy,
-			sx, sy,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			sx, sy, 0);
 
 		/* sprite wrapping - verified on real hardware*/
 		if(sx>0xf0)
 		{
-			drawgfx(bitmap, machine->gfx[2],
+			drawgfx_transpen(bitmap, cliprect,
+			machine->gfx[2],
 			code, color,
 			flipx, flipy,
-			sx-0x100, sy,
-			cliprect,
-			TRANSPARENCY_PEN, 0);
+			sx-0x100, sy, 0);
 		}
 
 	}

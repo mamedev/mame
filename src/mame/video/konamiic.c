@@ -1292,8 +1292,8 @@ WRITE8_HANDLER( K007121_ctrl_1_w )
  *
  */
 
-void K007121_sprites_draw(int chip,bitmap_t *bitmap,gfx_element **gfxs, colortable_t *ctable,
-						  const rectangle *cliprect, const UINT8 *source,int base_color,
+void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, gfx_element **gfxs, colortable_t *ctable,
+						  const UINT8 *source,int base_color,
 						  int global_x_offset,int bank_base, UINT32 pri_mask)
 {
 	const gfx_element *gfx = gfxs[chip];
@@ -1804,20 +1804,18 @@ void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect)
 
 					if (c & bankmask) continue; else c += bank;
 
-					drawgfx(bitmap,K007420_gfx,
+					drawgfx_transpen(bitmap,cliprect,K007420_gfx,
 						c,
 						color,
 						flipx,flipy,
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx,sy,0);
 
 					if (K007342_regs[2] & 0x80)
-						drawgfx(bitmap,K007420_gfx,
+						drawgfx_transpen(bitmap,cliprect,K007420_gfx,
 							c,
 							color,
 							flipx,flipy,
-							sx,sy-256,
-							cliprect,TRANSPARENCY_PEN,0);
+							sx,sy-256,0);
 				}
 			}
 		}
@@ -1842,22 +1840,20 @@ void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect)
 
 					if (c & bankmask) continue; else c += bank;
 
-					drawgfxzoom(bitmap,K007420_gfx,
+					drawgfxzoom_transpen(bitmap,cliprect,K007420_gfx,
 						c,
 						color,
 						flipx,flipy,
 						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0,
-						(zw << 16) / 8,(zh << 16) / 8);
+						(zw << 16) / 8,(zh << 16) / 8,0);
 
 					if (K007342_regs[2] & 0x80)
-						drawgfxzoom(bitmap,K007420_gfx,
+						drawgfxzoom_transpen(bitmap,cliprect,K007420_gfx,
 							c,
 							color,
 							flipx,flipy,
 							sx,sy-256,
-							cliprect,TRANSPARENCY_PEN,0,
-							(zw << 16) / 8,(zh << 16) / 8);
+							(zw << 16) / 8,(zh << 16) / 8,0);
 				}
 			}
 		}

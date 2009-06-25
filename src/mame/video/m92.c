@@ -340,35 +340,35 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				for (i=0; i<y_multi; i++)
 				{
 					if (flip_screen_get(machine)) {
-						pdrawgfx(bitmap,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
 								!fx,!fy,
 								464-x,240-(y-i*16),
-								cliprect,TRANSPARENCY_PEN,0,pri_back);
+								priority_bitmap,pri_back,0);
 
 						// wrap around x
-						pdrawgfx(bitmap,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
 								!fx,!fy,
 								464-x+512,240-(y-i*16),
-								cliprect,TRANSPARENCY_PEN,0,pri_back);
+								priority_bitmap,pri_back,0);
 					} else {
-						pdrawgfx(bitmap,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
 								fx,fy,
 								x,y-i*16,
-								cliprect,TRANSPARENCY_PEN,0,pri_back);
+								priority_bitmap,pri_back,0);
 
 						// wrap around x
-						pdrawgfx(bitmap,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
 								fx,fy,
 								x-512,y-i*16,
-								cliprect,TRANSPARENCY_PEN,0,pri_back);
+								priority_bitmap,pri_back,0);
 					}
 					if (fy) s_ptr++; else s_ptr--;
 				}

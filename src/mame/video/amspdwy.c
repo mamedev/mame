@@ -123,13 +123,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipx = !flipx;	flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,
 				flipx, flipy,
-				x,y,
-				cliprect,TRANSPARENCY_PEN,0 );
+				x,y,0 );
 	}
 }
 

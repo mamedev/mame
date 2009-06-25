@@ -195,8 +195,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx(bitmap, gfx, code2, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height, 0);
 		}
 
 		if(flags&0x10)
@@ -204,19 +203,15 @@ tilemap_mark_all_tiles_dirty(bgmap);
 
 
 
-			drawgfx(bitmap, gfx, code2+16, color, xflip, yflip, x, y + gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap, gfx, code2+16*2, color, xflip, yflip, x, y + 2*gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap, gfx, code2+16*3, color, xflip, yflip, x, y + 3*gfx->height,
-			        cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2+16, color, xflip, yflip, x, y + gfx->height, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2+16*2, color, xflip, yflip, x, y + 2*gfx->height, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2+16*3, color, xflip, yflip, x, y + 3*gfx->height, 0);
 
 		}
 
 
 
-		drawgfx(bitmap, gfx, code, color, xflip, yflip, x, y,
-		        cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, gfx, code, color, xflip, yflip, x, y, 0);
 
 		if (doubled) i += 4;
 	}
@@ -229,11 +224,10 @@ tilemap_mark_all_tiles_dirty(bgmap);
 			int y = fcombat_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, screen->machine->gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
 				videoram[offs] + 256 * char_bank,
 				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
-				fcombat_cocktail_flip, fcombat_cocktail_flip, x, y,
-				cliprect, TRANSPARENCY_PEN, 0);
+				fcombat_cocktail_flip, fcombat_cocktail_flip, x, y, 0);
 		}
 	return 0;
 }

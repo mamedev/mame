@@ -311,13 +311,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 						code,
 						color,
 						flipx, flipy,
 						sx + x*16,
-						sy + y*16,
-						cliprect,TRANSPARENCY_PEN,15);
+						sy + y*16,15);
 
 				code += inc;
 			}

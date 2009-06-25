@@ -166,20 +166,18 @@ static void flstory_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			flipx = ((spriteram[offs+1]&0x40)>>6)^flipscreen;
 			flipy = ((spriteram[offs+1]&0x80)>>7)^flipscreen;
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code,
 					spriteram[offs+1] & 0x0f,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code,
 						spriteram[offs+1] & 0x0f,
 						flipx,flipy,
-						sx-256,sy,
-						cliprect,TRANSPARENCY_PEN,15);
+						sx-256,sy,15);
 		}
 	}
 }
@@ -223,20 +221,18 @@ static void victnine_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			flipx = ((spriteram[offs+1]&0x40)>>6)^flipscreen;
 			flipy = ((spriteram[offs+1]&0x80)>>7)^flipscreen;
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code,
 					spriteram[offs+1] & 0x0f,
 					flipx,flipy,
-					sx,sy,
-					cliprect,TRANSPARENCY_PEN,15);
+					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code,
 						spriteram[offs+1] & 0x0f,
 						flipx,flipy,
-						sx-256,sy,
-						cliprect,TRANSPARENCY_PEN,15);
+						sx-256,sy,15);
 		}
 	}
 }

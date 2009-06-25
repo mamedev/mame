@@ -298,12 +298,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,machine->gfx[1],
 				code,
 				colorbank | (fastfred_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
-				sx,sy,
-				flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

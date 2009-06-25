@@ -188,23 +188,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				y -= 14;
 				x -= 7;
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						state->spriteram[offs + 2],
 						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
 						!(state->spriteram[offs + 1] & 0x80),!(state->spriteram[offs + 1] & 0x40),
-						x, y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x, y,0);
 			}
 			else
 			{
 				y += 1;
 				x -= 8;
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						state->spriteram[offs + 2],
 						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
 						(state->spriteram[offs + 1] & 0x80),(state->spriteram[offs + 1] & 0x40),
-						x, y,
-						cliprect,TRANSPARENCY_PEN,0);
+						x, y,0);
 			}
 		}
 	}

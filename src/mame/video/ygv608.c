@@ -590,27 +590,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, machine->gfx[GFX_8X8_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
 	       code+namcond1_gfxbank*0x10000,
 	       color,
 	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-8 )
-        drawgfx( bitmap, machine->gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx-512,sy,0x00);
       if( sy > 512-8 )
-        drawgfx( bitmap, machine->gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx,sy-512,0x00);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -623,27 +620,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, machine->gfx[GFX_16X16_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
 	       code+namcond1_gfxbank*0x4000,
 	       color,
 	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-16 )
-        drawgfx( bitmap, machine->gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx-512,sy,0x00);
       if( sy > 512-16 )
-        drawgfx( bitmap, machine->gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx,sy-512,0x00);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -656,27 +650,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	  logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
       }
-      drawgfx( bitmap, machine->gfx[GFX_32X32_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
 	       code+namcond1_gfxbank*0x1000,
 	       color,
 	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-32 )
-        drawgfx( bitmap, machine->gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx-512,sy,0x00);
       if( sy > 512-32 )
-        drawgfx( bitmap, machine->gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx,sy-512,0x00);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;
@@ -689,27 +680,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_64X64: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx( bitmap, machine->gfx[GFX_64X64_4BIT],
+      drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
 	       code+namcond1_gfxbank*0x400,
 	       color,
 	       flipx,flipy,
-	       sx,sy,
-	       &spriteClip,TRANSPARENCY_PEN,0x00);
+	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-64 )
-        drawgfx( bitmap, machine->gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
-	        sx-512,sy,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx-512,sy,0x00);
       if( sy > 512-64 )
-        drawgfx( bitmap, machine->gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, &spriteClip,machine->gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
-	        sx,sy-512,
-	        &spriteClip,TRANSPARENCY_PEN,0x00);
+	        sx,sy-512,0x00);
       // really should draw again for both wrapped!
       // - ignore until someone thinks it's required
       break;

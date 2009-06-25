@@ -178,15 +178,15 @@ VIDEO_UPDATE( malzak )
 			{
 				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
 				{
-					drawgfx (bitmap, screen->machine->gfx[2], code, colour, 0, 0,
-						sx * 6, sy * 10, cliprect, TRANSPARENCY_NONE, 0);
-					drawgfx (bitmap, screen->machine->gfx[3], code, colour, 0, 0,
-						sx * 6, (sy + 1) * 10, cliprect, TRANSPARENCY_NONE, 0);
+					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[2], code, colour, 0, 0,
+						sx * 6, sy * 10);
+					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[3], code, colour, 0, 0,
+						sx * 6, (sy + 1) * 10);
 				}
 				else
 				{
-					drawgfx (bitmap, screen->machine->gfx[1], code, colour, 0, 0,
-						sx * 6, sy * 10, cliprect, TRANSPARENCY_NONE, 0);
+					drawgfx_opaque (bitmap, cliprect, screen->machine->gfx[1], code, colour, 0, 0,
+						sx * 6, sy * 10);
 				}
 			}
 		}
@@ -213,8 +213,8 @@ VIDEO_UPDATE( malzak )
 			if(sx < -15)
 				sx+=256;
 
-			drawgfx(bitmap,screen->machine->gfx[0],field[x*16 + y].code,7,0,0,
-				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx_transpen(bitmap,cliprect, screen->machine->gfx[0],field[x*16 + y].code,7,0,0,
+				sx, sy, 0);
 		}
 
     /* update the S2636 chips */

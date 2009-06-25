@@ -172,13 +172,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				buffered_spriteram[offs],
 				((buffered_spriteram[offs+2] >> 1) & 3)	|
 					((buffered_spriteram[offs+2] << 2) & 4) | (slapfight_palette_bank << 3),
 				flipscreen, flipscreen,
-				sx, sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx, sy,0);
 		}
 	}
 }
@@ -231,19 +230,17 @@ VIDEO_UPDATE( slapfight )
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		if (flipscreen)
-			drawgfx(bitmap,screen->machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				1,1,
-				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],
-				cliprect,TRANSPARENCY_PEN,0);
+				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],0);
 		else
-			drawgfx(bitmap,screen->machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				0,0,
-				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],
-				cliprect,TRANSPARENCY_PEN,0);
+				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],0);
 	}
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);

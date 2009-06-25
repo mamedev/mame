@@ -247,10 +247,10 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
-INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
-		bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void roundupt_drawgfxzoomrotate( 
+		bitmap_t *dest_bmp, const rectangle *clip, const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
-		const rectangle *clip, int scalex, int scaley, int rotate, int write_priority_only )
+		int scalex, int scaley, int rotate, int write_priority_only )
 {
 	rectangle myclip;
 
@@ -282,7 +282,7 @@ INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *shadow_pens = shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
 			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
@@ -643,17 +643,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				for (w=0; w<x_width; w++) {
 					if (rotate)
-						roundupt_drawgfxzoomrotate(machine,
-								temp_bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(
+								temp_bitmap,cliprect,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
-								cliprect,scale,scale,0,write_priority_only);
+								scale,scale,0,write_priority_only);
 					else
-						roundupt_drawgfxzoomrotate(machine,
-								bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(
+								bitmap,cliprect,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
-								cliprect,scale,scale,0,write_priority_only);
+								scale,scale,0,write_priority_only);
 					base++;
 
 					if (fx)

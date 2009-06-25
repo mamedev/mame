@@ -216,10 +216,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		sprite = spriteram[offs+0]+(scrollram[0x0c]<<8);
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 				sprite,
 				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PENS,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0));
 	}
 }

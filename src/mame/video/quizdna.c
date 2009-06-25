@@ -181,12 +181,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			y &= 0x1ff;
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 					code ^ i,
 					col,
 					fx,fy,
-					x,y,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y,0);
 
 			y += dy;
 		}

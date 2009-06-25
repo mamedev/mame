@@ -246,12 +246,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,&clip,machine->gfx[1],
 				(spriteram_2[offs + 2] & 0x3f) + (spriteram_2[offs + 1] & 0xc0),
 				4 * (spriteram_2[offs + 1] & 0x07),
 				flipx,flipy,
-				sx,sy,
-				&clip,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 
 	for (offs = 0;offs < spriteram_size;offs += 4)
@@ -272,12 +271,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,&clip,machine->gfx[1],
 				(spriteram[offs + 1] & 0x3f) + (spriteram[offs + 2] & 0xc0),
 				4 * (spriteram[offs + 2] & 0x07),
 				flipx,flipy,
-				sx,sy,
-				&clip,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

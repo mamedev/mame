@@ -258,13 +258,13 @@ static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						cliprect, TRANSPARENCY_PEN,0x00,
-						pri_mask	);
+						priority_bitmap,
+						pri_mask,0x00	);
 		}
 	}
 }
@@ -311,13 +311,13 @@ static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						cliprect, TRANSPARENCY_PEN,0x00,
-						pri_mask	);
+						priority_bitmap,
+						pri_mask,0x00	);
 		}
 	}
 }

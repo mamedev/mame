@@ -283,12 +283,11 @@ static void equites_draw_sprites_block(running_machine *machine, bitmap_t *bitma
 			// sprites are 16x14 centered in a 16x16 square, so skip the first line
 			sy += 1;
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx_transmask(bitmap,cliprect, machine->gfx[2],
 					tile,
 					color,
 					fx, fy,
-					sx, sy,
-					cliprect, TRANSPARENCY_PENS, transmask);
+					sx, sy, transmask);
 		}
 	}
 }

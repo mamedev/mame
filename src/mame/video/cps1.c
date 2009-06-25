@@ -2210,19 +2210,19 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
 	if (flip_screen_get(machine))											\
-		pdrawgfx(bitmap,machine->gfx[2],							\
+		pdrawgfx_transpen(bitmap,\
+				cliprect,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				!(FLIPX),!(FLIPY),									\
-				511-16-(SX),255-16-(SY),							\
-				cliprect,TRANSPARENCY_PEN,15,0x02);					\
+				511-16-(SX),255-16-(SY),							priority_bitmap,0x02,15);					\
 	else															\
-		pdrawgfx(bitmap,machine->gfx[2],							\
+		pdrawgfx_transpen(bitmap,\
+				cliprect,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				FLIPX,FLIPY,										\
-				SX,SY,												\
-				cliprect,TRANSPARENCY_PEN,15,0x02);					\
+				SX,SY,												priority_bitmap,0x02,15);					\
 }
 
 
@@ -2446,19 +2446,19 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									\
 {																					\
 	if (flip_screen_get(machine))															\
-		pdrawgfx(bitmap,machine->gfx[2],											\
+		pdrawgfx_transpen(bitmap,\
+				cliprect,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
 				!(FLIPX),!(FLIPY),													\
-				511-16-(SX),255-16-(SY),											\
-				cliprect,TRANSPARENCY_PEN,15,primasks[priority]);					\
+				511-16-(SX),255-16-(SY),											priority_bitmap,primasks[priority],15);					\
 	else																			\
-		pdrawgfx(bitmap,machine->gfx[2],											\
+		pdrawgfx_transpen(bitmap,\
+				cliprect,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
 				FLIPX,FLIPY,														\
-				SX,SY,																\
-				cliprect,TRANSPARENCY_PEN,15,primasks[priority]);					\
+				SX,SY,																priority_bitmap,primasks[priority],15);					\
 }
 
 	int i;

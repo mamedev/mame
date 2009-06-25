@@ -380,9 +380,9 @@ UINT8* cps3_user5region;
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
+		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
 {
 	rectangle myclip;
@@ -581,7 +581,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= mame_rand(machine); // ?? not used?
+											if (c&0xf0) dest[x] |= mame_rand(gfx->machine); // ?? not used?
 										}
 										else
 										{
@@ -912,7 +912,7 @@ static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, in
 			if (!bpp) machine->gfx[1]->color_granularity=256;
 			else machine->gfx[1]->color_granularity=64;
 
-			cps3_drawgfxzoom(machine, bitmap, machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,&clip,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,&clip,machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 		}
 	}
 }
@@ -1155,11 +1155,11 @@ static VIDEO_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(screen->machine, renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(renderbuffer_bitmap,&renderbuffer_clip,screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(screen->machine, renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(renderbuffer_bitmap,&renderbuffer_clip,screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1225,7 +1225,7 @@ static VIDEO_UPDATE(cps3)
 				pal += cps3_ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(screen->machine, bitmap, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
 		}

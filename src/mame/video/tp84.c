@@ -173,7 +173,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flip_x = ~tp84_spriteram[offs + 2] & 0x40;
 		int flip_y =  tp84_spriteram[offs + 2] & 0x80;
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flip_x, flip_y, x, y, cliprect, TRANSPARENCY_PENS,
+		drawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flip_x, flip_y, x, y,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, palette_base));
 
 	}

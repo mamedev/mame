@@ -204,7 +204,7 @@ static VIDEO_UPDATE( norautp )
 				int tile = np_vram[count] & 0x3f;
 				int colour = (np_vram[count] & 0xc0) >> 6;
 
-				drawgfx(bitmap,screen->machine->gfx[1], tile, colour, 0, 0, x * 32, y * 32, cliprect, TRANSPARENCY_NONE, 0);
+				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[1], tile, colour, 0, 0, x * 32, y * 32);
 
 				count+=2;
 			}
@@ -216,7 +216,7 @@ static VIDEO_UPDATE( norautp )
 				int tile = np_vram[count] & 0x3f;
 				int colour = (np_vram[count] & 0xc0) >> 6;
 
-				drawgfx(bitmap,screen->machine->gfx[0], tile, colour, 0, 0, x * 16, y * 32, cliprect, TRANSPARENCY_NONE, 0);
+				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}

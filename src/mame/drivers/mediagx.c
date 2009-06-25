@@ -180,11 +180,13 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
+	const pen_t *pens = gfx->machine->pens;
+
 	dp = gfx_element_get_data(gfx, ch);
 
 	for (j=y; j < y+8; j++)
@@ -194,11 +196,11 @@ static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangl
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-				p[i] = machine->pens[gfx->color_base + (att & 0xf)];
+				p[i] = pens[gfx->color_base + (att & 0xf)];
 			else
 			{
 				if (((att >> 4) & 7) > 0)
-					p[i] = machine->pens[gfx->color_base + ((att >> 4) & 0x7)];
+					p[i] = pens[gfx->color_base + ((att >> 4) & 0x7)];
 			}
 		}
 	}
@@ -311,8 +313,8 @@ static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}

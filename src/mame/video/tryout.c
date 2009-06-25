@@ -207,22 +207,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
-				color,fx,fy,x,y + inc,
-				cliprect,TRANSPARENCY_PEN,0);
+				color,fx,fy,x,y + inc,0);
 
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite+1,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				color,fx,fy,x,y,0);
 		}
 		else
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
-				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				color,fx,fy,x,y,0);
 		}
 	}
 }

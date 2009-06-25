@@ -165,12 +165,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			for (x = 0;x < sizex;x++)
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code + x + sizex * y,
 						color,
 						flipx,flipy,
-						(sx + (flipx ? (-8*(x+1)+1) : 8*x) - vreg[6]+44) & 0x1ff,(sy + (flipy ? (-8*(y+1)+1) : 8*y) - vreg[7]-9) & 0x1ff,
-						cliprect,TRANSPARENCY_PEN,0);
+						(sx + (flipx ? (-8*(x+1)+1) : 8*x) - vreg[6]+44) & 0x1ff,(sy + (flipy ? (-8*(y+1)+1) : 8*y) - vreg[7]-9) & 0x1ff,0);
 			}
 		}
 	}

@@ -208,7 +208,7 @@ static VIDEO_UPDATE( supdrapo )
 			/* Global Column Coloring, GUESS! */
 			color = col_line[(x*2)+1] ? (col_line[(x*2)+1]-1) & 0x7 : 0;
 
-			drawgfx(bitmap,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
 
 			count++;
 		}

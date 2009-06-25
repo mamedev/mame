@@ -115,10 +115,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (fy) fy=0; else fy=1;
 		}
 
-		pdrawgfx(bitmap,machine->gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
 				color,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,15,pri);
+				priority_bitmap,pri,15);
 	}
 }
 

@@ -93,7 +93,7 @@ static VIDEO_UPDATE(murogmbl)
 		for (x = 0; x < 32; x++)
 		{
 			int tile = murogmbl_video[count];
-			drawgfx(bitmap, gfx, tile, 0, 0, 0, x * 8, y * 8, cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
 		}

@@ -234,9 +234,9 @@ WRITE32_HANDLER( video_dma_address_w )
 	COMBINE_DATA( &video_dma_address );
 }
 
-static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+static void drawgfx_blend(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
-	const pen_t *pens = &machine->pens[gfx->color_base];
+	const pen_t *pens = &gfx->machine->pens[gfx->color_base];
 	const UINT8 *dp;
 	int i, j;
 	int x1, x2;
@@ -410,11 +410,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for( x=x1; x < width; x++ ) {
 			for( y=y1; y < height; y++ ) {
-				draw_blend_gfx(machine, bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
+				drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
 
 				/* xpos seems to wrap-around to 0 at 512 */
 				if( (xpos + (16 * x) + 16) >= 512 ) {
-					draw_blend_gfx(machine, bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
+					drawgfx_blend(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
 				}
 
 				tile_num++;

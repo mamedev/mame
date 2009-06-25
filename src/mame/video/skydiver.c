@@ -197,11 +197,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx -= 8;
 		}
 
-		drawgfxzoom(bitmap,machine->gfx[1],
+		drawgfxzoom_transpen(bitmap,cliprect,machine->gfx[1],
 			charcode, color,
 			xflip,yflip,sx,sy,
-			cliprect,TRANSPARENCY_PEN,0,
-			wide ? 0x20000 : 0x10000, 0x10000);
+			wide ? 0x20000 : 0x10000, 0x10000,0);
 	}
 }
 

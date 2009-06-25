@@ -114,12 +114,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		for (y = 0;y < height;y++)
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
-					0x140-5 - ((sx + 0x10) & 0x1ff),0x100+1 - ((sy + 0x10 * (height - y)) & 0x1ff),
-					cliprect,TRANSPARENCY_PEN,0);
+					0x140-5 - ((sx + 0x10) & 0x1ff),0x100+1 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
 		}
 	}
 }

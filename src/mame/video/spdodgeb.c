@@ -151,9 +151,9 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 
 ***************************************************************************/
 
-#define DRAW_SPRITE( order, sx, sy ) drawgfx( bitmap, gfx, \
-					(which+order),color+ 8 * sprite_palbank,flipx,flipy,sx,sy, \
-					cliprect,TRANSPARENCY_PEN,0);
+#define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
+					cliprect,gfx, \
+					(which+order),color+ 8 * sprite_palbank,flipx,flipy,sx,sy,0);
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {

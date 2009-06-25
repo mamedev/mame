@@ -443,12 +443,11 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						c,
 						color,
 						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx + 16*x,sy + 16*y,0);
 			}
 		}
 
@@ -495,12 +494,11 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 						c,
 						color,
 						flipx,flipy,
-						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PEN,0);
+						sx + 16*x,sy + 16*y,0);
 			}
 		}
 	}

@@ -78,7 +78,7 @@ static VIDEO_UPDATE( acefruit )
 
 			if( color < 0x4 )
 			{
-				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8, cliprect, TRANSPARENCY_NONE, 0 );
+				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{

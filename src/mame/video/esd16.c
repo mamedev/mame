@@ -247,12 +247,12 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		for (y = starty ; y != endy ; y += incy)
 		{
-			pdrawgfx(	bitmap, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
 						code++,
 						color,
 						flipx, flipy,
 						sx, y,
-						cliprect, TRANSPARENCY_PEN, 0, pri_mask	);
+						priority_bitmap, pri_mask, 0	);
 		}
 	}
 }
@@ -310,12 +310,12 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		for (y = starty ; y != endy ; y += incy)
 		{
-			pdrawgfx(	bitmap, machine->gfx[0],
+			pdrawgfx_transpen(	bitmap, cliprect, machine->gfx[0],
 						code++,
 						color,
 						flipx, flipy,
 						sx, y,
-						cliprect, TRANSPARENCY_PEN, 0, pri_mask	);
+						priority_bitmap, pri_mask, 0	);
 		}
 	}
 }

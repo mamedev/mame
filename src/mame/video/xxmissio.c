@@ -86,7 +86,7 @@ VIDEO_START( xxmissio )
 }
 
 
-static void draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
 {
 	int offs;
 	int chr,col;
@@ -119,20 +119,18 @@ static void draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *c
 
 		px &= 0x1ff;
 
-		drawgfx(bitmap,gfx[1],
+		drawgfx_transpen(bitmap,cliprect,gfx,
 			chr,
 			col,
 			fx,fy,
-			px,py,
-			cliprect,TRANSPARENCY_PEN,0);
+			px,py,0);
 
 		if (px>0x1e0)
-			drawgfx(bitmap,gfx[1],
+			drawgfx_transpen(bitmap,cliprect,gfx,
 				chr,
 				col,
 				fx,fy,
-				px-0x200,py,
-				cliprect,TRANSPARENCY_PEN,0);
+				px-0x200,py,0);
 
 	}
 }
@@ -147,7 +145,7 @@ VIDEO_UPDATE( xxmissio )
 	tilemap_set_scrolly(bg_tilemap, 0, yscroll);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, screen->machine->gfx, cliprect);
+	draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	return 0;

@@ -281,13 +281,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			code = stfight_sprite_base + stfight_sprite_ram[offs];
 
-			pdrawgfx(bitmap,machine->gfx[4],
+			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 				     code,
 					 color,
 					 flipx,flip_screen_get(machine),
 					 sx,sy,
-				     cliprect,TRANSPARENCY_PEN,0x0f,
-					 pri ? 0x02 : 0);
+				     priority_bitmap,
+					 pri ? 0x02 : 0,0x0f);
 		}
 	}
 }

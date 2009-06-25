@@ -296,17 +296,15 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		else
 			sprite2=sprite+1;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
-				colour,fx,fy,x,y,
-				cliprect,TRANSPARENCY_PEN,0);
+				colour,fx,fy,x,y,0);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx(bitmap,machine->gfx[1],
+    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite2,
-				colour,fx,fy,x,y+16,
-				cliprect,TRANSPARENCY_PEN,0);
+				colour,fx,fy,x,y+16,0);
 	}
 }
 
@@ -364,12 +362,11 @@ static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rect
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
-					cliprect,TRANSPARENCY_PEN,0);
+					x,y + mult * multi,0);
 			multi--;
 		}
 	}
@@ -408,19 +405,17 @@ static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		}
 		else sy2=sy+16;
 
-    	drawgfx(bitmap,machine->gfx[1],
+    	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
         		code,
 				color,
 				fx,flip_screen_get(machine),
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy,0);
         if (multi)
-    		drawgfx(bitmap,machine->gfx[1],
+    		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				code+1,
 				color,
 				fx,flip_screen_get(machine),
-				sx,sy2,
-				cliprect,TRANSPARENCY_PEN,0);
+				sx,sy2,0);
 	}
 }
 
@@ -440,9 +435,8 @@ static void draw_characters(running_machine* machine, bitmap_t *bitmap, const re
 		mx = (offs/2) % 32;
 		my = (offs/2) / 32;
 
-		drawgfx(bitmap,machine->gfx[0],
-				tile,color,0,0,8*mx,8*my,
-				cliprect,TRANSPARENCY_PEN,0);
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				tile,color,0,0,8*mx,8*my,0);
 	}
 }
 #endif

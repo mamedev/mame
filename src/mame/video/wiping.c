@@ -121,12 +121,11 @@ VIDEO_UPDATE( wiping )
 			sy = 27 - sy;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				videoram[offs],
 				colorram[offs] & 0x3f,
 				flipscreen,flipscreen,
-				sx*8,sy*8,
-				cliprect,TRANSPARENCY_NONE,0);
+				sx*8,sy*8);
 	}
 
 	/* Note, we're counting up on purpose ! */
@@ -150,12 +149,11 @@ VIDEO_UPDATE( wiping )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[1],
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			color,
 			flipx,flipy,
 			sx,sy,
-			cliprect,TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 0x1f));
 	}
 
@@ -191,12 +189,11 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(bitmap,screen->machine->gfx[0],
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 					videoram[offs],
 					colorram[offs] & 0x3f,
 					flipscreen,flipscreen,
-					sx*8,sy*8,
-					cliprect,TRANSPARENCY_NONE,0);
+					sx*8,sy*8);
         	}
 	}
 

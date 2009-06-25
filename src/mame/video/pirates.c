@@ -94,12 +94,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		ypos = 0xf2 - ypos;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transpen(bitmap,cliprect,gfx,
 				code,
 				color,
 				flipx,flipy,
-				xpos,ypos,
-				cliprect,TRANSPARENCY_PEN,0);
+				xpos,ypos,0);
 
 		source+=4;
 	}

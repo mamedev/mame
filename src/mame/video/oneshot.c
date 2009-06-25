@@ -129,26 +129,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			for (blocky = 0; blocky<ysize;blocky++) {
 
 
-				drawgfx(
+				drawgfx_transpen(
 						bitmap,
+						cliprect,
 						gfx,
 						num+(blocky*xsize)+blockx,
 						1,
 						0,0,
-						xpos+blockx*8,ypos+blocky*8,
-						cliprect,
-						TRANSPARENCY_PEN,0
+						xpos+blockx*8,ypos+blocky*8,0
 						);
 
-				drawgfx(
+				drawgfx_transpen(
 						bitmap,
+						cliprect,
 						gfx,
 						num+(blocky*xsize)+blockx,
 						1,
 						0,0,
-						xpos+blockx*8-0x200,ypos+blocky*8,
-						cliprect,
-						TRANSPARENCY_PEN,0
+						xpos+blockx*8-0x200,ypos+blocky*8,0
 						);
 			}
 		}

@@ -1857,11 +1857,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spri
 		if (offs < 3*4)  sy++;
 
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx_transpen(bitmap,flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,machine->gfx[1],
 				code,color,
 				flipx,flipy,
-				sx,sy,
-				flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,TRANSPARENCY_PEN,0);
+				sx,sy,0);
 	}
 }
 

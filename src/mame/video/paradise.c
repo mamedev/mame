@@ -195,27 +195,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (flip_screen_get(machine))	{	x = 0xf0 - x;	flipx = !flipx;
 								y = 0xf0 - y;	flipy = !flipy;	}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
-				x,y,
-				cliprect,TRANSPARENCY_PEN, 0xff );
+				x,y, 0xff );
 
 		/* wrap around x */
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
-				x - 256,y,
-				cliprect,TRANSPARENCY_PEN, 0xff );
+				x - 256,y, 0xff );
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
-				x + 256,y,
-				cliprect,TRANSPARENCY_PEN, 0xff );
+				x + 256,y, 0xff );
 	}
 }
 

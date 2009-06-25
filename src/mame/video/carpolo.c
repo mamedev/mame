@@ -196,11 +196,10 @@ static void draw_alpha_line(running_machine *machine, bitmap_t *bitmap, const re
 		code = carpolo_alpharam[alpha_line * 32 + x] >> 2;
 		col  = carpolo_alpharam[alpha_line * 32 + x] & 0x03;
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 				code,col,
 				0,0,
-				x*8,video_line*8,
-				cliprect,TRANSPARENCY_PEN,0);
+				x*8,video_line*8,0);
 	}
 }
 
@@ -225,18 +224,16 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap, const rectan
 	x = 240 - x;
 	y = 240 - y;
 
-	drawgfx(bitmap,machine->gfx[0],
+	drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 			remapped_code, col,
 			0, flipy,
-			x, y,
-			cliprect,TRANSPARENCY_PEN,0);
+			x, y,0);
 
 	/* draw with wrap around */
-	drawgfx(bitmap,machine->gfx[0],
+	drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 			remapped_code, col,
 			0, flipy,
-			(INT16)x - 256, y,
-			cliprect,TRANSPARENCY_PEN,0);
+			(INT16)x - 256, y,0);
 }
 
 
@@ -283,20 +280,18 @@ VIDEO_UPDATE( carpolo )
 
 	/* left goal - position determined by bit 6 of the
        horizontal and vertical timing PROMs */
-	drawgfxzoom(bitmap,screen->machine->gfx[1],
+	drawgfxzoom_transpen(bitmap,cliprect,screen->machine->gfx[1],
 				0,0,
 				0,0,
 				LEFT_GOAL_X,GOAL_Y,
-				cliprect,TRANSPARENCY_PEN,0,
-				0x20000,0x20000);
+				0x20000,0x20000,0);
 
 	/* right goal */
-	drawgfxzoom(bitmap,screen->machine->gfx[1],
+	drawgfxzoom_transpen(bitmap,cliprect,screen->machine->gfx[1],
 				0,1,
 				1,0,
 				RIGHT_GOAL_X,GOAL_Y,
-				cliprect,TRANSPARENCY_PEN,0,
-				0x20000,0x20000);
+				0x20000,0x20000,0);
 
 	/* special char - bit 0 of 0x0f enables it,
                       bit 1 marked as WIDE, but never appears to be set */
@@ -382,17 +377,15 @@ static int check_sprite_sprite_collision(running_machine *machine,
 		bitmap_fill(sprite_sprite_collision_bitmap1, 0, 0);
 		bitmap_fill(sprite_sprite_collision_bitmap2, 0, 0);
 
-		drawgfx(sprite_sprite_collision_bitmap1,machine->gfx[0],
+		drawgfx_opaque(sprite_sprite_collision_bitmap1,0,machine->gfx[0],
 				code1,0,
 				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_NONE,0);
+				x1,y1);
 
-		drawgfx(sprite_sprite_collision_bitmap2,machine->gfx[0],
+		drawgfx_opaque(sprite_sprite_collision_bitmap2,0,machine->gfx[0],
 				code2,0,
 				0,flipy2,
-				x2,y2,
-				0,TRANSPARENCY_NONE,0);
+				x2,y2);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
@@ -437,18 +430,16 @@ static int check_sprite_left_goal_collision(running_machine *machine, int x1, in
 		bitmap_fill(sprite_goal_collision_bitmap1, 0, 0);
 		bitmap_fill(sprite_goal_collision_bitmap2, 0, 0);
 
-		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
+		drawgfx_opaque(sprite_goal_collision_bitmap1,0,machine->gfx[0],
 				code1,0,
 				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_NONE,0);
+				x1,y1);
 
-		drawgfxzoom(sprite_goal_collision_bitmap2,machine->gfx[1],
+		drawgfxzoom_transpen(sprite_goal_collision_bitmap2,0,machine->gfx[1],
 					0,0,
 					0,0,
 					x2,y2,
-					0,TRANSPARENCY_PEN,0,
-					0x20000,0x20000);
+					0x20000,0x20000,0);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
@@ -496,18 +487,16 @@ static int check_sprite_right_goal_collision(running_machine *machine, int x1, i
 		bitmap_fill(sprite_goal_collision_bitmap1, 0, 0);
 		bitmap_fill(sprite_goal_collision_bitmap2, 0, 0);
 
-		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
+		drawgfx_opaque(sprite_goal_collision_bitmap1,0,machine->gfx[0],
 				code1,0,
 				0,flipy1,
-				x1,y1,
-				0,TRANSPARENCY_NONE,0);
+				x1,y1);
 
-		drawgfxzoom(sprite_goal_collision_bitmap2,machine->gfx[1],
+		drawgfxzoom_transpen(sprite_goal_collision_bitmap2,0,machine->gfx[1],
 					0,1,
 					1,0,
 					x2,y2,
-					0,TRANSPARENCY_PEN,0,
-					0x20000,0x20000);
+					0x20000,0x20000,0);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
@@ -543,11 +532,10 @@ static int check_sprite_border_collision(running_machine *machine, UINT8 x1, UIN
 	x1 = 240 - x1;
 	y1 = 240 - y1;
 
-	drawgfx(sprite_border_collision_bitmap,machine->gfx[0],
+	drawgfx_opaque(sprite_border_collision_bitmap,0,machine->gfx[0],
 			code1,0,
 			0,flipy1,
-			0,0,
-			0,TRANSPARENCY_NONE,0);
+			0,0);
 
 	for (x = 0; x < SPRITE_WIDTH; x++)
 		for (y = 0; y < SPRITE_HEIGHT; y++)

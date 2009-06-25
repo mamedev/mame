@@ -550,7 +550,7 @@ static void toprollr_draw_bigsprite(bitmap_t *bitmap, const rectangle *cliprect)
 }
 
 
-static void cclimber_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
 {
 	int offs;
 
@@ -582,12 +582,12 @@ static void cclimber_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rec
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, gfx[1], code, color, flipx, flipy, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
 
-static void swimmer_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
 {
 	int offs;
 
@@ -619,7 +619,7 @@ static void swimmer_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rect
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, gfx[1], code, color, flipx, flipy, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -633,13 +633,13 @@ VIDEO_UPDATE( cclimber )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -667,13 +667,13 @@ VIDEO_UPDATE( yamato )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -719,13 +719,13 @@ VIDEO_UPDATE( swimmer )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		swimmer_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		swimmer_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		swimmer_draw_sprites(bitmap, screen->machine->gfx, cliprect);
+		swimmer_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -750,7 +750,7 @@ VIDEO_UPDATE( toprollr )
 	/* draw the "big sprite" over the regular sprites */
 	if ((cclimber_bigsprite_control[1] & 0x20))
 	{
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, &scroll_area_clip);
+		cclimber_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
 	}
 
@@ -758,7 +758,7 @@ VIDEO_UPDATE( toprollr )
 	else
 	{
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
-		cclimber_draw_sprites(bitmap, screen->machine->gfx, &scroll_area_clip);
+		cclimber_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
 	}
 
 	tilemap_mark_all_tiles_dirty(pf_tilemap);
