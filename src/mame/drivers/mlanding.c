@@ -2,12 +2,12 @@
   Dual 68k + 2xZ80
   no other hardware info..but it doesn't seem related to taitoair.c at all
 
-    TODO:
-    - Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
-    - Comms between the four CPUs;
-    - understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu (this might need a side-by-side);
-    - Fix "sound cpu error" msg;
-    - Inputs, particularly needed for a game like this one;
+	TODO:
+	- Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
+	- Comms between the four CPUs;
+	- understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu (this might need a side-by-side);
+	- Inputs, particularly needed for a game like this one;
+	- Needs a custom artwork for the cloche status;
 */
 
 #include "driver.h"
@@ -26,7 +26,7 @@ static bitmap_t *ml_bitmap[8];
 static int status_bit;
 static int adpcm_pos;
 static int adpcm_data;
-
+static UINT8 pal_fg_bank;
 
 
 static const gfx_layout tiles8x8_layout =
@@ -70,11 +70,17 @@ static READ16_HANDLER( io1_r ) //240006
 	return retval;
 }
 
-static WRITE16_HANDLER(ml_subreset_w)
+/* output */
+static WRITE16_HANDLER(ml_output_w)
 {
-	//wrong
-	if(cpu_get_pc(space->cpu) == 0x822)
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
+	/*
+	x--- ---- palette fg bankswitch
+	---x ---- coin lockout
+	---- x--- coin counter
+	*/
+//	popmessage("%04x",data);
+
+	pal_fg_bank = (data & 0x80)>>7;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -114,10 +120,21 @@ static WRITE8_DEVICE_HANDLER( ml_msm5205_stop_w )
 	adpcm_pos &= 0xff00;
 }
 
-/* TODO: check this */
-static WRITE16_HANDLER( sound_reset_w )
+/* TODO: this uses many bits */
+static WRITE16_HANDLER( ml_sub_reset_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( ml_to_sound_w )
+{
+	if (offset == 0)
+		taitosound_port_w (space, 0, data & 0xff);
+	else if (offset == 1)
+	{
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		taitosound_comm_w (space, 0, data & 0xff);
+	}
 }
 
 static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -130,12 +147,12 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
 
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITENOP
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(sound_reset_w) //sound reset ??
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
+	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITENOP //sound reset ??
 
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
-//  AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0xff00) AM_WRITE8(taitosound_comm_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff) AM_WRITE8(taitosound_comm_w, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
+	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)//AM_SHARE(2)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM // is it shared with mecha ? tested around $940
@@ -145,7 +162,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x240004, 0x240005) AM_NOP //watchdog ??
 	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_subreset_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
 
 	/* are we sure that these are for an analog stick? */
 	AM_RANGE(0x2b0000, 0x2b0001) AM_READ_PORT("STICKX")		//-40 .. 40 analog controls ?
@@ -192,7 +209,6 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x9000, 0x9001) AM_RAM
 	AM_RANGE(0x9800, 0x9803) AM_RAM
-
 ADDRESS_MAP_END
 
 static VIDEO_START(mlanding)
@@ -209,15 +225,19 @@ static VIDEO_UPDATE(mlanding)
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
+//	popmessage("%02x",test);
+
 	{
 		int i,dx,dy,j,k,num;
 		for(i=0;i<0x1000;i+=4)
 		{
 			int x,y,code,color;
-			code=ml_spriteram[i];
+			code=ml_spriteram[i] & 0x1fff;
 			x=ml_spriteram[i+1];
 			y=ml_spriteram[i+2];
-			color=ml_spriteram[i+3];
+			color=(ml_spriteram[i+3] & 0xf)|(pal_fg_bank ? 0x20 : 0x10); //TODO: this will be simplified in the end...
+
+			color&=0x3f;
 
 			dx=x>>11;
 			dy=y>>11;
@@ -240,11 +260,12 @@ static VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx_opaque(ml_bitmap[num],cliprect,screen->machine->gfx[0],
+						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
 							code++,
 							color,
 							0,0,
-							x+j*8,y+k*8);
+							x+j*8,y+k*8,
+							cliprect,TRANSPARENCY_NONE,0);
 					}
 					else
 					{
@@ -334,9 +355,9 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -354,9 +375,9 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -394,6 +415,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_RESET( mlanding )
 {
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	status_bit = 0;
 	adpcm_pos = 0;
 	adpcm_data = -1;
