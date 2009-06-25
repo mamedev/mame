@@ -572,7 +572,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
-	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+	MDRV_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT(amiga_aga)
@@ -725,6 +725,30 @@ static DRIVER_INIT(lasstixx)
 	cubocd32_input_hack = lasstixx_input_hack;
 }
 
+static void lsrquiz_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+		amiga_chip_ram_w(0x1e1a, 0x00);
+}
+
+static DRIVER_INIT(lsrquiz)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = lsrquiz_input_hack;
+}
+
+static void lsrquiz2_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+		amiga_chip_ram_w(0x46106, 0x00);
+}
+
+static DRIVER_INIT(lsrquiz2)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = lsrquiz2_input_hack;
+}
+
 /***************************************************************************************************/
 
 /* BIOS */
@@ -732,8 +756,8 @@ GAME( 1993, cd32, 0, cd32, cd32, cd32,   ROT0, "Commodore", "Amiga CD32 Bios", G
 
 GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Laser Quiz Italy", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, lsrquiz2, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lsrquiz,  cd32, cd32, haremchl, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, lsrquiz2, cd32, cd32, haremchl, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, mgprem11, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1995, mgnumber, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Number", GAME_NOT_WORKING|GAME_NO_SOUND )

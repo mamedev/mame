@@ -233,6 +233,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_COLOR29		(0x1BA/2)	/* W    D    Color table 29 */
 #define REG_COLOR30		(0x1BC/2)	/* W    D    Color table 30 */
 #define REG_COLOR31		(0x1BE/2)	/* W    D    Color table 31 */
+#define REG_DIWHIGH		(0x1E4/2)	/* W  A D    Display window upper bits for start/stop */
 #define REG_FMODE		(0x1FC/2)	/* W  A D    Fetch mode */
 
 /* DMACON bit layout */
@@ -427,5 +428,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 void amiga_aga_sprite_dma_reset(int which);
 void amiga_aga_sprite_enable_comparitor(int which, int enable);
 void aga_palette_write(int color_reg, UINT16 data);
+void aga_diwhigh_written(int written);
 
 #endif /* __AMIGA_H__ */

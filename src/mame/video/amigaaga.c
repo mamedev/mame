@@ -71,6 +71,7 @@ static int aga_sprite_dma_used_words[8];
 /* playfield states */
 static int last_scanline;
 static pen_t ham_color;
+static int diwhigh_written;
 
 /* copper states */
 static UINT32 copper_pc;
@@ -212,6 +213,7 @@ VIDEO_START( amiga_aga )
 	genlock_color = 0xffff;
 
 	sprite_ctl_written = 0;
+	diwhigh_written = 0;
 }
 
 
@@ -546,9 +548,6 @@ static void update_sprite_dma(int scanline)
 		/* fetch data if this sprite is enabled */
 		if (dmaenable && (sprite_dma_live_mask & bitmask) && (sprite_comparitor_enable_mask & bitmask))
 		{
-			//CUSTOM_REG(REG_SPR0DATA + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			//CUSTOM_REG(REG_SPR0DATB + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
-			//CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			fetch_sprite_data(scanline, num);
 		}
 	}
@@ -585,7 +584,6 @@ static int get_sprite_pixel(int x)
 				if (hstart == x)
 				{
 					sprite_remain[num] = 16;
-					//sprite_shiftreg[num] = interleave_sprite_data(CUSTOM_REG(REG_SPR0DATA + 4 * num), CUSTOM_REG(REG_SPR0DATB + 4 * num));
 					sprite_shiftreg[num] = interleave_sprite_data(aga_sprdata[num][0], aga_sprdatb[num][0]);
 					aga_sprite_dma_used_words[num] = 1;
 				}
@@ -741,6 +739,11 @@ INLINE void fetch_bitplane_data(int plane)
 	}
 }
 
+void aga_diwhigh_written(int written)
+{
+	diwhigh_written = written;
+}
+
 /*************************************
  *
  *  Hold and modify pixel computations
@@ -795,7 +798,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	int edelay = 0, odelay = 0;
 	int next_copper_x;
 	int p;
-	int fetch_odd_cnt = 0, fetch_even_cnt = 0;
 	pen_t ham_pix;
 	int defbitoffs = 0;
 
@@ -824,7 +826,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 	/* loop over the line */
 	next_copper_x = 2;	/* copper runs on odd timeslots */
-	for (x = 0; x < 0xe4*2; x++)
+	for (x = 0; x < 0xe8*2; x++)
 	{
 		int sprpix;
 
@@ -866,14 +868,36 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 			/* compute the horizontal start/stop */
 			hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
-			hstop = 0x100 + (CUSTOM_REG(REG_DIWSTOP) & 0xff);
+			hstop = (CUSTOM_REG(REG_DIWSTOP) & 0xff);
 
-			//ddf_stop_pixel = hstop - 1;
-			//hstop *= 2;
+			if (diwhigh_written)
+			{
+				hstart |= ((CUSTOM_REG(REG_DIWHIGH) >> 5) & 1) << 8;
+				hstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 13) & 1) << 8;
+			}
+			else
+			{
+				hstop |= 0x100;
+			}
+			if ( hstop < hstart )
+			{
+				hstart = 0x00;
+				hstop = 0x1ff;
+			}
 
 			/* compute the vertical start/stop */
 			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
-			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8) | ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
+			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);/* | ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);*/
+			if (diwhigh_written)
+			{
+				vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
+				vstop |= ((CUSTOM_REG(REG_DIWHIGH) >> 8) & 7) << 8;
+			}
+			else
+			{
+				if ((vstop & 0x80) == 0)
+					vstop |= 0x100;
+			}
 
 			/* extract playfield priorities */
 			pf1pri = CUSTOM_REG(REG_BPLCON2) & 7;
@@ -888,7 +912,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 		/* clear the target pixels to the background color as a starting point */
 		if (dst != NULL)
 			dst[x*2+0] =
-			dst[x*2+1] = aga_palette[0]; //CUSTOM_REG(REG_COLOR00);
+			dst[x*2+1] = aga_palette[0];
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
@@ -915,12 +939,10 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 			for (p = 0; p < 8; p++)
 				aga_bpldat[p] = 0;
-				//CUSTOM_REG(REG_BPL1DAT + p) = 0;
 		}
 
 		/* need to run the sprite engine every pixel to ensure display */
 		sprpix = get_sprite_pixel(x);
-		//sprpix = 0;
 
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
@@ -935,7 +957,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				/* if we need to fetch more data, do it now */
 				if (obitoffs == defbitoffs)
 				{
-					fetch_odd_cnt++;
 					for (p = 0; p < planes; p += 2)
 					{
 						fetch_bitplane_data(p);
@@ -953,8 +974,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					if (obitoffs < 0)
 					{
 						obitoffs = defbitoffs;
-
-						fetch_odd_cnt++;
 
 						for (p = 0; p < planes; p += 2)
 						{
@@ -979,7 +998,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 				/* if we need to fetch more data, do it now */
 				if (ebitoffs == defbitoffs)
 				{
-					fetch_even_cnt++;
 					for (p = 1; p < planes; p += 2)
 					{
 						fetch_bitplane_data(p);
@@ -997,8 +1015,6 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 					if (ebitoffs < 0)
 					{
 						ebitoffs = defbitoffs;
-
-						fetch_even_cnt++;
 
 						for (p = 1; p < planes; p += 2)
 						{
@@ -1119,7 +1135,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 	}
 
 #if 0
-	if ( video_screen_get_frame_number(machine->primary_screen) % 16 == 0 && scanline == 100 )
+	if ( video_screen_get_frame_number(machine->primary_screen) % 16 == 0 && scanline == 250 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -1136,7 +1152,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 		if ( hires && lace ) p = m_hilace;
 
-		popmessage("%s(%d pl od=%04x ed=%04x start=%04x stop=%04x hstart=%04x hstop=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP) );
+		popmessage("%s(%d pl od=%02x ed=%02x start=%04x stop=%04x hstart=%04x hstop=%04x diwhigh=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH) );
 	}
 #endif
 

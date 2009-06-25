@@ -1487,6 +1487,15 @@ WRITE16_HANDLER( amiga_custom_w )
 				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
 			}
 			break;
+		case REG_DIWSTRT:
+		case REG_DIWSTOP:
+			if (IS_AGA(amiga_intf))
+				aga_diwhigh_written(0);
+			break;
+		case REG_DIWHIGH:
+			if (IS_AGA(amiga_intf))
+				aga_diwhigh_written(1);
+			break;
 
 		default:
 			break;
