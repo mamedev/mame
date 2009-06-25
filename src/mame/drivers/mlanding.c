@@ -21,6 +21,7 @@
 
 static UINT16 * ml_tileram;
 static UINT16 * ml_spriteram;
+static UINT16 * ml_dotram;
 static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
 static int status_bit;
@@ -182,7 +183,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM // palette?
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x200000, 0x203fff) AM_RAM //AM_SHARE(2)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -260,12 +261,11 @@ static VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
+						drawgfx_opaque(ml_bitmap[num],cliprect,screen->machine->gfx[0],
 							code++,
 							color,
 							0,0,
-							x+j*8,y+k*8,
-							cliprect,TRANSPARENCY_NONE,0);
+							x+j*8,y+k*8);
 					}
 					else
 					{
@@ -297,6 +297,14 @@ static VIDEO_UPDATE(mlanding)
         }
         */
 	}
+	/*
+	0x810 - Y value
+	0x812 - Z value
+	0x814 - End marker?
+	*/
+	popmessage("%04x %04x %04x %04x|%04x %04x %04x %04x|%04x %04x %04x",ml_dotram[0x800/2],ml_dotram[0x802/2],ml_dotram[0x804/2],ml_dotram[0x806/2],
+	                    ml_dotram[0x808/2],ml_dotram[0x80a/2],ml_dotram[0x80c/2],ml_dotram[0x80e/2],
+	                    ml_dotram[0x810/2],ml_dotram[0x812/2],ml_dotram[0x814/2]);
 	return 0;
 }
 
