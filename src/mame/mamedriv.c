@@ -3548,7 +3548,6 @@ V-V                           TP-027
 	DRIVER( myherok )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( shtngmst )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( shtngmste )	/* 834-5719/5720 (c) 1985 (S2) */
- 	DRIVER( shtngmstu )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( choplift )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftu )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftbl )/* bootleg (S2) */

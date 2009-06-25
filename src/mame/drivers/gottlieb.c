@@ -30,6 +30,23 @@
 
 ****************************************************************************
 
+    Board Id           Game             Game Id
+    ---------------    -------------    --------
+                       Reactor          GV-100
+                       Mad Planets      GV-102
+    C-22248-2          Q*Bert           GV-103
+                       Krull            GV-105
+    22399-1 (GD-01)    M.A.C.H. 3       GV-109
+                       Wiz Warz         GV-110
+                       Knightmare       GV-112
+                       Three Stooges    GV-113
+                       Q*Bert Qubes     GV-118
+                       Us vs. Them      GV-126
+                       Video Vince      GV-132
+                       Curve Ball       GV-134
+
+****************************************************************************
+
     Thanks to Frans van Egmond for locating and dumping Tylz
 
     Notes:

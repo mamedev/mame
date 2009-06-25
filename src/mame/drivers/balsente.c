@@ -1432,6 +1432,8 @@ ROM_START( snakjack )
 	ROM_LOAD( "rom-gr4.u5b", 0x08000, 0x2000, CRC(3fbfa686) SHA1(6c137d177c7aa2701497ac3ac922fdb8cd9f52b3) )
 	ROM_LOAD( "rom-gr5.u4b", 0x0a000, 0x2000, CRC(345f94fb) SHA1(0af24f4e1a797efe5272f64b8a34483fe6002436) )
 
+    /* From a picture in an eBay auction the board appears to have a PAL that needs to be dumped. */
+
     MOTHERBOARD_PALS
 ROM_END
 
@@ -1849,6 +1851,9 @@ ROM_START( spiker )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(90ddd737) SHA1(8e1dde2f42e9bf755dedeef218745d1fc54faac7) )
 
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+
     MOTHERBOARD_PALS
 ROM_END
 
@@ -2130,7 +2135,7 @@ GAME( 1984, gghost,   0,        balsente, gghost,   gghost,   ROT0, "Bally/Sente
 /* Board: 006-8003-01-0D Rev D */
 GAME( 1984, hattrick, 0,        balsente, hattrick, hattrick, ROT0, "Bally/Sente",  "Hat Trick", GAME_SUPPORTS_SAVE )
 
-/* Board: Unknown */
+/* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
 GAME( 1984, otwalls,  0,        balsente, otwalls,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakepit, 0,        balsente, sentetst, snakepit, ROT0, "Bally/Sente",  "Snake Pit", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
@@ -2156,9 +2161,9 @@ GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente
 GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nstockr2, nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football", GAME_SUPPORTS_SAVE )
+GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown */
-GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin'", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraid, 0,        balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescrdsa, rescraid, balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider (stand-alone)", GAME_SUPPORTS_SAVE )
