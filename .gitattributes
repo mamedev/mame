@@ -2012,6 +2012,7 @@ src/mame/drivers/sidepckt.c svneol=native#text/plain
 src/mame/drivers/silkroad.c svneol=native#text/plain
 src/mame/drivers/simpl156.c svneol=native#text/plain
 src/mame/drivers/simpsons.c svneol=native#text/plain
+src/mame/drivers/skeetsht.c svneol=native#text/plain
 src/mame/drivers/skimaxx.c svneol=native#text/plain
 src/mame/drivers/skullxbo.c svneol=native#text/plain
 src/mame/drivers/skyarmy.c svneol=native#text/plain

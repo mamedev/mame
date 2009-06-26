@@ -1585,6 +1585,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/re900.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
+	$(DRIVERS)/skeetsht.o \
 	$(DRIVERS)/skimaxx.o \
 	$(DRIVERS)/skyarmy.o \
 	$(DRIVERS)/skylncr.o \

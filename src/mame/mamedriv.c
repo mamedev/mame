@@ -8172,6 +8172,9 @@ Other Sun games
 	DRIVER( stonebal )	/* (c) 1994 */
 	DRIVER( stoneba2 )	/* (c) 1994 */
 
+	/* Dynamo games */
+	DRIVER( skeetsht )	/* (c) 1991 */
+
 	/* Taiyo games */
 	DRIVER( dynamski )	/* (c) 1984 Taiyo */
 	DRIVER( chinhero )	/* (c) 1984 Taiyo */
