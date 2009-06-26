@@ -1,6 +1,6 @@
 /* One Shot One Kill & Maddonna
    Driver by David Haywood and Paul Priest
-   Dip Switches and Inputs by Stephane Humbert
+   Dip Switches and Inputs by stephh
 
 Notes :
   - The YM3812 is used only for timing. All sound is played with ADPCM samples.

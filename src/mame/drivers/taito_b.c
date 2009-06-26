@@ -3,7 +3,7 @@
 Taito B System
 
 driver by Jarek Burczynski, with help from:
-Nicola Salmoria, Brian A. Troha, Stephane Humbert, Gerardo Oporto Jorrin, David Graves
+Nicola Salmoria, Brian A. Troha, stephh, Gerardo Oporto Jorrin, David Graves
 heavily based on Taito F2 System driver by Brad Oliver, Andrew Prime
 
 The board uses TC0220IOC, TC0260DAR, TC0180VCU, and TC0140SYT.

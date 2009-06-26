@@ -4,7 +4,7 @@
   ======================
 
   Based on RAINE. Improvements with a lot of help from Ruben Panossian.
-  Additional thanks to Robert Gallagher and Stephane Humbert.
+  Additional thanks to Robert Gallagher and stephh.
 
   Verification on real hardware by Bryan McPhail, Feb 2006:
     The restart positions on real hardware are affected by the level

@@ -2,7 +2,7 @@
 
    Driver by Mariusz Wojcieszek
    CD-ROM controller by Ernesto Corvi
-   Inputs by Stephane Humbert
+   Inputs by stephh
 
    This is basically a CD32 (Amiga 68020, AGA based games system) hacked up to run arcade games.
    see http://ninjaw.ifrance.com/cd32/cubo/ for a brief overview.

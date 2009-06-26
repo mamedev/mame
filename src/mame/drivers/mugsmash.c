@@ -1,5 +1,5 @@
 /* Mug Smashers (c)199? Electronic Devices (Italy) / 3D Games (England)
-    driver by David Haywood - Dip Switches and Inputs by Stephane Humbert
+    driver by David Haywood - Dip Switches and Inputs by stephh
 
  a side scrolling beat-em-up, borrows ideas from Combatribes, including
  the music (apparently) and sound hardware!

@@ -3,7 +3,7 @@
   Tao Taido             (c) 1993 Video System
 
 
-    driver by David Haywood - Dip Switches and Inputs by Stephane Humbert
+    driver by David Haywood - Dip Switches and Inputs by stephh
     based on other Video System drivers
 
 Stephh's notes (based on the games M68000 code and some tests) :

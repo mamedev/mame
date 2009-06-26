@@ -6,7 +6,7 @@ ELECTRONIC DEVICES 1994 Milano Italy
 ECOGAMES S.L. Barcelona, Spain
 
 driver by David Haywood
-inputs etc. by Stephane Humbert
+inputs etc. by stephh
 
 ----------------------------------------
 
