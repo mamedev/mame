@@ -4,14 +4,12 @@ Midnight Landing (c) 1987 Taito Corporation
 
 driver by Tomasz Slanina, Phil Bennett & Angelo Salese, based on early work by David Haywood
 
-Dual 68k + 2xZ80
+Dual 68k + 2xZ80 + tms DSP
 no other hardware info..but it doesn't seem related to taitoair.c at all
 
 TODO:
-- Fix "sprite" emulation, it's probably a blitter/buffer with commands etc.;
-- Comms between the four CPUs;
-- understand how to display the "dots", my guess is that they are at 0x200000-0x203fff of the sub cpu
-  (this might need a side-by-side);
+- pal banking;
+- Comms between the five CPUs;
 - Gameplay looks stiff;
 - Needs a custom artwork for the cloche status;
 - Sound is nowhere near to be perfect;
@@ -64,6 +62,7 @@ static VIDEO_UPDATE(mlanding)
 			*dst++ = screen->machine->pens[256 + (srcpix >> 8)+(pal_fg_bank << 8)];
 		}
 	}
+
 	return 0;
 }
 
@@ -91,7 +90,7 @@ int start_dma(void)
 
 		x = dma_ram[offs + 1];
 		y = dma_ram[offs + 2];
-		colour = dma_ram[offs + 3];//|(pal_fg_bank & 1 ? 0x20 : 0x10);
+		colour = dma_ram[offs + 3];
 
 		dx = x >> 11;
 		dy = y >> 11;
@@ -411,7 +410,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(&g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(&ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_BASE(&dma_ram)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE(2) AM_BASE(&dma_ram)
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
@@ -447,7 +446,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
@@ -758,4 +757,4 @@ static DRIVER_INIT(mlanding)
 //	rom[0x88a]=0x71;
 }
 
-GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
