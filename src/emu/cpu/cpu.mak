@@ -1272,6 +1272,24 @@ $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
 
 
 #-------------------------------------------------
+# Texas Instruments TMS0980
+#-------------------------------------------------
+
+ifneq ($(filter TMS0980,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tms0980
+CPUOBJS += $(CPUOBJ)/tms0980/tms0980.o
+DBGOBJS += $(CPUOBJ)/tms0980/tms0980d.o
+endif
+
+$(CPUOBJ)/tms0980/tms0980.o:	$(CPUSRC)/tms0980/tms0980.h \
+								$(CPUSRC)/tms0980/tms0980.c
+
+$(CPUOBJ)/tms0980/tms0980d.o:	$(CPUSRC)/tms0980/tms0980.h \
+								$(CPUSRC)/tms0980/tms0980d.c
+
+
+
+#-------------------------------------------------
 # Texas Instruments TMS7000 series
 #-------------------------------------------------
 
