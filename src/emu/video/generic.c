@@ -570,7 +570,7 @@ int flip_screen_y_get(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    black - completely black pelette
+    black - completely black palette
 -------------------------------------------------*/
 
 PALETTE_INIT( all_black )
@@ -592,6 +592,28 @@ PALETTE_INIT( black_and_white )
 {
 	palette_set_color(machine,0,RGB_BLACK); /* black */
 	palette_set_color(machine,1,RGB_WHITE); /* white */
+}
+
+
+/*-------------------------------------------------
+    monochrome_amber - 2-color black & amber
+-------------------------------------------------*/
+
+PALETTE_INIT( monochrome_amber )
+{
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color_rgb(machine, 1, 0xf7, 0xaa, 0x00); /* amber */
+}
+
+
+/*-------------------------------------------------
+    monochrome_green - 2-color black & green
+-------------------------------------------------*/
+
+PALETTE_INIT( monochrome_green )
+{
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color_rgb(machine, 1, 0x00, 0xff, 0x00); /* green */
 }
 
 

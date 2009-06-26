@@ -133,6 +133,8 @@ int flip_screen_y_get(running_machine *machine);
 
 PALETTE_INIT( all_black );
 PALETTE_INIT( black_and_white );
+PALETTE_INIT( monochrome_amber );
+PALETTE_INIT( monochrome_green );
 PALETTE_INIT( RRRR_GGGG_BBBB );
 PALETTE_INIT( RRRRR_GGGGG_BBBBB );
 PALETTE_INIT( BBBBB_GGGGG_RRRRR );
