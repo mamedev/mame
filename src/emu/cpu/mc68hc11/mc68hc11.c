@@ -397,6 +397,9 @@ static CPU_RESET( hc11 )
 	cpustate->pc = READ16(cpustate, 0xfffe);
 	cpustate->wait_state = 0;
 	cpustate->stop_state = 0;
+	cpustate->ccr = CC_X | CC_I | CC_S;
+	cpustate->reg_position = 0x1000;
+	cpustate->ram_position = 0;
 }
 
 static CPU_EXIT( hc11 )

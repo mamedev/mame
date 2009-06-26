@@ -3289,8 +3289,11 @@ static void HC11OP(tab)(hc11_state *cpustate)
 /* TAP              0x06 */
 static void HC11OP(tap)(hc11_state *cpustate)
 {
-	UINT8 ccr = cpustate->ccr;
-	cpustate->ccr = (REG_A & 0xbf) | (ccr & 0x40);
+	UINT8 x_flag = cpustate->ccr & CC_X;
+	cpustate->ccr = REG_A;
+	if(x_flag == 0 && cpustate->ccr & CC_X) //X flag cannot do a 0->1 transition with this instruction.
+		cpustate->ccr &= ~CC_X;
+
 	CYCLES(cpustate, 2);
 }
 
