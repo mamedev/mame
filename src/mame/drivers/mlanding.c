@@ -20,8 +20,9 @@ TODO:
 ************************************************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/tms32025/tms32025.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
@@ -32,11 +33,11 @@ static UINT16 * ml_tileram;
 static UINT16 *g_ram;
 static UINT16 * ml_dotram;
 static UINT16 *dma_ram;
-static int status_bit;
 static int adpcm_pos;
 static int adpcm_data;
 static UINT8 pal_fg_bank;
 static int dma_active;
+static UINT16 dsp_HOLD_signal;
 
 static VIDEO_START(mlanding)
 {
@@ -277,7 +278,17 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 		dma_active = 1;
 		timer_set(space->machine, ATTOTIME_IN_MSEC(20), NULL, 0, dma_complete);
 	}
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+
+	if(!(data & 0x40)) // unknown line used
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+
+	//data & 0x20 sound cpu?
+
+	if(!(data & 0x80)) // unknown line used
+	{
+		cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
+		dsp_HOLD_signal = data & 0x80;
+	}
 }
 
 static WRITE16_HANDLER( ml_to_sound_w )
@@ -431,19 +442,13 @@ ADDRESS_MAP_END
 
 
 /* Sub CPU Map */
-static READ16_HANDLER( ml_sub_kludge_r )
-{
-	/* bit 15 == status bit? */
-	return dma_active<<15;
-}
 
 static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM // palette?
+	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE(3)
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x200814, 0x200815) AM_READ(ml_sub_kludge_r)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
 
@@ -463,6 +468,21 @@ static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf600, 0xf600) AM_WRITENOP
 ADDRESS_MAP_END
 
+static READ16_HANDLER( ml_dotram_r )
+{
+	return ml_dotram[offset];
+}
+
+static WRITE16_HANDLER( ml_dotram_w )
+{
+	ml_dotram[offset] = data;
+}
+
+static READ16_HANDLER( dsp_HOLD_signal_r )
+{
+	return dsp_HOLD_signal;
+}
+
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -471,6 +491,19 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x9000, 0x9001) AM_RAM
 	AM_RANGE(0x9800, 0x9803) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( DSP_map_program, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( DSP_map_data, ADDRESS_SPACE_DATA, 16 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ml_dotram_r,ml_dotram_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( DSP_map_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
+//	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )
@@ -628,9 +661,10 @@ static MACHINE_RESET( mlanding )
 {
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-	status_bit = 0;
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	adpcm_pos = 0;
 	adpcm_data = -1;
+	dsp_HOLD_signal = 0;
 }
 
 static MACHINE_DRIVER_START( mlanding )
@@ -650,6 +684,11 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_CPU_ADD("dsp", TMS32025,12000000)			/* 12 MHz ??? *///
+	MDRV_CPU_PROGRAM_MAP(DSP_map_program)
+	MDRV_CPU_DATA_MAP(DSP_map_data)
+	MDRV_CPU_IO_MAP(DSP_map_io)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
