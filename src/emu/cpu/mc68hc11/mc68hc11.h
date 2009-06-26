@@ -35,7 +35,7 @@ CPU_GET_INFO( mc68hc11 );
 typedef struct _hc11_config hc11_config;
 struct _hc11_config
 {
-	int has_io; // I/O enable flag
+	int has_extended_io; // I/O enable flag
 	int internal_ram_size;
 };
 

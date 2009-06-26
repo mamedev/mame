@@ -447,10 +447,9 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-/* For whatever reason the MCU capabilities are disabled, might be a version without it or the engineers programmed the MCU to not have it. */
 static const hc11_config hitpoker_config =
 {
-	1, //has internal I/O
+	0, //has extended internal I/O
 	0x100  //internal RAM size
 };
 
