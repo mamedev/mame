@@ -2920,6 +2920,18 @@ static void HC11OP(std_indy)(hc11_state *cpustate)
 	CYCLES(cpustate, 6);
 }
 
+/* STX DIR          0xDF */
+static void HC11OP(stx_dir)(hc11_state *cpustate)
+{
+	UINT8 adr = FETCH(cpustate);
+	UINT16 r = cpustate->ix;
+	CLEAR_NZV(cpustate);
+	WRITE8(cpustate, adr, (r & 0xff00) >> 8);
+	WRITE8(cpustate, adr + 1, (r & 0xff));
+	SET_N16(r);
+	SET_Z16(r);
+	CYCLES(cpustate, 4);
+}
 
 /* STX EXT          0xFF */
 static void HC11OP(stx_ext)(hc11_state *cpustate)
@@ -2960,6 +2972,19 @@ static void HC11OP(stx_indy)(hc11_state *cpustate)
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(cpustate, 6);
+}
+
+/* STY DIR          0x18 0xDF */
+static void HC11OP(sty_dir)(hc11_state *cpustate)
+{
+	UINT8 adr = FETCH(cpustate);
+	UINT16 r = cpustate->iy;
+	CLEAR_NZV(cpustate);
+	WRITE8(cpustate, adr, (r & 0xff00) >> 8);
+	WRITE8(cpustate, adr + 1, (r & 0xff));
+	SET_N16(r);
+	SET_Z16(r);
+	CYCLES(cpustate, 5);
 }
 
 
