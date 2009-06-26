@@ -6984,7 +6984,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rfjetj )	/* (c) 1998 Seibu Kaihatsu */
 	DRIVER( rfjetus )	/* (c) 1998 Seibu Kaihatsu (Fabtek license) */
 
-	DRIVER( ejsakura )	/* (c) 1999 Seibu Kaihatsu */
+	DRIVER( ejsakura )		/* (c) 1999 Seibu Kaihatsu */
+	DRIVER( ejsakura12 )	/* (c) 1999 Seibu Kaihatsu */
 
 	/* Seibu System SH2B games */
 	DRIVER( feversoc )  /* (c) 2000 */
@@ -8161,8 +8162,9 @@ Other Sun games
 	DRIVER( lemnangl ) 	/* (c) 1990 Home Data */
 	DRIVER( mjkinjas ) 	/* (c) 1991 Home Data */
 	DRIVER( battlcry ) 	/* (c) 1991 Home Data */
-	DRIVER( jogakuen )	/* Windom corporation */
-	DRIVER( mjikaga )	/* Mitchell */
+	DRIVER( jogakuen )	/* (c) 1992 Windom corporation */
+	DRIVER( mjikaga )	/* (c) 1991 Mitchell */
+	DRIVER( siseikat )	/* (c) 1991 Matoba */
 
 	/* Art & Magic games */
 	DRIVER( ultennis )	/* (c) 1993 */

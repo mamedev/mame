@@ -1739,6 +1739,33 @@ ROM_START( mjikaga )
 	ROM_LOAD( "m15a03.bin", 0x0000, 0x40000, CRC(07e2e8f8) SHA1(61eed47c4136733059c1d96e98cadb8ac9078f95) )
 ROM_END
 
+ROM_START( siseikat )
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
+	ROM_LOAD( "311c01.16e", 0x010000, 0xc000, CRC(92bf002d) SHA1(275276362ce030db5116f39ef025b2a10eabec45) )
+	ROM_CONTINUE(           0x00c000, 0x4000             )
+
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
+	ROM_LOAD( "311a02.9g", 0x00000, 0x40000, CRC(ae1d360a) SHA1(26a1e8d654ea2e4393a5267f0d9dab62149b4112) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "311a14.1f", 0, 0x40000, CRC(e8741ece) SHA1(ba380c287236668d8ed8583fb9735ed88d2eb41b) )
+	ROM_LOAD32_BYTE( "311a15.3f", 1, 0x40000, CRC(51a5c226) SHA1(d527cc542a507fda6b55aec51e76a2dd019b9560) )
+	ROM_LOAD32_BYTE( "311a16.4f", 2, 0x40000, CRC(f4419416) SHA1(0e8aa0ef51e449354dce3c8563c5eee230039dc6) )
+	ROM_LOAD32_BYTE( "311a17.6f", 3, 0x40000, CRC(1edf5715) SHA1(717181ef596aac6fb556da75ac495f44b763840e) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "311a10.1c", 0, 0x40000, CRC(6b15a5fc) SHA1(db19c4c8fae31357bd72821a74b277b7f9abccb4) )
+	ROM_LOAD32_BYTE( "311a11.3c", 1, 0x40000, CRC(b5faaf51) SHA1(7c6c72101d677d5f2e41ea6dc6490828f41d844c) )
+	ROM_LOAD32_BYTE( "311a12.4c", 2, 0x40000, CRC(ab26bb73) SHA1(3645d3f6767b0bcb43ce2e3b2ef3bdca37d446cf) )
+	ROM_LOAD32_BYTE( "311a13.6c", 3, 0x40000, CRC(f2f8f9a0) SHA1(d6b5dd68c85f9d506147f5ffeb60bdfad2bf0195) )
+
+	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_LOAD16_BYTE( "311a19.4k", 0x00000, 0x8000, CRC(dbb5569a) SHA1(e23a32667adc8eade7555adbac18dac268f08d3e) )
+	ROM_LOAD16_BYTE( "311a18.3k", 0x00001, 0x8000, CRC(a5ca7723) SHA1(d074c5c09a50abdb2b0ffdeacfc077a91b9204bf) )
+
+	ROM_REGION( 0x40000, "user1", 0 ) /* blitter data */
+	ROM_LOAD( "311b03.12e", 0x0000, 0x40000, CRC(5722c341) SHA1(694e63261d91da48c0ed14a44fbc6c9c74b055d9) )
+ROM_END
 
 
 static DRIVER_INIT( jogakuen )
@@ -1784,3 +1811,4 @@ GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mah
 GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", 0 )
 
 GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1991, siseikat, 0, lemnangl, pteacher, 0,          ROT0, "Matoba",    "Mahjong Shiseikatsu (Japan)", GAME_NOT_WORKING )

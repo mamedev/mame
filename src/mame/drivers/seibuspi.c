@@ -666,6 +666,71 @@ Notes:
       All surface mounted ROMs are stamped 'RAIDEN-FJET' and match
       the same named ROMs from the SPI version.
 
+
+E-Jan Sakurasou
+Seibu Kaihatsu Inc. 1999
+
+PCB Layout
+----------
+
+SYS386F V2.0
+|-----------------------------------------------------|
+|TA7252 4560D                                         |
+| VOL   YAC516        SOUND1                          |
+|                              |------------|         |
+|  16.384MHz YMZ280B  SOUND2   |   RISE11   |  CHR3   |
+|                              |            |         |
+|                 SB61L256     |            |  CHR4   |
+|                 SB61L256     |            |         |
+|M                SB61L256     |------------|  CHR2   |
+|A                SB61L256                28.63636MHz |
+|H                                             CHR1   |
+|J                       XC9536                       |
+|O     PAL16(1)                                       |
+|N           PAL16(2)  GAL20V8        W26010A         |
+|G                                                    |
+|    93C46   |---------|                              |
+|            | SEI600  |   PRG3                       |
+|  50MHz     |SB08-1513|              W26010A         |
+|            |         |   PRG2                       |
+|            |---------|                              |
+|                          PRG1                       |
+|                i386DX                               |
+|                          PRG0                       |
+|-----------------------------------------------------|
+Notes:
+      i386DX   - Intel i386DX-25MHz (QFP132), clock 25.000MHz [50/2]
+      YMZ280B  - Yamaha YMZ280B-F, clock input 16.384MHz
+      YAC516-M - Yamaha YAC516-M Delta Sigma Modulation D/A Converter with 8 Times Over Sampling Filter (SOP28)
+      4560D    - JRC 4560D OP Amp (DIP8)
+      TA7252   - Toshiba TA7252AP Power Amp IC (SIL7)
+      GAL20V8  - Lattice GAL20V8B stamped 'S386F1' at location U0170
+      PAL16(1) - AMD PAL16V8H stamped 'S386F2' at location U0069
+      PAL16(2) - AMD PAL16V8H stamped 'S386F4' at location U0341
+      XC9536   - Xilinx XC9536 CPLD (PLCC44) at location U0339
+      W26010A  - Winbond W26010AJ-15 64kx16 SRAM (SOJ44)
+      SB61L256 - Silicon-Based Technology Corporation SB61L256AS-12 32kx8 SRAM (SOJ28)
+      Custom   - SEI600 SB08-1513 (QFP208)
+                 RISE11 (QFP240)
+      ROMs     - PRG0.U0211 \
+                 PRG1.U0212  |
+                 PRG2.U0221  | 27C020 EPROM
+                 PRG3.U0220 /
+                 CHR1.U0442 \
+                 CHR2.U0443  |
+                 CHR3.U0444  | 32MBit SOP44 mask ROM
+                 CHR4.U0445 /
+                 SOUND1.U083 \
+                 SOUND2.U084 / 64MBit SOP44 mask ROM
+
+     Measurements
+     ------------
+     OSC1 - 50.0003MHz
+     OSC2 - 28.6368MHz
+     OSC3 - 16.3837MHz
+     VSync - 57.5943Hz
+     HSync - 15.6656kHz
+
 */
 
 #include "driver.h"
@@ -3403,6 +3468,28 @@ ROM_START(ejsakura) /* SYS386F V2.0 */
 	ROM_LOAD("sound2.84",  0x800000, 0x800000, CRC(ff37e769) SHA1(eb6d260cbc4e4a925a5d8f604ec695e567ac6bb5) )
 ROM_END
 
+ROM_START(ejsakura12) /* SYS386F V1.2 */
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("prg0v1.2.u0211",  0x100000, 0x40000, CRC(c734fde6) SHA1(d4256f0d2be624fc0e5340ae14679679e5e184c8) )
+	ROM_LOAD32_BYTE("prg1v1.2.u0212",  0x100001, 0x40000, CRC(fb7a9e38) SHA1(5a2e02e1b8ed71ffc96dbda871618f5f9cccc8c6) )
+	ROM_LOAD32_BYTE("prg2v1.2.u0221",  0x100002, 0x40000, CRC(e13098ad) SHA1(abf471afd25a08ba1848964c988112c86d1dcfaa) )
+	ROM_LOAD32_BYTE("prg3v1.2.u0220",  0x100003, 0x40000, CRC(29b5460f) SHA1(c9cb0eb421a79b722bf5a0dc428d0f5f8499e170) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF)	/* background layer roms */
+
+	ROM_REGION( 0x1000000, "gfx3", 0)	/* sprites */
+	ROM_LOAD16_WORD_SWAP("chr4.445", 0x000000, 0x400000, CRC(40c6c238) SHA1(0d07b59e25632feb070ce0e572ae75f9bb939893) )
+	ROM_LOAD16_WORD_SWAP("chr3.444", 0x400000, 0x400000, CRC(8e5d1de5) SHA1(c1ccb6b4341ee1e939958ec9e68280c6faa2ef1f) )
+	ROM_LOAD16_WORD_SWAP("chr2.443", 0x800000, 0x400000, CRC(638dc9ae) SHA1(0c11b1e688733fbaeabf83b33410714c22ae53cd) )
+	ROM_LOAD16_WORD_SWAP("chr1.442", 0xc00000, 0x400000, CRC(177e3139) SHA1(0385a831c141d59ec4e9c6d6fae9436dca123764) )
+
+	ROM_REGION(0x1000000, "ymz", 0)
+	ROM_LOAD("sound1.83",  0x000000, 0x800000, CRC(98783cfc) SHA1(f142429e0658a36e908cc135fe0e01ce853d071d) )
+	ROM_LOAD("sound2.84",  0x800000, 0x800000, CRC(ff37e769) SHA1(eb6d260cbc4e4a925a5d8f604ec695e567ac6bb5) )
+ROM_END
+
 /*******************************************************************/
 
 
@@ -3456,4 +3543,5 @@ GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu 
 GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
 
 /* SYS386F V2.0 */
-GAME( 1999, ejsakura,  0, sys386f2, spi_ejsakura, sys386f2, ROT0, "Seibu Kaihatsu", "E-Jan Sakurasou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ejsakura,   0,        sys386f2, spi_ejsakura, sys386f2, ROT0, "Seibu Kaihatsu", "E-Jan Sakurasou (v2.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ejsakura12, ejsakura, sys386f2, spi_ejsakura, sys386f2, ROT0, "Seibu Kaihatsu", "E-Jan Sakurasou (v1.2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
