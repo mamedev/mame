@@ -26,13 +26,13 @@ TODO:
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
 
-
 static UINT16 * ml_tileram;
 static UINT16 *g_ram;
 static UINT16 * ml_dotram;
 static UINT16 *dma_ram;
-static int adpcm_pos;
+static UINT32 adpcm_pos,adpcm_end;
 static int adpcm_data;
+static UINT8 adpcm_idle;
 static UINT8 pal_fg_bank;
 static int dma_active;
 static UINT16 dsp_HOLD_signal;
@@ -230,33 +230,35 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 
 static void ml_msm5205_vck(const device_config *device)
 {
-	if (adpcm_data != -1)
+	static UINT8 trigger;
+
+	popmessage("%08x",adpcm_pos);
+
+	if (adpcm_pos >= 0x50000  || adpcm_idle)
 	{
-		msm5205_data_w(device, adpcm_data & 0x0f);
-		adpcm_data = -1;
+		//adpcm_idle = 1;
+		msm5205_reset_w(device,1);
+		trigger = 0;
 	}
 	else
 	{
-		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
-		adpcm_pos = (adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(device, adpcm_data >> 4);
+		UINT8 *ROM = memory_region(device->machine, "adpcm");
+
+		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
+		msm5205_data_w(device,adpcm_data & 0xf);
+		trigger^=1;
+		if(trigger == 0)
+		{
+			adpcm_pos++;
+			//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			/*TODO: simplify this */
+			if(ROM[adpcm_pos] == 0x00 && ROM[adpcm_pos+1] == 0x00 && ROM[adpcm_pos+2] == 0x00 && ROM[adpcm_pos+3] == 0x00
+		       && ROM[adpcm_pos+4] == 0x00 && ROM[adpcm_pos+5] == 0x00 && ROM[adpcm_pos+6] == 0x00 && ROM[adpcm_pos+7] == 0x00
+		       && ROM[adpcm_pos+8] == 0x00 && ROM[adpcm_pos+9] == 0x00 && ROM[adpcm_pos+10] == 0x00 && ROM[adpcm_pos+11] == 0x00
+		       && ROM[adpcm_pos+12] == 0x00 && ROM[adpcm_pos+13] == 0x00 && ROM[adpcm_pos+14] == 0x00 && ROM[adpcm_pos+15] == 0x00)
+				adpcm_idle = 1;
+		}
 	}
-}
-
-static WRITE8_HANDLER( ml_msm5205_address_w )
-{
-	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
-}
-
-static WRITE8_DEVICE_HANDLER( ml_msm5205_start_w )
-{
-	msm5205_reset_w(device, 0);
-}
-
-static WRITE8_DEVICE_HANDLER( ml_msm5205_stop_w )
-{
-	msm5205_reset_w(device, 1);
-	adpcm_pos &= 0xff00;
 }
 
 static TIMER_CALLBACK( dma_complete )
@@ -296,7 +298,7 @@ static WRITE16_HANDLER( ml_to_sound_w )
 		taitosound_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 		taitosound_comm_w (space, 0, data & 0xff);
 	}
 }
@@ -307,7 +309,7 @@ static WRITE8_HANDLER( ml_sound_to_main_w )
 		taitosound_slave_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+		//cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 		taitosound_slave_comm_w (space, 0, data & 0xff);
 	}
 }
@@ -451,6 +453,19 @@ static ADDRESS_MAP_START( mlanding_sub_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&ml_dotram)
 ADDRESS_MAP_END
 
+static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
+{
+	adpcm_pos = (adpcm_pos & 0x0f0000) | ((data & 0xff)<<8) | 0x20;
+	adpcm_idle = 0;
+	msm5205_reset_w(device,0);
+	adpcm_end = (adpcm_pos+0x800);
+}
+
+static WRITE8_HANDLER( ml_msm_start_msb_w )
+{
+	adpcm_pos = (adpcm_pos & 0x00ff00) | ((data & 0x0f)<<16) | 0x20;
+}
+
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
@@ -459,12 +474,12 @@ static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", ml_msm5205_stop_w)
+//	AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
+//	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
+//	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", ml_msm5205_stop_w)
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
-	AM_RANGE(0xf600, 0xf600) AM_WRITENOP
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("msm",ml_msm_start_lsb_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
 ADDRESS_MAP_END
 
 static READ16_HANDLER( ml_dotram_r )
@@ -663,6 +678,7 @@ static MACHINE_RESET( mlanding )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	adpcm_pos = 0;
 	adpcm_data = -1;
+	adpcm_idle = 1;
 	dsp_HOLD_signal = 0;
 }
 
@@ -742,12 +758,12 @@ ROM_START( mlanding )
 	ROM_REGION( 0x10000, "z80sub", 0 )	/* z80 */
 	ROM_LOAD( "ml_b0937.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
 
-	ROM_REGION( 0x50000, "adpcm", 0 )
-	ROM_LOAD( "ml_b0930.epr", 0x00000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
-	ROM_LOAD( "ml_b0931.epr", 0x10000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
+	ROM_REGION( 0x80000, "adpcm", ROMREGION_ERASEFF )
+	ROM_LOAD( "ml_b0930.epr", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
+	ROM_LOAD( "ml_b0931.epr", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
 	ROM_LOAD( "ml_b0932.epr", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
-	ROM_LOAD( "ml_b0933.epr", 0x30000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
-	ROM_LOAD( "ml_b0934.epr", 0x40000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
+	ROM_LOAD( "ml_b0933.epr", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
+	ROM_LOAD( "ml_b0934.epr", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
 ROM_END
 
 static DRIVER_INIT(mlanding)
