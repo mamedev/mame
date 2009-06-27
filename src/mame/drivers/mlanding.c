@@ -8,11 +8,12 @@ Dual 68k + 2xZ80 + tms DSP
 no other hardware info..but it doesn't seem related to taitoair.c at all
 
 TODO:
-- pal banking;
+- Sound is nowhere near to be perfect, mode 5 causes "sound cpu error" for whatever reason;
+- Palette banking;
 - Comms between the five CPUs;
 - Gameplay looks stiff;
 - Needs a custom artwork for the cloche status;
-- Sound is nowhere near to be perfect;
+- Current dump is weird, a mix between German, English, and Japanese?
 - clean-ups!
 
 ************************************************************************************************************/
@@ -28,6 +29,7 @@ TODO:
 
 static UINT16 * ml_tileram;
 static UINT16 *g_ram;
+static UINT16 *g_bank_ram;
 static UINT16 * ml_dotram;
 static UINT16 *dma_ram;
 static UINT32 adpcm_pos,adpcm_end;
@@ -36,9 +38,11 @@ static UINT8 adpcm_idle;
 static UINT8 pal_fg_bank;
 static int dma_active;
 static UINT16 dsp_HOLD_signal;
+static UINT8 *mecha_ram;
 
 static VIDEO_START(mlanding)
 {
+	g_bank_ram = auto_alloc_array(machine, UINT16, 0x80000);
 }
 
 // 000: ???????
@@ -58,8 +62,8 @@ static VIDEO_UPDATE(mlanding)
 		{
 			UINT16 srcpix = *src++;
 
-			*dst++ = screen->machine->pens[256 + (srcpix & 0xff)+(pal_fg_bank << 8)];
-			*dst++ = screen->machine->pens[256 + (srcpix >> 8)+(pal_fg_bank << 8)];
+			*dst++ = screen->machine->pens[256+(srcpix & 0xff) + (pal_fg_bank & 1 ? 0x100 : 0x000)];
+			*dst++ = screen->machine->pens[256+(srcpix >> 8) + (pal_fg_bank & 1 ? 0x100 : 0x000)];
 		}
 	}
 
@@ -145,9 +149,13 @@ int start_dma(void)
 							if (~attr & 0x8000)
 							{
 								if (pix1)
+								{
 									*dst = (*dst & 0xff00) | ((colour << 4) | pix1);
+								}
 								if (pix2)
+								{
 									*dst = (*dst & 0x00ff) | (((colour << 4) | pix2) << 8);
+								}
 							}
 							else
 							{
@@ -205,7 +213,7 @@ static READ16_HANDLER( io1_r ) //240006
     */
 // multiplexed? or just overriden?
 
-	int retval = (dma_active << 15) | (input_port_read(space->machine, "DSW") & 0x7ffe) | 1;
+	int retval = (dma_active << 15) | (input_port_read(space->machine, "DSW") & 0x7fff);
 	return retval;
 }
 
@@ -214,8 +222,9 @@ static WRITE16_HANDLER(ml_output_w)
 {
 	/*
 	x--- ---- palette fg bankswitch
-	---x ---- coin lockout
-	---- x--- coin counter
+	---x ---- coin lockout?
+	---- x--- coin counter B
+	---- -x-- coin counter A
 	*/
 //	popmessage("%04x",data);
 
@@ -232,7 +241,7 @@ static void ml_msm5205_vck(const device_config *device)
 {
 	static UINT8 trigger;
 
-	popmessage("%08x",adpcm_pos);
+//	popmessage("%08x",adpcm_pos);
 
 	if (adpcm_pos >= 0x50000  || adpcm_idle)
 	{
@@ -365,15 +374,17 @@ static READ16_HANDLER( ml_analog2_msb_r )
 
 	res = 0;
 
-	if(x_adc >= 0x07ff)
+	if(x_adc == 0 || (!(x_adc & 0x800)))
 		res = 0x20;
 
-	if(y_adc == 0x07ff)
+	if(y_adc == 0)
 		res|= 0x50;
-	else if(y_adc < 0x07ff)
+	else if(y_adc & 0x800)
 		res|= 0x10;
 	else
 		res|= 0x40;
+
+//	popmessage("%04x %04x",x_adc,y_adc);
 
 	return ((input_port_read(space->machine, "STICKZ") & 0xf00)>>8) | res;
 }
@@ -395,7 +406,7 @@ static READ16_HANDLER( ml_analog3_msb_r )
 	else
 		res = 0x40;
 
-	if(x_adc <= 0x07ff)
+	if(x_adc & 0x800 || x_adc == 0)
 		res|= 0x10;
 
 	return ((input_port_read(space->machine, "STICKX") & 0xf00)>>8) | res;
@@ -403,7 +414,20 @@ static READ16_HANDLER( ml_analog3_msb_r )
 
 static WRITE16_HANDLER( ml_nmi_to_sound_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+//	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+static READ16_HANDLER( ml_mecha_ram_r )
+{
+	return (mecha_ram[offset*2]<<8)|mecha_ram[offset*2+1];
+}
+
+static WRITE16_HANDLER( ml_mecha_ram_w )
+{
+	COMBINE_DATA(mecha_ram+offset*2+1);
+	data >>= 8;
+	mem_mask >>= 8;
+	COMBINE_DATA(mecha_ram+offset*2);
 }
 
 static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -423,7 +447,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2d0002, 0x2d0003) AM_READ8(taitosound_comm_r, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM // is it shared with mecha ? tested around $940
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
 	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
@@ -497,14 +521,20 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 	return dsp_HOLD_signal;
 }
 
+
+static READ8_HANDLER( test_r )
+{
+	return mame_rand(space->machine);
+}
+
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM //AM_SHARE(2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&mecha_ram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 
-	AM_RANGE(0x9000, 0x9001) AM_RAM
-	AM_RANGE(0x9800, 0x9803) AM_RAM
+	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)
+	AM_RANGE(0x9800, 0x9803) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_program, ADDRESS_SPACE_PROGRAM, 16 )
@@ -522,9 +552,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "$2000-0")
-	PORT_DIPSETTING(	0x01, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))
+	PORT_DIPSETTING(	0x01, DEF_STR( Standard ))
+	PORT_DIPSETTING(	0x00, "Deluxe" ) //with Mecha driver
 	PORT_DIPNAME( 0x02, 0x02, "$2000-1")
 	PORT_DIPSETTING(	0x02, "H" )
 	PORT_DIPSETTING(	0x00, "L" )
@@ -564,9 +594,9 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPNAME( 0x2000, 0x2000, "$2000-5")
 	PORT_DIPSETTING(	0x2000, "H" )
 	PORT_DIPSETTING(	0x0000, "L" )
-	PORT_DIPNAME( 0x4000, 0x4000, "$2000-6")
-	PORT_DIPSETTING(	0x4000, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )
+	PORT_DIPSETTING(	0x4000, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( English ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "$2000-7")
 	PORT_DIPSETTING(	0x8000, "H" )
 	PORT_DIPSETTING(	0x0000, "L" )
@@ -648,10 +678,10 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
 
 	PORT_START("STICKY")	/* Stick 2 (4) */
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0000,0x0fff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START("STICKZ")	/* Stick 3 (5) */
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0000,0x0fff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static void irq_handler(const device_config *device, int irq)
@@ -700,7 +730,7 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("dsp", TMS32025,12000000)			/* 12 MHz ??? *///
+	MDRV_CPU_ADD("dsp", TMS32025,12000000)			/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(DSP_map_program)
 	MDRV_CPU_DATA_MAP(DSP_map_data)
 	MDRV_CPU_IO_MAP(DSP_map_io)
@@ -732,7 +762,7 @@ static MACHINE_DRIVER_START( mlanding )
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_DRIVER_END
 
 ROM_START( mlanding )
@@ -773,4 +803,4 @@ static DRIVER_INIT(mlanding)
 //	rom[0x88a]=0x71;
 }
 
-GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1987, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
