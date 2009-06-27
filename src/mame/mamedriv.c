@@ -3141,6 +3141,7 @@ V-V                           TP-027
 	DRIVER( ddrjb )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
 	DRIVER( ddra )		/* 1999 - Dance Dance Revolution (GN845 VER. AAA) */
 	DRIVER( fbait2bc )	/* 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB) */
+	DRIVER( bassang2 )	/* 1998 - Bass Angler 2 (GE865 VER. JAA) */
 	DRIVER( drmn )		/* 1999 - DrumMania (GQ881 VER. JAD) */
 	DRIVER( gtrfrks )	/* 1999 - Guitar Freaks (GQ886 VER. EAC) */
 	DRIVER( gtrfrksu )	/* 1999 - Guitar Freaks (GQ886 VER. UAC) */
