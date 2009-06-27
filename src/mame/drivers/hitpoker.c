@@ -453,12 +453,17 @@ static const hc11_config hitpoker_config =
 	0x100  //internal RAM size
 };
 
+static INTERRUPT_GEN( hitpoker_irq )
+{
+	cpu_set_input_line(device, MC68HC11_IRQ_LINE, HOLD_LINE);
+}
+
 static MACHINE_DRIVER_START( hitpoker )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
 	MDRV_CPU_IO_MAP(hitpoker_io)
 	MDRV_CPU_CONFIG(hitpoker_config)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", hitpoker_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
