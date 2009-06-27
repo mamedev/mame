@@ -2941,7 +2941,10 @@ V-V                           TP-027
 	DRIVER( beastrzr )	/* Beastorizer (USA) */
 	DRIVER( bldyroar )	/* Bloody Roar (JAPAN) */
 	DRIVER( beastrzb )	/* Beastorizer (USA Bootleg) */
-	DRIVER( bldyror2 )	/* Bloody Roar 2 (JAPAN) */
+	DRIVER( bldyror2 )	/* Bloody Roar 2 (WORLD) */
+	DRIVER( bldyro2u )	/* Bloody Roar 2 (USA) */
+	DRIVER( bldyro2a )	/* Bloody Roar 2 (ASIA) */
+	DRIVER( bldyro2j )	/* Bloody Roar 2 (JAPAN) */
 	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
 	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
