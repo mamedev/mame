@@ -29,7 +29,6 @@ TODO:
 
 static UINT16 * ml_tileram;
 static UINT16 *g_ram;
-static UINT16 *g_bank_ram;
 static UINT16 * ml_dotram;
 static UINT16 *dma_ram;
 static UINT32 adpcm_pos,adpcm_end;
@@ -42,7 +41,6 @@ static UINT8 *mecha_ram;
 
 static VIDEO_START(mlanding)
 {
-	g_bank_ram = auto_alloc_array(machine, UINT16, 0x80000);
 }
 
 // 000: ???????
