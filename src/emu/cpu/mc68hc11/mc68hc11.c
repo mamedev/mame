@@ -64,12 +64,17 @@ struct _hc11_state
 	const address_space *program;
 	const address_space *io;
 	int icount;
+
 	int ram_position;
 	int reg_position;
 	UINT8 *internal_ram;
+
 	int has_extended_io; // extended I/O enable flag
 	int internal_ram_size;
+
 	UINT8 wait_state,stop_state;
+
+	UINT8 tflg1;
 };
 
 INLINE hc11_state *get_safe_token(const device_config *device)
@@ -108,6 +113,8 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 			return 0;
 		case 0x0a:		/* PORTE */
 			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTE);
+		case 0x23:
+			return cpustate->tflg1;
 		case 0x28:		/* SPCR1 */
 			return 0;
 		case 0x30:		/* ADCTL */
@@ -219,6 +226,9 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 			return;
 		case 0x22:		/* TMSK1 */
 			return;
+		case 0x23:
+			cpustate->tflg1 = value;
+			return;
 		case 0x24:		/* TMSK2 */
 			return;
 		case 0x28:		/* SPCR1 */
@@ -229,6 +239,8 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x38:		/* OPT2 */
 			return;
 		case 0x39:		/* OPTION */
+			return;
+		case 0x3a:		/* COPRST (watchdog) */
 			return;
 
 		case 0x3d:		/* INIT */
