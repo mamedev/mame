@@ -4143,7 +4143,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( dirtdvla )
 	DRIVER( swtrilgy )	/* 1998.11 Star Wars Trilogy Arcade */
 	DRIVER( swtrilga )
-						/* 1998.11 Magical Trocco Adventure */
+	DRIVER( magtruck )	/* 1998.11 Magical Truck Adventure */
 						/* 1998.12 L.A. Machine Guns */
 	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
 						/* 1998.12 Virtua Striker 2 ver.99 */
