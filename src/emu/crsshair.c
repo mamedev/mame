@@ -154,7 +154,7 @@ static void create_bitmap(running_machine *machine, int player)
 
 	/* if we have a bitmap for this player, kill it */
 	if (global.bitmap[player] != NULL)
-		free(global.bitmap[player]);
+		bitmap_free(global.bitmap[player]);
 
 	if (global.name[player][0] != 0)
 	{
