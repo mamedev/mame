@@ -230,6 +230,39 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+
+/*
+    Super Basketball (version I, encrypted)
+*/
+
+ROM_START( sbasketb )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* roms located on the CPU/Video board */
+	ROM_LOAD( "405g05.14j", 0x6000, 0x2000, CRC(336dc0ab) SHA1(0fe47fdbf183683c569785fc6b980337a9cfde95) )
+	ROM_LOAD( "405i03.11j", 0x8000, 0x4000, CRC(d33b82dd) SHA1(9f0a1e2b0a43a2ec5029dd50dbd315291838fa39) )
+	ROM_LOAD( "405i01.9j",  0xc000, 0x4000, CRC(1c09cc3f) SHA1(881c0a9313f7f1ca17e1fa956a7b13e77d71957c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
+	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_LOAD( "405e12.22f", 0x0000, 0x4000, CRC(e02c54da) SHA1(2fa19f3bce894ef05820f95e0b88428e4f946a35) )
+
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_LOAD( "405h06.14g", 0x0000, 0x4000, CRC(cfbbff07) SHA1(39b19866b21372524933b5eef511bb5b7ad92556) )
+	ROM_LOAD( "405h08.17g", 0x4000, 0x4000, CRC(c75901b6) SHA1(4ff87123228da068f0c0ffffa4a3f03765eccd8d) )
+	ROM_LOAD( "405h10.20g", 0x8000, 0x4000, CRC(95bc5942) SHA1(55bf35283385d0ae768210706720a3b289ebd9a2) )
+
+	ROM_REGION( 0x0500, "proms", 0 ) /* roms located on the CPU/Video board */
+	ROM_LOAD( "405e17.5a",  0x0000, 0x0100, CRC(b4c36d57) SHA1(c4a63f57edce2b9588e2394ff54a28f91213d550) ) /* palette red component */
+	ROM_LOAD( "405e16.4a",  0x0100, 0x0100, CRC(0b7b03b8) SHA1(81297cb2b0b28b0fc0939a37ff30844d69fb65ac) ) /* palette green component */
+	ROM_LOAD( "405e18.6a",  0x0200, 0x0100, CRC(9e533bad) SHA1(611e7af6813caaf2bc36c311ae48a5efd30e6f0c) ) /* palette blue component */
+	ROM_LOAD( "405e20.19d", 0x0300, 0x0100, CRC(8ca6de2f) SHA1(67d29708d1a07d17c5dc5793a3293e7ace3a4e19) ) /* character lookup table */
+	ROM_LOAD( "405e19.16d", 0x0400, 0x0100, CRC(e0bc782f) SHA1(9f71e696d11a60f771535f6837ecad6132047b0a) ) /* sprite lookup table */
+
+	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom, located on Sound Board */
+	ROM_LOAD( "405e15.11f", 0x0000, 0x2000, CRC(01bb5ce9) SHA1(f48477b4011befba13c8bcd83e0c9f7deb14a1e1) )
+ROM_END
+
 /*
     Super Basketball (version H, unprotected)
 
@@ -246,7 +279,7 @@ MACHINE_DRIVER_END
         J1 connected with a null resistor
 */
 
-ROM_START( sbasketb )
+ROM_START( sbasketh )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405h05.14j", 0x6000, 0x2000, CRC(263ec36b) SHA1(b445b600726ba4935623311e1a178aeb4a356b0a) )
 	ROM_LOAD( "405h03.11j", 0x8000, 0x4000, CRC(0a4d7a82) SHA1(2e0153b41e23284427881258a44bd55be3570eb2) )
@@ -356,6 +389,7 @@ static DRIVER_INIT( sbasketb )
 	konami1_decode(machine, "maincpu");
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketh, sbasketb, sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1984, sbasketg, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   GAME_SUPPORTS_SAVE )
 GAME( 1984, sbaskete, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   GAME_SUPPORTS_SAVE )
