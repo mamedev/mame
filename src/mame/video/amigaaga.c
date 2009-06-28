@@ -887,7 +887,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 			/* compute the vertical start/stop */
 			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
-			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);/* | ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);*/
+			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);
 			if (diwhigh_written)
 			{
 				vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
@@ -1152,7 +1152,8 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 		if ( hires && lace ) p = m_hilace;
 
-		popmessage("%s(%d pl od=%02x ed=%02x start=%04x stop=%04x hstart=%04x hstop=%04x diwhigh=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH) );
+		//popmessage("%s(%d pl od=%02x ed=%02x start=%04x stop=%04x hstart=%04x hstop=%04x diwhigh=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH) );
+		popmessage("%s(%d pl bplpt1=%06X, bpl1mod=%04x)", p, planes, CUSTOM_REG_LONG(REG_BPL1PTH), CUSTOM_REG(REG_BPL1MOD));
 	}
 #endif
 
