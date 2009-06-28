@@ -3610,6 +3610,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( zoom909 )	/* (c) 1982 Sega */
 	DRIVER( kopunch )	/* 834-0103 (c) 1981 Sega */
 	DRIVER( suprloco )	/* (c) 1982 Sega */
+	DRIVER( suprlocoa )	/* (c) 1982 Sega */
 	DRIVER( dotrikun )	/* cabinet test board */
 	DRIVER( dotriku2 )	/* cabinet test board */
 	DRIVER( spcpostn )	/* (c) 1986 Sega / Nasco" */
