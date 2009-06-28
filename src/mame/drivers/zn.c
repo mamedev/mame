@@ -144,9 +144,9 @@ static const struct
 	{ "bldyroar", et01, et02 }, /* OK */
 	{ "beastrzb", et01, et02 }, /* OK */
 	{ "bldyror2", et01, et03 }, /* OK */
-	{ "bldyro2u", et01, et03 }, /* OK */
-	{ "bldyro2a", et01, et03 }, /* OK */
-	{ "bldyro2j", et01, et03 }, /* OK */
+	{ "bldyror2u",et01, et03 }, /* OK */
+	{ "bldyror2a",et01, et03 }, /* OK */
+	{ "bldyror2j",et01, et03 }, /* OK */
 	{ "bam2",     et01, et05 },
 	{ "glpracr2", mg01, mg02 }, /* locks up when starting a game/entering test mode */
 	{ "glprac2j", mg01, mg02 }, /* locks up when starting a game/entering test mode */
@@ -4140,10 +4140,10 @@ ROM_START( bldyror2 )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_world",      0x0000000, 0x000800, BAD_DUMP CRC(96fc78bd) SHA1(d72e3be843738f3b065be38046a41e03f196c8a6) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_world",      0x0000000, 0x000800, BAD_DUMP CRC(01b42397) SHA1(853553a38e81e64a17c040173b29c7bfd6f79f31) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
-ROM_START( bldyro2u )
+ROM_START( bldyror2u )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
@@ -4164,10 +4164,10 @@ ROM_START( bldyro2u )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_usa",      0x0000000, 0x000800, BAD_DUMP CRC(75fbefa2) SHA1(9864bc1e2d4896d42df28f7dff5435cc3135e084) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_usa",      0x0000000, 0x000800, BAD_DUMP CRC(b78d6fc3) SHA1(49d8b6f44c31d74f36cba981af7f4c7e23dd9007) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
-ROM_START( bldyro2j )
+ROM_START( bldyror2j )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
@@ -4188,10 +4188,10 @@ ROM_START( bldyro2j )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_japan",      0x0000000, 0x000800, BAD_DUMP CRC(2b069d57) SHA1(54e3ea1d9e220f90e147dcfa61b7b733430865bf) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_japan",      0x0000000, 0x000800, BAD_DUMP CRC(6cb55630) SHA1(b840bc0339485dd82f7c9aa669faf90ae371218f) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
-ROM_START( bldyro2a )
+ROM_START( bldyror2a )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
@@ -4212,7 +4212,7 @@ ROM_START( bldyro2a )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_asia",      0x0000000, 0x000800, BAD_DUMP CRC(c8010a48) SHA1(e0643dea48f8e0b0a6d512822d134ec3499eaa0c) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_asia",      0x0000000, 0x000800, BAD_DUMP CRC(da8c1a64) SHA1(14cbb751f498c96d9d8fce3eea3781ebc45f6291) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
 ROM_START( bam2 )
@@ -4482,14 +4482,14 @@ GAME( 1997, gdarius2, taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Dariu
 /* it in every zip file */
 GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony/Eighting/Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, beastrzr,  psarc95,   coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, beastrzb,  psarc95,   coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA Bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1998, bldyror2,  psarc95,   coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (WORLD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyro2u,  bldyror2,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyro2a,  bldyror2,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (ASIA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyro2j,  bldyror2,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvblade,  tps,       coh1002e, zn,   coh1002e, ROT270, "Eighting/Raizing", "Brave Blade (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzb,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA Bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (WORLD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (ASIA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvblade,  tps,      coh1002e, zn,   coh1002e, ROT270, "Eighting/Raizing", "Brave Blade (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
 GAME( 1999, bam2,     psarc95,  bam2,     zn, bam2,     ROT0, "Metro/Enix/Namco", "Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
