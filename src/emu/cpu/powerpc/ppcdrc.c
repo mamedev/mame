@@ -3894,7 +3894,7 @@ static int generate_instruction_3f(powerpc_state *ppc, drcuml_block *block, comp
 				return TRUE;
 
 			case 0x19:	/* FMULx */
-				UML_FDMUL(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));				// fdmul   rd,ra,rb
+				UML_FDMUL(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_REGC(op)));			// fdmul   rd,ra,rc
 				return TRUE;
 
 			case 0x12:	/* FDIVx */
