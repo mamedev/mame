@@ -1321,7 +1321,7 @@ static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 
 			case 0x19:	/* FMULx */
 				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
+				FPR_USED(desc, G_REGC(op));
 				FPR_MODIFIED(desc, G_RD(op));
 				if (op & M_RC)
 					CR_MODIFIED(desc, 1);
