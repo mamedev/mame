@@ -3505,7 +3505,12 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write32align[ppc->impstate->mode]);				// callh   write32align
 			generate_update_cycles(ppc, block, compiler, IMM(desc->pc + 4), TRUE);			// <update cycles>
+
 			UML_CMP(block, IREG(0), IREG(0));												// cmp     i0,i0
+			UML_GETFLGS(block, IREG(0), DRCUML_FLAG_Z | DRCUML_FLAG_C | DRCUML_FLAG_S);		// getflgs i0,zcs
+			UML_LOAD(block, IREG(0), ppc->impstate->cmp_cr_table, IREG(0), BYTE);			// load    i0,cmp_cr_table,i0,byte
+			UML_OR(block, CR32(G_CRFD(op)), IREG(0), XERSO32);								// or      [crn],i0,[xerso]
+
 			generate_compute_flags(ppc, block, desc, TRUE, 0, FALSE);						// <update flags>
 			return TRUE;
 
@@ -3802,7 +3807,7 @@ static int generate_instruction_3b(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x19:	/* FMULSx */
 			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
 				return generate_instruction_3f(ppc, block, compiler, desc);
-			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_RB(op)));						// fdmul   f0,ra,rb
+			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_REGC(op)));						// fdmul   f0,ra,rc
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 

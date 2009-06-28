@@ -1247,9 +1247,16 @@ static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *d
 
 		case 0x14:	/* FSUBSx */
 		case 0x15:	/* FADDSx */
-		case 0x19:	/* FMULSx */
 			FPR_USED(desc, G_RA(op));
 			FPR_USED(desc, G_RB(op));
+			FPR_MODIFIED(desc, G_RD(op));
+			if (op & M_RC)
+				CR_MODIFIED(desc, 1);
+			return TRUE;
+
+		case 0x19:	/* FMULSx - not the same form as FSUB/FADD! */	
+			FPR_USED(desc, G_RA(op));
+			FPR_USED(desc, G_REGC(op));
 			FPR_MODIFIED(desc, G_RD(op));
 			if (op & M_RC)
 				CR_MODIFIED(desc, 1);
