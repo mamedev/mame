@@ -374,7 +374,7 @@ INLINE tms0980_state *get_safe_token(const device_config *device)
 
 
 static ADDRESS_MAP_START(tms0980_internal_rom, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE( 0x0000, 0x07FF ) AM_ROM
+	AM_RANGE( 0x0000, 0x0FFF ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -511,8 +511,10 @@ static void tms0980_set_cki_bus( const device_config *device )
 	case 0x70: case 0x78:
 		cpustate->cki_bus = tms0980_c_value[ cpustate->opcode & 0x0F ];
 		break;
+	default:
+		cpustate->cki_bus = 0x0F;
+		break;
 	}
-	cpustate->cki_bus = 0x0F;
 	/* Case 000001XXX */
 	if ( ( cpustate->opcode & 0x1F8 ) == 0x008 )
 	{
@@ -524,6 +526,7 @@ static void tms0980_set_cki_bus( const device_config *device )
 	/* Case 00100XXXX - TCY */
 	if ( ( cpustate->opcode & 0x1F0 ) == 0x040 )
 	{
+		cpustate->cki_bus = cpustate->opcode & 0x0F;
 	}
 	/* Case 01XXXXXXX */
 	if ( ( cpustate->opcode & 0x180 ) == 0x080 )
@@ -718,25 +721,28 @@ static CPU_EXECUTE( tms0980 )
 			break;
 		case 4:
 			/* execute: register store */
-			if ( cpustate->decode & ( MICRO_MASK | M_AUTA ) )
+			if ( cpustate->decode & MICRO_MASK )
 			{
-				cpustate->a = cpustate->adder_result & 0x0F;
+				if ( cpustate->decode & M_AUTA )
+				{
+					cpustate->a = cpustate->adder_result & 0x0F;
+				}
+				if ( cpustate->decode & M_AUTY )
+				{
+					cpustate->y = cpustate->adder_result & 0x0F;
+				}
+//				if ( cpustate->decode & M_STSL )
+//				{
+//					cpustate->status_latch = cpustate->status;
+//				}
 			}
-			if ( cpustate->decode & ( MICRO_MASK | M_AUTY ) )
-			{
-				cpustate->y = cpustate->adder_result & 0x0F;
-			}
-//			if ( cpustate->decode & ( MICRO_MASK | M_STSL ) )
-//			{
-//				cpustate->status_latch = cpustate->status;
-//			}
 			debugger_instruction_hook( device, cpustate->rom_address << 1 );
 			/* fetch: fetch, update pc, ram address */
 			cpustate->opcode = memory_read_word_16be( cpustate->program, cpustate->rom_address << 1 );
 			cpustate->opcode &= 0x1FF;
 			cpustate->pc = tms0980_next_pc( cpustate->pc );
 			if (LOG)
-				logerror("tms0980: read opcode %04x. Set pc to %04x\n", cpustate->opcode, cpustate->pc );
+				logerror( "tms0980: read opcode %04x. Set pc to %04x\n", cpustate->opcode, cpustate->pc );
 			break;
 		case 5:
 			/* fetch: instruction decode */
@@ -822,7 +828,7 @@ CPU_GET_INFO( tms0980 )
 		case CPUINFO_INT_MAX_CYCLES:									info->i = 6; break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16 /* 9 */; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 11; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 12; break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0; break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8 /* 4 */; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7; break;
