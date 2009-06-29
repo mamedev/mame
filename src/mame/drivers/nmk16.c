@@ -921,9 +921,7 @@ static ADDRESS_MAP_START( ssmissin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0d0800, 0x0d0fff) AM_RAM_WRITE(nmk_txvideoram_w) //mirror for airattck
-	AM_RANGE(0x0d1000, 0x0d17ff) AM_RAM_WRITE(nmk_txvideoram_w) //mirror for airattck
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram) //mirror for airattck
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssmissin_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -987,7 +985,7 @@ static ADDRESS_MAP_START( gunnail_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE(&gunnail_scrollramy)
 	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY	// unknown
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(nmk_txvideoram_w) AM_MIRROR(0x001000) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
@@ -1006,8 +1004,7 @@ static ADDRESS_MAP_START( macross2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x130000, 0x130007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x130008, 0x1307ff) AM_WRITENOP	/* 0 only? */
 	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x171000, 0x171fff) AM_RAM_WRITE(nmk_txvideoram_w)	/* mirror */
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
@@ -1025,8 +1022,7 @@ static ADDRESS_MAP_START( raphero_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(nmk_scroll_3_w) AM_BASE(&gunnail_scrollram)
 	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x171000, 0x171fff) AM_RAM_WRITE(nmk_txvideoram_w)	/* mirror */
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
@@ -1090,11 +1086,10 @@ static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x084020, 0x08402f) AM_WRITE(NMK112_okibank_lsb_w)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP	/* IRQ enable? */
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09d000, 0x09dfff) AM_RAM_WRITE(nmk_bgvideoram_w)	/* mirror */
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
