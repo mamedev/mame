@@ -47,9 +47,6 @@ TODO:
   between CPU and NMK004.
 - Protection is patched in several games.
 - Hacha Mecha Fighter: mcu simulation *might* be wrong/incorrect (see notes).
-- Hacha Mecha Fighter: bg graphics are completely wrong except at the title screen &
-  the level 7.Likely to be a rom issue,the game activates the bgbank
-  when it is on the above two cases.
 - Cocktail mode is supported, but tilemap.c has problems with asymmetrical
   visible areas.
 - Music timing in nouryoku is a little off.
