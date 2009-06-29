@@ -824,9 +824,9 @@ void real3d_display_list1_dma(const address_space *space, UINT32 src, UINT32 dst
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src));
 		} else {
-			w = memory_read_dword(space, src^4);
+			w = memory_read_dword(space, src);
 		}
 		display_list_ram[d++] = w;
 		src += 4;
@@ -840,9 +840,9 @@ void real3d_display_list2_dma(const address_space *space, UINT32 src, UINT32 dst
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src));
 		} else {
-			w = memory_read_dword(space, src^4);
+			w = memory_read_dword(space, src);
 		}
 		culling_ram[d++] = w;
 		src += 4;
@@ -856,11 +856,11 @@ void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst,
 		UINT32 address, header;
 
 		if (byteswap) {
-			address = BYTE_REVERSE32(memory_read_dword(space, (src+0)^4));
-			header = BYTE_REVERSE32(memory_read_dword(space, (src+4)^4));
+			address = BYTE_REVERSE32(memory_read_dword(space, (src+0)));
+			header = BYTE_REVERSE32(memory_read_dword(space, (src+4)));
 		} else {
-			address = memory_read_dword(space, (src+0)^4);
-			header = memory_read_dword(space, (src+4)^4);
+			address = memory_read_dword(space, (src+0));
+			header = memory_read_dword(space, (src+4));
 		}
 		real3d_upload_texture(header, (UINT32*)&model3_vrom[address]);
 	}
@@ -872,9 +872,9 @@ void real3d_texture_fifo_dma(const address_space *space, UINT32 src, int length,
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src));
 		} else {
-			w = memory_read_dword(space, src^4);
+			w = memory_read_dword(space, src);
 		}
 		texture_fifo[texture_fifo_pos] = w;
 		texture_fifo_pos++;
@@ -889,9 +889,9 @@ void real3d_polygon_ram_dma(const address_space *space, UINT32 src, UINT32 dst, 
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src));
 		} else {
-			w = memory_read_dword(space, src^4);
+			w = memory_read_dword(space, src);
 		}
 		polygon_ram[d++] = w;
 		src += 4;
