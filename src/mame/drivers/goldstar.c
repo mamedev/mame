@@ -131,11 +131,11 @@ static size_t nvram_size;
 static NVRAM_HANDLER( goldstar )
 {
 	if (read_or_write)
-                mame_fwrite(file,nvram,nvram_size);
+		mame_fwrite(file,nvram,nvram_size);
 	else
 	{
 		if (file)
-                        mame_fread(file,nvram,nvram_size);
+			mame_fread(file,nvram,nvram_size);
 		else
 			memset(nvram,0xff,nvram_size);
 	}
@@ -453,14 +453,52 @@ static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static READ8_HANDLER( unkch_unk_r )
+{
+	return 0xff;
+}
 
+// scrolling is wrong / different
 static ADDRESS_MAP_START( unkch_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_READWRITE(SMH_RAM,paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc800, 0xc9ff) AM_READWRITE(SMH_RAM,paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
+ 	AM_RANGE(0x0000, 0x9fff) AM_ROM
+ 	AM_RANGE(0xc000, 0xc1ff) AM_READWRITE(SMH_RAM,paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE(&paletteram)
+ 	AM_RANGE(0xc800, 0xc9ff) AM_READWRITE(SMH_RAM,paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE(&paletteram_2)
+
+ 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+
+
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_WRITE( goldstar_reel1_ram_w ) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM AM_WRITE( goldstar_reel2_ram_w ) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM AM_WRITE( goldstar_reel3_ram_w ) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+
+	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xf880, 0xf9ff) AM_RAM
+	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xfa80, 0xfbff) AM_RAM
+	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( unkch_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
+//	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
+//	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+//	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
+//	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
+//	AM_RANGE(0x11, 0x11) AM_WRITENOP
+//	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
+//	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
+//	AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
+
+	AM_RANGE(0x08, 0x09) AM_READ(unkch_unk_r)
+ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( cmv801 )
@@ -5068,25 +5106,14 @@ static MACHINE_DRIVER_START( nfm )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
 MACHINE_DRIVER_END
 
-
-static VIDEO_START( unkch )
-{
-
-}
-
-static VIDEO_UPDATE( unkch )
-{
-	return 0;
-}
-
 static MACHINE_DRIVER_START( unkch )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(unkch_map)
-	//MDRV_CPU_IO_MAP(ncb3_readwriteport)
-	//MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_IO_MAP(unkch_portmap)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5094,15 +5121,15 @@ static MACHINE_DRIVER_START( unkch )
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(unkch)
 	MDRV_PALETTE_LENGTH(512)
 
 	//MDRV_NVRAM_HANDLER(goldstar)
 
-	MDRV_VIDEO_START(unkch)
-	MDRV_VIDEO_UPDATE(unkch)
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -7892,6 +7919,29 @@ static DRIVER_INIT(cherrys)
 
 }
 
+/* todo: remove these patches! */
+static DRIVER_INIT( unkch1 )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x9d52] = 0x00;
+	ROM[0x9d53] = 0x00;
+}
+
+static DRIVER_INIT( unkch3 )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x9b86] = 0x00;
+	ROM[0x9b87] = 0x00;
+}
+
+static DRIVER_INIT( unkch4 )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x9a6e] = 0x00;
+	ROM[0x9a6f] = 0x00;
+}
+
+
 
 /*********************************************
 *                Game Drivers                *
@@ -7970,10 +8020,10 @@ GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg"
 GAME( 2003, nfm, 0, nfm, nfb96bl, 0, ROT0, "Ming-Yang Electronic",         "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
-GAME( 1999, unkch1,   0,      unkch, ncb3, 0,         ROT0, "bootleg",               "Super Cherry Master / New Cherry Gold '99 (set 1)",                  GAME_NOT_WORKING )
-GAME( 1999, unkch2,   unkch1, unkch, ncb3, 0,         ROT0, "bootleg",               "Super Cherry Master / Super Cherry Gold",                  GAME_NOT_WORKING )
-GAME( 1999, unkch3,   unkch1, unkch, ncb3, 0,         ROT0, "bootleg",               "Super Cherry Master / New Cherry Gold '99 (set 2)",    GAME_NOT_WORKING )
-GAME( 1999, unkch4,   unkch1, unkch, ncb3, 0,         ROT0, "bootleg",               "Super Cherry Master / Grand Cherry Master",      GAME_NOT_WORKING )
+GAME( 1999, unkch1,   0,      unkch, schery97, unkch1,    ROT0, "bootleg",               "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)",                  GAME_NOT_WORKING )
+GAME( 1999, unkch2,   unkch1, unkch, schery97, unkch1,    ROT0, "bootleg",               "Super Cherry Gold (bootleg of Super Cherry Master)",                  GAME_NOT_WORKING )
+GAME( 1999, unkch3,   unkch1, unkch, schery97, unkch3,    ROT0, "bootleg",               "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)",    GAME_NOT_WORKING ) // cards have been hacked to look like barrels
+GAME( 1999, unkch4,   unkch1, unkch, schery97, unkch4,    ROT0, "bootleg",               "Grand Cherry Master (bootleg of Super Cherry Master)",      GAME_NOT_WORKING ) // by 'toy system' hungary
 
 
 
