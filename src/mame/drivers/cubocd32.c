@@ -650,7 +650,7 @@ static INPUT_PORTS_START( lasstixx )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and draw */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* draw */
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* retract */
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -671,6 +671,8 @@ static INPUT_PORTS_START( lasstixx )
 	PORT_MODIFY("DIPSW2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* not read at all */
 
+	PORT_MODIFY("CIA0PORTA")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
 
 /*************************************
@@ -904,7 +906,7 @@ GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy
 GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, lsrquiz,  cd32, cd32, lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs */
 GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )  /* no start button */
+GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 /* not checked yet */
 GAME( 1995, mgnumber, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Number",              GAME_NOT_WORKING )  /* game resets before initialisation */
 GAME( 1996, mgprem11, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_NOT_WORKING )
