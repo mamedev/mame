@@ -418,7 +418,6 @@ void amiga_sprite_enable_comparitor(int which, int enable);
 
 /*----------- defined in video/amigaaga.c -----------*/
 
-PALETTE_INIT( amiga_aga );
 VIDEO_START( amiga_aga );
 VIDEO_UPDATE( amiga_aga );
 

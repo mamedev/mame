@@ -175,22 +175,6 @@ void aga_palette_write(int color_reg, UINT16 data)
 
 /*************************************
  *
- *  4-4-4 palette init
- *
- *************************************/
-
-PALETTE_INIT( amiga_aga )
-{
-	int i;
-
-	for (i = 0; i < 0x1000; i++)
-		palette_set_color_rgb(machine, i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
-}
-
-
-
-/*************************************
- *
  *  Video startup
  *
  *************************************/
@@ -861,7 +845,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs) : (17 + defbitoffs));
+			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - 16) : (17 + defbitoffs));
 
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
@@ -1152,8 +1136,8 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
 
 		if ( hires && lace ) p = m_hilace;
 
-		//popmessage("%s(%d pl od=%02x ed=%02x start=%04x stop=%04x hstart=%04x hstop=%04x diwhigh=%04x)", p, planes, odelay, edelay, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP), CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH) );
-		popmessage("%s(%d pl bplpt1=%06X, bpl1mod=%04x)", p, planes, CUSTOM_REG_LONG(REG_BPL1PTH), CUSTOM_REG(REG_BPL1MOD));
+		popmessage("%s(%d pl od=%02x ed=%02x start=%d stop=%d hstart=%04x hstop=%04x diwhigh=%04x fetchbits=%d )", p, planes, odelay, edelay, ddf_start_pixel, ddf_stop_pixel, CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH), defbitoffs );
+		//popmessage("%s(%d pl bplpt1=%06X, bpl1mod=%04x, offset=%x)", p, planes, CUSTOM_REG_LONG(REG_BPL1PTH), CUSTOM_REG(REG_BPL1MOD), hires_modulo_offset );
 	}
 #endif
 

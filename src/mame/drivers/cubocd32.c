@@ -722,9 +722,6 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_SCREEN_SIZE(512*2, 312)
 	MDRV_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
 
-	MDRV_PALETTE_LENGTH(4096)
-	MDRV_PALETTE_INIT(amiga_aga)
-
 	MDRV_VIDEO_START(amiga_aga)
 	MDRV_VIDEO_UPDATE(amiga_aga)
 
@@ -905,7 +902,7 @@ GAME( 1993, cd32,     0,    cd32, cd32,     cd32,     ROT0, "Commodore", "Amiga 
 GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, lsrquiz,  cd32, cd32, lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs */
-GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 /* not checked yet */
 GAME( 1995, mgnumber, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Number",              GAME_NOT_WORKING )  /* game resets before initialisation */
