@@ -1010,7 +1010,8 @@ ROM_START( fruitbun )
 	ROM_REGION( 0x1000, "user1", 0 )
 	// 06.bin              = galx.1h               Galaxian Part X (moonaln hack)
 	ROM_LOAD( "06.bin", 0x00000, 0x0800, CRC(e8810654) SHA1(b6924c7ad765c32714e6abd5bb56b2732edd5855) )
-	// 07.bin no match (likely a gfx rom of something else undumped)
+	// 07.bin              = rp9.6h                97.705078%
+	// (a gfx rom from an undumped (later? licensed to Nichibutsu?) River Patrol set, it shows the body of the Orca logo if you replace it in rpatrol)
 	ROM_LOAD( "07.bin", 0x00800, 0x0800, CRC(3717fa41) SHA1(373e5ef6bef3407da084508c48522c7058568188) )
 
 	ROM_REGION( 0x10000, "gfx", 0 )
