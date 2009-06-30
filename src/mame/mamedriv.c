@@ -6280,6 +6280,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 				/* 0220 Choutetsu Brikin'ger - iron clad (MVS existance seems to have been confirmed) */
 	DRIVER( magdrop2 )	/* 0221 (c) 1996 Data East Corporation */
 	DRIVER( samsho4 )	/* 0222 (c) 1996 SNK */
+	DRIVER( samsho4k )	/* Censored Korean release of samsho4 */
 	DRIVER( rbffspec )	/* 0223 (c) 1996 SNK */
 	DRIVER( twinspri )	/* 0224 (c) 1996 ADK */
 	DRIVER( wakuwak7 )	/* 0225 (c) 1996 Sunsoft */

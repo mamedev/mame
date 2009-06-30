@@ -3738,6 +3738,33 @@ ROM_START( samsho4 )
 	ROM_LOAD16_BYTE( "222-c8.bin", 0x1800001, 0x400000, CRC(adfc50e3) SHA1(7d7ee874355b5aa75ad9c9a5c9c3df98d098d85e) ) /* Plane 2,3 */
 ROM_END
 
+ROM_START( samsho4k ) /* Uses PCBs "NEO-MVS PROGBK1" and "NEO-MVS CHA256 B" */
+	ROM_REGION( 0x500000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "222-p1k.p1", 0x000000, 0x100000, CRC(06e0a25d) SHA1(81e6727e0acb67ae41383518c0fc07f28d232979) )
+	ROM_LOAD16_WORD_SWAP( "222-p2.bin", 0x100000, 0x400000, CRC(b023cd8b) SHA1(35b4cec9858225f90acdfa16ed8a3017d0d08327) )
+
+	NEO_SFIX_128K( "222-s1k.s1", CRC(d313687d) SHA1(9ba468a9d582ef76c863f57ad9a0f811f3f08bd9) )
+
+	NEO_BIOS_AUDIO_128K( "222-m1.bin", CRC(7615bc1b) SHA1(b936f7b341f6fe0921b4c41049734684583e3596) )
+
+	ROM_REGION( 0xa00000, "ym", 0 )
+	ROM_LOAD( "222-v1.bin", 0x000000, 0x400000, CRC(7d6ba95f) SHA1(03cb4e0d770e0b332b07b64cacef624460b84c78) )
+	ROM_LOAD( "222-v2.bin", 0x400000, 0x400000, CRC(6c33bb5d) SHA1(fd5d4e08a962dd0d22c52c91bad5ec7f23cfb901) )
+	ROM_LOAD( "222-v3.bin", 0x800000, 0x200000, CRC(831ea8c0) SHA1(f2987b7d09bdc4311e972ce8a9ab7ca9802db4db) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "222-c1.bin", 0x0000000, 0x400000, CRC(68f2ed95) SHA1(c0a02df012cd25bcfe341770ea861a80294148cb) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "222-c2.bin", 0x0000001, 0x400000, CRC(a6e9aff0) SHA1(15addca49951ed53fa3c000c8d7cd327d012a620) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "222-c3.bin", 0x0800000, 0x400000, CRC(c91b40f4) SHA1(dcda45e0336204e3e024de08edfd0a3217bc1fdd) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "222-c4.bin", 0x0800001, 0x400000, CRC(359510a4) SHA1(b6642677ebdff7788263266402080272b8a66b15) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "222-c5.bin", 0x1000000, 0x400000, CRC(9cfbb22d) SHA1(789c32f917d0c6e38601cd390a7bf9d803131a4a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "222-c6.bin", 0x1000001, 0x400000, CRC(685efc32) SHA1(db21ba1c7e3631ce0f1cb6f503ae7e0e043ff71b) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "222-c7.bin", 0x1800000, 0x400000, CRC(d0f86f0d) SHA1(32502d71c2ab1469c492b6b382bf2bb3f85981d9) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "222-c8.bin", 0x1800001, 0x400000, CRC(adfc50e3) SHA1(7d7ee874355b5aa75ad9c9a5c9c3df98d098d85e) ) /* Plane 2,3 */
+ROM_END
+
 ROM_START( rbffspec )
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "223-p1.bin", 0x000000, 0x100000, CRC(f84a2d1d) SHA1(fc19225d9dbdb6bd0808023ee32c7829f6ffdef6) )
@@ -7680,7 +7707,7 @@ GAME( 1996, kof96h,   kof96,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The 
 GAME( 1996, ssideki4, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero, The", 0 )
 GAME( 1996, kizuna,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", 0 )
 GAME( 1996, samsho4,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin", 0 )
-/* Pae Wang Jeon Seol / Legend of Warrior - Korean / Chinese censored version of SamSho4, see http://www.kmrb.or.kr/Game_Image/1999/%EC%A0%9C2064%ED%98%B8.jpg */
+GAME( 1996, samsho4k, samsho4,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Pae Wang Jeon Seol / Legend of Warrior (Korean censored Samurai Shodown IV)", 0 )
 GAME( 1996, rbffspec, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special", 0 )
 GAME( 1997, kof97,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (set 1)", 0 )
 GAME( 1997, kof97a,   kof97,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (set 2)", 0 )
