@@ -414,11 +414,12 @@ const game_driver * const drivers[] =
 	DRIVER( hyhoo )		/* (c) 1987 */
 	DRIVER( hyhoo2 )	/* (c) 1987 */
 
-	DRIVER( jangou )    /* (c) 1983 */
-	DRIVER( macha )     /* (c) 1983 Logitec */
+	DRIVER( jangou )	/* (c) 1983 */
+	DRIVER( macha )		/* (c) 1983 Logitec */
 	/* Jangou Night   *//* (c) 1983 */
-	DRIVER( jngolady )  /* (c) 1984 */
-	DRIVER( cntrygrl )  /* (c) 1984 Royal Denshi */
+	DRIVER( jngolady )	/* (c) 1984 */
+	DRIVER( cntrygrl )	/* (c) 1984 Royal Denshi */
+	DRIVER( fruitbun )	/* (c) 1984 */
 	DRIVER( luckygrl )  /* (c) 1984 Wing? */
 	DRIVER( nightgal )  /* (c) 1984 */
 	DRIVER( ngtbunny )  /* (c) 1984 */

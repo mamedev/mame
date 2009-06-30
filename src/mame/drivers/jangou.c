@@ -1001,6 +1001,27 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "countrygirl_prom.bin", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46)  )
 ROM_END
 
+ROM_START( fruitbun )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "04.bin", 0x00000, 0x02000, CRC(480cb9bf) SHA1(f5e960cd8eaaa85336797fb5d895fa40f1fc4767) )
+	ROM_LOAD( "05.bin", 0x02000, 0x02000, CRC(817add97) SHA1(ee5e1b193c22dfd36ac7836ff6bc14e783cb0e86) )
+
+	/* same non-sense like Country Girl... */
+	ROM_REGION( 0x1000, "user1", 0 )
+	// 06.bin              = galx.1h               Galaxian Part X (moonaln hack)
+	ROM_LOAD( "06.bin", 0x00000, 0x0800, CRC(e8810654) SHA1(b6924c7ad765c32714e6abd5bb56b2732edd5855) )
+	// 07.bin no match (likely a gfx rom of something else undumped)
+	ROM_LOAD( "07.bin", 0x00800, 0x0800, CRC(3717fa41) SHA1(373e5ef6bef3407da084508c48522c7058568188) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "01.bin", 0x00000, 0x02000, CRC(5ce7f40c) SHA1(ec1998f218a30a1e19ce20b71f170425b4330ea5) )
+	ROM_LOAD( "02.bin", 0x02000, 0x02000, CRC(4ca0e465) SHA1(72af3f9e0534ba9a94854513250f6fa82d790549) )
+	ROM_LOAD( "03.bin", 0x04000, 0x02000, CRC(8a8f6abd) SHA1(143607c423bfe337e6feed7cd4cc8be5e09fbd5e) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "fruitbun_prom.bin", 0x00, 0x20, BAD_DUMP CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46) ) //taken from country girl
+ROM_END
+
 ROM_START( luckygrl )
 	ROM_REGION( 0x10000, "cpu0", 0 ) //encrypted z80 cpu
 	ROM_LOAD( "5.9c", 0x00000, 0x01000, CRC(79b34eb2) SHA1(4b4916e09bfd6573fd2c7a7254fa4419164e0c4d) )
@@ -1073,12 +1094,13 @@ static DRIVER_INIT (luckygrl)
 }
 
 
-GAME( 1983, jangou,     0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
-GAME( 1983, macha,      0,    jangou,   macha,     0,        ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, jngolady,   0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, cntrygrl,   0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1983, jangou,     0,        jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
+GAME( 1983, macha,      0,        jangou,   macha,     0,        ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, jngolady,   0,        jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrl,   0,        cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1984, fruitbun,   cntrygrl, cntrygrl, cntrygrl,  0,        ROT0, "Nichibutsu",   "Fruits & Bunny (World?)",  GAME_NO_COCKTAIL )
 /* The following might not run there... */
-GAME( 1984?,luckygrl,   0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing",         "Lucky Girl? (Wing)", GAME_NOT_WORKING )
+GAME( 1984?,luckygrl,   0,        cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing",         "Lucky Girl? (Wing)", GAME_NOT_WORKING )
 
 /*
 Some other games that might run on this HW:
