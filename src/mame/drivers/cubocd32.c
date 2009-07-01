@@ -41,12 +41,14 @@
 
    ToDo:
    - remove the hack needed to make inputs working
+   - find proper framerate - cndypuzl requires 60 (resets otherwise), mgnumber requires 50 (resets otherwise) 
    - settings are not saved
 
 
-   Stephh notes:
+Stephh's notes (based on the game M68EC020 code and some tests) :
 
-    Candy Puzzle
+
+1) "Candy Puzzle"
 
 settings (A5=0x059ac0) :
 
@@ -65,7 +67,7 @@ useful addresses :
   - 051c02.w (-$7ebe,A5) : must be 0x0000 instead of 0x0001 to accept coins !
   - 051c04.b (-$7ebc,A5) : credits
   - 051c10.l (-$7eb0,A5) : basic address for inputs = 0006fd18 :
-      * BA + 1 x 6 + 4 : start 2 (bit 5) and coin (bit 2)
+      * BA + 1 x 6 + 4 : start 2 (bit 5)
       * BA + 1 x 6 + 0 : player 2 L/R (-1/0/1)
       * BA + 1 x 6 + 2 : player 2 U/D (-1/0/1)
       * BA + 0 x 6 + 4 : start 1 (bit 5)
@@ -89,9 +91,9 @@ routines :
   - 07d0fe : start buttons verification
 
 
-   Harem Challenge:
+2) "Harem Challenge"
 
-settings (A5=0x00a688 & A2= 0x0028e8) :
+settings (A5=0x00a688 & A2=0x0028e8) :
 
   -                      : photo level - soft* / erotic / porno
   - 002906.b (A2 + 0x1e) : difficulty (2) - 1 = LOW / 2 = NORMAL / 3 = HIGH
@@ -134,9 +136,116 @@ routines :
   - 050b8c : start buttons verification
 
 
-  Laser Strixx 2
+3) "Laser Quiz"
 
-settings (A5=0x00a688 & A2= 0x0027f8) :
+settings (A5=0x00a580 & A2=0x001e08) :
+
+  - 001a54.w (see below) : numero di vite (2)
+  - 001e08.w (A2       ) : primo bonus dom. (5)
+  - 001e0a.w (A2 + 0x02) : max dom. facili (7)
+  - 001e0c.w (A2 + 0x04) : incremento dom. (2)
+  - 001e0e.w (A2 + 0x06) : inizio dom. diff. (10)
+  - 001e10.w (A2 + 0x08) : risposte a video (4)
+  - 001e12.w (A2 + 0x0a) : checkmark risp. (1) - 0 = CONTEMPORANEO / 1 = IMMEDIATO
+  - 001e16.w (A2 + 0x0e) : vel. chronometro (32) - 3C = LENTA / 32 = NORMALE / 28 = VELOCE
+  - 001e14.w (A2 + 0x0c) : volume musica (14) - 14 = NORMALE / 0A = BASSO / 00 = NO MUSICA
+  - 001e18.b (A2 + 0x10) : vita premio bonus (1) - 0 = PER IL PRIMO / 1 = PER EMTRAMBI
+  -                      : reset hi-score - NO* / SI
+  - 001e19.b (A2 + 0x11) : coin x 1 play (1) <=> number of credits used for each play
+  - 001e1a.b (A2 + 0x12) : foto erotiche (1) - 1 = SI / 2 = NO
+
+useful addresses :
+
+  - 001e1b.b (-$7fe0,A5 -> $13,A2) : must be 0x00 instead of 0x01 to accept coins !
+  - 0026a4.w (-$7f0c,A5) : player 2 inputs
+  - 0026a6.w (-$7f0a,A5) : player 1 inputs
+  - 002606.b (-$7faa,A5) : credits
+
+  - 001a54.w (-$7fe4,A5 -> $04,A2) : lives at start
+  - 001a59.b (-$7fe4,A5 -> $09,A2) : bonus level (so lives aren't decremented) ? 0x00 = NO / 0x01 YES
+  - 001a5a.b (-$7fe4,A5 -> $0a,A2) : level - range 0x00-0x63
+
+  - 00c9b0.b (-$7fdc,A5 -> A2 + $06 x 0 + 0x00) : player 1 active ? 0x00 = NO / 0x01 YES / 0x02 = "ATTENDI"
+  - 00c9b1.b (-$7fdc,A5 -> A2 + $06 x 0 + 0x01) : player 1 lives - range 0x00-0x63
+  - 00c9b2.l (-$7fdc,A5 -> A2 + $06 x 0 + 0x02) : player 1 score
+  - 00c9b6.b (-$7fdc,A5 -> A2 + $06 x 1 + 0x00) : player 2 active ? 0x00 = NO / 0x01 YES / 0x02 = "ATTENDI"
+  - 00c9b7.b (-$7fdc,A5 -> A2 + $06 x 1 + 0x01) : player 2 lives - range 0x00-0x63
+  - 00c9b8.l (-$7fdc,A5 -> A2 + $06 x 1 + 0x02) : player 2 score
+
+  - 02327c.l (-$50,A4) : player 1 inputs (ingame)
+  - 023280.l (-$4c,A4) : player 2 inputs (ingame)
+
+routines :
+
+  - 0cedf8 : inputs read
+  - 0d8150 : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 0cee42 : coin verification
+  - 0cefc6 : start buttons verification
+
+  - 0cb40c : inputs (ingame) read
+
+
+4) "Laser Quiz 2"
+
+settings (A5=0x0531e8 & A2=0x0460f0) :
+
+  - 0460f0.w (A2       ) : numero di vite (2)
+  - 0460f0.w (A2 + 0x02) : primo bonus dom. (5)
+  - 0460f0.w (A2 + 0x04) : max dom. facili (7)
+  - 0460f0.w (A2 + 0x06) : incremento dom. (2)
+  - 0460f0.w (A2 + 0x08) : inizio dom. diff. (10)
+  - 0460f0.w (A2 + 0x0a) : risposte a video (4)
+  - 0460f0.w (A2 + 0x0c) : checkmark risp. (1) - 0 = CONTEMPORANEO / 1 = IMMEDIATO
+  - 0460f0.w (A2 + 0x10) : vel. chronometro (5) - 5 = LENTA / 4 = NORMALE / 3 = VELOCE
+  - 0460f0.w (A2 + 0x0e) : volume musica (3F) - 3F = NORMALE / 20 = BASSO / 00 = NO MUSICA
+  - 0460f0.b (A2 + 0x12) : vita premio bonus (1) - 0 = PER IL PRIMO / 1 = PER TUTTI
+  -                      : reset hi-score - NO* / SI
+  - 0460f0.b (A2 + 0x13) : coin x 1 play (1) <=> number of credits used for each play
+  - 0460f0.b (A2 + 0x14) : play x credit (1) <=> credits awarded for each coin
+  - 0460f0.b (A2 + 0x15) : foto erotiche (1) - 1 = SI / 2 = NO
+  - 0460f0.b (A2 + 0x16) : numero giocatori (0) - 0 = 2 / 1 = 4
+
+useful addresses :
+
+  - 046107.b (-$7fdc,A5 -> $17,A2) : must be 0x00 instead of 0x01 to accept coins !
+  - 04b250.w (-$7f98,A5) : player 2 inputs
+  - 04b252.w (-$7f96,A5) : player 1 inputs
+  - 04b254.w (-$7f94,A5) : player 3 inputs
+  - 04b256.w (-$7f92,A5) : player 4 inputs
+  - 04b248.b (-$7fa0,A5) : credits
+
+  - 04570d.b (-$7fe0,A5 -> $05,A2) : bonus level (so lives aren't decremented) ? 0x00 = NO / 0x01 YES
+  - 04570e.b (-$7fe4,A5 -> $06,A2) : level - range 0x00-0x63
+
+  - 051fc0.b (-$7fd8,A5 -> A2 + $12 x 0 + 0x00) : player 1 active ? 0x00 = NO / 0x01 = YES / 0x02 = "ATTENDI"
+  - 051fc1.b (-$7fd8,A5 -> A2 + $12 x 0 + 0x01) : player 1 lives - range 0x00-0x63
+  - 051fc2.l (-$7fd8,A5 -> A2 + $12 x 0 + 0x02) : player 1 score
+  - 051fd2.b (-$7fd8,A5 -> A2 + $12 x 1 + 0x00) : player 2 active ? 0x00 = NO / 0x01 = YES / 0x02 = "ATTENDI"
+  - 051fd3.b (-$7fd8,A5 -> A2 + $12 x 1 + 0x01) : player 2 lives - range 0x00-0x63
+  - 051fd4.l (-$7fd8,A5 -> A2 + $12 x 1 + 0x02) : player 2 score
+  - 051fe4.b (-$7fd8,A5 -> A2 + $12 x 2 + 0x00) : player 3 active ? 0x00 = NO / 0x01 = YES / 0x02 = "ATTENDI"
+  - 051fe5.b (-$7fd8,A5 -> A2 + $12 x 2 + 0x01) : player 3 lives - range 0x00-0x63
+  - 051fe6.l (-$7fd8,A5 -> A2 + $12 x 2 + 0x02) : player 3 score
+  - 051ff6.b (-$7fd8,A5 -> A2 + $12 x 3 + 0x00) : player 4 active ? 0x00 = NO / 0x01 = YES / 0x02 = "ATTENDI"
+  - 051ff7.b (-$7fd8,A5 -> A2 + $12 x 3 + 0x01) : player 4 lives - range 0x00-0x63
+  - 051ff8.l (-$7fd8,A5 -> A2 + $12 x 3 + 0x02) : player 4 score
+
+routines :
+
+  - 0746d6 : inputs read
+  - 08251a : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 07472e : coin verification
+
+
+5) "Laser Strixx 2"
+
+settings (A5=0x00a688 & A2=0x0027f8) :
 
   -                      : photo level - soft* / erotic / porno
   - 002910.l (A2 + 0x18) : difficulty (00010000) - 00008000 = LOW / 00010000 = NORMAL / 00018000 = HIGH
@@ -148,7 +257,7 @@ settings (A5=0x00a688 & A2= 0x0027f8) :
 useful addresses :
 
   - 00281c.b (-$7fa2,A5 -> $24,A2) : must be 0x00 instead of 0x01 to accept coins !
-  - 0026f4.w (-$7f94,A5) : player 1 inputs (in MSW after swap)
+  - 0026f4.l (-$7f94,A5) : player 1 inputs (in MSW after swap)
   - 0026ee.b (-$7f9a,A5) : credits
 
   - 0027f8.l (A2 + 0x00) : player 1 energy (in MSW after swap) - range (0x00000000 - 0x00270000)
@@ -172,6 +281,48 @@ routines :
 
   - 04d1da : coin verification
 
+
+6) "Magic Number"
+
+settings (A5=0x053e78 & A2=0x03f540) : TO DO !
+
+useful addresses :
+
+  - 04bfa0.l (-$7ed8,A5) : must be 0x00000000 instead of 0x00010000 to accept coins !
+  - 04bf18.w (-$7f60,A5) : player 1 inputs (in MSW after swap)
+  - 04bf78.l (-$7e00,A5) : player 2 inputs (in MSW after swap)
+  - 03f547.b (-$7f92,A5 -> $7,A2) : credits
+
+routines :
+
+  - 07a480 : inputs read
+  - 085bb8 : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 07a50e : coin verification
+
+
+7) "Magic Premium"
+
+settings (A5=0x04ce48 & A2=0x0419b0) : TO DO !
+
+useful addresses :
+
+  - 044f7e.b (-$7eca,A5) : must be 0x00 instead of 0x01 to accept coins !
+  - 044f02.w (-$7f94,A5) : player 1 inputs
+  - 044f6a.l (-$7ede,A5) : player 2 inputs (in MSW after swap)
+  - 0419b1.b (-$7fc0,A5 -> $1,A2) : credits - range 0x00-0x09
+
+routines :
+
+  - 0707d6 : inputs read
+  - 07b3b2 : buttons + coin read
+      * D0 = 0 : read POTGO (player 2)
+      * D0 = 1 : read POTGO (player 1)
+
+  - 070802 : coin verification
+
 */
 
 #include "driver.h"
@@ -180,6 +331,12 @@ routines :
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
 #include "machine/6526cia.h"
+
+
+/* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
+#define MGPREM11_USE_JOY	1
+#define MGNUMBER_USE_JOY	1
+
 
 static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra);
 
@@ -401,6 +558,26 @@ static INPUT_PORTS_START( cd32 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)    /* BUTTON3 */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)    /* BUTTON4 */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)    /* BUTTON1 = START1 */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)    /* BUTTON2 */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)    /* BUTTON3 */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)    /* BUTTON4 */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)    /* BUTTON1 = START2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2)    /* BUTTON2 */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(2)
+
 	PORT_START("DIPSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
 	PORT_DIPSETTING(    0x01, "Reset" )
@@ -420,7 +597,9 @@ static INPUT_PORTS_START( cd32 )
 	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
 	PORT_DIPSETTING(    0x20, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x40, 0x40, "DSW1 6" )
+	PORT_DIPSETTING(    0x40, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
 	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
@@ -451,26 +630,6 @@ static INPUT_PORTS_START( cd32 )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
 
-	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* COIN1 */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)    /* BUTTON1 & START1 */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
-
-	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)    /* BUTTON1 & START2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cndypuzl )
@@ -479,7 +638,7 @@ static INPUT_PORTS_START( cndypuzl )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and launch bubble */
@@ -498,6 +657,8 @@ static INPUT_PORTS_START( cndypuzl )
 
 	PORT_MODIFY("DIPSW1")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* bits 0 to 5 must be set to 0 to insert coin */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("DIPSW2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* not read at all */
@@ -510,7 +671,7 @@ static INPUT_PORTS_START( haremchl )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* fire */
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and draw */
@@ -529,6 +690,8 @@ static INPUT_PORTS_START( haremchl )
 
 	PORT_MODIFY("DIPSW1")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* bits 0 to 5 must be set to 0 to insert coin */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("DIPSW2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* not read at all */
@@ -572,6 +735,7 @@ static INPUT_PORTS_START( lsrquiz )
 
 	PORT_MODIFY("DIPSW1")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* bits 0 to 5 must be set to 0 to insert coin */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("DIPSW2")
@@ -597,7 +761,7 @@ static INPUT_PORTS_START( lsrquiz2 )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* "C" */
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)    /* "D" */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* START1 and "A" */
@@ -619,12 +783,14 @@ static INPUT_PORTS_START( lsrquiz2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(3)    /* "B" */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(3)    /* START3 and "A" */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(3)    /* "D" */
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Free_Play ) )                  /* always set credits to 10 */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Speed" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, "Ultra Turbo" )                         /* the game is unplayable !!! */
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Free_Play ) )                  /* always set credits to 10 */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "Speed" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0020, "Ultra Turbo" )                         /* the game is unplayable !!! */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("DIPSW2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(4)    /* "C" */
@@ -637,6 +803,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( lasstixx )
 	PORT_INCLUDE( cd32 )
+
+	PORT_MODIFY("CIA0PORTA")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("P2JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -666,13 +835,180 @@ static INPUT_PORTS_START( lasstixx )
 
 	PORT_MODIFY("DIPSW1")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* bits 0 to 5 must be set to 0 to insert coin */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("DIPSW2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )                   /* not read at all */
 
-	PORT_MODIFY("CIA0PORTA")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mgnumber )
+	PORT_INCLUDE( cd32 )
+
+#if MGNUMBER_USE_JOY
+	/* P1JOY, P2JOY, P1 and P2 inputs when control panel is set to "joystick" in the dispenser setup */
+	PORT_MODIFY("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "C (setup)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "Put Number" )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Discard" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+#else
+	/* P1JOY, P2JOY, P1 and P2 inputs when control panel is set to "buttons" ("pulsanti") in the dispenser setup */
+	/* P1JOY is still needed in the dispenser setup, so I don't remove it even if it isn't needed to play the game */
+	PORT_MODIFY("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "1 / C (setup)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Discard" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME( "4" )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME( "5" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "2" )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "3" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+#endif
+
+	PORT_MODIFY("DIPSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Tokens" )                              /* Dip Switch or Input ? */
+	PORT_DIPSETTING(    0x00, "OK" )
+	PORT_DIPSETTING(    0x01, "ERROR!" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )                     /* keep pressed to enter dispenser setup at start */
+	PORT_BIT( 0x007e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("DIPSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Tickets" )                             /* Dip Switch or Input ? */
+	PORT_DIPSETTING(    0x00, "OK" )
+	PORT_DIPSETTING(    0x01, "ERROR!" )
+	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mgprem11 )
+	PORT_INCLUDE( cd32 )
+
+#if MGPREM11_USE_JOY
+	/* P1JOY, P2JOY, P1 and P2 inputs when control panel is set to "joystick" in the dispenser setup */
+	PORT_MODIFY("P1JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_PLAYER(1) PORT_NAME( "End Game / Abort / Confirm" )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_PLAYER(1) PORT_NAME( "C (setup)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_PLAYER(1) PORT_NAME( "Put Card / Initialise / Continue Game / Cancel" )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_PLAYER(1) PORT_NAME( "Discard / P1 A (setup)" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_PLAYER(1) PORT_NAME( "B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_PLAYER(1) PORT_NAME( "P2 A (setup)" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME( "P2 B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+#else
+	/* P1JOY, P2JOY, P1 and P2 inputs when control panel is set to "buttons" ("pulsanti") in the dispenser setup */
+	/* P1JOY is still needed in the dispenser setup, so I don't remove it even if it isn't needed to play the game */
+	PORT_MODIFY("P1JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_PLAYER(1) PORT_NAME( "End Game / Abort / Confirm" )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_PLAYER(1) PORT_NAME( "1 / C (setup)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_PLAYER(1) PORT_NAME( "Initialise / Continue Game / Cancel" )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_PLAYER(1) PORT_NAME( "Discard / P1 A (setup)" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_PLAYER(1) PORT_NAME( "B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON8  ) PORT_PLAYER(1) PORT_NAME( "4" )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_PLAYER(1) PORT_NAME( "5" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_PLAYER(1) PORT_NAME( "2" )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_PLAYER(1) PORT_NAME( "3 / P2 A (setup)" )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME( "P2 B (setup)" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+#endif
+
+	PORT_MODIFY("DIPSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Tokens" )                              /* Dip Switch or Input ? */
+	PORT_DIPSETTING(    0x00, "OK" )
+	PORT_DIPSETTING(    0x01, "ERROR!" )
+	PORT_DIPNAME( 0x50, 0x50, "Setup" )                               /* also affects payout values */
+	PORT_DIPSETTING(    0x50, "Full Tick" )
+//	PORT_DIPSETTING(    0x10, "Full Tick" )                           /* duplicated setting */
+	PORT_DIPSETTING(    0x40, "104 & 105" )
+	PORT_DIPSETTING(    0x00, "Full T+C" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )                    /* tested in dispenser setup when P1B3 is pressed */
+	PORT_DIPSETTING(    0x20, "0x20" )
+	PORT_DIPSETTING(    0x00, "0x00" )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )                     /* keep pressed to enter dispenser setup at start */
+	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("DIPSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Tickets" )                             /* Dip Switch or Input ? */
+	PORT_DIPSETTING(    0x00, "OK" )
+	PORT_DIPSETTING(    0x01, "ERROR!" )
+	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 /*************************************
@@ -716,7 +1052,8 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.997)
+	MDRV_SCREEN_REFRESH_RATE(59.997)    /* needed to boot 'cndypuzl' */
+//	MDRV_SCREEN_REFRESH_RATE(50)        /* needed to boot 'mgnumber' */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
@@ -743,7 +1080,12 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START(cd32_50fps)
+	MDRV_IMPORT_FROM(cd32)
 
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(50)
+MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
 
@@ -834,10 +1176,22 @@ static DRIVER_INIT( cd32 )
 	cubocd32_input_hack = NULL;
 }
 
+
+/*************************************
+ *
+ *  Hacks (to allow coins to be inserted)
+ *
+ *************************************/
+
 static void cndypuzl_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
-		amiga_chip_ram_w(0x051c02, 0x0000);
+	{
+//		amiga_chip_ram_w(0x051c02, 0x0000);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		amiga_chip_ram_w(r_A5 - 0x7ebe, 0x0000);
+	}
 }
 
 static DRIVER_INIT(cndypuzl)
@@ -849,7 +1203,13 @@ static DRIVER_INIT(cndypuzl)
 static void haremchl_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
-		amiga_chip_ram_w8(0x002907, 0x00);
+	{
+//		amiga_chip_ram_w8(0x002907, 0x00);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7f00 + 2));
+		amiga_chip_ram_w8(r_A2 + 0x1f, 0x00);
+	}
 }
 
 static DRIVER_INIT(haremchl)
@@ -861,7 +1221,13 @@ static DRIVER_INIT(haremchl)
 static void lsrquiz_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
-		amiga_chip_ram_w8(0x001e1b, 0x00);
+	{
+//		amiga_chip_ram_w8(0x001e1b, 0x00);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fe0 + 2));
+		amiga_chip_ram_w8(r_A2 + 0x13, 0x00);
+	}
 }
 
 static DRIVER_INIT(lsrquiz)
@@ -870,10 +1236,17 @@ static DRIVER_INIT(lsrquiz)
 	cubocd32_input_hack = lsrquiz_input_hack;
 }
 
+/* The hack isn't working if you exit the test mode with P1 button 2 ! */
 static void lsrquiz2_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
-		amiga_chip_ram_w8(0x046107, 0x00);
+	{
+//		amiga_chip_ram_w8(0x046107, 0x00);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fdc + 2));
+		amiga_chip_ram_w8(r_A2 + 0x17, 0x00);
+	}
 }
 
 static DRIVER_INIT(lsrquiz2)
@@ -885,7 +1258,13 @@ static DRIVER_INIT(lsrquiz2)
 static void lasstixx_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
-		amiga_chip_ram_w8(0x00281c, 0x00);
+	{
+//		amiga_chip_ram_w8(0x00281c, 0x00);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fa2 + 2));
+		amiga_chip_ram_w8(r_A2 + 0x24, 0x00);
+	}
 }
 
 static DRIVER_INIT(lasstixx)
@@ -894,16 +1273,49 @@ static DRIVER_INIT(lasstixx)
 	cubocd32_input_hack = lasstixx_input_hack;
 }
 
+static void mgnumber_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+	{
+//		amiga_chip_ram_w(0x04bfa0, 0x0000);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		amiga_chip_ram_w(r_A5 - 0x7ed8, 0x0000);
+	}
+}
+
+static DRIVER_INIT(mgnumber)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = mgnumber_input_hack;
+}
+
+static void mgprem11_input_hack(running_machine *machine)
+{
+	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
+	{
+//		amiga_chip_ram_w8(0x044f7e, 0x00);
+
+		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
+		amiga_chip_ram_w8(r_A5 - 0x7eca, 0x00);
+	}
+}
+
+static DRIVER_INIT(mgprem11)
+{
+	DRIVER_INIT_CALL(cd32);
+	cubocd32_input_hack = mgprem11_input_hack;
+}
+
 /***************************************************************************************************/
 
 /* BIOS */
 GAME( 1993, cd32,     0,    cd32, cd32,     cd32,     ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cd32, cd32, lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs */
-GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-/* not checked yet */
-GAME( 1995, mgnumber, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Number",              GAME_NOT_WORKING )  /* game resets before initialisation */
-GAME( 1996, mgprem11, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_NOT_WORKING )
+GAME( 1995, cndypuzl, cd32, cd32,       cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, haremchl, cd32, cd32,       haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cd32, cd32,       lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
+GAME( 1995, lsrquiz2, cd32, cd32,       lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, lasstixx, cd32, cd32,       lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, mgnumber, cd32, cd32_50fps, mgnumber, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, mgprem11, cd32, cd32,       mgprem11, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
