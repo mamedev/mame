@@ -1129,6 +1129,7 @@ static NVRAM_HANDLER( model3 )
 		mame_stricmp(name, "dirtdvls") == 0 ||
 		mame_stricmp(name, "dirtdvla") == 0 ||
 		mame_stricmp(name, "lemans24") == 0 ||
+		mame_stricmp(name, "magtruck") == 0 ||
 		mame_stricmp(name, "von2") == 0 ||
 		mame_stricmp(name, "von254g") == 0)
 	{
