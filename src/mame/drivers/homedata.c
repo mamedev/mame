@@ -1741,7 +1741,8 @@ ROM_END
 
 ROM_START( siseikat )
 	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
-	ROM_LOAD( "311c01.16e", 0x010000, 0xc000, CRC(92bf002d) SHA1(275276362ce030db5116f39ef025b2a10eabec45) )
+	//311c01.16e                                      BADADDR        xxxxxx-xxxxxxxxx (data is repeated once at every 0x200 bytes)
+	ROM_LOAD( "311c01.16e", 0x010000, 0xc000, BAD_DUMP CRC(92bf002d) SHA1(275276362ce030db5116f39ef025b2a10eabec45) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
 	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
