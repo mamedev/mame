@@ -806,7 +806,22 @@ static READ32_HANDLER( sound020_r )
 		case 10: // Vs. Net Soccer ver. JAB
 			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
-	}
+		case 11: // Racin' Force
+			if (reg == 0) 
+			{
+				if (cpu_get_pc(space->cpu) == 0x0202190)
+					rv |= 0x4000;
+			}
+			break;
+			
+		case 12: // Open Golf / Golfing Greats 2
+			if (reg == 0) 
+			{
+				if ((cpu_get_pc(space->cpu) == 0x0245e80) || (cpu_get_pc(space->cpu) == 0x02459d6) || (cpu_get_pc(space->cpu) == 0x0245e40) )
+					rv |= 0x4000;	
+			}
+			break;		
+		}
 
 	return(rv);
 }
@@ -3379,9 +3394,11 @@ typedef struct
 
 static const GXGameInfoT gameDefs[] =
 {
-	{ "racinfrc", 11, 0, 0, BPP4 },
-	{ "racinfru", 11, 0, 0, BPP4 },
-	{ "opengolf", 11, 0, 0, BPP4 },
+	{ "racinfrc", 11, 11, 0, BPP4 },
+	{ "racinfru", 11, 11, 0, BPP4 },
+	{ "opengolf", 11, 12, 0, BPP4 },
+	{ "opengol2", 11, 12, 0, BPP4 },
+	{ "ggreats2", 11, 12, 0, BPP4 },
 	{ "le2",      13, 1, 1, BPP4 },
 	{ "le2u",     13, 1, 1, BPP4 },
 	{ "gokuparo",  7, 0, 0, BPP5 },
