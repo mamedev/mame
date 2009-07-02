@@ -596,6 +596,8 @@ void ppccom_execute_mtspr(powerpc_state *ppc);
 void ppccom_execute_mfdcr(powerpc_state *ppc);
 void ppccom_execute_mtdcr(powerpc_state *ppc);
 
+void ppccom_update_fprf(powerpc_state *ppc);
+
 void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 

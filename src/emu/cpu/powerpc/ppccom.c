@@ -21,6 +21,17 @@
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define DOUBLE_SIGN		(U64(0x8000000000000000))
+#define DOUBLE_EXP		(U64(0x7ff0000000000000))
+#define DOUBLE_FRAC		(U64(0x000fffffffffffff))
+#define DOUBLE_ZERO		(0)
+
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -171,6 +182,98 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
 		ppc->irq_pending |= 0x02;
+}
+
+
+/*-------------------------------------------------
+    is_nan_double - is a double value a NaN
+-------------------------------------------------*/
+
+INLINE int is_nan_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
+			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
+}
+
+
+/*-------------------------------------------------
+    is_qnan_double - is a double value a 
+    quiet NaN
+-------------------------------------------------*/
+
+INLINE int is_qnan_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
+			((xi & U64(0x0007fffffffffff)) == U64(0x000000000000000)) &&
+			((xi & U64(0x000800000000000)) == U64(0x000800000000000)) );
+}
+
+
+/*-------------------------------------------------
+    is_snan_double - is a double value a
+    signaling NaN
+-------------------------------------------------*/
+
+INLINE int is_snan_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
+			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
+			((xi & U64(0x0008000000000000)) == DOUBLE_ZERO) );
+}
+
+
+/*-------------------------------------------------
+    is_infinity_double - is a double value
+    infinity
+-------------------------------------------------*/
+
+INLINE int is_infinity_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
+			((xi & DOUBLE_FRAC) == DOUBLE_ZERO) );
+}
+
+
+/*-------------------------------------------------
+    is_normalized_double - is a double value
+    normalized
+-------------------------------------------------*/
+
+INLINE int is_normalized_double(double x)
+{
+	UINT64 exp;
+	UINT64 xi = *(UINT64*)&x;
+	exp = (xi & DOUBLE_EXP) >> 52;
+
+	return (exp >= 1) && (exp <= 2046);
+}
+
+
+/*-------------------------------------------------
+    is_denormalized_double - is a double value
+    denormalized
+-------------------------------------------------*/
+
+INLINE int is_denormalized_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return( ((xi & DOUBLE_EXP) == 0) &&
+			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
+}
+
+
+/*-------------------------------------------------
+    sign_double - return sign of a double value
+-------------------------------------------------*/
+
+INLINE int sign_double(double x)
+{
+	UINT64 xi = *(UINT64*)&x;
+	return ((xi & DOUBLE_SIGN) != 0);
 }
 
 
@@ -992,6 +1095,59 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 	mame_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
 	if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 		ppc->dcr[ppc->param0] = ppc->param1;
+}
+
+
+
+/***************************************************************************
+    FLOATING POINT STATUS FLAGS HANDLING
+***************************************************************************/
+
+/*-------------------------------------------------
+    ppccom_update_fprf - update the FPRF field
+    of the FPSCR register
+-------------------------------------------------*/
+
+void ppccom_update_fprf(powerpc_state *ppc)
+{
+	UINT32 fprf;
+	double f = ppc->f[ppc->param0];
+
+	if (is_qnan_double(f))
+	{
+		fprf = 0x11;
+	}
+	else if (is_infinity_double(f))
+	{
+		if (sign_double(f))		/* -Infinity */
+			fprf = 0x09;
+		else					/* +Infinity */
+			fprf = 0x05;
+	}
+	else if (is_normalized_double(f))
+	{
+		if (sign_double(f))		/* -Normalized */
+			fprf = 0x08;
+		else					/* +Normalized */
+			fprf = 0x04;
+	}
+	else if (is_denormalized_double(f))
+	{
+		if (sign_double(f))		/* -Denormalized */
+			fprf = 0x18;
+		else					/* +Denormalized */
+			fprf = 0x14;
+	}
+	else
+	{
+		if (sign_double(f))		/* -Zero */
+			fprf = 0x12;
+		else					/* +Zero */
+			fprf = 0x02;
+	}
+
+	ppc->fpscr &= ~0x0001f000;
+	ppc->fpscr |= fprf << 12;
 }
 
 
