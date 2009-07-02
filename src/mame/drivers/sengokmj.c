@@ -10,7 +10,6 @@ TODO:
 - Find what the remaining video C.R.T. registers does;
 - Fix sprites bugs at a start of a play;
 - Check NVRAM boudaries;
-- Why we need to write "something" to the comms to let the coins to work? Bug with the Seibu custom z80?
 - How the "SW Service Mode" (press F2 during gameplay) really works (inputs etc)? Nothing mapped works with it...
 
 Notes:
@@ -98,11 +97,6 @@ static WRITE16_HANDLER( sengokmj_out_w )
 //  popmessage("%02x",hopper_io);
 }
 
-static WRITE16_HANDLER( seibu_z80_com_6_mirror_w )
-{
-	seibu_main_word_w(space,6,data,0xffff);
-}
-
 static READ16_HANDLER( sengokmj_system_r )
 {
 	return (input_port_read(space->machine, "SYSTEM") & 0xffbf) | hopper_io;
@@ -125,8 +119,8 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 
-	AM_RANGE(0x8080, 0x8081) AM_WRITE(seibu_z80_com_6_mirror_w)
-//  AM_RANGE(0x80c0, 0x80c1) AM_WRITE(seibu_z80_com_unk_mirror_w)
+//	AM_RANGE(0x8080, 0x8081) CRTC extra register?
+//  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)

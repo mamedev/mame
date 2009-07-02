@@ -396,7 +396,7 @@ READ16_HANDLER( seibu_main_word_r )
 
 WRITE16_HANDLER( seibu_main_word_w )
 {
-	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
+	//printf("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -410,6 +410,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 					update_irq_lines(space->machine, RST10_ASSERT);
 				update_irq_lines(space->machine, RST18_ASSERT);
 				break;
+			case 2: //Sengoku Mahjong writes here
 			case 6:
 				/* just a guess */
 				sub2main_pending = 0;
