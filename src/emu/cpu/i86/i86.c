@@ -76,7 +76,8 @@ INLINE i8086_state *get_safe_token(const device_config *device)
 	assert(device->type == CPU);
 	assert(cpu_get_type(device) == CPU_I8086 ||
 		   cpu_get_type(device) == CPU_I8088 ||
-		   cpu_get_type(device) == CPU_I80186);
+		   cpu_get_type(device) == CPU_I80186 ||
+		   cpu_get_type(device) == CPU_I80188);
 	return (i8086_state *)device->token;
 }
 
