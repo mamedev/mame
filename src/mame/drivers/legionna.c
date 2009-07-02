@@ -206,11 +206,18 @@ static ADDRESS_MAP_START( cupsocbl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
+
+static WRITE8_HANDLER( okim_rombank_w )
+{
+//	popmessage("%08x",0x40000 * (data & 0x07));
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * (data & 0x7));
+}
+
 static ADDRESS_MAP_START( cupsocbl_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1232,7 +1239,7 @@ static MACHINE_DRIVER_START( cupsocbl )
 	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)
 	MDRV_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
-	//MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	//MDRV_PERIODIC_INT("screen", nmi_line_pulse)
 
 	//MDRV_MACHINE_INIT(seibu_sound)
 
@@ -1255,11 +1262,7 @@ static MACHINE_DRIVER_START( cupsocbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -2058,11 +2061,21 @@ ROM_START( cupsocsb )
 	ROM_LOAD( "sc_10.bin", 0x400000, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
 	ROM_LOAD( "sc_11.bin", 0x480000, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
 
-	ROM_REGION( 0x020000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "sc_02.bin",    0x000000, 0x20000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
+	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
+	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
 
-	ROM_REGION( 0x080000, "oki1", 0 ) // sound related ?
-	ROM_LOAD( "sc_03.bin",    0x000000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASEFF )
+	ROM_COPY( "adpcm", 0x00000, 0x000000, 0x20000 ) //bank 0
+	ROM_COPY( "adpcm", 0x00000, 0x020000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x100000, 0x20000 ) //bank 4
+	ROM_COPY( "adpcm", 0x80000, 0x120000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x140000, 0x20000 ) //bank 5
+	ROM_COPY( "adpcm", 0xa0000, 0x160000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x180000, 0x20000 ) //bank 6
+	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
+	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 ROM_END
 
 

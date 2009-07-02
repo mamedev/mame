@@ -868,10 +868,9 @@ WRITE16_HANDLER( copdxbl_0_w )
 		case (0x66c/2): { legionna_scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x66e/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
-		/*WRONG*/
-		case (0x65c/2):
+		case (0x740/2):
 		{
-			soundlatch_w(space, 1, data & 0xff);
+			soundlatch_w(space, 0, data & 0xff);
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
