@@ -499,7 +499,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
 
-					/* case 0: TRANSPARENCY_NONE */
+					/* case 0: no transparency */
 					if (transparency == CPS3_TRANSPARENCY_NONE)
 					{
 						{

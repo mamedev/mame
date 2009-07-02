@@ -102,12 +102,12 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 				rgn = gfx1;
 			}
 
-			drawgfx(bitmap,cliprect,machine->gfx[rgn],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[rgn],
 					code,
 					color,
 					0,0,
 					8*x,8*y,
-					transparency,7);
+					transparency ? 7 : -1);
 
 			addr = (addr & 0xfc00) | ((addr + 1) & 0x03ff);
 		}
@@ -120,8 +120,8 @@ static VIDEO_UPDATE( tugboat )
 	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,TRANSPARENCY_NONE);
-	draw_tilemap(screen->machine, bitmap,cliprect,startaddr1,2,3,TRANSPARENCY_PEN);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,FALSE);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr1,2,3,TRUE);
 	return 0;
 }
 

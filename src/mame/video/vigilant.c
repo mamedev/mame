@@ -214,12 +214,12 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 			if (sy >= 48)
 				sx = (sx + scroll) & 0x1ff;
 
-			drawgfx(bitmap,cliprect,machine->gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					tile_number,
 					color,
 					0,0,
 					sx,sy,
-					(opaque || color >= 4) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+					(opaque || color >= 4) ? -1 : 0);
 		}
 	}
 }

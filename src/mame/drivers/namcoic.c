@@ -268,7 +268,6 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 static void zdrawgfxzoom(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		int transparency,int transparent_color,
 		int scalex, int scaley, int zpos )
 {
 	if (!scalex || !scaley) return;
@@ -342,68 +341,65 @@ static void zdrawgfxzoom(
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
-					if (transparency == TRANSPARENCY_PEN)
+					if( priority_bitmap )
 					{
-						if( priority_bitmap )
+						for( y=sy; y<ey; y++ )
 						{
-							for( y=sy; y<ey; y++ )
+							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+							UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+							int x, x_index = x_index_base;
+							if( mPalXOR )
 							{
-								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
-								int x, x_index = x_index_base;
-								if( mPalXOR )
+								for( x=sx; x<ex; x++ )
 								{
-									for( x=sx; x<ex; x++ )
+									int c = source[x_index>>16];
+									if( c != 0xff )
 									{
-										int c = source[x_index>>16];
-										if( c != transparent_color )
+										if( pri[x]<=zpos )
 										{
-											if( pri[x]<=zpos )
+											switch( c )
 											{
-												switch( c )
-												{
-												case 0:
-													dest[x] = 0x4000|(dest[x]&0x1fff);
-													break;
-												case 1:
-													dest[x] = 0x6000|(dest[x]&0x1fff);
-													break;
-												default:
-													dest[x] = pal[c];
-													break;
-												}
-												pri[x] = zpos;
+											case 0:
+												dest[x] = 0x4000|(dest[x]&0x1fff);
+												break;
+											case 1:
+												dest[x] = 0x6000|(dest[x]&0x1fff);
+												break;
+											default:
+												dest[x] = pal[c];
+												break;
 											}
+											pri[x] = zpos;
 										}
-										x_index += dx;
 									}
-									y_index += dy;
+									x_index += dx;
 								}
-								else
+								y_index += dy;
+							}
+							else
+							{
+								for( x=sx; x<ex; x++ )
 								{
-									for( x=sx; x<ex; x++ )
+									int c = source[x_index>>16];
+									if( c != 0xff )
 									{
-										int c = source[x_index>>16];
-										if( c != transparent_color )
+										if( pri[x]<=zpos )
 										{
-											if( pri[x]<=zpos )
+											if( color == 0xf && c==0xfe && shadow_offset )
 											{
-												if( color == 0xf && c==0xfe && shadow_offset )
-												{
-													dest[x] |= shadow_offset;
-												}
-												else
-												{
-													dest[x] = pal[c];
-												}
-												pri[x] = zpos;
+												dest[x] |= shadow_offset;
 											}
+											else
+											{
+												dest[x] = pal[c];
+											}
+											pri[x] = zpos;
 										}
-										x_index += dx;
 									}
-									y_index += dy;
+									x_index += dx;
 								}
+								y_index += dy;
 							}
 						}
 					}
@@ -485,7 +481,6 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 						color,
 						flipx,flipy,
 						xpos,ypos,
-						TRANSPARENCY_PEN,0xff,
 						scalex,scaley,
 						loop );
 				}
@@ -619,7 +614,6 @@ namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const
 				sprn, color,
 				flipx,flipy,
 				sx,sy,
-				TRANSPARENCY_PEN,0xff,
 				scalex, scaley,
 				loop );
 		}
@@ -885,7 +879,6 @@ draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 					color,
 					flipx,flipy,
 					sx,sy,
-					TRANSPARENCY_PEN,0xff,
 					zoomx, zoomy, zpos );
 			}
 			if( !flipx )

@@ -169,7 +169,7 @@ static void mlc_drawgfxzoom(
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
 
-					/* case 1: TRANSPARENCY_PEN */
+					/* case 1: no alpha */
 					if (alpha == 0xff)
 					{
 						{

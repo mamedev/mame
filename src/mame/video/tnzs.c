@@ -47,7 +47,7 @@ PALETTE_INIT( arknoid2 )
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m)
 {
-	int x,y,column,tot,trans;
+	int x,y,column,tot,transpen;
 	int scrollx, scrolly;
 	UINT32 upperbits;
 	int ctrl2	=	tnzs_objctrl[1];
@@ -59,9 +59,9 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	}
 
 	if(tnzs_bg_flag[0] & 0x80)
-		trans = TRANSPARENCY_NONE;
+		transpen = -1;
 	else
-		trans = TRANSPARENCY_PEN;
+		transpen = 0;
 
 
 	/* The byte at f200 is the y-scroll value for the first column.
@@ -107,20 +107,20 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						sx + scrollx,(sy + scrolly) & 0xff,
-						trans,0);
+						transpen);
 
 				/* wrap around x */
-				drawgfx(bitmap,cliprect,machine->gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						sx + 512 + scrollx,(sy + scrolly) & 0xff,
-						trans,0);
+						transpen);
 			}
 		}
 

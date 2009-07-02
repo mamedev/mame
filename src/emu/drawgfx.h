@@ -48,15 +48,6 @@
 
 enum
 {
-	TRANSPARENCY_NONE,			/* opaque with remapping */
-	TRANSPARENCY_PEN,			/* single pen transparency with remapping */
-	TRANSPARENCY_PENS,			/* multiple pen transparency with remapping */
-
-	TRANSPARENCY_MODES			/* total number of modes; must be last */
-};
-
-enum
-{
 	DRAWMODE_NONE,
 	DRAWMODE_SOURCE,
 	DRAWMODE_SHADOW
@@ -192,9 +183,6 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 
 /* ----- core graphics drawing ----- */
 
-/* generic drawgfx with legacy interface */
-void drawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int transparency, UINT32 transparent_color);
-
 /* specific drawgfx implementations for each transparency type */
 void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty);
 void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 transpen);
@@ -206,9 +194,6 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
 
 
 /* ----- zoomed graphics drawing ----- */
-
-/* generic drawgfxzoom with legacy interface */
-void drawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int transparency, UINT32 transparent_color, UINT32 scalex, UINT32 scaley);
 
 /* specific drawgfxzoom implementations for each transparency type */
 void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley);
@@ -222,9 +207,6 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 
 /* ----- priority masked graphics drawing ----- */
 
-/* generic pdrawgfx with legacy interface */
-void pdrawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int transparency, UINT32 transparent_color, UINT32 pmask);
-
 /* specific pdrawgfx implementations for each transparency type */
 void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask);
 void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, UINT32 transpen);
@@ -236,9 +218,6 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 
 
 /* ----- priority masked zoomed graphics drawing ----- */
-
-/* generic pdrawgfxzoom with legacy interface */
-void pdrawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int transparency, UINT32 transparent_color, UINT32 scalex, UINT32 scaley, UINT32 pmask);
 
 /* specific pdrawgfxzoom implementations for each transparency type */
 void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask);

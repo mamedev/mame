@@ -144,19 +144,19 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		int flipx = flip_screen_x_get(machine);
 		int flipy = flip_screen_y_get(machine);
 		/* the following line is most likely wrong */
-		int transp = (bg_on && sx >= 22) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN;
+		int transpen = (bg_on && sx >= 22) ? -1 : 0;
 
 		int code = videoram[offs];
 
 		if (flipx) sx = 31 - sx;
 		if (flipy) sy = 31 - sy;
 
-		drawgfx(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				code,
 				0,
 				flipx,flipy,
 				8*sx,8*sy,
-				transp,0);
+				transpen);
 	}
 }
 

@@ -375,8 +375,6 @@ INLINE void roundupt_drawgfxzoomrotate(
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
 #if 0
-					/* case 1: TRANSPARENCY_PEN */
-					if (transparency == TRANSPARENCY_PEN)
 					{
 						{
 							int startx=0;
@@ -429,7 +427,6 @@ INLINE void roundupt_drawgfxzoomrotate(
 					}
 #endif
 #if 1 // old
-					//if (transparency == TRANSPARENCY_PEN)
 					{
 						{
 							for( y=sy; y<ey; y++ )
@@ -466,7 +463,7 @@ INLINE void roundupt_drawgfxzoomrotate(
 
 static void mycopyrozbitmap_core(bitmap_t *bitmap,bitmap_t *srcbitmap,
 		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
-		const rectangle *clip,int transparency,int transparent_color)
+		const rectangle *clip,int transparent_color)
 {
 	UINT32 cx;
 	UINT32 cy;
@@ -693,8 +690,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			extent_x=extent_x>>16;
 			extent_y=extent_y>>16;
 			if (extent_x>2 && extent_y>2)
-			mycopyrozbitmap_core(bitmap, temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect,
-				TRANSPARENCY_PEN, 0);
+			mycopyrozbitmap_core(bitmap, temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect, 0);
 		}
 	}
 }

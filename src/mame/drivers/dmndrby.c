@@ -422,7 +422,7 @@ wouldnt like to say its the most effective way though...
 			tileno|=(bank<<8);
 			color=((dderby_vidattribs[count])&0x1f);
 
-			drawgfx(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? TRANSPARENCY_PEN : TRANSPARENCY_NONE,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 
 			count++;
 		}

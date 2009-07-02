@@ -192,12 +192,12 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			int tile =  vga_vram[offs] & 0xff;
 			int color = vga_vram[offs+1] & 0xff;
 
-			drawgfx(bitmap,cliprect,machine->gfx[gfx_num],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
 					color,
 					0,0,
 					x*8,y*8,
-					((color & 0xf0) != 0) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+					((color & 0xf0) != 0) ? -1 : 0);
 
 			offs+=2;
 		}

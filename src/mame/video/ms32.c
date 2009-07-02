@@ -335,7 +335,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		yzoom = 0x1000000/yzoom;
 		xzoom = 0x1000000/xzoom;
 
-		//trans = TRANSPARENCY_PEN; // there are surely also shadows (see gametngk) but how they're enabled we don't know
+		// there are surely also shadows (see gametngk) but how they're enabled we don't know
 
 		if (flipscreen)
 		{

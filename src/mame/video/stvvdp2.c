@@ -133,10 +133,10 @@ static bitmap_t *stv_vdp2_roz_bitmap[2];
 
 enum
 {
-	STV_TRANSPARENCY_NONE		= TRANSPARENCY_NONE,
-	STV_TRANSPARENCY_PEN		= TRANSPARENCY_PEN,
-	STV_TRANSPARENCY_ADD_BLEND  = TRANSPARENCY_MODES,
-	STV_TRANSPARENCY_ALPHA      = TRANSPARENCY_MODES + 1
+	STV_TRANSPARENCY_NONE,
+	STV_TRANSPARENCY_PEN,
+	STV_TRANSPARENCY_ADD_BLEND,
+	STV_TRANSPARENCY_ALPHA
 };
 
 #if DEBUG_MODE
@@ -2402,25 +2402,18 @@ static void stv_vdp2_drawgfxzoom(
 
 	if (!scalex || !scaley) return;
 
-	if (gfx->pen_usage && (transparency == TRANSPARENCY_PEN || transparency == TRANSPARENCY_PENS))
+	if (gfx->pen_usage && transparency == STV_TRANSPARENCY_PEN)
 	{
 		int transmask = 0;
 
-		if (transparency == TRANSPARENCY_PEN)
-		{
-			transmask = 1 << (transparent_color & 0xff);
-		}
-		else	/* transparency == TRANSPARENCY_PENS */
-		{
-			transmask = transparent_color;
-		}
+		transmask = 1 << (transparent_color & 0xff);
 
 		if ((gfx->pen_usage[code] & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
 			return;
 		else if ((gfx->pen_usage[code] & transmask) == 0)
 			/* character is totally opaque, can disable transparency */
-			transparency = TRANSPARENCY_NONE;
+			transparency = STV_TRANSPARENCY_NONE;
 	}
 
 	/*
@@ -2520,8 +2513,8 @@ static void stv_vdp2_drawgfxzoom(
 			{ /* skip if inner loop doesn't draw anything */
 				int y;
 
-				/* case 0: TRANSPARENCY_NONE */
-				if (transparency == TRANSPARENCY_NONE)
+				/* case 0: STV_TRANSPARENCY_NONE */
+				if (transparency == STV_TRANSPARENCY_NONE)
 				{
 					if (gfx->flags & GFX_ELEMENT_PACKED)
 					{
@@ -2559,8 +2552,8 @@ static void stv_vdp2_drawgfxzoom(
 					}
 				}
 
-				/* case 1: TRANSPARENCY_PEN */
-				if (transparency == TRANSPARENCY_PEN)
+				/* case 1: STV_TRANSPARENCY_PEN */
+				if (transparency == STV_TRANSPARENCY_PEN)
 				{
 					if (gfx->flags & GFX_ELEMENT_PACKED)
 					{
@@ -2825,7 +2818,7 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, const rectangle *clip, 
 					int r,g,b;
 
 					data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
-					t_pen = (data & 0x8000) || ( transparency == TRANSPARENCY_NONE );
+					t_pen = (data & 0x8000) || ( transparency == STV_TRANSPARENCY_NONE );
 					if (t_pen)
 					{
 						b = (data & 0x7c00) >> 10;
@@ -2929,7 +2922,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					if(tw == 0)
 					{
 						t_pen = (((gfxdata[0] & 0x0f) >> 0) != 0) ? (1) : (0);
-						if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
@@ -2942,7 +2935,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					if(tw == 0)
 					{
 						t_pen = (((gfxdata[0] & 0xf0) >> 4) != 0) ? (1) : (0);
-						if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
@@ -2974,7 +2967,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						{
 							//60aee2c = $0013 at @605d838
 							t_pen = ((gfxdata[xs] & 0xff) != 0) ? (1) : (0);
-							if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
@@ -3017,7 +3010,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						if(tw == 0)
 						{
 							t_pen = ((gfxdata[xs] & 0xff) != 0) ? 1 : 0;
-							if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
@@ -3042,7 +3035,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					if(tw == 0)
 					{
 						t_pen = ((((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff)) != 0) ? (1) : (0);
-						if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
@@ -3079,7 +3072,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						int r,g,b;
 						int xs = xcnt & xsizemask;
 
-						t_pen = ((gfxdata[2*xs] & 0x80) >> 7) || (stv2_current_tilemap.transparency == TRANSPARENCY_NONE);
+						t_pen = ((gfxdata[2*xs] & 0x80) >> 7) || (stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE);
 						if (!t_pen) continue;
 						b = ((gfxdata[2*xs] & 0x7c) >> 2);
 						g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
@@ -3120,7 +3113,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 
 						xs = xx >> 16;
 						t_pen = ((gfxdata[2*xs] & 0x80) >> 7);
-						if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						b = ((gfxdata[2*xs] & 0x7c) >> 2);
 						g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
 						r = ((gfxdata[2*xs+1] & 0x1f));
@@ -3164,7 +3157,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					int r,g,b;
 
 					t_pen = ((gfxdata[0] & 0x80) >> 7);
-					if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
+					if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 
 					/*TODO: 8bpp*/
 					b = (gfxdata[1] & 0xf8) >> 3;
@@ -3562,7 +3555,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 	}
 
 	/* other bits */
-	//stv2_current_tilemap.trans_enabled = stv2_current_tilemap.trans_enabled ? TRANSPARENCY_NONE : TRANSPARENCY_PEN;
+	//stv2_current_tilemap.trans_enabled = stv2_current_tilemap.trans_enabled ? STV_TRANSPARENCY_NONE : STV_TRANSPARENCY_PEN;
 	stv2_current_tilemap.scrollx &= mppixels_x-1;
 	stv2_current_tilemap.scrolly &= mppixels_y-1;
 
@@ -3750,10 +3743,10 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 					else
 					{
 						/* normal */
-						drawgfx(bitmap,cliprect,machine->gfx[gfx],tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,0);
-						drawgfx(bitmap,cliprect,machine->gfx[gfx],tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency,0);
-						drawgfx(bitmap,cliprect,machine->gfx[gfx],tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency,0);
-						drawgfx(bitmap,cliprect,machine->gfx[gfx],tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency,0);
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx],tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,(stv2_current_tilemap.transparency==STV_TRANSPARENCY_PEN)?0:-1);
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx],tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,(stv2_current_tilemap.transparency==STV_TRANSPARENCY_PEN)?0:-1);
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx],tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,(stv2_current_tilemap.transparency==STV_TRANSPARENCY_PEN)?0:-1);
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx],tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,(stv2_current_tilemap.transparency==STV_TRANSPARENCY_PEN)?0:-1);
 
 					}
 				}
@@ -3768,7 +3761,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 						if (stv2_current_tilemap.transparency == STV_TRANSPARENCY_ALPHA)
 							drawgfx_alpha(bitmap,cliprect,machine->gfx[gfx],tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,0,stv2_current_tilemap.alpha);
 						else
-							drawgfx(bitmap,cliprect,machine->gfx[gfx],tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,stv2_current_tilemap.transparency,0);
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx],tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,(stv2_current_tilemap.transparency==STV_TRANSPARENCY_PEN)?0:-1);
 					}
 				}
 				drawxpos = olddrawxpos;
@@ -4265,10 +4258,10 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 					stv_vdp2_compute_color_offset_RGB555_UINT16(&pix,stv2_current_tilemap.fade_control & 2);
 				switch( stv2_current_tilemap.transparency )
 				{
-					case TRANSPARENCY_PEN:
+					case STV_TRANSPARENCY_PEN:
 						if ( pix != 0x0000 ) line[hcnt] = pix;
 						break;
-					case TRANSPARENCY_NONE:
+					case STV_TRANSPARENCY_NONE:
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
@@ -4357,10 +4350,10 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 					stv_vdp2_compute_color_offset_RGB555_UINT16(&pix,stv2_current_tilemap.fade_control & 2);
 				switch( stv2_current_tilemap.transparency )
 				{
-					case TRANSPARENCY_PEN:
+					case STV_TRANSPARENCY_PEN:
 						if ( pix != 0x0000 ) line[hcnt] = pix;
 						break;
-					case TRANSPARENCY_NONE:
+					case STV_TRANSPARENCY_NONE:
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
@@ -4407,11 +4400,11 @@ static void stv_vdp2_draw_NBG0(running_machine *machine, bitmap_t *bitmap, const
 	}
 	if ( STV_VDP2_N0TPON == 0 )
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_PEN;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_PEN;
 	}
 	else
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_NONE;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_NONE;
 	}
 	stv2_current_tilemap.colour_depth = STV_VDP2_N0CHCN;
 	stv2_current_tilemap.tile_size = STV_VDP2_N0CHSZ;
@@ -4497,11 +4490,11 @@ static void stv_vdp2_draw_NBG1(running_machine *machine, bitmap_t *bitmap, const
 	}
 	if ( STV_VDP2_N1TPON == 0 )
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_PEN;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_PEN;
 	}
 	else
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_NONE;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_NONE;
 	}
 	stv2_current_tilemap.colour_depth = STV_VDP2_N1CHCN;
 	stv2_current_tilemap.tile_size = STV_VDP2_N1CHSZ;
@@ -4594,11 +4587,11 @@ static void stv_vdp2_draw_NBG2(running_machine *machine, bitmap_t *bitmap, const
 	}
 	if ( STV_VDP2_N2TPON == 0 )
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_PEN;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_PEN;
 	}
 	else
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_NONE;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_NONE;
 	}
 	stv2_current_tilemap.colour_depth = STV_VDP2_N2CHCN;
 	stv2_current_tilemap.tile_size = STV_VDP2_N2CHSZ;
@@ -4694,11 +4687,11 @@ static void stv_vdp2_draw_NBG3(running_machine *machine, bitmap_t *bitmap, const
 	}
 	if ( STV_VDP2_N3TPON == 0 )
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_PEN;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_PEN;
 	}
 	else
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_NONE;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_NONE;
 	}
 	stv2_current_tilemap.colour_depth = STV_VDP2_N3CHCN;
 	stv2_current_tilemap.tile_size = STV_VDP2_N3CHSZ;
@@ -4972,11 +4965,11 @@ static void stv_vdp2_draw_RBG0(running_machine *machine, bitmap_t *bitmap, const
 	}
 	if ( STV_VDP2_R0TPON == 0 )
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_PEN;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_PEN;
 	}
 	else
 	{
-		stv2_current_tilemap.transparency = TRANSPARENCY_NONE;
+		stv2_current_tilemap.transparency = STV_TRANSPARENCY_NONE;
 	}
 	stv2_current_tilemap.colour_depth = STV_VDP2_R0CHCN;
 	stv2_current_tilemap.tile_size = STV_VDP2_R0CHSZ;

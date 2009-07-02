@@ -402,36 +402,6 @@ void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    drawgfx - generic drawgfx with legacy
-    interface
--------------------------------------------------*/
-
-void drawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color)
-{
-	switch (transparency)
-	{
-		case TRANSPARENCY_NONE:
-			drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy);
-			break;
-
-		case TRANSPARENCY_PEN:
-			drawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, transparent_color);
-			break;
-
-		case TRANSPARENCY_PENS:
-			drawgfx_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, transparent_color);
-			break;
-
-		default:
-			fatalerror("Invalid transparency specified for drawgfx (%d)", transparency);
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
     drawgfx_opaque - render a gfx element with
     no transparency
 -------------------------------------------------*/
@@ -673,37 +643,6 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
 /***************************************************************************
     DRAWGFXZOOM IMPLEMENTATIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    drawgfxzoom - generic drawgfxzoom with legacy
-    interface
--------------------------------------------------*/
-
-void drawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
-		UINT32 scalex, UINT32 scaley)
-{
-	switch (transparency)
-	{
-		case TRANSPARENCY_NONE:
-			drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley);
-			break;
-
-		case TRANSPARENCY_PEN:
-			drawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, transparent_color);
-			break;
-
-		case TRANSPARENCY_PENS:
-			drawgfxzoom_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, transparent_color);
-			break;
-
-		default:
-			fatalerror("Invalid transparency specified for drawgfxzoom (%d)", transparency);
-			break;
-	}
-}
-
 
 /*-------------------------------------------------
     drawgfxzoom_opaque - render a scaled gfx
@@ -992,37 +931,6 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 ***************************************************************************/
 
 /*-------------------------------------------------
-    pdrawgfx - generic pdrawgfx with legacy
-    interface
--------------------------------------------------*/
-
-void pdrawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
-		UINT32 priority_mask)
-{
-	switch (transparency)
-	{
-		case TRANSPARENCY_NONE:
-			pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask);
-			break;
-
-		case TRANSPARENCY_PEN:
-			pdrawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask, transparent_color);
-			break;
-
-		case TRANSPARENCY_PENS:
-			pdrawgfx_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask, transparent_color);
-			break;
-
-		default:
-			fatalerror("Invalid transparency specified for pdrawgfx (%d)", transparency);
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
     pdrawgfx_opaque - render a gfx element with
     no transparency, checking against the priority
     bitmap
@@ -1280,37 +1188,6 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 /***************************************************************************
     PDRAWGFXZOOM IMPLEMENTATIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    pdrawgfxzoom - generic pdrawgfxzoom with
-    legacy interface
--------------------------------------------------*/
-
-void pdrawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
-		UINT32 scalex, UINT32 scaley, UINT32 priority_mask)
-{
-	switch (transparency)
-	{
-		case TRANSPARENCY_NONE:
-			pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask);
-			break;
-
-		case TRANSPARENCY_PEN:
-			pdrawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask, transparent_color);
-			break;
-
-		case TRANSPARENCY_PENS:
-			pdrawgfxzoom_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask, transparent_color);
-			break;
-
-		default:
-			fatalerror("Invalid transparency specified for pdrawgfxzoom (%d)", transparency);
-			break;
-	}
-}
-
 
 /*-------------------------------------------------
     pdrawgfxzoom_opaque - render a scaled gfx

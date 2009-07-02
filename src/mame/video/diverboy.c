@@ -33,12 +33,12 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 		if (!flash || (video_screen_get_frame_number(machine->primary_screen) & 1))
 		{
-			drawgfx(bitmap,cliprect,machine->gfx[bank],
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
 					number,
 					colr,
 					0,0,
 					xpos,ypos,
-					(source[1] & 0x0008) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+					(source[1] & 0x0008) ? -1 : 0);
 		}
 
 		source+=8;
