@@ -80,12 +80,12 @@ static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectang
 			scroll = ~scroll - 1;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,cliprect,machine->gfx[0],
 				code,
 				(col & 0x0f) | ((*ambush_colorbank & 0x03) << 4),
 				flip_screen_get(machine),flip_screen_get(machine),
 				8*sx, (8*sy + scroll) & 0xff,
-				cliprect,transparency,0);
+				transparency,0);
 	}
 }
 

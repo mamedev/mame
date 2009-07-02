@@ -664,12 +664,11 @@ static void cischeat_draw_road(running_machine *machine, bitmap_t *bitmap, const
 
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
-			drawgfx(bitmap,gfx,
+			drawgfx(bitmap,&rect,gfx,
 					curr_code++,
 					attr,
 					0,0,
 					sx,sy,
-					&rect,
 					transparency,15);
 
 			/* wrap around */
@@ -771,12 +770,11 @@ static void f1gpstar_draw_road(running_machine *machine, bitmap_t *bitmap, const
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
-			drawgfxzoom(bitmap,gfx,
+			drawgfxzoom(bitmap,&rect,gfx,
 						code++,
 						attr >> 8,
 						0,0,
 						sx / 0x10000, sy,
-						&rect,
 						transparency,15,
 						xscale, 1 << 16);
 

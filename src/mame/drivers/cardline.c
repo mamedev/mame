@@ -24,12 +24,11 @@
 
 static int cardline_video;
 
-#define DRAW_TILE(offset, transparency) drawgfx(bitmap, screen->machine->gfx[0],\
+#define DRAW_TILE(offset, transparency) drawgfx(bitmap, cliprect, screen->machine->gfx[0],\
 					(videoram[index+offset] | (colorram[index+offset]<<8))&0x3fff,\
 					(colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
-					cliprect,\
 					transparency?TRANSPARENCY_PEN:TRANSPARENCY_NONE,transparency);
 
 static VIDEO_UPDATE( cardline )

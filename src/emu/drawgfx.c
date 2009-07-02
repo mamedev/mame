@@ -406,8 +406,9 @@ void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count)
     interface
 -------------------------------------------------*/
 
-void drawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, const rectangle *cliprect, int transparency, UINT32 transparent_color)
+void drawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy,
+		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color)
 {
 	switch (transparency)
 	{
@@ -678,8 +679,9 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
     interface
 -------------------------------------------------*/
 
-void drawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, const rectangle *cliprect, int transparency, UINT32 transparent_color,
+void drawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy,
+		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
 		UINT32 scalex, UINT32 scaley)
 {
 	switch (transparency)
@@ -994,8 +996,9 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
     interface
 -------------------------------------------------*/
 
-void pdrawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, const rectangle *cliprect, int transparency, UINT32 transparent_color,
+void pdrawgfx(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy,
+		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
 		UINT32 priority_mask)
 {
 	switch (transparency)
@@ -1283,8 +1286,9 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
     legacy interface
 -------------------------------------------------*/
 
-void pdrawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy,
-		INT32 sx, INT32 sy, const rectangle *cliprect, int transparency, UINT32 transparent_color,
+void pdrawgfxzoom(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy,
+		INT32 sx, INT32 sy, int transparency, UINT32 transparent_color,
 		UINT32 scalex, UINT32 scaley, UINT32 priority_mask)
 {
 	switch (transparency)

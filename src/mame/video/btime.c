@@ -330,12 +330,12 @@ static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectang
             y = 33 - y;
         }
 
-        drawgfx(bitmap,machine->gfx[0],
+        drawgfx(bitmap,cliprect,machine->gfx[0],
                 code,
                 color,
                 flip_screen_get(machine),flip_screen_get(machine),
                 8*x,8*y,
-                cliprect,transparency,0);
+                transparency,0);
     }
 }
 

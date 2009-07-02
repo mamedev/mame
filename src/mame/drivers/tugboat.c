@@ -102,12 +102,12 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 				rgn = gfx1;
 			}
 
-			drawgfx(bitmap,machine->gfx[rgn],
+			drawgfx(bitmap,cliprect,machine->gfx[rgn],
 					code,
 					color,
 					0,0,
 					8*x,8*y,
-					cliprect,transparency,7);
+					transparency,7);
 
 			addr = (addr & 0xfc00) | ((addr + 1) & 0x03ff);
 		}

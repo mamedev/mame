@@ -906,7 +906,7 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 							color,
 							flipx, flipy,
 							sx, sy,
-							TRANSPARENCY_PEN, 15);
+							15);
 		}
 	}
 }
@@ -1038,7 +1038,7 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						color,
 						flipx, flipy,
 						sx, sy,
-						TRANSPARENCY_PEN, 15);
+						15);
 		}
 	}
 }
@@ -1088,7 +1088,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 							color,
 							flipx, flipy,
 							sx, sy,
-							TRANSPARENCY_PEN, 7);
+							7);
 			}
 			else if ((offs >= 0x000 && offs <= 0x0ff) || (offs >= 0x300 && offs <= 0x3ff))
 			{
@@ -1102,7 +1102,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 								color,
 								flipx, flipy,
 								sx + i * 16, sy,
-								TRANSPARENCY_PEN, 7);
+								7);
 				}
 			}
 			else if (offs >= 0x580 && offs <= 0x61f)
@@ -1122,7 +1122,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 									color,
 									flipx, flipy,
 									sx + j * 16, sy - i * 16,
-									TRANSPARENCY_PEN, 7);
+									7);
 					}
 				}
 			}
@@ -1143,7 +1143,7 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 									color,
 									flipx, flipy,
 									sx + j * 16, sy - i * 16,
-									TRANSPARENCY_PEN, 7);
+									7);
 					}
 				}
 			}

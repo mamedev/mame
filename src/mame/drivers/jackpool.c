@@ -70,7 +70,7 @@ static VIDEO_UPDATE(jackpool)
 				/*might just be sloppy coding,colors are enabled as 0x20-0x3f*/
 				int t_pen = (sc0_vram[count+0x800] & 0x2000);
 				//int colour = tile>>12;
-				drawgfx(bitmap,gfx,tile,attr,0,0,x*8,y*8,cliprect,(t_pen) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
 				count++;
 			}
 		}
@@ -103,7 +103,7 @@ static VIDEO_UPDATE(jackpool)
 				/*might just be sloppy coding,colors are enabled as 0x20-0x3f*/
 				int t_pen = (sc3_vram[count+0x800] & 0x2000);
 				//int colour = tile>>12;
-				drawgfx(bitmap,gfx,tile,attr,0,0,x*8,y*8,cliprect,(t_pen) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
 				count++;
 			}
 		}

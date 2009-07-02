@@ -142,8 +142,8 @@ WRITE8_HANDLER( wc90_txvideoram_w )
 ***************************************************************************/
 
 #define WC90_DRAW_SPRITE( code, sx, sy ) \
-					drawgfx( bitmap, machine->gfx[3], code, flags >> 4, \
-					bank&1, bank&2, sx, sy, cliprect, TRANSPARENCY_PEN, 0 )
+					drawgfx_transpen( bitmap, cliprect, machine->gfx[3], code, flags >> 4, \
+					bank&1, bank&2, sx, sy, 0 )
 
 static const char p32x32[4][4] = {
 	{ 0, 1, 2, 3 },

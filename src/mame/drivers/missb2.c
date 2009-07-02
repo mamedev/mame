@@ -44,12 +44,11 @@ static VIDEO_UPDATE( missb2 )
 	//popmessage("%02x",(*missb2_bgvram) & 0x1f);
 	for(bg_offs = ((*missb2_bgvram) << 4);bg_offs<(((*missb2_bgvram)<< 4)|0xf);bg_offs++)
 	{
-		drawgfx(bitmap,screen->machine->gfx[1],
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],
 				bg_offs,
 				1,
 				0,0,
-				0,(bg_offs & 0xf) * 0x10,
-				cliprect,TRANSPARENCY_NONE,0xff);
+				0,(bg_offs & 0xf) * 0x10);
 	}
 
 

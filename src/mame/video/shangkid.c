@@ -255,12 +255,12 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 			tile += ((attr>>5)&0x3)*256;
 			drawgfx(
 				bitmap,
+				cliprect,
 				machine->gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
 				sx,sy,
-				cliprect,
 				transparency,3 );
 		}
 	}

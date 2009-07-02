@@ -1367,7 +1367,7 @@ if (input_code_pressed(KEYCODE_D))
 		int transparent_color;
 		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
 		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
-		int x,y, ex, ey;
+		int x,y, ex, ey, flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
@@ -1406,40 +1406,34 @@ if (input_code_pressed(KEYCODE_D))
 
 					if (flipscreen)
 					{
-						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,transparent_color,
-								pri_mask);
-						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								!xflip,!yflip,
-								248-(sx+x*8),248-(sy+y*8),
-								cliprect,trans,transparent_color);
+						flipx = !xflip;
+						flipy = !yflip;
+						destx = 248-(sx+x*8);
+						desty = 248-(sy+y*8);
 					}
 					else
 					{
-						if (pri_mask != -1)
-							pdrawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,transparent_color,
-								pri_mask);
-						else
-							drawgfx(bitmap,gfx,
-								number + x_offset[ex] + y_offset[ey],
-								color,
-								xflip,yflip,
-								global_x_offset+sx+x*8,sy+y*8,
-								cliprect,trans,transparent_color);
+						flipx = !xflip;
+						flipy = !yflip;
+						destx = global_x_offset+sx+x*8;
+						desty = sy+y*8;
 					}
+
+					if (pri_mask != -1)
+						pdrawgfx(bitmap,cliprect,gfx,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							trans,transparent_color,
+							pri_mask);
+					else
+						drawgfx(bitmap,cliprect,gfx,
+							number + x_offset[ex] + y_offset[ey],
+							color,
+							flipx,flipy,
+							destx,desty,
+							trans,transparent_color);
 				}
 			}
 		}
