@@ -12,6 +12,36 @@
     Step 2.0: 166 MHz PPC, even faster 3D engine
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
+    Game status:
+    vf3/vf3a - boots and runs
+    vf3tb - deliberately kills itself (jumps to infinite loop)
+    bass - boots and runs with 3D
+    getbass - I/O board error (?)
+
+    scud/scuda - boots and runs with 3D (scuda says "for sale and use only in Japan but is marked Export?)
+    scudj - boots but hangs up (no SCSI IRQs)
+    scudp - shows initial screen, apparently won't go into test mode or advance
+    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked)
+    vs215 - boots and runs with 3D
+    lemans24 - SCSI IRQ stuck on (boots if hacked)
+    vs29815 - write to unknown 53c810 SCSI register
+
+    vs2 - looks like it should boot but never displays anything
+    harley - boots and runs with 3D after a "NO DAUGHTER BOARD DETECTED" error
+    skichamp - "NO DAUGHTER BOARD DETECTED", doesn't advance (no SCSI IRQs occur)
+    srally2/sraly2dx - doesn't boot (no SCSI IRQs occur, other IRQs look fine)
+    von2/von254g - SCSI IRQ stuck on (boots and runs if SCSI ack is hacked)
+    fvipers2 - says "ONE PROCESSOR DETECTED" and hangs (no SCSI IRQs occur, others look fine)
+    vs298/vs299/vs2v991 - hangs (no SCSI IRQs occur, others look fine)
+
+    daytona2/dayto2pe - hangs MAME, CROMs (program/data) are marked "bad dump"
+    dirtdvls/dirtdvla - SCSI IRQ stuck on (boots partially if hacked)
+    swtrilgy - doesn't boot (no SCSI IRQs occur, other IRQs look fine) 
+    swtrilga - SCSI IRQ stuck on
+    spikeout/spikeofe - hangs MAME, CROMs (program/data) are marked "bad dump" 
+    magtruck - SCSI IRQ stuck on (boots and fails country code check (!) if hacked)
+    eca/ecax - doesn't boot (a few SCSI IRQs occur but then cease, other IRQs look fine)
+
 ===================================================================================
 
 Tilemap generator notes:
@@ -551,6 +581,22 @@ ALL VROM ROMs are 16M MASK
 
 */
 
+/*
+	magtruck locations of interest
+
+	000006ee (word)  - incremented each vblank, used by mainline to busywait.
+	000006f5 (byte)  - shadow of current IRQ enable
+	000003f0 (dword) - shadow (from irq handler) of IRQ state on entry
+
+	00000500 - IRQ handler prologue/epilogue
+	00152250 - IRQ dispatcher
+
+	00151f48 - service routine for IRQ 0x02 (VBL)
+	00151ef8 - service routine for IRQ 0x04
+	00151ed8 - service routine for IRQ 0x08
+	0014b110 - service routine for IRQ 0x40 (SCSP)
+*/
+
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
@@ -581,9 +627,16 @@ static UINT16 *model3_soundram;
 static void update_irq_state(running_machine *machine)
 {
 	if ((irq_enable & irq_state) || scsi_irq_state)
+	{
+//		printf("IRQ set: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state);
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, ASSERT_LINE);
+		scsi_irq_state = 0;
+	}
 	else
+	{
+//		printf("IRQ clear: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state); 
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, CLEAR_LINE);
+	}
 }
 
 void model3_set_irq_line(running_machine *machine, UINT8 bit, int state)
@@ -1223,14 +1276,26 @@ static void model3_init(running_machine *machine, int step)
 			mame_stricmp(machine->gamedrv->name, "bass") == 0 )
 		{
 			mpc106_init();
-		} else {
+		} 
+		else 
+		{
 			mpc105_init();
 		}
 		real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
 	else {
 		mpc106_init();
-		real3d_device_id = 0x178611db;	/* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
+		// some step 2+ games need the older PCI ID (obvious symptom:
+		// vbl is enabled briefly then disabled so the game hangs)
+		if (mame_stricmp(machine->gamedrv->name, "magtruck") == 0 ||
+		    mame_stricmp(machine->gamedrv->name, "von254g") == 0)
+		{
+			real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
+		}
+		else
+		{
+			real3d_device_id = 0x178611db;	/* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
+		}
 	}
 }
 
@@ -1421,6 +1486,8 @@ static WRITE64_HANDLER( model3_ctrl_w )
 
 static READ64_HANDLER( model3_sys_r )
 {
+//	printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(space->cpu));
+
 	switch (offset)
 	{
 		case 0x08/8:
@@ -1454,6 +1521,8 @@ static READ64_HANDLER( model3_sys_r )
 
 static WRITE64_HANDLER( model3_sys_w )
 {
+//	printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
+
 	switch (offset)
 	{
 		case 0x10/8:
@@ -1462,6 +1531,38 @@ static WRITE64_HANDLER( model3_sys_w )
 				irq_enable = (data>>24)&0xff;
 			}
 			else logerror("m3_sys: unknown mask on IRQen write\n");
+			break;
+		case 0x18/8:
+			if ((mem_mask & 0xff000000) == 0xff000000)	// int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
+			{						// may also be a secondary enable based on behavior of e.g. magtruck VBL handler
+//				UINT32 old_irq = irq_state;
+				UINT8 ack = (data>>24)&0xff, realack;
+				int i;
+
+				switch (ack)
+				{
+					case 0xff:	// no ack, do nothing
+						return;
+
+					default:
+						realack = 0xff;	// default to all bits set, no clearing
+						for (i = 7; i >= 0; i--)
+						{
+							// if bit is clear, clear the bit on the opposite end
+							if (!(ack & (1<<i)))
+							{
+								realack &= ~(1<<(7-i));
+							}
+						}
+
+						irq_state &= realack;
+						break;
+				}
+			}
+			else
+			{
+				logerror("Unknown 0x18/8 write %llx mask %llx\n", data, mem_mask);
+			}
 			break;
 		case 0x08/8:
 			if (ACCESSING_BITS_56_63)
@@ -1531,7 +1632,10 @@ static READ64_HANDLER(model3_sound_r)
 
 static WRITE64_HANDLER(model3_sound_w)
 {
-	model3_set_irq_line(space->machine, 0x40, CLEAR_LINE);
+	if ((mem_mask & 0xff000000) == 0xff000000)
+	{
+		model3_set_irq_line(space->machine, 0x40, CLEAR_LINE);
+	}
 
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
@@ -4592,7 +4696,7 @@ static int model3_vblank = 0;
 static INTERRUPT_GEN(model3_interrupt)
 {
 	if (model3_vblank == 0) {
-		model3_set_irq_line(device->machine, 0x42, ASSERT_LINE);
+		model3_set_irq_line(device->machine, 0x02, ASSERT_LINE);
 	} else {
 		model3_set_irq_line(device->machine, 0x0d, ASSERT_LINE);
 	}
