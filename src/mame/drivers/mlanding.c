@@ -219,12 +219,12 @@ static READ16_HANDLER( io1_r ) //240006
 static WRITE16_HANDLER(ml_output_w)
 {
 	/*
-	x--- ---- palette fg bankswitch
-	---x ---- coin lockout?
-	---- x--- coin counter B
-	---- -x-- coin counter A
-	*/
-//	popmessage("%04x",data);
+    x--- ---- palette fg bankswitch
+    ---x ---- coin lockout?
+    ---- x--- coin counter B
+    ---- -x-- coin counter A
+    */
+//  popmessage("%04x",data);
 
 	pal_fg_bank = (data & 0x80)>>7;
 }
@@ -239,7 +239,7 @@ static void ml_msm5205_vck(const device_config *device)
 {
 	static UINT8 trigger;
 
-//	popmessage("%08x",adpcm_pos);
+//  popmessage("%08x",adpcm_pos);
 
 	if (adpcm_pos >= 0x50000  || adpcm_idle)
 	{
@@ -337,23 +337,23 @@ static READ16_HANDLER( ml_analog3_lsb_r )
 }
 
 /*
-	PORT_START("IN3")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_START("IN3")
+    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
+    PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
+    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
+    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN4")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_START("IN4")
+    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
+    PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
+    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
+    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 */
 
 /* high bits of analog inputs + "limiters"/ADC converters. */
@@ -382,7 +382,7 @@ static READ16_HANDLER( ml_analog2_msb_r )
 	else
 		res|= 0x40;
 
-//	popmessage("%04x %04x",x_adc,y_adc);
+//  popmessage("%04x %04x",x_adc,y_adc);
 
 	return ((input_port_read(space->machine, "STICKZ") & 0xf00)>>8) | res;
 }
@@ -412,7 +412,7 @@ static READ16_HANDLER( ml_analog3_msb_r )
 
 static WRITE16_HANDLER( ml_nmi_to_sound_w )
 {
-//	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static READ16_HANDLER( ml_mecha_ram_r )
@@ -496,9 +496,9 @@ static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 
-//	AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
-//	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
-//	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", ml_msm5205_stop_w)
+//  AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
+//  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
+//  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", ml_msm5205_stop_w)
 
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("msm",ml_msm_start_lsb_w)
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
-//	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
+//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )
@@ -796,9 +796,9 @@ ROM_END
 
 static DRIVER_INIT(mlanding)
 {
-//	UINT8 *rom = memory_region(machine, "sub");
-//	rom[0x88b]=0x4e;
-//	rom[0x88a]=0x71;
+//  UINT8 *rom = memory_region(machine, "sub");
+//  rom[0x88b]=0x4e;
+//  rom[0x88a]=0x71;
 }
 
 GAME( 1987, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

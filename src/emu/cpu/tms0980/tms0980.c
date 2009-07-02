@@ -11,39 +11,39 @@ execution phase. The execution phase takes place at the same time as the fetch
 phase of the next instruction. So, during execution there are both fetch and
 execution operations taking place. The operation can be split up as follows:
 cycle #0
-	- Fetch:
-		1. ROM address 0
-	- Execute:
-		1. Read RAM
-		2. Clear ALU inputs
-		3. Execute BRANCH/CALL/RETN part #2
-		4. K input valid
+    - Fetch:
+        1. ROM address 0
+    - Execute:
+        1. Read RAM
+        2. Clear ALU inputs
+        3. Execute BRANCH/CALL/RETN part #2
+        4. K input valid
 cycle #1
-	- Fetch:
-		1. ROM address 1
-	- Execute:
-		1. Update ALU inputs
+    - Fetch:
+        1. ROM address 1
+    - Execute:
+        1. Update ALU inputs
 cycle #2
-	- Fetch:
-		1. nothing/wait(?)
-	- Execute:
-		1. Perform ALU operation
-		2. Write RAM
+    - Fetch:
+        1. nothing/wait(?)
+    - Execute:
+        1. Perform ALU operation
+        2. Write RAM
 cycle #3
-	- Fetch:
-		1. Fetch/Update PC/RAM address #1
-	- Execute:
-		1. Register store part #1
+    - Fetch:
+        1. Fetch/Update PC/RAM address #1
+    - Execute:
+        1. Register store part #1
 cycle #4
-	- Fetch:
-		1. Fetch/Update PC/RAM address #2
-	- Execute:
-		1. Register store part #2
+    - Fetch:
+        1. Fetch/Update PC/RAM address #2
+    - Execute:
+        1. Register store part #2
 cycle #5
-	- Fetch:
-		1. Instruction decode
-	- Execute:
-		1. Execute BRANCH/CALL/RETN part #1
+    - Fetch:
+        1. Instruction decode
+    - Execute:
+        1. Execute BRANCH/CALL/RETN part #1
 
 Instructions built from microinstructions:
 
@@ -543,7 +543,7 @@ static CPU_EXECUTE( tms0980 )
 
 	do
 	{
-//		debugger_instruction_hook( device, ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1 );
+//      debugger_instruction_hook( device, ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1 );
 		cpustate->icount--;
 		switch( cpustate->subcycle )
 		{
@@ -731,10 +731,10 @@ static CPU_EXECUTE( tms0980 )
 				{
 					cpustate->y = cpustate->adder_result & 0x0F;
 				}
-//				if ( cpustate->decode & M_STSL )
-//				{
-//					cpustate->status_latch = cpustate->status;
-//				}
+//              if ( cpustate->decode & M_STSL )
+//              {
+//                  cpustate->status_latch = cpustate->status;
+//              }
 			}
 			debugger_instruction_hook( device, cpustate->rom_address << 1 );
 			/* fetch: fetch, update pc, ram address */

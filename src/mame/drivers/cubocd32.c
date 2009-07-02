@@ -41,7 +41,7 @@
 
    ToDo:
    - remove the hack needed to make inputs working
-   - find proper framerate - cndypuzl requires 60 (resets otherwise), mgnumber requires 50 (resets otherwise) 
+   - find proper framerate - cndypuzl requires 60 (resets otherwise), mgnumber requires 50 (resets otherwise)
    - settings are not saved
 
 
@@ -994,7 +994,7 @@ static INPUT_PORTS_START( mgprem11 )
 	PORT_DIPSETTING(    0x01, "ERROR!" )
 	PORT_DIPNAME( 0x50, 0x50, "Setup" )                               /* also affects payout values */
 	PORT_DIPSETTING(    0x50, "Full Tick" )
-//	PORT_DIPSETTING(    0x10, "Full Tick" )                           /* duplicated setting */
+//  PORT_DIPSETTING(    0x10, "Full Tick" )                           /* duplicated setting */
 	PORT_DIPSETTING(    0x40, "104 & 105" )
 	PORT_DIPSETTING(    0x00, "Full T+C" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )                    /* tested in dispenser setup when P1B3 is pressed */
@@ -1053,7 +1053,7 @@ static MACHINE_DRIVER_START( cd32 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.997)    /* needed to boot 'cndypuzl' */
-//	MDRV_SCREEN_REFRESH_RATE(50)        /* needed to boot 'mgnumber' */
+//  MDRV_SCREEN_REFRESH_RATE(50)        /* needed to boot 'mgnumber' */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
@@ -1187,7 +1187,7 @@ static void cndypuzl_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w(0x051c02, 0x0000);
+//      amiga_chip_ram_w(0x051c02, 0x0000);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		amiga_chip_ram_w(r_A5 - 0x7ebe, 0x0000);
@@ -1204,7 +1204,7 @@ static void haremchl_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w8(0x002907, 0x00);
+//      amiga_chip_ram_w8(0x002907, 0x00);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7f00 + 2));
@@ -1222,7 +1222,7 @@ static void lsrquiz_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w8(0x001e1b, 0x00);
+//      amiga_chip_ram_w8(0x001e1b, 0x00);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fe0 + 2));
@@ -1241,7 +1241,7 @@ static void lsrquiz2_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w8(0x046107, 0x00);
+//      amiga_chip_ram_w8(0x046107, 0x00);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fdc + 2));
@@ -1259,7 +1259,7 @@ static void lasstixx_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w8(0x00281c, 0x00);
+//      amiga_chip_ram_w8(0x00281c, 0x00);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fa2 + 2));
@@ -1277,7 +1277,7 @@ static void mgnumber_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w(0x04bfa0, 0x0000);
+//      amiga_chip_ram_w(0x04bfa0, 0x0000);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		amiga_chip_ram_w(r_A5 - 0x7ed8, 0x0000);
@@ -1294,7 +1294,7 @@ static void mgprem11_input_hack(running_machine *machine)
 {
 	if(cpu_get_pc(machine->cpu[0]) < amiga_chip_ram_size)
 	{
-//		amiga_chip_ram_w8(0x044f7e, 0x00);
+//      amiga_chip_ram_w8(0x044f7e, 0x00);
 
 		UINT32 r_A5 = cpu_get_reg(machine->cpu[0], M68K_A5);
 		amiga_chip_ram_w8(r_A5 - 0x7eca, 0x00);

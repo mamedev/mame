@@ -486,15 +486,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkch_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
-//	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
-//	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-//	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
-//	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
-//	AM_RANGE(0x11, 0x11) AM_WRITENOP
-//	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
-//	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
-//	AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
+//  AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
+//  AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
+//  AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) /* Input Ports */
+//  AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) /* DIP switches */
+//  AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)   /* output port */
+//  AM_RANGE(0x11, 0x11) AM_WRITENOP
+//  AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)   /* output port */
+//  AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
+//  AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
 
 	AM_RANGE(0x08, 0x09) AM_READ(unkch_unk_r)
 ADDRESS_MAP_END

@@ -197,7 +197,7 @@ static const hc11_config skeetsht_hc11_config =
 {
 	0,
 	0x100,	/* 256 bytes RAM */
-//	0x200,	/* 512 bytes EEPROM */
+//  0x200,  /* 512 bytes EEPROM */
 };
 
 
