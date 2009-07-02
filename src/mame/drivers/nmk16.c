@@ -6144,6 +6144,30 @@ ROM_START( sabotnba )
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) )	/* all banked */
 ROM_END
 
+// PCB is marked 'Cactus', actual game has no title screen
+ROM_START( cactus )
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
+	ROM_LOAD16_BYTE( "02.bin",  0x00000, 0x40000, CRC(15b2ff2f) SHA1(432cfd58daa0fdbe62157b36ca73eb9af6ce91e9) )
+	ROM_LOAD16_BYTE( "01.bin",  0x00001, 0x40000, CRC(5b8ba46a) SHA1(617e414fda1bd3e9f391676d312b0cdd4700adee) )
+
+	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "i03.bin",		0x000000, 0x010000, CRC(eb7bc99d) SHA1(b3063afd58025a441d4750c22483e9129da402e7) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "s-05.bin",    0x000000, 0x100000, CRC(fce962b9) SHA1(abd4311a17dac819d5bf8d81fe289a8b3a793b32) )
+	ROM_LOAD( "s-06.bin",    0x100000, 0x100000, CRC(16768fbc) SHA1(fe3667fc2e8fd0c6690e09f7b24466cc3eb34403) )
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "s-03.bin",    0x000001, 0x100000, CRC(bc1781b8) SHA1(5000f2111c5981428a772a9dcae2c7c8f1f6958b) )
+	ROM_LOAD16_BYTE( "s-04.bin",    0x000000, 0x100000, CRC(f823885e) SHA1(558b2bed207ccff8f1425cbb9dadc1ec0b70a65b) )
+
+	ROM_REGION( 0x140000, "oki1", 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "s-01.bin",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) )	/* all banked */
+
+	ROM_REGION( 0x140000, "oki2", 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "s-02.bin",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) )	/* all banked */
+ROM_END
+
 ROM_START( bjtwin )
 	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_BYTE( "93087-1.bin",  0x00000, 0x20000, CRC(93c84e2d) SHA1(ad0755cabfef78e7e689856379d6f8c88a9b27c1) )
@@ -6943,6 +6967,7 @@ GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "Media Tra
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
 GAME( 1992, sabotnba, sabotenb, bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1992, cactus,   sabotenb, bjtwin,   sabotenb, nmk,      ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", GAME_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", GAME_NO_COCKTAIL )
 GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", GAME_NO_COCKTAIL )
 
