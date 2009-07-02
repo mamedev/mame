@@ -1236,14 +1236,15 @@ static const struct CPS1config cps1_config_table[]=
 	{"forgottn", CPS_B_01,     mapper_LW621 },
 	{"forgottu", CPS_B_01,     mapper_LWCHR },
 	{"lostwrld", CPS_B_01,     mapper_LWCHR },
+	{"lostwrldo",CPS_B_01,     mapper_LWCHR },
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
 	{"ghoulsu",  CPS_B_01,     mapper_DM620 },
 	{"daimakai", CPS_B_01,     mapper_DM22A },	// equivalent to DM620
-	{"daimakr2", CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
+	{"daimakair",CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",  CPS_B_01,     mapper_ST24M1 },
 	{"stridrua", CPS_B_01,     mapper_ST24M1 },
-	{"striderj", CPS_B_01,     mapper_ST24M1 },
-	{"stridrja", CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
+	{"striderj", CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
+	{"striderjr",CPS_B_01,     mapper_ST24M1 },
 	{"dynwar",   CPS_B_02,     mapper_TK22B },
 	{"dynwaru",  CPS_B_02,     mapper_TK22B },
 	{"dynwarj",  CPS_B_02,     mapper_TK22B },

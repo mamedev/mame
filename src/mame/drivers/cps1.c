@@ -201,7 +201,7 @@ TO DO (2006.09.20) :
       * 'cworld2j' (IN2 only)
       * 'qad' and 'qadj'
       * 'qtono2'
-  - Check daimakr2 dip switches. E.g. changing the number of lives also changes the
+  - Check daimakar dip switches. E.g. changing the number of lives also changes the
     starting level.
 
 Stephh's log (2006.09.20) :
@@ -1064,7 +1064,7 @@ static INPUT_PORTS_START( strider )
 	CPS1_DIFFICULTY_2( "SW(B)" )
 	/* In 'striderj', bit 3 is stored at 0xff8e77 ($e77,A5) via code at 0x000a2a,
        but this address is never checked again.
-       In 'strider' and 'stridrja', this code even doesn't exist ! */
+       In 'strider' and 'stridrjr', this code even doesn't exist ! */
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )				PORT_DIPLOCATION("SW(B):4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )					// Manual says this is 2c start/1c continue but it
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )					// doesn't work (see comment above)
@@ -1113,7 +1113,7 @@ static INPUT_PORTS_START( stridrua )
 	PORT_MODIFY("DSWB")
 	/* In 'striderj', bit 3 is stored at 0xff8e77 ($e77,A5) via code at 0x000a2a,
        but this address is never checked again.
-       In 'strider' and 'stridrja', this code even doesn't exist ! */
+       In 'strider' and 'stridrjr', this code even doesn't exist ! */
 	PORT_DIPNAME( 0x08, 0x08, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW(B):4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )						// This works in this revision
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3116,6 +3116,43 @@ ROM_START( lostwrld )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 ROM_END
 
+ROM_START( lostwrldo )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "lw_11.14f",      0x00000, 0x20000, CRC(61e2cc56) SHA1(bc192e37806129dd00677ca2c2e4287aa670973d) )
+	ROM_LOAD16_BYTE( "lw_15.14g",      0x00001, 0x20000, CRC(8a0c18d3) SHA1(7a4d80cefa0c2be427de43fbbbb906880876ed1d) )
+	ROM_LOAD16_BYTE( "lw_10.13f",      0x40000, 0x20000, CRC(23bca4d5) SHA1(c9d356d052d82117b6c30e40aa02a5f1f5335a73) )
+	ROM_LOAD16_BYTE( "lw_14.13g",      0x40001, 0x20000, CRC(3a023771) SHA1(30de9b76e104e897ddce64615f24bba0aa270d14) )
+	ROM_LOAD16_WORD_SWAP( "lw-07.13e", 0x80000, 0x80000, CRC(fd252a26) SHA1(5cfb097984912a5167a8c7ec4c2e119b642f9970) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "lw-01.9d",  0x000000, 0x80000, CRC(0318f298) SHA1(178ffd6da7bf845e30abf1bfc38a469cd319a73f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-08.9f",  0x000002, 0x80000, CRC(25a8e43c) SHA1(d57cee1fc508db2677e84882fb814e4d9ad20543) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-05.9e",  0x000004, 0x80000, CRC(e4552fd7) SHA1(11147afc475904848458425661473586dd6f60cc) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-12.9g",  0x000006, 0x80000, CRC(8e6a832b) SHA1(d63a1331fda2365f090fa31950098f321a720ea8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-02.12d", 0x200000, 0x80000, CRC(43e6c5c8) SHA1(d3e6c971de0477ec4e178adc82508208dd8b397f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-09.12f", 0x200002, 0x80000, CRC(899cb4ad) SHA1(95e61af338945e690f2a82746feba3871ea224eb) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-06.12e", 0x200004, 0x80000, CRC(5b9edffc) SHA1(6fd8f4a3ab070733b52365ab1945bf86acb2bf62) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "lw-13.12g", 0x200006, 0x80000, CRC(8e058ef5) SHA1(00f2c0050fd106276ea5398511c5861ebfbc0d10) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, "stars", 0 )
+	ROM_COPY( "gfx", 0x200000, 0x000000, 0x8000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "lw_00b.14a", 0x00000, 0x08000, CRC(59df2a63) SHA1(dfe1fffc7a17179a80a2ae623e93b30a7d6df20d) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "lw-03.14c",  0x00000, 0x20000, CRC(ce2159e7) SHA1(77d564f8b768c1cbd6e5b334f7ee86c4c3f9d62e) )
+	ROM_LOAD( "lw-04.13c",  0x20000, 0x20000, CRC(39305536) SHA1(ad24d7b6df2dc5e84a35aecb9ba9b0aaa27ab6e5) )
+
+	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+ROM_END
+
 /* B-Board 88620B */
 ROM_START( ghouls )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
@@ -3273,27 +3310,24 @@ ROM_START( daimakai )
 	ROM_LOAD( "lwio.12c",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
-/* B-Board 91634B */
-/* This could be a hack since, running on a 91634B board, it must have been made at least three years after
-   the initial release of the game. However, if if it's a hack, it's exceptionally well made since all ROM
-   stickers look original and the B-board DAM63B PAL label is printed on the chip. */
-ROM_START( daimakr2 )
+/* B-Board 91634B-2 */
+ROM_START( daimakair )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "damj_23.8f",   0x00000, 0x80000, CRC(c3b248ec) SHA1(5c016d2dcf882b2a9564e3c4502a0f51ee3d1803) )
-	ROM_LOAD16_WORD_SWAP( "damj_22.7f",   0x80000, 0x80000, CRC(595ff2f3) SHA1(ac14b81e15f2c340526a03acbb4c28181d94d5b9) )	// == dm-17.7j
+	ROM_LOAD16_WORD_SWAP( "damj_23.bin",   0x00000, 0x80000, CRC(c3b248ec) SHA1(5c016d2dcf882b2a9564e3c4502a0f51ee3d1803) )
+	ROM_LOAD16_WORD_SWAP( "damj_22.bin",   0x80000, 0x80000, CRC(595ff2f3) SHA1(ac14b81e15f2c340526a03acbb4c28181d94d5b9) )	// == dm-17.7j
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROMX_LOAD( "dam_01.3a",   0x000000, 0x80000, CRC(0ba9c0b0) SHA1(c4945b603115f32b7346d72426571dc2d361159f) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-05.3a
-	ROMX_LOAD( "dam_02.4a",   0x000002, 0x80000, CRC(5d760ab9) SHA1(212176947933fcfef991bc80ad5bd91718689ffe) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-07.3f
-	ROMX_LOAD( "dam_03.5a",   0x000004, 0x80000, CRC(4ba90b59) SHA1(35bc9dec5ddbf064c30c951627581c16764456ac) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-06.3c
-	ROMX_LOAD( "dam_04.6a",   0x000006, 0x80000, CRC(4bdee9de) SHA1(7d0c4736f16577afe9966447a18f039728f6fbdf) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-08.3g
-	ROMX_LOAD( "dam_05.7a",   0x200000, 0x80000, CRC(7dc61b94) SHA1(7796bae7555c541b3c80aacfa24788aeb2ccdfd5) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "dam_06.8a",   0x200002, 0x80000, CRC(fde89758) SHA1(9a6192f629cd1e74e225ef7426338c2816c6b977) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "dam_07.9a",   0x200004, 0x80000, CRC(ec351d78) SHA1(1005a83be4b5577612143ae7f64ca4a08aae7959) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "dam_08.10a",  0x200006, 0x80000, CRC(ee2acc1e) SHA1(4628a9b2447266349d97132003992a21e2bb423a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_01.bin",   0x000000, 0x80000, CRC(0ba9c0b0) SHA1(c4945b603115f32b7346d72426571dc2d361159f) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-05.3a
+	ROMX_LOAD( "dam_02.bin",   0x000002, 0x80000, CRC(5d760ab9) SHA1(212176947933fcfef991bc80ad5bd91718689ffe) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-07.3f
+	ROMX_LOAD( "dam_03.bin",   0x000004, 0x80000, CRC(4ba90b59) SHA1(35bc9dec5ddbf064c30c951627581c16764456ac) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-06.3c
+	ROMX_LOAD( "dam_04.bin",   0x000006, 0x80000, CRC(4bdee9de) SHA1(7d0c4736f16577afe9966447a18f039728f6fbdf) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-08.3g
+	ROMX_LOAD( "dam_05.bin",   0x200000, 0x80000, CRC(7dc61b94) SHA1(7796bae7555c541b3c80aacfa24788aeb2ccdfd5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_06.bin",   0x200002, 0x80000, CRC(fde89758) SHA1(9a6192f629cd1e74e225ef7426338c2816c6b977) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_07.bin",   0x200004, 0x80000, CRC(ec351d78) SHA1(1005a83be4b5577612143ae7f64ca4a08aae7959) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_08.bin",  0x200006, 0x80000, CRC(ee2acc1e) SHA1(4628a9b2447266349d97132003992a21e2bb423a) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "dam_09.12a",   0x00000, 0x08000, CRC(0656ff53) SHA1(063a8124dbe73d014b11f72007f1b877afd1a661) )	// == dm_26.10a + garbage
+	ROM_LOAD( "dam_09.bin",   0x00000, 0x08000, CRC(0656ff53) SHA1(063a8124dbe73d014b11f72007f1b877afd1a661) )	// == dm_26.10a + garbage
 	ROM_CONTINUE(             0x10000, 0x18000 )	// second half of ROM is unused, not mapped in memory
 
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
@@ -3397,48 +3431,8 @@ ROM_START( stridrua )
 	ROM_LOAD( "lwio.11e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
-/* FIXME B-Board unknown
-   from the number of the only new ROM found in this set (sthj23.bin), this could
-   be from a 91634B/91635B, which would classify it as a hack since that board wasn't available at the
-   time of release of this game.
-   All other ROMs copied from the US set
-*/
-ROM_START( striderj )
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "sthj23.bin", 0x00000, 0x80000, CRC(046e7b12) SHA1(a5761f730f6844a7e93556a6aeae76240a99540c) )
-	ROM_LOAD16_WORD_SWAP( "st-14.8h",   0x80000, 0x80000, CRC(9b3cfc08) SHA1(a7d7f270a097437affa845d80bed82a1fa874878) )
-
-	ROM_REGION( 0x400000, "gfx", 0 )
-	ROMX_LOAD( "st-2.8a",   0x000000, 0x80000, CRC(4eee9aea) SHA1(5e619fd5f3f1181e32a8fd9dbb4661d74ff8a484) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "6" socket
-	ROMX_LOAD( "st-11.10a", 0x000002, 0x80000, CRC(2d7f21e4) SHA1(593cec513de40ff802084d54313bb25a4561e25d) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "8" socket
-	ROMX_LOAD( "st-5.4a",   0x000004, 0x80000, CRC(7705aa46) SHA1(6cbfa30b2852fd117d117beefba434ce41d24c2f) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "2" socket
-	ROMX_LOAD( "st-9.6a",   0x000006, 0x80000, CRC(5b18b722) SHA1(cf71c62348ca6b404279e87a6686cb3a842eb381) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "4" socket
-	ROMX_LOAD( "st-1.7a",   0x200000, 0x80000, CRC(005f000b) SHA1(e6f65af7cc3295be9efaaded352e7ae6320b4133) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "5" socket
-	ROMX_LOAD( "st-10.9a",  0x200002, 0x80000, CRC(b9441519) SHA1(bb0926dc484dae4f64c5e5a6bce20afdc7aeba55) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "7" socket
-	ROMX_LOAD( "st-4.3a",   0x200004, 0x80000, CRC(b7d04e8b) SHA1(5c5a079baa694927c33d0e0c23e5ff09d6c9d985) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "1" socket
-	ROMX_LOAD( "st-8.5a",   0x200006, 0x80000, CRC(6b4713b4) SHA1(759b8b1fc7a5c4b00d74a27c2dd11667db44b09e) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "3" socket
-
-	ROM_REGION( 0x8000, "stars", 0 )
-	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )
-
-	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "strider.09",    0x00000, 0x08000, CRC(2ed403bc) SHA1(4ce863ea40d789db5a7cfce91d2c7c720deb9be5) )
-	ROM_CONTINUE(              0x10000, 0x08000 )
-
-	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "strider.18",   0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )
-	ROM_LOAD( "strider.19",   0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )
-
-	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
-	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
-	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
-	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
-	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
-	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
-ROM_END
-
 /* FIXME B-Board 88622B ? (unverified) */
-ROM_START( stridrja )
+ROM_START( striderj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "sth36.bin",   0x00000, 0x20000, CRC(53c7b006) SHA1(30daa256a32b209b907e5d916a82068017862a01) )
 	ROM_LOAD16_BYTE( "sth42.bin",   0x00001, 0x20000, CRC(4037f65f) SHA1(490b9fb15f80772316101ea15e61ab32f42feaec) )
@@ -3493,6 +3487,41 @@ ROM_START( stridrja )
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "sth30.bin",    0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )	// == strider.18
 	ROM_LOAD( "sth31.bin",    0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )	// == strider.19
+
+	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+ROM_END
+
+/* B-Board 91634B-2 */
+ ROM_START( striderjr )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "sthj_23.bin", 0x00000, 0x80000, CRC(046e7b12) SHA1(a5761f730f6844a7e93556a6aeae76240a99540c) )
+	ROM_LOAD16_WORD_SWAP( "sthj_22.bin", 0x80000, 0x80000, CRC(9b3cfc08) SHA1(a7d7f270a097437affa845d80bed82a1fa874878) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "sth_01.bin",  0x000000, 0x80000, CRC(4eee9aea) SHA1(5e619fd5f3f1181e32a8fd9dbb4661d74ff8a484) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "6" socket
+	ROMX_LOAD( "sth_02.bin",  0x000002, 0x80000, CRC(2d7f21e4) SHA1(593cec513de40ff802084d54313bb25a4561e25d) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "8" socket
+	ROMX_LOAD( "sth_03.bin",  0x000004, 0x80000, CRC(7705aa46) SHA1(6cbfa30b2852fd117d117beefba434ce41d24c2f) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "2" socket
+	ROMX_LOAD( "sth_04.bin",  0x000006, 0x80000, CRC(5b18b722) SHA1(cf71c62348ca6b404279e87a6686cb3a842eb381) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "4" socket
+	ROMX_LOAD( "sth_05.bin",  0x200000, 0x80000, CRC(005f000b) SHA1(e6f65af7cc3295be9efaaded352e7ae6320b4133) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "5" socket
+	ROMX_LOAD( "sth_06.bin",  0x200002, 0x80000, CRC(b9441519) SHA1(bb0926dc484dae4f64c5e5a6bce20afdc7aeba55) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "7" socket
+	ROMX_LOAD( "sth_07.bin",  0x200004, 0x80000, CRC(b7d04e8b) SHA1(5c5a079baa694927c33d0e0c23e5ff09d6c9d985) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "1" socket
+	ROMX_LOAD( "sth_08.bin",  0x200006, 0x80000, CRC(6b4713b4) SHA1(759b8b1fc7a5c4b00d74a27c2dd11667db44b09e) , ROM_GROUPWORD | ROM_SKIP(6) )	// in "3" socket
+
+	ROM_REGION( 0x8000, "stars", 0 )
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sth_09.bin",   0x00000, 0x08000, CRC(08d63519) SHA1(c120ecfe25c3c50bc51bc7d5a9ef1c8ca6591240) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "sth_18.bin",   0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )
+	ROM_LOAD( "sth_19.bin",   0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )
 
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
@@ -8456,14 +8485,15 @@ static DRIVER_INIT( sf2mdt )
 GAME( 1988, forgottn, 0,        cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (World)", 0 )
 GAME( 1988, forgottu, forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Forgotten Worlds (US)", 0 )
 GAME( 1988, lostwrld, forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Lost Worlds (Japan)", 0 )
+GAME( 1988, lostwrldo,forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom", "Lost Worlds (Japan Old Ver.)", 0 )
 GAME( 1988, ghouls,   0,        cps1_10MHz, ghouls,   cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)" , 0)				// Wed.26.10.1988 in the ROMS
 GAME( 1988, ghoulsu,  ghouls,   cps1_10MHz, ghoulsu,  cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (US)" , 0)					// Wed.26.10.1988 in the ROMS
 GAME( 1988, daimakai, ghouls,   cps1_10MHz, daimakai, cps1,     ROT0,   "Capcom", "Dai Makai-Mura (Japan)" , 0)					// Wed.26.10.1988 in the ROMS
-GAME( 1988, daimakr2, ghouls,   cps1_10MHz, daimakai, cps1,     ROT0,   "Capcom", "Dai Makai-Mura (Japan hack?)" , 0)			// still Wed.26.10.1988 in the ROMS...
+GAME( 1988, daimakair,ghouls,   cps1_10MHz, daimakai, cps1,     ROT0,   "Capcom", "Dai Makai-Mura (Japan Resale Ver.)" , 0)		// still Wed.26.10.1988 in the ROMS...
 GAME( 1989, strider,  0,        cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider (US set 1)", 0 )
 GAME( 1989, stridrua, strider,  cps1_10MHz, stridrua, cps1,     ROT0,   "Capcom", "Strider (US set 2)", 0 )
-GAME( 1989, striderj, strider,  cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan set 1)", 0 )
-GAME( 1989, stridrja, strider,  cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan set 2)", 0 )
+GAME( 1989, striderj, strider,  cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan)", 0 )
+GAME( 1989, striderjr,strider,  cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan Resale Ver.)", 0 )
 GAME( 1989, dynwar,   0,        cps1_10MHz, dynwar,   cps1,     ROT0,   "Capcom", "Dynasty Wars (US set 1)", 0 )				// (c) Capcom U.S.A.
 GAME( 1989, dynwaru,  dynwar,   cps1_10MHz, dynwar,   cps1,     ROT0,   "Capcom", "Dynasty Wars (US set 2)", 0 )				// (c) Capcom U.S.A.
 GAME( 1989, dynwarj,  dynwar,   cps1_10MHz, dynwar,   cps1,     ROT0,   "Capcom", "Tenchi wo Kurau (Japan)", 0 )
