@@ -4910,17 +4910,30 @@ UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
 static int K053936_offset[K053936_MAX_CHIPS][2];
 static int K053936_wraparound[K053936_MAX_CHIPS];
 
+// there is another implementation of this in  machine/konamigx.c (!)
+//  why?
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl,bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
-	if (ctrl[0x07] & 0x0040)	/* "super" mode */
+	if (!tmap)
+		return;
+
+	if (ctrl[0x07] & 0x0040)
 	{
 		UINT32 startx,starty;
 		int incxx,incxy;
 		rectangle my_clip;
 		int y,maxy;
-
-		if ((ctrl[0x07] & 0x0002) && ctrl[0x09])	/* wrong, but fixes glfgreat */
+	
+		// Racin' Force will get to here if glfgreat_hack is enabled, and it ends 
+		// up setting a maximum y value of '13', thus causing nothing to be drawn.
+		// It looks like the roz output should be flipped somehow as it seems to be
+		// displaying the wrong areas of the tilemap and is rendered upside down,
+		// although due to the additional post-processing the voxel renderer performs
+		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
+		// to see the chip output)
+		
+		if (((ctrl[0x07] & 0x0002) && ctrl[0x09]) && (glfgreat_hack))	/* wrong, but fixes glfgreat */
 		{
 			my_clip.min_x = ctrl[0x08] + K053936_offset[chip][0]+2;
 			my_clip.max_x = ctrl[0x09] + K053936_offset[chip][0]+2 - 1;
@@ -4944,12 +4957,14 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl,bitmap_t *b
 			y = cliprect->min_y;
 			maxy = cliprect->max_y;
 		}
-
+		
 		while (y <= maxy)
 		{
 			UINT16 *lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
 			my_clip.min_y = my_clip.max_y = y;
 
+			
+			
 			startx = 256 * (INT16)(lineaddr[0] + ctrl[0x00]);
 			starty = 256 * (INT16)(lineaddr[1] + ctrl[0x01]);
 			incxx  =       (INT16)(lineaddr[2]);
@@ -5019,14 +5034,14 @@ if (input_code_pressed(KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
-	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority);
+	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
-void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
-	K053936_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,flags,priority);
+	K053936_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
 

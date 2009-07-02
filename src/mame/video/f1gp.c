@@ -317,7 +317,7 @@ VIDEO_UPDATE( f1gp )
 {
 	bitmap_fill(priority_bitmap, cliprect, 0);
 
-	K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
+	K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0,1);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 
@@ -443,18 +443,18 @@ VIDEO_UPDATE( f1gp2 )
 		switch (gfxctrl & 3)
 		{
 			case 0:
-				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0);
+				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0,1);
 				f1gp2_draw_sprites(screen->machine,bitmap,cliprect);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 				break;
 			case 1:
-				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0);
+				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0,1);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 				f1gp2_draw_sprites(screen->machine,bitmap,cliprect);
 				break;
 			case 2:
 				tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
+				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0,1);
 				f1gp2_draw_sprites(screen->machine,bitmap,cliprect);
 				break;
 #ifdef MAME_DEBUG

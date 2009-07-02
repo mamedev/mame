@@ -151,7 +151,7 @@ VIDEO_START( suprslam )
 VIDEO_UPDATE( suprslam )
 {
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	K053936_0_zoom_draw(bitmap,cliprect,suprslam_bg_tilemap,0,0);
+	K053936_0_zoom_draw(bitmap,cliprect,suprslam_bg_tilemap,0,0,1);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,suprslam_screen_tilemap,0,0);
 	return 0;

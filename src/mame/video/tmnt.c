@@ -708,19 +708,19 @@ VIDEO_UPDATE( glfgreat )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
 	if (layerpri[0] >= 0x30 && layerpri[1] < 0x30)
 	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
+		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
 		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
 	if (layerpri[1] >= 0x30 && layerpri[2] < 0x30)
 	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
+		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
 		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
 	if (layerpri[2] >= 0x30)
 	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
+		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
 		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
 	}
 

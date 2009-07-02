@@ -177,7 +177,7 @@ static void draw_bg(bitmap_t *bitmap,const rectangle *cliprect)
 
 static void draw_fg(bitmap_t *bitmap,const rectangle *cliprect)
 {
-	K053936_0_zoom_draw(bitmap,cliprect,tilemap1,0,0);
+	K053936_0_zoom_draw(bitmap,cliprect,tilemap1,0,0,1);
 }
 
 

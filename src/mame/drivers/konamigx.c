@@ -807,20 +807,20 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 		case 11: // Racin' Force
-			if (reg == 0)
+			if (reg == 0) 
 			{
 				if (cpu_get_pc(space->cpu) == 0x0202190)
 					rv |= 0x4000;
 			}
 			break;
-
+			
 		case 12: // Open Golf / Golfing Greats 2
-			if (reg == 0)
+			if (reg == 0) 
 			{
 				if ((cpu_get_pc(space->cpu) == 0x0245e80) || (cpu_get_pc(space->cpu) == 0x02459d6) || (cpu_get_pc(space->cpu) == 0x0245e40) )
-					rv |= 0x4000;
+					rv |= 0x4000;	
 			}
-			break;
+			break;		
 		}
 
 	return(rv);
@@ -1172,10 +1172,10 @@ static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE(adc0834_w)
 	AM_RANGE(0xddc000, 0xddcfff) AM_READ(adc0834_r)
 	AM_RANGE(0xdde000, 0xdde003) AM_WRITE(type1_cablamps_w)
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl) 	// chips 21L+19L / S
+	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl) 	// chips 21L+19L / S
 	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_BASE(&gx_psacram)  // chips 20J+23J+18J / S
 	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
@@ -1323,6 +1323,8 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
+// for scanrows on tilemap
+#if 0
 static const gfx_layout t1_charlayout6 =
 {
 	16, 16,
@@ -1345,6 +1347,32 @@ static const gfx_layout t1_charlayout8 =
 	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
 	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	16*16*8
+};
+#endif
+
+// for scancols on tilemap
+static const gfx_layout t1_charlayout6 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	6,
+	{ 20, 16, 12, 8, 4, 0 },
+	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
+	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
+  16*16*6
+};
+
+static const gfx_layout t1_charlayout8 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	8,
+	{ 28, 24, 20, 16, 12, 8, 4, 0 },
+	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
+	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
+	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
+  16*16*8
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
