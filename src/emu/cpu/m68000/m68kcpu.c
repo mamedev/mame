@@ -484,7 +484,8 @@ INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
 		   cpu_get_type(device) == CPU_M68010 ||
 		   cpu_get_type(device) == CPU_M68EC020 ||
 		   cpu_get_type(device) == CPU_M68020 ||
-		   cpu_get_type(device) == CPU_M68040);
+		   cpu_get_type(device) == CPU_M68040 ||
+		   cpu_get_type(device) == CPU_SCC68070);
 	return (m68ki_cpu_core *)device->token;
 }
 
@@ -1332,5 +1333,27 @@ CPU_GET_INFO( m68040 )
 			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
+	}
+}
+
+
+/****************************************************************************
+ * SCC-68070 section
+ ****************************************************************************/
+
+CPU_GET_INFO( scc68070 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m68000);		break; //todo
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
+
+		default: 										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
