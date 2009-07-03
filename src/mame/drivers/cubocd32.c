@@ -41,7 +41,6 @@
 
    ToDo:
    - remove the hack needed to make inputs working
-   - find proper framerate - cndypuzl requires 60 (resets otherwise), mgnumber requires 50 (resets otherwise)
    - settings are not saved
 
 
@@ -1052,8 +1051,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.997)    /* needed to boot 'cndypuzl' */
-//  MDRV_SCREEN_REFRESH_RATE(50)        /* needed to boot 'mgnumber' */
+	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 312)
@@ -1078,13 +1076,6 @@ static MACHINE_DRIVER_START( cd32 )
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
 	MDRV_CIA8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START(cd32_50fps)
-	MDRV_IMPORT_FROM(cd32)
-
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
@@ -1312,10 +1303,10 @@ static DRIVER_INIT(mgprem11)
 /* BIOS */
 GAME( 1993, cd32,     0,    cd32, cd32,     cd32,     ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, cndypuzl, cd32, cd32,       cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cd32, cd32,       haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cd32, cd32,       lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
-GAME( 1995, lsrquiz2, cd32, cd32,       lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lasstixx, cd32, cd32,       lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, mgnumber, cd32, cd32_50fps, mgnumber, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, mgprem11, cd32, cd32,       mgprem11, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cd32, cd32, lsrquiz,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
+GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, mgnumber, cd32, cd32, mgnumber, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, mgprem11, cd32, cd32, mgprem11, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
