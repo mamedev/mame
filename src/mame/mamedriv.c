@@ -2457,8 +2457,8 @@ V-V                           TP-027
 	DRIVER( f1dreamb )	/* bootleg */
 	DRIVER( 1943kai )	/*  6/1988 (c) 1987 (Japan) */
 	DRIVER( lastduel )	/*  7/1988 (c) 1988 (US) */
-	DRIVER( lstduela )	/*  7/1988 (c) 1988 (US) */
-	DRIVER( lstduelb )	/* bootleg */
+	DRIVER( lastduelo )	/*  7/1988 (c) 1988 (US) */
+	DRIVER( lastduelb )	/* bootleg */
 	DRIVER( madgear )	/*  2/1989 (c) 1989 (US) */
 	DRIVER( madgearj )	/*  2/1989 (c) 1989 (Japan) */
 	DRIVER( ledstorm )	/*  1988 (c) 1988 (US) */

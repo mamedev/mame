@@ -14,6 +14,9 @@ TODO:
   be like that. The priority PROM is missing.
 - visible area might be wrong
 
+Last Duel
+- PCB No. Top:87615A-4 / Bottom:87615B-3
+
 **************************************************************************/
 
 #include "driver.h"
@@ -179,6 +182,13 @@ static GFXDECODE_START( lastduel )
 	GFXDECODE_ENTRY( "gfx1", 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0,tile_layout,   0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx4", 0,madgear_tile,  0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
+
+static GFXDECODE_START( lastduelb )
+	GFXDECODE_ENTRY( "gfx1", 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx2", 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( "gfx3", 0,tile_layout,   0x000, 16 )	/* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0,tile_layout,   0x100, 16 )	/* colors 0x100-0x1ff */
 GFXDECODE_END
 
@@ -244,6 +254,44 @@ static MACHINE_DRIVER_START( lastduel )
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 
 	MDRV_GFXDECODE(lastduel)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(lastduel)
+	MDRV_VIDEO_EOF(lastduel)
+	MDRV_VIDEO_UPDATE(lastduel)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( lastduelb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
+	MDRV_CPU_PROGRAM_MAP(lastduel_map)
+	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
+
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+
+	MDRV_GFXDECODE(lastduelb)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lastduel)
@@ -525,91 +573,65 @@ INPUT_PORTS_END
 
 ROM_START( lastduel )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "ldu-06.rom",   0x00000, 0x20000, CRC(4228a00b) SHA1(8c23f74f682ba2074da9f3306600c881ce41e50f) )
-	ROM_LOAD16_BYTE( "ldu-05.rom",   0x00001, 0x20000, CRC(7260434f) SHA1(55eeb12977efb3c6afd86d68612782ba526c9055) )
-	ROM_LOAD16_BYTE( "ldu-04.rom",   0x40000, 0x10000, CRC(429fb964) SHA1(78769b05e62c190d846dd08214427d1abbbe2bba) )
-	ROM_LOAD16_BYTE( "ldu-03.rom",   0x40001, 0x10000, CRC(5aa4df72) SHA1(9e7315b793f09c8b422bad1ce776588e3a48d80c) )
+	ROM_LOAD16_BYTE( "ldu_06b.13k",   0x00000, 0x20000, CRC(0e71acaf) SHA1(e804c77bfd768ae2fc1917bcec1fd0ec7418b780) )
+	ROM_LOAD16_BYTE( "ldu_05b.12k",   0x00001, 0x20000, CRC(47a85bea) SHA1(9d6b2a4e27c84ffce8ed58aa1b314c67c7314932) )
+	ROM_LOAD16_BYTE( "ldu_04b.11k",   0x40000, 0x10000, CRC(aa4bf001) SHA1(3f14b174016c6fa4c82011d3d0f1c957096d6d93) )
+	ROM_LOAD16_BYTE( "ldu_03b.9k",    0x40001, 0x10000, CRC(bbaac8ab) SHA1(3c5773e39e7a96ef62da7b846ce4099222b3e66b) )
 
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
+	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_09.bin",    0x000000, 0x10000, CRC(f8fd5243) SHA1(fad80d8959f50a83eb2e47788a8183284d19bea6) ) /* sprites */
-	ROM_LOAD( "ld_10.bin",    0x010000, 0x10000, CRC(b49ad746) SHA1(4e609982d60155b0df13a156c37bdf2a25626632) )
-	ROM_LOAD( "ld_11.bin",    0x020000, 0x10000, CRC(1a0d180e) SHA1(a68a7f5d00da99a8068876fd2d61c726047aca80) )
-	ROM_LOAD( "ld_12.bin",    0x030000, 0x10000, CRC(b2745e26) SHA1(b511631fe4e21f3d2dc7440b3f69cd5edb43d20e) )
-	ROM_LOAD( "ld_15.bin",    0x040000, 0x10000, CRC(96b13bbc) SHA1(f2df8d4f11e9192063063ff2e9e4fe76971c5b24) )
-	ROM_LOAD( "ld_16.bin",    0x050000, 0x10000, CRC(9d80f7e6) SHA1(ce7c10eba6a9f6a1fad655c7de6b487aef6d7d64) )
-	ROM_LOAD( "ld_13.bin",    0x060000, 0x10000, CRC(a1a598ac) SHA1(a0d24d9125cd502b57adf9167cb61e8864d521ce) )
-	ROM_LOAD( "ld_14.bin",    0x070000, 0x10000, CRC(edf515cc) SHA1(8dc68d1d4e480afe9614ea85e2eced3fd3917484) )
+	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
+	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
+	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
+	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
 
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_01.bin",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
+	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
 
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_17.bin",    0x000000, 0x10000, CRC(7188bfdd) SHA1(26c47af6abb4e6f5e11e2dd6b56113a54c0e6269) ) /* tiles */
-	ROM_LOAD( "ld_18.bin",    0x010000, 0x10000, CRC(a62af66a) SHA1(240dafcb03011cf51bfe9d01bec4aceac64d5760) )
-	ROM_LOAD( "ld_19.bin",    0x020000, 0x10000, CRC(4b762e50) SHA1(95b3413f67d2e9ebea2a8331945a572a3d824cc1) )
-	ROM_LOAD( "ld_20.bin",    0x030000, 0x10000, CRC(b140188e) SHA1(491af082789a11c809c2798da6ae5e52a2b1d986) )
+	ROM_LOAD( "ld-15.6p",     0x000000, 0x20000, CRC(d977a175) SHA1(e3cb482ede10d2204f8352b10623e442a4ae99d2) ) /* tiles */
+	ROM_LOAD( "ld-13.6m",     0x020000, 0x20000, CRC(bc25729f) SHA1(7a6e8a4158bf4c804e87b11c15deb6d0f09fa538) )
 
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_28.bin",    0x000000, 0x10000, CRC(06778248) SHA1(09663db5f07961a432feb4f82847a2f9741b34ad) ) /* tiles */
-	ROM_LOAD( "ld_26.bin",    0x010000, 0x10000, CRC(b0edac81) SHA1(2ba1f864b7f8047b20206063d4e9956ef1d1ad34) )
-	ROM_LOAD( "ld_24.bin",    0x020000, 0x10000, CRC(66eac4df) SHA1(b2604f6fd443071deb2729f4381e6fe3a2069a33) )
-	ROM_LOAD( "ld_22.bin",    0x030000, 0x10000, CRC(f80f8812) SHA1(2483b272b51ab15c47eb0b48df68b7c3b05d4d35) )
-	ROM_LOAD( "ld_27.bin",    0x040000, 0x10000, CRC(48c78675) SHA1(27b03cd1a5335b60953e5dc4888264598e63c147) )
-	ROM_LOAD( "ld_25.bin",    0x050000, 0x10000, CRC(c541ae9a) SHA1(b1d6acab76cba77ea6b9fe6fc770b6a6d6960a77) )
-	ROM_LOAD( "ld_23.bin",    0x060000, 0x10000, CRC(d817332c) SHA1(c1c3d70a42eb01237bcbe8e274f7022e74c8c715) )
-	ROM_LOAD( "ld_21.bin",    0x070000, 0x10000, CRC(b74f0c0e) SHA1(866e3c65fd5dd7099423baefd09eb2b7da7e8392) )
+	ROM_LOAD( "ld-14.15n",    0x000000, 0x80000, CRC(d0653739) SHA1(8278e8601e82470d785a8ffef48a1b5f70bc2a9b) ) /* tiles */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141.3d",    0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
 ROM_END
 
-ROM_START( lstduela )
+ROM_START( lastduelo )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "06",   0x00000, 0x20000, CRC(0e71acaf) SHA1(e804c77bfd768ae2fc1917bcec1fd0ec7418b780) )
-	ROM_LOAD16_BYTE( "05",   0x00001, 0x20000, CRC(47a85bea) SHA1(9d6b2a4e27c84ffce8ed58aa1b314c67c7314932) )
-	ROM_LOAD16_BYTE( "04",   0x40000, 0x10000, CRC(aa4bf001) SHA1(3f14b174016c6fa4c82011d3d0f1c957096d6d93) )
-	ROM_LOAD16_BYTE( "03",   0x40001, 0x10000, CRC(bbaac8ab) SHA1(3c5773e39e7a96ef62da7b846ce4099222b3e66b) )
+	ROM_LOAD16_BYTE( "ldu-06.13k",   0x00000, 0x20000, CRC(4228a00b) SHA1(8c23f74f682ba2074da9f3306600c881ce41e50f) )
+	ROM_LOAD16_BYTE( "ldu-05.12k",   0x00001, 0x20000, CRC(7260434f) SHA1(55eeb12977efb3c6afd86d68612782ba526c9055) )
+	ROM_LOAD16_BYTE( "ldu-04.11k",   0x40000, 0x10000, CRC(429fb964) SHA1(78769b05e62c190d846dd08214427d1abbbe2bba) )
+	ROM_LOAD16_BYTE( "ldu-03.9k",   0x40001, 0x10000, CRC(5aa4df72) SHA1(9e7315b793f09c8b422bad1ce776588e3a48d80c) )
 
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
+	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_09.bin",    0x000000, 0x10000, CRC(f8fd5243) SHA1(fad80d8959f50a83eb2e47788a8183284d19bea6) ) /* sprites */
-	ROM_LOAD( "ld_10.bin",    0x010000, 0x10000, CRC(b49ad746) SHA1(4e609982d60155b0df13a156c37bdf2a25626632) )
-	ROM_LOAD( "ld_11.bin",    0x020000, 0x10000, CRC(1a0d180e) SHA1(a68a7f5d00da99a8068876fd2d61c726047aca80) )
-	ROM_LOAD( "ld_12.bin",    0x030000, 0x10000, CRC(b2745e26) SHA1(b511631fe4e21f3d2dc7440b3f69cd5edb43d20e) )
-	ROM_LOAD( "ld_15.bin",    0x040000, 0x10000, CRC(96b13bbc) SHA1(f2df8d4f11e9192063063ff2e9e4fe76971c5b24) )
-	ROM_LOAD( "ld_16.bin",    0x050000, 0x10000, CRC(9d80f7e6) SHA1(ce7c10eba6a9f6a1fad655c7de6b487aef6d7d64) )
-	ROM_LOAD( "ld_13.bin",    0x060000, 0x10000, CRC(a1a598ac) SHA1(a0d24d9125cd502b57adf9167cb61e8864d521ce) )
-	ROM_LOAD( "ld_14.bin",    0x070000, 0x10000, CRC(edf515cc) SHA1(8dc68d1d4e480afe9614ea85e2eced3fd3917484) )
+	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
+	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
+	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
+	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
 
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_01.bin",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
+	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
 
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_17.bin",    0x000000, 0x10000, CRC(7188bfdd) SHA1(26c47af6abb4e6f5e11e2dd6b56113a54c0e6269) ) /* tiles */
-	ROM_LOAD( "ld_18.bin",    0x010000, 0x10000, CRC(a62af66a) SHA1(240dafcb03011cf51bfe9d01bec4aceac64d5760) )
-	ROM_LOAD( "ld_19.bin",    0x020000, 0x10000, CRC(4b762e50) SHA1(95b3413f67d2e9ebea2a8331945a572a3d824cc1) )
-	ROM_LOAD( "ld_20.bin",    0x030000, 0x10000, CRC(b140188e) SHA1(491af082789a11c809c2798da6ae5e52a2b1d986) )
+	ROM_LOAD( "ld-15.6p",     0x000000, 0x20000, CRC(d977a175) SHA1(e3cb482ede10d2204f8352b10623e442a4ae99d2) ) /* tiles */
+	ROM_LOAD( "ld-13.6m",     0x020000, 0x20000, CRC(bc25729f) SHA1(7a6e8a4158bf4c804e87b11c15deb6d0f09fa538) )
 
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_28.bin",    0x000000, 0x10000, CRC(06778248) SHA1(09663db5f07961a432feb4f82847a2f9741b34ad) ) /* tiles */
-	ROM_LOAD( "ld_26.bin",    0x010000, 0x10000, CRC(b0edac81) SHA1(2ba1f864b7f8047b20206063d4e9956ef1d1ad34) )
-	ROM_LOAD( "ld_24.bin",    0x020000, 0x10000, CRC(66eac4df) SHA1(b2604f6fd443071deb2729f4381e6fe3a2069a33) )
-	ROM_LOAD( "ld_22.bin",    0x030000, 0x10000, CRC(f80f8812) SHA1(2483b272b51ab15c47eb0b48df68b7c3b05d4d35) )
-	ROM_LOAD( "ld_27.bin",    0x040000, 0x10000, CRC(48c78675) SHA1(27b03cd1a5335b60953e5dc4888264598e63c147) )
-	ROM_LOAD( "ld_25.bin",    0x050000, 0x10000, CRC(c541ae9a) SHA1(b1d6acab76cba77ea6b9fe6fc770b6a6d6960a77) )
-	ROM_LOAD( "ld_23.bin",    0x060000, 0x10000, CRC(d817332c) SHA1(c1c3d70a42eb01237bcbe8e274f7022e74c8c715) )
-	ROM_LOAD( "ld_21.bin",    0x070000, 0x10000, CRC(b74f0c0e) SHA1(866e3c65fd5dd7099423baefd09eb2b7da7e8392) )
+	ROM_LOAD( "ld-14.15n",    0x000000, 0x80000, CRC(d0653739) SHA1(8278e8601e82470d785a8ffef48a1b5f70bc2a9b) ) /* tiles */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141.3d",    0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
 ROM_END
 
-ROM_START( lstduelb )
+ROM_START( lastduelb )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ld_08.bin",    0x00000, 0x10000, CRC(43811a96) SHA1(79db50c941d8845f1642f2257c610768172923a3) )
 	ROM_LOAD16_BYTE( "ld_07.bin",    0x00001, 0x10000, CRC(63c30946) SHA1(cab7374839a68483b3f94821144546cc3eb1528e) )
@@ -619,7 +641,7 @@ ROM_START( lstduelb )
 	ROM_LOAD16_BYTE( "ldu-03.rom",   0x40001, 0x10000, CRC(5aa4df72) SHA1(9e7315b793f09c8b422bad1ce776588e3a48d80c) )
 
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
+	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ld_09.bin",    0x000000, 0x10000, CRC(f8fd5243) SHA1(fad80d8959f50a83eb2e47788a8183284d19bea6) ) /* sprites */
@@ -632,7 +654,7 @@ ROM_START( lstduelb )
 	ROM_LOAD( "ld_14.bin",    0x070000, 0x10000, CRC(edf515cc) SHA1(8dc68d1d4e480afe9614ea85e2eced3fd3917484) )
 
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ld_01.bin",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
+	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
 
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "ld_17.bin",    0x000000, 0x10000, CRC(7188bfdd) SHA1(26c47af6abb4e6f5e11e2dd6b56113a54c0e6269) ) /* tiles */
@@ -651,7 +673,7 @@ ROM_START( lstduelb )
 	ROM_LOAD( "ld_21.bin",    0x070000, 0x10000, CRC(b74f0c0e) SHA1(866e3c65fd5dd7099423baefd09eb2b7da7e8392) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141.3d",    0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
 ROM_END
 
 ROM_START( madgear )
@@ -808,10 +830,10 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel, 0,        lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US set 1)", 0 )
-GAME( 1988, lstduela, lastduel, lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US set 2)", 0 )
-GAME( 1988, lstduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", 0 )
-GAME( 1989, madgear,  0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
-GAME( 1989, madgearj, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
-GAME( 1988, ledstorm, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
-GAME( 1988, ledstrm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", 0 )
+GAME( 1988, lastduel,  0,        lastduel,  lastduel, 0, ROT270, "Capcom", "Last Duel (US New Ver.)", 0 )
+GAME( 1988, lastduelo, lastduel, lastduel,  lastduel, 0, ROT270, "Capcom", "Last Duel (US Old Ver.)", 0 )
+GAME( 1988, lastduelb, lastduel, lastduelb, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", 0 )
+GAME( 1989, madgear,   0,        madgear,   madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
+GAME( 1989, madgearj,  madgear,  madgear,   madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
+GAME( 1988, ledstorm,  madgear,  madgear,   madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
+GAME( 1988, ledstrm2,  madgear,  madgear,   madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", 0 )
