@@ -13,15 +13,15 @@
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
     Game status:
-    vf3/vf3a - boots and runs
-    vf3tb - deliberately kills itself (jumps to infinite loop)
+    vf3/vf3a - boots and runs <-- doesn't boot - stuck in poly_wait()
+    vf3tb - doesn't boot - bad dump
     bass - boots and runs with 3D
     getbass - I/O board error (?)
 
     scud/scuda - boots and runs with 3D (scuda says "for sale and use only in Japan but is marked Export?)
     scudj - boots but hangs up (no SCSI IRQs)
     scudp - shows initial screen, apparently won't go into test mode or advance
-    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked)
+    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked) <-- crashes MAME on boot (accesses CROM bank 0xe - should be masked/mirrored)
     vs215 - boots and runs with 3D
     lemans24 - SCSI IRQ stuck on (boots if hacked)
     vs29815 - write to unknown 53c810 SCSI register
@@ -34,7 +34,8 @@
     fvipers2 - says "ONE PROCESSOR DETECTED" and hangs (no SCSI IRQs occur, others look fine)
     vs298/vs299/vs2v991 - hangs (no SCSI IRQs occur, others look fine)
 
-    daytona2/dayto2pe - hangs MAME, CROMs (program/data) are marked "bad dump"
+    daytona2 - hangs MAME, CROMs (program/data) are marked "bad dump"
+    dayto2pe - bug in DRC MMU page-fault handling, causes infinite loop at PC:0x2270 (or debug assert)
     dirtdvls/dirtdvla - SCSI IRQ stuck on (boots partially if hacked)
     swtrilgy - doesn't boot (no SCSI IRQs occur, other IRQs look fine) 
     swtrilga - SCSI IRQ stuck on
@@ -2625,10 +2626,10 @@ ROM_START( vf3tb )	/* step 1.0? */
 	ROM_LOAD64_WORD_SWAP( "epr-20129.20",  0x600000, 0x080000, CRC(0db897ce) SHA1(68f5005082c69fab254d43485669dd6b95a6cc9b) )
 
 	// CROM0
-	ROM_LOAD64_WORD_SWAP( "mpr-20130.1",   0x800006, 0x200000, CRC(19e1eaca) SHA1(e63afe7d8f5e653d0efd026fe20da0850f908d5e) )
-	ROM_LOAD64_WORD_SWAP( "mpr-20131.2",   0x800004, 0x200000, CRC(d86ec71b) SHA1(da8ffb1a8000b8e656893c29dad8458e04c91df6) )
-	ROM_LOAD64_WORD_SWAP( "mpr-20132.3",   0x800002, 0x200000, CRC(91ebc0fb) SHA1(0c37d29c15ec7137dd5398c010a289ffce9ee1e8) )
-	ROM_LOAD64_WORD_SWAP( "mpr-20133.4",   0x800000, 0x200000, CRC(d9a10a89) SHA1(a1c1dff2cde54cd128690bb5896448786e5243b9) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20130.1",   0x800006, 0x200000, BAD_DUMP CRC(19e1eaca) SHA1(e63afe7d8f5e653d0efd026fe20da0850f908d5e) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20131.2",   0x800004, 0x200000, BAD_DUMP CRC(d86ec71b) SHA1(da8ffb1a8000b8e656893c29dad8458e04c91df6) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20132.3",   0x800002, 0x200000, BAD_DUMP CRC(91ebc0fb) SHA1(0c37d29c15ec7137dd5398c010a289ffce9ee1e8) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20133.4",   0x800000, 0x200000, BAD_DUMP CRC(d9a10a89) SHA1(a1c1dff2cde54cd128690bb5896448786e5243b9) )
 
 	// CROM1
 	ROM_LOAD64_WORD_SWAP( "mpr-19197.5",  0x1800006, 0x400000, CRC(a22d76c9) SHA1(ad2d67a62436ccc6479e2a218ab09d2fc22c367d) )
