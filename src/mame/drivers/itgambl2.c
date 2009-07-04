@@ -436,7 +436,7 @@ ROM_START( mdrink )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "mdrink_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 ) /* only 3 ROMs?? */
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "mdrink-1.bin", 0x000000, 0x80000, CRC(25a7cea9) SHA1(d67a7264501699c8f7a48c3f3956903a5c95898f) )
 	ROM_LOAD( "mdrink-2.bin", 0x080000, 0x80000, CRC(c2a14bca) SHA1(8d0095333c34d81d103f15ee5731e2e4aa4d1fac) )
 	ROM_LOAD( "mdrink-3.bin", 0x100000, 0x80000, CRC(ff593676) SHA1(b21bb85df0b7b79c07ded2c4b950c94719e08302) )
@@ -538,7 +538,7 @@ ROM_START( cmagica )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "cmagica_ver1.8_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 ) /* gfx seems 3bpp, not separated bitplanes? */
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "1.u6", 0x000000, 0x80000, CRC(3e7e6c9f) SHA1(53a7c4422d9a7c63a21cf4d35d4d883dc2d0eac0) )
 	ROM_LOAD( "2.u7", 0x080000, 0x80000, CRC(6339b62d) SHA1(160030e07600c8db365429c27a33081cfa7d3d61) )
 	ROM_LOAD( "3.u4", 0x100000, 0x80000, CRC(ba636099) SHA1(3d3d9eee5d6808d7666dbf113d7c17a03b6b461e) )
@@ -586,7 +586,7 @@ ROM_START( millsun )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "millsun_hd64f3337f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "msun_ep1.bin", 0x000000, 0x80000, CRC(06f10795) SHA1(f88a36e11f8ba38439aa066dc013427f204be3d7) )
 	ROM_LOAD( "msun_ep2.bin", 0x080000, 0x80000, CRC(f85d10e6) SHA1(d33017c4a4883a4c9c76132deb5c57eb38f9fdb3) )
 	ROM_LOAD( "msun_ep3.bin", 0x100000, 0x80000, CRC(329d380c) SHA1(618a7010fca8be6c368c3cc09fe129d8a4c72087) )
@@ -635,7 +635,7 @@ ROM_START( sspac2k1 )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "sspac2k1_hd64f3337f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "sup_spaces_ep1.bin", 0x000000, 0x80000, CRC(d512ee80) SHA1(f113218899394bf1dfe81518746414c4eda9a94c) )
 	ROM_LOAD( "sup_spaces_ep2.bin", 0x080000, 0x80000, CRC(775eb938) SHA1(a83851ea6d90aaf3cad064cdbcc8379eed3d90ca) )
 	ROM_LOAD( "sup_spaces_ep3.bin", 0x100000, 0x80000, CRC(d1d9c06c) SHA1(64993b5572201cc2c29d8900a89f036e96221e05) )
@@ -725,7 +725,7 @@ ROM_START( trstar2k )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "trstar2k_hd64f3337ycp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "ep1.bin", 0x000000, 0x80000, CRC(59394c87) SHA1(a8b5de197b474714a8e5a5c959b81cb78fc69291) )
 	ROM_LOAD( "ep2.bin", 0x080000, 0x80000, CRC(80608870) SHA1(5af501e4bb9498d2b9b614cc98ec9f4c907f207d) )
 	ROM_LOAD( "ep3.bin", 0x100000, 0x80000, CRC(cad4523f) SHA1(1a16f200622a8c9666beea2da2ec64bf7c9195a8) )
@@ -745,7 +745,7 @@ ROM_START( sstar )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "sstar_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 ) /* gfx seems 4bpp */
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "sstar.ep1", 0x000000, 0x80000, CRC(e798295e) SHA1(ed9a0ceeaefccfb1bde5894548ba91d631055b69) ) //contains C-based strings?
 	ROM_LOAD( "sstar.ep2", 0x080000, 0x80000, CRC(5e9fa33b) SHA1(5196723db69bf9f1df497f4d8f84ac1d9768736f) )
 	ROM_LOAD( "sstar.ep3", 0x100000, 0x80000, CRC(67abc2a1) SHA1(877e233b2120281779a2480e8035a73df87e7240) )
@@ -753,6 +753,29 @@ ROM_START( sstar )
 	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
 	ROM_LOAD( "sstar.msg0", 0x00000, 0x20000, CRC(04f44a53) SHA1(0b27d1fe1992d1769abec2078defc30896c36bcb) )
 ROM_END
+
+/* Pirati
+
+H8/337 HD64F3337CP16
+16.000 MHz
+14.31818 MHz
+D7759GC
+
+*/
+
+ROM_START( pirati )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "pirati_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "s.ch.ep1", 0x000000, 0x80000, CRC(735d28a6) SHA1(feaf71b64db45e9dd68bff4daf75d3bd5e6ab6c8) )
+	ROM_LOAD( "s.ch.ep2", 0x080000, 0x80000, CRC(35b75de6) SHA1(95c85c505ed0f3ddcc8c5d0d9e19128515840282) )
+	ROM_LOAD( "s.ch.ep3", 0x100000, 0x80000, CRC(faff2daa) SHA1(ea7376d20d5ddd50c7a4b0c86d7998bcc0fa1598) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "m.s.g.0", 0x00000, 0x20000, CRC(01ed1dcd) SHA1(69b0b4ff2633ca4ca7b3a01830582c8b6df059e8) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
@@ -770,3 +793,4 @@ GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millenn
 GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Space 2001",                     GAME_NOT_WORKING )
 GAME( 200?, elvis,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Elvis?",                               GAME_NOT_WORKING )
 GAME( 200?, sstar,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Star",                           GAME_NOT_WORKING )
+GAME( 2001, pirati,   0,      itgambl2, itgambl2, 0,   ROT0, "Cin", 	"Pirati",                           GAME_NOT_WORKING )
