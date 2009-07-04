@@ -9064,6 +9064,7 @@ Other Sun games
 	DRIVER( sspac2k1 )	/* (c) 200? unknown */
 	DRIVER( elvis )		/* (c) 200? unknown */
 	DRIVER( sstar )		/* (c) 200? unknown */
+	DRIVER( pirati )	/* (c) 2001 Cin */
 
 	/* Intel 8086-based italian gambling games */
 	DRIVER( newmcard )	/* (c) 19?? unknown */
