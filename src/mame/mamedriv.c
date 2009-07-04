@@ -9089,6 +9089,7 @@ Other Sun games
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000b )	/* (c) 2000 Sure Milano */
+	DRIVER( mil4000c )	/* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */

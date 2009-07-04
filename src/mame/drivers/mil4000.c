@@ -58,6 +58,18 @@ Note
 
 ============================================================================================
 
+CHAMPION 4000 V 1.4
+(CMP4 1.3 on PCB)
+12.000000MHz
+14.31818MHz
+1000J
+MC68HC000FN12
+PIC16C74B
+PALCE22V10H
+U6295
+
+============================================================================================
+
 Changes (2008-12-10, Roberto Fresca):
 
 - Completed normal Inputs/Outputs.
@@ -421,7 +433,26 @@ ROM_START( mil4000b )
 	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x000, 0x4d4c, BAD_DUMP CRC(4f3f7b90) SHA1(fdf689dda57960820315dcf0138d2ade28248681) )
 ROM_END
 
+ROM_START( mil4000c )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "0.u75", 0x000001, 0x20000, CRC(2f84883e) SHA1(8b016eb586db59517f6a5d7e98a53c2002a6ed0a) )
+	ROM_LOAD16_BYTE( "e.u76", 0x000000, 0x20000, CRC(f162018f) SHA1(43ac82d5828e57fb7ae83d88e1ed287a2e2060a3) )
+
+	ROM_REGION( 0xa0000, "gfx1", ROMREGION_ERASE00 ) // 5bpp?
+	ROM_LOAD( "5.u36",   0x000000, 0x20000, BAD_DUMP CRC(e3f7a67a) SHA1(9548accd8a045a3513af9e389bd1072b72e91e6d) ) //FIXED BITS (1111x111)
+	ROM_LOAD( "4.u35",   0x020000, 0x20000, CRC(c7e66443) SHA1(f65b0b55890938f5bb83e8e684973b4ff097c1be) )
+	ROM_LOAD( "3.u34",   0x040000, 0x20000, CRC(df3dc1cf) SHA1(2776308ccd9beb34c4bbfcebc7443caf68eae54a) )
+	ROM_LOAD( "2.u33",   0x060000, 0x20000, CRC(f030d2a6) SHA1(1be377c0b87f738b9cca0e1fc14132dbdba42d56) )
+	ROM_LOAD( "1.u32",   0x080000, 0x20000, CRC(733fdc61) SHA1(7efdd0666ae0482b7cd232b7e3781919b508dc76) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
+	ROM_LOAD( "red.u54",   0x000000, 0x40000, CRC(aac1748e) SHA1(65f936041c87b7af223737b1459a495546821dc0) )
+
+	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
+	ROM_LOAD( "pic16c65b_ch4000.u60", 0x000, 0x4d4c, NO_DUMP )
+ROM_END
 
 GAMEL( 2000, mil4000,    0,        mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 2.0)", 0, layout_mil4000 )
 GAMEL( 2000, mil4000a,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.8)", 0, layout_mil4000 )
 GAMEL( 2000, mil4000b,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.5)", 0, layout_mil4000 )
+GAMEL( 2000, mil4000c,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.3)", GAME_NOT_WORKING, layout_mil4000 )
