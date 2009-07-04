@@ -130,6 +130,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 
 #define SCC_DCR_VREG    (pcab_vregs[0x02/2] & 0xffff)
 #define SCC_DE_VREG		((SCC_DCR_VREG & 0x8000)>>15)
+#define SCC_FG_VREG		((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
 
 /*
@@ -275,23 +276,58 @@ static VIDEO_UPDATE(magicard)
 
 	count = ((SCC_VSR_VREG)/2);
 
-	for(y=0;y<300;y++)
+	if(SCC_FG_VREG) //4bpp gfx
 	{
-		for(x=0;x<168;x++)
+		for(y=0;y<300;y++)
 		{
-			UINT32 color;
+			for(x=0;x<84;x++)
+			{
+				UINT32 color;
 
-			color = ((magicram[count]) & 0x00ff)>>0;
+				color = ((magicram[count]) & 0x000f)>>0;
 
-			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+				if(((x*4)+3)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine->pens[color];
 
-			color = ((magicram[count]) & 0xff00)>>8;
+				color = ((magicram[count]) & 0x00f0)>>4;
 
-			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+				if(((x*4)+2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine->pens[color];
 
-			count++;
+				color = ((magicram[count]) & 0x0f00)>>8;
+
+				if(((x*4)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine->pens[color];
+
+				color = ((magicram[count]) & 0xf000)>>12;
+
+				if(((x*4)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine->pens[color];
+
+				count++;
+			}
+		}
+	}
+	else //8bpp gfx
+	{
+		for(y=0;y<300;y++)
+		{
+			for(x=0;x<168;x++)
+			{
+				UINT32 color;
+
+				color = ((magicram[count]) & 0x00ff)>>0;
+
+				if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+
+				color = ((magicram[count]) & 0xff00)>>8;
+
+				if(((x*2)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+
+				count++;
+			}
 		}
 	}
 
@@ -316,9 +352,9 @@ static WRITE16_HANDLER( paletteram_io_w )
 	{
 		case 0:
 			pal_offs = data;
+			internal_pal_offs = 0;
 			break;
 		case 4:
-			internal_pal_offs = 0;
 			break;
 		case 2:
 			switch(internal_pal_offs)
