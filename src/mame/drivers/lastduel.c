@@ -598,7 +598,7 @@ ROM_START( lastduel )
 	ROM_LOAD( "ld-14.15n",    0x000000, 0x80000, CRC(d0653739) SHA1(8278e8601e82470d785a8ffef48a1b5f70bc2a9b) ) /* tiles */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
 ROM_START( lastduelo )
@@ -628,7 +628,7 @@ ROM_START( lastduelo )
 	ROM_LOAD( "ld-14.15n",    0x000000, 0x80000, CRC(d0653739) SHA1(8278e8601e82470d785a8ffef48a1b5f70bc2a9b) ) /* tiles */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
 ROM_START( lastduelb )
@@ -673,7 +673,7 @@ ROM_START( lastduelb )
 	ROM_LOAD( "ld_21.bin",    0x070000, 0x10000, CRC(b74f0c0e) SHA1(866e3c65fd5dd7099423baefd09eb2b7da7e8392) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) )	/* priority (not used) */
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
 ROM_START( madgear )
