@@ -13,15 +13,15 @@
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
     Game status:
-    vf3/vf3a - boots and runs <-- doesn't boot - stuck in poly_wait()
+    vf3/vf3a - doesn't boot - stuck in poly_wait()
     vf3tb - doesn't boot - bad dump
     bass - boots and runs with 3D
     getbass - I/O board error (?)
 
-    scud/scuda - boots and runs with 3D (scuda says "for sale and use only in Japan but is marked Export?)
+    scud/scuda - boots and runs with 3D (scuda says "for sale and use only in Japan" but is marked Export?)
     scudj - boots but hangs up (no SCSI IRQs)
     scudp - shows initial screen, apparently won't go into test mode or advance
-    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked) <-- crashes MAME on boot (accesses CROM bank 0xe - should be masked/mirrored)
+    lostwsga - SCSI IRQ stuck on (boots and runs with 3D if hacked)
     vs215 - boots and runs with 3D
     lemans24 - SCSI IRQ stuck on (boots if hacked)
     vs29815 - write to unknown 53c810 SCSI register
@@ -1512,6 +1512,7 @@ static READ64_HANDLER( model3_sys_r )
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
+//			printf("read irq_state %x (PC %x)\n", irq_state, cpu_get_pc(space->cpu));
 			return (UINT64)irq_state<<56 | 0xff000000;
 			break;
 	}
@@ -1556,6 +1557,8 @@ static WRITE64_HANDLER( model3_sys_w )
 							}
 						}
 
+//						printf("%x to ack (realack %x)\n", ack, realack);
+
 						irq_state &= realack;
 						break;
 				}
@@ -1571,7 +1574,8 @@ static WRITE64_HANDLER( model3_sys_w )
 				model3_crom_bank = data >> 56;
 
 				data >>= 56;
-				data = (~data) & 0xf;
+				data = (~data) & 0x7;
+
 				memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
@@ -1728,6 +1732,12 @@ static const UINT16 eca_prot_data[] =
     0x530a, 0x666f, 0x7774, 0x7261, 0x2065, 0x2652, 0x2044, 0x6544,
     0x7470, 0x202e, 0x3123, 0x660a, 0x726f, 0x7420, 0x7365, 0x0a74,
 };
+
+/* 
+   dirtdvls: first 2 words read are discarded, then every other word
+   is written to char RAM starting at f1013400 (in between words are
+   discarded).
+*/
 
 static READ64_HANDLER(model3_security_r)
 {
