@@ -712,7 +712,7 @@ ROM_START( madgear )
 	ROM_LOAD( "ls-05.12e",    0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) )	/* priority (not used) */
+	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
 ROM_START( madgearj )
@@ -803,17 +803,8 @@ ROM_START( ledstrm2 )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ls-09.5a",     0x000000, 0x40000, NO_DUMP )	/* NEC 23C2000 256kx8 mask ROM (QFP52) */
-	ROM_LOAD( "ls-10.13a",    0x040000, 0x40000, NO_DUMP )	/* NEC 23C2000 256kx8 mask ROM (QFP52) */
-	/*  Sprite roms not dumped from this revision of the game */
-	ROM_LOAD( "11.rom0",   0x000000, 0x10000, BAD_DUMP CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )	/* Interleaved sprites */
-	ROM_LOAD( "07u.rom2",  0x010000, 0x10000, BAD_DUMP CRC(7152b212) SHA1(b021496e8b3c22c018907e6e374a7401d3843570) )
-	ROM_LOAD( "12.rom1",   0x020000, 0x10000, BAD_DUMP CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
-	ROM_LOAD( "08u.rom3",  0x030000, 0x10000, BAD_DUMP CRC(72e5d525) SHA1(209def4206e9b66be9879f0105d3f04980f156da) )
-	ROM_LOAD( "13.rom0",   0x040000, 0x10000, BAD_DUMP CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
-	ROM_LOAD( "09u.rom2",  0x050000, 0x10000, BAD_DUMP CRC(7b5175cb) SHA1(8d8d4953dd787308bed75345af6789899d2afded) )
-	ROM_LOAD( "14.rom1",   0x060000, 0x10000, BAD_DUMP CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
-	ROM_LOAD( "10u.rom3",  0x070000, 0x10000, BAD_DUMP CRC(6db7ca64) SHA1(389cc93b9bfe2824a0de9796e79c6d452d09567e) )
+	ROM_LOAD( "ls-09.5a",     0x000000, 0x40000, CRC(80875e1d) SHA1(6f53694a0617bf3b4f65a0cf71750b0e65e49b46) )	/* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_LOAD( "ls-10.13a",    0x040000, 0x40000, CRC(c5993f93) SHA1(29c565c112edb003c7d4adc5ac52e98e034bd1a1) )	/* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ls-08.10k",    0x000000, 0x08000, CRC(8803cf49) SHA1(7a01a05f760d8e2472fdbc1d10b53094babe295e) )	/* 8x8 text */
@@ -840,4 +831,4 @@ GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last
 GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
 GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
-GAME( 1988, ledstrm2,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", 0 )
+GAME( 1988, ledstrm2,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS ) /* game still has wrong sprite issues */
