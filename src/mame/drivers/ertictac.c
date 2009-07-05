@@ -439,18 +439,6 @@ ROM_START( poizone )
 	ROM_LOAD32_BYTE( "p_son24.bin", 0x140003, 0x10000, CRC(a09d7f55) SHA1(e0d562c655c16034b40db93de801b98b7948beb2) )
 ROM_END
 
-static DRIVER_INIT( ertictac )
-{
-	((UINT32 *)memory_region(machine, "user1"))[0x55]=0;// patched TSTS r11,r15,lsl #32  @ $3800154
-}
-
-
-static DRIVER_INIT( poizone )
-{
-	((UINT32 *)memory_region(machine, "user1"))[0x21C/4]=0;// patched TSTS r11,r15,lsl #32  @ $380021C
-}
-
-
-GAME( 1990, ertictac, 0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_NO_SOUND)
-GAME( 1991, poizone,  0, ertictac, poizone, poizone,  ROT0, "Eterna" ,"Poizone" ,GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME( 1990, ertictac, 0, ertictac, ertictac, 0, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_NO_SOUND)
+GAME( 1991, poizone,  0, ertictac, poizone, 0,  ROT0, "Eterna" ,"Poizone" ,GAME_NO_SOUND|GAME_NOT_WORKING)
 

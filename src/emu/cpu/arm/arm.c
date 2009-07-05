@@ -333,7 +333,7 @@ static CPU_EXECUTE( arm )
 	cpustate->icount = cycles;
 	do
 	{
-		debugger_instruction_hook(device, R15);
+		debugger_instruction_hook(device, R15 & ADDRESS_MASK);
 
 		/* load instruction */
 		pc = R15;
@@ -805,7 +805,6 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 		rd = (rn + op2);
 		HandleALUAddFlags(rd, rn, op2);
 		break;
-
 	/* Logical operations */
 	case OPCODE_AND:
 	case OPCODE_TST:
@@ -866,36 +865,25 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 			}
 		}
 	/* TST & TEQ can affect R15 (the condition code register) with the S bit set */
-	} else if (rdn==eR15) {
-		if (insn & INSN_S) {
-			if (ARM_DEBUG_CORE)
-				logerror("%08x: TST class on R15 s bit set\n",R15);
-
-			/* Dubious hack for 'TEQS R15, #$3', the docs suggest execution
-                should continue two instructions later (because pipelined R15
-                is read back as already being incremented), but it seems the
-                hardware should execute the instruction in the delay slot.
-                Simulate it by just setting the PC back to the previously
-                skipped instruction.
-
-                See Heavy Smash (Data East) at 0x1c4
-            */
-			if (insn==0xe33ff003)
-				rd-=4;
-
-			cpustate->icount -= S_CYCLE + N_CYCLE;
-			if ((R15&MODE_MASK)!=0)
-			{
-				SetRegister(cpustate, 15, rd);
-			}
-			else
-			{
-				SetRegister(cpustate, 15, (rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
-			}
-		} else {
-			if (ARM_DEBUG_CORE)
-				logerror("%08x: TST class on R15 no s bit set\n",R15);
+	}
+	else if ((rdn==eR15) && (insn & INSN_S))
+	{
+		// update only the flags
+		if ((R15&MODE_MASK)!=0)
+		{
+			// combine the flags from rd with the address from R15
+			rd &= ~ADDRESS_MASK;
+			rd |= (R15 & ADDRESS_MASK);
+			SetRegister(cpustate,rdn,rd);
 		}
+		else
+		{
+			// combine the flags from rd with the address from R15
+			rd &= ~ADDRESS_MASK;	// clear address part of RD
+			rd |= (R15 & ADDRESS_MASK);	// RD = address part of R15
+			SetRegister(cpustate, rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
+		}
+		cpustate->icount -= S_CYCLE + N_CYCLE;
 	}
 }
 
