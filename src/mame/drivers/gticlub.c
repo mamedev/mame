@@ -1192,7 +1192,7 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_REGION(0x80000, "audiocpu", 0)	/* 68k program */
 	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
-	ROM_REGION(0x1000000, "rf", 0)	/* other roms */
+	ROM_REGION(0x1000000, "rf", 0)	/* sound roms */
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
