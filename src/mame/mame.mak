@@ -869,6 +869,7 @@ $(MAMEOBJ)/metro.a: \
 	$(DRIVERS)/hyprduel.o $(VIDEO)/hyprduel.o \
 	$(DRIVERS)/metro.o $(VIDEO)/metro.o \
 	$(DRIVERS)/rabbit.o \
+	$(DRIVERS)/tmmjprd.o \
 
 $(MAMEOBJ)/midcoin.a: \
 	$(DRIVERS)/wallc.o \

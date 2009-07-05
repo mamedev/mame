@@ -26,12 +26,8 @@ To Do:
 - raster effects (rabbit only?, see left side of one of the levels in rabbit)
 - clean up zoom code and make zoom effect more accurate
 - sound (adpcm of some kind)
-
-- tilemap.c can't handle tiles with different transpens so we have to invert
-  the tilegfx, this means we also have to invert the palette write addresses,
-  low bits of the palette number for 4bpp tiles, the blitter data as it
-  is read from the gfx roms, and the data read by the rom test.
-
+- status bar in rabbit is the wrong colour, timing of blitter / interrupts?
+- eeprom hookup seems flakey
 
 */
 
@@ -139,13 +135,15 @@ INLINE void get_rabbit_tilemap_info(running_machine *machine, tile_data *tileinf
 		tileno >>=(1+tilesize*2);
 		colour&=0x0f;
 		colour+=0x20;
+		tileinfo->group = 1;
 		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
 		tileno >>=(0+tilesize*2);
+		//colour&=0x3f; // fixes status bar.. but breaks other stuff
 		colour+=0x200;
-		colour ^=0xf; // ^0xf because we've inverted palette writes (see notes in driver init)
+		tileinfo->group = 0;
 		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
@@ -240,11 +238,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		tileno = (source[1]&0x0001ffff);
 		colr =   (source[1]&0x0ff00000)>>20;
-		colr ^= 0xf;
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		drawgfx_transpen(rabbit_sprite_bitmap,&rabbit_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,0);
+		drawgfx_transpen(rabbit_sprite_bitmap,&rabbit_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,15);
 //      drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(rabbit_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((rabbit_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
@@ -348,10 +345,17 @@ static VIDEO_START(rabbit)
 	rabbit_tilemap[1] = tilemap_create(machine, get_rabbit_tilemap1_tile_info,tilemap_scan_rows,16, 16, 128,32);
 	rabbit_tilemap[2] = tilemap_create(machine, get_rabbit_tilemap2_tile_info,tilemap_scan_rows,16, 16, 128,32);
 	rabbit_tilemap[3] = tilemap_create(machine, get_rabbit_tilemap3_tile_info,tilemap_scan_rows, 8,  8, 128,32);
-	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
+
+	/* the tilemaps mix 4bpp and 8bbp tiles, we split these into 2 groups, and set a different transpen for each group */
+    tilemap_map_pen_to_layer(rabbit_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[3], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(rabbit_tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
 	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,video_screen_get_format(machine->primary_screen));
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
@@ -451,7 +455,7 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(space->machine,offset^0xff,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( rabbit_tilemap0_r )
@@ -483,12 +487,16 @@ static READ32_HANDLER( randomrabbits )
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
 	UINT8 *dataroms = memory_region(space->machine, "gfx1");
-//  int bank;
-//  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
-//  bank = data & 0x3ff;
+#if 0
+	int bank;
+	printf("rabbit rombank %08x\n",data);
+	bank = data & 0x3ff;
 
-//  memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
+#else
 	memory_set_bankptr(space->machine, 1,&dataroms[0]);
+#endif
+
 }
 
 /*
@@ -606,8 +614,8 @@ static void rabbit_do_blit(running_machine *machine)
 
 	while(1)
 	{
-		int blt_commnd = blt_data[blt_source+1]^0xff;
-		int blt_amount = blt_data[blt_source+0]^0xff;
+		int blt_commnd = blt_data[blt_source+1];
+		int blt_amount = blt_data[blt_source+0];
 		int blt_value;
 		int loopcount;
 		int writeoffs;
@@ -626,7 +634,7 @@ static void rabbit_do_blit(running_machine *machine)
 				if(BLITLOG) mame_printf_debug("blit copy %02x bytes\n", blt_amount);
 				for (loopcount=0;loopcount<blt_amount;loopcount++)
 				{
-					blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]))^0xffff;
+					blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
 					blt_source+=2;
 					writeoffs=blt_oddflg+blt_column;
 					rabbit_tilemap_ram[blt_tilemp][writeoffs]=(rabbit_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
@@ -640,7 +648,7 @@ static void rabbit_do_blit(running_machine *machine)
 
 			case 0x02: /* fill nn bytes */
 				if(BLITLOG) mame_printf_debug("blit fill %02x bytes\n", blt_amount);
-				blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]))^0xffff;
+				blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
 				blt_source+=2;
 
 				for (loopcount=0;loopcount<blt_amount;loopcount++)
@@ -723,7 +731,7 @@ static ADDRESS_MAP_START( rabbit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* hmm */
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE( &rabbit_viewregs10 )
 
-	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK(1) // roms read from here during testing
+	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK(1) // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(rabbit_tilemap0_r,rabbit_tilemap0_w)
 	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)
@@ -732,53 +740,6 @@ static ADDRESS_MAP_START( rabbit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_BASE(&rabbit_spriteram) // sprites?
 	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
-
-/* tmmjprd has a different memory map */
-
-static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
-{
-	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
-
-	b = ((paletteram32[offset] & 0x000000ff) >>0);
-	r = ((paletteram32[offset] & 0x0000ff00) >>8);
-	g = ((paletteram32[offset] & 0x00ff0000) >>16);
-
-	palette_set_color(space->machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
-}
-
-static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200010, 0x200013) AM_READ(randomrabbits) // gfx chip status?
-	AM_RANGE(0x200980, 0x200983) AM_READ(randomrabbits) // sound chip status?
-	AM_RANGE(0x200984, 0x200987) AM_READ(randomrabbits) // sound chip status?
-	/* check these are used .. */
-//  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_BASE( &rabbit_viewregs0 )
-	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_BASE( &rabbit_tilemap_regs[0] ) // tilemap regs1
-	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_BASE( &rabbit_tilemap_regs[1] ) // tilemap regs2
-	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_BASE( &rabbit_tilemap_regs[2] ) // tilemap regs3
-	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_BASE( &rabbit_tilemap_regs[3] ) // tilemap regs4
-	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_BASE( &rabbit_spriteregs ) // sprregs?
-//  AM_RANGE(0x200300, 0x200303) AM_WRITE(rabbit_rombank_w) // used during rom testing, rombank/area select + something else?
-//  AM_RANGE(0x200400, 0x200413) AM_WRITEONLY AM_BASE( &rabbit_viewregs6 ) // some global controls? (brightness etc.?)
-//  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_BASE( &rabbit_viewregs7 )
-//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(rabbit_blitter_w) AM_BASE( &rabbit_blitterregs )
-//  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_BASE( &rabbit_viewregs9 ) // never changes?
-//  AM_RANGE(0x200900, 0x20098f) AM_WRITE(rabbit_audio_w)
-	/* hmm */
-//  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_BASE( &rabbit_viewregs10 )
-	/* tilemaps */
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(rabbit_tilemap0_r,rabbit_tilemap0_w)
-	AM_RANGE(0x284000, 0x287fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)
-	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
-	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
-	/* ?? is palette ram shared with sprites in this case or just a different map */
-	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(&rabbit_spriteram)
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_BASE(&paletteram32)
-
-	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("INPUTS") AM_WRITE(rabbit_eeprom_write)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -792,59 +753,6 @@ static INPUT_PORTS_START( rabbit )
 	PORT_SERVICE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tmmjprd )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// as per code at 778
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -980,6 +888,7 @@ static const gfx_layout rabbit_16x16x8_layout =
 };
 
 
+
 static GFXDECODE_START( rabbit )
 	/* this seems to be sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_8x8x4_layout,   0x0, 0x1000  )
@@ -1024,20 +933,9 @@ static MACHINE_DRIVER_START( rabbit )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(rabbit_map)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
-	/* (rabbit) */
-/*  lev 1 : 0x64 : 0000 027c -
-    lev 2 : 0x68 : 0000 3106 - unused?
-    lev 3 : 0x6c : 0000 3106 - unused?
-    lev 4 : 0x70 : 0000 0268 -
-    lev 5 : 0x74 : 0000 0278 -
-    lev 6 : 0x78 : 0000 0204 -
-    lev 7 : 0x7c : 0000 3106 - unused?
-*/
 	MDRV_NVRAM_HANDLER(93C46)
 
 	MDRV_GFXDECODE(rabbit)
-
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1049,6 +947,7 @@ static MACHINE_DRIVER_START( rabbit )
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 
 	MDRV_PALETTE_LENGTH(0x4000)
+	MDRV_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
 
 	MDRV_VIDEO_START(rabbit)
 	MDRV_VIDEO_UPDATE(rabbit)
@@ -1056,103 +955,6 @@ MACHINE_DRIVER_END
 
 
 
-static TILE_GET_INFO( get_tmmjprd_tilemap0_tile_info )
-{
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,0,0);
-}
-
-static TILE_GET_INFO( get_tmmjprd_tilemap1_tile_info )
-{
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,1,0);
-}
-
-static TILE_GET_INFO( get_tmmjprd_tilemap2_tile_info )
-{
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,2,0);
-}
-
-static TILE_GET_INFO( get_tmmjprd_tilemap3_tile_info )
-{
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
-}
-
-static VIDEO_START(tmmjprd)
-{
-	/* NOTE tilemap sizes are different.. game can also select between 16x16 and 8x8.. it NEEDS this to work */
-
-	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
-	/* or maybe not for this game/hw .... */
-	rabbit_tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	rabbit_tilemap_ram[1] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	rabbit_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-	rabbit_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
-
-	rabbit_tilemap[0] = tilemap_create(machine, get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
-	rabbit_tilemap[1] = tilemap_create(machine, get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,16, 16, 64, 64);
-	rabbit_tilemap[2] = tilemap_create(machine, get_tmmjprd_tilemap2_tile_info,tilemap_scan_rows,16, 16, 64, 64);
-	rabbit_tilemap[3] = tilemap_create(machine, get_tmmjprd_tilemap3_tile_info,tilemap_scan_rows,16, 16, 64, 64);
-	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
-	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
-	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,video_screen_get_format(machine->primary_screen));
-	rabbit_sprite_clip.min_x = 0;
-	rabbit_sprite_clip.max_x = 0x1000-1;
-	rabbit_sprite_clip.min_y = 0;
-	rabbit_sprite_clip.max_y = 0x1000-1;
-}
-
-
-static VIDEO_UPDATE( tmmjprd )
-{
-	tilemap_set_scrolly(rabbit_tilemap[3], 0, rabbit_tilemap_regs[3][2] >> 20);
-	tilemap_set_scrolly(rabbit_tilemap[2], 0, rabbit_tilemap_regs[2][2] >> 20);
-	tilemap_set_scrolly(rabbit_tilemap[1], 0, rabbit_tilemap_regs[1][2] >> 20);
-	tilemap_set_scrolly(rabbit_tilemap[0], 0, rabbit_tilemap_regs[0][2] >> 20);
-
-//  popmessage("%08x %08x", rabbit_viewregs0[0], rabbit_viewregs0[1]);
-//  popmessage("%08x %08x %08x %08x %08x %08x", rabbit_tilemap_regs[0][0],rabbit_tilemap_regs[0][1],rabbit_tilemap_regs[0][2],rabbit_tilemap_regs[0][3],rabbit_tilemap_regs[0][4],rabbit_tilemap_regs[0][5]);
-//  popmessage("%08x %08x %08x %08x %08x %08x", rabbit_tilemap_regs[1][0],rabbit_tilemap_regs[1][1],rabbit_tilemap_regs[1][2],rabbit_tilemap_regs[1][3],rabbit_tilemap_regs[1][4],rabbit_tilemap_regs[1][5]);
-//  popmessage("%08x %08x %08x %08x %08x %08x", rabbit_tilemap_regs[2][0],rabbit_tilemap_regs[2][1],rabbit_tilemap_regs[2][2],rabbit_tilemap_regs[2][3],rabbit_tilemap_regs[2][4],rabbit_tilemap_regs[2][5]);
-//  popmessage("%08x %08x %08x %08x %08x %08x", rabbit_tilemap_regs[3][0],rabbit_tilemap_regs[3][1],rabbit_tilemap_regs[3][2],rabbit_tilemap_regs[3][3],rabbit_tilemap_regs[3][4],rabbit_tilemap_regs[3][5]);
-//  popmessage("%08x %08x %08x %08x %08x %08x %08x", rabbit_spriteregs[0],rabbit_spriteregs[1],rabbit_spriteregs[2],rabbit_spriteregs[3],rabbit_spriteregs[4],rabbit_spriteregs[5], rabbit_spriteregs[6]);
-//  popmessage("%08x %08x %08x %08x %08x", rabbit_viewregs6[0],rabbit_viewregs6[1],rabbit_viewregs6[2],rabbit_viewregs6[3],rabbit_viewregs6[4]);
-//  popmessage("%08x", rabbit_viewregs7[0]);
-//  popmessage("%08x %08x %08x %08x", rabbit_blitterregs[0],rabbit_blitterregs[1],rabbit_blitterregs[2],rabbit_blitterregs[3]);
-//  popmessage("%08x %08x %08x %08x", rabbit_viewregs9[0],rabbit_viewregs9[1],rabbit_viewregs9[2],rabbit_viewregs9[3]);
-
-//  popmessage("%08x %08x %08x %08x %08x", rabbit_viewregs10[0],rabbit_viewregs10[1],rabbit_viewregs10[2],rabbit_viewregs10[3],rabbit_viewregs10[4]);
-
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	tilemap_draw(bitmap,cliprect,rabbit_tilemap[3],0,0);
-	tilemap_draw(bitmap,cliprect,rabbit_tilemap[1],0,0); //same as 3?
-	tilemap_draw(bitmap,cliprect,rabbit_tilemap[2],0,0);
-	tilemap_draw(bitmap,cliprect,rabbit_tilemap[0],0,0);
-
-	return 0;
-}
-
-static INTERRUPT_GEN( tmmjprd_interrupt )
-{
-	int intlevel = 0;
-
-	if (cpu_getiloops(device)==0)
-		intlevel = 5;
-	else
-		intlevel = 3;
-
-	cpu_set_input_line(device, intlevel, HOLD_LINE);
-}
-
-static MACHINE_DRIVER_START( tmmjprd )
-	MDRV_IMPORT_FROM(rabbit)
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
-	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
-
-	MDRV_VIDEO_START(tmmjprd)
-	MDRV_VIDEO_UPDATE(tmmjprd)
-MACHINE_DRIVER_END
 
 
 static DRIVER_INIT(rabbit)
@@ -1163,13 +965,6 @@ static DRIVER_INIT(rabbit)
 	/* 5 and 1 are also valid and might be raster related */
 }
 
-static DRIVER_INIT(tmmjprd)
-{
-	rabbit_banking = 0;
-	rabbit_vblirqlevel = 5;
-	rabbit_bltirqlevel = 3; // actually palette related?
-	/* other irqs aren't valid */
-}
 
 
 ROM_START( rabbit )
@@ -1179,25 +974,28 @@ ROM_START( rabbit )
 	ROM_LOAD32_BYTE( "jpr2.2", 0x000002, 0x080000, CRC(fa3fd91a) SHA1(ac0e658af30b37b752ede833b44ff5423b93bdb1) )
 	ROM_LOAD32_BYTE( "jpr3.3", 0x000003, 0x080000, CRC(d22727ca) SHA1(8415cb2d3864b11fe5623ac65f2e28fd62c61bd1) )
 
-//  ROM_REGION( 0x9000000, "gfx1", ROMREGION_ERASE ) /* Other Roms probably accessable by cpu / blitter, order is no doubt wrong */
-	/* this seems to be how it tests them? weird ... */
-//  ROM_LOAD32_WORD( "jfv0.00", 0x0000000, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) )
-//  ROM_LOAD32_WORD( "jfv1.01", 0x0000002, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) )
-//  ROM_LOAD32_WORD( "jsn0.11", 0x0800002, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) )
-//  ROM_LOAD32_WORD( "jfv2.02", 0x2000000, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) )
-//  ROM_LOAD32_WORD( "jfv3.03", 0x2000002, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) )
-//  ROM_LOAD16_BYTE( "jbg0.40", 0x4000001, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) ) // how should this one be, it won't pass it.
-//  ROM_LOAD16_BYTE( "jbg1.50", 0x6000000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
-//  ROM_LOAD16_BYTE( "jbg2.60", 0x8000001, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_INVERT ) /* Sprite Roms (and Blitter Data) */
+// the rom test tests as if things were mapped like this (video chip / blitter space?)
+#if 0
+	ROM_REGION( 0x9000000, "test", ROMREGION_ERASE )
+	ROM_LOAD32_WORD( "jfv0.00", 0x0000002, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) ) // sprite gfx
+	ROM_LOAD32_WORD( "jfv1.01", 0x0000000, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) ) // sprite gfx
+	ROM_LOAD32_WORD( "jsn0.11", 0x0800002, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) ) // sound
+	ROM_LOAD32_WORD( "jfv2.02", 0x2000002, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) ) // sprite gfx
+	ROM_LOAD32_WORD( "jfv3.03", 0x2000000, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) ) // sprite gfx
+	ROM_LOAD16_BYTE( "jbg0.40", 0x4000001, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) ) // bg gfx (fails check?)
+	ROM_LOAD16_BYTE( "jbg1.50", 0x6000000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) ) // bg gfx
+	ROM_LOAD16_BYTE( "jbg2.60", 0x8000001, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) ) // bg gfx
+#endif
+
+	ROM_REGION( 0x1000000, "gfx1", 0 ) /* Sprite Roms (and Blitter Data) */
 	ROM_LOAD32_WORD( "jfv0.00", 0x0000002, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) )
 	ROM_LOAD32_WORD( "jfv1.01", 0x0000000, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) )
 	ROM_LOAD32_WORD( "jfv2.02", 0x0800002, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) )
 	ROM_LOAD32_WORD( "jfv3.03", 0x0800000, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) )
 
 
-	ROM_REGION( 0x600000, "gfx2", ROMREGION_INVERT ) /* BG Roms */
+	ROM_REGION( 0x600000, "gfx2", 0 ) /* BG Roms */
 	ROM_LOAD( "jbg0.40", 0x000000, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) )
 	ROM_LOAD( "jbg1.50", 0x200000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
 	ROM_LOAD( "jbg2.60", 0x400000, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
@@ -1207,69 +1005,5 @@ ROM_START( rabbit )
 
 ROM_END
 
-ROM_START( tmmjprd )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
-	ROM_LOAD32_BYTE( "p00.bin", 0x000000, 0x080000, CRC(a1efd960) SHA1(7f41ab58de32777bccbfe28e6e5a1f2dca35bb90) )
-	ROM_LOAD32_BYTE( "p01.bin", 0x000001, 0x080000, CRC(9c325374) SHA1(1ddf1c292fc1bcf4dcefb5d4aa3abdeb1489c020) )
- 	ROM_LOAD32_BYTE( "p02.bin", 0x000002, 0x080000, CRC(729a5f12) SHA1(615704d36afdceb4b1ff2e5dc34856e614181e16) )
-	ROM_LOAD32_BYTE( "p03.bin", 0x000003, 0x080000, CRC(595615ab) SHA1(aca746d74aa6e7e856eb5c9b740d884778743b27) )
-
-	ROM_REGION( 0x2000000, "gfx1", ROMREGION_INVERT ) /* Sprite Roms */
-	ROM_LOAD16_WORD_SWAP( "00.bin", 0x1000000, 0x400000, CRC(303e91a1) SHA1(c29a22061ab8af8b72e0e6bdb36915a0cb5b2a5c) )
-	ROM_LOAD16_WORD_SWAP( "01.bin", 0x1400000, 0x400000, CRC(3371b775) SHA1(131dd850bd01dac52fa82c41948d900c4833db3c) )
-	ROM_LOAD16_WORD_SWAP( "10.bin", 0x1800000, 0x400000, CRC(5ab6af41) SHA1(e29cee23c84e17dd8dabd2ec71e622c25418646e) )
-	ROM_LOAD16_WORD_SWAP( "11.bin", 0x1c00000, 0x400000, CRC(1d1fd633) SHA1(655be5b72bb70a90d23e49512ca84d9978d87b0b) )
-	ROM_LOAD16_WORD_SWAP( "02.bin", 0x0000000, 0x400000, CRC(4c1e13b9) SHA1(d244eb74f755350604824670db58ab2a56a856cb) )
-	ROM_LOAD16_WORD_SWAP( "03.bin", 0x0400000, 0x400000, CRC(9cf86152) SHA1(e27e0d9befb12ad5c2acf547afe80d1c7921a4d1) )
-	ROM_LOAD16_WORD_SWAP( "12.bin", 0x0800000, 0x400000, CRC(5b8bb9d6) SHA1(ee93774077d8a2ddcf70869a9c2f4961219a85b4) )
-	ROM_LOAD16_WORD_SWAP( "13.bin", 0x0c00000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
-
-	ROM_REGION( 0x2000000, "gfx2", ROMREGION_INVERT ) /* BG Roms */
-	ROM_LOAD32_WORD( "40.bin", 0x0000000, 0x400000, CRC(8bedc606) SHA1(7159c8b86e8d7d5ae202c239638483ccdc7dfc25) )
-	ROM_LOAD32_WORD( "41.bin", 0x0000002, 0x400000, CRC(e19713dd) SHA1(a8f1b716913f2e391abf277e5bf0e9986cc75898) )
-	ROM_LOAD32_WORD( "50.bin", 0x0800000, 0x400000, CRC(85ca9ce9) SHA1(c5a7270507522e11e9485196be325508846fda90) )
-	ROM_LOAD32_WORD( "51.bin", 0x0800002, 0x400000, CRC(6ba1d2ec) SHA1(bbe7309b33f213c8cb9ab7adb3221ea79f89e8b0) )
-	ROM_LOAD32_WORD( "60.bin", 0x1000000, 0x400000, CRC(7cb132e0) SHA1(f9c366befec46c7f6e307111a62eede029202b16) )
-	ROM_LOAD32_WORD( "61.bin", 0x1000002, 0x400000, CRC(caa7e854) SHA1(592867e001abd0781f83a5124bf9aa62ad1aa7f3) )
-	ROM_LOAD32_WORD( "70.bin", 0x1800000, 0x400000, CRC(9b737ae4) SHA1(0b62a90d42ace81ee32db073a57731a55a32f989) )
-	ROM_LOAD32_WORD( "71.bin", 0x1800002, 0x400000, CRC(189f694e) SHA1(ad0799d4aadade51be38d824910d299257a758a3) )
-
-	ROM_REGION( 0x800000, "unknown", 0 ) /* Sound Roms? */
-	ROM_LOAD16_BYTE( "21.bin", 0x0000001, 0x400000, CRC(bb5fa8da) SHA1(620e609b3e2524d06d58844625f186fd4682205f))
-ROM_END
-
-ROM_START( tmpdoki )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
-	ROM_LOAD32_BYTE( "u70_p0.bin", 0x000000, 0x080000, CRC(c0ee1942) SHA1(0cebc3e326d84e200c2399208d810c0ac767dbb4) )
-	ROM_LOAD32_BYTE( "u72_p1.bin", 0x000001, 0x080000, CRC(3c1bc6f6) SHA1(7b3719d4bb52e45db793564b0ccee067fd7af4e4) )
- 	ROM_LOAD32_BYTE( "u71_p2.bin", 0x000002, 0x080000, CRC(f2091cce) SHA1(88c6822eb1546e914c2644264367e71fb2a82be3) )
-	ROM_LOAD32_BYTE( "u73_p3.bin", 0x000003, 0x080000, CRC(cca8ef13) SHA1(d5b077f3d8d38262e69d058a7d61e4563332abce) )
-
-	ROM_REGION( 0x2000000, "gfx1", ROMREGION_INVERT ) /* Sprite Roms */
-	ROM_LOAD16_WORD_SWAP( "00.bin", 0x1000000, 0x400000, CRC(303e91a1) SHA1(c29a22061ab8af8b72e0e6bdb36915a0cb5b2a5c) )
-	ROM_LOAD16_WORD_SWAP( "01.bin", 0x1400000, 0x400000, CRC(3371b775) SHA1(131dd850bd01dac52fa82c41948d900c4833db3c) )
-	ROM_LOAD16_WORD_SWAP( "10.bin", 0x1800000, 0x400000, CRC(5ab6af41) SHA1(e29cee23c84e17dd8dabd2ec71e622c25418646e) )
-	ROM_LOAD16_WORD_SWAP( "11.bin", 0x1c00000, 0x400000, CRC(1d1fd633) SHA1(655be5b72bb70a90d23e49512ca84d9978d87b0b) )
-	ROM_LOAD16_WORD_SWAP( "02.bin", 0x0000000, 0x400000, CRC(4c1e13b9) SHA1(d244eb74f755350604824670db58ab2a56a856cb) )
-	ROM_LOAD16_WORD_SWAP( "03.bin", 0x0400000, 0x400000, CRC(9cf86152) SHA1(e27e0d9befb12ad5c2acf547afe80d1c7921a4d1) )
-	ROM_LOAD16_WORD_SWAP( "12.bin", 0x0800000, 0x400000, CRC(5b8bb9d6) SHA1(ee93774077d8a2ddcf70869a9c2f4961219a85b4) )
-	ROM_LOAD16_WORD_SWAP( "13.bin", 0x0c00000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
-
-	ROM_REGION( 0x2000000, "gfx2", ROMREGION_INVERT ) /* BG Roms */
-	ROM_LOAD32_WORD( "40.bin", 0x0000000, 0x400000, CRC(8bedc606) SHA1(7159c8b86e8d7d5ae202c239638483ccdc7dfc25) )
-	ROM_LOAD32_WORD( "41.bin", 0x0000002, 0x400000, CRC(e19713dd) SHA1(a8f1b716913f2e391abf277e5bf0e9986cc75898) )
-	ROM_LOAD32_WORD( "50.bin", 0x0800000, 0x400000, CRC(85ca9ce9) SHA1(c5a7270507522e11e9485196be325508846fda90) )
-	ROM_LOAD32_WORD( "51.bin", 0x0800002, 0x400000, CRC(6ba1d2ec) SHA1(bbe7309b33f213c8cb9ab7adb3221ea79f89e8b0) )
-	ROM_LOAD32_WORD( "60.bin", 0x1000000, 0x400000, CRC(7cb132e0) SHA1(f9c366befec46c7f6e307111a62eede029202b16) )
-	ROM_LOAD32_WORD( "61.bin", 0x1000002, 0x400000, CRC(caa7e854) SHA1(592867e001abd0781f83a5124bf9aa62ad1aa7f3) )
-	ROM_LOAD32_WORD( "70.bin", 0x1800000, 0x400000, CRC(9b737ae4) SHA1(0b62a90d42ace81ee32db073a57731a55a32f989) )
-	ROM_LOAD32_WORD( "71.bin", 0x1800002, 0x400000, CRC(189f694e) SHA1(ad0799d4aadade51be38d824910d299257a758a3) )
-
-	ROM_REGION( 0x800000, "unknown", 0 ) /* Sound Roms? */
-	ROM_LOAD16_BYTE( "21.bin", 0x0000001, 0x400000, CRC(bb5fa8da) SHA1(620e609b3e2524d06d58844625f186fd4682205f))
-ROM_END
-
 
 GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Electronic Arts / Aorn", "Rabbit", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // somewhat playable
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, tmpdoki, tmmjprd, tmmjprd, tmmjprd, tmmjprd, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", GAME_NOT_WORKING | GAME_NO_SOUND )
