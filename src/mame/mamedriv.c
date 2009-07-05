@@ -8176,7 +8176,7 @@ Other Sun games
 	DRIVER( battlcry ) 	/* (c) 1991 Home Data */
 	DRIVER( jogakuen )	/* (c) 1992 Windom corporation */
 	DRIVER( mjikaga )	/* (c) 1991 Mitchell */
-	DRIVER( siseikat )	/* (c) 1991 Matoba */
+	DRIVER( mjprivat )	/* (c) 1991 Matoba */
 
 	/* Art & Magic games */
 	DRIVER( ultennis )	/* (c) 1993 */

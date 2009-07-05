@@ -64,8 +64,7 @@ TODO:
 - I'm not sure service mode in the newer mahjong games is working as it's supposed to.
   dip switch changes are not reported, and keypresses only work after you insert a coin.
 
-- Sound and inputs don't work in mjikaga. CPU communication issue?
-  Coins and dip switches *do* work however.
+- Sound sfxs don't work in mjikaga. CPU communication issue?
   Also note that bit 2 of bankswitch_w() and bit 7 of pteacher_blitter_bank_w() might
   have some other function, since the ROMs are smaller.
 
@@ -1739,10 +1738,9 @@ ROM_START( mjikaga )
 	ROM_LOAD( "m15a03.bin", 0x0000, 0x40000, CRC(07e2e8f8) SHA1(61eed47c4136733059c1d96e98cadb8ac9078f95) )
 ROM_END
 
-ROM_START( siseikat )
+ROM_START( mjprivat )
 	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
-	//311c01.16e                                      BADADDR        xxxxxx-xxxxxxxxx (data is repeated once at every 0x200 bytes)
-	ROM_LOAD( "311c01.16e", 0x010000, 0xc000, BAD_DUMP CRC(92bf002d) SHA1(275276362ce030db5116f39ef025b2a10eabec45) )
+	ROM_LOAD( "311d01.16e", 0x010000, 0xc000, CRC(3b4f4676) SHA1(e308febb9c8d35b495b83b37daff7c56deba78fb) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
 	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
@@ -1810,6 +1808,6 @@ GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, 0,          ROT0, "Home Data", "Mah
 GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mahjong Jogakuen (Japan)", 0 )
 
 GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", 0 )
+GAME( 1991, mjprivat, 0, lemnangl, pteacher, 0,          ROT0, "Matoba",    "Mahjong Private (Japan)", 0 )
 
-GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1991, siseikat, 0, lemnangl, pteacher, 0,          ROT0, "Matoba",    "Mahjong Shiseikatsu (Japan)", GAME_NOT_WORKING )
+GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_IMPERFECT_SOUND )
