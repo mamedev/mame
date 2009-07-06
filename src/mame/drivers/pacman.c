@@ -5076,7 +5076,7 @@ Notes:
       DIP40 - 40 pins extended from bottom of module for connection to main board
 */
 
-ROM_START( woodpek )
+ROM_START( woodpeck )
 	ROM_REGION( 0x10000, "maincpu",0 )
 	/* roms dumped from epoxy block */
 	ROM_LOAD( "f.bin", 0x0000, 0x1000, CRC(37ea66ca) SHA1(1779e2af8ffc72ec454a401cf6fa93e77e28576a) )
@@ -5100,14 +5100,14 @@ ROM_START( woodpek )
 	ROM_LOAD( "pr.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
 ROM_END
 
-ROM_START( woodpeka )
+ROM_START( woodpeca )
 	ROM_REGION( 0x10000, "maincpu",0 )
 	/* roms dumped from epoxy block */
 	ROM_LOAD( "0", 0x0000, 0x1000, CRC(b5ee8bca) SHA1(b9a07dafa1b5ac26e28fd6520506c22b12881bc4) )
-	ROM_LOAD( "1", 0x8000, 0x1000, NO_DUMP ) /* a rom is missing */
+	ROM_LOAD( "1", 0x8000, 0x1000, CRC(c5ec2de6) SHA1(4014c99761c184466f586848ed3685c0e4bc272c) )
 	ROM_LOAD( "2", 0x9000, 0x1000, CRC(07ea534e) SHA1(d93a9c35be21558b553ae8234b7d7e6e7e7e07f0) )
 	ROM_LOAD( "3", 0xa000, 0x1000, CRC(a3a3253a) SHA1(e623bf11063570b7a8617a4590a6050cb73f61a2) )
-	ROM_LOAD( "4", 0xb000, 0x1000, BAD_DUMP CRC(6c50546b) SHA1(1ca1c70a1722172036b30f99d7f6bf005dca9b79) )
+	ROM_LOAD( "4", 0xb000, 0x1000, CRC(6c50546b) SHA1(1ca1c70a1722172036b30f99d7f6bf005dca9b79) )
 
 	ROM_REGION( 0x2000, "gfx1" , ROMREGION_DISPOSE)
 	ROM_LOAD( "10.5f", 0x0000, 0x1000, CRC(0bf52102) SHA1(dfd8bb56e25b5599a7fdc9d7db8f9f5f2d7c4b03) )
@@ -5754,8 +5754,8 @@ GAME( 1981, nmouseb,  nmouse ,  nmouse ,  nmouse,   eyes,     ROT90,  "Amenip No
 GAME( 1981, mspacman, 0,        mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmat, mspacman, mspacman, mspacman, mspacman, ROT90,  "hack", "Ms. Pac Attack", GAME_SUPPORTS_SAVE )
-GAME( 1981, woodpek,  0,        woodpek,  woodpek,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, woodpeka, woodpek,  woodpek,  woodpek,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, woodpeck, 0,        woodpek,  woodpek,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, woodpeca, woodpeck, woodpek,  woodpek,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmab, mspacman, woodpek,  mspacman, 0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmbe, mspacman, woodpek,  mspacman, mspacmbe, ROT90,  "bootleg", "Ms. Pac-Man (bootleg, (encrypted))", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacgal,   mspacman, woodpek,  mspacman, 0,        ROT90,  "hack", "Pac-Gal", GAME_SUPPORTS_SAVE )

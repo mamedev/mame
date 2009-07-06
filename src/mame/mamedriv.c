@@ -85,8 +85,8 @@ const game_driver * const drivers[] =
 	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by General Computer */
 	DRIVER( mspacmnf )	/* hack */
 	DRIVER( mspacmat )	/* hack */
-	DRIVER( woodpek )	/* (c) 1981 Amenip (Palcom Queen River) */
-	DRIVER( woodpeka )	/* (c) 1981 Amenip Nova Games Ltd. */
+	DRIVER( woodpeck )	/* (c) 1981 Amenip (Palcom Queen River) */
+	DRIVER( woodpeca )	/* (c) 1981 Amenip Nova Games Ltd. */
 	DRIVER( mspacmab )	/* bootleg */
 	DRIVER( mspacmbe )	/* bootleg */
 	DRIVER( pacgal )	/* hack */
