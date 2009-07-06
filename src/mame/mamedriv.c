@@ -6452,7 +6452,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gangwars )	/* Alpha-68K96V       (c) 1989 Alpha Denshi Co. */
 	DRIVER( gangwarb )	/* Alpha-68K96V bootleg */
 	DRIVER( sbasebal )	/* Alpha-68K96V       (c) 1989 SNK of America licensed from Alpha */
-	DRIVER( tnexspce )	/* A8003 'NS' (c) 1989 */
+	DRIVER( tnextspc )	/* A8003 'NS' (c) 1989 */
+	DRIVER( tnextspcj )	/* A8003 'NS' (c) 1989 */
 
 	DRIVER( meijinsn )	/* (c) 1986 SNK */
 
