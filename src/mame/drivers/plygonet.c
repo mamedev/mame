@@ -1,5 +1,6 @@
 /*
     Polygonet Commanders (Konami, 1993)
+    Poly-Net Warriors (Konami, 1993)
 
     Preliminary driver by R. Belmont
     Additional work by Andrew Gardner
@@ -199,7 +200,7 @@ static READ32_HANDLER( sound_r )
 {
 	int latch = soundlatch3_r(space, 0);
 
-	if (latch == 0xe) latch = 0xf;	/* hack: until 54539 NMI disable found */
+	if ((latch == 0xd) || (latch == 0xe)) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
 	return latch<<8;
 }
@@ -745,5 +746,34 @@ ROM_START( plygonet )
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 ROM_END
 
+ROM_START( polynetw )
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0)
+        ROM_LOAD32_BYTE( "305jaa01.4k",  0x000003, 0x080000, CRC(ea889bd9) SHA1(102e7c0f0c064662c0f6137ad5da97a9ccd49a97) )
+        ROM_LOAD32_BYTE( "305jaa02.2k",  0x000002, 0x080000, CRC(d0710379) SHA1(cf0970d63e8d021edf2d404838c658a5b7cb8fb8) )
+        ROM_LOAD32_BYTE( "305jaa03.2h",  0x000001, 0x080000, CRC(278b5928) SHA1(2ea96054e2ef637731cd64f2bef0b5b2bbe7e24f) )
+        ROM_LOAD32_BYTE( "305jaa04.4h",  0x000000, 0x080000, CRC(b069353b) SHA1(12fbe2df09328bb7193e89a49d84a61eab5bfdcb) )
+
+	/* Z80 sound program */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
+        ROM_LOAD( "305jaa05.7b",  0x000000, 0x020000, CRC(06053db6) SHA1(c7d43c2650d949ee552a49db93dece842c17e68d) )
+	ROM_RELOAD( 0x10000, 0x20000)
+
+	/* TTL text plane tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )
+        ROM_LOAD( "305a06.18g",    0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
+
+	/* '936 tiles */
+ 	ROM_REGION( 0x40000, "gfx2", 0 )
+        ROM_LOAD( "305a07.20d",   0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+        ROM_LOAD( "305a08.2e",    0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
+        ROM_LOAD( "305a09.3e",    0x200000, 0x200000, CRC(6da1be58) SHA1(d63ac16ac551193ff8a6036724fb59e1d702e06b) )
+ROM_END
+
 /*          ROM       parent   machine   inp        init */
 GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, polynetw, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
