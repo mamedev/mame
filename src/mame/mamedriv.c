@@ -9563,4 +9563,7 @@ Other Sun games
 	/* Accept LTD. */
 	DRIVER( hitpoker ) /* (c) 1997 */
 
+	/* Play Mechanix */
+	DRIVER( jnero )		/* (c) 2004 */
+
 #endif	/* DRIVER_RECURSIVE */
