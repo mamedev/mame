@@ -17,11 +17,12 @@
 
  - Video has a 'blitter' but it isn't used by these games, it is used by Rabbit
 
- - tmpdoki only ouputs video to a single screen, can dual screen be turned on in service mode?
+ - tmpdoki isn't a dual screen game, we should remove the dual screen layout from VIDEO_UPDATE and from the MACHINE_DRIVER, also notice that MAME
+   doesn't have a macro for removing previously declared screens.
 
  - sound (see rabbit.c for preliminary details, not copied here)
 
- - sprites from one screen are overlapping on the other, probably a way to limit them to a single screen
+ - sprites from one screen are overlapping on the other, probably there's a way to limit them to a single screen
 
  - priority is wrong.
 
@@ -549,8 +550,6 @@ static INPUT_PORTS_START( tmmjprd )
 INPUT_PORTS_END
 
 
-/* tmmjprd has a different memory map */
-
 static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 {
 	int r,g,b;
@@ -561,6 +560,45 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+}
+
+static double old_brt1, old_brt2;
+
+/* notice that data & 0x4 is always cleared on brt_1 and set on brt_2 */
+static WRITE32_HANDLER( tmmjprd_brt_1_w )
+{
+	int i;
+	double brt;
+	int bank;
+
+	data>>=24;
+	brt = (data & 0x7f) / 128.0;
+	bank = data & 0x4 ? 0x800 : 0; //guess
+
+	if(data & 0x80 && old_brt1 != brt)
+	{
+		old_brt1 = brt;
+		for (i = bank; i < 0x800+bank; i++)
+			palette_set_pen_contrast(space->machine, i, brt);
+	}
+}
+
+static WRITE32_HANDLER( tmmjprd_brt_2_w )
+{
+	int i;
+	double brt;
+	int bank;
+
+	data>>=24;
+	brt = (data & 0x7f) / 128.0;
+	bank = data & 0x4 ? 0x800 : 0; //guess
+
+	if(data & 0x80 && old_brt2 != brt)
+	{
+		old_brt2 = brt;
+		for (i = bank; i < 0x800+bank; i++)
+			palette_set_pen_contrast(space->machine, i, brt);
+	}
 }
 
 static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -576,7 +614,8 @@ static ADDRESS_MAP_START( tmmjprd_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_BASE( &tmmjprd_tilemap_regs[3] ) // tilemap regs4
 	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_BASE( &tmmjprd_spriteregs ) // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
-//  AM_RANGE(0x200400, 0x200413) AM_WRITEONLY AM_BASE( &tmmjprd_viewregs6 ) // some global controls? (brightness etc.?)
+  	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
+    AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_BASE( &tmmjprd_viewregs7 )
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_BASE( &tmmjprd_blitterregs )
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_BASE( &tmmjprd_viewregs9 ) // never changes?
@@ -653,7 +692,7 @@ static MACHINE_DRIVER_START( tmmjprd )
 //	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 //	MDRV_SCREEN_SIZE(64*16, 64*16)
 //	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_PALETTE_LENGTH(0x4000)
+	MDRV_PALETTE_LENGTH(0x1000)
 
 
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
