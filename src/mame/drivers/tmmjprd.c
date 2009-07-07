@@ -573,7 +573,7 @@ static WRITE32_HANDLER( tmmjprd_brt_1_w )
 	int bank;
 
 	data>>=24;
-	brt = ((data & 0x78)>>3) / 16.0;
+	brt = ((data & 0x78)>>3) / 15.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
 	if(data & 0x80 && old_brt1 != brt)
@@ -591,7 +591,7 @@ static WRITE32_HANDLER( tmmjprd_brt_2_w )
 	int bank;
 
 	data>>=24;
-	brt = ((data & 0x78)>>3) / 16.0;
+	brt = ((data & 0x78)>>3) / 15.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
 	if(data & 0x80 && old_brt2 != brt)
