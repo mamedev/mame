@@ -564,7 +564,8 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 
 static double old_brt1, old_brt2;
 
-/* notice that data & 0x4 is always cleared on brt_1 and set on brt_2 */
+/* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
+ * My wild guess is that bits 0,1 and 2 controls what palette entries to dim. */
 static WRITE32_HANDLER( tmmjprd_brt_1_w )
 {
 	int i;
@@ -572,7 +573,7 @@ static WRITE32_HANDLER( tmmjprd_brt_1_w )
 	int bank;
 
 	data>>=24;
-	brt = (data & 0x7f) / 128.0;
+	brt = ((data & 0x78)>>3) / 16.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
 	if(data & 0x80 && old_brt1 != brt)
@@ -590,7 +591,7 @@ static WRITE32_HANDLER( tmmjprd_brt_2_w )
 	int bank;
 
 	data>>=24;
-	brt = (data & 0x7f) / 128.0;
+	brt = ((data & 0x78)>>3) / 16.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
 	if(data & 0x80 && old_brt2 != brt)
