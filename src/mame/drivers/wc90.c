@@ -49,6 +49,29 @@ To enter into input test mode:
 -keep pressed both start buttons during P.O.S.T. until the cross hatch test fade out(in wc90t).
 Press one of the start buttons to exit.
 
+
+*****************************
+*                           *
+*  Pacman on WC90 Hardware  *
+*                           *
+*****************************
+
+There is known to be a Pacman hack runing on this hardware.  It was done by Mike C. and isn't ment
+for inclusion in MAME.  However the roms with checksums are listed below to prevent it being added
+as a newly "found" game:
+
+Set is known as pac90 (rom names may differ, but the CRC32/SHA1 values are listed):
+
+rom1.ic87      CRC32 8af34306   SHA1 1a98adca74f46da36e3648d37bfcb56a328a031e
+rom2.ic67      CRC32 bc9bfdf2   SHA1 869e4012e5c577e501143cbfd75cce8cef919c86
+rom3.ic54      CRC32 1c4d17fd   SHA1 5abebf867de452cc3e85331e91b9110c26a8b050
+char.ic85      CRC32 70941a50   SHA1 283583743c21774d0097dc935ae7bc7009b5b633
+char.ic85      CRC32 0b906dae   SHA1 0d14d6a7bbe0b8772143afb4c6c94c62313e4b9c <-- An alternate version...
+sprite1.ic50   CRC32 190852ea   SHA1 fad7eb3aa53d03917173dd5a040655cfd329db32
+sprite2.ic60   CRC32 33effbea   SHA1 dbf6b735f3c8bacb695caf5d15ac8b7961bffc74
+voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
+
+
 */
 
 #include "driver.h"
