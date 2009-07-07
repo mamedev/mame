@@ -5494,7 +5494,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gticlubj )	/* GX688 (c)1996 Japan JAA */
 	DRIVER( hangplt )	/* GX685 (c)1997 */
 	DRIVER( nbapbp )	/* GX778 (c)1998 */
-	DRIVER( terabrst )	/* GX??? (c)1998 */
+	DRIVER( terabrst )	/* GX??? (c)1998 USA UEL 1998/07/17*/
+	DRIVER( terabrsta )	/* GX??? (c)1998 Asia AAA 1998/02/25 */
 	DRIVER( gradius4 )	/* GX837 (c)1999 */
 	DRIVER( sscope )	/* GX830 (c)1999 */
 	DRIVER( sscopea )	/* GX830 (c)1999 */

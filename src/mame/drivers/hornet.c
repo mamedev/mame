@@ -1350,6 +1350,28 @@ ROM_START(sscopea)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
 ROM_END
 
+ROM_START(sscopeb)
+	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
+	ROM_LOAD16_WORD_SWAP("830_a01.bin", 0x200000, 0x200000, CRC(39e353f1) SHA1(569b06969ae7a690f6d6e63cc3b5336061663a37) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "user2", ROMREGION_ERASE00)	/* Data roms */
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
+
+	ROM_REGION(0x1000000, "user5", 0)		/* CG Board texture roms */
+	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+
+	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
+	ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
+	ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) )
+ROM_END
+
 ROM_START(sscope2)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
 	ROM_LOAD16_WORD_SWAP("931d01.bin", 0x200000, 0x200000, CRC(4065fde6) SHA1(84f2dedc3e8f61651b22c0a21433a64993e1b9e2) )
@@ -1432,6 +1454,33 @@ ROM_END
 
 ROM_START(terabrst)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
+        ROM_LOAD32_WORD_SWAP( "715l02.25p",   0x000000, 0x200000, CRC(79586f19) SHA1(8dcfed5d101ebe49d958a7a38d5472323f75dd1d) )
+	ROM_LOAD32_WORD_SWAP( "715l03.22p",   0x000002, 0x200000, CRC(c193021e) SHA1(c934b7c4bdab0ceff0f1699fcf2fb7d90e2e8962) )
+
+	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
+	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
+	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
+
+	ROM_REGION32_BE(0x1000000, "user5", 0)	/* CG Board texture roms */
+	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
+	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP( "715a08.7s",    0x000000, 0x080000, CRC(3aa2f4a5) SHA1(bb43e5f5ef4ac51f228d4d825be66d3c720d51ea) )
+
+	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
+	ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
+	ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
+
+	ROM_REGION(0x20000, "dsp", 0)		/* 68K Program */
+	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "715uel_m48t58y.35d", 0x000000, 0x002000, CRC(57322db4) SHA1(59cb8cd6ab446bf8781e3dddf902a4ff2484068e) )
+ROM_END
+
+ROM_START(terabrsta)
+	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
 	ROM_LOAD32_WORD_SWAP( "715a02.25p",   0x000000, 0x200000, CRC(070c48b3) SHA1(066cefbd34d8f6476083417471114f782bef97fb) )
 	ROM_LOAD32_WORD_SWAP( "715a03.22p",   0x000002, 0x200000, CRC(f77d242f) SHA1(7680e4abcccd549b3f6d1d245f64631fab57e80d) )
 
@@ -1457,11 +1506,12 @@ ROM_START(terabrst)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) )
 ROM_END
 
-/*************************************************************************/
+/*************************************************************************/				 
 
 GAME(  1998, gradius4, 0,      hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,   0,      hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL( 1998, terabrst, 0,      hornet_2board,    hornet, hornet_2board, ROT0, "Konami", "Teraburst", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrst, 0,      hornet_2board,    hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrsta,terabrst,hornet_2board,   hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscope,   0,      hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,  sscope, hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscope2,  0,      hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
