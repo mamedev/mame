@@ -56,7 +56,7 @@ Press one of the start buttons to exit.
 *                           *
 *****************************
 
-There is known to be a Pacman hack runing on this hardware.  It was done by Mike C. and isn't ment
+There is known to be a Pacman hack running on this hardware.  It was done by Mike C. and isn't ment
 for inclusion in MAME.  However the roms with checksums are listed below to prevent it being added
 as a newly "found" game:
 
