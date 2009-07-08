@@ -64,6 +64,7 @@ typedef struct _game_driver game_driver;
 typedef struct _machine_config machine_config;
 typedef struct _gfx_element gfx_element;
 typedef struct _mame_file mame_file;
+typedef struct _device_config device_config;
 
 
 /* pen_t is used to represent pixel values in bitmaps */

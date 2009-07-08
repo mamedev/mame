@@ -63,7 +63,6 @@ struct _cpu_config
 {
 	cpu_type			type;						/* index for the CPU type */
 	UINT32				flags;						/* flags; see #defines below */
-	const addrmap_token *address_map[ADDRESS_SPACES]; /* 1 memory map per address space */
 	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
 	int 				vblank_interrupts_per_frame;/* usually 1 */
 	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
@@ -111,14 +110,14 @@ struct _cpu_class_header
 #define MDRV_CPU_CONFIG(_config) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_CPU_PROGRAM_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_PROGRAM_MAP(_map) \
+	MDRV_DEVICE_PROGRAM_MAP(_map)
 
-#define MDRV_CPU_DATA_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_DATA_MAP(_map) \
+	MDRV_DEVICE_DATA_MAP(_map)
 
-#define MDRV_CPU_IO_MAP(_map1) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map1)) \
+#define MDRV_CPU_IO_MAP(_map) \
+	MDRV_DEVICE_IO_MAP(_map)
 
 #define MDRV_CPU_VBLANK_INT(_tag, _func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \

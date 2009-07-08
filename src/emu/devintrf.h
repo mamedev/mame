@@ -16,6 +16,7 @@
 
 #include "mamecore.h"
 #include "romload.h"
+#include "memory.h"
 
 
 /***************************************************************************
@@ -188,7 +189,6 @@ enum
 
 /* forward-declare these types */
 typedef union _deviceinfo deviceinfo;
-typedef struct _device_config device_config;
 
 
 /* a device contract */
@@ -252,6 +252,7 @@ struct _device_config
 
 	/* device configuration (always valid) */
 	UINT32					clock;					/* device clock */
+	const addrmap_token *	address_map[ADDRESS_SPACES]; /* address maps for each address space */
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 

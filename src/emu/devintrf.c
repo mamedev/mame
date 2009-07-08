@@ -126,6 +126,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* populate device configuration */
 	device->clock = clock;
+	memset(device->address_map, 0, sizeof(device->address_map));
 	if ((device->clock & 0xff000000) == 0xff000000)
 	{
 		assert(device->owner != NULL);

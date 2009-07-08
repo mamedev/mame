@@ -155,6 +155,13 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, device->clock, 32);
 				break;
 
+			case MCONFIG_TOKEN_DEVICE_MAP:
+				assert(device != NULL);
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, data32, 8);
+				device->address_map[data32] = TOKEN_GET_PTR(tokens, addrmap);
+				break;
+
 			case MCONFIG_TOKEN_DEVICE_CONFIG:
 				assert(device != NULL);
 				device->static_config = TOKEN_GET_PTR(tokens, voidptr);

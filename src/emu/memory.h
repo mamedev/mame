@@ -15,8 +15,9 @@
 #define __MEMORY_H__
 
 #include "mamecore.h"
-#include "devintrf.h"
 #include "tokenize.h"
+#include "astring.h"
+
 
 
 /***************************************************************************

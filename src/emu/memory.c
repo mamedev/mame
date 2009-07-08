@@ -764,7 +764,6 @@ const address_space *memory_find_address_space(const device_config *cpu, int spa
 
 address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum)
 {
-	const cpu_config *cpuconfig = (const cpu_config *)device->inline_config;
 	const addrmap_token *internal_map;
 	address_map *map;
 
@@ -776,8 +775,8 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 		map_detokenize(map, driver, device->tag, internal_map);
 
 	/* construct the standard map */
-	if (cpuconfig->address_map[spacenum] != NULL)
-		map_detokenize(map, driver, device->tag, cpuconfig->address_map[spacenum]);
+	if (device->address_map[spacenum] != NULL)
+		map_detokenize(map, driver, device->tag, device->address_map[spacenum]);
 
 	return map;
 }
