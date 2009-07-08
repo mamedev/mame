@@ -2161,10 +2161,10 @@ CPU_GET_INFO( i960 )
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:		info->internal_map32 = NULL;break;
 
 		// CPU misc parameters
-	case CPUINFO_STR_NAME:					strcpy(info->s, "i960KB");							break;
-	case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);							break;
+	case DEVINFO_STR_NAME:					strcpy(info->s, "i960KB");							break;
+	case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);							break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, i960_get_strflags(i960));			break;
-	case CPUINFO_INT_ENDIANNESS:			info->i = ENDIANNESS_LITTLE;								break;
+	case DEVINFO_INT_ENDIANNESS:			info->i = ENDIANNESS_LITTLE;								break;
 	case CPUINFO_INT_INPUT_LINES:			info->i = 4;										break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:	info->i = -1;										break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:		info->i = 1;										break;

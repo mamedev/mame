@@ -819,7 +819,7 @@ CPU_GET_INFO( tms0980 )
 	{
 		case CPUINFO_INT_CONTEXT_SIZE:									info->i = sizeof(tms0980_state); break;
 		case CPUINFO_INT_INPUT_LINES:									info->i = 1; break;
-		case CPUINFO_INT_ENDIANNESS:									info->i = ENDIANNESS_BIG; break;
+		case DEVINFO_INT_ENDIANNESS:									info->i = ENDIANNESS_BIG; break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:								info->i = 1; break;
 		case CPUINFO_INT_CLOCK_DIVIDER:									info->i = 1; break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 2; break;
@@ -827,12 +827,12 @@ CPU_GET_INFO( tms0980 )
 		case CPUINFO_INT_MIN_CYCLES:									info->i = 1; break;
 		case CPUINFO_INT_MAX_CYCLES:									info->i = 6; break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16 /* 9 */; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 12; break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0; break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8 /* 4 */; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7; break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0; break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16 /* 9 */; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 12; break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0; break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8 /* 4 */; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7; break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0; break;
 
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->prev_pa << 7 ) | cpustate->prev_pc ) << 1; break;
 		case CPUINFO_INT_PC:											info->i = ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1; break;
@@ -846,8 +846,8 @@ CPU_GET_INFO( tms0980 )
 		case CPUINFO_INT_REGISTER + TMS0980_Y:							info->i = cpustate->y; break;
 		case CPUINFO_INT_REGISTER + TMS0980_STATUS:						info->i = cpustate->status; break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:					info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
 
 		case CPUINFO_FCT_SET_INFO:										info->setinfo = CPU_SET_INFO_NAME( tms0980 ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
@@ -856,11 +856,11 @@ CPU_GET_INFO( tms0980 )
 		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms0980 ); break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:							info->icount = &cpustate->icount; break;
 
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS0980" ); break;
-		case CPUINFO_STR_CORE_FAMILY:									strcpy( info->s, "Texas Instruments TMS0980" ); break;
-		case CPUINFO_STR_CORE_VERSION:									strcpy( info->s, "0.1" ); break;
-		case CPUINFO_STR_CORE_FILE:										strcpy( info->s, __FILE__ ); break;
-		case CPUINFO_STR_CORE_CREDITS:									strcpy( info->s, "Copyright the MESS and MAME teams" ); break;
+		case DEVINFO_STR_NAME:											strcpy( info->s, "TMS0980" ); break;
+		case DEVINFO_STR_FAMILY:									strcpy( info->s, "Texas Instruments TMS0980" ); break;
+		case DEVINFO_STR_VERSION:									strcpy( info->s, "0.1" ); break;
+		case DEVINFO_STR_SOURCE_FILE:										strcpy( info->s, __FILE__ ); break;
+		case DEVINFO_STR_CREDITS:									strcpy( info->s, "Copyright the MESS and MAME teams" ); break;
 
 		case CPUINFO_STR_FLAGS:											strcpy( info->s, "N/A" ); break;
 

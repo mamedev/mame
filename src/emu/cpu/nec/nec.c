@@ -1329,7 +1329,7 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(nec_state_t);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -1384,11 +1384,11 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_state->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.5");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "NEC emulator v1.5 by Bryan McPhail"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.5");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "NEC emulator v1.5 by Bryan McPhail"); break;
 
 		case CPUINFO_STR_FLAGS:
             flags = CompressFlags();
@@ -1447,7 +1447,7 @@ CPU_GET_INFO( v20 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V20");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V20");					break;
 
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
@@ -1470,7 +1470,7 @@ CPU_GET_INFO( v25 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V25");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V25");					break;
 
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
@@ -1489,7 +1489,7 @@ CPU_GET_INFO( v30 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V30");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V30");					break;
 
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
@@ -1508,7 +1508,7 @@ CPU_GET_INFO( v33 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v33);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V33");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V33");					break;
 
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
@@ -1527,7 +1527,7 @@ CPU_GET_INFO( v35 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V35");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V35");					break;
 
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}

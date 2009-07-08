@@ -1441,7 +1441,7 @@ CPU_GET_INFO(tms57002)
 	switch(state) {
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(tms57002_t); break;
 	case CPUINFO_INT_INPUT_LINES:				info->i = 0; break;
-	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_LITTLE; break;
+	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_LITTLE; break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1; break;
 	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1; break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i = 4; break;
@@ -1463,11 +1463,11 @@ CPU_GET_INFO(tms57002)
 	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(tms57002); break;
 	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(tms57002); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount = &s->icount; break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP:		info->internal_map32 = ADDRESS_MAP_NAME(internal_pgm); break;
-	case CPUINFO_STR_NAME:						strcpy( info->s, "TMS57002" ); break;
-	case CPUINFO_STR_CORE_FAMILY:				strcpy( info->s, "Texas Instruments TMS57002 (DASP)" ); break;
-	case CPUINFO_STR_CORE_VERSION:				strcpy( info->s, "1.0" ); break;
-	case CPUINFO_STR_CORE_FILE:					strcpy( info->s, __FILE__ ); break;
-	case CPUINFO_STR_CORE_CREDITS:				strcpy( info->s, "Copyright Olivier Galibert" ); break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:info->internal_map32 = ADDRESS_MAP_NAME(internal_pgm); break;
+	case DEVINFO_STR_NAME:						strcpy( info->s, "TMS57002" ); break;
+	case DEVINFO_STR_FAMILY:				strcpy( info->s, "Texas Instruments TMS57002 (DASP)" ); break;
+	case DEVINFO_STR_VERSION:				strcpy( info->s, "1.0" ); break;
+	case DEVINFO_STR_SOURCE_FILE:					strcpy( info->s, __FILE__ ); break;
+	case DEVINFO_STR_CREDITS:				strcpy( info->s, "Copyright Olivier Galibert" ); break;
 	}
 }

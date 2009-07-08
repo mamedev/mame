@@ -433,7 +433,7 @@ CPU_GET_INFO( h6280 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(h6280_Regs);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -494,11 +494,11 @@ CPU_GET_INFO( h6280 )
 		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(h6280);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HuC6280");			break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hudsonsoft 6280");	break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.11");			break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);			break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, mish@tendril.co.uk"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HuC6280");			break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hudsonsoft 6280");	break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.11");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);			break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, mish@tendril.co.uk"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

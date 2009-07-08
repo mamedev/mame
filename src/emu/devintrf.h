@@ -52,6 +52,14 @@ enum
 		DEVINFO_INT_INLINE_CONFIG_BYTES,				/* R/O: bytes to allocate for the inline configuration */
 		DEVINFO_INT_CLASS,								/* R/O: the device's class */
 
+		DEVINFO_INT_ENDIANNESS,							/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
+		DEVINFO_INT_DATABUS_WIDTH,						/* R/O: data bus size for each address space (8,16,32,64) */
+		DEVINFO_INT_DATABUS_WIDTH_LAST = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
+		DEVINFO_INT_ADDRBUS_WIDTH,						/* R/O: address bus size for each address space (12-32) */
+		DEVINFO_INT_ADDRBUS_WIDTH_LAST = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
+		DEVINFO_INT_ADDRBUS_SHIFT,						/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
+		DEVINFO_INT_ADDRBUS_SHIFT_LAST = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
+
 	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				/* R/W: device-specific values start here */
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
 	DEVINFO_INT_LAST = 0x0ffff,
@@ -62,6 +70,9 @@ enum
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
 		DEVINFO_PTR_MACHINE_CONFIG,						/* R/O: pointer to device-specific machine config */
 		DEVINFO_PTR_CONTRACT_LIST,						/* R/O: pointer to list of supported device contracts */
+
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				/* R/O: const addrmap_token *map */
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP_LAST = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 
 	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
@@ -151,6 +162,7 @@ enum
 #define devtag_get_device(mach,tag)							device_list_find_by_tag((mach)->config->devicelist, tag)
 
 #define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
+#define devtag_get_address_space(mach,tag,space)			
 
 #define devtag_get_info_int(mach,tag,state)					device_get_info_int(devtag_get_device(mach, tag), state)
 #define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr(devtag_get_device(mach, tag), state)
@@ -159,6 +171,10 @@ enum
 
 
 /* shorthand for getting standard data about device types */
+#define devtype_get_endianness(type)						devtype_get_info_int(type, DEVINFO_INT_ENDIANNESS)
+#define devtype_get_databus_width(type,space)				devtype_get_info_int(type, DEVINFO_INT_DATABUS_WIDTH + (space))
+#define devtype_get_addrbus_width(type,space)				devtype_get_info_int(type, DEVINFO_INT_ADDRBUS_WIDTH + (space))
+#define devtype_get_addrbus_shift(type,space)				devtype_get_info_int(type, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define devtype_get_name(type)								devtype_get_info_string(type, DEVINFO_STR_NAME)
 #define devtype_get_family(type) 							devtype_get_info_string(type, DEVINFO_STR_FAMILY)
 #define devtype_get_version(type) 							devtype_get_info_string(type, DEVINFO_STR_VERSION)
@@ -167,6 +183,10 @@ enum
 
 
 /* shorthand for getting standard data about devices */
+#define device_get_endianness(dev)							device_get_info_int(dev, DEVINFO_INT_ENDIANNESS)
+#define device_get_databus_width(dev,space)					device_get_info_int(dev, DEVINFO_INT_DATABUS_WIDTH + (space))
+#define device_get_addrbus_width(dev,space)					device_get_info_int(dev, DEVINFO_INT_ADDRBUS_WIDTH + (space))
+#define device_get_addrbus_shift(dev,space)					device_get_info_int(dev, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define device_get_name(dev)								device_get_info_string(dev, DEVINFO_STR_NAME)
 #define device_get_family(dev) 								device_get_info_string(dev, DEVINFO_STR_FAMILY)
 #define device_get_version(dev) 							device_get_info_string(dev, DEVINFO_STR_VERSION)
@@ -175,6 +195,10 @@ enum
 
 
 /* shorthand for getting standard data about devices by machine/type/tag */
+#define devtag_get_endianness(mach,tag)						devtag_get_info_int(mach, tag, DEVINFO_INT_ENDIANNESS)
+#define devtag_get_databus_width(mach,tag,space)			devtag_get_info_int(mach, tag, DEVINFO_INT_DATABUS_WIDTH + (space))
+#define devtag_get_addrbus_width(mach,tag,space)			devtag_get_info_int(mach, tag, DEVINFO_INT_ADDRBUS_WIDTH + (space))
+#define devtag_get_addrbus_shift(mach,tag,space)			devtag_get_info_int(mach, tag, DEVINFO_INT_ADDRBUS_SHIFT + (space))
 #define devtag_get_name(mach,tag)							devtag_get_info_string(mach, tag, DEVINFO_STR_NAME)
 #define devtag_get_family(mach,tag) 						devtag_get_info_string(mach, tag, DEVINFO_STR_FAMILY)
 #define devtag_get_version(mach,tag) 						devtag_get_info_string(mach, tag, DEVINFO_STR_VERSION)
@@ -265,6 +289,7 @@ struct _device_config
 	UINT32					tokenbytes;				/* size of the token data allocated */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */
+	const address_space *	space[ADDRESS_SPACES];	/* auto-discovered address spaces */
 	device_execute_func 	execute;				/* quick pointer to execute callback */
 
 	/* tag (always valid; at end because it is variable-length) */

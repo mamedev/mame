@@ -951,7 +951,7 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms32010_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -997,11 +997,11 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments TMS32010");	break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.22");						break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tony La Porta");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments TMS32010");	break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.22");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Tony La Porta");		break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

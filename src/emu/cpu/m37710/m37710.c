@@ -1021,7 +1021,7 @@ CPU_GET_INFO( m37710 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m37710i_cpu_struct);			break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -1078,11 +1078,11 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map8 = NULL;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M37710");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "M7700");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright R. Belmont, based on G65816 by Karl Stenerud"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M37710");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "M7700");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright R. Belmont, based on G65816 by Karl Stenerud"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -1122,7 +1122,7 @@ CPU_GET_INFO( m37710 )
 // 37702 is identical except with an internal ROM, so just change the name
 CPU_GET_INFO( m37702 )
 {
-	if (state == CPUINFO_STR_NAME)
+	if (state == DEVINFO_STR_NAME)
 	{
 		strcpy(info->s, "M37702");
 		return;

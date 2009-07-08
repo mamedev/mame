@@ -4855,7 +4855,7 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(hyperstone_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -5004,10 +5004,10 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map16 = NULL;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hyperstone CPU");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.9");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Pierpaolo Prazzoli and Ryan Holtz"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hyperstone CPU");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.9");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Pierpaolo Prazzoli and Ryan Holtz"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
@@ -5160,7 +5160,7 @@ CPU_GET_INFO( e116t )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116t);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16T");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-16T");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5181,7 +5181,7 @@ CPU_GET_INFO( e116xt )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xt);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XT");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-16XT");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5202,7 +5202,7 @@ CPU_GET_INFO( e116xs )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xs);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XS");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-16XS");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5223,7 +5223,7 @@ CPU_GET_INFO( e116xsr )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xsr);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XSR");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-16XSR");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5244,7 +5244,7 @@ CPU_GET_INFO( e132n )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132n);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32N");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32N");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5265,7 +5265,7 @@ CPU_GET_INFO( e132t )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132t);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32T");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32T");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5286,7 +5286,7 @@ CPU_GET_INFO( e132xn )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xn);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XN");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32XN");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5307,7 +5307,7 @@ CPU_GET_INFO( e132xt )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xt);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XT");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32XT");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5328,7 +5328,7 @@ CPU_GET_INFO( e132xs )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xs);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XS");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32XS");				break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5349,7 +5349,7 @@ CPU_GET_INFO( e132xsr )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xsr);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XSR");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "E1-32XSR");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5370,7 +5370,7 @@ CPU_GET_INFO( gms30c2116 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2116);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2116");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "GMS30C2116");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5391,7 +5391,7 @@ CPU_GET_INFO( gms30c2132 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2132);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2132");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "GMS30C2132");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5412,7 +5412,7 @@ CPU_GET_INFO( gms30c2216 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2216);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2216");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "GMS30C2216");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);
@@ -5433,7 +5433,7 @@ CPU_GET_INFO( gms30c2232 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2232);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2232");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "GMS30C2232");			break;
 
 		default:
 			CPU_GET_INFO_CALL(hyperstone);

@@ -2,7 +2,7 @@
 
     memory.c
 
-    Functions which handle the CPU memory access.
+    Functions which handle device memory access.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -186,7 +186,7 @@ typedef enum _read_or_write read_or_write;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* a memory block is a chunk of RAM associated with a range of memory in a CPU's address space */
+/* a memory block is a chunk of RAM associated with a range of memory in a device's address space */
 typedef struct _memory_block memory_block;
 struct _memory_block
 {
@@ -197,7 +197,7 @@ struct _memory_block
 	UINT8 *					data;					/* pointer to the data for this block */
 };
 
-/* a bank is a global pointer to memory that can be shared across CPUs and changed dynamically */
+/* a bank is a global pointer to memory that can be shared across devices and changed dynamically */
 typedef struct _bank_reference bank_reference;
 struct _bank_reference
 {
@@ -316,7 +316,7 @@ static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine *machine);
 
 /* address map helpers */
-static void map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens);
+static void map_detokenize(address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
 
 /* memory mapping helpers */
 static void space_map_range_private(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -714,7 +714,7 @@ void memory_init(running_machine *machine)
 	/* allocate our private data */
 	memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
 
-	/* build up the cpudata array with info about all CPUs and address spaces */
+	/* build up the list of address spaces */
 	memory_init_spaces(machine);
 
 	/* preflight the memory handlers and check banks */
@@ -737,16 +737,16 @@ void memory_init(running_machine *machine)
 /*-------------------------------------------------
     memory_find_address_space - find an address
     space in our internal list; for faster access
-    use cpu_get_address_space()
+    use device->space[] after device is started
 -------------------------------------------------*/
 
-const address_space *memory_find_address_space(const device_config *cpu, int spacenum)
+const address_space *memory_find_address_space(const device_config *device, int spacenum)
 {
-	memory_private *memdata = cpu->machine->memory_data;
+	memory_private *memdata = device->machine->memory_data;
 	const address_space *space;
 
 	for (space = memdata->spacelist; space != NULL; space = space->next)
-		if (space->cpu == cpu && space->spacenum == spacenum)
+		if (space->cpu == device && space->spacenum == spacenum)
 			return space;
 	return NULL;
 }
@@ -759,7 +759,7 @@ const address_space *memory_find_address_space(const device_config *cpu, int spa
 
 /*-------------------------------------------------
     address_map_alloc - build and allocate an
-    address map for a CPU's address space
+    address map for a device's address space
 -------------------------------------------------*/
 
 address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum)
@@ -769,8 +769,8 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 
 	map = alloc_clear_or_die(address_map);
 
-	/* append the internal CPU map (first so it takes priority) */
-	internal_map = (const addrmap_token *)device_get_info_ptr(device, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	/* append the internal device map (first so it takes priority) */
+	internal_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
 		map_detokenize(map, driver, device->tag, internal_map);
 
@@ -847,20 +847,20 @@ void memory_set_decrypted_region(const address_space *space, offs_t addrstart, o
 
 			/* fatal error if the decrypted region straddles the bank */
 			else if (bank->bytestart < byteend && bank->byteend > bytestart)
-				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for CPU '%s'", bytestart, byteend, space->cpu->tag);
+				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag);
 		}
 	}
 
 	/* fatal error as well if we didn't find any relevant memory banks */
 	if (!found)
-		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for CPU '%s'", bytestart, byteend, space->cpu->tag);
+		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for device '%s'", bytestart, byteend, space->cpu->tag);
 }
 
 
 /*-------------------------------------------------
     memory_set_direct_update_handler - register a
     handler for opcode base changes on a given
-    CPU
+    device
 -------------------------------------------------*/
 
 direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function)
@@ -873,8 +873,9 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
 
 
 /*-------------------------------------------------
-    memory_set_direct_region - called by CPU cores to
-    update the opcode base for the given address
+    memory_set_direct_region - called by deivce 
+    cores to update the opcode base for the given 
+    address
 -------------------------------------------------*/
 
 int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
@@ -914,7 +915,7 @@ int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
 		if (!spacerw->debugger_access)
-			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, overrideaddress, space->name);
+			logerror("Device '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, overrideaddress, space->name);
 		return FALSE;
 	}
 
@@ -1458,13 +1459,13 @@ void memory_dump(running_machine *machine, FILE *file)
 	{
 		fprintf(file, "\n\n"
 		              "====================================================\n"
-		              "CPU '%s' %s address space read handler dump\n"
+		              "Device '%s' %s address space read handler dump\n"
 		              "====================================================\n", space->cpu->tag, space->name);
 		dump_map(file, space, &space->read);
 
 		fprintf(file, "\n\n"
 		              "====================================================\n"
-		              "CPU '%s' %s address space write handler dump\n"
+		              "Device '%s' %s address space write handler dump\n"
 		              "====================================================\n", space->cpu->tag, space->name);
 		dump_map(file, space, &space->read);
 	}
@@ -1492,17 +1493,17 @@ static void memory_init_spaces(running_machine *machine)
 	memdata->wptable = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
-	/* loop over CPUs */
-	for (device = machine->cpu[0]; device != NULL; device = device->typenext)
+	/* loop over devices */
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpu_get_addrbus_width(device, spacenum) > 0)
+			if (device_get_addrbus_width(device, spacenum) > 0)
 			{
 				address_space *space = alloc_clear_or_die(address_space);
 				int logbits = cpu_get_logaddr_width(device, spacenum);
-				int ashift = cpu_get_addrbus_shift(device, spacenum);
-				int abits = cpu_get_addrbus_width(device, spacenum);
-				int dbits = cpu_get_databus_width(device, spacenum);
-				int endianness = cpu_get_endianness(device);
+				int ashift = device_get_addrbus_shift(device, spacenum);
+				int abits = device_get_addrbus_width(device, spacenum);
+				int dbits = device_get_databus_width(device, spacenum);
+				int endianness = device_get_endianness(device);
 				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 				int entrynum;
 
@@ -1522,7 +1523,6 @@ static void memory_init_spaces(running_machine *machine)
 				space->spacenum = spacenum;
 				space->endianness = endianness;
 				space->ashift = ashift;
-				space->pageshift = cpu_get_page_shift(device, spacenum);
 				space->abits = abits;
 				space->dbits = dbits;
 				space->addrchars = (abits + 3) / 4;
@@ -1615,7 +1615,7 @@ static void memory_init_preflight(running_machine *machine)
 			space->bytemask = memory_address_to_byte_end(space, space->addrmask);
 		}
 
-		/* make a pass over the address map, adjusting for the CPU and getting memory pointers */
+		/* make a pass over the address map, adjusting for the device and getting memory pointers */
 		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 		{
 			/* computed adjusted addresses first */
@@ -1644,9 +1644,9 @@ static void memory_init_preflight(running_machine *machine)
 
 				/* validate the region */
 				if (base == NULL)
-					fatalerror("Error: CPU '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region);
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region);
 				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
-					fatalerror("Error: CPU '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region, length);
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region, length);
 			}
 
 			/* convert any region-relative entries to their memory pointers */
@@ -1753,7 +1753,7 @@ static void memory_init_populate(running_machine *machine)
 
 /*-------------------------------------------------
     memory_init_allocate - allocate memory for
-    CPU address spaces
+    device address spaces
 -------------------------------------------------*/
 
 static void memory_init_allocate(running_machine *machine)
@@ -1988,7 +1988,7 @@ static void memory_exit(running_machine *machine)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens)
+static void map_detokenize(address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
@@ -2027,7 +2027,7 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(map, driver, cputag, TOKEN_GET_PTR(tokens, tokenptr));
+				map_detokenize(map, driver, devtag, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -2090,7 +2090,7 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				entry->read_name = TOKEN_GET_STRING(tokens);
 				if (entry->read_devtag_string == NULL)
 					entry->read_devtag_string = astring_alloc();
-				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, cputag, TOKEN_GET_STRING(tokens));
+				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, devtag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
@@ -2101,7 +2101,7 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				entry->write_name = TOKEN_GET_STRING(tokens);
 				if (entry->write_devtag_string == NULL)
 					entry->write_devtag_string = astring_alloc();
-				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, cputag, TOKEN_GET_STRING(tokens));
+				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, devtag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
@@ -2115,7 +2115,7 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
 				if (entry->region_string == NULL)
 					entry->region_string = astring_alloc();
-				entry->region = device_inherit_tag(entry->region_string, cputag, TOKEN_GET_STRING(tokens));
+				entry->region = device_inherit_tag(entry->region_string, devtag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:
@@ -2262,8 +2262,8 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 /*-------------------------------------------------
     space_find_backing_memory - return a pointer to
-    the base of RAM associated with the given CPU
-    and offset
+    the base of RAM associated with the given 
+    device and offset
 -------------------------------------------------*/
 
 static void *space_find_backing_memory(const address_space *space, offs_t byteaddress)
@@ -2400,7 +2400,7 @@ static genf *bank_assign_dynamic(const address_space *space, read_or_write reado
 	}
 
 	/* if we got here, we failed */
-	fatalerror("CPU '%s': ran out of banks for RAM/ROM regions!", space->cpu->tag);
+	fatalerror("Device '%s': ran out of banks for RAM/ROM regions!", space->cpu->tag);
 	return NULL;
 }
 
@@ -3187,40 +3187,40 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 
 static READ8_HANDLER( unmap_read8 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset));
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory byte read from %08X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset));
 	return space->unmap;
 }
 static READ16_HANDLER( unmap_read16 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*2), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory word read from %08X & %04X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*2), mem_mask);
 	return space->unmap;
 }
 static READ32_HANDLER( unmap_read32 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*4), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory dword read from %08X & %08X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*4), mem_mask);
 	return space->unmap;
 }
 static READ64_HANDLER( unmap_read64 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory qword read from %08X & %08X%08X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 	return space->unmap;
 }
 
 static WRITE8_HANDLER( unmap_write8 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset), data);
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory byte write to %08X = %02X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset), data);
 }
 static WRITE16_HANDLER( unmap_write16 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*2), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory word write to %08X = %04X & %04X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( unmap_write32 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*4), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory dword write to %08X = %08X & %08X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( unmap_write64 )
 {
-	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, memory_byte_to_address(space, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("%s: unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", cpuexec_describe_context(space->machine), space->name, memory_byte_to_address(space, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 

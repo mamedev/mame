@@ -2540,7 +2540,7 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z180_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -2583,11 +2583,11 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		info->p = (void *)cc[Z180_TABLE_ex];	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.4");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.4");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

@@ -2678,7 +2678,7 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6800_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -2723,11 +2723,11 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6800");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 6800");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "The MAME team.");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6800");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 6800");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "The MAME team.");		break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -2771,7 +2771,7 @@ CPU_GET_INFO( m6801 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6801);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
@@ -2794,7 +2794,7 @@ CPU_GET_INFO( m6802 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6802);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
@@ -2822,7 +2822,7 @@ CPU_GET_INFO( m6803 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(m6803_mem); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6803");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6803");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
@@ -2845,7 +2845,7 @@ CPU_GET_INFO( m6808 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6808);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
@@ -2871,7 +2871,7 @@ CPU_GET_INFO( hd63701 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
@@ -2895,7 +2895,7 @@ CPU_GET_INFO( nsc8105 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;
 
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}

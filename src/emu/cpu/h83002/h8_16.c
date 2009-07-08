@@ -606,10 +606,10 @@ CPU_GET_INFO( h8_3002 )
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map16 = NULL;	break;
 
 		// CPU misc parameters
-	case CPUINFO_STR_NAME:						strcpy(info->s, "H8/3002");						break;
-	case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
+	case DEVINFO_STR_NAME:						strcpy(info->s, "H8/3002");						break;
+	case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	case CPUINFO_STR_FLAGS:						strcpy(info->s, h8_get_ccr_str(h8));				break;
-	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
+	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
 	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
 	case CPUINFO_INT_INPUT_LINES:				info->i = 16;									break;
@@ -652,7 +652,7 @@ CPU_GET_INFO( h8_3044 )
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8_3044_internal_map);  break;
 		case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(h8_24);					break;
-		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3044");	 break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8/3044");	 break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
 	}
@@ -664,7 +664,7 @@ CPU_GET_INFO( h8_3007 )
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = address_map_h8_3007_internal_map;  break;
 		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
-		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
 	}

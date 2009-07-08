@@ -122,7 +122,6 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	/* populate device properties */
 	device->type = type;
 	device->devclass = (device_class)(INT32)devtype_get_info_int(type, DEVINFO_INT_CLASS);
-	device->execute = NULL;
 
 	/* populate device configuration */
 	device->clock = clock;
@@ -142,6 +141,8 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	device->tokenbytes = 0;
 	device->region = NULL;
 	device->regionbytes = 0;
+	memset(device->space, 0, sizeof(device->space));
+	device->execute = NULL;
 
 	/* append the tag */
 	strcpy(device->tag, tag);
@@ -569,6 +570,8 @@ void device_list_start(running_machine *machine)
 	/* iterate over devices and allocate memory for them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
+		int spacenum;
+		
 		assert(!device->started);
 		assert(device->machine == machine);
 		assert(device->token == NULL);
@@ -585,10 +588,11 @@ void device_list_start(running_machine *machine)
 		device->token = alloc_array_clear_or_die(UINT8, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
-		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
-		device->machine = machine;
 		device->region = memory_region(machine, device->tag);
 		device->regionbytes = memory_region_length(machine, device->tag);
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			device->space[spacenum] = memory_find_address_space(device, spacenum);
+		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
 	}
 
 	/* iterate until we've started everything */

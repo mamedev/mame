@@ -446,8 +446,8 @@ static DEVICE_START( cpu )
 	cpu_class_data *classdata;
 	const cpu_config *config;
 	cpu_init_func init;
-	int spacenum, line;
 	int num_regs;
+	int line;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -466,9 +466,6 @@ static DEVICE_START( cpu )
 
 	/* build the header */
 	header->debug = NULL;
-	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		header->space[spacenum] = memory_find_address_space(device, spacenum);
-
 	header->set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_FCT_SET_INFO);
 
 	/* fill in the input states and IRQ callback information */

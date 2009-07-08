@@ -1080,7 +1080,7 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(SHARC_REGS);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 32;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -1216,10 +1216,10 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "SHARC");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.01");				break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Ville Linde"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "SHARC");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.01");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Ville Linde"); break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 
@@ -1333,7 +1333,7 @@ CPU_GET_INFO( adsp21062 )
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp21062);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP21062");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ADSP21062");			break;
 
 		default:										CPU_GET_INFO_CALL(sharc);				break;
 	}

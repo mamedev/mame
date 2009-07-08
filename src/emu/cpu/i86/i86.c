@@ -520,7 +520,7 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i8086_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -560,11 +560,11 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_FCT_EXPORT_STRING:					info->export_string = CPU_EXPORT_STRING_NAME(i8086);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "8086");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 80x86");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.4");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "8086");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 80x86");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.4");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			cpustate->flags = CompressFlags();
@@ -606,7 +606,7 @@ CPU_GET_INFO( i8088 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8088);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "8088");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "8088");				break;
 
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
@@ -629,7 +629,7 @@ CPU_GET_INFO( i80186 )
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "80186");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "80186");				break;
 
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
@@ -653,7 +653,7 @@ CPU_GET_INFO( i80188 )
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "80188");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "80188");				break;
 
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}

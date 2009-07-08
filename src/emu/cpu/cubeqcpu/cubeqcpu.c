@@ -1887,7 +1887,7 @@ CPU_GET_INFO( cquestsnd )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestsnd_state);		break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -1921,11 +1921,11 @@ CPU_GET_INFO( cquestsnd )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Sound CPU");break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Cube Quest");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Sound CPU");break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cube Quest");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, ".......");			 break;
 		case CPUINFO_STR_REGISTER + CQUESTSND_PC:  		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
@@ -2005,7 +2005,7 @@ CPU_GET_INFO( cquestrot )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestrot_state);		break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2037,11 +2037,11 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Rotate CPU");break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Cube Quest");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Rotate CPU");break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cube Quest");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c", cpustate->cflag ? 'C' : '.',
 																				   cpustate->vflag ? 'V' : '.',
@@ -2123,7 +2123,7 @@ CPU_GET_INFO( cquestlin )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestlin_state);		break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2155,11 +2155,11 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Line CPU");			break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Cube Quest");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Line CPU");			break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cube Quest");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c|%cG",	cpustate->cflag ? 'C' : '.',
 																						cpustate->vflag ? 'V' : '.',

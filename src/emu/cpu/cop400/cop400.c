@@ -1364,7 +1364,7 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cop400_state);							break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;											break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;											break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;											break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = (intf != NULL) ? intf->cki : 16;				break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;											break;
@@ -1397,11 +1397,11 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		/* set per-core */ 										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP400");								break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");									break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);								break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright MAME Team");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP400");								break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "National Semiconductor COPS");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright MAME Team");					break;
 	}
 }
 
@@ -1429,7 +1429,7 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_32b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP410");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP410");								break;
 
 		case CPUINFO_STR_FLAGS: sprintf(info->s,
 									"%c%c",
@@ -1450,7 +1450,7 @@ CPU_GET_INFO( cop411 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop411);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP411");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP411");								break;
 
 		default:										CPU_GET_INFO_CALL(cop410);								break;
 	}
@@ -1466,7 +1466,7 @@ CPU_GET_INFO( cop401 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP401");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP401");								break;
 
 		default:										CPU_GET_INFO_CALL(cop410);								break;
 	}
@@ -1492,7 +1492,7 @@ CPU_GET_INFO( cop420 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP420");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP420");								break;
 
 		case CPUINFO_STR_FLAGS: sprintf(info->s,
 									"%c%c%c",
@@ -1515,7 +1515,7 @@ CPU_GET_INFO( cop421 )
 		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP421");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP421");								break;
 
 		default:										CPU_GET_INFO_CALL(cop420);								break;
 	}
@@ -1531,7 +1531,7 @@ CPU_GET_INFO( cop422 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop422);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP422");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP422");								break;
 
 		default:										CPU_GET_INFO_CALL(cop421);								break;
 	}
@@ -1547,7 +1547,7 @@ CPU_GET_INFO( cop402 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP402");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP402");								break;
 
 		default:										CPU_GET_INFO_CALL(cop420);								break;
 	}
@@ -1573,7 +1573,7 @@ CPU_GET_INFO( cop444 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_128b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP444");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP444");								break;
 
 		case CPUINFO_STR_FLAGS: sprintf(info->s,
 									"%c%c%c",
@@ -1595,7 +1595,7 @@ CPU_GET_INFO( cop445 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop445);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP445");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP445");								break;
 
 		default:										CPU_GET_INFO_CALL(cop444);								break;
 	}
@@ -1616,7 +1616,7 @@ CPU_GET_INFO( cop424 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP424");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP424");								break;
 
 		default:										CPU_GET_INFO_CALL(cop444);								break;
 	}
@@ -1632,7 +1632,7 @@ CPU_GET_INFO( cop425 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop425);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP425");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP425");								break;
 
 		default:										CPU_GET_INFO_CALL(cop424);								break;
 	}
@@ -1648,7 +1648,7 @@ CPU_GET_INFO( cop426 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop426);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP426");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP426");								break;
 
 		default:										CPU_GET_INFO_CALL(cop424);								break;
 	}
@@ -1664,7 +1664,7 @@ CPU_GET_INFO( cop404 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "COP404");								break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "COP404");								break;
 
 		default:										CPU_GET_INFO_CALL(cop444);								break;
 	}

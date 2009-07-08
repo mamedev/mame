@@ -1186,7 +1186,7 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(r3000_state);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;									break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;									break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;									break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;									break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;									break;
@@ -1262,11 +1262,11 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000->icount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000");						break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "MIPS II");						break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); 		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "R3000");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "MIPS II");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); 		break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");							break;
 
@@ -1318,14 +1318,14 @@ CPU_GET_INFO( r3000be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");					break;
 
 		default:										CPU_GET_INFO_CALL(r3000);						break;
 	}
@@ -1337,14 +1337,14 @@ CPU_GET_INFO( r3000le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");				break;
 
 		default:										CPU_GET_INFO_CALL(r3000);						break;
 	}
@@ -1356,14 +1356,14 @@ CPU_GET_INFO( r3041be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");					break;
 
 		default:										CPU_GET_INFO_CALL(r3000);						break;
 	}
@@ -1375,14 +1375,14 @@ CPU_GET_INFO( r3041le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");				break;
 
 		default:										CPU_GET_INFO_CALL(r3000);						break;
 	}

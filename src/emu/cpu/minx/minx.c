@@ -318,7 +318,7 @@ CPU_GET_INFO( minx )
 	case CPUINFO_INT_CONTEXT_SIZE:								info->i = sizeof(minx_state); break;
 	case CPUINFO_INT_INPUT_LINES:								info->i = 1; break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:						info->i = 0x00; break;
-	case CPUINFO_INT_ENDIANNESS:								info->i = ENDIANNESS_BIG; break;
+	case DEVINFO_INT_ENDIANNESS:								info->i = ENDIANNESS_BIG; break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:							info->i = 1; break;
 	case CPUINFO_INT_CLOCK_DIVIDER:								info->i = 1; break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:						info->i = 1; break;
@@ -360,11 +360,11 @@ CPU_GET_INFO( minx )
 	case CPUINFO_FCT_BURN:										info->burn = CPU_BURN_NAME(minx); break;
 	case CPUINFO_FCT_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx->icount; break;
-	case CPUINFO_STR_NAME:										strcpy( info->s, "Minx" ); break;
-	case CPUINFO_STR_CORE_FAMILY:								strcpy( info->s, "Nintendo Minx" ); break;
-	case CPUINFO_STR_CORE_VERSION:								strcpy( info->s, "0.1" ); break;
-	case CPUINFO_STR_CORE_FILE:									strcpy( info->s, __FILE__ ); break;
-	case CPUINFO_STR_CORE_CREDITS:								strcpy( info->s, "Copyright The MESS Team." ); break;
+	case DEVINFO_STR_NAME:										strcpy( info->s, "Minx" ); break;
+	case DEVINFO_STR_FAMILY:								strcpy( info->s, "Nintendo Minx" ); break;
+	case DEVINFO_STR_VERSION:								strcpy( info->s, "0.1" ); break;
+	case DEVINFO_STR_SOURCE_FILE:									strcpy( info->s, __FILE__ ); break;
+	case DEVINFO_STR_CREDITS:								strcpy( info->s, "Copyright The MESS Team." ); break;
 	case CPUINFO_STR_FLAGS:
 		sprintf( info->s, "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
 			minx->F & FLAG_I ? 'I' : '.',

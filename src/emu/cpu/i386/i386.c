@@ -854,7 +854,7 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i386_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 32;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -970,11 +970,11 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_FCT_DEBUG_INIT:					info->debug_init = CPU_DEBUG_INIT_NAME(i386); 	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I386");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 386");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Ville Linde"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "I386");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 386");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Ville Linde"); break;
 
 		case CPUINFO_STR_FLAGS:	   						sprintf(info->s, "%08X", get_flags(cpustate));	break;
 
@@ -1153,8 +1153,8 @@ CPU_GET_INFO( i486 )
 		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
 		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
 
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I486");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 486");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "I486");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 486");			break;
 		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
 		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
 		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
@@ -1284,8 +1284,8 @@ CPU_GET_INFO( pentium )
 		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
 		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
 
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PENTIUM");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel Pentium");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PENTIUM");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel Pentium");		break;
 		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
 		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
 		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
@@ -1415,8 +1415,8 @@ CPU_GET_INFO( mediagx )
 		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
 		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
 
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MEDIAGX");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Cyrix MediaGX");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MEDIAGX");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cyrix MediaGX");		break;
 		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
 		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
 		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;

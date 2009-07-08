@@ -710,7 +710,7 @@ CPU_GET_INFO( tms32031 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms32031_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 11;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -796,11 +796,11 @@ CPU_GET_INFO( tms32031 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_32031); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32031");			break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments TMS32031"); break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32031");			break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments TMS32031"); break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:
 		{
@@ -867,7 +867,7 @@ CPU_GET_INFO( tms32032 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_32032); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32032");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32032");			break;
 
 		default:										CPU_GET_INFO_CALL(tms32031);			break;
 	}

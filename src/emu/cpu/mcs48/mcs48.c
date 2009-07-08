@@ -1374,7 +1374,7 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs48_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = MCS48_INPUT_IRQ;				break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 3*5;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -1411,11 +1411,11 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		/* set per-core */ 						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							/* set per-core */						break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8039");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
+		case DEVINFO_STR_NAME:							/* set per-core */						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 8039");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c %c%c%c%c%c%c%c%c",
@@ -1502,7 +1502,7 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:
+		case DEVINFO_STR_NAME:
 			strcpy(info->s, name);
 			break;
 

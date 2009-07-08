@@ -885,7 +885,7 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(alpha8201_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -941,10 +941,10 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "AlphaDenshi MCU");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.1");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tatsuyuki Satoh"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "AlphaDenshi MCU");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.1");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Tatsuyuki Satoh"); break;
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c", cpustate->cf?'C':'.',cpustate->zf?'Z':'.'); break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_PC:		sprintf(info->s, "cpustate->PC:%03X", cpustate->PC);		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_SP:		sprintf(info->s, "SP:%02X", M_RDMEM(0x001) ); break;
@@ -976,7 +976,7 @@ CPU_GET_INFO( alpha8201 )
 {
 	switch (state)
 	{
-	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
 	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(alpha8201);			break;
 	default:
 		/* 8201 / 8301 */
@@ -988,7 +988,7 @@ CPU_GET_INFO( alpha8301 )
 {
 	switch (state)
 	{
-	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8301");				break;
+	case DEVINFO_STR_NAME:							strcpy(info->s, "ALPHA-8301");				break;
 	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8301);			break;
 	default:
 		/* 8201 / 8301 */

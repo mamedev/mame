@@ -1240,7 +1240,7 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					/* provided by core */					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1325,11 +1325,11 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "PowerPC");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");					break;
-		case CPUINFO_STR_CORE_FILE:						/* provided by core */					break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PowerPC");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "PowerPC");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						/* provided by core */					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 

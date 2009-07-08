@@ -1155,7 +1155,7 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v810_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -1236,11 +1236,11 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "V810");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC V810");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Tomasz Slanina");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V810");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC V810");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Tomasz Slanina");		break;
 
 		case CPUINFO_STR_REGISTER + V810_PC:			sprintf(info->s, "PC:%08X", cpustate->PC);		break;
 		case CPUINFO_STR_REGISTER + V810_R0:			sprintf(info->s, "R0 :%08X", cpustate->R0);		break;

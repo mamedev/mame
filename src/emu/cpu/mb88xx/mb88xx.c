@@ -934,7 +934,7 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mb88_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 6;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -990,11 +990,11 @@ CPU_GET_INFO( mb88 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB88xx");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Fujitsu MB88xx");	break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Ernesto Corvi"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB88xx");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Fujitsu MB88xx");	break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Ernesto Corvi"); break;
 
 		case CPUINFO_STR_FLAGS:
     		sprintf(info->s, "%c%c%c%c%c%c",
@@ -1042,7 +1042,7 @@ CPU_GET_INFO( mb8841 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8841");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8841");				break;
 
 		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
@@ -1061,7 +1061,7 @@ CPU_GET_INFO( mb8842 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8842");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8842");				break;
 
 		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
@@ -1080,7 +1080,7 @@ CPU_GET_INFO( mb8843 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8843");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8843");				break;
 
 		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
@@ -1099,7 +1099,7 @@ CPU_GET_INFO( mb8844 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8844");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8844");				break;
 
 		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}

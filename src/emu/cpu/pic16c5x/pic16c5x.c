@@ -1018,7 +1018,7 @@ static CPU_GET_INFO( pic16c5x )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pic16c5x_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -1067,11 +1067,11 @@ static CPU_GET_INFO( pic16c5x )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C5x");			break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Microchip");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.12");				break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tony La Porta"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C5x");			break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Microchip");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.12");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Tony La Porta"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%01x%c%c%c%c%c %c%c%c%03x",
@@ -1155,7 +1155,7 @@ CPU_GET_INFO( pic16c54 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c54_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C54");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C54");			break;
 
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}
@@ -1207,7 +1207,7 @@ CPU_GET_INFO( pic16c55 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c55_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C55");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C55");			break;
 
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}
@@ -1261,7 +1261,7 @@ CPU_GET_INFO( pic16c56 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C56");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C56");			break;
 
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}
@@ -1319,7 +1319,7 @@ CPU_GET_INFO( pic16c57 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C57");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C57");			break;
 
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}
@@ -1377,7 +1377,7 @@ CPU_GET_INFO( pic16c58 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 7;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C58");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C58");			break;
 
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}

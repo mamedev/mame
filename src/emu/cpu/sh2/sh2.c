@@ -2324,7 +2324,7 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(SH2);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 16;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -2400,11 +2400,11 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "SH-2");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi SH7600");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");				break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SH-2");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7600");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.01");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%d%c%c",
@@ -2451,7 +2451,7 @@ CPU_GET_INFO( sh1 )
 		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh1);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
+		case DEVINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
 
 		default:							CPU_GET_INFO_CALL(sh2);			break;
 	}

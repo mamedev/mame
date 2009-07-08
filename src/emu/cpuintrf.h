@@ -81,12 +81,22 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	CPUINFO_INT_FIRST = DEVINFO_INT_FIRST,
 
+		/* useful aliases */
+		CPUINFO_INT_DATABUS_WIDTH_PROGRAM = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_DATABUS_WIDTH_DATA = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_DATABUS_WIDTH_IO = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO,
+		CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_ADDRBUS_WIDTH_DATA = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_ADDRBUS_WIDTH_IO = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO,
+		CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_ADDRBUS_SHIFT_DATA = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_ADDRBUS_SHIFT_IO = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO,
+
 		/* CPU-specific additions */
 		CPUINFO_INT_CONTEXT_SIZE = DEVINFO_INT_CLASS_SPECIFIC,	/* R/O: size of CPU context in bytes */
 		CPUINFO_INT_INPUT_LINES,							/* R/O: number of input lines */
 		CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
 		CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
-		CPUINFO_INT_ENDIANNESS,								/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
 		CPUINFO_INT_CLOCK_MULTIPLIER,						/* R/O: internal clock multiplier */
 		CPUINFO_INT_CLOCK_DIVIDER,							/* R/O: internal clock divider */
 		CPUINFO_INT_MIN_INSTRUCTION_BYTES,					/* R/O: minimum bytes per instruction */
@@ -94,21 +104,6 @@ enum
 		CPUINFO_INT_MIN_CYCLES,								/* R/O: minimum cycles for a single instruction */
 		CPUINFO_INT_MAX_CYCLES,								/* R/O: maximum cycles for a single instruction */
 
-		CPUINFO_INT_DATABUS_WIDTH,							/* R/O: data bus size for each address space (8,16,32,64) */
-		CPUINFO_INT_DATABUS_WIDTH_PROGRAM = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_INT_DATABUS_WIDTH_DATA = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA,
-		CPUINFO_INT_DATABUS_WIDTH_IO = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO,
-		CPUINFO_INT_DATABUS_WIDTH_LAST = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
-		CPUINFO_INT_ADDRBUS_WIDTH,							/* R/O: address bus size for each address space (12-32) */
-		CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_INT_ADDRBUS_WIDTH_DATA = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA,
-		CPUINFO_INT_ADDRBUS_WIDTH_IO = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO,
-		CPUINFO_INT_ADDRBUS_WIDTH_LAST = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
-		CPUINFO_INT_ADDRBUS_SHIFT,							/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
-		CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_INT_ADDRBUS_SHIFT_DATA = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA,
-		CPUINFO_INT_ADDRBUS_SHIFT_IO = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO,
-		CPUINFO_INT_ADDRBUS_SHIFT_LAST = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
 		CPUINFO_INT_LOGADDR_WIDTH,							/* R/O: address bus size for logical accesses in each space (0=same as physical) */
 		CPUINFO_INT_LOGADDR_WIDTH_PROGRAM = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM,
 		CPUINFO_INT_LOGADDR_WIDTH_DATA = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_DATA,
@@ -135,14 +130,14 @@ enum
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	CPUINFO_PTR_FIRST = DEVINFO_PTR_FIRST,
 
+		/* useful aliases */
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO,
+
 		/* CPU-specific additions */
 		CPUINFO_PTR_INSTRUCTION_COUNTER = DEVINFO_PTR_CLASS_SPECIFIC,
 															/* R/O: int *icount */
-		CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
-		CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA,
-		CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO,
-		CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 		CPUINFO_PTR_STATE_TABLE,							/* R/O: cpu_state_table *state */
 
 	CPUINFO_PTR_CPU_SPECIFIC = DEVINFO_PTR_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
@@ -173,13 +168,6 @@ enum
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	CPUINFO_STR_FIRST = DEVINFO_STR_FIRST,
-
-		/* direct map to device data */
-		CPUINFO_STR_NAME = DEVINFO_STR_NAME,				/* R/O: name of the CPU */
-		CPUINFO_STR_CORE_FAMILY = DEVINFO_STR_FAMILY,		/* R/O: family of the CPU */
-		CPUINFO_STR_CORE_VERSION = DEVINFO_STR_VERSION,		/* R/O: version of the CPU core */
-		CPUINFO_STR_CORE_FILE = DEVINFO_STR_SOURCE_FILE,	/* R/O: file containing the CPU core */
-		CPUINFO_STR_CORE_CREDITS = DEVINFO_STR_CREDITS,		/* R/O: credits for the CPU core */
 
 		/* CPU-specific additions */
 		CPUINFO_STR_FLAGS = DEVINFO_STR_CLASS_SPECIFIC,		/* R/O: string representation of the main flags value */
@@ -323,16 +311,12 @@ enum
 #define cpu_get_input_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_INPUT_LINES)
 #define cpu_get_output_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_OUTPUT_LINES)
 #define cpu_get_default_irq_vector(cpu)		device_get_info_int(cpu, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define cpu_get_endianness(cpu)				device_get_info_int(cpu, CPUINFO_INT_ENDIANNESS)
 #define cpu_get_clock_multiplier(cpu)		device_get_info_int(cpu, CPUINFO_INT_CLOCK_MULTIPLIER)
 #define cpu_get_clock_divider(cpu)			device_get_info_int(cpu, CPUINFO_INT_CLOCK_DIVIDER)
 #define cpu_get_min_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
 #define cpu_get_max_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
 #define cpu_get_min_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MIN_CYCLES)
 #define cpu_get_max_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MAX_CYCLES)
-#define cpu_get_databus_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_DATABUS_WIDTH + (space))
-#define cpu_get_addrbus_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_ADDRBUS_WIDTH + (space))
-#define cpu_get_addrbus_shift(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_ADDRBUS_SHIFT + (space))
 #define cpu_get_logaddr_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_LOGADDR_WIDTH + (space))
 #define cpu_get_page_shift(cpu, space)		device_get_info_int(cpu, CPUINFO_INT_PAGE_SHIFT + (space))
 #define cpu_get_reg(cpu, reg)				device_get_info_int(cpu, CPUINFO_INT_REGISTER + (reg))
@@ -341,16 +325,22 @@ enum
 #define	cpu_get_sp(cpu)						cpu_get_reg(cpu, REG_GENSP)
 #define cpu_get_icount_ptr(cpu)				(int *)device_get_info_ptr(cpu, CPUINFO_PTR_INSTRUCTION_COUNTER)
 #define cpu_get_state_table(cpu)			(const cpu_state_table *)device_get_info_ptr(cpu, CPUINFO_PTR_STATE_TABLE)
-#define cpu_get_name(cpu)					device_get_info_string(cpu, CPUINFO_STR_NAME)
-#define cpu_get_core_family(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_FAMILY)
-#define cpu_get_core_version(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_VERSION)
-#define cpu_get_core_file(cpu)				device_get_info_string(cpu, CPUINFO_STR_CORE_FILE)
-#define cpu_get_core_credits(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_CREDITS)
 #define cpu_get_flags_string(cpu)			device_get_info_string(cpu, CPUINFO_STR_FLAGS)
 #define cpu_get_irq_string(cpu, irq)		device_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
 #define cpu_get_reg_string(cpu, reg)		device_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
 
 #define cpu_set_reg(cpu, reg, val)			cpu_set_info(cpu, CPUINFO_INT_REGISTER + (reg), (val))
+
+/* helpers that map directly to device helpers */
+#define cpu_get_endianness(cpu)				device_get_endianness(cpu)
+#define cpu_get_databus_width(cpu, space)	device_get_databus_width(cpu, space)
+#define cpu_get_addrbus_width(cpu, space)	device_get_addrbus_width(cpu, space)
+#define cpu_get_addrbus_shift(cpu, space)	device_get_addrbus_shift(cpu, space)
+#define cpu_get_name(cpu)					device_get_name(cpu)
+#define cpu_get_core_family(cpu)			device_get_family(cpu)
+#define cpu_get_core_version(cpu)			device_get_version(cpu)
+#define cpu_get_core_file(cpu)				device_get_source_file(cpu)
+#define cpu_get_core_credits(cpu)			device_get_credits(cpu)
 
 
 
