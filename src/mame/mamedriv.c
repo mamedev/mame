@@ -907,6 +907,7 @@ const game_driver * const drivers[] =
 	DRIVER( finfrl2j )	/* (c) 1999 */
 
 	/* Misc Namco games */
+	DRIVER( turrett )	/* (c) 199? Namco */
 	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.04 */
 	DRIVER( 20pacgaa )	/* (c) 2000 Ver 1.01 */
 

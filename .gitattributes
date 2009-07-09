@@ -2181,6 +2181,7 @@ src/mame/drivers/tumbleb.c svneol=native#text/plain
 src/mame/drivers/tumblep.c svneol=native#text/plain
 src/mame/drivers/tunhunt.c svneol=native#text/plain
 src/mame/drivers/turbo.c svneol=native#text/plain
+src/mame/drivers/turrett.c svneol=native#text/plain
 src/mame/drivers/tutankhm.c svneol=native#text/plain
 src/mame/drivers/twin16.c svneol=native#text/plain
 src/mame/drivers/twincobr.c svneol=native#text/plain
