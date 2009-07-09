@@ -536,7 +536,7 @@ ROM_START( bloodbro )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "bloodb.obj",   0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -562,7 +562,7 @@ ROM_START( bloodbra )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "bloodb.obj",   0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -608,7 +608,7 @@ ROM_START( weststry )
 	ROM_LOAD( "ws19.bin",    0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin",    0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -634,7 +634,7 @@ ROM_START( skysmash )
 	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom10",   0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )	/* sprites */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "rom1",    0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
 ROM_END
 

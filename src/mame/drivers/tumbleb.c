@@ -2805,7 +2805,7 @@ ROM_START( htchctch )
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(5b27adb6) SHA1(a0821093d8c73765ff15767bdfc0afa95aa1371d) )
 
-	ROM_REGION( 0x020000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p01.c1", 0x00000, 0x20000, CRC(18c06829) SHA1(46b180319ed33abeaba70d2cc61f17639e59bfdb) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* Sprites */
@@ -2836,7 +2836,7 @@ ROM_START( cookbib )
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(a77d13f4) SHA1(13db72f5b171b0c1226e97ea98d9edd7144d56d9) )
 
-	ROM_REGION( 0x020000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "sound.uc1", 0x00000, 0x20000, CRC(545e19b6) SHA1(ef518bbe44b22e7ef77ee6af337ebcad9b2674e0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* */

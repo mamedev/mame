@@ -957,7 +957,7 @@ ROM_START( shadoww )
 	ROM_LOAD( "shadoww_13a.xx", 0x0e0000, 0x10000, CRC(996d2fa5) SHA1(a32526949af3635914927ebbbe684c3de9562a9d) )	/* sprites D2 */
 	ROM_LOAD( "shadoww_13b.xx", 0x0f0000, 0x10000, CRC(b8df8a34) SHA1(6810f7961052a983b8c78b42d550038051012c6d) )	/* sprites D2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
@@ -998,7 +998,7 @@ ROM_START( shadowwa )
 	ROM_LOAD( "shadoww_13a.xx", 0x0e0000, 0x10000, CRC(996d2fa5) SHA1(a32526949af3635914927ebbbe684c3de9562a9d) )	/* sprites D2 */
 	ROM_LOAD( "shadoww_13b.xx", 0x0f0000, 0x10000, CRC(b8df8a34) SHA1(6810f7961052a983b8c78b42d550038051012c6d) )	/* sprites D2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
@@ -1036,7 +1036,7 @@ ROM_START( gaiden )
 	ROM_LOAD( "11.1r",        0x0c0000, 0x20000, CRC(7fbfdf5e) SHA1(ab67b72dcadb5f2236d29de751de5bf890a9e423) )	/* sprites C2 */
 	ROM_LOAD( "gaiden_13.1s", 0x0e0000, 0x20000, CRC(7d9f5c5e) SHA1(200102532ea9a88c7c708e03f8893c46dff827d1) )	/* sprites D2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
@@ -1077,7 +1077,7 @@ ROM_START( ryukendn )
 	ROM_LOAD( "shadoww_13a.xx",  0x0e0000, 0x10000, CRC(996d2fa5) SHA1(a32526949af3635914927ebbbe684c3de9562a9d) )	/* sprites D2 */
 	ROM_LOAD( "ryukendn_13b.xx", 0x0f0000, 0x10000, CRC(1f43c507) SHA1(29f655442c16677855073284c7ab41059c99c497) )	/* sprites D2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
@@ -1124,7 +1124,7 @@ ROM_START( ryukenda )
 	ROM_LOAD( "11.1r",    0x0c0000, 0x20000, CRC(7fbfdf5e) SHA1(ab67b72dcadb5f2236d29de751de5bf890a9e423) )	/* sprites C2 */
 	ROM_LOAD( "13.1s",    0x0e0000, 0x20000, CRC(4e56a508) SHA1(f89a6037e602b26d6ce11859e0b43a602b50d985) )	/* sprites D2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
@@ -1154,7 +1154,7 @@ ROM_START( tknight )
 	ROM_LOAD( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) )	/* sprites */
 	ROM_LOAD( "tkni8.bin",    0x080000, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) )	/* sprites */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
 ROM_END
 
@@ -1185,7 +1185,7 @@ ROM_START( wildfang )
 	ROM_LOAD( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) )	/* sprites */
 	ROM_LOAD( "tkni8.bin",    0x080000, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) )	/* sprites */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
 ROM_END
 
@@ -1213,7 +1213,7 @@ ROM_START( stratof )
 	ROM_LOAD( "b-2m",  0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
 	ROM_LOAD( "b-1m",  0x80000, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-4a.4", 0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 
@@ -1241,7 +1241,7 @@ ROM_START( raiga )
 	ROM_LOAD( "b-2m",  0x00000, 0x80000, CRC(5794ec32) SHA1(07e78d8bcb2373da77ef9f8cde6a01f384f8bf7e) )
 	ROM_LOAD( "b-1m",  0x80000, 0x80000, CRC(b0de0ded) SHA1(45c74d0c58e3e73c79e587722d9fea9f7ba9cb0a) )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-4a.4", 0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 

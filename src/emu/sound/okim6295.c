@@ -48,9 +48,10 @@ struct _okim6295_state
 {
 	#define OKIM6295_VOICES		4
 	struct ADPCMVoice voice[OKIM6295_VOICES];
+	const device_config *device;
 	INT32 command;
-	INT32 bank_offset;
-	UINT8 *region_base;		/* pointer to the base of the region */
+	INT32 bank_num;
+	INT32 bank_offs;
 	sound_stream *stream;	/* which stream are we playing on? */
 	UINT32 master_clock;	/* master clock frequency */
 };
@@ -90,6 +91,11 @@ static int tables_computed = 0;
 /* useful interfaces */
 const okim6295_interface okim6295_interface_pin7high = { 1 };
 const okim6295_interface okim6295_interface_pin7low = { 0 };
+
+/* default address map */
+static ADDRESS_MAP_START( okim6295, 0, 8 )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+ADDRESS_MAP_END
 
 
 INLINE okim6295_state *get_safe_token(const device_config *device)
@@ -202,7 +208,7 @@ static void generate_adpcm(okim6295_state *chip, struct ADPCMVoice *voice, INT16
 	/* if this voice is active */
 	if (voice->playing)
 	{
-		UINT8 *base = chip->region_base + chip->bank_offset + voice->base_offset;
+		offs_t base = voice->base_offset;
 		int sample = voice->sample;
 		int count = voice->count;
 
@@ -210,7 +216,7 @@ static void generate_adpcm(okim6295_state *chip, struct ADPCMVoice *voice, INT16
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			int nibble = base[sample / 2] >> (((sample & 1) << 2) ^ 4);
+			int nibble = memory_raw_read_byte(chip->device->space[0], base + sample / 2) >> (((sample & 1) << 2) ^ 4);
 
 			/* output to the buffer, scaling by the volume */
 			/* signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767 */
@@ -309,14 +315,23 @@ static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_con
 	state_save_register_device_item(device, index, voice->base_offset);
 }
 
+static STATE_POSTLOAD( okim6295_postload )
+{
+	const device_config *device = (const device_config *)param;
+	okim6295_state *info = get_safe_token(device);
+	okim6295_set_bank_base(device, info->bank_offs);
+}
+
 static void okim6295_state_save_register(okim6295_state *info, const device_config *device)
 {
 	int j;
 
 	state_save_register_device_item(device, 0, info->command);
-	state_save_register_device_item(device, 0, info->bank_offset);
+	state_save_register_device_item(device, 0, info->bank_offs);
 	for (j = 0; j < OKIM6295_VOICES; j++)
 		adpcm_state_save_register(&info->voice[j], device, j);
+	
+	state_save_register_postload(device->machine, okim6295_postload, (void *)device);
 }
 
 
@@ -331,16 +346,15 @@ static DEVICE_START( okim6295 )
 {
 	const okim6295_interface *intf = (const okim6295_interface *)device->static_config;
 	okim6295_state *info = get_safe_token(device);
-	int voice;
 	int divisor = intf->pin7 ? 132 : 165;
+	int voice;
 
 	compute_tables();
 
 	info->command = -1;
-	info->bank_offset = 0;
-	info->region_base = device->region;
-	if (intf->rgnoverride != NULL)
-		info->region_base = memory_region(device->machine, intf->rgnoverride);
+	info->bank_num = -1;
+	info->bank_offs = 0;
+	info->device = device;
 
 	info->master_clock = device->clock;
 
@@ -388,7 +402,24 @@ void okim6295_set_bank_base(const device_config *device, int base)
 {
 	okim6295_state *info = get_safe_token(device);
 	stream_update(info->stream);
-	info->bank_offset = base;
+
+	/* if we are setting a non-zero base, and we have no bank, allocate one */	
+	if (info->bank_num == -1 && base != 0)
+	{
+		info->bank_num = memory_find_unused_bank(device->machine);
+		if (info->bank_num == -1)
+			fatalerror("Unable to allocate bank for oki6295 device '%s'", device->tag);
+
+		/* override our memory map with a bank */
+		memory_install_read8_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, SMH_BANK(info->bank_num));
+	}
+	
+	/* if we have a bank number, set the base pointer */
+	if (info->bank_num != -1)
+	{
+		info->bank_offs = base;
+		memory_set_bankptr(device->machine, info->bank_num, device->region + base);
+	}
 }
 
 
@@ -451,8 +482,7 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 	if (info->command != -1)
 	{
 		int temp = data >> 4, i, start, stop;
-		unsigned char *base;
-
+		offs_t base;
 
 		/* the manual explicitly says that it's not possible to start multiple voices at the same time */
 		if (temp != 0 && temp != 1 && temp != 2 && temp != 4 && temp != 8)
@@ -469,9 +499,17 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 				struct ADPCMVoice *voice = &info->voice[i];
 
 				/* determine the start/stop positions */
-				base = &info->region_base[info->bank_offset + info->command * 8];
-				start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x3ffff;
-				stop  = ((base[3] << 16) + (base[4] << 8) + base[5]) & 0x3ffff;
+				base = info->command * 8;
+
+				start  = memory_raw_read_byte(device->space[0], base + 0) << 16;
+				start |= memory_raw_read_byte(device->space[0], base + 1) << 8;
+				start |= memory_raw_read_byte(device->space[0], base + 2) << 0;
+				start &= 0x3ffff;
+
+				stop  = memory_raw_read_byte(device->space[0], base + 3) << 16;
+				stop |= memory_raw_read_byte(device->space[0], base + 4) << 8;
+				stop |= memory_raw_read_byte(device->space[0], base + 5) << 0;
+				stop &= 0x3ffff;
 
 				/* set up the voice to play this sample */
 				if (start < stop)
@@ -543,18 +581,23 @@ DEVICE_GET_INFO( okim6295 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(okim6295_state);					break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(okim6295_state);				break;
+		case DEVINFO_INT_DATABUS_WIDTH_0:			info->i = 8;									break;
+		case DEVINFO_INT_ADDRBUS_WIDTH_0:			info->i = 18;									break;
+		case DEVINFO_INT_ADDRBUS_SHIFT_0:			info->i = 0;									break;
+		
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:		info->default_map8 = ADDRESS_MAP_NAME(okim6295);break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( okim6295 );			break;
-		case DEVINFO_FCT_STOP:							/* nothing */										break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( okim6295 );			break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME( okim6295 );	break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( okim6295 );	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI6295");							break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");						break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "OKI6295");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

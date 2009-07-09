@@ -708,7 +708,7 @@ ROM_START( multchmp )
 	ROM_LOAD( "esd9.fu28",  0x300000, 0x080000, CRC(6652c04a) SHA1(178e1d42847506d869ef79db2f7e10df05e9ef76) )
 	ROM_LOAD( "esd10.fu31", 0x380000, 0x080000, CRC(d815974b) SHA1(3e528a5df79fa7dc0f38b0ee7f2f3a0ebc97a369) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
@@ -738,7 +738,7 @@ ROM_START( multchmk )
 	ROM_LOAD( "multchmp.u31", 0x300000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
 	ROM_LOAD( "multchmp.u32", 0x380000, 0x080000, CRC(f05cb5b4) SHA1(1b33e60942238e39d61ae59e9317b99e83595ab1) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
@@ -908,7 +908,7 @@ ROM_START( hedpanic ) /* Story line & game instructions in English */
 	ROM_LOAD16_BYTE( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
 	ROM_LOAD16_BYTE( "esd9.fu34", 0x000001, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
 ROM_END
 
@@ -933,7 +933,7 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 	ROM_LOAD16_BYTE( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
 	ROM_LOAD16_BYTE( "esd9.fu34", 0x000001, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
 ROM_END
 
@@ -961,7 +961,7 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	ROM_LOAD16_BYTE( "sm3.bin", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
 	ROM_LOAD16_BYTE( "sm4.bin", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
 ROM_END
 
@@ -1040,7 +1040,7 @@ ROM_START( tangtang )
 	ROM_LOAD16_BYTE( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
 	ROM_LOAD16_BYTE( "fu34.bin", 0x000001, 0x200000, CRC(bf91f543) SHA1(7c149fed8b8044850cd6b798622a91c45336cd47) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(f2dfb02d) SHA1(04001488697aad3e5b2d15c9f5a81dc2b7d0952c) )
 ROM_END
 

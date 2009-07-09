@@ -379,7 +379,7 @@ ROM_START( pktgaldx )
 	ROM_LOAD16_BYTE( "maz-00.1b",    0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
 	ROM_LOAD16_BYTE( "maz-01.3b",    0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "ke01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
@@ -397,7 +397,7 @@ ROM_START( pktgaldj )
 	ROM_LOAD16_BYTE( "maz-00.1b",    0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
 	ROM_LOAD16_BYTE( "maz-01.3b",    0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "ke01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
@@ -417,7 +417,7 @@ ROM_START( pktgaldb )
 	ROM_LOAD16_BYTE( "9.bin",     0x200001, 0x80000, CRC(078f371c) SHA1(5b510a0f7f50c55cce1ffcc8f2e9c3432b23e352) )
 	ROM_LOAD16_BYTE( "8.bin",     0x200000, 0x80000, CRC(40f5a032) SHA1(c2ad585ddbc3ef40c6214cb30b4d78a2cd0a9446) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "kg01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) ) // 1.bin on the bootleg
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */

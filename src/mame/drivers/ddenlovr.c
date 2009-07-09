@@ -8391,6 +8391,8 @@ ROM_START( hginga )
 	ROM_RELOAD(           0x120000, 0x20000 )
 	ROM_RELOAD(           0x140000, 0x20000 )
 	ROM_RELOAD(           0x160000, 0x20000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )	/* Samples - none */
 ROM_END
 
 

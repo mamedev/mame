@@ -342,7 +342,7 @@ ROM_START( funkyjet )
 	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
   	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
   	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
@@ -361,7 +361,7 @@ ROM_START( funkyjej )
 	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
   	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
   	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
@@ -380,7 +380,7 @@ ROM_START( sotsugyo )
 	ROM_LOAD( "01.4a", 0x000000, 0x80000, CRC(fa10dd54) SHA1(5dfe66df0bbab5eb151bf65f7e767a2325a50b36) ) /* sprites */
   	ROM_LOAD( "00.2a", 0x080000, 0x80000, CRC(d35a14ef) SHA1(b8d27766db7e183aee208c690364e4383f3c6882) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
   	ROM_LOAD( "sb030.15h",    0x00000, 0x20000, CRC(1ea43f48) SHA1(74cc8c740f1c7fa94c2cb460ea4ee7aa0c490ed7) )
 ROM_END
 

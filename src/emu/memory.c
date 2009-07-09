@@ -765,6 +765,7 @@ const address_space *memory_find_address_space(const device_config *device, int 
 address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum)
 {
 	const addrmap_token *internal_map;
+	const addrmap_token *default_map;
 	address_map *map;
 
 	map = alloc_clear_or_die(address_map);
@@ -777,6 +778,11 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	/* construct the standard map */
 	if (device->address_map[spacenum] != NULL)
 		map_detokenize(map, driver, device->tag, device->address_map[spacenum]);
+
+	/* append the default device map (last so it can be overridden) */
+	default_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
+	if (default_map != NULL)
+		map_detokenize(map, driver, device->tag, default_map);
 
 	return map;
 }
@@ -1135,6 +1141,24 @@ void memory_set_bankptr(running_machine *machine, int banknum, void *base)
 	/* invalidate all the direct references to any referenced address spaces */
 	for (ref = bank->reflist; ref != NULL; ref = ref->next)
 		force_opbase_update(ref->space);
+}
+
+
+/*-------------------------------------------------
+    memory_find_unused_bank - return the index of 
+    an unused bank
+-------------------------------------------------*/
+
+int memory_find_unused_bank(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	int banknum;
+
+	for (banknum = STATIC_BANK1; banknum <= MAX_EXPLICIT_BANKS; banknum++)
+		if (!memdata->bankdata[banknum].used)
+			return banknum;
+	
+	return -1;
 }
 
 
@@ -1600,7 +1624,7 @@ static void memory_init_preflight(running_machine *machine)
 	/* loop over valid address spaces */
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
 	{
-		int regionsize = (space->spacenum == ADDRESS_SPACE_PROGRAM) ? memory_region_length(space->machine, space->cpu->tag) : 0;
+		int regionsize = (space->spacenum == ADDRESS_SPACE_0) ? memory_region_length(space->machine, space->cpu->tag) : 0;
 		address_map_entry *entry;
 		int entrynum;
 
@@ -1626,7 +1650,7 @@ static void memory_init_preflight(running_machine *machine)
 			adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 			/* if this is a ROM handler without a specified region, attach it to the implicit region */
-			if (space->spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
+			if (space->spacenum == ADDRESS_SPACE_0 && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
 			{
 				/* make sure it fits within the memory region before doing so, however */
 				if (entry->byteend < regionsize)
@@ -2326,7 +2350,7 @@ static int space_needs_backing_store(const address_space *space, const address_m
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || space->spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag)) &&
+			(handler != STATIC_ROM || space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag)) &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
 			return TRUE;

@@ -2173,7 +2173,7 @@ ROM_START( cookbib2 )
        shared ram, the MCU puts it there */
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x00000, 0x200 , CRC(ae6d8ed5) SHA1(410cdacb9b90ea345c0e4be85e60a138f45a51f1) )
 
-	ROM_REGION( 0x020000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "cookbib2.06", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) )
 
 	ROM_REGION( 0x140000, "gfx1", 0 ) /* Sprites */
@@ -2202,7 +2202,7 @@ ROM_START( cookbib3 )
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(c819b9a8) SHA1(1d425e8c9940c0e691149e5406dd71808bd73832) )
 	/* the 'empty' pattern continued after 0x200 but the game doesn't use it or attempt to decrypt it */
 
-	ROM_REGION( 0x020000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "u14.bin", 0x00000, 0x20000, CRC(e5bf9288) SHA1(12fb9542f9105fe1a21a74a08cda4d6372b984ee) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* Sprites */
@@ -2274,7 +2274,7 @@ ROM_START( finalttr )
        stop at 0x102200, might be worth going back and checking if its simply random
        values due to ram not being cleared, or actual data */
 
-	ROM_REGION( 0x020000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "11.7p",    0x00000, 0x20000, CRC(2e331022) SHA1(1e74c66d16eb9c8ae04acecbb4040dea037492cc) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* Sprites */

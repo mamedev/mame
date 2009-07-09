@@ -957,7 +957,7 @@ ROM_START( cninja ) /* World ver 4 */
 	ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
 	ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gl-06.rom",  0x00000,  0x20000,  CRC(d92e519d) SHA1(08238f12bf7058a3965ab6348b468e3d35d4cd23) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -998,7 +998,7 @@ ROM_START( cninja1 ) /* World ver 1 */
 	ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
 	ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gl-06.rom",  0x00000,  0x20000,  CRC(d92e519d) SHA1(08238f12bf7058a3965ab6348b468e3d35d4cd23) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1039,7 +1039,7 @@ ROM_START( cninjau ) /* US ver 4 */
 	ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
 	ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gl-06.rom",  0x00000,  0x20000,  CRC(d92e519d) SHA1(08238f12bf7058a3965ab6348b468e3d35d4cd23) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1080,7 +1080,7 @@ ROM_START( joemac ) /* Japan ver 1 */
 	ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
 	ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gl-06.rom",  0x00000,  0x20000,  CRC(d92e519d) SHA1(08238f12bf7058a3965ab6348b468e3d35d4cd23) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1128,6 +1128,7 @@ ROM_START( stoneage )
 	ROM_LOAD( "sa_1_069.bin",  0x00000,  0x40000, CRC(2188f3ca) SHA1(9c29b62ed261e63d701ff8d43020089c89a64ab2) )
 
 	/* No extra Oki samples in the bootleg */
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( edrandy ) /* World ver 3 */
@@ -1169,7 +1170,7 @@ ROM_START( edrandy ) /* World ver 3 */
 	ROM_LOAD16_BYTE( "mad-09",   0x400000, 0x80000, CRC(930f4900) SHA1(dd09d3c8a251b8397996f6a3330e6e704f65d7fa) )
 	ROM_LOAD16_BYTE( "mad-12",   0x400001, 0x80000, CRC(a0bd62b6) SHA1(a1ab365f3c63fc4edc32b09ecf8f982beb4bfae5) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ge-08.j13",    0x00000, 0x20000, CRC(dfe28c7b) SHA1(aba55834b276cbab194e03858564077cad21eff1) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1218,7 +1219,7 @@ ROM_START( edrandy2 ) /* World ver 2 */
 	ROM_LOAD16_BYTE( "mad-09",   0x400000, 0x80000, CRC(930f4900) SHA1(dd09d3c8a251b8397996f6a3330e6e704f65d7fa) )
 	ROM_LOAD16_BYTE( "mad-12",   0x400001, 0x80000, CRC(a0bd62b6) SHA1(a1ab365f3c63fc4edc32b09ecf8f982beb4bfae5) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ge-08.j13",    0x00000, 0x20000, CRC(dfe28c7b) SHA1(aba55834b276cbab194e03858564077cad21eff1) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1267,7 +1268,7 @@ ROM_START( edrandy1 ) /* World ver 1 */
 	ROM_LOAD16_BYTE( "mad-09",   0x400000, 0x80000, CRC(930f4900) SHA1(dd09d3c8a251b8397996f6a3330e6e704f65d7fa) )
 	ROM_LOAD16_BYTE( "mad-12",   0x400001, 0x80000, CRC(a0bd62b6) SHA1(a1ab365f3c63fc4edc32b09ecf8f982beb4bfae5) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ge-08.j13",    0x00000, 0x20000, CRC(dfe28c7b) SHA1(aba55834b276cbab194e03858564077cad21eff1) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1316,7 +1317,7 @@ ROM_START( edrandyj ) /* Japan ver 3 */
 	ROM_LOAD16_BYTE( "mad-09",   0x400000, 0x80000, CRC(930f4900) SHA1(dd09d3c8a251b8397996f6a3330e6e704f65d7fa) )
 	ROM_LOAD16_BYTE( "mad-12",   0x400001, 0x80000, CRC(a0bd62b6) SHA1(a1ab365f3c63fc4edc32b09ecf8f982beb4bfae5) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ge-08.j13",    0x00000, 0x20000, CRC(dfe28c7b) SHA1(aba55834b276cbab194e03858564077cad21eff1) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1366,7 +1367,7 @@ ROM_START( robocop2 )
 	ROM_LOAD16_BYTE( "mah-07.a9",  0x200000, 0x80000,  CRC(526f4190) SHA1(23cb79230ec267b8e4236381b5a596d7af8ec5b3) )
 	ROM_LOAD16_BYTE( "mah-10.a12", 0x200001, 0x80000,  CRC(14b770da) SHA1(6d57da630da1ec457ebaeed8c251e85bd737e97c) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gp-08.j13",  0x00000,  0x20000,  CRC(365183b1) SHA1(7d3c201c49981c3ac84022283b048e380cbb7ec3) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1416,7 +1417,7 @@ ROM_START( robocp2u )
 	ROM_LOAD16_BYTE( "mah-07.a9",  0x200000, 0x80000,  CRC(526f4190) SHA1(23cb79230ec267b8e4236381b5a596d7af8ec5b3) )
 	ROM_LOAD16_BYTE( "mah-10.a12", 0x200001, 0x80000,  CRC(14b770da) SHA1(6d57da630da1ec457ebaeed8c251e85bd737e97c) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gp-08.j13",  0x00000,  0x20000,  CRC(365183b1) SHA1(7d3c201c49981c3ac84022283b048e380cbb7ec3) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -1466,7 +1467,7 @@ ROM_START( robocp2j )
 	ROM_LOAD16_BYTE( "mah-07.a9",  0x200000, 0x80000,  CRC(526f4190) SHA1(23cb79230ec267b8e4236381b5a596d7af8ec5b3) )
 	ROM_LOAD16_BYTE( "mah-10.a12", 0x200001, 0x80000,  CRC(14b770da) SHA1(6d57da630da1ec457ebaeed8c251e85bd737e97c) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gp-08.j13",  0x00000,  0x20000,  CRC(365183b1) SHA1(7d3c201c49981c3ac84022283b048e380cbb7ec3) )
 
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */

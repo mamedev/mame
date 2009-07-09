@@ -15,7 +15,7 @@
 #ifndef __DRCUML_H__
 #define __DRCUML_H__
 
-#include "memory.h"
+#include "cpuintrf.h"
 #include "drccache.h"
 #include <setjmp.h>
 

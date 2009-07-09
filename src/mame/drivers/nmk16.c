@@ -5314,7 +5314,7 @@ ROM_START( mustangb )
 	ROM_LOAD16_BYTE( "90058-8",    0x00000, 0x80000, CRC(560bff04) SHA1(b005642adc81d878971ecbdead8ef5e604c90ae2) )
 	ROM_LOAD16_BYTE( "90058-9",    0x00001, 0x80000, CRC(b9d72a03) SHA1(43ee9def1b6c491c6832562d66c1af54d81d9b3c) )
 
-	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "mustang.17",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
@@ -5348,7 +5348,7 @@ ROM_START( mustangb2 )
 	ROM_LOAD16_BYTE( "12.bin",    0xc0000, 0x20000, CRC(42a6cfc2) SHA1(46fc3b30a50efc94613e3b34aaf0543fa4cdc919) )
 	ROM_LOAD16_BYTE( "11.bin",    0xc0001, 0x20000, CRC(9d3bee66) SHA1(e8db57b9a5581d3d54e69bb7ba229a49a7cc224f) )
 
-	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "02.bin",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
@@ -5602,7 +5602,7 @@ ROM_START( tdragonb )
 	ROM_LOAD16_BYTE( "td_10.bin",	0x000000, 0x080000, CRC(bfd0ec5d) SHA1(7983661f74e8695f56e45c6e5c278d7d86431052) )	/* Sprites */
 	ROM_LOAD16_BYTE( "td_09.bin",	0x000001, 0x080000, CRC(b6e074eb) SHA1(bdde068f03415391b5edaa42f1389df0f7eef899) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "td_01.bin",     0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
@@ -6903,7 +6903,7 @@ ROM_START( spec2k )
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE | ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
 	ROM_LOAD( "yonatech4.u3", 0x00000, 0x20000, CRC(5626b08e) SHA1(63207ed6b4fc8684690bf3fe1991a4f3babd73e8) )
 
-	ROM_REGION( 0x020000, "oki1", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
 	ROM_LOAD( "yonatech2.u101", 0x00000, 0x20000, CRC(4160f172) SHA1(0478a5a4bbba115e6cfb5501aa55aa2836c963bf) )
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */

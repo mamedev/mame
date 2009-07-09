@@ -233,7 +233,7 @@ ROM_START( blockout )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "bo29e2-0.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -248,7 +248,7 @@ ROM_START( blckout2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "bo29e2-0.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -263,7 +263,7 @@ ROM_START( blckoutj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "bo29e2-0.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -333,7 +333,7 @@ ROM_START( agress )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "palco3.73", 0x0000, 0x8000, CRC(2a21c97d) SHA1(7f71bf18db3e6ff9c69c589268450e66c6585cdd) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "palco4.78", 0x0000, 0x20000, CRC(9dfd9cfe) SHA1(5ea8f98bc0cd117cde81c04f02aa33199afe8231) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -349,7 +349,7 @@ ROM_START( agressb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "palco3.ic73",  0x000000, 0x08000, CRC(2a21c97d) SHA1(7f71bf18db3e6ff9c69c589268450e66c6585cdd) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "palco4.ic78",  0x000000, 0x20000, CRC(9dfd9cfe) SHA1(5ea8f98bc0cd117cde81c04f02aa33199afe8231) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

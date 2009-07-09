@@ -1311,7 +1311,7 @@ ROM_START( legionna )
 	ROM_REGION( 0x80000, "gfx6", ROMREGION_DISPOSE )	/* LBK */
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
 ROM_END
 
@@ -1353,7 +1353,7 @@ ROM_START( legionnu )
 	ROM_REGION( 0x80000, "gfx6", ROMREGION_DISPOSE )	/* LBK */
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
 ROM_END
 
@@ -1389,7 +1389,7 @@ ROM_START( heatbrl )
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
 ROM_END
 
@@ -1425,7 +1425,7 @@ ROM_START( heatbrl2 )
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
 ROM_END
 
@@ -1465,7 +1465,7 @@ barrel1,2,3,4.BG */
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
 ROM_END
 
@@ -1500,7 +1500,7 @@ ROM_START( heatbrlu )
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
 ROM_END
 
@@ -1800,7 +1800,7 @@ ROM_START( sdgndmrb )
 //#define ROM_COPY(rgn,srcoffset,offset,length)
 	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
 
-	ROM_REGION( 0x20000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rb-ad.922",    0x000000, 0x020000, CRC(a364cb42) SHA1(c527b39a1627ecee20a2c4df4cf2b5f2ba729081) )
 
 	ROM_REGION( 0x040000, "user1", 0 )

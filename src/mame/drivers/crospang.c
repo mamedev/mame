@@ -383,7 +383,7 @@ ROM_START( crospang )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80  */
 	ROM_LOAD( "s1.bin", 0x00000, 0x10000, CRC(d61a224c) SHA1(5cd1b2d136ad58ab550c7ba135558d6c8a4cd8f6) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "s2.bin", 0x00000, 0x20000, CRC(9f9ecd22) SHA1(631ffe14018ba39658c435b8ecb23b19a14569ee) ) // sample rom contains oksan?
 
 

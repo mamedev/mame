@@ -27,9 +27,10 @@
 /* address spaces */
 enum
 {
-	ADDRESS_SPACE_PROGRAM = 0,		/* program address space */
-	ADDRESS_SPACE_DATA,				/* data address space */
-	ADDRESS_SPACE_IO,				/* I/O address space */
+	ADDRESS_SPACE_0,				/* first address space */
+	ADDRESS_SPACE_1,				/* second address space */
+	ADDRESS_SPACE_2,				/* third address space */
+	ADDRESS_SPACE_3,				/* fourth address space */
 	ADDRESS_SPACES					/* maximum number of address spaces */
 };
 
@@ -853,6 +854,9 @@ int memory_get_bank(running_machine *machine, int banknum) ATTR_NONNULL(1);
 
 /* set the absolute address of a bank base */
 void memory_set_bankptr(running_machine *machine, int banknum, void *base) ATTR_NONNULL(1, 3);
+
+/* return the index of an unused bank */
+int memory_find_unused_bank(running_machine *machine) ATTR_NONNULL(1);
 
 
 

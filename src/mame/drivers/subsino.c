@@ -525,7 +525,7 @@ ROM_START( sharkpy )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
 	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
@@ -588,7 +588,7 @@ ROM_START( sharkpya )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
 	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
@@ -650,7 +650,7 @@ ROM_START( smoto16 )
 	ROM_CONTINUE(                       0x28000, 0x08000 )
 	ROM_CONTINUE(                       0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "rideritaly_4ver1.6.u54", 0x00000, 0x20000, CRC(df828563) SHA1(f39324c5c37486ed9512e0ff934394556dd182ae) )
 
 	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
@@ -720,7 +720,7 @@ ROM_START( smoto20 )
 	ROM_CONTINUE(      0x28000, 0x08000 )
 	ROM_CONTINUE(      0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "rom4ver1.0.u54", 0x00000, 0x20000, CRC(df828563) SHA1(f39324c5c37486ed9512e0ff934394556dd182ae) )
 
 	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )

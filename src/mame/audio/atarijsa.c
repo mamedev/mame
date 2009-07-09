@@ -59,8 +59,6 @@ static const device_config *tms5220;
 static const device_config *oki6295;
 static const device_config *oki6295_l, *oki6295_r;
 
-static UINT32 oki6295_bank_base;
-
 static UINT8 overall_volume;
 static UINT8 pokey_volume;
 static UINT8 ym2151_volume;
@@ -79,6 +77,24 @@ static WRITE8_HANDLER( jsa3_io_w );
 
 /*************************************
  *
+ *  OKI banked address map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( jsa3_oki_map, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK(12)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(13)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jsa3_oki2_map, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK(14)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(15)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
  *  State save
  *
  *************************************/
@@ -87,8 +103,6 @@ static void init_save_state(running_machine *machine)
 {
 	state_save_register_global(machine, speech_data);
 	state_save_register_global(machine, last_ctl);
-
-	state_save_register_global(machine, oki6295_bank_base);
 
 	state_save_register_global(machine, overall_volume);
 	state_save_register_global(machine, pokey_volume);
@@ -137,7 +151,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* initialize JSA III ADPCM */
 	{
-		static const char *const regions[] = { "adpcm", "adcpml", "adpcmr" };
+		static const char *const regions[] = { "adpcm", "adpcml", "adpcmr" };
 		int rgn;
 
 		/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
@@ -145,15 +159,12 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
 		{
 			UINT8 *base = memory_region(machine, regions[rgn]);
-			if (base != NULL && memory_region_length(machine, regions[rgn]) >= 0x100000)
+			if (base != NULL && memory_region_length(machine, regions[rgn]) >= 0x80000)
 			{
-				memcpy(&base[0x00000], &base[0x80000], 0x20000);
-				memcpy(&base[0x40000], &base[0x80000], 0x20000);
-				memcpy(&base[0x80000], &base[0xa0000], 0x20000);
-
-				memcpy(&base[0x20000], &base[0xe0000], 0x20000);
-				memcpy(&base[0x60000], &base[0xe0000], 0x20000);
-				memcpy(&base[0xa0000], &base[0xe0000], 0x20000);
+				int banknum = (rgn != 2) ? 12 : 14;
+				memory_configure_bank(machine, banknum, 0, 2, base + 0x00000, 0x00000);
+				memory_configure_bank(machine, banknum, 2, 2, base + 0x20000, 0x20000);
+				memory_set_bankptr(machine, banknum + 1, base + 0x60000);
 			}
 		}
 	}
@@ -168,7 +179,6 @@ void atarijsa_reset(void)
 	/* reset the static states */
 	speech_data = 0;
 	last_ctl = 0;
-	oki6295_bank_base = 0x00000;
 	overall_volume = 100;
 	pokey_volume = 100;
 	ym2151_volume = 100;
@@ -520,8 +530,8 @@ static WRITE8_HANDLER( jsa3_io_w )
             */
 
 			/* update the OKI bank */
-			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			if (oki6295 != NULL) okim6295_set_bank_base(oki6295, oki6295_bank_base);
+			if (oki6295 != NULL)
+				memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -545,8 +555,8 @@ static WRITE8_HANDLER( jsa3_io_w )
             */
 
 			/* update the OKI bank */
-			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			if (oki6295 != NULL) okim6295_set_bank_base(oki6295, oki6295_bank_base);
+			if (oki6295 != NULL)
+				memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 1) | ((data >> 3) & 2));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -651,8 +661,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcml"), oki6295_bank_base);
+			memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -677,9 +686,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcml"), oki6295_bank_base);
-			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcmr"), 0x40000 * (data >> 6));
+			memory_set_bank(space->machine, 12, (memory_get_bank(space->machine, 12) & 1) | ((data >> 3) & 2));
+			memory_set_bank(space->machine, 14, data >> 6);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -854,13 +862,16 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 MACHINE_DRIVER_END
 
 
-/* Used by Batman, Guardians of the 'Hood, Road Riot 4WD */
+/* Used by Batman, Guardians of the 'Hood, Road Riot 4WD, Steel Talons */
 MACHINE_DRIVER_START( jsa_iii_mono )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jsa_ii_mono)
 	MDRV_CPU_MODIFY("jsa")
 	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
+	
+	MDRV_DEVICE_MODIFY("adpcm")
+	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 MACHINE_DRIVER_END
 
 
@@ -875,7 +886,7 @@ MACHINE_DRIVER_START( jsa_iii_mono_noadpcm )
 MACHINE_DRIVER_END
 
 
-/* Used by Space Lords, Moto Frenzy, Steel Talons, Road Riot's Revenge Rally */
+/* Used by Space Lords, Moto Frenzy, Road Riot's Revenge Rally */
 MACHINE_DRIVER_START( jsa_iiis_stereo )
 
 	/* basic machine hardware */
@@ -894,10 +905,12 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_SOUND_ADD("adpcml", OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 
 	MDRV_SOUND_ADD("adpcmr", OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_DRIVER_END
 
 

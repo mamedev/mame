@@ -284,10 +284,10 @@ ROM_START( vaportra )
   	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
   	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -322,10 +322,10 @@ ROM_START( vaportru )
   	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
   	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -360,10 +360,10 @@ ROM_START( kuhga )
   	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
   	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )

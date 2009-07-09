@@ -742,7 +742,7 @@ ROM_START( magicbub )
 	ROM_LOAD( "magbuble.u22", 0x040000, 0x020000, CRC(7c68df7a) SHA1(88acf9dd43892a790415b418f77d88c747aa84f5) )
 	ROM_LOAD( "magbuble.u23", 0x060000, 0x020000, CRC(c7763fc1) SHA1(ed68b3c3c5155073afb7b55d6d92d3057e40df6c) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "magbuble.131", 0x000000, 0x020000, CRC(03e04e89) SHA1(7d80e6a7be2322e32e40acae72bedd8d7e90ad33) )
 
 ROM_END
@@ -772,7 +772,7 @@ ROM_START( magicbua )
 	ROM_LOAD( "magbuble.u22", 0x040000, 0x020000, CRC(7c68df7a) SHA1(88acf9dd43892a790415b418f77d88c747aa84f5) )
 	ROM_LOAD( "magbuble.u23", 0x060000, 0x020000, CRC(c7763fc1) SHA1(ed68b3c3c5155073afb7b55d6d92d3057e40df6c) )
 
-	ROM_REGION( 0x020000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "magbuble.131", 0x000000, 0x020000, CRC(03e04e89) SHA1(7d80e6a7be2322e32e40acae72bedd8d7e90ad33) )
 
 ROM_END

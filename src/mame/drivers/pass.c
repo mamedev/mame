@@ -286,7 +286,7 @@ ROM_START( pass )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 clone? */
 	ROM_LOAD( "23", 0x00000, 0x10000, CRC(b9a0ccde) SHA1(33e7dda247aa44b1933ae9c033c161c152276ce6) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* samples? */
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples? */
 	ROM_LOAD( "31", 0x00000, 0x20000, CRC(c7315bbd) SHA1(c0bb392793cafc7b3f76da8fb26c6c16948f87e5) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* fg layer 'sprites' */

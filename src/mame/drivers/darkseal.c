@@ -311,10 +311,10 @@ ROM_START( darkseal )
 	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -342,10 +342,10 @@ ROM_START( darksea1 )
 	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -373,10 +373,10 @@ ROM_START( darkseaj )
 	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -404,10 +404,10 @@ ROM_START( gatedoom )
 	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -438,10 +438,10 @@ ROM_START( gatedom1 )
 	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 

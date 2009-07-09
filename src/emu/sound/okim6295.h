@@ -13,7 +13,6 @@ typedef struct _okim6295_interface okim6295_interface;
 struct _okim6295_interface
 {
 	int pin7;
-	const char *rgnoverride;
 };
 
 extern const okim6295_interface okim6295_interface_pin7high;

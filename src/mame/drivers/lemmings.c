@@ -316,7 +316,7 @@ ROM_START( lemmings )
 	ROM_LOAD( "lemmings.14", 0x020000, 0x10000, CRC(c162788f) SHA1(e1f669efa59699cd1b7da71b112701ee79240c18) )
 	ROM_FILL(                0x030000, 0x10000, 0 ) /* 3bpp data but sprite chip expects 4 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
   	ROM_LOAD( "lemmings.16",    0x00000, 0x20000, CRC(f747847c) SHA1(00880fa6dff979e5d15daea61938bd18c768c92f) )
 ROM_END
 

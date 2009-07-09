@@ -532,7 +532,7 @@ ROM_START( toki )
 	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
@@ -562,7 +562,7 @@ ROM_START( tokia )
 	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
@@ -591,7 +591,7 @@ ROM_START( tokiu )
 	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
@@ -620,7 +620,7 @@ ROM_START( juju )
 	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
@@ -672,7 +672,7 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "25.20l",        0x40000, 0x10000, CRC(be064c4b) SHA1(d777b560942e9f6300aed1bf22a07b381c27a479) )
 	ROM_LOAD16_BYTE( "26.21l",        0x60000, 0x10000, CRC(f8b5b38d) SHA1(6ec60cf5259469cc9c4bdd9ffc6c63bc2785b708) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI samples */
 	ROM_LOAD( "1.6a",   0x00000, 0x10000, CRC(377153ad) SHA1(1c184197b344c2b65b5842f9ba99fab776a9577b) )
 	ROM_LOAD( "2.7a",   0x10000, 0x10000, CRC(093ca15d) SHA1(1b298146c9eea93c22c03e63513200b483b86a3f) )
 ROM_END

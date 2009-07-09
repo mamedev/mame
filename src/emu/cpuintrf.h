@@ -28,6 +28,15 @@
 #define MAX_INPUT_EVENTS		32
 
 
+/* alternate address space names for common use */
+enum
+{
+	ADDRESS_SPACE_PROGRAM = ADDRESS_SPACE_0,	/* program address space */
+	ADDRESS_SPACE_DATA = ADDRESS_SPACE_1,		/* data address space */
+	ADDRESS_SPACE_IO = ADDRESS_SPACE_2			/* I/O address space */
+};
+
+
 /* I/O line states */
 enum
 {
@@ -432,10 +441,14 @@ union _cpuinfo
 	cpu_string_io_func 		export_string;				/* CPUINFO_FCT_EXPORT_STRING */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
 	const cpu_state_table *	state_table;				/* CPUINFO_PTR_STATE_TABLE */
-	const addrmap8_token *	internal_map8;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap16_token *	internal_map16;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap32_token *	internal_map32;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
-	const addrmap64_token *	internal_map64;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap8_token *	internal_map8;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap16_token *	internal_map16;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap32_token *	internal_map32;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap64_token *	internal_map64;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap8_token *	default_map8;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap16_token *	default_map16;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap32_token *	default_map32;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap64_token *	default_map64;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
 };
 
 

@@ -407,7 +407,7 @@ ROM_START( laperlag )
 	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
 	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -549,7 +549,7 @@ ROM_START( euro2k2s )
 	ROM_LOAD( "europa2002_2-a.ic20",   0x100000, 0x40000, CRC(971bc33b) SHA1(c385e5bef57cdb52a86c1e38fca471ef5ab3da7c) )
 	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) /* identical halves */
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
 ROM_END
 

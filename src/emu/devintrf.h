@@ -54,10 +54,22 @@ enum
 
 		DEVINFO_INT_ENDIANNESS,							/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
 		DEVINFO_INT_DATABUS_WIDTH,						/* R/O: data bus size for each address space (8,16,32,64) */
+		DEVINFO_INT_DATABUS_WIDTH_0 = DEVINFO_INT_DATABUS_WIDTH + 0,
+		DEVINFO_INT_DATABUS_WIDTH_1 = DEVINFO_INT_DATABUS_WIDTH + 1,
+		DEVINFO_INT_DATABUS_WIDTH_2 = DEVINFO_INT_DATABUS_WIDTH + 2,
+		DEVINFO_INT_DATABUS_WIDTH_3 = DEVINFO_INT_DATABUS_WIDTH + 3,
 		DEVINFO_INT_DATABUS_WIDTH_LAST = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
 		DEVINFO_INT_ADDRBUS_WIDTH,						/* R/O: address bus size for each address space (12-32) */
+		DEVINFO_INT_ADDRBUS_WIDTH_0 = DEVINFO_INT_ADDRBUS_WIDTH + 0,
+		DEVINFO_INT_ADDRBUS_WIDTH_1 = DEVINFO_INT_ADDRBUS_WIDTH + 1,
+		DEVINFO_INT_ADDRBUS_WIDTH_2 = DEVINFO_INT_ADDRBUS_WIDTH + 2,
+		DEVINFO_INT_ADDRBUS_WIDTH_3 = DEVINFO_INT_ADDRBUS_WIDTH + 3,
 		DEVINFO_INT_ADDRBUS_WIDTH_LAST = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
 		DEVINFO_INT_ADDRBUS_SHIFT,						/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
+		DEVINFO_INT_ADDRBUS_SHIFT_0 = DEVINFO_INT_ADDRBUS_SHIFT + 0,
+		DEVINFO_INT_ADDRBUS_SHIFT_1 = DEVINFO_INT_ADDRBUS_SHIFT + 1,
+		DEVINFO_INT_ADDRBUS_SHIFT_2 = DEVINFO_INT_ADDRBUS_SHIFT + 2,
+		DEVINFO_INT_ADDRBUS_SHIFT_3 = DEVINFO_INT_ADDRBUS_SHIFT + 3,
 		DEVINFO_INT_ADDRBUS_SHIFT_LAST = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
 
 	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				/* R/W: device-specific values start here */
@@ -72,7 +84,18 @@ enum
 		DEVINFO_PTR_CONTRACT_LIST,						/* R/O: pointer to list of supported device contracts */
 
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				/* R/O: const addrmap_token *map */
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP_0 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 0,
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP_1 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 1,
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP_2 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 2,
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP_3 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 3,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_LAST = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
+
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP,					/* R/O: const addrmap_token *map */
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP_0 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 0,
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP_1 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 1,
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP_2 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 2,
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP_3 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 3,
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP_LAST = DEVINFO_PTR_DEFAULT_MEMORY_MAP + ADDRESS_SPACES - 1,
 
 	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
@@ -243,21 +266,29 @@ typedef device_get_info_func device_type;
 /* the actual deviceinfo union */
 union _deviceinfo
 {
-	INT64					i;						/* generic integers */
-	void *					p;						/* generic pointers */
-	genf *  				f;						/* generic function pointers */
-	char *					s;						/* generic strings */
+	INT64					i;							/* generic integers */
+	void *					p;							/* generic pointers */
+	genf *  				f;							/* generic function pointers */
+	char *					s;							/* generic strings */
 
-	device_start_func		start;					/* DEVINFO_FCT_START */
-	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
-	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
-	device_execute_func 	execute;				/* DEVINFO_FCT_EXECUTE */
-	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
-	device_custom_config_func custom_config;		/* DEVINFO_FCT_CUSTOM_CONFIG */
-	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
-	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
-	const union _machine_config_token *machine_config;/* DEVINFO_PTR_MACHINE_CONFIG */
-	const device_contract *	contract_list;			/* DEVINFO_PTR_CONTRACT_LIST */
+	device_start_func		start;						/* DEVINFO_FCT_START */
+	device_stop_func		stop;						/* DEVINFO_FCT_STOP */
+	device_reset_func		reset;						/* DEVINFO_FCT_RESET */
+	device_execute_func 	execute;					/* DEVINFO_FCT_EXECUTE */
+	device_validity_check_func validity_check;			/* DEVINFO_FCT_VALIDITY_CHECK */
+	device_custom_config_func custom_config;			/* DEVINFO_FCT_CUSTOM_CONFIG */
+	device_nvram_func		nvram;						/* DEVINFO_FCT_NVRAM */
+	const rom_entry *		romregion;					/* DEVINFO_PTR_ROM_REGION */
+	const union _machine_config_token *machine_config;	/* DEVINFO_PTR_MACHINE_CONFIG */
+	const device_contract *	contract_list;				/* DEVINFO_PTR_CONTRACT_LIST */
+	const addrmap8_token *	internal_map8;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap16_token *	internal_map16;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap32_token *	internal_map32;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap64_token *	internal_map64;				/* DEVINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap8_token *	default_map8;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap16_token *	default_map16;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap32_token *	default_map32;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
+	const addrmap64_token *	default_map64;				/* DEVINFO_PTR_DEFAULT_MEMORY_MAP */
 };
 
 

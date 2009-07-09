@@ -477,7 +477,7 @@ ROM_START( vball ) /* US version */
 	ROM_LOAD( "25j4-0.35",    0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "25j3-0.5",     0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x20000, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "25j0-0.78",    0x00000, 0x20000, CRC(8e04bdbf) SHA1(baafc5033c9442b83cb332c2c453c13117b31a3b) )
 
 	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
@@ -505,7 +505,7 @@ ROM_START( vball2pj ) /* Japan version */
 	ROM_LOAD( "25j4-0.35",    0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "25j3-0.5",     0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x20000, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "25j0-0.78",    0x00000, 0x20000, CRC(8e04bdbf) SHA1(baafc5033c9442b83cb332c2c453c13117b31a3b) )
 
 	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
@@ -537,7 +537,7 @@ ROM_START( vballb ) /* bootleg */
 	ROM_LOAD( "vball.35",     0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball.5",      0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x20000, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "vball.78a",    0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) )
 	ROM_LOAD( "vball.78b",    0x10000, 0x10000, CRC(7ad9d338) SHA1(3e3c270fa69bda93b03f07a54145eb5e211ec8ba) )
 

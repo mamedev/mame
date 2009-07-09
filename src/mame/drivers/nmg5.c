@@ -1121,7 +1121,7 @@ ROM_START( nmg5 )
 	ROM_LOAD( "uh1.bin", 0x0c0000, 0x40000, CRC(f7726e8e) SHA1(f28669725609ffab7c6c3bfddbe293c55ddd0155) )
 	ROM_LOAD( "uj1.bin", 0x100000, 0x40000, CRC(54f7486e) SHA1(88a237a1005b1fd70b6d8544ef60a0d16cb38e6f) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "xra1.bin", 0x00000, 0x20000, CRC(c74a4f3e) SHA1(2f6165c1d5bdd3e816b95ffd9303dd4bd07f7ac8) )
 ROM_END
 
@@ -1150,7 +1150,7 @@ ROM_START( nmg5e )
 	ROM_LOAD( "uh1.rom", 0x0c0000, 0x40000, CRC(f6a3ef4d) SHA1(9d5c011ec5eb69822905d0872d5baf55dc76ca39) )
 	ROM_LOAD( "uj1.rom", 0x100000, 0x40000, CRC(0595d8ef) SHA1(b2f2fbd8cf6dce6358db9cd976aa7d117cafb5ae) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "xra1.bin", 0x00000, 0x20000, CRC(c74a4f3e) SHA1(2f6165c1d5bdd3e816b95ffd9303dd4bd07f7ac8) )
 ROM_END
 

@@ -339,7 +339,7 @@ ROM_START( sengokmj )
 	ROM_REGION( 0x080000, "tx_gfx", ROMREGION_DISPOSE )
 	ROM_COPY( "gfx_tiles" , 0x180000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x20000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "mah1-1-1.915", 0x00000, 0x20000, CRC(d4612e95) SHA1(937c5dbd25c89d4f4178b0bed510307020c5f40e) )
 
 	ROM_REGION( 0x200, "user1", ROMREGION_DISPOSE ) /* not used */

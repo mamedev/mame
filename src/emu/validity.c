@@ -744,7 +744,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
     validate_cpu - validate CPUs and memory maps
 -------------------------------------------------*/
 
-static int validate_cpu(int drivnum, const machine_config *config, const input_port_config *portlist, region_info *rgninfo)
+static int validate_cpu(int drivnum, const machine_config *config)
 {
 	const game_driver *driver = drivers[drivnum];
 	cpu_validity_check_func cpu_validity_check;
@@ -755,7 +755,6 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 	for (device = cpu_first(config); device != NULL; device = cpu_next(device))
 	{
 		const cpu_config *cpuconfig = (const cpu_config *)device->inline_config;
-		int spacenum;
 
 		/* check the CPU for incompleteness */
 		if (device_get_info_fct(device, CPUINFO_FCT_RESET) == NULL ||
@@ -771,159 +770,45 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		if (cpu_validity_check != NULL && (*cpu_validity_check)(driver, device->static_config))
 			error = TRUE;
 
-		/* loop over all address spaces */
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		/* validate the interrupts */
+		if (cpuconfig->vblank_interrupt != NULL)
 		{
-#define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
-#define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			int databus_width = cpu_get_databus_width(device, spacenum);
-			int addr_shift = cpu_get_addrbus_shift(device, spacenum);
-			int alignunit = databus_width/8;
-			address_map_entry *entry;
-			address_map *map;
-
-			/* construct the maps */
-			map = address_map_alloc(device, driver, spacenum);
-
-			/* if this is an empty map, just skip it */
-			if (map->entrylist == NULL)
+			if (video_screen_count(config) == 0)
 			{
-				address_map_free(map);
-				continue;
-			}
-
-			/* validate the global map parameters */
-			if (map->spacenum != spacenum)
-			{
-				mame_printf_error("%s: %s CPU '%s' space %d has address space %d handlers!\n", driver->source_file, driver->name, device->tag, spacenum, map->spacenum);
+				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-			if (map->databits != databus_width)
+			else if (cpuconfig->vblank_interrupt_screen != NULL && cpuconfig->vblank_interrupts_per_frame != 0)
 			{
-				mame_printf_error("%s: %s cpu '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], databus_width, map->databits);
+				mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-
-			/* loop over entries and look for errors */
-			for (entry = map->entrylist; entry != NULL; entry = entry->next)
+			else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(config->devicelist, cpuconfig->vblank_interrupt_screen) == NULL)
 			{
-				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
-				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
-
-				/* look for inverted start/end pairs */
-				if (byteend < bytestart)
-				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend);
-					error = TRUE;
-				}
-
-				/* look for misaligned entries */
-				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
-				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend, alignunit);
-					error = TRUE;
-				}
-
-				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
-				{
-					entry->region = device->tag;
-					entry->rgnoffs = entry->addrstart;
-				}
-
-				/* if this entry references a memory region, validate it */
-				if (entry->region != NULL && entry->share == 0)
-				{
-					int rgnnum;
-
-					/* loop over entries in the class */
-					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
-					{
-						/* stop if we hit an empty */
-						if (rgninfo->entries[rgnnum].tag == NULL)
-						{
-							mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
-							error = TRUE;
-							break;
-						}
-
-						/* if we hit a match, check against the length */
-						if (astring_cmpc(rgninfo->entries[rgnnum].tag, entry->region) == 0)
-						{
-							offs_t length = rgninfo->entries[rgnnum].length;
-							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
-							{
-								mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
-								error = TRUE;
-							}
-							break;
-						}
-					}
-				}
-
-				/* make sure all devices exist */
-				if (entry->read_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtag) == NULL)
-				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_devtag);
-					error = TRUE;
-				}
-				if (entry->write_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtag) == NULL)
-				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_devtag);
-					error = TRUE;
-				}
-
-				/* make sure ports exist */
-				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
-				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
-					error = TRUE;
-				}
-			}
-
-			/* release the address map */
-			address_map_free(map);
-
-			/* validate the interrupts */
-			if (cpuconfig->vblank_interrupt != NULL)
-			{
-				if (video_screen_count(config) == 0)
-				{
-					mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, device->tag);
-					error = TRUE;
-				}
-				else if (cpuconfig->vblank_interrupt_screen != NULL && cpuconfig->vblank_interrupts_per_frame != 0)
-				{
-					mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag);
-					error = TRUE;
-				}
-				else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(config->devicelist, cpuconfig->vblank_interrupt_screen) == NULL)
-				{
-					mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag, cpuconfig->vblank_interrupt_screen);
-					error = TRUE;
-				}
-				else if (cpuconfig->vblank_interrupt_screen == NULL && cpuconfig->vblank_interrupts_per_frame == 0)
-				{
-					mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, device->tag);
-					error = TRUE;
-				}
-			}
-			else if (cpuconfig->vblank_interrupts_per_frame != 0)
-			{
-				mame_printf_error("%s: %s cpu '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag, cpuconfig->vblank_interrupt_screen);
 				error = TRUE;
 			}
+			else if (cpuconfig->vblank_interrupt_screen == NULL && cpuconfig->vblank_interrupts_per_frame == 0)
+			{
+				mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, device->tag);
+				error = TRUE;
+			}
+		}
+		else if (cpuconfig->vblank_interrupts_per_frame != 0)
+		{
+			mame_printf_error("%s: %s cpu '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, device->tag);
+			error = TRUE;
+		}
 
-			if (cpuconfig->timed_interrupt != NULL && cpuconfig->timed_interrupt_period == 0)
-			{
-				mame_printf_error("%s: %s cpu '%s' has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, device->tag);
-				error = TRUE;
-			}
-			else if (cpuconfig->timed_interrupt == NULL && cpuconfig->timed_interrupt_period != 0)
-			{
-				mame_printf_error("%s: %s cpu '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, device->tag);
-				error = TRUE;
-			}
+		if (cpuconfig->timed_interrupt != NULL && cpuconfig->timed_interrupt_period == 0)
+		{
+			mame_printf_error("%s: %s cpu '%s' has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, device->tag);
+			error = TRUE;
+		}
+		else if (cpuconfig->timed_interrupt == NULL && cpuconfig->timed_interrupt_period != 0)
+		{
+			mame_printf_error("%s: %s cpu '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, device->tag);
+			error = TRUE;
 		}
 	}
 
@@ -1555,7 +1440,7 @@ static int validate_sound(int drivnum, const machine_config *config)
     checks
 -------------------------------------------------*/
 
-static int validate_devices(int drivnum, const machine_config *config)
+static int validate_devices(int drivnum, const machine_config *config, const input_port_config *portlist, region_info *rgninfo)
 {
 	int error = FALSE;
 	const game_driver *driver = drivers[drivnum];
@@ -1565,6 +1450,7 @@ static int validate_devices(int drivnum, const machine_config *config)
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
 		const device_config *scandevice;
+		int spacenum;
 
 		/* validate the device tag */
 		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
@@ -1580,6 +1466,120 @@ static int validate_devices(int drivnum, const machine_config *config)
 		/* call the device-specific validity check */
 		if (validity_check != NULL && (*validity_check)(driver, device))
 			error = TRUE;
+
+		/* loop over all address spaces */
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		{
+#define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
+#define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
+			int databus_width = device_get_databus_width(device, spacenum);
+			int addr_shift = device_get_addrbus_shift(device, spacenum);
+			int alignunit = databus_width/8;
+			address_map_entry *entry;
+			address_map *map;
+
+			/* construct the maps */
+			map = address_map_alloc(device, driver, spacenum);
+
+			/* if this is an empty map, just skip it */
+			if (map->entrylist == NULL)
+			{
+				address_map_free(map);
+				continue;
+			}
+
+			/* validate the global map parameters */
+			if (map->spacenum != spacenum)
+			{
+				mame_printf_error("%s: %s device '%s' space %d has address space %d handlers!\n", driver->source_file, driver->name, device->tag, spacenum, map->spacenum);
+				error = TRUE;
+			}
+			if (map->databits != databus_width)
+			{
+				mame_printf_error("%s: %s device '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], databus_width, map->databits);
+				error = TRUE;
+			}
+
+			/* loop over entries and look for errors */
+			for (entry = map->entrylist; entry != NULL; entry = entry->next)
+			{
+				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
+				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
+
+				/* look for inverted start/end pairs */
+				if (byteend < bytestart)
+				{
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend);
+					error = TRUE;
+				}
+
+				/* look for misaligned entries */
+				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
+				{
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend, alignunit);
+					error = TRUE;
+				}
+
+				/* if this is a program space, auto-assign implicit ROM entries */
+				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
+				{
+					entry->region = device->tag;
+					entry->rgnoffs = entry->addrstart;
+				}
+
+				/* if this entry references a memory region, validate it */
+				if (entry->region != NULL && entry->share == 0)
+				{
+					int rgnnum;
+
+					/* loop over entries in the class */
+					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
+					{
+						/* stop if we hit an empty */
+						if (rgninfo->entries[rgnnum].tag == NULL)
+						{
+							mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
+							error = TRUE;
+							break;
+						}
+
+						/* if we hit a match, check against the length */
+						if (astring_cmpc(rgninfo->entries[rgnnum].tag, entry->region) == 0)
+						{
+							offs_t length = rgninfo->entries[rgnnum].length;
+							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
+							{
+								mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
+								error = TRUE;
+							}
+							break;
+						}
+					}
+				}
+
+				/* make sure all devices exist */
+				if (entry->read_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_devtag);
+					error = TRUE;
+				}
+				if (entry->write_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_devtag);
+					error = TRUE;
+				}
+
+				/* make sure ports exist */
+				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
+				{
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
+					error = TRUE;
+				}
+			}
+
+			/* release the address map */
+			address_map_free(map);
+		}
 	}
 	return error;
 }
@@ -1684,7 +1684,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate the CPU information */
 		cpu_checks -= osd_profiling_ticks();
-		error = validate_cpu(drivnum, config, portlist, &rgninfo) || error;
+		error = validate_cpu(drivnum, config) || error;
 		cpu_checks += osd_profiling_ticks();
 
 		/* validate the display */
@@ -1704,7 +1704,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate devices */
 		device_checks -= osd_profiling_ticks();
-		error = validate_devices(drivnum, config) || error;
+		error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
 		device_checks += osd_profiling_ticks();
 
 		for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo.entries); rgnnum++)

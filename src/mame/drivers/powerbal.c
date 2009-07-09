@@ -643,7 +643,7 @@ ROM_START( magicstk )
 	ROM_LOAD( "19.u84",       0x40000, 0x20000, CRC(ee12d5b2) SHA1(872edff5a35d2725e3dd752a5f609aca995bfeff) )
 	ROM_LOAD( "20.u83",       0x60000, 0x20000, CRC(a07f542b) SHA1(0c17629142a90687460b4c951f2062f5c7de8921) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* OKI Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKI Samples */
 	ROM_LOAD( "10.u16",       0x00000, 0x20000, CRC(1e4a03ef) SHA1(6a134daa9a6d8dbda51cab348627f078c3dde8c7) )
 
 	ROM_REGION( 0x0800, "plds", 0 )

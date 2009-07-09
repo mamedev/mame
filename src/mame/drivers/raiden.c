@@ -340,7 +340,7 @@ ROM_START( raiden )
 	ROM_REGION( 0x090000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", ROMREGION_DISPOSE )
@@ -377,7 +377,7 @@ ROM_START( raidena )
 	ROM_REGION( 0x090000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -410,7 +410,7 @@ ROM_START( raidenk )
 	ROM_REGION( 0x090000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -443,7 +443,7 @@ ROM_START( raident )
 	ROM_REGION( 0x090000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 

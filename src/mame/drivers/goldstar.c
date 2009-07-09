@@ -5162,7 +5162,7 @@ ROM_START( goldstar )
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "gs3.bin",      0x00000, 0x08000, CRC(8454ce3c) SHA1(74686ebb91f191db8cbc3d0417a5e8112c5b67b1) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
@@ -5177,7 +5177,7 @@ ROM_START( goldstbl )
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "gsb-spr.bin",  0x00000, 0x08000, CRC(52ecd4c7) SHA1(7ef013020521a0c19ecd67db1c00047e78a3c736) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
@@ -5317,7 +5317,7 @@ ROM_START( moonlght )
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "29.bin",      0x00000, 0x20000, CRC(8a5f274d) SHA1(0f2ad61b00e220fc509c01c11c1a8f4e47b54f2a) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x40000, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 

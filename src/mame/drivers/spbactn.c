@@ -382,7 +382,7 @@ ROM_START( spbactn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-u14.3", 0x00000, 0x10000, CRC(57f4c503) SHA1(e5ddc63a43ba824bcaa4340eeba25a0d3f26cad9) )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-u19",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) )
 
 	/* Board 9002-B (GFX Board) */
@@ -408,7 +408,7 @@ ROM_START( spbactnj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-u14.3", 0x00000, 0x10000, CRC(57f4c503) SHA1(e5ddc63a43ba824bcaa4340eeba25a0d3f26cad9) )
 
-	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-u19",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) )
 
 	/* Board 9002-B (GFX Board) */

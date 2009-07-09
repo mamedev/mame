@@ -339,7 +339,7 @@ ROM_START( tumblep )
 	ROM_LOAD16_BYTE( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
 	ROM_LOAD16_BYTE( "map-00.rom",   0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "hl03-.j15",    0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) )
 ROM_END
 
@@ -358,7 +358,7 @@ ROM_START( tumblepj )
 	ROM_LOAD16_BYTE( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
 	ROM_LOAD16_BYTE( "map-00.rom",   0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "hl03-.j15",    0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) )
 ROM_END
 

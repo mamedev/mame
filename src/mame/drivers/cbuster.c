@@ -357,10 +357,10 @@ ROM_START( cbuster )
 	ROM_LOAD( "fu09-.rom",     0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
 	ROM_LOAD( "fu10-.rom",     0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu12-.rom",     0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu13-.rom",     0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -395,10 +395,10 @@ ROM_START( cbusterw )
 	ROM_LOAD( "fu09-.rom",     0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
 	ROM_LOAD( "fu10-.rom",     0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu12-.rom",     0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu13-.rom",     0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -433,10 +433,10 @@ ROM_START( cbusterj )
 	ROM_LOAD( "fr09",          0x160000, 0x10000, CRC(f8363424) SHA1(6a6b143a3474965ef89f75e9d7b15946ae26d0d4) )
 	ROM_LOAD( "fr10",          0x170000, 0x10000, CRC(241d5760) SHA1(cd216ecf7e88939b91a6e0f02a23c8b875ac24dc) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu12-.rom",     0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu13-.rom",     0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -471,10 +471,10 @@ ROM_START( twocrude )
 	ROM_LOAD( "ft09",          0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
 	ROM_LOAD( "ft10",          0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
 
-	ROM_REGION( 0x20000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu12-.rom",     0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x20000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fu13-.rom",     0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

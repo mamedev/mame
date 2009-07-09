@@ -3188,6 +3188,8 @@ ROM_START( ghouls )
 	ROM_LOAD( "dm_26.10a", 0x00000, 0x08000, CRC(3692f6e5) SHA1(61b8438d60a39b4cf5062dff0a53228e8a4e4b5f) )
 	ROM_CONTINUE(          0x10000, 0x08000 )
 
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )	/* Samples (not present) */
+
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
 	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
@@ -3234,6 +3236,8 @@ ROM_START( ghoulsu )
 	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "dm_26.10a", 0x00000, 0x08000, CRC(3692f6e5) SHA1(61b8438d60a39b4cf5062dff0a53228e8a4e4b5f) )
 	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )	/* Samples (not present) */
 
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
@@ -3298,6 +3302,8 @@ ROM_START( daimakai )
 	ROM_LOAD( "dm_37.13c",  0x00000, 0x08000, CRC(3692f6e5) SHA1(61b8438d60a39b4cf5062dff0a53228e8a4e4b5f) )	// == dm_26.10a
 	ROM_CONTINUE(           0x10000, 0x08000 )
 
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )	/* Samples (not present) */
+
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
 	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
@@ -3329,6 +3335,8 @@ ROM_START( daimakair )
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "dam_09.bin",   0x00000, 0x08000, CRC(0656ff53) SHA1(063a8124dbe73d014b11f72007f1b877afd1a661) )	// == dm_26.10a + garbage
 	ROM_CONTINUE(             0x10000, 0x18000 )	// second half of ROM is unused, not mapped in memory
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )	/* Samples (not present) */
 
 	ROM_REGION( 0x0200, "aboardplds", ROMREGION_DISPOSE )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )

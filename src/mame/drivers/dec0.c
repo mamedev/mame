@@ -1468,7 +1468,7 @@ ROM_START( hbarrel )
 	ROM_LOAD( "hb09.bin",     0x60000, 0x10000, CRC(26240ea0) SHA1(25732986d787afd99a045ce4587f1079f84e675b) )
 	ROM_LOAD( "hb10.bin",     0x70000, 0x10000, CRC(47d95447) SHA1(d2ffe96a19cfcbddee0df07dad89bd83cba801fa) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "hb08.bin",     0x0000, 0x10000, CRC(645c5b68) SHA1(096ca5d7b5df752df6d2c856b3f94b29eea7c3de) )
 ROM_END
 
@@ -1517,7 +1517,7 @@ ROM_START( hbarrelw )
 	ROM_LOAD( "hb09.bin",     0x60000, 0x10000, CRC(26240ea0) SHA1(25732986d787afd99a045ce4587f1079f84e675b) )
 	ROM_LOAD( "hb10.bin",     0x70000, 0x10000, CRC(47d95447) SHA1(d2ffe96a19cfcbddee0df07dad89bd83cba801fa) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "hb_ec08.rom",  0x0000, 0x10000, CRC(2159a609) SHA1(cae503e446c7164a44b59886680f554a4cb1eef2) )
 ROM_END
 
@@ -1560,7 +1560,7 @@ ROM_START( baddudes )
 	ROM_LOAD( "baddudes.9",   0x60000, 0x10000, CRC(6901e628) SHA1(1162c8cee20450780774cad54a9af40ebf0f0826) )
 	ROM_LOAD( "baddudes.10",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "baddudes.8",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
 ROM_END
 
@@ -1603,7 +1603,7 @@ ROM_START( drgninja )
 	ROM_LOAD( "baddudes.9",   0x60000, 0x10000, CRC(6901e628) SHA1(1162c8cee20450780774cad54a9af40ebf0f0826) )
 	ROM_LOAD( "baddudes.10",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "baddudes.8",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
 ROM_END
 
@@ -1649,7 +1649,7 @@ ROM_START( birdtry )
 	ROM_LOAD( "ek-09.bin",     0x60000, 0x10000, CRC(6d2d488a) SHA1(40b21a4bc8a4641a6f80d7579e32fe9d69eb42f1) )
 	ROM_LOAD( "ek-10.bin",     0x70000, 0x08000, CRC(580ba206) SHA1(8e57e4ef8c732b85e494bd6ec5da6566f27540e6) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ek-08.bin",     0x0000, 0x10000, CRC(be3db6cb) SHA1(4e8b8e0bef3a3f36d7e641e27b5f48c8fe9a8b7f) )
 ROM_END
 
@@ -1692,7 +1692,7 @@ ROM_START( robocop )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 /*
@@ -1750,7 +1750,7 @@ ROM_START( robocopw )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
@@ -1793,7 +1793,7 @@ ROM_START( robocopj )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
@@ -1836,7 +1836,7 @@ ROM_START( robocopu )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
@@ -1879,7 +1879,7 @@ ROM_START( robocpu0 )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
@@ -1919,7 +1919,7 @@ ROM_START( robocopb )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
@@ -2078,7 +2078,7 @@ ROM_START( hippodrm )
 	ROM_LOAD( "ew17",         0x60000, 0x10000, CRC(8c97c757) SHA1(36fd807da9e144dfb29c8252e9450cc37ca2604f) )
 	ROM_LOAD( "ew12",         0x70000, 0x10000, CRC(a2d244bc) SHA1(ff2391efc480f36a302650691f8a7a620b86d99a) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
 ROM_END
 
@@ -2121,7 +2121,7 @@ ROM_START( ffantasy )
 	ROM_LOAD( "ev17",         0x60000, 0x10000, CRC(045509d4) SHA1(ebbd71de8e8492ff6321e3ede0d98d9ed462de01) )
 	ROM_LOAD( "ew12",         0x70000, 0x10000, CRC(a2d244bc) SHA1(ff2391efc480f36a302650691f8a7a620b86d99a) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
 ROM_END
 
@@ -2164,7 +2164,7 @@ ROM_START( ffantasa )
 	ROM_LOAD( "ev17",         0x60000, 0x10000, CRC(045509d4) SHA1(ebbd71de8e8492ff6321e3ede0d98d9ed462de01) )
 	ROM_LOAD( "ew12",         0x70000, 0x10000, CRC(a2d244bc) SHA1(ff2391efc480f36a302650691f8a7a620b86d99a) )
 
-	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
 ROM_END
 
@@ -2198,7 +2198,7 @@ ROM_START( slyspy )
 	ROM_LOAD( "fa00.2a",      0x40000, 0x20000, CRC(f7df3fd7) SHA1(ed9e4649e0b1fcca61cf4d159b3f8a35f06102ce) )
 	ROM_LOAD( "fa02.5a",      0x60000, 0x20000, CRC(84e8da9d) SHA1(41da6042f80ea3562aa350f4f466b16db29e2aca) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fa11.11k",     0x00000, 0x20000, CRC(4e547bad) SHA1(655eda4d00f8846957ed40dcbf750fba3ce19f4e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2241,7 +2241,7 @@ ROM_START( slyspy2 )
 	ROM_LOAD( "fa00.2a",      0x40000, 0x20000, CRC(f7df3fd7) SHA1(ed9e4649e0b1fcca61cf4d159b3f8a35f06102ce) )
 	ROM_LOAD( "fa02.5a",      0x60000, 0x20000, CRC(84e8da9d) SHA1(41da6042f80ea3562aa350f4f466b16db29e2aca) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fa11.11k",     0x00000, 0x20000, CRC(4e547bad) SHA1(655eda4d00f8846957ed40dcbf750fba3ce19f4e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2284,7 +2284,7 @@ ROM_START( secretag )
 	ROM_LOAD( "fa00.2a",      0x40000, 0x20000, CRC(f7df3fd7) SHA1(ed9e4649e0b1fcca61cf4d159b3f8a35f06102ce) )
 	ROM_LOAD( "fa02.5a",      0x60000, 0x20000, CRC(84e8da9d) SHA1(41da6042f80ea3562aa350f4f466b16db29e2aca) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fa11.11k",     0x00000, 0x20000, CRC(4e547bad) SHA1(655eda4d00f8846957ed40dcbf750fba3ce19f4e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2357,7 +2357,7 @@ ROM_START( secretab )
 	ROM_LOAD( "sa_21.bin",      0x70000, 0x10000,CRC(dc6a38df) SHA1(9043df911389d3f085299f2f2202cab356473a32) )
 	ROM_LOAD( "sa_22.bin",      0x60000, 0x10000,CRC(d234cae5) SHA1(0cd07bf087a4da19a5da29785385de9eee52d0fb) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "sa_02.bin",      0x00000, 0x10000,CRC(439eb5a9) SHA1(8d6baad8a1e89279ef0a378941d3d9b49a606864) ) // both halves identical
 ROM_END
 
@@ -2395,7 +2395,7 @@ ROM_START( midres )
 	ROM_LOAD( "fl00",              0x40000, 0x20000, CRC(756fb801) SHA1(35510c4ddf9258d87fdee0d3a64a8de0ebd1967d) )
 	ROM_LOAD( "fl02",              0x60000, 0x20000, CRC(54d2c120) SHA1(84f93bcd41d5bda8cfb39c4947fff025f53b143d) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fl17",              0x00000, 0x20000, CRC(9029965d) SHA1(9b28dc38e86f24fa89d7971b141c9bdddc662c99) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2442,7 +2442,7 @@ ROM_START( midresu )
 	ROM_LOAD( "fl00",              0x40000, 0x20000, CRC(756fb801) SHA1(35510c4ddf9258d87fdee0d3a64a8de0ebd1967d) )
 	ROM_LOAD( "fl02",              0x60000, 0x20000, CRC(54d2c120) SHA1(84f93bcd41d5bda8cfb39c4947fff025f53b143d) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fl17",              0x00000, 0x20000, CRC(9029965d) SHA1(9b28dc38e86f24fa89d7971b141c9bdddc662c99) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2489,7 +2489,7 @@ ROM_START( midresj )
 	ROM_LOAD( "fl00",              0x40000, 0x20000, CRC(756fb801) SHA1(35510c4ddf9258d87fdee0d3a64a8de0ebd1967d) )
 	ROM_LOAD( "fl02",              0x60000, 0x20000, CRC(54d2c120) SHA1(84f93bcd41d5bda8cfb39c4947fff025f53b143d) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fh17",              0x00000, 0x20000, CRC(c7b0a24e) SHA1(8a068d7838bbdfb200c7104deb0cd5647336117a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2572,7 +2572,7 @@ ROM_START( midresb )
 	ROM_LOAD( "5.bin",             0x60000, 0x10000, CRC(fd0bd8d3) SHA1(d6b19869ddc2a8ed4f38ba9d613b71853f2d13c0) )
 	ROM_LOAD( "1.bin",             0x70000, 0x10000, CRC(fc46d5ed) SHA1(20ddf3f67f0dfb222ad8d3fd464b892ec9c9e4f5) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "16.bin",            0x00000, 0x10000, CRC(ccf24b52) SHA1(39b2663c548b30684197284cb8e7a6ca803330c9) )
 ROM_END
 
@@ -2609,7 +2609,7 @@ ROM_START( bouldash )
 	ROM_LOAD( "fn-00",        0x20000, 0x10000, CRC(ec18d098) SHA1(3cd1a27de295a177e81c14b9e9bbfcf5793aade2) )
 	ROM_LOAD( "fn-02",        0x30000, 0x10000, CRC(4f060cba) SHA1(4063183e699bb8b6059d56f4e2fec5fa0b037c23) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fn-11",      0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -2648,7 +2648,7 @@ ROM_START( bouldshj )
 	ROM_LOAD( "fn-00",        0x20000, 0x10000, CRC(ec18d098) SHA1(3cd1a27de295a177e81c14b9e9bbfcf5793aade2) )
 	ROM_LOAD( "fn-02",        0x30000, 0x10000, CRC(4f060cba) SHA1(4063183e699bb8b6059d56f4e2fec5fa0b037c23) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "fn-11",      0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

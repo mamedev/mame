@@ -421,7 +421,7 @@ ROM_START( missb2 )
 	ROM_LOAD16_BYTE( "msbub2-u.ic2", 0x000001, 0x80000, CRC(694c2783) SHA1(401dc8713a02130289f364786c38e70c4c4f9b2e) )
 	ROM_LOAD16_BYTE( "msbub2-u.ic4", 0x000000, 0x80000, CRC(be71c9f0) SHA1(1961e931017f644486cea0ce431d50973679c848) )
 
-	ROM_REGION( 0x20000, "oki", 0 ) /* samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) )
 
 	/* I doubt this prom is on the board, it's loaded so we can share video emulation with bubble bobble */

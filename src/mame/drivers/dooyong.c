@@ -1383,7 +1383,7 @@ ROM_START( bluehawk )
 	ROM_LOAD16_BYTE( "rom6",         0x00000, 0x20000, CRC(e6bd9daa) SHA1(3b478fd02b145d13e49539df5260191a5254be19) )
 	ROM_LOAD16_BYTE( "rom5",         0x00001, 0x20000, CRC(5c654dc6) SHA1(f10f64d7114adf7f18ec37c193c524ec80236201) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI6295 samples */
 	ROM_LOAD( "rom4",         0x00000, 0x20000, CRC(f7318919) SHA1(8b7e2ffe77603142cf1b9440585f8dfa9199ed05) )
 ROM_END
 
@@ -1411,7 +1411,7 @@ ROM_START( bluehawn )
 	ROM_LOAD16_BYTE( "rom6",         0x00000, 0x20000, CRC(e6bd9daa) SHA1(3b478fd02b145d13e49539df5260191a5254be19) )
 	ROM_LOAD16_BYTE( "rom5",         0x00001, 0x20000, CRC(5c654dc6) SHA1(f10f64d7114adf7f18ec37c193c524ec80236201) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI6295 samples */
 	ROM_LOAD( "rom4",         0x00000, 0x20000, CRC(f7318919) SHA1(8b7e2ffe77603142cf1b9440585f8dfa9199ed05) )
 ROM_END
 
@@ -1537,7 +1537,7 @@ ROM_START( sadari )
 	ROM_LOAD16_BYTE( "12.10g",       0x40000, 0x20000, CRC(547b7645) SHA1(fdfe5cccdae1b88736aae702aa55fd642396ce01) )
 	ROM_LOAD16_BYTE( "7.8g",         0x40001, 0x20000, CRC(14f20fa3) SHA1(95aabb5a5de976fb62b5cffd3efb2a86b5d62c20) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI6295 samples */
 	ROM_LOAD( "8.10r",        0x00000, 0x20000, CRC(9c29a093) SHA1(b6252e0cb8e618cdc4a741ee7ab01058f929fd11) )
 ROM_END
 
@@ -1562,7 +1562,7 @@ ROM_START( gundl94 )
 	ROM_LOAD16_BYTE( "gd94_012.g9",  0x00000, 0x20000, CRC(117c693c) SHA1(e08bd6fbbae8ac657e6a1f9df36983ace941da3a) )
 	ROM_LOAD16_BYTE( "gd94_007.g7",  0x00001, 0x20000, CRC(96a72c6d) SHA1(b79a746fc114eb8977591f147e4ea4a4e4f14526) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI6295 samples */
 	ROM_LOAD( "gd94_008.r9",  0x00000, 0x20000, CRC(f92e5803) SHA1(69dd11469e9e6bdc7825a5a14994276b50c10a14) )
 
 	ROM_REGION( 0x30000, "cpu2", 0 )	/* extra z80 rom? this doesn't seem to belong to this game! */
@@ -1595,7 +1595,7 @@ ROM_START( primella )
 	ROM_LOAD16_BYTE( "8_g9.bin",     0x00000, 0x20000, CRC(542ecb83) SHA1(0a4decaad9dde4681f7b6cdab0ae0e4951efc83d) )
 	ROM_LOAD16_BYTE( "5_g7.bin",     0x00001, 0x20000, CRC(058ecac6) SHA1(12f70f78b882b6ce08c56f6fa9a1211c3464bf9d) )
 
-	ROM_REGION( 0x20000, "oki", 0 )	/* OKI6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI6295 samples */
 	ROM_LOAD( "gd94_008.r9",  0x00000, 0x20000, CRC(f92e5803) SHA1(69dd11469e9e6bdc7825a5a14994276b50c10a14) )	/* 6_r9 */
 ROM_END
 

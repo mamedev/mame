@@ -628,7 +628,7 @@ ROM_START( dassault )
 	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -694,7 +694,7 @@ ROM_START( dassaul4 )
 	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
@@ -760,7 +760,7 @@ ROM_START( thndzone )
 	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */

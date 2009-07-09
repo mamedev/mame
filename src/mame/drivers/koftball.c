@@ -240,7 +240,7 @@ ROM_START( koftball )
 	ROM_LOAD16_BYTE(	"ft5_v6_c2.u60", 0x40001, 0x20000, CRC(3dc22223) SHA1(dc74800c51de3b6a7fbf7214a1da1d2f3d2aea84) )
 
 
-	ROM_REGION( 0x010000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "ft5_v6_c9.u21", 0x00000, 0x10000,  CRC(f6216740) SHA1(3d1c795da2f8093e937107e3848cb96338536faf) )
 
 ROM_END
