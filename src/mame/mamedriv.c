@@ -8640,6 +8640,7 @@ Other Sun games
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
 	DRIVER( sothello )	/* (c) 1986 Success / Fujiwara */
+	DRIVER( quake )		/* (c) 19?? Lazer-Tron / iD Software  */
 
 	/* Multi Amenity Cassette System */
 	DRIVER( macsbios )

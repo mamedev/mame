@@ -1921,6 +1921,7 @@ src/mame/drivers/pushman.c svneol=native#text/plain
 src/mame/drivers/pzletime.c svneol=native#text/plain
 src/mame/drivers/qdrmfgp.c svneol=native#text/plain
 src/mame/drivers/qix.c svneol=native#text/plain
+src/mame/drivers/quakeat.c svneol=native#text/plain
 src/mame/drivers/quantum.c svneol=native#text/plain
 src/mame/drivers/quasar.c svneol=native#text/plain
 src/mame/drivers/queen.c svneol=native#text/plain
