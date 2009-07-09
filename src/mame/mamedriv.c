@@ -5032,7 +5032,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( lvpoker )	/* ???? - (c) 1985 Tehkan */
 	DRIVER( lvcards )	/* (c) 1985 Tehkan */
 	DRIVER( tehkanwc )	/* (c) 1985 Tehkan */
-	DRIVER( tehkanwb )	/* bootleg */
+	DRIVER( tehkanwcb )	/* bootleg */
+	DRIVER( tehkanwcc )	/* bootleg */
 	DRIVER( gridiron )	/* (c) 1985 Tehkan */
 	DRIVER( teedoff )	/* 6102 - (c) 1986 Tecmo */
 	DRIVER( solomon )	/* (c) 1986 Tecmo */
