@@ -1,8 +1,9 @@
-/* Namco Turret Tower
-Turret Tower by Namco
--- no idea about this, is the dump complete?
--- what is the CPU?
+/*
 
+Turret Tower by Dell Electronics
+
+PCB Info
+========
 
 Silkscreened	Copyright (c) 2001 Dell Electroinics Labs, Ltd
 
@@ -57,18 +58,12 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 */
 
 #include "driver.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/mips/r3000.h"
 #include "deprecat.h"
 
 
+#define R3041_CLOCK		25000000
 
-static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
-
-
-static INPUT_PORTS_START( turrett )
-INPUT_PORTS_END
 
 VIDEO_START(turrett)
 {
@@ -80,12 +75,40 @@ VIDEO_UPDATE(turrett)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( turrett )
 
+static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x02000010, 0x02000013) AM_RAM
+	AM_RANGE(0x02000040, 0x02000043) AM_RAM
+	AM_RANGE(0x02000050, 0x02000053) AM_RAM
+	AM_RANGE(0x02000060, 0x02000063) AM_RAM
+	AM_RANGE(0x02000070, 0x02000073) AM_RAM
+	AM_RANGE(0x04000100, 0x04000103) AM_RAM
+	AM_RANGE(0x08000000, 0x08000003) AM_RAM
+	AM_RANGE(0x08000004, 0x08000007) AM_RAM
+	AM_RANGE(0x08000008, 0x0800000b) AM_RAM
+	AM_RANGE(0x0800000c, 0x0800000f) AM_RAM
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( turrett )
+INPUT_PORTS_END
+
+
+static const r3000_cpu_core config =
+{
+	0,		/* 1 if we have an FPU, 0 otherwise */
+	2048,	/* code cache size */
+	512		/* data cache size */
+};
+
+
+static MACHINE_DRIVER_START( turrett )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 24000000) // CPU is ????
+	MDRV_CPU_ADD("maincpu", R3041BE, R3041_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MDRV_CPU_CONFIG(config)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -99,22 +122,19 @@ static MACHINE_DRIVER_START( turrett )
 
 	MDRV_VIDEO_START(turrett)
 	MDRV_VIDEO_UPDATE(turrett)
-
 MACHINE_DRIVER_END
-
-
 
 
 ROM_START( turrett )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "turret.u7",  0x000000, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
+	ROM_LOAD32_BYTE( "turret.u13", 0x000000, 0x080000, CRC(85287007) SHA1(990b954905c66340d3e88918b2f8cc7f1b9c7cf4) )
+	ROM_LOAD32_BYTE( "turret.u12", 0x000001, 0x080000, CRC(a2a498fc) SHA1(47f2c9c9f2496b49fd923acb400166e963095e1d) )
 	ROM_LOAD32_BYTE( "turret.u8",  0x000002, 0x080000, CRC(ddff4898) SHA1(a8f859a0dcab8ec83fbfe255d58b3e644933b923) )
-	ROM_LOAD32_BYTE( "turret.u12", 0x000003, 0x080000, CRC(a2a498fc) SHA1(47f2c9c9f2496b49fd923acb400166e963095e1d) )
-	ROM_LOAD32_BYTE( "turret.u13", 0x000001, 0x080000, CRC(85287007) SHA1(990b954905c66340d3e88918b2f8cc7f1b9c7cf4) )
+	ROM_LOAD32_BYTE( "turret.u7",  0x000003, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "turrett", 0, SHA1(b0c98c5876870dd8b3e37a38fe35846c9e011df4) )
 ROM_END
 
 
-GAME( 199?, turrett, 0, turrett, turrett, 0, ROT0, "Namco", "Turret Tower", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, turrett, 0, turrett, turrett, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", GAME_NOT_WORKING | GAME_NO_SOUND )
