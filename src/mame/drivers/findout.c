@@ -663,7 +663,6 @@ When ERROR appears, press F2, then F3 to reset, then F2 again and the game will 
 */
 
 GAME( 1986, gt507uk,  0,       findout, gt507uk, 0, ROT0, "Grayhound Electronics", "Trivia (UK Version 5.07)",               GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1986, gt103,    0,       findout, gt103,   0, ROT0, "Grayhound Electronics", "Trivia (Version 1.03)",                  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1986, gt5,      0,       findout, gt103,   0, ROT0, "Grayhound Electronics", "Trivia (Version 5.06)",                  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 
 GAME( 1984, gtsers8,  0,       findout, gt103a,  0, ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
