@@ -8461,16 +8461,16 @@ Other Sun games
 	DRIVER( taxidrvr )	/* [1984 Graphic Techno] */
 	DRIVER( xyonix )	/* [1989 Philko] */
 	DRIVER( gt507uk )	/* (c) 1986 Grayhound Electronics */
-	DRIVER( gt103 )		/* (c) 1986 Grayhound Electronics */
 	DRIVER( gt5 )		/* (c) 1984 Grayhound Electronics */
-	DRIVER( gt103a )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers8 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers9 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers10 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers11 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt103a1 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt103a2 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt103a3 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt103a4 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt103asx )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt103aa )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt103ab )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gt103asx )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( reelfun )	/* (c) 1986 Grayhound Electronics */
 	DRIVER( findout )	/* (c) 1987 [Elettronolo] */
 	DRIVER( quiz )		/* (c) 1986 Italian bootleg */
