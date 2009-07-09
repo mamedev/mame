@@ -2957,6 +2957,90 @@ static MACHINE_DRIVER_START( sf2mdt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
+/*
+
+CPU:
+
+1x MC68000P12 ic65 main
+1x Z0840006PSC ic1 sound
+1x YM2151 ic29 sound
+1x YM3012 ic30 sound
+2x LM324 ic15,ic31 sound
+2x M5205 ic184,ic185 sound
+1x TDA2003 ic14 sound
+1x oscillator 24.000000MHz (close to main)
+1x oscillator 29.821000MHz (close to sound) 
+
+ROMs
+
+5x M27C2001 1,2,3,4,5 dumped
+4x maskrom KA,KB,KC,KD not dumped
+
+RAMs:
+
+4x KM62256ALP ic112,ic113,ic168,ic170
+1x SYC6116L ic24
+1x MCM2018AN ic7,ic8,ic51,ic56,ic70,ic71,ic77,ic78
+
+PLDs:
+
+1x TPC1020AFN ic116 read protected
+3x GAL20V8A ic120,ic121,ic169 read protected
+3x GAL16V8A ic7,ic72,ic80 read protected 
+
+Note:
+
+1x JAMMA edge connector
+2x 10 legs connector
+1x trimmer (volume)
+3x 8x2 switches DIP 
+
+*/
+
+static MACHINE_DRIVER_START( knightsb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)                       
+	MDRV_CPU_PROGRAM_MAP(main_map)
+	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
+
+	MDRV_CPU_ADD("audiocpu", Z80, 29821000 / 8)
+	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+
+	MDRV_GFXDECODE(cps1)
+	MDRV_PALETTE_LENGTH(0xc00)
+
+	MDRV_VIDEO_START(cps1)
+	MDRV_VIDEO_EOF(cps1)
+	MDRV_VIDEO_UPDATE(cps1)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("2151", YM2151, 29821000 / 8)
+	MDRV_SOUND_CONFIG(ym2151_config)
+	MDRV_SOUND_ROUTE(0, "mono", 0.35)
+	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+
+	/* has 2x MSM5205 instead of OKI6295 */
+	MDRV_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+
 #endif
 
 
@@ -6190,6 +6274,29 @@ ROM_START( knightsj )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 ROM_END
 
+
+/* bootleg */
+ROM_START( knightsb )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "3.ic173",    0x00001, 0x40000, CRC(c9c6e720) SHA1(e8a1cd73458b548e88fc49d8f659e0dc33a8e756) )
+	ROM_LOAD16_BYTE( "5.ic172",    0x00000, 0x40000, CRC(7fd91118) SHA1(d2832b21309a467938891946d7af35d8095787a4) )
+	ROM_LOAD16_BYTE( "2.ic175",    0x80001, 0x40000, CRC(1eb91343) SHA1(e02cfbbd7689346f14f2e3455ed17e7f0b51bad0) )
+	ROM_LOAD16_BYTE( "4.ic176",    0x80000, 0x40000, CRC(af352703) SHA1(7855ac65752203f45af4ef41af8c291540a1c8a8) )
+	
+	ROM_REGION( 0x400000, "gfx", 0 ) /* bootleg had 4x 1meg MASKroms, these need dumping so that the format is known */
+	ROMX_LOAD( "kr_gfx1.rom",  0x000000, 0x80000, BAD_DUMP CRC(9e36c1a4) SHA1(772daae74e119371dfb76fde9775bda78a8ba125) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx3.rom",  0x000002, 0x80000, BAD_DUMP CRC(c5832cae) SHA1(a188cf401cd3a2909b377d3059f14d22ec3b0643) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx2.rom",  0x000004, 0x80000, BAD_DUMP CRC(f095be2d) SHA1(0427d1574062f277a9d04440019d5638b05de561) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx4.rom",  0x000006, 0x80000, BAD_DUMP CRC(179dfd96) SHA1(b1844e69da7ab13474da569978d5b47deb8eb2be) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx5.rom",  0x200000, 0x80000, BAD_DUMP CRC(1f4298d2) SHA1(4b162a7f649b0bcd676f8ca0c5eee9a1250d6452) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx7.rom",  0x200002, 0x80000, BAD_DUMP CRC(37fa8751) SHA1(b88b39d1f08621f15a5620095aef998346fa9891) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx6.rom",  0x200004, 0x80000, BAD_DUMP CRC(0200bc3d) SHA1(c900b1be2b4e49b951e5c1e3fd1e19d21b82986e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "kr_gfx8.rom",  0x200006, 0x80000, BAD_DUMP CRC(0bb2b4e7) SHA1(983b800925d58e4aeb4e5105f93ed5faf66d009c) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "1.ic26",     0x00000, 0x40000, CRC(bd6f9cc1) SHA1(9f33cccef224d2204736a9eae761196866bd6e41) )
+ROM_END
+
 ROM_START( sf2ce )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sf2ce.23",     0x000000, 0x80000, CRC(3f846b74) SHA1(c8d7a01b626771870123f1663a01a81f9c8fe582) )
@@ -8562,6 +8669,7 @@ GAME( 1991, captcomb, captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "bootleg
 GAME( 1991, knights,  0,        cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)" , 0)			// "ETC"
 GAME( 1991, knightsu, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (US 911127)", 0 )
 GAME( 1991, knightsj, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127)", 0 )
+GAME( 1991, knightsb, knights,  knightsb,   knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127, bootleg)" , GAME_NOT_WORKING)
 GAME( 1992, sf2ce,    0,        cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (World 920313)" , 0)	// "ETC"
 GAME( 1992, sf2ceua,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920313)", 0 )
 GAME( 1992, sf2ceub,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920513)", 0 )
