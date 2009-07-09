@@ -1727,7 +1727,8 @@ $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 						$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \
-						$(LAYOUT)/invad2ct.lh
+						$(LAYOUT)/invad2ct.lh \
+						$(LAYOUT)/lagunar.lh
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 						$(LAYOUT)/gypsyjug.lh

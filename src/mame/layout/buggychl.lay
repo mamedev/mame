@@ -49,19 +49,19 @@
 	</element>
 	<view name="Shifter-R">
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds x="0" y="0" width="480" height="640" />
 		</screen>		
 		<bezel element="shifter" inputtag="IN0" inputmask="0x08">
-			<bounds x="606" y="414" width="32" height="64" />
+			<bounds x="446" y="574" width="32" height="64" />
 			<color alpha="0.9" />
 		</bezel>
 	</view>
 	<view name="Shifter-L">
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds x="0" y="0" width="480" height="640" />
 		</screen>		
 		<bezel element="shifter" inputtag="IN0" inputmask="0x08">
-			<bounds x="2" y="414" width="32" height="64" />
+			<bounds x="2" y="574" width="32" height="64" />
 			<color alpha="0.9" />
 		</bezel>
 	</view>
