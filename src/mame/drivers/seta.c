@@ -9206,6 +9206,45 @@ ROM_START( inttoote )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
 
+// set only contained 2 program roms, others are potentially incorrect
+ROM_START( inttootea )
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "p387.v01_horse_prog_2.002", 0x000000, 0x10000, CRC(1ced885e) SHA1(7bb444bbfa3c07c0c54378432186ff3b056b6090) )
+	ROM_LOAD16_BYTE( "p387.v01_horse_prog_1.003", 0x000001, 0x10000, CRC(e24592af) SHA1(86ab84cb1c5cbb0dcc73e75c05ce446411fab08a) )
+	ROM_FILL(                                     0x020000, 0x60000, 0xff )
+	ROM_LOAD16_WORD_SWAP( "ya_002_001.u18",       0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
+	ROM_FILL(                                     0x180000, 0x80000, 0xff )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD( "ya_011_004.u10",             0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
+	ROM_LOAD( "p523.v01_horse_fore_1.u135", 0x070000, 0x10000, CRC(3a75df30) SHA1(f3b3a7428e3e125921686bc9aacde6b28b1947b5) )
+
+	ROM_LOAD( "ya_011_005.u17",             0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD( "p523.v01_horse_fore_2.u134", 0x0f0000, 0x10000, CRC(26fb0339) SHA1(a134ecef00f690c82c8bddf26498b357ccf8d5c3) )
+
+	ROM_LOAD( "ya_011_006.u22",             0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD( "p523.v01_horse_fore_3.u133", 0x170000, 0x10000, CRC(c38596af) SHA1(d27141e28d8f8352f065c55121412e604c199a9a) )
+
+	ROM_LOAD( "ya_011_007.u27",             0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD( "p523.v01_horse_fore_4.u132", 0x1f0000, 0x10000, CRC(64ef345e) SHA1(ef5d9f293ded44a2be91278549f5db8673fc7571) )
+
+	ROM_REGION( 0xc0000, "gfx2", 0 )	/* Layer 1 */
+	ROM_LOAD( "ya_011_008.u35",             0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD( "p523.v01_horse_back_1.u137", 0x040000, 0x20000, CRC(39b221ea) SHA1(3b3367430733ed36d6a981cd2ec6df731d07c089) )
+
+	ROM_LOAD( "ya_011_009.u41",             0x060000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	ROM_LOAD( "p523.v01_horse_back_2.u136", 0x0a0000, 0x20000, CRC(9c5e32a0) SHA1(964734a626b5c7b9d7130addc642895df520dcb7) )
+
+	ROM_REGION( 0x400, "proms", 0 )	/* Colours */
+	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
+	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
+
+	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
+	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
+ROM_END
+
+
 
 static READ16_HANDLER( twineagl_debug_r )
 {
@@ -9456,6 +9495,22 @@ static DRIVER_INIT( inttoote )
 	ROM[0x368a/2] = 0x50f9;	// betting count down
 }
 
+static DRIVER_INIT( inttootea )
+{
+	//UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	static UINT16 seta_vregs_unused[3] = {0,0,0};
+
+	// missing / unused video regs
+	seta_vregs = seta_vregs_unused;
+
+	// code patches (to be removed...)
+	//ROM[0x4de0/2] = 0x4e71;	// hardware test errors
+	//ROM[0x4de2/2] = 0x4e71;
+
+	//ROM[0x368a/2] = 0x50f9;	// betting count down
+}
+
+
 
 /***************************************************************************
 
@@ -9483,6 +9538,7 @@ GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",   
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "[Seta] (Visco license)", "Jockey Club", 0 )
 GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1991, rezon,    0,        rezon,    rezon,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )
 GAME( 1992, rezont,   rezon,    rezon,    rezont,   rezon,    ROT0,   "Allumer (Taito license)","Rezon (Taito)", 0 )
 GAME( 1991, stg,      0,        drgnunit, stg,      0,        ROT270, "Athena / Tecmo",         "Strike Gunner S.T.G", 0 )
