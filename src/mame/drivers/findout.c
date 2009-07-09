@@ -531,7 +531,7 @@ ROM_END
 
 ROM_START( gtsers8 )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "trvmast3.bin",    0x00000, 0x4000, CRC(9ea277bc) SHA1(f813de572a3b5e2ad601dc6559dc93c30bb7a38c) )
+	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "science",         0x10000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
 	ROM_LOAD( "general",         0x18000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
 	ROM_LOAD( "sports",          0x20000, 0x8000, CRC(6bd1ba9a) SHA1(7caac1bd438a9b1d11fb33e11814b5d76951211a) )
