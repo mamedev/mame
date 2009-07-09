@@ -1130,6 +1130,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/ssf2md.o \
+	$(DRIVERS)/ssgbl.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
 	$(DRIVERS)/stv.o $(DRIVERS)/stvinit.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o \

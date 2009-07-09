@@ -4309,6 +4309,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( ssf2ghw )	/* MegaDrive-based hack */
 	DRIVER( aladbl )	/* MegaDrive-based hack */
+	DRIVER( ssgbl )		/* MegaDrive-based hack */
 
 	/* Sega Naomi-based (Dreamcast) systems */
 	DRIVER( naomi )
