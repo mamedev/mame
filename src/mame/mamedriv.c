@@ -4582,7 +4582,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
-						/* 2002.12 The House of the Dead III */
+	DRIVER( hotd3 )		/* 2002.12 The House of the Dead III */
 						/* 2003.03 Crazy Taxi High Roller */
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 						/* 2003.12 Outrun 2 */

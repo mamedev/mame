@@ -71,6 +71,20 @@ ROM_START( chihiro )
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
+ 
+
+ROM_START( hotd3 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0001", 0,  SHA1(174c72f851d0c97e8993227467f16b0781ed2f5c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0348-com.data", 0x00, 0x50, CRC(d28219ef) SHA1(40dbbc092bc9f99b8d2ae67fbefacd62184f90ec) )
+ROM_END
+
 /*
 
 Title   GHOST SQUAD
@@ -191,6 +205,7 @@ ROM_END
 
 
 GAME( 200?, chihiro,  0,       chihirogd,    chihiro,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2002, hotd3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "The House of the Dead III [GDX-0001]", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, mj2,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Export) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
