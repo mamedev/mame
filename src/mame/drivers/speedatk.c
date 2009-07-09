@@ -313,10 +313,10 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb1-3",        0x4000, 0x2000, CRC(741a5949) SHA1(7f7bebd4fb73fef9aa28549d100f632c442ac9b3) )
 	ROM_LOAD( "cb0-4",        0x6000, 0x2000, CRC(53a9c0c8) SHA1(cd0fd94411dabf09828c1f629891158c40794127) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cb0-7",        0x0000, 0x2000, CRC(a86007b5) SHA1(8e5cab76c37a8d53e1355000cd1a0a85ffae0e8c) )
 
-	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
 	ROM_COPY( "gfx2",    	  0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */

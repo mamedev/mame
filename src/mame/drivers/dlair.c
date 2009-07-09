@@ -866,7 +866,7 @@ ROM_START( dleuro )		/* European Atari version */
 	ROM_LOAD( "elu47.bin", 0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
 	ROM_LOAD( "elu48.bin", 0x6000, 0x2000, CRC(36575106) SHA1(178e26e7d5c7f879bc55c2fb170f3bb47a709610) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "elu33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
 
 	DISK_REGION( "laserdisc" )
@@ -880,7 +880,7 @@ ROM_START( dlital )		/* Italian Sidam version */
 	ROM_LOAD( "dlita47.bin", 0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
 	ROM_LOAD( "dlita48.bin", 0x6000, 0x2000, CRC(36575106) SHA1(178e26e7d5c7f879bc55c2fb170f3bb47a709610) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "dlita33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
 
 	DISK_REGION( "laserdisc" )
@@ -932,7 +932,7 @@ ROM_START( saeuro )		/* Italian Sidam version */
 	ROM_LOAD( "sa_u48a.bin", 0x6000, 0x2000, CRC(8c83ac81) SHA1(12818ee51ae8028a84bbbf3e43904b62942c76e3) )
 	ROM_LOAD( "sa_u49a.bin", 0x6000, 0x2000, CRC(03b58fc3) SHA1(25e4c1df74e2d7cbb9e252e34f007bc1c9f015b2) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sa_u33a.bin", 0x0000, 0x2000, CRC(a8c14612) SHA1(dbcf90b929e714f328bdcb0d8cd7c9e7d08a8be7) )
 
 	DISK_REGION( "laserdisc" )

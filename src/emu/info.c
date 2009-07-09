@@ -515,13 +515,9 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
 						fprintf(out, " status=\"baddump\"");
 
-					/* for non-disk entries, print dispose flag and offset */
+					/* for non-disk entries, print offset */
 					if (!is_disk)
-					{
-						if (ROMREGION_GETFLAGS(region) & ROMREGION_DISPOSE)
-							fprintf(out, " dispose=\"yes\"");
 						fprintf(out, " offset=\"%x\"", offset);
-					}
 
 					/* for disk entries, add the disk index */
 					else

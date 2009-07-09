@@ -176,7 +176,6 @@ static void init_buffered_spriteram(running_machine *machine);
 
 /* graphics decoding */
 static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
-static void decode_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
 
 static void realloc_screen_bitmaps(const device_config *screen);
 static STATE_POSTLOAD( video_screen_postload );
@@ -339,10 +338,6 @@ void video_init(running_machine *machine)
 	/* call the PALETTE_INIT function */
 	if (machine->config->init_palette != NULL)
 		(*machine->config->init_palette)(machine, memory_region(machine, "proms"));
-
-	/* actually decode the graphics */
-	if (PREDECODE_GFX && machine->config->gfxdecodeinfo != NULL)
-		decode_graphics(machine, machine->config->gfxdecodeinfo);
 
 	/* create a render target for snapshots */
 	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
@@ -590,51 +585,6 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		/* allocate the graphics */
 		machine->gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
 	}
-}
-
-
-/*-------------------------------------------------
-    decode_graphics - decode the graphics
--------------------------------------------------*/
-
-static void decode_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo)
-{
-	int totalgfx = 0, curgfx = 0;
-	int i;
-
-	/* count total graphics elements */
-	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (machine->gfx[i] != NULL)
-			totalgfx += machine->gfx[i]->total_elements;
-
-	/* loop over all elements */
-	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (machine->gfx[i] != NULL)
-		{
-			/* if we have a valid region, decode it now */
-			if (gfxdecodeinfo[i].memory_region != NULL)
-			{
-				gfx_element *gfx = machine->gfx[i];
-				int j;
-
-				/* now decode the actual graphics */
-				for (j = 0; j < gfx->total_elements; j += 1024)
-				{
-					char buffer[200];
-					int num_to_decode = (j + 1024 < gfx->total_elements) ? 1024 : (gfx->total_elements - j);
-					decodegfx(gfx, j, num_to_decode);
-					curgfx += num_to_decode;
-
-					/* display some startup text */
-					sprintf(buffer, "Decoding (%d%%)", curgfx * 100 / totalgfx);
-					ui_set_startup_text(machine, buffer, FALSE);
-				}
-			}
-
-			/* otherwise, clear the target region */
-			else
-				memset(machine->gfx[i]->gfxdata, 0, machine->gfx[i]->char_modulo * machine->gfx[i]->total_elements);
-		}
 }
 
 

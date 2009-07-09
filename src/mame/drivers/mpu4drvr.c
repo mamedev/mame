@@ -1830,7 +1830,7 @@ ROM_START( dealem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "zenndlem.u6",	0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "zenndlem.u24",	0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
 
 	ROM_REGION( 0x020, "proms", 0 )

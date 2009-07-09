@@ -173,7 +173,7 @@ ROM_START( trucocl )
 	ROM_LOAD( "trucocl.01", 0x00000, 0x20000, CRC(c9511c37) SHA1(d6a0fa573c8d2faf1a94a2be26fcaafe631d0699) )
 	ROM_LOAD( "trucocl.03", 0x20000, 0x20000, CRC(b37ce38c) SHA1(00bd506e9a03cb8ed65b0b599514db6b9b0ee5f3) ) /* samples */
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "trucocl.02", 0x0000, 0x20000, CRC(bda803e5) SHA1(e4fee42f23be4e0dc8926b6294e4b3e4a38ff185) ) /* tiles */
 
 	ROM_REGION( 0x0040, "proms", 0 )

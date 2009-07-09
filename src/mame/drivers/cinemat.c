@@ -1165,7 +1165,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 #define CCPU_PROMS \
-	ROM_REGION( 0x1a0, "proms", ROMREGION_DISPOSE ) \
+	ROM_REGION( 0x1a0, "proms", 0 ) \
 	ROM_LOAD("prom.f14", 0x000, 0x100, CRC(9edbf536) SHA1(036ad8a231284e05f44b1106d38fc0c7e041b6e8) ) \
 	ROM_LOAD("prom.e14", 0x100, 0x020, CRC(29dbfb87) SHA1(d8c40ab010b2ea30f29b2c443819e2b69f376c04) ) \
 	ROM_LOAD("prom.d14", 0x120, 0x020, CRC(9a05afbf) SHA1(5d806a42424942ba5ef0b70a1d629315b37f931b) ) \

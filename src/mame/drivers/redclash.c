@@ -403,14 +403,14 @@ ROM_START( zerohour )
 	ROM_LOAD( "zerohour.5",	  0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) )
 	ROM_LOAD( "zerohour.6",	  0x2800, 0x0800, CRC(8a93ae6e) SHA1(a66f05bb27e67b755c64ac8b68fa38ffe4cd961c) )
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "zerohour.9",   0x0000, 0x0800, CRC(17ae6f13) SHA1(ce7a02f4e1aa2e5292d3807a0cfed6d92752fc7a) )
 
-	ROM_REGION( 0x1000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx2", 0 )
 	ROM_LOAD( "zerohour.7",	  0x0000, 0x0800, CRC(4c12f59d) SHA1(b99a21415bff0e59b6130df60182f05b1a5d0811) )
 	ROM_LOAD( "zerohour.8",	  0x0800, 0x0800, CRC(6b9a6b6e) SHA1(f80d893b1b26c75c297e1da1c20db04e7129c92a) )
 
-	ROM_REGION( 0x1000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx3", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 sprites */
 
 	ROM_REGION( 0x0600, "proms", 0 )
@@ -425,16 +425,16 @@ ROM_START( redclash )
 	ROM_LOAD( "13.7c",        0x1000, 0x1000, CRC(c2090318) SHA1(71725cdf51aedf5f29fa1dd1a41ad5e62c9a580d) )
 	ROM_LOAD( "12.9c",        0x2000, 0x1000, CRC(b60e5ada) SHA1(37440f382c5e8852d804fa9837c36cc1e9d94d1d) )
 
-	ROM_REGION(0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION(0x0800, "gfx1", 0 )
 	ROM_LOAD( "6.12a",        0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "14.3e",        0x0000, 0x0800, CRC(483a1293) SHA1(e7812475c7509389bcf8fee35598e9894428eb37) )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_LOAD( "15.3d",        0x0800, 0x0800, CRC(c45d9601) SHA1(2f156ad61161d65284df0cc55eb1b3b990eb41cb) )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 sprites */
 
 	ROM_REGION( 0x0060, "proms", 0 )
@@ -449,16 +449,16 @@ ROM_START( redclsha )
 	ROM_LOAD( "rc3.7c",       0x1000, 0x1000, CRC(409c4ee7) SHA1(15c03a4093d7695751a143aa749229fcb7721f46) )
 	ROM_LOAD( "rc2.9c",       0x2000, 0x1000, CRC(5f215c9a) SHA1(c305f7be19f6a052c08feb0b63a0326b6a1bd808) )
 
-	ROM_REGION(0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION(0x0800, "gfx1", 0 )
 	ROM_LOAD( "rc6.12a",      0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "rc4.3e",       0x0000, 0x0800, CRC(64ca8b63) SHA1(5fd1ca9b81f66b4d2041674900718dc8c94c2a97) )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_LOAD( "rc5.3d",       0x0800, 0x0800, CRC(fce610a2) SHA1(0be829c6f6f5c3a19056ba1594141c1965c7aa2a) )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 sprites */
 
 	ROM_REGION( 0x0060, "proms", 0 )
@@ -476,16 +476,16 @@ ROM_START( redclask )
 	ROM_LOAD( "rc5.4c",       0x2000, 0x0800, CRC(744b5261) SHA1(6c5de2f91f57c463230e0ea04b336347840161a3) )
 	ROM_LOAD( "rc6.3c",       0x2800, 0x0800, CRC(fa507e17) SHA1(dd0e27b08e902b91c5e9552351206c671ed2f3c0) )
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "rc6.12a",      0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) ) /* rc9.7m */
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "rc4.4m",       0x0000, 0x0800, CRC(483a1293) SHA1(e7812475c7509389bcf8fee35598e9894428eb37) )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_LOAD( "rc5.5m",       0x0800, 0x0800, CRC(c45d9601) SHA1(2f156ad61161d65284df0cc55eb1b3b990eb41cb) )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 sprites */
 
 	ROM_REGION( 0x0060, "proms", 0 )

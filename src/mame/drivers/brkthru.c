@@ -435,10 +435,10 @@ ROM_START( brkthru )
 	ROM_LOAD( "brkthru.4",    0x10000, 0x8000, CRC(8cabf252) SHA1(45e8847b2e6b278989f67e0b27b827a9b3b92581) )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "brkthru.12",   0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) )	/* characters */
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
@@ -455,7 +455,7 @@ ROM_START( brkthru )
 	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
@@ -475,10 +475,10 @@ ROM_START( brkthruj )
 	ROM_LOAD( "4",            0x10000, 0x8000, CRC(b42b3359) SHA1(c1da550e0f7cc52721802c7c0f2770ef0087e28b) )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "12",   0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )	/* characters */
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
@@ -495,7 +495,7 @@ ROM_START( brkthruj )
 	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
@@ -516,10 +516,10 @@ ROM_START( forcebrk )
 	ROM_LOAD( "forcebrk4",    0x10000, 0x8000, CRC(b4838c19) SHA1(b32f183ee042872a6eb6689aab219108d37829e4) )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "12",           0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )	/* characters */
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
@@ -536,7 +536,7 @@ ROM_START( forcebrk )
 	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
@@ -556,10 +556,10 @@ ROM_START( darwin )
 	ROM_LOAD( "darw_07.rom",  0x10000, 0x8000, CRC(97ac052c) SHA1(8baa117472d46b99e5946f095b869de9b5c48f9a) )
 	ROM_LOAD( "darw_06.rom",  0x18000, 0x8000, CRC(2a9fb208) SHA1(f04a5502600e49e2494a87ec65a44a2843441d37) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "darw_09.rom",  0x00000, 0x2000, CRC(067b4cf5) SHA1(fc752bb72e4850b71565afd1df0cbb4f732f131c) )   /* characters */
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
@@ -576,7 +576,7 @@ ROM_START( darwin )
 	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "darw_10.rom",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )	/* sprites */
 	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
 	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )

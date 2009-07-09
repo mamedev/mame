@@ -300,11 +300,11 @@ ROM_START( chaknpop )
        extracted with a trojan, see machine/chaknpop.c */
 	ROM_LOAD( "68705.mcu",   0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
+	ROM_REGION( 0x4000, "gfx1", 0 )	/* Sprite */
 	ROM_LOAD( "a04-08.14",     0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
 	ROM_LOAD( "a04-07.15",     0x2000, 0x2000, CRC(ae687c18) SHA1(65b25263da88d30cbc0dad94511869596e5c975a) )
 
-	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x4000, "gfx2", 0 )	/* Text */
 	ROM_LOAD( "a04-09.98",     0x0000, 0x2000, CRC(757a723a) SHA1(62ab84d2aaa9bc1ea5aa9df8155aa3b5a1e93889) )
 	ROM_LOAD( "a04-10.97",     0x2000, 0x2000, CRC(3e3fd608) SHA1(053a8fbdb35bf1c142349f78a63e8cd1adb41ef6) )
 

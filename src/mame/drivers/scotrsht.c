@@ -238,10 +238,10 @@ ROM_START( scotrsht )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
 	ROM_LOAD( "gx545_g01_8c.bin",  0x0000, 0x4000, CRC(46a7cc65) SHA1(73389fe04ce40da124d630dc3f8e58600d9556fc) )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "gx545_g05_5f.bin",  0x0000, 0x8000, CRC(856c349c) SHA1(ba45e6d18e56cc7fc49c8fda190ec152ce6bd15c) )	/* characters */
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "gx545_g06_6f.bin",  0x0000, 0x8000, CRC(14ad7601) SHA1(6dfcf2abfa2ea056c948d82d35c55f033f3e4678) )	/* sprites */
 	ROM_LOAD( "gx545_h04_4f.bin",  0x8000, 0x8000, CRC(c06c11a3) SHA1(6e89c738498d716fd43d9cc7b71b23438bd3c4b8) )
 

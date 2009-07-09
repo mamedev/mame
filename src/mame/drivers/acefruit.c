@@ -592,7 +592,7 @@ ROM_START( sidewndr )
 	ROM_LOAD( "2_h11.bin",    0x001000, 0x000800, CRC(e2932643) SHA1(e1c0cd5d0cd332519432cbefa8718362a6cd1ccc) )
 	ROM_LOAD( "2_h12.bin",    0x001800, 0x000800, CRC(26af0b1f) SHA1(36f0e54982688b9d5a24a6986a847ac69ee0a355) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", 0 )	/* 8k for graphics */
 	ROM_LOAD( "2_h05.bin",    0x000000, 0x000800, CRC(64b64cff) SHA1(c11f2bd2af68ae7f104b711deb7f6509fdbaeb8f) )
 	ROM_LOAD( "2_h06.bin",    0x000800, 0x000800, CRC(6b96a586) SHA1(6d5ab8fefe37ca4dbc5057ebf31f12b33dbdf5c0) )
 	ROM_LOAD( "2_h07.bin",    0x001000, 0x000800, CRC(3a8e68a2) SHA1(2ffe07360f57f0f11ecf326f00905747d9b66811) )
@@ -606,7 +606,7 @@ ROM_START( spellbnd )
 	ROM_LOAD( "h11.bin",      0x001000, 0x000800, CRC(7375166c) SHA1(f05b01941423fd36e0a5d3aa913a594e4e7aa5d4) )
 	ROM_LOAD( "h12.bin",      0x001800, 0x000800, CRC(4546c68c) SHA1(92104e2005fc772ea9f70451d9d674f95d3f0ba9) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", 0 )	/* 8k for graphics */
 	ROM_LOAD( "h5.bin",       0x000000, 0x000800, CRC(198da32c) SHA1(bf6c4ddcda0503095d310e08057dd88154952ef4) )
 	ROM_LOAD( "h6.bin",       0x000800, 0x000800, CRC(e777130f) SHA1(3421c6f399e5ec749f1908f6b4ebff7761c6c5d9) )
 	ROM_LOAD( "h7.bin",       0x001000, 0x000800, CRC(bfed5b8f) SHA1(f95074e8809297eec67da9d7e33ae1dd1c5eabc0) )
@@ -673,7 +673,7 @@ ROM_START( starspnr )
 	ROM_LOAD( "h12.h12",      0x00f800, 0x0800, CRC(8571f3f5) SHA1(e8b60a604a4a0368b6063b15b328c68f351cb740) ) /* bad dump ? nothing of interest 0xf800-0xffff */
 	ROM_CONTINUE(             0x001800, 0x0800 )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* 8k for graphics */
 	ROM_LOAD( "5.h5",         0x000000, 0x000800, CRC(df49876f) SHA1(68077304f096491baeddc1d6b4dc62f90de71903) )
 	ROM_LOAD( "6.h6",         0x000800, 0x000800, CRC(d992e2f6) SHA1(7841efec7d81689c82b8da501cce743436e7e8d4) )
 	ROM_LOAD( "7.h7",         0x001000, 0x000800, CRC(d5a40e88) SHA1(5cac8d85123720cdbb8b4630b14a27cf0ceef33f) )
@@ -695,7 +695,7 @@ ROM_START( acefruit  )
 	ROM_LOAD( "vp-h11.bin",   0x00f000, 0x0800, CRC(fa176072) SHA1(18203278bb9c505f07390f7b95ecf9ab6d7b7122) )
 	ROM_CONTINUE(             0x001000, 0x0800 )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* 8k for graphics */
 	ROM_LOAD( "vp-h5.bin",         0x000000, 0x000800, CRC(dfffe063) SHA1(1b860323fe93b7d010fa35167769555a6bd4a49c) )
 	ROM_LOAD( "vp-h6.bin",         0x000800, 0x000800, CRC(355203b8) SHA1(959f3599a24293f392e8b10061c39d3244f34c05) )
 	ROM_LOAD( "vp-h7.bin",         0x001000, 0x000800, CRC(7784de8a) SHA1(40851724c9b7ef26964462b5e97ad943df4d56e2) )

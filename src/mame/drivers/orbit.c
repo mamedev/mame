@@ -343,11 +343,11 @@ ROM_START( orbit )
 	ROM_LOAD_NIB_HIGH( "033690.n1", 0x7C00, 0x400, CRC(f756ebd4) SHA1(4e473541b712078c6a81901714a6243de348e543) )
 	ROM_RELOAD(                     0xFC00, 0x400 )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )  /* sprites */
+	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "033712.b7", 0x0000, 0x800, CRC(cfd43bf2) SHA1(dbca0da6ed355aac921bae5adeef2f384f5fa2c3) )
 	ROM_LOAD( "033713.d7", 0x0800, 0x800, CRC(5ac89f4d) SHA1(747889b33cd83510a640e68fb4581a3e881c43a3) )
 
-	ROM_REGION( 0x200, "gfx2", ROMREGION_DISPOSE )   /* tiles */
+	ROM_REGION( 0x200, "gfx2", 0 )   /* tiles */
 	ROM_LOAD( "033711.a7", 0x0000, 0x200, CRC(9987174a) SHA1(d2117b6e6d64c29aef8ad8c94256baea493bce5c) )
 
 	ROM_REGION( 0x100, "proms", 0 )                  /* sync, unused */

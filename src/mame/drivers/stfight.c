@@ -496,22 +496,22 @@ ROM_START( empcity )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* character data */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "sf07.bin",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "sf08.bin",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "sf05.bin",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "sf06.bin",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )	/* background tile pixel data */
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* background tile pixel data */
 	ROM_LOAD( "sf13.bin",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "sf14.bin",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "sf11.bin",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "sf12.bin",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprite data */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprite data */
 	ROM_LOAD( "sf20.bin",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "sf21.bin",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "sf18.bin",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
@@ -548,22 +548,22 @@ ROM_START( empcityu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* character data */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "vid.2p",   0x0000, 0x2000, CRC(15593793) SHA1(ac9ca8a0aa0ce3810f45aa41e74d4946ecced245) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "sf07.bin",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "sf08.bin",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "sf05.bin",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "sf06.bin",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )	/* background tile pixel data */
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* background tile pixel data */
 	ROM_LOAD( "sf13.bin",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "sf14.bin",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "sf11.bin",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "sf12.bin",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprite data */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprite data */
 	ROM_LOAD( "sf20.bin",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "sf21.bin",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "sf18.bin",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
@@ -602,22 +602,22 @@ ROM_START( empcityj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* character data */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "sf07.bin",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "sf08.bin",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "sf05.bin",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "sf06.bin",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )	/* background tile pixel data */
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* background tile pixel data */
 	ROM_LOAD( "sf13.bin",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "sf14.bin",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "sf11.bin",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "sf12.bin",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprite data */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprite data */
 	ROM_LOAD( "sf20.bin",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "sf21.bin",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "sf18.bin",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
@@ -653,22 +653,22 @@ ROM_START( stfight )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* character data */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "sf07.bin",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "sf08.bin",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "sf05.bin",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "sf06.bin",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )	/* background tile pixel data */
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* background tile pixel data */
 	ROM_LOAD( "sf13.bin",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "sf14.bin",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "sf11.bin",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "sf12.bin",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprite data */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprite data */
 	ROM_LOAD( "sf20.bin",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "sf21.bin",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "sf18.bin",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
@@ -706,22 +706,22 @@ ROM_START( stfighta )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* character data */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "sf07.bin",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "sf08.bin",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "sf05.bin",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "sf06.bin",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )	/* background tile pixel data */
+	ROM_REGION( 0x20000, "gfx3", 0 )	/* background tile pixel data */
 	ROM_LOAD( "sf13.bin",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "sf14.bin",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "sf11.bin",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "sf12.bin",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprite data */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprite data */
 	ROM_LOAD( "sf20.bin",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "sf21.bin",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "sf18.bin",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )

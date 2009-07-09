@@ -804,12 +804,12 @@ ROM_START( magicfly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "magicfly3_3.bin",	0xc000, 0x4000, CRC(c29798d5) SHA1(bf92ac93d650398569b3ab79d01344e74a6d35be) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "magicfly2.bin",	0x0000, 0x2000, CRC(3596a45b) SHA1(7ec32ec767d0883d05606beb588d8f27ba8f10a4) )
 	ROM_LOAD( "magicfly1.bin",	0x2000, 0x2000, CRC(724d330c) SHA1(cce3923ce48634b27f0e7d29979cd36e7394ab37) )
 	ROM_LOAD( "magicfly0.bin",	0x4000, 0x2000, CRC(44e3c9d6) SHA1(677d25360d261bf2400f399b8015eeb529ad405e) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r4a-magicfly.bin",	0x0000, 0x0104, NO_DUMP )	/* PAL is read protected */
 
 ROM_END
@@ -818,12 +818,12 @@ ROM_START( 7mezzo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ns3_1.bin",	0xc000, 0x4000, CRC(b1867b76) SHA1(eb76cffb81c865352f4767015edade54801f6155) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "ns2.bin",	0x0000, 0x2000, CRC(7983a41c) SHA1(68805ea960c2738d3cd2c7490ffed84f90da029b) )    /* Renamed as ns2.bin regarding pcb location and content */
 	ROM_LOAD( "ns1.bin",	0x2000, 0x2000, CRC(a6ada872) SHA1(7f531a76e73d479161e485bdcf816eb8eb9fdc62) )
 	ROM_LOAD( "ns0.bin",	0x4000, 0x2000, CRC(e04fb210) SHA1(81e764e296fe387daf8ca67064d5eba2a4fc3c26) )    /* Renamed as ns0.bin regarding pcb location and content */
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r4a-7mezzo.bin",	0x0000, 0x0104, CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
 ROM_END
 

@@ -2165,20 +2165,20 @@ ROM_START( explbrkr )
 	ROM_LOAD16_BYTE( "ts101e.u19", 0x000001, 0x040000, CRC(88f4afb7) SHA1(08b8efd6bd935bc1b8cf9753d58b38ccf9a70b4d) )
 
 	/* these actually match the other set but have different names on the board..*/
-	ROM_REGION( 0x240000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x240000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
 	ROM_RELOAD(       0x100000, 0x080000             )
 	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
 	ROM_RELOAD(       0x180000, 0x080000             )
 	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles */
 	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
 
-	ROM_REGION( 0x100000, "user1", ROMREGION_DISPOSE )	/* OKI Sample ROM */
+	ROM_REGION( 0x100000, "user1", 0 )	/* OKI Sample ROM */
 	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2207,20 +2207,20 @@ ROM_START( bakubrkr )
 	ROM_LOAD16_BYTE( "ts100j.u18", 0x000000, 0x040000, CRC(8cc0a4fd) SHA1(e7e18b5ea236522a79ba9db8f573ac8f7ade504b) )
 	ROM_LOAD16_BYTE( "ts101j.u19", 0x000001, 0x040000, CRC(aea92195) SHA1(e89f964e7e936fd7774f21956eb4ff5c9104837b) )
 
-	ROM_REGION( 0x240000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x240000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "ts001j.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
 	ROM_RELOAD(       0x100000, 0x080000             )
 	ROM_LOAD( "ts000j.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
 	ROM_RELOAD(       0x180000, 0x080000             )
 	ROM_LOAD( "ts002j.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles */
 	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
 
-	ROM_REGION( 0x100000, "user1", ROMREGION_DISPOSE )	/* OKI Sample ROM */
+	ROM_REGION( 0x100000, "user1", 0 )	/* OKI Sample ROM */
 	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
@@ -2283,15 +2283,15 @@ ROM_START( berlwall )
 	ROM_LOAD16_BYTE( "u23_01.bin", 0x000000, 0x020000, CRC(76b526ce) SHA1(95ba7cccbe88fd695c28b6a7c25a1afd130c1aa6) )
 	ROM_LOAD16_BYTE( "u39_01.bin", 0x000001, 0x020000, CRC(78fa7ef2) SHA1(8392de6e307dcd2bf5bcbeb37d578d33246acfcf) )
 
-	ROM_REGION( 0x120000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x120000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "bw001",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "bw003",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )	/* High Color Background */
+	ROM_REGION( 0x400000, "gfx3", 0 )	/* High Color Background */
 	ROM_LOAD16_BYTE( "bw004",  0x000000, 0x080000, CRC(5300c34d) SHA1(ccb12ea05f89ef68bcfe003faced2ffea24c4bf0) )
 	ROM_LOAD16_BYTE( "bw008",  0x000001, 0x080000, CRC(9aaf2f2f) SHA1(1352856159e19f07e8e30f9c44b21347103ce024) ) // FIXED BITS (xxxxxxx0)
 	ROM_LOAD16_BYTE( "bw005",  0x100000, 0x080000, CRC(16db6d43) SHA1(0158d0278d085487400ad4384b8cc9618503319e) )
@@ -2355,15 +2355,15 @@ ROM_START( berlwalt )
 	ROM_LOAD16_BYTE( "bw100a", 0x000000, 0x020000, CRC(e6bcb4eb) SHA1(220b8fddc79230b4f6a8cf33e1035355c485e8d1) )
 	ROM_LOAD16_BYTE( "bw101a", 0x000001, 0x020000, CRC(38056fb2) SHA1(48338b9a5ebea872286541a3c45016673c4af76b) )
 
-	ROM_REGION( 0x120000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x120000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "bw001",  0x000000, 0x080000, CRC(bc927260) SHA1(44273a8b6a041504d54da4a7897adf23e3e9db10) )
 	ROM_LOAD( "bw002",  0x080000, 0x080000, CRC(223f5465) SHA1(6ed077514ab4370a215a4a60c3aecc8b72ed1c97) )
 	ROM_LOAD( "bw300",  0x100000, 0x020000, CRC(b258737a) SHA1(b5c8fe44a8dcfc19bccba896bdb73030c5843544) )
 
-	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x080000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "bw003",  0x000000, 0x080000, CRC(fbb4b72d) SHA1(07a0590f18b3bba1843ef6a89a5c214e8e605cc3) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )	/* High Color Background */
+	ROM_REGION( 0x400000, "gfx3", 0 )	/* High Color Background */
 	ROM_LOAD16_BYTE( "bw004",  0x000000, 0x080000, CRC(5300c34d) SHA1(ccb12ea05f89ef68bcfe003faced2ffea24c4bf0) )
 	ROM_LOAD16_BYTE( "bw008",  0x000001, 0x080000, CRC(9aaf2f2f) SHA1(1352856159e19f07e8e30f9c44b21347103ce024) ) // FIXED BITS (xxxxxxx0)
 	ROM_LOAD16_BYTE( "bw005",  0x100000, 0x080000, CRC(16db6d43) SHA1(0158d0278d085487400ad4384b8cc9618503319e) )
@@ -2412,11 +2412,11 @@ ROM_START( blazeon )
  	ROM_REGION( 0x020000, "audiocpu", 0 )			/* Z80 Code */
 	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "bz_sp1.u20", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
 ROM_END
 
@@ -2503,7 +2503,7 @@ ROM_START( bloodwar )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "dox3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
 
-	ROM_REGION( 0x1e00000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1e00000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD       ( "2000201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )
 	ROM_LOAD       ( "2010202.9",   0x0200000, 0x200000, CRC(4ffd9ddc) SHA1(62bc8c0ed2efab407fc2956c514c3e732bcc47ee) )
 	ROM_LOAD       ( "2020203.10",  0x0400000, 0x200000, CRC(fbcc5363) SHA1(9eff48c29d5c887d39e4db442c6ee51ec879521e) )
@@ -2526,10 +2526,10 @@ ROM_START( bloodwar )
 	ROM_LOAD16_BYTE( "214e0220.26", 0x1c00000, 0x100000, CRC(43c622de) SHA1(73efe57233f056127e2d34590c624f39d1c0ab79) )
 	ROM_LOAD16_BYTE( "21400221.27", 0x1c00001, 0x100000, CRC(d10bf03c) SHA1(a81d6b7df7382fc8d50614c1332611e0c202b805) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "3000225.51", 0x000000, 0x100000, CRC(fbc3c08a) SHA1(0ba52b381e7a10fb1513244b394438b440950af3) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "3010226.55", 0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2639,7 +2639,7 @@ ROM_START( gtmr )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x2.u124.bin",  0x000000, 0x020000, CRC(3d7cb329) SHA1(053106acde642a414fde0b01105fe6762b6a10f6) ) // from gtmra
 
-	ROM_REGION( 0x840000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x840000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "mm-200-402-s0.bin",  0x000000, 0x200000, CRC(c0ab3efc) SHA1(e6cd15480977b036234d91e6f3a6e21b7f0a3c3e) )
 	ROM_LOAD( "mm-201-403-s1.bin",  0x200000, 0x200000, CRC(cf6b23dc) SHA1(ccfd0b17507e091e55c169361cd6a6b19641b717) )
 	ROM_LOAD( "mm-202-404-s2.bin",  0x400000, 0x200000, CRC(8f27f5d3) SHA1(219a86446ce2556682009d8aff837480f040a01e) )
@@ -2647,10 +2647,10 @@ ROM_START( gtmr )
   	ROM_LOAD16_BYTE( "mms1x2.u30.bin",  0x800001, 0x020000, CRC(b42b426f) SHA1(6aee5759b5f0786c5ee074d9df3d2716919ea621) )
   	ROM_LOAD16_BYTE( "mms0x2.u29.bin",  0x800000, 0x020000, CRC(bd22b7d2) SHA1(ef82d00d72439590c71aed33ecfabc6ee71a6ff9) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2668,7 +2668,7 @@ ROM_START( gtmra )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mmd0x2.u124.bin",  0x000000, 0x020000, CRC(3d7cb329) SHA1(053106acde642a414fde0b01105fe6762b6a10f6) )
 
-	ROM_REGION( 0x840000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x840000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "mm-200-402-s0.bin",  0x000000, 0x200000, CRC(c0ab3efc) SHA1(e6cd15480977b036234d91e6f3a6e21b7f0a3c3e) )
 	ROM_LOAD( "mm-201-403-s1.bin",  0x200000, 0x200000, CRC(cf6b23dc) SHA1(ccfd0b17507e091e55c169361cd6a6b19641b717) )
 	ROM_LOAD( "mm-202-404-s2.bin",  0x400000, 0x200000, CRC(8f27f5d3) SHA1(219a86446ce2556682009d8aff837480f040a01e) )
@@ -2676,10 +2676,10 @@ ROM_START( gtmra )
   	ROM_LOAD16_BYTE( "mms1x2.u30.bin",  0x800001, 0x020000, CRC(b42b426f) SHA1(6aee5759b5f0786c5ee074d9df3d2716919ea621) )
   	ROM_LOAD16_BYTE( "mms0x2.u29.bin",  0x800000, 0x020000, CRC(bd22b7d2) SHA1(ef82d00d72439590c71aed33ecfabc6ee71a6ff9) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2706,7 +2706,7 @@ ROM_START( gtmre )
 	// this rom has the right version string, so is probably correct
 	ROM_LOAD16_WORD_SWAP( "gtmrusa.u12",  0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	/* fill the 0x700000-7fffff range first, with the second of the identical halves */
 	ROM_LOAD16_BYTE( "gmmu64.bin",  0x600000, 0x100000, CRC(57d77b33) SHA1(f7ae28ae889be4442b7b236705943eaad1f0c84e) )	// HALVES IDENTICAL
 	ROM_LOAD16_BYTE( "gmmu65.bin",  0x600001, 0x100000, CRC(05b8bdca) SHA1(44471d66787d5b48ae8b13676f42f27af44e5c6a) )	// HALVES IDENTICAL
@@ -2716,10 +2716,10 @@ ROM_START( gtmre )
 	ROM_LOAD( "gmmu30.bin",  0x600000, 0x080000, CRC(e9747c8c) SHA1(2507102ec34755c6f110eadb3444e6d3a3474051) )
 	/* codes 6800-6fff are explicitly skipped */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "gmmu52.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2743,7 +2743,7 @@ ROM_START( gtmrusa )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "gtmrusa.u12",  0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	/* fill the 0x700000-7fffff range first, with the second of the identical halves */
 	ROM_LOAD16_BYTE( "gmmu64.bin",  0x600000, 0x100000, CRC(57d77b33) SHA1(f7ae28ae889be4442b7b236705943eaad1f0c84e) )	// HALVES IDENTICAL
 	ROM_LOAD16_BYTE( "gmmu65.bin",  0x600001, 0x100000, CRC(05b8bdca) SHA1(44471d66787d5b48ae8b13676f42f27af44e5c6a) )	// HALVES IDENTICAL
@@ -2753,10 +2753,10 @@ ROM_START( gtmrusa )
 	ROM_LOAD( "gmmu30.bin",  0x600000, 0x080000, CRC(e9747c8c) SHA1(2507102ec34755c6f110eadb3444e6d3a3474051) )
 	/* codes 6800-6fff are explicitly skipped */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "gmmu52.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2932,20 +2932,20 @@ ROM_START( gtmr2 )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
 	ROM_LOAD16_BYTE( "m2s0x1a.u32", 0x700000, 0x080000, CRC(a485eec6) SHA1(f8aff62daed95a63544106472a9ef34902feaaa2) )
 	ROM_LOAD16_BYTE( "m2s1x1a.u33", 0x700001, 0x080000, CRC(c5b71bb2) SHA1(874e2a2e19cd8f916afa6fcf54169a8db035fe64) )
 
-	ROM_REGION( 0x440000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2963,20 +2963,20 @@ ROM_START( gtmr2a )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
 	ROM_LOAD16_BYTE( "m2s0x1.u32", 0x700000, 0x080000, CRC(4069d6c7) SHA1(2ed1cbb7ebde8347e0359cd56ee3a0d4d42d551f) )
 	ROM_LOAD16_BYTE( "m2s1x1.u33", 0x700001, 0x080000, CRC(c53fe269) SHA1(e6c485bbaea4b67f074b89e047f686f107805713) )
 
-	ROM_REGION( 0x440000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -2994,20 +2994,20 @@ ROM_START( gtmr2u )
  	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
 	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
 	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
 	ROM_LOAD16_BYTE( "m2s0a1.u32", 0x700000, 0x080000, CRC(98977171) SHA1(5b69462e07778b5bd1f5119cae6b63ede38cd642) )
 	ROM_LOAD16_BYTE( "m2s1a1.u33", 0x700001, 0x080000, CRC(c69a732e) SHA1(810b333f442c0714f4cb8b4a73136d0b44443277) )
 
-	ROM_REGION( 0x440000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
 	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
 	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
-	ROM_REGION( 0x440000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x440000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */
@@ -3073,7 +3073,7 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 	ROM_LOAD16_BYTE( "mc100e02.u18", 0x000000, 0x020000, CRC(246a1335) SHA1(8333945a92e08a7bff425d2d6602557386016dc5) ) /* Labeled as MC100E/U18-02 */
 	ROM_LOAD16_BYTE( "mc101e02.u19", 0x000001, 0x040000, CRC(708ea1dc) SHA1(ae6eca6620729bc1e815f1bfbd8fe130f0ba943c) ) /* Labeled as MC101E/U19-02 */
 
-	ROM_REGION( 0x280000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x280000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "mc000.u38",    0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) )
 	ROM_LOAD( "mc001.u37",    0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) )
 	ROM_RELOAD(               0x180000, 0x080000             )
@@ -3082,10 +3082,10 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 	ROM_RELOAD(               0x240000, 0x020000             )
 	ROM_RELOAD(               0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc010.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
@@ -3097,7 +3097,7 @@ ROM_START( mgcrysto ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_LOAD16_BYTE( "mc100h00.u18", 0x000000, 0x020000, CRC(c7456ba7) SHA1(96c25c3432069373fa86d7af3e093e02e39aea34) ) /* Labeled as MC100H/U18-00 */
 	ROM_LOAD16_BYTE( "mc101h00.u19", 0x000001, 0x040000, CRC(ea8f9300) SHA1(0cd0d448805aa45986b63befca00b08fe066dbb2) ) /* Labeled as MC101H/U19-00 */
 
-	ROM_REGION( 0x280000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x280000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "mc000.u38",    0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) )
 	ROM_LOAD( "mc001.u37",    0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) )
 	ROM_RELOAD(               0x180000, 0x080000             )
@@ -3106,10 +3106,10 @@ ROM_START( mgcrysto ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_RELOAD(               0x240000, 0x020000             )
 	ROM_RELOAD(               0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc010.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
@@ -3121,7 +3121,7 @@ ROM_START( mgcrystj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_LOAD16_BYTE( "mc100j02.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-02 */
 	ROM_LOAD16_BYTE( "mc101j02.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-02 */
 
-	ROM_REGION( 0x280000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x280000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "mc000.u38",  0x000000, 0x100000, CRC(28acf6f4) SHA1(6647ad90ea580b65ed28772f9d65352b06833d0c) )
 	ROM_LOAD( "mc001.u37",  0x100000, 0x080000, CRC(005bc43d) SHA1(6f6cd99e8e60562fa86581008455a6d9d646fa95) )
 	ROM_RELOAD(             0x180000, 0x080000             )
@@ -3130,10 +3130,10 @@ ROM_START( mgcrystj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_RELOAD(             0x240000, 0x020000             )
 	ROM_RELOAD(             0x260000, 0x020000             )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc010.u04",  0x000000, 0x100000, CRC(85072772) SHA1(25e903cc2c893d61db791d1fe60a1205a4395667) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (Scrambled) */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
@@ -3190,7 +3190,7 @@ ROM_START( shogwarr )
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "fb040a.u33",  0x000000, 0x020000, CRC(4b62c4d9) SHA1(35c943dde70438a411714070e42a84366db5ef83) )
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fb020a.u1",  0x000000, 0x080000, CRC(da1b7373) SHA1(89510901848f1798fb76dd82d1cd9ac97c41521d) )
 	ROM_LOAD( "fb022a.u5",  0x080000, 0x080000, CRC(60aa1282) SHA1(4648816016e00df3256226ba5134f6e5bb429909) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
@@ -3199,7 +3199,7 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb023.u7",   0x400000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
@@ -3249,7 +3249,7 @@ ROM_START( shogware )
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fb020a.u1",  0x000000, 0x080000, CRC(da1b7373) SHA1(89510901848f1798fb76dd82d1cd9ac97c41521d) )
 	ROM_LOAD( "fb022a.u5",  0x080000, 0x080000, CRC(60aa1282) SHA1(4648816016e00df3256226ba5134f6e5bb429909) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
@@ -3258,7 +3258,7 @@ ROM_START( shogware )
 	ROM_LOAD( "fb023.u7",   0x400000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
@@ -3317,7 +3317,7 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "fb040j.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fb020a.u1",  0x000000, 0x080000, CRC(da1b7373) SHA1(89510901848f1798fb76dd82d1cd9ac97c41521d) )
 	ROM_LOAD( "fb022a.u5",  0x080000, 0x080000, CRC(60aa1282) SHA1(4648816016e00df3256226ba5134f6e5bb429909) )
 	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
@@ -3326,7 +3326,7 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD( "fb023.u7",   0x400000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
 	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
@@ -3459,7 +3459,7 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "rb-040.u33",  0x000000, 0x020000, CRC(757c6e19) SHA1(0f1c37b1b1eb6b230c593e4648c4302f413a61f5) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
 	/* order is probably wrong, but until it does more we can't tell */
 	ROM_LOAD( "rb-020.u2",  0x000000, 0x080000, CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) )
 	ROM_LOAD( "rb-025.u80", 0x080000, 0x040000, CRC(36cd6b90) SHA1(45c50f2652726ded67c9c24185a71a6367e09270) ) // Correct size for this set
@@ -3470,7 +3470,7 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
 	ROM_LOAD( "rb-023.u78", 0x300000, 0x080000, CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) )
 	ROM_LOAD( "rb-024.u79", 0x380000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
@@ -3495,7 +3495,7 @@ ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "rb-006.u33",  0x000000, 0x020000, CRC(f1d76b20) SHA1(c571b5f28e529589ee2d7697ef5d4b60ccb66e7a) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
 	/* order is probably wrong, but until it does more we can't tell */
 	ROM_LOAD( "rb-020.u2",  0x000000, 0x080000, CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) )
 	ROM_LOAD( "rb-025.u4",  0x080000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) )
@@ -3506,7 +3506,7 @@ ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom
 	ROM_LOAD( "rb-023.u78", 0x300000, 0x080000, CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) )
 	ROM_LOAD( "rb-024.u79", 0x380000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
@@ -3581,17 +3581,17 @@ ROM_START( bonkadv )
 	ROM_REGION( 0x020000, "mcudata", 0 )			/* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "mcu.124",			 0x000000, 0x020000, CRC(9d4e2724) SHA1(9dd43703265e39f876877020a0ac3875de6faa8d) )
 
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x500000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "pc100101.37",		 0x000000, 0x200000, CRC(c96e7c10) SHA1(607cc7745abc3ff820047e8a00060ece61646623) )
 	ROM_LOAD( "pc200102.40",		 0x200000, 0x100000, CRC(c2b7a26a) SHA1(1c8783442e0ccf30c5640866c5493f1dc1dd48f8) )
 	ROM_LOAD( "pc300103.38",		 0x300000, 0x100000, CRC(51ee162c) SHA1(b33afc7d1e9f55f191e08472e8c51ca931b0389d) )
 	ROM_LOAD16_BYTE( "pc600106.42",  0x400000, 0x080000, CRC(25877026) SHA1(96814d97e9f9284f98c35edfe5e76677ac50dd97) )
 	ROM_LOAD16_BYTE( "pc700107.43",  0x400001, 0x080000, CRC(bfe21c44) SHA1(9900a6fe4182b720a90d64d368bd0fd08bf936a8) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "pc400104.51",		 0x000000, 0x100000, CRC(3b176f84) SHA1(0ad6fd5f03d275165490881173bafcb0a94762eb) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "pc500105.55",		 0x000000, 0x100000, CRC(bebb3edc) SHA1(e0fed4307316deaeb811ec29f5022adeaf577a95) )
 
 	ROM_REGION( 0x400000, "oki1", 0 )	/* Samples, plus room for expansion */

@@ -261,17 +261,17 @@ ROM_START( exedexes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "11e_ee01.bin", 0x00000, 0x4000, CRC(73cdf3b2) SHA1(c9f2c91011bdeecec8fa76a42d95f3a5ec77cec9) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "05c_ee00.bin", 0x00000, 0x2000, CRC(cadb75bd) SHA1(2086be5e295e5d870bcb35f116cc925f811b7583) ) /* Characters */
 
-	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "h01_ee08.bin", 0x00000, 0x4000, CRC(96a65c1d) SHA1(3b49c64b32f01ec72cf2d943bfe3aa575d62a765) ) /* 32x32 tiles planes 0-1 */
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "a03_ee06.bin", 0x00000, 0x4000, CRC(6039bdd1) SHA1(01156e02ed59e6c1e55204729e515cd4419568fb) ) /* 16x16 tiles planes 0-1 */
 	ROM_LOAD( "a02_ee05.bin", 0x04000, 0x4000, CRC(b32d8252) SHA1(738225146ba38f2a9216fda278838e7ebb29a0bb) ) /* 16x16 tiles planes 2-3 */
 
-	ROM_REGION( 0x08000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx4", 0 )
 	ROM_LOAD( "j11_ee10.bin", 0x00000, 0x4000, CRC(bc83e265) SHA1(ac9b4cce9e539c560414abf2fc239910f2bfbb2d) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "j12_ee11.bin", 0x04000, 0x4000, CRC(0e0f300d) SHA1(2f973748e459b16673115abf7de8615219e39fa4) ) /* Sprites planes 2-3 */
 
@@ -303,17 +303,17 @@ ROM_START( savgbees )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ee01e.11e",    0x00000, 0x4000, CRC(93d3f952) SHA1(5c86d1ddf03083ac2787efb7a29c09b2f46ec3fa) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "ee00e.5c",     0x00000, 0x2000, CRC(5972f95f) SHA1(7b90ceca37dba773f72a80da6272b00061526348) ) /* Characters */
 
-	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "h01_ee08.bin", 0x00000, 0x4000, CRC(96a65c1d) SHA1(3b49c64b32f01ec72cf2d943bfe3aa575d62a765) ) /* 32x32 tiles planes 0-1 */
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "a03_ee06.bin", 0x00000, 0x4000, CRC(6039bdd1) SHA1(01156e02ed59e6c1e55204729e515cd4419568fb) ) /* 16x16 tiles planes 0-1 */
 	ROM_LOAD( "a02_ee05.bin", 0x04000, 0x4000, CRC(b32d8252) SHA1(738225146ba38f2a9216fda278838e7ebb29a0bb) ) /* 16x16 tiles planes 2-3 */
 
-	ROM_REGION( 0x08000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx4", 0 )
 	ROM_LOAD( "j11_ee10.bin", 0x00000, 0x4000, CRC(bc83e265) SHA1(ac9b4cce9e539c560414abf2fc239910f2bfbb2d) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "j12_ee11.bin", 0x04000, 0x4000, CRC(0e0f300d) SHA1(2f973748e459b16673115abf7de8615219e39fa4) ) /* Sprites planes 2-3 */
 

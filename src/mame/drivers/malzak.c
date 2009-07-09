@@ -421,7 +421,7 @@ ROM_START( malzak )
 	ROM_REGION(0x0800, "user2", 0)
 	ROM_LOAD( "malzak.2",     0x0000, 0x0800, CRC(2a12ad67) SHA1(f89a50b62311a170004c061abd8dedc3ebd84748) )
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
 
 	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM
@@ -445,7 +445,7 @@ ROM_START( malzak2 )
 	ROM_REGION(0x0800, "user2", 0)
 	ROM_LOAD( "malz4d.bin",     0x0000, 0x0800, CRC(5c6ca415) SHA1(e7571519ac7911507d2c1cf975a7663f41321cb9) )
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
 
 	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM

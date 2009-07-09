@@ -1448,12 +1448,12 @@ ROM_START( spclords )
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0 )		   /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "gfx3", 0 )
@@ -1489,12 +1489,12 @@ ROM_START( spclordb )
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0 )		   /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "gfx3", 0 )
@@ -1530,12 +1530,12 @@ ROM_START( spclordg )
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0 )		   /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "gfx3", 0 )
@@ -1558,7 +1558,7 @@ ROM_START( spclordg )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1576,12 +1576,12 @@ ROM_START( spclorda )
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0 )		   /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "gfx3", 0 )
@@ -1604,7 +1604,7 @@ ROM_START( spclorda )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1622,12 +1622,12 @@ ROM_START( motofren )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1652,7 +1652,7 @@ ROM_START( motofren )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1670,12 +1670,12 @@ ROM_START( motofrmd )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1700,7 +1700,7 @@ ROM_START( motofrmd )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1719,12 +1719,12 @@ ROM_START( motofrei )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1749,7 +1749,7 @@ ROM_START( motofrei )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1768,12 +1768,12 @@ ROM_START( motofreg )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1798,7 +1798,7 @@ ROM_START( motofreg )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1817,12 +1817,12 @@ ROM_START( motofmdg )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1847,7 +1847,7 @@ ROM_START( motofmdg )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1865,12 +1865,12 @@ ROM_START( motofrft )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1895,7 +1895,7 @@ ROM_START( motofrft )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1913,12 +1913,12 @@ ROM_START( motomdft )
 	ROM_LOAD( "mfs6502.bin", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "motof2d.bin", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "motof5d.bin", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "motof8d.bin", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "motof13n.bin", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "gfx3", 0 )
@@ -1943,7 +1943,7 @@ ROM_START( motomdft )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "mfadpcm.bin",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
 	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
@@ -1961,12 +1961,12 @@ ROM_START( rrreveng )
 	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "rralpl.bin", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "rralpm.bin", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "rralph.bin", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "rralalph.bin", 0x000000, 0x20000, CRC(7ca93790) SHA1(5e2f069be4b15d63f418c8693e8550eb0ae22381) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "gfx3", 0 )
@@ -1987,7 +1987,7 @@ ROM_START( rrreveng )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "rrmoprg1.bin",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "rrmoprg2.bin",  0x0200, 0x0200, NO_DUMP )
 	ROM_LOAD( "rrmoprg3.bin",  0x0400, 0x0200, NO_DUMP )
@@ -2005,12 +2005,12 @@ ROM_START( rrrevenp )
 	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "rralpl.bin", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "rralpm.bin", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "rralph.bin", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "alpha.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "gfx3", 0 )
@@ -2031,7 +2031,7 @@ ROM_START( rrrevenp )
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
-	ROM_REGION( 0x0600, "proms", ROMREGION_DISPOSE )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "rrmoprg1.bin",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "rrmoprg2.bin",  0x0200, 0x0200, NO_DUMP )
 	ROM_LOAD( "rrmoprg3.bin",  0x0400, 0x0200, NO_DUMP )

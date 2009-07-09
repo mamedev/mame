@@ -260,7 +260,7 @@ ROM_START( xyonix )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xyonix3.bin", 0x00000, 0x10000, CRC(1960a74e) SHA1(5fd7bc31ca2f5f1e114d3d0ccf6554ebd712cbd3) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "xyonix1.bin", 0x00000, 0x08000, CRC(3dfa9596) SHA1(52cdbbe18f83cea7248c29588ea3a18c4bb7984f) )
 	ROM_LOAD( "xyonix2.bin", 0x08000, 0x08000, CRC(db87343e) SHA1(62bc30cd65b2f8976cd73a0b349a9ccdb3faaad2) )
 

@@ -720,7 +720,7 @@ ROM_START( looping )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
@@ -744,7 +744,7 @@ ROM_START( loopinga )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
@@ -767,7 +767,7 @@ ROM_START( skybump )
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "vid.8a",			0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
 	ROM_LOAD( "vid.6a",			0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
 

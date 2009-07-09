@@ -1015,7 +1015,7 @@ ROM_START( hngmnjpm )
 	ROM_LOAD( "hang-so1.bin", 0x000000, 0x80000, CRC(5efe1712) SHA1(e4e7a73a1b1897ed6e96306f99d234fb3b47c59b) )
 
 	/* Likely to be the same for the other games */
-	ROM_REGION( 0x0a00, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0a00, "plds", 0 )
 	ROM_LOAD( "s60-3.bin", 0x0000, 0x0117, CRC(19e1d28b) SHA1(12dff4bea16b95807f1a9455b6785468ca5de858) )
 	ROM_LOAD( "s61-6.bin", 0x0000, 0x0117, CRC(c72cec0e) SHA1(9d6e5510600987f9359af9ecc3e95f5bd8444bcd) )
 	ROM_LOAD( "ig1.1.bin", 0x0000, 0x02DD, CRC(4e11fa4e) SHA1(ded2d2086c4360708462024054e5409962ea8589) )

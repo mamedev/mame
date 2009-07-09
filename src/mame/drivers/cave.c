@@ -2416,14 +2416,14 @@ ROM_START( agallet ) /* PCB showed "Taiwan Only" on the copyright notice screen.
 	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) )
 	ROM_LOAD( "bp962a.u77", 0x200000, 0x200000, CRC(ea2ba35e) SHA1(72487f21d44fe7be9a98068ce7f57a43c132945f) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bp962a.u53", 0x000000, 0x100000, CRC(fcd9a107) SHA1(169b94db8389e7d47d4d77f36907a62c30fea727) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bp962a.u54", 0x000000, 0x200000, CRC(0cfa3409) SHA1(17107e26762ef7e3b902fb29a6d7bc534a4d09aa) )
 
-	ROM_REGION( (1*0x200000)*2, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( (1*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
 	/* 4 bit part */
 	ROM_LOAD( "bp962a.u57", 0x000000, 0x200000, CRC(6d608957) SHA1(15f6e8346f5f95eb229505b1b4666dabeb810ee8) )
 	/* 2 bit part */
@@ -2458,10 +2458,10 @@ ROM_START( dfeveron )
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "cv01-u50.bin", 0x000000, 0x200000, CRC(7a344417) SHA1(828bd8f95d2fcc34407e17629ccafc904a4ea12d) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "cv01-u49.bin", 0x000000, 0x200000, CRC(d21cdda7) SHA1(cace4650de580c3c4a037f1f5c32bfc1846b383c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2561,10 +2561,10 @@ ROM_START( feversos )
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "cv01-u50.bin", 0x000000, 0x200000, CRC(7a344417) SHA1(828bd8f95d2fcc34407e17629ccafc904a4ea12d) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "cv01-u49.bin", 0x000000, 0x200000, CRC(d21cdda7) SHA1(cace4650de580c3c4a037f1f5c32bfc1846b383c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2595,13 +2595,13 @@ ROM_START( ddonpach )
 	ROM_LOAD( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
 	ROM_LOAD( "u53.bin", 0x600000, 0x200000, CRC(cb4c10f0) SHA1(a622e8bd0c938b5d38b392b247400b744d8be288) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u60.bin", 0x000000, 0x200000, CRC(903096a7) SHA1(a243e903fef7c4a7b71383263e82e42acd869261) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u61.bin", 0x000000, 0x200000, CRC(d89b7631) SHA1(a66bb4955ca58fab8973ca37a0f971e9a67ce017) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x200000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u62.bin", 0x000000, 0x200000, CRC(292bfb6b) SHA1(11b385991ee990eb5ef36e136b988802b5f90fa4) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2621,13 +2621,13 @@ ROM_START( ddonpchj )
 	ROM_LOAD( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
 	ROM_LOAD( "u53.bin", 0x600000, 0x200000, CRC(cb4c10f0) SHA1(a622e8bd0c938b5d38b392b247400b744d8be288) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u60.bin", 0x000000, 0x200000, CRC(903096a7) SHA1(a243e903fef7c4a7b71383263e82e42acd869261) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u61.bin", 0x000000, 0x200000, CRC(d89b7631) SHA1(a66bb4955ca58fab8973ca37a0f971e9a67ce017) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x200000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u62.bin", 0x000000, 0x200000, CRC(292bfb6b) SHA1(11b385991ee990eb5ef36e136b988802b5f90fa4) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2683,13 +2683,13 @@ ROM_START( donpachi )
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atdp.u54", 0x000000, 0x100000, CRC(6bda6b66) SHA1(6472e6706505bac17484fb8bf4e8922ced4adf63) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_DISPOSE )	/* Text / Character Layer */
+	ROM_REGION( 0x040000, "gfx4", 0 )	/* Text / Character Layer */
 	ROM_LOAD( "text.u58", 0x000000, 0x040000, CRC(5dba06e7) SHA1(f9dab7f6c732a683fddb4cae090a875b3962332b) )
 
 	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -2710,13 +2710,13 @@ ROM_START( donpacjp )
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atdp.u54", 0x000000, 0x100000, CRC(6bda6b66) SHA1(6472e6706505bac17484fb8bf4e8922ced4adf63) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_DISPOSE )	/* Text / Character Layer */
+	ROM_REGION( 0x040000, "gfx4", 0 )	/* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
 	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -2737,13 +2737,13 @@ ROM_START( donpackr )
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atdp.u54", 0x000000, 0x100000, CRC(6bda6b66) SHA1(6472e6706505bac17484fb8bf4e8922ced4adf63) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_DISPOSE )	/* Text / Character Layer */
+	ROM_REGION( 0x040000, "gfx4", 0 )	/* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
 	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -2764,13 +2764,13 @@ ROM_START( donpachk )
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atdp.u54", 0x000000, 0x100000, CRC(6bda6b66) SHA1(6472e6706505bac17484fb8bf4e8922ced4adf63) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atdp.u57", 0x000000, 0x100000, CRC(0a0e72b9) SHA1(997e8253777e7acca5a1c0c4026e78eecc122d5d) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_DISPOSE )	/* Text / Character Layer */
+	ROM_REGION( 0x040000, "gfx4", 0 )	/* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
 	ROM_REGION( 0x240000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -2804,15 +2804,15 @@ ROM_START( esprade )
 	ROM_LOAD16_BYTE( "u65.bin", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
 	ROM_LOAD16_BYTE( "u66.bin", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x800000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u54.bin", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
 	ROM_LOAD( "u55.bin", 0x400000, 0x400000, CRC(f53bd94f) SHA1(d0a74fb3d36fe522ef075e5ae44a9980da8abe2f) )
 
-	ROM_REGION( 0x800000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x800000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u52.bin", 0x000000, 0x400000, CRC(e7abe7b4) SHA1(e98da45497e1aaf0d6ab352ec3e43c7438ed792a) )
 	ROM_LOAD( "u53.bin", 0x400000, 0x400000, CRC(51a0f391) SHA1(8b7355cbad119f4e1add14e5cd5e343ec6706104) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u51.bin", 0x000000, 0x400000, CRC(0b9b875c) SHA1(ef05447cd8565ae24bb71db42342724622ad1e3e) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2830,15 +2830,15 @@ ROM_START( espradej )
 	ROM_LOAD16_BYTE( "u65.bin", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
 	ROM_LOAD16_BYTE( "u66.bin", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x800000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u54.bin", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
 	ROM_LOAD( "u55.bin", 0x400000, 0x400000, CRC(f53bd94f) SHA1(d0a74fb3d36fe522ef075e5ae44a9980da8abe2f) )
 
-	ROM_REGION( 0x800000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x800000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u52.bin", 0x000000, 0x400000, CRC(e7abe7b4) SHA1(e98da45497e1aaf0d6ab352ec3e43c7438ed792a) )
 	ROM_LOAD( "u53.bin", 0x400000, 0x400000, CRC(51a0f391) SHA1(8b7355cbad119f4e1add14e5cd5e343ec6706104) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u51.bin", 0x000000, 0x400000, CRC(0b9b875c) SHA1(ef05447cd8565ae24bb71db42342724622ad1e3e) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2856,15 +2856,15 @@ ROM_START( espradeo )
 	ROM_LOAD16_BYTE( "u65.bin", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
 	ROM_LOAD16_BYTE( "u66.bin", 0x800001, 0x400000, CRC(7bbe4cfc) SHA1(e77d0ed7a11b5abca1df8a0eb20ac9360cf79e76) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x800000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u54.bin", 0x000000, 0x400000, CRC(e7ca6936) SHA1(b7f5ab67071a1d9dd3d2c1cd2304d9cdad68850c) )
 	ROM_LOAD( "u55.bin", 0x400000, 0x400000, CRC(f53bd94f) SHA1(d0a74fb3d36fe522ef075e5ae44a9980da8abe2f) )
 
-	ROM_REGION( 0x800000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x800000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u52.bin", 0x000000, 0x400000, CRC(e7abe7b4) SHA1(e98da45497e1aaf0d6ab352ec3e43c7438ed792a) )
 	ROM_LOAD( "u53.bin", 0x400000, 0x400000, CRC(51a0f391) SHA1(8b7355cbad119f4e1add14e5cd5e343ec6706104) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u51.bin", 0x000000, 0x400000, CRC(0b9b875c) SHA1(ef05447cd8565ae24bb71db42342724622ad1e3e) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
@@ -2921,13 +2921,13 @@ ROM_START( gaia )
 	ROM_LOAD( "obj1.736", 0x000000, 0x400000, CRC(f4f84e5d) SHA1(8f445dd7a5c8a996939c211e5aec5742121a6e7e) )
 	ROM_LOAD( "obj2.738", 0x400000, 0x400000, CRC(15c2a9ce) SHA1(631eb2968395be86ef2403733e7d4ec769a013b9) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bg1.989", 0x000000, 0x400000, CRC(013a693d) SHA1(2cc5be6f47c13febed942e1c3167946efedc5f9b) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x400000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bg2.995", 0x000000, 0x400000, CRC(783cc62f) SHA1(8b6e4212688b53be5ecc29ff2d41fd43e7d0a420) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "bg3.998", 0x000000, 0x400000, CRC(bcd61d1c) SHA1(660a3b02a8c39e1117b00d0ad06f73221fef4ce8) )
 
 	ROM_REGION( 0xc00000, "ymz", 0 )	/* Samples */
@@ -2983,13 +2983,13 @@ ROM_START( theroes )
 	ROM_LOAD( "t-hero-obj1.u0736", 0x000000, 0x400000, CRC(35090f7c) SHA1(035e6c12a87d9c7241eea34fc7e2170bec842acc) )
 	ROM_LOAD( "t-hero-obj2.u0738", 0x400000, 0x400000, CRC(71605108) SHA1(6070c26d8f22fafc81d97cacfef96ae652e355d0) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "t-hero-bg1.u0999", 0x000000, 0x400000, CRC(47b0fb40) SHA1(a7217b3d805b4255c589821cdadd9b190cada525) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x400000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "t-hero-bg2.u0995", 0x000000, 0x400000, CRC(b16237a1) SHA1(66aed2c5036492a17d20de90333e172a6f117851) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "t-hero-bg3.u0998", 0x000000, 0x400000, CRC(08eb5604) SHA1(3d32966708c73198272c40e6ddc680bf4c7919eb) )
 
 	ROM_REGION( 0xc00000, "ymz", 0 )	/* Samples */
@@ -3027,19 +3027,19 @@ ROM_START( guwange )
 //sprite bug fix?
 //  ROM_FILL(                    0x1800000, 0x800000, 0xff )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x800000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u101.bin", 0x000000, 0x800000, CRC(0369491f) SHA1(ca6b1345506f13a17c9bace01637d1f61a278644) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x400000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "u10102.bin", 0x000000, 0x400000, CRC(e28d6855) SHA1(7001a6e298c6a1fcceb79586bf5f4bf0f30027f6) )
 
-	ROM_REGION( 0x400000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x400000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "u10103.bin", 0x000000, 0x400000, CRC(0fe91b8e) SHA1(8b71ebeef5e4d2b00fdaaab97776d74e1c96dc59) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u0462.bin", 0x000000, 0x400000, CRC(b3d75691) SHA1(71d8dae92be1542a3cff50efeec0bf3c14ab59f5) )
 
-    ROM_REGION( 0x0004, "plds", ROMREGION_DISPOSE )
+    ROM_REGION( 0x0004, "plds", 0 )
     ROM_LOAD( "atc05-1.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8D-15LP located at U159 */
     ROM_LOAD( "u0259.bin",   0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U0249. (Chip label different then label silk screened onto the board.) */
     ROM_LOAD( "u108.bin",    0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U108. */
@@ -3081,13 +3081,13 @@ ROM_START( hotdogst )
 	ROM_LOAD( "mp9u55", 0x000000, 0x200000, CRC(258d49ec) SHA1(f39e30c82d8f680f248e1eb59d7c5acb479fa277) )
 	ROM_LOAD( "mp8u54", 0x200000, 0x200000, CRC(bdb4d7b8) SHA1(0dd490988aa84b0e9a21ade5fd606b03eca13f6c) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "mp7u56", 0x00000, 0x80000, CRC(87c21c50) SHA1(fc0eea79abdd96edb4fa2c7047aaa728ef838234) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "mp6u61", 0x00000, 0x80000, CRC(4dafb288) SHA1(4756259adfe49ba42cde25e7902655b0f0731a6c) )
 
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x80000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "mp5u64", 0x00000, 0x80000, CRC(9b26458c) SHA1(acef62422fa3f92e6ca1eba0ee6fb914cd1ee190) )
 
 	ROM_REGION( 0xc0000, "oki", 0 )	/* Samples */
@@ -3150,7 +3150,7 @@ ROM_START( korokoro )
 	ROM_LOAD( "mp-001_ver01.u1066", 0x000000, 0x100000, CRC(c5c6af7e) SHA1(13ac26fd703672a01d629be4e5efe9fb8720a4fb) )
 	ROM_LOAD( "mp-001_ver01.u1051", 0x100000, 0x080000, CRC(fe5e28e8) SHA1(44da1a7d813b149f9bae351bbcbd0bc2d4c70e10) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "mp-001_ver01.u1060", 0x000000, 0x100000, CRC(ec9cf9d8) SHA1(32fa7120e30c14e484de3b3a9c93efe3654d43c8) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )	/* Samples */
@@ -3198,10 +3198,10 @@ ROM_START( mazinger )
 	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) )
 	ROM_LOAD( "bp943a-3.u55", 0x200000, 0x080000, CRC(9c4957dd) SHA1(e775605a01b6cadc318855ac046dad03c4fc5bb4) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bp943a-1.u60", 0x000000, 0x200000, CRC(46327415) SHA1(679d26caefa975569198fac550105c370e2be00d) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bp943a-0.u63", 0x000000, 0x200000, CRC(c1fed98a) SHA1(c276505f80a49b129862966a19db507f97153e45) )	// FIXED BITS (xxxxxxxx00000000)
 
 	ROM_REGION( 0x0c0000, "oki", 0 )	/* Samples */
@@ -3272,15 +3272,15 @@ ROM_START( metmqstr )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
 	ROM_LOAD( "bp947a.u52", 0x600000, 0x200000, CRC(70c64875) SHA1(1c20ab100ccfdf42c97a25e4deb9041b83f5ca8d) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bp947a.u48", 0x000000, 0x100000, CRC(04ff6a3d) SHA1(7187db436f7a2ab59a3f5c6ab297b3d740e20f1d) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bp947a.u47", 0x000000, 0x100000, CRC(0de42827) SHA1(05d452ca11a31f941cb8a9b0cbb0b59c6b0cbdcb) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "bp947a.u46", 0x000000, 0x100000, CRC(0f9c906e) SHA1(03872e8be28637df66373bddb04ed91de4f9db75) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
@@ -3311,15 +3311,15 @@ ROM_START( nmaster )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
 	ROM_LOAD( "bp947a.u52", 0x600000, 0x200000, CRC(70c64875) SHA1(1c20ab100ccfdf42c97a25e4deb9041b83f5ca8d) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bp947a.u48", 0x000000, 0x100000, CRC(04ff6a3d) SHA1(7187db436f7a2ab59a3f5c6ab297b3d740e20f1d) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bp947a.u47", 0x000000, 0x100000, CRC(0de42827) SHA1(05d452ca11a31f941cb8a9b0cbb0b59c6b0cbdcb) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "bp947a.u46", 0x000000, 0x100000, CRC(0f9c906e) SHA1(03872e8be28637df66373bddb04ed91de4f9db75) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
@@ -3372,16 +3372,16 @@ ROM_START( pwrinst2 )
 	ROM_LOAD( "g02.u66", 0xa00000, 0x200000, CRC(becf2a36) SHA1(f8b386d0292b1dc745b7253a3df51d1aa8d5e9db) )
 	ROM_LOAD( "g02.u67", 0xc00000, 0x200000, CRC(52fe2b8b) SHA1(dd50aa62f7db995e28f47de9b3fb749aeeaaa5b0) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "g02.u78", 0x000000, 0x200000, CRC(1eca63d2) SHA1(538942b43301f950e3d5139461331c54dc90129d) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "g02.u81", 0x000000, 0x100000, CRC(8a3ff685) SHA1(4a59ec50ec4470453374fe10f76d3e894494b49f) )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "g02.u89", 0x000000, 0x100000, CRC(373e1f73) SHA1(ec1ae9fab37eee41be8e1bc6dad03809b62fdbce) )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* Layer 3 */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* Layer 3 */
 	ROM_LOAD( "g02.82a", 0x000000, 0x080000, CRC(4b3567d6) SHA1(d3e14783b312d2bea9722a8e3c22bcec81e26166) )
 
 	ROM_REGION( 0x440000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -3418,16 +3418,16 @@ ROM_START( pwrins2j )
 	ROM_LOAD( "g02.u66", 0xa00000, 0x200000, CRC(becf2a36) SHA1(f8b386d0292b1dc745b7253a3df51d1aa8d5e9db) )
 	ROM_LOAD( "g02.u67", 0xc00000, 0x200000, CRC(52fe2b8b) SHA1(dd50aa62f7db995e28f47de9b3fb749aeeaaa5b0) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "g02.u78", 0x000000, 0x200000, CRC(1eca63d2) SHA1(538942b43301f950e3d5139461331c54dc90129d) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "g02.u81", 0x000000, 0x100000, CRC(8a3ff685) SHA1(4a59ec50ec4470453374fe10f76d3e894494b49f) )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "g02.u89", 0x000000, 0x100000, CRC(373e1f73) SHA1(ec1ae9fab37eee41be8e1bc6dad03809b62fdbce) )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* Layer 3 */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* Layer 3 */
 	ROM_LOAD( "g02j.82a", 0x000000, 0x080000, CRC(3be86fe1) SHA1(313bfe5fb8dc5fee4462db259738e079759f9390) )
 
 	ROM_REGION( 0x440000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -3519,16 +3519,16 @@ ROM_START( plegends )
 	ROM_LOAD( "atgs.u1", 0xc00000, 0x200000, CRC(aa6f34a9) SHA1(00de85de1b413bd2c46931c13365f8556b50b634) ) /* US version's rom labeled "sp6_u67-1" */
 	ROM_LOAD( "atgs.u2", 0xe00000, 0x200000, CRC(553eda27) SHA1(5b9126f966f0c64b3ac7c06526064d71e4df60c5) ) /* US version's rom labeled "sp6_u67-2" */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atgs.u78", 0x000000, 0x200000, CRC(16710ecb) SHA1(6277f7f6095457df649932550b04242e5853ec5e) ) /* US version's rom labeled "bg0_u78" */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atgs.u81", 0x000000, 0x200000, CRC(cb2aca91) SHA1(869f0f2db35c45ec90b74d33d521cbb598e60a3f) ) /* US version's rom labeled "bg1_u81" */
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x200000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "atgs.u89", 0x000000, 0x200000, CRC(65f45a0f) SHA1(b7f4b56308dcdc144100d0a92d91255459a320a4) ) /* US version's rom labeled "bg2_u89" */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* Layer 3 */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* Layer 3 */
 	ROM_LOAD( "text.u82", 0x000000, 0x080000, CRC(f57333ea) SHA1(409d8005ffcf91943e4a743b2434ce425f5bdc36) ) /* US version's rom labeled "d20" */
 
 	ROM_REGION( 0x440000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -3567,16 +3567,16 @@ ROM_START( plegendj )
 	ROM_LOAD( "atgs.u1", 0xc00000, 0x200000, CRC(aa6f34a9) SHA1(00de85de1b413bd2c46931c13365f8556b50b634) ) /* US version's rom labeled "sp6_u67-1" */
 	ROM_LOAD( "atgs.u2", 0xe00000, 0x200000, CRC(553eda27) SHA1(5b9126f966f0c64b3ac7c06526064d71e4df60c5) ) /* US version's rom labeled "sp6_u67-2" */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "atgs.u78", 0x000000, 0x200000, CRC(16710ecb) SHA1(6277f7f6095457df649932550b04242e5853ec5e) ) /* US version's rom labeled "bg0_u78" */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "atgs.u81", 0x000000, 0x200000, CRC(cb2aca91) SHA1(869f0f2db35c45ec90b74d33d521cbb598e60a3f) ) /* US version's rom labeled "bg1_u81" */
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( 0x200000, "gfx4", 0 )	/* Layer 2 */
 	ROM_LOAD( "atgs.u89", 0x000000, 0x200000, CRC(65f45a0f) SHA1(b7f4b56308dcdc144100d0a92d91255459a320a4) ) /* US version's rom labeled "bg2_u89" */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* Layer 3 */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* Layer 3 */
 	ROM_LOAD( "text.u82", 0x000000, 0x080000, CRC(f57333ea) SHA1(409d8005ffcf91943e4a743b2434ce425f5bdc36) ) /* US version's rom labeled "d20" */
 
 	ROM_REGION( 0x440000, "oki1", 0 )	/* OKIM6295 #1 Samples */
@@ -3652,13 +3652,13 @@ ROM_START( sailormn )
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) )
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) )
 
-	ROM_REGION( (5*0x200000)*2, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( (5*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
 	/* 4 bit part */
 	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) )
 	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) )
@@ -3696,13 +3696,13 @@ ROM_START( sailormo )
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) )
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "bpsm.u53", 0x000000, 0x200000, CRC(b9b15f83) SHA1(8c574c97d38fb9e2889648c8d677b171e80a4229) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 1 */
 	ROM_LOAD( "bpsm.u54", 0x000000, 0x200000, CRC(8f00679d) SHA1(4ea412f8ecdb9fd46f2d1378809919d1a62fcc2b) )
 
-	ROM_REGION( (5*0x200000)*2, "gfx4", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_REGION( (5*0x200000)*2, "gfx4", 0 )	/* Layer 2 */
 	/* 4 bit part */
 	ROM_LOAD( "bpsm.u57", 0x000000, 0x200000, CRC(86be7b63) SHA1(6b7d3d41fb1e4045c765b3cc98304464d91e6e3d) )
 	ROM_LOAD( "bpsm.u58", 0x200000, 0x200000, CRC(e0bba83b) SHA1(9e1434814efd9321b2e5210b995d2fe66cca37dd) )
@@ -3744,7 +3744,7 @@ ROM_START( uopoko )
 	ROM_REGION( 0x400000 * 2, "gfx1", 0 )		/* Sprites: * 2 , do not dispose */
 	ROM_LOAD( "u33.bin", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u49.bin", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )	/* Samples */
@@ -3759,7 +3759,7 @@ ROM_START( uopokoj )
 	ROM_REGION( 0x400000 * 2, "gfx1", 0 )		/* Sprites: * 2 , do not dispose */
 	ROM_LOAD( "u33.bin", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 0 */
 	ROM_LOAD( "u49.bin", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )	/* Samples */

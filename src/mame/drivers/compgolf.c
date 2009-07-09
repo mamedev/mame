@@ -233,19 +233,19 @@ ROM_START( compgolf )
 	ROM_REGION( 0x8000, "user1", 0 ) // background data
 	ROM_LOAD( "cv06.bin",     0x00000, 0x8000, CRC(8f76979d) SHA1(432f6a1402fd3276669f5f45f03fd12380900178) )
 
-	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE ) // Sprites
+	ROM_REGION( 0x18000, "gfx1", 0 ) // Sprites
 	ROM_LOAD( "cv00.bin",     0x00000, 0x8000, CRC(aa3d3b99) SHA1(eb968e40bcc7e7dd1acc0bbe885fd3f7d70d4bb5) )
 	ROM_LOAD( "cv01.bin",     0x08000, 0x8000, CRC(f68c2ff6) SHA1(dda9159fb59d3855025b98c272722b031617c89a) )
 	ROM_LOAD( "cv02.bin",     0x10000, 0x8000, CRC(979cdb5a) SHA1(25c1f3e6ddf50168c7e1a967bfa2753bea6106ec) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "cv03.bin",     0x00000, 0x8000, CRC(cc7ed6d8) SHA1(4ffcfa3f720414e1b7e929bdf29359ebcd8717c3) )
 	/* we expand rom cv04.bin to 0x8000 - 0xffff */
 
-	ROM_REGION( 0x8000,  "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx3", 0 )
 	ROM_LOAD( "cv07.bin",     0x00000, 0x8000, CRC(ed5441ba) SHA1(69d50695e8b92544f9857c6f3de0efb399899a2c) )
 
-	ROM_REGION( 0x4000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx4", 0 )
 	ROM_LOAD( "cv04.bin",     0x00000, 0x4000, CRC(df693a04) SHA1(45bef98c7e66881f8c62affecc1ab90dd2707240) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -259,19 +259,19 @@ ROM_START( compglfo )
 	ROM_REGION( 0x8000, "user1", 0 ) // background data
 	ROM_LOAD( "cv06.bin",     0x00000, 0x8000, CRC(8f76979d) SHA1(432f6a1402fd3276669f5f45f03fd12380900178) )
 
-	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE ) // Sprites
+	ROM_REGION( 0x18000, "gfx1", 0 ) // Sprites
 	ROM_LOAD( "cv00.bin",     0x00000, 0x8000, CRC(aa3d3b99) SHA1(eb968e40bcc7e7dd1acc0bbe885fd3f7d70d4bb5) )
 	ROM_LOAD( "cv01.bin",     0x08000, 0x8000, CRC(f68c2ff6) SHA1(dda9159fb59d3855025b98c272722b031617c89a) )
 	ROM_LOAD( "cv02.bin",     0x10000, 0x8000, CRC(979cdb5a) SHA1(25c1f3e6ddf50168c7e1a967bfa2753bea6106ec) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "cv03.bin",     0x00000, 0x8000, CRC(cc7ed6d8) SHA1(4ffcfa3f720414e1b7e929bdf29359ebcd8717c3) )
 	/* we expand rom cv04.bin to 0x8000 - 0xffff */
 
-	ROM_REGION( 0x8000,  "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx3", 0 )
 	ROM_LOAD( "cv07.bin",     0x00000, 0x8000, CRC(ed5441ba) SHA1(69d50695e8b92544f9857c6f3de0efb399899a2c) )
 
-	ROM_REGION( 0x4000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx4", 0 )
 	ROM_LOAD( "cv04.bin",     0x00000, 0x4000, CRC(df693a04) SHA1(45bef98c7e66881f8c62affecc1ab90dd2707240) )
 
 	ROM_REGION( 0x100, "proms", 0 )

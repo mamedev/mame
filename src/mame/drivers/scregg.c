@@ -272,7 +272,7 @@ ROM_START( dommy )
 	ROM_LOAD( "dommy.e11",  0xc000, 0x2000, CRC(7c4fad5c) SHA1(fb733ac979092a6fc278836b82d8ed3fae7a20d9) )
 	ROM_LOAD( "dommy.e21",  0xe000, 0x2000, CRC(cd1a4d55) SHA1(f7f4f5ef2e89519652e8401e75dc4e2b8edf4bae) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "dommy.e50",  0x0000, 0x2000, CRC(5e9db0a4) SHA1(82e60d6b65a4d901102d7e195e66b278f18586f7) )
 	ROM_LOAD( "dommy.e40",  0x2000, 0x2000, CRC(4d1c36fb) SHA1(5904421e8e2f727dd6292045871429a1373085e9) )
 	ROM_LOAD( "dommy.e30",  0x4000, 0x2000, CRC(4e68bb12) SHA1(de26d278e43882deffad4d5b19d785f8824cf05a) )
@@ -292,7 +292,7 @@ ROM_START( scregg )
 	ROM_LOAD( "scregg.a14",   0x7000, 0x1000, CRC(b5a0814a) SHA1(192cdc506fb0bbfed8ae687f2699397ace3bef30) )
 	ROM_RELOAD(               0xf000, 0x1000 )        /* for reset/interrupt vectors */
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "scregg.j12",   0x0000, 0x1000, CRC(a485c10c) SHA1(88edd35479ceb58244f644a7e0520d225df3bf65) )
 	ROM_LOAD( "scregg.j10",   0x1000, 0x1000, CRC(1fd4e539) SHA1(3067bbd9493614e80d8d3982fe80ef25688d256c) )
 	ROM_LOAD( "scregg.h12",   0x2000, 0x1000, CRC(8454f4b2) SHA1(6a8d257a3fec901453c7216ad894badf96188ebf) )
@@ -314,7 +314,7 @@ ROM_START( eggs )
 	ROM_LOAD( "a14.bin",      0x7000, 0x1000, CRC(953faf07) SHA1(ee3181e9ee664053d6e6899fe38e136a9ea6abe1) )
 	ROM_RELOAD(               0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "j12.bin",      0x0000, 0x1000, CRC(ce4a2e46) SHA1(6b31c481ca038834ae295d015054f852baa6330f) )
 	ROM_LOAD( "j10.bin",      0x1000, 0x1000, CRC(a1bcaffc) SHA1(74f6df3136826822bbc22b027700fb3ddfceaa97) )
 	ROM_LOAD( "h12.bin",      0x2000, 0x1000, CRC(9562836d) SHA1(c5d5d6ceede6105975c87ff8e1f7e5312b992b92) )
@@ -343,7 +343,7 @@ ROM_START( rockduck )
 //  this rom is a bad dump of rdb.bin with only 1 bit different.
 //  (bit 5 is on at offset $1629).
 
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "rd3.rdg",	0x0000, 0x2000, CRC(8a3f1e53) SHA1(398bbbab314e4ea87cc5f5978c7e806818398d02) ) // not scrambled
 	ROM_LOAD( "rd2.rdh",	0x2000, 0x2000, CRC(e94e673e) SHA1(0adf01d35879b9dd355d0c53a51b5f416f22d7b2) )
 	ROM_LOAD( "rd1.rdj",	0x4000, 0x2000, CRC(654afff2) SHA1(f1e21447f0a2ac23cd64cf1f6f315937787b6377) )

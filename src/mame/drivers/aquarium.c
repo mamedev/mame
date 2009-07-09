@@ -396,22 +396,22 @@ ROM_START( aquarium )
 	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 	ROM_RELOAD( 		0x010000, 0x40000 )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
 	/* data is expanded here from USER1 */
-	ROM_REGION( 0x100000, "user1", ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar6",      0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar8",      0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
 	/* data is expanded here from USER2 */
-	ROM_REGION( 0x100000, "user2", ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar7",      0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
-	ROM_REGION( 0x060000, "gfx2", ROMREGION_DISPOSE ) /* FG Tiles */
+	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
 	ROM_LOAD( "aquar2",   0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE ) /* Sprites? */
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
 	ROM_LOAD( "aquarf1",     0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */

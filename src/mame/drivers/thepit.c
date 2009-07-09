@@ -726,7 +726,7 @@ ROM_START( thepit )
 	ROM_LOAD( "pit07.ic30",          0x0000, 0x0800, CRC(2d4881f9) SHA1(4773235d427ab88116e07599d0d5b130377548e7) )
 	ROM_LOAD( "pit06.ic31",          0x0800, 0x0800, CRC(c9d8c1cc) SHA1(66d0840182ede356c53cd1f930ea8abf86094ab7) )
 
-	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "pit08.ic9",           0x0000, 0x0800, CRC(00dce65f) SHA1(ba0cce484d1f8693a85b85e0689d107588df9043) )
 	ROM_LOAD( "pit09.ic8",           0x1000, 0x0800, CRC(a2e2b218) SHA1(1aa293a9503f3cbbc2fbd84b6b1d30124ef462e7) )
 
@@ -745,7 +745,7 @@ ROM_START( thepitc )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p30",          0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
 
-	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "p9",           0x0000, 0x0800, CRC(69502afc) SHA1(9baf094baab8325af659879cfb6984eeca0d94bd) )
 	ROM_LOAD( "p8",           0x1000, 0x0800, CRC(2ddd5045) SHA1(baa962a874f00e56c15c264980b1e31a2c9dc270) )
 
@@ -764,7 +764,7 @@ ROM_START( thepitb ) /* Bootleg based on the Centuri version by AW Zilec Elc Ltd
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pit6.bin",     0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
 
-	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "pit8.bin",     0x0000, 0x0800, CRC(69502afc) SHA1(9baf094baab8325af659879cfb6984eeca0d94bd) )
 	ROM_LOAD( "pit7.bin",     0x1000, 0x0800, CRC(d901b353) SHA1(4a35dd857ca352e0260361376fe666af4b3315af) )
 
@@ -784,7 +784,7 @@ ROM_START( roundup )
 	ROM_LOAD( "roundup.u30",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
 	ROM_LOAD( "roundup.u31",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
 
-	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "roundup.u9",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
 	ROM_LOAD( "roundup.u10",  0x1000, 0x0800, CRC(a38d708d) SHA1(6632392cece34332a2a4427ec14d95f201319c67) )
 
@@ -804,7 +804,7 @@ ROM_START( fitter )
 	ROM_LOAD( "ic30.bin",     0x0000, 0x0800, CRC(4055b5ca) SHA1(abf8f9e830b1190fb87896e1fb3adca8f9e18df1) )
 	ROM_LOAD( "ic31.bin",     0x0800, 0x0800, CRC(c9d8c1cc) SHA1(66d0840182ede356c53cd1f930ea8abf86094ab7) )
 
-	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ic9.bin",      0x0000, 0x0800, CRC(a6799a37) SHA1(7864cb255bff976630b6e03b1683f7d3ccd0a80f) )
 	ROM_LOAD( "ic8.bin",      0x1000, 0x0800, CRC(a8256dfe) SHA1(b3dfb915ba4367c8c73a8cc6fb02d98ec148f5a1) )
 
@@ -824,7 +824,7 @@ ROM_START( intrepid )
 	ROM_LOAD( "ic22.7",       0x0000, 0x0800, CRC(1a7cc392) SHA1(bb800eb1c9f22f5f9c3a2636964f5ab78ddcd2fb) )
 	ROM_LOAD( "ic23.6",       0x0800, 0x0800, CRC(91ca7097) SHA1(98e40f3059dfd972e38db5642479dc22cdc4a302) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ic9.9",        0x0000, 0x1000, CRC(8c70d18d) SHA1(785099c947ee1fe19196dfb02752cc849640fe21) )
 	ROM_LOAD( "ic8.8",        0x1000, 0x1000, CRC(04d067d3) SHA1(aeb763e658cd3d0bd849cdae6af55cb1008b2143) )
 
@@ -844,7 +844,7 @@ ROM_START( intrepi2 )
 	ROM_LOAD( "intrepid.007", 0x0000, 0x0800, CRC(f85ead07) SHA1(72479a9b49dd9c629480a2ce72bdd09fbb12b25d) )
 	ROM_LOAD( "intrepid.006", 0x0800, 0x0800, CRC(9eb6c61b) SHA1(a168fa634b6909c2ea484c2bbaa5afee2a5fe616) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ic9.9",        0x0000, 0x1000, CRC(8c70d18d) SHA1(785099c947ee1fe19196dfb02752cc849640fe21) )
 	ROM_LOAD( "ic8.8",        0x1000, 0x1000, CRC(04d067d3) SHA1(aeb763e658cd3d0bd849cdae6af55cb1008b2143) )
 
@@ -867,7 +867,7 @@ ROM_START( zaryavos )
 	ROM_LOAD( "ic22.7",       0x0000, 0x0800, NO_DUMP )
 	ROM_LOAD( "ic23.6",       0x0800, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ic9.9",        0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "ic8.8",        0x1000, 0x1000, NO_DUMP )
 
@@ -887,7 +887,7 @@ ROM_START( dockman )
 	ROM_LOAD( "pe7.22",          0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
 	ROM_LOAD( "pe6.23",          0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "pe8.9",          0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) )
 	ROM_LOAD( "pe9.8",          0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
 
@@ -907,7 +907,7 @@ ROM_START( portman )
 	ROM_LOAD( "pe7.22",          0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
 	ROM_LOAD( "pe6.23",          0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "pe8.9",          0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) )
 	ROM_LOAD( "pe9.8",          0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
 
@@ -926,7 +926,7 @@ ROM_START( funnymou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sm.6",         0x0000, 0x1000, CRC(fba71785) SHA1(56537a64a1e6cffedb8a6bd77e3edfa8aca94822) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "suprmous.x8",  0x0000, 0x1000, CRC(dbef9db8) SHA1(2bb070603f79e4acb7821cfa61ea1b4aed6d8e1f) )
 	ROM_LOAD( "suprmous.x9",  0x1000, 0x1000, CRC(700d996e) SHA1(31884ec80b5eb70dc8e96712b5541754997b0ca8) )
 	ROM_LOAD( "suprmous.x7",  0x2000, 0x1000, CRC(e9295071) SHA1(6034b7bc86bf070464af82bf1b9a55da81e864d9) )
@@ -947,7 +947,7 @@ ROM_START( suprmous )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sm.6",         0x0000, 0x1000, CRC(fba71785) SHA1(56537a64a1e6cffedb8a6bd77e3edfa8aca94822) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "sm.8",         0x0000, 0x1000, CRC(2f81ab5f) SHA1(9106255f37398c9d0c7cdc69b13765f5e4daa3bc) )
 	ROM_LOAD( "sm.9",         0x1000, 0x1000, CRC(8463af89) SHA1(d29a2a30727d9bdb21b900c8543541cef49127dc) )
 	ROM_LOAD( "sm.7",         0x2000, 0x1000, CRC(1d476696) SHA1(4ecb06297a29e279e31b9dd3a46642578a893c0b) )
@@ -968,7 +968,7 @@ ROM_START( machomou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mm6.e6",       0x0000, 0x1000, CRC(20816913) SHA1(aed524b54d6ed802f3dd0170b3d9943e2d71b546) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "mm8.3c",       0x0000, 0x1000, CRC(062e77cb) SHA1(5fcb509af611d163a2a5c4908959ca6d5df49b37) )
 	ROM_LOAD( "mm9.3a",       0x1000, 0x1000, CRC(a2f0cfb3) SHA1(bfae294cfa2ec9e18141dcda029c4471077df76a) )
 	ROM_LOAD( "mm7.3d",       0x2000, 0x1000, CRC(a6f60ed2) SHA1(7ce12a10546144ce529d41159b593f1bac9b900b) )
@@ -989,7 +989,7 @@ ROM_START( rtriv )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ngames7.22",   0x0000, 0x0800, CRC(871e5a03) SHA1(d2105a8ae1829d493e85bcbbcd152a28f68eb035) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* chars and sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ngames8.8",    0x1000, 0x1000, BAD_DUMP CRC(f7644e1d) SHA1(d58d0d5739906b602f4c08a2fb9a16c32fcc245b) )
 	ROM_LOAD( "ngames9.9",    0x0000, 0x1000, CRC(db553afc) SHA1(e7561ca0b2a4543c41bf41c96d17784b299ab367) )
 	ROM_RELOAD(				  0x1000, 0x1000 ) // reload it until the other rom is re-dumped

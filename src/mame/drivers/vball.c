@@ -470,10 +470,10 @@ ROM_START( vball ) /* US version */
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
     with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
     there are a few bytes different between the bootleg and the original (the original is correct though!) */
-	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", 0 ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
-	ROM_REGION(0x40000, "gfx2", ROMREGION_DISPOSE ) /* sprites */
+	ROM_REGION(0x40000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD( "25j4-0.35",    0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "25j3-0.5",     0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
@@ -498,10 +498,10 @@ ROM_START( vball2pj ) /* Japan version */
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
     with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
     there are a few bytes different between the bootleg and the original (the original is correct though!) */
-	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", 0 ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
-	ROM_REGION(0x40000, "gfx2", ROMREGION_DISPOSE ) /* sprites */
+	ROM_REGION(0x40000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD( "25j4-0.35",    0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "25j3-0.5",     0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
@@ -523,7 +523,7 @@ ROM_START( vballb ) /* bootleg */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* These are from the bootleg; the original has the image data stored in a special dip rom */
-	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE )	 /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", 0 )	 /* fg tiles */
 	ROM_LOAD( "vball13.bin",  0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball14.bin",  0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball15.bin",  0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
@@ -533,7 +533,7 @@ ROM_START( vballb ) /* bootleg */
 	ROM_LOAD( "vball11.bin",  0x60000, 0x10000, CRC(4754b303) SHA1(8630f077b542590ef1340a2f0a6b94086ff91c40) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball12.bin",  0x70000, 0x10000, CRC(21294a84) SHA1(b36ea9ddf6879443d3104241997fa0f916856528) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x40000, "gfx2", ROMREGION_DISPOSE ) /* sprites */
+	ROM_REGION(0x40000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD( "vball.35",     0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball.5",      0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 

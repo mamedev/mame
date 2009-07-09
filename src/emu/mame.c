@@ -1474,7 +1474,6 @@ static void destroy_machine(running_machine *machine)
 static void init_machine(running_machine *machine)
 {
 	mame_private *mame = machine->mame_data;
-	const char *rgntag, *nextrgntag;
 	time_t newbase;
 
 	/* initialize basic can't-fail systems here */
@@ -1564,16 +1563,6 @@ static void init_machine(running_machine *machine)
 		(*machine->config->sound_start)(machine);
 	if (machine->config->video_start != NULL)
 		(*machine->config->video_start)(machine);
-
-	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
-	/* but not if the debugger is enabled (so we can look at the data) */
-	if (PREDECODE_GFX && !options_get_bool(mame_options(), OPTION_DEBUG))
-		for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
-		{
-			nextrgntag = memory_region_next(machine, rgntag);
-			if (memory_region_flags(machine, rgntag) & ROMREGION_DISPOSE)
-				memory_region_free(machine, rgntag);
-		}
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);

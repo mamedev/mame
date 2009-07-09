@@ -336,10 +336,10 @@ ROM_START( gunsmoke )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11f_gs01.bin", 0x00000, 0x4000, CRC(b61ece9b) SHA1(eb3fc62644cc5b5a2b9cbe67c393d4a0e2a59ca9) ) /* Characters */
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "06c_gs13.bin", 0x00000, 0x8000, CRC(f6769fc5) SHA1(d192ec176425327ca4b7e25fc8432fc47837ba29) ) /* 32x32 tiles planes 2-3 */
 	ROM_LOAD( "05c_gs12.bin", 0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
 	ROM_LOAD( "04c_gs11.bin", 0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
@@ -349,7 +349,7 @@ ROM_START( gunsmoke )
 	ROM_LOAD( "04a_gs07.bin", 0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
 	ROM_LOAD( "02a_gs06.bin", 0x38000, 0x8000, CRC(4cafe7a6) SHA1(fe501f3a5e9ce9e82e9708f1cd297f4c94ef0f81) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "06n_gs22.bin", 0x00000, 0x8000, CRC(dc9c508c) SHA1(920505dd4c63b177918feb4e54cca8a7948ec9d9) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "04n_gs21.bin", 0x08000, 0x8000, CRC(68883749) SHA1(c7bf2bf49c53feddf8f30b4001dc2d59b52b1c28) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "03n_gs20.bin", 0x10000, 0x8000, CRC(0be932ed) SHA1(1c5af5884a23112dbc36579515d1cb497992da2f) ) /* Sprites planes 2-3 */
@@ -384,10 +384,10 @@ ROM_START( gunsmokj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11f_gs01.bin", 0x00000, 0x4000, CRC(b61ece9b) SHA1(eb3fc62644cc5b5a2b9cbe67c393d4a0e2a59ca9) ) /* Characters */
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "06c_gs13.bin", 0x00000, 0x8000, CRC(f6769fc5) SHA1(d192ec176425327ca4b7e25fc8432fc47837ba29) ) /* 32x32 tiles planes 2-3 */
 	ROM_LOAD( "05c_gs12.bin", 0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
 	ROM_LOAD( "04c_gs11.bin", 0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
@@ -397,7 +397,7 @@ ROM_START( gunsmokj )
 	ROM_LOAD( "04a_gs07.bin", 0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
 	ROM_LOAD( "02a_gs06.bin", 0x38000, 0x8000, CRC(4cafe7a6) SHA1(fe501f3a5e9ce9e82e9708f1cd297f4c94ef0f81) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "06n_gs22.bin", 0x00000, 0x8000, CRC(dc9c508c) SHA1(920505dd4c63b177918feb4e54cca8a7948ec9d9) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "04n_gs21.bin", 0x08000, 0x8000, CRC(68883749) SHA1(c7bf2bf49c53feddf8f30b4001dc2d59b52b1c28) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "03n_gs20.bin", 0x10000, 0x8000, CRC(0be932ed) SHA1(1c5af5884a23112dbc36579515d1cb497992da2f) ) /* Sprites planes 2-3 */
@@ -432,10 +432,10 @@ ROM_START( gunsmoku )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11f_gs01.bin", 0x00000, 0x4000, CRC(b61ece9b) SHA1(eb3fc62644cc5b5a2b9cbe67c393d4a0e2a59ca9) ) /* Characters */
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "06c_gs13.bin", 0x00000, 0x8000, CRC(f6769fc5) SHA1(d192ec176425327ca4b7e25fc8432fc47837ba29) ) /* 32x32 tiles planes 2-3 */
 	ROM_LOAD( "05c_gs12.bin", 0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
 	ROM_LOAD( "04c_gs11.bin", 0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
@@ -445,7 +445,7 @@ ROM_START( gunsmoku )
 	ROM_LOAD( "04a_gs07.bin", 0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
 	ROM_LOAD( "02a_gs06.bin", 0x38000, 0x8000, CRC(4cafe7a6) SHA1(fe501f3a5e9ce9e82e9708f1cd297f4c94ef0f81) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "06n_gs22.bin", 0x00000, 0x8000, CRC(dc9c508c) SHA1(920505dd4c63b177918feb4e54cca8a7948ec9d9) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "04n_gs21.bin", 0x08000, 0x8000, CRC(68883749) SHA1(c7bf2bf49c53feddf8f30b4001dc2d59b52b1c28) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "03n_gs20.bin", 0x10000, 0x8000, CRC(0be932ed) SHA1(1c5af5884a23112dbc36579515d1cb497992da2f) ) /* Sprites planes 2-3 */
@@ -480,10 +480,10 @@ ROM_START( gunsmoka )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11f_gs01.bin", 0x00000, 0x4000, CRC(b61ece9b) SHA1(eb3fc62644cc5b5a2b9cbe67c393d4a0e2a59ca9) ) /* Characters */
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "06c_gs13.bin", 0x00000, 0x8000, CRC(f6769fc5) SHA1(d192ec176425327ca4b7e25fc8432fc47837ba29) ) /* 32x32 tiles planes 2-3 */
 	ROM_LOAD( "05c_gs12.bin", 0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
 	ROM_LOAD( "04c_gs11.bin", 0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
@@ -493,7 +493,7 @@ ROM_START( gunsmoka )
 	ROM_LOAD( "04a_gs07.bin", 0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
 	ROM_LOAD( "02a_gs06.bin", 0x38000, 0x8000, CRC(4cafe7a6) SHA1(fe501f3a5e9ce9e82e9708f1cd297f4c94ef0f81) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "06n_gs22.bin", 0x00000, 0x8000, CRC(dc9c508c) SHA1(920505dd4c63b177918feb4e54cca8a7948ec9d9) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "04n_gs21.bin", 0x08000, 0x8000, CRC(68883749) SHA1(c7bf2bf49c53feddf8f30b4001dc2d59b52b1c28) ) /* Sprites planes 2-3 */
 	ROM_LOAD( "03n_gs20.bin", 0x10000, 0x8000, CRC(0be932ed) SHA1(1c5af5884a23112dbc36579515d1cb497992da2f) ) /* Sprites planes 2-3 */

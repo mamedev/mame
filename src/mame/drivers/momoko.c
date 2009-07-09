@@ -291,13 +291,13 @@ ROM_START( momoko )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
 	ROM_LOAD( "momoko01.bin", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* text */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "momoko13.bin", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) )
 
-	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE ) /* FG */
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
 	ROM_LOAD( "momoko14.bin", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) /* sprite */
+	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
 	ROM_LOAD16_BYTE( "momoko16.bin", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) )
 	ROM_LOAD16_BYTE( "momoko17.bin", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) )
 

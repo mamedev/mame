@@ -383,7 +383,7 @@ ROM_START( tunhunt )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
 	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
 
-	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
+	ROM_REGION( 0x400, "gfx1", 0 ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )
 
 	ROM_REGION( 0x400, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */
@@ -408,7 +408,7 @@ ROM_START( tunhuntc )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
 	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
 
-	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
+	ROM_REGION( 0x400, "gfx1", 0 ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )
 
 	ROM_REGION( 0x400, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */

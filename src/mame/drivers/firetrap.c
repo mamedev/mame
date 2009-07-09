@@ -654,10 +654,10 @@ ROM_START( firetrap )
 
 	/* there's also a protected 8751 microcontroller with ROM onboard */
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* characters */
 	ROM_LOAD( "di03.bin",     0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* tiles */
 	ROM_LOAD( "di06.bin",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -675,7 +675,7 @@ ROM_START( firetrap )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx3", 0 )
 	ROM_LOAD( "di09.bin",     0x00000, 0x2000, CRC(d11e28e8) SHA1(3e91764f74d551e0984bac92daeab4e094e8dc13) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -693,7 +693,7 @@ ROM_START( firetrap )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprites */
 	ROM_LOAD( "di16.bin",     0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "di13.bin",     0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "di14.bin",     0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
@@ -715,10 +715,10 @@ ROM_START( firetpbl )
 	ROM_LOAD( "di17.bin",     0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di18.bin",     0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x02000, "gfx1", 0 )	/* characters */
 	ROM_LOAD( "ft0e.bin",     0x00000, 0x2000, CRC(a584fc16) SHA1(6ac3692a14cb7c70799c23f8f6726fa5be1ac0d8) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* tiles */
 	ROM_LOAD( "di06.bin",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -736,7 +736,7 @@ ROM_START( firetpbl )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx3", 0 )
 	ROM_LOAD( "di09.bin",     0x00000, 0x2000, CRC(d11e28e8) SHA1(3e91764f74d551e0984bac92daeab4e094e8dc13) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -754,7 +754,7 @@ ROM_START( firetpbl )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprites */
 	ROM_LOAD( "di16.bin",     0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "di13.bin",     0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "di14.bin",     0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )

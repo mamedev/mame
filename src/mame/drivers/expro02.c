@@ -553,9 +553,9 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94",        0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	ROM_LOAD( "pm019u_u93-01.u93", 0x180000, 0x010000, CRC(3cb79005) SHA1(05a0b993b9071467265067c3762644f46343d8de) ) // ?? seems to be an extra / replacement enemy?, not sure where it maps, or when it's used, it might load over another rom
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* sprites - encrypted */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* sprites - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
@@ -593,9 +593,9 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* tiles - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
@@ -632,9 +632,9 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* tiles - encrypted */
 	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
@@ -661,7 +661,7 @@ ROM_START( fantasia )
 	ROM_LOAD16_BYTE( "imag2_10.rom", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
 	ROM_LOAD16_BYTE( "imag1_06.rom", 0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx1", 0 )	/* sprites */
 	ROM_LOAD( "obj1_17.rom",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
@@ -670,9 +670,9 @@ ROM_START( fantasia )
 	ROM_RELOAD(               0x40000, 0x80000 )
 	ROM_LOAD( "mus-2_02.rom", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* tiles - encrypted */
 	ROM_LOAD16_BYTE( "gscr2_15.rom", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
 	ROM_LOAD16_BYTE( "gscr1_12.rom", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
 	ROM_LOAD16_BYTE( "gscr4_14.rom", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )

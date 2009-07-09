@@ -154,7 +154,7 @@ ROM_START( gomoku )
 	ROM_LOAD( "rj_4.7f",    0x3000, 0x1000, CRC(6e3d1c18) SHA1(e2f7e4c0de3c78d1b8e686152458972f996b023a) )
 	ROM_LOAD( "rj_5.4e",    0x4000, 0x0800, CRC(eaf541b4) SHA1(bc7e7ec1ba68f71ab9ac86f9ae77971ddb9ce3a4) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )	// text char
+	ROM_REGION( 0x1000, "gfx1", 0 )	// text char
 	ROM_LOAD( "rj_6.4r",    0x0000, 0x1000, CRC(ed26ae36) SHA1(61cb73d7f2568e88e1c2981e7af3e9a3b26797d3) )
 
 	ROM_REGION( 0x1000, "gomoku", 0 )	// sound

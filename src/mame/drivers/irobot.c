@@ -348,7 +348,7 @@ ROM_START( irobot )
 	/* RAM data from c000-dfff */
 	/* COMRAM from   e000-ffff */
 
-	ROM_REGION( 0x800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "136029-124.bin",     0x0000,  0x0800, CRC(848948b6) SHA1(743c6570c787bc9a2a14716adc66b8e2fe57129f) )
 
 	ROM_REGION( 0x3420, "proms", 0 )

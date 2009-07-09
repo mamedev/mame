@@ -342,10 +342,10 @@ ROM_START( superdq )		/* long scenes */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq-prog.bin", 0x0000, 0x4000, CRC(96b931e2) SHA1(a2408272e19b02755368a6d7e526eec15896e586) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sdq-char.bin", 0x0000, 0x2000, CRC(5fb0e440) SHA1(267413aeb36b661458b7229d65d7b1d03562a1d3) )
 
-	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
 	DISK_REGION( "laserdisc" )
@@ -356,10 +356,10 @@ ROM_START( superdqs )		/* short scenes */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45.rom", 0x0000, 0x4000, CRC(0f4d4832) SHA1(c6db63721f0c73151eb9a678ceafd0e7d6121fd3) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sdq_a8.rom", 0x0000, 0x2000, CRC(7d981a14) SHA1(0a0949113b80c30adbb5bdb108d396993225be5b) )
 
-	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
 	DISK_REGION( "laserdisc" )
@@ -370,10 +370,10 @@ ROM_START( superdqa )		/* short scenes, alternate */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45a.rom", 0x0000, 0x4000, CRC(b12ce1f8) SHA1(3f0238ea73a6d3e1fe62f83ed3343ca4c268bdd6) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sdq_a8.rom", 0x0000, 0x2000, CRC(7d981a14) SHA1(0a0949113b80c30adbb5bdb108d396993225be5b) )
 
-	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
 	DISK_REGION( "laserdisc" )

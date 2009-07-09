@@ -1061,7 +1061,7 @@ ROM_START( fantland )
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) )
 	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
 
-	ROM_REGION( 0x480000, "gfx1", ROMREGION_DISPOSE )	// Sprites
+	ROM_REGION( 0x480000, "gfx1", 0 )	// Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.m01", 0x0c0000, 0x80000, CRC(70a94139) SHA1(689fbfa267d60821cde13d5dc2dfe1dea67b434a) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.05",  0x000002, 0x80000, CRC(62b9a00b) SHA1(ecd18e5e7a5e3535956fb693d2f7e35d2bb7ede9) , ROM_SKIP(2) )
@@ -1090,7 +1090,7 @@ ROM_START( fantlnda )
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) ) // 06.bin (was first half only)
 	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
 
-	ROM_REGION( 0x480000, "gfx1", ROMREGION_DISPOSE )	// Sprites
+	ROM_REGION( 0x480000, "gfx1", 0 )	// Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.m01", 0x0c0000, 0x80000, CRC(70a94139) SHA1(689fbfa267d60821cde13d5dc2dfe1dea67b434a) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.05",  0x000002, 0x80000, CRC(62b9a00b) SHA1(ecd18e5e7a5e3535956fb693d2f7e35d2bb7ede9) , ROM_SKIP(2) )
@@ -1122,7 +1122,7 @@ ROM_START( galaxygn )
 	ROM_COPY( "audiocpu", 0xc0000, 0xe0000, 0x10000 )
 	ROM_COPY( "audiocpu", 0xc0000, 0xf0000, 0x10000 )
 
-	ROM_REGION( 0x1b0000, "gfx1", ROMREGION_DISPOSE )	// Sprites
+	ROM_REGION( 0x1b0000, "gfx1", 0 )	// Sprites
 	ROMX_LOAD( "gg54.bin", 0x000000, 0x10000, CRC(b3621119) SHA1(66ade772077e57f872ef1c8f45e244f4006023f0) , ROM_SKIP(2) )
 	ROMX_LOAD( "gg38.bin", 0x000001, 0x10000, CRC(52b70f3e) SHA1(65f11d5700337d6d9b6325ff70c86d076e1bdc26) , ROM_SKIP(2) )
 	ROMX_LOAD( "gg22.bin", 0x000002, 0x10000, CRC(ea49fee4) SHA1(29ae3e5dfade421a5e97efe5be1cb17862fdcea1) , ROM_SKIP(2) )

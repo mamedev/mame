@@ -768,7 +768,7 @@ MACHINE_DRIVER_END
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 
 #define BIOS_GFX											\
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )	\
+	ROM_REGION( 0x6000, "gfx1", 0 )	\
 	ROM_LOAD( "pch1-c.8p",    0x00000, 0x2000, CRC(30c15e23) SHA1(69166afdb2fe827c7f1919cdf4197caccbd961fa) )	\
     ROM_LOAD( "pch1-c.8m",    0x02000, 0x2000, CRC(c1232eee) SHA1(beaf9fa2d091a3c7f70c51e966d885b1f9f0935f) )	\
     ROM_LOAD( "pch1-c.8k",    0x04000, 0x2000, CRC(9acffb30) SHA1(b814f10ef23f2ca445fabafcbf7f25e2d454ba8c) )	\

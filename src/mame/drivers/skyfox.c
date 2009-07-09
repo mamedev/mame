@@ -345,7 +345,7 @@ ROM_START( skyfox )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "skyfox9.bin", 0x00000, 0x8000, CRC(0b283bf5) SHA1(5b14d0beea689ee7e9174017e5a127435df4fbe3) )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x60000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "skyfox3.bin", 0x00000, 0x10000, CRC(3a17a929) SHA1(973fb36af416161e04a83d7869819d9b13df18cd) )
 	ROM_LOAD( "skyfox4.bin", 0x10000, 0x10000, CRC(358053bb) SHA1(589e3270eda0d44e73fbc7ac06e782f332920b39) )
 	ROM_LOAD( "skyfox5.bin", 0x20000, 0x10000, CRC(c1215a6e) SHA1(5ca30be8a68ac6a00907cc9e47ede0acec980f46) )
@@ -370,7 +370,7 @@ ROM_START( exerizrb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "skyfox9.bin", 0x00000, 0x8000, CRC(0b283bf5) SHA1(5b14d0beea689ee7e9174017e5a127435df4fbe3) )	// 1-i
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x60000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "1-c",         0x00000, 0x10000, CRC(450e9381) SHA1(f99b2ca73f1e4ba91b8066bb6d28d33b66a3ee81) )
 	ROM_LOAD( "skyfox4.bin", 0x10000, 0x10000, CRC(358053bb) SHA1(589e3270eda0d44e73fbc7ac06e782f332920b39) )	// 1-d
 	ROM_LOAD( "1-e",         0x20000, 0x10000, CRC(50a38c60) SHA1(a4b8d530914d6c85b15940a7821b4365068de668) )

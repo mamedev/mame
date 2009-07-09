@@ -323,14 +323,14 @@ ROM_START( exerion )
 	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
@@ -353,14 +353,14 @@ ROM_START( exeriont )
 	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
@@ -383,14 +383,14 @@ ROM_START( exerionb )
 	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx2", 0 )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )

@@ -787,18 +787,18 @@ ROM_START( psychic5 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
 	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
 	ROM_LOAD( "p5h",          0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
 	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
@@ -811,18 +811,18 @@ ROM_START( psychic5a )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
 	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
 	ROM_LOAD( "myp5g",          0x00000, 0x10000, CRC(617b074b) SHA1(7aaac9fddf5675b6698373333db3e096471d7ad6) )
 	ROM_LOAD( "myp5h",          0x10000, 0x10000, CRC(a9dfbe67) SHA1(f31f75e88f9b37d7fe5b1a1a8e0299151b729ccf) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
 	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
@@ -905,19 +905,19 @@ ROM_START( bombsa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
 	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(bd972ff4) SHA1(63bfb455bc0ae1d31e6f1066864ec0c8d2d0cf99) )
 	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
 	/* some corrupt 'blank' characters, should also be checked with a redump */
 	ROM_LOAD( "8.2l",         0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
 	ROM_LOAD( "9.2m",         0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
 	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
 
-	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
 	ROM_LOAD( "82s131.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "82s137.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END

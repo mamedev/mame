@@ -397,7 +397,7 @@ ROM_START( xfiles )
 	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
-	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
 	ROM_LOAD( "xfiles_pic",  0x0000, 0x1000, NO_DUMP ) // protected
 ROM_END
 
@@ -474,7 +474,7 @@ ROM_START( kdynastg )
 	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(3f103cb1) SHA1(2ff9bd73f3005f09d872018b81c915b01d6703f5) )
 
-	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
 	ROM_LOAD( "kdynastg_pic",  0x0000, 0x1000, NO_DUMP ) // protected
 ROM_END
 
@@ -550,7 +550,7 @@ ROM_START( fmaniac3 )
 	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(dfeb91a0) SHA1(a4a79073c3f6135957ea8a4a66a9c71a3a39893c) )
 
-	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
 	// not present
 ROM_END
 

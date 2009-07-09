@@ -244,10 +244,10 @@ ROM_START( sbasketb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e12.22f", 0x0000, 0x4000, CRC(e02c54da) SHA1(2fa19f3bce894ef05820f95e0b88428e4f946a35) )
 
-	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x0c000, "gfx2", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405h06.14g", 0x0000, 0x4000, CRC(cfbbff07) SHA1(39b19866b21372524933b5eef511bb5b7ad92556) )
 	ROM_LOAD( "405h08.17g", 0x4000, 0x4000, CRC(c75901b6) SHA1(4ff87123228da068f0c0ffffa4a3f03765eccd8d) )
 	ROM_LOAD( "405h10.20g", 0x8000, 0x4000, CRC(95bc5942) SHA1(55bf35283385d0ae768210706720a3b289ebd9a2) )
@@ -288,10 +288,10 @@ ROM_START( sbasketh )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e12.22f", 0x0000, 0x4000, CRC(e02c54da) SHA1(2fa19f3bce894ef05820f95e0b88428e4f946a35) )
 
-	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x0c000, "gfx2", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405h06.14g", 0x0000, 0x4000, CRC(cfbbff07) SHA1(39b19866b21372524933b5eef511bb5b7ad92556) )
 	ROM_LOAD( "405h08.17g", 0x4000, 0x4000, CRC(c75901b6) SHA1(4ff87123228da068f0c0ffffa4a3f03765eccd8d) )
 	ROM_LOAD( "405h10.20g", 0x8000, 0x4000, CRC(95bc5942) SHA1(55bf35283385d0ae768210706720a3b289ebd9a2) )
@@ -323,10 +323,10 @@ ROM_START( sbasketg )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e12.22f", 0x0000, 0x4000, CRC(e02c54da) SHA1(2fa19f3bce894ef05820f95e0b88428e4f946a35) )
 
-	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x0c000, "gfx2", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e06",     0x0000, 0x2000, CRC(7e2f5bb2) SHA1(e22008c0ef7ae000dcca7f43a386d43064aaea62) )
 	ROM_LOAD( "405e07",     0x2000, 0x2000, CRC(963a44f9) SHA1(03cd7699668b010f27af025ba6bd44509526ec7b) )
 	ROM_LOAD( "405e08",     0x4000, 0x2000, CRC(63901deb) SHA1(c65d896298846ed8b70a4d38b32820746214fa5c) )
@@ -361,10 +361,10 @@ ROM_START( sbaskete )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
-	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e12.22f", 0x0000, 0x4000, CRC(e02c54da) SHA1(2fa19f3bce894ef05820f95e0b88428e4f946a35) )
 
-	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x0c000, "gfx2", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e06",     0x0000, 0x2000, CRC(7e2f5bb2) SHA1(e22008c0ef7ae000dcca7f43a386d43064aaea62) )
 	ROM_LOAD( "405e07",     0x2000, 0x2000, CRC(963a44f9) SHA1(03cd7699668b010f27af025ba6bd44509526ec7b) )
 	ROM_LOAD( "405e08",     0x4000, 0x2000, CRC(63901deb) SHA1(c65d896298846ed8b70a4d38b32820746214fa5c) )

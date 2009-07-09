@@ -403,7 +403,7 @@ ROM_START( pengo )
 	ROM_LOAD( "ep5118b.32",   0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
 	ROM_LOAD( "ep5119c.31",   0x7000, 0x1000, CRC(933950fe) SHA1(fec7236b3dee2ea6e39c68440a6d2d9e3f72675a) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1)*/
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -430,7 +430,7 @@ ROM_START( pengo2 )
 	ROM_LOAD( "ep5118b.32",   0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
 	ROM_LOAD( "ic31.2",       0x7000, 0x1000, CRC(669555c1) SHA1(50d5cf8022af6d6bd022235ab06015cb5c8aa433) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -457,7 +457,7 @@ ROM_START( pengo2u )
 	ROM_LOAD( "ep5126.32",    0x6000, 0x1000, CRC(e5920728) SHA1(0ac5ffdad7bdcb32e630b9582e1b1aaece5198c9) )
 	ROM_LOAD( "epr5135.u31",    0x7000, 0x1000, CRC(13de47ed) SHA1(332b484d47c9921ed93432755bb2d7a9d4628939) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -484,7 +484,7 @@ ROM_START( pengo3u )
 	ROM_LOAD( "ep5126.32",    0x6000, 0x1000, CRC(e5920728) SHA1(0ac5ffdad7bdcb32e630b9582e1b1aaece5198c9) )
 	ROM_LOAD( "ep5127.31",    0x7000, 0x1000, CRC(a7d3d1d6) SHA1(20e4353208c3803d8879b25f821ea617e9a19cc4) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -511,7 +511,7 @@ ROM_START( pengo4 )
 	ROM_LOAD( "ep1744.32",    0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
 	ROM_LOAD( "ep1745.31",    0x7000, 0x1000, CRC(507e18b9) SHA1(e169e4c9c6350fb5e4020222dbcaa6f5ce41849c) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -536,7 +536,7 @@ ROM_START( pengob )
 	ROM_LOAD( "032_pn04.bin", 0x6000, 0x1000, CRC(bfde44c1) SHA1(97e8a360ce09faa36d864d7020b1669a349867c6) ) // 4 (1/2)
 	ROM_LOAD( "031_pn08.bin", 0x7000, 0x1000, CRC(64e8c30d) SHA1(aa50c21db2ac8361fc575f0785e2aae57f338564) ) // 4 (2/2)
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "5",            0x0000, 0x1000, CRC(1232437b) SHA1(7ec410a2a802514449ccb05684762c25f29556b0) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -563,7 +563,7 @@ ROM_START( penta )
 	ROM_LOAD( "032_pn04.bin", 0x6000, 0x1000, CRC(bfde44c1) SHA1(97e8a360ce09faa36d864d7020b1669a349867c6) )
 	ROM_LOAD( "031_pn08.bin", 0x7000, 0x1000, CRC(64e8c30d) SHA1(aa50c21db2ac8361fc575f0785e2aae57f338564) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "092_pn09.bin", 0x0000, 0x1000, CRC(6afeba9d) SHA1(cd723fb94aa90dbaac9a6fe085c0f4786d2fa092) ) /* tiles (bank 1) */
 	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1) */
 	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2) */
@@ -590,7 +590,7 @@ ROM_START( jrpacmbl )
 	ROM_LOAD( "jrpacpe-08.ic2",     0x6000, 0x1000, CRC(0624ffd6) SHA1(8209ab633242f2c8952a5afe2b7cd399bab08f0a) )
 	ROM_LOAD( "jrpacpe-04.ic1",     0x7000, 0x1000, CRC(d3a8448c) SHA1(f58aed6ebdb45ed38613b336a517b87745831e24) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "jrpacpe-09.ic92",    0x0000, 0x2000, CRC(2128d9b4) SHA1(b6f64423ae6ee3765050f7b85b4490b5eed95215) ) /* tiles bank 1 & 2 */
 	ROM_LOAD( "jrpacpe-10.ic105",   0x2000, 0x2000, CRC(73477193) SHA1(f00a488958ea0438642d345693787bdf771219ad) ) /* sprites (bank 1) & 2 */
 

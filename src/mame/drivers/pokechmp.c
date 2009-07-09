@@ -282,14 +282,14 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_09_27c512.bin",	   0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21) )
 	ROM_CONTINUE(			   0x08000, 0x8000 )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE)
+	ROM_REGION( 0x100000, "gfx1", 0)
 	/* Seems to be 8bpp */
 	ROM_LOAD( "pokechamp_05_27c020.bin",	   0x00000, 0x40000, CRC(554cfa42) SHA1(862d0dd83697da7bd52dc640c34926c62691afea) )
 	ROM_LOAD( "pokechamp_06_27c020.bin",	   0x40000, 0x40000, CRC(00bb9536) SHA1(1a5584297ebb425d6ce331955e0c6a4f467cd1e6) )
 	ROM_LOAD( "pokechamp_07_27c020.bin",	   0x80000, 0x40000, CRC(4b15ab5e) SHA1(5523134853b9ea1c81fd5aeb58061376d94e9298) )
 	ROM_LOAD( "pokechamp_08_27c020.bin",	   0xc0000, 0x40000, CRC(e9db54d6) SHA1(ac3b7c06d0f61847bf9bc6147f2f88d712f2b4b3) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	/* the first half of all these roms is identical... for rom 3 both halves match, is the first half unused? 4bpp gfx? */
 	ROM_LOAD( "pokechamp_01_27c512.bin",	   0x00000, 0x10000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) )
 	ROM_LOAD( "pokechamp_02_27c512.bin",	   0x10000, 0x10000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) )

@@ -416,13 +416,13 @@ ROM_START( circus )
 	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
 	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )  /* Character Set */
 	ROM_LOAD( "9002.3c",    0x0200, 0x0200, CRC(30d72ef5) SHA1(45fc8285e213bf3906a26205a8c0b22f311fd6c3) )
 	ROM_LOAD( "9001.2c",    0x0400, 0x0200, CRC(361da7ee) SHA1(6e6fe5b37ccb4c11aa4abbd9b7df772953abfe7e) )
 	ROM_LOAD( "9000.1c",    0x0600, 0x0200, CRC(1f954bb3) SHA1(62a958b48078caa639b96f62a690583a1c8e83f5) )
 
-	ROM_REGION( 0x0200, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "gfx2", 0 )
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )  /* Clown */
 ROM_END
 
@@ -438,13 +438,13 @@ ROM_START( circusse )
 	ROM_LOAD( "93448.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
 	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "93448.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )  /* Character Set */
 	ROM_LOAD( "93448.3c",    0x0200, 0x0200, CRC(30d72ef5) SHA1(45fc8285e213bf3906a26205a8c0b22f311fd6c3) )
 	ROM_LOAD( "93448.2c",    0x0400, 0x0200, CRC(361da7ee) SHA1(6e6fe5b37ccb4c11aa4abbd9b7df772953abfe7e) )
 	ROM_LOAD( "93448.1c",    0x0600, 0x0200, CRC(1f954bb3) SHA1(62a958b48078caa639b96f62a690583a1c8e83f5) )
 
-	ROM_REGION( 0x0200, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "gfx2", 0 )
 	ROM_LOAD( "93448.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )  /* Clown */
 ROM_END
 
@@ -459,13 +459,13 @@ ROM_START( robotbwl )
 	ROM_LOAD( "robotbwl.8a",  0xfc00, 0x0200, CRC(bc809ed3) SHA1(2bb4cdae8c9619eebea30cc323960a46a509bb58) )
 	ROM_LOAD( "robotbwl.9a",  0xfe00, 0x0200, CRC(07487e27) SHA1(b5528fb3fec474df2b66f36e28df13a7e81f9ce3) )
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "robotbwl.4c",  0x0000, 0x0200, CRC(a5f7acb9) SHA1(556dd34d0fa50415b128477e208e96bf0c050c2c) )  /* Character Set */
 	ROM_LOAD( "robotbwl.3c",  0x0200, 0x0200, CRC(d5380c9b) SHA1(b9670e87011a1b3aebd1d386f1fe6a74f8c77be9) )
 	ROM_LOAD( "robotbwl.2c",  0x0400, 0x0200, CRC(47b3e39c) SHA1(393c680fba3bd384e2c773150c3bae4d735a91bf) )
 	ROM_LOAD( "robotbwl.1c",  0x0600, 0x0200, CRC(b2991e7e) SHA1(32b6d42bb9312d6cbe5b4113fcf2262bfeef3777) )
 
-	ROM_REGION( 0x0020, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x0020, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "robotbwl.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )  /* Ball */
 ROM_END
 
@@ -481,13 +481,13 @@ ROM_START( crash )
 	ROM_LOAD( "crash.a8",     0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
 	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "crash.c4",     0x0000, 0x0200, CRC(ba16f9e8) SHA1(fdbf8d36993196552ddb7729750420f8e31eee70) )  /* Character Set */
 	ROM_LOAD( "crash.c3",     0x0200, 0x0200, CRC(3c8f7560) SHA1(ce4023167a0b4b912bbbc70b00fd3b462990a04c) )
 	ROM_LOAD( "crash.c2",     0x0400, 0x0200, CRC(38f3e4ed) SHA1(4e537402c09b58997bc45498fd721d83a0eac3a7) )
 	ROM_LOAD( "crash.c1",     0x0600, 0x0200, CRC(e9adf1e1) SHA1(c1f6d2a3be1e9b35c8675d1e3f57e6a85ddd99fd) )
 
-	ROM_REGION( 0x0200, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "gfx2", 0 )
 	ROM_LOAD( "crash.d14",    0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )  /* Cars */
 ROM_END
 
@@ -503,13 +503,13 @@ ROM_START( ripcord )
 	ROM_LOAD( "9034.9a",      0x1e00, 0x0200, CRC(7caf926d) SHA1(f51d010ce1909e21e04313e4262c70ab948c14e0) )
 	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "9026.5c",      0x0000, 0x0200, CRC(06e7adbb) SHA1(0c119743eacc30d6d9eb50dfee0746b69bb17377) )  /* Character Set */
 	ROM_LOAD( "9025.4c",      0x0200, 0x0200, CRC(3129527e) SHA1(3d0519811c9e4a5645f5c54ed8f0b411cdc5d54b) )
 	ROM_LOAD( "9024.2c",      0x0400, 0x0200, CRC(bcb88396) SHA1(d92dff2436f58d977f9196a88fa7701c3032ef7d) )
 	ROM_LOAD( "9023.1c",      0x0600, 0x0200, CRC(9f86ed5b) SHA1(fbe38c6d63887e603d919b0ab2216cd44b8955e4) )
 
-	ROM_REGION( 0x0200, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "gfx2", 0 )
 	ROM_LOAD( "9035.14d",     0x0000, 0x0200, CRC(c9979802) SHA1(cf6dfad0821fa736c8fcf8735792054858232806) )
 ROM_END
 

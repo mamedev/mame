@@ -519,15 +519,15 @@ ROM_START( quizdna )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */
 
-	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, "gfx1", 0 ) /* fg */
 	ROM_LOAD( "quiz2.102",    0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	/* empty */
 
-	ROM_REGION( 0x108000, "gfx2", ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, "gfx2", 0 ) /* bg */
 	ROM_LOAD( "quiz2-bg.100", 0x000000,  0x100000, CRC(f1d0cac2) SHA1(26d25c1157d1916dfe4496c6cf119c4a9339e31c) )
 	/* empty */
 
-	ROM_REGION( 0x108000, "gfx3", ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, "gfx3", 0 ) /* obj */
 	ROM_LOAD( "quiz2-ob.98",  0x000000,  0x100000, CRC(682f19a6) SHA1(6b8e6e583f423cf8ef9095f2c300201db7d7b8b3) )
 	ROM_LOAD( "quiz2ob2.97",  0x100000,  0x008000, CRC(03736b1a) SHA1(bc42ac293260f58a8a138702d890f69aec99c05e) )
 
@@ -544,15 +544,15 @@ ROM_START( gakupara )
 	ROM_CONTINUE(         0x18000,  0x78000 )             /* banked */
 	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) /* banked */
 
-	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, "gfx1", 0 ) /* fg */
 	ROM_LOAD( "u102.bin", 0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	ROM_LOAD( "u103.bin", 0x20000,  0x20000, CRC(38644251) SHA1(ebfdc43c38e1380709ed08575c346b2467ad1592) )
 
-	ROM_REGION( 0x108000, "gfx2", ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, "gfx2", 0 ) /* bg */
 	ROM_LOAD( "u100.bin", 0x000000,  0x100000, CRC(f9d886ea) SHA1(d7763f54a165af720216b96e601a66fbc59e3568) )
 	ROM_LOAD( "u99.bin",  0x100000,  0x008000, CRC(ac224d0a) SHA1(f187c3b74bc18606d0fe638f6a829f71c109998d) )
 
-	ROM_REGION( 0x108000, "gfx3", ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, "gfx3", 0 ) /* obj */
 	ROM_LOAD( "u98.bin",  0x000000,  0x100000, CRC(a6e8cb56) SHA1(2fc85c1769513cc7aa5e23afaf0c99c38de9b855) )
 	ROM_LOAD( "u97.bin",  0x100000,  0x008000, CRC(9dacd5c9) SHA1(e40211059e71408be3d67807463304f4d4ecae37) )
 
@@ -569,15 +569,15 @@ ROM_START( gekiretu )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */
 
-	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, "gfx1", 0 ) /* fg */
 	ROM_LOAD( "quiz3.102",    0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	/* empty */
 
-	ROM_REGION( 0x108000, "gfx2", ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, "gfx2", 0 ) /* bg */
 	ROM_LOAD( "quiz3-bg.100", 0x000000,  0x100000, CRC(cb9272fd) SHA1(cfc1ff93d1fdc7d144e161a77e534cea75d7f181) )
 	/* empty */
 
-	ROM_REGION( 0x108000, "gfx3", ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, "gfx3", 0 ) /* obj */
 	ROM_LOAD( "quiz3-ob.98",  0x000000,  0x100000, CRC(01bed020) SHA1(5cc56c8823ee5e538371debe1cbeb57c4976677b) )
 	/* empty */
 

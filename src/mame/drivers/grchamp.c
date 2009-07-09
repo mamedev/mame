@@ -752,19 +752,19 @@ ROM_START( grchamp )
 	ROM_LOAD( "gm07",	0x0000, 0x1000, CRC(65dcc572) SHA1(c9b19af365fa7ade2698be0bb892591ba281ecb0) )
 	ROM_LOAD( "gm08",	0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* characters/sprites */
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* characters/sprites */
 	ROM_LOAD( "gm01",	0x0000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
 	ROM_LOAD( "gm02",	0x1000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* left tiles */
+	ROM_REGION( 0x2000, "gfx2", 0 ) /* left tiles */
 	ROM_LOAD( "gr20",	0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
 	ROM_LOAD( "gr19",	0x1000, 0x1000, CRC(ff34b444) SHA1(51c67a1691da3a2d8ddcff5fd8fa816b1f9c60c0) )
 
-	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE ) /* right tiles */
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* right tiles */
 	ROM_LOAD( "gr21",	0x0000, 0x1000, CRC(2f77a9f3) SHA1(9e20a776c5e8c7577c3e8467d4f8ac7ac909901f) )
 	ROM_LOAD( "gr22",	0x1000, 0x1000, CRC(31bb5fc7) SHA1(9f638e632e7c72461bedecb710ac9b30f015eebf) )
 
-	ROM_REGION( 0x2000, "gfx4", ROMREGION_DISPOSE ) /* center tiles */
+	ROM_REGION( 0x2000, "gfx4", 0 ) /* center tiles */
 	ROM_LOAD( "gr13",	0x0000, 0x1000, CRC(d5e19ebd) SHA1(d0ca553eec87619ec489f7ba6238f1fdde7c480b) )
 	ROM_LOAD( "gr14",	0x1000, 0x1000, CRC(d129b8e4) SHA1(db25bfde2a48e14d38a43133d88d479c3cc1397a) )
 

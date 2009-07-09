@@ -829,14 +829,14 @@ ROM_START( gsword )
 	ROM_REGION( 0x10000, "cpu5", 0 )	/* 8741 */
 	ROM_LOAD( "aa-017.9g",    0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ac1-10.9n",    0x0000, 0x2000, CRC(517c571b) SHA1(05572a8ea416922da50143936fda9ba038f0b91e) )	/* tiles */
 	ROM_LOAD( "ac1-11.9p",    0x2000, 0x2000, CRC(7a1d8a3a) SHA1(3f90be9ddba3cf7a879fd69ac67c2b67fd63b9ee) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "ac1-6.9e",     0x0000, 0x2000, CRC(1b0a3cb7) SHA1(0b0f17b9844d7310b46110559e09cfc3b50bb38b) )	/* sprites */
 
-	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "ac0-7.9f",     0x0000, 0x2000, CRC(ef5f28c6) SHA1(85d943e5c5136d9458118f676b0c79fcf3aaf0c4) )
 	ROM_LOAD( "ac0-8.9h",     0x2000, 0x2000, CRC(46824b30) SHA1(f6880b1c31ae795e3781d16ee96145df1db60328) )
 
@@ -876,14 +876,14 @@ ROM_START( gsword2 )
 	ROM_REGION( 0x10000, "cpu5", 0 )	/* 8741 */
 	ROM_LOAD( "aa-017.9g",    0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ac1-10.9n",    0x0000, 0x2000, CRC(517c571b) SHA1(05572a8ea416922da50143936fda9ba038f0b91e) )	/* tiles */
 	ROM_LOAD( "ac1-11.9p",    0x2000, 0x2000, CRC(7a1d8a3a) SHA1(3f90be9ddba3cf7a879fd69ac67c2b67fd63b9ee) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "ac1-6.9e",     0x0000, 0x2000, CRC(1b0a3cb7) SHA1(0b0f17b9844d7310b46110559e09cfc3b50bb38b) )	/* sprites */
 
-	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "ac0-7.9f",     0x0000, 0x2000, CRC(ef5f28c6) SHA1(85d943e5c5136d9458118f676b0c79fcf3aaf0c4) )
 	ROM_LOAD( "ac0-8.9h",     0x2000, 0x2000, CRC(46824b30) SHA1(f6880b1c31ae795e3781d16ee96145df1db60328) )
 
@@ -910,15 +910,15 @@ ROM_START( josvolly )
 	ROM_REGION( 0x04000, "user1", 0 )	/* music data and samples - not sure where it's mapped */
 	ROM_LOAD( "aa0-14.4j",    0x0000, 0x2000, CRC(436fe91f) SHA1(feb29501090c6db911e13ce6e9935ba004b0ce7e) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "aa0-10.9n",    0x0000, 0x2000, CRC(207c4f42) SHA1(4cf2922d55cfc9e68cc07c3252ea3b5619b8aca5) )	/* tiles */
 	ROM_LOAD( "aa1-11.9p",    0x2000, 0x1000, CRC(c130464a) SHA1(9d23577b8aaaffeefff3d8f93668d1b2bd0ba3d9) )
 	ROM_RELOAD(               0x3000, 0x1000 ) // title screen data is actually read from here
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "aa0-6.9e",     0x0000, 0x2000, CRC(c2c2401a) SHA1(ef987d53d9e502277086f39b455174d3539572e6) )	/* sprites */
 
-	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "aa0-7.9f",     0x0000, 0x2000, CRC(da836231) SHA1(209723778b705dba8206b56c3b8f0996f02ba8d5) )
 	ROM_LOAD( "aa0-8.9h",     0x2000, 0x2000, CRC(a0426d57) SHA1(d029408e005ea57f4902c081203f3d3980a5f927) )
 

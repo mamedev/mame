@@ -1303,10 +1303,10 @@ ROM_START( equites )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "ep9",  0x00000, 0x1000, CRC(0325be11) SHA1(d95667b439e3d97b08efeaf08022348546a4f385) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "eb5.7h",  0x00000, 0x2000, CRC(cbef7da5) SHA1(c5fcd2341ce5b039a15116fbd85796bb5ddc4701) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "eb6.8h",  0x04000, 0x2000, CRC(1e5e5475) SHA1(80ebe9326c628685faafb259f956a98ac435c809) )
@@ -1316,7 +1316,7 @@ ROM_START( equites )
 	ROM_LOAD( "eb3.10f", 0x0c000, 0x2000, CRC(dbd0044b) SHA1(5611517bb0f54bfb0585eeca8af21fbfc2f65b2c) )
 	ROM_LOAD( "eb4.11f", 0x0e000, 0x2000, CRC(f8f8e600) SHA1(c7c97e4dc1f7a73694c98b2b1a3d7fa9f3317a2a) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "es5.5h",  0x00000, 0x2000, CRC(d5b82e6a) SHA1(956a1413426e53f8a735260e660805b04016ca8d) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "es6.4h",  0x04000, 0x2000, CRC(cb4f5da9) SHA1(5af8f6aca0a3bb6417430e0179ec97c33d4014e3) )
@@ -1367,10 +1367,10 @@ ROM_START( equitess )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-ep0.3e",  0x00000, 0x1000, CRC(3f5a81c3) SHA1(8fd5bc621f483bfa46be7e40e6480b25243bdf70) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "eb5.7h",  0x00000, 0x2000, CRC(cbef7da5) SHA1(c5fcd2341ce5b039a15116fbd85796bb5ddc4701) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "eb6.8h",  0x04000, 0x2000, CRC(1e5e5475) SHA1(80ebe9326c628685faafb259f956a98ac435c809) )
@@ -1380,7 +1380,7 @@ ROM_START( equitess )
 	ROM_LOAD( "eb3.10f", 0x0c000, 0x2000, CRC(dbd0044b) SHA1(5611517bb0f54bfb0585eeca8af21fbfc2f65b2c) )
 	ROM_LOAD( "eb4.11f", 0x0e000, 0x2000, CRC(f8f8e600) SHA1(c7c97e4dc1f7a73694c98b2b1a3d7fa9f3317a2a) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "es5.5h",  0x00000, 0x2000, CRC(d5b82e6a) SHA1(956a1413426e53f8a735260e660805b04016ca8d) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "es6.4h",  0x04000, 0x2000, CRC(cb4f5da9) SHA1(5af8f6aca0a3bb6417430e0179ec97c33d4014e3) )
@@ -1425,10 +1425,10 @@ ROM_START( bullfgtr )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "hb5vr.bin",  0x00000, 0x2000, CRC(6d05e9f2) SHA1(4b5c92b72bf73a08a2359fe889a327a696a45e8a) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "hb6vr.bin",  0x04000, 0x2000, CRC(016340ae) SHA1(f980d39337c711a15520388967ca4503e7970e18) )
@@ -1438,7 +1438,7 @@ ROM_START( bullfgtr )
 	ROM_LOAD( "hb3vr.bin",  0x0c000, 0x2000, CRC(4947114e) SHA1(822dc3f14b71dc9e5b69078aefbed6b438aa0690) )
 	ROM_LOAD( "hb4vr.bin",  0x0e000, 0x2000, CRC(fa296cb3) SHA1(2ba864766655cb3dd2999a6cdf96dcefd6818135) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "hs5vr.bin",  0x00000, 0x2000, CRC(48394389) SHA1(a5c6021b60226a775b2052909e8d21b5f79d9ec5) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "hs6vr.bin",  0x04000, 0x2000, CRC(141409ec) SHA1(3cc542fa34fdbd71e392c7c22da5d5120642be86) )
@@ -1507,10 +1507,10 @@ ROM_START( bullfgts )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "hb5vr.bin",  0x00000, 0x2000, CRC(6d05e9f2) SHA1(4b5c92b72bf73a08a2359fe889a327a696a45e8a) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "hb6vr.bin",  0x04000, 0x2000, CRC(016340ae) SHA1(f980d39337c711a15520388967ca4503e7970e18) )
@@ -1520,7 +1520,7 @@ ROM_START( bullfgts )
 	ROM_LOAD( "hb3vr.bin",  0x0c000, 0x2000, CRC(4947114e) SHA1(822dc3f14b71dc9e5b69078aefbed6b438aa0690) )
 	ROM_LOAD( "hb4vr.bin",  0x0e000, 0x2000, CRC(fa296cb3) SHA1(2ba864766655cb3dd2999a6cdf96dcefd6818135) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "hs5vr.bin",  0x00000, 0x2000, CRC(48394389) SHA1(a5c6021b60226a775b2052909e8d21b5f79d9ec5) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "hs6vr.bin",  0x04000, 0x2000, CRC(141409ec) SHA1(3cc542fa34fdbd71e392c7c22da5d5120642be86) )
@@ -1574,10 +1574,10 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6699.bin", 0x08000, 0x2000, CRC(9bfa4a72) SHA1(8ac4d308dab0d67a26b4e3550c2e8064aaf36a74) )
 	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "epr-6695.bin", 0x00000, 0x2000, CRC(22bea465) SHA1(4860d7ee3c386cdacc9c608ffe74ec8bfa58edcb) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "epr-6694.bin", 0x04000, 0x2000, CRC(51a7345e) SHA1(184c890559ed633e23cb459c313e6179cc3eb542) )
@@ -1587,7 +1587,7 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6687.bin", 0x0c000, 0x2000, CRC(9c1f49df) SHA1(1a5cf5278777f829d3654e838bd2bb9f4dbb57ba) )
 	ROM_LOAD( "epr-6686.bin", 0x0e000, 0x2000, CRC(3d9e516f) SHA1(498614821f87dbcc39edb1756e1af6b536044e6a) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "epr-6696.bin", 0x00000, 0x2000, CRC(0625f48e) SHA1(bea09ccf37f38678fb53c55bd0a79557d6c81b3f) )
 	// empty space to unpack previous ROM
 	ROM_LOAD( "epr-6697.bin", 0x04000, 0x2000, CRC(f18afabe) SHA1(abd7f6c0bd0de145c423166a2f4e86ccdb12b1ce) )
@@ -1636,10 +1636,10 @@ ROM_START( gekisou )
 	ROM_LOAD( "v2.1h", 0x04000, 0x4000, CRC(cb12582e) SHA1(ef378232e2744540cc4c9187cfb36d780dadc962) )
 	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "0.5c",  0x00000, 0x1000, CRC(7e8bf4d1) SHA1(8abb82be006e8d1df449a5f83d59637314405119) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "7.18r",   0x00000, 0x2000, CRC(a1918b6c) SHA1(6ffa4c845d23d311b59cc19411a68a782618b3fd) )
 	// empty space to unpack previous ROM
 	ROM_CONTINUE(        0x04000, 0x2000)
@@ -1649,7 +1649,7 @@ ROM_START( gekisou )
 	ROM_LOAD( "6.15r",   0x0a000, 0x2000, CRC(473e3fbf) SHA1(5039387b3627c19f592d630ba7bd010a3881adc5) )
 	ROM_CONTINUE(        0x0e000, 0x2000)
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "10.9r",   0x00000, 0x2000, CRC(11d89c73) SHA1(8753f635d321c8e9b93b0ab767cf44aca1db7a0a) )
 	// empty space to unpack previous ROM
 	ROM_CONTINUE(        0x04000, 0x2000)
@@ -1705,14 +1705,14 @@ ROM_START( splndrbt )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars
+	ROM_REGION( 0x2000, "gfx1", 0 )	// chars
 	ROM_LOAD( "10.8c",  0x00000, 0x2000, CRC(501887d4) SHA1(3cf4401d6fddff1500066219a71ac3b30ecbdd28) )
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )	// tiles
+	ROM_REGION( 0x8000, "gfx2", 0 )	// tiles
 	ROM_LOAD( "8.14m",  0x00000, 0x4000, CRC(c2c86621) SHA1(a715c70ace98502f2c0d4a81539cd79d19e9b6c4) )
 	ROM_LOAD( "9.12m",  0x04000, 0x4000, CRC(4f7da6ff) SHA1(0516271df4a36d6ea38d1b8a5e471e1d2a79e8c1) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE )	// sprites
+	ROM_REGION( 0x10000, "gfx3", 0 )	// sprites
 	ROM_LOAD( "6.18n", 0x00000, 0x2000, CRC(aa72237f) SHA1(0a26746a6c448a7fb853ef708e2bdeb76edd99cf) )
 	// empty space to unpack previous ROM
 	ROM_CONTINUE(      0x04000, 0x2000 )
@@ -1768,14 +1768,14 @@ ROM_START( hvoltage )
 	ROM_LOAD( "6_v.1h", 0x04000, 0x4000, CRC(e9542211) SHA1(482f2c90e842fe5cc31cc6a39025adf65ba47ce9) )
 	ROM_LOAD( "7_v.1e", 0x08000, 0x4000, CRC(44d38554) SHA1(6765971376eafa218fda1accb1e173a7c1850cc8) )
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
 	ROM_LOAD( "5.8c",   0x00000, 0x2000, CRC(656d53cd) SHA1(9971ed7e7da0e8bf46e97e8f75a2c2201b33fc2f) )
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_REGION( 0x8000, "gfx2", 0 ) // tiles
 	ROM_LOAD( "9.14m",  0x00000, 0x4000, CRC(506a0989) SHA1(0e7f2c9bab5e83f06a8148f69d8d0cbfe7d55c5e) )
 	ROM_LOAD( "10.12m", 0x04000, 0x4000, CRC(98f87d4f) SHA1(94a7a14b0905597993595b347102436d97fc1dc9) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
 	ROM_LOAD( "8.18n", 0x00000, 0x2000, CRC(725acae5) SHA1(ba54598a087f8bb5fa7182b0e85d0e038003e622) )
 	// empty space to unpack previous ROM
 	ROM_CONTINUE(      0x04000, 0x2000 )

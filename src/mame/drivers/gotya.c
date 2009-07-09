@@ -217,10 +217,10 @@ ROM_START( thehand )
 	ROM_LOAD( "hand4.bin",	0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
 	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )
 
-	ROM_REGION( 0x1000,  "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x1000,  "gfx1", 0 )	/* characters */
 	ROM_LOAD( "hand12.bin",	0x0000, 0x1000, CRC(95773b46) SHA1(db8d7ace4eafd4c72edfeff6003ca6e96e0239b5) )
 
-	ROM_REGION( 0x1000,  "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x1000,  "gfx2", 0 )	/* sprites */
 	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
 	ROM_REGION( 0x0120,  "proms", 0 )
@@ -245,10 +245,10 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-04.bin",	0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )
 	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )    /* this is the only ROM that passes the ROM test */
 
-	ROM_REGION( 0x1000,  "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x1000,  "gfx1", 0 )	/* characters */
 	ROM_LOAD( "gb-12.bin",	0x0000, 0x1000, CRC(4993d735) SHA1(9e47876238a8af3659721191a5f75c33507ed1a5) )
 
-	ROM_REGION( 0x1000,  "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x1000,  "gfx2", 0 )	/* sprites */
 	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
 	ROM_REGION( 0x0120,  "proms", 0 )

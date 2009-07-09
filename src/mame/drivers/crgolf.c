@@ -427,7 +427,7 @@ ROM_START( crgolf ) // 834-5419-04
 	ROM_REGION( 0x0020,  "proms", 0 )
 	ROM_LOAD( "pr5877.1s", 0x0000, 0x0020, CRC(f880b95d) SHA1(5ad0ee39e2b9befaf3895ec635d5865b7b1e562b) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8.3e",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -455,7 +455,7 @@ ROM_START( crgolfa ) // 834-5419-03
 	ROM_REGION( 0x0020,  "proms", 0 )
 	ROM_LOAD( "pr5877.1s", 0x0000, 0x0020, CRC(f880b95d) SHA1(5ad0ee39e2b9befaf3895ec635d5865b7b1e562b) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8.3e",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 

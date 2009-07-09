@@ -1784,7 +1784,7 @@ ROM_START( snowbros )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 	/* where were these from, a bootleg? */
 //  ROM_LOAD( "ch0",          0x00000, 0x20000, CRC(36d84dfe) SHA1(5d45a750220930bc409de30f19282bb143fbf94f) )
@@ -1801,7 +1801,7 @@ ROM_START( snowbroa )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 ROM_END
 
@@ -1813,7 +1813,7 @@ ROM_START( snowbrob )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 ROM_END
 
@@ -1825,7 +1825,7 @@ ROM_START( snowbroc )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 ROM_END
 
@@ -1837,7 +1837,7 @@ ROM_START( snowbrod ) /* Korean release, but no specific "For use in Korea only.
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 ROM_END
 
@@ -1849,7 +1849,7 @@ ROM_START( snowbroj )/* "For use in Japan only..." notice screen */
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	/* The gfx ROM (snowbros.1) was bad, I'm using the ones from the other sets. */
 	ROM_LOAD( "sbros-1.41",   0x00000, 0x80000, CRC(16f06b3a) SHA1(c64d3b2d32f0f0fcf1d8c5f02f8589d59ddfd428) )
 ROM_END
@@ -1874,7 +1874,7 @@ ROM_START( wintbob )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "wb05.bin",     0x0000, 0x10000, CRC(53fe59df) SHA1(a99053e82b9fed76f744fa9f67078294641c6317) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	/* probably identical data to Snow Bros, in a different format */
 	ROM_LOAD16_BYTE( "wb13.bin",     0x00000, 0x10000, CRC(426921de) SHA1(5107c58e7e08d71895baa67fe260b17ebd61389c) )
 	ROM_LOAD16_BYTE( "wb06.bin",     0x00001, 0x10000, CRC(68204937) SHA1(fd2ef93df5fd8aa2d36072858dbcfce41157ef3e) )
@@ -1896,10 +1896,10 @@ ROM_START( honeydol )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "d-12.uh15",   0x0000, 0x8000, CRC(386f1b63) SHA1(d719875226cd3d380e2ebec49209590d91b6f07b) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) // 4 bpp gfx
+	ROM_REGION( 0x80000, "gfx1", 0 ) // 4 bpp gfx
 	ROM_LOAD( "d-13.1",          0x000000, 0x80000, CRC(ff6a57fb) SHA1(2fbf61f4ac2655a60b1fa82bb6d001f0ef8b4654) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "d-14.5",          0x000000, 0x80000, CRC(2178996f) SHA1(04368384cb191b28b23199c8175e93271ab79103) )
 	ROM_LOAD( "d-15.6",          0x080000, 0x80000, CRC(6629239e) SHA1(5f462c04eb11c2b662236fd65bbf74fa08038eec) )
 	ROM_LOAD( "d-18.9",          0x100000, 0x80000, CRC(0210507a) SHA1(5b7348bf253b1ae8bfa86cdee2ff80aa2b3faa79) )
@@ -1958,7 +1958,7 @@ ROM_START( twinadv )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) /* 4bpp gfx */
+	ROM_REGION( 0x180000, "gfx1", 0 ) /* 4bpp gfx */
 	ROM_LOAD( "16.ua4", 0x000000, 0x80000, CRC(f491e171) SHA1(f31b945b0c4b30d1b3dc6c5928b77aad4e956bc7) )
 	ROM_LOAD( "15.ua5", 0x080000, 0x80000, CRC(79a08b8d) SHA1(034c0a3b9e27ac174092d265b32fb82d6ee45d47) )
 	ROM_LOAD( "14.ua6", 0x100000, 0x80000, CRC(79faee0b) SHA1(7421a5fa038d01658ba5ac1f65ea87b97ac25c36) )
@@ -1977,7 +1977,7 @@ ROM_START( twinadvk )
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) /* 4bpp gfx */
+	ROM_REGION( 0x180000, "gfx1", 0 ) /* 4bpp gfx */
 	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(a5aff49b) SHA1(ee162281ba643729ee007f9634c21fadd3c1cb48) )
 	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(f83b3b97) SHA1(2e967d49ef411d164a0b6cf32444f60fcd8068a9) )
 	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(4dfcffb9) SHA1(c157e031acbb321b9435389f9fc4e1ffebca106d) )
@@ -2233,10 +2233,10 @@ ROM_START( snowbro3 )
 
 	/* is sound cpu code missing or is it driven by the main cpu? */
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "ua5",		0x000000, 0x80000, CRC(0604e385) SHA1(96acbc65a8db89a7be100f852dc07ba9a0313167) )	/* 16x16 tiles */
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE ) /* 16x16 BG Tiles */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* 16x16 BG Tiles */
 	ROM_LOAD( "un7",		0x000000, 0x200000, CRC(4a79da4c) SHA1(59207d116d39b9ee25c51affe520f5fdff34e536) )
 	ROM_LOAD( "un8",		0x200000, 0x200000, CRC(7a4561a4) SHA1(1dd823369c09368d1f0ec8e1cb85d700f10ff448) )
 

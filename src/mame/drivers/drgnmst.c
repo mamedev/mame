@@ -426,7 +426,7 @@ ROM_START( drgnmst )
 //  ROM_LOAD( "pic16c55", 0x0000, 0x400, CRC(531c9f8d) SHA1(8ec180b0566f2ce1e08f0347e5ad402c73b44049) )
 	/* ROM will be copied here by the init code from the USER1 region */
 
-	ROM_REGION( 0x1000, "user1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "pic16c55.hex", 0x000, 0x0b7b, CRC(f17011e7) SHA1(8f3bd94ffb528f661eed77d89e5b772442d2f5a6) )
 
 	ROM_REGION( 0x140000, "oki1", 0 ) /* OKI-0 Samples */

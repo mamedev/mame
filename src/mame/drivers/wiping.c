@@ -327,10 +327,10 @@ ROM_START( wiping )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "4",            0x0000, 0x1000, CRC(a1547e18) SHA1(1f86d770e42ff1d94bf1f8b12f9b74accc3bb193) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "8",            0x0000, 0x1000, CRC(601160f6) SHA1(2465a1319d442a96d3b1b5e3ad544b0a0126762c) ) /* chars */
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "7",            0x0000, 0x2000, CRC(2c2cc054) SHA1(31851983de61bb8616856b0067c4e237819df5fb) ) /* sprites */
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -356,10 +356,10 @@ ROM_START( rugrats )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "rugr4c4",      0x0000, 0x2000, CRC(d4a92c38) SHA1(4a31cfef9f084b4d2934595155bf0f3dd589efb3) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "rugr8d2",      0x0000, 0x1000, CRC(a3dcaca5) SHA1(d71f9090bf95dfd035ee0e0619a1cce575033cf3) ) /* chars */
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "rugr7c13",     0x0000, 0x2000, CRC(fe1191dd) SHA1(80ebf093f7a32f4cc9dc89dcc44cab6e3db4fca1) ) /* sprites */
 
 	ROM_REGION( 0x0220, "proms", 0 )

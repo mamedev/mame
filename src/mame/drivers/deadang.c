@@ -278,21 +278,21 @@ ROM_START( deadang )
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
+	ROM_REGION( 0x08000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "7.21j", 0x000000, 0x4000, CRC(fe615fcd) SHA1(d67ee5e877b937173f4c188829d5bcbd354ceb29) )
 	ROM_LOAD( "8.21l", 0x004000, 0x4000, CRC(905d6b27) SHA1(952f1879e6c27dc87234a4dc572e0453dc2d59fa) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* Sprites */
 	ROM_LOAD( "l12", 0x000000, 0x80000, CRC(c94d5cd2) SHA1(25ded13faaed90886c9fe40f85969dab2f511e31) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* pf1 layer */
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* pf1 layer */
 	ROM_LOAD( "16n", 0x000000, 0x80000, CRC(fd70e1a5) SHA1(c3d1233f4dfe08f686ec99a556889f9ed6a21da3) ) // bank 0 (0x1000 tiles)
 	ROM_LOAD( "16r", 0x080000, 0x80000, CRC(92f5e382) SHA1(2097b9e9bf3cd37c8613847e7aed677b5aeab7f9) ) // bank 1 (0x1000 tiles)
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE ) // pf2 layer
+	ROM_REGION( 0x40000, "gfx4", 0 ) // pf2 layer
 	ROM_LOAD( "11m", 0x000000, 0x40000, CRC(a366659a) SHA1(e2fcd82b0b2d4e3adcdf50c710984907d26acd04) ) // fixed (0x800 tiles)
 
-	ROM_REGION( 0x40000, "gfx5", ROMREGION_DISPOSE ) // pf3 layer
+	ROM_REGION( 0x40000, "gfx5", 0 ) // pf3 layer
 	ROM_LOAD( "11k", 0x000000, 0x40000, CRC(9cf5bcc7) SHA1(cf96592e601fc373b1bf322d9b576668799130a5) ) // fixed (0x800 tiles)
 
 	ROM_REGION16_BE( 0x10000, "gfx6", 0 )	/* background map data */
@@ -323,21 +323,21 @@ ROM_START( leadang )
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
+	ROM_REGION( 0x08000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "7.22k", 0x000000, 0x4000, CRC(490701e7) SHA1(2f5cbc0407d7fe41b9e7683c7531656fda7bf9f7) )
 	ROM_LOAD( "8.22l", 0x004000, 0x4000, CRC(18024c5e) SHA1(b02bcaa1ba6e7c188f3d2a6b20b52b2dcb8215e0) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* Sprites */
 	ROM_LOAD( "l12", 0x000000, 0x80000, CRC(c94d5cd2) SHA1(25ded13faaed90886c9fe40f85969dab2f511e31) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* pf1 layer */
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* pf1 layer */
 	ROM_LOAD( "16n", 0x000000, 0x80000, CRC(fd70e1a5) SHA1(c3d1233f4dfe08f686ec99a556889f9ed6a21da3) ) // bank 0 (0x1000 tiles)
 	ROM_LOAD( "16r", 0x080000, 0x80000, CRC(92f5e382) SHA1(2097b9e9bf3cd37c8613847e7aed677b5aeab7f9) ) // bank 1 (0x1000 tiles)
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE ) // pf2 layer
+	ROM_REGION( 0x40000, "gfx4", 0 ) // pf2 layer
 	ROM_LOAD( "11m", 0x000000, 0x40000, CRC(a366659a) SHA1(e2fcd82b0b2d4e3adcdf50c710984907d26acd04) ) // fixed (0x800 tiles)
 
-	ROM_REGION( 0x40000, "gfx5", ROMREGION_DISPOSE ) // pf3 layer
+	ROM_REGION( 0x40000, "gfx5", 0 ) // pf3 layer
 	ROM_LOAD( "11k", 0x000000, 0x40000, CRC(9cf5bcc7) SHA1(cf96592e601fc373b1bf322d9b576668799130a5) ) // fixed (0x800 tiles)
 
 	ROM_REGION16_BE( 0x10000, "gfx6", 0 )	/* background map data */
@@ -368,21 +368,21 @@ ROM_START( ghunter )
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
+	ROM_REGION( 0x08000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "7.21j", 0x000000, 0x4000, CRC(fe615fcd) SHA1(d67ee5e877b937173f4c188829d5bcbd354ceb29) )
 	ROM_LOAD( "8.21l", 0x004000, 0x4000, CRC(905d6b27) SHA1(952f1879e6c27dc87234a4dc572e0453dc2d59fa) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* Sprites */
 	ROM_LOAD( "l12", 0x000000, 0x80000, CRC(c94d5cd2) SHA1(25ded13faaed90886c9fe40f85969dab2f511e31) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* pf1 layer */
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* pf1 layer */
 	ROM_LOAD( "16n", 0x000000, 0x80000, CRC(fd70e1a5) SHA1(c3d1233f4dfe08f686ec99a556889f9ed6a21da3) ) // bank 0 (0x1000 tiles)
 	ROM_LOAD( "16r", 0x080000, 0x80000, CRC(92f5e382) SHA1(2097b9e9bf3cd37c8613847e7aed677b5aeab7f9) ) // bank 1 (0x1000 tiles)
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE ) // pf2 layer
+	ROM_REGION( 0x40000, "gfx4", 0 ) // pf2 layer
 	ROM_LOAD( "11m", 0x000000, 0x40000, CRC(a366659a) SHA1(e2fcd82b0b2d4e3adcdf50c710984907d26acd04) ) // fixed (0x800 tiles)
 
-	ROM_REGION( 0x40000, "gfx5", ROMREGION_DISPOSE ) // pf3 layer
+	ROM_REGION( 0x40000, "gfx5", 0 ) // pf3 layer
 	ROM_LOAD( "11k", 0x000000, 0x40000, CRC(9cf5bcc7) SHA1(cf96592e601fc373b1bf322d9b576668799130a5) ) // fixed (0x800 tiles)
 
 	ROM_REGION16_BE( 0x10000, "gfx6", 0 )	/* background map data */

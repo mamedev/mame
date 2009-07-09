@@ -859,7 +859,7 @@ ROM_START( devilw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "687_l03.10a",		0x00000,  0x8000, CRC(7201983c) SHA1(06d089406d2f702e8d51ffdfbf34e4727a28d506) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "687_m14.d8",			0x00000,  0x4000, CRC(d7338557) SHA1(9b384baafabaab3888a0139674f0b530303684ca) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -895,7 +895,7 @@ ROM_START( majuu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "687_l03.10a",		0x00000,  0x8000, CRC(7201983c) SHA1(06d089406d2f702e8d51ffdfbf34e4727a28d506) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "687_l14.d8",			0x00000,  0x4000, CRC(20ecccd6) SHA1(b8ac3186de5ea81ae1c64b9511b7a0718aabab48) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -931,7 +931,7 @@ ROM_START( darkadv )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "687_n03.10a",		0x00000,  0x8000, CRC(a24c682f) SHA1(cf053270d3f77448ff802db832598ae3cf7dae6c) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "687_n14.d8",	0x0000,  0x4000, CRC(c76ac6d2) SHA1(d8fec255f1f7177a3716a5894fb679cbe172b6ea) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -967,7 +967,7 @@ ROM_START( vulcan )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a",		0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "785_h14.d8",			0x0000,	0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) ) // characters
 
 	ROM_REGION16_BE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1001,7 +1001,7 @@ ROM_START( gradius2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a",		0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "785_g14.d8",			0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) // characters
 
 	ROM_REGION16_BE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1040,7 +1040,7 @@ ROM_START( grdius2a )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a",		0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "785_g14.d8",			0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) // characters
 
 	ROM_REGION16_BE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1074,7 +1074,7 @@ ROM_START( grdius2b )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) 	// Z80 code (sound CPU)
 	ROM_LOAD( "785_g03.10a",		0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "785_g14.d8",			0x0000, 0x4000, CRC(9dcdad9d) SHA1(22f457408b453a71b7e91974aee1b1e735ff887f) ) // characters
 
 	ROM_REGION16_BE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1100,7 +1100,7 @@ ROM_START( fround )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "870_f03.10a",		0x00000,  0x8000, CRC(a645c727) SHA1(e173e79130f187d090766664f1c478d47062749c) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "870_f14.d8",			0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1124,7 +1124,7 @@ ROM_START( froundl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "870_f03.10a",		0x00000,  0x8000, CRC(a645c727) SHA1(e173e79130f187d090766664f1c478d47062749c) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "870_f14.d8",			0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1154,7 +1154,7 @@ ROM_START( hpuncher )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
 	ROM_LOAD( "870_g03.10a",		0x00000,  0x8000, CRC(db9c10c8) SHA1(b2ec4d6800a4ab00dfcc8d3cd4abf9b9d7c5544a) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "870_f14.d8",			0x0000, 0x4000, CRC(c9b46615) SHA1(c0cddb1af47b8e0865055624cf4e89a111ac1b0f) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1186,7 +1186,7 @@ ROM_START( miaj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) 	// Z80 code (sound CPU)
 	ROM_LOAD( "808_e03.10a",		0x00000,  0x8000, CRC(3d93a7cd) SHA1(dcdd327e78f32436b276d0666f62a5b733b296e8) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD("808_e14.d8",			0x0000, 0x4000, CRC(b9d36525) SHA1(53291c4911d7e1a5110539e4c57a11d0d530dc6f) ) // characters
 
 	ROM_REGION16_LE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
@@ -1217,7 +1217,7 @@ ROM_START( cuebrckj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) 	// Z80 code (sound CPU)
 	ROM_LOAD( "903_d03.10a",		0x00000,  0x8000, CRC(455e855a) SHA1(cfdd54a5071862653ee94c0455301f4a7245fbd8) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "903_e14.d8",			0x0000, 0x4000, CRC(ddbebbd5) SHA1(df532f19a08cabb28d693e4cd445c47c9e35e5ff) ) // characters
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )	// gfx data used at runtime

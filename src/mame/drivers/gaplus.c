@@ -580,11 +580,11 @@ ROM_START( gaplus )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */
@@ -603,7 +603,7 @@ ROM_START( gaplus )
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
 	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
-	ROM_REGION( 0x0100, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
@@ -621,11 +621,11 @@ ROM_START( gapluso )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */
@@ -644,7 +644,7 @@ ROM_START( gapluso )
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
 	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
-	ROM_REGION( 0x0100, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
@@ -662,11 +662,11 @@ ROM_START( gaplusa )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */
@@ -685,7 +685,7 @@ ROM_START( gaplusa )
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
 	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
-	ROM_REGION( 0x0100, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
@@ -703,11 +703,11 @@ ROM_START( galaga3 )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */
@@ -741,11 +741,11 @@ ROM_START( galaga3a )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */
@@ -779,11 +779,11 @@ ROM_START( galaga3m )
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
 	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )	/* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, "gfx2", 0 )
 	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )	/* objects */
 	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )	/* objects */
 	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )	/* objects */

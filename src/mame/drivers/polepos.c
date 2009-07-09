@@ -993,17 +993,17 @@ ROM_START( polepos )
 	ROM_LOAD16_BYTE( "pp1_6b.4l",     0x0000, 0x2000, CRC(81696272) SHA1(27041a7c24297a6f317537c44922b51d2b2278a6) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "pp1_28.1f",     0x0000, 0x1000, CRC(5b277daf) SHA1(0b1feeb2c0c63a5db5ba9b0115aa1b2388636a70) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "pp1_29.1e",     0x0000, 0x1000, CRC(706e888a) SHA1(af1aa2199fcf73a3afbe760857ff117865350954) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "pp1_25.1n",     0x0000, 0x2000, CRC(ac8e28c1) SHA1(13bc2bf4be28d9ae987f79034f9532272b3a2543) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "pp1_26.1m",     0x2000, 0x2000, CRC(94443079) SHA1(413d7b762c8dff541675e96874be6ee0251d3581) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.150",   0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "pp1_19.4n",    0x2000, 0x2000, CRC(43ff83e1) SHA1(8f830549a629b019125e59801e5027e4e4b3c0f2) )
 	ROM_LOAD( "pp1_21.3n",    0x4000, 0x2000, CRC(5f958eb4) SHA1(b56d84e5e5e0ddeb0e71851ba66e5fa1b1409551) )
@@ -1077,17 +1077,17 @@ ROM_START( poleposa )
 	ROM_LOAD16_BYTE( "136014.204",   0x0000, 0x2000, CRC(c52c98ed) SHA1(2e33c487deaf8afb941e07e511a9828d2d8f6b31) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.132",   0x0000, 0x1000, CRC(a949aa85) SHA1(2d6414196b6071101001128418233e585279ffb9) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx2", 0 )
 	ROM_LOAD( "136014.133",   0x0000, 0x1000, CRC(3f0eb551) SHA1(39516d0f72f4e3b03df9451d2dbe081d6c71a508) )    /* 2bpp view layer */
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "136014.156",   0x0000, 0x2000, CRC(e7a09c93) SHA1(47cc5c6776333bba8454a3df9e2f6e7de4a465e1) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "136014.157",   0x2000, 0x2000, CRC(dee7d687) SHA1(ea34b51c91f6915b74a4a7b53ddb4ff36b72bf66) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.150",   0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "136014.152",   0x2000, 0x2000, CRC(a7e3a1c6) SHA1(b7340318afaa4b5f416fe4444899579242cd36c2) )
 	ROM_LOAD( "136014.154",   0x4000, 0x2000, CRC(8992d381) SHA1(3bf2544dbe88132137acec2c064a104a74139ec7) )
@@ -1156,17 +1156,17 @@ ROM_START( polepos1 )
 	ROM_LOAD16_BYTE( "136014.104",   0x0000, 0x2000, CRC(ba0045f3) SHA1(aedb8d8c56407963aa4ffb66243288c8fd6d845a) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.132",   0x0000, 0x1000, CRC(a949aa85) SHA1(2d6414196b6071101001128418233e585279ffb9) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "136014.133",   0x0000, 0x1000, CRC(3f0eb551) SHA1(39516d0f72f4e3b03df9451d2dbe081d6c71a508) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "136014.156",   0x0000, 0x2000, CRC(e7a09c93) SHA1(47cc5c6776333bba8454a3df9e2f6e7de4a465e1) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "136014.157",   0x2000, 0x2000, CRC(dee7d687) SHA1(ea34b51c91f6915b74a4a7b53ddb4ff36b72bf66) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.150",   0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "136014.152",   0x2000, 0x2000, CRC(a7e3a1c6) SHA1(b7340318afaa4b5f416fe4444899579242cd36c2) )
 	ROM_LOAD( "136014.154",   0x4000, 0x2000, CRC(8992d381) SHA1(3bf2544dbe88132137acec2c064a104a74139ec7) )
@@ -1332,17 +1332,17 @@ ROM_START( topracer )
 	ROM_LOAD16_BYTE( "tr6b.bin",     0x0000, 0x2000, CRC(9d038ada) SHA1(7a9496c3fb93fd1945393656f8510a0c6421a9ab) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "tr29.bin",     0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "trus25.bin",   0x0000, 0x2000, CRC(9e1a9c3b) SHA1(deca026c39093119985d1486ed61abc3e6e5705c) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "trus26.bin",   0x2000, 0x2000, CRC(3b39a176) SHA1(d04c9c2c9129c8dd7d7eab24c43502b67162407c) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "pp17.bin",     0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "tr19.bin",     0x2000, 0x2000, CRC(f8e7f551) SHA1(faa23c55bc43325e6f71936be970f2ca144697d8) )
 	ROM_LOAD( "tr21.bin",     0x4000, 0x2000, CRC(17c798b0) SHA1(ae2047bc0e4e8c85e1de09c39c200ea8f7c6a72e) )
@@ -1406,17 +1406,17 @@ ROM_START( topracra )
 	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "tr29.bin",     0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "pole-5",       0x0000, 0x2000, CRC(301117d2) SHA1(0d8be9e50da4601963a8392aa3e0f3414e721fa1) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "pole-6",       0x2000, 0x2000, CRC(3c9db014) SHA1(c26098dd78803e699845fefa92bf034c38259cea) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "pp17.bin",     0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "tr19.bin",     0x2000, 0x2000, CRC(f8e7f551) SHA1(faa23c55bc43325e6f71936be970f2ca144697d8) )
 	ROM_LOAD( "tr21.bin",     0x4000, 0x2000, CRC(17c798b0) SHA1(ae2047bc0e4e8c85e1de09c39c200ea8f7c6a72e) )
@@ -1483,17 +1483,17 @@ ROM_START( topracrb )
 	ROM_LOAD16_BYTE( "tr6b.f5",     0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) )
 
 	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "tr28.j9",      0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
 
-	ROM_REGION( 0x01000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "tr29.k9",      0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "tr25.d5",      0x0000, 0x2000, CRC(9e1a9c3b) SHA1(deca026c39093119985d1486ed61abc3e6e5705c) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "tr26.d8",      0x2000, 0x2000, CRC(3b39a176) SHA1(d04c9c2c9129c8dd7d7eab24c43502b67162407c) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "tr17.a5",      0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "tr19.b5",      0x2000, 0x2000, CRC(f8e7f551) SHA1(faa23c55bc43325e6f71936be970f2ca144697d8) )
 	ROM_LOAD( "tr21.c5",      0x4000, 0x2000, CRC(17c798b0) SHA1(ae2047bc0e4e8c85e1de09c39c200ea8f7c6a72e) )
@@ -1564,17 +1564,17 @@ ROM_START( polepos2 )
 	ROM_LOAD16_BYTE( "pp4_8.3l",      0x4000, 0x1000, CRC(ef25a2ee) SHA1(45959355cad1a48f19ae14193374e03d4f9965c7) )
 
 	/* graphics data */
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x02000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "pp4_28.1f",     0x0000, 0x2000, CRC(280dde7d) SHA1(b7c7fb3a5076aa4d0e0cf3256ece9a6194315626) )
 
-	ROM_REGION( 0x02000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x02000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "136014.173",   0x0000, 0x2000, CRC(ec3ec6e6) SHA1(ae905d0ae802d1010b2c1f1a13e88a1f0dbe57da) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "pp4_25.1n",     0x0000, 0x2000, CRC(fd098e65) SHA1(2c497f1d278ba6730752706a0d1b5a5a0fec3d5b) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "pp4_26.1m",     0x2000, 0x2000, CRC(35ac62b3) SHA1(21038a78eb73d520e3e1ae8e1c0047d06b94cdab) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.119",  0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "pp1_19.4n",     0x2000, 0x2000, CRC(43ff83e1) SHA1(8f830549a629b019125e59801e5027e4e4b3c0f2) )
 	ROM_LOAD( "pp1_21.3n",     0x4000, 0x2000, CRC(5f958eb4) SHA1(b56d84e5e5e0ddeb0e71851ba66e5fa1b1409551) )
@@ -1656,17 +1656,17 @@ ROM_START( poleps2a )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
 	/* graphics data */
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x02000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.172",   0x0000, 0x2000, CRC(fbe5e72f) SHA1(07965d6e98ac1332ac6192b5e9cc927dd9eb706f) )
 
-	ROM_REGION( 0x02000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x02000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "136014.173",   0x0000, 0x2000, CRC(ec3ec6e6) SHA1(ae905d0ae802d1010b2c1f1a13e88a1f0dbe57da) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "136014.170",   0x0000, 0x2000, CRC(455d79a0) SHA1(03ef7c58f3145d9a6a461ef1aea3b5a49e653f80) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "136014.171",   0x2000, 0x2000, CRC(78372b81) SHA1(5defaf2074c1ab4d13dc36a190c658ddf7f7931b) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.119",   0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "136014.166",   0x2000, 0x2000, CRC(2b0517bd) SHA1(ebe447ba3dcd8a3b56f47d707483074f61953fec) )
 	ROM_LOAD( "136014.168",   0x4000, 0x2000, CRC(4d7916d9) SHA1(052745f252f51bfdd456e54cf7b8d22ab3aace27) )
@@ -1740,17 +1740,17 @@ ROM_START( poleps2b )
 	ROM_LOAD16_BYTE( "136014.185",   0x4000, 0x2000, CRC(899de75e) SHA1(4a16535115e37a3d342b2cb53f610a87c0d0abe1) )
 
 	/* graphics data */
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) 	/* 2bpp alpha layer */
+	ROM_REGION( 0x02000, "gfx1", 0 ) 	/* 2bpp alpha layer */
 	ROM_LOAD( "136014.172",   0x0000, 0x2000, CRC(fbe5e72f) SHA1(07965d6e98ac1332ac6192b5e9cc927dd9eb706f) )
 
-	ROM_REGION( 0x02000, "gfx2", ROMREGION_DISPOSE ) 	/* 2bpp view layer */
+	ROM_REGION( 0x02000, "gfx2", 0 ) 	/* 2bpp view layer */
 	ROM_LOAD( "136014.173",   0x0000, 0x2000, CRC(ec3ec6e6) SHA1(ae905d0ae802d1010b2c1f1a13e88a1f0dbe57da) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_DISPOSE ) 	/* 4bpp 16x16 sprites */
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
 	ROM_LOAD( "136014.170",   0x0000, 0x2000, CRC(455d79a0) SHA1(03ef7c58f3145d9a6a461ef1aea3b5a49e653f80) )    /* 4bpp sm sprites, planes 0+1 */
 	ROM_LOAD( "136014.171",   0x2000, 0x2000, CRC(78372b81) SHA1(5defaf2074c1ab4d13dc36a190c658ddf7f7931b) )    /* 4bpp sm sprites, planes 2+3 */
 
-	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) 	/* 4bpp 32x32 sprites */
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
 	ROM_LOAD( "136014.119",   0x0000, 0x2000, CRC(2e134b46) SHA1(0938f5f9f5cc6d7c1096c569449db78dbc42da01) )    /* 4bpp lg sprites, planes 0+1 */
 	ROM_LOAD( "136014.166",   0x2000, 0x2000, CRC(2b0517bd) SHA1(ebe447ba3dcd8a3b56f47d707483074f61953fec) )
 	ROM_LOAD( "136014.168",   0x4000, 0x2000, CRC(4d7916d9) SHA1(052745f252f51bfdd456e54cf7b8d22ab3aace27) )

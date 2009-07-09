@@ -691,14 +691,14 @@ ROM_START( multchmp )
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 	ROM_CONTINUE(          0x10000, 0x14000)
 
-	ROM_REGION( 0x140000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x140000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd14.ju03", 0x000000, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
 	ROM_LOAD( "esd15.ju04", 0x040000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
 	ROM_LOAD( "esd16.ju05", 0x080000, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
 	ROM_LOAD( "esd17.ju06", 0x0c0000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
 	ROM_LOAD( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD( "esd5.fu27",  0x000000, 0x080000, CRC(299f32c2) SHA1(274752444f6ddba16eeefc02c3e78525c079b3d8) )
 	ROM_LOAD( "esd6.fu32",  0x080000, 0x080000, CRC(e2689bb2) SHA1(1da9b1f7335d5c2d1c2f8353fccf91c0109d2e9d) )
 	ROM_LOAD( "esd11.fu29", 0x100000, 0x080000, CRC(9bafd8ee) SHA1(db18be05431d4b6d4207e19fa4ed8701621aaa19) )
@@ -721,14 +721,14 @@ ROM_START( multchmk )
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 	ROM_CONTINUE(          0x10000, 0x14000)
 
-	ROM_REGION( 0x140000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x140000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "multchmp.u36", 0x000000, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
 	ROM_LOAD( "multchmp.u37", 0x040000, 0x040000, CRC(b1ae7f08) SHA1(37dd9d4cef8b9e1d09d7b46a9794fb2b777c9a01) )
 	ROM_LOAD( "multchmp.u38", 0x080000, 0x040000, CRC(88e252e8) SHA1(07d898379798c6be42b636762b0af61b9111a480) )
 	ROM_LOAD( "multchmp.u39", 0x0c0000, 0x040000, CRC(51f01067) SHA1(d5ebbc7d358b63724d2f24da8b2ce4a202be37a5) )
 	ROM_LOAD( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD( "multchmp.u27", 0x000000, 0x080000, CRC(dc42704e) SHA1(58a04a47ffc6d6ae0e4d49e466b1c58b37ad741a) )
 	ROM_LOAD( "multchmp.u28", 0x080000, 0x080000, CRC(449991fa) SHA1(fd93e420a04cb8bea5421aa9cbe079bd3e7d4924) )
 	ROM_LOAD( "multchmp.u33", 0x100000, 0x080000, CRC(e4c0ec96) SHA1(74152108e4d05f4aff9d38919f212fcb8c87cef3) )
@@ -804,14 +804,14 @@ ROM_START( mchampdx )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
 	/* this has additional copyright sprites in the flash roms for the (c)2000 message.. */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "ver0106_ju01.bin", 0x200000, 0x200000, CRC(55841d90) SHA1(52ba3ee9393dcddf28e2d20a50151bc739faaaa4) )
 	ROM_LOAD( "ver0106_ju02.bin", 0x000000, 0x200000, CRC(b27a4977) SHA1(b7f94bb04d0046538b3938335e6b0cce330ad79c) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "ver0106_esd5.ju07", 0x400000, 0x040000, CRC(7a3ac887) SHA1(3c759f9bed396bbaf6bd7298a8bd2bd76df3aa6f) )
 	ROM_FILL(                             0x500000, 0x100000, 0 )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "rom.fu35", 0x000000, 0x200000, CRC(ba46f3dc) SHA1(4ac7695bdf4237654481f7f74f8650d70a51e691) )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
@@ -828,14 +828,14 @@ ROM_START( mchampda )
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "rom.ju01", 0x200000, 0x200000, CRC(1a749fc2) SHA1(feff4b26ee28244b4d092798a176e33e09d5df2c) )
 	ROM_LOAD( "rom.ju02", 0x000000, 0x200000, CRC(7e87e332) SHA1(f90aa00a64a940846d99053c7aa023e3fd5d070b) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(6cc871cc) SHA1(710b9695c864e4234686993b88d24590d60e1cb9) )
 	ROM_FILL(                     0x500000, 0x100000, 0 )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "rom.fu35", 0x000000, 0x200000, CRC(ba46f3dc) SHA1(4ac7695bdf4237654481f7f74f8650d70a51e691) )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
@@ -897,14 +897,14 @@ ROM_START( hedpanic ) /* Story line & game instructions in English */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
 	ROM_LOAD( "esd7.ju02", 0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(bd785921) SHA1(c8bcb38d5aa6f5a27f0dedf7efd1d6737d59b4ca) )
 	ROM_FILL(                     0x500000, 0x100000, 0 )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
 	ROM_LOAD16_BYTE( "esd9.fu34", 0x000001, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
@@ -922,14 +922,14 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
 	ROM_LOAD( "esd7.ju02", 0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(bd785921) SHA1(c8bcb38d5aa6f5a27f0dedf7efd1d6737d59b4ca) )
 	ROM_FILL(                     0x500000, 0x100000, 0 )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
 	ROM_LOAD16_BYTE( "esd9.fu34", 0x000001, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
@@ -950,14 +950,14 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "sm1.bin", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
 	ROM_LOAD( "sm2.bin", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) )
 	ROM_FILL(                    0x500000, 0x100000, 0 )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "sm3.bin", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
 	ROM_LOAD16_BYTE( "sm4.bin", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
 
@@ -1029,14 +1029,14 @@ ROM_START( tangtang )
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x140000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x140000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "xju04.bin", 0x000000, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
 	ROM_LOAD( "xju05.bin", 0x040000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
 	ROM_LOAD( "xju06.bin", 0x080000, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
 	ROM_LOAD( "xju07.bin", 0x0c0000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
 	ROM_LOAD( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
 	ROM_LOAD16_BYTE( "fu34.bin", 0x000001, 0x200000, CRC(bf91f543) SHA1(7c149fed8b8044850cd6b798622a91c45336cd47) )
 
@@ -1103,14 +1103,14 @@ ROM_START( swatpolc ) /* SWAT Police */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) /* 2 roms on PCB with an ESD3 label */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
-	ROM_REGION( 0x280000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_REGION( 0x280000, "gfx1", 0 )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd1.ju03", 0x000000, 0x080000, CRC(17fcc5e7) SHA1(ad57d2b0c0062f6f8c7732df57e4d12ca47c1bb8) )
 	ROM_LOAD( "esd2.ju04", 0x080000, 0x080000, CRC(9c1752f2) SHA1(2e8c377137258498564749413b49e156180e806a) )
 	ROM_LOAD( "esd3.ju05", 0x100000, 0x080000, CRC(e8d9c092) SHA1(80e1f1d4dad48c7be3d4b72c4a82d5388fd493c7) )
 	ROM_LOAD( "esd4.ju06", 0x180000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
 	ROM_LOAD( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) /* No labels on the flash roms */
 	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(7117a6a2) SHA1(17c0ab02698cffa0582ed2d2b7dbb7fed8cd9393) ) /* No labels on the flash roms */
 

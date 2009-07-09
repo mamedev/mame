@@ -1125,21 +1125,21 @@ ROM_START( lastday )
 	ROM_LOAD( "lday1.bin",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "lday2.bin",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_BYTE( "lday16.bin",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
 	ROM_LOAD16_BYTE( "lday15.bin",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "lday6.bin",    0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
 	ROM_LOAD16_BYTE( "lday9.bin",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
 	ROM_LOAD16_BYTE( "lday7.bin",    0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
 	ROM_LOAD16_BYTE( "lday10.bin",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "lday12.bin",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
 	ROM_LOAD16_BYTE( "lday14.bin",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
@@ -1162,21 +1162,21 @@ ROM_START( lastdaya )
 	ROM_LOAD( "e1",           0x0000, 0x8000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "lday2.bin",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_BYTE( "lday16.bin",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
 	ROM_LOAD16_BYTE( "lday15.bin",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "e6",           0x00000, 0x20000, CRC(7623c443) SHA1(abfed648a8cc438dbb7de9c23a663082667ca366) )
 	ROM_LOAD16_BYTE( "e9",           0x00001, 0x20000, CRC(717f6a0e) SHA1(0b2d98fa5b8734210df18bce7725972fd42a6e4a) )
 	ROM_LOAD16_BYTE( "lday7.bin",    0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
 	ROM_LOAD16_BYTE( "lday10.bin",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "lday12.bin",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
 	ROM_LOAD16_BYTE( "lday14.bin",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
@@ -1197,23 +1197,23 @@ ROM_START( gulfstrm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "12.r8",        0x00000, 0x20000, CRC(ec3ad3e7) SHA1(276da309b788091cd6e5faada2ff9e5b0df2caea) )
 	ROM_LOAD16_BYTE( "13.r9",        0x00001, 0x20000, CRC(c64090cb) SHA1(5dab576e5f454c62c7826d477b3f699e979753ad) )
 
@@ -1234,23 +1234,23 @@ ROM_START( gulfstr2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "2.bin",        0x0000, 0x8000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )	/* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
 	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
 
@@ -1271,17 +1271,17 @@ ROM_START( pollux )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "pollux1.bin",  0x08000, 0x08000, CRC(7f7135da) SHA1(0f77841e52b3d7e731d5142fba9ed5cd57343305) )
 	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
@@ -1303,17 +1303,17 @@ ROM_START( polluxa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "dooyong1.bin",  0x08000, 0x08000, CRC(a7d820b2) SHA1(bbcc3690f91a4bd4f0cff5da25cbfeceb7a19437) )
 	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
@@ -1335,17 +1335,17 @@ ROM_START( polluxa2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "dooyong1.bin",  0x08000, 0x08000, CRC(a7d820b2) SHA1(bbcc3690f91a4bd4f0cff5da25cbfeceb7a19437) )
 	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x80000, "gfx4", 0 )	/* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
@@ -1367,10 +1367,10 @@ ROM_START( bluehawk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "rom3",         0x00000, 0x10000, CRC(c192683f) SHA1(060372b21bf331671c135a074640868eeb5f13ec) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m3",     0x00000, 0x80000, CRC(8809d157) SHA1(7f86378f9fcb95ab83b68f37a29732bb8cb3d95a) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles + tilemaps (together!) */
@@ -1395,10 +1395,10 @@ ROM_START( bluehawn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "rom3ntc",      0x00000, 0x10000, CRC(31eb221a) SHA1(7b893972227047d2f609fd1f97cc006eba2c9579) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m3",     0x00000, 0x80000, CRC(8809d157) SHA1(7f86378f9fcb95ab83b68f37a29732bb8cb3d95a) )	// ROM7+ROM8+ROM13+ROM14
 
 	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles + tilemaps (together!) */
@@ -1492,11 +1492,11 @@ ROM_START( flytiger )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x10000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "2.4h",         0x08000, 0x08000, CRC(2fb72912) SHA1(34453e2b49cf3a6bc9e87a8400428d95f626b97a) )
 	ROM_CONTINUE(             0x00000, 0x8000 )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
 	ROM_LOAD16_BYTE( "13.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
 	ROM_LOAD16_BYTE( "15.2h", 0x00001, 0x20000, CRC(399f6043) SHA1(ea0debd6d0f8c61f0078809c2828734fc15e891d) )
 	ROM_LOAD16_BYTE( "14.4k", 0x40000, 0x20000, CRC(df66b6f3) SHA1(3a29ae69a09306c5a2a2786acbf227832b408152) )
@@ -1520,7 +1520,7 @@ ROM_START( sadari )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "3.6r",         0x0000, 0x10000, CRC(4786fca6) SHA1(b2347e2f6bbe3dd9d1cc8d8a4af40e7997d5ab74) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "2.4c",         0x0000, 0x20000, CRC(b2a3f1c6) SHA1(06f0038dc113c8001786157b9c9ee0eda76c2411) )
 
 	/* no sprites */
@@ -1549,7 +1549,7 @@ ROM_START( gundl94 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "gd94_002.c5",  0x0000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
 
 	/* no sprites */
@@ -1569,7 +1569,7 @@ ROM_START( gundl94 )
 	ROM_LOAD( "gd94_011.j9",  0x00000, 0x20000, CRC(d8ad0208) SHA1(5df0f94ef86d7a03bde546e7aafdc0caf8a17076) )
 	ROM_RELOAD(               0x10000, 0x20000 )				/* banked at 0x8000-0xbfff */
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )	/* more tiles? they don't seem to belong to this game! */
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* more tiles? they don't seem to belong to this game! */
 	ROM_LOAD16_BYTE( "gd94_006.j7",  0x00000, 0x20000, CRC(1d9536fe) SHA1(d72e66a529456c87217f9ba88f7f45aa2aa3e399) )
 	ROM_LOAD16_BYTE( "gd94_010.l7",  0x00001, 0x20000, CRC(4b74857f) SHA1(a4413369fdb165c0f12454592181675095f28145) )
 ROM_END
@@ -1582,7 +1582,7 @@ ROM_START( primella )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* chars */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* chars */
 	ROM_LOAD( "gd94_002.c5",  0x0000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
 
 	/* no sprites */
@@ -1669,7 +1669,7 @@ ROM_START( superx )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "1.5u",     0x0000, 0x10000, CRC(6894ce05) SHA1(9726fc3f1e9bebecf498c208ab03007f34936632) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* sprite */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* sprite */
 	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",    0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* tiles + tilemaps (together!) */
@@ -1704,7 +1704,7 @@ ROM_START( superxm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "1_m.5u",     0x0000, 0x10000,  CRC(319fa632) SHA1(b621ad080e8cf6611fc88d8fc2af5aa4e31e9e01) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* sprite */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* sprite */
 	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",    0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* tiles + tilemaps (together!) */
@@ -1738,7 +1738,7 @@ ROM_START( rshark )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "rse3.bin",     0x0000, 0x10000, CRC(03c8fd17) SHA1(d59a3d8b731484572384a9d6f24ef4cd200ef661) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* sprite */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* sprite */
 	ROM_LOAD16_BYTE( "rse4.bin",     0x000000, 0x80000, CRC(b857e411) SHA1(14a8883243f3f1ee661395cbcce7d5d3c08caef8) )
 	ROM_LOAD16_BYTE( "rse5.bin",     0x000001, 0x80000, CRC(7822d77a) SHA1(25d34b508a25ab8052d3f73eeb60c7b9e6610db6) )
 	ROM_LOAD16_BYTE( "rse6.bin",     0x100000, 0x80000, CRC(80215c52) SHA1(6138804fc2f81cf1366cc1bcca7572e45845ca8a) )
@@ -1819,7 +1819,7 @@ ROM_START( popbingo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "rom1.3p",     0x0000, 0x10000, CRC(46e8d2c4) SHA1(a6fb55766e0bad321ac03977f33d3000ab7ab295) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* sprite */
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* sprite */
 	ROM_LOAD16_BYTE( "rom5.9m",   0x00000, 0x80000, CRC(e8d73e07) SHA1(4ed647eaa6b32b9f159fc49d30962ad20f97b245) )
 	ROM_LOAD16_BYTE( "rom6.9l",   0x00001, 0x80000, CRC(c3db3975) SHA1(bb085c9339d640585b18992dc8b861870920559a) )
 

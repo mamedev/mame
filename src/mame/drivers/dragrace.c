@@ -361,12 +361,12 @@ ROM_START( dragrace )
 	ROM_LOAD( "8514.a1", 0x1800, 0x0800, CRC(ad218690) SHA1(08ba5f4fa4c75d8dad1a7162888d44b3349cbbe4) )
 	ROM_RELOAD(          0xF800, 0x0800 )
 
-	ROM_REGION( 0x800, "gfx1", ROMREGION_DISPOSE )   /* 2 color tiles */
+	ROM_REGION( 0x800, "gfx1", 0 )   /* 2 color tiles */
 	ROM_LOAD( "8519dr.j0", 0x000, 0x200, CRC(aa221ba0) SHA1(450acbf349d77a790a25f3e303c31b38cc426a38) )
 	ROM_LOAD( "8521dr.k0", 0x200, 0x200, CRC(0cb33f12) SHA1(d50cb55391aec03e064eecad1624d50d4c30ccab) )
 	ROM_LOAD( "8520dr.r0", 0x400, 0x200, CRC(ee1ae6a7) SHA1(83491095260c8b7c616ff17ec1e888d05620f166) )
 
-	ROM_REGION( 0x800, "gfx2", ROMREGION_DISPOSE )   /* 4 color tiles */
+	ROM_REGION( 0x800, "gfx2", 0 )   /* 4 color tiles */
 	ROM_LOAD( "8515dr.e0", 0x000, 0x200, CRC(9510a59e) SHA1(aea0782b919279efe55a07007bd55a16f7f59239) )
 	ROM_LOAD( "8517dr.h0", 0x200, 0x200, CRC(8b5bff1f) SHA1(fdcd719c66bff7c4b9f3d56d1e635259dd8add61) )
 	ROM_LOAD( "8516dr.l0", 0x400, 0x200, CRC(d1e74af1) SHA1(f55a3bfd7d152ac9af128697f55c9a0c417779f5) )

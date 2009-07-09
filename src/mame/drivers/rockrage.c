@@ -319,11 +319,11 @@ ROM_START( rockrage )
 	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
-	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx1", 0 )
 	ROM_LOAD( "620k06.rom",	0x000000, 0x20000, CRC(7fa2c57c) SHA1(8c5d85c31dc26cb59a012ebb1ea195c3db80cda8)  )	/* tiles */
 	ROM_LOAD( "620k05.rom",	0x020000, 0x20000, CRC(145d387c) SHA1(4fb0c54f9a218d512d8aec09ef995494a06912d6)  ) /* Both World & Japan use the same "K" code for these??? */
 
-	ROM_REGION( 0x040000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620k11.rom",	0x000000, 0x20000, CRC(70449239) SHA1(07653ea3bfe0063c9d2b2102ac52a1b50fc2971e) )	/* sprites */
 	ROM_LOAD( "620l10.8g",	0x020000, 0x20000, CRC(06d108e0) SHA1(cae8c5f2fc4e84bc7adbf27f71a18a74968c4296) ) /* One "K" & one "L" code version??? */
 
@@ -344,13 +344,13 @@ ROM_START( rockraga )
 	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) ) /* Same rom but labeled as ver "G" */
 
-	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx1", 0 )
 	ROM_LOAD( "620d06a.15g", 0x000000, 0x10000, CRC(8cc05d4b) SHA1(0d6fef98bdc4d299229de4e0044241aedee83b85) )	/* tiles */
 	ROM_LOAD( "620d06b.15f", 0x010000, 0x10000, CRC(3892d41d) SHA1(c49f2e61f24a59be4e59e2f3c60e731b8a05ddd3) )
 	ROM_LOAD( "620d05a.16g", 0x020000, 0x10000, CRC(4d53fde9) SHA1(941fb6c94922727516945330b4b738aa052f7734) )
 	ROM_LOAD( "620d05b.16f", 0x030000, 0x10000, CRC(69f4599f) SHA1(664581874d74ed7bf59bde6730799e15f4e0144d) )
 
-	ROM_REGION( 0x040000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620g11a.7g",	0x000000, 0x10000, CRC(0ef40c2c) SHA1(2c0b7e611333a072ebcef60c1985211d5936bf66) )	/* sprites */
 	ROM_LOAD( "620d11b.7f",	0x010000, 0x10000, CRC(8f116cbf) SHA1(0400609aadde39c6f02ab954c78bc67a1d23da1d) )
 	ROM_LOAD( "620d10a.8g",	0x020000, 0x10000, CRC(4789ae7b) SHA1(8885ca20bf746fb3ed229486c0e3903ababfacc9) )
@@ -373,11 +373,11 @@ ROM_START( rockragj )
 	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
-	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx1", 0 )
 	ROM_LOAD( "620k06.15g",	0x000000, 0x20000, CRC(c0e2b35c) SHA1(fb37a151188f27f883fed5fdfb0094c3efa9470d) )	/* tiles */
 	ROM_LOAD( "620k05.16g",	0x020000, 0x20000, CRC(ca9d9346) SHA1(fee8d98def802f312c6cd0ec751c67aa18acfacd) ) /* Both World & Japan use the same "K" code for these??? */
 
-	ROM_REGION( 0x040000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620k11.7g",	0x000000, 0x20000, CRC(7430f6e9) SHA1(5d488c7b7b0eb4e502b3e566ac102cd3267e8568) )	/* sprites */
 	ROM_LOAD( "620k10.8g",	0x020000, 0x20000, CRC(0d1a95ab) SHA1(be565424f17af31dcd07004c6be03bbb00aef514) )
 

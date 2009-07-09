@@ -441,7 +441,7 @@ ROM_START( ar_fast )
 	ROM_LOAD16_BYTE( "fastv28.8h", 0x0e0000, 0x10000, CRC(3650aaf0) SHA1(cc37aa94360159f45076eafaae8140a661bd52f6) )
 	ROM_LOAD16_BYTE( "fastv28.8l", 0x0e0001, 0x10000, CRC(82603f68) SHA1(8affe73e97b966b8e63bff2c7914fb5ead7b60ff) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-sec-scpa.bin", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 

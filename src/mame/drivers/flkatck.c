@@ -261,7 +261,7 @@ ROM_START( mx5000 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
 	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "mask4m.bin",     0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) )/* tiles + sprites */
 
 	ROM_REGION( 0x040000, "konami", 0 )	/* 007232 data (chip 1) */
@@ -276,7 +276,7 @@ ROM_START( flkatck )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
 	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "mask4m.bin",     0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) )/* tiles + sprites */
 
 	ROM_REGION( 0x040000, "konami", 0 )	/* 007232 data (chip 1) */

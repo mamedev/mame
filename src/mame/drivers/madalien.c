@@ -216,12 +216,12 @@ ROM_START( madalien )
 	ROM_LOAD( "m8", 0xf800, 0x0400, CRC(cfd19dab) SHA1(566dc84ffe9bcaeb112250a9e1882bf62f47b579) )
 	ROM_LOAD( "m9", 0xfc00, 0x0400, CRC(48f30f24) SHA1(9c0bf6e43b143d6af1ebb9dad2bdc2b53eb2e48e) )
 
-	ROM_REGION( 0x0c00, "gfx1", ROMREGION_DISPOSE )    /* background tiles */
+	ROM_REGION( 0x0c00, "gfx1", 0 )    /* background tiles */
 	ROM_LOAD( "mc.3k", 0x0000, 0x0400, CRC(2daadfb7) SHA1(8be084a39b256e538fd57111e92d47115cb142cd) )
 	ROM_LOAD( "md.3l", 0x0400, 0x0400, CRC(3ee1287a) SHA1(33bc59a8d09d22f3db80f881c2f37aa788718138) )
 	ROM_LOAD( "me.3m", 0x0800, 0x0400, CRC(45a5c201) SHA1(ac600afeabf494634c3189d8e96644bd0deb45f3) )
 
-	ROM_REGION( 0x0400, "gfx2", ROMREGION_DISPOSE )    /* headlight */
+	ROM_REGION( 0x0400, "gfx2", 0 )    /* headlight */
 	ROM_LOAD( "ma.2b", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
 	ROM_REGION( 0x0400, "user1", 0 )                    /* background tile map */
@@ -399,12 +399,12 @@ ROM_START( madalina )
 	ROM_LOAD( "8_2708.4d", 0xf800, 0x0400, CRC(46162e7e) SHA1(7ed85f4a9ac58d6d9bafba0c843a16c269656563) )
 	ROM_LOAD( "9_2708.3d", 0xfc00, 0x0400, CRC(4175f5c4) SHA1(45cae8a1fcfd34b91c63cc7e544a32922da14f16) )
 
-	ROM_REGION( 0x0c00, "gfx1", ROMREGION_DISPOSE )    /* background tiles */
+	ROM_REGION( 0x0c00, "gfx1", 0 )    /* background tiles */
 	ROM_LOAD( "mc-1.3k", 0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "me-1.3l", 0x0400, 0x0400, CRC(7328a425) SHA1(327adc8b0e25d93f1ae98a44c26d0aaaac1b1a9c) )
 	ROM_LOAD( "md-1.3m", 0x0800, 0x0400, CRC(b5329929) SHA1(86890e1b7cc8cb31fc0dcbc2d3cff02e4cf95619) )
 
-	ROM_REGION( 0x0400, "gfx2", ROMREGION_DISPOSE )    /* headlight */
+	ROM_REGION( 0x0400, "gfx2", 0 )    /* headlight */
 	ROM_LOAD( "ma.2b", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
 	ROM_REGION( 0x0400, "user1", 0 )                    /* background tile map */

@@ -604,6 +604,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 {
 	const game_driver *driver = drivers[drivnum];
 	int bios_flags = 0, last_bios = 0;
+	const char *last_rgnname = "???";
 	const char *last_name = "???";
 	region_entry *currgn = NULL;
 	int items_since_region = 1;
@@ -625,9 +626,10 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 
 				/* if we haven't seen any items since the last region, print a warning */
 				if (items_since_region == 0)
-					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
-				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
+					mame_printf_warning("%s: %s has empty ROM region '%s' (warning)\n", driver->source_file, driver->name, last_rgnname);
+				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 				currgn = NULL;
+				last_rgnname = regiontag;
 
 				/* check for a valid tag */
 				if (regiontag == NULL)

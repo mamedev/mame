@@ -264,7 +264,7 @@ ROM_START( sbugger )
 	ROM_LOAD( "spbugger.u33", 0x2800, 0x0800, CRC(f6cb1399) SHA1(53cb67e29a238c5ac20c6be9423d850e004212c1) ) // seems to map at 2800
 	ROM_LOAD( "spbugger.u32", 0x3000, 0x0800, CRC(f49af2b3) SHA1(1519ee4786b78546767827d3a9508e7ddb646765) ) // seems to map at 3000
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x1000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
@@ -278,7 +278,7 @@ ROM_START( sbuggera )
 	ROM_LOAD( "bug_e10.u33", 0x2800, 0x0800, CRC(fefd9c5e) SHA1(1b0bbf462231c32014d45ec21b105a669665d90d) )
 	ROM_LOAD( "bug_d10.u32", 0x3000, 0x0800, BAD_DUMP CRC(c807742f) SHA1(cb5c44ffd6dd184c6a0722003ff6674caf865bee) ) // missing in this set
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 

@@ -491,10 +491,10 @@ ROM_START( wwfwfest )
  	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
- 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+ 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "31a12-0.ic33", 0x00000, 0x20000, CRC(d0803e20) SHA1(b68758e9a5522396f831a3972571f8aed54c64de) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
 	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
 	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
@@ -504,7 +504,7 @@ ROM_START( wwfwfest )
 	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
 	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
 	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
@@ -520,10 +520,10 @@ ROM_START( wwfwfsta )
  	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
- 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+ 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "wf_33.rom",    0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
 	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
 	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
@@ -533,7 +533,7 @@ ROM_START( wwfwfsta )
 	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
 	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
 	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
@@ -549,10 +549,10 @@ ROM_START( wwfwfstb )
 	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "wf_73a.rom",    0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "4",             0x00000, 0x20000, CRC(520ef575) SHA1(99a5e9b94e9234851c6b504d58939ad84e0d6589) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16) */
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16) */
 	ROM_LOAD( "wf_09.rom",    0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
 	ROM_LOAD( "wf_08.rom",    0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
 	ROM_LOAD( "wf_11.rom",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
@@ -562,7 +562,7 @@ ROM_START( wwfwfstb )
 	ROM_LOAD( "wf_15.rom",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
 	ROM_LOAD( "wf_14.rom",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
 	ROM_LOAD16_BYTE( "5",     0x40000, 0x20000, CRC(35e4d6eb) SHA1(d2a12bde268bc0734e6806ff5302b8c3dcc17280) ) /* 0 */
 	ROM_LOAD16_BYTE( "6",     0x40001, 0x20000, CRC(a054a5b2) SHA1(d6ed5d5a20acb7cdbaee8e3f520873650529c0ae) ) /* 1 */
 	ROM_LOAD16_BYTE( "7",     0x00000, 0x20000, CRC(101f0136) SHA1(2ccd641e49cdd3f5243ebe8c52c492842d62f5b8) ) /* 2 */
@@ -580,10 +580,10 @@ ROM_START( wwfwfstj )
  	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
- 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+ 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "31j12-0.ic33", 0x00000, 0x20000, CRC(f4821fe0) SHA1(e5faa9860e9d4e75393b64ca85a8bfc4852fd4fd) )
 
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
 	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
 	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
@@ -593,7 +593,7 @@ ROM_START( wwfwfstj )
 	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
 	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
 	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END

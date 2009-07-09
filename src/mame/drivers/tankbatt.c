@@ -325,7 +325,7 @@ ROM_START( tankbatt )
 	ROM_LOAD( "tb1-4.1d",  0x7800, 0x0800, CRC(3dfb5bcf) SHA1(aa24bf74f4d5dc81baf3843196c837e0b731077b) )
 	ROM_RELOAD(            0xf800, 0x0800 )	/* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "tb1-5.2k",  0x0000, 0x0800, CRC(aabd4fb1) SHA1(5cff659b531d0f1b6faa503f7c06045c3a209a84) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

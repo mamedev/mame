@@ -476,7 +476,7 @@ ROM_START( gpworld )
 	ROM_LOAD( "epr6164.ic83",  0x8000, 0x4000, CRC(7f0e6853) SHA1(c255ac6e4b61faa8da9b5aa70f12c868b81acfe1) )
 
 	/* Tiles */
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "epr6148.ic18", 0x0000, 0x1000, CRC(a4b11cf5) SHA1(9697494335089b13071d773812eec373ef5b358c) )
 
 	/* Sprites */

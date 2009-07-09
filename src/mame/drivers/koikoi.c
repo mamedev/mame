@@ -300,7 +300,7 @@ ROM_START( koikoi )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.ic23", 0x000, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
 
-	ROM_REGION( 0x0a00, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0a00, "plds", 0 )
 	ROM_LOAD( "pal16r8-10_pink.ic9",   0x0000, 0x0104, CRC(9f8fdb95) SHA1(cdcdb1a6baef18961cf6c75fba0c3aba47f3edbb) )
 	ROM_LOAD( "pal16r8-10_green.ic15", 0x0200, 0x0104, CRC(da7b8b95) SHA1(a4eb12f2365ff2b6057e4a2e225e8f879a961d45) )
 	ROM_LOAD( "pal16r8a_yellow.ic8",   0x0400, 0x0104, CRC(7d8da540) SHA1(28925d1fb4ef670e9c9d24860b67fdff8791c6a9) )

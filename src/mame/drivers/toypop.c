@@ -609,10 +609,10 @@ ROM_START( liblrabl )
 	ROM_LOAD16_BYTE("10c.rom",   0x0001, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
 
 	/* temporary space for graphics (disposed after conversion) */
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5p.rom",   0x0000, 0x2000, CRC(3b4937f0) SHA1(06d9de576f1c2262c34aeb91054e68c9298af688) )	/* characters */
 
-	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "9t.rom",   0x0000, 0x4000, CRC(a88e24ca) SHA1(eada133579f19de09255084dcdc386311606a335) )	/* sprites */
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* color proms */
@@ -639,10 +639,10 @@ ROM_START( toypop )
 	ROM_LOAD16_BYTE("tp1-5.10c", 0x0001, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
 
 	/* temporary space for graphics (disposed after conversion) */
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "tp1-7.5p", 0x0000, 0x2000, CRC(95076f9e) SHA1(1e3d32b21f6d46591ec3921aba51f672d64a9023) )	/* characters */
 
-	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "tp1-6.9t", 0x0000, 0x4000, CRC(481ffeaf) SHA1(c51735ad3a1dbb46ad414408b54554e9223b2219) )	/* sprites */
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* color proms */

@@ -596,7 +596,7 @@ ROM_START( aligator )
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_FILL(				0x1000000, 0x0400000, 0x0 )		/* to decode GFX as 5 bpp */
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",		0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )	/* GFX only */
 	ROM_LOAD( "u47",		0x0400000, 0x0400000, CRC(74a5a29f) SHA1(8ea2aa1f8a80c5b88ca9222c5ecc3c4794e0a160) )	/* GFX + Sound */
 	ROM_LOAD( "u50",		0x0800000, 0x0400000, CRC(85daecf9) SHA1(824f6d2491075b1ef96ecd6667c5510409338a2f) )	/* GFX only */
@@ -612,7 +612,7 @@ ROM_START( aligatun )
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_FILL(				0x1000000, 0x0400000, 0x0 )		/* to decode GFX as 5 bpp */
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "u48",		0x0000000, 0x0400000, CRC(19e03bf1) SHA1(2b3a4bb438b0aebf4f6a9fd26b071e5c9dd222b8) )	/* GFX only */
 	ROM_LOAD( "u47",		0x0400000, 0x0400000, CRC(74a5a29f) SHA1(8ea2aa1f8a80c5b88ca9222c5ecc3c4794e0a160) )	/* GFX + Sound */
 	ROM_LOAD( "u50",		0x0800000, 0x0400000, CRC(85daecf9) SHA1(824f6d2491075b1ef96ecd6667c5510409338a2f) )	/* GFX only */
@@ -853,7 +853,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) )	/* GFX only */
 
-	ROM_REGION( 0x0c00000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) )	/* GFX only */
 	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) )	/* Sound only */
 	ROM_FILL(          0x0600000, 0x0200000, 0x0 )			/* Empty */
@@ -869,7 +869,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) )	/* GFX only */
 
-	ROM_REGION( 0x0c00000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) )	/* GFX only */
 	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) )	/* Sound only */
 	ROM_FILL(          0x0600000, 0x0200000, 0x0 )			/* Empty */
@@ -885,7 +885,7 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) )	/* GFX only */
 
-	ROM_REGION( 0x0c00000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) )	/* GFX only */
 	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) )	/* Sound only */
 	ROM_FILL(          0x0600000, 0x0200000, 0x0 )			/* Empty */
@@ -1034,7 +1034,7 @@ ROM_START( snowboar )
 	ROM_LOAD( "sb43",		0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )	/* GFX only */
 	ROM_FILL(				0x1200000, 0x0200000, 0x0 )			/* Empty */
 
-	ROM_REGION( 0x0c00000, "gfx2", ROMREGION_DISPOSE ) /* Temporary storage */
+	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "sb44",		0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )	/* GFX only */
 	ROM_LOAD( "sb45",		0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )	/* Sound only */
 	ROM_LOAD( "sb46",		0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )	/* GFX only */

@@ -364,17 +364,17 @@ ROM_START( chanbara )
 	ROM_REGION( 0x8000, "user1", 0 ) // background data
 	ROM_LOAD( "cp02.14c",     0x00000, 0x8000, CRC(c2b66cea) SHA1(f72f57add5f38313a72f5c521dce157edf49f70e) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE ) // text layer
+	ROM_REGION( 0x02000, "gfx1", 0 ) // text layer
 	ROM_LOAD( "cp12.17h",     	0x00000, 0x2000, CRC(b87b96de) SHA1(f8bb9f094917df305c4fed071edaa775071e40fd) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE ) // bg layer
+	ROM_REGION( 0x08000, "gfx3", 0 ) // bg layer
 	ROM_LOAD( "cp13.15h",     	0x00000, 0x4000, CRC(2dc38c3d) SHA1(4bb1335b8285e91b51c28e74d8de11a8d6df0486) )
 	/* rom cp14.13h is expanded at 0x4000 - 0x8000 */
 
-	ROM_REGION( 0x08000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx4", 0 )
 	ROM_LOAD( "cp14.13h",     	0x00000, 0x2000, CRC(d31db368) SHA1(b62834137bfe4ac2013d2d16b0ead10bf2a2df83) )
 
-	ROM_REGION( 0x24000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x24000, "gfx2", 0 )
 	ROM_LOAD( "cp03.12c",     0x08000, 0x4000, CRC(dea247fb) SHA1(d54fa30813613ef6c3b5f86b563e9ab618a9f627))
 	ROM_LOAD( "cp04.10c",     0x04000, 0x4000, CRC(f7dce87b) SHA1(129ae41d70d96720e020ec1bc1d3f2d9e87ebf47) )
 	ROM_LOAD( "cp05.9c",      0x00000, 0x4000, CRC(df2dc3cb) SHA1(3505042c91566bb09fcd2102fecbe2034551b8eb) )

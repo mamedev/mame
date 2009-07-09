@@ -223,7 +223,7 @@ ROM_START( zerozone )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "zz-1.rom", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "zz-6.rom", 0x00000, 0x80000, CRC(c8b906b9) SHA1(1775d69df6397d6772b20c65751d44556d76c033) )
 
 	ROM_REGION( 0x40000, "oki", 0 )      /* ADPCM samples */
@@ -236,7 +236,7 @@ ROM_START( lvgirl94 )
 	ROM_LOAD16_BYTE( "rom4", 0x0000, 0x10000, CRC(c4fb449e) SHA1(dd1c567ba2cf951267dd622e2e9af265e742f246) )
 	ROM_LOAD16_BYTE( "rom5", 0x0001, 0x10000, CRC(5d446a1a) SHA1(2d7ea25e5b86e7cf4eb7f10daa1eaaaed6830a53) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(eeeb94ba) SHA1(9da09312c090ef2d40f596247d9a7decf3724e54) )
 
 	/* sound roms are the same as zerozone */

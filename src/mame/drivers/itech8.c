@@ -2182,7 +2182,7 @@ ROM_START( gtg2t )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom00.bin", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
 
@@ -2207,7 +2207,7 @@ ROM_START( gtg2j )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
 
@@ -2371,7 +2371,7 @@ ROM_START( hstennis )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )
 ROM_END
 
@@ -2395,7 +2395,7 @@ ROM_START( hstenn10 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )
 ROM_END
 
@@ -2502,7 +2502,7 @@ ROM_START( rimrockn )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0", 0x00000, 0x40000, CRC(7ad42be0) SHA1(c9b519bad3c5c9a3315d1bf3292cc30ee0771db7) )
 
-	ROM_REGION( 0x0600, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16l8.u14", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "pal16r4.u45", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "pal16l8.u29", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -2646,7 +2646,7 @@ ROM_START( gtg2 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom00.bin", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
 
-	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u29", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 

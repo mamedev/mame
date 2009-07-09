@@ -574,13 +574,13 @@ ROM_START( magix )
 	ROM_LOAD( "yunsung8.08", 0x00000, 0x0c000, CRC(6fd60be9) SHA1(87622dc2967842629e90a02b415bec86cc26cbc7) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Background */
 	ROM_LOAD( "yunsung8.04",  0x000000, 0x80000, CRC(0a100d2b) SHA1(c36a2489748c8ac7b6d7457ad09d8153707c85be) )
 	ROM_LOAD( "yunsung8.03",  0x080000, 0x80000, CRC(c8cb0373) SHA1(339c4e0fef44da3cab615e07dc8739bd925ebf28) )
 	ROM_LOAD( "yunsung8.02",  0x100000, 0x80000, CRC(09efb8e5) SHA1(684bb5c4b579f8c77e79aab4decbefea495d9474) )
 	ROM_LOAD( "yunsung8.01",  0x180000, 0x80000, CRC(4590d782) SHA1(af875166207793572b9ecf01bb6a24feba562a96) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* Text */
 	ROM_LOAD( "yunsung8.05", 0x00000, 0x20000, CRC(862d378c) SHA1(a4e2cf14b5b25c6b8725dd285ddea65ce9ee257a) )	// only first $8000 bytes != 0
 	ROM_LOAD( "yunsung8.06", 0x20000, 0x20000, CRC(8b2ab901) SHA1(1a5c05dd0cf830b645357a62d8e6e876b44c6b7f) )	// only first $8000 bytes != 0
 
@@ -612,13 +612,13 @@ ROM_START( cannball )
 	ROM_LOAD( "cannball.08", 0x00000, 0x0c000, CRC(11403875) SHA1(9f583bc4f08e7aef3fd0f3fe3f31cce1d226641a) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* Background */
 	ROM_LOAD( "cannball.01",  0x000000, 0x40000, CRC(2d7785e4) SHA1(9911354c0be192506f8bfca3e85ede0bbc4828d5) )
 	ROM_LOAD( "cannball.02",  0x040000, 0x40000, CRC(24df387e) SHA1(5f4afe11feb367ca3b3c4f5eb37a6b6c4edb83bb) )
 	ROM_LOAD( "cannball.03",  0x080000, 0x40000, CRC(4d62f192) SHA1(8c60b9b4b36c13c2d145c49413580a10e71eb283) )
 	ROM_LOAD( "cannball.04",  0x0c0000, 0x40000, CRC(37cf8b12) SHA1(f93df8e0babe2c4ec996aa3c2a48bf40a5a02e62) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* Text */
 	ROM_LOAD( "cannball.05", 0x00000, 0x20000, CRC(87c1f1fa) SHA1(dbc568d2133734e41b69fd8d18b76531648b32ef) )
 	ROM_LOAD( "cannball.06", 0x20000, 0x20000, CRC(e722bee8) SHA1(3aed7df9df81a6776b6bf2f5b167965b0d689216) )
 
@@ -635,13 +635,13 @@ ROM_START( cannbalv )
 	ROM_LOAD( "yunsung8", 0x00000, 0x0c000, CRC(11403875) SHA1(9f583bc4f08e7aef3fd0f3fe3f31cce1d226641a) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Background */
 	ROM_LOAD( "yunsung7",  0x000000, 0x80000, CRC(a5f1a648) SHA1(7a5bf5bc0ad257ccb12104512e98dfb3525babfc) )
 	ROM_LOAD( "yunsung6",  0x080000, 0x80000, CRC(8baa686e) SHA1(831c3e2864d262bf5429dca6653c83dc976e610e) )
 	ROM_LOAD( "yunsung5",  0x100000, 0x80000, CRC(a7f2ce51) SHA1(81632aca067f2c8c45488266c4489d9af24fb552) )
 	ROM_LOAD( "yunsung4",  0x180000, 0x80000, CRC(74bef793) SHA1(6208580ce747cec3d410ce3c71e07aa570b9121d) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* Text */
 	ROM_LOAD( "yunsung3", 0x00000, 0x20000, CRC(8217abbe) SHA1(1a459a816a1aa5b68858e39c4a21bd78ee78dcab) )
 	ROM_LOAD( "yunsung2", 0x20000, 0x20000, CRC(76de1045) SHA1(a3845ee1874e6ec0ce26e6e73e4643243779e70d) )
 
@@ -678,14 +678,14 @@ ROM_START( rocktris )
 	ROM_LOAD( "cpu2.bin",    0x00000, 0x0c000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Background */
 	ROM_LOAD( "gfx4.bin",     0x000000, 0x80000, CRC(abb49cac) SHA1(e2d766e950df398a8ec8b6888e128ffc3bdf1ce9) )
 	ROM_LOAD( "gfx3.bin",     0x080000, 0x80000, CRC(70a6ad52) SHA1(04cd58d3f885dd7c2fb1061f93d3ae3a418ad762) )
 	ROM_LOAD( "gfx2.bin",     0x100000, 0x80000, CRC(fcc9ec97) SHA1(1f09452988e3fa976b233e3b458c7a60977b76aa) )
 	ROM_LOAD( "gfx1.bin",     0x180000, 0x80000, CRC(4295034d) SHA1(9bdbbcdb46eb659a13b77c5bb26c9d8ad43731a7) )
 
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x40000, "gfx2", 0 )	/* Text */
 	ROM_LOAD( "gfx5.bin",     0x00000, 0x20000, CRC(058ee379) SHA1(57088bb02c56212979b9119b773eedc31af17e50) )
 	ROM_LOAD( "gfx6.bin",     0x20000, 0x20000, CRC(593cbd39) SHA1(4d60b5811118f3f22f6f3b300a4daec158456b72) )
 

@@ -311,15 +311,15 @@ ROM_START( timelimt )
 	ROM_LOAD( "tl5",    0x0000, 0x1000, CRC(5b782e4a) SHA1(2f4fe2beb8efa5a636fefc1ee172d0200d1c9497) )
 	ROM_LOAD( "tl4",    0x1000, 0x1000, CRC(a32883a9) SHA1(26e1725b67be87db28855672facb1504b8ac84d6) )
 
-	ROM_REGION( 0x2000, "tiles_1", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x2000, "tiles_1", 0 )	/* tiles */
 	ROM_LOAD( "tl11",   0x0000, 0x1000, CRC(46676307) SHA1(38fe80722972b6b3ba32705469a0dcb868fb76a9) )
 	ROM_LOAD( "tl10",   0x1000, 0x1000, CRC(2336908a) SHA1(345fc209ce891cc6f8f111c6d3a9e0f65ee6d818) )
 
-	ROM_REGION( 0x2000, "tiles_2", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x2000, "tiles_2", 0 )	/* tiles */
 	ROM_LOAD( "tl13",   0x0000, 0x1000, CRC(072e4053) SHA1(209edf7b371078e38d1c2812fa6a3d1a78193b3f) )
 	ROM_LOAD( "tl12",   0x1000, 0x1000, CRC(ce960389) SHA1(57ee52cfa1b5a3832b362b38c8b7aa411dfc782b) )
 
-	ROM_REGION( 0x6000, "sprites", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x6000, "sprites", 0 )	/* sprites */
 	ROM_LOAD( "tl3",    0x0000, 0x2000, CRC(01a9fd95) SHA1(cd1078700c97a3539c9d9447c55efbd27540a1b3) )
 	ROM_LOAD( "tl2",    0x2000, 0x2000, CRC(4693b849) SHA1(fbebedde53599fb1eaedc648bd704b321ab096b5) )
 	ROM_LOAD( "tl1",    0x4000, 0x2000, CRC(c4007caf) SHA1(ae05af3319545d5ca98a046bfc100138a5a3ed96) )
@@ -340,15 +340,15 @@ ROM_START( progress )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* ROMs */
 	ROM_LOAD( "pg4.bin",    0x0000, 0x1000, CRC(b1cc2fe8) SHA1(c9045e7b65311b052c337ad3bedadf108d1c24c3) )
 
-	ROM_REGION( 0x2000, "tiles_1", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x2000, "tiles_1", 0 )	/* tiles */
 	ROM_LOAD( "pg11.bin",   0x0000, 0x1000, CRC(bd8462e4) SHA1(91b1bd2d69aa1b1a84ee8e642b2c1131a7697dd9) )
 	ROM_LOAD( "pg10.bin",   0x1000, 0x1000, CRC(c4bbf0b8) SHA1(d149eda9637474febdafd565a60eb2940702f162) )
 
-	ROM_REGION( 0x2000, "tiles_2", ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x2000, "tiles_2", 0 )	/* tiles */
 	ROM_LOAD( "pg13.bin",   0x0000, 0x1000, CRC(25ec45be) SHA1(1271b7a5632934a82ccae35de8c2968247a233bb) )
 	ROM_LOAD( "pg12.bin",   0x1000, 0x1000, CRC(c837c5f5) SHA1(dbfc0d8afe0a8e9dd213cb4095b23b7aa8e2b6f4) )
 
-	ROM_REGION( 0x6000, "sprites", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x6000, "sprites", 0 )	/* sprites */
 	ROM_LOAD( "pg1.bin",    0x0000, 0x2000, CRC(155c8f7f) SHA1(0d32ebceb9b2a0b3faf1f91b7a6800999889b331) )
 	ROM_LOAD( "pg2.bin",    0x2000, 0x2000, CRC(a6ca4dfc) SHA1(4243c9ea98e365bf342cf928ff97cafb35cdc7b6) )
 	ROM_LOAD( "pg3.bin",    0x4000, 0x2000, CRC(2b21c2fb) SHA1(8c95889a19057d32790c9ccddc0977980eddbd0e) )

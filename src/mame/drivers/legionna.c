@@ -1285,30 +1285,30 @@ ROM_START( legionna )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "user1", ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
 	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
-	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )  /* FG Tiles */
+	ROM_REGION( 0x010000, "gfx1", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", ROMREGION_DISPOSE )  /* BK3 */
+	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "user2", ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )  /* MBK */
+	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
 	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
 	/* Not Used */
 
-	ROM_REGION( 0x80000, "gfx6", ROMREGION_DISPOSE )	/* LBK */
+	ROM_REGION( 0x80000, "gfx6", 0 )	/* LBK */
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1327,30 +1327,30 @@ ROM_START( legionnu )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "user1", ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
 	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
-	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )  /* FG Tiles */
+	ROM_REGION( 0x010000, "gfx1", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", ROMREGION_DISPOSE )  /* BK3 */
+	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "user2", ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )  /* MBK */
+	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
 	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
 	/* Not Used */
 
-	ROM_REGION( 0x80000, "gfx6", ROMREGION_DISPOSE )	/* LBK */
+	ROM_REGION( 0x80000, "gfx6", 0 )	/* LBK */
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1369,24 +1369,24 @@ ROM_START( heatbrl )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
 	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used? */
+	ROM_REGION( 0x020000, "gfx4", 0 )	/* not used? */
 	ROM_COPY( "gfx1", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1405,24 +1405,24 @@ ROM_START( heatbrl2 )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
 	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used? */
+	ROM_REGION( 0x020000, "gfx4", 0 )	/* not used? */
 	ROM_COPY( "gfx1", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1441,7 +1441,7 @@ ROM_START( heatbrlo )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
 	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
@@ -1450,19 +1450,19 @@ Readme mentions as undumped:
 barrel1,2,3,4.OBJ
 barrel1,2,3,4.BG */
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1481,23 +1481,23 @@ ROM_START( heatbrlu )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
 	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -1566,25 +1566,25 @@ ROM_START( godzilla )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "11.620",       0x000000, 0x010000, CRC(58e0e41f) SHA1(563c633eb3d4df41e467c93957c74b540a0ae43c) )
 	ROM_LOAD16_BYTE( "10.615",       0x000001, 0x010000, CRC(9c22bc13) SHA1(a94d9ed63ee1f5e358ebcaf517e6a1c986fa5d96) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD( "obj1.748",     0x300000, 0x100000, CRC(146bacb0) SHA1(1331f04f3d9e6236cec7524e9da1782ed1916ff7) ) // this might be half size like denjinmk, same pcb..
 	ROM_LOAD( "obj2.756",     0x200000, 0x100000, CRC(91c2a6a5) SHA1(0e9d9d94c3d99a54c6f9f99270e65682eb0a8b6a) )
 	ROM_LOAD( "obj3.743",     0x100000, 0x100000, CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) )
 	ROM_LOAD( "obj4.757",     0x000000, 0x100000, CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg1.618",      0x000000, 0x100000, CRC(78fbbb84) SHA1(b1f5d4041bb88c5b2a561949239b11c3fd7c5fbc) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x100000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x100000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg2.619",      0x000000, 0x100000, CRC(8ac192a5) SHA1(54b557e81a704c70a651e6b8da70207a2a70530f) )
 
-	ROM_REGION( 0x100000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x100000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x100000 )
 
 	ROM_REGION( 0x080000, "oki", 0 )	/* ADPCM samples */
@@ -1684,26 +1684,26 @@ ROM_START( denjinmk )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom7.620",       0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
 	ROM_LOAD16_BYTE( "rom8.615",       0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
 
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x500000, "gfx2", 0 )
     ROM_LOAD( "obj-0-3.748",     0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
 	ROM_LOAD( "obj-4-5.756",     0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
 	ROM_LOAD( "obj-6-7.743",     0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
 	ROM_LOAD( "obj-8-9.757",     0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg-1-ab.618",      0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* BK2 used */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* BK2 used */
 	ROM_LOAD( "bg-2-ab.617",      0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
 
-	ROM_REGION( 0x100000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x100000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "bg-3-ab.619",      0x000000, 0x100000,  CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
 
-	ROM_REGION( 0x100000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x100000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx4", 0x00000, 0x00000, 0x100000 )
 
 	ROM_REGION( 0x080000, "oki", 0 )	/* ADPCM samples */
@@ -1780,23 +1780,23 @@ ROM_START( sdgndmrb )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
 	ROM_LOAD16_BYTE( "rb-f2.615",    0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
 	ROM_LOAD( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x100000, "gfx5", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx5", 0 )
 	ROM_LOAD( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
 
-	ROM_REGION( 0x100000, "gfx6", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx6", 0 )
 //#define ROM_COPY(rgn,srcoffset,offset,length)
 	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
 
@@ -1820,22 +1820,22 @@ ROM_START( cupsoc )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "scc_06.bin",   0x000000, 0x010000, CRC(f1a18ec6) SHA1(43f8ec3fc541b8dc2a17533329dd3448afadcb3b) )
 	ROM_LOAD16_BYTE( "scc_05.bin",   0x000001, 0x010000, CRC(c0358503) SHA1(e87991c6a6f3e060a1b03b4899fa891510fca15f) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
@@ -1857,22 +1857,22 @@ ROM_START( cupsoca )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6.bin",   0x000000, 0x010000, CRC(a9e15910) SHA1(305541b16a87d0e38871240fa2e111bb9332e93c) )
 	ROM_LOAD16_BYTE( "5.bin",   0x000001, 0x010000, CRC(73a3e024) SHA1(aeb359dd2dc9eb96330f494c44123bab3f5986a4) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
@@ -1894,22 +1894,22 @@ ROM_START( cupsocs )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6_7x.bin",   0x000000, 0x010000, CRC(7981366e) SHA1(b859bf23c5ae466f4020958a06935192fa68ee8d) )
 	ROM_LOAD16_BYTE( "5_7y.bin",   0x000001, 0x010000, CRC(26cbfaf0) SHA1(1ba7bc1cecb4bd06ba5c2d3eaa9c9e38e2106cd2) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
@@ -1931,22 +1931,22 @@ ROM_START( cupsocs2 )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
 	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
@@ -1966,22 +1966,22 @@ ROM_START( olysoc92 )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
 	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
@@ -2028,24 +2028,24 @@ ROM_START( cupsocsb )
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
 	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 	ROM_RELOAD(               0x100000, 0x100000 )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x100000, "gfx4", 0 )	/* not used */
 	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
 	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
 
-	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
 
 	/*bootleg GFX roms,for now load the original roms*/

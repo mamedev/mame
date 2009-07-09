@@ -592,12 +592,12 @@ ROM_START( cabal )
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
-	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000,  "gfx1", 0 )
 	ROM_LOAD( "5-6s",           0x00000, 0x04000, CRC(6a76955a) SHA1(733cb4b862b5dac97c2641b58f2362471e62fcf2) ) /* characters */
 
 	/* The Joystick versions use a sub-board instead of the mask roms
        the content is the same as the mask roms */
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bg_rom1.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "bg_rom2.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
 	ROM_LOAD16_BYTE( "bg_rom3.bin",   0x20000, 0x10000, CRC(420b0801) SHA1(175be6e3ca3cb98672e4cdbc9b5f5b007bc531c9) )
@@ -607,7 +607,7 @@ ROM_START( cabal )
 	ROM_LOAD16_BYTE( "bg_rom7.bin",   0x60000, 0x10000, CRC(d28d921e) SHA1(e133de5129a33ca9ff449948a959621bbfc58c11) )
 	ROM_LOAD16_BYTE( "bg_rom8.bin",   0x60001, 0x10000, CRC(67e4fe47) SHA1(15620fc5e985a249677da333b77331e40d2b24ab) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "sp_rom1.bin",   0x00000, 0x10000, CRC(34d3cac8) SHA1(a6a2304fb576267db2c72cfbf0a3f66740ebe60e) )
 	ROM_LOAD16_BYTE( "sp_rom2.bin",   0x00001, 0x10000, CRC(4e49c28e) SHA1(ea74443a9423b14611a1f97e44692badfedd0ead) )
 	ROM_LOAD16_BYTE( "sp_rom3.bin",   0x20000, 0x10000, CRC(7065e840) SHA1(baa8cd28be60c678d782ecfabde6cd5e36480415) )
@@ -635,13 +635,13 @@ ROM_START( cabala )
 	ROM_LOAD( "epr-a-4.3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "epr-a-3.3p",         0x8000, 0x4000, CRC(c0097c55) SHA1(874f813c1b466dab2d15a707e340b9bdb200246c) )
 
-	ROM_REGION( 0x8000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx1", 0 )
 	ROM_LOAD( "epr-a-5.6s",           0x00000, 0x08000, CRC(189033fd) SHA1(814f0cbc5f72345c04922d6d7c986f99d57335fa) ) /* characters */
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "tad-2.7s",       0x00000, 0x80000, CRC(13ca7ae1) SHA1(b26bb4876a6518e3809e0fa4d442616508b3e7e8) ) /* tiles */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
 	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples */
@@ -660,13 +660,13 @@ ROM_START( cabalus )
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
-	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000,  "gfx1", 0 )
 	ROM_LOAD( "t6_128.bin",     0x00000, 0x04000, CRC(1ccee214) SHA1(7c842bc1c6002ec90693160fd5407345092420bb) ) /* characters */
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "tad-2.7s",       0x00000, 0x80000, CRC(13ca7ae1) SHA1(b26bb4876a6518e3809e0fa4d442616508b3e7e8) ) /* tiles */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
 	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples? */
@@ -689,13 +689,13 @@ ROM_START( cabalus2 )
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
-	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000,  "gfx1", 0 )
 	ROM_LOAD( "5-6s",           0x00000, 0x04000, CRC(6a76955a) SHA1(733cb4b862b5dac97c2641b58f2362471e62fcf2) ) /* characters */
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "tad-2.7s",       0x00000, 0x80000, CRC(13ca7ae1) SHA1(b26bb4876a6518e3809e0fa4d442616508b3e7e8) ) /* tiles */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
 	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples? */
@@ -753,12 +753,12 @@ ROM_START( cabalbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "cabal_11.bin",    0x0000, 0x10000, CRC(d308a543) SHA1(4f45db42512f83266001daee55d06f49e7908e35) )
 
-	ROM_REGION( 0x8000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx1", 0 )
 	ROM_LOAD( "cabal_20.bin",           0x00000, 0x08000, CRC(189033fd) SHA1(814f0cbc5f72345c04922d6d7c986f99d57335fa) ) /* characters */
 
 	/* The bootleg versions use a sub-board instead of the mask roms
        the content is the same as the mask roms */
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "cabal_15.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "cabal_17.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
 	ROM_LOAD16_BYTE( "cabal_14.bin",   0x20000, 0x10000, CRC(420b0801) SHA1(175be6e3ca3cb98672e4cdbc9b5f5b007bc531c9) )
@@ -768,7 +768,7 @@ ROM_START( cabalbl )
 	ROM_LOAD16_BYTE( "cabal_13.bin",   0x60000, 0x10000, CRC(d28d921e) SHA1(e133de5129a33ca9ff449948a959621bbfc58c11) )
 	ROM_LOAD16_BYTE( "cabal_19.bin",   0x60001, 0x10000, CRC(67e4fe47) SHA1(15620fc5e985a249677da333b77331e40d2b24ab) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "cabal_04.bin",   0x00000, 0x10000, CRC(34d3cac8) SHA1(a6a2304fb576267db2c72cfbf0a3f66740ebe60e) )
 	ROM_LOAD16_BYTE( "cabal_05.bin",   0x00001, 0x10000, CRC(4e49c28e) SHA1(ea74443a9423b14611a1f97e44692badfedd0ead) )
 	ROM_LOAD16_BYTE( "cabal_03.bin",   0x20000, 0x10000, CRC(7065e840) SHA1(baa8cd28be60c678d782ecfabde6cd5e36480415) )
@@ -804,11 +804,11 @@ ROM_START( cabalbl2 )
 	ROM_IGNORE(0x4000)
 	ROM_LOAD( "c3.bin",    0x8000, 0x8000,  CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
-	ROM_REGION( 0x4000,  "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000,  "gfx1", 0 )
 	ROM_LOAD( "c5.bin",           0x00000, 0x04000, CRC(183e4834) SHA1(05ab0c388be8701930a9de437978206cda6fed68) ) /* characters */
 	ROM_CONTINUE(0x0000,0x4000)
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "c14.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "c10.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
 	ROM_LOAD16_BYTE( "c15.bin",   0x20000, 0x10000, CRC(420b0801) SHA1(175be6e3ca3cb98672e4cdbc9b5f5b007bc531c9) )
@@ -818,7 +818,7 @@ ROM_START( cabalbl2 )
 	ROM_LOAD16_BYTE( "c17.bin",   0x60000, 0x10000, CRC(d28d921e) SHA1(e133de5129a33ca9ff449948a959621bbfc58c11) )
 	ROM_LOAD16_BYTE( "c13.bin",   0x60001, 0x10000, CRC(67e4fe47) SHA1(15620fc5e985a249677da333b77331e40d2b24ab) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "c18.bin",   0x00000, 0x10000, CRC(34d3cac8) SHA1(a6a2304fb576267db2c72cfbf0a3f66740ebe60e) )
 	ROM_LOAD16_BYTE( "c22.bin",   0x00001, 0x10000, CRC(4e49c28e) SHA1(ea74443a9423b14611a1f97e44692badfedd0ead) )
 	ROM_LOAD16_BYTE( "c19.bin",   0x20000, 0x10000, CRC(7065e840) SHA1(baa8cd28be60c678d782ecfabde6cd5e36480415) )

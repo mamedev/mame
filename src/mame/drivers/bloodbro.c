@@ -526,14 +526,14 @@ ROM_START( bloodbro )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "bb_05.bin",    0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
 	ROM_LOAD( "bb_06.bin",    0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "bloodb.bk",   0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "bloodb.obj",   0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -552,14 +552,14 @@ ROM_START( bloodbra )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "bb_05.bin",    0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
 	ROM_LOAD( "bb_06.bin",    0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "bloodb.bk",   0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "bloodb.obj",   0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -578,7 +578,7 @@ ROM_START( weststry )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "ws09.bin",    0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )	/* characters */
 	ROM_CONTINUE(            0x00000, 0x8000 )
 	ROM_LOAD( "ws11.bin",    0x08000, 0x08000, CRC(2b10e3d2) SHA1(0f5045615b44e2300745fd3afac7f1441352cca5) )
@@ -588,7 +588,7 @@ ROM_START( weststry )
 	ROM_LOAD( "ws12.bin",    0x18000, 0x08000, CRC(af993578) SHA1(b250b562deeab3bb2c79002e5e1f0b6e17986848) )
 	ROM_CONTINUE(            0x18000, 0x8000 )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "ws05.bin",    0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )	/* Background */
 	ROM_LOAD( "ws07.bin",    0x20000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
 	ROM_LOAD( "ws06.bin",    0x40000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
@@ -598,7 +598,7 @@ ROM_START( weststry )
 	ROM_LOAD( "ws02.bin",    0xc0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
 	ROM_LOAD( "ws04.bin",    0xe0000, 0x20000, CRC(75f082e5) SHA1(b29f09a3cc9a0ac3f982be3981f5e895050c49e8) )
 
-	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx3", 0 )
 	ROM_LOAD( "ws25.bin",    0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )	/* sprites */
 	ROM_LOAD( "ws26.bin",    0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin",    0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
@@ -624,14 +624,14 @@ ROM_START( skysmash )
 	ROM_CONTINUE(        0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "rom3",    0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )	/* characters */
 	ROM_LOAD( "rom4",    0x10000, 0x10000, CRC(ad3cde81) SHA1(2bd0c707e5b67d3699a743d989cb5384cbe37ff7) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "rom9",    0x00000, 0x100000, CRC(b0a5eecf) SHA1(9e8191c7ae4a32dc16aebc37fa942afc531eddd4) )	/* Background + Foreground */
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "rom10",   0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )	/* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */

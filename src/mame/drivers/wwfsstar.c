@@ -485,13 +485,13 @@ ROM_START( wwfsstar )
 	ROM_LOAD( "wwfs03.bin",    0x20000, 0x10000, CRC(8a35a20e) SHA1(3bc1a43f956b6840a4bee9e8fb2a6e3d4ac18f75) )
 	ROM_LOAD( "wwfs05.bin",    0x30000, 0x10000, CRC(6df08962) SHA1(e3dec81644fe5867024a2fcf34a67924622f3a5b) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	/* this rom may not be correct for this set.. the rom in the set had half the data missing and only a 99%
        match with wwfsstau for the first part */
 	ROM_LOAD( "24a4-0.58",    0x00000, 0x20000, BAD_DUMP CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
 
 	/* these are bootleg roms ...  the original has mask roms */
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16) */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
 	ROM_LOAD( "wwfs39.bin",    0x000000, 0x010000, CRC(d807b09a) SHA1(e5a221ac57e16cb3fb47d986e62f265ebbc5b0e6) )
 	ROM_LOAD( "wwfs38.bin",    0x010000, 0x010000, CRC(d8ea94d3) SHA1(3a9e200dbcd456364317858e4b5fa6a149cb3c61) )
 	ROM_LOAD( "wwfs37.bin",    0x020000, 0x010000, CRC(5e8d7407) SHA1(829cc0c2013138097aa49c9072b87452bf8c8936) )
@@ -525,7 +525,7 @@ ROM_START( wwfsstar )
 	ROM_LOAD( "wwfs29.bin",    0x1e0000, 0x010000, CRC(7b5b9d83) SHA1(e7381e48a3a63f28fc9a997bfda3e612f4fcccf9) )
 	ROM_LOAD( "wwfs28.bin",    0x1f0000, 0x010000, CRC(70fda626) SHA1(049ef67f57953266ef2c750f58c0ee9baf963b39) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 Tiles (16x16) */
 	ROM_LOAD( "wwfs51.bin",    0x00000, 0x10000, CRC(51157385) SHA1(fa9f74ace9432d8686402e410cbc03a8c3b86f4d) )
 	ROM_LOAD( "wwfs50.bin",    0x10000, 0x10000, CRC(7fc79df5) SHA1(c57e8bb55a1d176b9232395207c5a28c622de9a4) )
 	ROM_LOAD( "wwfs49.bin",    0x20000, 0x10000, CRC(a14076b0) SHA1(6817f56d2c6e2d596ebc7827d816ad331b425eeb) )
@@ -549,11 +549,11 @@ ROM_START( wwfsstau )
 	ROM_LOAD( "wwfs03.bin",    0x20000, 0x10000, CRC(8a35a20e) SHA1(3bc1a43f956b6840a4bee9e8fb2a6e3d4ac18f75) )
 	ROM_LOAD( "wwfs05.bin",    0x30000, 0x10000, CRC(6df08962) SHA1(e3dec81644fe5867024a2fcf34a67924622f3a5b) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "24a4-0.58",    0x00000, 0x20000, CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
 
 	/* these are bootleg roms ...  the original has mask roms */
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16) */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
 	ROM_LOAD( "wwfs39.bin",    0x000000, 0x010000, CRC(d807b09a) SHA1(e5a221ac57e16cb3fb47d986e62f265ebbc5b0e6) )
 	ROM_LOAD( "wwfs38.bin",    0x010000, 0x010000, CRC(d8ea94d3) SHA1(3a9e200dbcd456364317858e4b5fa6a149cb3c61) )
 	ROM_LOAD( "wwfs37.bin",    0x020000, 0x010000, CRC(5e8d7407) SHA1(829cc0c2013138097aa49c9072b87452bf8c8936) )
@@ -587,7 +587,7 @@ ROM_START( wwfsstau )
 	ROM_LOAD( "wwfs29.bin",    0x1e0000, 0x010000, CRC(7b5b9d83) SHA1(e7381e48a3a63f28fc9a997bfda3e612f4fcccf9) )
 	ROM_LOAD( "wwfs28.bin",    0x1f0000, 0x010000, CRC(70fda626) SHA1(049ef67f57953266ef2c750f58c0ee9baf963b39) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 Tiles (16x16) */
 	ROM_LOAD( "wwfs51.bin",    0x00000, 0x10000, CRC(51157385) SHA1(fa9f74ace9432d8686402e410cbc03a8c3b86f4d) )
 	ROM_LOAD( "wwfs50.bin",    0x10000, 0x10000, CRC(7fc79df5) SHA1(c57e8bb55a1d176b9232395207c5a28c622de9a4) )
 	ROM_LOAD( "wwfs49.bin",    0x20000, 0x10000, CRC(a14076b0) SHA1(6817f56d2c6e2d596ebc7827d816ad331b425eeb) )
@@ -611,10 +611,10 @@ ROM_START( wwfsstaa )
 	ROM_LOAD( "24a9-0.46", 0x00000, 0x20000, CRC(703ff08f) SHA1(08c4d33208eb4c76c751a1a0fe16a817bdc30820) )
 	ROM_LOAD( "24j8-0.45", 0x20000, 0x20000, CRC(61138487) SHA1(6d5e3b12acdefb6923aa8ae0704f6c328f4747b3) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	ROM_LOAD( "24aa-0.58", 0x00000, 0x20000, CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16) */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
 	ROM_LOAD( "c951.114",   0x000000, 0x80000, CRC(fa76d1f0) SHA1(f69f8e6d1c5f27b054133e0faa49a8e1a9c391b2) )
 	ROM_LOAD( "24j4-0.115", 0x080000, 0x40000, CRC(c4a589a3) SHA1(5511e77c8b381419d7c63971023783c26ef6d94b) )
 	ROM_LOAD( "24j5-0.116", 0x0c0000, 0x40000, CRC(d6bca436) SHA1(25857a840b93f7f106a3a5c7dde8e0a732f45013) )
@@ -622,7 +622,7 @@ ROM_START( wwfsstaa )
 	ROM_LOAD( "24j2-0.118", 0x180000, 0x40000, CRC(dc1b7600) SHA1(bd80d7d4063f2b739ac9420132859c23473d9968) )
 	ROM_LOAD( "24j3-0.119", 0x1c0000, 0x40000, CRC(3ba12d43) SHA1(f60d5ff54fdef5a31fe1ee7041dda325ef6649c8) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 Tiles (16x16) */
 	ROM_LOAD( "24j7-0.113", 0x00000, 0x40000, CRC(e0a1909e) SHA1(6ec0db2e0297256d1c6d003a0e5b29236048bd88) )
 	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
 ROM_END
@@ -640,13 +640,13 @@ ROM_START( wwfsstaj )
 	ROM_LOAD( "wwfs03.bin",    0x20000, 0x10000, CRC(8a35a20e) SHA1(3bc1a43f956b6840a4bee9e8fb2a6e3d4ac18f75) )
 	ROM_LOAD( "wwfs05.bin",    0x30000, 0x10000, CRC(6df08962) SHA1(e3dec81644fe5867024a2fcf34a67924622f3a5b) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* FG0 Tiles (8x8) */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
 	/* this rom may not be correct for this set.. the rom in the set had half the data missing and only a 99%
        match with wwfsstau for the first part */
 	ROM_LOAD( "24a4-0.58",    0x00000, 0x20000, BAD_DUMP CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
 
 	/* these are bootleg roms ...  the original has mask roms */
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE ) /* SPR Tiles (16x16) */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
 	ROM_LOAD( "wwfs39.bin",    0x000000, 0x010000, CRC(d807b09a) SHA1(e5a221ac57e16cb3fb47d986e62f265ebbc5b0e6) )
 	ROM_LOAD( "wwfs38.bin",    0x010000, 0x010000, CRC(d8ea94d3) SHA1(3a9e200dbcd456364317858e4b5fa6a149cb3c61) )
 	ROM_LOAD( "wwfs37.bin",    0x020000, 0x010000, CRC(5e8d7407) SHA1(829cc0c2013138097aa49c9072b87452bf8c8936) )
@@ -680,7 +680,7 @@ ROM_START( wwfsstaj )
 	ROM_LOAD( "wwfs29.bin",    0x1e0000, 0x010000, CRC(7b5b9d83) SHA1(e7381e48a3a63f28fc9a997bfda3e612f4fcccf9) )
 	ROM_LOAD( "wwfs28.bin",    0x1f0000, 0x010000, CRC(70fda626) SHA1(049ef67f57953266ef2c750f58c0ee9baf963b39) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* BG0 Tiles (16x16) */
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 Tiles (16x16) */
 	ROM_LOAD( "wwfs51.bin",    0x00000, 0x10000, CRC(51157385) SHA1(fa9f74ace9432d8686402e410cbc03a8c3b86f4d) )
 	ROM_LOAD( "wwfs50.bin",    0x10000, 0x10000, CRC(7fc79df5) SHA1(c57e8bb55a1d176b9232395207c5a28c622de9a4) )
 	ROM_LOAD( "wwfs49.bin",    0x20000, 0x10000, CRC(a14076b0) SHA1(6817f56d2c6e2d596ebc7827d816ad331b425eeb) )

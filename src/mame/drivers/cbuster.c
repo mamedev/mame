@@ -339,15 +339,15 @@ ROM_START( cbuster )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
 	ROM_LOAD16_BYTE( "fu05-.rom",     0x80000, 0x10000, CRC(8134d412) SHA1(9c70ff6f9f24ec89c0bb4645afdf2a5ca27e9a0c) ) /* Chars */
 	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "mab-01",        0x00000, 0x80000, CRC(1080d619) SHA1(68f33a1580d33e4dd0858248c12a0a10ac117249) ) /* Tiles */
 
-	ROM_REGION( 0x180000,"gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000,"gfx3", 0 )
 	ROM_LOAD( "mab-02",        0x000000, 0x80000, CRC(58b7231d) SHA1(5b51a2fa42c67f23648be205295184a1fddc00f5) ) /* Sprites */
 	/* Space for extra sprites to be copied to (0x20000) */
 	ROM_LOAD( "mab-03",        0x0a0000, 0x80000, CRC(76053b9d) SHA1(093cd01a13509701ec9dd1a806132600a5bd1915) )
@@ -377,15 +377,15 @@ ROM_START( cbusterw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
 	ROM_LOAD16_BYTE( "fu05-.rom",     0x80000, 0x10000, CRC(8134d412) SHA1(9c70ff6f9f24ec89c0bb4645afdf2a5ca27e9a0c) ) /* Chars */
 	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "mab-01",        0x00000, 0x80000, CRC(1080d619) SHA1(68f33a1580d33e4dd0858248c12a0a10ac117249) ) /* Tiles */
 
-	ROM_REGION( 0x180000,"gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000,"gfx3", 0 )
 	ROM_LOAD( "mab-02",        0x000000, 0x80000, CRC(58b7231d) SHA1(5b51a2fa42c67f23648be205295184a1fddc00f5) ) /* Sprites */
 	/* Space for extra sprites to be copied to (0x20000) */
 	ROM_LOAD( "mab-03",        0x0a0000, 0x80000, CRC(76053b9d) SHA1(093cd01a13509701ec9dd1a806132600a5bd1915) )
@@ -415,15 +415,15 @@ ROM_START( cbusterj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
 	ROM_LOAD16_BYTE( "fu05-.rom",     0x80000, 0x10000, CRC(8134d412) SHA1(9c70ff6f9f24ec89c0bb4645afdf2a5ca27e9a0c) ) /* Chars */
 	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "mab-01",        0x00000, 0x80000, CRC(1080d619) SHA1(68f33a1580d33e4dd0858248c12a0a10ac117249) ) /* Tiles */
 
-	ROM_REGION( 0x180000,"gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000,"gfx3", 0 )
 	ROM_LOAD( "mab-02",        0x000000, 0x80000, CRC(58b7231d) SHA1(5b51a2fa42c67f23648be205295184a1fddc00f5) ) /* Sprites */
 	/* Space for extra sprites to be copied to (0x20000) */
 	ROM_LOAD( "mab-03",        0x0a0000, 0x80000, CRC(76053b9d) SHA1(093cd01a13509701ec9dd1a806132600a5bd1915) )
@@ -453,15 +453,15 @@ ROM_START( twocrude )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mab-00",        0x00000, 0x80000, CRC(660eaabd) SHA1(e3d614e13fdb9af159d9758a869d9dae3dbe14e0) ) /* Tiles */
 	ROM_LOAD16_BYTE( "fu05-.rom",     0x80000, 0x10000, CRC(8134d412) SHA1(9c70ff6f9f24ec89c0bb4645afdf2a5ca27e9a0c) ) /* Chars */
 	ROM_LOAD16_BYTE( "fu06-.rom",     0x80001, 0x10000, CRC(2f914a45) SHA1(bb44ba4779e45ee77ef0006363df91aac1f4559a) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "mab-01",        0x00000, 0x80000, CRC(1080d619) SHA1(68f33a1580d33e4dd0858248c12a0a10ac117249) ) /* Tiles */
 
-	ROM_REGION( 0x180000,"gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000,"gfx3", 0 )
 	ROM_LOAD( "mab-02",        0x000000, 0x80000, CRC(58b7231d) SHA1(5b51a2fa42c67f23648be205295184a1fddc00f5) ) /* Sprites */
 	/* Space for extra sprites to be copied to (0x20000) */
 	ROM_LOAD( "mab-03",        0x0a0000, 0x80000, CRC(76053b9d) SHA1(093cd01a13509701ec9dd1a806132600a5bd1915) )

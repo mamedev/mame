@@ -351,28 +351,28 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
-	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD16_BYTE( "km05.9e",   0x00000, 0x010000, CRC(d10aef95) SHA1(a611a35ab312caee19c31da079c647679d31673d) )
 	ROM_LOAD16_BYTE( "km04.8e",   0x00001, 0x010000, CRC(329323a8) SHA1(e2ec7b059301c0a2e052dfc683e044c808ad9b33) )
 
-	ROM_REGION( 0x300000, "tiles2", ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x300000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbd-01.9b", 0x000000, 0x100000, CRC(d7de4f4b) SHA1(4747f8795e277ed8106667b6f68e1176d95db684) )
 	ROM_LOAD( "mbd-00.8b", 0x100000, 0x100000, CRC(adb20ba9) SHA1(2ffa1dd19a438a4d2f5743b1050a8037183a3e7d) )
 	/* 0x100000 bytes expanded from mbd-02.10e copied here later */
 
-	ROM_REGION( 0x200000, "tiles3", ROMREGION_DISPOSE ) /* Tiles 3 */
+	ROM_REGION( 0x200000, "tiles3", 0 ) /* Tiles 3 */
 	ROM_LOAD( "mbd-03.13b",   0x000000, 0x100000, CRC(cf798f2c) SHA1(f484a22679d6a4d4b0dcac820de3f1a37cbc478f) )
 	ROM_LOAD( "mbd-04.14b",   0x100000, 0x100000, CRC(d9764d0b) SHA1(74d6f09d65d073606a6e10556cedf740aa50ff08) )
 
-	ROM_REGION( 0x400000, "sprites1", ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbd-05.16b",    0x000001, 0x200000, CRC(1768c66a) SHA1(06bf3bb187c65db9dcce959a43a7231e2ac45c17) )
 	ROM_LOAD16_BYTE( "mbd-06.17b",    0x000000, 0x200000, CRC(7750847a) SHA1(358266ed68a9816094e7aab0905d958284c8ce98) )
 
-	ROM_REGION( 0x400000, "sprites2", ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbd-07.18b",    0x000001, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD16_BYTE( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", ROMREGION_DISPOSE ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -381,7 +381,7 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
-	ROM_REGION( 0x000400, "proms", ROMREGION_DISPOSE ) /* Priority (not used) */
+	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
 	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
 ROM_END
 
@@ -395,28 +395,28 @@ ROM_START( boogwina ) /* VER 1.5 ASA 92.12.07 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
-	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD16_BYTE( "km05.9e",   0x00000, 0x010000, CRC(d10aef95) SHA1(a611a35ab312caee19c31da079c647679d31673d) )
 	ROM_LOAD16_BYTE( "km04.8e",   0x00001, 0x010000, CRC(329323a8) SHA1(e2ec7b059301c0a2e052dfc683e044c808ad9b33) )
 
-	ROM_REGION( 0x300000, "tiles2", ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x300000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbd-01.9b", 0x000000, 0x100000, CRC(d7de4f4b) SHA1(4747f8795e277ed8106667b6f68e1176d95db684) )
 	ROM_LOAD( "mbd-00.8b", 0x100000, 0x100000, CRC(adb20ba9) SHA1(2ffa1dd19a438a4d2f5743b1050a8037183a3e7d) )
 	/* 0x100000 bytes expanded from mbd-02.10e copied here later */
 
-	ROM_REGION( 0x200000, "tiles3", ROMREGION_DISPOSE ) /* Tiles 3 */
+	ROM_REGION( 0x200000, "tiles3", 0 ) /* Tiles 3 */
 	ROM_LOAD( "mbd-03.13b",   0x000000, 0x100000, CRC(cf798f2c) SHA1(f484a22679d6a4d4b0dcac820de3f1a37cbc478f) )
 	ROM_LOAD( "mbd-04.14b",   0x100000, 0x100000, CRC(d9764d0b) SHA1(74d6f09d65d073606a6e10556cedf740aa50ff08) )
 
-	ROM_REGION( 0x400000, "sprites1", ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbd-05.16b",    0x000001, 0x200000, CRC(1768c66a) SHA1(06bf3bb187c65db9dcce959a43a7231e2ac45c17) )
 	ROM_LOAD16_BYTE( "mbd-06.17b",    0x000000, 0x200000, CRC(7750847a) SHA1(358266ed68a9816094e7aab0905d958284c8ce98) )
 
-	ROM_REGION( 0x400000, "sprites2", ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbd-07.18b",    0x000001, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD16_BYTE( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", ROMREGION_DISPOSE ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -425,7 +425,7 @@ ROM_START( boogwina ) /* VER 1.5 ASA 92.12.07 */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
-	ROM_REGION( 0x000400, "proms", ROMREGION_DISPOSE ) /* Priority (not used) */
+	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
 	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
 ROM_END
 
@@ -439,28 +439,28 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
-	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD16_BYTE( "km05.9e",   0x00000, 0x010000, CRC(d10aef95) SHA1(a611a35ab312caee19c31da079c647679d31673d) )
 	ROM_LOAD16_BYTE( "km04.8e",   0x00001, 0x010000, CRC(329323a8) SHA1(e2ec7b059301c0a2e052dfc683e044c808ad9b33) )
 
-	ROM_REGION( 0x300000, "tiles2", ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x300000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbd-01.9b", 0x000000, 0x100000, CRC(d7de4f4b) SHA1(4747f8795e277ed8106667b6f68e1176d95db684) )
 	ROM_LOAD( "mbd-00.8b", 0x100000, 0x100000, CRC(adb20ba9) SHA1(2ffa1dd19a438a4d2f5743b1050a8037183a3e7d) )
 	/* 0x100000 bytes expanded from mbd-02.10e copied here later */
 
-	ROM_REGION( 0x200000, "tiles3", ROMREGION_DISPOSE ) /* Tiles 3 */
+	ROM_REGION( 0x200000, "tiles3", 0 ) /* Tiles 3 */
 	ROM_LOAD( "mbd-03.13b",   0x000000, 0x100000, CRC(cf798f2c) SHA1(f484a22679d6a4d4b0dcac820de3f1a37cbc478f) )
 	ROM_LOAD( "mbd-04.14b",   0x100000, 0x100000, CRC(d9764d0b) SHA1(74d6f09d65d073606a6e10556cedf740aa50ff08) )
 
-	ROM_REGION( 0x400000, "sprites1", ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbd-05.16b",    0x000001, 0x200000, CRC(1768c66a) SHA1(06bf3bb187c65db9dcce959a43a7231e2ac45c17) )
 	ROM_LOAD16_BYTE( "mbd-06.17b",    0x000000, 0x200000, CRC(7750847a) SHA1(358266ed68a9816094e7aab0905d958284c8ce98) )
 
-	ROM_REGION( 0x400000, "sprites2", ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbd-07.18b",    0x000001, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD16_BYTE( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", ROMREGION_DISPOSE ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -469,7 +469,7 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
-	ROM_REGION( 0x000400, "proms", ROMREGION_DISPOSE ) /* Priority (not used) */
+	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
 	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
 ROM_END
 
@@ -483,28 +483,28 @@ ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
-	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD16_BYTE( "km05.9e",   0x00000, 0x010000, CRC(d10aef95) SHA1(a611a35ab312caee19c31da079c647679d31673d) )
 	ROM_LOAD16_BYTE( "km04.8e",   0x00001, 0x010000, CRC(329323a8) SHA1(e2ec7b059301c0a2e052dfc683e044c808ad9b33) )
 
-	ROM_REGION( 0x300000, "tiles2", ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x300000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbd-01.9b", 0x000000, 0x100000, CRC(d7de4f4b) SHA1(4747f8795e277ed8106667b6f68e1176d95db684) )
 	ROM_LOAD( "mbd-00.8b", 0x100000, 0x100000, CRC(adb20ba9) SHA1(2ffa1dd19a438a4d2f5743b1050a8037183a3e7d) )
 	/* 0x100000 bytes expanded from mbd-02.10e copied here later */
 
-	ROM_REGION( 0x200000, "tiles3", ROMREGION_DISPOSE ) /* Tiles 3 */
+	ROM_REGION( 0x200000, "tiles3", 0 ) /* Tiles 3 */
 	ROM_LOAD( "mbd-03.13b",   0x000000, 0x100000, CRC(cf798f2c) SHA1(f484a22679d6a4d4b0dcac820de3f1a37cbc478f) )
 	ROM_LOAD( "mbd-04.14b",   0x100000, 0x100000, CRC(d9764d0b) SHA1(74d6f09d65d073606a6e10556cedf740aa50ff08) )
 
-	ROM_REGION( 0x400000, "sprites1", ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbd-05.16b",    0x000001, 0x200000, CRC(1768c66a) SHA1(06bf3bb187c65db9dcce959a43a7231e2ac45c17) )
 	ROM_LOAD16_BYTE( "mbd-06.17b",    0x000000, 0x200000, CRC(7750847a) SHA1(358266ed68a9816094e7aab0905d958284c8ce98) )
 
-	ROM_REGION( 0x400000, "sprites2", ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbd-07.18b",    0x000001, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD16_BYTE( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", ROMREGION_DISPOSE ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -513,7 +513,7 @@ ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
-	ROM_REGION( 0x000400, "proms", ROMREGION_DISPOSE ) /* Priority (not used) */
+	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
 	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
 ROM_END
 

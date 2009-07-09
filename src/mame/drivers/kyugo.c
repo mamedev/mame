@@ -568,15 +568,15 @@ ROM_START( gyrodine )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a21.01", 0x0000, 0x2000, CRC(b2ce0aa2) SHA1(576754105819aec64781a5c8e8540b21fcfd346b) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "a21.15", 0x00000, 0x1000, CRC(adba18d0) SHA1(b1afd7d8f2a8545a00525a23e087d9ca975a6401) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "a21.08", 0x00000, 0x2000, CRC(a57df1c9) SHA1(63505f63e978c52c43fe863dca056b52f7ebd501) ) /* tiles - plane 0 */
 	ROM_LOAD( "a21.07", 0x02000, 0x2000, CRC(63623ba3) SHA1(bcb80fc0edf7c4d1f82a2ff6d0bad9d2ccaf48c6) ) /* tiles - plane 1 */
 	ROM_LOAD( "a21.06", 0x04000, 0x2000, CRC(4cc969a9) SHA1(0b89f4142c2fcc0a882fbc3514d8d11027e78e01) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "a21.14", 0x00000, 0x2000, CRC(9c5c4d5b) SHA1(0d0c9efb63b761acfaf51d17c525f94430ad703d) ) /* sprites - plane 0 */
 	/* 0x03000-0x04fff empty */
 	ROM_LOAD( "a21.13", 0x04000, 0x2000, CRC(d36b5aad) SHA1(8fac23474ffd3a62e2283eadbc8d278cd9c70105) ) /* sprites - plane 0 */
@@ -609,15 +609,15 @@ ROM_START( gyrodinc )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a21.01", 0x0000, 0x2000, CRC(b2ce0aa2) SHA1(576754105819aec64781a5c8e8540b21fcfd346b) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "a21.15", 0x00000, 0x1000, CRC(adba18d0) SHA1(b1afd7d8f2a8545a00525a23e087d9ca975a6401) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "a21.08", 0x00000, 0x2000, CRC(a57df1c9) SHA1(63505f63e978c52c43fe863dca056b52f7ebd501) ) /* tiles - plane 0 */
 	ROM_LOAD( "a21.07", 0x02000, 0x2000, CRC(63623ba3) SHA1(bcb80fc0edf7c4d1f82a2ff6d0bad9d2ccaf48c6) ) /* tiles - plane 1 */
 	ROM_LOAD( "a21.06", 0x04000, 0x2000, CRC(4cc969a9) SHA1(0b89f4142c2fcc0a882fbc3514d8d11027e78e01) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "a21.14", 0x00000, 0x2000, CRC(9c5c4d5b) SHA1(0d0c9efb63b761acfaf51d17c525f94430ad703d) ) /* sprites - plane 0 */
 	/* 0x03000-0x04fff empty */
 	ROM_LOAD( "a21.13", 0x04000, 0x2000, CRC(d36b5aad) SHA1(8fac23474ffd3a62e2283eadbc8d278cd9c70105) ) /* sprites - plane 0 */
@@ -650,15 +650,15 @@ ROM_START( buzzard )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a21.01",     0x0000, 0x2000, CRC(b2ce0aa2) SHA1(576754105819aec64781a5c8e8540b21fcfd346b) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "buzl01.bin", 0x00000, 0x1000, CRC(65d728d0) SHA1(12da6cd2c9a8acca98c194dac6dd0edd6384118c) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "a21.08",     0x00000, 0x2000, CRC(a57df1c9) SHA1(63505f63e978c52c43fe863dca056b52f7ebd501) ) /* tiles - plane 0 */
 	ROM_LOAD( "a21.07",     0x02000, 0x2000, CRC(63623ba3) SHA1(bcb80fc0edf7c4d1f82a2ff6d0bad9d2ccaf48c6) ) /* tiles - plane 1 */
 	ROM_LOAD( "a21.06",     0x04000, 0x2000, CRC(4cc969a9) SHA1(0b89f4142c2fcc0a882fbc3514d8d11027e78e01) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "a21.14",     0x00000, 0x2000, CRC(9c5c4d5b) SHA1(0d0c9efb63b761acfaf51d17c525f94430ad703d) ) /* sprites - plane 0 */
 	/* 0x03000-0x04fff empty */
 	ROM_LOAD( "a21.13",     0x04000, 0x2000, CRC(d36b5aad) SHA1(8fac23474ffd3a62e2283eadbc8d278cd9c70105) ) /* sprites - plane 0 */
@@ -693,15 +693,15 @@ ROM_START( sonofphx )
 	ROM_LOAD( "3.j2",   0x4000, 0x2000, CRC(197e314c) SHA1(6921cd1bc3571b0ac7d8d7eb19b256daca85f17e) )
 	ROM_LOAD( "4.k2",   0x6000, 0x2000, CRC(4f3695a1) SHA1(63443d0a0c52e9a761934f8fd43792579fb9966b) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "14.4a",  0x00000, 0x1000, CRC(b3859b8b) SHA1(9afec14bcee6093ff466ae00b721b177dfdac392) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "15.9h",  0x00000, 0x2000, CRC(c9213469) SHA1(03bd7a86f9cbb28ecf39e7ac643a186cfeb38a35) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.10h", 0x02000, 0x2000, CRC(7de5d39e) SHA1(47fc5740a972e105d282873b4d72774a4405dfff) ) /* tiles - plane 1 */
 	ROM_LOAD( "17.11h", 0x04000, 0x2000, CRC(0ba5f72c) SHA1(79292e16e2f6079f160d957a22e355457599669d) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "8.6a",   0x00000, 0x4000, CRC(0e9f757e) SHA1(1d4a46b3f18fe5099cdc889ba5e55c1d171a0430) ) /* sprites - plane 0 */
 	ROM_LOAD( "9.7a",   0x04000, 0x4000, CRC(f7d2e650) SHA1(eac715e09ad22b1a1d18e5cade4955cb8d4156f4) ) /* sprites - plane 0 */
 	ROM_LOAD( "10.8a",  0x08000, 0x4000, CRC(e717baf4) SHA1(d52a6c5f8b915769cc6dfb50d34922c1a3cd1333) ) /* sprites - plane 1 */
@@ -729,15 +729,15 @@ ROM_START( repulse )
 	ROM_LOAD( "3.j2",         0x4000, 0x2000, CRC(197e314c) SHA1(6921cd1bc3571b0ac7d8d7eb19b256daca85f17e) )
 	ROM_LOAD( "repulse.b4",   0x6000, 0x2000, CRC(86b267f3) SHA1(5e352737e0ea0ca4a025d002b75c821c55660b4f) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "repulse.a11",  0x00000, 0x1000, CRC(8e1de90a) SHA1(5e655e6d282f6c8ae8bdfb72db64212e9262f717) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "15.9h",        0x00000, 0x2000, CRC(c9213469) SHA1(03bd7a86f9cbb28ecf39e7ac643a186cfeb38a35) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.10h",       0x02000, 0x2000, CRC(7de5d39e) SHA1(47fc5740a972e105d282873b4d72774a4405dfff) ) /* tiles - plane 1 */
 	ROM_LOAD( "17.11h",       0x04000, 0x2000, CRC(0ba5f72c) SHA1(79292e16e2f6079f160d957a22e355457599669d) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "8.6a",         0x00000, 0x4000, CRC(0e9f757e) SHA1(1d4a46b3f18fe5099cdc889ba5e55c1d171a0430) ) /* sprites - plane 0 */
 	ROM_LOAD( "9.7a",         0x04000, 0x4000, CRC(f7d2e650) SHA1(eac715e09ad22b1a1d18e5cade4955cb8d4156f4) ) /* sprites - plane 0 */
 	ROM_LOAD( "10.8a",        0x08000, 0x4000, CRC(e717baf4) SHA1(d52a6c5f8b915769cc6dfb50d34922c1a3cd1333) ) /* sprites - plane 1 */
@@ -765,15 +765,15 @@ ROM_START( 99lstwar )
 	ROM_LOAD( "3.j2",         0x4000, 0x2000, CRC(197e314c) SHA1(6921cd1bc3571b0ac7d8d7eb19b256daca85f17e) )
 	ROM_LOAD( "repulse.b4",   0x6000, 0x2000, CRC(86b267f3) SHA1(5e352737e0ea0ca4a025d002b75c821c55660b4f) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "1999.4a",      0x00000, 0x1000, CRC(49a2383e) SHA1(b4be929abbde034df5ef12342fbcecb14772886a) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "15.9h",        0x00000, 0x2000, CRC(c9213469) SHA1(03bd7a86f9cbb28ecf39e7ac643a186cfeb38a35) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.10h",       0x02000, 0x2000, CRC(7de5d39e) SHA1(47fc5740a972e105d282873b4d72774a4405dfff) ) /* tiles - plane 1 */
 	ROM_LOAD( "17.11h",       0x04000, 0x2000, CRC(0ba5f72c) SHA1(79292e16e2f6079f160d957a22e355457599669d) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "8.6a",         0x00000, 0x4000, CRC(0e9f757e) SHA1(1d4a46b3f18fe5099cdc889ba5e55c1d171a0430) ) /* sprites - plane 0 */
 	ROM_LOAD( "9.7a",         0x04000, 0x4000, CRC(f7d2e650) SHA1(eac715e09ad22b1a1d18e5cade4955cb8d4156f4) ) /* sprites - plane 0 */
 	ROM_LOAD( "10.8a",        0x08000, 0x4000, CRC(e717baf4) SHA1(d52a6c5f8b915769cc6dfb50d34922c1a3cd1333) ) /* sprites - plane 1 */
@@ -801,15 +801,15 @@ ROM_START( 99lstwra )
 	ROM_LOAD( "2j.bin",       0x4000, 0x2000, CRC(16879c4c) SHA1(5195abdd5ad8cf9aa081f96ed5d16c14af603289) )
 	ROM_LOAD( "repulse.b4",   0x6000, 0x2000, CRC(86b267f3) SHA1(5e352737e0ea0ca4a025d002b75c821c55660b4f) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "1999.4a",      0x00000, 0x1000, CRC(49a2383e) SHA1(b4be929abbde034df5ef12342fbcecb14772886a) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "9h.bin",       0x00000, 0x2000, CRC(59993c27) SHA1(e7de7fbea4f09718f0a13d4a7f60360e6431c3a7) ) /* tiles - plane 0 */
 	ROM_LOAD( "10h.bin",      0x02000, 0x2000, CRC(dfbf0280) SHA1(c97923fcdd01bdcfbbc6308b04de8bb610e9b5d2) ) /* tiles - plane 1 */
 	ROM_LOAD( "11h.bin",      0x04000, 0x2000, CRC(e4f29fc0) SHA1(8ef393d5292b0eb1d6c253589e37b3ab2eaeb402) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "6a.bin",       0x00000, 0x4000, CRC(98d44410) SHA1(3d3ca9d2d28038402daedc6b9c01977a1897d8b2) ) /* sprites - plane 0 */
 	ROM_LOAD( "7a.bin",       0x04000, 0x4000, CRC(4c54d281) SHA1(be7d14d2a8910e0b38d5614c1eba5e71a6bf7a6c) ) /* sprites - plane 0 */
 	ROM_LOAD( "8a.bin",       0x08000, 0x4000, CRC(81018101) SHA1(fa94b6bc07beb70bd6535c3f5620897c2ad49240) ) /* sprites - plane 1 */
@@ -837,15 +837,15 @@ ROM_START( 99lstwrk )
 	ROM_LOAD( "3.j2",         0x4000, 0x2000, CRC(197e314c) SHA1(6921cd1bc3571b0ac7d8d7eb19b256daca85f17e) )
 	ROM_LOAD( "repulse.b4",   0x6000, 0x2000, CRC(86b267f3) SHA1(5e352737e0ea0ca4a025d002b75c821c55660b4f) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "1999-14.rom",  0x00000, 0x1000, CRC(b4995072) SHA1(5127a979c7f6897c5c53927012c679653920e56f) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "15.9h",        0x00000, 0x2000, CRC(c9213469) SHA1(03bd7a86f9cbb28ecf39e7ac643a186cfeb38a35) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.10h",       0x02000, 0x2000, CRC(7de5d39e) SHA1(47fc5740a972e105d282873b4d72774a4405dfff) ) /* tiles - plane 1 */
 	ROM_LOAD( "17.11h",       0x04000, 0x2000, CRC(0ba5f72c) SHA1(79292e16e2f6079f160d957a22e355457599669d) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "8.6a",         0x00000, 0x4000, CRC(0e9f757e) SHA1(1d4a46b3f18fe5099cdc889ba5e55c1d171a0430) ) /* sprites - plane 0 */
 	ROM_LOAD( "9.7a",         0x04000, 0x4000, CRC(f7d2e650) SHA1(eac715e09ad22b1a1d18e5cade4955cb8d4156f4) ) /* sprites - plane 0 */
 	ROM_LOAD( "10.8a",        0x08000, 0x4000, CRC(e717baf4) SHA1(d52a6c5f8b915769cc6dfb50d34922c1a3cd1333) ) /* sprites - plane 1 */
@@ -877,15 +877,15 @@ ROM_START( flashgal )
 	ROM_LOAD( "epr-7165.2j",  0x4000, 0x2000, CRC(4cd3fe5e) SHA1(a69e02acbcad825101f96dcabfada667ae25799c) )
 	ROM_LOAD( "epr-7166.2k",  0x6000, 0x2000, CRC(552ca339) SHA1(2313c6aaec47957bce00d0d04f89012eafc014fd) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "epr-7177.4a",  0x00000, 0x1000, CRC(dca9052f) SHA1(cbeb997db01b875a73a67e08c0b94ab74de77b7b) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "epr-7178.9h",  0x00000, 0x2000, CRC(2f5b62c0) SHA1(8be09e4ef1c3e2b1494431d4f07570a109e93dfd) ) /* tiles - plane 0 */
 	ROM_LOAD( "epr-7179.10h", 0x02000, 0x2000, CRC(8fbb49b5) SHA1(111f0c42cee6ab2766a5322dd90e1516ffbbc35c) ) /* tiles - plane 1 */
 	ROM_LOAD( "epr-7180.11h", 0x04000, 0x2000, CRC(26a8e5c3) SHA1(9a2bc4de87e16bbb777b39564c08d99fd3ccd4ff) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "epr-7171.6a",  0x00000, 0x4000, CRC(62caf2a1) SHA1(6fb2c1882630b32af27638d2e9b306d4fc028d62) ) /* sprites - plane 0 */
 	ROM_LOAD( "epr-7172.7a",  0x04000, 0x4000, CRC(10f78a10) SHA1(8745da857bdb873d5ffebf753dd66321e1fabc59) ) /* sprites - plane 0 */
 	ROM_LOAD( "epr-7173.8a",  0x08000, 0x4000, CRC(36ea1d59) SHA1(cba9117de745049c06c703dc1782b83376523ce3) ) /* sprites - plane 1 */
@@ -914,15 +914,15 @@ ROM_START( flashgla )
 	ROM_LOAD( "flashgal.3",   0x4000, 0x2000, CRC(A1223B74) SHA1(13E2A33E3968F23D60393D950660BE4E6B8AE46D) )
 	ROM_LOAD( "flashgal.4",   0x6000, 0x2000, CRC(04D2A05F) SHA1(009B8EAFC850A100D3A2CDE8F6FBBA9C98828DDD) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "epr-7177.4a",  0x00000, 0x1000, CRC(dca9052f) SHA1(cbeb997db01b875a73a67e08c0b94ab74de77b7b) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "epr-7178.9h",  0x00000, 0x2000, CRC(2f5b62c0) SHA1(8be09e4ef1c3e2b1494431d4f07570a109e93dfd) ) /* tiles - plane 0 */
 	ROM_LOAD( "epr-7179.10h", 0x02000, 0x2000, CRC(8fbb49b5) SHA1(111f0c42cee6ab2766a5322dd90e1516ffbbc35c) ) /* tiles - plane 1 */
 	ROM_LOAD( "epr-7180.11h", 0x04000, 0x2000, CRC(26a8e5c3) SHA1(9a2bc4de87e16bbb777b39564c08d99fd3ccd4ff) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "epr-7171.6a",  0x00000, 0x4000, CRC(62caf2a1) SHA1(6fb2c1882630b32af27638d2e9b306d4fc028d62) ) /* sprites - plane 0 */
 	ROM_LOAD( "epr-7172.7a",  0x04000, 0x4000, CRC(10f78a10) SHA1(8745da857bdb873d5ffebf753dd66321e1fabc59) ) /* sprites - plane 0 */
 	ROM_LOAD( "epr-7173.8a",  0x08000, 0x4000, CRC(36ea1d59) SHA1(cba9117de745049c06c703dc1782b83376523ce3) ) /* sprites - plane 1 */
@@ -947,15 +947,15 @@ ROM_START( srdmissn )
 	ROM_LOAD( "1.t7",   0x0000, 0x4000, CRC(dc48595e) SHA1(cbf357db4555ba57eb0a696bf1ecfcfeb9871409) )
 	ROM_LOAD( "3.t8",   0x4000, 0x4000, CRC(216be1e8) SHA1(90016f74ebad1aafb9bd086e28ca3d400839b0a2) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "15.4a",  0x00000, 0x1000, CRC(4961f7fd) SHA1(8b08b9df0c3f71ceffd9b17a364aba611c05c774) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "17.9h",  0x00000, 0x2000, CRC(41211458) SHA1(bb080f4d7b92a1dadb7e554fd640e14ddbbcfcb6) ) /* tiles - plane 1 */
 	ROM_LOAD( "18.10h", 0x02000, 0x2000, CRC(740eccd4) SHA1(a1ce4b1a9e7c26a7322b7cdd6c734889900485be) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.11h", 0x04000, 0x2000, CRC(c1f4a5db) SHA1(b9a0e57fac6317dceec3d4fbcde25b6b883fbbb1) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "14.6a",  0x00000, 0x4000, CRC(3d4c0447) SHA1(a064d43f5e8e0ac6ce441148057623f4a32f6056) ) /* sprites - plane 0 */
 	ROM_LOAD( "13.7a",  0x04000, 0x4000, CRC(22414a67) SHA1(aaeb1bd196967d201d0dfc06de88419d6651f788) ) /* sprites - plane 0 */
 	ROM_LOAD( "12.8a",  0x08000, 0x4000, CRC(61e34283) SHA1(35fff04aae4d5ab3269c1cd2c306c21507dde073) ) /* sprites - plane 1 */
@@ -980,15 +980,15 @@ ROM_START( fx )
 	ROM_LOAD( "fx.03", 0x0000, 0x4000, CRC(8907df6b) SHA1(a6d3e804fdaaeddca6f6f1e29dc35f25ed9490ae) )
 	ROM_LOAD( "fx.04", 0x4000, 0x4000, CRC(c665834f) SHA1(91ffb32790df324b5f47f8b88f47a1b6ec689cce) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "fx.05", 0x0000, 0x1000, CRC(4a504286) SHA1(0d5ca6ce24ebaad466235fdb22471ac1ad7703db) )
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "17.9h",  0x00000, 0x2000, CRC(41211458) SHA1(bb080f4d7b92a1dadb7e554fd640e14ddbbcfcb6) ) /* tiles - plane 1 */
 	ROM_LOAD( "18.10h", 0x02000, 0x2000, CRC(740eccd4) SHA1(a1ce4b1a9e7c26a7322b7cdd6c734889900485be) ) /* tiles - plane 0 */
 	ROM_LOAD( "16.11h", 0x04000, 0x2000, CRC(c1f4a5db) SHA1(b9a0e57fac6317dceec3d4fbcde25b6b883fbbb1) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "14.6a",  0x00000, 0x4000, CRC(3d4c0447) SHA1(a064d43f5e8e0ac6ce441148057623f4a32f6056) ) /* sprites - plane 0 */
 	ROM_LOAD( "13.7a",  0x04000, 0x4000, CRC(22414a67) SHA1(aaeb1bd196967d201d0dfc06de88419d6651f788) ) /* sprites - plane 0 */
 	ROM_LOAD( "12.8a",  0x08000, 0x4000, CRC(61e34283) SHA1(35fff04aae4d5ab3269c1cd2c306c21507dde073) ) /* sprites - plane 1 */
@@ -1012,15 +1012,15 @@ ROM_START( airwolf )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a.7s",        0x0000, 0x8000, CRC(a3c7af5c) SHA1(0f70ca94f3d168d38e0e93252e9441973f72441a) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "f.4a",        0x00000, 0x1000, CRC(4df44ce9) SHA1(145986009d4ae6f7dd98ce715838d0331dea005d) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "09h_14.bin",  0x00000, 0x2000, CRC(25e57e1f) SHA1(bef24bced102cd470e10bd4aa19da3c608211258) ) /* tiles - plane 1 */
 	ROM_LOAD( "10h_13.bin",  0x02000, 0x2000, CRC(cf0de5e9) SHA1(32f3eb4c9298d59aca1dc2530b0e92f64311946d) ) /* tiles - plane 0 */
 	ROM_LOAD( "11h_12.bin",  0x04000, 0x2000, CRC(4050c048) SHA1(ca21e0750f01342d9791067160339eec436c9458) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "e.6a",        0x00000, 0x2000, CRC(e8fbc7d2) SHA1(a9a651b4a714f490a051a89fd0327a665353d64b) ) /* sprites - plane 0 */
 	ROM_CONTINUE(            0x04000, 0x2000 )
 	ROM_CONTINUE(            0x02000, 0x2000 )
@@ -1041,7 +1041,7 @@ ROM_START( airwolf )
 	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 
-	ROM_REGION( 0x0400, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16l8a.2j",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "epl12p6a.9j",   0x0200, 0x0034, CRC(19808f14) SHA1(d5043237be8857d2cecaf7dec079461f6b53efa9) )
 	ROM_LOAD( "epl12p6a.9k",   0x0300, 0x0034, CRC(f5acad85) SHA1(ee3caeedf3e91793b12895f109eae5417f5c7631) )
@@ -1054,15 +1054,15 @@ ROM_START( airwolfa )
 	ROM_REGION( 0x10000, "sub", 0 ) /* the rom with this set was bad with FIXED BITS (11xxxxxx), but the remaining bits matched */
 	ROM_LOAD( "airwolf.1",        0x0000, 0x8000, CRC(a3c7af5c) SHA1(0f70ca94f3d168d38e0e93252e9441973f72441a) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "airwolf.6",        0x00000, 0x2000, CRC(5b0a01e9) SHA1(a2873054caf08fcfa51e2f87556e9529b7d4b865) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "airwolf.9",  0x00000, 0x2000, CRC(25e57e1f) SHA1(bef24bced102cd470e10bd4aa19da3c608211258) ) /* tiles - plane 1 */
 	ROM_LOAD( "airwolf.8",  0x02000, 0x2000, CRC(cf0de5e9) SHA1(32f3eb4c9298d59aca1dc2530b0e92f64311946d) ) /* tiles - plane 0 */
 	ROM_LOAD( "airwolf.7",  0x04000, 0x2000, CRC(4050c048) SHA1(ca21e0750f01342d9791067160339eec436c9458) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "airwolf.5",   0x00000, 0x2000, CRC(e8fbc7d2) SHA1(a9a651b4a714f490a051a89fd0327a665353d64b) ) /* sprites - plane 0 */
 	ROM_CONTINUE(            0x04000, 0x2000 )
 	ROM_CONTINUE(            0x02000, 0x2000 )
@@ -1083,7 +1083,7 @@ ROM_START( airwolfa )
 	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 
-	ROM_REGION( 0x0400, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16l8a.2j",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "epl12p6a.9j",   0x0200, 0x0034, CRC(19808f14) SHA1(d5043237be8857d2cecaf7dec079461f6b53efa9) )
 	ROM_LOAD( "epl12p6a.9k",   0x0300, 0x0034, CRC(f5acad85) SHA1(ee3caeedf3e91793b12895f109eae5417f5c7631) )
@@ -1098,15 +1098,15 @@ ROM_START( skywolf )
 	ROM_LOAD( "07s_01.bin",  0x0000, 0x4000, CRC(c680a905) SHA1(9a65bade18d0340d428ee12d2e505def2339e3c3) )
 	ROM_LOAD( "08s_02.bin",  0x4000, 0x4000, CRC(3d66bf26) SHA1(10a9f9888c1da12e2ba71748b8608b18e46e8db6) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "04a_11.bin",  0x00000, 0x1000, CRC(219de9aa) SHA1(7f79b718427310f8725b64cb1953879d7277b212) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "09h_14.bin",  0x00000, 0x2000, CRC(25e57e1f) SHA1(bef24bced102cd470e10bd4aa19da3c608211258) ) /* tiles - plane 1 */
 	ROM_LOAD( "10h_13.bin",  0x02000, 0x2000, CRC(cf0de5e9) SHA1(32f3eb4c9298d59aca1dc2530b0e92f64311946d) ) /* tiles - plane 0 */
 	ROM_LOAD( "11h_12.bin",  0x04000, 0x2000, CRC(4050c048) SHA1(ca21e0750f01342d9791067160339eec436c9458) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "06a_10.bin",  0x00000, 0x4000, CRC(1c809383) SHA1(955aed87a8e9ae6ef7f0daa27a0cc4d85493ba90) ) /* sprites - plane 0 */
 	ROM_LOAD( "07a_09.bin",  0x04000, 0x4000, CRC(5665d774) SHA1(cd4359d2f970e2b9d09f5ddadcddf8e77caea6e9) ) /* sprites - plane 0 */
 	ROM_LOAD( "08a_08.bin",  0x08000, 0x4000, CRC(6dda8f2a) SHA1(db9fc81094fa8384da89f8f3349f09fc8e4f3c92) ) /* sprites - plane 1 */
@@ -1130,15 +1130,15 @@ ROM_START( skywolf2 )
 	ROM_LOAD( "07s_01.bin",  0x0000, 0x4000, CRC(c680a905) SHA1(9a65bade18d0340d428ee12d2e505def2339e3c3) )
 	ROM_LOAD( "08s_02.bin",  0x4000, 0x4000, CRC(3d66bf26) SHA1(10a9f9888c1da12e2ba71748b8608b18e46e8db6) )
 
-	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "04a_11.bin",  0x00000, 0x1000, CRC(219de9aa) SHA1(7f79b718427310f8725b64cb1953879d7277b212) ) /* chars */
 
-	ROM_REGION( 0x06000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "09h_14.bin",  0x00000, 0x2000, CRC(25e57e1f) SHA1(bef24bced102cd470e10bd4aa19da3c608211258) ) /* tiles - plane 1 */
 	ROM_LOAD( "10h_13.bin",  0x02000, 0x2000, CRC(cf0de5e9) SHA1(32f3eb4c9298d59aca1dc2530b0e92f64311946d) ) /* tiles - plane 0 */
 	ROM_LOAD( "11h_12.bin",  0x04000, 0x2000, CRC(4050c048) SHA1(ca21e0750f01342d9791067160339eec436c9458) ) /* tiles - plane 2 */
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx3", 0 )
 	ROM_LOAD( "06a_10.bin",  0x00000, 0x4000, CRC(1c809383) SHA1(955aed87a8e9ae6ef7f0daa27a0cc4d85493ba90) ) /* sprites - plane 0 */
 	ROM_LOAD( "07a_09.bin",  0x04000, 0x4000, CRC(5665d774) SHA1(cd4359d2f970e2b9d09f5ddadcddf8e77caea6e9) ) /* sprites - plane 0 */
 	ROM_LOAD( "08a_08.bin",  0x08000, 0x4000, CRC(6dda8f2a) SHA1(db9fc81094fa8384da89f8f3349f09fc8e4f3c92) ) /* sprites - plane 1 */
@@ -1165,15 +1165,15 @@ ROM_START( legend )
 	ROM_LOAD( "a_r9.rom",    0x4000, 0x2000, CRC(66737f1e) SHA1(5eac6606ed3a11a00eb1172e35487b0d95b1d739) )
 	ROM_LOAD( "a_n7.rom",    0x6000, 0x2000, CRC(13915a53) SHA1(25ba3babc8eb0df413bdfe7dbcd8642e4c658120) )
 
-	ROM_REGION(  0x1000, "gfx1", ROMREGION_DISPOSE )	/* fg tiles */
+	ROM_REGION(  0x1000, "gfx1", 0 )	/* fg tiles */
 	ROM_LOAD( "b_a4.rom",    0x0000, 0x1000, CRC(c7dd3cf7) SHA1(87f31c639d840e781d0f56f98f00d0642c6b87b4) )
 
-	ROM_REGION(  0x6000, "gfx2", ROMREGION_DISPOSE )	/* bg tiles */
+	ROM_REGION(  0x6000, "gfx2", 0 )	/* bg tiles */
 	ROM_LOAD( "b_h9.rom",    0x0000, 0x2000, CRC(1fe8644a) SHA1(42f5b93ffb3277321969a0bd805ec78796583d37) )
 	ROM_LOAD( "b_h10.rom",   0x2000, 0x2000, CRC(5f7dc82e) SHA1(3e70be650b8046c2b34a2405a2fbc2a16bf73bf1) )
 	ROM_LOAD( "b_h11.rom",   0x4000, 0x2000, CRC(46741643) SHA1(3fba31bac5a7d94af80035304647f39af3a9484f) )
 
-	ROM_REGION( 0x18000, "gfx3", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x18000, "gfx3", 0 )	/* sprites */
 	ROM_LOAD( "b_a6.rom",   0x00000, 0x4000, CRC(1689f21c) SHA1(fafb13dc8ca27a7506065bbf08102afc6d722843) )
 	ROM_LOAD( "b_a7.rom",   0x04000, 0x4000, CRC(f527c909) SHA1(40f44828502018c73283965eb7a2a68ed25ebfe5) )
 	ROM_LOAD( "b_a8.rom",   0x08000, 0x4000, CRC(8d618629) SHA1(3cc49fd8066464ee940de010da3f33ed8573df3d) )
@@ -1188,7 +1188,7 @@ ROM_START( legend )
 	ROM_LOAD( "82s123.5j",   0x0300, 0x0020, CRC(c98f0651) SHA1(4f1b95213c28ad017c8d6542e8d522e4d69f91e3) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 
-	ROM_REGION( 0x0300, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0300, "plds", 0 )
 	ROM_LOAD( "epl10p8.2j", 0x0000, 0x002c, CRC(8abc03bf) SHA1(05a7085583f76cb46ec623adfc1e0dd35c6a36e6) )
 	ROM_LOAD( "epl12p6.9k", 0x0100, 0x0034, CRC(9b0bd6f8) SHA1(9dceb37245969537301b1f3c74f2c4ee088faa93) )
 	ROM_LOAD( "epl12p6.9j", 0x0200, 0x0034, CRC(dcae870d) SHA1(2224724a3faf0608083f5d6ff76712adc7616a54) )

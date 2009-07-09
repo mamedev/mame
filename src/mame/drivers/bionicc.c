@@ -377,14 +377,14 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )	/* VIDEORAM (text layer) tiles */
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "tsu_07.5l",   0x00000, 0x8000, CRC(9469efa4) SHA1(53c70361e8d9e54825f61b87a10df42438aaf5b0) )	/* SCROLL2 Layer Tiles */
 	ROM_LOAD( "tsu_06.4l",   0x08000, 0x8000, CRC(40bf0eb4) SHA1(fcb186c31747e2c9872de01e34b3e713dc74df82) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )	/* SCROLL1 Layer Tiles */
 	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
 	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
@@ -394,7 +394,7 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx4", 0 )
 	ROM_LOAD( "tse_10.13f",   0x00000, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )	/* Sprites */
 	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
 	ROM_LOAD( "tse_15.13g",   0x10000, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
@@ -421,14 +421,14 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )	/* VIDEORAM (text layer) tiles */
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "tsu_07.5l",   0x00000, 0x8000, CRC(9469efa4) SHA1(53c70361e8d9e54825f61b87a10df42438aaf5b0) )	/* SCROLL2 Layer Tiles */
 	ROM_LOAD( "tsu_06.4l",   0x08000, 0x8000, CRC(40bf0eb4) SHA1(fcb186c31747e2c9872de01e34b3e713dc74df82) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )	/* SCROLL1 Layer Tiles */
 	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
 	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
@@ -438,7 +438,7 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx4", 0 )
 	ROM_LOAD( "tsu_10.13f",   0x00000, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )	/* Sprites */
 	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
 	ROM_LOAD( "tsu_15.13g",   0x10000, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
@@ -465,14 +465,14 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )	/* VIDEORAM (text layer) tiles */
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "tsu_07.5l",   0x00000, 0x8000, CRC(9469efa4) SHA1(53c70361e8d9e54825f61b87a10df42438aaf5b0) )	/* SCROLL2 Layer Tiles */
 	ROM_LOAD( "tsu_06.4l",   0x08000, 0x8000, CRC(40bf0eb4) SHA1(fcb186c31747e2c9872de01e34b3e713dc74df82) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )	/* SCROLL1 Layer Tiles */
 	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
 	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
@@ -482,7 +482,7 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx4", 0 )
 	ROM_LOAD( "tsu_10.13f",   0x00000, 0x8000, CRC(f1180d02) SHA1(312626af48235a1f726ab596f296ef4739785ca0) )	/* Sprites */
 	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
 	ROM_LOAD( "tsu_15.13g",   0x10000, 0x8000, CRC(ea912701) SHA1(106336c63a1c8a0b13236268bc533a8263285cad) )
@@ -509,14 +509,14 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )	/* VIDEORAM (text layer) tiles */
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "ts_07.5l",    0x00000, 0x8000, CRC(25cdf8b2) SHA1(316f6acc46878682dabeab12722e6a64504d23bd) )	/* SCROLL2 Layer Tiles */
 	ROM_LOAD( "ts_06.4l",    0x08000, 0x8000, CRC(314fb12d) SHA1(dab0519a49b64fe7a837b3c6383f6147e1ab6ffd) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )	/* SCROLL1 Layer Tiles */
 	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
 	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
@@ -526,7 +526,7 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx4", 0 )
 	ROM_LOAD( "ts_10.13f",    0x00000, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )	/* Sprites */
 	ROM_LOAD( "ts_09.11f",    0x08000, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
 	ROM_LOAD( "ts_15.13g",    0x10000, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )

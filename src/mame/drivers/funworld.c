@@ -2258,7 +2258,7 @@ ROM_START( jollycrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jolycard.run", 0x8000, 0x8000, CRC(f531dd10) SHA1(969191fbfeff4349afef619d9241ef5186e6d57f) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2270,7 +2270,7 @@ ROM_START( jolycdae )	/* encrypted roms...*/
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "pokeru0.bin", 0x8000, 0x10000, CRC(7732f177) SHA1(b75fca596a7315d1379fa5bcf07c449ec32c90f5) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "pokeru1.bin", 0x00000, 0x10000, CRC(878d695b) SHA1(0e1ea455e991e591316a340c56b23fa26764988d) )
 	ROM_LOAD( "pokeru2.bin", 0x10000, 0x10000, CRC(b7b2946a) SHA1(25b15296b32bf88db6d60991105bba667f7940cc) )
 	ROM_COPY( "gfx1",	 0x10000, 0x00000, 0x8000 ) /* rgn, srcoffset, offset, length */
@@ -2283,7 +2283,7 @@ ROM_START( jolyc3x3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jc3x3.bin", 0x8000, 0x8000, CRC(71e304ad) SHA1(238b792d841432582c94b21a674d46a95e8f3826) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2295,7 +2295,7 @@ ROM_START( jolyc980 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "j980.bin", 0x8000, 0x8000, CRC(48249fff) SHA1(390cd0eb3399446a66363dc6760458170e1970fd) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2307,7 +2307,7 @@ ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lipa.bin", 0x8000, 0x8000, CRC(62657c98) SHA1(237466dde26540c119c631c75f51c87ea59d1a91) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jollyb.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2322,7 +2322,7 @@ ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyc.bin", 0x8000, 0x8000, CRC(8926d99d) SHA1(dd5d1ac03d30d823dfcfe1349328ecb7afbc37fa) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jollyb.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2334,7 +2334,7 @@ ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollypkr.003", 0x8000, 0x8000, CRC(ea7340b4) SHA1(7dd468f28a488a4781521809d06db1d7917048ad) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2346,7 +2346,7 @@ ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jn.bin", 0x8000, 0x8000, CRC(6ae00ed0) SHA1(5921c2882aeb5eadd0e04a477fa505ad35e9d98c) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
@@ -2370,7 +2370,7 @@ ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(c76fdc79) SHA1(fc75c274d64fa9c99a546d424f38e79f1acf2576) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
@@ -2385,7 +2385,7 @@ ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "sj2.bin", 0x0000, 0x8000, CRC(d7253325) SHA1(ad40e662519da9b11f77690b7d41c5007f74e280) )
 	ROM_LOAD( "sj1.bin", 0x8000, 0x8000, CRC(82741749) SHA1(d0bf3073dff9ba1c4913fd754f965951e9cb5b03) )
 
@@ -2401,7 +2401,7 @@ ROM_START( jolycdab )
 	ROM_LOAD( "ig1poker.run", 0x8000, 0x8000, CRC(c96e6542) SHA1(ed6c0cf9fe8597dba9149b2225320d8d9c39219a) )
 //  ROM_RELOAD(               0x4000, 0x4000 )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jn1poker.ch2", 0x0000, 0x8000, CRC(8d78e43d) SHA1(15c60f8e0cd88518b0dc72b92aff6d8d4b2149cf) )
 	ROM_LOAD( "jn1poker.ch1", 0x8000, 0x8000, CRC(d0a87f58) SHA1(6b7925557c4e40a1ebe52ecd14391cdd5e00b59a) )
 
@@ -2413,7 +2413,7 @@ ROM_START( bigdeal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker4.001", 0x8000, 0x8000, CRC(bb0198c1) SHA1(6e7d42beb5723a4368ae3788f83b448f86e5653d) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
@@ -2425,7 +2425,7 @@ ROM_START( bigdealb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker8.003", 0x8000, 0x8000, CRC(09c93745) SHA1(a64e96ef3489bc37c2c642f49e62cfef371de6f1) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
@@ -2438,7 +2438,7 @@ ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps w
 	ROM_LOAD( "bonucard.cpu", 0x8000, 0x4000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )
 	ROM_CONTINUE(			  0xc000, 0x4000 )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
@@ -2450,7 +2450,7 @@ ROM_START( cuoreuno )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cuore1a.u2", 0x8000, 0x8000, CRC(6e112184) SHA1(283ac534fc1cb33d11bbdf3447630333f2fc957f) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "cuore1b.u21", 0x0000, 0x8000, CRC(14eca2b8) SHA1(35cba415800c6cd3e6ed9946057f33510ad2bfc9) )
 	ROM_LOAD( "cuore1c.u22", 0x8000, 0x8000, CRC(253fac84) SHA1(1ad104ab8e8d73df6397a840a4b26565b245d7a3) )
 
@@ -2467,7 +2467,7 @@ ROM_START( elephfam )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "eleph_a.u2", 0x8000, 0x10000, CRC(8392b842) SHA1(74c850c734ca8174167b2f826b9b1ac902669392) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "eleph_c.u22", 0x00000, 0x10000, CRC(4b909bf3) SHA1(a822b12126bc58af6d3f999ab2117370015a039b) )
 	ROM_LOAD( "eleph_b.u21", 0x10000, 0x10000, CRC(e3612670) SHA1(beb65f7d2bd6d7bc68cfd876af51910cf6417bd0) )
 	ROM_COPY( "gfx1",	 0x10000, 0x00000, 0x8000 ) /* rgn, srcoffset, offset, length */
@@ -2485,7 +2485,7 @@ ROM_START( elephfmb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "now.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "elephb.u21", 0x0000, 0x8000, CRC(3c60549c) SHA1(c839b3ea415a877e5eac04e0522c342cce8d6e64) )
 	ROM_LOAD( "elephc.u20", 0x8000, 0x8000, CRC(448ba955) SHA1(2785cbc8cd42a7dda85bd8b81d5fbec01a1ba0bd) )
 
@@ -2502,7 +2502,7 @@ ROM_START( pool10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pool10.u2", 0x8000, 0x8000, CRC(4e928756) SHA1(d9ac3d41ea32e060a7e269502b7f22333c5e6c61) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
@@ -2520,7 +2520,7 @@ ROM_START( pool10b )	/* this set should be the parent */
 	ROM_LOAD( "u2.bin", 0x8000, 0x10000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
 
 	/* GFX ROMs are the same of pool10, but double sized with identical halves. */
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "u20.bin", 0x00000, 0x10000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
 	ROM_LOAD( "u21.bin", 0x10000, 0x10000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) )
 	ROM_COPY( "gfx1",	 0x10000, 0x00000, 0x8000 ) /* rgn, srcoffset, offset, length */
@@ -2538,7 +2538,7 @@ ROM_START( pool10c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(ac157b17) SHA1(f2b7eb940273bc404d3e0d8dd0f00ca757cebf69) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
@@ -2555,7 +2555,7 @@ ROM_START( pool10d )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "3.50.u2", 0x8000, 0x10000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
@@ -2572,7 +2572,7 @@ ROM_START( tortufam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tortu.a.u2", 0x8000, 0x8000, CRC(6e112184) SHA1(283ac534fc1cb33d11bbdf3447630333f2fc957f) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "tortu.b.u21", 0x0000, 0x8000, CRC(e7b18584) SHA1(fa1c367469d4ced5d7c83c15a25ec5fd6afcca10) )
 	ROM_LOAD( "tortu.c.u20", 0x8000, 0x8000, CRC(3cda6f73) SHA1(b4f3d2d3c652ebf6973358ae33b7808de5939acd) )
 
@@ -2589,7 +2589,7 @@ ROM_START( potgame )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "now.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "potg.b.u21", 0x0000, 0x8000, CRC(32fc1d4f) SHA1(cc533a44498338bc0cbb7c7b9c42559ce7ff1337) )
 	ROM_LOAD( "potg.c.u20", 0x8000, 0x8000, CRC(0331eb42) SHA1(a8e838d644fc6d93a9632070b305e44e4242ce94) )
 
@@ -2606,7 +2606,7 @@ ROM_START( bottle10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "boat_3.bin", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "boat_2.bin", 0x0000, 0x8000, CRC(a6b36c3f) SHA1(90b12d9552ad5dbf11a30fc7451da1f3e6763cc3) )
 	ROM_LOAD( "boat_1.bin", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
@@ -2623,7 +2623,7 @@ ROM_START( bottl10b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(9395c15b) SHA1(e4caefc6f55b07f5c4370a3b8652fa93e08987ce) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
@@ -2640,7 +2640,7 @@ ROM_START( royalcrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r2.bin", 0x8000, 0x8000, CRC(25dfe0dc) SHA1(1a857a910d0c34b6b5bfc2b6ea2e08ed8ed0cae0) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
@@ -2658,7 +2658,7 @@ ROM_START( royalcdb ) /* both halves have different programs. we're using the 2n
 	ROM_LOAD( "rc.bin", 0x10000, 0x10000, CRC(8a9a6dd6) SHA1(04c3f9f17d5404ac1414c51ef8f930df54530e72) )
 	ROM_COPY( "maincpu",	0x18000, 0x8000, 0x8000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "1a.bin", 0x0000, 0x10000, CRC(8a66f22c) SHA1(67d6e8f8f5a0fd979dc498ba2cc67cf707ccdf95) )
 	ROM_LOAD( "2a.bin", 0x10000, 0x10000, CRC(3af71cf8) SHA1(3a0ce0d0abebf386573c5936545dada1d3558e55) )
 	ROM_COPY( "gfx1",	 0x10000, 0x00000, 0x8000 )	/* rgn, srcoffset, offset, length */
@@ -2674,7 +2674,7 @@ ROM_START( royalcdc )	/* encrypted program rom */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc_1.bin", 0x8000, 0x8000, CRC(8cdcc978) SHA1(489b58760a7c8646399c8cdfb86ec4341823e7dd) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "rc_3.bin", 0x0000, 0x8000, CRC(8612c6ed) SHA1(3306a252af479e0510f136020086015b60dce879) )
 	ROM_LOAD( "rc_2.bin", 0x8000, 0x8000, CRC(7f934488) SHA1(c537a09ef7e88a81ee9c2e1d971b3caf9d3dba0e) )
 
@@ -2691,7 +2691,7 @@ ROM_START( lluck3x3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l3x3.bin", 0x8000, 0x8000, CRC(dbdb07ff) SHA1(6be43aa0b2c10d83373f20f477606cb031bc6dd9) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "l2.bin", 0x0000, 0x8000, CRC(8ca90a8f) SHA1(bc3db3f8c097f89eff488e3aca39bf24ff2b5cff) )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
@@ -2703,7 +2703,7 @@ ROM_START( lluck4x1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rk4x1.bin", 0x8000, 0x8000, CRC(37f8a355) SHA1(a6eb4c53464e373bdecbbaaf146f5f7cf66b4bcd) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "l2.bin", 0x0000, 0x8000, CRC(8ca90a8f) SHA1(bc3db3f8c097f89eff488e3aca39bf24ff2b5cff) )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
@@ -2716,7 +2716,7 @@ ROM_START( magicrd2 )	/* Impera */
     ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "magicard.01",  0x8000, 0x10000, CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr2.bin",   0x0000, 0x8000, CRC(733da697) SHA1(45122c64d5a371ec91cecc67b7faf179078e714d) )
 	ROM_LOAD( "mc2gr1.bin",   0x8000, 0x8000, CRC(2406b8d2) SHA1(e9d7a25562fd5adee351d7ef6ba02fff6aab021a) )
 
@@ -2732,7 +2732,7 @@ ROM_START( magicd2a )	/* for green TAB or Impera boards */
     ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 //    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr2.bin",   0x0000, 0x8000, CRC(733da697) SHA1(45122c64d5a371ec91cecc67b7faf179078e714d) )
 	ROM_LOAD( "mc2gr1.bin",   0x8000, 0x8000, CRC(2406b8d2) SHA1(e9d7a25562fd5adee351d7ef6ba02fff6aab021a) )
 
@@ -2748,7 +2748,7 @@ ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
 //    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
     ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr1b.bin",  0x0000, 0x8000, CRC(ce2629a7) SHA1(84767ed5da8dcee44a210255537e10372bcc264b) )
 	ROM_LOAD( "mc2gr2b.bin",  0x8000, 0x8000, CRC(d2bf8bde) SHA1(975b8f43a0396c09e357b96d5ae7381b12152b9e) )
 
@@ -2763,7 +2763,7 @@ ROM_START( vegasslw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vslow.bin", 0x8000, 0x8000, CRC(9cb7861a) SHA1(f934eacd5b3573a6bbeaa827f521b4a498e5bcdf) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
@@ -2775,7 +2775,7 @@ ROM_START( vegasfst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vfast.bin", 0x8000, 0x8000, CRC(87dfb28d) SHA1(9a06e695e59722b6c97e5a9fd2c8b238661e5a4a) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
@@ -2787,7 +2787,7 @@ ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ch3.bin", 0x8000, 0x8000, CRC(87dfb28d) SHA1(9a06e695e59722b6c97e5a9fd2c8b238661e5a4a) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ch2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "ch1.bin", 0x8000, 0x8000, CRC(0a3679c0) SHA1(ce8a067e1a2eccf9fabb16733ef3a14e0e8129e5) )	/* X & Y in txt layer */
 
@@ -2799,7 +2799,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (Impera, original) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera3orig.bin", 0x8000, 0x8000, CRC(ceb3a0d5) SHA1(25efae9f225abddfa663e6abcc91801996e5b0ea) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "impera2.bin", 0x0000, 0x8000, BAD_DUMP CRC(57c1ca04) SHA1(9d3e1f50795ebe5997532b67ba467fd6428e81d2) )
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(8e354c4a) SHA1(95d7edf83bb07b5c58312af6d8a7dff1cf87cba7) )
 
@@ -2811,7 +2811,7 @@ ROM_START( jolyjkra )	/* Jolly Joker (Impera, 50bet) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera50.bin", 0x8000, 0x8000, CRC(7effc044) SHA1(961438e7fb8222296fb959b510cdf646e4ac3226) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "impera2.bin", 0x0000, 0x8000, BAD_DUMP CRC(57c1ca04) SHA1(9d3e1f50795ebe5997532b67ba467fd6428e81d2) )
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(8e354c4a) SHA1(95d7edf83bb07b5c58312af6d8a7dff1cf87cba7) )
 
@@ -2829,7 +2829,7 @@ ROM_START( jokercrd )
 	ROM_LOAD( "ic37.bin",   0x10000, 0x8000, CRC(8e0d70c4) SHA1(018f92631acbe98e5826a41698f0e07b4b46cd71) ) /* 1st and 2nd half identical */
 	ROM_COPY( "maincpu",	0x10000, 0xc000, 0x4000 ) /* rgn, srcoffset, offset, length */
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ic10.bin",	0x0000, 0x8000, CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )
 	ROM_LOAD( "ic11.bin",	0x8000, 0x8000, CRC(21d05a57) SHA1(156c18ec31b08e4c4af6f73b49cb5d5c68d1670f) ) /* bad dump?, or sprite plane */
 
@@ -2845,7 +2845,7 @@ ROM_START( mongolnw )
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-mf.u40", 0x00000, 0x02000 , CRC(ae22e778) SHA1(0897e05967d68d7f23489e98717663e3a3176070) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "mong.rc.b2.u3", 0x00000, 0x10000, CRC(5e019b73) SHA1(63a544dccb9589e5a6b938e604c09d4d8fc060fc) )
 	ROM_LOAD( "mong.rc.c1.u2", 0x10000, 0x10000, CRC(e3fc24c4) SHA1(ea4e67ace63b55a76365f7e11a67c7d420a52dd7) )
 	ROM_COPY( "gfx1",	 0x10000, 0x8000, 0x8000 ) /* rgn, srcoffset, offset, length */
@@ -2865,7 +2865,7 @@ ROM_START( soccernw )
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-sn.u40", 0x00000, 0x02000 , CRC(af0bd35b) SHA1(c6613a7bcdec2fd6060d6dcf639654568de87e75) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "soccer2.u3", 0x00000, 0x10000, CRC(db09b5bb) SHA1(a12bf2938f5482ea5ebc0db6fd6594e1beb97017) )
 	ROM_LOAD( "soccer1.u2", 0x10000, 0x10000, CRC(564cc467) SHA1(8f90c4bacd97484623666b25dae77e628908e243) )
 	ROM_COPY( "gfx1",	 0x10000, 0x8000, 0x8000 ) /* rgn, srcoffset, offset, length */
@@ -2881,7 +2881,7 @@ ROM_START( saloon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1s.bin", 0x8000, 0x8000, CRC(66938330) SHA1(09118d607eff7121472db7d2cc24079e063dc7cf) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2s.bin", 0x0000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
 	ROM_LOAD( "3s.bin", 0x8000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
 

@@ -324,13 +324,13 @@ ROM_START( boxer )
 	ROM_LOAD_NIB_LOW ( "3c00l.h1", 0x3C00, 0x0400, CRC(09e204f2) SHA1(565d4c8865da7d96a45e909973d570101de61f63) )
 	ROM_LOAD_NIB_HIGH( "3c00m.c1", 0x3C00, 0x0400, CRC(2f8ebc85) SHA1(05a4e29ec7e49173200d5fe5344274fd6afd16d7) )
 
-	ROM_REGION( 0x0400, "gfx1", ROMREGION_DISPOSE ) /* lower boxer */
+	ROM_REGION( 0x0400, "gfx1", 0 ) /* lower boxer */
 	ROM_LOAD( "bx137l.c8", 0x0000, 0x0400, CRC(e91f2048) SHA1(64039d07557e210aa4f6663cd7e72814cb881310) )
 
-	ROM_REGION( 0x0400, "gfx2", ROMREGION_DISPOSE ) /* upper boxer */
+	ROM_REGION( 0x0400, "gfx2", 0 ) /* upper boxer */
 	ROM_LOAD( "bx137u.m8", 0x0000, 0x0400, CRC(e4fee386) SHA1(79b70aca4a92c56363689a363b643d46294d3e88) )
 
-	ROM_REGION( 0x0400, "gfx3", ROMREGION_DISPOSE ) /* tiles */
+	ROM_REGION( 0x0400, "gfx3", 0 ) /* tiles */
 	ROM_LOAD( "9417.k2", 0x0000, 0x0400, CRC(7e3d22cf) SHA1(92e6bbe049dc8fcd674f2ff96cde3786f714508d) )
 
 	ROM_REGION( 0x0200, "user1", 0 ) /* lower boxer map */

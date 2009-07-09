@@ -223,10 +223,10 @@ ROM_START( glass ) /* Version 1.1 */
 	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
@@ -244,10 +244,10 @@ ROM_START( glass10 ) /* Version 1.0 */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
@@ -265,10 +265,10 @@ ROM_START( glassbrk ) /* Title screen shows "GLASS" and under that "Break Editio
 	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 

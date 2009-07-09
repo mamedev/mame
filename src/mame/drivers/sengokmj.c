@@ -320,29 +320,29 @@ ROM_START( sengokmj )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0,     0x018000, 0x08000 )
 
-	ROM_REGION( 0x100000, "spr_gfx", ROMREGION_DISPOSE ) /*Sprites gfx rom*/
+	ROM_REGION( 0x100000, "spr_gfx", 0 ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )
 
 	ROM_REGION( 0x200000, "gfx_tiles", 0 ) /*Tiles data,to be reloaded*/
 	ROM_LOAD( "rssengo0.64", 0x000000, 0x100000, CRC(36924b71) SHA1(814b2c69ab9876ccc57774e5718c05059ea23150) )
 	ROM_LOAD( "rssengo1.68", 0x100000, 0x100000, CRC(1bbd00e5) SHA1(86391323b8e0d3b7e09a5914d87fb2adc48e5af4) )
 
-	ROM_REGION( 0x080000, "bg_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x000000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "md_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "md_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x080000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "fg_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "fg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x100000, 0x00000, 0x080000)
 
-	ROM_REGION( 0x080000, "tx_gfx", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "tx_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x180000, 0x00000, 0x080000)
 
 	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "mah1-1-1.915", 0x00000, 0x20000, CRC(d4612e95) SHA1(937c5dbd25c89d4f4178b0bed510307020c5f40e) )
 
-	ROM_REGION( 0x200, "user1", ROMREGION_DISPOSE ) /* not used */
+	ROM_REGION( 0x200, "user1", 0 ) /* not used */
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
