@@ -1769,6 +1769,8 @@ static MACHINE_DRIVER_START( galagab )
 
 	MDRV_DEVICE_REMOVE("54xx")
 	MDRV_DEVICE_REMOVE("06xx")
+	
+	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
@@ -1838,6 +1840,8 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_DEVICE_REMOVE("50xx")
 	MDRV_DEVICE_REMOVE("54xx")
 	MDRV_DEVICE_REMOVE("06xx")
+
+	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
