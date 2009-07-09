@@ -200,6 +200,7 @@ psoldier dip locations still need veritication.
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
+#include "sound/okim6295.h"
 
 static UINT8 irqvector;
 static UINT16 sound_status;
@@ -319,6 +320,9 @@ enum { VECTOR_INIT, YM2151_ASSERT, YM2151_CLEAR, V30_ASSERT, V30_CLEAR };
 
 static TIMER_CALLBACK( setvector_callback )
 {
+	if (!devtag_get_device(machine, "soundcpu"))
+		return;
+
 	switch(param)
 	{
 		case VECTOR_INIT:	irqvector = 0;		break;
@@ -1006,6 +1010,42 @@ static MACHINE_DRIVER_START( hook )
 	MDRV_CPU_CONFIG(hook_config)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ppan )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",V33,18000000/2)
+	MDRV_CPU_PROGRAM_MAP(m92_map)
+	MDRV_CPU_IO_MAP(m92_portmap)
+
+	/* no Sound CPU */
+	
+	MDRV_MACHINE_START(m92)
+	MDRV_MACHINE_RESET(m92)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
+
+	MDRV_GFXDECODE(m92)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(m92)
+	MDRV_VIDEO_UPDATE(m92)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 static const nec_config rtypeleo_config ={ rtypeleo_decryption_table, };
 static MACHINE_DRIVER_START( rtypeleo )
 	MDRV_IMPORT_FROM(m92)
@@ -1503,6 +1543,31 @@ ROM_START( hookj )
 	ROM_LOAD( "hook-da.rom", 0x000000, 0x080000, CRC(88cd0212) SHA1(789532f5544b5d024d8af60eb8a5c133ae0d19d4) )
 ROM_END
 
+ROM_START( ppan )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.u6", 0x000001, 0x080000, CRC(b135dd6e) SHA1(3e7ac75db53804c605fb628546f5a506ba7f7a5f) )
+	ROM_LOAD16_BYTE( "2.u5", 0x000000, 0x080000, CRC(7785289c) SHA1(8125c4ae8e99b6eed5216c1d956426bf2034ada0) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* Tiles */
+	ROM_LOAD( "7.u114", 0x000000, 0x040000, CRC(dec63dcf) SHA1(e9869110f832d782c460b123928b042c65fdf8bd) )
+	ROM_LOAD( "6.u115", 0x040000, 0x040000, CRC(e4eb0b92) SHA1(159da3ec973490a153c69c96c1373cf4e0290736) )
+	ROM_LOAD( "5.u116", 0x080000, 0x040000, CRC(a52b320b) SHA1(1522562239bb3b93ef552c47445daa4ee021495c) )
+	ROM_LOAD( "4.u117", 0x0c0000, 0x040000, CRC(7ef67731) SHA1(af0b0ee6e1c06af04c609af7e077d4a7d76d8817) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "15.u106", 0x000000, 0x080000, CRC(cdfc2f78) SHA1(02981c5b48afe532a74c9aa72ebdaaaca7a091e5) )
+	ROM_LOAD( "14.u110", 0x080000, 0x080000, CRC(87e767f0) SHA1(ddf3c5a04c8fc1551bddb7e7753972a80442b88b) )
+	ROM_LOAD( "13.u107", 0x100000, 0x080000, CRC(e07f2abe) SHA1(1b404fcf6bcc1a25e510c95a9eb83df0c780934a) )
+	ROM_LOAD( "12.u111", 0x180000, 0x080000, CRC(f446150e) SHA1(1bb964c9060906d0d9f2cdb465b20e04827e9b86) )
+	ROM_LOAD( "11.u108", 0x200000, 0x080000, CRC(5c114daa) SHA1(6dd28b3e9f82aa9370986e137453ef8d4c641483) )
+	ROM_LOAD( "10.u112", 0x280000, 0x080000, CRC(fa11fa40) SHA1(63092a0df1f8e52c3caad196aada57fb8f3c3629) )
+	ROM_LOAD( "9.u109",  0x300000, 0x080000, CRC(9d466b1a) SHA1(c65b7afcfbd6bfec1b495a5dbce806ff34a7cbc1) )
+	ROM_LOAD( "8.u113",  0x380000, 0x080000, CRC(d08a5f6b) SHA1(ab762be9e5fadac2dc3149bfa69b8cbdbac3218b) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI M6295 samples */
+	ROM_LOAD( "3.u122", 0x000000, 0x080000, CRC(d0d37028) SHA1(0f58d220a1972bafa1299a19e704b7735886c8b6) )
+ROM_END
+
 ROM_START( rtypeleo )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rtl-h0-c.bin", 0x000001, 0x040000, CRC(5fef7fa1) SHA1(7d18d4ea979d887d6da42c79734b8c695f3df02b) )
@@ -1978,12 +2043,14 @@ static void init_m92(running_machine *machine, int hasbanks)
 	}
 
 	RAM = memory_region(machine, "soundcpu");
-	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
+	
+	if (RAM)
+		memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m92_game_kludge = 0;
 	m92_irq_vectorbase = 0x80;
 	m92_sprite_buffer_busy = 1;
-
+	
 	setvector_callback(machine, NULL, VECTOR_INIT);
 }
 
@@ -2112,6 +2179,7 @@ GAME( 1992, skingam2, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem
 GAME( 1992, hook,     0,        hook,          hook,     hook,     ROT0,   "Irem",         "Hook (World)", 0 )
 GAME( 1992, hooku,    hook,     hook,          hook,     hook,     ROT0,   "Irem America", "Hook (US)", 0 )
 GAME( 1992, hookj,    hook,     hook,          hook,     hook,     ROT0,   "Irem",         "Hook (Japan)", 0 )
+GAME( 1992, ppan,     hook,     ppan,          hook,     hook,     ROT0,   "Irem",         "Peter Pan (bootleg of Hook)", GAME_NOT_WORKING ) // PCB marked 'Peter Pan', no title screen, made in Italy?
 GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, rtypeleo, ROT0,   "Irem",         "R-Type Leo (World)", 0 )
 GAME( 1992, rtypelej, rtypeleo, rtypeleo,      rtypeleo, rtypelej, ROT0,   "Irem",         "R-Type Leo (Japan)", 0 )
 GAME( 1993, inthunt,  0,        inthunt,       inthunt,  inthunt,  ROT0,   "Irem",         "In The Hunt (World)", 0 )
