@@ -2058,6 +2058,7 @@ src/mame/drivers/srmp6.c svneol=native#text/plain
 src/mame/drivers/srumbler.c svneol=native#text/plain
 src/mame/drivers/ssf2md.c svneol=native#text/plain
 src/mame/drivers/ssfindo.c svneol=native#text/plain
+src/mame/drivers/ssgbl.c svneol=native#text/plain
 src/mame/drivers/sshangha.c svneol=native#text/plain
 src/mame/drivers/ssingles.c svneol=native#text/plain
 src/mame/drivers/sslam.c svneol=native#text/plain
