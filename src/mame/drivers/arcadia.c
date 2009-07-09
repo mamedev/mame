@@ -371,6 +371,17 @@ ROM_START( ar_airh )
 	ROM_LOAD16_BYTE( "airh_1l.bin", 0x00001, 0x10000, CRC(155452b6) SHA1(aeaa67ea9cc543c9a43094545450159e4784fb5c) )
 ROM_END
 
+ROM_START( ar_airh2 )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "arcadia4.u10", 0x00000, 0x10000, CRC(baf8d886) SHA1(77efbc27c1cf717dfee2686009a957029eb1b113) )
+	ROM_LOAD16_BYTE( "arcadia4.u6",  0x00001, 0x10000, CRC(ccff38ee) SHA1(ae89dbc9533358c80423b2dc21f101816730be7c) )
+
+	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+ROM_END
+
 
 /* BOWL V 2.1 */
 ROM_START( ar_bowl )
@@ -403,6 +414,27 @@ ROM_START( ar_dart )
 	ROM_LOAD16_BYTE( "dart_5l.bin", 0x80001, 0x10000, CRC(df4103cc) SHA1(c792cc52148afa7bde6458704d9de2550b6eb636) )
 	ROM_LOAD16_BYTE( "dart_6h.bin", 0xa0000, 0x10000, CRC(e21cc8be) SHA1(04280eef26f4a97c2280bdec19b1bc586fceffb0) )
 	ROM_LOAD16_BYTE( "dart_6l.bin", 0xa0001, 0x10000, CRC(21112d4e) SHA1(95e49aa2f23c6d005a0de3cf96a1c06adeacf2a9) )
+ROM_END
+
+ROM_START( ar_dart2 )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_LOAD16_BYTE( "arcadia3.u10", 0x00000, 0x10000, CRC(7166c736) SHA1(9892725b4d0aac6486950f8153083ba3f6982ad8) )
+	ROM_LOAD16_BYTE( "arcadia3.u6",  0x00001, 0x10000, CRC(f226137e) SHA1(61540885ff83420f5adc1087547e0ece33383ffd) )
+	ROM_LOAD16_BYTE( "arcadia3.u11", 0x20000, 0x10000, CRC(5d9a7804) SHA1(acd8eb7fd28594e8008eb953f843a72f12782ea2) )
+	ROM_LOAD16_BYTE( "arcadia3.u7",  0x20001, 0x10000, CRC(a4876410) SHA1(668d120f688d31d86645fa67e01cd7e6356ca340) )
+	ROM_LOAD16_BYTE( "arcadia3.u12", 0x40000, 0x10000, CRC(0cb77441) SHA1(cadd5656d2a97a852bcc231c7df22965f751a80a) )
+	ROM_LOAD16_BYTE( "arcadia3.u8",  0x40001, 0x10000, CRC(97caab85) SHA1(9fd1b90d9cce073db81724ddd62f3e4ec610792b) )
+	ROM_LOAD16_BYTE( "arcadia3.u13", 0x60000, 0x10000, CRC(9ccf347e) SHA1(9c2b5276543d20006e115459ac5451e2e807b28f) )
+	ROM_LOAD16_BYTE( "arcadia3.u9",  0x60001, 0x10000, CRC(39c6675a) SHA1(6b79c2afab5b42b83d673836b94d7baa7a4e3214) )
+	ROM_LOAD16_BYTE( "arcadia3.u19", 0x80000, 0x10000, CRC(2495a19e) SHA1(2cfb4c1ebb67b534d7c6df28512c80b52931e244) )
+	ROM_LOAD16_BYTE( "arcadia3.u15", 0x80001, 0x10000, BAD_DUMP CRC(6d7006df) SHA1(eb6a0c9df3ec1bf5d0a180e138a591f374555f1c) ) // FIXED BITS (0000x000)
+	ROM_LOAD16_BYTE( "arcadia3.u20", 0xa0000, 0x10000, CRC(efb0f2e2) SHA1(7ba1d85ac573db9bbd1ef04d0770c7c1277bc10e) )
+	ROM_LOAD16_BYTE( "arcadia3.u16", 0xa0001, 0x10000, CRC(a9c5e939) SHA1(75de7c0fb4654b6738ecd0c170589f3a46012f33) )
+
+	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
 ROM_END
 
 
@@ -513,6 +545,28 @@ ROM_START( ar_ninj )
 	ROM_LOAD16_BYTE( "ninj_6l.bin", 0xa0001, 0x10000, CRC(9e5407e3) SHA1(85a8383573f3cd120f323e867c7fa2b6badd5aad) )
 ROM_END
 
+ROM_START( ar_ninj2 )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_LOAD16_BYTE( "arcadia5.u10", 0x00000, 0x10000, CRC(217cb8eb) SHA1(7cb1da4d5d5b5af5f42c10848c7535bdeebbcd94) )
+	ROM_LOAD16_BYTE( "arcadia5.u6",  0x00001, 0x10000, CRC(009bee8f) SHA1(ff61a0770643400ecddc70e603ca6589424b6831) )
+	ROM_LOAD16_BYTE( "arcadia5.u11", 0x20000, 0x10000, CRC(f5c84e48) SHA1(8149a225a406ffb7c9faaa48af4947c2f66f750d) )
+	ROM_LOAD16_BYTE( "arcadia5.u7",  0x20001, 0x10000, CRC(62d32d21) SHA1(3b80e0a4543d64f905139224f333a913cde60f30) )
+	ROM_LOAD16_BYTE( "arcadia5.u12", 0x40000, 0x10000, CRC(c6e4dd36) SHA1(a8dcea97e0eb1da462ad55fd543c637544bfd059) )
+	ROM_LOAD16_BYTE( "arcadia5.u8",  0x40001, 0x10000, CRC(1dca7ea5) SHA1(2950ea2e9267d27e0ebe785a08e2d6627ae5eb17) )
+	ROM_LOAD16_BYTE( "arcadia5.u13", 0x60000, 0x10000, CRC(1bca3231) SHA1(57bd0516c30c4b7d8b4ca27580f770732b1a56bd) )
+	ROM_LOAD16_BYTE( "arcadia5.u9",  0x60001, 0x10000, CRC(df2f98ae) SHA1(cbad0371109aab9fa6c72a022a496e9b85c5fcd4) )
+	ROM_LOAD16_BYTE( "arcadia5.u19", 0x80000, 0x10000, CRC(49cda31b) SHA1(e9579b9d47f7e638f933b8ce659bc63c8bdeb0a4) )
+	ROM_LOAD16_BYTE( "arcadia5.u15", 0x80001, 0x10000, CRC(1c5ef815) SHA1(7e88c1545ee15efd928220989f8b29207a8fec7e) )
+	ROM_LOAD16_BYTE( "arcadia5.u20", 0xa0000, 0x10000, CRC(7359920b) SHA1(72c7438f9f5ef5d6a23f11fc58d32f8e1ff0ae44) )
+	ROM_LOAD16_BYTE( "arcadia5.u16", 0xa0001, 0x10000, CRC(85a639bb) SHA1(22bfadfe6c8fd366e45ec172c070d9811e1ea8a9) )
+
+	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+ROM_END
+
+
 
 /* RDWR V 2.3 */
 ROM_START( ar_rdwr )
@@ -547,6 +601,27 @@ ROM_START( ar_sdwr )
 	ROM_LOAD16_BYTE( "sdwr_5l.bin", 0x80001, 0x10000, CRC(ecd1fbd3) SHA1(0b859d608859ccbff03db655219dfea4e609454d) )
 	ROM_LOAD16_BYTE( "sdwr_6h.bin", 0xa0000, 0x10000, CRC(ea3c8ab3) SHA1(95cb5b9dd29c19862a2659867474cbf49192f830) )
 	ROM_LOAD16_BYTE( "sdwr_6l.bin", 0xa0001, 0x10000, CRC(2544ccd7) SHA1(953aa00f2610ecd31db6e36964cbe7c2866050b9) )
+ROM_END
+
+ROM_START( ar_sdwr2 )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_LOAD16_BYTE( "arcadia1.u10", 0x00000, 0x10000, CRC(30949f1f) SHA1(270cd449f994eda76afd5532018bad636ac4cf68) )
+	ROM_LOAD16_BYTE( "arcadia1.u6",  0x00001, 0x10000, CRC(c760d1c4) SHA1(7d311e8b192e493da9501755e096599e1e8e8d3e) )
+	ROM_LOAD16_BYTE( "arcadia1.u11", 0x20000, 0x10000, CRC(d67ba564) SHA1(2afba72a77806e3925c9ca1e13c16c442a6cfc3a) )
+	ROM_LOAD16_BYTE( "arcadia1.u7",  0x20001, 0x10000, CRC(97f58a6d) SHA1(161bc8b3e14e5efca7b988f80cc16345280ca4bd) )
+	ROM_LOAD16_BYTE( "arcadia1.u12", 0x40000, 0x10000, CRC(b31ad2b2) SHA1(66003bd331f61d1bd2e8f4d595b61503dad4e4b8) )
+	ROM_LOAD16_BYTE( "arcadia1.u8",  0x40001, 0x10000, CRC(af929620) SHA1(5fde0f199016abf8fd9db821ee492feeba21b604) )
+	ROM_LOAD16_BYTE( "arcadia1.u13", 0x60000, 0x10000, CRC(360b17a6) SHA1(db7e1ce1c545139142804ce68ce5232d153fb0f2) )
+	ROM_LOAD16_BYTE( "arcadia1.u9",  0x60001, 0x10000, CRC(d724e563) SHA1(0012bc6354642a761fc223627401542ae48aea6e) )
+	ROM_LOAD16_BYTE( "arcadia1.u19", 0x80000, 0x10000, CRC(c25ac91d) SHA1(da4d46a2c987e2be2e31c081557b2de1744fa237) )
+	ROM_LOAD16_BYTE( "arcadia1.u15", 0x80001, 0x10000, CRC(ecd1fbd3) SHA1(0b859d608859ccbff03db655219dfea4e609454d) )
+	ROM_LOAD16_BYTE( "arcadia1.u20", 0xa0000, 0x10000, CRC(5791440b) SHA1(fc9297343ddc2e6e1e22b7ed9a986777519061db) )
+	ROM_LOAD16_BYTE( "arcadia1.u16", 0xa0001, 0x10000, CRC(e63e1679) SHA1(0762bff0018e006905a2e58141fdf05910f06e29) )
+
+	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?	
 ROM_END
 
 
@@ -641,6 +716,23 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
 	/* only the low byte of ROMs are encrypted in these games */
 	for (i = 0; i < 0x20000/2; i++)
 		rom[i] = BITSWAP16(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		
+	#if 0
+	{
+		UINT8 *ROM = memory_region(machine, tag);
+		int size = memory_region_length(machine, tag);
+
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, size, 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
 }
 
 
@@ -685,17 +777,17 @@ static void arcadia_init(running_machine *machine)
  *
  *************************************/
 
-static DRIVER_INIT( none )  {                                                arcadia_init(machine); }
-static DRIVER_INIT( airh )  { generic_decode(machine, "user3", 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(machine); }
-static DRIVER_INIT( bowl )  { generic_decode(machine, "user3", 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(machine); }
-static DRIVER_INIT( dart )  { generic_decode(machine, "user3", 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(machine); }
-static DRIVER_INIT( ldrba ) { generic_decode(machine, "user3", 2, 3, 4, 1, 0, 7, 5, 6); arcadia_init(machine); }
-static DRIVER_INIT( ninj )  { generic_decode(machine, "user3", 1, 6, 5, 7, 4, 2, 0, 3); arcadia_init(machine); }
-static DRIVER_INIT( rdwr )  { generic_decode(machine, "user3", 3, 1, 6, 4, 0, 5, 2, 7); arcadia_init(machine); }
-static DRIVER_INIT( sdwr )  { generic_decode(machine, "user3", 6, 3, 4, 5, 2, 1, 0, 7); arcadia_init(machine); }
-static DRIVER_INIT( socc )  { generic_decode(machine, "user3", 0, 7, 1, 6, 5, 4, 3, 2); arcadia_init(machine); }
-static DRIVER_INIT( sprg )  { generic_decode(machine, "user3", 4, 7, 3, 0, 6, 5, 2, 1); arcadia_init(machine); }
-static DRIVER_INIT( xeon )  { generic_decode(machine, "user3", 3, 1, 2, 4, 0, 5, 6, 7); arcadia_init(machine); }
+static DRIVER_INIT( none )  { arcadia_init(machine); }
+static DRIVER_INIT( airh )  { arcadia_init(machine); generic_decode(machine, "user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+static DRIVER_INIT( bowl )  { arcadia_init(machine); generic_decode(machine, "user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+static DRIVER_INIT( dart )  { arcadia_init(machine); generic_decode(machine, "user3", 4, 0, 7, 6, 3, 1, 2, 5); }
+static DRIVER_INIT( ldrba ) { arcadia_init(machine); generic_decode(machine, "user3", 2, 3, 4, 1, 0, 7, 5, 6); }
+static DRIVER_INIT( ninj )  { arcadia_init(machine); generic_decode(machine, "user3", 1, 6, 5, 7, 4, 2, 0, 3); }
+static DRIVER_INIT( rdwr )  { arcadia_init(machine); generic_decode(machine, "user3", 3, 1, 6, 4, 0, 5, 2, 7); }
+static DRIVER_INIT( sdwr )  { arcadia_init(machine); generic_decode(machine, "user3", 6, 3, 4, 5, 2, 1, 0, 7); }
+static DRIVER_INIT( socc )  { arcadia_init(machine); generic_decode(machine, "user3", 0, 7, 1, 6, 5, 4, 3, 2); }
+static DRIVER_INIT( sprg )  { arcadia_init(machine); generic_decode(machine, "user3", 4, 7, 3, 0, 6, 5, 2, 1); }
+static DRIVER_INIT( xeon )  { arcadia_init(machine); generic_decode(machine, "user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 
 
 
@@ -708,17 +800,32 @@ static DRIVER_INIT( xeon )  { generic_decode(machine, "user3", 3, 1, 2, 4, 0, 5,
 /* BIOS */
 GAME( 1988, ar_bios,	0, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", GAME_IS_BIOS_ROOT )
 
-/* working */
-GAME( 1988, ar_airh,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, V 2.1)", 0 )
+
+GAME( 1988, ar_airh,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1988, ar_airh2,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
+
 GAME( 1988, ar_bowl,	ar_bios, arcadia, arcadia, bowl,  ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
-GAME( 1987, ar_dart,	ar_bios, arcadia, arcadia, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, V 2.1)", 0 )
+
+GAME( 1987, ar_dart,	ar_bios, arcadia, arcadia, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1987, ar_dart2,	ar_dart, arcadia, arcadia, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, set 2)", GAME_NOT_WORKING ) // bad dump
+
 GAME( 1988, ar_fast,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
+
 GAME( 1988, ar_ldrb,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.4?)", 0 )
 GAME( 1988, ar_ldrba,	ar_ldrb, arcadia, arcadia, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, V 2.5)", 0 )
-GAME( 1987, ar_ninj,	ar_bios, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, V 2.5)", 0 )
+
+GAME( 1987, ar_ninj,	ar_bios, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1987, ar_ninj2,   ar_ninj, arcadia, arcadia, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )
+
 GAME( 1988, ar_rdwr,	ar_bios, arcadia, arcadia, rdwr,  ROT0, "Arcadia Systems", "RoadWars (Arcadia, V 2.3)", 0  )
-GAME( 1988, ar_sdwr,	ar_bios, arcadia, arcadia, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, V 2.1)", 0 )
+
+GAME( 1988, ar_sdwr,	ar_bios, arcadia, arcadia, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1988, ar_sdwr2,   ar_sdwr, arcadia, arcadia, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 2)", 0 )
+
 GAME( 1989, ar_socc,	ar_bios, arcadia, arcadia, socc,  ROT0, "Arcadia Systems", "World Trophy Soccer (Arcadia, V 3.0)", 0 )
+
 GAME( 1990, ar_spot,	ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Spot (Arcadia)", 0 )
+
 GAME( 1987, ar_sprg,	ar_bios, arcadia, arcadia, sprg,  ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
+
 GAME( 1988, ar_xeon,	ar_bios, arcadia, arcadia, xeon,  ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )

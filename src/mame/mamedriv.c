@@ -8244,14 +8244,18 @@ Other Sun games
 	/* Arcadia System */
 	DRIVER( ar_bios )
 	DRIVER( ar_airh )	/* (c) 1988 */
+	DRIVER( ar_airh2 )	/* (c) 1988 */
 	DRIVER( ar_bowl )	/* (c) 1988 */
 	DRIVER( ar_dart )	/* (c) 1987 */
+	DRIVER( ar_dart2 )	/* (c) 1987 */
 	DRIVER( ar_fast )	/* (c) 1988 */
 	DRIVER( ar_ldrb )	/* (c) 1988 */
 	DRIVER( ar_ldrba )	/* (c) 1988 */
 	DRIVER( ar_ninj )	/* (c) 1987 */
+	DRIVER( ar_ninj2 )	/* (c) 1987 */
 	DRIVER( ar_rdwr )	/* (c) 1988 */
 	DRIVER( ar_sdwr )	/* (c) 1988 */
+	DRIVER( ar_sdwr2 )	/* (c) 1988 */
 	DRIVER( ar_socc )	/* (c) 1989 */
 	DRIVER( ar_spot )	/* (c) 1990 */
 	DRIVER( ar_sprg )	/* (c) 1987 */
