@@ -636,6 +636,122 @@ ROM_START( darkhors )
 	ROM_LOAD( "eeprom", 0x00000, 0x80000, CRC(45314fdb) SHA1(c4bd5508e5b51a6e0356c049f1ccf2b5d94caee9) )
 ROM_END
 
+/*
+These Jockey Club II sets make no sense, they just seem to consist of multiple program revisions, no graphics, no sound
+
+Jockey Club II by SETA 1996
+
+PCB E79-001 rev 01a (Newer)
+
+Main CPU : SETA ST-0032 70C600JF505
+
+Others : MC68EC020FG16
+	 SETA ST-0013
+	 SETA ST-0017
+
+Xtal : 42.9545 MHz, 60.0000 MHz, 33.3333 MHz 
+
+
+Rams : 	Toshiba : TC5118160CJ-60 (x3)
+	NKK N341256SJ-15 (x2)
+	NEC D43001GU-70LL (x4)
+
+Gals : gal16V8B(x2) ref : M88-03 M88-04
+
+Eeprom : 93c46
+
+Eproms : M88-01.u38,M88-023.u6 (read as 578200) (1st set)
+	 M88-01A.u38,M88-02.u6 (2nd set)
+	 M88-01B.u38,M88-02.u6 (3rd set)
+	 M88-01.u38,M88-02.u6,Z201x.u39 (4th set)
+	 M88-01A.u38,M88-02.u6 M88-03D.u39 (5th set)
+	 M88-01B.u38,M88-02.u6,M88-03D.u39 (6th set)
+
+Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
+*/
+
+// this contains mutliple sets, although splitting them as listed above makes no sense.. especially not the 'subcpu' roms
+ROM_START( jclub2 )
+	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code
+	// main program (similar to main program of bootleg
+	ROM_LOAD16_WORD_SWAP( "m88-01b.u38",0x00000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) ) 
+	ROM_LOAD16_WORD_SWAP( "m88-01a.u38",0x00000, 0x200000, CRC(c1243e1c) SHA1(2a5857738b8950daf77ddaa8304b765f809f8241) ) // alt revision?
+	ROM_LOAD16_WORD_SWAP( "m88-01.u38", 0x00000, 0x200000, CRC(84476b68) SHA1(1014d23d3cebbfa9aa3bfb90505529989a8eedfa) ) // alt revision?
+
+	ROM_REGION( 0x200000, "subcpu", 0 )	// 68EC020 code
+	// what are these? they're valid 68020 / 68000 code, but too small to be main program roms??  sound program??
+	ROM_LOAD16_WORD_SWAP( "m88-03d.u39",0x00000, 0x080000, CRC(723dd22b) SHA1(0ca622e0dd315f29e72dd9b82fb419d306ec5df8) )
+	ROM_LOAD16_WORD_SWAP( "z201x.u39",0x00000, 0x080000, CRC(1fb79c16) SHA1(c8914f7dfc17c412f6ca756f8eb6d6a35e3b6214) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "gfx", 0x00000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "oki", 0 )	// Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
+	// data distribution would indicate this is a sound rom
+	ROM_LOAD( "m88-02.u6", 0x00000, 0x100000, CRC(0dd3436a) SHA1(809d3b7a26d36f71da04036fd8ab5d0c5089392a) )
+	
+	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF | ROMREGION_BE )	// EEPROM
+
+	ROM_REGION( 0x80000, "misc", ROMREGION_ERASEFF )
+	ROM_LOAD( "gal16v8b-m88-03.bin", 0x000, 0x117, CRC(6d9c882e) SHA1(84cb95ab540290c2f8b740668360e9c643a67dcf) )
+	ROM_LOAD( "gal16v8b-m88-04.bin", 0x000, 0x117, CRC(5e79f292) SHA1(5e44c234e2b15d486a1af71fee986892aa245b4d) )
+ROM_END
+
+/*
+Jockey Club II by SETA 1994-1995
+
+Other hardware version (older):
+
+Main PCB: E06-00409
+Sub PCb	: E06-00407 (I/O nothing else)
+
+Main CPU : SETA ST-0020
+
+Many XTAL : 48.0000 MHz,33.3333 MHz,4.91520 MHz,42.9545 MHz(x2),105.0000 MHz (this 105.0000 Xtal is sometimes replaced by a tiny pcb silscreened 108.0000 MHz(!), with ICS ICS1494N, MB3771 and 14.3181 MHz Xtal)
+
+Others : MC68EC020FG16
+	 SETA ST-0013
+	 SETA ST-0016
+	 SETA ST-0017
+
+Rams :  Toshiba TC514800AJ-70
+	Toshiba TC514000ASJ-70 (x8)
+	Sharp LH5168D
+
+Eproms : SX006A-01.u26 read as 5716200,JC2-110x.u27,SX006-04.u87 (sound) 
+	 SX006B-01.u26,JC2-110x.u27,SX006-04.u87 (sound) 
+	 SX006A-01.u26,JC2-112x.u27,SX006-04.u87 (sound) 
+	 SX006B-01.u26,JC2-112x.u27,SX006-04.u87 (sound) 
+
+Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
+
+*/
+
+// this contains mutliple sets
+ROM_START( jclub2o )
+	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code
+	// main program (similar to main program of bootleg
+	ROM_LOAD16_WORD_SWAP( "sx006a-01.106",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) ) 
+	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26",0x00000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) )  // alt revision?
+
+	
+	ROM_REGION( 0x200000, "subcpu", 0 )	// 68EC020 code
+	// what are these? they're valid 68020 / 68000 code, but too small to be main program roms??  sound program?? overlay patch??
+	ROM_LOAD16_WORD_SWAP( "jc2-110x.u27",0x00000, 0x080000, CRC(03aa6882) SHA1(e0343bc77a19994ddafa614891663b40e1476332) )
+	ROM_LOAD16_WORD_SWAP( "jc2-112x.u27",0x00000, 0x080000, CRC(e1ab93bd) SHA1(78b618b3f7819bd5351ebf949f328fec7795cec9) ) // alt revision?
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "gfx", 0x00000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "oki", 0 )	// Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
+	// this is a Z80 program rom.. not sound data..
+	ROM_LOAD( "sx006-04.u87", 0x00000, 0x080000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
+	
+	// missing samples rom?
+	
+	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF | ROMREGION_BE )	// EEPROM
+ROM_END
+
 /***************************************************************************
 
 
@@ -663,4 +779,6 @@ static DRIVER_INIT( darkhors )
 		eeprom[i] = eeprom[i*2];
 }
 
-GAME( 2001, darkhors, 0, darkhors, darkhors, darkhors, ROT0, "bootleg", "Dark Horse", GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, jclub2,   0,      darkhors, darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING )
+GAME( 199?, jclub2o,  jclub2, darkhors, darkhors, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING )
+GAME( 2001, darkhors, jclub2, darkhors, darkhors, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )

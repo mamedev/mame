@@ -7482,6 +7482,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zombraid )	/* (c) 1995 American Sammy */
 	DRIVER( crazyfgt )	/* (c) 1998 Subsino */
 	DRIVER( inttoote )	/* (c) 1998 Coinmaster */
+	DRIVER( inttootea )	/* (c) 1998 Coinmaster */
 
 	/* Seta games (seta2.c) */
 	DRIVER( gundamex )	/* (c) 1994 Banpresto */
@@ -7533,6 +7534,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ultrax )	/* (c) 1995 Banpresto */
 	DRIVER( gdfs )		/* (c) 1995 Banpresto */
 
+	DRIVER( jclub2 )	/* (c) 199? Seta */
+	DRIVER( jclub2o )	/* (c) 199? Seta */
 	DRIVER( darkhors )	/* bootleg of Jockey Club II */
 
 	/* ST-0016 based games (ST-0016 is a z80 / gfx / sound all in one) */
