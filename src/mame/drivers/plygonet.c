@@ -1,4 +1,4 @@
-/*
+a/*
     Polygonet Commanders (Konami, 1993)
     Poly-Net Warriors (Konami, 1993)
 
@@ -761,11 +761,11 @@ ROM_START( polynetw )
 
 	/* TTL text plane tiles */
 	ROM_REGION( 0x20000, "gfx1", 0 )
-        ROM_LOAD( "305a06.18g",    0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
+        ROM_LOAD( "305jaa06.18g",    0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
 
 	/* '936 tiles */
  	ROM_REGION( 0x40000, "gfx2", 0 )
-        ROM_LOAD( "305a07.20d",   0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
+        ROM_LOAD( "305jaa07.20d",   0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
