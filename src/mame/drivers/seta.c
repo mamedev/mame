@@ -116,6 +116,13 @@ TODO:
   the current area is right for it)
 - crazyfgt: emulate protection & tickets, fix graphics glitches, find correct clocks,
   level 2 interrupt should probably be triggered by the 3812 but sound tends to die that way.
+- jjsquawk: Nuts don't fall from the trees shaken by white animal.
+  Player's shot sound is missing (not requested to X1-010?).
+  Many sounds are wrong since MAME 0.62.
+  i.e.
+  all scene: when you beat enemies or yellow walking eggs
+  stage 1: weasels throw eggs, white animals (shaking trees) are damaged, rabbit jump
+  stage 2: when BOX-MEN gets angry
 
 ***************************************************************************/
 
@@ -3928,14 +3935,14 @@ static INPUT_PORTS_START( jjsquawk )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal )  )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard )    )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x3000, 0x3000, "Energy" ) PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(      0x2000, "2" )
+	PORT_DIPNAME( 0x3000, 0x2000, "Energy" ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x2000, "2" )	// factory default
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x1000, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(      0x8000, "20K, Every 100K" )
-	PORT_DIPSETTING(      0xc000, "50K, Every 200K" )
+	PORT_DIPSETTING(      0x8000, "20K, Every 100K" )	// 							TYPO on manual "20000 200000"
+	PORT_DIPSETTING(      0xc000, "50K, Every 200K" )	// manufacturer setting //	TYPO on manual "50000 100000"
 	PORT_DIPSETTING(      0x4000, "70K, 200K Only" )
 	PORT_DIPSETTING(      0x0000, "100K Only" )
 INPUT_PORTS_END
@@ -9552,8 +9559,8 @@ GAME( 1992, umanclub, 0,        umanclub, umanclub, 0,        ROT0,   "Tsuburaya
 GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer + Tecmo",        "Zing Zing Zip", 0 )
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
-GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", 0 )
-GAME( 1993, jjsquawb, jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", 0 )
+GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
+GAME( 1993, jjsquawb, jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Toei / Banpresto",       "Masked Riders Club Battle Race", 0 )
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
