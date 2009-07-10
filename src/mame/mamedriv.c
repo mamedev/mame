@@ -3226,35 +3226,36 @@ V-V                           TP-027
 	DRIVER( bmiidx8 )
 
 	/* Konami Viper games */
-	DRIVER( kviper )	/* 1999 */
-	DRIVER( ppp2nd )	/* 2001 */
-	DRIVER( boxingm )	/* 2001 */
-	DRIVER( code1d )	/* 2000 */
-	DRIVER( code1db )	/* 2000 */
-	DRIVER( gticlub2 )	/* 2001 */
-	DRIVER( jpark3 )	/* 2001 */
-	DRIVER( mocapglf )	/* 2001 */
-	DRIVER( mocapb )	/* 2001 */
-	DRIVER( mocapbj )	/* 2001 */
-	DRIVER( p911 )		/* 2001 */
-	DRIVER( p911uc )	/* 2001 */
-	DRIVER( p911kc )	/* 2001 */
-	DRIVER( p911e )		/* 2001 */
-	DRIVER( p911j )		/* 2001 */
-	DRIVER( p9112 )		/* 2001 */
-	DRIVER( popn9 )		/* 2003 */
-	DRIVER( sscopex )	/* 2001 */
-	DRIVER( sogeki )	/* 2001 */
-	DRIVER( thrild2 )	/* 2001 */
-	DRIVER( thrild2a )	/* 2001 */
-	DRIVER( tsurugi )	/* 2001 */
-	DRIVER( tsurugij )	/* 2001 */
-	DRIVER( wcombat )	/* 2002 */
-	DRIVER( wcombak )	/* 2002 */
-	DRIVER( wcombaj )	/* 2002 */
-	DRIVER( xtrial )	/* 2002 */
-	DRIVER( mfightc )	/* 2002 */
-	DRIVER( mfightcc )	/* 2002 */
+	DRIVER( kviper )		/* 1999 */
+	DRIVER( ppp2nd )		/* 2001 */
+	DRIVER( boxingm )		/* 2001 */
+	DRIVER( code1d )		/* 2000 */
+	DRIVER( code1db )		/* 2000 */
+	DRIVER( gticlub2 )		/* 2001 */
+	DRIVER( gticlub2ea )	/* 2001 */
+	DRIVER( jpark3 )		/* 2001 */
+	DRIVER( mocapglf )		/* 2001 */
+	DRIVER( mocapb )		/* 2001 */
+	DRIVER( mocapbj )		/* 2001 */
+	DRIVER( p911 )			/* 2001 */
+	DRIVER( p911uc )		/* 2001 */
+	DRIVER( p911kc )		/* 2001 */
+	DRIVER( p911e )			/* 2001 */
+	DRIVER( p911j )			/* 2001 */
+	DRIVER( p9112 )			/* 2001 */
+	DRIVER( popn9 )			/* 2003 */
+	DRIVER( sscopex )		/* 2001 */
+	DRIVER( sogeki )		/* 2001 */
+	DRIVER( thrild2 )		/* 2001 */
+	DRIVER( thrild2a )		/* 2001 */
+	DRIVER( tsurugi )		/* 2001 */
+	DRIVER( tsurugij )		/* 2001 */
+	DRIVER( wcombat )		/* 2002 */
+	DRIVER( wcombatk )		/* 2002 */
+	DRIVER( wcombatj )		/* 2002 */
+	DRIVER( xtrial )		/* 2002 */
+	DRIVER( mfightc )		/* 2002 */
+	DRIVER( mfightcc )		/* 2002 */
 
 	/* Mitchell games */
 	DRIVER( mgakuen )	/* (c) 1988 Yuga */
