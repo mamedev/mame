@@ -9504,10 +9504,10 @@ static DRIVER_INIT( inttootea )
 	seta_vregs = seta_vregs_unused;
 
 	// code patches (to be removed...)
-	//ROM[0x4de0/2] = 0x4e71;	// hardware test errors
+	//ROM[0x4de0/2] = 0x4e71;   // hardware test errors
 	//ROM[0x4de2/2] = 0x4e71;
 
-	//ROM[0x368a/2] = 0x50f9;	// betting count down
+	//ROM[0x368a/2] = 0x50f9;   // betting count down
 }
 
 

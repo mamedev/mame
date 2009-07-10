@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( okim_rombank_w )
 {
-//	popmessage("%08x",0x40000 * (data & 0x07));
+//  popmessage("%08x",0x40000 * (data & 0x07));
 	okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * (data & 0x7));
 }
 

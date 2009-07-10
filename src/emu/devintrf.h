@@ -185,7 +185,7 @@ enum
 #define devtag_get_device(mach,tag)							device_list_find_by_tag((mach)->config->devicelist, tag)
 
 #define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
-#define devtag_get_address_space(mach,tag,space)			
+#define devtag_get_address_space(mach,tag,space)
 
 #define devtag_get_info_int(mach,tag,state)					device_get_info_int(devtag_get_device(mach, tag), state)
 #define devtag_get_info_ptr(mach,tag,state)					device_get_info_ptr(devtag_get_device(mach, tag), state)

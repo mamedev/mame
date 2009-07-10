@@ -571,7 +571,7 @@ void device_list_start(running_machine *machine)
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
 		int spacenum;
-		
+
 		assert(!device->started);
 		assert(device->machine == machine);
 		assert(device->token == NULL);

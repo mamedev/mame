@@ -1115,11 +1115,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 		case (0x024/2):
 			/*
-			This looks like a register for the BCD...
-			Godzilla and Heated Barrel sets 3
-			Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
-			SD Gundam sets 0 (maybe there's a mirror somewhere else? 0x01e for example is setted with an 8)
-			*/
+            This looks like a register for the BCD...
+            Godzilla and Heated Barrel sets 3
+            Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
+            SD Gundam sets 0 (maybe there's a mirror somewhere else? 0x01e for example is setted with an 8)
+            */
 			break;
 
 		/* Command tables for 0x500 / 0x502 commands */

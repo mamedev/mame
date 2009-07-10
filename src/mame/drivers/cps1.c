@@ -2969,7 +2969,7 @@ CPU:
 2x M5205 ic184,ic185 sound
 1x TDA2003 ic14 sound
 1x oscillator 24.000000MHz (close to main)
-1x oscillator 29.821000MHz (close to sound) 
+1x oscillator 29.821000MHz (close to sound)
 
 ROMs
 
@@ -2986,21 +2986,21 @@ PLDs:
 
 1x TPC1020AFN ic116 read protected
 3x GAL20V8A ic120,ic121,ic169 read protected
-3x GAL16V8A ic7,ic72,ic80 read protected 
+3x GAL16V8A ic7,ic72,ic80 read protected
 
 Note:
 
 1x JAMMA edge connector
 2x 10 legs connector
 1x trimmer (volume)
-3x 8x2 switches DIP 
+3x 8x2 switches DIP
 
 */
 
 static MACHINE_DRIVER_START( knightsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)                       
+	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
@@ -6282,7 +6282,7 @@ ROM_START( knightsb )
 	ROM_LOAD16_BYTE( "5.ic172",    0x00000, 0x40000, CRC(7fd91118) SHA1(d2832b21309a467938891946d7af35d8095787a4) )
 	ROM_LOAD16_BYTE( "2.ic175",    0x80001, 0x40000, CRC(1eb91343) SHA1(e02cfbbd7689346f14f2e3455ed17e7f0b51bad0) )
 	ROM_LOAD16_BYTE( "4.ic176",    0x80000, 0x40000, CRC(af352703) SHA1(7855ac65752203f45af4ef41af8c291540a1c8a8) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 ) /* bootleg had 4x 1meg MASKroms, these need dumping so that the format is known */
 	ROMX_LOAD( "kr_gfx1.rom",  0x000000, 0x80000, BAD_DUMP CRC(9e36c1a4) SHA1(772daae74e119371dfb76fde9775bda78a8ba125) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "kr_gfx3.rom",  0x000002, 0x80000, BAD_DUMP CRC(c5832cae) SHA1(a188cf401cd3a2909b377d3059f14d22ec3b0643) , ROM_GROUPWORD | ROM_SKIP(6) )

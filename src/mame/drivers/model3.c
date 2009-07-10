@@ -35,9 +35,9 @@
 
     dayto2pe - bug in DRC MMU page-fault handling, causes infinite loop at PC:0x2270 (or debug assert)
     daytona2 - See above. Also CROMs (program/data) are marked "bad dump"
-    spikeout/spikeofe - As above. CROMs (program/data) are marked "bad dump" 
+    spikeout/spikeofe - As above. CROMs (program/data) are marked "bad dump"
     dirtdvls/dirtdvla - SCSI IRQ stuck on (boots partially if hacked)
-    swtrilgy - doesn't boot (no SCSI IRQs occur, other IRQs look fine) 
+    swtrilgy - doesn't boot (no SCSI IRQs occur, other IRQs look fine)
     swtrilga - SCSI IRQ stuck on
     magtruck - SCSI IRQ stuck on (boots and fails country code check (!) if hacked)
     eca/ecax - doesn't boot (a few SCSI IRQs occur but then cease, other IRQs look fine)
@@ -582,19 +582,19 @@ ALL VROM ROMs are 16M MASK
 */
 
 /*
-	magtruck locations of interest
+    magtruck locations of interest
 
-	000006ee (word)  - incremented each vblank, used by mainline to busywait.
-	000006f5 (byte)  - shadow of current IRQ enable
-	000003f0 (dword) - shadow (from irq handler) of IRQ state on entry
+    000006ee (word)  - incremented each vblank, used by mainline to busywait.
+    000006f5 (byte)  - shadow of current IRQ enable
+    000003f0 (dword) - shadow (from irq handler) of IRQ state on entry
 
-	00000500 - IRQ handler prologue/epilogue
-	00152250 - IRQ dispatcher
+    00000500 - IRQ handler prologue/epilogue
+    00152250 - IRQ dispatcher
 
-	00151f48 - service routine for IRQ 0x02 (VBL)
-	00151ef8 - service routine for IRQ 0x04
-	00151ed8 - service routine for IRQ 0x08
-	0014b110 - service routine for IRQ 0x40 (SCSP)
+    00151f48 - service routine for IRQ 0x02 (VBL)
+    00151ef8 - service routine for IRQ 0x04
+    00151ed8 - service routine for IRQ 0x08
+    0014b110 - service routine for IRQ 0x40 (SCSP)
 */
 
 #include "driver.h"
@@ -628,13 +628,13 @@ static void update_irq_state(running_machine *machine)
 {
 	if ((irq_enable & irq_state) || scsi_irq_state)
 	{
-//		printf("IRQ set: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state);
+//      printf("IRQ set: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state);
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, ASSERT_LINE);
 		scsi_irq_state = 0;
 	}
 	else
 	{
-//		printf("IRQ clear: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state); 
+//      printf("IRQ clear: state %x enable %x scsi %x\n", irq_state, irq_enable, scsi_irq_state);
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, CLEAR_LINE);
 	}
 }
@@ -1276,8 +1276,8 @@ static void model3_init(running_machine *machine, int step)
 			mame_stricmp(machine->gamedrv->name, "bass") == 0 )
 		{
 			mpc106_init();
-		} 
-		else 
+		}
+		else
 		{
 			mpc105_init();
 		}
@@ -1486,7 +1486,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 
 static READ64_HANDLER( model3_sys_r )
 {
-//	printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(space->cpu));
+//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(space->cpu));
 
 	switch (offset)
 	{
@@ -1511,7 +1511,7 @@ static READ64_HANDLER( model3_sys_r )
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//			printf("read irq_state %x (PC %x)\n", irq_state, cpu_get_pc(space->cpu));
+//          printf("read irq_state %x (PC %x)\n", irq_state, cpu_get_pc(space->cpu));
 			return (UINT64)irq_state<<56 | 0xff000000;
 			break;
 	}
@@ -1522,7 +1522,7 @@ static READ64_HANDLER( model3_sys_r )
 
 static WRITE64_HANDLER( model3_sys_w )
 {
-//	printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
+//  printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
 
 	switch (offset)
 	{
@@ -1536,7 +1536,7 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x18/8:
 			if ((mem_mask & 0xff000000) == 0xff000000)	// int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
 			{						// may also be a secondary enable based on behavior of e.g. magtruck VBL handler
-//				UINT32 old_irq = irq_state;
+//              UINT32 old_irq = irq_state;
 				UINT8 ack = (data>>24)&0xff, realack;
 				int i;
 
@@ -1556,7 +1556,7 @@ static WRITE64_HANDLER( model3_sys_w )
 							}
 						}
 
-//						printf("%x to ack (realack %x)\n", ack, realack);
+//                      printf("%x to ack (realack %x)\n", ack, realack);
 
 						irq_state &= realack;
 						break;
@@ -1732,7 +1732,7 @@ static const UINT16 eca_prot_data[] =
     0x7470, 0x202e, 0x3123, 0x660a, 0x726f, 0x7420, 0x7365, 0x0a74,
 };
 
-/* 
+/*
    dirtdvls: first 2 words read are discarded, then every other word
    is written to char RAM starting at f1013400 (in between words are
    discarded).

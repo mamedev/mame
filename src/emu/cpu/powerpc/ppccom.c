@@ -198,7 +198,7 @@ INLINE int is_nan_double(double x)
 
 
 /*-------------------------------------------------
-    is_qnan_double - is a double value a 
+    is_qnan_double - is a double value a
     quiet NaN
 -------------------------------------------------*/
 

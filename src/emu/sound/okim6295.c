@@ -330,7 +330,7 @@ static void okim6295_state_save_register(okim6295_state *info, const device_conf
 	state_save_register_device_item(device, 0, info->bank_offs);
 	for (j = 0; j < OKIM6295_VOICES; j++)
 		adpcm_state_save_register(&info->voice[j], device, j);
-	
+
 	state_save_register_postload(device->machine, okim6295_postload, (void *)device);
 }
 
@@ -403,7 +403,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	okim6295_state *info = get_safe_token(device);
 	stream_update(info->stream);
 
-	/* if we are setting a non-zero base, and we have no bank, allocate one */	
+	/* if we are setting a non-zero base, and we have no bank, allocate one */
 	if (info->bank_num == -1 && base != 0)
 	{
 		info->bank_num = memory_find_unused_bank(device->machine);
@@ -413,7 +413,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 		/* override our memory map with a bank */
 		memory_install_read8_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, SMH_BANK(info->bank_num));
 	}
-	
+
 	/* if we have a bank number, set the base pointer */
 	if (info->bank_num != -1)
 	{
@@ -585,7 +585,7 @@ DEVICE_GET_INFO( okim6295 )
 		case DEVINFO_INT_DATABUS_WIDTH_0:			info->i = 8;									break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:			info->i = 18;									break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:			info->i = 0;									break;
-		
+
 		/* --- the following bits of info are returned as pointers to data --- */
 		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:		info->default_map8 = ADDRESS_MAP_NAME(okim6295);break;
 

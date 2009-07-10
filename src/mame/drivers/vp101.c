@@ -4,12 +4,12 @@
     (PCB also marked "Raw Thrills" but all RT games appear to be on PC hardware)
 
     Skeleton driver by R. Belmont
- 
+
     MIPS VR5500 at 300 to 400 MHz
     Xilinx Virtex-II FPGA with custom 3D hardware and 1 or 2 PowerPC 405 CPU cores
-    AC97 audio with custom DMA frontend which streams 8 stereo channels	
+    AC97 audio with custom DMA frontend which streams 8 stereo channels
     PIC18c442 protection chip (not readable)
- 
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -33,7 +33,7 @@ static READ32_HANDLER(tty_ready_r)
 static WRITE32_HANDLER(tty_w)	// set breakpoint at bfc01430 to catch when it's printing things
 {
 // uncomment to see startup messages - it says "RAM OK" and "EPI RSS Ver 4.5.1" followed by "<RSS active>" and then lots of dots
-//	printf("%c", data);
+//  printf("%c", data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )

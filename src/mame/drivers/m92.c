@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( ppan )
 	MDRV_CPU_IO_MAP(m92_portmap)
 
 	/* no Sound CPU */
-	
+
 	MDRV_MACHINE_START(m92)
 	MDRV_MACHINE_RESET(m92)
 
@@ -2043,14 +2043,14 @@ static void init_m92(running_machine *machine, int hasbanks)
 	}
 
 	RAM = memory_region(machine, "soundcpu");
-	
+
 	if (RAM)
 		memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m92_game_kludge = 0;
 	m92_irq_vectorbase = 0x80;
 	m92_sprite_buffer_busy = 1;
-	
+
 	setvector_callback(machine, NULL, VECTOR_INIT);
 }
 

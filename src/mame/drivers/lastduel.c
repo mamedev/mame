@@ -65,7 +65,7 @@ Notes:
       43256         - 32kx8 SRAM (DIP28)
       6116          - 2kx8 SRAM (DIP24)
       DL-0100-103   - NEC custom (SDIP64)
-      ROMs          - 
+      ROMs          -
                       LS-07    - 27C512 EPROM (DIP28)
                       LS-08    - 27C256 EPROM (DIP28)
                       LS-05/06 - 128kx8 mask ROM (DIP28)
@@ -73,7 +73,7 @@ Notes:
       Measurements  -
                       VSync 57.4444Hz
                       HSync 15.1432kHz
-                      OSC1  23.99985MHz 
+                      OSC1  23.99985MHz
                       OSC2  9.99993MHz
                       OSC3  3.57943MHz
 
@@ -109,7 +109,7 @@ Notes:
       6116        - 2kx8 SRAM (DIP24)
       81301       - ? (SDIP28)
       29          - 63S141 bipolar PROM (DIP16)
- 
+
 
 
 **************************************************************************/

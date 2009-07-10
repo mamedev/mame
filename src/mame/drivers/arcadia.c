@@ -621,7 +621,7 @@ ROM_START( ar_sdwr2 )
 	ROM_LOAD16_BYTE( "arcadia1.u16", 0xa0001, 0x10000, CRC(e63e1679) SHA1(0762bff0018e006905a2e58141fdf05910f06e29) )
 
 	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?	
+	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
 ROM_END
 
 
@@ -716,7 +716,7 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
 	/* only the low byte of ROMs are encrypted in these games */
 	for (i = 0; i < 0x20000/2; i++)
 		rom[i] = BITSWAP16(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
-		
+
 	#if 0
 	{
 		UINT8 *ROM = memory_region(machine, tag);

@@ -807,20 +807,20 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 		case 11: // Racin' Force
-			if (reg == 0) 
+			if (reg == 0)
 			{
 				if (cpu_get_pc(space->cpu) == 0x0202190)
 					rv |= 0x4000;
 			}
 			break;
-			
+
 		case 12: // Open Golf / Golfing Greats 2
-			if (reg == 0) 
+			if (reg == 0)
 			{
 				if ((cpu_get_pc(space->cpu) == 0x0245e80) || (cpu_get_pc(space->cpu) == 0x02459d6) || (cpu_get_pc(space->cpu) == 0x0245e40) )
-					rv |= 0x4000;	
+					rv |= 0x4000;
 			}
-			break;		
+			break;
 		}
 
 	return(rv);

@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jclub2o_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	
+
 ADDRESS_MAP_END
 
 
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( jclub2o )
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
 	MDRV_CPU_IO_MAP(st0016_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	
+
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jclub2o_map)
 	//MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -724,7 +724,7 @@ static MACHINE_DRIVER_START( jclub2o )
 
 	MDRV_VIDEO_START(jclub2)
 	MDRV_VIDEO_UPDATE(jclub2)
-	
+
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("st", ST0016, 0)
@@ -775,26 +775,26 @@ PCB E79-001 rev 01a (Newer)
 Main CPU : SETA ST-0032 70C600JF505
 
 Others : MC68EC020FG16
-	 SETA ST-0013
-	 SETA ST-0017
+     SETA ST-0013
+     SETA ST-0017
 
-Xtal : 42.9545 MHz, 60.0000 MHz, 33.3333 MHz 
+Xtal : 42.9545 MHz, 60.0000 MHz, 33.3333 MHz
 
 
-Rams : 	Toshiba : TC5118160CJ-60 (x3)
-	NKK N341256SJ-15 (x2)
-	NEC D43001GU-70LL (x4)
+Rams :  Toshiba : TC5118160CJ-60 (x3)
+    NKK N341256SJ-15 (x2)
+    NEC D43001GU-70LL (x4)
 
 Gals : gal16V8B(x2) ref : M88-03 M88-04
 
 Eeprom : 93c46
 
 Eproms : M88-01.u38,M88-023.u6 (read as 578200) (1st set)
-	 M88-01A.u38,M88-02.u6 (2nd set)
-	 M88-01B.u38,M88-02.u6 (3rd set)
-	 M88-01.u38,M88-02.u6,Z201x.u39 (4th set)
-	 M88-01A.u38,M88-02.u6 M88-03D.u39 (5th set)
-	 M88-01B.u38,M88-02.u6,M88-03D.u39 (6th set)
+     M88-01A.u38,M88-02.u6 (2nd set)
+     M88-01B.u38,M88-02.u6 (3rd set)
+     M88-01.u38,M88-02.u6,Z201x.u39 (4th set)
+     M88-01A.u38,M88-02.u6 M88-03D.u39 (5th set)
+     M88-01B.u38,M88-02.u6,M88-03D.u39 (6th set)
 
 Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 */
@@ -803,7 +803,7 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 ROM_START( jclub2 )
 	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code
 	// main program (similar to main program of bootleg
-	ROM_LOAD16_WORD_SWAP( "m88-01b.u38",0x00000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) ) 
+	ROM_LOAD16_WORD_SWAP( "m88-01b.u38",0x00000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) )
 	ROM_LOAD16_WORD_SWAP( "m88-01a.u38",0x00000, 0x200000, CRC(c1243e1c) SHA1(2a5857738b8950daf77ddaa8304b765f809f8241) ) // alt revision?
 	ROM_LOAD16_WORD_SWAP( "m88-01.u38", 0x00000, 0x200000, CRC(84476b68) SHA1(1014d23d3cebbfa9aa3bfb90505529989a8eedfa) ) // alt revision?
 
@@ -818,7 +818,7 @@ ROM_START( jclub2 )
 	ROM_REGION( 0x100000, "oki", 0 )	// Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
 	// data distribution would indicate this is a sound rom
 	ROM_LOAD( "m88-02.u6", 0x00000, 0x100000, CRC(0dd3436a) SHA1(809d3b7a26d36f71da04036fd8ab5d0c5089392a) )
-	
+
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF | ROMREGION_BE )	// EEPROM
 
 	ROM_REGION( 0x80000, "misc", ROMREGION_ERASEFF )
@@ -832,25 +832,25 @@ Jockey Club II by SETA 1994-1995
 Other hardware version (older):
 
 Main PCB: E06-00409
-Sub PCb	: E06-00407 (I/O nothing else)
+Sub PCb : E06-00407 (I/O nothing else)
 
 Main CPU : SETA ST-0020
 
 Many XTAL : 48.0000 MHz,33.3333 MHz,4.91520 MHz,42.9545 MHz(x2),105.0000 MHz (this 105.0000 Xtal is sometimes replaced by a tiny pcb silscreened 108.0000 MHz(!), with ICS ICS1494N, MB3771 and 14.3181 MHz Xtal)
 
 Others : MC68EC020FG16
-	 SETA ST-0013
-	 SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.c
-	 SETA ST-0017
+     SETA ST-0013
+     SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.c
+     SETA ST-0017
 
 Rams :  Toshiba TC514800AJ-70
-	Toshiba TC514000ASJ-70 (x8)
-	Sharp LH5168D
+    Toshiba TC514000ASJ-70 (x8)
+    Sharp LH5168D
 
-Eproms : SX006A-01.u26 read as 5716200,JC2-110x.u27,SX006-04.u87 (sound) 
-	 SX006B-01.u26,JC2-110x.u27,SX006-04.u87 (sound) 
-	 SX006A-01.u26,JC2-112x.u27,SX006-04.u87 (sound) 
-	 SX006B-01.u26,JC2-112x.u27,SX006-04.u87 (sound) 
+Eproms : SX006A-01.u26 read as 5716200,JC2-110x.u27,SX006-04.u87 (sound)
+     SX006B-01.u26,JC2-110x.u27,SX006-04.u87 (sound)
+     SX006A-01.u26,JC2-112x.u27,SX006-04.u87 (sound)
+     SX006B-01.u26,JC2-112x.u27,SX006-04.u87 (sound)
 
 Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 
@@ -860,7 +860,7 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 ROM_START( jclub2o )
 	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code
 	// main program (similar to main program of bootleg
-	ROM_LOAD16_WORD_SWAP( "sx006a-01.106",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) ) 
+	ROM_LOAD16_WORD_SWAP( "sx006a-01.106",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26",0x00000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) )  // alt revision?
 
 	ROM_REGION( 0x200000, "subcpu", 0 )	// 68EC020 code
@@ -874,7 +874,7 @@ ROM_START( jclub2o )
 	ROM_REGION( 0x90000, "st0016", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x10000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 	ROM_COPY( "st0016",  0x10000, 0x00000, 0x08000 )
-		
+
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF | ROMREGION_BE )	// EEPROM
 ROM_END
 

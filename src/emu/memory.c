@@ -879,8 +879,8 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
 
 
 /*-------------------------------------------------
-    memory_set_direct_region - called by deivce 
-    cores to update the opcode base for the given 
+    memory_set_direct_region - called by deivce
+    cores to update the opcode base for the given
     address
 -------------------------------------------------*/
 
@@ -1145,7 +1145,7 @@ void memory_set_bankptr(running_machine *machine, int banknum, void *base)
 
 
 /*-------------------------------------------------
-    memory_find_unused_bank - return the index of 
+    memory_find_unused_bank - return the index of
     an unused bank
 -------------------------------------------------*/
 
@@ -1157,7 +1157,7 @@ int memory_find_unused_bank(running_machine *machine)
 	for (banknum = STATIC_BANK1; banknum <= MAX_EXPLICIT_BANKS; banknum++)
 		if (!memdata->bankdata[banknum].used)
 			return banknum;
-	
+
 	return -1;
 }
 
@@ -2286,7 +2286,7 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 /*-------------------------------------------------
     space_find_backing_memory - return a pointer to
-    the base of RAM associated with the given 
+    the base of RAM associated with the given
     device and offset
 -------------------------------------------------*/
 

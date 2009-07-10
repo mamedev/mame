@@ -4924,15 +4924,15 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *
 		int incxx,incxy;
 		rectangle my_clip;
 		int y,maxy;
-	
-		// Racin' Force will get to here if glfgreat_hack is enabled, and it ends 
+
+		// Racin' Force will get to here if glfgreat_hack is enabled, and it ends
 		// up setting a maximum y value of '13', thus causing nothing to be drawn.
 		// It looks like the roz output should be flipped somehow as it seems to be
 		// displaying the wrong areas of the tilemap and is rendered upside down,
 		// although due to the additional post-processing the voxel renderer performs
 		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
 		// to see the chip output)
-		
+
 		if (((ctrl[0x07] & 0x0002) && ctrl[0x09]) && (glfgreat_hack))	/* wrong, but fixes glfgreat */
 		{
 			my_clip.min_x = ctrl[0x08] + K053936_offset[chip][0]+2;
@@ -4957,14 +4957,14 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *
 			y = cliprect->min_y;
 			maxy = cliprect->max_y;
 		}
-		
+
 		while (y <= maxy)
 		{
 			UINT16 *lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
 			my_clip.min_y = my_clip.max_y = y;
 
-			
-			
+
+
 			startx = 256 * (INT16)(lineaddr[0] + ctrl[0x00]);
 			starty = 256 * (INT16)(lineaddr[1] + ctrl[0x01]);
 			incxx  =       (INT16)(lineaddr[2]);

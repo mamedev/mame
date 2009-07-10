@@ -5,52 +5,52 @@ Turret Tower by Dell Electronics
 PCB Info
 ========
 
-Silkscreened	Copyright (c) 2001 Dell Electroinics Labs, Ltd
+Silkscreened    Copyright (c) 2001 Dell Electroinics Labs, Ltd
 
-Samsung SV2001H Hard drive	stickered	(c)DELL V1.XX
-						TOCAB0181
-						TURRET TOWER
+Samsung SV2001H Hard drive  stickered   (c)DELL V1.XX
+                        TOCAB0181
+                        TURRET TOWER
 
-IDT 		79R3041-25J 
-		XG0110P
+IDT         79R3041-25J
+        XG0110P
 
-Xilinx Spartan	XCS30XL 		x2
-		PQ208AKP0105 
-		D1164035A 
-		4c	
+Xilinx Spartan  XCS30XL         x2
+        PQ208AKP0105
+        D1164035A
+        4c
 
 
-Xilinx		XC9572
-		PC84AEM0109
-		A1172748A
-		10C
+Xilinx      XC9572
+        PC84AEM0109
+        A1172748A
+        10C
 
-IDT		71124			x8
-		S12Y
-		N0048M
+IDT     71124           x8
+        S12Y
+        N0048M
 
-COMPAQ		MT16LSDT1664AG-10CY5	SDRAM stick	x2
+COMPAQ      MT16LSDT1664AG-10CY5    SDRAM stick x2
 
-.u7	AM29F040B	stickered	U7 (c)DELL
+.u7 AM29F040B   stickered   U7 (c)DELL
 
-.u8	AM29F040B	stickered	U8 (c)DELL
+.u8 AM29F040B   stickered   U8 (c)DELL
 
-.u12	AM29F040B	stickered	U12 (c)DELL
+.u12    AM29F040B   stickered   U12 (c)DELL
 
-.u13	AM29F040B	stickered	U13 (c)DELL
+.u13    AM29F040B   stickered   U13 (c)DELL
 
-.u29			stickered	TTML(1) (c) DELL	Unmarked chip looks like 28 PIN DIP PLD
+.u29            stickered   TTML(1) (c) DELL    Unmarked chip looks like 28 PIN DIP PLD
 
 
 CHDMAN info
 Version 0.128
-Input offset	511
-Cycliders	2438
-Heads		255
-Sectors		63
-Bytes/Sector	512
-Sectors/Hunk	8
-Logical size	20,053,232,640
+Input offset    511
+Cycliders   2438
+Heads       255
+Sectors     63
+Bytes/Sector    512
+Sectors/Hunk    8
+Logical size    20,053,232,640
 
 Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 

@@ -869,7 +869,7 @@ MACHINE_DRIVER_START( jsa_iii_mono )
 	MDRV_IMPORT_FROM(jsa_ii_mono)
 	MDRV_CPU_MODIFY("jsa")
 	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
-	
+
 	MDRV_DEVICE_MODIFY("adpcm")
 	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 MACHINE_DRIVER_END

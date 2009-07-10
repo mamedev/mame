@@ -70,11 +70,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
 	const gfx_element *gfx = machine->gfx[0];
-//	int todraw = (tmmjprd_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
+//  int todraw = (tmmjprd_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 
-//	UINT32 *source = (tmmjprd_spriteram+ (todraw*2))-2;
-//	UINT32 *finish = tmmjprd_spriteram;
+//  UINT32 *source = (tmmjprd_spriteram+ (todraw*2))-2;
+//  UINT32 *finish = tmmjprd_spriteram;
 
 	UINT32 *source = tmmjprd_spriteram+(0xc000/4)-2;
 	UINT32 *finish = tmmjprd_spriteram;
@@ -114,7 +114,7 @@ static void ttmjprd_draw_tile(running_machine *machine, bitmap_t *bitmap, const 
 	int colour   = (tiledata&0x0ff00000)>>20;
 	int depth    = (tiledata&0x10000000)>>28;
 	//int flipxy   = (tiledata&0x60000000)>>29;
-	//		                 0x80000000   (blank tile like metro.c?)
+	//                       0x80000000   (blank tile like metro.c?)
 	int drawx,drawy;
 	int count;
 
@@ -249,24 +249,24 @@ static VIDEO_UPDATE( tmmjprd )
 	}
 
 	/*
-	popmessage("%08x %08x %08x %08x %08x %08x",
-	tmmjprd_tilemap_regs[2][0],
-	tmmjprd_tilemap_regs[2][1],
-	tmmjprd_tilemap_regs[2][2],
-	tmmjprd_tilemap_regs[2][3],
-	tmmjprd_tilemap_regs[2][4],
-	tmmjprd_tilemap_regs[2][5]);
-	*/
+    popmessage("%08x %08x %08x %08x %08x %08x",
+    tmmjprd_tilemap_regs[2][0],
+    tmmjprd_tilemap_regs[2][1],
+    tmmjprd_tilemap_regs[2][2],
+    tmmjprd_tilemap_regs[2][3],
+    tmmjprd_tilemap_regs[2][4],
+    tmmjprd_tilemap_regs[2][5]);
+    */
 
 /*
-	popmessage("%08x %08x %08x %08x %08x %08x %08x",
-	tmmjprd_spriteregs[0],
-	tmmjprd_spriteregs[1],
-	tmmjprd_spriteregs[2],
-	tmmjprd_spriteregs[3],
-	tmmjprd_spriteregs[4],
-	tmmjprd_spriteregs[5],
-	tmmjprd_spriteregs[6]);
+    popmessage("%08x %08x %08x %08x %08x %08x %08x",
+    tmmjprd_spriteregs[0],
+    tmmjprd_spriteregs[1],
+    tmmjprd_spriteregs[2],
+    tmmjprd_spriteregs[3],
+    tmmjprd_spriteregs[4],
+    tmmjprd_spriteregs[5],
+    tmmjprd_spriteregs[6]);
 */
 
 	return 0;
@@ -660,9 +660,9 @@ static const gfx_layout rabbit_sprite_16x16x8_layout =
 // gfx decoding is ugly.. 16*16 tiles can start at varying different offsets..
 static GFXDECODE_START( tmmjprd )
 	/* this seems to be sprites */
-//	GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x4_layout,   0x0, 0x1000  )
-//	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
-//	GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x8_layout,   0x0, 0x1000  )
+//  GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x4_layout,   0x0, 0x1000  )
+//  GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
+//  GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x8_layout,   0x0, 0x1000  )
 	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x8_layout, 0x0, 0x1000  )
 GFXDECODE_END
 
@@ -687,12 +687,12 @@ static MACHINE_DRIVER_START( tmmjprd )
 
 	MDRV_GFXDECODE(tmmjprd)
 
-//	MDRV_SCREEN_ADD("screen", RASTER)
-//	MDRV_SCREEN_REFRESH_RATE(60)
-//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-//	MDRV_SCREEN_SIZE(64*16, 64*16)
-//	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+//  MDRV_SCREEN_ADD("screen", RASTER)
+//  MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//  MDRV_SCREEN_SIZE(64*16, 64*16)
+//  MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 
@@ -783,7 +783,7 @@ ROM_START( tmpdoki )
 	ROM_LOAD32_WORD( "51.bin", 0x0800002, 0x400000, CRC(6ba1d2ec) SHA1(bbe7309b33f213c8cb9ab7adb3221ea79f89e8b0) )
 
 	/* I think these should be different, the game attempts to draw tiles from here for the title logo, but
-	   the tiles are empty.  Once the ROM check is hooked up this will be easier to confirm */
+       the tiles are empty.  Once the ROM check is hooked up this will be easier to confirm */
 	ROM_LOAD32_WORD( "60.bin", 0x1000000, 0x400000, BAD_DUMP CRC(7cb132e0) SHA1(f9c366befec46c7f6e307111a62eede029202b16) )
 	ROM_LOAD32_WORD( "61.bin", 0x1000002, 0x400000, BAD_DUMP CRC(caa7e854) SHA1(592867e001abd0781f83a5124bf9aa62ad1aa7f3) )
 	ROM_LOAD32_WORD( "70.bin", 0x1800000, 0x400000, BAD_DUMP CRC(9b737ae4) SHA1(0b62a90d42ace81ee32db073a57731a55a32f989) )

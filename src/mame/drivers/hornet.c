@@ -1590,7 +1590,7 @@ ROM_START(terabrsta)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) )
 ROM_END
 
-/*************************************************************************/				 
+/*************************************************************************/
 
 GAME(  1998, gradius4, 0,      hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,   0,      hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

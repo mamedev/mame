@@ -1,15 +1,15 @@
 /*
 
  Quake Arcade Tournament
- 
+
  This is unknown PC hardware, only the HDD is dumped.  The HDD is stickered 'Release Beta 2'
- 
+
  I've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
- 
- 
+
+
 
  -- set info
- 
+
 Quake Arcade Tournament by Lazer-Tron
 
 PC running Windows 95 with a Dongle on the parallel port
@@ -18,18 +18,18 @@ Created .chd with version 0.125
 
 It found the following disk paramaters...
 
-Input offset	511
-Cyclinders	263
-Heads		255
-Sectors		63
-Byte/Sector	512
-Sectors/Hunk	8
-Logical size	2,1163,248,864
+Input offset    511
+Cyclinders  263
+Heads       255
+Sectors     63
+Byte/Sector 512
+Sectors/Hunk    8
+Logical size    2,1163,248,864
 
 
 The "backup" directory on hard disk was created by me.
 
- 
+
 */
 
 #include "driver.h"

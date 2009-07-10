@@ -4,9 +4,9 @@
 /* Sunset Riders bootleg - based on Genesis / Megadrive version
 
  - coinage system is protected?  (by what?)
- 
+
  - title raster effect is broken (bug in megadrive code, happens with normal set too)
- 
+
  */
 
 ROM_START( ssgbl )
@@ -32,10 +32,10 @@ static DRIVER_INIT( sunsetbl )
 {
 	int i;
 	UINT8* rom = memory_region(machine, "maincpu");
-	
+
 	/* todo, reduce bitswaps to single swap */
 	for (i=0x00001;i<0x40000;i+=2)
-	{ 
+	{
 		rom[i] = rom[i] ^ 0xff;
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,1,0 );
 		rom[i] = BITSWAP8(rom[i], 1,6,5,4,3,2,7,0 );
@@ -44,9 +44,9 @@ static DRIVER_INIT( sunsetbl )
 		rom[i] = BITSWAP8(rom[i], 5,6,7,4,3,2,1,0 );
 		rom[i] = BITSWAP8(rom[i], 7,5,6,4,3,2,1,0 );
 	}
-	
+
 	for (i=0x40001;i<0x80000;i+=2)
-	{ 
+	{
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,1,0 );
 		rom[i] = BITSWAP8(rom[i], 7,6,1,4, 3,2,5,0);
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,0,2,1,3 );
@@ -58,7 +58,7 @@ static DRIVER_INIT( sunsetbl )
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x77007f, 0, 0, sunsetbl_r);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa10006, 0xa10007, 0, 0, sunsetbl2_r); // coins??
-	
+
 	/* patch the startup and boot vector?! */
 	rom[0x01] = 0x00;
 	rom[0x00] = 0xff;

@@ -21,22 +21,22 @@ extern UINT32 *gx_psacram, *gx_subpaletteram32;
    output of the K053936 (this can clearly be seen in videos as large chunks of
    scenary flicker when in the distance due to single pixels in the K053936 output
    becoming visible / invisible due to drawing precision.
-   
+
    -- however, progress on this has stalled as our K053936 doesn't seem to give
       the right output for post processing, I suspect the game is using some
-	  unsupported flipping modes (probably due to the way it's hooked up to the 
-	  rest of the chips) which is causing entirely the wrong output.
-	  
+      unsupported flipping modes (probably due to the way it's hooked up to the
+      rest of the chips) which is causing entirely the wrong output.
+
    -- furthermore machine/konamigx.c (!) contains it's own implementation of
       the K053936_zoom_draw named K053936GP_zoom_draw ... It really shouldn't do,
-	  epsecially not in 'machine', which isn't meant to be video related.
-	  
-	  
+      epsecially not in 'machine', which isn't meant to be video related.
+
+
    */
 static bitmap_t *gxtype1_roz_dstbitmap;
 static bitmap_t *gxtype1_roz_dstbitmap2;
 static rectangle gxtype1_roz_dstbitmapclip;
-	
+
 static void (*game_tile_callback)(int layer, int *code, int *color, int *flags);
 
 /* Run and Gun 2 / Rushing Heroes */
@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_gx_psac1b_tile_info )
 
 	colour = 0;
 	tileno = (gx_psacram[tile_index*2+1] & 0x00003fff)>>0;
-	
+
 	// scanrows
 	//flipx  = (gx_psacram[tile_index*2+1] & 0x00800000)>>23;
 	//flipy  = (gx_psacram[tile_index*2+1] & 0x00400000)>>22;
@@ -192,7 +192,7 @@ static void _gxcommoninitnosprites(running_machine *machine)
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 0;
-	
+
 	// Documented relative offsets of non-flipped games are (-2, 0, 2, 3),(0, 0, 0, 0).
 	// (+ve values move layers to the right and -ve values move layers to the left)
 	// In most cases only a constant is needed to add to the X offsets to yield correct
@@ -362,24 +362,24 @@ VIDEO_START(opengolf)
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
-	
+
 	gxtype1_roz_dstbitmap =  auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
 	gxtype1_roz_dstbitmap2 = auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
 
-	
+
 	gxtype1_roz_dstbitmapclip.min_x = 0;
 	gxtype1_roz_dstbitmapclip.max_x = 512-1;
 	gxtype1_roz_dstbitmapclip.min_y = 0;
 	gxtype1_roz_dstbitmapclip.max_y = 512-1;
-	
-	
+
+
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
-	
+
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16); 
-	
+	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
+
 }
 
 VIDEO_START(racinfrc)
@@ -396,32 +396,32 @@ VIDEO_START(racinfrc)
 
 	gx_psac_tilemap = tilemap_create(machine, get_gx_psac1a_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
 	gx_psac_tilemap2 = tilemap_create(machine, get_gx_psac1b_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
-	
+
 	// transparency will be handled manually in post-processing
 	//tilemap_set_transparent_pen(gx_psac_tilemap, 0);
 	//tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
-	
+
 	gxtype1_roz_dstbitmap =  auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
 	gxtype1_roz_dstbitmap2 = auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
 
-	
+
 	gxtype1_roz_dstbitmapclip.min_x = 0;
 	gxtype1_roz_dstbitmapclip.max_x = 512-1;
 	gxtype1_roz_dstbitmapclip.min_y = 0;
 	gxtype1_roz_dstbitmapclip.max_y = 512-1;
-	
-	
+
+
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
-	
+
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16); 
+	priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
 
-	
+
 }
 
 VIDEO_UPDATE(konamigx)
@@ -482,7 +482,7 @@ VIDEO_UPDATE(konamigx)
 		K053936_0_zoom_draw(gxtype1_roz_dstbitmap, &gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
 		K053936_0_zoom_draw(gxtype1_roz_dstbitmap2,&gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
 	}
-	
+
 	if (gx_rozenable)
 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
 	else
@@ -490,27 +490,27 @@ VIDEO_UPDATE(konamigx)
 
 	/* Hack! draw type-1 roz layer here for testing purposes only */
 	if (gx_specialrozenable)
-	{	
+	{
 		const pen_t *paldata = screen->machine->pens;
-		
+
 		if ( input_code_pressed(KEYCODE_W) )
-		{	
+		{
 			int y,x;
-			
+
 			// make it flicker, to compare positioning
 			//if (video_screen_get_frame_number(screen) & 1)
 			{
-			
+
 				for (y=0;y<256;y++)
 				{
 					//UINT16* src = BITMAP_ADDR16( gxtype1_roz_dstbitmap, y, 0);
-					
+
 					//UINT32* dst = BITMAP_ADDR32( bitmap, y, 0);
 					// ths K053936 rendering should probably just be flipped
 					// this is just kludged to align the racing force 2d logo
 					UINT16* src = BITMAP_ADDR16( gxtype1_roz_dstbitmap2, y+30, 0);
 					UINT32* dst = BITMAP_ADDR32( bitmap, 256-y, 0);
-					
+
 					for (x=0;x<512;x++)
 					{
 						UINT16 dat = src[x];
@@ -518,11 +518,11 @@ VIDEO_UPDATE(konamigx)
 					}
 				}
 			}
-		
+
 		}
 
 	}
-		
+
 	return 0;
 }
 

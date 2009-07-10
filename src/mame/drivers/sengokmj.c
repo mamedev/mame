@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 
-//	AM_RANGE(0x8080, 0x8081) CRTC extra register?
+//  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
