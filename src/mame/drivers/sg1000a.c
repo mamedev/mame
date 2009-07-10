@@ -115,7 +115,7 @@ CN4               CN5
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "machine/segacrpt.h"
 
 /*************************************
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn", sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -247,7 +247,7 @@ static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 	coin_counter_w(0, data & 0x01);
 }
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("P1"),
 	DEVCB_INPUT_PORT("P2"),
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( sg1000a )
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", sg1000a_interrupt)
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
