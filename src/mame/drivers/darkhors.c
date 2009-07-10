@@ -59,6 +59,9 @@ To do:
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "sound/st0016.h"
+#include "st0016.h"
+#include "cpu/z80/z80.h"
 
 #define DARKHORS_DEBUG	0
 
@@ -69,6 +72,8 @@ To do:
 
 
 ***************************************************************************/
+
+extern UINT8 *st0016_charram;
 
 static VIDEO_START( darkhors );
 static VIDEO_UPDATE( darkhors );
@@ -321,6 +326,38 @@ static ADDRESS_MAP_START( darkhors_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE(SMH_RAM)	// this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITE(SMH_RAM) AM_BASE(&darkhors_tmapscroll)
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITE(SMH_RAM) AM_BASE(&darkhors_tmapscroll2)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( jclub2_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM
+
+	AM_RANGE(0x490040, 0x490043) AM_WRITE(darkhors_eeprom_w)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
+
+	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
+	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
+	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
+	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
+	AM_RANGE(0x580200, 0x580203) AM_READ(SMH_NOP)
+	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
+	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
+
+	AM_RANGE(0x800000, 0x87dfff) AM_RAM
+	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE(&spriteram32)
+
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE(SMH_RAM)	// this should still be palette ram!
+
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( jclub2o_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM
+	
 ADDRESS_MAP_END
 
 
@@ -605,6 +642,98 @@ static MACHINE_DRIVER_START( darkhors )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+VIDEO_START(jclub2)
+{
+
+}
+
+VIDEO_UPDATE(jclub2)
+{
+	return 0;
+}
+
+static MACHINE_DRIVER_START( jclub2 )
+	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
+	MDRV_CPU_PROGRAM_MAP(jclub2_map)
+	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
+
+	MDRV_NVRAM_HANDLER(darkhors)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(0x190, 0x100)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
+
+	MDRV_GFXDECODE(darkhors)
+	MDRV_PALETTE_LENGTH(0x10000)
+
+	MDRV_VIDEO_START(jclub2)
+	MDRV_VIDEO_UPDATE(jclub2)
+MACHINE_DRIVER_END
+
+static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("st", st0016_snd_r, st0016_snd_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
+	//AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
+	//AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
+	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
+	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+ADDRESS_MAP_END
+
+static const st0016_interface st0016_config =
+{
+	&st0016_charram
+};
+
+
+static MACHINE_DRIVER_START( jclub2o )
+	MDRV_CPU_ADD("st0016",Z80,8000000)
+	MDRV_CPU_PROGRAM_MAP(st0016_mem)
+	MDRV_CPU_IO_MAP(st0016_io)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	
+	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
+	MDRV_CPU_PROGRAM_MAP(jclub2o_map)
+	//MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
+
+	MDRV_NVRAM_HANDLER(darkhors)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(0x190, 0x100)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
+
+	MDRV_GFXDECODE(darkhors)
+	MDRV_PALETTE_LENGTH(0x10000)
+
+	MDRV_VIDEO_START(jclub2)
+	MDRV_VIDEO_UPDATE(jclub2)
+	
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("st", ST0016, 0)
+	MDRV_SOUND_CONFIG(st0016_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+
 /***************************************************************************
 
 
@@ -711,7 +840,7 @@ Many XTAL : 48.0000 MHz,33.3333 MHz,4.91520 MHz,42.9545 MHz(x2),105.0000 MHz (th
 
 Others : MC68EC020FG16
 	 SETA ST-0013
-	 SETA ST-0016
+	 SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.c
 	 SETA ST-0017
 
 Rams :  Toshiba TC514800AJ-70
@@ -734,7 +863,6 @@ ROM_START( jclub2o )
 	ROM_LOAD16_WORD_SWAP( "sx006a-01.106",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) ) 
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26",0x00000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) )  // alt revision?
 
-	
 	ROM_REGION( 0x200000, "subcpu", 0 )	// 68EC020 code
 	// what are these? they're valid 68020 / 68000 code, but too small to be main program roms??  sound program?? overlay patch??
 	ROM_LOAD16_WORD_SWAP( "jc2-110x.u27",0x00000, 0x080000, CRC(03aa6882) SHA1(e0343bc77a19994ddafa614891663b40e1476332) )
@@ -743,12 +871,10 @@ ROM_START( jclub2o )
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "gfx", 0x00000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "oki", 0 )	// Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
-	// this is a Z80 program rom.. not sound data..
-	ROM_LOAD( "sx006-04.u87", 0x00000, 0x080000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
-	
-	// missing samples rom?
-	
+	ROM_REGION( 0x90000, "st0016", 0 ) // z80 core (used for sound?)
+	ROM_LOAD( "sx006-04.u87", 0x10000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
+	ROM_COPY( "st0016",  0x10000, 0x00000, 0x08000 )
+		
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF | ROMREGION_BE )	// EEPROM
 ROM_END
 
@@ -779,6 +905,6 @@ static DRIVER_INIT( darkhors )
 		eeprom[i] = eeprom[i*2];
 }
 
-GAME( 199?, jclub2,   0,      darkhors, darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING )
-GAME( 199?, jclub2o,  jclub2, darkhors, darkhors, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING )
+GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, darkhors, jclub2, darkhors, darkhors, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )
