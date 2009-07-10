@@ -125,7 +125,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* populate device configuration */
 	device->clock = clock;
-	memset(device->address_map, 0, sizeof(device->address_map));
+	memset((void *)device->address_map, 0, sizeof(device->address_map));
 	if ((device->clock & 0xff000000) == 0xff000000)
 	{
 		assert(device->owner != NULL);
@@ -141,7 +141,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	device->tokenbytes = 0;
 	device->region = NULL;
 	device->regionbytes = 0;
-	memset(device->space, 0, sizeof(device->space));
+	memset((void *)device->space, 0, sizeof(device->space));
 	device->execute = NULL;
 
 	/* append the tag */
