@@ -4428,6 +4428,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
+	DRIVER( shootpl )	/* 2003.xx Shootout Pool / Shootout Pool Prize */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
@@ -4524,14 +4525,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
-	DRIVER( sprtshot )			/* 2002.12 Sports Shooting USA */
+	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 						/* 2003.08 Dolphin Blue */
 						/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
 						/* 2004.03 The Rumble Fish */
-	DRIVER( rangrmsn )			/* 2004.03 Ranger Mission */
+	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
 						/* 2004.07 The King of Fighters Neo Wave */
 						/* 2004.09 Extreme Hunting */
