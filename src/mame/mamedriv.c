@@ -3238,6 +3238,7 @@ V-V                           TP-027
 	DRIVER( mocapbj )	/* 2001 */
 	DRIVER( p911 )		/* 2001 */
 	DRIVER( p911uc )	/* 2001 */
+	DRIVER( p911kc )	/* 2001 */
 	DRIVER( p911e )		/* 2001 */
 	DRIVER( p911j )		/* 2001 */
 	DRIVER( p9112 )		/* 2001 */

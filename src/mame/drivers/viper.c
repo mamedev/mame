@@ -686,14 +686,14 @@ ROM_START(ppp2nd)
 ROM_END
 
 /* Viper games with Compact Flash card */
-ROM_START(boxingm)
+ROM_START(boxingm) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
+	ROM_LOAD("a45jaa_nvram.u39", 0x00000, 0x2000, CRC(1) SHA1(1))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a45jaa02", 0, SHA1(3aaf9bc713c9ea8922d8f8acfeab5b4bdf058f41) )
+	DISK_IMAGE( "a45a02", 0, SHA1(1) )
 ROM_END
 
 ROM_START(code1d)
@@ -714,33 +714,35 @@ ROM_START(code1db)
 	DISK_IMAGE( "gk922b02", 0, SHA1(d1ecbfe3c76ba482638982879c96874537b89995) )
 ROM_END
 
-ROM_START(gticlub2)
+ROM_START(gticlub2) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239))
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239)) //old dump, probably has non-default settings.
+	ROM_LOAD("941jab_nvram.u39", 0x00000, 0x2000, CRC(6c4a852f) SHA1(2753dda42cdd81af22dc6780678f1ddeb3c62013))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gm941b02", 0, SHA1(5f7e023d2ed0df5fa6876ac086864ffd69e9aa5a) )
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
 ROM_END
 
-ROM_START(jpark3)
+ROM_START(jpark3) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
+	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "b41c02", 0, SHA1(ad7c42b06b9a75c2d28a2368387fe55fbec36a70) )
+	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
 ROM_END
 
-ROM_START(mocapglf)
+ROM_START(mocapglf) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "b33a02", 0, SHA1(6c52cd8d52a5282c1650ee5aac088b293915d32c) )
+	DISK_IMAGE( "b33a02", 0, SHA1(819d8fac5d2411542c1b989105cffe38a5545fc2) )
 ROM_END
 
 ROM_START(mocapb)
@@ -773,13 +775,25 @@ ROM_START(p911)
 	DISK_IMAGE( "a00aad02", 0, SHA1(c9b92bd53e62cc83c30db32d6cf329273af4ca8d) )
 ROM_END
 
-ROM_START(p911uc)
+ROM_START(p911uc) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a00uac_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a00aac02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
+	DISK_IMAGE( "a00c02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
+ROM_END
+
+ROM_START(p911kc) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a00kac_nvram.u39", 0x000000, 0x2000,  CRC(8ddc921c) SHA1(901538da237679fc74966a301278b36d1335671f) )
+	// UAC nvram is undumped
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "a00c02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
 ROM_END
 
 ROM_START(p911e)
@@ -863,10 +877,10 @@ ROM_START(tsurugi)
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
+	ROM_LOAD("a30eab_nvram.u39", 0x00000, 0x2000, CRC(1) SHA1(1))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a30eab02", 0, SHA1(b6b3dbcf52ea5da54ccc5e14c08174eef4d02c30) )
+	DISK_IMAGE( "a30b02", 0, SHA1(1) )
 ROM_END
 
 ROM_START(tsurugij)
@@ -908,14 +922,14 @@ ROM_START(wcombaj)
 	DISK_IMAGE( "c22a02", 0, SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
 ROM_END
 
-ROM_START(xtrial)
+ROM_START(xtrial) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
+	ROM_LOAD("b4xjab_nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "b4xb02", 0, SHA1(27be96c5ea534d51b2e6d052e98c30e5848e572c) )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
 ROM_END
 
 /* Viper Satellite Terminal games */
@@ -1001,6 +1015,7 @@ GAME(2001, mocapb,   kviper,  viper, 0, vipercf,  ROT0,  "Konami", "Mocap Boxing
 GAME(2001, mocapbj,  mocapb,  viper, 0, vipercf,  ROT0,  "Konami", "Mocap Boxing (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911,     kviper,  viper, 0, vipercf,  ROT0,  "Konami", "Police 911", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911uc,   p911,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911 (ver UAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, p911kc,   p911,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911 (ver KAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911e,    p911,    viper, 0, vipercf,  ROT0,  "Konami", "Police 24/7 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911j,    p911,    viper, 0, vipercf,  ROT0,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p9112,    kviper,  viper, 0, vipercf,  ROT0,  "Konami", "Police 911 2", GAME_NOT_WORKING|GAME_NO_SOUND)

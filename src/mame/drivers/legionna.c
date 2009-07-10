@@ -2123,5 +2123,5 @@ GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Se
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocs,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocs2, cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
