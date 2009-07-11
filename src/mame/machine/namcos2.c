@@ -310,7 +310,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		switch(offset)
 		{
 		case 1: return 0xBD;
-		case 7: return 0xBD;
+		// case 7: return 0xBD;
 		}
 		break;
 
@@ -520,8 +520,10 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 	case 0x1d0000:
 		if( bWrite )
 		{
-			cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
-		}		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_0], CLEAR_LINE);
+			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+			// cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
+		}
+		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_0], CLEAR_LINE);
 		break;
 
 	case 0x1d2000:
@@ -531,7 +533,8 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 	case 0x1d4000:
 		if( bWrite )
 		{
-			cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
+			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+			// cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_2], CLEAR_LINE);
 		break;
