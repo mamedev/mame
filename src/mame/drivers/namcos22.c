@@ -4613,7 +4613,7 @@ ROM_START( aquajet )
 
 	ROM_REGION( 0xa00000, "c352", 0 ) /* sound samples */
         ROM_LOAD( "aj1wavea.2l",  0x000000, 0x400000, CRC(8c72ea59) SHA1(3ae8dbd8baae08f1daab2b218932ba9d9451231d) )
-        ROM_LOAD( "aj1waveb.1l",  0x400000, 0x400000, CRC(ab5a457f) SHA1(c34531fd574eb0c3e78fc31a9af8658df3446adc) )
+        ROM_LOAD( "aj1waveb.1l",  0x800000, 0x400000, CRC(ab5a457f) SHA1(c34531fd574eb0c3e78fc31a9af8658df3446adc) )
 ROM_END
 
 /*******************************************************************/
