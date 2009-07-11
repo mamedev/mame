@@ -29,89 +29,104 @@
   Konami, 1998-2001
 
   This system uses Konami PSX-based hardware with an ATAPI CDROM drive.
-  There is a slot for a security cart (cart is installed in CN14) and also a PCMCIA card slot,
-  which is unused. The main board and CDROM drive are housed in a black metal box.
+  Gun Mania (and probably Gun Mania Zone Plus) has no CDROM drive.
+  There is a slot for a security cart (cart is installed in CN14) and also a PCMCIA card slot.
+  The main board and CDROM drive are housed in a black metal box. Gun Mania doesn't have that box.
   The games can be swapped by exchanging the CDROM disc and the security cart, whereby the main-board
   FlashROMs are re-programmed after a small wait. On subsequent power-ups, there is a check to test if the
   contents of the FlashROMs matches the CDROM, then the game boots up immediately.
+  
+  PCMCIA card slot is used by Dance Dance Revolution (2ndMIX link ver. and later),
+  GUITARFREAKS (2ndMIX link ver. and later), drummania (7thMIX and later), and Gun Mania.
+  DDR and GF: 32M flash card is used to store edit data (players can edit data by PlayStation
+  console, and send data to arcade machine via PS memory card).
+  DM and GF: network PCB unit (for e-AMUSEMENT) is connected via PCMCIA slot.
+  GM: unknown (program data is stored in flash card?)
 
   The games that run on this system include...
 
   Game                                         Year       Hardware Code     CD Code
   ---------------------------------------------------------------------------------
-  *Anime Champ                                  2000.12
-  Bass Angler                                   1998.03    GE765 JA          765 JA A02
-  Bass Angler 2                                 1998.07    GC865 JA          865 JA A02
-  *DAM-DDR Dance Dance Revolution for DAM       1999.11
-  *DAM-DDR Dance Dance Revolution for DAM 2nd   2000.07
-  Dance Dance Revolution                        1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
-  Dance Dance Revolution Internet Ranking ver.  1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
-  Dance Dance Revolution 2ndMIX                 1999.01    GC895 JA          895 JA A02
-  Dance Dance Revolution 2ndMIX LINK version    1999.04    GE885 JA          885 JA A02
-  DDR 2ndMIX with bmIIDX CLUB ver.              1999.05    GN896 JA          896 JA A01
-  DDR 2ndMIX AND bmIIDX substream CLUB ver. 2   1999.05    GE984 JA          984 JA A01
-  Dance Dance Revolution Solo BASS MIX          1999.08    GQ894 JA          894 JA A02
-  Dance Dance Revolution 3rdMIX                 1999.10    GN887 AA/JA/KA    887 AA/JA/KA A02
-  Dance Dance Revolution Solo 2000              1999.12    GC905 AA/JA       905 AA/JA A02
-  Dance Dance Revolution 3rdMIX PLUS            2000.06    GCA22 JA          A22 JA A02
-  Dance Dance Revolution 4thMIX                 2000.08    GCA34 JA          A34 JA A02
-  *Dance Dance Revolution Kids                  2000.12
-  Dance Dance Revolution 5thMIX                 2001.03    GCA27 JA          A27 JA A02
-  DDRMAX Dance Dance Revolution 6thMIX          2001.10    GCB19 JA          B19 JA A02
-  DDRMAX2 Dance Dance Revolution 7thMIX         2002.03    GCB20 JA          B20 JA A02
-  Dance Dance Revolution EXTREME                2002.12    GCC36 JA          C36 JA A02
-  Dance Maniax                                  2000.06    GE874 JA          874 JA A(needs redump)
-  Dance Maniax 2ndMIX                           2000.12    GCA39 JA          A39 JA A02
-  *Dance Maniax 2ndMIX APPEND J PARADISE        2001.04
-  Dancing Stage                                 1999.08    GN845 EA          845 EA(needs redump)
-  Dancing Stage Euro Mix                        2000       GE936 EA          936 EA A(needs redump)
-  Dancing Stage Euro Mix 2                      2000       G*C23 EA          C23 EA A02
-  Dancing Stage featuring Disney's Rave         2000.11    GCA37 JA          A37 JA A02
-  Dancing Stage featuring DREAMS COME TRUE      1999.12    GC910 JA          910 JA/JC A02
-  Dancing Stage featuring TRUE KiSS DESTiNATiON 1999.07    G*884 JA          884 JA A02
-  Dark Horse Legend                             1998.03    GX706 JA          706 JA A02
-  drummania                                     1999.07    GQ881 JA          881 JA D01 / 881 JA A02(missing, audio CD)
-  drummania 2ndMIX                              2000.03    GE912 JA          912 JA B02
-  drummania 3rdMIX                              2000.09    GCA23 JA          A23 JA A02
-  drummania 4thMIX                              2001.03    GEA25 JA          A25 JA A02
-  drummania 5thMIX                              2001.09    GCB05 JA          B05 JA A02
-  drummania 6thMIX                              2002.02    GCB16 JA          B16 JA A02
-  drummania 7thMIX                              2002.08    GCC07 JA          C07 JA A02
-  drummania 7thMIX power-up ver.                2002.08    GEC07 JB          C07 JC A02
-  drummania 8thMIX                              2003.04    GCC38 JA          C38 JA A02
-  drummania 9thMIX                              2003.10    GCD09 JA          D09 JA A02
-  *drummania 10thMIX                            2004.04
-  *Fighting Mania                               2000
-  Fisherman's Bait                              1998.06    GE765 UA          765 UA B02
-  Fisherman's Bait 2                            1998       GC865 UA          865 UA B02
-  Fisherman's Bait Marlin Challenge             1999       GX889             889 AA/EA/JA/UA(needs redump)
-  GUITARFREAKS                                  1999.02    GQ886 EA/JA/UA    886 ** C02
-  GUITARFREAKS 2ndMIX                           1999.07    GQ883 JA          929 JB B02(needs redump)
-  *GUITARFREAKS 2ndMIX Link ver.                1999.09
-  GUITARFREAKS 3rdMIX                           2000.04    GE949 JA          949 JA C01 / 949 JA C02
-  GUITARFREAKS 4thMIX                           2000.08    GEA24 JA          A24 JA A02
-  GUITARFREAKS 5thMIX                           2001.03    GCA26 JA          A26 JA A02
-  GUITARFREAKS 6thMIX                           2001.09    GCB06 JA          B06 JA A02
-  GUITARFREAKS 7thMIX                           2002.02    GCB17 JA          B17 JA A02
-  GUITARFREAKS 8thMIX                           2002.08    GCC08 JA          C08 JA A02
-  GUITARFREAKS 8thMIX power-up ver.             2002.11    GEC08 JB          C08 JB A02
-  GUITARFREAKS 9thMIX                           2003.04    GCC39 JA          C39 JA A02
-  GUITARFREAKS 10thMIX                          2003.10    GCD10 JA          D10 JA A02
-  *GUITARFREAKS 11thMIX                         2004.04
-  *Gun Mania                                    2000.07
-  *Gun Mania Zone Plus                          2000.10
-  *Gachaga Champ                                1999.01
-  Hyper Bishi Bashi Champ                       1998.07    GC908 JA          908    A02
-  Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
-  *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
-  *Kick & Kick                                  2001
-  Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
-  Konami 80's AC Special                        1998       GC826 UA          826 UA A01
-  *Mambo a GoGo                                 2001.06
-  Punchmania Hokuto no Ken                      2000.03                      918 JA B02
-  Punchmania Hokuto no Ken 2                    2000.12                      A09 JA A02
-  Salary Man Champ                              2001.02    GCA18 JA          A18 JA(needs redump)
-  *Step Champ                                   1999.12
+P *Anime Champ                                  2000.12
+P Bass Angler                                   1998.03    GE765 JA          765 JA A02
+P Bass Angler 2                                 1998.07    GC865 JA          865 JA A02
+P *DAM-DDR Dance Dance Revolution for DAM       1999.11
+P *DAM-DDR Dance Dance Revolution for DAM 2nd   2000.07
+A Dance Dance Revolution                        1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
+A Dance Dance Revolution Internet Ranking ver.  1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
+A Dance Dance Revolution 2ndMIX                 1999.01    GC895 JA          895 JA A02
+A Dance Dance Revolution 2ndMIX LINK version    1999.04    GE885 JA          885 JA A02
+A DDR 2ndMIX with bmIIDX CLUB ver.              1999.05    GN896 JA          896 JA A01
+A DDR 2ndMIX AND bmIIDX substream CLUB ver. 2   1999.05    GE984 JA          984 JA A01
+D Dance Dance Revolution Solo BASS MIX          1999.08    GQ894 JA          894 JA A02
+D Dance Dance Revolution 3rdMIX                 1999.10    GN887 AA/JA/KA    887 AA/JA/KA A02
+D Dance Dance Revolution Solo 2000              1999.12    GC905 AA/JA       905 AA/JA A02
+D Dance Dance Revolution 3rdMIX PLUS            2000.06    GCA22 JA          A22 JA A02
+D Dance Dance Revolution 4thMIX                 2000.08    GCA33 JA          A33 JA A02
+D Dance Dance Revolution 4thMIX PLUS            2000.12    GCA34 JA          A34 JA A02
+? *Dance Dance Revolution Kids                  2000.12
+D Dance Dance Revolution 5thMIX                 2001.03    GCA27 JA          A27 JA A02
+D DDRMAX Dance Dance Revolution 6thMIX          2001.10    GCB19 JA          B19 JA A02
+D DDRMAX2 Dance Dance Revolution 7thMIX         2002.03    GCB20 JA          B20 JA A02
+D Dance Dance Revolution EXTREME                2002.12    GCC36 JA          C36 JA A02
+D Dance Maniax                                  2000.06    GE874 JA          874 JA A(needs redump)
+D Dance Maniax 2ndMIX                           2000.12    GCA39 JA          A39 JA A02
+D *Dance Maniax 2ndMIX APPEND J PARADISE        2001.04
+A Dancing Stage                                 1999.08    GN845 EA          845 EA(needs redump)
+D Dancing Stage Euro Mix                        2000       GE936 EA          936 EA A(needs redump)
+D Dancing Stage Euro Mix 2                      2000       G*C23 EA          C23 EA A02
+D Dancing Stage featuring Disney's Rave         2000.11    GCA37 JA          A37 JA A02
+D Dancing Stage featuring DREAMS COME TRUE      1999.12    GC910 JA          910 JA/JC A02
+A Dancing Stage featuring TRUE KiSS DESTiNATiON 1999.07    G*884 JA          884 JA A02
+P Dark Horse Legend                             1998.03    GX706 JA          706 JA A02
+A drummania                                     1999.07    GQ881 JA          881 JA D01 / 881 JA A02(missing, audio CD)
+D drummania 2ndMIX                              2000.03    GE912 JA          912 JA B02
+D drummania 3rdMIX                              2000.09    GCA23 JA          A23 JA A02
+D drummania 4thMIX                              2001.03    GEA25 JA          A25 JA A02
+D drummania 5thMIX                              2001.09    GCB05 JA          B05 JA A02
+D drummania 6thMIX                              2002.02    GCB16 JA          B16 JA A02
+N drummania 7thMIX                              2002.08    GCC07 JA          C07 JA A02
+N drummania 7thMIX power-up ver.                2002.08    GEC07 JB          C07 JC A02
+N drummania 8thMIX                              2003.04    GCC38 JA          C38 JA A02
+N drummania 9thMIX                              2003.10    GCD09 JA          D09 JA A02
+N *drummania 10thMIX                            2004.04
+? *Fighting Mania                               2000
+P Fisherman's Bait                              1998.06    GE765 UA          765 UA B02
+P Fisherman's Bait 2                            1998       GC865 UA          865 UA B02
+P Fisherman's Bait Marlin Challenge             1999       GX889             889 AA/EA/JA/UA(needs redump)
+A GUITARFREAKS                                  1999.02    GQ886 EA/JA/UA    886 ** C02
+A GUITARFREAKS 2ndMIX                           1999.07    GQ883 JA          929 JB B02(needs redump)
+A *GUITARFREAKS 2ndMIX Link ver.                1999.09
+D GUITARFREAKS 3rdMIX                           2000.04    GE949 JA          949 JA C01 / 949 JA C02
+D GUITARFREAKS 4thMIX                           2000.08    GEA24 JA          A24 JA A02
+D GUITARFREAKS 5thMIX                           2001.03    GCA26 JA          A26 JA A02
+D GUITARFREAKS 6thMIX                           2001.09    GCB06 JA          B06 JA A02
+D GUITARFREAKS 7thMIX                           2002.02    GCB17 JA          B17 JA A02
+N GUITARFREAKS 8thMIX                           2002.08    GCC08 JA          C08 JA A02
+N GUITARFREAKS 8thMIX power-up ver.             2002.11    GEC08 JB          C08 JB A02
+N GUITARFREAKS 9thMIX                           2003.04    GCC39 JA          C39 JA A02
+N GUITARFREAKS 10thMIX                          2003.10    GCD10 JA          D10 JA A02
+N *GUITARFREAKS 11thMIX                         2004.04
+G *Gun Mania                                    2000.07    G?906 JA          (no CD)
+? *Gun Mania Zone Plus                          2000.10
+P *Gachaga Champ                                1999.01
+P Hyper Bishi Bashi Champ                       1998.07    GC908 JA          908    A02
+P Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
+P *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
+? *Kick & Kick                                  2001
+P Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
+P Konami 80's AC Special                        1998       GC826 UA          826 UA A01
+D *Mambo a GoGo                                 2001.06
+D Punchmania Hokuto no Ken                      2000.03                      918 JA B02
+D Punchmania Hokuto no Ken 2                    2000.12                      A09 JA A02
+P Salary Man Champ                              2001.02    GCA18 JA          A18 JA(needs redump)
+P *Step Champ                                   1999.12
+
+P: plain System573
+A: uses ext. analog I/O board
+D: uses ext. digital sound and I/O board
+N: uses network PCB unit + ext. digital sound and I/O board
+G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
   Note:
        Not all games listed above are confirmed to run on System 573.
