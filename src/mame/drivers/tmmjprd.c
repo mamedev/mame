@@ -69,16 +69,14 @@ static WRITE32_HANDLER( tmmjprd_tilemap3_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int screen)
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	static int abs_x = 0,abs_y = 0;
 	const gfx_element *gfx = machine->gfx[0];
 	int xoffs;
-//  int todraw = (tmmjprd_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
-
+	//  int todraw = (tmmjprd_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 //  UINT32 *source = (tmmjprd_spriteram+ (todraw*2))-2;
 //  UINT32 *finish = tmmjprd_spriteram;
 
-	UINT32 *source = tmmjprd_spriteram+(0xc000/4);
+	UINT32 *source = tmmjprd_spriteram+(0xc000/4)-2;
 	UINT32 *finish = tmmjprd_spriteram;
 	xoffs = (screen & 1)*320;
 
@@ -87,18 +85,44 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if(screen != (source[0]&0x2000)>>13) continue; //screen flag
 		if(!(source[0]&0x80000000)) continue; //disable flag
 
-		/* TODO: sprite-sprite priorities works as back-to-top but abs x/y calcs works as top-to-back? */
+		/* Note: sprite-sprite priorities works as back-to-top but abs x/y calcs works as top-to-back */
 		if(source[0]&0x40000000)
 		{
-			abs_x = (source[0]&0x00000fff);
-			abs_y = (source[0]&0x0fff0000)>>16;
 			xpos = (source[0]&0x00000fff);
 			ypos = (source[0]&0x0fff0000)>>16;
+			if(xpos&0x800)xpos-=0x1000;
+			if(ypos&0x800)ypos-=0x1000;
 		}
 		else
 		{
+			UINT32 *calc_abs;
+			UINT8 calc_abs_helper;
+			int abs_x = 0,abs_y = 0;
+
+			calc_abs = source-2;
+
+			/* TODO: wrong sprite positioning for the right screen */
+			calc_abs_helper = 0;
+			while(calc_abs > finish || calc_abs_helper == 0) //sanity check
+			{
+				if(calc_abs[0] & 0x40000000)
+				{
+					abs_x = (calc_abs[0]&0x00000fff);
+					abs_y = (calc_abs[0]&0x0fff0000)>>16;
+
+					if(abs_x & 0x800) abs_x-=0x1000;
+					if(abs_y & 0x800) abs_y-=0x1000;
+
+					calc_abs_helper = 1;
+				}
+				calc_abs-=2;
+			}
+
 			xpos = (source[0]&0x00000fff);
 			ypos = (source[0]&0x0fff0000)>>16;
+
+			if(xpos&0x800)xpos-=0x1000;
+			if(ypos&0x800)ypos-=0x1000;
 			xpos+=abs_x;
 			ypos+=abs_y;
 			xpos&=0x7ff;
@@ -112,8 +136,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		// the tiles in this are 8bpp, it can probably do the funky sub-tile addressing for them too tho..
 		tileno >>=1;
-
-		if(xpos&0x800)xpos-=0x1000;
 
 		// 255 for 8bpp
 		drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
