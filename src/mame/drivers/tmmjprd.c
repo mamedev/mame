@@ -66,44 +66,57 @@ static WRITE32_HANDLER( tmmjprd_tilemap3_w )
 	COMBINE_DATA(&tmmjprd_tilemap_ram[3][offset]);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int screen)
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
+	static int abs_x = 0,abs_y = 0;
 	const gfx_element *gfx = machine->gfx[0];
+	int xoffs;
 //  int todraw = (tmmjprd_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 
 //  UINT32 *source = (tmmjprd_spriteram+ (todraw*2))-2;
 //  UINT32 *finish = tmmjprd_spriteram;
 
-	UINT32 *source = tmmjprd_spriteram+(0xc000/4)-2;
+	UINT32 *source = tmmjprd_spriteram+(0xc000/4);
 	UINT32 *finish = tmmjprd_spriteram;
+	xoffs = (screen & 1)*320;
 
-
-	while( source>finish )
+	for(;source>finish;source-=2)
 	{
+		if(screen != (source[0]&0x2000)>>13) continue; //screen flag
+		if(!(source[0]&0x80000000)) continue; //disable flag
 
-		xpos = (source[0]&0x00000fff);
-		ypos = (source[0]&0x0fff0000)>>16;
+		/* TODO: sprite-sprite priorities works as back-to-top but abs x/y calcs works as top-to-back? */
+		if(source[0]&0x40000000)
+		{
+			abs_x = (source[0]&0x00000fff);
+			abs_y = (source[0]&0x0fff0000)>>16;
+			xpos = (source[0]&0x00000fff);
+			ypos = (source[0]&0x0fff0000)>>16;
+		}
+		else
+		{
+			xpos = (source[0]&0x00000fff);
+			ypos = (source[0]&0x0fff0000)>>16;
+			xpos+=abs_x;
+			ypos+=abs_y;
+			xpos&=0x7ff;
+			ypos&=0x7ff;
+		}
 
-		xflip = (source[0]&0x00008000)>>15;
-		yflip = (source[0]&0x00004000)>>14;
-		colr = (source[1]&0x0ff00000)>>15;
-
-
+		xflip =  (source[0]&0x00008000)>>15;
+		yflip =  (source[0]&0x00004000)>>14;
 		tileno = (source[1]&0x0003ffff);
+		colr =   (source[1]&0x0ff00000)>>20;
 
 		// the tiles in this are 8bpp, it can probably do the funky sub-tile addressing for them too tho..
 		tileno >>=1;
-
-		colr =   (source[1]&0x0ff00000)>>20;
 
 		if(xpos&0x800)xpos-=0x1000;
 
 		// 255 for 8bpp
 		drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
-
-		source-=2;
 	}
 }
 
@@ -238,7 +251,7 @@ static VIDEO_UPDATE( tmmjprd )
 	if (screen == left_screen)
 	{
 		ttmjprd_draw_tilemap( screen->machine, bitmap, cliprect, tmmjprd_tilemap_ram[3], tmmjprd_tilemap_regs[3], gfxroms );
-		draw_sprites(screen->machine,bitmap,cliprect, 320);
+		draw_sprites(screen->machine,bitmap,cliprect, 1);
 		ttmjprd_draw_tilemap( screen->machine, bitmap, cliprect, tmmjprd_tilemap_ram[2], tmmjprd_tilemap_regs[2], gfxroms );
 	}
 	if (screen == right_screen)
