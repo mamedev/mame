@@ -26,9 +26,6 @@
     G?C09         2002    Mahjong Fight Club
     G?C22         2002    World Combat (USA/Japan/Korea) / Warzaid (Europe)
 
-Note:
-Everything but p911uc might be a bad dump.
-
 */
 
 #include "driver.h"
@@ -696,22 +693,24 @@ ROM_START(boxingm) //*
 	DISK_IMAGE( "a45a02", 0, SHA1(9af2481f53de705ae48fad08d8dd26553667c2d0) )
 ROM_END
 
-ROM_START(code1d)
+ROM_START(code1d) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gk922d02", 0, SHA1(99b199e061621ecdd48ca125250c52656c814f38) )
+	DISK_IMAGE( "922d02", 0, SHA1(99b199e061621ecdd48ca125250c52656c814f38) )
 ROM_END
 
-ROM_START(code1db)
+ROM_START(code1db) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gk922b02", 0, SHA1(d1ecbfe3c76ba482638982879c96874537b89995) )
+	DISK_IMAGE( "922b02", 0, SHA1(d1ecbfe3c76ba482638982879c96874537b89995) )
 ROM_END
 
 ROM_START(gticlub2) //*
@@ -825,7 +824,7 @@ ROM_START(p911j) //*
 	DISK_IMAGE( "a00c02", 0, SHA1(d962d3a8ea84c380767d0fe336296911c289c224) )
 ROM_END
 
-ROM_START(p9112)
+ROM_START(p9112) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
@@ -849,11 +848,13 @@ ROM_START(sscopex)
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
+	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "gka13c02", 0, SHA1(53ae5cd4ff38581816502b0fe7d0fcf1b6364a93) )
 ROM_END
+
+//TODO: sscopexb + many nvram clone versions.
 
 ROM_START(sogeki) //*
 	VIPER_BIOS
@@ -1023,32 +1024,32 @@ GAME(1999, kviper,   0,       viper, 0, viper,    ROT0, "Konami", "Konami Viper 
 
 GAME(2001, ppp2nd,    kviper,  viper, 0, viper,    ROT0,  "Konami", "ParaParaParadise 2nd Mix", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME(2001, boxingm,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Boxing Mania", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2000, code1d,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Code One Dispatch", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, boxingm,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Boxing Mania (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2000, code1d,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2000, code1db,   code1d,    viper, 0, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver B)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, gticlub2,  kviper,    viper, 0, vipercf,  ROT0,  "Konami", "GTI Club 2", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, gticlub2,  kviper,    viper, 0, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver JAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, gticlub2ea,gticlub2,  viper, 0, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, jpark3,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Jurassic Park 3", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, mocapglf,  kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Mocap Golf", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, jpark3,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, mocapglf,  kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Mocap Golf (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Mocap Boxing (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, 0, vipercf,  ROT0,  "Konami", "Mocap Boxing (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, p911,      kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, p911,      kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911 (ver UAD)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911uc,    p911,      viper, 0, vipercf,  ROT0,  "Konami", "Police 911 (ver UAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911kc,    p911,      viper, 0, vipercf,  ROT0,  "Konami", "Police 911 (ver KAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, 0, vipercf,  ROT0,  "Konami", "Police 24/7 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, 0, vipercf,  ROT0,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, p9112,     kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911 2", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2003, popn9,     kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Pop'n Music 9", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, p9112,     kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Police 911 2 (ver A)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2003, popn9,     kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, 0, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, thrild2,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, thrild2a,  thrild2,   viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver A)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, thrild2,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, thrild2a,  thrild2,   viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, tsurugi,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, tsurugij,  tsurugi,   viper, 0, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2002, wcombat,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "World Combat", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2002, wcombat,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "World Combat (ver UAA?)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2002, wcombatk,  wcombat,   viper, 0, vipercf,  ROT0,  "Konami", "World Combat (ver KBC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, 0, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2002, xtrial,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Xtrial Racing", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2002, xtrial,    kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME(2002, mfightc,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver D)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2002, mfightcc,  mfightc,   viper, 0, vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver C)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2002, mfightc,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2002, mfightcc,  mfightc,   viper, 0, vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
