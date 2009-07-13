@@ -514,8 +514,20 @@ Core state/playback options
 -wavwrite <filename>
 
 	Writes the final mixer output to the given <filename> in WAV format,
-	producing an audio recording of the	game session. The default is
+	producing an audio recording of the game session. The default is
 	NULL (no recording).
+
+-[no]burnin
+
+	Tracks brightness of the screen during play and at the end of 
+	emulation generates a PNG that can be used to simulate burn-in
+	effects on other games. The resulting PNG is created such that the
+	least used-areas of the screen are fully white (since burned-in areas 
+	are darker, all other areas of the screen must be lightened a touch).
+	The intention is that this PNG can be loaded via an artwork file with
+	a low alpha (e.g, 0.1-0.2 seems to work well) and blended over the
+	entire screen. The PNG files are saved in the snap directory under 
+	the gamename/burnin-<screen.name>.png. The default is OFF (-noburnin).
 
 
 

@@ -29,6 +29,7 @@ enum _bitmap_format
 	BITMAP_FORMAT_INDEXED8,			/* 8bpp indexed */
 	BITMAP_FORMAT_INDEXED16,		/* 16bpp indexed */
 	BITMAP_FORMAT_INDEXED32,		/* 32bpp indexed */
+	BITMAP_FORMAT_INDEXED64,		/* 64bpp indexed */
 	BITMAP_FORMAT_RGB15,			/* 15bpp 5-5-5 RGB */
 	BITMAP_FORMAT_RGB32,			/* 32bpp 8-8-8 RGB */
 	BITMAP_FORMAT_ARGB32,			/* 32bpp 8-8-8-8 ARGB */
@@ -77,6 +78,7 @@ struct _bitmap_t
 #define BITMAP_ADDR8(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT8, y, x)
 #define BITMAP_ADDR16(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT16, y, x)
 #define BITMAP_ADDR32(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT32, y, x)
+#define BITMAP_ADDR64(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT64, y, x)
 
 
 

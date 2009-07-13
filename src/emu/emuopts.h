@@ -68,6 +68,7 @@
 #define OPTION_SNAPNAME				"snapname"
 #define OPTION_SNAPSIZE				"snapsize"
 #define OPTION_SNAPVIEW				"snapview"
+#define OPTION_BURNIN				"burnin"
 
 /* core performance options */
 #define OPTION_AUTOFRAMESKIP		"autoframeskip"

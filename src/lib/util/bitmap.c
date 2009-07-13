@@ -243,6 +243,32 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 				}
 			}
 			break;
+
+		case 64:
+			/* 64bpp can use memset if the bytes are equal */
+			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
+			{
+				for (y = fill.min_y; y <= fill.max_y; y++)
+					memset(BITMAP_ADDR64(dest, y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 4);
+			}
+			else
+			{
+				UINT64 *destrow, *destrow0;
+
+				/* Fill the first line the hard way */
+				destrow  = BITMAP_ADDR64(dest, fill.min_y, 0);
+				for (x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (UINT64)color;
+
+				/* For the other lines, just copy the first one */
+				destrow0 = BITMAP_ADDR64(dest, fill.min_y, fill.min_x);
+				for (y = fill.min_y + 1; y <= fill.max_y; y++)
+				{
+					destrow = BITMAP_ADDR64(dest, y, fill.min_x);
+					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
+				}
+			}
+			break;
 	}
 }
 
@@ -274,6 +300,9 @@ int bitmap_format_to_bpp(bitmap_format format)
 		case BITMAP_FORMAT_RGB32:
 		case BITMAP_FORMAT_ARGB32:
 			return 32;
+		
+		case BITMAP_FORMAT_INDEXED64:
+			return 64;
 
 		default:
 			break;
