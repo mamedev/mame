@@ -329,7 +329,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 	/* fetch the code and compute the DATIC latched value */
 	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
-		code = laserdisc_get_field_code(ld->device, line);
+		code = laserdisc_get_field_code(ld->device, line, FALSE);
 
 	/* at the start of each line, signal an interrupt and use a timer to turn it off */
 	if (which == 0)

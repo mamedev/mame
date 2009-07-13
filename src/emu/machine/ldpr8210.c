@@ -503,8 +503,8 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 			if (LOG_SERIAL)
 			{
 				printf("--- Command = %02X\n", player->pia.porta >> 3);
-				while (input_code_pressed(KEYCODE_ENTER)) ;
-				while (!input_code_pressed(KEYCODE_ENTER)) ;
+//				while (input_code_pressed(KEYCODE_ENTER)) ;
+//				while (!input_code_pressed(KEYCODE_ENTER)) ;
 			}
 
 			/* reset the first bit time so that the accumulator clears on the next write */
@@ -539,8 +539,8 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	ldplayer_data *player = ld->player;
 	UINT8 focus_on = !(player->port1 & 0x08);
 	UINT8 laser_on = !(player->port2 & 0x01);
-	UINT32 line16 = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16);
-	UINT32 line1718 = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718);
+	UINT32 line16 = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16, FALSE);
+	UINT32 line1718 = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718, FALSE);
 
 	/* logging */
 	if (LOG_VBLANK_VBI)

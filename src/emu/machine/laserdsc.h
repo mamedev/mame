@@ -154,7 +154,7 @@ struct _laserdisc_config
 int laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
 
 /* return the raw philips or white flag codes */
-UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code);
+UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code, UINT8 zero_if_squelched);
 
 
 

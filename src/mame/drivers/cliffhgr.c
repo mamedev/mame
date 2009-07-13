@@ -94,13 +94,13 @@ static emu_timer *irq_timer;
 
 static WRITE8_HANDLER( cliff_test_led_w )
 {
-	set_led_status( 0, offset ^ 1 );
+	set_led_status(0, offset ^ 1);
 }
 
 static WRITE8_HANDLER( cliff_port_bank_w )
 {
 	/* writing 0x0f clears the LS174 flip flop */
-	if ( data == 0x0f )
+	if (data == 0x0f)
 		port_bank = 0;
 	else
 		port_bank = data & 0x0f; /* only D3-D0 are connected */
@@ -110,10 +110,8 @@ static READ8_HANDLER( cliff_port_r )
 {
 	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
-	if ( port_bank < 7 )
-	{
+	if (port_bank < 7)
 		return input_port_read(space->machine,  banknames[port_bank]);
-	}
 
 	/* output is pulled up for non-mapped ports */
 	return 0xff;
@@ -121,12 +119,15 @@ static READ8_HANDLER( cliff_port_r )
 
 static READ8_HANDLER( cliff_phillips_code_r )
 {
-	if ( laserdisc != NULL )
-	{
-		return ( phillips_code >> (8*offset) ) & 0xff;
-	}
+	if (laserdisc != NULL)
+		return (phillips_code >> (8 * offset)) & 0xff;
 
 	return 0x00;
+}
+
+static WRITE8_HANDLER( cliff_phillips_clear_w )
+{
+	/* reset serial to parallel converters */
 }
 
 static WRITE8_HANDLER( cliff_coin_counter_w )
@@ -145,7 +146,7 @@ static READ8_HANDLER( cliff_irq_ack_r )
 static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 {
 	int sound = data & 3;
-	int overlay = ( data & 0x10 ) ? 1 : 0;
+	int overlay = (data & 0x10) ? 1 : 0;
 
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
 	if (overlay)
@@ -160,13 +161,13 @@ static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 	}
 
 	/* audio */
-	discrete_sound_w(device, CLIFF_ENABLE_SND_1, sound&1);
-	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (sound>>1)&1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_1, sound & 1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (sound >> 1) & 1);
 }
 
 static WRITE8_HANDLER( cliff_ldwire_w )
 {
-	laserdisc_line_w(laserdisc,LASERDISC_LINE_CONTROL,(data&1) ? ASSERT_LINE : CLEAR_LINE );
+	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -185,26 +186,29 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	switch (param)
 	{
 		case 17:
-			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE17);
+			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE17, TRUE);
 			param = 18;
 			break;
 
 		case 18:
-			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE18);
+			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE18, TRUE);
 			param = 17;
 			break;
 	}
 
 	/* if we have a valid code, trigger an IRQ */
-	if ( phillips_code & 0x800000 )
+	if (phillips_code & 0x800000)
+	{
+		printf("%2d:code = %06X\n", param, phillips_code);
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	}
 
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param * 2, 0), param);
 }
 
-static void vdp_interrupt (running_machine *machine, int state)
+static void vdp_interrupt(running_machine *machine, int state)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -239,14 +243,14 @@ static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
 	AM_RANGE(0x54, 0x54) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0x55, 0x55) AM_READ(TMS9928A_register_r)
-	AM_RANGE(0x57, 0x57) AM_WRITENOP /* clears the serial->parallel chips of the Phillips code reader. */
+	AM_RANGE(0x57, 0x57) AM_WRITE(cliff_phillips_clear_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
 	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
 	AM_RANGE(0x64, 0x64) AM_WRITENOP /* unused in schematics, may be used as timing delay for IR interface */
 	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w)
 	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w)
-	AM_RANGE(0x6A, 0x6A) AM_WRITENOP /* /LAMP0 (Infrared?) */
-	AM_RANGE(0x6E, 0x6F) AM_WRITE(cliff_test_led_w)
+	AM_RANGE(0x6a, 0x6a) AM_WRITENOP /* /LAMP0 (Infrared?) */
+	AM_RANGE(0x6e, 0x6f) AM_WRITE(cliff_test_led_w)
 ADDRESS_MAP_END
 
 
@@ -732,7 +736,7 @@ ROM_START( cliffhgr )
 	ROM_LOAD( "cliff_u5.bin",	0x8000, 0x2000, CRC(5922e710) SHA1(10637baba4d16dc333aeb0ab88ee251f44e1a115) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "cliffhgr", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "cliffhgr", 0, SHA1(4442995c824d7891a2a19c607bb3301d696fbdc8) )
 ROM_END
 
 ROM_START( cliffhga )
@@ -779,6 +783,6 @@ static DRIVER_INIT( cliff )
  *
  *************************************/
 
-GAME( 1983, cliffhgr, 0, cliffhgr, cliffhgr, cliff, ROT0, "Stern Electronics", "Cliff Hanger", GAME_NO_SOUND | GAME_NOT_WORKING)
-GAME( 1983, cliffhga, 0, cliffhgr, cliffhga, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", GAME_NO_SOUND | GAME_NOT_WORKING)
-GAME( 1983, goaltogo, 0, cliffhgr, goaltogo, cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1983, cliffhgr, 0, cliffhgr, cliffhgr, cliff, ROT0, "Stern Electronics", "Cliff Hanger", 0)
+GAME( 1983, cliffhga, 0, cliffhgr, cliffhga, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", 0)
+GAME( 1983, goaltogo, 0, cliffhgr, goaltogo, cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NOT_WORKING)

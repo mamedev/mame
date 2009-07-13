@@ -474,11 +474,15 @@ int laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
     information read from the disc
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code)
+UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code, UINT8 zero_if_squelched)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	int field = ldcore->fieldnum;
+	
+	/* return nothing if the video is off (external devices can't sense) */
+	if (zero_if_squelched && ldcore->videosquelch)
+		return 0;
 
 	switch (code)
 	{
@@ -817,6 +821,14 @@ static void read_track_data(laserdisc_state *ld)
 	/* cheat and look up the metadata we are about to retrieve */
 	if (ldcore->vbidata != NULL)
 		vbi_metadata_unpack(&vbidata, NULL, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
+	
+	/* if we're in the lead-in area, force the VBI data to be standard lead-in */
+	if (tracknum - 1 < VIRTUAL_LEAD_IN_TRACKS)
+	{
+		vbidata.line16 = 0;
+		vbidata.line17 = vbidata.line18 = vbidata.line1718 = VBI_CODE_LEADIN;
+	}
+//printf("track %5d.%d: %06X %06X %06X\n", tracknum, fieldnum, vbidata.line16, vbidata.line17, vbidata.line18);
 
 	/* if we're about to read the first field in a frame, advance */
 	frame = &ldcore->frame[ldcore->videoindex];
@@ -864,6 +876,13 @@ static void read_track_data(laserdisc_state *ld)
 	/* set the VBI data for the new field from our precomputed data */
 	if (ldcore->vbidata != NULL)
 		vbi_metadata_unpack(&ldcore->metadata[fieldnum], &vbiframe, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
+
+	/* if we're in the lead-in area, force the VBI data to be standard lead-in */
+	if (tracknum - 1 < VIRTUAL_LEAD_IN_TRACKS)
+	{
+		ldcore->metadata[fieldnum].line16 = 0;
+		ldcore->metadata[fieldnum].line17 = ldcore->metadata[fieldnum].line18 = ldcore->metadata[fieldnum].line1718 = VBI_CODE_LEADIN;
+	}
 
 	/* configure the codec and then read */
 	ldcore->readresult = CHDERR_FILE_NOT_FOUND;

@@ -354,9 +354,9 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	UINT32 lines[3];
 
 	/* appears to return data in reverse order */
-	lines[0] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718);
-	lines[1] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE17);
-	lines[2] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16);
+	lines[0] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718, FALSE);
+	lines[1] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE17, FALSE);
+	lines[2] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16, FALSE);
 
 	/* fill in the details */
 	memset(player->vbi, 0, sizeof(player->vbi));
