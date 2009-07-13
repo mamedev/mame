@@ -28,7 +28,13 @@ Logical size    2,1163,248,864
 
 
 The "backup" directory on hard disk was created by me.
-
+ 
+ 
+ -- Hardware info
+ 
+"Its a Pentium II 300MHz or Celeron Slot 1, I forget.
+The Video Card is a Quantum 3D Quad chipped 3DFX Voodoo of some sort.
+The I/O Card is a custom JAMMA to parallel port interface."
 
 */
 
