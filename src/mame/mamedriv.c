@@ -5701,6 +5701,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( qwak )	 	/* (proto)          (c) 1982 */
 	DRIVER( runaway )	/* (proto)          (c) 1982 */
 	DRIVER( bullsdrt )	/* (c) 1985 Shinkai */
+	DRIVER( cmmb162 )
 
 	/* misc Atari games */
 	DRIVER( tunhunt )	/* 136000           (c) 1979 */

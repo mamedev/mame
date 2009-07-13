@@ -400,6 +400,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/centiped.o $(VIDEO)/centiped.o \
 	$(DRIVERS)/cloak.o $(VIDEO)/cloak.o \
 	$(DRIVERS)/cloud9.o $(VIDEO)/cloud9.o \
+	$(DRIVERS)/cmmb.o \
 	$(DRIVERS)/cojag.o $(AUDIO)/jaguar.o $(VIDEO)/jaguar.o \
 	$(DRIVERS)/copsnrob.o $(MACHINE)/copsnrob.o $(VIDEO)/copsnrob.o \
 	$(DRIVERS)/cyberbal.o $(AUDIO)/cyberbal.o $(VIDEO)/cyberbal.o \
