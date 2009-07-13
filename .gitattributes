@@ -1450,6 +1450,7 @@ src/mame/drivers/dec0.c svneol=native#text/plain
 src/mame/drivers/dec8.c svneol=native#text/plain
 src/mame/drivers/deco156.c svneol=native#text/plain
 src/mame/drivers/deco32.c svneol=native#text/plain
+src/mame/drivers/deco_ld.c svneol=native#text/plain
 src/mame/drivers/deco_mlc.c svneol=native#text/plain
 src/mame/drivers/decocass.c svneol=native#text/plain
 src/mame/drivers/deniam.c svneol=native#text/plain

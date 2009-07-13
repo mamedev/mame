@@ -4721,6 +4721,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* UX8 1985.01 Tokyo Mie Shinryoujo Part 2 */
 						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
+	/* Data East LD games */
+	DRIVER( cobra )		/* (c) 1984 */
+	DRIVER( rblaster )	/* (c) 1985 */
+
 	/* other Data East games */
 	DRIVER( madalien )	/* (c) 1980 */
 	DRIVER( madalina )	/* (c) 1980 */
