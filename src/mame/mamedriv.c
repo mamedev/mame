@@ -3516,6 +3516,7 @@ V-V                           TP-027
 	DRIVER( sblazerp )  /* (c) 1983 */
 	DRIVER( cobraseg )  /* (c) ???? */
 	DRIVER( gpworld )	/* (c) 1984 */
+	DRIVER( timetrv )	/* (c) 1991.10 Virtual Image Productions */
 
 	/* Sega SG1000 based games */
 	DRIVER( chboxing )	/* (c) 1984 */
@@ -3920,7 +3921,6 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( spidman )	/* 1991.?? Spiderman (World) */
 	DRIVER( spidmanu )	/* 1991.09 Spiderman (US) */
 						/* 1991.09 Spiderman (Japan) */
-						/* 1991.10 Hologram Time Traveler (Japan) */
 	DRIVER( f1en )		/* 1991.?? F-1 Exhaust Note (World) */
 						/* 1992.01 F-1 Exhaust Note (US) */
 						/* 1991.11 F-1 Exhaust Note (Japan) */
