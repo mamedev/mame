@@ -3221,7 +3221,7 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 			/* search for crosshair graphics */
 
 			/* open a path to the crosshairs */
-			path = mame_openpath(mame_options(), OPTION_CRSSHAIRPATH);
+			path = mame_openpath(mame_options(), OPTION_CROSSHAIRPATH);
 			if (path != NULL)
 			{
 				const osd_directory_entry *dir;

@@ -45,7 +45,7 @@
 #define OPTION_INIPATH				"inipath"
 #define OPTION_FONTPATH				"fontpath"
 #define OPTION_CHEATPATH			"cheatpath"
-#define OPTION_CRSSHAIRPATH			"crsshairpath"
+#define OPTION_CROSSHAIRPATH		"crosshairpath"
 
 /* core directory options */
 #define OPTION_CFG_DIRECTORY		"cfg_directory"
