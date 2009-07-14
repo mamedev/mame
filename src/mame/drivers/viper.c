@@ -744,6 +744,7 @@ ROM_START(jpark3) //*
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
 ROM_END
 
+/* This PCB has sticker B33A02 */
 ROM_START(mocapglf) //*
 	VIPER_BIOS
 
@@ -887,7 +888,16 @@ ROM_START(thrild2a) //*
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
-//todo: thrild2c
+/* This PCB has sticker 941EAA02 */
+ROM_START(thrild2c) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, NO_DUMP )
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "a41c02", 0, SHA1(ab3020e8709768c0fd2467573e92b679a05944e5) )
+ROM_END
 
 ROM_START(tsurugi) //*
 	VIPER_BIOS
@@ -909,6 +919,7 @@ ROM_START(tsurugij) //*
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
+/* This PCB has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
 
@@ -996,6 +1007,7 @@ For non-dongled games, I have verified the following games will work when the
 CF card and NVRAM are swapped....
 */
 
+/* This PCB has sticker C09JAD04 */
 ROM_START(mfightc) //*
 	VIPER_BIOS
 
@@ -1007,6 +1019,7 @@ ROM_START(mfightc) //*
 	DISK_IMAGE( "c09d04", 0, SHA1(7395b7a33e953f65827aea44461e49f8388464fb) )
 ROM_END
 
+/* This PCB has sticker C09JAC04 */
 ROM_START(mfightcc) //*
 	VIPER_BIOS
 
@@ -1044,6 +1057,7 @@ GAME(2001, sscopex,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Silent Sc
 GAME(2001, sogeki,    sscopex,   viper, 0, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, thrild2,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, thrild2a,  thrild2,   viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, thrild2c,  thrild2,   viper, 0, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, tsurugi,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, tsurugij,  tsurugi,   viper, 0, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2002, wcombat,   kviper,    viper, 0, vipercf,  ROT0,  "Konami", "World Combat (ver UAA?)", GAME_NOT_WORKING|GAME_NO_SOUND)

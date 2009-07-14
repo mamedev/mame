@@ -3248,6 +3248,7 @@ V-V                           TP-027
 	DRIVER( sogeki )		/* 2001 */
 	DRIVER( thrild2 )		/* 2001 */
 	DRIVER( thrild2a )		/* 2001 */
+	DRIVER( thrild2c )		/* 2001 */
 	DRIVER( tsurugi )		/* 2001 */
 	DRIVER( tsurugij )		/* 2001 */
 	DRIVER( wcombat )		/* 2002 */
