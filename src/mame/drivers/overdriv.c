@@ -163,7 +163,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
@@ -211,12 +211,12 @@ static WRITE16_HANDLER( overdriv_soundirq_w )
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 5, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sub", 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 6, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sub", 6, HOLD_LINE);
 }
 
 
