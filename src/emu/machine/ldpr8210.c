@@ -54,11 +54,12 @@
 
 /* serial timing, mostly from the service manual, derived from the XTAL */
 #define SERIAL_CLOCK					XTAL_455kHz
-#define SERIAL_0_BIT_TIME				ATTOTIME_IN_HZ(SERIAL_CLOCK / 512)
-#define SERIAL_1_BIT_TIME				ATTOTIME_IN_HZ(SERIAL_CLOCK / 1024)
-#define SERIAL_MIDPOINT_TIME			ATTOTIME_IN_HZ(SERIAL_CLOCK / 600)
-#define SERIAL_MAX_WORD_TIME			ATTOTIME_IN_HZ(SERIAL_CLOCK / 11520)
-#define SERIAL_REJECT_DUPLICATE_TIME	ATTOTIME_IN_HZ(SERIAL_CLOCK / 11520 / 4)
+#define SERIAL_0_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 512)
+#define SERIAL_1_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 1024)
+#define SERIAL_MIDPOINT_TIME			ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 600)
+#define SERIAL_MAX_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 4096)
+#define SERIAL_MAX_WORD_TIME			ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 11520)
+#define SERIAL_REJECT_DUPLICATE_TIME	ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 11520 / 4)
 
 
 
@@ -450,23 +451,23 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 	if (prev != ASSERT_LINE && data == ASSERT_LINE)
 	{
 		attotime curtime = timer_get_time(ld->device->machine);
-		attotime delta;
+		attotime delta, overalldelta;
 		int longpulse;
 
+		/* get the time difference from the last assert */
+		/* and update our internal command time */
+		delta = attotime_sub(curtime, player->lastbittime);
+		player->lastbittime = curtime;
+
 		/* if we timed out since the first bit, reset the accumulator */
-		delta = attotime_sub(curtime, player->firstbittime);
-		if (attotime_compare(delta, SERIAL_MAX_WORD_TIME) > 0)
+		overalldelta = attotime_sub(curtime, player->firstbittime);
+		if (attotime_compare(overalldelta, SERIAL_MAX_WORD_TIME) > 0 || attotime_compare(delta, SERIAL_MAX_BIT_TIME) > 0)
 		{
 			player->firstbittime = curtime;
 			player->accumulator = 0x5555;
 			if (LOG_SERIAL)
 				printf("Reset accumulator\n");
 		}
-
-		/* get the time difference from the last assert */
-		/* and update our internal command time */
-		delta = attotime_sub(curtime, player->lastbittime);
-		player->lastbittime = curtime;
 
 		/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
 		longpulse = (attotime_compare(delta, SERIAL_MIDPOINT_TIME) < 0) ? 0 : 1;
@@ -501,11 +502,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 			/* log the command and wait for a keypress */
 			if (LOG_SERIAL)
-			{
 				printf("--- Command = %02X\n", player->pia.porta >> 3);
-//				while (input_code_pressed(KEYCODE_ENTER)) ;
-//				while (!input_code_pressed(KEYCODE_ENTER)) ;
-			}
 
 			/* reset the first bit time so that the accumulator clears on the next write */
 			player->firstbittime = attotime_sub(curtime, SERIAL_MAX_WORD_TIME);
