@@ -2636,8 +2636,8 @@ static void video_update_burnin(running_machine *machine)
 			int dstheight = state->burnin->height;
 			int xstep = (srcwidth << 16) / dstwidth;
 			int ystep = (srcheight << 16) / dstheight;
-			int xstart = (rand() % 32767) * xstep / 32767;
-			int ystart = (rand() % 32767) * ystep / 32767;
+			int xstart = ((UINT32)rand() % 32767) * xstep / 32767;
+			int ystart = ((UINT32)rand() % 32767) * ystep / 32767;
 			int srcx, srcy;
 			int x, y;
 
