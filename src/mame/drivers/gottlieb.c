@@ -468,7 +468,7 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param * 2, 0), param);
 }
 
 
