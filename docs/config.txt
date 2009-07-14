@@ -329,7 +329,7 @@ Core search path options
 	paths can be specified by separating them with semicolons. The default
 	is '.' (that is, search in the same directory as the MAME executable).
 
--crsshairpath <path>
+-crosshairpath <path>
 
 	Specifies a list of paths within which to find crosshair files. Multiple
 	paths can be specified by separating them with semicolons. The default
