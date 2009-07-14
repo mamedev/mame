@@ -834,14 +834,14 @@ ROM_START(p9112) //*
 	DISK_IMAGE( "b11a02", 0, SHA1(57665664321b78c1913d01f0d2c0b8d3efd42e04) )
 ROM_END
 
-ROM_START(popn9) //*
+ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-based) move out of here.
 	VIPER_BIOS
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) ) //missing bootloader
+	DISK_IMAGE( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
 
 ROM_START(sscopex)
@@ -851,7 +851,7 @@ ROM_START(sscopex)
 	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gka13c02", 0, SHA1(53ae5cd4ff38581816502b0fe7d0fcf1b6364a93) )
+	DISK_IMAGE( "a13c02", 0, SHA1(d740784fa51a3f43695ea95e23f92ef05f43284a) )
 ROM_END
 
 //TODO: sscopexb + many nvram clone versions.
@@ -871,7 +871,7 @@ ROM_START(thrild2) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
-//a41eba_nvram == a41ebb_nvram
+//	a41eba_nvram == a41ebb_nvram
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
