@@ -744,7 +744,7 @@ ROM_START(jpark3) //*
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
 ROM_END
 
-/* This PCB has sticker B33A02 */
+/* This CF card has sticker B33A02 */
 ROM_START(mocapglf) //*
 	VIPER_BIOS
 
@@ -888,7 +888,7 @@ ROM_START(thrild2a) //*
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
-/* This PCB has sticker 941EAA02 */
+/* This CF card has sticker 941EAA02 */
 ROM_START(thrild2c) //*
 	VIPER_BIOS
 
@@ -919,7 +919,7 @@ ROM_START(tsurugij) //*
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
-/* This PCB has sticker C22D02 */
+/* This CF card has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
 
@@ -1007,7 +1007,7 @@ For non-dongled games, I have verified the following games will work when the
 CF card and NVRAM are swapped....
 */
 
-/* This PCB has sticker C09JAD04 */
+/* This CF card has sticker C09JAD04 */
 ROM_START(mfightc) //*
 	VIPER_BIOS
 
@@ -1019,7 +1019,7 @@ ROM_START(mfightc) //*
 	DISK_IMAGE( "c09d04", 0, SHA1(7395b7a33e953f65827aea44461e49f8388464fb) )
 ROM_END
 
-/* This PCB has sticker C09JAC04 */
+/* This CF card has sticker C09JAC04 */
 ROM_START(mfightcc) //*
 	VIPER_BIOS
 
