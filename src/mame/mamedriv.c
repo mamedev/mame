@@ -274,9 +274,9 @@ const game_driver * const drivers[] =
 	DRIVER( sfx )		/* (c) 1983 Nichibutsu */
 	DRIVER( skelagon )	/* (c) 1983 Nichibutsu USA */
 	DRIVER( monsterz )	/* (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top) */
-	DRIVER( mimonscr )	/* Universal Video Games */
-	DRIVER( mimonkey )	/* bootleg */
-	DRIVER( mimonsco )	/* bootleg */
+	DRIVER( mimonscr )	/* (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)*/
+	DRIVER( mimonkey )	/* (c) 1982 bootleg */
+	DRIVER( mimonsco )	/* (c) 1982 bootleg */
 	DRIVER( scobra )	/* GX316 (c) 1981 Konami */
 	DRIVER( scobras )	/* GX316 (c) 1981 Stern */
 	DRIVER( scobrase )	/* GX316 (c) 1981 Stern */

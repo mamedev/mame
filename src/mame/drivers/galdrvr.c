@@ -5225,7 +5225,7 @@ GAME( 1981, moonwara, moonwar,  moonwar,  moonwara, moonwar,  ROT90,  "Stern", "
 //GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1984, hncholms, huncholy, theend  /*hncholms*/, hncholms, scramble_ppi, ROT90, "Century Electronics", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, cavelon,  0,        theend  /*cavelon*/,  cavelon,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
-//GAME( 198?, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, ad2083,   0,        theend  /*ad2083*/,   ad2083,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 //GAME( 1981, turpins,  turtles,  turtles,  turpins,  0,              ROT90, "[Sega] (bootleg)", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
@@ -5242,8 +5242,8 @@ GAME( 1981, moonwara, moonwar,  moonwar,  moonwara, moonwar,  ROT90,  "Stern", "
 //GAME( 1981, hustler,  0,        scobra/*hustler*/,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 //GAME( 1981, billiard, hustler,  scobra/*hustler*/,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
 //GAME( 1981, hustlerb, hustler,  scobra/*hustlerb*/, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 198?, mimonkey, 0,      scobra/*mimonkey*/, mimonkey,   mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
-//GAME( 198?, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonkey, 0,        scobra/*mimonkey*/, mimonkey, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
 /* currently in dambustr.c and should be moved here */
 //GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US)", 0 )
