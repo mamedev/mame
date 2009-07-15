@@ -117,7 +117,7 @@ static void ojankohs_adpcm_int(const device_config *device)
 
 	/* generate an NMI if we're out of data */
 	if (!ojankohs_vclk_left)
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
