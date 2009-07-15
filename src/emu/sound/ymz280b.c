@@ -936,6 +936,7 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 		return compute_status(chip);
 }
 
+
 WRITE8_DEVICE_HANDLER( ymz280b_w )
 {
 	ymz280b_state *chip = get_safe_token(device);
@@ -946,25 +947,7 @@ WRITE8_DEVICE_HANDLER( ymz280b_w )
 		write_to_register(chip, data);
 }
 
-READ16_DEVICE_HANDLER( ymz280b_word_r )
-{
-	ymz280b_state *chip = get_safe_token(device);
 
-	if (ACCESSING_BITS_8_15)
-		return devcb_call_read8(&chip->ext_ram_read, chip->rom_readback_addr++ - 1) << 8;
-	else
-		return compute_status(chip);
-}
-
-WRITE16_DEVICE_HANDLER( ymz280b_word_w )
-{
-	ymz280b_state *chip = get_safe_token(device);
-
-	if (ACCESSING_BITS_8_15)
-		chip->current_register = data >> 8;
-	else
-		write_to_register(chip, data);
-}
 
 /**************************************************************************
  * Generic get_info

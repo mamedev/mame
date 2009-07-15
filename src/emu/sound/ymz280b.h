@@ -22,8 +22,6 @@ struct _ymz280b_interface
 
 READ8_DEVICE_HANDLER ( ymz280b_r );
 WRITE8_DEVICE_HANDLER( ymz280b_w );
-READ16_DEVICE_HANDLER ( ymz280b_word_r );
-WRITE16_DEVICE_HANDLER( ymz280b_word_w );
 
 DEVICE_GET_INFO( ymz280b );
 #define SOUND_YMZ280B DEVICE_GET_INFO_NAME( ymz280b )
