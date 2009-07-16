@@ -849,7 +849,7 @@ ROM_START( tehkanwcc )
 	ROM_LOAD( "e12.bin",   0x00000, 0x4000, CRC(a9e274f8) SHA1(02b46e1b149a856f0be74a23faaeb792935b66c7) )	/* fg tiles */
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "e7.bin",    0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) )	/* sprites */
+	ROM_LOAD( "e8.bin",    0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) )	/* sprites */
 	ROM_LOAD( "e7.bin",    0x08000, 0x8000, CRC(59faebe7) SHA1(85dad90928369601e039467d575750539410fcf6) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
