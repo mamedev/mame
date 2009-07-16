@@ -3673,6 +3673,7 @@ src/tools/ldverify.c svneol=native#text/plain
 src/tools/regrep.c svneol=native#text/plain
 src/tools/romcmp.c svneol=native#text/plain
 src/tools/runtest.cmd svneol=CRLF#text/plain eol=crlf
+src/tools/split.c svneol=native#text/plain
 src/tools/src2html.c svneol=native#text/plain
 src/tools/srcclean.c svneol=native#text/plain
 src/tools/tools.mak svneol=native#text/plain
