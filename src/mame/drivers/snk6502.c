@@ -1,7 +1,7 @@
 /***************************************************************************
 
     Sasuke vs. Commander
-    SNK/Rock-Ola
+    SNK
 
     driver by ?
 
@@ -268,7 +268,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
-#include "rockola.h"
+#include "snk6502.h"
 
 
 #define MASTER_CLOCK	XTAL_11_289MHz
@@ -306,9 +306,9 @@ static void sasuke_start_counter(running_machine *machine)
  *
  *************************************/
 
-static CUSTOM_INPUT( rockola_music0_r )
+static CUSTOM_INPUT( snk6502_music0_r )
 {
-	return (rockola_music0_playing() ? 0x01 : 0x00);
+	return (snk6502_music0_playing() ? 0x01 : 0x00);
 }
 
 static CUSTOM_INPUT( sasuke_count_r )
@@ -325,10 +325,10 @@ static CUSTOM_INPUT( sasuke_count_r )
 
 static ADDRESS_MAP_START( sasuke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
@@ -344,10 +344,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( satansat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
@@ -363,20 +363,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanguard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x3100, 0x3102) AM_WRITE(vanguard_sound_w)
-	AM_RANGE(0x3103, 0x3103) AM_WRITE(rockola_flipscreen_w)
+	AM_RANGE(0x3103, 0x3103) AM_WRITE(snk6502_flipscreen_w)
 	AM_RANGE(0x3104, 0x3104) AM_READ_PORT("IN0")
 	AM_RANGE(0x3105, 0x3105) AM_READ_PORT("IN1")
 	AM_RANGE(0x3106, 0x3106) AM_READ_PORT("DSW")
 	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(rockola_scrollx_w)
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(rockola_scrolly_w)
+	AM_RANGE(0x3200, 0x3200) AM_WRITE(snk6502_scrollx_w)
+	AM_RANGE(0x3300, 0x3300) AM_WRITE(snk6502_scrolly_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(vanguard_speech_w)	// speech
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
@@ -384,10 +384,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x2100, 0x2103) AM_WRITE(fantasy_sound_w)
@@ -395,8 +395,8 @@ static ADDRESS_MAP_START( fantasy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2105, 0x2105) AM_READ_PORT("IN1")
 	AM_RANGE(0x2106, 0x2106) AM_READ_PORT("DSW")
 	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(rockola_scrollx_w)
-	AM_RANGE(0x2300, 0x2300) AM_WRITE(rockola_scrolly_w)
+	AM_RANGE(0x2200, 0x2200) AM_WRITE(snk6502_scrollx_w)
+	AM_RANGE(0x2300, 0x2300) AM_WRITE(snk6502_scrolly_w)
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(fantasy_speech_w)	// speech
 	AM_RANGE(0x3000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -404,10 +404,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pballoon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE(&snk6502_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE(&snk6502_charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -416,8 +416,8 @@ static ADDRESS_MAP_START( pballoon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb105, 0xb105) AM_READ_PORT("IN1")
 	AM_RANGE(0xb106, 0xb106) AM_READ_PORT("DSW")
 	AM_RANGE(0xb107, 0xb107) AM_READ_PORT("IN2")
-	AM_RANGE(0xb200, 0xb200) AM_WRITE(rockola_scrollx_w)
-	AM_RANGE(0xb300, 0xb300) AM_WRITE(rockola_scrolly_w)
+	AM_RANGE(0xb200, 0xb200) AM_WRITE(snk6502_scrollx_w)
+	AM_RANGE(0xb300, 0xb300) AM_WRITE(snk6502_scrolly_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -428,7 +428,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static INPUT_PORTS_START( rockola_generic_joy8way )
+static INPUT_PORTS_START( snk6502_generic_joy8way )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rockola_music0_r, NULL)     /* music0 playing */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk6502_music0_r, NULL)     /* music0 playing */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
@@ -548,7 +548,7 @@ static INPUT_PORTS_START( sasuke )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vanguard )
-	PORT_INCLUDE(rockola_generic_joy8way)
+	PORT_INCLUDE(snk6502_generic_joy8way)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )                /* fire down */
@@ -563,11 +563,11 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL  /* fire left */
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rockola_music0_r, NULL)     /* music0 playing */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk6502_music0_r, NULL)     /* music0 playing */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasy )
-	PORT_INCLUDE(rockola_generic_joy8way)
+	PORT_INCLUDE(snk6502_generic_joy8way)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasyu )
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( fantasyu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pballoon )
-	PORT_INCLUDE(rockola_generic_joy8way)
+	PORT_INCLUDE(snk6502_generic_joy8way)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( pballoon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nibbler )
-	PORT_INCLUDE(rockola_generic_joy8way)
+	PORT_INCLUDE(snk6502_generic_joy8way)
 
 	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
        with a "Vanguard" cabinet so they have been mapped with debug features. */
@@ -737,7 +737,7 @@ static INTERRUPT_GEN( satansat_interrupt )
 		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
-static INTERRUPT_GEN( rockola_interrupt )
+static INTERRUPT_GEN( snk6502_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
@@ -784,12 +784,12 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_RESET( sasuke )
 {
-	//rockola_set_music_clock(M_LN2 * (RES_K(1) + RES_K(10) * 2) * CAP_U(1));
+	//snk6502_set_music_clock(M_LN2 * (RES_K(1) + RES_K(10) * 2) * CAP_U(1));
 	// adjusted
-	rockola_set_music_clock(1 / 72.1);
+	snk6502_set_music_clock(1 / 72.1);
 
 	// adjusted
-	rockola_set_music_freq(38000);
+	snk6502_set_music_freq(38000);
 
 	sasuke_start_counter(machine);
 }
@@ -797,7 +797,7 @@ static MACHINE_RESET( sasuke )
 static MACHINE_RESET( satansat )
 {
 	// same as sasuke
-	rockola_set_music_freq(38000);
+	snk6502_set_music_freq(38000);
 
 	sasuke_start_counter(machine);
 }
@@ -805,13 +805,13 @@ static MACHINE_RESET( satansat )
 static MACHINE_RESET( vanguard )
 {
 	// 41.6 Hz update (measured)
-	rockola_set_music_clock(1 / 41.6);
+	snk6502_set_music_clock(1 / 41.6);
 }
 
 static MACHINE_RESET( pballoon )
 {
 	// 40.3 Hz update (measured)
-	rockola_set_music_clock(1 / 40.3);
+	snk6502_set_music_clock(1 / 40.3);
 }
 
 
@@ -843,14 +843,14 @@ static MACHINE_DRIVER_START( sasuke )
 
 	MDRV_PALETTE_INIT(satansat)
 	MDRV_VIDEO_START(satansat)
-	MDRV_VIDEO_UPDATE(rockola)
+	MDRV_VIDEO_UPDATE(snk6502)
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("rockola", ROCKOLA, 0)
+	MDRV_SOUND_ADD("snk6502", snk6502, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -899,7 +899,7 @@ static MACHINE_DRIVER_START( vanguard )
 	//MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MDRV_CPU_ADD("maincpu", M6502, 930000)		// adjusted
 	MDRV_CPU_PROGRAM_MAP(vanguard_map)
-	MDRV_CPU_VBLANK_INT_HACK(rockola_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(snk6502_interrupt, 2)
 
 	MDRV_MACHINE_RESET(vanguard)
 
@@ -915,16 +915,16 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_GFXDECODE(vanguard)
 	MDRV_PALETTE_LENGTH(64)
 
-	MDRV_PALETTE_INIT(rockola)
-	MDRV_VIDEO_START(rockola)
-	MDRV_VIDEO_UPDATE(rockola)
+	MDRV_PALETTE_INIT(snk6502)
+	MDRV_VIDEO_START(snk6502)
+	MDRV_VIDEO_UPDATE(snk6502)
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("rockola", ROCKOLA, 0)
+	MDRV_SOUND_ADD("snk6502", snk6502, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -1011,7 +1011,7 @@ ROM_START( sasuke )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sasuke.clr",   0x0000, 0x0020, CRC(b70f34c1) SHA1(890cfbb25e14112713ba7900b9cd56554a8bc1ec) )
 
-	ROM_REGION( 0x1000, "rockola", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
 	ROM_LOAD( "sc11",         0x0000, 0x0800, CRC(24a0e121) SHA1(e3cde355309de6678026d595955297258f069946) )
 ROM_END
 
@@ -1037,7 +1037,7 @@ ROM_START( satansat )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "zarz138.03",   0x0000, 0x0020, CRC(5dd6933a) SHA1(417d827d9e47b6db01fecc2164e5ef332d4cd70e) )
 
-	ROM_REGION( 0x1000, "rockola", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
 	ROM_LOAD( "ss12",         0x0000, 0x0800, CRC(dee01f24) SHA1(92c8545226a31412239dad4aa2715b51264ad22e) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
@@ -1064,7 +1064,7 @@ ROM_START( satansaa )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "zarz138.03",   0x0000, 0x0020, CRC(5dd6933a) SHA1(417d827d9e47b6db01fecc2164e5ef332d4cd70e) )
 
-	ROM_REGION( 0x1000, "rockola", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
 	ROM_LOAD( "ic53.bin",   0x0000, 0x0800, CRC(8cb95a6b) SHA1(41d3986f1c2876a914b0087127ae99e9a2b41564) ) // different
 	ROM_LOAD( "ic54.bin",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
@@ -1091,7 +1091,7 @@ ROM_START( zarzon )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "zarz138.03",   0x0000, 0x0020, CRC(5dd6933a) SHA1(417d827d9e47b6db01fecc2164e5ef332d4cd70e) )
 
-	ROM_REGION( 0x1000, "rockola", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
 	ROM_LOAD( "zarz133.53",   0x0000, 0x0800, CRC(b253cf78) SHA1(56a73b22ed2866222c407a3e9b51b8e0c92cf2aa) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
@@ -1116,7 +1116,7 @@ ROM_START( vanguard )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* sound ROM 1 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
 
@@ -1147,7 +1147,7 @@ ROM_START( vangrdce )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* confirmed, 6/21/05 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* confirmed, 6/21/05 */
 
@@ -1178,7 +1178,7 @@ ROM_START( vanguarj )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* sound ROM 1 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
 
@@ -1210,7 +1210,7 @@ ROM_START( fantasyu )
 	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
 	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
@@ -1243,7 +1243,7 @@ ROM_START( fantasy )
 	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
 	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
@@ -1276,7 +1276,7 @@ ROM_START( fantasyj )
 	ROM_LOAD( "prom-8.bpr",   0x0000, 0x0020, CRC(1aa9285a) SHA1(d503aa76ca0cf032c7b1c962abc59677c41a2c62) ) /* foreground colors */
 	ROM_LOAD( "prom-7.bpr",   0x0020, 0x0020, CRC(7a6f7dc3) SHA1(e15d898275d1cd205cc2d28f7dd9df653594039e) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
@@ -1307,7 +1307,7 @@ ROM_START( pballoon )
 	ROM_LOAD( "sk8_ic7.bin",  0x0000, 0x0020, CRC(ef6c82a0) SHA1(95b522d6389f25bf5fa2fca5f3f826ef43b2885b) ) /* foreground colors */
 	ROM_LOAD( "sk8_ic6.bin",  0x0020, 0x0020, CRC(eabc6a00) SHA1(942af5e22e49e578c6a24651476e3b60d40e2076) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "sk7_ic52.bin", 0x0800, 0x0800, CRC(5d6d68ea) SHA1(d3e03720eff5c85c1c2fb1d4bf960f45a99dc86a) )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
@@ -1334,7 +1334,7 @@ ROM_START( nibbler )
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
@@ -1361,7 +1361,7 @@ ROM_START( nibblera )
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
@@ -1388,7 +1388,7 @@ ROM_START( nibblerb )
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) // not in this set / board according to readme but it seems to be needed?!
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) ) // 50-152.052
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) ) // 50-151.053
@@ -1415,7 +1415,7 @@ ROM_START( nibblero )
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "rockola", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "g-0959-43.ic51", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )

@@ -14,7 +14,7 @@
 #include "streams.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
-#include "rockola.h"
+#include "snk6502.h"
 #include "sound/discrete.h"
 
 
@@ -377,7 +377,7 @@ INLINE void validate_tone_channel(running_machine *machine, int channel)
 {
 	if (!tone_channels[channel].mute)
 	{
-		UINT8 *ROM = memory_region(machine, "rockola");
+		UINT8 *ROM = memory_region(machine, "snk6502");
 		UINT8 romdata = ROM[tone_channels[channel].base + tone_channels[channel].offset];
 
 		if (romdata != 0xff)
@@ -387,7 +387,7 @@ INLINE void validate_tone_channel(running_machine *machine, int channel)
 	}
 }
 
-static STREAM_UPDATE( rockola_tone_update )
+static STREAM_UPDATE( snk6502_tone_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	int i;
@@ -596,7 +596,7 @@ static void build_waveform(int channel, int mask)
 		tone_channels[channel].form[i] *= 65535 / 160;
 }
 
-void rockola_set_music_freq(int freq)
+void snk6502_set_music_freq(int freq)
 {
 	int i;
 
@@ -614,37 +614,37 @@ void rockola_set_music_freq(int freq)
 	}
 }
 
-void rockola_set_music_clock(double clock_time)
+void snk6502_set_music_clock(double clock_time)
 {
 	tone_clock_expire = clock_time * SAMPLE_RATE * FRAC_ONE;
 	tone_clock = 0;
 }
 
-static DEVICE_START( rockola_sound )
+static DEVICE_START( snk6502_sound )
 {
 	// adjusted
-	rockola_set_music_freq(43000);
+	snk6502_set_music_freq(43000);
 
 	// 38.99 Hz update (according to schematic)
-	rockola_set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
+	snk6502_set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
+	tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
 }
 
-DEVICE_GET_INFO( rockola_sound )
+DEVICE_GET_INFO( snk6502_sound )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(rockola_sound);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(snk6502_sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Rockola Custom");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "snk6502 Custom");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 	}
 }
 
-int rockola_music0_playing(void)
+int snk6502_music0_playing(void)
 {
 	return tone_channels[0].mute;
 }
@@ -982,7 +982,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		tone_channels[2].mask = 0xff;
 
-		rockola_flipscreen_w(space, 0, data);
+		snk6502_flipscreen_w(space, 0, data);
 		break;
 	}
 }
@@ -1018,7 +1018,7 @@ static int	hd38880_data_bytes;
 static double	hd38880_speed;
 
 
-static void rockola_speech_w(running_machine *machine, UINT8 data, const UINT16 *table, int start)
+static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 *table, int start)
 {
 	/*
         bit description
@@ -1183,7 +1183,7 @@ WRITE8_HANDLER( vanguard_speech_w )
 		0x054ce
 	};
 
-	rockola_speech_w(space->machine, data, vanguard_table, 2);
+	snk6502_speech_w(space->machine, data, vanguard_table, 2);
 }
 
 WRITE8_HANDLER( fantasy_speech_w )
@@ -1208,5 +1208,5 @@ WRITE8_HANDLER( fantasy_speech_w )
 		0
 	};
 
-	rockola_speech_w(space->machine, data, fantasy_table, 0);
+	snk6502_speech_w(space->machine, data, fantasy_table, 0);
 }

@@ -7,11 +7,11 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "includes/rockola.h"
+#include "includes/snk6502.h"
 
 
-UINT8 *rockola_videoram2;
-UINT8 *rockola_charram;
+UINT8 *snk6502_videoram2;
+UINT8 *snk6502_charram;
 
 static int charbank;
 static int backcolor;
@@ -33,7 +33,7 @@ static rgb_t palette[64];
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
-PALETTE_INIT( rockola )
+PALETTE_INIT( snk6502 )
 {
 	int i;
 
@@ -84,36 +84,36 @@ PALETTE_INIT( rockola )
 	}
 }
 
-WRITE8_HANDLER( rockola_videoram_w )
+WRITE8_HANDLER( snk6502_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( rockola_videoram2_w )
+WRITE8_HANDLER( snk6502_videoram2_w )
 {
-	rockola_videoram2[offset] = data;
+	snk6502_videoram2[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( rockola_colorram_w )
+WRITE8_HANDLER( snk6502_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( rockola_charram_w )
+WRITE8_HANDLER( snk6502_charram_w )
 {
-	if (rockola_charram[offset] != data)
+	if (snk6502_charram[offset] != data)
 	{
-		rockola_charram[offset] = data;
+		snk6502_charram[offset] = data;
 		gfx_element_mark_dirty(space->machine->gfx[0], (offset/8) % 256);
 	}
 }
 
 
-WRITE8_HANDLER( rockola_flipscreen_w )
+WRITE8_HANDLER( snk6502_flipscreen_w )
 {
 	int bank;
 
@@ -148,12 +148,12 @@ WRITE8_HANDLER( rockola_flipscreen_w )
 	}
 }
 
-WRITE8_HANDLER( rockola_scrollx_w )
+WRITE8_HANDLER( snk6502_scrollx_w )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, data);
 }
 
-WRITE8_HANDLER( rockola_scrolly_w )
+WRITE8_HANDLER( snk6502_scrolly_w )
 {
 	tilemap_set_scrolly(bg_tilemap, 0, data);
 }
@@ -169,23 +169,23 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = rockola_videoram2[tile_index];
+	int code = snk6502_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x07;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-VIDEO_START( rockola )
+VIDEO_START( snk6502 )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
-	gfx_element_set_source(machine->gfx[0], rockola_charram);
+	gfx_element_set_source(machine->gfx[0], snk6502_charram);
 }
 
-VIDEO_UPDATE( rockola )
+VIDEO_UPDATE( snk6502 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
@@ -289,7 +289,7 @@ static TILE_GET_INFO( satansat_get_bg_tile_info )
 
 static TILE_GET_INFO( satansat_get_fg_tile_info )
 {
-	int code = rockola_videoram2[tile_index];
+	int code = snk6502_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x03;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -302,5 +302,5 @@ VIDEO_START( satansat )
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
-	gfx_element_set_source(machine->gfx[0], rockola_charram);
+	gfx_element_set_source(machine->gfx[0], snk6502_charram);
 }
