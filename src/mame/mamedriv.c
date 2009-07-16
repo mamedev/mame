@@ -416,7 +416,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( jangou )	/* (c) 1983 */
 	DRIVER( macha )		/* (c) 1983 Logitec */
-	/* Jangou Night   */	/* (c) 1983 */
+	/* Jangou Night   *//* (c) 1983 */
 	DRIVER( jngolady )	/* (c) 1984 */
 	DRIVER( cntrygrl )	/* (c) 1984 Royal Denshi */
 	DRIVER( fruitbun )	/* (c) 1984 */
@@ -1157,7 +1157,7 @@ const game_driver * const drivers[] =
 	/* Midway 8080 b/w games */
 	DRIVER( seawolf )	/* 596 [1976] */
 	DRIVER( gunfight )	/* 597 [1975] */
-				/* 603 - Top Gun [1976] */
+						/* 603 - Top Gun [1976] */
 	DRIVER( tornbase )	/* 605 [1976] */
 	DRIVER( 280zzzap )	/* 610 [1976] */
 	DRIVER( maze )		/* 611 [1976] */
@@ -1171,7 +1171,7 @@ const game_driver * const drivers[] =
 	DRIVER( m4 )		/* 626 [1977] */
 	DRIVER( clowns )	/* 630 [1978] */
 	DRIVER( clowns1 )	/* 630 [1978] */
-				/* 640 - Space Walk [1978] */
+						/* 640 - Space Walk [1978] */
 	DRIVER( einning )	/* 642 [1978] Midway */
 	DRIVER( shuffle )	/* 643 [1978] */
 	DRIVER( dogpatch )	/* 644 [1977] */
@@ -1184,7 +1184,7 @@ const game_driver * const drivers[] =
 	DRIVER( invadpt2 )	/* 852 [1980] Taito */
 	DRIVER( invaddlx )	/* 852 [1980] Midway */
 	DRIVER( moonbase )	/* Zeta - Nichibutsu */
-				/* 870 - Space Invaders Deluxe cocktail */
+						/* 870 - Space Invaders Deluxe cocktail */
 	DRIVER( searthin )	/* bootleg */
 	DRIVER( searthia )	/* bootleg */
 	DRIVER( invadrmr )	/* (c) 1978 Model Racing */
@@ -1250,7 +1250,7 @@ const game_driver * const drivers[] =
 	DRIVER( sspeedr )	/* 1979 Midway */
 
 	/* Similar but with a M6800 instead of an 8080 */
-	DRIVER( sflush ) /* (c)1979 Taito */
+	DRIVER( sflush )	/* (c)1979 Taito */
 
 	/* Meadows S2650 games */
 	DRIVER( lazercmd )	/* [1976?] */
@@ -1960,7 +1960,7 @@ const game_driver * const drivers[] =
 	DRIVER( thundfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltryua )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryua )/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltryj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */
@@ -2444,8 +2444,8 @@ V-V                           TP-027
 	DRIVER( 1943 )		/*  6/1987 (c) 1987 (US) */
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
-	DRIVER( blktigerb1 )	/* bootleg */
-	DRIVER( blktigerb2 )	/* bootleg */
+	DRIVER( blktigerb1 )/* bootleg */
+	DRIVER( blktigerb2 )/* bootleg */
 	DRIVER( blkdrgon )	/*  8/1987 (c) 1987 (Japan) */
 	DRIVER( blkdrgonb )	/* bootleg, hacked to say Black Tiger */
 	DRIVER( sf )		/*  8/1987 (c) 1987 (World) */
@@ -3227,37 +3227,37 @@ V-V                           TP-027
 	DRIVER( bmiidx8 )
 
 	/* Konami Viper games */
-	DRIVER( kviper )		/* 1999 */
-	DRIVER( ppp2nd )		/* 2001 */
-	DRIVER( boxingm )		/* 2001 */
-	DRIVER( code1d )		/* 2000 */
-	DRIVER( code1db )		/* 2000 */
-	DRIVER( gticlub2 )		/* 2001 */
-	DRIVER( gticlub2ea )		/* 2001 */
-	DRIVER( jpark3 )		/* 2001 */
-	DRIVER( mocapglf )		/* 2001 */
-	DRIVER( mocapb )		/* 2001 */
-	DRIVER( mocapbj )		/* 2001 */
-	DRIVER( p911 )			/* 2001 */
-	DRIVER( p911uc )		/* 2001 */
-	DRIVER( p911kc )		/* 2001 */
-	DRIVER( p911e )			/* 2001 */
-	DRIVER( p911j )			/* 2001 */
-	DRIVER( p9112 )			/* 2001 */
-	DRIVER( popn9 )			/* 2003 */
-	DRIVER( sscopex )		/* 2001 */
-	DRIVER( sogeki )		/* 2001 */
-	DRIVER( thrild2 )		/* 2001 */
-	DRIVER( thrild2a )		/* 2001 */
-	DRIVER( thrild2c )		/* 2001 */
-	DRIVER( tsurugi )		/* 2001 */
-	DRIVER( tsurugij )		/* 2001 */
-	DRIVER( wcombat )		/* 2002 */
-	DRIVER( wcombatk )		/* 2002 */
-	DRIVER( wcombatj )		/* 2002 */
-	DRIVER( xtrial )		/* 2002 */
-	DRIVER( mfightc )		/* 2002 */
-	DRIVER( mfightcc )		/* 2002 */
+	DRIVER( kviper )	/* 1999 */
+	DRIVER( ppp2nd )	/* 2001 */
+	DRIVER( boxingm )	/* 2001 */
+	DRIVER( code1d )	/* 2000 */
+	DRIVER( code1db )	/* 2000 */
+	DRIVER( gticlub2 )	/* 2001 */
+	DRIVER( gticlub2ea )/* 2001 */
+	DRIVER( jpark3 )	/* 2001 */
+	DRIVER( mocapglf )	/* 2001 */
+	DRIVER( mocapb )	/* 2001 */
+	DRIVER( mocapbj )	/* 2001 */
+	DRIVER( p911 )		/* 2001 */
+	DRIVER( p911uc )	/* 2001 */
+	DRIVER( p911kc )	/* 2001 */
+	DRIVER( p911e )		/* 2001 */
+	DRIVER( p911j )		/* 2001 */
+	DRIVER( p9112 )		/* 2001 */
+	DRIVER( popn9 )		/* 2003 */
+	DRIVER( sscopex )	/* 2001 */
+	DRIVER( sogeki )	/* 2001 */
+	DRIVER( thrild2 )	/* 2001 */
+	DRIVER( thrild2a )	/* 2001 */
+	DRIVER( thrild2c )	/* 2001 */
+	DRIVER( tsurugi )	/* 2001 */
+	DRIVER( tsurugij )	/* 2001 */
+	DRIVER( wcombat )	/* 2002 */
+	DRIVER( wcombatk )	/* 2002 */
+	DRIVER( wcombatj )	/* 2002 */
+	DRIVER( xtrial )	/* 2002 */
+	DRIVER( mfightc )	/* 2002 */
+	DRIVER( mfightcc )	/* 2002 */
 
 	/* Mitchell games */
 	DRIVER( mgakuen )	/* (c) 1988 Yuga */
@@ -3267,7 +3267,7 @@ V-V                           TP-027
 	DRIVER( pkladiel )	/* (c) 1989 Leprechaun */
 	DRIVER( pkladila )	/* (c) 1989 Leprechaun */
 	DRIVER( dokaben )	/*  3/1989 (c) 1989 Capcom (Japan) */
-				/*  8/1989 Dokaben 2 (baseball) */
+						/*  8/1989 Dokaben 2 (baseball) */
 	DRIVER( pang )		/* (c) 1989 Mitchell (World) */
 	DRIVER( pangb )		/* bootleg */
 	DRIVER( pangbold )	/* bootleg */
@@ -3283,7 +3283,7 @@ V-V                           TP-027
 	DRIVER( sbbros )	/* 01/10/1990 (c) 1990 Mitchell + Capcom (US) not listed on Capcom's site */
 	DRIVER( marukin )	/* 17/10/1990 (c) 1990 Yuga (Japan) */
 	DRIVER( qtono1 )	/* 25/12/1990 (QUIZ 3) (c) 1991 Capcom (Japan) */
-				/*  4/1991 Ashita Tenki ni Naare (golf) */
+						/*  4/1991 Ashita Tenki ni Naare (golf) */
 	DRIVER( qsangoku )	/* 07/06/1991 (QUIZ 4) (c) 1991 Capcom (Japan) */
 	DRIVER( block )		/* 10/09/1991 (c) 1991 Capcom (World) */
 	DRIVER( blockj )	/* 10/09/1991 (c) 1991 Capcom (Japan) */
@@ -3449,17 +3449,17 @@ V-V                           TP-027
 	DRIVER( supcrash )	/* bootleg */
 	DRIVER( headon2 )	/* ???-??? (c) 1979 Sega */
 	DRIVER( car2 )		/* bootleg */
-				/* ???-??? Fortress */
-				/* ???-??? Gee Bee */
-				/* 255-270  Head On 2 / Deep Scan */
+						/* ???-??? Fortress */
+						/* ???-??? Gee Bee */
+						/* 255-270  Head On 2 / Deep Scan */
 	DRIVER( invho2 )	/* 271-286 (c) 1979 Sega */
 	DRIVER( nsub )		/* 268-275 (c) 1980 Sega */
 	DRIVER( samurai )	/* 289-302 + upgrades (c) 1980 Sega */
 	DRIVER( invinco )	/* 310-318 (c) 1979 Sega */
 	DRIVER( invds )		/* 367-382 (c) 1979 Sega */
 	DRIVER( tranqgun )	/* 413-428 (c) 1980 Sega */
-				/* 450-465  Tranquilizer Gun (different version?) */
-				/* ???-??? Car Hunt / Deep Scan */
+						/* 450-465  Tranquilizer Gun (different version?) */
+						/* ???-??? Car Hunt / Deep Scan */
 	DRIVER( spacetrk )	/* 630-645 (c) 1980 Sega */
 	DRIVER( sptrekct )	/* (c) 1980 Sega */
 	DRIVER( carnival )	/* 651-666 (c) 1980 Sega */
@@ -3567,7 +3567,7 @@ V-V                           TP-027
 	DRIVER( shtngmste )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( choplift )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftu )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
-	DRIVER( chopliftbl )	/* bootleg (S2) */
+	DRIVER( chopliftbl )/* bootleg (S2) */
 	DRIVER( 4dwarrio )	/* 834-5918 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( brain )		/* (c) 1986 Coreland / Sega (S2?) */
 	DRIVER( raflesia )	/* 834-5753 (c) 1985 Coreland / Sega (S1) */
@@ -3579,7 +3579,7 @@ V-V                           TP-027
 	DRIVER( wboy4 )		/* 834-5984 (c) 1986 + Escape license (S1) */
 	DRIVER( wboyu )		/* 834-5753 (? maybe a conversion) (c) 1986 + Escape license (S1) */
 	DRIVER( wbdeluxe )	/* (c) 1986 + Escape license (S1) */
-	DRIVER( wboysys2 )      /* 834-5984  (c) 1986 + Escape license (S1) */
+	DRIVER( wboysys2 )	/* 834-5984  (c) 1986 + Escape license (S1) */
 	DRIVER( gardia )	/* 834-6119 (S2?) */
 	DRIVER( gardiab )	/* bootleg */
 	DRIVER( nob )		/* (c) Data East */
@@ -3630,7 +3630,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( calorieb )	/* (c) 1986 Sega (but bootleg) */
 
 	/* Bingo-based games */
-	DRIVER( bingoc )    	/* (c) 1989 Sega */
+	DRIVER( bingoc )	/* (c) 1989 Sega */
 	/* Bingo Fantasy  *//* (c) 19?? Sega */
 	/* Bingo Star	  *//* (c) 19?? Sega */
 	/* Bingo Party    *//* (c) 1993 Sega */
@@ -3756,14 +3756,14 @@ DokiDoki Penguin Land *not confirmed
 
 
 	/* S16 Bootlegs */
-	DRIVER( bayrouteb1 )	/* (c) 1989 (protected) (bootleg) */
-	DRIVER( bayrouteb2 )	/* (c) 1989 (protected) (bootleg) */
+	DRIVER( bayrouteb1 )/* (c) 1989 (protected) (bootleg) */
+	DRIVER( bayrouteb2 )/* (c) 1989 (protected) (bootleg) */
 	DRIVER( dduxbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( eswatbl )	/* BOOTLEG */
 	DRIVER( fpointbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( fpointbj )	/* (c) 1989 (Datsu bootleg, Japan) */
-	DRIVER( goldnaxeb1 )	/* BOOTLEG  */
-	DRIVER( goldnaxeb2 )	/* BOOTLEG  */
+	DRIVER( goldnaxeb1 )/* BOOTLEG  */
+	DRIVER( goldnaxeb2 )/* BOOTLEG  */
 	DRIVER( passht4b )	/* bootleg */
 	DRIVER( passshtb )	/* bootleg */
 	DRIVER( shinoblb )	/* (c) 1987 (but bootleg) */
@@ -4241,17 +4241,17 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_orun )	/* 06 */
 	DRIVER( mt_asyn )	/* 07 */
 	DRIVER( mt_shnbi )	/* 08 */
-				/* 09 */
+						/* 09 */
 	DRIVER( mt_aftrb )	/* 10 */
 	DRIVER( mt_tfor2 )	/* 11 */
-				/* 12 */
+						/* 12 */
 	DRIVER( mt_astro )	/* 13 */
-				/* 14 */
-				/* 15 */
-				/* 16 */
-				/* 17 */
-				/* 18 */
-				/* 19 */
+						/* 14 */
+						/* 15 */
+						/* 16 */
+						/* 17 */
+						/* 18 */
+						/* 19 */
 	DRIVER( mt_lastb )	/* 20 */
 	DRIVER( mt_wcsoc )	/* 21 */
 	DRIVER( mt_tetri )	/* 22 */
@@ -4262,42 +4262,42 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_mystd )	/* 27 */
 	DRIVER( mt_revsh )	/* 28 */
 	DRIVER( mt_parlg )	/* 29 */
-				/* 30 */
+						/* 30 */
 	DRIVER( mt_tgolf )	/* 31 */
 	DRIVER( mt_srbb )	/* 32 */
-				/* 33 */
-				/* 34 */
+						/* 33 */
+						/* 34 */
 	DRIVER( mt_tlbba )	/* 35 */
 	DRIVER( mt_cols )	/* 36 */
-				/* 37 */
+						/* 37 */
 	DRIVER( mt_eswat )	/* 38 */
 	DRIVER( mt_smgp )	/* 39 */
 	DRIVER( mt_mwalk )	/* 40 */
 	DRIVER( mt_crack )	/* 41 */
-				/* 42 */
+						/* 42 */
 	DRIVER( mt_shado )	/* 43 */
 	DRIVER( mt_arrow )	/* 44 */
-				/* 45 */
-				/* 46 */
+						/* 45 */
+						/* 46 */
 	DRIVER( mt_astrm )	/* 47 */
 	DRIVER( mt_wwar )	/* 48 */
 	DRIVER( mt_bbros )	/* 49 */
-				/* 50 */
+						/* 50 */
 	DRIVER( mt_srage )	/* 51 */
 	DRIVER( mt_sonic )	/* 52 */
 	DRIVER( mt_sonia )	/* ^^ */
 	DRIVER( mt_fshrk )	/* 53 */
-				/* 54 */
-				/* 55 */
-				/* 56 */
+						/* 54 */
+						/* 55 */
+						/* 56 */
 	DRIVER( mt_gaxe2 )	/* 57 */
 	DRIVER( mt_stf )	/* 58 */
 	DRIVER( mt_mlh )	/* 59 */
 	DRIVER( mt_kcham )	/* 60 */
-				/* 61 */
+						/* 61 */
 	DRIVER( mt_soni2 )	/* 62 */
-	//DRIVER( mt_comp1 )  	/* ?? */
-	//DRIVER( mt_comp2 )  	/* ?? */
+	//DRIVER( mt_comp1 )	/* ?? */
+	//DRIVER( mt_comp2 )	/* ?? */
 
 	/* Sega MegaPlay */
 	DRIVER( megaplay )
@@ -4308,9 +4308,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_sor2 )	/* 05 */
 	DRIVER( mp_bio )	/* 06 */
 	DRIVER( mp_soni2 )	/* 07 */
-				/* 08 */
+						/* 08 */
 	DRIVER( mp_shnb3 )	/* 09 */
-				/* 10 */
+						/* 10 */
 	DRIVER( mp_mazin )	/* 11 */
 	DRIVER( mp_col3 )	/* ?? */
 
@@ -4917,7 +4917,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( captavuu )	/* MAN (c) 1991 Data East Corporation (US) */
 	DRIVER( captavua )	/* MAN (c) 1991 Data East Corporation (US) */
 	DRIVER( captavnj )	/* MAN (c) 1991 Data East Corporation (Japan) */
-				/* MAO ?? */
+						/* MAO ?? */
 	DRIVER( tumblep )	/* MAP (c) 1991 Data East Corporation (World) */
 	DRIVER( tumblepj )	/* MAP (c) 1991 Data East Corporation (Japan) */
 	DRIVER( tumbleb )	/* bootleg */
@@ -4939,18 +4939,18 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dquizgo )	/* (c) 1998 SemiCom */
 	DRIVER( suprtrio )	/* (c) 1994 GameAce */
 	DRIVER( lemmings )	/* prototype (c) 1991 Data East USA (US) */
-				/* MAQ ?? */
+						/* MAQ ?? */
 	DRIVER( dragngun )	/* MAR (c) 1992 Data East Corporation (US) */
 	DRIVER( wizdfire )	/* MAS (c) 1992 Data East Corporation (Over Sea) */
 	DRIVER( wizdfiru )	/* MAS (c) 1992 Data East Corporation (US) */
 	DRIVER( darksel2 )	/* MAS (c) 1992 Data East Corporation (Japan) */
 	DRIVER( funkyjet )	/* MAT (c) 1992 Mitchell */
 	DRIVER( funkyjej )	/* MAT (c) 1992 Mitchell */
-				/* MAU ?? */
+						/* MAU ?? */
 	DRIVER( nitrobal )	/* MAV (c) 1992 Data East Corporation (US) */
 	DRIVER( gunball )	/* MAV (c) 1992 Data East Corporation (Japan) */
-				/* MAW ?? */
-				/* MAX ?? */
+						/* MAW ?? */
+						/* MAX ?? */
 	DRIVER( dietgo )	/* MAY (c) 1993 */
 	DRIVER( dietgoe )	/* MAY (c) 1993 */
 	DRIVER( dietgou )	/* MAY (c) 1993 */
@@ -4958,9 +4958,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pktgaldx )	/* MAZ (c) 1993 Data East (Euro v3.00) */
 	DRIVER( pktgaldj )	/* MAZ (c) 1993 */
 	DRIVER( pktgaldb )	/* bootleg */
-				/* MBA ?? */
-				/* MBB ?? */
-				/* MBC ?? */
+						/* MBA ?? */
+						/* MBB ?? */
+						/* MBC ?? */
 	DRIVER( boogwing )	/* MBD (c) 1992 (Euro) */
 	DRIVER( boogwina )	/* MBD (c) 1992 (Asia) */
 	DRIVER( ragtime )	/* MBD (c) 1992 (Japan) */
@@ -4976,37 +4976,37 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( nslasher )	/* MBH (c) 1993 Data East Corporation */
 	DRIVER( nslashej )	/* MBH (c) 1993 Data East Corporation (Japan)*/
 	DRIVER( nslashes )	/* MBH (c) 1993 Data East Corporation (Japan)*/
-				/* MBI ?? */
-				/* MBJ ?? */
-				/* MBK ?? */
-				/* MBL ?? */
+						/* MBI ?? */
+						/* MBJ ?? */
+						/* MBK ?? */
+						/* MBL ?? */
 	DRIVER( lockload )	/* MBM (c) 1994 Data East Corporation (US) */
 	DRIVER( locklodu )	/* MBM (c) 1994 Data East Corporation (US) */
 	DRIVER( joemacr )	/* MBN (c) 1994 */
 	DRIVER( joemacra )	/* MBN (c) 1994 */
-				/* MBO ?? */
-				/* MBP ?? */
-				/* MBQ ?? */
+						/* MBO ?? */
+						/* MBP ?? */
+						/* MBQ ?? */
 	DRIVER( tattass )	/* prototype (c) 1994 Data East Pinball (US) */
 	DRIVER( tattassa )	/* prototype (c) 1994 Data East Pinball (Asia) */
 	DRIVER( charlien )	/* MBR (c) 1994 Mitchell */
-				/* MBS ?? */
-				/* MBT ?? */
-				/* MBU ?? */
-				/* MBV ?? */
-				/* MBW ?? */
+						/* MBS ?? */
+						/* MBT ?? */
+						/* MBU ?? */
+						/* MBV ?? */
+						/* MBW ?? */
 	DRIVER( wcvol95 )	/* MBX (c) 1993 Data East */
-				/* MBY ?? */
+						/* MBY ?? */
 	DRIVER( backfire )	/* MBZ (c) 1995 */
 	DRIVER( backfira )	/* MBZ (c) 1995 */
-				/* MCA ?? */
+						/* MCA ?? */
 	DRIVER( prtytime )	/* MCB (c) 1995 Mitchell */
 	DRIVER( gangonta )	/* MCB (c) 1995 Mitchell */
 	DRIVER( chainrec )	/* MCC (c) 1994 */
 	DRIVER( magdrop )	/* MCC (c) 1995 Data East */
 	DRIVER( magdropp )	/* MCC (c) 1995 Data East */
-				/* MCD ?? */
-				/* MCE Dunk Dream 95/Hoops96 See MLC games below */
+						/* MCD ?? */
+	/* MCE Dunk Dream 95/Hoops96 See MLC games below */
 	DRIVER( osman )		/* MCF (c) 1996 Mitchell */
 	DRIVER( candance )	/* MCF (c) 1996 Mitchell */
 	DRIVER( sotsugyo )	/*     (c) 1995 Mitchell (Atlus license) */
@@ -5037,7 +5037,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pbaction )	/* (c) 1985 Tehkan */
 	DRIVER( pbactio2 )	/* (c) 1985 Tehkan */
 	DRIVER( pbactio3 )	/* (c) 1985 Tehkan */
-				/* 6009 Tank Busters */
+						/* 6009 Tank Busters */
 	DRIVER( ponttehk )	/* 6011 - (c) 1985 Tehkan */
 	DRIVER( lvpoker )	/* ???? - (c) 1985 Tehkan */
 	DRIVER( lvcards )	/* (c) 1985 Tehkan */
@@ -5251,9 +5251,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( esckidsj )	/* GX975 (c) 1991 (Japan) */
 	DRIVER( vendetta )	/* GX081 (c) 1991 (World) */
 	DRIVER( vendettar )	/* GX081 (c) 1991 (World) */
-	DRIVER( vendetta2p )	/* GX081 (c) 1991 (World) */
-	DRIVER( vendetta2pu )	/* GX081 (c) 1991 (Asia) */
-	DRIVER( vendetta2pd )	/* GX081 (c) 1991 (Asia) */
+	DRIVER( vendetta2p )/* GX081 (c) 1991 (World) */
+	DRIVER( vendetta2pu )/* GX081 (c) 1991 (Asia) */
+	DRIVER( vendetta2pd )/* GX081 (c) 1991 (Asia) */
 	DRIVER( vendettaj )	/* GX081 (c) 1991 (Japan) */
 	DRIVER( mogura )	/* GX141 (c) 1991 */
 	DRIVER( wecleman )	/* GX602 (c) 1986 */
@@ -5471,7 +5471,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm2ndmix )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm2ndmxa )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm3rdmix )	/* GX853 (c) 1998 (Japan) */
-	//DRIVER( bm3rdmxb )    /* GX853 (c) 1998 (Japan) */
+	//DRIVER( bm3rdmxb )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bmcompmx )	/* GX858 (c) 1999 (Japan) */
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
@@ -5485,10 +5485,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm7thmix )	/* GXB07 (c) 2001 (Japan) */
 	DRIVER( bmfinal )	/* GXC01 (c) 2002 (Japan) */
 
-	//DRIVER( popn1 )       /* GX803 (c) 1998 (Japan) */
-	//DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
-	//DRIVER( popn3 )       /* GX980 (c) 1999 (Japan) */
-	//DRIVER( popnstex )    /* GX970 (c) 1999 (Japan) */
+	//DRIVER( popn1 )		/* GX803 (c) 1998 (Japan) */
+	//DRIVER( popn2 )		/* GX831 (c) 1998 (Japan) */
+	//DRIVER( popn3 )		/* GX980 (c) 1999 (Japan) */
+	//DRIVER( popnstex )	/* GX970 (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */
@@ -6027,7 +6027,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tmek44 )	/* 136100           (c) 1994 */
 	DRIVER( tmek20 )	/* 136100           (c) 1994 */
 	DRIVER( primrage )	/* 136102           (c) 1994 */
-	DRIVER( primrage20 )	/* 136102           (c) 1994 */
+	DRIVER( primrage20 )/* 136102           (c) 1994 */
 	DRIVER( area51 )	/* 136105           (c) 1995 */
 	DRIVER( area51t )	/* 136105           (c) 1995 */
 	DRIVER( area51a )	/* 136105           (c) 1995 */
@@ -6158,15 +6158,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ridhero )	/* 0006 (c) 1990 SNK */
 	DRIVER( ridheroh )	/* 0006 (c) 1990 SNK */
 	DRIVER( alpham2 )	/* 0007 (c) 1991 SNK */
-				/* 0008 Sunshine (prototype) 1990 SNK */
+						/* 0008 Sunshine (prototype) 1990 SNK */
 	DRIVER( ncombat )	/* 0009 (c) 1990 Alpha Denshi Co. */
 	DRIVER( ncombath )	/* 0009 (c) 1990 Alpha Denshi Co. */
 	DRIVER( cyberlip )	/* 0010 (c) 1990 SNK */
 	DRIVER( superspy )	/* 0011 (c) 1990 SNK */
-				/* 0012 */
-				/* 0013 */
+						/* 0012 */
+						/* 0013 */
 	DRIVER( mutnat )	/* 0014 (c) 1992 SNK */
-				/* 0015 */
+						/* 0015 */
 	DRIVER( kotm )		/* 0016 (c) 1991 SNK */
 	DRIVER( kotmh )		/* 0016 (c) 1991 SNK */
 	DRIVER( sengoku )	/* 0017 (c) 1991 SNK */
@@ -6181,9 +6181,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( quizdais )	/* 0023 (c) 1991 SNK */
 	DRIVER( lresort )	/* 0024 (c) 1992 SNK */
 	DRIVER( eightman )	/* 0025 (c) 1991 SNK / Pallas */
-				/* 0026 Fun Fun Brothers (prototype) 1991 Alpha */
+						/* 0026 Fun Fun Brothers (prototype) 1991 Alpha */
 	DRIVER( minasan )	/* 0027 (c) 1990 Monolith Corp. */
-				/* 0028 Dunk Star (prototype) Sammy */
+						/* 0028 Dunk Star (prototype) Sammy */
 	DRIVER( legendos )	/* 0029 (c) 1991 SNK */
 	DRIVER( 2020bb )	/* 0030 (c) 1991 SNK / Pallas */
 	DRIVER( 2020bba )	/* 0030 (c) 1991 SNK / Pallas */
@@ -6193,7 +6193,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( roboarmy )	/* 0032 (c) 1991 SNK */
 	DRIVER( fatfury1 )	/* 0033 (c) 1991 SNK */
 	DRIVER( fbfrenzy )	/* 0034 (c) 1992 SNK */
-				/* 0035 Mystic Wand (prototype) 1991 Alpha */
+						/* 0035 Mystic Wand (prototype) 1991 Alpha */
 	DRIVER( bakatono )	/* 0036 (c) 1991 Monolith Corp. */
 	DRIVER( crsword )	/* 0037 (c) 1991 Alpha Denshi Co. */
 	DRIVER( trally )	/* 0038 (c) 1991 Alpha Denshi Co. */
@@ -6216,7 +6216,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wh1 )		/* 0053 (c) 1992 Alpha Denshi Co. */
 	DRIVER( wh1h )		/* 0053 (c) 1992 Alpha Denshi Co. */
 	DRIVER( wh1ha )		/* 0053 (c) 1992 Alpha Denshi Co. */
-				/* 0054 Crossed Swords 2  (CD only? not confirmed, MVS might exist) */
+						/* 0054 Crossed Swords 2  (CD only? not confirmed, MVS might exist) */
 	DRIVER( kof94 )		/* 0055 (c) 1994 SNK */
 	DRIVER( aof2 )		/* 0056 (c) 1994 SNK */
 	DRIVER( aof2a )		/* 0056 (c) 1994 SNK */
@@ -6235,16 +6235,16 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( karnovr )	/* 0066 (c) 1994 Data East Corporation */
 	DRIVER( gururin )	/* 0067 (c) 1994 Face */
 	DRIVER( pspikes2 )	/* 0068 (c) 1994 Video System Co. */
-				/* Super Volley '94 was once released in Mar.1994, and recalled. Then released as Power Spikes 2 (with some tweaks). */
+						/* Super Volley '94 was once released in Mar.1994, and recalled. Then released as Power Spikes 2 (with some tweaks). */
 	DRIVER( fatfury3 )	/* 0069 (c) 1995 SNK */
 	DRIVER( zupapa )	/* 0070 Zupapa - released in 2001, 1994 prototype probably exists */
-				/* 0071 Bang Bang Busters (prototype) 1994 Visco */
-				/* 0072 Last Odyssey Pinball Fantasia (prototype) 1995 Monolith */
+						/* 0071 Bang Bang Busters (prototype) 1994 Visco */
+						/* 0072 Last Odyssey Pinball Fantasia (prototype) 1995 Monolith */
 	DRIVER( panicbom )	/* 0073 (c) 1994 Eighting / Hudson */
 	DRIVER( aodk )		/* 0074 (c) 1994 ADK / SNK */
 	DRIVER( sonicwi2 )	/* 0075 (c) 1994 Video System Co. */
 	DRIVER( zedblade )	/* 0076 (c) 1994 NMK */
-				/* 0077 The Warlocks of the Fates (prototype) 1995 Astec */
+						/* 0077 The Warlocks of the Fates (prototype) 1995 Astec */
 	DRIVER( galaxyfg )	/* 0078 (c) 1995 Sunsoft */
 	DRIVER( strhoop )	/* 0079 (c) 1994 Data East Corporation */
 	DRIVER( quizkof )	/* 0080 (c) 1995 Saurus */
@@ -6254,7 +6254,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pbobblena )	/* 0083 (c) 1994 Taito */
 	DRIVER( kof95 )		/* 0084 (c) 1995 SNK */
 	DRIVER( kof95h )	/* 0084 (c) 1995 SNK */
-				/* 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only) */
+						/* 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only) */
 	DRIVER( tws96 )		/* 0086 (c) 1996 Tecmo */
 	DRIVER( samsho3 )	/* 0087 (c) 1995 SNK */
 	DRIVER( samsho3h )	/* 0087 (c) 1995 SNK */
@@ -6262,7 +6262,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( stakwin )	/* 0088 (c) 1995 Saurus */
 	DRIVER( pulstar )	/* 0089 (c) 1995 Aicom */
 	DRIVER( whp )		/* 0090 (c) 1995 ADK / SNK */
-				/* 0091 */
+						/* 0091 */
 	DRIVER( kabukikl )	/* 0092 (c) 1995 Hudson */
 	DRIVER( neobombe )	/* 0093 (c) 1997 Hudson */
 	DRIVER( gowcaizr )	/* 0094 (c) 1995 Technos */
@@ -6271,21 +6271,21 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( aof3 )		/* 0096 (c) 1996 SNK */
 	DRIVER( aof3k )		/* Censored Korean release of aof3 */
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
-				/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
-				/* 0099 Neo Pool Masters */
-				/* 0160 98 BEST 44 (c) 1997/1998 SNK */
+						/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
+						/* 0099 Neo Pool Masters */
+						/* 0160 98 BEST 44 (c) 1997/1998 SNK */
 	DRIVER( turfmast )	/* 0200 (c) 1996 Nazca */
 	DRIVER( mslug )		/* 0201 (c) 1996 Nazca */
 	DRIVER( puzzledp )	/* 0202 (c) 1995 Taito (Visco license) */
 	DRIVER( mosyougi )	/* 0203 (c) 1995 ADK / SNK */
-				/* 0204 QP (prototype) */
-				/* 0205 Neo-Geo CD Special (CD only) */
+						/* 0204 QP (prototype) */
+						/* 0205 Neo-Geo CD Special (CD only) */
 	DRIVER( marukodq )	/* 0206 (c) 1995 Takara */
 	DRIVER( neomrdo )	/* 0207 (c) 1996 Visco */
 	DRIVER( sdodgeb )	/* 0208 (c) 1996 Technos */
 	DRIVER( goalx3 )	/* 0209 (c) 1995 Visco */
-				/* 0210 Karate Ninja Sho (prototype) 1995 Yumekobo */
-				/* 0211 Oshidashi Zintrick (CD only? not confirmed, MVS might exist) 1996 SNK/ADK */
+						/* 0210 Karate Ninja Sho (prototype) 1995 Yumekobo */
+						/* 0211 Oshidashi Zintrick (CD only? not confirmed, MVS might exist) 1996 SNK/ADK */
 	DRIVER( zintrckb )	/* 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version */
 	DRIVER( overtop )	/* 0212 (c) 1996 ADK */
 	DRIVER( neodrift )	/* 0213 (c) 1996 Visco */
@@ -6293,21 +6293,21 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kof96h )	/* 0214 (c) 1996 SNK */
 	DRIVER( ssideki4 )	/* 0215 (c) 1996 SNK */
 	DRIVER( kizuna )	/* 0216 (c) 1996 SNK */
-				/*  Fu-un Super Tag Battle Special Version (4-player battle available) exists */
+						/*  Fu-un Super Tag Battle Special Version (4-player battle available) exists */
 	DRIVER( ninjamas )	/* 0217 (c) 1996 ADK / SNK */
 	DRIVER( ragnagrd )	/* 0218 (c) 1996 Saurus */
 	DRIVER( pgoal )		/* 0219 (c) 1996 Saurus */
-				/* 0220 Choutetsu Brikin'ger - iron clad (MVS existance seems to have been confirmed) */
+						/* 0220 Choutetsu Brikin'ger - iron clad (MVS existance seems to have been confirmed) */
 	DRIVER( magdrop2 )	/* 0221 (c) 1996 Data East Corporation */
 	DRIVER( samsho4 )	/* 0222 (c) 1996 SNK */
 	DRIVER( samsho4k )	/* Censored Korean release of samsho4 */
 	DRIVER( rbffspec )	/* 0223 (c) 1996 SNK */
 	DRIVER( twinspri )	/* 0224 (c) 1996 ADK */
 	DRIVER( wakuwak7 )	/* 0225 (c) 1996 Sunsoft */
-				/* 0226 Pair Pair Wars (prototype) 1996 Sunsoft? */
+						/* 0226 Pair Pair Wars (prototype) 1996 Sunsoft? */
 	DRIVER( stakwin2 )	/* 0227 (c) 1996 Saurus */
 	DRIVER( ghostlop )	/* 0228 GhostLop (prototype) 1996? Data East */
-				/* 0229 King of Fighters '96 CD Collection (CD only) */
+						/* 0229 King of Fighters '96 CD Collection (CD only) */
 	DRIVER( breakers )	/* 0230 (c) 1996 Visco */
 	DRIVER( miexchng )	/* 0231 (c) 1997 Face */
 	DRIVER( kof97 )		/* 0232 (c) 1997 SNK */
@@ -6357,7 +6357,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mslug3b6 )	/* bootleg */
 	DRIVER( kof2000 )	/* 0257 (c) 2000 SNK */
 	DRIVER( kof2000n )	/* 0257 (c) 2000 SNK */
-				/* 0258 SNK vs. Capcom? */
+						/* 0258 SNK vs. Capcom? */
 	DRIVER( bangbead )	/* 0259 (c) 2000 Visco */
 	DRIVER( nitd )		/* 0260 (c) 2000 Eleven / Gavaking */
 	DRIVER( nitdbl )	/* bootleg */
@@ -6553,7 +6553,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wwfwfstj )	/* TA-0031 (c) 1991 (Japan) */
 	DRIVER( shadfrce )	/* TA-0032 (c) 1993 (US) */
 	DRIVER( shadfrcj )	/* TA-0032 (c) 1993 (Japan) */
-	DRIVER( shadfrcjv2 )	/* TA-0032 (c) 1993 (Japan) */
+	DRIVER( shadfrcjv2 )/* TA-0032 (c) 1993 (Japan) */
 
 	/* Stern "Berzerk hardware" games */
 	DRIVER( berzerk )	/* (c) 1980 */
@@ -7220,8 +7220,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gstrikea )	/* (c) [1993] Human */
 	DRIVER( vgoalsoc )	/* (c) 199? Temco */
 	DRIVER( vgoalsca )	/* (c) 199? Temco */
-	DRIVER( twrldc94 )      /* (c) 1994 Tecmo */
-	DRIVER( twrdc94a )      /* (c) 1994 Tecmo */
+	DRIVER( twrldc94 )	/* (c) 1994 Tecmo */
+	DRIVER( twrdc94a )	/* (c) 1994 Tecmo */
 	DRIVER( suprslam )	/* (c) 1995 Banpresto */
 	DRIVER( fromanc2 )	/* (c) 1995 Video System Co. (Japan) */
 	DRIVER( fromancr )	/* (c) 1995 Video System Co. (Japan) */
