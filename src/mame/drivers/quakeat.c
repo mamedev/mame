@@ -27,16 +27,28 @@ Sectors/Hunk    8
 Logical size    2,1163,248,864
 
 
-The "backup" directory on hard disk was created by me.
+The "backup" directory on hard disk was created by the dumper.
  
  
- -- Hardware info
- 
-"Its a Pentium II 300MHz or Celeron Slot 1, I forget.
-The Video Card is a Quantum 3D Quad chipped 3DFX Voodoo of some sort.
-The I/O Card is a custom JAMMA to parallel port interface."
+ -- Hardware info found in the following press release:
+http://www.quantum3d.com/press/HTMLarchive/4-20-98.html
 
-*/
+QUANTUM3D'S HEAVY METAL SYSTEM - HM233G
+NLX form factor system that is based on the Intel 440LX chipset
+233MHz Intel Pentium II processor with 512KB of L2 cache
+32MB of SDRAM
+Microsoft Windows 95 OSR2.5
+shock-mounted 3.1GB Ultra DMA-33 hard drive
+12-24x CD-ROM drive
+1.44 MB floppy drive
+16-bit per sample 3D audio
+PCI-based 2D/VGA
+built-in 10/100 Ethernet
+Obsidian2 90-4440 AGP Voodoo2-based realtime 3D graphics accelerator
+Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem 
+	designed to interface coin-op and industrial input/output control devices to a PC
+ 
+    */
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
