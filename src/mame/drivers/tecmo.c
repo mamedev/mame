@@ -408,6 +408,107 @@ static INPUT_PORTS_START( gemini )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( backfirt )
+	PORT_START("JOY1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START("BUTTONS1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("JOY2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("BUTTONS2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYS_0")		/* unused? */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYS_1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START("SYS_2")		/* unused? */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSWA_0")
+	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+
+	PORT_START("DSWA_1")
+	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB_0")
+	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB_1")
+	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( silkworm )
 	PORT_START("JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -838,6 +939,69 @@ ROM_START( silkwrm2 )
 	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
 
+/*
+
+main cpu Z80A
+sound cpu Z80A* see note
+sound ic ym3812 + 3014
+Osc 8Mhz and 24Mhz
+
+*Note:The sound cpu was protected inside a epoxy block fit on a 40 pin socket in reverse of cpu board (solder side).By dissolving resin the small sub pcb contains Z80A (identified by pins),76c28 (6116),a 74ls00 and 74ls138.
+ 
+ROMs	B4,B5 main program
+B2 sound program
+B3 character gfx
+B6 to B9 object gfx
+B10 to B13 foreground gfx
+B14 to B17 background gfx
+All eprom/rom are 27256,27512
+
+RAMs:
+-ram (cpu board):
+6264 main/work
+6116 (sub pcb*),6116, 2114 x3 sound
+6116 character
+-ram (video board):
+6116 scroll
+6116 foreground
+6116 background
+4164 x20 object/sprites 
+
+*/
+
+ROM_START( backfirt )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "b5-e3.bin",           0x00000, 0x10000, CRC(0ab3bd4d) SHA1(2653d099c894304d3f9c2b2de9a7fed67be7b6dc) )	/* c000-ffff is not used */
+	ROM_LOAD( "b4-f3.bin",   0x10000, 0x10000, CRC(150b6949) SHA1(31870a2f471b71d79a4daa0b5baca0d941de12e4) )	/* banked at f000-f7ff */
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD( "b2-e10.bin",           0x0000, 0x8000, CRC(9b2ac54f) SHA1(7c10e00235dc2668dee5c97ea5c6dc7722f35f03) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "b3-c10.bin",   0x00000, 0x08000, CRC(08ce729f) SHA1(8e426251b20edfb10f0837b3106b4f333bc114a4) )	/* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "b6-c2.bin",   0x00000, 0x10000, CRC(c8c25e45) SHA1(d771d5e7d2d8082680f73b778ef2d88f2e9b8591) )	/* sprites */
+	ROM_LOAD( "b7-d2.bin",   0x10000, 0x10000, CRC(25fb6a57) SHA1(7f411af7417fa901d65194c348ecec58c61b7cf7) )	/* sprites */
+	ROM_LOAD( "b8-e2.bin",   0x20000, 0x10000, CRC(6bccac4e) SHA1(e042d049761affe4d3d0eac3c7a24f428643a9cf) )	/* sprites */
+	ROM_LOAD( "b9-h2.bin",   0x30000, 0x10000, CRC(566a99b8) SHA1(a78825f0a85235399e66906cffafda98445a89a2) )	/* sprites */
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "b13-p1.bin",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )	/* tiles #1 */
+	ROM_LOAD( "b12-p2.bin",  0x10000, 0x10000, CRC(6c03c476) SHA1(79ad800a2f4ba6d44ba5a31210cbd8566bb357b6) )	/* tiles #1 */
+	ROM_LOAD( "b11-p2.bin",  0x20000, 0x10000, CRC(0bc84b4b) SHA1(599041108d09fd61aab2b0aeac0e07715887476c) )	/* tiles #1 */
+	ROM_LOAD( "b10-p3.bin",  0x30000, 0x10000, CRC(ec149ec3) SHA1(7817dc2659fe4ba3bb810df278378d51d97065b3) )	/* tiles #1 */
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "b17-s1.bin",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )	/* tiles #2 */
+	ROM_LOAD( "b16-s2.bin",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )	/* tiles #2 */
+	ROM_LOAD( "b15-s2.bin",  0x20000, 0x10000, CRC(2b6cc20e) SHA1(4815819288753400935836cc1b0b69f4c4b43ddc) )	/* tiles #2 */
+	ROM_LOAD( "b14-s3.bin",  0x30000, 0x08000, CRC(4d29637a) SHA1(28e85925138256b8ce5a1c4a5df5b219b1b6b197) )	/* tiles #2 */
+
+	ROM_REGION( 0x8000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
+	// not on this pcb?
+ROM_END
+
 ROM_START( gemini )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gw04-5s.rom",  0x00000, 0x10000, CRC(ff9de855) SHA1(34167af8456a081f68b338f10d4319ce1e703fd4) )	/* c000-ffff is not used */
@@ -890,3 +1054,4 @@ GAME( 1986, rygarj,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "A
 GAME( 1987, gemini,   0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing", 0 )
 GAME( 1988, silkworm, 0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 1)", 0 )
 GAME( 1988, silkwrm2, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 )
+GAME( 1988, backfirt, 0,        gemini,   backfirt, gemini,   ROT0,  "Tecmo", "Back Fire (Tecmo)", 0 )
