@@ -6928,7 +6928,7 @@ static x86code *op_fabs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		emit_movsd_r128_p64(drcbe, &dst, dstreg, &srcp);								// movsd dstreg,srcp
 		emit_andpd_r128_m128(&dst, dstreg, MABS(drcbe, drcbe->absmask64));				// andpd dstreg,[absmask64]
-		emit_movsd_p64_r128(drcbe, &dst, &srcp, dstreg);								// movsd dstp,dstreg
+		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd dstp,dstreg
 	}
 	return dst;
 }
