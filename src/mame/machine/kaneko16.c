@@ -361,7 +361,7 @@ static void calc3_mcu_run(running_machine *machine)
 			// execute the command:
 
 			kaneko16_mcu_ram[param1 / 2] = ~input_port_read(machine, "DSW1");	// DSW
-			kaneko16_mcu_ram[param2 / 2] = 0xffff;				// ? -1 / anything else
+			kaneko16_mcu_ram[param2 / 2] = 0x0000;// 0xffff;				// ? -1 / anything else (changes coinage..)
 
 			// param 4?
 			kaneko16_mcu_ram[param5 / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
