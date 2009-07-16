@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include "astring.h"
 #include "corefile.h"
+#include "corestr.h"
 #include "sha1.h"
 
 #define DEFAULT_SPLIT_SIZE		100
@@ -396,7 +397,7 @@ int main(int argc, char *argv[])
 		goto usage;
 
 	/* split command */
-	if (stricmp(argv[1], "-split") == 0)
+	if (core_stricmp(argv[1], "-split") == 0)
 	{
 		if (argc != 4 && argc != 5)
 			goto usage;
@@ -404,7 +405,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* join command */
-	else if (stricmp(argv[1], "-join") == 0)
+	else if (core_stricmp(argv[1], "-join") == 0)
 	{
 		if (argc != 3 && argc != 4)
 			goto usage;
@@ -412,7 +413,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* verify command */
-	else if (stricmp(argv[1], "-verify") == 0)
+	else if (core_stricmp(argv[1], "-verify") == 0)
 	{
 		if (argc != 3)
 			goto usage;
