@@ -27,21 +27,21 @@ static CDP1802_EF_READ( cidelsa_ef_r )
 	return input_port_read(device->machine, "EF");
 }
 
-static CDP1802_Q_WRITE( cidelsa_q_w )
+static WRITE_LINE_DEVICE_HANDLER( cidelsa_q_w )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *driver_state = (cidelsa_state *)device->machine->driver_data;
 
-	state->cdp1802_q = level;
+	driver_state->cdp1802_q = state;
 }
 
 static CDP1802_INTERFACE( cidelsa_cdp1802_config )
 {
-	cidelsa_mode_r,		// MODE
-	cidelsa_ef_r,		// EF
-	NULL,				// SC
-	cidelsa_q_w,		// Q
-	NULL,				// DMA read
-	NULL				// DMA write
+	cidelsa_mode_r,				// MODE
+	cidelsa_ef_r,				// EF
+	NULL,						// SC
+	DEVCB_LINE(cidelsa_q_w),	// Q
+	DEVCB_NULL,					// DMA read
+	DEVCB_NULL					// DMA write
 };
 
 /* Sound Interface */

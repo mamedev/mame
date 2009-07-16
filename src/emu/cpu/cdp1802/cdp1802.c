@@ -29,6 +29,10 @@ struct _cdp1802_state
     const address_space *program;
     const address_space *io;
 
+	devcb_resolved_write_line	out_q_func;
+	devcb_resolved_read8		in_dma_func;
+	devcb_resolved_write8		out_dma_func;
+
 	/* registers */
 	UINT8 d;				/* data register (accumulator) */
 	int df;					/* data flag (ALU carry) */
@@ -549,19 +553,13 @@ static void cdp1802_run(const device_config *device)
 			case 0xa:
 				Q = 0;
 
-				if (cpustate->intf->q_w)
-				{
-					cpustate->intf->q_w(device, Q);
-				}
+				devcb_call_write_line(&cpustate->out_q_func, Q);
 				break;
 
 			case 0xb:
 				Q = 1;
 
-				if (cpustate->intf->q_w)
-				{
-					cpustate->intf->q_w(device, Q);
-				}
+				devcb_call_write_line(&cpustate->out_q_func, Q);
 				break;
 
 			case 0xc:
@@ -791,10 +789,7 @@ static void cdp1802_run(const device_config *device)
 
     case CDP1802_STATE_2_DMA_IN:
 
-		if (cpustate->intf->dma_r)
-		{
-			RAM_W(R[0], cpustate->intf->dma_r(device, R[0]));
-		}
+		RAM_W(R[0], devcb_call_read8(&cpustate->in_dma_func, R[0]));
 
 		R[0] = R[0] + 1;
 
@@ -824,10 +819,7 @@ static void cdp1802_run(const device_config *device)
 
     case CDP1802_STATE_2_DMA_OUT:
 
-		if (cpustate->intf->dma_w)
-		{
-	        cpustate->intf->dma_w(device, R[0], RAM_R(R[0]));
-		}
+		devcb_call_write8(&cpustate->out_dma_func, R[0], RAM_R(R[0]));
 
 		R[0] = R[0] + 1;
 
@@ -954,19 +946,21 @@ static CPU_INIT( cdp1802 )
 
 	cpustate->intf = (cdp1802_interface *) device->static_config;
 
-	/* set up the state table */
+	/* resolve callbacks */
+	devcb_resolve_write_line(&cpustate->out_q_func, &cpustate->intf->out_q_func, device);
+	devcb_resolve_read8(&cpustate->in_dma_func, &cpustate->intf->in_dma_func, device);
+	devcb_resolve_write8(&cpustate->out_dma_func, &cpustate->intf->out_dma_func, device);
 
+	/* set up the state table */
 	cpustate->state_table = state_table_template;
 	cpustate->state_table.baseptr = cpustate;
 	cpustate->state_table.subtypemask = 1;
 
 	/* find address spaces */
-
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set initial values */
-
 	cpustate->p = mame_rand(device->machine) & 0x0f;
 	cpustate->x = mame_rand(device->machine) & 0x0f;
 	cpustate->d = mame_rand(device->machine);
@@ -987,7 +981,6 @@ static CPU_INIT( cdp1802 )
 	cpustate->dmaout = CLEAR_LINE;
 
 	/* register for state saving */
-
 	state_save_register_device_item(device, 0, cpustate->p);
 	state_save_register_device_item(device, 0, cpustate->x);
 	state_save_register_device_item(device, 0, cpustate->d);

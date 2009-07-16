@@ -18,6 +18,7 @@
 */
 
 #include "cpuintrf.h"
+#include "devcb.h"
 
 enum
 {
@@ -70,15 +71,6 @@ typedef UINT8 (*cdp1802_ef_read_func)(const device_config *device);
 typedef void (*cdp1802_sc_write_func)(const device_config *device, cdp1802_state_code state);
 #define CDP1802_SC_WRITE(name) void name(const device_config *device, cdp1802_state_code state)
 
-typedef void (*cdp1802_q_write_func)(const device_config *device, int level);
-#define CDP1802_Q_WRITE(name) void name(const device_config *device, int level)
-
-typedef UINT8 (*cdp1802_dma_read_func)(const device_config *device, UINT16 ma);
-#define CDP1802_DMA_READ(name) UINT8 name(const device_config *device, UINT16 ma)
-
-typedef void (*cdp1802_dma_write_func)(const device_config *device, UINT16 ma, UINT8 data);
-#define CDP1802_DMA_WRITE(name) void name(const device_config *device, UINT16 ma, UINT8 data)
-
 /* interface */
 typedef struct _cdp1802_interface cdp1802_interface;
 struct _cdp1802_interface
@@ -93,13 +85,13 @@ struct _cdp1802_interface
 	cdp1802_sc_write_func	sc_w;
 
 	/* if specified, this gets called for every change of the Q pin (pin 4) */
-	cdp1802_q_write_func	q_w;
+	devcb_write_line		out_q_func;
 
 	/* if specified, this gets called for every DMA read */
-	cdp1802_dma_read_func	dma_r;
+	devcb_read8				in_dma_func;
 
 	/* if specified, this gets called for every DMA write */
-	cdp1802_dma_write_func	dma_w;
+	devcb_write8			out_dma_func;
 };
 #define CDP1802_INTERFACE(name) const cdp1802_interface (name) =
 
