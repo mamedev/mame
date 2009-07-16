@@ -28,8 +28,8 @@ Logical size    2,1163,248,864
 
 
 The "backup" directory on hard disk was created by the dumper.
- 
- 
+
+
  -- Hardware info found in the following press release:
 http://www.quantum3d.com/press/HTMLarchive/4-20-98.html
 
@@ -47,8 +47,8 @@ built-in 10/100 Ethernet
 Obsidian2 90-4440 AGP Voodoo2-based realtime 3D graphics accelerator
 Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem 
 	designed to interface coin-op and industrial input/output control devices to a PC
- 
-    */
+
+*/
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
