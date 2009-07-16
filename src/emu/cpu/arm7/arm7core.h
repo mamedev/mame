@@ -90,6 +90,66 @@ enum
     kNumRegisters
 };
 
+/* Coprocessor-related macros */
+#define COPRO_TLB_BASE        	cpustate->tlbBase
+#define COPRO_TLB_BASE_MASK                 0xffffc000
+#define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
+#define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
+#define COPRO_TLB_VADDR_CSLTI_MASK          0x000ff000
+#define COPRO_TLB_VADDR_CSLTI_MASK_SHIFT    10
+#define COPRO_TLB_VADDR_FSLTI_MASK          0x000ffc00
+#define COPRO_TLB_VADDR_FSLTI_MASK_SHIFT    8
+#define COPRO_TLB_CFLD_ADDR_MASK            0xfffffc00
+#define COPRO_TLB_CFLD_ADDR_MASK_SHIFT      10
+#define COPRO_TLB_SECTION_PAGE_MASK         0xfff00000
+#define COPRO_TLB_LARGE_PAGE_MASK           0xffff0000
+#define COPRO_TLB_SMALL_PAGE_MASK           0xfffff000
+#define COPRO_TLB_TINY_PAGE_MASK            0xfffffc00
+#define COPRO_TLB_UNMAPPED                  0
+#define COPRO_TLB_LARGE_PAGE                1
+#define COPRO_TLB_SMALL_PAGE                2
+#define COPRO_TLB_TINY_PAGE                 3
+#define COPRO_TLB_COARSE_TABLE              1
+#define COPRO_TLB_SECTION_TABLE             2
+#define COPRO_TLB_FINE_TABLE                3
+
+#define COPRO_CTRL            cpustate->control
+#define COPRO_CTRL_MMU_EN                   0x00000001
+#define COPRO_CTRL_ADDRFAULT_EN             0x00000002
+#define COPRO_CTRL_DCACHE_EN                0x00000004
+#define COPRO_CTRL_WRITEBUF_EN              0x00000008
+#define COPRO_CTRL_ENDIAN                   0x00000080
+#define COPRO_CTRL_SYSTEM                   0x00000100
+#define COPRO_CTRL_ROM                      0x00000200
+#define COPRO_CTRL_ICACHE_EN                0x00001000
+#define COPRO_CTRL_INTVEC_ADJUST            0x00002000
+#define COPRO_CTRL_ADDRFAULT_EN_SHIFT       1
+#define COPRO_CTRL_DCACHE_EN_SHIFT          2
+#define COPRO_CTRL_WRITEBUF_EN_SHIFT        3
+#define COPRO_CTRL_ENDIAN_SHIFT             7
+#define COPRO_CTRL_SYSTEM_SHIFT             8
+#define COPRO_CTRL_ROM_SHIFT                9
+#define COPRO_CTRL_ICACHE_EN_SHIFT          12
+#define COPRO_CTRL_INTVEC_ADJUST_SHIFT      13
+#define COPRO_CTRL_LITTLE_ENDIAN            0
+#define COPRO_CTRL_BIG_ENDIAN               1
+#define COPRO_CTRL_INTVEC_0                 0
+#define COPRO_CTRL_INTVEC_F                 1
+#define COPRO_CTRL_MASK                     0x0000338f
+
+/* Coprocessor Registers */
+#define ARM7COPRO_REGS \
+    UINT32 control; \
+    UINT32 tlbBase;
+
+enum
+{
+	eARM_ARCHFLAGS_T	= 1,		// Thumb present
+	eARM_ARCHFLAGS_E	= 2,		// extended DSP operations present (only for v5+)
+	eARM_ARCHFLAGS_J	= 4,		// "Jazelle" (direct execution of Java bytecode)
+	eARM_ARCHFLAGS_MMU	= 8,		// has on-board MMU (traditional ARM style like the SA1110)
+};
+
 #define ARM7CORE_REGS                   \
     UINT32 sArmRegister[kNumRegisters]; \
     UINT8 pendingIrq;                   \
@@ -107,7 +167,12 @@ enum
 /* CPU state struct */
 typedef struct
 {
-    ARM7CORE_REGS               // these must be included in your cpu specific register implementation
+	ARM7CORE_REGS			// these must be included in your cpu specific register implementation
+	ARM7COPRO_REGS			
+
+	UINT8 archRev;			// ARM architecture revision (3, 4, and 5 are valid)
+	UINT8 archFlags;		// architecture flags
+
 } arm_state;
 
 /****************************************************************************************************
@@ -278,6 +343,16 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define INSN_RD_SHIFT               12
 #define INSN_COND_SHIFT             28
 
+#define INSN_COPRO_N        ((UINT32) 0x00100000u)
+#define INSN_COPRO_CREG     ((UINT32) 0x000f0000u)
+#define INSN_COPRO_AREG     ((UINT32) 0x0000f000u)
+#define INSN_COPRO_OP2      ((UINT32) 0x000000e0u)
+#define INSN_COPRO_OP3      ((UINT32) 0x0000000fu)
+#define INSN_COPRO_N_SHIFT          20
+#define INSN_COPRO_CREG_SHIFT       16
+#define INSN_COPRO_AREG_SHIFT       12
+#define INSN_COPRO_OP2_SHIFT        5
+
 #define THUMB_INSN_TYPE     ((UINT16)0xf000)
 #define THUMB_COND_TYPE     ((UINT16)0x0f00)
 #define THUMB_GROUP4_TYPE   ((UINT16)0x0c00)
@@ -403,11 +478,11 @@ enum
 #define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
 #define ARM7_CHECKIRQ           arm7_check_irq_state(cpustate)
 
-extern write32_space_func arm7_coproc_do_callback;
-extern read32_space_func arm7_coproc_rt_r_callback;
-extern write32_space_func arm7_coproc_rt_w_callback;
-extern void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
-extern void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
+extern write32_device_func arm7_coproc_do_callback;
+extern read32_device_func arm7_coproc_rt_r_callback;
+extern write32_device_func arm7_coproc_rt_w_callback;
+extern void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+extern void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
 extern UINT32 arm7_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
 extern UINT32 thumb_disasm(char *pBuf, UINT32 pc, UINT16 opcode);

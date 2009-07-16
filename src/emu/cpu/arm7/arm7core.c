@@ -117,9 +117,9 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr);
 
 /* Static Vars */
 // Note: for multi-cpu implementation, this approach won't work w/o modification
-write32_space_func arm7_coproc_do_callback;    // holder for the co processor Data Operations Callback func.
-read32_space_func arm7_coproc_rt_r_callback;   // holder for the co processor Register Transfer Read Callback func.
-write32_space_func arm7_coproc_rt_w_callback;  // holder for the co processor Register Transfer Write Callback Callback func.
+write32_device_func arm7_coproc_do_callback;    // holder for the co processor Data Operations Callback func.
+read32_device_func arm7_coproc_rt_r_callback;   // holder for the co processor Register Transfer Read Callback func.
+write32_device_func arm7_coproc_rt_w_callback;  // holder for the co processor Register Transfer Write Callback Callback func.
 // holder for the co processor Data Transfer Read & Write Callback funcs
 void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
@@ -674,7 +674,7 @@ static void HandleCoProcDO(arm_state *cpustate, UINT32 insn)
 {
     // This instruction simply instructs the co-processor to do something, no data is returned to ARM7 core
     if (arm7_coproc_do_callback)
-        arm7_coproc_do_callback(cpustate->program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
+        arm7_coproc_do_callback(cpustate->device, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
     else
         LOG(("%08x: Co-Processor Data Operation executed, but no callback defined!\n", R15));
 }
@@ -690,7 +690,7 @@ static void HandleCoProcRT(arm_state *cpustate, UINT32 insn)
     {
         if (arm7_coproc_rt_r_callback)
         {
-            UINT32 res = arm7_coproc_rt_r_callback(cpustate->program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
+            UINT32 res = arm7_coproc_rt_r_callback(cpustate->device, insn, 0);   // RT Read handler must parse opcode & return appropriate result
             SET_REGISTER(cpustate, (insn >> 12) & 0xf, res);
         }
         else
@@ -700,7 +700,7 @@ static void HandleCoProcRT(arm_state *cpustate, UINT32 insn)
     else
     {
         if (arm7_coproc_rt_r_callback)
-            arm7_coproc_rt_w_callback(cpustate->program, insn, GET_REGISTER(cpustate, (insn >> 12) & 0xf), 0);
+            arm7_coproc_rt_w_callback(cpustate->device, insn, GET_REGISTER(cpustate, (insn >> 12) & 0xf), 0);
         else
             LOG(("%08x: Co-Processor Register Transfer executed, but no RT Write callback defined!\n", R15));
     }

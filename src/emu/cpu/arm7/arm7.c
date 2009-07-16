@@ -1,9 +1,10 @@
 /*****************************************************************************
  *
  *   arm7.c
- *   Portable ARM7TDMI CPU Emulator
+ *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
  *
  *   Copyright Steve Ellenoff, all rights reserved.
+ *   Thumb, DSP, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -20,7 +21,6 @@
  *  This work is based on:
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'
  *  #2) Arm 2/3/6 emulator By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino (MAME CORE 0.76)
- *  #3) Thumb support by Ryan Holtz
  *
  *****************************************************************************/
 
@@ -41,14 +41,12 @@
 /* Example for showing how Co-Proc functions work */
 #define TEST_COPROC_FUNCS 1
 
-/* prototypes */
-#if TEST_COPROC_FUNCS
-static WRITE32_HANDLER(test_do_callback);
-static READ32_HANDLER(test_rt_r_callback);
-static WRITE32_HANDLER(test_rt_w_callback);
-static void test_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
-static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
-#endif
+/* prototypes of coprocessor functions */
+static WRITE32_DEVICE_HANDLER(arm7_do_callback);
+static READ32_DEVICE_HANDLER(arm7_rt_r_callback);
+static WRITE32_DEVICE_HANDLER(arm7_rt_w_callback);
+void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
 /* In this case, we are using the default arm7 handlers (supplied by the core)
@@ -92,19 +90,33 @@ static CPU_INIT( arm7 )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-#if TEST_COPROC_FUNCS
-	// setup co-proc callbacks example
-	arm7_coproc_do_callback = test_do_callback;
-	arm7_coproc_rt_r_callback = test_rt_r_callback;
-	arm7_coproc_rt_w_callback = test_rt_w_callback;
-	arm7_coproc_dt_r_callback = test_dt_r_callback;
-	arm7_coproc_dt_w_callback = test_dt_w_callback;
-#endif
+	// setup co-proc callbacks
+	arm7_coproc_do_callback = arm7_do_callback;
+	arm7_coproc_rt_r_callback = arm7_rt_r_callback;
+	arm7_coproc_rt_w_callback = arm7_rt_w_callback;
+	arm7_coproc_dt_r_callback = arm7_dt_r_callback;
+	arm7_coproc_dt_w_callback = arm7_dt_w_callback;
 }
 
 static CPU_RESET( arm7 )
 {
+	arm_state *cpustate = device->token;
+
 	// must call core reset
+	arm7_core_reset(device);
+
+	cpustate->archRev = 4;	// ARMv4
+	cpustate->archFlags = eARM_ARCHFLAGS_T;	// has Thumb
+}
+
+static CPU_RESET( arm9 )
+{
+	arm_state *cpustate = device->token;
+
+	// must call core reset
+	cpustate->archRev = 5;	// ARMv5
+	cpustate->archFlags = eARM_ARCHFLAGS_T;	// has Thumb
+
 	arm7_core_reset(device);
 }
 
@@ -324,7 +336,7 @@ CPU_GET_INFO( arm7 )
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case DEVINFO_STR_NAME:                  strcpy(info->s, "ARM7");                        break;
         case DEVINFO_STR_FAMILY:           strcpy(info->s, "Acorn Risc Machine");          break;
-        case DEVINFO_STR_VERSION:          strcpy(info->s, "1.3");                         break;
+        case DEVINFO_STR_VERSION:          strcpy(info->s, "2.0");                         break;
         case DEVINFO_STR_SOURCE_FILE:             strcpy(info->s, __FILE__);                      break;
         case DEVINFO_STR_CREDITS:          strcpy(info->s, "Copyright Steve Ellenoff, sellenoff@hotmail.com"); break;
 
@@ -391,29 +403,196 @@ CPU_GET_INFO( arm7 )
     }
 }
 
-/* TEST COPROC CALLBACK HANDLERS - Used for example on how to implement only */
-#if TEST_COPROC_FUNCS
-
-static WRITE32_HANDLER(test_do_callback)
+CPU_GET_INFO( arm9 )
 {
-    LOG(("test_do_callback opcode=%x, =%x\n", offset, data));
+    switch (state)
+    {
+        case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(arm9);                       break;
+        case DEVINFO_STR_NAME:             strcpy(info->s, "ARM9");                        break;
+	default:	CPU_GET_INFO_CALL(arm7);
+		break;
+    }
 }
-static READ32_HANDLER(test_rt_r_callback)
+
+/* ARM system coprocessor support */
+
+#define LOG(x) logerror x
+
+static WRITE32_DEVICE_HANDLER( arm7_do_callback )
 {
-    UINT32 data=0;
-    LOG(("test_rt_r_callback opcode=%x\n", offset));
+}
+
+static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
+{
+    arm_state *cpustate = device->token;
+    UINT32 opcode = offset;
+    UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+    UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+    UINT8 op3 =    opcode & INSN_COPRO_OP3;
+    UINT32 data = 0;
+
+    switch( cReg )
+    {
+        case 4:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+            // RESERVED
+            LOG( ( "arm7_rt_r_callback CR%d, RESERVED\n", cReg ) );
+            break;
+        case 0:             // ID
+	    switch (cpustate->archRev)
+	    {
+	    	case 3:	// ARM6 32-bit
+			data = 0x41;
+			break;
+
+		case 4: // ARM7/SA11xx
+			data = 0x41 | (1 << 23) | (7 << 12);
+			break;
+
+		case 5:	// ARM9/10/XScale
+			data = 0x41 | (9 << 12);
+			if (cpustate->archFlags & eARM_ARCHFLAGS_T)
+			{
+				if (cpustate->archFlags & eARM_ARCHFLAGS_E)
+				{
+					if (cpustate->archFlags & eARM_ARCHFLAGS_J)
+					{
+						data |= (6<<16);	// v5TEJ
+					}
+					else
+					{
+						data |= (5<<16);	// v5TE
+					}
+				}
+				else
+				{
+					data |= (4<<16);	// v5T
+				}
+			}
+			break;
+
+		case 6:	// ARM11
+			data = 0x41 | (10<< 12) | (7<<16);	// v6
+			break;
+	    }
+            LOG( ( "arm7_rt_r_callback, ID\n" ) );
+            break;
+        case 1:             // Control
+            LOG( ( "arm7_rt_r_callback, Control\n" ) );
+            data = COPRO_CTRL;
+            break;
+        case 2:             // Translation Table Base
+            LOG( ( "arm7_rt_r_callback, TLB Base\n" ) );
+            data = COPRO_TLB_BASE;
+            break;
+        case 3:             // Domain Access Control
+            LOG( ( "arm7_rt_r_callback, Domain Access Control\n" ) );
+            break;
+        case 5:             // Fault Status
+            LOG( ( "arm7_rt_r_callback, Fault Status\n" ) );
+            break;
+        case 6:             // Fault Address
+            LOG( ( "arm7_rt_r_callback, Fault Address\n" ) );
+            break;
+        case 13:            // Read Process ID (PID)
+            LOG( ( "arm7_rt_r_callback, Read PID\n" ) );
+            break;
+        case 14:            // Read Breakpoint
+            LOG( ( "arm7_rt_r_callback, Read Breakpoint\n" ) );
+            break;
+        case 15:            // Test, Clock, Idle
+            LOG( ( "arm7_rt_r_callback, Test / Clock / Idle \n" ) );
+            break;
+    }
+
+    op2 = 0;
+    op3 = 0;
+
     return data;
 }
-static WRITE32_HANDLER(test_rt_w_callback)
+
+static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
 {
-    LOG(("test_rt_w_callback opcode=%x, data from ARM7 register=%x\n", offset, data));
+    arm_state *cpustate = device->token;
+    UINT32 opcode = offset;
+    UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+    UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+    UINT8 op3 =    opcode & INSN_COPRO_OP3;
+
+    switch( cReg )
+    {
+        case 0:
+        case 4:
+        case 10:
+        case 11:
+        case 12:
+            // RESERVED
+            LOG( ( "arm7_rt_w_callback CR%d, RESERVED = %08x\n", cReg, data) );
+            break;
+        case 1:             // Control
+            LOG( ( "arm7_rt_w_callback Control = %08x (%d) (%d)\n", data, op2, op3 ) );
+            LOG( ( "    MMU:%d, Address Fault:%d, Data Cache:%d, Write Buffer:%d\n",
+                   data & COPRO_CTRL_MMU_EN, ( data & COPRO_CTRL_ADDRFAULT_EN ) >> COPRO_CTRL_ADDRFAULT_EN_SHIFT,
+                   ( data & COPRO_CTRL_DCACHE_EN ) >> COPRO_CTRL_DCACHE_EN_SHIFT,
+                   ( data & COPRO_CTRL_WRITEBUF_EN ) >> COPRO_CTRL_WRITEBUF_EN_SHIFT ) );
+            LOG( ( "    Endianness:%d, System:%d, ROM:%d, Instruction Cache:%d\n",
+                   ( data & COPRO_CTRL_ENDIAN ) >> COPRO_CTRL_ENDIAN_SHIFT,
+                   ( data & COPRO_CTRL_SYSTEM ) >> COPRO_CTRL_SYSTEM_SHIFT,
+                   ( data & COPRO_CTRL_ROM ) >> COPRO_CTRL_ROM_SHIFT,
+                   ( data & COPRO_CTRL_ICACHE_EN ) >> COPRO_CTRL_ICACHE_EN_SHIFT ) );
+            LOG( ( "    Int Vector Adjust:%d\n", ( data & COPRO_CTRL_INTVEC_ADJUST ) >> COPRO_CTRL_INTVEC_ADJUST_SHIFT ) );
+            COPRO_CTRL = data & COPRO_CTRL_MASK;
+            if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+            {
+//                change_pc(arm7_tlb_translate(R15));
+            }
+            break;
+        case 2:             // Translation Table Base
+            LOG( ( "arm7_rt_w_callback TLB Base = %08x (%d) (%d)\n", data, op2, op3 ) );
+            COPRO_TLB_BASE = data;
+            break;
+        case 3:             // Domain Access Control
+            LOG( ( "arm7_rt_w_callback Domain Access Control = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 5:             // Fault Status
+            LOG( ( "arm7_rt_w_callback Fault Status = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 6:             // Fault Address
+            LOG( ( "arm7_rt_w_callback Fault Address = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 7:             // Cache Operations
+            LOG( ( "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 8:             // TLB Operations
+            LOG( ( "arm7_rt_w_callback TLB Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 9:             // Read Buffer Operations
+            LOG( ( "arm7_rt_w_callback Read Buffer Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 13:            // Write Process ID (PID)
+            LOG( ( "arm7_rt_w_callback Write PID = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 14:            // Write Breakpoint
+            LOG( ( "arm7_rt_w_callback Write Breakpoint = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+        case 15:            // Test, Clock, Idle
+            LOG( ( "arm7_rt_w_callback Test / Clock / Idle = %08x (%d) (%d)\n", data, op2, op3 ) );
+            break;
+    }
+    op2 = 0;
+    op3 = 0;
 }
-static void test_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr))
+
+void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr))
 {
-    LOG(("test_dt_r_callback: insn = %x\n", insn));
 }
-static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data))
+
+void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data))
 {
-    LOG(("test_dt_w_callback: opcode = %x\n", insn));
 }
-#endif
+

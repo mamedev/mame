@@ -65,7 +65,7 @@ static MACHINE_START(39in1)
 }
 
 static MACHINE_DRIVER_START( 39in1 )
-	MDRV_CPU_ADD("maincpu", ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
+	MDRV_CPU_ADD("maincpu", ARM9, 200000000)	// actually Xscale PXA255, but ARM9 is a compatible subset
 	MDRV_CPU_PROGRAM_MAP(39in1_map)
 
 	MDRV_PALETTE_LENGTH(32768)
