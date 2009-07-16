@@ -35,7 +35,7 @@
   The games can be swapped by exchanging the CDROM disc and the security cart, whereby the main-board
   FlashROMs are re-programmed after a small wait. On subsequent power-ups, there is a check to test if the
   contents of the FlashROMs matches the CDROM, then the game boots up immediately.
-  
+
   PCMCIA card slot is used by Dance Dance Revolution (2ndMIX link ver. and later),
   GUITARFREAKS (2ndMIX link ver. and later), drummania (7thMIX and later), and Gun Mania.
   DDR and GF: 32M flash card is used to store edit data (players can edit data by PlayStation

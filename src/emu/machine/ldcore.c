@@ -479,7 +479,7 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code, UINT8 
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	int field = ldcore->fieldnum;
-	
+
 	/* return nothing if the video is off (external devices can't sense) */
 	if (zero_if_squelched && ldcore->videosquelch)
 		return 0;
@@ -821,7 +821,7 @@ static void read_track_data(laserdisc_state *ld)
 	/* cheat and look up the metadata we are about to retrieve */
 	if (ldcore->vbidata != NULL)
 		vbi_metadata_unpack(&vbidata, NULL, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
-	
+
 	/* if we're in the lead-in area, force the VBI data to be standard lead-in */
 	if (tracknum - 1 < VIRTUAL_LEAD_IN_TRACKS)
 	{

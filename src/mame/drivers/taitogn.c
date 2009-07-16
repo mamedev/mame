@@ -555,11 +555,11 @@ static WRITE32_HANDLER(control3_w)
 {
 	COMBINE_DATA(&control3);
 
-	/* Not card reset */	
+	/* Not card reset */
 	#if 0
 	// card reset, maybe
 	if(control3 & 2) {
-		devtag_reset(space->machine, "card");		
+		devtag_reset(space->machine, "card");
 		locked = 0x1ff;
 	}
 	#endif
@@ -1039,11 +1039,11 @@ static INPUT_PORTS_START( coh3002t_mp )
 INPUT_PORTS_END
 
 
-//    
+//
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */		
-		
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
@@ -1199,7 +1199,7 @@ ROM_END
 ROM_START(otenamhf)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
-	
+
 	DISK_REGION( "card" )
 	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562))
 ROM_END

@@ -159,7 +159,7 @@ static void output_pc(i8255a_t *i8255a)
 
 	case MODE_1:
 		data |= i8255a->intr[PORT_A] ? 0x08 : 0x00;
-		
+
 		if (port_mode(i8255a, PORT_A) == MODE_OUTPUT)
 		{
 			data |= i8255a->obf[PORT_A] ? 0x80 : 0x00;
@@ -261,7 +261,7 @@ static void set_obf(i8255a_t *i8255a, int port, int state)
 	if (LOG) logerror("8255A Port %c OBF: %u\n", 'A' + port, state);
 
 	i8255a->obf[port] = state;
-	
+
 	check_interrupt(i8255a, port);
 }
 
@@ -270,7 +270,7 @@ static void set_inte(i8255a_t *i8255a, int port, int state)
 	if (LOG) logerror("8255A Port %c INTE: %u\n", 'A' + port, state);
 
 	i8255a->inte[port] = state;
-	
+
 	check_interrupt(i8255a, port);
 }
 
@@ -279,7 +279,7 @@ static void set_inte1(i8255a_t *i8255a, int state)
 	if (LOG) logerror("8255A Port A INTE1: %u\n", state);
 
 	i8255a->inte1 = state;
-	
+
 	check_interrupt(i8255a, PORT_A);
 }
 
@@ -288,7 +288,7 @@ static void set_inte2(i8255a_t *i8255a, int state)
 	if (LOG) logerror("8255A Port A INTE2: %u\n", state);
 
 	i8255a->inte2 = state;
-	
+
 	check_interrupt(i8255a, PORT_A);
 }
 
@@ -382,7 +382,7 @@ static UINT8 read_pc(i8255a_t *i8255a)
 
 	case MODE_1:
 		data |= i8255a->intr[PORT_A] ? 0x08 : 0x00;
-		
+
 		if (port_mode(i8255a, PORT_A) == MODE_OUTPUT)
 		{
 			data |= i8255a->obf[PORT_A] ? 0x80 : 0x00;
@@ -441,7 +441,7 @@ static UINT8 read_pc(i8255a_t *i8255a)
 		/* read data from port */
 		data |= devcb_call_read8(&i8255a->in_port_func[PORT_C], 0) & mask;
 	}
-	
+
 	return data;
 }
 
@@ -643,9 +643,9 @@ static void set_pc_bit(const device_config *device, int bit, int state)
 		case 0: set_intr(i8255a, PORT_B, state); break;
 		case 1:
 			if (port_mode(i8255a, PORT_B) == MODE_OUTPUT)
-				set_obf(i8255a, PORT_B, state); 
+				set_obf(i8255a, PORT_B, state);
 			else
-				set_ibf(i8255a, PORT_B, state); 
+				set_ibf(i8255a, PORT_B, state);
 			break;
 		case 2: set_inte(i8255a, PORT_B, state); break;
 		}
@@ -700,7 +700,7 @@ WRITE8_DEVICE_HANDLER( i8255a_w )
 			int state = BIT(data, 0);
 
 			if (LOG) logerror("8255A '%s' %s Bit %u\n", device->tag, state ? "Set" : "Reset", bit);
-	
+
 			set_pc_bit(device, bit, state);
 		}
 		break;

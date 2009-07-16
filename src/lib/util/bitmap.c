@@ -300,7 +300,7 @@ int bitmap_format_to_bpp(bitmap_format format)
 		case BITMAP_FORMAT_RGB32:
 		case BITMAP_FORMAT_ARGB32:
 			return 32;
-		
+
 		case BITMAP_FORMAT_INDEXED64:
 			return 64;
 

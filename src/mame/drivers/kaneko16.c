@@ -232,8 +232,8 @@ static MACHINE_RESET( shogwarr )
 	kaneko16_sprite_xoffs = 0xa00;
 
 	kaneko16_sprite_yoffs = 0x200;
-	
-	
+
+
 	kaneko16_priority.sprite[0] = 2;	// below all
 	kaneko16_priority.sprite[1] = 3;	// above tile[0], below the others
 	kaneko16_priority.sprite[2] = 5;	// above all
@@ -1994,14 +1994,14 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 		// the code for this interupt is provided by the MCU..
 		case 0:  cpu_set_input_line(device, 4, HOLD_LINE); break;
 		/*case 0:
-		{
-			// hack, clear this ram address to get into test mode (interrupt would clear it)
-			if (kaneko16_mainram[0x2dfe/2]==0xff00)
-			{
-				kaneko16_mainram[0x2dfe/2]=0x0000;
-			}
+        {
+            // hack, clear this ram address to get into test mode (interrupt would clear it)
+            if (kaneko16_mainram[0x2dfe/2]==0xff00)
+            {
+                kaneko16_mainram[0x2dfe/2]=0x0000;
+            }
 
-		}*/
+        }*/
 	}
 }
 
@@ -3814,7 +3814,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 					UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 					//printf("%02x, ",inlinet);
 					dat -= inlinet;
-					
+
 					if (tabnum==0x40) // fjbuster / shogun warriors japanese character select (what enables this extra?)
 					{
 						// note the original, table is an odd number of words, so we can't just check if i is odd / even because the additional overlay
@@ -3823,14 +3823,14 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						{
 							// thie gets mapped over half the inline table?!..  (inline length is 0x22, this changes odd bytes)
 							// what specifies the additional overlay here?
-							UINT8 extra[0x11] = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a };						
+							UINT8 extra[0x11] = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a };
 							dat -= extra[(i%inline_table_size)>>1];
-						
+
 						}
 
 
 					}
-					
+
 					dstram[(dstoffset+i)^1] = dat;
 				}
 			}
@@ -3847,14 +3847,14 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 
 				for (i=0;i<length;i++)
 				{
-					
-				
+
+
 					UINT8 dat = rom[offset+i];
-					
-					
+
+
 					if (tabnum==0x80) // shogwarr table 80 (irq code)
 					{
-					
+
 					unsigned char extracted80[686+2] = {
 						0x00, 0x00,
 						0xE7, 0x48, 0xFE, 0xFF, 0x39, 0x4A, 0x10, 0x00, 0xFE, 0x2D, 0x00, 0x67,
@@ -3916,7 +3916,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						0xFE, 0xFF, 0xC0, 0x33, 0x2D, 0x00, 0x00, 0x00, 0xDF, 0x4C, 0xFF, 0x7F,
 						0x73, 0x4E
 					};
-					
+
 						if ((i&1)==0)
 						{
 							dat -= table[i&0x3f];
@@ -3932,16 +3932,16 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 
 
 
-						
-						//	dat = BITSWAP8(dat,4,3,2,1,0,7,6,5);
-						//	dat -= table[i&0x3f];
+
+						//  dat = BITSWAP8(dat,4,3,2,1,0,7,6,5);
+						//  dat -= table[i&0x3f];
 						}
 					}
 					else if (tabnum==0x41) // shogwarr table 41  -- note fjbuster uses table 40, which looks like (almost) the same data but with better encryption...
 					{
-						// simple shifts... 
+						// simple shifts...
 						dat -= table[i&0x3f];
-					
+
 						if ((i&1)==1) dat = BITSWAP8(dat,0,7,6,5,4,3,2,1);
 						else dat = BITSWAP8(dat,6,5,4,3,2,1,0,7);
 					}
@@ -3950,7 +3950,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						dat -= table[i&0x3f];
 					}
 
-					
+
 					dstram[(dstoffset+i)^1] = dat;
 				}
 			}

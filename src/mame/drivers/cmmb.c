@@ -102,13 +102,13 @@ static READ8_HANDLER( cmmb_input_r )
 static UINT8 irq_mask;
 
 /*
-	{
-		UINT8 *ROM = memory_region(space->machine, "maincpu");
-		UINT32 bankaddress;
+    {
+        UINT8 *ROM = memory_region(space->machine, "maincpu");
+        UINT32 bankaddress;
 
-		bankaddress = 0x10000 + (0x10000 * (data & 0x03));
-		memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
-	}
+        bankaddress = 0x10000 + (0x10000 * (data & 0x03));
+        memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+    }
 */
 
 static WRITE8_HANDLER( cmmb_output_w )
@@ -141,7 +141,7 @@ static READ8_HANDLER( kludge_r )
 /* overlap empty addresses */
 static ADDRESS_MAP_START( cmmb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
-//	AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
+//  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
@@ -263,7 +263,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( cmmb_irq )
 {
 	//if(input_code_pressed_once(KEYCODE_Z))
-	//	cpu_set_input_line(device, 0, HOLD_LINE);
+	//  cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( cmmb )
@@ -293,9 +293,9 @@ static MACHINE_DRIVER_START( cmmb )
 	MDRV_MACHINE_RESET(cmmb)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MDRV_SPEAKER_STANDARD_MONO("mono")
+//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /***************************************************************************

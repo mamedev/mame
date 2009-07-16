@@ -782,7 +782,7 @@ ROM_START( darkhors )
 	ROM_LOAD( "eeprom", 0x00000, 0x80000, CRC(45314fdb) SHA1(c4bd5508e5b51a6e0356c049f1ccf2b5d94caee9) )
 ROM_END
 
-/*  
+/*
 
 Jockey Club II Original sets
 
@@ -791,9 +791,9 @@ Jockey Club II Original sets
  -- the program can be upgraded by placing a ROM in the socket next to the main program ROM.
 
  */
- 
- 
- 
+
+
+
  /*
 Jockey Club II by SETA 1996
 

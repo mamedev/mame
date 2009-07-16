@@ -45,8 +45,8 @@ shock-mounted 3.1GB Ultra DMA-33 hard drive
 PCI-based 2D/VGA
 built-in 10/100 Ethernet
 Obsidian2 90-4440 AGP Voodoo2-based realtime 3D graphics accelerator
-Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem 
-	designed to interface coin-op and industrial input/output control devices to a PC
+Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem
+    designed to interface coin-op and industrial input/output control devices to a PC
 
 */
 

@@ -9131,7 +9131,7 @@ Other Sun games
 	/* Dyna */
 	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
 	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
-	
+
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */

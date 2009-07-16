@@ -872,7 +872,7 @@ ROM_START(thrild2) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
-//	a41eba_nvram == a41ebb_nvram
+//  a41eba_nvram == a41ebb_nvram
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )

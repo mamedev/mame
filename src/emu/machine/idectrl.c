@@ -153,7 +153,7 @@ struct _ide_state
 	hard_disk_file *disk;
 	emu_timer *		last_status_timer;
 	emu_timer *		reset_timer;
-	
+
 	UINT8			master_password_enable;
 	UINT8			user_password_enable;
 	const UINT8 *	master_password;
@@ -279,7 +279,7 @@ UINT8 *ide_get_features(const device_config *device)
 void ide_set_gnet_readlock(const device_config *device, const UINT8 onoff)
 {
 	ide_state *ide = get_safe_token(device);
-	ide->gnetreadlock = onoff;	
+	ide->gnetreadlock = onoff;
 }
 
 void ide_set_master_password(const device_config *device, const UINT8 *password)
@@ -724,7 +724,7 @@ static void read_sector_done(ide_state *ide)
 	/* GNET readlock check */
 	if (ide->gnetreadlock) {
 		ide->status &= ~IDE_STATUS_ERROR;
-		ide->status &= ~IDE_STATUS_BUSY;		
+		ide->status &= ~IDE_STATUS_BUSY;
 		return;
 	}
 	/* now do the read */
@@ -1000,9 +1000,9 @@ static TIMER_CALLBACK( write_sector_done_callback )
  *************************************/
 
 static void handle_command(ide_state *ide, UINT8 command)
-{	
+{
 	UINT8 key[5];
-	
+
 	/* implicitly clear interrupts here */
 	clear_interrupt(ide);
 
@@ -1209,17 +1209,17 @@ static void handle_command(ide_state *ide, UINT8 command)
 
 		case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
 			LOGPRINT(("IDE GNET Unlock 3\n"));
-			
-			/* key check */									
-			chd_get_metadata (ide->handle, HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);			
+
+			/* key check */
+			chd_get_metadata (ide->handle, HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
 			if ((ide->precomp_offset == key[0]) && (ide->sector_count == key[1]) && (ide->cur_sector == key[2]) && (ide->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
 			{
 				ide->gnetreadlock= 0;
 			}
-		
+
 			/* update flags */
 			ide->status |= IDE_STATUS_DRIVE_READY;
-			ide->status &= ~IDE_STATUS_ERROR;			
+			ide->status &= ~IDE_STATUS_ERROR;
 			signal_interrupt(ide);
 			break;
 

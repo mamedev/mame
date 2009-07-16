@@ -768,7 +768,7 @@ static MACHINE_DRIVER_START( backfirt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* no MSM on this PCB */
-	
+
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -988,8 +988,8 @@ sound ic ym3812 + 3014
 Osc 8Mhz and 24Mhz
 
 *Note:The sound cpu was protected inside a epoxy block fit on a 40 pin socket in reverse of cpu board (solder side).By dissolving resin the small sub pcb contains Z80A (identified by pins),76c28 (6116),a 74ls00 and 74ls138.
- 
-ROMs	B4,B5 main program
+
+ROMs    B4,B5 main program
 B2 sound program
 B3 character gfx
 B6 to B9 object gfx
@@ -1006,7 +1006,7 @@ RAMs:
 6116 scroll
 6116 foreground
 6116 background
-4164 x20 object/sprites 
+4164 x20 object/sprites
 
 */
 
@@ -1086,18 +1086,18 @@ static DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
 static DRIVER_INIT( backfirt )
 {
 	tecmo_video_type = 2;
-	
+
 	/* no MSM */
 	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, SMH_NOP);
 	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xd000, 0xd000, 0, 0, SMH_NOP);
 	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, SMH_NOP);
 
-	
+
 }
 
 
-	
-	
+
+
 GAME( 1986, rygar,    0,        rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 )
 GAME( 1986, rygar2,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 )
 GAME( 1986, rygar3,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", 0 )

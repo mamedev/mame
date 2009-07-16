@@ -79,8 +79,8 @@ static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
 	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)//_PORT("IN3")
 	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)//AM_READ_PORT("IN0")
-//	AM_RANGE(0x1004, 0x1004) AM_READ(test_r)//_PORT("IN4")
-//	AM_RANGE(0x1005, 0x1005) AM_READ(test_r)//_PORT("IN5")
+//  AM_RANGE(0x1004, 0x1004) AM_READ(test_r)//_PORT("IN4")
+//  AM_RANGE(0x1005, 0x1005) AM_READ(test_r)//_PORT("IN5")
 	AM_RANGE(0x1004, 0x1004) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rblaster_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-//	AM_RANGE(0x1000, 0x1007) AM_NOP
+//  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
@@ -383,12 +383,12 @@ static MACHINE_DRIVER_START( rblaster )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6502,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(rblaster_map)
-//	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 	MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu",M6502,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(rblaster_sound_map)
-//	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //test
+//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //test
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound") //Sony LDP-1000A, is it truly compatible with the Pioneer?

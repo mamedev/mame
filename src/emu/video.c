@@ -368,7 +368,7 @@ void video_init(running_machine *machine)
 	/* extract snap resolution if present */
 	if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
 		global.snap_width = global.snap_height = 0;
-		
+
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
 	if (filename[0] != 0)
@@ -2622,7 +2622,7 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 static void video_update_burnin(running_machine *machine)
 {
 	const device_config *screen;
-	
+
 	/* iterate over screens and update the burnin for the ones that care */
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
@@ -2641,11 +2641,11 @@ static void video_update_burnin(running_machine *machine)
 			int srcx, srcy;
 			int x, y;
 
-			/* iterate over rows in the destination */			
+			/* iterate over rows in the destination */
 			for (y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
 				UINT64 *dst = BITMAP_ADDR64(state->burnin, y, 0);
-				
+
 				/* handle the 16-bit palettized case */
 				if (srcbitmap->format == BITMAP_FORMAT_INDEXED16)
 				{
@@ -2657,7 +2657,7 @@ static void video_update_burnin(running_machine *machine)
 						dst[x] += RGB_GREEN(pixel) + RGB_RED(pixel) + RGB_BLUE(pixel);
 					}
 				}
-				
+
 				/* handle the 15-bit RGB case */
 				else if (srcbitmap->format == BITMAP_FORMAT_RGB15)
 				{
@@ -2703,18 +2703,18 @@ static void video_finalize_burnin(const device_config *screen)
 		file_error filerr;
 		mame_file *file;
 		int x, y;
-		
+
 		/* compute the scaled visible region */
 		scaledvis.min_x = state->visarea.min_x * state->burnin->width / state->width;
 		scaledvis.max_x = state->visarea.max_x * state->burnin->width / state->width;
 		scaledvis.min_y = state->visarea.min_y * state->burnin->height / state->height;
 		scaledvis.max_y = state->visarea.max_y * state->burnin->height / state->height;
-		
+
 		/* wrap a bitmap around the subregion we care about */
 		finalmap = bitmap_alloc(scaledvis.max_x + 1 - scaledvis.min_x,
 		                        scaledvis.max_y + 1 - scaledvis.min_y,
 		                        BITMAP_FORMAT_ARGB32);
-		
+
 		/* find the maximum value */
 		for (y = 0; y < finalmap->height; y++)
 		{
@@ -2737,7 +2737,7 @@ static void video_finalize_burnin(const device_config *screen)
 				dst[x] = MAKE_ARGB(0xff, brightness, brightness, brightness);
 			}
 		}
-		
+
 		/* write the final PNG */
 
 		/* compute the name and create the file */

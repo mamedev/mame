@@ -168,7 +168,7 @@ enum
 typedef struct
 {
 	ARM7CORE_REGS			// these must be included in your cpu specific register implementation
-	ARM7COPRO_REGS			
+	ARM7COPRO_REGS
 
 	UINT8 archRev;			// ARM architecture revision (3, 4, and 5 are valid)
 	UINT8 archFlags;		// architecture flags
