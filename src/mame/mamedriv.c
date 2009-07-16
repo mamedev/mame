@@ -8907,6 +8907,7 @@ Other Sun games
 	DRIVER( witchcda )	/* 1991, Unknown */
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
+	DRIVER( witchcdd )	/* 1991, Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
@@ -9129,6 +9130,8 @@ Other Sun games
 
 	/* Dyna */
 	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
+	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
+	
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */

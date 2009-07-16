@@ -137,8 +137,8 @@ static VIDEO_UPDATE(cb2001)
 }
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+	AM_RANGE(0x00000, 0xbffff) AM_RAM
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cb2001_io, ADDRESS_SPACE_IO, 16 )
@@ -204,10 +204,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( cb2001 )
-	ROM_REGION( 0x020000, "boot_prg", 0 )
-	ROM_LOAD16_WORD( "c01111.11f", 0x000000, 0x20000, CRC(ec6269f1) SHA1(f2428562a10e30192f2c95053f5ce448302e7cf5) )
+	ROM_REGION( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "c01111.11f", 0x020000, 0x20000, CRC(ec6269f1) SHA1(f2428562a10e30192f2c95053f5ce448302e7cf5) )
 
-	ROM_REGION( 0x080000, "gfx", 0 ) // not tiles, blitter based, or mem mapped?
+	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "c0111.12a", 0x000000, 0x80000, CRC(342b760e) SHA1(bc168bec384ccacd73543f604e3ab5b2b8f4f441) )
 
 	ROM_REGION( 0x200, "user1", 0 ) // ?
@@ -216,4 +216,20 @@ ROM_START( cb2001 )
 	ROM_LOAD( "am27s29.11b", 0x000, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
 ROM_END
 
+ROM_START( scherrym )
+	ROM_REGION( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
+
+	ROM_REGION( 0x080000, "gfx", 0 )
+	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB
+
+	// assumed to be the same
+	ROM_REGION( 0x200, "user1", 0 ) // ?
+	ROM_LOAD( "am27s29.9b", 0x000, 0x200, CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
+	ROM_REGION( 0x200, "user2", 0 ) // ?
+	ROM_LOAD( "am27s29.11b", 0x000, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
+ROM_END
+
 GAME( 2001, cb2001,    0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Cherry Bonus 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, scherrym,  0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Super Cherry Master", GAME_NOT_WORKING|GAME_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+

@@ -2437,6 +2437,8 @@ ROM_START( goldnpkb )
 */
 ROM_END
 
+
+
 ROM_START( pmpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-5.bin",	0x5000, 0x1000, CRC(3446a643) SHA1(e67854e3322e238c17fed4e05282922028b5b5ea) )
@@ -2718,6 +2720,23 @@ ROM_START( witchcdc )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( witchcdd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "12a.bin",	0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(				0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "ce-3-tvg.bin",	0x4000, 0x2000, CRC(54b51497) SHA1(8c3a74377fde8c7c5a6b277a9c1e717e6bdd98f8) )    /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "ce-1-tvg.bin",	0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "ce-2-tvg.bin",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",	0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 ROM_START( sloco93 )
@@ -3266,6 +3285,7 @@ GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, 0,        ROT0,   "Video Kl
 GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 1)", 0 )
 GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 2)", 0 )
 GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "Unknown",                   "Witch Card (english, no witch game)",     0 )
+GAME(  1991, witchcdd, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Unknown",                   "Witch Card (german?)",                    0 )
 GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",          0 )
 GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",          0 )
 GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Maverik",                                 0 )
