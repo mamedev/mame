@@ -5055,6 +5055,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gemini )	/* (c) 1987 Tecmo */
 	DRIVER( silkworm )	/* 6217 - (c) 1988 Tecmo */
 	DRIVER( silkwrm2 )	/* 6217 - (c) 1988 Tecmo */
+	DRIVER( backfirt )	/* bootleg [(c) 1988 Tecmo] */
 	DRIVER( tbowl )		/* 6206 - (c) 1987 Tecmo */
 	DRIVER( tbowlj )	/* 6206 - (c) 1987 Tecmo */
 	DRIVER( shadoww )	/* 6215 - (c) 1988 Tecmo (World) */
