@@ -724,6 +724,9 @@ file_error core_fload(const char *filename, void **data, UINT32 *length)
 		free(*data);
 		return FILERR_FAILURE;
 	}
+
+	/* close the file and return data */
+	core_fclose(file);
 	return FILERR_NONE;
 }
 
