@@ -403,6 +403,9 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			locked &= ~(1 << pos);
 		else
 			locked |= 1 << pos;
+		if (!locked) {
+			ide_set_gnet_readlock (devtag_get_device(space->machine, "card"), 0);
+		}
 	}
 }
 
@@ -552,11 +555,14 @@ static WRITE32_HANDLER(control3_w)
 {
 	COMBINE_DATA(&control3);
 
+	/* Not card reset */	
+	#if 0
 	// card reset, maybe
 	if(control3 & 2) {
-		devtag_reset(space->machine, "card");
+		devtag_reset(space->machine, "card");		
 		locked = 0x1ff;
 	}
+	#endif
 }
 
 static READ32_HANDLER(gn_1fb70000_r)
@@ -824,6 +830,7 @@ static MACHINE_RESET( coh3002t )
 	control = 0;
 	psx_machine_init(machine);
 	devtag_reset(machine, "card");
+	ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);
 }
 
 static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1032,14 +1039,19 @@ static INPUT_PORTS_START( coh3002t_mp )
 INPUT_PORTS_END
 
 
-//    ROM_LOAD( "flashv2.u30",    0x000000, 0x200000, CRC(f624ebf8) SHA1(be84ef1b083f819f3ab13c983c52bca97bb908ef) )
+//    
 
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */		
+		
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
-\
 	ROM_REGION16_LE( 0x200000, "subbios", 0 ) \
-    ROM_LOAD( "flash.u30",     0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
+	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
+    	ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
+	ROM_SYSTEM_BIOS( 1, "v2",   "G-NET Bios v2" ) \
+    	ROM_LOAD16_WORD_BIOS(1, "flashv2.u30", 0x000000, 0x200000, CRC(CAE462D3) SHA1(f1b10846a8423d9fe021191c5876190857c3d2a4) ) \
 	ROM_REGION32_LE( 0x80000,  "soundcpu", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
 	ROM_REGION32_LE( 0x600000, "samples", 0) \
@@ -1184,6 +1196,13 @@ ROM_START(zokuoten)
 	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
+ROM_START(otenamhf)
+	TAITOGNET_BIOS
+	ROM_DEFAULT_BIOS( "v2" )
+	
+	DISK_REGION( "card" )
+	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562))
+ROM_END
 
 
 
@@ -1256,6 +1275,7 @@ GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito", "
 GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", 0 )
 
 GAME( 1999, otenamih, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Otenami Haiken (V2.04J)", 0 )
+GAME( 2005, otenamhf, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success/Warashi", "Otenami Haiken Final (V2.07JC)", 0 )
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )

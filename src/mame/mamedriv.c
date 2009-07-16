@@ -2995,6 +2995,7 @@ V-V                           TP-027
 	DRIVER( chaoshej )	/* 1998.10 Chaos Heat (V2.08J) */
 	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
 	DRIVER( otenamih )	/* 1999.02 Otenami Haiken (Success) */
+	DRIVER( otenamhf )	/* 2005.04 Otenami Haiken Final (V2.07JC) */
 	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
 	DRIVER( spuzbobl )	/* 1999.?? Super Puzzle Bobble (V2.05O) */
 	DRIVER( gobyrc )	/* 1999.?? Go By RC (V2.03O) */

@@ -60,6 +60,8 @@ UINT8 *ide_get_features(const device_config *device);
 void ide_set_master_password(const device_config *device, const UINT8 *password);
 void ide_set_user_password(const device_config *device, const UINT8 *password);
 
+void ide_set_gnet_readlock(const device_config *device, const UINT8 onoff);
+
 int ide_bus_r(const device_config *config, int select, int offset);
 void ide_bus_w(const device_config *config, int select, int offset, int data);
 

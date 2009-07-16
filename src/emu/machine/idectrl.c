@@ -83,6 +83,7 @@
 #define IDE_COMMAND_IDLE_IMMEDIATE		0xe1
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_1 0xfe
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_2 0xfc
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_3 0x0f
 
 #define IDE_ERROR_NONE					0x00
 #define IDE_ERROR_DEFAULT				0x01
@@ -152,11 +153,13 @@ struct _ide_state
 	hard_disk_file *disk;
 	emu_timer *		last_status_timer;
 	emu_timer *		reset_timer;
-
+	
 	UINT8			master_password_enable;
 	UINT8			user_password_enable;
 	const UINT8 *	master_password;
 	const UINT8 *	user_password;
+
+	UINT8			gnetreadlock;
 };
 
 
@@ -273,6 +276,11 @@ UINT8 *ide_get_features(const device_config *device)
 	return ide->features;
 }
 
+void ide_set_gnet_readlock(const device_config *device, const UINT8 onoff)
+{
+	ide_state *ide = get_safe_token(device);
+	ide->gnetreadlock = onoff;	
+}
 
 void ide_set_master_password(const device_config *device, const UINT8 *password)
 {
@@ -713,6 +721,12 @@ static void read_sector_done(ide_state *ide)
 {
 	int lba = lba_address(ide), count = 0;
 
+	/* GNET readlock check */
+	if (ide->gnetreadlock) {
+		ide->status &= ~IDE_STATUS_ERROR;
+		ide->status &= ~IDE_STATUS_BUSY;		
+		return;
+	}
 	/* now do the read */
 	if (ide->disk)
 		count = hard_disk_read(ide->disk, lba, ide->buffer);
@@ -986,7 +1000,9 @@ static TIMER_CALLBACK( write_sector_done_callback )
  *************************************/
 
 static void handle_command(ide_state *ide, UINT8 command)
-{
+{	
+	UINT8 key[5];
+	
 	/* implicitly clear interrupts here */
 	clear_interrupt(ide);
 
@@ -1188,6 +1204,22 @@ static void handle_command(ide_state *ide, UINT8 command)
 
 			/* mark the buffer ready */
 			ide->status |= IDE_STATUS_BUFFER_READY;
+			signal_interrupt(ide);
+			break;
+
+		case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
+			LOGPRINT(("IDE GNET Unlock 3\n"));
+			
+			/* key check */									
+			chd_get_metadata (ide->handle, HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);			
+			if ((ide->precomp_offset == key[0]) && (ide->sector_count == key[1]) && (ide->cur_sector == key[2]) && (ide->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
+			{
+				ide->gnetreadlock= 0;
+			}
+		
+			/* update flags */
+			ide->status |= IDE_STATUS_DRIVE_READY;
+			ide->status &= ~IDE_STATUS_ERROR;			
 			signal_interrupt(ide);
 			break;
 
@@ -1409,8 +1441,10 @@ static void ide_controller_write(const device_config *device, int bank, offs_t o
 						ide->status &= ~IDE_STATUS_BUFFER_READY;
 						if (bad)
 							ide->status |= IDE_STATUS_ERROR;
-						else
+						else {
 							ide->status &= ~IDE_STATUS_ERROR;
+							ide->gnetreadlock= 0;
+						}
 					}
 					else
 						continue_write(ide);
@@ -1842,6 +1876,8 @@ static DEVICE_START( ide_controller )
 
 	state_save_register_device_item(device, 0, ide->master_password_enable);
 	state_save_register_device_item(device, 0, ide->user_password_enable);
+
+	state_save_register_device_item(device, 0, ide->gnetreadlock);
 }
 
 
@@ -1873,6 +1909,7 @@ static DEVICE_RESET( ide_controller )
 	ide->status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 	ide->error = IDE_ERROR_DEFAULT;
 	ide->buffer_offset = 0;
+	ide->gnetreadlock = 0;
 	ide->master_password_enable = (ide->master_password != NULL);
 	ide->user_password_enable = (ide->user_password != NULL);
 	clear_interrupt(ide);
