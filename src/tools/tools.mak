@@ -31,6 +31,7 @@ TOOLS += \
 	regrep$(EXE) \
 	srcclean$(EXE) \
 	src2html$(EXE) \
+	split$(EXE) \
 
 
 
