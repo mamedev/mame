@@ -185,7 +185,12 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_HASHJMPS		(0)
+#define LOG_HASHJMPS			(0)
+
+#define USE_RCPSS_FOR_SINGLES	(0)
+#define USE_RSQRTSS_FOR_SINGLES	(0)
+#define USE_RCPSS_FOR_DOUBLES	(0)
+#define USE_RSQRTSS_FOR_DOUBLES	(0)
 
 
 
@@ -285,6 +290,8 @@ struct _drcbe_state
 	UINT32					ssecontrol[4];			/* copy of the sse_control array */
 	UINT32 *				absmask32;				/* absolute value mask (32-bit) */
 	UINT64 *				absmask64;				/* absolute value mask (32-bit) */
+	float					single1;				/* 1.0 is single-precision */
+	double					double1;				/* 1.0 in double-precision */
 
 	void *					stacksave;				/* saved stack pointer */
 	void *					hashstacksave;			/* saved stack pointer for hashjmp */
@@ -723,6 +730,8 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 	drcbe->absmask32[0] = drcbe->absmask32[1] = drcbe->absmask32[2] = drcbe->absmask32[3] = 0x7fffffff;
 	drcbe->absmask64 = (UINT64 *)&drcbe->absmask32[4];
 	drcbe->absmask64[0] = drcbe->absmask64[1] = U64(0x7fffffffffffffff);
+	drcbe->single1 = 1.0f;
+	drcbe->double1 = 1.0;
 
 	/* get pointers to C functions we need to call */
 	drcbe->debug_cpu_instruction_hook = (x86code *)debug_cpu_instruction_hook;
@@ -7000,23 +7009,47 @@ static x86code *op_frecip(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_rcpss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));					// rcpss dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_rcpss_r128_r128(&dst, dstreg, srcp.value);								// rcpss dstreg,srcp
-		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss dstp,dstreg
+		if (USE_RCPSS_FOR_SINGLES)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_rcpss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// rcpss dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_rcpss_r128_r128(&dst, dstreg, srcp.value);							// rcpss dstreg,srcp
+			emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);							// movss dstp,dstreg
+		}
+		else
+		{
+			emit_movss_r128_m32(&dst, REG_XMM1, MABS(drcbe, &drcbe->single1));			// movss xmm1,1.0
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_divss_r128_m32(&dst, REG_XMM1, MABS(drcbe, srcp.value));			// divss xmm1,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_divss_r128_r128(&dst, REG_XMM1, srcp.value);						// divss xmm1,srcp
+			emit_movss_p32_r128(drcbe, &dst, &dstp, REG_XMM1);							// movss dstp,xmm1
+		}
 	}
 
 	/* 64-bit form */
 	else if (inst->size == 8)
 	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2ss dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);							// cvtsd2ss dstreg,srcp
-		emit_rcpss_r128_r128(&dst, dstreg, dstreg);										// rcpss dstreg,dstreg
-		emit_cvtss2sd_r128_r128(&dst, dstreg, dstreg);									// cvtss2sd dstreg,dstreg
-		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd dstp,dstreg
+		if (USE_RCPSS_FOR_DOUBLES)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2ss dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);						// cvtsd2ss dstreg,srcp
+			emit_rcpss_r128_r128(&dst, dstreg, dstreg);									// rcpss dstreg,dstreg
+			emit_cvtss2sd_r128_r128(&dst, dstreg, dstreg);								// cvtss2sd dstreg,dstreg
+			emit_movsd_p64_r128(drcbe, &dst, &dstp, REG_XMM1);							// movsd dstp,dstreg
+		}
+		else
+		{
+			emit_movsd_r128_m64(&dst, REG_XMM1, MABS(drcbe, &drcbe->double1));			// movsd xmm1,1.0
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_divsd_r128_m64(&dst, REG_XMM1, MABS(drcbe, srcp.value));			// divsd xmm1,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_divsd_r128_r128(&dst, REG_XMM1, srcp.value);						// divsd xmm1,srcp
+			emit_movsd_p64_r128(drcbe, &dst, &dstp, REG_XMM1);							// movsd dstp,xmm1
+		}
 	}
 	return dst;
 }
@@ -7045,22 +7078,46 @@ static x86code *op_frsqrt(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_rsqrtss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// rsqrtss dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_rsqrtss_r128_r128(&dst, dstreg, srcp.value);							// rsqrtss dstreg,srcp
+		if (USE_RSQRTSS_FOR_SINGLES)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_rsqrtss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// rsqrtss dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_rsqrtss_r128_r128(&dst, dstreg, srcp.value);						// rsqrtss dstreg,srcp
+		}
+		else
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_sqrtss_r128_m32(&dst, REG_XMM1, MABS(drcbe, srcp.value));			// sqrtss xmm1,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_sqrtss_r128_r128(&dst, REG_XMM1, srcp.value);						// sqrtss xmm1,srcp
+			emit_movss_r128_m32(&dst, dstreg, MABS(drcbe, &drcbe->single1));			// movss dstreg,1.0
+			emit_divss_r128_r128(&dst, dstreg, REG_XMM1);								// divss dstreg,xmm1
+		}
 		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss dstp,dstreg
 	}
 
 	/* 64-bit form */
 	else if (inst->size == 8)
 	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2ss dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);							// cvtsd2ss dstreg,srcp
-		emit_rsqrtss_r128_r128(&dst, dstreg, dstreg);									// rsqrtss dstreg,dstreg
-		emit_cvtss2sd_r128_r128(&dst, dstreg, dstreg);									// cvtss2sd dstreg,dstreg
+		if (USE_RSQRTSS_FOR_DOUBLES)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2ss dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);						// cvtsd2ss dstreg,srcp
+			emit_rsqrtss_r128_r128(&dst, dstreg, dstreg);								// rsqrtss dstreg,dstreg
+			emit_cvtss2sd_r128_r128(&dst, dstreg, dstreg);								// cvtss2sd dstreg,dstreg
+		}
+		else
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_sqrtsd_r128_m64(&dst, REG_XMM1, MABS(drcbe, srcp.value));			// sqrtsd xmm1,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_sqrtsd_r128_r128(&dst, REG_XMM1, srcp.value);						// sqrtsd xmm1,srcp
+			emit_movsd_r128_m64(&dst, dstreg, MABS(drcbe, &drcbe->double1));			// movsd dstreg,1.0
+			emit_divsd_r128_r128(&dst, dstreg, REG_XMM1);								// divsd dstreg,xmm1
+		}
 		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd dstp,dstreg
 	}
 	return dst;
