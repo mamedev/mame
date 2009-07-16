@@ -116,6 +116,34 @@ static void tecmo_adpcm_int(const device_config *device)
 	}
 }
 
+/* the 8-bit dipswitches are split across addresses */
+static READ8_HANDLER( tecmo_dswa_l_r )
+{
+	UINT8 port = input_port_read(space->machine, "DSWA");
+	port &= 0x0f;
+	return port;
+}
+
+static READ8_HANDLER( tecmo_dswa_h_r )
+{
+	UINT8 port = input_port_read(space->machine, "DSWA");
+	port &= 0xf0;
+	return port>>4;
+}
+
+static READ8_HANDLER( tecmo_dswb_l_r )
+{
+	UINT8 port = input_port_read(space->machine, "DSWB");
+	port &= 0x0f;
+	return port;
+}
+
+static READ8_HANDLER( tecmo_dswb_h_r )
+{
+	UINT8 port = input_port_read(space->machine, "DSWB");
+	port &= 0xf0;
+	return port>>4;
+}
 
 
 static ADDRESS_MAP_START( rygar_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -133,10 +161,10 @@ static ADDRESS_MAP_START( rygar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSWA_0")
-	AM_RANGE(0xf807, 0xf807) AM_READ_PORT("DSWA_1")
-	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSWB_0")
-	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("DSWB_1")
+	AM_RANGE(0xf806, 0xf806) AM_READ( tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ( tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ( tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ( tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -161,10 +189,10 @@ static ADDRESS_MAP_START( gemini_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSWA_0")
-	AM_RANGE(0xf807, 0xf807) AM_READ_PORT("DSWA_1")
-	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSWB_0")
-	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("DSWB_1")
+	AM_RANGE(0xf806, 0xf806) AM_READ( tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ( tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ( tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ( tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -189,10 +217,10 @@ static ADDRESS_MAP_START( silkworm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSWA_0")
-	AM_RANGE(0xf807, 0xf807) AM_READ_PORT("DSWA_1")
-	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSWB_0")
-	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("DSWB_1")
+	AM_RANGE(0xf806, 0xf806) AM_READ( tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ( tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ( tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ( tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -264,7 +292,7 @@ static INPUT_PORTS_START( rygar )
 	PORT_START("SYS_2")		/* unused? */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSWA_0")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -275,21 +303,19 @@ static INPUT_PORTS_START( rygar )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0C, DEF_STR( 1C_3C ) )
-
-	PORT_START("DSWA_1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) /* Listed as "Unused" in the manual */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) /* Listed as "Unused" in the manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSWB_0")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
 	PORT_DIPSETTING(    0x01, "100000 300000 600000" )
@@ -301,19 +327,17 @@ static INPUT_PORTS_START( rygar )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) /* Listed as "Unused" in the manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-
-	PORT_START("DSWB_1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, "2P Can Start Anytime" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x00, "2P Can Start Anytime" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gemini )
@@ -353,7 +377,7 @@ static INPUT_PORTS_START( gemini )
 	PORT_START("SYS_2")		/* unused? */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSWA_0")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -366,22 +390,20 @@ static INPUT_PORTS_START( gemini )
 	PORT_DIPNAME( 0x08, 0x00, "Final Round Continuation" )
 	PORT_DIPSETTING(    0x00, "Round 6" )
 	PORT_DIPSETTING(    0x08, "Round 7" )
-
-	PORT_START("DSWA_1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x08, 0x00, "Buy in During Final Round" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x80, 0x00, "Buy in During Final Round" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START("DSWB_0")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -392,19 +414,17 @@ static INPUT_PORTS_START( gemini )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
-
-	PORT_START("DSWB_1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "50000 200000" )
-	PORT_DIPSETTING(    0x01, "50000 300000" )
-	PORT_DIPSETTING(    0x02, "100000 500000" )
-	PORT_DIPSETTING(    0x03, "50000" )
-	PORT_DIPSETTING(    0x04, "100000" )
-	PORT_DIPSETTING(    0x05, "200000" )
-	PORT_DIPSETTING(    0x06, "300000" )
-	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, "50000 300000" )
+	PORT_DIPSETTING(    0x20, "100000 500000" )
+	PORT_DIPSETTING(    0x30, "50000" )
+	PORT_DIPSETTING(    0x40, "100000" )
+	PORT_DIPSETTING(    0x50, "200000" )
+	PORT_DIPSETTING(    0x60, "300000" )
+	PORT_DIPSETTING(    0x70, DEF_STR( None ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -446,66 +466,55 @@ static INPUT_PORTS_START( backfirt )
 	PORT_START("SYS_2")		/* unused? */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSWA_0")
-	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) ) // limit of 9?
+	PORT_DIPNAME( 0x0C, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0C, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-
-	PORT_START("DSWA_1")
-	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB_0")
-	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB_1")
-	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
+	PORT_DIPSETTING(    0x01, "100000 300000 800000" )
+	PORT_DIPSETTING(    0x02, "50000 200000" )
+	PORT_DIPSETTING(    0x03, "100000 300000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x05, "100000" )
+	PORT_DIPSETTING(    0x06, "200000" )
+	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x28, "5" )
+	PORT_DIPSETTING(    0x30, "6" )
+	PORT_DIPSETTING(    0x38, "7" )
+    PORT_DIPNAME( 0x40, 0x40, "Continue" )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, "Invulnerability" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -546,7 +555,7 @@ static INPUT_PORTS_START( silkworm )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("DSWA_0")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -557,21 +566,19 @@ static INPUT_PORTS_START( silkworm )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0C, DEF_STR( 1C_3C ) )
-
-	PORT_START("DSWA_1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	/* unused? */
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )	/* unused? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSWB_0")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
 	PORT_DIPSETTING(    0x01, "100000 300000 800000" )
@@ -584,18 +591,17 @@ static INPUT_PORTS_START( silkworm )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	/* unused? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-
-	PORT_START("DSWB_1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x60, "0" )
+	PORT_DIPSETTING(    0x70, "0" )
 	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x05, "5" )
-	/* 0x06 and 0x07 are the same as 0x00 */
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x50, "5" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
@@ -728,7 +734,42 @@ static MACHINE_DRIVER_START( silkworm )
 	MDRV_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( backfirt )
 
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
+	MDRV_CPU_PROGRAM_MAP(rygar_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2)
+	MDRV_CPU_PROGRAM_MAP(rygar_sound_map)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(tecmo)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(tecmo)
+	MDRV_VIDEO_UPDATE(tecmo)
+
+	MDRV_MACHINE_RESET( rygar )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_4MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(ym3812_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* no MSM on this PCB */
+	
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -996,10 +1037,7 @@ ROM_START( backfirt )
 	ROM_LOAD( "b17-s1.bin",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )	/* tiles #2 */
 	ROM_LOAD( "b16-s2.bin",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )	/* tiles #2 */
 	ROM_LOAD( "b15-s2.bin",  0x20000, 0x10000, CRC(2b6cc20e) SHA1(4815819288753400935836cc1b0b69f4c4b43ddc) )	/* tiles #2 */
-	ROM_LOAD( "b14-s3.bin",  0x30000, 0x08000, CRC(4d29637a) SHA1(28e85925138256b8ce5a1c4a5df5b219b1b6b197) )	/* tiles #2 */
-
-	ROM_REGION( 0x8000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
-	// not on this pcb?
+	ROM_LOAD( "b14-s3.bin",  0x30000, 0x08000, CRC(4d29637a) SHA1(28e85925138256b8ce5a1c4a5df5b219b1b6b197) )	/* tiles #2 */ // half size is correct, rom type 27256
 ROM_END
 
 ROM_START( gemini )
@@ -1045,8 +1083,21 @@ static DRIVER_INIT( rygar )    { tecmo_video_type = 0; }
 static DRIVER_INIT( silkworm ) { tecmo_video_type = 1; }
 static DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
 
+static DRIVER_INIT( backfirt )
+{
+	tecmo_video_type = 2;
+	
+	/* no MSM */
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xd000, 0xd000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, SMH_NOP);
+
+	
+}
 
 
+	
+	
 GAME( 1986, rygar,    0,        rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 )
 GAME( 1986, rygar2,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 )
 GAME( 1986, rygar3,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", 0 )
@@ -1054,4 +1105,4 @@ GAME( 1986, rygarj,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "A
 GAME( 1987, gemini,   0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing", 0 )
 GAME( 1988, silkworm, 0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 1)", 0 )
 GAME( 1988, silkwrm2, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 )
-GAME( 1988, backfirt, 0,        gemini,   backfirt, gemini,   ROT0,  "Tecmo", "Back Fire (Tecmo)", 0 )
+GAME( 1988, backfirt, 0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )
