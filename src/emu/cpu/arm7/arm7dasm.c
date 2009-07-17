@@ -231,6 +231,10 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		if ((opcode & 0x0f) == 14)
 			dasmflags = DASMFLAG_STEP_OUT;
 	}
+    	else if ((opcode & 0x0ff000f0) == 0x01600010)	// CLZ - v5
+	{
+		pBuf += sprintf(pBuf, "CLZ R%d, R%d", (opcode>>12)&0xf, opcode&0xf);
+	}
 	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) )	//bits 27-25 == 000, bit 7=1, bit 4=1
 	{
 		/* multiply or swap or half word data transfer */

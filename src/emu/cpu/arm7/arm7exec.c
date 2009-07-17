@@ -1248,6 +1248,15 @@
                             R15--;
                         }
                     }
+		    else if ((insn & 0x0ff000f0) == 0x01600010)	// CLZ - v5
+		    {
+		    	UINT32 rm = insn&0xf;
+			UINT32 rd = (insn>>12)&0xf;
+
+			SET_REGISTER(cpustate, rd, count_leading_zeros(GET_REGISTER(cpustate, rm)));
+
+			R15 += 4;
+		    }
                     else
                     /* Multiply OR Swap OR Half Word Data Transfer */
                     if ((insn & 0x0e000000) == 0 && (insn & 0x80) && (insn & 0x10))  // bits 27-25=000 bit 7=1 bit 4=1
