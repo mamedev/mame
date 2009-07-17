@@ -46,7 +46,7 @@ typedef enum _cdp1802_control_mode cdp1802_control_mode;
 
 enum _cdp1802_state_code
 {
-	CDP1802_STATE_CODE_S0_FETCH,
+	CDP1802_STATE_CODE_S0_FETCH = 0,
 	CDP1802_STATE_CODE_S1_EXECUTE,
 	CDP1802_STATE_CODE_S2_DMA,
 	CDP1802_STATE_CODE_S3_INTERRUPT
@@ -58,7 +58,7 @@ enum
 	CDP1802_P, CDP1802_X, CDP1802_D, CDP1802_B, CDP1802_T,
 	CDP1802_R0, CDP1802_R1, CDP1802_R2, CDP1802_R3, CDP1802_R4, CDP1802_R5, CDP1802_R6, CDP1802_R7,
 	CDP1802_R8, CDP1802_R9, CDP1802_Ra, CDP1802_Rb, CDP1802_Rc, CDP1802_Rd, CDP1802_Re, CDP1802_Rf,
-	CDP1802_DF, CDP1802_IE, CDP1802_Q, CDP1802_N, CDP1802_I,
+	CDP1802_DF, CDP1802_IE, CDP1802_Q, CDP1802_N, CDP1802_I, CDP1802_SC,
 	CDP1802_GENPC = REG_GENPC
 };
 
@@ -68,8 +68,8 @@ typedef cdp1802_control_mode (*cdp1802_mode_read_func)(const device_config *devi
 typedef UINT8 (*cdp1802_ef_read_func)(const device_config *device);
 #define CDP1802_EF_READ(name) UINT8 name(const device_config *device)
 
-typedef void (*cdp1802_sc_write_func)(const device_config *device, cdp1802_state_code state);
-#define CDP1802_SC_WRITE(name) void name(const device_config *device, cdp1802_state_code state)
+typedef void (*cdp1802_sc_write_func)(const device_config *device, cdp1802_state_code state, int sc0, int sc1);
+#define CDP1802_SC_WRITE(name) void name(const device_config *device, cdp1802_state_code state, int sc0, int sc1)
 
 /* interface */
 typedef struct _cdp1802_interface cdp1802_interface;
