@@ -293,6 +293,8 @@ static WRITE8_HANDLER(page3_w)
 	}
 }
 
+
+
 static ADDRESS_MAP_START( sfkick_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK(1)
 	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK(2)
@@ -317,6 +319,7 @@ static ADDRESS_MAP_START( sfkick_io_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
 	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfkick_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -500,6 +503,9 @@ static DRIVER_INIT(sfkick)
 	main_mem=auto_alloc_array(machine, UINT8, 0x4000);
 }
 
+
+
+
 ROM_START( sfkick )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
@@ -520,6 +526,29 @@ ROM_START( sfkick )
 
 	ROM_REGION(0x10000,  "soundcpu", 0)
 	ROM_LOAD( "sfkick1.c5", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
+ROM_END
+
+
+ROM_START( sfkicka )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION(0x20000,  "banked", ROMREGION_ERASEFF)
+	ROM_LOAD( "c145.bin", 0x00000, 0x8000, CRC(1dcaec5e) SHA1(7e063d46fb6606df2d772866cc55f207035b98c4) )
+	ROM_LOAD( "c146.bin", 0x08000, 0x8000, CRC(57afc4c6) SHA1(ee28b3f74e3175c22f542855b09f1673d048b1fa) )
+	ROM_LOAD( "c147.bin", 0x10000, 0x8000, CRC(ee1b344e) SHA1(d33fbad017cc4838192e9c540621537edb7e8dc4) )
+	/* 0x18000-0x1ffff = empty */
+
+	ROM_REGION(0x8000,  "extrom", 0)
+	 ROM_LOAD( "c149.bin", 0x00000, 0x8000, CRC(828bd9cf) SHA1(f493de40147f2d67a48d4c90b01170fbd6ea074e) )
+
+	ROM_REGION(0x8000,  "cartridge", 0)
+	ROM_LOAD( "c150.bin", 0x0000, 0x8000, CRC(7291ac4b) SHA1(afc5e2c2fe0cd208235ac6ae2775cc9a0b1c9f76) )
+
+	ROM_REGION(0x8000,  "bios", 0)
+	ROM_LOAD( "c151.bin", 0x00000, 0x8000, CRC(8cd94c63) SHA1(e6dba66c8716593b8ab88f79f7205211938d1598) )
+
+	ROM_REGION(0x10000,  "soundcpu", 0)
+	ROM_LOAD( "c130.bin", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
 ROM_END
 
 
@@ -545,5 +574,8 @@ ROM_START( spinkick )
 	ROM_LOAD( "spinkick.r1", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
 ROM_END
 
-GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick", 0 )
+
+GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
+GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
 GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )
+

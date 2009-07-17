@@ -8880,8 +8880,9 @@ Other Sun games
 	DRIVER( rcorsair )	/* (c) 1984 Nakasawa */
 	DRIVER( pzlestar )	/* (c) 199? Sang Ho Soft */
 	DRIVER( sexyboom )	/* (c) 1992 Sang Ho Soft */
-	DRIVER( sfkick )	/* (c) 199? HEC */
-	DRIVER( spinkick )	/* (c) 199? HEC */
+	DRIVER( sfkick )	/* (c) 1988 Haesung/HJ Corp */
+	DRIVER( sfkicka )	/* (c) 198? Haesung */
+	DRIVER( spinkick )	/* (c) 1988 Haesung/Seojin */
 	DRIVER( 7mezzo )	/* (c) 198? Unknown */
 	DRIVER( magicfly )	/* (c) 198? P&A GAMES */
 	DRIVER( dynabomb )	/* (c) 2000 Limenko */
