@@ -232,6 +232,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 				if (!prot)
 				{
 					logerror("naomibd: reading protection data, but none was supplied\n");
+					return 0;
 				}
 
 				ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
