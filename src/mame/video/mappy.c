@@ -341,6 +341,8 @@ VIDEO_START( phozon )
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
+
+    state_save_register_global(machine, mappy_scroll);
 }
 
 VIDEO_START( mappy )
