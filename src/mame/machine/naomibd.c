@@ -101,6 +101,15 @@ extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* regi
  *
  *************************************/
 
+#define MAX_PROT_REGIONS	(32)
+
+typedef struct _naomibd_config_table naomibd_config_table;
+struct _naomibd_config_table
+{
+	const char *name;
+	UINT32	transtbl[MAX_PROT_REGIONS*2];
+};
+
 typedef struct _naomibd_state naomibd_state;
 struct _naomibd_state
 {
@@ -115,9 +124,22 @@ struct _naomibd_state
 	UINT32				rom_offset, rom_offset_flags, dma_count;
 	UINT32				dma_offset, dma_offset_flags;
 	UINT32				prot_offset, prot_key;
+
+	UINT32				*prot_translate;
 };
 
-
+// maps protection offsets to real addresses
+static naomibd_config_table naomibd_translate_tbl[] =
+{
+	{ "doa2", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
+		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x118a3a, 0x120000,
+		    0x12c0d8, 0x140000, 0x147e22, 0x160000, 0x1645ce, 0x180000, 0x17c6b2, 0x1a0000, 
+		    0x19902e, 0x1c0000, 0x1b562a, 0x1e0000, 0xffffffff, 0xffffffff } },
+	{ "doa2m", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
+		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x11a5b4, 0x120000,
+		    0x12e7c4, 0x140000, 0x1471f6, 0x160000, 0x1640c4, 0x180000, 0x1806ca, 0x1a0000, 
+		    0x199df4, 0x1c0000, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
+};
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -227,7 +249,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 			if (v->rom_offset == 0x1fffe)
 			{
 				UINT8 *prot = (UINT8 *)v->protdata;
-				UINT32 byte_offset = v->prot_offset * 2;
+				UINT32 byte_offset = v->prot_offset*2;
 
 				if (!prot)
 				{
@@ -305,6 +327,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 WRITE64_DEVICE_HANDLER( naomibd_w )
 {
 	naomibd_state *v = get_safe_token(device);
+	INT32 i;
 
 	switch(offset)
 	{
@@ -353,6 +376,25 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						v->prot_key = data;
 
 						mame_printf_verbose("Protection: set up read @ %x, key %x [%s]\n", v->prot_offset, v->prot_key, cpuexec_describe_context(device->machine));
+
+						// translate address if necessary
+						if (v->prot_translate != NULL)
+						{
+							i = 0;
+							while (v->prot_translate[i] != 0xffffffff)
+							{
+								if (v->prot_translate[i] == (v->prot_offset*2))
+								{
+									mame_printf_verbose("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+1]);
+									v->prot_offset = v->prot_translate[i+1]/2;
+									break;
+								}
+								else
+								{
+									i += 2;
+								}
+							}
+						}
 						break;
 
 					default:
@@ -611,6 +653,7 @@ static DEVICE_START( naomibd )
 {
 	const naomibd_config *config = (const naomibd_config *)device->inline_config;
 	naomibd_state *v = get_safe_token(device);
+	int i;
 
 	/* validate some basic stuff */
 	assert(device->static_config == NULL);
@@ -623,6 +666,17 @@ static DEVICE_START( naomibd )
 
 	/* store a pointer back to the device */
 	v->device = device;
+
+	/* find the protection address translation for this game */
+	v->prot_translate = (UINT32 *)0;
+	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
+	{
+		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
+		{
+			v->prot_translate = &naomibd_translate_tbl[i].transtbl[0];
+			break;
+		}
+	}
 
 	/* configure type-specific values */
 	switch (config->type)
@@ -759,3 +813,4 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
