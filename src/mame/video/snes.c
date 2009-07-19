@@ -289,8 +289,23 @@ INLINE void snes_draw_tile_2(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 				c = snes_cgram[pal + colour];
 				if( screen == MAINSCREEN )	/* Only blend main screens */
 					snes_draw_blend(ii, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4 );
-				scanlines[screen].buffer[ii] = c;
-				scanlines[screen].zbuf[ii] = priority;
+				if( snes_ram[MOSAIC] & (1 << layer) ) // handle horizontal mosaic
+				{
+					int x_mos;
+
+					//TODO: 512 modes has the h values doubled.
+					for(x_mos = 0;x_mos < (((snes_ram[MOSAIC] & 0xf0)>>4)+1) ; x_mos++)
+					{
+						scanlines[screen].buffer[ii + x_mos] = c;
+						scanlines[screen].zbuf[ii + x_mos] = priority;
+					}
+					ii += x_mos - 1;
+				}
+				else
+				{
+					scanlines[screen].buffer[ii] = c;
+					scanlines[screen].zbuf[ii] = priority;
+				}
 			}
 		}
 	}
@@ -367,8 +382,22 @@ INLINE void snes_draw_tile_4(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 				c = snes_cgram[pal + colour];
 				if( screen == MAINSCREEN )	/* Only blend main screens */
 					snes_draw_blend(ii, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4 );
-				scanlines[screen].buffer[ii] = c;
-				scanlines[screen].zbuf[ii] = priority;
+				if( snes_ram[MOSAIC] & (1 << layer) ) // handle horizontal mosaic
+				{
+					int x_mos;
+					//TODO: 512 modes has the h values doubled.
+					for(x_mos = 0;x_mos < (((snes_ram[MOSAIC] & 0xf0)>>4)+1) ; x_mos++)
+					{
+						scanlines[screen].buffer[ii + x_mos] = c;
+						scanlines[screen].zbuf[ii + x_mos] = priority;
+					}
+					ii += x_mos - 1;
+				}
+				else
+				{
+					scanlines[screen].buffer[ii] = c;
+					scanlines[screen].zbuf[ii] = priority;
+				}
 			}
 		}
 	}
@@ -453,8 +482,23 @@ INLINE void snes_draw_tile_8(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 				c = snes_cgram[colour];
 				if( screen == MAINSCREEN )	/* Only blend main screens */
 					snes_draw_blend(ii, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4 );
-				scanlines[screen].buffer[ii] = c;
-				scanlines[screen].zbuf[ii] = priority;
+				if( snes_ram[MOSAIC] & (1 << layer) ) // handle horizontal mosaic
+				{
+					int x_mos;
+
+					//TODO: 512 modes has the h values doubled.
+					for(x_mos = 0;x_mos < (((snes_ram[MOSAIC] & 0xf0)>>4)+1) ; x_mos++)
+					{
+						scanlines[screen].buffer[ii + x_mos] = c;
+						scanlines[screen].zbuf[ii + x_mos] = priority;
+					}
+					ii += x_mos - 1;
+				}
+				else
+				{
+					scanlines[screen].buffer[ii] = c;
+					scanlines[screen].zbuf[ii] = priority;
+				}
 			}
 		}
 	}
