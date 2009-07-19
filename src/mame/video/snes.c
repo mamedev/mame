@@ -282,7 +282,7 @@ INLINE void snes_draw_tile_2(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 			colour &= snes_ppu.clipmasks[layer][ii];
 
 		/* Only draw if we have a colour (0 == transparent) */
-		if( colour || snes_ram[MOSAIC] & (1 << layer))
+		if( colour )
 		{
 			if( (scanlines[screen].zbuf[ii] <= priority) && (ii >= 0) )
 			{
@@ -375,7 +375,7 @@ INLINE void snes_draw_tile_4(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 			colour &= snes_ppu.clipmasks[layer][ii];
 
 		/* Only draw if we have a colour (0 == transparent) */
-		if( colour || snes_ram[MOSAIC] & (1 << layer))
+		if( colour )
 		{
 			if( (scanlines[screen].zbuf[ii] <= priority) && (ii >= 0) )
 			{
@@ -385,6 +385,7 @@ INLINE void snes_draw_tile_4(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 				if( snes_ram[MOSAIC] & (1 << layer) ) // handle horizontal mosaic
 				{
 					int x_mos;
+
 					//TODO: 512 modes has the h values doubled.
 					for(x_mos = 0;x_mos < (((snes_ram[MOSAIC] & 0xf0)>>4)+1) ; x_mos++)
 					{
@@ -475,7 +476,7 @@ INLINE void snes_draw_tile_8(UINT8 screen, UINT8 layer, UINT16 tileaddr, INT16 x
 			colour &= snes_ppu.clipmasks[layer][ii];
 
 		/* Only draw if we have a colour (0 == transparent) */
-		if( colour || snes_ram[MOSAIC] & (1 << layer))
+		if( colour )
 		{
 			if( (scanlines[screen].zbuf[ii] <= priority) && (ii >= 0) )
 			{
