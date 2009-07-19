@@ -1219,7 +1219,7 @@ GAME(   2002, mfish_9,  mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi F
 GAME(   2002, mfish_10, mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031117)",  0 )
 GAME(   2002, mfish_11, mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 )
 GAME(   2002, mfish_12, mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 1)",  0 )
-GAME(   2002, mfish_12a mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 2, hack?)",  0 )
+GAME(   2002, mfish_12a,mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 2, hack?)",  0 )
 GAME(   2002, mfish_13, mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040316)",  0 )
 
 #else /* Multifish sets for which SHA1 information is available */

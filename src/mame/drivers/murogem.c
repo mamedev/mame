@@ -270,6 +270,6 @@ ROM_START( lasvegas )
 
 ROM_END
 
-GAME( 198?,	murogem,  0,       murogem, murogem, 0, ROT0, "unknown", "Muroge Monaco (set 1)", GAME_NO_SOUND|GAME_WRONG_COLORS )
+GAME( 198?, murogem,  0,       murogem, murogem, 0, ROT0, "unknown", "Muroge Monaco (set 1)", GAME_NO_SOUND|GAME_WRONG_COLORS )
 GAME( 198?, murogema, murogem, murogem, murogem, 0, ROT0, "unknown", "Muroge Monaco (set 2)", GAME_NO_SOUND|GAME_WRONG_COLORS )
-GAME( 198?, lasvegas, murogem, murogem, murogem, 0, ROT0, "hack", "Las Vegas, Nevada", GAME_NO_SOUND|GAME_WRONG_COLORS )
+GAME( 198?, lasvegas, murogem, murogem, murogem, 0, ROT0, "hack",    "Las Vegas, Nevada", GAME_NO_SOUND|GAME_WRONG_COLORS )
