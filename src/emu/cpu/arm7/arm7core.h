@@ -270,6 +270,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define Z_BIT   30
 #define C_BIT   29
 #define V_BIT   28
+#define Q_BIT   27
 #define I_BIT   7
 #define F_BIT   6
 #define T_BIT   5   // Thumb mode
@@ -278,6 +279,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define Z_MASK  ((UINT32)(1 << Z_BIT)) /* Zero flag */
 #define C_MASK  ((UINT32)(1 << C_BIT)) /* Carry flag */
 #define V_MASK  ((UINT32)(1 << V_BIT)) /* oVerflow flag */
+#define Q_MASK  ((UINT32)(1 << Q_BIT)) /* signed overflow for QADD, MAC */
 #define I_MASK  ((UINT32)(1 << I_BIT)) /* Interrupt request disable */
 #define F_MASK  ((UINT32)(1 << F_BIT)) /* Fast interrupt request disable */
 #define T_MASK  ((UINT32)(1 << T_BIT)) /* Thumb Mode flag */
@@ -286,6 +288,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define Z_IS_SET(pc)    ((pc) & Z_MASK)
 #define C_IS_SET(pc)    ((pc) & C_MASK)
 #define V_IS_SET(pc)    ((pc) & V_MASK)
+#define Q_IS_SET(pc)    ((pc) & Q_MASK)
 #define I_IS_SET(pc)    ((pc) & I_MASK)
 #define F_IS_SET(pc)    ((pc) & F_MASK)
 #define T_IS_SET(pc)    ((pc) & T_MASK)
@@ -294,6 +297,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define Z_IS_CLEAR(pc)  (!Z_IS_SET(pc))
 #define C_IS_CLEAR(pc)  (!C_IS_SET(pc))
 #define V_IS_CLEAR(pc)  (!V_IS_SET(pc))
+#define Q_IS_CLEAR(pc)  (!Q_IS_SET(pc))
 #define I_IS_CLEAR(pc)  (!I_IS_SET(pc))
 #define F_IS_CLEAR(pc)  (!F_IS_SET(pc))
 #define T_IS_CLEAR(pc)  (!T_IS_SET(pc))

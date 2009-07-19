@@ -73,6 +73,22 @@ INLINE arm_state *get_safe_token(const device_config *device)
 	return (arm_state *)device->token;
 }
 
+INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)
+{
+	if (res > 2147483647)	// INT32_MAX
+	{	// overflow high? saturate and set Q
+		res = 2147483647;
+		SET_CPSR(GET_CPSR | Q_MASK);
+	}
+	else if (res < (-2147483647-1))	// INT32_MIN
+	{	// overflow low? saturate and set Q
+		res = (-2147483647-1);
+		SET_CPSR(GET_CPSR | Q_MASK);
+	}
+
+	return res;
+}
+
 /* include the arm7 core */
 #include "arm7core.c"
 
@@ -341,11 +357,12 @@ CPU_GET_INFO( arm7 )
         case DEVINFO_STR_CREDITS:          strcpy(info->s, "Copyright Steve Ellenoff, sellenoff@hotmail.com"); break;
 
         case CPUINFO_STR_FLAGS:
-            sprintf(info->s, "%c%c%c%c%c%c%c %s",
+            sprintf(info->s, "%c%c%c%c%c%c%c%c %s",
                     (ARM7REG(eCPSR) & N_MASK) ? 'N' : '-',
                     (ARM7REG(eCPSR) & Z_MASK) ? 'Z' : '-',
                     (ARM7REG(eCPSR) & C_MASK) ? 'C' : '-',
                     (ARM7REG(eCPSR) & V_MASK) ? 'V' : '-',
+                    (ARM7REG(eCPSR) & Q_MASK) ? 'Q' : '-',
                     (ARM7REG(eCPSR) & I_MASK) ? 'I' : '-',
                     (ARM7REG(eCPSR) & F_MASK) ? 'F' : '-',
                     (ARM7REG(eCPSR) & T_MASK) ? 'T' : '-',
@@ -444,40 +461,57 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
             LOG( ( "arm7_rt_r_callback CR%d, RESERVED\n", cReg ) );
             break;
         case 0:             // ID
-	    switch (cpustate->archRev)
+	    switch(op2)
 	    {
-	    	case 3:	// ARM6 32-bit
-			data = 0x41;
-			break;
+	    	case 0:
+		    switch (cpustate->archRev)
+		    {
+		    	case 3:	// ARM6 32-bit
+				data = 0x41;
+				break;
 
-		case 4: // ARM7/SA11xx
-			data = 0x41 | (1 << 23) | (7 << 12);
-			break;
+			case 4: // ARM7/SA11xx
+				data = 0x41 | (1 << 23) | (7 << 12);
+				break;
 
-		case 5:	// ARM9/10/XScale
-			data = 0x41 | (9 << 12);
-			if (cpustate->archFlags & eARM_ARCHFLAGS_T)
-			{
-				if (cpustate->archFlags & eARM_ARCHFLAGS_E)
+			case 5:	// ARM9/10/XScale
+				data = 0x41 | (9 << 12);
+				if (cpustate->archFlags & eARM_ARCHFLAGS_T)
 				{
-					if (cpustate->archFlags & eARM_ARCHFLAGS_J)
+					if (cpustate->archFlags & eARM_ARCHFLAGS_E)
 					{
-						data |= (6<<16);	// v5TEJ
+						if (cpustate->archFlags & eARM_ARCHFLAGS_J)
+						{
+							data |= (6<<16);	// v5TEJ
+						}
+						else
+						{
+							data |= (5<<16);	// v5TE
+						}
 					}
 					else
 					{
-						data |= (5<<16);	// v5TE
+						data |= (4<<16);	// v5T
 					}
 				}
-				else
-				{
-					data |= (4<<16);	// v5T
-				}
-			}
-			break;
+				break;
 
-		case 6:	// ARM11
-			data = 0x41 | (10<< 12) | (7<<16);	// v6
+			case 6:	// ARM11
+				data = 0x41 | (10<< 12) | (7<<16);	// v6
+				break;
+		    }
+		    break;
+	    	case 1:	// cache type
+			data = 0x0f0d2112;	// HACK: value expected by ARMWrestler (probably Nintendo DS ARM9's value)
+			break;
+		case 2: // TCM type
+			data = 0;
+			break;
+		case 3: // TLB type
+			data = 0;
+			break;
+		case 4:	// MPU type
+			data = 0;
 			break;
 	    }
             LOG( ( "arm7_rt_r_callback, ID\n" ) );

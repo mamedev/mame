@@ -1257,6 +1257,235 @@
 
 			R15 += 4;
 		    }
+		    else if ((insn & 0x0ff000f0) == 0x01000050)	// QADD - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>16)&0xf);
+			INT64 res;
+
+			res = saturate_qbit_overflow(cpustate, (INT64)src1 + (INT64)src2);
+
+			SET_REGISTER(cpustate, (insn>>12)&0xf, (INT32)res);
+			R15 += 4;
+		    }
+		    else if ((insn & 0x0ff000f0) == 0x01400050)	// QDADD - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>16)&0xf);
+			INT64 res;
+
+			// check if doubling operation will overflow
+			res = (INT64)src2 * 2;
+			saturate_qbit_overflow(cpustate, res);
+
+			src2 *= 2;
+			res = saturate_qbit_overflow(cpustate, (INT64)src1 + (INT64)src2);
+
+			SET_REGISTER(cpustate, (insn>>12)&0xf, (INT32)res);
+			R15 += 4;
+		    }
+		    else if ((insn & 0x0ff000f0) == 0x01200050)	// QSUB - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>16)&0xf);
+			INT64 res;
+
+			res = saturate_qbit_overflow(cpustate, (INT64)src1 - (INT64)src2);
+
+			SET_REGISTER(cpustate, (insn>>12)&0xf, (INT32)res);
+			R15 += 4;
+		    }
+		    else if ((insn & 0x0ff000f0) == 0x01600050)	// QDSUB - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>16)&0xf);
+			INT64 res;
+
+			// check if doubling operation will overflow
+			res = (INT64)src2 * 2;
+			saturate_qbit_overflow(cpustate, res);
+
+			src2 *= 2;
+			res = saturate_qbit_overflow(cpustate, (INT64)src1 - (INT64)src2);
+
+			SET_REGISTER(cpustate, (insn>>12)&0xf, (INT32)res);
+			R15 += 4;
+		    }
+		    else if ((insn & 0x0ff00090) == 0x01000080)	// SMLAxy - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>8)&0xf);
+			INT32 res1;
+
+			// select top and bottom halves of src1/src2 and sign extend if necessary
+			if (insn & 0x20)
+			{
+				src1 >>= 16;
+			}
+			else
+			{
+				src1 &= 0xffff;
+				if (src1 & 0x8000)
+				{
+					src1 |= 0xffff;
+				}
+			}
+
+			if (insn & 0x40)
+			{
+				src2 >>= 16;
+			}
+			else
+			{
+				src2 &= 0xffff;
+				if (src2 & 0x8000)
+				{
+					src2 |= 0xffff;
+				}
+			}
+
+			// do the signed multiply
+			res1 = src1 * src2;
+			// and the accumulate.  NOTE: only the accumulate can cause an overflow, which is why we do it this way.
+			saturate_qbit_overflow(cpustate, (INT64)res1 + (INT64)GET_REGISTER(cpustate, (insn>>12)&0xf));
+
+			SET_REGISTER(cpustate, (insn>>16)&0xf, res1 + GET_REGISTER(cpustate, (insn>>12)&0xf));
+			R15 += 4;
+		    }
+		    else if ((insn & 0x0ff00090) == 0x01400080)	// SMLALxy - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>8)&0xf);
+			INT64 dst;
+
+			// select top and bottom halves of src1/src2 and sign extend if necessary
+			if (insn & 0x20)
+			{
+				src1 >>= 16;
+			}
+			else
+			{
+				src1 &= 0xffff;
+				if (src1 & 0x8000)
+				{
+					src1 |= 0xffff;
+				}
+			}
+
+			if (insn & 0x40)
+			{
+				src2 >>= 16;
+			}
+			else
+			{
+				src2 &= 0xffff;
+				if (src2 & 0x8000)
+				{
+					src2 |= 0xffff;
+				}
+			}
+
+			dst = (INT64)GET_REGISTER(cpustate, (insn>>12)&0xf);
+			dst |= (INT64)GET_REGISTER(cpustate, (insn>>16)&0xf)<<32;
+
+			// do the multiply and accumulate
+			dst += (INT64)src1 * (INT64)src2;
+
+			// write back the result
+			SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)(dst&0xffffffff));
+			SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst>>32));
+		    }
+		    else if ((insn & 0x0ff00090) == 0x01600080)	// SMULxy - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>8)&0xf);
+			INT32 res;
+
+			// select top and bottom halves of src1/src2 and sign extend if necessary
+			if (insn & 0x20)
+			{
+				src1 >>= 16;
+			}
+			else
+			{
+				src1 &= 0xffff;
+				if (src1 & 0x8000)
+				{
+					src1 |= 0xffff;
+				}
+			}
+
+			if (insn & 0x40)
+			{
+				src2 >>= 16;
+			}
+			else
+			{
+				src2 &= 0xffff;
+				if (src2 & 0x8000)
+				{
+					src2 |= 0xffff;
+				}
+			}
+
+			res = src1 * src2;
+			SET_REGISTER(cpustart, (insn>>16)&0xf, res);
+		    }
+		    else if ((insn & 0x0ff000b0) == 0x012000a0)	// SMULWy - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>8)&0xf);
+			INT64 res;
+
+			if (insn & 0x40)
+			{
+				src2 >>= 16;
+			}
+			else
+			{
+				src2 &= 0xffff;
+				if (src2 & 0x8000)
+				{
+					src2 |= 0xffff;
+				}
+			}
+
+			res = (INT64)src1 * (INT64)src2;
+			res >>= 16;
+			SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		    }
+		    else if ((insn & 0x0ff000b0) == 0x01200080)	// SMLAWy - v5
+		    {
+		    	INT32 src1 = GET_REGISTER(cpustate, insn&0xf);
+			INT32 src2 = GET_REGISTER(cpustate, (insn>>8)&0xf);
+			INT32 src3 = GET_REGISTER(cpustate, (insn>>12)&0xf);
+			INT64 res;
+
+			if (insn & 0x40)
+			{
+				src2 >>= 16;
+			}
+			else
+			{
+				src2 &= 0xffff;
+				if (src2 & 0x8000)
+				{
+					src2 |= 0xffff;
+				}
+			}
+
+			res = (INT64)src1 * (INT64)src2;
+			res >>= 16;
+
+			// check for overflow and set the Q bit
+			saturate_qbit_overflow(cpustate, (INT64)src3 + res);
+
+			// do the real accumulate
+			src3 += (INT32)res;
+
+			// write the result back
+			SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		    }
                     else
                     /* Multiply OR Swap OR Half Word Data Transfer */
                     if ((insn & 0x0e000000) == 0 && (insn & 0x80) && (insn & 0x10))  // bits 27-25=000 bit 7=1 bit 4=1

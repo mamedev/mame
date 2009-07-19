@@ -233,7 +233,63 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	}
     	else if ((opcode & 0x0ff000f0) == 0x01600010)	// CLZ - v5
 	{
-		pBuf += sprintf(pBuf, "CLZ R%d, R%d", (opcode>>12)&0xf, opcode&0xf);
+		pBuf += sprintf(pBuf, "CLZ");
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d", (opcode>>12)&0xf, opcode&0xf);
+	}
+    	else if ((opcode & 0x0ff000f0) == 0x01000050)	// QADD - v5
+	{
+		pBuf += sprintf(pBuf, "QADD");
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
+	}
+    	else if ((opcode & 0x0ff000f0) == 0x01400050)	// QDADD - v5
+	{
+		pBuf += sprintf(pBuf, "QDADD");
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
+	}
+    	else if ((opcode & 0x0ff000f0) == 0x01200050)	// QSUB - v5
+	{
+		pBuf += sprintf(pBuf, "QSUB");
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
+	}
+    	else if ((opcode & 0x0ff000f0) == 0x01600050)	// QDSUB - v5
+	{
+		pBuf += sprintf(pBuf, "QDSUB");
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
+	}
+    	else if ((opcode & 0x0ff00090) == 0x01000080)	// SMLAxy - v5
+	{
+		pBuf += sprintf(pBuf, "SMLA%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
+	}
+    	else if ((opcode & 0x0ff00090) == 0x01400080)	// SMLALxy - v5
+	{
+		pBuf += sprintf(pBuf, "SMLAL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
+	}
+    	else if ((opcode & 0x0ff00090) == 0x01600080)	// SMULxy - v5
+	{
+		pBuf += sprintf(pBuf, "SMUL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>12)&0xf);
+	}
+    	else if ((opcode & 0x0ff000b0) == 0x012000a0)	// SMULWy - v5
+	{
+		pBuf += sprintf(pBuf, "SMULW%c", (opcode&0x40) ? 'T' : 'B');
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);
+	}
+    	else if ((opcode & 0x0ff000b0) == 0x01200080)	// SMLAWy - v5
+	{
+		pBuf += sprintf(pBuf, "SMLAW%c", (opcode&0x40) ? 'T' : 'B');
+		pBuf = WritePadding( pBuf, pBuf0 );
+		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf, (opcode>>12)&0xf);
 	}
 	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) )	//bits 27-25 == 000, bit 7=1, bit 4=1
 	{
