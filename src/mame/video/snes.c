@@ -162,10 +162,13 @@ static const struct SNES_MODE_CONFIG snes_modedefs[8] =
  *****************************************/
 INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 clip )
 {
+	if( clip == SNES_CLIP_ALL2) // blending mode 3 == always OFF
+		return;
+
 #ifdef SNES_DBG_video
 	if( !debug_options.transparency_disabled )
 #endif /* SNES_DBG_video */
-	if( (clip == SNES_CLIP_ALL || clip == SNES_CLIP_ALL2) ||
+	if( (clip == SNES_CLIP_ALL) ||
 		(clip == SNES_CLIP_IN  && snes_ppu.clipmasks[5][offset]) ||
 		(clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[5][offset]) )
 	{
