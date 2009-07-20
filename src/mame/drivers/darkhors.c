@@ -619,7 +619,7 @@ static const gfx_layout layout_16x16x8_jclub2 =
 };
 
 static GFXDECODE_START( jclub2 )
-	//GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 )	// color codes should be doubled
+	//GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
 
@@ -679,12 +679,12 @@ VIDEO_START(jclub2)
 		if (machine->gfx[jclub2_gfx_index] == 0)
 			break;
 
-	assert(jclub2_gfx_index != MAX_GFX_ELEMENTS);	
+	assert(jclub2_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)jclub2_tileram, machine->config->total_colors / 16, 0);
 
-	
+
 }
 
 VIDEO_UPDATE(jclub2)

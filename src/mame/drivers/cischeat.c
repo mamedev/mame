@@ -1769,7 +1769,7 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 	{
 		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
 		case 14:	cpu_set_input_line(device, 2, HOLD_LINE); break;
-		
+
 		default: break;
 	}
 }

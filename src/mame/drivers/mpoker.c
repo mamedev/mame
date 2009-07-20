@@ -41,7 +41,7 @@
   |                                |___|___|___|___|                           |
   |                                  |   |   |   |                             |
   |                                                                            |
-  |    74LS253N  74LS253N 74LS253N 74LS253                                     | 
+  |    74LS253N  74LS253N 74LS253N 74LS253                                     |
   |                                                _____________               |
   |                                               | 4700uF 35V  |   MC7812CT   |
   |                                              -|  Capacitor  |-             |
@@ -63,7 +63,7 @@
   | | |                74LS367N 74LS161N 74LS161N  74LS04N    DM7404N          |
   | | |                                                                        |
   | | |        74LS245PC             _________     74LS74N    LM3302N          |
-  | | |                             | Z80 CPU |                                |                      
+  | | |                             | Z80 CPU |                                |
   | | |        74LS245PC            |___U1____|   MM2114N-3  74LS174N 74LS166J |
   | | |                                                                 _____  |
   | |_|        74LS138N       74LS245PC 74LS245PC MM2114N-3  74LS157N  |_U68_| |
@@ -148,7 +148,7 @@
   * CPU clock derived from #defined crystal.
   * 8000-8007 Output ports.
   * Coin related counters.
-  *	Sound components and trigger found at 8000-8003, bit2.
+  * Sound components and trigger found at 8000-8003, bit2.
   * Full lamps support.
   * PCBs layouts & technical notes.
 
@@ -158,10 +158,10 @@
 
   - Still analyze 8000-8007 offset range remaining bits.
     These writes sounds like a BCD valueset.
-	Maybe were intended formerly to send some data to 7seg display unit.
+    Maybe were intended formerly to send some data to 7seg display unit.
 
   - Color system (no bipolar PROMs in the system)
- 
+
 
 **********************************************************************************/
 
@@ -227,7 +227,7 @@ static READ8_HANDLER( mixport_r )
 
     Spark-Watchdog... The system expect status changes on bit1, otherwise stop the hardware with an error message.
     The line seems to be tied to a clock. We can't use XORed status due to the nested checks.
-	If you change the status *every* read, the HW stucks.
+    If you change the status *every* read, the HW stucks.
 */
 	static int mixdata;
 
@@ -250,7 +250,7 @@ static READ8_HANDLER( mixport_r )
 
 //static WRITE8_HANDLER( muxed_w )
 //{
-//	popmessage("written : %02X %02X %02X %02X %02X %02X %02X %02X", data & 0x01, data & 0x02, data & 0x04, data & 0x08, data & 0x10, data & 0x20, data & 0x40, data & 0x80);
+//  popmessage("written : %02X %02X %02X %02X %02X %02X %02X %02X", data & 0x01, data & 0x02, data & 0x04, data & 0x08, data & 0x10, data & 0x20, data & 0x40, data & 0x80);
 //}
 
 /***** Port 8000 *****
@@ -440,13 +440,13 @@ static WRITE8_HANDLER( outport7_w )
 
 //static WRITE8_HANDLER( sound_w )
 //{
-//	dac_data_w(devtag_get_device(space->machine, "dac"), data);
+//  dac_data_w(devtag_get_device(space->machine, "dac"), data);
 //}
 */
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-//	AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
+//  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* NVRAM = 2x SCM5101E */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&mpoker_video)	/* 4x MM2114N-3 */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
@@ -467,17 +467,17 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mpoker )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1) PORT_NAME("Bet")             
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2) PORT_NAME("Deal/Draw")       
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("Cancel Discards") 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_M) PORT_NAME("Stand (Hold all Cards)")  
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Discard 1")       
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_X) PORT_NAME("Discard 2")       
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_C) PORT_NAME("Discard 3")       
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_V) PORT_NAME("Discard 4")      
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1) PORT_NAME("Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2) PORT_NAME("Deal/Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("Cancel Discards")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_M) PORT_NAME("Stand (Hold all Cards)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Discard 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_X) PORT_NAME("Discard 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_C) PORT_NAME("Discard 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_V) PORT_NAME("Discard 4")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_B) PORT_NAME("Discard 5")      
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_B) PORT_NAME("Discard 5")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Stats")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Payout")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
@@ -495,7 +495,7 @@ static INPUT_PORTS_START( mpoker )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) --> damn check... you can't set 2 different bits pointing to the same coinage.
+//  PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) --> damn check... you can't set 2 different bits pointing to the same coinage.
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_5C ) )
@@ -578,9 +578,9 @@ static MACHINE_DRIVER_START( mpoker )
 	MDRV_VIDEO_UPDATE(mpoker)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("dac", DAC, 0)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MDRV_SPEAKER_STANDARD_MONO("mono")
+//  MDRV_SOUND_ADD("dac", DAC, 0)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 ROM_START( mpoker )

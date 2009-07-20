@@ -896,7 +896,7 @@ static CPU_EXECUTE( cdp1802 )
 				/* execute initialization cycle */
 				cpustate->state = CDP1802_STATE_1_INIT;
 				cdp1802_run(device);
-				
+
 				/* next state is IDLE */
 				cpustate->state = CDP1802_STATE_1_EXECUTE;
 			}

@@ -18,10 +18,10 @@ Data East 3-boardset, same hardware as Bega's Battle & Road Blaster, Sony
 LDP-1000
 MACH3 conversion kit (ROMs, disc, decals), Pioneer PR-8210
 
-There are four versions of the laserdisc. 
+There are four versions of the laserdisc.
 
 Pioneer (08359)
-Data East (Japan), LDS-301 with an orange label 
+Data East (Japan), LDS-301 with an orange label
 Data East (USA), LDS-301A with a green label
 Sony (a1090731704132a)
 
@@ -35,7 +35,7 @@ which has a similar Sony label.
 I peeled the Data East labels off an orange and a green labelled disc and
 the labels underneath were identical to the Sony labelled disc (Sony Japan,
 disc No.a1090731704132a).
-  
+
 Physical appearances aside, the Sony and Pioneer pressed discs have
 identical content.
 

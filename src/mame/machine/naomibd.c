@@ -45,24 +45,24 @@
 
     Cartridge protection info from Deunan Knute:
 
-    NAOMI cart can hold up to 256MB of data (well, 512 is possible too I guess), so the highest bits are used for other, dark and scary purposes. 
+    NAOMI cart can hold up to 256MB of data (well, 512 is possible too I guess), so the highest bits are used for other, dark and scary purposes.
     I call those bits "mode selector".
 
     First it's important to note that DMA and PIO seem to have separate address counters, as well as separate mode selector registers.
 
     * bit 31 (mode bit 3) is auto-advance bit
-    When set to one the address will be automatically incremented when data is read, so you need only set it once and can just keep polling 
-    the PIO port. When zero it will stay on current address.  Now this works exactly the same for DMA, and even if DMA engine is 32-byte 
+    When set to one the address will be automatically incremented when data is read, so you need only set it once and can just keep polling
+    the PIO port. When zero it will stay on current address.  Now this works exactly the same for DMA, and even if DMA engine is 32-byte
     per block it will repeatedly read only the first 16-bit word.
 
     * bit 30 (mode bit 2) is most often as special mode switch
     DMA transfer with this bit set will hang. PIO will return semi-random data (floating bus?). So one function of that bit is "disable".
-    PIO read will return all ones if DMA mode has this bit cleared, so it seems you can do either PIO or DMA but not both at the same time. 
+    PIO read will return all ones if DMA mode has this bit cleared, so it seems you can do either PIO or DMA but not both at the same time.
     In other words, disable DMA once before using PIO (most games using both access types do that when the DMA terminates).
     This bit is also used to reset the chip's internal protection mechanism on "Oh! My Goddess" to a known state.
 
     * bit 29 (mode bit 1) is address shuffle bit
-    It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun 
+    It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun
     with address lines 10 to 23(?). It's not a simple swap function, rather a lookup table and one with repeating results too.
     The few games I got to work never made any use of that bit, it's always set for all normal reads.
 
@@ -133,11 +133,11 @@ static naomibd_config_table naomibd_translate_tbl[] =
 {
 	{ "doa2", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
 		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x118a3a, 0x120000,
-		    0x12c0d8, 0x140000, 0x147e22, 0x160000, 0x1645ce, 0x180000, 0x17c6b2, 0x1a0000, 
+		    0x12c0d8, 0x140000, 0x147e22, 0x160000, 0x1645ce, 0x180000, 0x17c6b2, 0x1a0000,
 		    0x19902e, 0x1c0000, 0x1b562a, 0x1e0000, 0xffffffff, 0xffffffff } },
 	{ "doa2m", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
 		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x11a5b4, 0x120000,
-		    0x12e7c4, 0x140000, 0x1471f6, 0x160000, 0x1640c4, 0x180000, 0x1806ca, 0x1a0000, 
+		    0x12e7c4, 0x140000, 0x1471f6, 0x160000, 0x1640c4, 0x180000, 0x1806ca, 0x1a0000,
 		    0x199df4, 0x1c0000, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
 };
 

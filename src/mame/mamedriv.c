@@ -3632,7 +3632,7 @@ DokiDoki Penguin Land *not confirmed
 	/* Bingo-based games */
 	DRIVER( bingoc )	/* (c) 1989 Sega */
 	/* Bingo Fantasy  *//* (c) 19?? Sega */
-	/* Bingo Star	  *//* (c) 19?? Sega */
+	/* Bingo Star     *//* (c) 19?? Sega */
 	/* Bingo Party    *//* (c) 1993 Sega */
 	/* BP Phoenix     *//* (c) 1998 Sega */
 	/* BP Special     *//* (c) 2000 Sega */
@@ -4296,8 +4296,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_kcham )	/* 60 */
 						/* 61 */
 	DRIVER( mt_soni2 )	/* 62 */
-	//DRIVER( mt_comp1 )	/* ?? */
-	//DRIVER( mt_comp2 )	/* ?? */
+	//DRIVER( mt_comp1 )    /* ?? */
+	//DRIVER( mt_comp2 )    /* ?? */
 
 	/* Sega MegaPlay */
 	DRIVER( megaplay )
@@ -5471,7 +5471,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm2ndmix )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm2ndmxa )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm3rdmix )	/* GX853 (c) 1998 (Japan) */
-	//DRIVER( bm3rdmxb )	/* GX853 (c) 1998 (Japan) */
+	//DRIVER( bm3rdmxb )    /* GX853 (c) 1998 (Japan) */
 	DRIVER( bmcompmx )	/* GX858 (c) 1999 (Japan) */
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
@@ -5485,10 +5485,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm7thmix )	/* GXB07 (c) 2001 (Japan) */
 	DRIVER( bmfinal )	/* GXC01 (c) 2002 (Japan) */
 
-	//DRIVER( popn1 )		/* GX803 (c) 1998 (Japan) */
-	//DRIVER( popn2 )		/* GX831 (c) 1998 (Japan) */
-	//DRIVER( popn3 )		/* GX980 (c) 1999 (Japan) */
-	//DRIVER( popnstex )	/* GX970 (c) 1999 (Japan) */
+	//DRIVER( popn1 )       /* GX803 (c) 1998 (Japan) */
+	//DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
+	//DRIVER( popn3 )       /* GX980 (c) 1999 (Japan) */
+	//DRIVER( popnstex )    /* GX970 (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */

@@ -199,7 +199,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	/* if we have a valid code, trigger an IRQ */
 	if (phillips_code & 0x800000)
 	{
-//		printf("%2d:code = %06X\n", param, phillips_code);
+//      printf("%2d:code = %06X\n", param, phillips_code);
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 

@@ -306,15 +306,15 @@ Notes:
       Super Puzzle Bobble (Japan)
       Usagi
 
-Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with the game´s label)
+Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with the game?s label)
 ------
-	   
-	   The Compact Flash card is read protected, it is a custom Sandisk SDCFB-64 Card (64MByte)
-	   
-	   Confirmed usage on.... (not all games listed)
-	   Otenami Haiken Final
-	   Kollon
-	   Zooo
+
+       The Compact Flash card is read protected, it is a custom Sandisk SDCFB-64 Card (64MByte)
+
+       Confirmed usage on.... (not all games listed)
+       Otenami Haiken Final
+       Kollon
+       Zooo
 */
 
 #include "driver.h"
@@ -341,16 +341,16 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8
 	switch (reg)
 	{
 		// Interrupt and General Control Register
-		case 0x03:			
+		case 0x03:
 			// Check for card reset
 			if (!(data & 0x40))
 			{
 				devtag_reset(machine, "card");
 				locked = 0x1ff;
-				ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);			
+				ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);
 			}
 		break;
-				
+
 		default:
 		break;
 	}
@@ -549,7 +549,7 @@ static WRITE32_HANDLER(control_w)
 
 	UINT32 p = control;
 	const device_config *mb3773 = devtag_get_device(space->machine, "mb3773");
-	
+
 	COMBINE_DATA(&control);
 
 	mb3773_set_ck(mb3773, 0, (control & 0x20) >> 5);
@@ -946,7 +946,7 @@ static MACHINE_DRIVER_START( coh3002t )
 	MDRV_AT28C16_ADD( "at28c16", 0 )
 	MDRV_IDE_CONTROLLER_ADD( "card", 0 )
 	MDRV_NVRAM_HANDLER( coh3002t )
-	
+
 	MDRV_MB3773_ADD("mb3773")
 MACHINE_DRIVER_END
 
