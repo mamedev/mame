@@ -69,7 +69,7 @@ INLINE arm_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_ARM7);
+	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9);
 	return (arm_state *)device->token;
 }
 
