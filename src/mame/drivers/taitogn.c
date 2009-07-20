@@ -306,6 +306,15 @@ Notes:
       Super Puzzle Bobble (Japan)
       Usagi
 
+Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with the game´s label)
+------
+	   
+	   The Compact Flash card is read protected, it is a custom Sandisk SDCFB-64 Card (64MByte)
+	   
+	   Confirmed usage on.... (not all games listed)
+	   Otenami Haiken Final
+	   Kollon
+	   Zooo
 */
 
 #include "driver.h"
@@ -315,6 +324,7 @@ Notes:
 #include "machine/intelfsh.h"
 #include "machine/znsec.h"
 #include "machine/idectrl.h"
+#include "machine/mb3773.h"
 #include "sound/psx.h"
 
 
@@ -328,6 +338,22 @@ static unsigned char rf5c296_reg = 0;
 static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8 data)
 {
 	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, cpuexec_describe_context(machine));
+	switch (reg)
+	{
+		// Interrupt and General Control Register
+		case 0x03:			
+			// Check for card reset
+			if (!(data & 0x40))
+			{
+				devtag_reset(machine, "card");
+				locked = 0x1ff;
+				ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);			
+			}
+		break;
+				
+		default:
+		break;
+	}
 }
 
 static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine *machine, UINT8 reg)
@@ -522,7 +548,11 @@ static WRITE32_HANDLER(control_w)
 	// selection too, but they're always 0.
 
 	UINT32 p = control;
+	const device_config *mb3773 = devtag_get_device(space->machine, "mb3773");
+	
 	COMBINE_DATA(&control);
+
+	mb3773_set_ck(mb3773, 0, (control & 0x20) >> 5);
 
 #if 0
 	if((p ^ control) & ~0x20)
@@ -554,15 +584,6 @@ static READ32_HANDLER(control3_r)
 static WRITE32_HANDLER(control3_w)
 {
 	COMBINE_DATA(&control3);
-
-	/* Not card reset */
-	#if 0
-	// card reset, maybe
-	if(control3 & 2) {
-		devtag_reset(space->machine, "card");
-		locked = 0x1ff;
-	}
-	#endif
 }
 
 static READ32_HANDLER(gn_1fb70000_r)
@@ -925,6 +946,8 @@ static MACHINE_DRIVER_START( coh3002t )
 	MDRV_AT28C16_ADD( "at28c16", 0 )
 	MDRV_IDE_CONTROLLER_ADD( "card", 0 )
 	MDRV_NVRAM_HANDLER( coh3002t )
+	
+	MDRV_MB3773_ADD("mb3773")
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( coh3002t )
