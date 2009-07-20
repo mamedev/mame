@@ -328,6 +328,15 @@ static ADDRESS_MAP_START( darkhors_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITE(SMH_RAM) AM_BASE(&darkhors_tmapscroll2)
 ADDRESS_MAP_END
 
+static UINT32* jclub2_tileram;
+static int jclub2_gfx_index;
+
+WRITE32_HANDLER( jclub2_tileram_w )
+{
+	COMBINE_DATA(&jclub2_tileram[offset]);
+	gfx_element_mark_dirty(space->machine->gfx[jclub2_gfx_index], offset/(256/4));
+
+}
 
 static ADDRESS_MAP_START( jclub2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -344,13 +353,15 @@ static ADDRESS_MAP_START( jclub2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE(&spriteram32)
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE(SMH_RAM)	// this should still be palette ram!
 
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM
+	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
+	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
+
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_BASE(&jclub2_tileram) // tile data gets decompressed here by main cpu?
 ADDRESS_MAP_END
 
 
@@ -599,16 +610,16 @@ GFXDECODE_END
 static const gfx_layout layout_16x16x8_jclub2 =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	0x10000/256,
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96, 104, 112, 120},
+	{ 24,16,8,0,  56,48,40,32,  88,80,72,64,  120, 112, 104, 96},
 	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
-	16*128
+	256*8
 };
 
 static GFXDECODE_START( jclub2 )
-	GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 )	// color codes should be doubled
+	//GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 )	// color codes should be doubled
 GFXDECODE_END
 
 
@@ -659,9 +670,21 @@ static MACHINE_DRIVER_START( darkhors )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+
 VIDEO_START(jclub2)
 {
+ 	/* find first empty slot to decode gfx */
+	for (jclub2_gfx_index = 0; jclub2_gfx_index < MAX_GFX_ELEMENTS; jclub2_gfx_index++)
+		if (machine->gfx[jclub2_gfx_index] == 0)
+			break;
 
+	assert(jclub2_gfx_index != MAX_GFX_ELEMENTS);	
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine->gfx[jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)jclub2_tileram, machine->config->total_colors / 16, 0);
+
+	
 }
 
 VIDEO_UPDATE(jclub2)
@@ -715,6 +738,15 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
+VIDEO_START(jclub2o)
+{
+
+}
+
+VIDEO_UPDATE(jclub2o)
+{
+	return 0;
+}
 
 static MACHINE_DRIVER_START( jclub2o )
 	MDRV_CPU_ADD("st0016",Z80,8000000)
@@ -739,8 +771,8 @@ static MACHINE_DRIVER_START( jclub2o )
 	MDRV_GFXDECODE(jclub2)
 	MDRV_PALETTE_LENGTH(0x10000)
 
-	MDRV_VIDEO_START(jclub2)
-	MDRV_VIDEO_UPDATE(jclub2)
+	MDRV_VIDEO_START(jclub2o)
+	MDRV_VIDEO_UPDATE(jclub2o)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
