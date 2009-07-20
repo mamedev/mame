@@ -294,7 +294,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
 
 	/* validate stuff */
-	assert(desc->length > 0);
+	assert(desc->length > 0 || (desc->flags & OPFLAG_VIRTUAL_NOOP) != 0);
 
 	/* if we are a branch with delay slots, recursively walk those */
 	if (desc->flags & OPFLAG_IS_BRANCH)
