@@ -2605,7 +2605,7 @@ GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar"
 /* games using rev 2 sound board */
 GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1983, mach3,    0,        g2laser,   mach3,    romtiles, ROT0,   "Mylstar", "M.A.C.H. 3", 0 )
-GAME( 1984, cobram3,  0,        g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", 0 )
+GAME( 1984, cobram3,  cobra,    g2laser,   mach3,    romtiles, ROT0,   "Data East","Cobra Command (M.A.C.H. 3 hardware)", 0 )
 GAME( 1984, usvsthem, 0,        g2laser,   usvsthem, romtiles, ROT0,   "Mylstar", "Us vs. Them", 0 )
 GAME( 1984, 3stooges, 0,        gottlieb2, 3stooges, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
 GAME( 1984, vidvince, 0,        gottlieb2, vidvince, vidvince, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues
