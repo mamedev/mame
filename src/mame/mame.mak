@@ -1725,6 +1725,8 @@ $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
 
+$(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
+
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
 						$(LAYOUT)/connect4.lh \
 						$(LAYOUT)/gamball.lh
