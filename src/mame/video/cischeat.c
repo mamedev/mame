@@ -1322,8 +1322,8 @@ extern UINT16 scudhamm_motor_command;
 VIDEO_UPDATE( scudhamm )
 {
 	int megasys1_active_layers1, flag;
-	megasys1_active_layers = 0x0d;
 	megasys1_active_layers1 = megasys1_active_layers;
+	megasys1_active_layers = 0x0d;
 
 #ifdef MAME_DEBUG
 debugsprites = 0;
@@ -1355,15 +1355,13 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 #endif
 
 	cischeat_tmap_SET_SCROLL(0)
-//  cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
 	bitmap_fill(bitmap,cliprect,0);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else bitmap_fill(bitmap,cliprect,0);
-//  cischeat_tmap_DRAW(1)
+	// no layer 1
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,0,15);
 	cischeat_tmap_DRAW(2)
 

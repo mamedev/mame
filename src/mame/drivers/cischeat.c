@@ -1713,9 +1713,10 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
-		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
-														// the main loop polls before updating the sprites.
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE); break;	// update palette, layers etc. Not the sprites.
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE); break;	// "real" vblank. It just sets a flag that
+											// the main loop polls before updating the sprites.
+		default: break;
 	}
 }
 
@@ -1766,8 +1767,10 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);
-		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE); break;
+		
+		default: break;
 	}
 }
 
