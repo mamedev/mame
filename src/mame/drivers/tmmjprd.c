@@ -210,7 +210,7 @@ static void ttmjprd_draw_tile(running_machine *machine, bitmap_t *bitmap, const 
 					dat = (rom[(tileaddr*32)+count] & 0xff);
 					if (dat!=255)
 					{
-						dat += (colour<<8);
+						dat += (colour<<8) & 0xf00;
 						dst = BITMAP_ADDR16(bitmap, drawy, drawx);
 						dst[0] = dat;
 					}
@@ -698,7 +698,7 @@ static GFXDECODE_START( tmmjprd )
 //  GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x4_layout,   0x0, 0x1000  )
 //  GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
 //  GFXDECODE_ENTRY( "gfx1", 0, tmmjprd_sprite_8x8x8_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x8_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x8_layout, 0x0, 0x10  )
 GFXDECODE_END
 
 
