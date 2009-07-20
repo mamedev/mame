@@ -9,6 +9,36 @@ TODO:
 - video emulation is bare bones;
 - i/os
 
+***************************************************************************
+
+There are three hardware versions of Cobra Command (LD):
+
+Data East single PCB, Pioneer LD-V1000
+Data East 3-boardset, same hardware as Bega's Battle & Road Blaster, Sony
+LDP-1000
+MACH3 conversion kit (ROMs, disc, decals), Pioneer PR-8210
+
+There are four versions of the laserdisc. 
+
+Pioneer (08359)
+Data East (Japan), LDS-301 with an orange label 
+Data East (USA), LDS-301A with a green label
+Sony (a1090731704132a)
+
+The Data East labelled discs were released with the DE 3-boardset version
+and MACH3 conversion.
+The Pioneer Labelled disc was released with the DE single PCB version.
+Not sure what version the Sony disc came from. It was given to me by the
+copyright owner of Road Blaster, who also gave me a Road Blaster disc/kit
+which has a similar Sony label.
+
+I peeled the Data East labels off an orange and a green labelled disc and
+the labels underneath were identical to the Sony labelled disc (Sony Japan,
+disc No.a1090731704132a).
+  
+Physical appearances aside, the Sony and Pioneer pressed discs have
+identical content.
+
 ***************************************************************************/
 
 #include "driver.h"

@@ -199,7 +199,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	/* if we have a valid code, trigger an IRQ */
 	if (phillips_code & 0x800000)
 	{
-		printf("%2d:code = %06X\n", param, phillips_code);
+//		printf("%2d:code = %06X\n", param, phillips_code);
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( cliffhgr )
 	PORT_DIPNAME( 0x10, 0x00, "Display Score and Lives During Animation" )	PORT_DIPLOCATION("E11:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Regular Length Scenes" )	PORT_DIPLOCATION("E11:4")
+	PORT_DIPNAME( 0x08, 0x00, "Regular Length Scenes" )	PORT_DIPLOCATION("E11:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "No Hanging Scene" )		PORT_DIPLOCATION("E11:3")
@@ -747,7 +747,7 @@ ROM_START( cliffhga )
 	ROM_LOAD( "cliff_alt_3.bin",	0x6000, 0x2000, CRC(54cdb4a1) SHA1(6b1d73aec029af4a88ca2f883b4ed706d153592d) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "cliffhgr", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "cliffhgr", 0, SHA1(4442995c824d7891a2a19c607bb3301d696fbdc8) )
 ROM_END
 
 ROM_START( goaltogo )
