@@ -1579,6 +1579,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pcat_nit.o \
 	$(DRIVERS)/pcxt.o \
 	$(DRIVERS)/peplus.o \
+	$(DRIVERS)/photon.o $(VIDEO)/pk8000.o \
 	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/pkscram.o \
 	$(DRIVERS)/pntnpuzl.o \

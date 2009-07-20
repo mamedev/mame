@@ -6896,6 +6896,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( konek )		/* (c) 1988 Terminal */
 	DRIVER( sosterm )	/* (c) 1988 Terminal */
 
+	/* Photon hardware games */
+	DRIVER( phtetris )
+
 	/* Valadon Automation games */
 	DRIVER( bagman )	/* (c) 1982 */
 	DRIVER( bagnard )	/* (c) 1982 */
