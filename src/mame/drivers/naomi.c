@@ -741,8 +741,7 @@ or I/O, one for a communication module, one for a cooling fan and one for the se
 
 
 
-
-Atomiswave cart PCB layout and game usage
+Atomiswave cart PCB layout and game usage (revision 0.3 19/7/2009 5:55pm)
 -----------------------------------------
 
 Type 1 ROM Board:
@@ -787,6 +786,7 @@ Notes:
                Fist Of The North Star                AX1901F01
                Victory Furlong : Horse Racing        AX2001F01
                King Of Fighters NEOWAVE              AX2201F01
+               Extreme Hunting                       AX2401F01
 
         IC18 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
                The name in the archive has been devised purely for convenience.
@@ -796,7 +796,6 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                ROMs because the ROM on the main board is also a custom Macronix
                ROM and they have a history of producing custom ROMs for other
                companies that hide their ROM types like Nintendo etc.
-               They could also be Oki MR27V12800.
 
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
@@ -823,6 +822,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                Fist Of The North Star                AX1901M01 to AX1907M01    7
                Victory Furlong : Horse Racing        AX2001M01 to AX2007M01    7
                King Of Fighters NEOWAVE              AX2201M01 to AX2206M01    6
+               Extreme Hunting                       AX2401M01 to AX2406M01    6
 
 
 Type 2 ROM Board:
@@ -880,23 +880,128 @@ Notes:
                Rumble Fish 2                         AX3401M01 to AX3405M01    5
 
 
-               Other games not dumped (some may have been cancelled)
+Type 3 ROM Board:
+
+This type is manufactured by Sega when Sammy merged with Sega.
+
+171-8355A
+PC BD A/W 128M FLASH
+837-14608 (sticker for Extreme Hunting 2 Tournament Edition)
+|----------------------------|
+| XC9536*         U16   U2*  |
+|                            |
+|J2                          |
+|                            |
+|                 U4*   U14  |
+|                            |
+|                            |
+||-|                         |
+|| |              U17   U1*  |
+|| |                         |
+|| |J1*                      |
+|| |                         |
+||-|              U3*   U15  |
+|----------------------------|
+Notes:
+           * - Denotes those parts are on the other side of the PCB
+          J1 - This connector plugs into the main board.
+          J2 - 6 pin connector for programming the XC9536 CPLD and/or the flash ROMs
+      XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
+               Sega 315-xxxx part number with a sticker over the top of it.
+
+               Game                                  Part#      Sticker
+               ---------------------------------------------------------
+               Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
+
+          U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
+               (configured as 16Mbytes x8bit or 8Mwords x16bit)
+               This ROM has no additional custom markings. The name in the archive has been devised
+               purely for convenience. The number of ROMs may vary between games. So far all 8
+               positions have been seen populated. It's also possible all positions are present
+               when manufactured, each board is programmed to requirements and depending on the total
+               data length, some ROMs may be empty.
+
+
+               Other games not dumped (some may have been cancelled, * = known to be released)
                ----------------------
                Chase 1929
                Dirty Pigskin
-               Extreme Hunting
-               Extreme Hunting 2: Tournament Edition
                Faster Than Speed
                Force Five
-               Guilty Gear X Version 1.5
+               Guilty Gear X Version 1.5 *
                Kenju
                Maximum Speed
-               Metal Slug 6
+               Metal Slug 6 *
                Premier Eleven
                Sushi Bar
-               The King Of Fighters XI
+               The King Of Fighters XI *
 
 
+Network Board
+-------------
+
+This board is required for Extreme Hunting 2 Tournament Edition, although it doesn't need to be connected
+to a network or another Atomiswave unit to boot up. However it must be plugged into the PCB in the
+communication slot or the game will not go in-game. It will boot but then displays NETWORK BOARD ERROR
+if not present. Externally there's a hole for an RJ45 network cable and a slot for a PIC16C621/PIC16C622
+PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This board probably acts
+like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
+
+837-14508R
+171-8324C
+(C) SEGA 2005
+|-----------------------------------|
+| RJ45    24LC0241* IC2       CN3   |
+|LLLL        K4S643232*       IC14  |
+|  RTL8201 LLLL                     |
+|25MHz                              |
+|       6417710          IC4S*      |
+|                        XC3S200    |
+|MAX3221        JP1     XCF01S*     |
+|CN5  33.333MHz JP2             CN2*|
+|-----------------------------------|
+Notes:
+      *        - Denotes those parts are on the other side of the PCB
+      L        - LED
+      RJ45     - RJ45 network connector
+      24LC0241 - EEPROM (SOIC8)
+      K4S643232- Samsung K4S643232 512k x 32bit x 4 banks synchronous DRAM (TSOPII-86)
+      RTL8201  - Realtek RTL8201 Single Port 10/100M Fast Ethernet IC (QFP48)
+      6417710  - Renesas HD6417710BPV SH3-DSP 32-Bit RISC Microcomputer SuperHTM RISC engine Family / SH7700 Series (BGA256)
+      XC3S200  - Xilinx Spartan XC3S200 FPGA (QFP100)
+      XCF01S   - Xilinx XCF01S In-System Programmable 1Mbit PROM for Configuration of Xilinx FPGAs (TSSOP20)
+      MAX3221  - Maxim MAX3221 3.0V to 5.5V, 250kbps, RS-232 Transceivers with Auto Shutdown (TSSOP16)
+      JP1/2    - Jumpers, both set to 1-2
+      CN2      - This connector plugs into the main board
+      CN3      - 6 pin connector
+      CN5      - 3 position connector
+      IC2      - ST M29DW324DB 32M flash ROM (TSOP48)
+      IC4S     - Spartan S29GL128N10TFIO1 128M flash ROM (TSOP56)
+      IC14     - socket for PIC16C621 mounted in a plastic plug-in case
+                 PIC Usage:
+                           Game                                   Sega Part#
+                           ---------------------------------------------------
+                           Extreme Hunting 2 Tournament Edition   317-0445-COM
+
+Gun Sub Board
+-------------
+
+AM3AGT-02 GUN SUB PCB
+|------------------|
+|CN5  CN4  CN3  CN2|
+|       74HC74     |
+|                  |
+| 74HC74    7CHC74 |
+|      74HC74      |
+|                  |
+|       CN1        |
+|------------------|
+Notes:
+      CN1 - 8 pin connector joining to I/O Expansion Module (which is plugged into main board)
+      CN2 - Gun connection for player 2 trigger and optical
+      CN3 - Gun connection for player 2 pump switch
+      CN4 - Gun connection for player 1 trigger and optical
+      CN5 - Gun connection for player 1 pump switch
 
 
 
@@ -5014,6 +5119,17 @@ struct AtomiswaveKey rm_key = {
     {1,13,12,15,8,7,0,5,11,3,4,14,9,10,6,2},
     {6,0,7,4,5,3,1,2}
 };
+
+/* ****************************************** The Extreme Hunting key below is _NOT_ correct...   FIX ME  */
+struct AtomiswaveKey xh_key = {
+    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
+    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
+    {3,6,0,19,14,30,17,22,13,23,2,11,29,24,28,4,10,7,15,12,31,1,20,16,9,8,18,26,25,21,27,5},
+    {2,6,3,7,11,4,12,0,10,9,15,14,13,5,1,8},
+    {1,13,12,15,8,7,0,5,11,3,4,14,9,10,6,2},
+    {6,0,7,4,5,3,1,2}
+};
+
 static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
 {
     int b0,b1,b2,b3;
@@ -5126,6 +5242,19 @@ static DRIVER_INIT(rangrmsn)
 	}
 }
 
+static DRIVER_INIT(xtrmhunt)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &xh_key);
+	}
+}
+
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	AW_BIOS
@@ -5174,11 +5303,25 @@ ROM_START( sprtshot )
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-        ROM_LOAD( "ax0101p01.ic18", 0x0000000, 0x800000, CRC(b3642b5d) SHA1(85eabd9551aefb825ae8eb6422092fb5a58d60f6) )
+        ROM_LOAD( "ax0101p01.ic18", 0x0000000, 0x0800000, CRC(b3642b5d) SHA1(85eabd9551aefb825ae8eb6422092fb5a58d60f6) )
         ROM_LOAD( "ax0101m01.ic11", 0x1000000, 0x1000000, CRC(1e39184d) SHA1(663e0cb9f43a0f89d9841e04b3d009f6c5e88d5e) )
         ROM_LOAD( "ax0102m01.ic12", 0x2000000, 0x1000000, CRC(700764d1) SHA1(310f1606f7bbed1012c119f1ef5d89d231d8489e) )
         ROM_LOAD( "ax0103m01.ic13", 0x3000000, 0x1000000, CRC(6144e7a8) SHA1(4d4341082f008dfd93ef5bf32a44c80869ef02a8) )
         ROM_LOAD( "ax0104m01.ic14", 0x4000000, 0x1000000, CRC(ccb72150) SHA1(a1032d321c27f9ff43da41f20b8687bf1958ddc9) )
+ROM_END
+
+ROM_START( xtrmhunt )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD("ax2401p01.ic18", 0x0000000, 0x0800000,  CRC(8e2a11f5) SHA1(b5106314fb8d4483254e83ac3982039bb60a78e8) )
+	ROM_LOAD("ax2401m01.ic11", 0x1000000, 0x1000000,  CRC(76dbc286) SHA1(8f36ca94b8e67c76e0f90b21debc5ac7890f0da1) )
+	ROM_LOAD("ax2402m01.ic12", 0x2000000, 0x1000000,  CRC(cd590ea2) SHA1(ee5e38bf68e95da665be478ebba9cc5ffed52bb7) )
+	ROM_LOAD("ax2403m01.ic13", 0x3000000, 0x1000000,  CRC(06f62eb5) SHA1(f7e8d1dda6bb59ca2bc7cfa1105889b9e8e6d55d) )
+	ROM_LOAD("ax2404m01.ic14", 0x4000000, 0x1000000,  CRC(759ef5cb) SHA1(27ac2d12c6fb358b3d631c017c7b693e5ad95fd7) )
+	ROM_LOAD("ax2405m01.ic15", 0x5000000, 0x1000000,  CRC(940d77f1) SHA1(eefdfcb92873032dc7d9ff9310bf5ed715c8bf4f) )
+	ROM_LOAD("ax2406m01.ic16", 0x6000000, 0x1000000,  CRC(cbcf2c5d) SHA1(61362fabcbb3bfc01c996748a7ca65f8a0e02f2f) )
 ROM_END
 
 
@@ -5189,4 +5332,5 @@ GAME( 2002, sprtshot, awbios,   naomi,    naomi,    sprtshot, ROT0, "Sammy",    
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, rangrmsn, awbios,   naomi,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, xtrmhunt, awbios,   naomi,    naomi,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
