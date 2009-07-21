@@ -38,8 +38,11 @@
 #include "debugger.h"
 #include "arm7core.h"   //include arm7 core
 
-/* Example for showing how Co-Proc functions work */
-#define TEST_COPROC_FUNCS 1
+#if 0
+#define LOG(x) mame_printf_debug x
+#else
+#define LOG(x) logerror x
+#endif
 
 /* prototypes of coprocessor functions */
 static WRITE32_DEVICE_HANDLER(arm7_do_callback);
@@ -69,7 +72,7 @@ INLINE arm_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9);
+	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9 || cpu_get_type(device) == CPU_PXA255);
 	return (arm_state *)device->token;
 }
 
@@ -88,6 +91,115 @@ INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)
 
 	return res;
 }
+
+/**************************************************************************
+ * ARM TLB IMPLEMENTATION
+ **************************************************************************/
+
+enum
+{
+    TLB_COARSE = 0,
+    TLB_FINE,
+};
+
+INLINE UINT32 arm7_tlb_get_first_level_descriptor( arm_state *cpustate, UINT32 vaddr )
+{
+    UINT32 entry_paddr = ( COPRO_TLB_BASE & COPRO_TLB_BASE_MASK ) | ( ( vaddr & COPRO_TLB_VADDR_FLTI_MASK ) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT );
+    return memory_read_dword_32le( cpustate->program, entry_paddr );
+}
+
+INLINE UINT32 arm7_tlb_get_second_level_descriptor( arm_state *cpustate, UINT32 granularity, UINT32 first_desc, UINT32 vaddr )
+{
+    UINT32 desc_lvl2 = vaddr;
+
+    switch( granularity )
+    {
+        case TLB_COARSE:
+            desc_lvl2 = ( first_desc & COPRO_TLB_CFLD_ADDR_MASK ) | ( ( vaddr & COPRO_TLB_VADDR_CSLTI_MASK ) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT );
+            break;
+        case TLB_FINE:
+            LOG( ( "ARM7: Attempting to get second-level TLB descriptor of fine granularity\n" ) );
+            break;
+        default:
+            // We shouldn't be here
+            LOG( ( "ARM7: Attempting to get second-level TLB descriptor of invalid granularity (%d)\n", granularity ) );
+            break;
+    }
+
+    return memory_read_dword_32le( cpustate->program, desc_lvl2 );
+}
+
+INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr)
+{
+    UINT32 desc_lvl1 = arm7_tlb_get_first_level_descriptor( cpustate, vaddr );
+    UINT32 desc_lvl2 = 0;
+    UINT32 paddr = vaddr;
+
+    switch( desc_lvl1 & 3 )
+    {
+        case COPRO_TLB_UNMAPPED:
+            // Unmapped, generate a translation fault
+            LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
+            break;
+        case COPRO_TLB_COARSE_TABLE:
+            // Entry is the physical address of a coarse second-level table
+            desc_lvl2 = arm7_tlb_get_second_level_descriptor( cpustate, TLB_COARSE, desc_lvl1, vaddr );
+            break;
+        case COPRO_TLB_SECTION_TABLE:
+            // Entry is a section
+            paddr = ( desc_lvl1 & COPRO_TLB_SECTION_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_SECTION_PAGE_MASK );
+            break;
+        case COPRO_TLB_FINE_TABLE:
+            // Entry is the physical address of a fine second-level table
+            LOG( ( "ARM7: Not Yet Implemented: fine second-level TLB lookup, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
+            break;
+        default:
+            // Entry is the physical address of a three-legged termite-eaten table
+            break;
+    }
+
+    if( ( desc_lvl1 & 3 ) == COPRO_TLB_COARSE_TABLE || ( desc_lvl1 & 3 ) == COPRO_TLB_FINE_TABLE )
+    {
+        switch( desc_lvl2 & 3 )
+        {
+            case COPRO_TLB_UNMAPPED:
+                // Unmapped, generate a translation fault
+                LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, vaddr = %08x\n", vaddr ) );
+                break;
+            case COPRO_TLB_LARGE_PAGE:
+                // Large page descriptor
+                paddr = ( desc_lvl2 & COPRO_TLB_LARGE_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_LARGE_PAGE_MASK );
+                break;
+            case COPRO_TLB_SMALL_PAGE:
+                // Small page descriptor
+                paddr = ( desc_lvl2 & COPRO_TLB_SMALL_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_SMALL_PAGE_MASK );
+                break;
+            case COPRO_TLB_TINY_PAGE:
+                // Tiny page descriptor
+                if( ( desc_lvl1 & 3 ) == 1 )
+                {
+                    LOG( ( "ARM7: It would appear that we're looking up a tiny page from a coarse TLB lookup.  This is bad. vaddr = %08x\n", vaddr ) );
+                }
+                paddr = ( desc_lvl2 & COPRO_TLB_TINY_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_TINY_PAGE_MASK );
+                break;
+        }
+    }
+
+    return paddr;
+}
+
+static CPU_TRANSLATE( arm7 )
+{
+	arm_state *cpustate = (device != NULL) ? device->token : NULL;
+
+	/* only applies to the program address space and only does something if the MMU's enabled */
+	if( space == ADDRESS_SPACE_PROGRAM && ( COPRO_CTRL & COPRO_CTRL_MMU_EN ) )
+	{
+		*address = arm7_tlb_translate(cpustate, *address);
+	}
+	return TRUE;
+}
+
 
 /* include the arm7 core */
 #include "arm7core.c"
@@ -130,10 +242,21 @@ static CPU_RESET( arm9 )
 	arm_state *cpustate = device->token;
 
 	// must call core reset
-	cpustate->archRev = 5;	// ARMv5
-	cpustate->archFlags = eARM_ARCHFLAGS_T;	// has Thumb
-
 	arm7_core_reset(device);
+
+	cpustate->archRev = 5;	// ARMv5
+	cpustate->archFlags = eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E;	// has TE extensions
+}
+
+static CPU_RESET( pxa255 )
+{
+	arm_state *cpustate = device->token;
+
+	// must call core reset
+	arm7_core_reset(device);
+
+	cpustate->archRev = 5;	// ARMv5
+	cpustate->archFlags = eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE;	// has TE and XScale extensions
 }
 
 static CPU_EXIT( arm7 )
@@ -348,6 +471,7 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
         case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(arm7);                  break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &ARM7_ICOUNT;                    break;
+	case CPUINFO_FCT_TRANSLATE:	       	info->translate = CPU_TRANSLATE_NAME(arm7);		break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case DEVINFO_STR_NAME:                  strcpy(info->s, "ARM7");                        break;
@@ -431,9 +555,18 @@ CPU_GET_INFO( arm9 )
     }
 }
 
-/* ARM system coprocessor support */
+CPU_GET_INFO( pxa255 )
+{
+    switch (state)
+    {
+        case CPUINFO_FCT_RESET:            info->reset = CPU_RESET_NAME(pxa255);                       break;
+        case DEVINFO_STR_NAME:             strcpy(info->s, "PXA255");                        break;
+	default:	CPU_GET_INFO_CALL(arm7);
+		break;
+    }
+}
 
-#define LOG(x) logerror x
+/* ARM system coprocessor support */
 
 static WRITE32_DEVICE_HANDLER( arm7_do_callback )
 {
@@ -446,7 +579,41 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
     UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
     UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
     UINT8 op3 =    opcode & INSN_COPRO_OP3;
+    UINT8 cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
     UINT32 data = 0;
+
+//    printf("cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, GET_REGISTER(cpustate, 15));
+
+    // we only handle system copro here
+    if (cpnum != 15)
+    {
+    	if (cpustate->archFlags & eARM_ARCHFLAGS_XSCALE)
+	{
+		// handle XScale specific CP14
+		if (cpnum == 14)
+		{
+			switch( cReg )
+			{
+				case 1:	// clock counter
+					data = (UINT32)cpu_get_total_cycles(device);
+					break;
+
+				default:
+					break;
+			}
+		}
+		else
+		{
+			fatalerror("XScale: Unhandled coprocessor %d (archFlags %x)\n", cpnum, cpustate->archFlags);
+		}
+
+		return data;
+	}
+	else
+	{
+		fatalerror("ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, cpustate->archFlags);
+	}
+    }
 
     switch( cReg )
     {
@@ -517,11 +684,9 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
             LOG( ( "arm7_rt_r_callback, ID\n" ) );
             break;
         case 1:             // Control
-            LOG( ( "arm7_rt_r_callback, Control\n" ) );
-            data = COPRO_CTRL;
+            data = COPRO_CTRL | 0x70;	// bits 4-6 always read back as "1" (bit 3 too in XScale)
             break;
         case 2:             // Translation Table Base
-            LOG( ( "arm7_rt_r_callback, TLB Base\n" ) );
             data = COPRO_TLB_BASE;
             break;
         case 3:             // Domain Access Control
@@ -557,7 +722,22 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
     UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
     UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
     UINT8 op3 =    opcode & INSN_COPRO_OP3;
+    UINT8 cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 
+    // handle XScale specific CP14 - just eat writes for now
+    if (cpnum != 15)
+    {
+	    if (cpnum == 14)
+	    {
+	    	LOG( ("arm7_rt_w_callback: write %x to XScale CP14 reg %d\n", data, cReg) );
+	    	return;
+	    }
+	    else
+	    {
+	    	fatalerror("ARM7: Unhandled coprocessor %d\n", cpnum);
+	    }
+    }
+    
     switch( cReg )
     {
         case 0:
@@ -581,10 +761,6 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
                    ( data & COPRO_CTRL_ICACHE_EN ) >> COPRO_CTRL_ICACHE_EN_SHIFT ) );
             LOG( ( "    Int Vector Adjust:%d\n", ( data & COPRO_CTRL_INTVEC_ADJUST ) >> COPRO_CTRL_INTVEC_ADJUST_SHIFT ) );
             COPRO_CTRL = data & COPRO_CTRL_MASK;
-            if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-            {
-//                change_pc(arm7_tlb_translate(R15));
-            }
             break;
         case 2:             // Translation Table Base
             LOG( ( "arm7_rt_w_callback TLB Base = %08x (%d) (%d)\n", data, op2, op3 ) );
@@ -600,7 +776,7 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
             LOG( ( "arm7_rt_w_callback Fault Address = %08x (%d) (%d)\n", data, op2, op3 ) );
             break;
         case 7:             // Cache Operations
-            LOG( ( "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+//            LOG( ( "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
             break;
         case 8:             // TLB Operations
             LOG( ( "arm7_rt_w_callback TLB Ops = %08x (%d) (%d)\n", data, op2, op3 ) );

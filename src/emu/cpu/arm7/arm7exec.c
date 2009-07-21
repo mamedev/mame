@@ -53,13 +53,17 @@
         /* handle Thumb instructions if active */
         if (T_IS_SET(GET_CPSR))
         {
-            UINT32 readword;
-            UINT32 addr;
+            UINT32 readword, addr, raddr;
             UINT32 rm, rn, rs, rd, op2, imm, rrs, rrd;
             INT32 offs;
 
             pc = R15;
-            insn = memory_decrypted_read_word(cpustate->program, pc & (~1));
+	    raddr = pc & (~1);
+	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	    {
+	    	raddr = arm7_tlb_translate(cpustate, raddr);
+	    }
+            insn = memory_decrypted_read_word(cpustate->program, raddr);
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
             switch ((insn & THUMB_INSN_TYPE) >> THUMB_INSN_TYPE_SHIFT)
             {
@@ -1165,6 +1169,10 @@
 
             /* load 32 bit instruction */
             pc = R15;
+	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	    {
+	    	pc = arm7_tlb_translate(cpustate, pc);
+	    }
             insn = memory_decrypted_read_dword(cpustate->program, pc);
 
             /* process condition codes for this instruction */

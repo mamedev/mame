@@ -148,6 +148,8 @@ enum
 	eARM_ARCHFLAGS_E	= 2,		// extended DSP operations present (only for v5+)
 	eARM_ARCHFLAGS_J	= 4,		// "Jazelle" (direct execution of Java bytecode)
 	eARM_ARCHFLAGS_MMU	= 8,		// has on-board MMU (traditional ARM style like the SA1110)
+	eARM_ARCHFLAGS_SA	= 16,		// StrongARM extensions (enhanced TLB)
+	eARM_ARCHFLAGS_XSCALE	= 32,		// XScale extensions (CP14, enhanced TLB)
 };
 
 #define ARM7CORE_REGS                   \
@@ -350,11 +352,13 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define INSN_COPRO_N        ((UINT32) 0x00100000u)
 #define INSN_COPRO_CREG     ((UINT32) 0x000f0000u)
 #define INSN_COPRO_AREG     ((UINT32) 0x0000f000u)
+#define INSN_COPRO_CPNUM    ((UINT32) 0x00000f00u)
 #define INSN_COPRO_OP2      ((UINT32) 0x000000e0u)
 #define INSN_COPRO_OP3      ((UINT32) 0x0000000fu)
 #define INSN_COPRO_N_SHIFT          20
 #define INSN_COPRO_CREG_SHIFT       16
 #define INSN_COPRO_AREG_SHIFT       12
+#define INSN_COPRO_CPNUM_SHIFT	    8
 #define INSN_COPRO_OP2_SHIFT        5
 
 #define THUMB_INSN_TYPE     ((UINT16)0xf000)

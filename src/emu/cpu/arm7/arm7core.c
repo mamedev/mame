@@ -81,12 +81,6 @@
 
 #define ARM7_DEBUG_CORE 0
 
-#if 0
-#define LOG(x) mame_printf_debug x
-#else
-#define LOG(x) logerror x
-#endif
-
 /* Prototypes */
 
 // SJE: should these be inline? or are they too big to see any benefit?
@@ -137,6 +131,11 @@ char *(*arm7_dasm_cop_do_callback)(arm_state *cpustate, char *pBuf, UINT32 opcod
  ***************************************************************************/
 INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
 {
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
+
     addr &= ~3;
     memory_write_dword_32le(cpustate->program, addr, data);
 }
@@ -144,18 +143,33 @@ INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
 
 INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
 {
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
+
     addr &= ~1;
     memory_write_word_32le(cpustate->program, addr, data);
 }
 
 INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 {
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
+
     memory_write_byte_32le(cpustate->program, addr, data);
 }
 
 INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
 {
     UINT32 result;
+
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
 
     if (addr & 3)
     {
@@ -174,6 +188,11 @@ INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
 {
     UINT16 result;
 
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
+
     result = memory_read_word_32le(cpustate->program, addr & ~1);
 
     if (addr & 1)
@@ -186,6 +205,11 @@ INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
 
 INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
 {
+    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+    {
+        addr = arm7_tlb_translate( cpustate, addr );
+    }
+
     // Handle through normal 8 bit handler (for 32 bit cpu)
     return memory_read_byte_32le(cpustate->program, addr);
 }
