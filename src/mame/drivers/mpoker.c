@@ -160,7 +160,7 @@
     These writes sounds like a BCD valueset.
     Maybe were intended formerly to send some data to 7seg display unit.
 
-  - Color system (no bipolar PROMs in the system)
+  - Color system (no bipolar PROMs in the system), needs a reference
 
 
 **********************************************************************************/
@@ -194,7 +194,7 @@ static VIDEO_UPDATE(mpoker)
 		for (x=0;x<32;x++)
 		{
 			UINT16 dat = mpoker_video[count];
-			UINT16 col = mpoker_video[count+0x400];
+			UINT16 col = mpoker_video[count+0x400] & 0x7f;
 			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}
@@ -203,14 +203,20 @@ static VIDEO_UPDATE(mpoker)
 	return 0;
 }
 
-static PALETTE_INIT( mpoker )	// WRONG... FIXME
+static PALETTE_INIT(mpoker)
 {
 	int i;
 
-	for (i = 0; i < 64; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		palette_set_color_rgb(machine, 2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
-		palette_set_color_rgb(machine, 2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
+		else
+			color = RGB_BLACK;
+
+		palette_set_color(machine, i, color);
 	}
 }
 
@@ -520,7 +526,7 @@ static INPUT_PORTS_START( mpoker )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )		/* bit1 connected to a signal heartbeat */
-	PORT_DIPNAME( 0x1c, 0x1c, "Main Percentage" )
+	PORT_DIPNAME( 0x1c, 0x0c, "Main Percentage" )
 	PORT_DIPSETTING(    0x18, "75%" )
 	PORT_DIPSETTING(    0x14, "80%" )
 	PORT_DIPSETTING(    0x00, "85%" )
@@ -551,7 +557,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 static GFXDECODE_START( mpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( mpoker )
@@ -571,7 +577,7 @@ static MACHINE_DRIVER_START( mpoker )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
 	MDRV_GFXDECODE(mpoker)
-	MDRV_PALETTE_LENGTH(2*64)
+	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_PALETTE_INIT(mpoker)
 	MDRV_VIDEO_START(mpoker)
