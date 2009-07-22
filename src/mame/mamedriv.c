@@ -8801,6 +8801,7 @@ Other Sun games
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( saloon )	/* 199? unknown */
+	DRIVER( photoply )
 
 	/* Sandii' */
 	DRIVER( snookr10 )	/* (c) 1998 Sandii' */
