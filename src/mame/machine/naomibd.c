@@ -84,7 +84,7 @@
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
-#define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip scramble address lines, 1 for normal
+#define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
 /*************************************
  *
@@ -356,6 +356,20 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				v->dma_offset &= 0xffff;
 				v->dma_offset |= (data >> 16) & 0x1fff0000;
 				v->dma_offset_flags = (data>>28);
+
+				// if the flag is cleared that lets the protection chip go,
+				// we need to handle this specially.
+				if (!(v->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE))
+				{
+					if (!strcmp(device->machine->gamedrv->name, "qmegamis"))
+					{
+						v->dma_offset = 0x9000000;
+					}
+					else
+					{
+						logerror("Protected DMA not handled for this game\n");
+					}
+				}
 			}
 			if(ACCESSING_BITS_0_15)
 			{

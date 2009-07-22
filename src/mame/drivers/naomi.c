@@ -3130,7 +3130,7 @@ ROM_START( qmegamis )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASEFF)
+	ROM_REGION( 0x9000200, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-23227.ic11", 0x0000000, 0x0400000, CRC(3f76087e) SHA1(664d28ef95394590b186e7badaf96ddaf781c104) ) //ic 22
 	ROM_RELOAD( 0x400000, 0x400000)
 	/*ic 1 empty */
@@ -3150,6 +3150,9 @@ ROM_START( qmegamis )
 	ROM_LOAD32_WORD("mpr-23224.ic30", 0x7000002, 0x0800000, CRC(bed270e1) SHA1(342199ac5903681f2bfdb9dfd57ce06202f14685) ) //ic 15
 	ROM_LOAD32_WORD("mpr-23225.ic31", 0x8000000, 0x0800000, CRC(ea558614) SHA1(b7dfe5598639a8e59e3cbbee38b1d9a1d8e022ea) ) //ic 16
 	ROM_LOAD32_WORD("mpr-23226.ic32", 0x8000002, 0x0800000, CRC(cd5da506) SHA1(2e76c8892c1d389b0f12a0046213f43d2ab07d78) ) //ic 17
+
+	// trojaned protection data (must be in the "user1" region because it's accessed via DMA)
+	ROM_LOAD( "81452000_dma.bin", 0x9000000, 0x000120, CRC(96049488) SHA1(e2b98e8986f8cbf026db50a652300081a8e470b0) )
 ROM_END
 
 /*
@@ -5120,14 +5123,13 @@ struct AtomiswaveKey rm_key = {
     {6,0,7,4,5,3,1,2}
 };
 
-/* ****************************************** The Extreme Hunting key below is _NOT_ correct...   FIX ME  */
 struct AtomiswaveKey xh_key = {
-    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
-    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
-    {3,6,0,19,14,30,17,22,13,23,2,11,29,24,28,4,10,7,15,12,31,1,20,16,9,8,18,26,25,21,27,5},
-    {2,6,3,7,11,4,12,0,10,9,15,14,13,5,1,8},
-    {1,13,12,15,8,7,0,5,11,3,4,14,9,10,6,2},
-    {6,0,7,4,5,3,1,2}
+    {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
+    {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
+    {4,3,23,28,8,18,24,15,16,10,11,2,31,17,27,25,12,20,29,6,14,26,21,13,30,7,22,9,0,1,5,19,},
+    {13,3,1,15,5,11,12,6,0,2,9,10,4,8,14,7,},
+    {7,5,13,9,0,8,15,11,4,3,6,2,12,1,10,14,},
+    {4,1,5,3,0,2,7,6} 
 };
 
 static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
