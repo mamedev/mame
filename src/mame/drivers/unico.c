@@ -72,7 +72,8 @@ static ADDRESS_MAP_START( burglarx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800116, 0x800117) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrollx_1)				//
 	AM_RANGE(0x800120, 0x800121) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrolly_1)				//
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
-	AM_RANGE(0x80018a, 0x80018d) AM_DEVREADWRITE8("ym", ym3812_r, ym3812_w, 0xff00)			//
+	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8("ym", ym3812_write_port_w, 0xff00			)	//
+	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8("ym", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_DEVWRITE("oki", burglarx_sound_bank_w)					//
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP												// IRQ Ack
 	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(unico_vram_1_w) AM_BASE(&unico_vram_1	)		// Layers
