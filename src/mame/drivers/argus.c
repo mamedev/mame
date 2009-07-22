@@ -61,9 +61,42 @@ System specs :
             Various sprite sizes   (Emulated)
 
 
+PCB Edge Connector Pinout :
+============================
+ Argus
+ ----------------------------------
+         PARTS         SOLDER
+  --------------------------------
+           GND   1 A   GND
+           GND   2 B   GND
+            5V   3 C   5V
+            5V   4 D   5V
+           12V   5 E   12V
+     Video Red   6 F   Video Blue
+   Video Green   7 H   Video Sync
+     Speaker +   8 J   Speaker -
+        Coin 2   9 K   Coin 1     (*) see below
+           GND  10 L   GND
+      1P Start  11 M   2P Start
+         1P Up  12 N   2P Up
+       1P Down  13 P   2P Down
+      1P Right  14 R   2P Right
+       1P Left  15 S   2P Left
+     1P Shot 1  16 T   2P Shot 1
+     1P Shot 2  17 U   2P Shot 2
+           GND  18 V   GND
+ (*) You may doubt that 9 and K are swapped. But they are not.
+
+ Valtric and Butasan
+ ----------------------------------
+   JAMMA
+
+
 Note :
 =======
- - To enter test mode, press coin 2 key at start in Argus and Valtric.
+ - To enter test mode, press Coin 2 key at start in Argus,
+                       press Coin 1 key at start in Valtric,
+                   and press Service key at start in Butasan.
  - DIP locations verified for:
     butasan
     argus
@@ -260,8 +293,7 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
@@ -285,15 +317,16 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	/* DIPSW default setting: all OFF */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:7,6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium_Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -303,7 +336,7 @@ static INPUT_PORTS_START( argus )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
@@ -312,7 +345,7 @@ static INPUT_PORTS_START( argus )
 	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:8" )			/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:7" )			/* Listed as "Unused" */
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:6,5,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -321,7 +354,7 @@ static INPUT_PORTS_START( argus )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:3,2,1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
@@ -335,13 +368,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( valtric )
 	PORT_INCLUDE( argus )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* assigned JAMMA "Service", but not used */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	/* DIPSW default setting: all OFF */
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:7,6")
 	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Harder ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x04, DEF_STR( Medium_Difficult ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
@@ -351,32 +390,15 @@ static INPUT_PORTS_START( valtric )
 	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0C, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x1C, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( butasan )
 	PORT_INCLUDE( valtric )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )	/* work as both "Service Credit SW" and "Test Mode SW" */
 
+	/* DIPSW default setting: all OFF */
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -384,16 +406,16 @@ static INPUT_PORTS_START( butasan )
 	PORT_DIPNAME( 0x02, 0x02, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x30, "Rank 1" )
-	PORT_DIPSETTING(    0x20, "Rank 2" )
-	PORT_DIPSETTING(    0x10, "Rank 3" )
-	PORT_DIPSETTING(    0x00, "Rank 4" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium_Difficult ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:2" )			/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:1" )			/* Listed as "Unused" */
 
