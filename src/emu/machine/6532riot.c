@@ -182,11 +182,10 @@ static TIMER_CALLBACK( timer_end_callback )
 		update_irqstate(device);
 	}
 
-	/* if we finished finishing, switch to the idle state */
+	/* if we finished finishing, keep spinning */
 	else if (riot->timerstate == TIMER_FINISHING)
 	{
-		riot->timerstate = TIMER_IDLE;
-		timer_adjust_oneshot(riot->timer, attotime_never, 0);
+		timer_adjust_oneshot(riot->timer, ticks_to_attotime(256, device->clock), 0);
 	}
 }
 
