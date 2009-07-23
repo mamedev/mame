@@ -5295,26 +5295,21 @@ UINT8 stv_get_vblank(running_machine *machine)
 /*some vblank lines measurements (according to Charles MacDonald)*/
 static int get_vblank_duration(running_machine *machine)
 {
-	/* TODO: +64 is probably due of missing pixel clock/screen raw params hook-up.
-             Problem is, I don't know if it's possible to handle that in MAME with
-             all this dynamic resolution babblecrap...
-             */
-
 	if(STV_VDP2_HRES & 4)
 	{
 		switch(STV_VDP2_HRES & 1)
 		{
-			case 0: return 45+64; //31kHz Monitor
-			case 1: return 82+64; //Hi-Vision Monitor
+			case 0: return 45; //31kHz Monitor
+			case 1: return 82; //Hi-Vision Monitor
 		}
 	}
 
 	switch(STV_VDP2_VRES & 3)
 	{
-		case 0: return 39+64; //263-224
-		case 1: return 23+64; //263-240
-		case 2: return 7+64; //263-256
-		case 3: return 7+64; //263-256
+		case 0: return 39; //263-224
+		case 1: return 23; //263-240
+		case 2: return 7; //263-256
+		case 3: return 7; //263-256
 	}
 
 	return 0;

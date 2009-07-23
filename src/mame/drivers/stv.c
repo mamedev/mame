@@ -180,6 +180,7 @@ ToDo / Notes:
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
+#define PIXEL_CLOCK MASTER_CLOCK_352/4
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -2752,11 +2753,8 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(704*2, 512*2)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 704, 0, 703, 512, 0, 511) // we need to use a resolution as high as the max size it can change to
 
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MDRV_GFXDECODE(stv)
