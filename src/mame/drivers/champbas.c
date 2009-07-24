@@ -770,7 +770,7 @@ ROM_START( champbas )
 	ROM_LOAD( "champbb.pr1", 0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
-ROM_START( champbbj )
+ROM_START( champbasj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11.2e", 0x0000, 0x2000, CRC(e2dfc166) SHA1(482e084d7d21b1cf2d17431699e6bab4c4b6ac15) )
 	ROM_LOAD( "12.2g", 0x2000, 0x2000, CRC(7b4e5faa) SHA1(b7201816a819ef313ddc81f312d26982b83ef1c7) )
@@ -795,7 +795,7 @@ ROM_START( champbbj )
 	ROM_LOAD( "5k.bpr", 0x0020, 0x0100, CRC(2e481ffa) SHA1(bc8979efd43bee8be0ce96ebdacc873a5821e06e) ) /* look-up table */
 ROM_END
 
-ROM_START( champbja )
+ROM_START( champbasja )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10", 0x0000, 0x2000, CRC(f7cdaf8e) SHA1(d4c840f2107394fadbcf822d64aaa381ac900367) )
 	ROM_LOAD( "09", 0x2000, 0x2000, CRC(9d39e5b3) SHA1(11c1a1d2296c0bf16d7610eaa79b034bfd813740) )
@@ -844,7 +844,7 @@ ROM_START( champbb2 )
 	ROM_LOAD( "pr5956", 0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
-ROM_START( champb2a )
+ROM_START( champbb2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(9b75b44d) SHA1(35b67638a5e48cbe999907e3c9c3a33da9d76bba) )
 	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(736a1b62) SHA1(24c2d57506754ca789b378a595c03b7591eb5b5c) )
@@ -902,7 +902,7 @@ ROM_START( exctsccr )
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
-ROM_START( exctscca )
+ROM_START( exctsccra )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_g10.bin",    0x0000, 0x2000, CRC(aa68df66) SHA1(f10cac5a4c5aad1e1eb8835174dc8d517bb2921a) )
 	ROM_LOAD( "2_h10.bin",    0x2000, 0x2000, CRC(2d8f8326) SHA1(8809e7b081fa2a1966cb51ac969fd7b468d35be0) )
@@ -932,7 +932,7 @@ ROM_START( exctscca )
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
-ROM_START( exctsccj )
+ROM_START( exctsccrj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.10g",    0x0000, 0x2000, CRC(d1bfdf75) SHA1(a4a9bb340712401b1d24705c26d996a798776d4f) )
 	ROM_LOAD( "2.10h",    0x2000, 0x2000, CRC(5c61f0fe) SHA1(8c6751b80f89d8744d3eaa2a6da2cafdde968ed2) )
@@ -978,7 +978,7 @@ KAZUTOMI board
 1x 2764 (daughter board kazutomi) (6)
 2x 2732 (daughter board kazutomi) (7-8)
 */
-ROM_START( exctsccb )
+ROM_START( exctsccrb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "es-1.e2",      0x0000, 0x2000, CRC(997c6a82) SHA1(60fe27a12eedd22c775b7e65c5ba692cfcf5ac74) )
 	ROM_LOAD( "es-2.g2",      0x2000, 0x2000, CRC(5c66e792) SHA1(f7a7f32806965fa926261217cee3159ccd198d49) )
@@ -1091,14 +1091,14 @@ static DRIVER_INIT( exctsccr )
 
 GAME( 1982, talbot,   0,        talbot,   talbot,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", 0 )
 
-GAME( 1983, champbas, 0,        champbas, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball", 0 )
-GAME( 1983, champbbj, champbas, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", 0 )
-GAME( 1983, champbja, champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", 0 )
-GAME( 1983, champbb2, 0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", 0 )
-GAME( 1983, champb2a, champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING)	// no dump
+GAME( 1983, champbas,  0,        champbas, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball", 0 )
+GAME( 1983, champbasj, champbas, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", 0 )
+GAME( 1983, champbasja,champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", 0 )
+GAME( 1983, champbb2,  0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", 0 )
+GAME( 1983, champbb2a, champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING)	// no dump
 
-GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", 0 )
-GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
-GAME( 1983, exctsccj, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", 0 )
-GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", 0 )
-GAME( 1984, exctscc2, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", 0 )
+GAME( 1983, exctsccr,  0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", 0 )
+GAME( 1983, exctsccra, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
+GAME( 1983, exctsccrj, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", 0 )
+GAME( 1983, exctsccrb, exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", 0 )
+GAME( 1984, exctscc2,  0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", 0 )

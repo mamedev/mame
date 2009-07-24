@@ -333,7 +333,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps4pa ) /* World 4 Player, later? (by use of later leters) */
+ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 	ROM_REGION( 0x8b000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-g01.17c", 0x30000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
@@ -361,7 +361,7 @@ ROM_START( simps4pa ) /* World 4 Player, later? (by use of later leters) */
 ROM_END
 
 
-ROM_START( simpsn2p ) /* World 2 Player */
+ROM_START( simpsons2p ) /* World 2 Player */
 	ROM_REGION( 0x8b000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "072-g02.16c",  0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-p01.17c",  0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
@@ -388,7 +388,7 @@ ROM_START( simpsn2p ) /* World 2 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps2pa ) /* World 2 Player, alt */
+ROM_START( simpsons2p2 ) /* World 2 Player, alt */
 	ROM_REGION( 0x8b000, "maincpu", 0 ) /* code + banked roms + banked ram */
         ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-p01.17c", 0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
@@ -415,7 +415,7 @@ ROM_START( simps2pa ) /* World 2 Player, alt */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simp2pa ) /* Asia 2 Player */
+ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_REGION( 0x8b000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) ) /* Same as both world 2p sets */
 	ROM_LOAD( "072-p01.17c", 0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) ) /* Same as both world 2p sets */
@@ -442,7 +442,7 @@ ROM_START( simp2pa ) /* Asia 2 Player */
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps2pj ) /* Japan 2 Player */
+ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_REGION( 0x8b000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "072-s02.16c", 0x10000, 0x20000, CRC(265f7a47) SHA1(d39c19a5e303f822313409343b209947f4c47ae4) )
 	ROM_LOAD( "072-t01.17c", 0x30000, 0x20000, CRC(91de5c2d) SHA1(1e18a5585ed821ec7cda69bdcdbfa4e6c71455c6) )
@@ -482,9 +482,9 @@ static DRIVER_INIT( simpsons )
 }
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons, 0,        simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", 0 )
-GAME( 1991, simps4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", 0 )
-GAME( 1991, simpsn2p, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", 0 )
-GAME( 1991, simps2pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", 0 )
-GAME( 1991, simp2pa,  simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Asia)", 0 )
-GAME( 1991, simps2pj, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 )
+GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", 0 )
+GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", 0 )
+GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", 0 )
+GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", 0 )
+GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Asia)", 0 )
+GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 )

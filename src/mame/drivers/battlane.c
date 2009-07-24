@@ -319,7 +319,7 @@ ROM_START( battlane )
 	ROM_LOAD( "82s123.9n", 0x00020, 0x0020, CRC(06491e53) SHA1(d6cf5003798f9a9d555bca97844dcb2966cbac9d) )
 ROM_END
 
-ROM_START( battlan2 )
+ROM_START( battlane2 )
 	ROM_REGION( 0x8000, "user1", 0 )
 	ROM_LOAD( "da00-3",     0x0000, 0x8000, CRC(7a0a5d58) SHA1(ef97e5a64a668c437c18cda931c52bf39b580b4a) )
 
@@ -347,7 +347,7 @@ ROM_START( battlan2 )
 	ROM_LOAD( "82s123.9n", 0x00020, 0x0020, CRC(06491e53) SHA1(d6cf5003798f9a9d555bca97844dcb2966cbac9d) )
 ROM_END
 
-ROM_START( battlan3 )
+ROM_START( battlane3 )
 	ROM_REGION( 0x8000, "user1", 0 )
 	ROM_LOAD( "bl_04.rom",  0x0000, 0x8000, CRC(5681564c) SHA1(25b3a715e91976830d87c7c45b93b473df709241) )
 
@@ -376,6 +376,6 @@ ROM_START( battlan3 )
 ROM_END
 
 
-GAME( 1986, battlane, 0,        battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", 0 )
-GAME( 1986, battlan2, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", 0 )
-GAME( 1986, battlan3, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", 0 )
+GAME( 1986, battlane,  0,        battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", 0 )
+GAME( 1986, battlane2, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", 0 )
+GAME( 1986, battlane3, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", 0 )

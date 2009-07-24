@@ -610,7 +610,7 @@ ROM_START( darius2d )
 //  ROM_LOAD( "C07-16.79", 0x00000, 0x00?00, NO_DUMP )
 ROM_END
 
-ROM_START( drius2do )
+ROM_START( darius2do )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "c07_20-1.74", 0x00000, 0x20000, CRC(48b0804a) SHA1(932fb2cd55e6bfef84cf3cfaf3e75b4297a92b34) )
 	ROM_LOAD16_BYTE( "c07_19-1.73", 0x00001, 0x20000, CRC(1f9a4f83) SHA1(d02caef350bdcac0ff771b5c92bb4e7435e0c9fa) )
@@ -717,5 +717,5 @@ static MACHINE_RESET( taito_dualscreen )
 /* Working Games */
 
 GAME( 1989, darius2d, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan)", 0 )
-GAME( 1989, drius2do, darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan old version)", 0 )
+GAME( 1989, darius2do,darius2,  darius2d, darius2d, 0, ROT0, "Taito Corporation", "Darius II (dual screen) (Japan old version)", 0 )
 GAME( 1991, warriorb, 0,        warriorb, warriorb, 0, ROT0, "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 )

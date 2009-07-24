@@ -1488,7 +1488,7 @@ Chips named L_xxx
 All roms 2764
 All Proms TBP24S10
 */
-ROM_START( bullfgts )
+ROM_START( bullfgtrs )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs
 	ROM_LOAD16_BYTE( "m_d13.bin",  0x00001, 0x2000, CRC(7c35dd4b) SHA1(6bd604ee32c0c5db17f90e24aa254ec7072d27dd) )
 	ROM_LOAD16_BYTE( "m_b13.bin",  0x00000, 0x2000, CRC(c4adddce) SHA1(48b6ddbad52a3941d3e651642b26d9adf70f71f5) )
@@ -1874,7 +1874,7 @@ static DRIVER_INIT( hvoltage )
 GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_IMPERFECT_SOUND )
 GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_IMPERFECT_SOUND )
 GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_IMPERFECT_SOUND )
-GAME( 1984, bullfgts, bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND )
+GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND )
 GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_IMPERFECT_SOUND )
 GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 

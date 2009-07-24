@@ -401,7 +401,7 @@ ROM_START( ginganin )
 
 ROM_END
 
-ROM_START( gingania )
+ROM_START( ginganina )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* main cpu */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x10000, CRC(6da1d8a3) SHA1(ea81f2934fa7901563e886f3d600edd08ec0ea24) )
 	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x10000, CRC(0bd32d59) SHA1(5ab2c0e4a1d9cafbd3448d981103508debd7ed96) )
@@ -455,4 +455,4 @@ static DRIVER_INIT( ginganin )
 
 
 GAME( 1987, ginganin, 0,        ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", 0 )
-GAME( 1987, gingania, ginganin, ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", 0 )
+GAME( 1987, ginganina,ginganin, ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", 0 )

@@ -1667,7 +1667,7 @@ ROM_START( minigolf )
 ROM_END
 
 
-ROM_START( minigol2 )
+ROM_START( minigolf2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(19a6ff47) SHA1(70b6da3b4186e5b9463f2ea0fefefad21ec80637) )
@@ -1781,7 +1781,7 @@ ROM_START( nstocker )
     MOTHERBOARD_PALS
 ROM_END
 
-ROM_START( nstockr2 )
+ROM_START( nstocker2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
@@ -1898,7 +1898,7 @@ ROM_START( rescraid )
 ROM_END
 
 
-ROM_START( rescrdsa )
+ROM_START( rescraida )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab1-sa.a10",   0x10000, 0x8000, CRC(aa0a9f48) SHA1(b871573df0abdba20de78f655da846423191f0b4) )
 	ROM_LOAD( "ab12-sa.a12",  0x18000, 0x8000, CRC(16d4da86) SHA1(240cfe8c5c4c005da9b9f370a04ed32fc245ec64) )
@@ -2144,7 +2144,7 @@ GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente
 GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE, layout_stocker )
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, minigol2, minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, minigolf2,minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown (Baby Boomer Edition uses 006-8025-01-0B Rev B board.  Do the rest use it too? */
 GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )
@@ -2159,13 +2159,13 @@ GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente
 
 /* Board: 006-8027-01-0B Rev B */
 GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, nstockr2, nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nstocker2,nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football", GAME_SUPPORTS_SAVE )
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown */
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin'", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraid, 0,        balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider", GAME_SUPPORTS_SAVE )
-GAME( 1987, rescrdsa, rescraid, balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider (stand-alone)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rescraida,rescraid, balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider (stand-alone)", GAME_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge,   grudge,   ROT0, "Bally/Midway", "Grudge Match (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 198?, shrike,   0,        shrike,   shrike,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", GAME_SUPPORTS_SAVE )

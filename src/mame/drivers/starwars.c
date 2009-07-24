@@ -376,7 +376,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-ROM_START( starwar1 )
+ROM_START( starwars1 )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
 	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021.114",   0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) )   /* ROM 0 bank pages 0 and 1 */
@@ -563,6 +563,6 @@ static DRIVER_INIT( esb )
  *************************************/
 
 GAME( 1983, starwars, 0,        starwars, starwars, starwars, ROT0, "Atari", "Star Wars (rev 2)", 0 )
-GAME( 1983, starwar1, starwars, starwars, starwars, starwars, ROT0, "Atari", "Star Wars (rev 1)", 0 )
+GAME( 1983, starwars1,starwars, starwars, starwars, starwars, ROT0, "Atari", "Star Wars (rev 1)", 0 )
 GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", GAME_NO_SOUND )
 GAME( 1985, esb,      0,        starwars, esb,      esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )

@@ -734,7 +734,7 @@ ROM_START( galpani2 )
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
 
-ROM_START( galpan2g )
+ROM_START( galpani2g )
  	ROM_REGION( 0x100000, "maincpu", 0 )			/* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000g1.u133-0", 0x000000, 0x080000, CRC(5a9c4886) SHA1(6fbc443612e72bafc5cac30de78c72815db20c4c) )
 	ROM_LOAD16_BYTE( "g001g1.u134-0", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )
@@ -785,7 +785,7 @@ ROM_START( galpan2g )
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
 
-ROM_START( galpan2t )
+ROM_START( galpani2t )
  	ROM_REGION( 0x100000, "maincpu", 0 )			/* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000t1.133", 0x000000, 0x080000, CRC(332048e7) SHA1(1a353d4b29f7a08158fc454309dc496df6b5b108) )
 	ROM_LOAD16_BYTE( "g001t1.134", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )
@@ -850,7 +850,7 @@ this just appears to be a regular japanese version, NOT the quiz version, unless
 
 */
 
-ROM_START( galpan2j )
+ROM_START( galpani2j )
 	ROM_REGION( 0x100000, "maincpu", 0 )			/* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000j2.165", 0x000000, 0x080000, CRC(e0c5a03d) SHA1(e12457400ca8cd78674b44d7f4d664cfc0afc8c9) )
 	ROM_LOAD16_BYTE( "g001j2.164", 0x000001, 0x080000, CRC(c8e12223) SHA1(0e0160565e95cb33dc6ad796225e995ed3baf8eb) )
@@ -949,9 +949,9 @@ ROM_START( gp2quiz )
 	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
-GAME( 1993, galpani2, 0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpan2g, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (German)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpan2t, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpan2j, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // it is a 'quiz edition' but the title screen doesn't say that??
+GAME( 1993, galpani2,  0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1993, galpani2g, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (German)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1993, galpani2t, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1993, galpani2j, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // it is a 'quiz edition' but the title screen doesn't say that??
 GAME( 1993, gp2quiz,  0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // this one has 'quiz edition' on the title screen
 GAME( 1994, gp2se,    0,        galpani2, gp2se,    0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )

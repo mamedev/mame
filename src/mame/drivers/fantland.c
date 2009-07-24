@@ -1077,7 +1077,7 @@ ROM_START( fantland )
 ROM_END
 
 /* this dump had several roms half size however they all appear to be data & gfx roms, the main program looks ok */
-ROM_START( fantlnda )
+ROM_START( fantlanda )
 	ROM_REGION( 0x100000, "maincpu", 0 )					// Main CPU
 	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) ) // 04.bin (was first half only)
 	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) ) // 03.bin (was first half only)
@@ -1373,6 +1373,6 @@ ROM_END
 
 GAME( 19??, borntofi, 0,        borntofi, borntofi, 0, ROT0,  "International Games",       "Born To Fight",        0 )
 GAME( 19??, fantland, 0,        fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", 0 )
-GAME( 19??, fantlnda, fantland, fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", 0 )
+GAME( 19??, fantlanda,fantland, fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", 0 )
 GAME( 19??, wheelrun, 0,        wheelrun, wheelrun, 0, ROT0,  "International Games",       "Wheels Runner",        0 )
 GAME( 1989, galaxygn, 0,        galaxygn, galaxygn, 0, ROT90, "Electronics Devices Italy", "Galaxy Gunners",       GAME_IMPERFECT_SOUND )

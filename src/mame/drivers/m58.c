@@ -321,7 +321,7 @@ ROM_START( vs10yard )
 	ROM_LOAD( "yard.2m",      0x0420, 0x0100, CRC(45384397) SHA1(e4c662ee81aef63efd8b4a45f85c4a78dc2d419e) ) /* radar palette high 4 bits */
 ROM_END
 
-ROM_START( vs10yarj )
+ROM_START( vs10yardj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vyf-a.3n",     0x0000, 0x2000, CRC(418e01fc) SHA1(56a6515735cd88ec803e24574a28aef823a5d36b) )
 	ROM_LOAD( "vyf-a.3m",     0x2000, 0x2000, CRC(3b9330f8) SHA1(b35fe72cf724cfb887906060bbcf40b0c896ccf0) )
@@ -366,4 +366,4 @@ ROM_END
 GAME( 1983, 10yard,   0,        yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (World)", 0 )
 GAME( 1983, 10yardj,  10yard,   yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 )
 GAME( 1984, vs10yard, 10yard,   yard,     vs10yard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", 0 )
-GAME( 1984, vs10yarj, 10yard,   yard,     vs10yarj, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 )
+GAME( 1984, vs10yardj,10yard,   yard,     vs10yarj, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 )

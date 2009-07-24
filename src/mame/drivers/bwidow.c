@@ -826,7 +826,7 @@ ROM_START( gravitar )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
-ROM_START( gravitr2 )
+ROM_START( gravitar2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136010.210",   0x2800, 0x0800, CRC(debcb243) SHA1(2c50cd38d60739c126f1d0d8e7fbd46a0bde6e1c) )
@@ -943,7 +943,7 @@ ROM_END
 GAME( 1980, spacduel, 0,        spacduel, spacduel, 0, ROT0, "Atari", "Space Duel", GAME_SUPPORTS_SAVE )
 GAME( 1982, bwidow,   0,        bwidow,   bwidow,   0, ROT0, "Atari", "Black Widow", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravitar, 0,        gravitar, gravitar, 0, ROT0, "Atari", "Gravitar (version 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, gravitr2, gravitar, gravitar, gravitar, 0, ROT0, "Atari", "Gravitar (version 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, gravitar2,gravitar, gravitar, gravitar, 0, ROT0, "Atari", "Gravitar (version 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravp,    gravitar, gravitar, gravitar, 0, ROT0, "Atari", "Gravitar (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1982, lunarbat, gravitar, gravitar, gravitar, 0, ROT0, "Atari", "Lunar Battle (prototype, later)", GAME_SUPPORTS_SAVE )
 GAME( 1982, lunarba1, gravitar, lunarbat, lunarbat, 0, ROT0, "Atari", "Lunar Battle (prototype, earlier)", GAME_SUPPORTS_SAVE )

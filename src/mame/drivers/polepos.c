@@ -1637,7 +1637,7 @@ ROM_END
     couple of extra roms.
 */
 
-ROM_START( poleps2a )
+ROM_START( polepos2a )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.180",   0x0000, 0x2000, CRC(f85212c4) SHA1(666e55a7662247e72393b105b3e719be4233f1ff) )
@@ -1720,7 +1720,7 @@ ROM_START( poleps2a )
 ROM_END
 
 
-ROM_START( poleps2b )
+ROM_START( polepos2b )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.180",   0x0000, 0x2000, CRC(f85212c4) SHA1(666e55a7662247e72393b105b3e719be4233f1ff) )
@@ -1840,5 +1840,5 @@ GAME( 1982, topracer, polepos,	polepos, polepos,  polepos,	 ROT0, "bootleg", "To
 GAME( 1982, topracra, polepos,	polepos, topracra, topracra, ROT0, "bootleg", "Top Racer (set 2)", 0 )
 GAME( 1983, topracrb, polepos,	polepos, polepos,  polepos,	 ROT0, "bootleg", "Top Racer (set 3)", 0 )
 GAME( 1983, polepos2, 0,		polepos, polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
-GAME( 1983, poleps2a, polepos2, polepos, polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
-GAME( 1983, poleps2b, polepos2, polepos, polepos2, polepos,	 ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
+GAME( 1983, polepos2a,polepos2, polepos, polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
+GAME( 1983, polepos2b,polepos2, polepos, polepos2, polepos,	 ROT0, "bootleg", "Pole Position II (bootleg)", 0 )

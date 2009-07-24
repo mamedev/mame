@@ -947,7 +947,7 @@ ROM_START( silkworm )
 	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
 
-ROM_START( silkwrm2 )
+ROM_START( silkworm2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "r4",           0x00000, 0x10000, CRC(6df3df22) SHA1(9d6201c2df014bdb6877dfff936dddde1fe6fbd0) )	/* c000-ffff is not used */
 	ROM_LOAD( "silkworm.5",   0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )	/* banked at f000-f7ff */
@@ -1104,5 +1104,5 @@ GAME( 1986, rygar3,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "R
 GAME( 1986, rygarj,   rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 )
 GAME( 1987, gemini,   0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing", 0 )
 GAME( 1988, silkworm, 0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 1)", 0 )
-GAME( 1988, silkwrm2, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 )
+GAME( 1988, silkworm2,silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (set 2)", 0 )
 GAME( 1988, backfirt, 0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )

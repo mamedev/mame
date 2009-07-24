@@ -535,7 +535,7 @@ ROM_START( robowres )
 	ROM_LOAD( "epr-7543.12b", 0x00000, 0x8000, CRC(4d108c49) SHA1(a7c3c5a5ad36917ea7f6d917377c2392fa9beea3) )
 ROM_END
 
-ROM_START( robowrb )
+ROM_START( robowresb )
 	ROM_REGION( 0x1c000+0x8000, "maincpu", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "dg4.e13",      0x00000, 0x8000, CRC(f7585d4f) SHA1(718879f8262681b6b66968eb49a0fb04fda5160b) )
 	ROM_LOAD( "epr-7541.14d", 0x08000, 0x6000, CRC(cbf7d1a8) SHA1(5eb6d2130d4e5401a332df6db5cad07f3131e8e4) )
@@ -577,4 +577,4 @@ static DRIVER_INIT(robowrb){
 
 GAME( 1984, appoooh,  0,        appoooh,  appoooh,  0,        ROT0, "[Sanritsu] Sega", "Appoooh", GAME_SUPPORTS_SAVE )
 GAME( 1986, robowres, 0,        robowres, robowres, robowres, ROT0, "Sega", "Robo Wres 2001", GAME_SUPPORTS_SAVE )
-GAME( 1986, robowrb,  robowres, robowres, robowres, robowrb,  ROT0, "bootleg", "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, robowresb,robowres, robowres, robowres, robowrb,  ROT0, "bootleg", "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )

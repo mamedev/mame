@@ -654,7 +654,7 @@ ROM_START( spaceint )
 	ROM_LOAD( "clr",		  0x0000, 0x0100, CRC(13c1803f) SHA1(da59bf63d9e84aca32904c107674bc89974648eb) )
 ROM_END
 
-ROM_START( spaceinj )
+ROM_START( spaceintj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3j",			  0x0000, 0x0800, CRC(b26c57a1) SHA1(456330c09130f910e847ef4bfe773421615d1448) )
 	ROM_LOAD( "3f",			  0x0800, 0x0800, CRC(bac8b96c) SHA1(5a7b24402c7a1a08e69cf15eb31c93d411a7e929) )
@@ -699,4 +699,4 @@ GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, kamikaze, ROT270, "Stern",  
 GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, kamikaze, ROT270, "bootleg",            "Kosmo Killer", 0 ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
 GAME( 1979, spcking2, 0,        spcking2, spcking2, spcking2, ROT270, "Konami",             "Space King 2", 0 )
 GAME( 1980, spaceint, 0,        spaceint, spaceint, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_WRONG_COLORS )
-GAME( 1980, spaceinj, spaceint, spaceint, spaceinj, 0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_WRONG_COLORS )
+GAME( 1980, spaceintj,spaceint, spaceint, spaceinj, 0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_WRONG_COLORS )

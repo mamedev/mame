@@ -741,7 +741,7 @@ MACHINE_DRIVER_END
 
 
 /* bootleg by Playmark, uses Joystick controls */
-ROM_START( badlandb )
+ROM_START( badlandsb )
 	/* bootleg 68k Program */
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "blb28.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
@@ -779,4 +779,4 @@ static DRIVER_INIT( badlandb )
 }
 
 
-GAME( 1989, badlandb, badlands, badlandb, badlands, badlandb, ROT0, "[Atari Games] (Playmark bootleg)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandb, badlands, badlandb, ROT0, "[Atari Games] (Playmark bootleg)", "Bad Lands (bootleg)", GAME_NOT_WORKING )

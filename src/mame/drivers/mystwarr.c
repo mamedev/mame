@@ -1229,7 +1229,7 @@ ROM_START( mystwarr )
 	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 ROM_END
 
-ROM_START( mystwaru )
+ROM_START( mystwarru )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128uaa01.20f", 0x000000, 0x40000, CRC(3a89aafd) SHA1(6d2ebb7e04d262545276c8dbe1c63405e5de4901) )
@@ -1266,7 +1266,7 @@ ROM_START( mystwaru )
 	ROM_LOAD( "128a07.1d", 0x200000, 2*1024*1024, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 ROM_END
 
-ROM_START( mystwarj )
+ROM_START( mystwarrj )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128jaa01.20f", 0x000000, 0x40000, CRC(49c37bfe) SHA1(177843899055476c9d2716ba494ac3892993eee5) )
@@ -1335,7 +1335,7 @@ ROM_START( viostorm )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 ROM_END
 
-ROM_START( viostrmu )
+ROM_START( viostormu )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "168uac01.15h", 0x000001, 0x80000, CRC(49853530) SHA1(dc8fa1a929848949cb0ad02f5a2a8a5f820fd6c1) )
@@ -1367,7 +1367,7 @@ ROM_START( viostrmu )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 ROM_END
 
-ROM_START( viostmub )
+ROM_START( viostormub )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "168uab01.15h", 0x000001, 0x80000, CRC(2d6a9fa3) SHA1(a2f82702896eddb11cd2b2f9ed5fff730f6baf0f) )
@@ -1399,7 +1399,7 @@ ROM_START( viostmub )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 ROM_END
 
-ROM_START( viostrma )
+ROM_START( viostorma )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "168aac01.15h", 0x000001, 0x80000, CRC(3620635c) SHA1(d296ba707a131bd78b401608d6b165b214f4fe61) )
@@ -1431,7 +1431,7 @@ ROM_START( viostrma )
 	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 ROM_END
 
-ROM_START( viostrmj )
+ROM_START( viostormj )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "168jac01.b01", 0x000001, 0x80000, CRC(f8be1225) SHA1(8c38ca218c0005c60a48cd3a43b5460b63a851e7) )
@@ -1498,7 +1498,7 @@ ROM_START( metamrph )
 	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 ROM_END
 
-ROM_START( metamrpu )
+ROM_START( metamrphu )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224uaa01.15h", 0x000001, 0x40000, CRC(e1d9b516) SHA1(387ed5ce87af376c0568e39187330a4585dc499a) )
@@ -1533,7 +1533,7 @@ ROM_START( metamrpu )
 	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 ROM_END
 
-ROM_START( metamrpj )
+ROM_START( metamrphj )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224jaa01.15h", 0x000001, 0x40000, CRC(558d2602) SHA1(2dbc16fcc07436ca7eff8d070196348f272b8723) )
@@ -1602,7 +1602,7 @@ ROM_START( mtlchamp )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 ROM_END
 
-ROM_START( mtlchmp1 )
+ROM_START( mtlchamp1 )
 	/* main program */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234eaa01.20f", 0x000000, 0x40000, CRC(8fa731db) SHA1(e2ed81762070a764f51aae36ce03859b5d86520d) )
@@ -1636,7 +1636,7 @@ ROM_START( mtlchmp1 )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 ROM_END
 
-ROM_START( mtlchmpa )
+ROM_START( mtlchampa )
 	/* main program */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234aaa01.20f", 0x000000, 0x40000, CRC(32c70e65) SHA1(10103ba403656d962bafe970a4ad0b2a9bed0ffe) )
@@ -1670,7 +1670,7 @@ ROM_START( mtlchmpa )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 ROM_END
 
-ROM_START( mtlchmpj )
+ROM_START( mtlchampj )
 	/* main program */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234jaa01.20f", 0x000000, 0x40000, CRC(76c3c568) SHA1(14c0009804fcedd8a3e5a105cc871dd6cd4cf7b3) )
@@ -1704,7 +1704,7 @@ ROM_START( mtlchmpj )
 	ROM_LOAD( "234a07.1d", 0x200000, 2*1024*1024, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 ROM_END
 
-ROM_START( mtlchmpu )
+ROM_START( mtlchampu )
 	/* main program */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234uad01.20f", 0x000000, 0x40000, CRC(5f6c8d09) SHA1(5850398cb9582973b400eaa82d84b7d07c87f779) )
@@ -1783,7 +1783,7 @@ ROM_START( gaiapols )
 	ROM_LOAD( "123e15.2m", 0x200000, 2*1024*1024, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 ROM_END
 
-ROM_START( gaiapolu )
+ROM_START( gaiapolsu )
 	/* main program */
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "123e07.24m", 0x000000, 1*1024*1024, CRC(f1a1db0f) SHA1(1394b8a57493cbc8d5bf555d363ad844a2407d98) )
@@ -1828,7 +1828,7 @@ ROM_START( gaiapolu )
 	ROM_LOAD( "123e15.2m", 0x200000, 2*1024*1024, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 ROM_END
 
-ROM_START( gaiapolj )
+ROM_START( gaiapolsj )
 	/* main program */
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "123e07.24m", 0x000000, 1*1024*1024, CRC(f1a1db0f) SHA1(1394b8a57493cbc8d5bf555d363ad844a2407d98) )
@@ -1970,24 +1970,24 @@ static DRIVER_INIT(metamrph)
 
 
 /*           ROM       parent    machine   inp       init */
-GAME( 1993, mystwarr, 0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwaru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarj, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mmaulers, 0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, dadandrn, mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostorm, 0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostrmu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostmub, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostrmj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostrma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrph, 0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrpu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrpj, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchamp, 0,        martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchmp1, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchmpu, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchmpj, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchmpa, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapols, 0,        gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolu, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolj, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarr,  0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulers,  0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dadandrn,  mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorm,  0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormub,viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrph,  0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphj, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp,  0,        martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp1, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampj, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampa, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapols,  0,        gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsu, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsj, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS )

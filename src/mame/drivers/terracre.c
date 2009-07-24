@@ -704,7 +704,7 @@ ROM_END
 /* Notes: All the roms are the same except the SOUND ROMs */
 /**********************************************************/
 
-ROM_START( terracrb )
+ROM_START( terracrea )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128K for 68000 code */
 	ROM_LOAD16_BYTE( "1a_4b.rom",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
 	ROM_LOAD16_BYTE( "1a_4d.rom",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
@@ -747,7 +747,7 @@ ROM_END
 /* Notes: All the roms are the same except the SOUND ROMs */
 /**********************************************************/
 
-ROM_START( terracra )
+ROM_START( terracren ) /* 'n' for OPN(YM2203) */
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128K for 68000 code */
 	ROM_LOAD16_BYTE( "1a_4b.rom",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
 	ROM_LOAD16_BYTE( "1a_4d.rom",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
@@ -1004,8 +1004,8 @@ static DRIVER_INIT( horekid )
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
 GAME( 1985, terracre, 0,        ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, terracrb, terracre, ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, terracra, terracre, ym2203,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracrea,terracre, ym3526,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracren,terracre, ym2203,  terracre, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", GAME_SUPPORTS_SAVE )
 GAME( 1986, amazon,   0,        amazon,  amazon,   amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", GAME_SUPPORTS_SAVE )
 GAME( 1986, amatelas, amazon,   amazon,  amazon,   amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", GAME_SUPPORTS_SAVE )
 GAME( 1987, horekid,  0,        amazon,  horekid,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", GAME_SUPPORTS_SAVE )

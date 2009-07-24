@@ -3380,7 +3380,7 @@ ROM_END
     CPU: FD1089A (317-0033)
     ROM Board: 171-5358?
 */
-ROM_START( aliensy3 )
+ROM_START( aliensyn3 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr10816.a4",  0x00000, 0x8000, CRC(17bf5304) SHA1(f6318c6c4a606d21ba43354229b60a51d8a3baa6) )
 	ROM_LOAD16_BYTE( "epr10814.a1",  0x00001, 0x8000, CRC(4cd134df) SHA1(541377bd6eba280d7f0367694032891989762485) )
@@ -3465,7 +3465,7 @@ ROM_END
     CPU: 68000 + i8751 (317-0077)
     ROM Board: 171-5521
 */
-ROM_START( altbeasj )
+ROM_START( altbeastj )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11885.a7", 0x000000, 0x20000, CRC(5bb715aa) SHA1(ad69ea126a366274a696cf0e11f50829031e5581) )
 	ROM_LOAD16_BYTE( "epr-11884.a5", 0x000001, 0x20000, CRC(e1707090) SHA1(2a262741a724bf282c0380113001b8da39afba43) )
@@ -3508,7 +3508,7 @@ ROM_END
     CPU: 68000 + i8751 (317-0076)
     ROM Board: 171-5521
 */
-ROM_START( altbeas5 )
+ROM_START( altbeast5 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11883.a7", 0x000000, 0x20000, CRC(c5b3e8f7) SHA1(06c59d38093330b74f685cb02f8c7311e4a7b38c) )
 	ROM_LOAD16_BYTE( "epr-11882.a5", 0x000001, 0x20000, CRC(9c01170b) SHA1(7651f791e5488ce1143eeb4ad01eb924d1460170) )
@@ -3551,7 +3551,7 @@ ROM_END
     CPU: 68000 + MC-8123B 317-0066
     ROM Board: 171-5521
 */
-ROM_START( altbeas4 )
+ROM_START( altbeast4 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11740.a7", 0x000000, 0x20000, CRC(ce227542) SHA1(54adcc1246943360bb68498e971809a0d4f9fe0c) )
 	ROM_LOAD16_BYTE( "epr-11739.a5", 0x000001, 0x20000, CRC(e466eb65) SHA1(c9bb57818eb81a43abdf2ad2a79a0bd45c25d208) )
@@ -3594,7 +3594,7 @@ ROM_END
     CPU: FD1094 (317-0068)
     ROM Board: 171-5521
 */
-ROM_START( altbeaj3 )
+ROM_START( altbeastj3 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11721.a7", 0x000000, 0x20000, CRC(1c5d11de) SHA1(106def35c274382d851b803c4b9058fbe5a613ff) )
 	ROM_LOAD16_BYTE( "epr-11720.a5", 0x000001, 0x20000, CRC(735350cf) SHA1(35c182edf0a1335bc067a8269f0e9136ff89745c) )
@@ -3637,7 +3637,7 @@ ROM_END
     CPU: 68000 + MC8123B (317-0066)
     ROM Board: 171-5521
 */
-ROM_START( altbeas2 )
+ROM_START( altbeast2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11705.a7", 0x000000, 0x20000, CRC(57dc5c7a) SHA1(a5cc9b10a00778f5163fc915b956fa5d0d7a37ce) )
 	ROM_LOAD16_BYTE( "epr-11704.a5", 0x000001, 0x20000, CRC(33bbcf07) SHA1(534e5426580dbf72509dceb762b8b99766d3a739) )
@@ -3671,7 +3671,7 @@ ROM_END
     CPU: FD1094 (317-0065)
     ROM Board: 171-5521
 */
-ROM_START( altbeaj1 )
+ROM_START( altbeastj1 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11670.a7", 0x000000, 0x20000, CRC(b748eb07) SHA1(f3663831610bcb358340f14c2c96833dd7591bfb) )
 	ROM_LOAD16_BYTE( "epr-11669.a5", 0x000001, 0x20000, CRC(005ecd11) SHA1(c392195955cf727752f03db92414701cc2bf1f4a) )
@@ -3952,7 +3952,7 @@ ROM_END
     CPU: FD1094 (317-0115)
     ROM Board: 171-5704
 */
-ROM_START( bayroutj )
+ROM_START( bayroutej )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12457.a7", 0x000000, 0x20000, CRC(bc726255) SHA1(2fcf190dab944ea09e7e7574c0dda101bb55424e) )
 	ROM_LOAD16_BYTE( "epr12455.a5", 0x000001, 0x20000, CRC(b6a722eb) SHA1(a8cb3ae6a9a7dc7b64be452a64566878e1a54722) )
@@ -3985,7 +3985,7 @@ ROM_END
     CPU: 68000
     ROM Board: 171-5358
 */
-ROM_START( bayrout1 )
+ROM_START( bayroute1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "br.a4", 0x000000, 0x10000, CRC(91c6424b) SHA1(79a968ade7690d5944ee815e19586cb82c3aa562) )
 	ROM_LOAD16_BYTE( "br.a1", 0x000001, 0x10000, CRC(76954bf3) SHA1(bd617c6ddaf1e7760479b17205388c201fb67662) )
@@ -4655,7 +4655,7 @@ ROM_END
     CPU: FD1094 (317-0122)
     ROM Board: 171-5797
 */
-ROM_START( goldnaxu )
+ROM_START( goldnaxeu )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12543.a2", 0x00000, 0x40000, CRC(b0df9ca4) SHA1(240f3c2998f969569d992f796e006f5ea4434e55) )
 	ROM_LOAD16_BYTE( "epr12542.a1", 0x00001, 0x40000, CRC(b7994d3c) SHA1(87570f23826922fca465c69df6b892c59f14e103) )
@@ -4692,7 +4692,7 @@ ROM_END
     CPU: FD1094 (317-0121)
     ROM Board: 171-5704
 */
-ROM_START( goldnaxj )
+ROM_START( goldnaxej )
 	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12540.a7", 0x00000, 0x20000, CRC(0c7ccc6d) SHA1(25bc29eee731befc665472c2c1998cac8447cc21) )
 	ROM_LOAD16_BYTE( "epr12539.a5", 0x00001, 0x20000, CRC(1f24f7d0) SHA1(a09cdf394c03069707f7ed400b8fbdc13674fa74) )
@@ -4732,7 +4732,7 @@ ROM_END
     CPU: FD1094 (317-0120)
     ROM Board: 171-5704
 */
-ROM_START( goldnax3 )
+ROM_START( goldnaxe3 )
 	ROM_REGION( 0xc0000, "maincpu", 0) /* 68000 code */
 	/* fails rom test on 8 & 6 ?! */
 	ROM_LOAD16_BYTE( "7.bin", 0x00000, 0x20000, CRC(48332c76) SHA1(4cdf7dc2f504a030ae63b4854bb76a3f2cc1d96b) )
@@ -4773,7 +4773,7 @@ ROM_END
     CPU: 68000 + i8751 (317-0112)
     ROM Board: 171-5704
 */
-ROM_START( goldnax2 )
+ROM_START( goldnaxe2 )
 	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12523.a7", 0x00000, 0x20000, CRC(8e6128d7) SHA1(b8de216f4ca08815ca98d39a773024d191d21b4d) )
 	ROM_LOAD16_BYTE( "epr12522.a5", 0x00001, 0x20000, CRC(b6c35160) SHA1(88015d0a486f56911360362c96a82f36a13de886) )
@@ -4813,7 +4813,7 @@ ROM_END
     CPU: FD1094 (317-0110)
     ROM Board: 171-5797
 */
-ROM_START( goldnax1 )
+ROM_START( goldnaxe1 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12389.a2", 0x00000, 0x40000, CRC(35d5fa77) SHA1(b16b312eb1c91c412fee61002599812e30e321ee) )
 	ROM_LOAD16_BYTE( "epr12388.a1", 0x00001, 0x40000, CRC(72952a93) SHA1(b31888429ad81388a96333dc0b2c7e2223134834) )
@@ -5998,7 +5998,7 @@ ROM_END
     CPU: FD1094 (317-0102)
     ROM Board: 171-5704
 */
-ROM_START( wrestwa2 )
+ROM_START( wrestwar2 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12370.a7", 0x00000, 0x20000, CRC(cb5dbb76) SHA1(c6d8599020b2ce311d1d1cdbdac1f4830327ec9a) )
 	ROM_LOAD16_BYTE( "epr12369.a5", 0x00001, 0x20000, CRC(6f47dd2f) SHA1(f970e5e0aad6b4199616eeb60461590817395688) )
@@ -6039,7 +6039,7 @@ ROM_END
     CPU: FD1094 (317-0090)
     ROM Board: 171-5704
 */
-ROM_START( wrestwa1 )
+ROM_START( wrestwar1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12145.a7", 0x00000, 0x20000, CRC(2af51e2e) SHA1(b9299f17a7b945a8c96a52288e6da8e20651e4e5) )
 	ROM_LOAD16_BYTE( "epr12143.a5", 0x00001, 0x20000, CRC(4131e345) SHA1(9f66e50cf76ad77b60f2bef97153d9fe6fc12339) )
@@ -6312,72 +6312,99 @@ static DRIVER_INIT( snapper )
  *************************************/
 
 GAME( 1988, aceattac, 0,        system16b,      aceattac, generic_5358,        ROT0,   "Sega",           "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
+
 GAME( 1987, aliensyn, 0,        system16b,      aliensyn, generic_5358,        ROT0,   "Sega",           "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, aliensy3, aliensyn, system16b,      aliensyn, aliensy3_5358,       ROT0,   "Sega",           "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
-GAME( 1988, altbeast, 0,        system16b_8751, altbeast, altbeast_5521,       ROT0,   "Sega",           "Altered Beast (set 7, 8751 317-0078)", 0 )
-GAME( 1988, altbeasj, altbeast, system16b_8751, altbeast, altbeasj_5521,       ROT0,   "Sega",           "Juuouki (set 6, Japan, 8751 317-0077)", 0 )
-GAME( 1988, altbeas5, altbeast, system16b_8751, altbeast, altbeas5_5521,       ROT0,   "Sega",           "Altered Beast (set 5, 8751 317-0076)", 0 )
-GAME( 1988, altbeas4, altbeast, system16b,      altbeast, altbeas4_5521,       ROT0,   "Sega",           "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeaj3, altbeast, system16b,      altbeast, generic_5521,        ROT0,   "Sega",           "Juuouki (set 3, Japan, FD1094 317-0068)", 0 )
-GAME( 1988, altbeas2, altbeast, system16b,      altbeast, altbeas4_5521,       ROT0,   "Sega",           "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeaj1, altbeast, system16b,      altbeast, generic_5521,        ROT0,   "Sega",           "Juuouki (set 1, Japan, FD1094 317-0065)", GAME_NOT_WORKING )
+GAME( 1987, aliensyn3,aliensyn, system16b,      aliensyn, aliensy3_5358,       ROT0,   "Sega",           "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
+
+GAME( 1988, altbeast,  0,        system16b_8751, altbeast, altbeast_5521,       ROT0,   "Sega",           "Altered Beast (set 7, 8751 317-0078)", 0 )
+GAME( 1988, altbeastj, altbeast, system16b_8751, altbeast, altbeasj_5521,       ROT0,   "Sega",           "Juuouki (set 6, Japan, 8751 317-0077)", 0 )
+GAME( 1988, altbeast5, altbeast, system16b_8751, altbeast, altbeas5_5521,       ROT0,   "Sega",           "Altered Beast (set 5, 8751 317-0076)", 0 )
+GAME( 1988, altbeast4, altbeast, system16b,      altbeast, altbeas4_5521,       ROT0,   "Sega",           "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj3,altbeast, system16b,      altbeast, generic_5521,        ROT0,   "Sega",           "Juuouki (set 3, Japan, FD1094 317-0068)", 0 )
+GAME( 1988, altbeast2, altbeast, system16b,      altbeast, altbeas4_5521,       ROT0,   "Sega",           "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj1,altbeast, system16b,      altbeast, generic_5521,        ROT0,   "Sega",           "Juuouki (set 1, Japan, FD1094 317-0065)", GAME_NOT_WORKING )
+
 GAME( 1990, aurail,   0,        system16b,      aurail,   generic_5704,        ROT0,   "Sega / Westone", "Aurail (set 3, US, unprotected)", 0 )
 GAME( 1990, aurail1,  aurail,   system16b,      aurail,   aurail1_5704,        ROT0,   "Sega / Westone", "Aurail (set 2, World, FD1089B 317-0168)", 0 )
 GAME( 1990, aurailj,  aurail,   system16b,      aurail,   aurailj_5704,        ROT0,   "Sega / Westone", "Aurail (set 1, Japan, FD1089A 317-0167)", 0 )
+
 GAME( 1989, bayroute, 0,        system16b,      bayroute, generic_5704,        ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World, FD1094 317-0116)", 0 )
-GAME( 1989, bayroutj, bayroute, system16b,      bayroute, generic_5704,        ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan, FD1094 317-0115)", 0 )
-GAME( 1989, bayrout1, bayroute, system16b,      bayroute, generic_5358,        ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US, unprotected)", 0 )
+GAME( 1989, bayroutej,bayroute, system16b,      bayroute, generic_5704,        ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan, FD1094 317-0115)", 0 )
+GAME( 1989, bayroute1,bayroute, system16b,      bayroute, generic_5358,        ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US, unprotected)", 0 )
+
 GAME( 1987, bullet,   0,        system16b,      bullet,   generic_5358_small,  ROT0,   "Sega",           "Bullet (FD1094 317-0041)", GAME_UNEMULATED_PROTECTION )
 /* Charon */
 GAME( 1991, cotton,   0,        system16b,      cotton,   generic_5704,        ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 )
 GAME( 1991, cottonu,  cotton,   system16b,      cotton,   generic_5704,        ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 )
 GAME( 1991, cottonj,  cotton,   system16b,      cotton,   generic_5704,        ROT0,   "Sega / Success", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 )
+
 GAME( 1988, ddux,     0,        system16b,      ddux,     generic_5521,        ROT0,   "Sega",           "Dynamite Dux (set 2, FD1094 317-0096)", 0 )
 GAME( 1988, ddux1,    ddux,     system16b_8751, ddux,     ddux_5704,           ROT0,   "Sega",           "Dynamite Dux (set 1, 8751 317-0095)", 0 )
+
 GAME( 1986, dunkshot, 0,        timescan,       dunkshot, dunkshot_5358,       ROT0,   "Sega",           "Dunk Shot (FD1089A 317-0022)", 0 )
+
 GAME( 1989, eswat,    0,        system16b,      eswat,    generic_5797,        ROT0,   "Sega",           "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
 GAME( 1989, eswatu,   eswat,    system16b,      eswat,    generic_5797,        ROT0,   "Sega",           "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
 GAME( 1989, eswatj,   eswat,    system16b,      eswat,    generic_5797,        ROT0,   "Sega",           "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
+
 GAME( 1988, exctleag, 0,        system16b,      exctleag, exctleag_5358,       ROT0,   "Sega",           "Excite League (FD1094 317-0079)", 0 )
+
 GAME( 1989, fpoint,   0,        system16b,      fpoint,   generic_5358,        ROT0,   "Sega",           "Flash Point (set 2, Japan, FD1094 317-0127A)", 0 )
 GAME( 1989, fpoint1,  fpoint,   system16b,      fpoint,   generic_5704,        ROT0,   "Sega",           "Flash Point (set 1, Japan, FD1094 317-0127A)", 0 )
+
 GAME( 1989, goldnaxe, 0,        system16b_8751, goldnaxe, goldnaxe_5797,       ROT0,   "Sega",           "Golden Axe (set 6, US, 8751 317-123A)", 0 )
-GAME( 1989, goldnaxu, goldnaxe, system16b,      goldnaxe, generic_5797,        ROT0,   "Sega",           "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
-GAME( 1989, goldnaxj, goldnaxe, system16b,      goldnaxe, generic_5704,        ROT0,   "Sega",           "Golden Axe (set 4, Japan, FD1094 317-0121)", 0 )
-GAME( 1989, goldnax3, goldnaxe, system16b,      goldnaxe, generic_5704,        ROT0,   "Sega",           "Golden Axe (set 3, World, FD1094 317-0120)" , 0) // set was labeled japan but doesn't seem to be
-GAME( 1989, goldnax2, goldnaxe, system16b_8751, goldnaxe, goldnaxe_5704,       ROT0,   "Sega",           "Golden Axe (set 2, US, 8751 317-0112)", 0 )
-GAME( 1989, goldnax1, goldnaxe, system16b,      goldnaxe, generic_5797,        ROT0,   "Sega",           "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
+GAME( 1989, goldnaxeu,goldnaxe, system16b,      goldnaxe, generic_5797,        ROT0,   "Sega",           "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
+GAME( 1989, goldnaxej,goldnaxe, system16b,      goldnaxe, generic_5704,        ROT0,   "Sega",           "Golden Axe (set 4, Japan, FD1094 317-0121)", 0 )
+GAME( 1989, goldnaxe3,goldnaxe, system16b,      goldnaxe, generic_5704,        ROT0,   "Sega",           "Golden Axe (set 3, World, FD1094 317-0120)" , 0) // set was labeled japan but doesn't seem to be
+GAME( 1989, goldnaxe2,goldnaxe, system16b_8751, goldnaxe, goldnaxe_5704,       ROT0,   "Sega",           "Golden Axe (set 2, US, 8751 317-0112)", 0 )
+GAME( 1989, goldnaxe1,goldnaxe, system16b,      goldnaxe, generic_5797,        ROT0,   "Sega",           "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
+
 GAME( 1987, hwchamp,  0,        system16b,      hwchamp,  hwchamp_5521,        ROT0,   "Sega",           "Heavyweight Champ", 0 )
+
 GAME( 1989, mvp,      0,        system16b,      mvp,      generic_5797,        ROT0,   "Sega",           "MVP (set 2, US, FD1094 317-0143)", 0 )
 GAME( 1989, mvpj,     mvp,      system16b,      mvp,      generic_5704,        ROT0,   "Sega",           "MVP (set 1, Japan, FD1094 317-0142)", 0 )
+
 GAME( 1988, passsht,  0,        system16b,      passsht,  generic_5358,        ROT270, "Sega",           "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
 GAME( 1988, passshta, passsht,  system16b,      passshtj, passshtj_5358,       ROT270, "Sega",           "Passing Shot (World, 4 Players, FD1094 317-0074)", 0 )
 GAME( 1988, passshtj, passsht,  system16b,      passshtj, passshtj_5358,       ROT270, "Sega",           "Passing Shot (Japan, 4 Players, FD1094 317-0070)", 0 )
+
 GAME( 1991, riotcity, 0,        system16b,      riotcity, generic_5704,        ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
+
 GAME( 1990, ryukyu,   0,        system16b,      ryukyu,   generic_5704,        ROT0,   "Success / Sega", "RyuKyu (Japan, FD1094 317-5023)", 0 )
+
 GAME( 1987, defense,  sdi,      system16b,      sdi,      defense_5358,        ROT0,   "Sega",           "Defense (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdib,     sdi,      system16b,      sdi,      defense_5358,        ROT0,   "Sega",           "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdibl,    sdi,      system16b,      sdi,      sdi_5358,            ROT0,   "bootleg",        "SDI - Strategic Defense Initiative (bootleg)", 0 )
+
 GAME( 1987, shinobi5, shinobi,  system16b,      shinobi,  generic_5521,        ROT0,   "Sega",           "Shinobi (set 5, System 16B, unprotected)", 0 )
 GAME( 1987, shinobi4, shinobi,  system16b,      shinobi,  shinobi4_5521,       ROT0,   "Sega",           "Shinobi (set 4, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi3, shinobi,  system16b,      shinobi,  shinobi3_5358,       ROT0,   "Sega",           "Shinobi (set 3, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2, shinobi,  system16b,      shinobi,  generic_5358,        ROT0,   "Sega",           "Shinobi (set 2, System 16B, FD1094 317-0049)", 0 )
+
 GAME( 1987, sonicbom, 0,        system16b,      sonicbom, generic_5358,        ROT270, "Sega",           "Sonic Boom (FD1094 317-0053)", 0 )
+
 GAME( 1988, sjryuko,  0,        timescan,       sjryuko,  sjryuko_5358,        ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
+
 GAME( 1987, suprleag, 0,        system16b,      exctleag, exctleag_5358,       ROT0,   "Sega",           "Super League (FD1094 317-0045)", 0 )
+
 GAME( 1988, tetris2,  tetris,   system16b,      tetris,   generic_5704,        ROT0,   "Sega",           "Tetris (set 2, Japan, System 16B, FD1094 317-0092)", 0 )
 GAME( 1988, tetris1,  tetris,   system16b,      tetris,   generic_5358,        ROT0,   "Sega",           "Tetris (set 1, Japan, System 16B, FD1094 317-0091)", 0 )
+
 GAME( 1987, timescan, 0,        timescan,       timescan, generic_5358,        ROT270, "Sega",           "Time Scanner (set 2, System 16B)", 0 )
+
 GAME( 1994, toryumon, 0,        system16b,      toryumon, generic_5797,        ROT0,   "Sega",           "Toryumon", 0 )
+
 GAME( 1989, tturf,    0,        system16b_8751, tturf,    tturf_5704,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND /* due to missing ROM only */)
 GAME( 1989, tturfu,   tturf,    system16b_8751, tturf,    tturf_5358,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
+
 GAME( 1988, wb3,      0,        system16b_8751, wb3,      wb3_5704,            ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, World, System 16B, 8751 317-0098)", 0 )
 GAME( 1988, wb34,     wb3,      system16b,      wb3,      generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B, FD1094 317-0087)", 0 )
 GAME( 1988, wb33,     wb3,      system16b,      wb3,      generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B, FD1094 317-0089)", 0 )
 GAME( 1988, wb32,     wb3,      system16b,      wb3,      generic_5358,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B, FD1094 317-0085)", 0 )
+
 GAME( 1989, wrestwar, 0,        system16b_8751, wrestwar, wrestwar_8751,       ROT270, "Sega",           "Wrestle War (set 3, World, 8751 317-0103)", 0 )
-GAME( 1989, wrestwa2, wrestwar, system16b,      wrestwar, generic_5704,        ROT270, "Sega",           "Wrestle War (set 2, World, FD1094 317-0102)", 0 )
-GAME( 1989, wrestwa1, wrestwar, system16b,      wrestwar, generic_5704,        ROT270, "Sega",           "Wrestle War (set 1, Japan, FD1094 317-0090)", 0 )
+GAME( 1989, wrestwar2,wrestwar, system16b,      wrestwar, generic_5704,        ROT270, "Sega",           "Wrestle War (set 2, World, FD1094 317-0102)", 0 )
+GAME( 1989, wrestwar1,wrestwar, system16b,      wrestwar, generic_5704,        ROT270, "Sega",           "Wrestle War (set 1, Japan, FD1094 317-0090)", 0 )
 
 /* Custom Korean Board - these probably belong with the bootlegs... */
 GAME( 1990, atomicp,  0,        atomicp,        atomicp,  atomicp,             ROT0,   "Philko",         "Atomic Point (Korea)" , 0) // korean clone board..

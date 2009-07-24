@@ -425,7 +425,7 @@ ROM_START( goodejan )
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
-ROM_START( goodejaa )
+ROM_START( goodejana )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "1.u022",  0xc0000, 0x20000, CRC(d496cdd1) SHA1(144a9d8850b3b62520b71efd2ed1459bd673ac92) )
 	ROM_LOAD16_BYTE( "2.u023",  0xc0001, 0x20000, CRC(5eda77bb) SHA1(ac54125988f9c929207becf0dcbab72eff4f054a) )
@@ -459,4 +459,4 @@ ROM_END
 
 GAME( 1991, totmejan, 0,        totmejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, goodejan, 0,        goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, goodejaa, goodejan, goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, goodejana,goodejan, goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )

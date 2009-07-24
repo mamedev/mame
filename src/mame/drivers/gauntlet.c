@@ -570,7 +570,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-ROM_START( gaunts )
+ROM_START( gauntlets )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1507.9a",  0x000000, 0x008000, CRC(b5183228) SHA1(5cf433acf1463076576ce7c29298c609b0bd9705) )
 	ROM_LOAD16_BYTE( "136037-1508.9b",  0x000001, 0x008000, CRC(afd3c501) SHA1(99a7bb6c05fc4a865a44887a5ca9dc5e710397d9) )
@@ -636,7 +636,7 @@ ROM_START( gauntlet )
 ROM_END
 
 
-ROM_START( gauntj )
+ROM_START( gauntletj )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1307.9a",  0x000000, 0x008000, CRC(46fe8743) SHA1(d5fa19e028a2f43658330c67c10e0c811d332780) )
 	ROM_LOAD16_BYTE( "136037-1308.9b",  0x000001, 0x008000, CRC(276e15c4) SHA1(7467b2ec21b1b4fcc18ff9387ce891495f4b064c) )
@@ -669,7 +669,7 @@ ROM_START( gauntj )
 ROM_END
 
 
-ROM_START( gauntj12 )
+ROM_START( gauntletj12 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1207.9a",  0x000000, 0x008000, CRC(6dc0610d) SHA1(6f810a8ac1c753b2fd24e6b008f0cdf82e9e0831) )
 	ROM_LOAD16_BYTE( "136037-1208.9b",  0x000001, 0x008000, CRC(faa306eb) SHA1(48c5632a365b4c3df8f424d06229f10b608edfa5) )
@@ -702,7 +702,7 @@ ROM_START( gauntj12 )
 ROM_END
 
 
-ROM_START( gauntg )
+ROM_START( gauntletg )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1007.9a",  0x000000, 0x008000, CRC(6a224cea) SHA1(1d9205a1587a39b3bc6da1813e380a8babee2994) )
 	ROM_LOAD16_BYTE( "136037-1008.9b",  0x000001, 0x008000, CRC(fa391dab) SHA1(7dcb67fa969b437fe2474daeb3c7c3652df2ff5d) )
@@ -735,7 +735,7 @@ ROM_START( gauntg )
 ROM_END
 
 
-ROM_START( gauntr9 )
+ROM_START( gauntletr9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-907.9a",   0x000000, 0x008000, CRC(c13a6399) SHA1(569c8eac81ec7d0ea451b73888efd5dce4d4906d) )
 	ROM_LOAD16_BYTE( "136037-908.9b",   0x000001, 0x008000, CRC(417607d9) SHA1(b168773d5868adc9b8d860f32d847bb525d9069f) )
@@ -768,7 +768,7 @@ ROM_START( gauntr9 )
 ROM_END
 
 
-ROM_START( gauntgr8 )
+ROM_START( gauntletgr8 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-807.9a",   0x000000, 0x008000, CRC(671c0bc2) SHA1(73c8249bac8a131b2fb93fc4ac7235b3f329b987) )
 	ROM_LOAD16_BYTE( "136037-808.9b",   0x000001, 0x008000, CRC(f2842af4) SHA1(8ecaec141f21b26647b2f2fd224c92b8a36acbad) )
@@ -801,7 +801,7 @@ ROM_START( gauntgr8 )
 ROM_END
 
 
-ROM_START( gauntr7 )
+ROM_START( gauntletr7 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-207.9a",   0x000000, 0x008000, CRC(fd871f81) SHA1(111615cb3990fe2121ed5b3dd0c28054c98ef665) )
 	ROM_LOAD16_BYTE( "136037-208.9b",   0x000001, 0x008000, CRC(bcb2fb1d) SHA1(62f2acf81d8094617e4fcaa427e47c5940d85ad2) )
@@ -834,7 +834,7 @@ ROM_START( gauntr7 )
 ROM_END
 
 
-ROM_START( gauntgr6 )
+ROM_START( gauntletgr6 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-307.9a",   0x000000, 0x008000, CRC(759827c9) SHA1(d267e2416365814cd9a2b2c587edc8334031b77f) )
 	ROM_LOAD16_BYTE( "136037-308.9b",   0x000001, 0x008000, CRC(d71262d1) SHA1(cc7f64f75d325b0531c3ee509d3eb1159a149b81) )
@@ -867,7 +867,7 @@ ROM_START( gauntgr6 )
 ROM_END
 
 
-ROM_START( gauntr5 )
+ROM_START( gauntletr5 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-207.9a",   0x000000, 0x008000, CRC(fd871f81) SHA1(111615cb3990fe2121ed5b3dd0c28054c98ef665) )
 	ROM_LOAD16_BYTE( "136037-208.9b",   0x000001, 0x008000, CRC(bcb2fb1d) SHA1(62f2acf81d8094617e4fcaa427e47c5940d85ad2) )
@@ -900,7 +900,7 @@ ROM_START( gauntr5 )
 ROM_END
 
 
-ROM_START( gauntr4 )
+ROM_START( gauntletr4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-207.9a",   0x000000, 0x008000, CRC(fd871f81) SHA1(111615cb3990fe2121ed5b3dd0c28054c98ef665) )
 	ROM_LOAD16_BYTE( "136037-208.9b",   0x000001, 0x008000, CRC(bcb2fb1d) SHA1(62f2acf81d8094617e4fcaa427e47c5940d85ad2) )
@@ -933,7 +933,7 @@ ROM_START( gauntr4 )
 ROM_END
 
 
-ROM_START( gauntgr3 )
+ROM_START( gauntletgr3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-307.9a",   0x000000, 0x008000, CRC(759827c9) SHA1(d267e2416365814cd9a2b2c587edc8334031b77f) )
 	ROM_LOAD16_BYTE( "136037-308.9b",   0x000001, 0x008000, CRC(d71262d1) SHA1(cc7f64f75d325b0531c3ee509d3eb1159a149b81) )
@@ -966,7 +966,7 @@ ROM_START( gauntgr3 )
 ROM_END
 
 
-ROM_START( gauntr2 )
+ROM_START( gauntletr2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-207.9a",   0x000000, 0x008000, CRC(fd871f81) SHA1(111615cb3990fe2121ed5b3dd0c28054c98ef665) )
 	ROM_LOAD16_BYTE( "136037-208.9b",   0x000001, 0x008000, CRC(bcb2fb1d) SHA1(62f2acf81d8094617e4fcaa427e47c5940d85ad2) )
@@ -999,7 +999,7 @@ ROM_START( gauntr2 )
 ROM_END
 
 
-ROM_START( gauntr1 )
+ROM_START( gauntletr1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-107.9a",   0x000000, 0x008000, CRC(a5885e14) SHA1(aa49a3bd8352179532d1cbbb27badb6fbe7d3394) )
 	ROM_LOAD16_BYTE( "136037-108.9b",   0x000001, 0x008000, CRC(0087f1ab) SHA1(d16a44a5ad4faf26df63b91fac813111c9302713) )
@@ -1032,7 +1032,7 @@ ROM_START( gauntr1 )
 ROM_END
 
 
-ROM_START( gaunt2p )
+ROM_START( gauntlet2p )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-507.9a",   0x000000, 0x008000, CRC(8784133f) SHA1(98017427d84209405bb15d95a47bda5e1bd69f45) )
 	ROM_LOAD16_BYTE( "136041-508.9b",   0x000001, 0x008000, CRC(2843bde3) SHA1(15e480c5245fd407f0fd5f0a3f3189ff18de88b3) )
@@ -1065,7 +1065,7 @@ ROM_START( gaunt2p )
 ROM_END
 
 
-ROM_START( gaunt2pj )
+ROM_START( gauntlet2pj )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-507.9a",   0x000000, 0x008000, CRC(8784133f) SHA1(98017427d84209405bb15d95a47bda5e1bd69f45) )
 	ROM_LOAD16_BYTE( "136041-508.9b",   0x000001, 0x008000, CRC(2843bde3) SHA1(15e480c5245fd407f0fd5f0a3f3189ff18de88b3) )
@@ -1098,7 +1098,7 @@ ROM_START( gaunt2pj )
 ROM_END
 
 
-ROM_START( gaunt2pg )
+ROM_START( gauntlet2pg )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-407.9a",   0x000000, 0x008000, CRC(cde72140) SHA1(6cf4254e90a32ee36f5fbfa44b69fca82f68d2bc) )
 	ROM_LOAD16_BYTE( "136041-408.9b",   0x000001, 0x008000, CRC(4ab1af62) SHA1(46915a6822551004f3670678691a4ffb6d187914) )
@@ -1131,7 +1131,7 @@ ROM_START( gaunt2pg )
 ROM_END
 
 
-ROM_START( gaun2pr3 )
+ROM_START( gauntlet2pr3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-207.9a",   0x000000, 0x008000, CRC(0e1af1b4) SHA1(7091d3ff15dce33959e3c2268843c8d4f4140097) )
 	ROM_LOAD16_BYTE( "136041-208.9b",   0x000001, 0x008000, CRC(bf51a238) SHA1(2110e6aa4a8076b1ed29432876138590102a7408) )
@@ -1164,7 +1164,7 @@ ROM_START( gaun2pr3 )
 ROM_END
 
 
-ROM_START( gaun2pj2 )
+ROM_START( gauntlet2pj2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-207.9a",   0x000000, 0x008000, CRC(0e1af1b4) SHA1(7091d3ff15dce33959e3c2268843c8d4f4140097) )
 	ROM_LOAD16_BYTE( "136041-208.9b",   0x000001, 0x008000, CRC(bf51a238) SHA1(2110e6aa4a8076b1ed29432876138590102a7408) )
@@ -1197,7 +1197,7 @@ ROM_START( gaun2pj2 )
 ROM_END
 
 
-ROM_START( gaun2pg1 )
+ROM_START( gauntlet2pg1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136041-107.9a",   0x000000, 0x008000, CRC(3faf74d8) SHA1(366256fb42e9d3a548c6545f6fa718beb766ba16) )
 	ROM_LOAD16_BYTE( "136041-108.9b",   0x000001, 0x008000, CRC(f1e6d815) SHA1(9bda05ee05c1f49078a152aa30a1fafa108f1c93) )
@@ -1359,7 +1359,7 @@ ROM_START( gaunt22p )
 ROM_END
 
 
-ROM_START( gaun22p1 )
+ROM_START( gaunt22p1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1307.9a",  0x000000, 0x008000, CRC(46fe8743) SHA1(d5fa19e028a2f43658330c67c10e0c811d332780) )
 	ROM_LOAD16_BYTE( "136037-1308.9b",  0x000001, 0x008000, CRC(276e15c4) SHA1(7467b2ec21b1b4fcc18ff9387ce891495f4b064c) )
@@ -1402,7 +1402,7 @@ ROM_START( gaun22p1 )
 ROM_END
 
 
-ROM_START( gaun22pg )
+ROM_START( gaunt22pg )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136037-1007.9a",  0x000000, 0x008000, CRC(6a224cea) SHA1(1d9205a1587a39b3bc6da1813e380a8babee2994) )
 	ROM_LOAD16_BYTE( "136037-1008.9b",  0x000001, 0x008000, CRC(fa391dab) SHA1(7dcb67fa969b437fe2474daeb3c7c3652df2ff5d) )
@@ -1503,7 +1503,7 @@ ROM_START( vindctr2 )
 ROM_END
 
 
-ROM_START( vindc2r2 )
+ROM_START( vindctr2r2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136059-1186.9a",  0x000000, 0x008000, CRC(af138263) SHA1(acb1b7f497b83c9950d51776e620adee347b48a7) )
 	ROM_LOAD16_BYTE( "136059-1187.9b",  0x000001, 0x008000, CRC(44baff64) SHA1(3cb3af1e93208ac139e90482d329e2368fde66d5) )
@@ -1561,7 +1561,7 @@ ROM_START( vindc2r2 )
 ROM_END
 
 
-ROM_START( vindc2r1 )
+ROM_START( vindctr2r1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136059-1186.9a",  0x000000, 0x008000, CRC(af138263) SHA1(acb1b7f497b83c9950d51776e620adee347b48a7) )
 	ROM_LOAD16_BYTE( "136059-1187.9b",  0x000001, 0x008000, CRC(44baff64) SHA1(3cb3af1e93208ac139e90482d329e2368fde66d5) )
@@ -1690,35 +1690,35 @@ static DRIVER_INIT( vindctr2 )
  *
  *************************************/
 
-GAME( 1985, gauntlet, 0,        gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 14)", 0 )
-GAME( 1985, gaunts,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Spanish, rev 15)", 0 )
-GAME( 1985, gauntj,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 13)", 0 )
-GAME( 1985, gauntg,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 10)", 0 )
-GAME( 1985, gauntj12, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 12)", 0 )
-GAME( 1985, gauntr9,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 9)", 0 )
-GAME( 1985, gauntgr8, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 8)", 0 )
-GAME( 1985, gauntr7,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 7)", 0 )
-GAME( 1985, gauntgr6, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 6)", 0 )
-GAME( 1985, gauntr5,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 5)", 0 )
-GAME( 1985, gauntr4,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 4)", 0 )
-GAME( 1985, gauntgr3, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 3)", 0 )
-GAME( 1985, gauntr2,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 2)", 0 )
-GAME( 1985, gauntr1,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 1)", 0 )
+GAME( 1985, gauntlet,    0,        gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 14)", 0 )
+GAME( 1985, gauntlets,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Spanish, rev 15)", 0 )
+GAME( 1985, gauntletj,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 13)", 0 )
+GAME( 1985, gauntletg,   gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 10)", 0 )
+GAME( 1985, gauntletj12, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 12)", 0 )
+GAME( 1985, gauntletr9,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 9)", 0 )
+GAME( 1985, gauntletgr8, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 8)", 0 )
+GAME( 1985, gauntletr7,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 7)", 0 )
+GAME( 1985, gauntletgr6, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 6)", 0 )
+GAME( 1985, gauntletr5,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 5)", 0 )
+GAME( 1985, gauntletr4,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 4)", 0 )
+GAME( 1985, gauntletgr3, gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 3)", 0 )
+GAME( 1985, gauntletr2,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 2)", 0 )
+GAME( 1985, gauntletr1,  gauntlet, gauntlet, gauntlet, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 1)", 0 )
 
-GAME( 1985, gaunt2p,  gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, rev 6)", 0 )
-GAME( 1985, gaunt2pj, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 5)", 0 )
-GAME( 1985, gaunt2pg, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 4)", 0 )
-GAME( 1985, gaun2pr3, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, rev 3)", 0 )
-GAME( 1985, gaun2pj2, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 2)", 0 )
-GAME( 1985, gaun2pg1, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 1)", 0 )
+GAME( 1985, gauntlet2p,   gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, rev 6)", 0 )
+GAME( 1985, gauntlet2pj,  gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 5)", 0 )
+GAME( 1985, gauntlet2pg,  gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 4)", 0 )
+GAME( 1985, gauntlet2pr3, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, rev 3)", 0 )
+GAME( 1985, gauntlet2pj2, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 2)", 0 )
+GAME( 1985, gauntlet2pg1, gauntlet, gauntlet, gauntlet, gaunt2p,   ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 1)", 0 )
 
 GAME( 1986, gaunt2,   0,        gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II", 0 )
 GAME( 1986, gaunt2g,  gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (German)", 0 )
 
-GAME( 1986, gaunt22p, gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 2)", 0 )
-GAME( 1986, gaun22p1, gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 1)", 0 )
-GAME( 1986, gaun22pg, gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, German)", 0 )
+GAME( 1986, gaunt22p,  gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 2)", 0 )
+GAME( 1986, gaunt22p1, gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 1)", 0 )
+GAME( 1986, gaunt22pg, gaunt2,   gauntlet, gauntlet, gauntlet2, ROT0, "Atari Games", "Gauntlet II (2 Players, German)", 0 )
 
-GAME( 1988, vindctr2, 0,        gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 3)", 0 )
-GAME( 1988, vindc2r2, vindctr2, gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 2)", 0 )
-GAME( 1988, vindc2r1, vindctr2, gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 1)", 0 )
+GAME( 1988, vindctr2,   0,        gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 3)", 0 )
+GAME( 1988, vindctr2r2, vindctr2, gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 2)", 0 )
+GAME( 1988, vindctr2r1, vindctr2, gauntlet, vindctr2, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 1)", 0 )

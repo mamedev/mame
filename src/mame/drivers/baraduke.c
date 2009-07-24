@@ -517,7 +517,7 @@ ROM_START( metrocrs )
 	ROM_LOAD( "mc1-2.2m",	0x0800, 0x0800, CRC(6f4dca7b) SHA1(781134c02853aded2cba63719c0e4c78b227da1c) )	/* Red palette */
 ROM_END
 
-ROM_START( metrocra )
+ROM_START( metrocrsa )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6809 code */
 	ROM_LOAD( "mc2-3.9b",	0x6000, 0x02000, CRC(ffe08075) SHA1(4e1341d5a9a58f171e1e6f9aa18092d5557a6947) )
 	ROM_LOAD( "mc2-1.9a",	0x8000, 0x04000, CRC(05a239ea) SHA1(3e7c7d305d0f48e2431d60b176a0cb451ddc4637) )
@@ -567,6 +567,6 @@ static DRIVER_INIT( baraduke )
 
 
 GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
-GAME( 1985, metrocra, metrocrs, baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
+GAME( 1985, metrocrsa,metrocrs, baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
 GAME( 1985, aliensec, 0,        baraduke, baraduke, baraduke, ROT0, "Namco", "Alien Sector", 0 )
 GAME( 1985, baraduke, aliensec, baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke", 0 )

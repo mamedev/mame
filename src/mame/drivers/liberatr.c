@@ -460,7 +460,7 @@ ROM_START( liberatr )
 ROM_END
 
 
-ROM_START( liberat2 )
+ROM_START( liberatr2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code and data  */
 	ROM_LOAD( "l6.bin",       0x6000, 0x1000, CRC(78093d06) SHA1(0f6ca01e27b32aae384a6ab67a6f14eedd3f1d9c) )
 	ROM_LOAD( "l5.bin",       0x7000, 0x1000, CRC(988db636) SHA1(8fdd07b397d4bef108aafb10c06c2fd53fc1f99a) )
@@ -498,5 +498,5 @@ ROM_END
  *************************************/
 
 GAME( 1982, liberatr, 0,        liberatr, liberatr, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL )
-GAME( 1982, liberat2, liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL )
+GAME( 1982, liberatr2,liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL )
 

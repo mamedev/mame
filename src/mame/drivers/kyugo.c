@@ -599,7 +599,7 @@ ROM_START( gyrodine )
 ROM_END
 
 
-ROM_START( gyrodinc )
+ROM_START( gyrodinec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom2",   0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
 	ROM_LOAD( "a21.03", 0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
@@ -789,7 +789,7 @@ ROM_START( 99lstwar )
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
-ROM_START( 99lstwra )
+ROM_START( 99lstwara )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4f.bin",       0x0000, 0x2000, CRC(efe2908d) SHA1(4de8661f523f002c6a9368f81d865c7cc98926dd) )
 	ROM_LOAD( "4h.bin",       0x2000, 0x2000, CRC(5b79c342) SHA1(293990dab3360139727a5c90aad0826d4a3746b7) )
@@ -825,7 +825,7 @@ ROM_START( 99lstwra )
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
-ROM_START( 99lstwrk )
+ROM_START( 99lstwark )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1999.4f",      0x0000, 0x2000, CRC(e3cfc09f) SHA1(e48905726c6308194c596117dd30444dcb748908) )
 	ROM_LOAD( "1999.4h",      0x2000, 0x2000, CRC(fd58c6e1) SHA1(005f3114425fd2bfb9452c790d40653661b3d1d9) )
@@ -901,7 +901,7 @@ ROM_START( flashgal )
 	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
-ROM_START( flashgla )
+ROM_START( flashgala )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flashgal.5",   0x0000, 0x2000, CRC(aa889ace) SHA1(7CAAC8FAE723485ADB6990367BDB8A94BD273322) )
 	ROM_LOAD( "epr-7168.4h",  0x2000, 0x2000, CRC(00c4851f) SHA1(f29ef123702bb3506ac3740b2779ae2757d884c2) )
@@ -1228,15 +1228,15 @@ static DRIVER_INIT( srdmissn )
  *************************************/
 
 GAME( 1984, gyrodine, 0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", 0 )
-GAME( 1984, gyrodinc, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", 0 )
+GAME( 1984, gyrodinec,gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", 0 )
 GAME( 1984, buzzard,  gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", 0 )
 GAME( 1985, sonofphx, 0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", 0 )
 GAME( 1985, repulse,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", 0 )
 GAME( 1985, 99lstwar, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", 0 )
-GAME( 1985, 99lstwra, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", 0 )
-GAME( 1985, 99lstwrk, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", 0 )
+GAME( 1985, 99lstwara,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", 0 )
+GAME( 1985, 99lstwark,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", 0 )
 GAME( 1985, flashgal, 0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", 0 )
-GAME( 1985, flashgla, flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", 0 )
+GAME( 1985, flashgala,flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", 0 )
 GAME( 1986, srdmissn, 0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", 0 )
 GAME( 1986, fx,       srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", 0 )
 GAME( 1986, legend,   0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", 0 )

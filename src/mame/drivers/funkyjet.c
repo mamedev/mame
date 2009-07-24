@@ -346,7 +346,7 @@ ROM_START( funkyjet )
   	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
-ROM_START( funkyjej )
+ROM_START( funkyjetj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "jh00-2.11f", 0x00000, 0x40000, CRC(5b98b700) SHA1(604bd04f4031b0a3b53db2fab4a0e160dff6936d) )
 	ROM_LOAD16_BYTE( "jh01-2.13f", 0x00001, 0x40000, CRC(21280220) SHA1(b365b6c8aa778e21a14b2813e93b9c9d02e14995) )
@@ -392,5 +392,5 @@ static DRIVER_INIT( funkyjet )
 /******************************************************************************/
 
 GAME( 1992, funkyjet, 0,        funkyjet, funkyjet, funkyjet, ROT0, "[Data East] (Mitchell license)", "Funky Jet (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, funkyjej, funkyjet, funkyjet, funkyjej, funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, funkyjetj,funkyjet, funkyjet, funkyjej, funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sotsugyo, 0,        funkyjet, sotsugyo, funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", GAME_SUPPORTS_SAVE )

@@ -11,7 +11,7 @@
         * aceattaa
         * aliensyn
         * aliensy1
-        * pshot16a
+        * passsht16a
         * quartet
         * quart2
         * shinobi
@@ -726,7 +726,7 @@ static READ16_HANDLER( mjleague_custom_io_r )
  *
  *************************************/
 
-static READ16_HANDLER( pshot16a_custom_io_r )
+static READ16_HANDLER( passsht16a_custom_io_r )
 {
 	static int read_port = 0;
 	switch (offset & (0x3000/2))
@@ -1448,7 +1448,7 @@ static INPUT_PORTS_START( mjleague )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( pshot16a )
+static INPUT_PORTS_START( passsht16a )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("SERVICE")
@@ -1993,7 +1993,7 @@ MACHINE_DRIVER_END
     Ace Attacker, Sega System 16A
     CPU: FD1094 317-0060
 */
-ROM_START( aceattaa )
+ROM_START( aceattaca )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11573.43", 0x00000, 0x10000, CRC(ca116367) SHA1(ca09b01568dafec48354072267accb73a97a670f) )
 	ROM_LOAD16_BYTE( "epr-11571.26", 0x00001, 0x10000, CRC(5631d1d6) SHA1(08a2d375e3e4caf392cf2da2dc5497fd1142ab15) )
@@ -2120,7 +2120,7 @@ ROM_END
     Alex Kidd, Sega System 16A
     CPU: FD1089A 317-0021
  */
-ROM_START( alexkid1 )
+ROM_START( alexkidd1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr10429.42", 0x000000, 0x10000, CRC(bdf49eca) SHA1(899bc2d346544e4a33de51b60e02ebf7ee82cea8) )
 	ROM_LOAD16_BYTE( "epr10427.26", 0x000001, 0x10000, CRC(f6e3dd29) SHA1(bb94ebc062bb7c6c13b68579053b9cbe8b92417c) )
@@ -2163,7 +2163,7 @@ ROM_END
     CPU: FD1089B 317-0037
  */
 
-ROM_START( aliensy5 )
+ROM_START( aliensyn5 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr10804.43", 0x00000, 0x8000, CRC(23f78b83) SHA1(76538663e8f7ffffeea4928e3ebe091dac954dc7) )
 	ROM_LOAD16_BYTE( "epr10802.26", 0x00001, 0x8000, CRC(996768bd) SHA1(8c972f0f4120600ecd10ceb3456243d9614924b7) )
@@ -2217,7 +2217,7 @@ ROM_END
     Alien Syndrome, pre-System 16
     CPU: FD1089A 317-0033
  */
-ROM_START( aliensy2 )
+ROM_START( aliensyn2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "10808", 0x00000, 0x8000, CRC(e669929f) SHA1(b5ab41d6f31f0369f8c5f5eb6fc08e8c23312b96) )
 	ROM_LOAD16_BYTE( "10806", 0x00001, 0x8000, CRC(9f7f8fdd) SHA1(819e9c491b7d23deaef646d37319c38e75827d68) )
@@ -2268,7 +2268,7 @@ ROM_END
     Alien Syndrome, pre-System 16
     CPU: FD1089A 317-0033
  */
-ROM_START( aliensy1 )
+ROM_START( aliensyn1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Custom 68000 code */
 	ROM_LOAD16_BYTE( "epr10699.43", 0x00000, 0x8000, CRC(3fd38d17) SHA1(538c1246121051a1af9ba2a4259eb1fe7e4952e1) )
 	ROM_LOAD16_BYTE( "epr10696.26", 0x00001, 0x8000, CRC(d734f19f) SHA1(4a08c35084f7a9364ba0f058b9a9ffc30c8b5a78) )
@@ -2445,7 +2445,7 @@ ROM_END
     Fantasy Zone, Sega System 16A
     CPU: 68000
  */
-ROM_START( fantzon1 )
+ROM_START( fantzone1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "7385.43", 0x000000, 0x8000, CRC(5cb64450) SHA1(5831405359975dd7d8c6614b20fd9b18a5d6410d) )
 	ROM_LOAD16_BYTE( "7382.26", 0x000001, 0x8000, CRC(3fda7416) SHA1(91f34cc8afb4ad8bc783c31d25781a1359c44cfe) )
@@ -2523,7 +2523,7 @@ ROM_END
     CPU: FD1094 (317-0071)
  */
 
-ROM_START( pshot16a )
+ROM_START( passsht16a )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr11833.43", 0x000000, 0x10000, CRC(5eb1405c) SHA1(0a68d3fcc074475d38f999c93082d4a9dff0f19a) )
 	ROM_LOAD16_BYTE( "epr11832.26", 0x000001, 0x10000, CRC(718a3fe4) SHA1(bd6844c53ce3b64b113795360175df92d095b467) )
@@ -3182,7 +3182,7 @@ ROM_END
     -   A5  EPR10854    "
     -   A6  EPR10855    "
 */
-ROM_START( timesca1 )
+ROM_START( timescan1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr10540a.43", 0x00000, 0x8000, CRC(76848b0b) SHA1(a7755898c2b3212d80034c47760440db6dcde83c) )
 	ROM_LOAD16_BYTE( "epr10537a.26", 0x00001, 0x8000, CRC(4ddc434a) SHA1(54908654f1445f2d3a3b1496015f3347ad603225) )
@@ -3352,10 +3352,10 @@ static DRIVER_INIT( mjleague )
 	custom_io_r = mjleague_custom_io_r;
 }
 
-static DRIVER_INIT( pshot16a )
+static DRIVER_INIT( passsht16a )
 {
 	system16a_generic_init(machine);
-	custom_io_r = pshot16a_custom_io_r;
+	custom_io_r = passsht16a_custom_io_r;
 }
 
 static DRIVER_INIT( quartet )
@@ -3399,16 +3399,16 @@ GAME( 1986, quartet2,  quartet,  system16a_8751,   quart2,   generic_16a, ROT0, 
 GAME( 1986, quartet2a, quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",          "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
-GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, fd1089b_16a, ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", 0 )
-GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
-GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
-GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
+GAME( 1987, aliensyn5,aliensyn, system16a,        aliensyn, fd1089b_16a, ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", 0 )
+GAME( 1987, aliensyn2,aliensyn, system16a,        aliensyn, fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensyn1,aliensyn, system16a,        aliensy1, fd1089a_16a, ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
+GAME( 1988, aceattaca,aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
 GAME( 1986, afighter, 0,        system16a_no7751, afighter, fd1089a_16a, ROT270, "Sega",           "Action Fighter (FD1089A 317-0018)", 0 )
 GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 )
-GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, fd1089a_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", 0 )
+GAME( 1986, alexkidd1,alexkidd, system16a,        alexkidd, fd1089a_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", 0 )
 GAME( 1986, fantzone, 0,        system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 2, unprotected)", 0 )
-GAME( 1986, fantzon1, fantzone, system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 1, unprotected)", 0 )
-GAME( 1988, pshot16a, passsht,  system16a,        pshot16a, pshot16a,    ROT270, "Sega",           "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", 0 )
+GAME( 1986, fantzone1,fantzone, system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 1, unprotected)", 0 )
+GAME( 1988, passsht16a,passsht,  system16a,        passsht16a, passsht16a,    ROT270, "Sega",           "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", 0 )
 GAME( 1987, sdi,      0,        system16a_no7751, sdi,      sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Europe, System 16A, FD1089B 317-0027)", 0 )
 GAME( 1987, shinobi,  0,        system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", 0 )
 GAME( 1987, shinobi1, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 1, System 16A, FD1094 317-0050)", 0 )
@@ -3417,6 +3417,6 @@ GAME( 1987, shinoblb, shinobi,  system16a,        shinobi,  generic_16a, ROT0,  
 GAME( 1987, sjryuko1, sjryuko,  system16a,        sjryuko,  sjryukoa,    ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", 0 )
 GAME( 1988, tetris,   0,        system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", 0 )
 GAME( 1988, tetris3,  tetris,   system16a_no7751, tetris,   generic_16a, ROT0,   "Sega",           "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", 0 )
-GAME( 1987, timesca1, timescan, system16a,        timescan, fd1089b_16a, ROT270, "Sega",           "Time Scanner (set 1, System 16A, FD1089B 317-0024)", 0 )
+GAME( 1987, timescan1,timescan, system16a,        timescan, fd1089b_16a, ROT270, "Sega",           "Time Scanner (set 1, System 16A, FD1089B 317-0024)", 0 )
 GAME( 1988, wb31,     wb3,      system16a_no7751, wb3,      generic_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", 0 )
 GAME( 1988, wb35,     wb3,      system16a_no7751, wb3,      fd1089a_16a, ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, System 16A, FD1089A 317-xxxx)", GAME_NOT_WORKING )

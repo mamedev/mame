@@ -240,7 +240,7 @@ ROM_START( blockout )
 	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )	/* unknown */
 ROM_END
 
-ROM_START( blckout2 )
+ROM_START( blockout2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "29a0",         0x00000, 0x20000, CRC(605f931e) SHA1(65fa7227dafde1fc8564e09fa949fe575b394d8a) )
 	ROM_LOAD16_BYTE( "29a1",         0x00001, 0x20000, CRC(38f07000) SHA1(e4070e3067d77cc1b0d8d0c63786f2729c5c703a) )
@@ -255,7 +255,7 @@ ROM_START( blckout2 )
 	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )	/* unknown */
 ROM_END
 
-ROM_START( blckoutj )
+ROM_START( blockoutj )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "2.bin",         0x00000, 0x20000, CRC(e16cf065) SHA1(541b30b054cf08f10d6ca4746423759f4326c005) )
 	ROM_LOAD16_BYTE( "1.bin",         0x00001, 0x20000, CRC(950b28a3) SHA1(7d1635ac2a3fc1efdd2f78cd6038bd7b4c907b1b) )
@@ -358,7 +358,7 @@ ROM_END
 
 
 GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 1)", 0 )
-GAME( 1989, blckout2, blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", 0 )
-GAME( 1989, blckoutj, blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", 0 )
+GAME( 1989, blockout2,blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", 0 )
+GAME( 1989, blockoutj,blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", 0 )
 GAME( 1991, agress,   0,        blockout, agress,   0, ROT0, "Palco", "Agress", 0 )
 GAME( 2003, agressb,  agress,   blockout, agress,   0, ROT0, "Palco", "Agress (English bootleg)", 0 )

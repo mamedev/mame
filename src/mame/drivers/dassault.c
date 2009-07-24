@@ -650,7 +650,7 @@ ROM_START( dassault )
 	ROM_LOAD( "pal16l8b.10c", 0x0e00, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( dassaul4 )
+ROM_START( dassault4 )
 	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("gs01", 0x00000, 0x20000, CRC(8613634d) SHA1(69b64e54fde3b5f1ee3435d7327b84e7a7d43f6d) )
 	ROM_LOAD16_BYTE("gs03", 0x00001, 0x20000, CRC(ea860bd4) SHA1(6e4e2d004433ad5842b4bc895eaa8f55bd1ee168) )
@@ -848,4 +848,4 @@ static DRIVER_INIT( thndzone )
 
 GAME( 1991, thndzone, 0,        dassault, thndzone, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", 0 )
 GAME( 1991, dassault, thndzone, dassault, dassault, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", 0 )
-GAME( 1991, dassaul4, thndzone, dassault, dassaul4, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", 0 )
+GAME( 1991, dassault4,thndzone, dassault, dassaul4, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", 0 )

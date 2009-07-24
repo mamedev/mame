@@ -664,7 +664,7 @@ ROM_START( ddragon3 )
 	ROM_LOAD( "mb7114h.ic38", 0x000000, 0x00100, CRC(113c7443) SHA1(7b0b13e9f0c219f6d436aeec06494734d1f4a599) )
 ROM_END
 
-ROM_START( ddrago3j )
+ROM_START( ddragon3j )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "30j15.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
 	ROM_LOAD16_BYTE( "30j14.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
@@ -695,7 +695,7 @@ ROM_START( ddrago3j )
 	ROM_LOAD( "mb7114h.ic38", 0x000000, 0x00100, CRC(113c7443) SHA1(7b0b13e9f0c219f6d436aeec06494734d1f4a599) )
 ROM_END
 
-ROM_START( ddrago3p )
+ROM_START( ddragon3p )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "30a14-0.ic80", 0x00001, 0x40000, CRC(f42fe016) SHA1(11511aa43caa12b36a795bfaefee824821282523) )
 	ROM_LOAD16_BYTE( "30a15-0.ic79", 0x00000, 0x20000, CRC(ad50e92c) SHA1(facac5bbe11716d076a40eacbb67f7caab7a4a27) )
@@ -746,7 +746,7 @@ ROM_START( ddrago3p )
 	ROM_LOAD( "30.ic38", 0x000000, 0x00100, CRC(113c7443) SHA1(7b0b13e9f0c219f6d436aeec06494734d1f4a599) )
 ROM_END
 
-ROM_START( ddrago3b )
+ROM_START( ddragon3b )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "dd3.01",   0x00001, 0x20000, CRC(68321d8b) SHA1(bd34d361e8ef18ef2b7e8bfe438b1b098c3151b5) )
 	ROM_LOAD16_BYTE( "dd3.03",   0x00000, 0x20000, CRC(bc05763b) SHA1(49f661fdc98bd43a6622945e9aa8d8e7a7dc1ce6) )
@@ -928,7 +928,7 @@ ROM_START( ctribeb )
 	ROM_CONTINUE(			  0x000000, 0x20000 )
 ROM_END
 
-ROM_START( ctribb2 )
+ROM_START( ctribeb2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "1.bin",  0x00001, 0x20000, CRC(9cfa997f) SHA1(ee49b4b9e9cd29616f244fdf3912ef743e2404ce) )
 	ROM_LOAD16_BYTE( "3.bin",  0x00000, 0x20000, CRC(2ece8681) SHA1(17ee2ceb893e2eb08fa4cabcdebcec02bee16cda) )
@@ -982,11 +982,11 @@ ROM_END
  *************************************/
 
 GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3j, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3p, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j,ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p,ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b,ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribb2,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2, ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 2)", GAME_SUPPORTS_SAVE )

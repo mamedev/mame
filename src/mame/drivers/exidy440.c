@@ -1595,7 +1595,7 @@ ROM_START( hitnmiss )
 ROM_END
 
 
-ROM_START( hitnmis2 )
+ROM_START( hitnmiss2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
 	ROM_LOAD( "hml2.a1",   0x08000, 0x2000, CRC(322f7e83) SHA1(e80e51c943402d0b644b1788e6a278130610d0e6) )
 	ROM_LOAD( "hml2.a3",   0x0a000, 0x2000, CRC(0e12a721) SHA1(22ee013d68c1afc218672cbb40c99fc9de607328) )
@@ -2016,7 +2016,7 @@ GAME( 1986, claypign, 0,        exidy440, claypign, claypign, ROT0, "Exidy", "Cl
 GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440, ROT0, "Exidy", "Chiller (version 3.0)", 0 )
 GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
 GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 )
-GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
+GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
 GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
 GAME( 1988, showdown, 0,        exidy440, showdown, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 )
 GAME( 1989, yukon,    0,        exidy440, showdown, yukon,    ROT0, "Exidy", "Yukon (version 2.0)", 0 )

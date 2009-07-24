@@ -2989,7 +2989,7 @@ ROM_START( armchmp2 )
 	ROM_LOAD( "pr91042_5.ic91", 0x000000, 0x000100, CRC(e71de4aa) SHA1(d06e5a35ad2127df2d6328cce153073380ee7819) )
 ROM_END
 
-ROM_START( armchm2o )
+ROM_START( armchmp2o )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD16_BYTE( "ac91106_ver1.7_4.ic63", 0x000000, 0x020000, CRC(aaa11bc7) SHA1(ac6186f45a006074d3a86d7437c5a3411bf27188) )
 	ROM_LOAD16_BYTE( "ac91106_ver1.7_3.ic62", 0x000001, 0x020000, CRC(a7965879) SHA1(556fecd6ea0f977b718d132c4180bb2160b9da7e) )
@@ -3046,7 +3046,7 @@ GAME( 1989, bigrun,   0,        bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", 
 GAME( 1990, cischeat, 0,        cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, armchmp2, 0,        armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, armchm2o, armchmp2, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, wildplt,  0,        f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, scudhamm, 0,        scudhamm, scudhamm, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )

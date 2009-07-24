@@ -300,7 +300,7 @@ ROM_START( sichuan2 )
 	ROM_LOAD( "ic05.05",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
 ROM_END
 
-ROM_START( sichuana )
+ROM_START( sichuan2a )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "sichuan.a6",   0x00000, 0x10000, CRC(f8ac05ef) SHA1(cd20e5239d73264f1323ba6b1e35934685852ba1) )
 	ROM_RELOAD(               0x10000, 0x10000 )
@@ -440,5 +440,5 @@ ROM_END
 GAME( 1989, matchit,  0,	     shisen,   matchit,  0, ROT0, "Tamtex",  "Match It", 0 )
 GAME( 1989, shisen,   matchit,   shisen,   shisen,   0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", 0 )
 GAME( 1989, sichuan2, matchit,   shisen,   shisen,   0, ROT0, "hack", "Sichuan II (hack, set 1)", 0 )
-GAME( 1989, sichuana, matchit,   shisen,   shisen,   0, ROT0, "hack", "Sichuan II (hack, set 2)", 0 )
+GAME( 1989, sichuan2a,matchit,   shisen,   shisen,   0, ROT0, "hack", "Sichuan II (hack, set 2)", 0 )
 

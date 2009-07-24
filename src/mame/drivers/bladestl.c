@@ -336,7 +336,7 @@ ROM_START( bladestl )
 	ROM_LOAD( "797a04",	0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
 
-ROM_START( bladstle )
+ROM_START( bladestle )
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "797e01", 0x10000, 0x08000, CRC(f8472e95) SHA1(8b6caa905fb1642300dd9da508871b00429872c3) )	/* fixed ROM */
 	ROM_CONTINUE(		0x08000, 0x08000 )				/* banked ROM */
@@ -358,4 +358,4 @@ ROM_END
 
 
 GAME( 1987, bladestl, 0,        bladestl, bladestl, 0, ROT90, "Konami", "Blades of Steel (version T)", 0 )
-GAME( 1987, bladstle, bladestl, bladestl, bladstle, 0, ROT90, "Konami", "Blades of Steel (version E)", 0 )
+GAME( 1987, bladestle,bladestl, bladestl, bladstle, 0, ROT90, "Konami", "Blades of Steel (version E)", 0 )

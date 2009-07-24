@@ -701,7 +701,7 @@ ROM_START( eggventr )
 ROM_END
 
 
-ROM_START( eggvent8 )
+ROM_START( eggventr8 )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggvc8.8", 0x000000, 0x020000, CRC(5a130c04) SHA1(00408912b436efa003bb02dce90fae4fe33a0180) )
 	ROM_LOAD16_BYTE( "eggvc9.8", 0x000001, 0x020000, CRC(3ac0a95b) SHA1(7f3bd0e6d2d790af4aa6881ea8de8b296a64164a) )
@@ -727,7 +727,7 @@ ROM_START( eggvent8 )
 ROM_END
 
 
-ROM_START( eggvent7 )
+ROM_START( eggventr7 )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggvc8.7", 0x000000, 0x020000, CRC(99999899) SHA1(e3908600fa711baa7f7562f86498ec7e988a5bea) )
 	ROM_LOAD16_BYTE( "eggvc9.7", 0x000001, 0x020000, CRC(1b608155) SHA1(256dd981515d57f806a3770bdc6ff46b9000f7f3) )
@@ -753,7 +753,7 @@ ROM_START( eggvent7 )
 ROM_END
 
 
-ROM_START( eggventa ) /* Allied Leisure Australia, official license? */
+ROM_START( eggventra ) /* Allied Leisure Australia, official license? */
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "egr8.vc8", 0x000000, 0x080000, CRC(a62c4143) SHA1(a21d6b7efdba4965285265426ed79f3249a86685) )
 	ROM_LOAD16_BYTE( "egr9.vc9", 0x000001, 0x080000, CRC(bc55bc7a) SHA1(d6e3fc76b4a0a20176af1338a32bb81f0599fdc0) )
@@ -777,7 +777,7 @@ ROM_START( eggventa ) /* Allied Leisure Australia, official license? */
 ROM_END
 
 
-ROM_START( eggvntdx )
+ROM_START( eggventrd )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
 	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x080000, CRC(cc5f122e) SHA1(e719a3937378df605cdb86c59a534808473c8f90) )
@@ -934,10 +934,10 @@ static DRIVER_INIT( cclownz )
 
 GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
 GAME( 1997, eggventr, 0,        gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggvent8, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventa, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, eggventr8,eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7,eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventra,eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd,eggventr, gameroom, eggvntdx, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
 GAME( 1997, ripribit, 0,        gameroom, ripribit, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,    0,        gameroom, cfarm,    cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
 GAME( 1999, cclownz,  0,        gameroom, cclownz,  cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

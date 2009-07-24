@@ -450,7 +450,7 @@ ROM_START( crzrally )
 	ROM_LOAD( "pal16r8a.1d",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( crzralla )
+ROM_START( crzrallya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crzralla_1.7g",        0x0000, 0x4000, CRC(8c6a70aa) SHA1(61b10cb16ddce813a768181483b03bead5b05702) )
 	ROM_LOAD( "crzralla_2.7f",        0x4000, 0x4000, CRC(7fdd4a45) SHA1(194d504adfd83adc52df2df27a18116a3072ea9d) )
@@ -481,7 +481,7 @@ ROM_START( crzralla )
 	ROM_LOAD( "pal16r8a.1d",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( crzrallg )
+ROM_START( crzrallyg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12.7g",       0x0000, 0x4000, CRC(0cab3ef9) SHA1(6de4d4a7159e0a6ad13dbca3344759410618ea26) )
 	ROM_LOAD( "13.7f",       0x4000, 0x4000, CRC(e19a8e13) SHA1(1462b21f16990eb9ae2f2d1cd5c097edf88bf614) )
@@ -509,6 +509,6 @@ ROM_END
 
 GAME( 1984, holeland, 0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole Land", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, crzrally, 0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, crzralla, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, crzrallg, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, crzrallya,crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, crzrallyg,crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS )
 

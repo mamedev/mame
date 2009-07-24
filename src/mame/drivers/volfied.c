@@ -372,7 +372,7 @@ ROM_START( volfiedj )
 	ROM_LOAD( "c04-5.75",  0x00200, 0x00200, CRC(2763ec89) SHA1(1e8339e21ee35b526d8604a21cfed9a1ac6455e8) ) /* PROM type is a MB7124E or compatible */
 ROM_END
 
-ROM_START( volfidjo )
+ROM_START( volfiedjo )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code and tile data */
 	ROM_LOAD16_BYTE( "c04-12.30", 0x00000, 0x10000, CRC(e319c7ec) SHA1(e76fb872191fce0186ed0ac5066385a9913fdc4c) )
 	ROM_LOAD16_BYTE( "c04-08.10", 0x00001, 0x10000, CRC(81c6f755) SHA1(43ad72bb05d847f58b3043c674fb9b1e317691df) )
@@ -405,4 +405,4 @@ ROM_END
 GAME( 1989, volfied,  0,       volfied, volfied,  volfied, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", 0 )
 GAME( 1989, volfiedu, volfied, volfied, volfiedu, volfied, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", 0 )
 GAME( 1989, volfiedj, volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", 0 )
-GAME( 1989, volfidjo, volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan)", 0 )
+GAME( 1989, volfiedjo,volfied, volfied, volfiedj, volfied, ROT270, "Taito Corporation",         "Volfied (Japan)", 0 )

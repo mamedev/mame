@@ -720,7 +720,7 @@ ROM_START( chinhero )
 	ROM_LOAD( "ic42",		  0xa60, 0x020, CRC(2ccfe10a) SHA1(d89ea91e5da436805fca9ded9b33609f4a862724) ) /* sound cpu banking */
 ROM_END
 
-ROM_START( chinher2 )
+ROM_START( chinhero2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
 	ROM_LOAD( "1.128",        0x0000, 0x4000, CRC(68e247aa) SHA1(27c2b864e482ba10c81337ed7c03a58b395e52bb) )
 	ROM_LOAD( "2.128",        0x4000, 0x4000, CRC(0346d8c9) SHA1(458b9a37b0ad0cafecdb0348f7d93508531bc310) )
@@ -784,7 +784,7 @@ All eproms are 27128,2764
 There are present 12 bipolar proms but i cannot dump them,but i think that code is identical to Taiyo set.
  */
 
-ROM_START( chinhert )
+ROM_START( chinherot )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
 	ROM_LOAD( "chtaito1.bin",        0x0000, 0x4000, CRC(2bd64de0) SHA1(cce14f9779a830ed83fa185918d22de0658e40ea) )
 	ROM_LOAD( "chtaito2.bin",        0x4000, 0x4000, CRC(8fd04da9) SHA1(17f868c33ad01f0df96fe50e78dbde35ac8e2fe1) )
@@ -988,7 +988,7 @@ ROM_END
 
 GAME( 1984, dynamski, 0,        dynamski, dynamski, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
 GAME( 1984, chinhero, 0,        chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 )
-GAME( 1984, chinher2, chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
-GAME( 1984, chinhert, chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", 0 )
+GAME( 1984, chinhero2,chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
+GAME( 1984, chinherot,chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", 0 )
 GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
 GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid, ROT0,  "[Nihon Game] (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )

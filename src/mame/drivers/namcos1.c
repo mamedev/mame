@@ -1253,7 +1253,7 @@ ROM_START( youkaidk )
 ROM_END
 
 /* Youkai Douchuuki (Shadowland Japan old version) */
-ROM_START( yokaidko )
+ROM_START( youkaidko )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "yd1.sd0",            0x0c000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
 	ROM_LOAD( "yd1.sd1",            0x1c000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
@@ -1541,7 +1541,7 @@ ROM_START( pacmania )
 ROM_END
 
 /* Pac-Mania (Japan) diff o1,s0,s1,p7,v0 */
-ROM_START( pacmanij )
+ROM_START( pacmaniaj )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "pn1_s0.bin",         0x0c000, 0x10000, CRC(d5ef5eee) SHA1(6f263955662defe7a03cc89368b70d5fcb06ee3e) )
 	ROM_LOAD( "pn1_s1.bin",         0x1c000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) )
@@ -1618,7 +1618,7 @@ ROM_START( galaga88 )
 ROM_END
 
 /* Galaga '88 (Japan) */
-ROM_START( galag88j )
+ROM_START( galaga88j )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "g81_s0.bin",         0x0c000, 0x10000, CRC(164a3fdc) SHA1(d7b026f6a617bb444e3bce80cec2cbb4772cb533) )
 	ROM_LOAD( "g81_s1.bin",         0x1c000, 0x10000, CRC(16a4b784) SHA1(a0d6f6ad4a68c9e10f2662e940ffaee691cafcac) )
@@ -1742,7 +1742,7 @@ ROM_START( berabohm )
 	ROM_LOAD( "bm_obj-7.bin",       0xe0000, 0x20000, CRC(377c81ed) SHA1(85f4682c6079863793f5575d261a33309c221ba7) )
 ROM_END
 
-ROM_START( beraboho )
+ROM_START( berabohmo )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "bm1_s0.bin",         0x0c000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
 
@@ -2068,7 +2068,7 @@ ROM_START( splatter )
 	ROM_LOAD( "sh_obj-7.bin",       0xe0000, 0x20000, CRC(08b1953a) SHA1(f84f97e8e14ed6fcf99565d2603651831101ed2f) )
 ROM_END
 
-ROM_START( splatteo )
+ROM_START( splattero )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x1c000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
@@ -2112,7 +2112,7 @@ ROM_START( splatteo )
 	ROM_LOAD( "sh_obj-7.bin",       0xe0000, 0x20000, CRC(08b1953a) SHA1(f84f97e8e14ed6fcf99565d2603651831101ed2f) )
 ROM_END
 
-ROM_START( splattej )
+ROM_START( splatterj )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x1c000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
@@ -2638,7 +2638,7 @@ ROM_START( tankfrce )
 ROM_END
 
 /* Tank Force US 4 Player version*/
-ROM_START( tankfrc4 )
+ROM_START( tankfrce4 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "tf1_snd0.bin",       0x0c000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
 
@@ -2674,7 +2674,7 @@ ROM_START( tankfrc4 )
 ROM_END
 
 /* Tank Force (Japan) */
-ROM_START( tankfrcj )
+ROM_START( tankfrcej )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "tf1_snd0.bin",       0x0c000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
 
@@ -2713,25 +2713,25 @@ ROM_END
 
 GAME( 1987, shadowld, 0,        ns1,     shadowld, shadowld, ROT180, "Namco", "Shadowland", 0 )
 GAME( 1987, youkaidk, shadowld, ns1,     shadowld, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan new version)", 0 )
-GAME( 1987, yokaidko, shadowld, ns1,     shadowld, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan old version)", 0 )
+GAME( 1987, youkaidko,shadowld, ns1,     shadowld, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan old version)", 0 )
 GAME( 1987, dspirit,  0,        ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version)", 0 )
 GAME( 1987, dspirito, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version)", 0 )
 GAME( 1987, dspirita, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (Atari license)", 0 )
 GAME( 1987, blazer,   0,        ns1,     ns1,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
 GAME( 1987, quester,  0,        ns1,     quester,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
 GAME( 1987, pacmania, 0,        ns1,     pacmania, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
-GAME( 1987, pacmanij, pacmania, ns1,     pacmania, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
+GAME( 1987, pacmaniaj,pacmania, ns1,     pacmania, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
 GAME( 1987, galaga88, 0,        ns1,     galaga88, galaga88, ROT270, "Namco", "Galaga '88", 0 )
-GAME( 1987, galag88j, galaga88, ns1,     galaga88, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
+GAME( 1987, galaga88j,galaga88, ns1,     galaga88, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
 GAME( 1988, ws,       0,        ns1,     ns1,      ws,       ROT180, "Namco", "World Stadium (Japan)", 0 )
 GAME( 1988, berabohm, 0,        ns1,     berabohm, berabohm, ROT180, "Namco", "Beraboh Man (Japan version C)", 0 )
-GAME( 1988, beraboho, berabohm, ns1,     berabohm, berabohm, ROT180, "Namco", "Beraboh Man (Japan version B)", 0 )
+GAME( 1988, berabohmo,berabohm, ns1,     berabohm, berabohm, ROT180, "Namco", "Beraboh Man (Japan version B)", 0 )
 GAME( 1988, mmaze,    0,        ns1,     mmaze,    alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
 GAME( 1988, bakutotu, 0,        ns1,     bakutotu, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
 GAME( 1988, wldcourt, 0,        ns1,     wldcourt, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
 GAME( 1988, splatter, 0,        ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World new version)", 0 )
-GAME( 1988, splatteo, splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World old version)", 0 )
-GAME( 1988, splattej, splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (Japan)", 0 )
+GAME( 1988, splattero,splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World old version)", 0 )
+GAME( 1988, splatterj,splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (Japan)", 0 )
 GAME( 1988, faceoff,  0,        ns1,     faceoff,  faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
 GAME( 1989, rompers,  0,        ns1,     ns1,      rompers,  ROT90,  "Namco", "Rompers (Japan)", 0 )
 GAME( 1989, romperso, rompers,  ns1,     ns1,      rompers,  ROT90,  "Namco", "Rompers (Japan old version)", 0 )
@@ -2744,5 +2744,5 @@ GAME( 1990, boxyboy,  0,        ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "B
 GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan)", 0 )
 GAME( 1990, puzlclub, 0,        ns1,     puzlclub, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
 GAME( 1991, tankfrce, 0,        ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
-GAME( 1991, tankfrc4, tankfrce, ns1,     tankfrc4, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )
-GAME( 1991, tankfrcj, tankfrce, ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
+GAME( 1991, tankfrce4,tankfrce, ns1,     tankfrc4, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )
+GAME( 1991, tankfrcej,tankfrce, ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )

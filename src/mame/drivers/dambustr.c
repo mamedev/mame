@@ -240,7 +240,7 @@ ROM_START( dambustr )
 ROM_END
 
 
-ROM_START( dambusta )
+ROM_START( dambustra )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "db8a.pr8",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db6.pr6",    0x5000, 0x1000, CRC(56d301a9) SHA1(a0839767af822ab1b8df1a7d0767e72b494974c6) ) /* This single rom had a yellow label, while all the rest were white */
@@ -267,7 +267,7 @@ ROM_START( dambusta )
 ROM_END
 
 
-ROM_START( dambust )
+ROM_START( dambustruk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "db8.pr8",    0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db6p.bin",   0x5000, 0x1000, CRC(35dcee01) SHA1(2c23c727d9b38322a6d0548dfe6a2a254f3530af) )
@@ -294,6 +294,6 @@ ROM_START( dambust )
 ROM_END
 
 
-GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambusta, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+GAME( 1981, dambustr,  0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra, dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk,dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )

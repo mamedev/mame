@@ -420,7 +420,7 @@ ROM_START( supbtime )
 ROM_END
 
 /* is this actually a good dump?, there are no backgrounds ingame! */
-ROM_START( supbtima )
+ROM_START( supbtimea )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "3.11f", 0x00000, 0x20000, CRC(98b5f263) SHA1(ee4b0d2fcdc95aba0e78d066bd6c4d553a902848) )
 	ROM_LOAD16_BYTE( "4.12f", 0x00001, 0x20000, CRC(937e68b9) SHA1(4779e150518b9014c2154f33d38767c6a7447334) )
@@ -439,7 +439,7 @@ ROM_START( supbtima )
   	ROM_LOAD( "gc05.bin",    0x00000, 0x20000, CRC(2f2246ff) SHA1(3fcceb6f5aa5f33187bcf4c59d88327f396fa80d) )
 ROM_END
 
-ROM_START( supbtimj )
+ROM_START( supbtimej )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "gc03.bin", 0x00000, 0x20000, CRC(b5621f6a) SHA1(2dfd361e81dc4805bc248cc293d94131162df2d2) )
 	ROM_LOAD16_BYTE( "gc04.bin", 0x00001, 0x20000, CRC(551b2a0c) SHA1(8a6dde2d64029b8e7f7c9b88bd05633b69417dc1) )
@@ -480,6 +480,6 @@ ROM_END
 /******************************************************************************/
 
 GAME( 1990, supbtime, 0,        supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", 0 )
-GAME( 1990, supbtima, supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", 0 )
-GAME( 1990, supbtimj, supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", 0 )
+GAME( 1990, supbtimea,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", 0 )
+GAME( 1990, supbtimej,supbtime, supbtime, supbtime, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", 0 )
 GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, 0, ROT0, "Data East Corporation", "China Town (Japan)", 0 )

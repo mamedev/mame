@@ -827,7 +827,7 @@ ROM_START( bbusters )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
-ROM_START( bbusteru )
+ROM_START( bbustersu )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbv2-3.k10",   0x000000, 0x20000, CRC(6930088b) SHA1(265f0b584d81b6fdcda5c3a2e0bd15d56443bb35) )
 	ROM_LOAD16_BYTE( "bbv2-5.k12",   0x000001, 0x20000, CRC(cfdb2c6c) SHA1(54a837dc84b74d12e931f607f3dc9ee06a7e4d31) )
@@ -951,7 +951,7 @@ ROM_END
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
 GAME( 1989, bbusters, 0,        bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, bbusteru, bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, bbustersu,bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1989, mechatt,  0,        mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
 GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, 0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )

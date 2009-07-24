@@ -252,7 +252,7 @@ ROM_START( compgolf )
 	ROM_LOAD( "cv08-1.bpr",   0x00000, 0x0100, CRC(b7c43db9) SHA1(418b11e4c8a9bce6873b0624ac53a5011c5807d0) )
 ROM_END
 
-ROM_START( compglfo )
+ROM_START( compgolfo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cv05.bin",     0x08000, 0x8000, CRC(3cef62c9) SHA1(c4827b45faf7aa4c80ddd3c57f1ed6ba76b5c49b) )
 
@@ -299,4 +299,4 @@ static DRIVER_INIT( compgolf )
 }
 
 GAME( 1986, compgolf, 0,		compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", 0 )
-GAME( 1985, compglfo, compgolf, compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (old version)", 0 )
+GAME( 1985, compgolfo,compgolf, compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (old version)", 0 )

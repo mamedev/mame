@@ -697,7 +697,7 @@ ROM_START( airbustr )
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
-ROM_START( airbustj )
+ROM_START( airbustrj )
 	ROM_REGION( 0x24000, "master", 0 )
 	ROM_LOAD( "pr-14j.bin", 0x00000, 0x0c000, CRC(6b9805bd) SHA1(db6df33cf17316a4b81d7731dca9fe8bbf81f014) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
@@ -737,7 +737,7 @@ Rom 5 is on a piggyback daughterboard with a z80 and a PAL
 
 */
 
-ROM_START( airbusb )
+ROM_START( airbustrb )
 	ROM_REGION( 0x24000, "master", 0 )
 	ROM_LOAD( "5.bin",   0x00000, 0x0c000, CRC(9e4216a2) SHA1(46572da4df5a67b10cc3ee21bdc0ec4bcecaaf93) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
@@ -782,6 +782,6 @@ static DRIVER_INIT( airbustr )
 
 /* Game Drivers */
 
-GAME( 1990, airbustr, 0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE )	// 891220
-GAME( 1990, airbustj, airbustr, airbustr, airbustj, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
-GAME( 1990, airbusb,  airbustr, airbusb,  airbustj, 0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)
+GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE )	// 891220
+GAME( 1990, airbustrj,  airbustr, airbustr, airbustj, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
+GAME( 1990, airbustrb,  airbustr, airbusb,  airbustj, 0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)

@@ -586,7 +586,7 @@ ROM_START( makaimur )
 	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  /* priority (not used) */
 ROM_END
 
-ROM_START( makaimuc )
+ROM_START( makaimurc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "mj04c.bin",      0x04000, 0x4000, CRC(1294edb1) SHA1(35d3b3ce4ee25d3cfa27097de0c9a2ab5e4892aa) )   /* 4000-5fff is page 4 */
 	ROM_LOAD( "mj03c.bin",      0x08000, 0x8000, CRC(d343332d) SHA1(3edf47ff2bd49b4451b737b6d3eb54256b489c81) )
@@ -619,7 +619,7 @@ ROM_START( makaimuc )
 	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  /* priority (not used) */
 ROM_END
 
-ROM_START( makaimug )
+ROM_START( makaimurg )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "mj04g.bin",      0x04000, 0x4000, CRC(757c94d3) SHA1(07f7cf788810a1425016e016ce3579adb3253ac7) )   /* 4000-5fff is page 4 */
 	ROM_LOAD( "mj03g.bin",      0x08000, 0x8000, CRC(61b043bb) SHA1(23a0a17d0abc4b084ffeba90266ef455361771cc) )
@@ -702,6 +702,6 @@ GAME( 1985, gngbl,	  gng, gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (b
 GAME( 1985, gngblita,	  gng, gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngt,	  gng, gng, gng,	  0,	   ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
 GAME( 1985, makaimur, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, makaimuc, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
-GAME( 1985, makaimug, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision G)", GAME_SUPPORTS_SAVE )
+GAME( 1985, makaimurc,gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
+GAME( 1985, makaimurg,gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision G)", GAME_SUPPORTS_SAVE )
 GAME( 1989, diamond,  0,   gng, diamond,  diamond, ROT0, "KH Video", "Diamond Run", GAME_SUPPORTS_SAVE )

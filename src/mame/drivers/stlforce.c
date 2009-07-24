@@ -368,7 +368,7 @@ ROM_START( twinbrat )
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
-ROM_START( twinbrta )
+ROM_START( twinbrata )
 	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(5e75f568) SHA1(f42d2a73d737e6b01dd049eea2a10fc8c8096d8f) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(0e3fa9b0) SHA1(0148cc616eac84dc16415e1557ec6040d14392d4) )
@@ -416,4 +416,4 @@ static DRIVER_INIT(twinbrat)
 
 GAME( 1994, stlforce, 0,        stlforce, stlforce, stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", 0 )
 GAME( 1995, twinbrat, 0,        twinbrat, stlforce, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", 0 )
-GAME( 1995, twinbrta, twinbrat, twinbrat, stlforce, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", 0 )
+GAME( 1995, twinbrata,twinbrat, twinbrat, stlforce, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", 0 )

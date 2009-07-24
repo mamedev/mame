@@ -364,7 +364,7 @@ ROM_START( shootout )
 	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
 ROM_END
 
-ROM_START( shootouj )
+ROM_START( shootoutj )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128k for code  */
 	ROM_LOAD( "cg02.bin",    0x08000, 0x8000, CRC(8fc5d632) SHA1(809ac4eba09972229fe741c96fa8036d7139b6a8) )
 	ROM_LOAD( "cg00.bin",    0x10000, 0x8000, CRC(ef6ced1e) SHA1(feea508c7a60fc6cde1efee52cba628accd26028) )
@@ -389,7 +389,7 @@ ROM_START( shootouj )
 	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
 ROM_END
 
-ROM_START( shootoub )
+ROM_START( shootoutb )
 	ROM_REGION( 2*0x20000, "maincpu", 0 )	/* 128k for code + 128k for decrypted opcodes */
 	ROM_LOAD( "shootout.006", 0x08000, 0x8000, CRC(2c054888) SHA1(cb0de2f7d743506789626304e6bcbbc292fbe8bc) )
 	ROM_LOAD( "shootout.008", 0x10000, 0x8000, CRC(9651b656) SHA1(e90eddf2833ef36fa73b7b8d81d28443d2f60220) )
@@ -440,5 +440,5 @@ static DRIVER_INIT( shootouj )
 
 
 GAME( 1985, shootout, 0,        shootout, shootout, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0)
-GAME( 1985, shootouj, shootout, shootouj, shootouj, shootouj, ROT0, "Data East USA", "Shoot Out (Japan)", 0 )
-GAME( 1985, shootoub, shootout, shootouj, shootout, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootouj, ROT0, "Data East USA", "Shoot Out (Japan)", 0 )
+GAME( 1985, shootoutb, shootout, shootouj, shootout, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 )

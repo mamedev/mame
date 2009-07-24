@@ -1121,7 +1121,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_LOAD64_WORD( "680a16.4d",  0x000006, 0x200000, CRC(ea388143) SHA1(3de5314a009d702186d5e285c8edefdd48139eab) )
 ROM_END
 
-ROM_START( thundrhu ) /* USA version UAA */
+ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE( "680uaa01.21u", 0x000003, 0x080000, CRC(f2bb2ba1) SHA1(311e88d63179486014376c4af4ff0ef28673ee5a) )
 	ROM_LOAD32_BYTE( "680uaa02.19u", 0x000002, 0x080000, CRC(52f617b5) SHA1(fda3133d3a7e04eb4432c69becdcf1872b3660d9) )
@@ -1249,6 +1249,6 @@ GAME( 1996, gticlub,  0,        gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI
 GAME( 1996, gticluba, gticlub,  gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1996, gticlubj, gticlub,  gticlub, gticlub,  gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1996, thunderh, 0,        gticlub, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, thundrhu, thunderh, gticlub, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, thunderhu,thunderh, gticlub, thunderh, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1997, slrasslt, 0,        gticlub, slrasslt, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAMEL( 1997, hangplt, 0,        hangplt, hangplt,  hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )

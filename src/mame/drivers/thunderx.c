@@ -800,7 +800,7 @@ ROM_START( thunderx )
 	ROM_LOAD( "873a08.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) )	/* priority encoder (not used) */
 ROM_END
 
-ROM_START( thnderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps a US set? */
+ROM_START( thunderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps a US set? */
 	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )
 	ROM_LOAD( "873-k02.k13", 0x20000, 0x08000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )
@@ -833,7 +833,7 @@ ROM_START( thnderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps
 	ROM_LOAD( "873a08.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) )	/* priority encoder (not used) */
 ROM_END
 
-ROM_START( thnderxb ) /* Set had no labels, same starting stage as parent set */
+ROM_START( thunderxb ) /* Set had no labels, same starting stage as parent set */
 	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )
 	ROM_LOAD( "873-02.k13", 0x20000, 0x08000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )
@@ -866,7 +866,7 @@ ROM_START( thnderxb ) /* Set had no labels, same starting stage as parent set */
 	ROM_LOAD( "873a08.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) )	/* priority encoder (not used) */
 ROM_END
 
-ROM_START( thnderxj )
+ROM_START( thunderxj )
 	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )
 	ROM_LOAD( "873-n02.k13", 0x20000, 0x08000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )
@@ -942,7 +942,7 @@ static DRIVER_INIT( scontra )
 GAME( 1988, scontra,  0,        scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra", 0 )
 GAME( 1988, scontraj, scontra,  scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra (Japan)", 0 )
 GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 1)", 0 )
-GAME( 1988, thnderxa, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 2)", 0 )
-GAME( 1988, thnderxb, thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 3)", 0 )
-GAME( 1988, thnderxj, thunderx, thunderx, thnderxj, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 )
+GAME( 1988, thunderxa,thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 2)", 0 )
+GAME( 1988, thunderxb,thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 3)", 0 )
+GAME( 1988, thunderxj,thunderx, thunderx, thnderxj, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 )
 //GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, scontra, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", 0 )

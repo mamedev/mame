@@ -4557,7 +4557,7 @@ ROM_START( fitegolf )
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
-ROM_START( fitegol2 )
+ROM_START( fitegolfu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "np45.128", 0x0000, 0x4000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
 	ROM_LOAD( "mn45.256", 0x4000, 0x8000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
@@ -5306,7 +5306,7 @@ ROM_START( bermudat )
 	ROM_LOAD( "bt_p5.rom",  0x10000, 0x10000, CRC(817bd62c) SHA1(d3ee2ff01a4da8b928728b2fd4948fabd2b04420) )
 ROM_END
 
-ROM_START( bermudaj )
+ROM_START( bermudatj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "btj_p01.bin", 0x0000, 0x10000,  CRC(eda75f36) SHA1(d6fcb46dc45007a77bf6a8ca7aa53aefedcecf92) )
 
@@ -5400,7 +5400,7 @@ ROM_START( worldwar )
 	ROM_LOAD( "bt_p5.rom",  0x10000, 0x10000, CRC(817bd62c) SHA1(d3ee2ff01a4da8b928728b2fd4948fabd2b04420) )
 ROM_END
 
-ROM_START( bermudaa )
+ROM_START( bermudata )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4",  0x0000, 0x10000,  CRC(4de39d01) SHA1(4312660c6658079c2d148c07d24f741804f3e45c) )
 
@@ -6182,7 +6182,7 @@ GAME( 1985, tnk3,     0,        tnk3,     tnk3,     0,        ROT270, "SNK", "T.
 GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,   0,        athena,   athena,   0,        ROT0,   "SNK", "Athena", 0 )
 GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
-GAME( 1988, fitegol2, fitegolf, fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
+GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
 GAME( 1988, countryc, 0,        fitegolf, countryc, countryc, ROT0,   "SNK", "Country Club", 0 )
 
 GAME( 1986, ikari,    0,        ikari,    ikari,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 )
@@ -6195,9 +6195,9 @@ GAME( 1986, dogosoke, victroad, victroad, victroad, 0,        ROT270, "SNK", "Do
 GAME( 1986, dogosokb, victroad, victroad, dogosokb, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
 GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (World?)", 0 )
-GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, bermudatj,bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
 GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
-GAME( 1987, bermudaa, worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
+GAME( 1987, bermudata,worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
 GAME( 1987, psychos,  0,        psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
 GAME( 1987, psychosj, psychos,  psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )

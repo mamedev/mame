@@ -791,7 +791,7 @@ ROM_START( ledstorm )
 	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
-ROM_START( ledstrm2 )
+ROM_START( ledstorm2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "lsu-04.8b", 0x00000, 0x20000, CRC(56a2f079) SHA1(da581c117d92ac5c1e8e44324f1aed2858a3cdc8) )
 	ROM_LOAD16_BYTE( "lsu-03.7b", 0x00001, 0x20000, CRC(9b6408c0) SHA1(8ef8349f58c62a2d626b1053eae2032d168d602c) )
@@ -831,4 +831,4 @@ GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last
 GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
 GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
-GAME( 1988, ledstrm2,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS ) /* game still has wrong sprite issues */
+GAME( 1988, ledstorm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS ) /* game still has wrong sprite issues */

@@ -382,7 +382,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( madalina )
+ROM_START( madaliena )
 	ROM_REGION( 0x10000, "maincpu", 0 )                   /* main CPU */
 	ROM_LOAD( "2716.4c", 0xb000, 0x0800, CRC(90be68af) SHA1(472ccfd2e04d6d49be47d919cba0c55d850b2887) )
 	ROM_LOAD( "2716.4e", 0xb800, 0x0800, CRC(aba10cbb) SHA1(6ca213ded8ed7f4f310ab5ae25220cf867dd1d00) )
@@ -420,4 +420,4 @@ ROM_END
 
 /*          set       parent    machine   inp       init */
 GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, madaliena, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

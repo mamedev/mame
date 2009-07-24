@@ -1478,7 +1478,7 @@ ROM_START( spclords )
 ROM_END
 
 
-ROM_START( spclordb )
+ROM_START( spclordsb )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136095.21b", 0x00000, 0x20000, CRC(2ba99ce2) SHA1(5d8d138698c29838a85da1721c3400c666a14e18) )
 	ROM_LOAD32_BYTE( "136095.22b", 0x00001, 0x20000, CRC(631c5009) SHA1(6b2ea907087e411579f55dff60724ba33afa8a06) )
@@ -1519,7 +1519,7 @@ ROM_START( spclordb )
 ROM_END
 
 
-ROM_START( spclordg )
+ROM_START( spclordsg )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "german0.095",  0x000000, 0x020000, CRC(5a885f8e) SHA1(ec7ef0d76320099a6f3fad80c9ec404ce8602557) )
 	ROM_LOAD32_BYTE( "german1.095",  0x000001, 0x020000, CRC(56f8d517) SHA1(4bcd2d368d48e7492a739aa3041a40e1518b8c94) )
@@ -1565,7 +1565,7 @@ ROM_START( spclordg )
 ROM_END
 
 
-ROM_START( spclorda )
+ROM_START( spclordsa )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136095.21a", 0x00000, 0x20000, CRC(fe8edb0b) SHA1(ae50a637df476c62f8194577cdca2677f9b5cbd0) )
 	ROM_LOAD32_BYTE( "136095.22a", 0x00001, 0x20000, CRC(c2d2867b) SHA1(481fe54d6cd8698bfd2776e2af6f51332304b7ba) )
@@ -1659,7 +1659,7 @@ ROM_START( motofren )
 ROM_END
 
 
-ROM_START( motofrmd )
+ROM_START( motofrenmd )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "94-0221a.23e", 0x00000, 0x20000, CRC(134e9ff0) SHA1(801b817bf49b4317a7518192025a878b9cd13f7f) )
 	ROM_LOAD32_BYTE( "94-0222a.23j", 0x00001, 0x20000, CRC(f6df65c7) SHA1(0a2092a509ae8c61e3f55c30c47bf39c71e2aa6e) )
@@ -1854,7 +1854,7 @@ ROM_START( motofmdg )
 ROM_END
 #endif
 
-ROM_START( motofrft )
+ROM_START( motofrenft )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "ft0.094",      0x000000, 0x020000, CRC(99158754) SHA1(46e73a465aceb147e1ca1bd982448079880cc47e) )
 	ROM_LOAD32_BYTE( "ft1.094",      0x000001, 0x020000, CRC(33c4e205) SHA1(8a223481cfe2aa45a815c6a18017a14502e929b3) )
@@ -1902,7 +1902,7 @@ ROM_START( motofrft )
 ROM_END
 
 
-ROM_START( motomdft )
+ROM_START( motofrenmf )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "ftmd0.094",    0x000000, 0x020000, CRC(9be0803e) SHA1(b5e3029ef43adfeafd5979d4ee49a3eb62efd629) )
 	ROM_LOAD32_BYTE( "ftmd1.094",    0x000001, 0x020000, CRC(2a5e9b18) SHA1(af671680047678f86614e23439ac1f0420528343) )
@@ -1994,7 +1994,7 @@ ROM_START( rrreveng )
 ROM_END
 
 
-ROM_START( rrrevenp )
+ROM_START( rrrevengp )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "rrprghh.bin", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) )
 	ROM_LOAD32_BYTE( "rrprghl.bin", 0x00001, 0x20000, CRC(1afd500c) SHA1(6d24087a839e5e7d9c764026a9f3089e52785cdb) )
@@ -2114,15 +2114,15 @@ static DRIVER_INIT( rrreveng )
  *
  *************************************/
 
-GAME( 1992, spclords, 0,        atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev C)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclordb, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev B)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclordg, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclorda, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclords,  0,        atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev C)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsb, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev B)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsg, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsa, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, motofren, 0,        atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motofrmd, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motofrft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motomdft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofren,   0,        atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenmd, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenmf, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1994, rrreveng, 0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1994, rrrevenp, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype alt)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, rrrevengp, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype alt)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

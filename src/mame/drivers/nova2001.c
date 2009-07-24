@@ -873,7 +873,7 @@ ROM_START( nova2001 )
 	ROM_LOAD( "nova2001.clr", 0x0000, 0x0020, CRC(a2fac5cd) SHA1(ad14aa2be57722d1f48b47171fe72f96091423b6) )
 ROM_END
 
-ROM_START( nov2001u )
+ROM_START( nova2001u )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nova2001.1",   0x0000, 0x2000, CRC(b79461bd) SHA1(7fac3313bc76612f66a6518450d0fed32fe70c45) )
 	ROM_LOAD( "nova2001.2",   0x2000, 0x2000, CRC(fab87144) SHA1(506703f9d96443839f864ef5bde1a71120f54384) )
@@ -962,7 +962,7 @@ ROM_START( raiders5 )
 	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
-ROM_START( raidrs5t )
+ROM_START( raiders5t )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "raiders1.4c", 0x0000,  0x4000, CRC(4e2d5679) SHA1(a1c1603ba98814a83b92ad024ca4422aea872111) )
 	ROM_LOAD( "raiders2.4d", 0x4000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
@@ -1055,9 +1055,9 @@ static DRIVER_INIT( raiders5 )
  *************************************/
 
 GAME( 1983, nova2001, 0,        nova2001, nova2001, 0,        ROT0, "UPL", "Nova 2001 (Japan)", 0 )
-GAME( 1983, nov2001u, nova2001, nova2001, nova2001, 0,        ROT0, "UPL (Universal license)", "Nova 2001 (US)", 0 )
+GAME( 1983, nova2001u,nova2001, nova2001, nova2001, 0,        ROT0, "UPL (Universal license)", "Nova 2001 (US)", 0 )
 GAME( 1984, ninjakun, 0,        ninjakun, ninjakun, 0,        ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 )
 GAME( 1985, pkunwar,  0,        pkunwar,  pkunwar,  pkunwar,  ROT0, "UPL", "Penguin-Kun Wars (US)", 0 )
 GAME( 1985, pkunwarj, pkunwar,  pkunwar,  pkunwar,  pkunwar,  ROT0, "UPL", "Penguin-Kun Wars (Japan)", 0 )
 GAME( 1985, raiders5, 0,        raiders5, raiders5, raiders5, ROT0, "UPL", "Raiders5", 0 )
-GAME( 1985, raidrs5t, raiders5, raiders5, raiders5, raiders5, ROT0, "UPL (Taito license)", "Raiders5 (Japan)", 0 )
+GAME( 1985, raiders5t,raiders5, raiders5, raiders5, raiders5, ROT0, "UPL (Taito license)", "Raiders5 (Japan)", 0 )

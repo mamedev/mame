@@ -454,7 +454,7 @@ ROM_START( atetrisb )
 ROM_END
 
 
-ROM_START( atetrsb2 )
+ROM_START( atetrisb2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) )
 	ROM_CONTINUE(         0x08000, 0x8000 )
@@ -464,7 +464,7 @@ ROM_START( atetrsb2 )
 ROM_END
 
 
-ROM_START( atetcktl )
+ROM_START( atetrisc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "tetcktl1.rom", 0x10000, 0x8000, CRC(9afd1f4a) SHA1(323d1576d92c905e8e95108b39cabf6fa0c10db6) )
 	ROM_CONTINUE(             0x08000, 0x8000 )
@@ -474,7 +474,7 @@ ROM_START( atetcktl )
 ROM_END
 
 
-ROM_START( atetckt2 )
+ROM_START( atetrisc2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "136066-1102.45f", 0x10000, 0x8000, CRC(1bd28902) SHA1(ae8c34f082bce1f827bf60830f207c46cb282421) )
 	ROM_CONTINUE(                0x08000, 0x8000 )
@@ -510,6 +510,6 @@ static DRIVER_INIT( atetris )
 GAME( 1988, atetris,  0,       atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, atetrisa, atetris, atetris,  atetris,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, atetrisb, atetris, atetris,  atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, atetrsb2, atetris, atetrsb2, atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetcktl, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetckt2, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2,atetris, atetrsb2, atetris,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc, atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2,atetris, atetris,  atetcktl, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )

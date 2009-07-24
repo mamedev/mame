@@ -1053,7 +1053,7 @@ ROM_START( suprmatk )
 ROM_END
 
 
-ROM_START( sprmatkd )
+ROM_START( suprmatkd )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035820.sma",   0x5000, 0x0800, CRC(75f01b87) SHA1(32ed71b6a869d7b361f244c384bbe6f407f6c6d7) )
 	ROM_LOAD( "035821.sma",   0x5800, 0x0800, CRC(3320d67e) SHA1(5bb04b985421af6309818b94676298f4b90495cf) )
@@ -1196,7 +1196,7 @@ static DRIVER_INIT( suprmatk )
 GAME( 1980, missile,  0,       missile, missile,         0, ROT0, "Atari", "Missile Command (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, missile2, missile, missile, missile,         0, ROT0, "Atari", "Missile Command (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari + Gencomp", "Super Missile Attack (for set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, sprmatkd, missile, missile, suprmatk,        0, ROT0, "Atari + Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk,        0, ROT0, "Atari + Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
 
 /* the bootlegs are on different hardware and don't work */
 GAME( 198?, mcombat,  missile, missile, missile,         0, ROT0, "[Atari] (Videotron bootleg)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )

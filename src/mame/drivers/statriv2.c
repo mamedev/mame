@@ -755,7 +755,7 @@ ROM_START( statriv2 )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-ROM_START( statrv2v )
+ROM_START( statriv2v )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "status.u7",    0x00000, 0x01000, CRC(4acc2060) SHA1(04f841fa7fba2231f312904dbd1d352fd2dbc287) )
 	ROM_LOAD( "status.u8",    0x01000, 0x01000, CRC(f2de3867) SHA1(ec891d4aa4e8dc0780cf187d8b1548d7e00d4321) )
@@ -1088,7 +1088,7 @@ GAME( 1981, tripdraw, 0,        statriv2,  funcsino, 0,         ROT0, "Status Ga
 GAME( 1984, hangman,  0,        statriv2,  hangman,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, addr_xlh,  ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
-GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
+GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
 GAME( 1985, statriv4, 0,        statriv2,  statriv4, addr_xhl,  ROT0, "Status Games", "Triv Four", GAME_SUPPORTS_SAVE )
 GAME( 1985, sextriv,  0,        statriv2,  sextriv,  addr_lhx,  ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )

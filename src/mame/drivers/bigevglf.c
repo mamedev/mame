@@ -518,7 +518,7 @@ ROM_START( bigevglf )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-ROM_START( bigevglj )
+ROM_START( bigevglfj )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "a67-02-2.10", 0x00000, 0x8000, CRC(b3edbb78) SHA1(7873b1a94cca830f1d1c143376cb49f6e48dbf0b))
 	ROM_LOAD( "a67-01-2.9",  0x08000, 0x4000, CRC(7788b5d0) SHA1(f331138352c4d7b4566d342047785ed97e7b5990))
@@ -550,4 +550,4 @@ ROM_START( bigevglj )
 ROM_END
 
 GAME( 1986, bigevglf, 0,        bigevglf, bigevglf, 0, ROT270, "Taito America Corporation", "Big Event Golf (US)", GAME_NO_COCKTAIL)
-GAME( 1986, bigevglj, bigevglf, bigevglf, bigevglj, 0, ROT270, "Taito Corporation", "Big Event Golf (Japan)", GAME_NO_COCKTAIL)
+GAME( 1986, bigevglfj,bigevglf, bigevglf, bigevglj, 0, ROT270, "Taito Corporation", "Big Event Golf (Japan)", GAME_NO_COCKTAIL)

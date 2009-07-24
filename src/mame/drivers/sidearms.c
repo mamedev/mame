@@ -845,7 +845,7 @@ ROM_START( sidearms )
 	ROM_LOAD( "63s081.3j",    0x0300, 0x0020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) )	// unknown
 ROM_END
 
-ROM_START( sidearmr )
+ROM_START( sidearmsr )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "03",           0x00000, 0x08000, CRC(9a799c45) SHA1(cf6836108506929ee2449546a4867a7cbf00bcc8) )        /* CODE */
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
@@ -890,7 +890,7 @@ ROM_START( sidearmr )
 	ROM_LOAD( "63s081.3j",    0x0300, 0x0020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) )	// unknown
 ROM_END
 
-ROM_START( sidearjp )
+ROM_START( sidearmsj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "a_15e.rom",    0x00000, 0x08000, CRC(61ceb0cc) SHA1(bacf28e5e02b90a9d404c3ade0267e0a7cd73cd8) )        /* CODE */
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
@@ -968,7 +968,7 @@ ROM_START( turtship )
 	ROM_LOAD( "t-16.9f",   0x00000, 0x08000, CRC(1a5a45d7) SHA1(51ceeae938fbda207c3f8ce65593d271dc8c4a41) )
 ROM_END
 
-ROM_START( turtshij )
+ROM_START( turtshipj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "t-3.5g",    0x00000, 0x08000, CRC(0863fc1c) SHA1(b583e06e05e466c2344a4a420a47227c9ab8705c) )
 	ROM_LOAD( "t-2.3g",    0x10000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
@@ -1001,7 +1001,7 @@ ROM_START( turtshij )
 	ROM_LOAD( "t-16.9f",   0x00000, 0x08000, CRC(1a5a45d7) SHA1(51ceeae938fbda207c3f8ce65593d271dc8c4a41) )
 ROM_END
 
-ROM_START( turtshik )
+ROM_START( turtshipk )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "turtship.003",  0x00000, 0x08000, CRC(e7a7fc2e) SHA1(1a9147e82a5e56e8e5b68bbce144f96261e88669) )
 	ROM_LOAD( "turtship.002",  0x10000, 0x08000, CRC(e576f482) SHA1(3be3792cb437bff0345681a3a2fdefefa3439357) )
@@ -1169,11 +1169,11 @@ static DRIVER_INIT( dyger    ) { sidearms_gameid = 2; }
 static DRIVER_INIT( whizz    ) { sidearms_gameid = 3; }
 
 GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmr, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearjp, sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearmsr,sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearmsj,sidearms, sidearms, sidearms, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, turtship, 0,        turtship, turtship, turtship, ROT0,   "Philko (Sharp Image license)", "Turtle Ship (North America)", 0 )
-GAME( 1988, turtshij, turtship, turtship, turtship, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 )
-GAME( 1988, turtshik, turtship, turtship, turtship, turtship, ROT0,   "Philko", "Turtle Ship (Korea)", 0 )
+GAME( 1988, turtshipj,turtship, turtship, turtship, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 )
+GAME( 1988, turtshipk,turtship, turtship, turtship, turtship, ROT0,   "Philko", "Turtle Ship (Korea)", 0 )
 GAME( 1989, dyger,    0,        turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", 0 )
 GAME( 1989, dygera,   dyger,    turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 )
 GAME( 1989, twinfalc, 0,        whizz,    whizz,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 )

@@ -402,7 +402,7 @@ ROM_START( clshroad )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END
 
-ROM_START( clshrdst )
+ROM_START( clshroads )
 	ROM_REGION( 0x10000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "cr-3",  0x0000, 0x8000, CRC(23559df2) SHA1(41a08a4fbad3da1898226e2ca1956a9f7c8f94b0) )
 
@@ -465,4 +465,4 @@ die once, it would be nice to avoid the hack however
 
 GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Woodplace Inc.", "Clash-Road", 0 )
-GAME( 1986, clshrdst, clshroad, clshroad, clshroad, 0,        ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, 0,        ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )

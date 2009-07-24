@@ -1014,7 +1014,7 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-ROM_START( tkdensha )
+ROM_START( tkdenshoa )
 	ROM_REGION( 0x600000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
 	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
@@ -1105,6 +1105,6 @@ static DRIVER_INIT( tkdensha )
 	tecmosys_decramble(machine);
 	device_data = &tkdensha_data;
 }
-GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
-GAME( 1996, tkdensha,    tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
+GAME( 1995, deroon,           0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
+GAME( 1996, tkdensho,         0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
+GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )

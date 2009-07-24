@@ -678,7 +678,7 @@ ROM_START( ctisland )
 	ROM_LOAD( "deco-ti.x4",   0x3000, 0x1000, CRC(1cbe43de) SHA1(8f26ad224e96c87da810c60d3dd88d415400b9fc) )
 ROM_END
 
-ROM_START( ctislnd2 )
+ROM_START( ctisland2 )
 	DECOCASS_COMMON_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
@@ -694,7 +694,7 @@ ROM_START( ctislnd2 )
 	ROM_LOAD( "deco-ti.x4",   0x3000, 0x1000, CRC(1cbe43de) SHA1(8f26ad224e96c87da810c60d3dd88d415400b9fc) )
 ROM_END
 
-ROM_START( ctislnd3 )
+ROM_START( ctisland3 )
 	DECOCASS_COMMON_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
@@ -840,7 +840,7 @@ ROM_START( cburnrub )
 	ROM_LOAD( "cburnrub.cas",   0x0000, 0x8000, CRC(4528ac22) SHA1(dc0fcc5e5fd21c1c858a90f43c175e36a24b3c3d) )
 ROM_END
 
-ROM_START( cburnrb2 )
+ROM_START( cburnrub2 )
 	DECOCASS_COMMON_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
@@ -880,7 +880,7 @@ ROM_START( cgraplop )
 	ROM_LOAD( "cgraplop.cas", 0x0000, 0x8000, CRC(d2c1c1bb) SHA1(db67304caa11540363735e7d4bf03507ccbe9980) )
 ROM_END
 
-ROM_START( cgraplp2 )
+ROM_START( cgraplop2 )
 	DECOCASS_COMMON_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
@@ -940,7 +940,7 @@ ROM_START( cnightst )
 	ROM_LOAD( "cnightst.cas", 0x0000, 0x8000, CRC(c6f844cb) SHA1(5fc6154c20ee4e2f4049a78df6f3cacbb96b0dc0) )
 ROM_END
 
-ROM_START( cnights2 )
+ROM_START( cnightst2 )
 	DECOCASS_COMMON_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
@@ -1100,8 +1100,8 @@ static DRIVER_INIT( decocrom )
 /* 13 */ GAME( 1981, cprogolf, decocass, cprogolf, decocass, decocass, ROT270, "Data East Corporation", "Pro Golf (Cassette)", 0 )
 /* 15 */ GAME( 1981, cluckypo, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 1)", 0 )
-/* 16 */ GAME( 1981, ctislnd2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 2)", 0 )
-/* 16 */ GAME( 1981, ctislnd3, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
+/* 16 */ GAME( 1981, ctisland2,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 2)", 0 )
+/* 16 */ GAME( 1981, ctisland3,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
 /* 18 */ GAME( 1982, cexplore, decocass, cexplore, decocass, decocass, ROT270, "Data East Corporation", "Explorer (Cassette)", GAME_NOT_WORKING )
 /* 19 */ GAME( 1982, cdiscon1, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (Cassette)", 0 )
 /* 19 */ GAME( 1982, csweetht, cdiscon1, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (Cassette)", 0 )
@@ -1110,15 +1110,15 @@ static DRIVER_INIT( decocrom )
 /* 22 */ GAME( 1982, cptennis, decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (Cassette)", 0 )
 /* 26 */ GAME( 1983, cbtime,   decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (Cassette)", 0 )
 /* 27 */ GAME( 1982, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 1)", 0 )
-/* 27 */ GAME( 1982, cburnrb2, cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
+/* 27 */ GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
 /* 27 */ GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump N Jump (Cassette)", 0 )
 /* 28 */ GAME( 1983, cgraplop, decocass, cgraplop, decocass, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 1)", 0 )
-/* 28 */ GAME( 1983, cgraplp2, cgraplop, cgraplp2, decocass, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
+/* 28 */ GAME( 1983, cgraplop2,cgraplop, cgraplp2, decocass, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
 /* 29 */ GAME( 1983, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
 /* 29 */ GAME( 1983, clapapa2, clapapa, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (Cassette)" , 0)			/* Displays 'Rootin' Tootin' during attract */
 /* 31 */ GAME( 1983, cprobowl, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )
 /* 32 */ GAME( 1983, cnightst, decocass, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 1)", 0 )
-/* 32 */ GAME( 1983, cnights2, cnightst, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
+/* 32 */ GAME( 1983, cnightst2,cnightst, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
 /* 33 */ GAME( 1983, cprosocc, decocass, cprosocc, decocass, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
 /* 37 */ GAME( 1983, czeroize, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (Cassette)", 0 )
 /* 38 */ GAME( 1984, cscrtry,  decocass, cscrtry,  decocass, decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 1)", 0 )

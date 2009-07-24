@@ -1178,7 +1178,7 @@ ROM_START( skykiddx )
 	/* the ROM/voice expansion board is not present in this game */
 ROM_END
 
-ROM_START( skykiddo )
+ROM_START( skykiddxo )
 	ROM_REGION( 0x18000, "cpu1", 0 )
 	ROM_LOAD( "sk3_1.9c",     0x08000, 0x8000, CRC(5722a291) SHA1(0b3ca2585bf5c18214c1337dce8f92027e9d78c2) )
 	ROM_LOAD( "sk3_2.9d",     0x10000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
@@ -1393,7 +1393,7 @@ ROM_START( rthunder )
 	/* m3 empty */
 ROM_END
 
-ROM_START( rthundro )
+ROM_START( rthundero )
 	ROM_REGION( 0x18000, "cpu1", 0 )
 	ROM_LOAD( "r1",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
 	/* 9d empty */
@@ -1558,10 +1558,10 @@ static DRIVER_INIT( namco86 )
 
 
 GAME( 1986, skykiddx, 0,        skykiddx, skykiddx, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 1)", 0 )
-GAME( 1986, skykiddo, skykiddx, skykiddx, skykiddx, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", 0 )
+GAME( 1986, skykiddxo,skykiddx, skykiddx, skykiddx, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", 0 )
 GAME( 1986, hopmappy, 0,        hopmappy, hopmappy, namco86, ROT0,   "Namco", "Hopping Mappy", 0 )
 GAME( 1986, roishtar, 0,        roishtar, roishtar, namco86, ROT0,   "Namco", "The Return of Ishtar", 0 )
 GAME( 1986, genpeitd, 0,        genpeitd, genpeitd, namco86, ROT0,   "Namco", "Genpei ToumaDen", 0 )
 GAME( 1986, rthunder, 0,        rthunder, rthunder, namco86, ROT0,   "Namco", "Rolling Thunder (new version)", 0 )
-GAME( 1986, rthundro, rthunder, rthunder, rthundro, namco86, ROT0,   "Namco", "Rolling Thunder (old version)", 0 )
+GAME( 1986, rthundero,rthunder, rthunder, rthundro, namco86, ROT0,   "Namco", "Rolling Thunder (old version)", 0 )
 GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo, namco86, ROT0,   "Namco", "Wonder Momo", GAME_IMPERFECT_GRAPHICS )

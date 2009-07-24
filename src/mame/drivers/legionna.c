@@ -1315,7 +1315,7 @@ ROM_START( legionna )
 	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
 ROM_END
 
-ROM_START( legionnu )
+ROM_START( legionnau )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD32_BYTE( "1",   0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
 	ROM_LOAD32_BYTE( "2",   0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
@@ -2108,7 +2108,7 @@ static DRIVER_INIT( legiongfx )
 
 
 GAME( 1992, legionna, 0,        legionna, legionna, legiongfx, ROT0, "Tad", "Legionnaire (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, legionnu, legionna, legionna, legionna, legiongfx, ROT0, "Tad (Fabtek license)", "Legionnaire (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, legionnau,legionna, legionna, legionna, legiongfx, ROT0, "Tad (Fabtek license)", "Legionnaire (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World version 3)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World version 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

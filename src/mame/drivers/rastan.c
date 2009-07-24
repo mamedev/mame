@@ -546,7 +546,7 @@ ROM_START( rastsaga )
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
-ROM_START( rastsag1 )
+ROM_START( rastsaga1 )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-14.19",   0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) )
 	ROM_LOAD16_BYTE( "b04-13.7",    0x00001, 0x10000, CRC(bad60872) SHA1(e020f79b3ac3d2abccfcd5d135d2dc49e1335c7d) )
@@ -580,4 +580,4 @@ GAME( 1987, rastan,   0,      rastan, rastan,   0, ROT0, "Taito Corporation Japa
 GAME( 1987, rastanu,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 1)", 0)
 GAME( 1987, rastanu2, rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 2)", 0)
 GAME( 1987, rastsaga, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan)", 0)
-GAME( 1987, rastsag1, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan Rev 1)", 0)
+GAME( 1987, rastsaga1,rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan Rev 1)", 0)

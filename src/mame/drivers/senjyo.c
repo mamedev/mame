@@ -689,7 +689,7 @@ ROM_START( starforc )
     ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )	/* unknown - timing? */
 ROM_END
 
-ROM_START( starforb )
+ROM_START( starforcb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a2.8m",   0x0000, 0x2000, CRC(e81e8b7d) SHA1(829a082a335a0cf5bf8cc97bee96e62271f03ff4) )
 	ROM_LOAD( "a3.8k",   0x2000, 0x2000, CRC(7e98f0ab) SHA1(76eb387fbf5d04b7951a115d29076d1fd21346c4) )
@@ -732,7 +732,7 @@ ROM_START( starforb )
 ROM_END
 
 
-ROM_START( starfora )
+ROM_START( starforca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(7691bbd4) SHA1(efcab11ea0ed58b6a47c9d7a994c921dfaa1b47e) )
 	ROM_LOAD( "4.bin",   0x2000, 0x2000, CRC(32f3c34e) SHA1(9ecaa46fe296c2f2e9c8faf3d40085c0f10acbe1) )
@@ -775,7 +775,7 @@ ROM_START( starfora )
 ROM_END
 
 
-ROM_START( starfore )
+ROM_START( starforce )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "starfore.005", 0x0000, 0x2000, CRC(825f7ebe) SHA1(d63fd516e075bcc28d42189216b95bbf491a4cd1) )
 	ROM_LOAD( "starfore.004", 0x2000, 0x2000, CRC(fbcecb65) SHA1(0406ae134915539a171603ecdd1b549f98dd048c) )
@@ -921,9 +921,9 @@ static DRIVER_INIT( senjyo )
 
 GAME( 1983, senjyo,   0,        senjyo,  senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
 GAME( 1984, starforc, 0,        senjyo,  starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
-GAME( 1984, starfore, starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
-GAME( 1984, starforb, starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (bootleg)", "Star Force (encrypted, bootleg)", 0 )
-GAME( 1984, starfora, starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
+GAME( 1984, starforce,starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
+GAME( 1984, starforcb,starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (bootleg)", "Star Force (encrypted, bootleg)", 0 )
+GAME( 1984, starforca,starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
 GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
 GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
 

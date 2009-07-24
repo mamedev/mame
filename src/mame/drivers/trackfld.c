@@ -816,7 +816,7 @@ ROM_START( trackfld )
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
-ROM_START( trackflc )
+ROM_START( trackfldc )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "f01.1a",       0x6000, 0x2000, CRC(4e32b360) SHA1(cafd4b9ef5548d31d894610dfd2288425d29ed58) )
 	ROM_LOAD( "f02.2a",       0x8000, 0x2000, CRC(4e7ebf07) SHA1(266110e5195ab1e374724536b82ec4da35123dc7) )
@@ -878,7 +878,7 @@ ROM_START( hyprolym ) /* GX361 */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) ) /* 361-d15.c09 */
 ROM_END
 
-ROM_START( hyprolyb )
+ROM_START( hyprolymb )
     /* These ROM's are located on the CPU/Video Board */
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "1.a1",         0x6000, 0x2000, CRC(9aee2d5a) SHA1(81f151459f1113b5f2f76ddc140bf86676f778e4) )
@@ -1021,7 +1021,7 @@ ROM_START( wizzquiz )
 	/* not used */
 ROM_END
 
-ROM_START( wizzquza )
+ROM_START( wizzquiza )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic9_a1.bin",   0xe000, 0x2000, CRC(608e1ff3) SHA1(f3350a3367df59ec1780bb22c7a6a227e7b10d5e) )
 
@@ -1180,11 +1180,11 @@ static DRIVER_INIT( wizzquiz )
 
 
 GAME( 1983, trackfld, 0,        trackfld, trackfld, trackfld, ROT0,  "Konami", "Track & Field", 0 )
-GAME( 1983, trackflc, trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami (Centuri license)", "Track & Field (Centuri)", 0 )
+GAME( 1983, trackfldc,trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami (Centuri license)", "Track & Field (Centuri)", 0 )
 GAME( 1983, hyprolym, trackfld, trackfld, trackfld, trackfld, ROT0,  "Konami", "Hyper Olympic", 0 )
-GAME( 1983, hyprolyb, trackfld, hyprolyb, trackfld, trackfld, ROT0,  "bootleg", "Hyper Olympic (bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1983, hyprolymb,trackfld, hyprolyb, trackfld, trackfld, ROT0,  "bootleg", "Hyper Olympic (bootleg)", GAME_IMPERFECT_SOUND )
 GAME( 1996, atlantol, trackfld, hyprolyb, atlantol,	atlantol, ROT0,  "bootleg", "Atlant Olimpic", 0 )
 GAME( 1988, mastkin,  0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", GAME_WRONG_COLORS )
 GAME( 1985, wizzquiz, 0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Konami", "Wizz Quiz (Konami version)", 0 )
-GAME( 1985, wizzquza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec - Zenitone", "Wizz Quiz (version 4)", 0 )
+GAME( 1985, wizzquiza,wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec - Zenitone", "Wizz Quiz (version 4)", 0 )
 GAME( 1987, reaktor,  0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", 0 )

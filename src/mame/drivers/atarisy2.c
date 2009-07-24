@@ -1244,7 +1244,7 @@ ROM_START( paperboy )
 ROM_END
 
 
-ROM_START( paperbr2 )
+ROM_START( paperboyr2 )
 	ROM_REGION( 0x90000, "maincpu", 0 )	/* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "cpu_l07.rv2", 0x008000, 0x004000, CRC(39d0a625) SHA1(c4f62cecbc8a122f58f98312517feccf9429f28b) )
 	ROM_LOAD16_BYTE( "cpu_n07.rv2", 0x008001, 0x004000, CRC(3c5de588) SHA1(faad02fee1528cd52af1fac315096a46a9eb9a85) )
@@ -1283,7 +1283,7 @@ ROM_START( paperbr2 )
 ROM_END
 
 
-ROM_START( paperbr1 )
+ROM_START( paperboyr1 )
 	ROM_REGION( 0x90000, "maincpu", 0 )	/* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "cpu_l07.rv1", 0x008000, 0x004000, CRC(fd87a8ee) SHA1(f42fe59f62928bb36c00b6814e1af173d713fb2e) )
 	ROM_LOAD16_BYTE( "cpu_n07.rv1", 0x008001, 0x004000, CRC(a997e217) SHA1(85d97e62bb225f6302cdad18bf1299d364614ce4) )
@@ -1933,7 +1933,7 @@ ROM_START( ssprint3 )
 ROM_END
 
 
-ROM_START( sspring1 )
+ROM_START( ssprintg1 )
 	ROM_REGION( 0x90000, "maincpu", 0 )	/* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "136042-230.7l",   0x008000, 0x004000, CRC(e5b2da29) SHA1(99150184a3f065e934ed6f60731fe534a75ba991) )
 	ROM_LOAD16_BYTE( "136042-231.7n",   0x008001, 0x004000, CRC(fac14b00) SHA1(6e5bf1e80f3d04f670b8290195609c0ac0cacea2) )
@@ -2105,7 +2105,7 @@ ROM_START( csprint )
 ROM_END
 
 
-ROM_START( csprins1 )
+ROM_START( csprints1 )
 	ROM_REGION( 0x90000, "maincpu", 0 )	/* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "136045-1326.7l",  0x008000, 0x004000, CRC(cfa673a6) SHA1(db630ce26b6b2cf9215a7810ab6b93a5485bd5ae) )
 	ROM_LOAD16_BYTE( "136045-1327.7n",  0x008001, 0x004000, CRC(16c1dcab) SHA1(deb3eaff35e7b3810133c7ce74a528d3a58babb2) )
@@ -2273,7 +2273,7 @@ ROM_START( csprint2 )
 ROM_END
 
 
-ROM_START( cspring1 )
+ROM_START( csprintg1 )
 	ROM_REGION( 0x90000, "maincpu", 0 )	/* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "136045-1226.7l",  0x008000, 0x004000, CRC(becfc276) SHA1(cc3a6ef91fb3a47426a347ba4f6df41582e6deba) )
 	ROM_LOAD16_BYTE( "136045-1227.7n",  0x008001, 0x004000, CRC(d1dce1cc) SHA1(2de07c4730e1b5e4b11466220bb350f3263d43e7) )
@@ -3250,9 +3250,9 @@ static DRIVER_INIT( apb )
  *
  *************************************/
 
-GAME( 1984, paperboy, 0,        atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paperbr2, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paperbr1, paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paperboy, 0,         atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paperboyr2,paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paperboyr1,paperboy, atarisy2, paperboy, paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", GAME_SUPPORTS_SAVE )
 
 GAME( 1986, 720,      0,        atarisy2, 720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", GAME_SUPPORTS_SAVE )
 GAME( 1986, 720r3,    720,      atarisy2, 720,      720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", GAME_SUPPORTS_SAVE )
@@ -3265,7 +3265,7 @@ GAME( 1986, ssprint,  0,        sprint,   ssprint,  ssprint,  ROT0,   "Atari Gam
 GAME( 1986, ssprint3, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (rev 3)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ssprint1, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ssprintg, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (German, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, sspring1, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ssprintg1,ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ssprintf, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (French)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ssprints, ssprint,  sprint,   ssprint,  ssprint1, ROT0,   "Atari Games", "Super Sprint (Spanish)", GAME_SUPPORTS_SAVE )
 
@@ -3273,10 +3273,10 @@ GAME( 1986, csprint,  0,        sprint,   csprint,  csprint,  ROT0,   "Atari Gam
 GAME( 1986, csprint2, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, csprint1, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, csprintg, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, cspring1, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, csprintg1,csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (German, rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, csprintf, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (French)", GAME_SUPPORTS_SAVE )
 GAME( 1986, csprints, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, csprins1, csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, csprints1,csprint,  sprint,   csprint,  csprint,  ROT0,   "Atari Games", "Championship Sprint (Spanish, rev 1)", GAME_SUPPORTS_SAVE )
 
 GAME( 1987, apb,      0,        atarisy2, apb,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 7)", GAME_SUPPORTS_SAVE )
 GAME( 1987, apb6,     apb,      atarisy2, apb,      apb,      ROT270, "Atari Games", "APB - All Points Bulletin (rev 6)", GAME_SUPPORTS_SAVE )

@@ -903,7 +903,7 @@ ROM_START( kuniokun )
 	ROM_LOAD( "ta18-09.bin",  0x18000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
 ROM_END
 
-ROM_START( kuniokub )
+ROM_START( kuniokunb )
 	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + bank switched ROM */
 	ROM_LOAD( "ta18-10.bin",  0x08000, 0x8000, CRC(a90cf44a) SHA1(6d63d9c29da7b8c5bc391e074b6b8fe6ae3892ae) ) // bootleg
 	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
@@ -947,4 +947,4 @@ ROM_END
 
 GAME( 1986, renegade, 0,        renegade, renegade, renegade, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
 GAME( 1986, kuniokun, renegade, renegade, renegade, kuniokun, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
-GAME( 1986, kuniokub, renegade, renegade, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )
+GAME( 1986, kuniokunb,renegade, renegade, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )

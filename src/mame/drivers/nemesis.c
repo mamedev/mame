@@ -2070,7 +2070,7 @@ ROM_START( nemesis )
 	ROM_LOAD(      "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( nemesuk )
+ROM_START( nemesisuk )
 	ROM_REGION( 0x40000, "maincpu", 0 )    /* 4 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "456-e01.12a",   0x00000, 0x8000, CRC(e1993f91) SHA1(6759bb9ba0ce28ad4d7f61b824a7d0fe43215bdc) )
 	ROM_LOAD16_BYTE( "456-e05.12c",   0x00001, 0x8000, CRC(c9761c78) SHA1(bfd63517efa820a05a0d9a908dd0917cd0d01b77) )
@@ -2185,7 +2185,7 @@ ROM_START( salamand )
 	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
-ROM_START( salamanj )
+ROM_START( salamandj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-j02.18b",  0x00000, 0x10000, CRC(f68ee99a) SHA1(aec1f4720abe2529120ae711daa9e7e7d966b351) )
 	ROM_LOAD16_BYTE( "587-j05.18c",  0x00001, 0x10000, CRC(72c16128) SHA1(6921445caa0b1121e483c9c62c17aad8aa42cc18) )
@@ -2219,7 +2219,7 @@ ROM_START( lifefrce )
 	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
-ROM_START( lifefrcj )
+ROM_START( lifefrcej )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-n02.18b",  0x00000, 0x10000, CRC(235dba71) SHA1(f3a0092a7d002436253054953e36d0865ce95b80) )
 	ROM_LOAD16_BYTE( "587-n05.18c",  0x00001, 0x10000, CRC(054e569f) SHA1(e810f7e3e762875e2e71e4356997257e1bbe0da1) )
@@ -2268,7 +2268,7 @@ ROM_START( citybomb )
 	ROM_LOAD(      "787-e01.1k",  0x00000, 0x80000, CRC(edc34d01) SHA1(b1465d1a7364a7cebc14b96cd01dc78e57975972) )
 ROM_END
 
-ROM_START( citybmrj )
+ROM_START( citybombj )
 	ROM_REGION( 0x1c0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "787-h10.15k",  0x000000, 0x10000, CRC(66fecf69) SHA1(5881ec019ef6228a693af5c9f6c26e05bdee3846) )
 	ROM_LOAD16_BYTE( "787-h09.15h",  0x000001, 0x10000, CRC(a0e29468) SHA1(78971da14a748ade6ea94770080a393c7617b97d) )
@@ -2471,19 +2471,19 @@ static DRIVER_INIT( nemesis )
 
 
 GAME( 1985, nemesis,   0,         nemesis,    nemesis,   nemesis,  ROT0,   "Konami", "Nemesis",  GAME_SUPPORTS_SAVE )
-GAME( 1985, nemesuk,   nemesis,   nemesis,    nemesuk,   nemesis,  ROT0,   "Konami", "Nemesis (World?)",  GAME_SUPPORTS_SAVE )
+GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,   nemesis,  ROT0,   "Konami", "Nemesis (World?)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, konamigt,  0,         konamigt,   konamigt,  nemesis,  ROT0,   "Konami", "Konami GT",  GAME_SUPPORTS_SAVE )
 GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2,       nemesis,  ROT0,   "Konami", "Konami RF2 - Red Fighter",  GAME_SUPPORTS_SAVE )
 GAME( 1985, twinbee,   0,         gx400,      twinbee,   nemesis,  ROT90,  "Konami", "TwinBee",  GAME_SUPPORTS_SAVE )
 GAME( 1985, gradius,   nemesis,   gx400,      gradius,   nemesis,  ROT0,   "Konami", "Gradius",  GAME_SUPPORTS_SAVE )
 GAME( 1985, gwarrior,  0,         gx400,      gwarrior,  nemesis,  ROT0,   "Konami", "Galactic Warriors",  GAME_SUPPORTS_SAVE )
 GAME( 1986, salamand,  0,         salamand,   salamand,  nemesis,  ROT0,   "Konami", "Salamander (version D)",  GAME_SUPPORTS_SAVE )
-GAME( 1986, salamanj,  salamand,  salamand,   salamand,  nemesis,  ROT0,   "Konami", "Salamander (version J)",  GAME_SUPPORTS_SAVE )
+GAME( 1986, salamandj, salamand,  salamand,   salamand,  nemesis,  ROT0,   "Konami", "Salamander (version J)",  GAME_SUPPORTS_SAVE )
 GAME( 1986, lifefrce,  salamand,  salamand,   salamand,  nemesis,  ROT0,   "Konami", "Lifeforce (US)",  GAME_SUPPORTS_SAVE )
-GAME( 1987, lifefrcj,  salamand,  salamand,   lifefrcj,  nemesis,  ROT0,   "Konami", "Lifeforce (Japan)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, lifefrcej, salamand,  salamand,   lifefrcj,  nemesis,  ROT0,   "Konami", "Lifeforce (Japan)",  GAME_SUPPORTS_SAVE )
 GAME( 1987, blkpnthr,  0,         blkpnthr,   blkpnthr,  nemesis,  ROT0,   "Konami", "Black Panther",  GAME_SUPPORTS_SAVE )
 GAME( 1987, citybomb,  0,         citybomb,   citybomb,  nemesis,  ROT270, "Konami", "City Bomber (World)",  GAME_SUPPORTS_SAVE )
-GAME( 1987, citybmrj,  citybomb,  citybomb,   citybomb,  nemesis,  ROT270, "Konami", "City Bomber (Japan)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, citybombj, citybomb,  citybomb,   citybomb,  nemesis,  ROT270, "Konami", "City Bomber (Japan)",  GAME_SUPPORTS_SAVE )
 GAME( 1987, hcrash,    0,         hcrash,     hcrash,    nemesis,  ROT0,   "Konami", "Hyper Crash (version D)",  GAME_SUPPORTS_SAVE )
 GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash,    nemesis,  ROT0,   "Konami", "Hyper Crash (version C)",  GAME_SUPPORTS_SAVE )
 GAME( 1988, kittenk,   0,         nyanpani,   nyanpani,  nemesis,  ROT0,   "Konami", "Kitten Kaboodle",  GAME_SUPPORTS_SAVE )

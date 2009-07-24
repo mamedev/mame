@@ -343,7 +343,7 @@ ROM_START( skullxbo )
 ROM_END
 
 
-ROM_START( skullxb4 )
+ROM_START( skullxbo4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136072-4150.228a", 0x000000, 0x010000, CRC(607fc73b) SHA1(e6ebaf1a7570df1d12becae217becdd0a60d6aca) )
 	ROM_LOAD16_BYTE( "136072-4151.228c", 0x000001, 0x010000, CRC(76bbf619) SHA1(2cbd61f414684587c0e634c223c758b0a28aafc0) )
@@ -407,7 +407,7 @@ ROM_START( skullxb4 )
 ROM_END
 
 
-ROM_START( skullxb3 )
+ROM_START( skullxbo3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136072-3150.228a", 0x000000, 0x010000, CRC(47083d59) SHA1(a713231c22a3c2de09af65aa2bae17ea41f10cf0) )
 	ROM_LOAD16_BYTE( "136072-3151.228c", 0x000001, 0x010000, CRC(2c03feaf) SHA1(e7ad1568e3008386f520ed3ba90aefbfc9417a64) )
@@ -471,7 +471,7 @@ ROM_START( skullxb3 )
 ROM_END
 
 
-ROM_START( skullxb2 )
+ROM_START( skullxbo2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136072-2150.228a", 0x000000, 0x010000, CRC(8614f9ef) SHA1(981ba6fad7aa7002c3a5aa0d4dd859e664ca0fdb) )
 	ROM_LOAD16_BYTE( "136072-2151.228c", 0x000001, 0x010000, CRC(47090acb) SHA1(12c47d6112bec88aaf25d10ba2d5335b6b474fb7) )
@@ -535,7 +535,7 @@ ROM_START( skullxb2 )
 ROM_END
 
 
-ROM_START( skullxb1 )
+ROM_START( skullxbo1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136072-1150.228a", 0x000000, 0x010000, CRC(376bb0c7) SHA1(195c8411f3ea9681e9ba6661a55418c194324339) )
 	ROM_LOAD16_BYTE( "136072-1151.228c", 0x000001, 0x010000, CRC(858382f7) SHA1(6e18183962c36bf2599cf04b7dc824e840a94343) )
@@ -621,8 +621,8 @@ static DRIVER_INIT( skullxbo )
  *
  *************************************/
 
-GAME( 1989, skullxbo, 0,        skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 )
-GAME( 1989, skullxb4, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 )
-GAME( 1989, skullxb3, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 )
-GAME( 1989, skullxb2, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 )
-GAME( 1989, skullxb1, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 )
+GAME( 1989, skullxbo,  0,        skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 )
+GAME( 1989, skullxbo4, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 )
+GAME( 1989, skullxbo3, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 )
+GAME( 1989, skullxbo2, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 )
+GAME( 1989, skullxbo1, skullxbo, skullxbo, skullxbo, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 )

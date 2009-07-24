@@ -1186,7 +1186,7 @@ ROM_START( wwfmania )
 ROM_END
 
 
-ROM_START( wwfmanib )
+ROM_START( wwfmaniab )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "wwf.2",  0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) )
 	ROM_LOAD16_BYTE( "wwf.3",  0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
@@ -1236,7 +1236,7 @@ GAME( 1994, umk3r11,  umk3,      wunit, mk3,      umk3r11,  ROT0, "Midway", "Ult
 GAME( 1994, umk3r10,  umk3,      wunit, mk3,      umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", GAME_SUPPORTS_SAVE )
 
 GAME( 1995, wwfmania, 0,         wunit, wwfmania, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", GAME_SUPPORTS_SAVE )
-GAME( 1995, wwfmanib, wwfmania,  wunit, wwfmania, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab,wwfmania,  wunit, wwfmania, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", GAME_SUPPORTS_SAVE )
 GAME( 1995, openice,  0,         wunit, openice,  openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", GAME_SUPPORTS_SAVE )
 GAME( 1996, nbahangt, 0,         wunit, nbahangt, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", GAME_SUPPORTS_SAVE )
 GAME( 1996, nbamht,   nbahangt,  wunit, nbahangt, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", GAME_SUPPORTS_SAVE )

@@ -1187,7 +1187,7 @@ ROM_START( indytemp )
 ROM_END
 
 
-ROM_START( indytem2 )
+ROM_START( indytemp2 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.470",   0x10000, 0x08000, CRC(7fac1dd8) SHA1(043daf709209e76115899a1e301f8fb262b3a749) )
@@ -1237,7 +1237,7 @@ ROM_START( indytem2 )
 ROM_END
 
 
-ROM_START( indytem3 )
+ROM_START( indytemp3 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "232.10b",      0x10000, 0x08000, CRC(1e80108f) SHA1(663ef81b865c4d13fd73eca4f82ee64a4bdeaad5) )
@@ -1287,7 +1287,7 @@ ROM_START( indytem3 )
 ROM_END
 
 
-ROM_START( indytem4 )
+ROM_START( indytemp4 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.332",   0x10000, 0x08000, CRC(a5563773) SHA1(52701b53e62aae691f7b9483f5e843d805223a0a) )
@@ -1337,7 +1337,7 @@ ROM_START( indytem4 )
 ROM_END
 
 
-ROM_START( indytemc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDGE COCKTAIL A043310' */
+ROM_START( indytempc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDGE COCKTAIL A043310' */
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
 	ROM_LOAD16_BYTE( "136032.116",   0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) )
 	ROM_LOAD16_BYTE( "136032.117",   0x00001, 0x04000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) )
@@ -1384,7 +1384,7 @@ ROM_START( indytemc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDGE
 ROM_END
 
 
-ROM_START( indytemd )
+ROM_START( indytempd )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.462",   0x10000, 0x08000, CRC(317dc430) SHA1(563f09fb1b096bd40e1a73acb7f11d3809f9f19f) )
@@ -1501,7 +1501,7 @@ ROM_START( roadrunn )
 ROM_END
 
 
-ROM_START( roadrun2 )
+ROM_START( roadrunn2 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136040-x28.11c",  0x010000, 0x008000, CRC(fbd43085) SHA1(57f2f2f01e235f4525507583887d52b09f6267b4) )
@@ -1564,7 +1564,7 @@ ROM_START( roadrun2 )
 ROM_END
 
 
-ROM_START( roadrun1 )
+ROM_START( roadrunn1 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136040-128.11c",  0x010000, 0x008000, CRC(5e39d540) SHA1(69fae4c7db247062dffda0138a6e3bfb697f17bf) )
@@ -1706,7 +1706,7 @@ ROM_START( roadblst )
 ROM_END
 
 
-ROM_START( roadblsg )
+ROM_START( roadblstg )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2257.11c", 0x010000, 0x008000, CRC(6e9de790) SHA1(348d4953b63f577b2b1ad747c6fb32c8ec55d310) )
@@ -1774,7 +1774,7 @@ ROM_START( roadblsg )
 ROM_END
 
 
-ROM_START( roadbls3 )
+ROM_START( roadblst3 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-3157.11c", 0x010000, 0x008000, CRC(ce88fe34) SHA1(72a311e7e2e5f588226168e048905281f71f0aef) )
@@ -1842,7 +1842,7 @@ ROM_START( roadbls3 )
 ROM_END
 
 
-ROM_START( roadblg2 )
+ROM_START( roadblstg2 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1239.11c", 0x010000, 0x008000, CRC(3b2bb14b) SHA1(e5eac61a4249a644fbc27908b443a3830d4488e6) )
@@ -1910,7 +1910,7 @@ ROM_START( roadblg2 )
 ROM_END
 
 
-ROM_START( roadbls2 )
+ROM_START( roadblst2 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1139.11c", 0x010000, 0x008000, CRC(b73c1bd5) SHA1(c4de0267a75225db22c771bec14b8da2fc9f06bf) )
@@ -1978,7 +1978,7 @@ ROM_START( roadbls2 )
 ROM_END
 
 
-ROM_START( roadblg1 )
+ROM_START( roadblstg1 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1251.11c", 0x010000, 0x008000, CRC(7e94d6a2) SHA1(985b7537dc484975b458a9ae5780e32a5f742d1c) )
@@ -2046,7 +2046,7 @@ ROM_START( roadblg1 )
 ROM_END
 
 
-ROM_START( roadbls1 )
+ROM_START( roadblst1 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2151.11c", 0x010000, 0x008000, CRC(ea6b3060) SHA1(0786f2e528c6a77ad7422ae199d06b7261cb4f2c) )
@@ -2114,7 +2114,7 @@ ROM_START( roadbls1 )
 ROM_END
 
 
-ROM_START( roadblsc )
+ROM_START( roadblstc )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1179.7p",  0x010000, 0x008000, CRC(ef448f96) SHA1(238a6c435e317383a1983702ef0a1f2b757ebe8c) )
@@ -2182,7 +2182,7 @@ ROM_START( roadblsc )
 ROM_END
 
 
-ROM_START( roadblcg )
+ROM_START( roadblstcg )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1235.7p",  0x010000, 0x008000, CRC(58b2998f) SHA1(7e9f4ca2b15cf60c61e0615f214f9fcc518cb194) )
@@ -2250,7 +2250,7 @@ ROM_START( roadblcg )
 ROM_END
 
 
-ROM_START( roadblc1 )
+ROM_START( roadblstc1 )
 	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
     MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2135.7p",  0x010000, 0x008000, CRC(c0ef86df) SHA1(7dd4d2acba55dc001e009c37fae5a97a53ea1e66) )
@@ -2403,23 +2403,23 @@ GAME( 1984, marble5,  marble,   atarisy1, marble,   marble,   ROT0, "Atari Games
 GAME( 1984, peterpak, atarisy1, atarisy1, peterpak, peterpak, ROT0, "Atari Games", "Peter Pack-Rat", 0 )
 
 GAME( 1985, indytemp, atarisy1, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
-GAME( 1985, indytem2, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
-GAME( 1985, indytem3, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
-GAME( 1985, indytem4, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
-GAME( 1985, indytemd, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytemc, indytemp, atarisy1, indytemc, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, indytemp2,indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
+GAME( 1985, indytemp3,indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
+GAME( 1985, indytemp4,indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
+GAME( 1985, indytempd,indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
+GAME( 1985, indytempc,indytemp, atarisy1, indytemc, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1985, roadrunn, atarisy1, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
-GAME( 1985, roadrun2, roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
-GAME( 1985, roadrun1, roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
+GAME( 1985, roadrunn2,roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
+GAME( 1985, roadrunn1,roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
 
-GAME( 1987, roadblst, atarisy1, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
-GAME( 1987, roadblsg, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
-GAME( 1987, roadbls3, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
-GAME( 1987, roadblg2, roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
-GAME( 1987, roadbls2, roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
-GAME( 1987, roadblg1, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
-GAME( 1987, roadbls1, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
-GAME( 1987, roadblsc, roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
-GAME( 1987, roadblcg, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, roadblc1, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblst,   atarisy1, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, rev 4)", 0 )
+GAME( 1987, roadblstg,  roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev 3)", 0 )
+GAME( 1987, roadblst3,  roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, rev 3)", 0 )
+GAME( 1987, roadblstg2, roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, German, rev 2)", 0 )
+GAME( 1987, roadblst2,  roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (upright, rev 2)", 0 )
+GAME( 1987, roadblstg1, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, German, rev 1)", 0 )
+GAME( 1987, roadblst1,  roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (upright, rev 1)", 0 )
+GAME( 1987, roadblstc,  roadblst, atarisy1, roadblst, roadb110, ROT0, "Atari Games", "Road Blasters (cockpit, rev 2)", 0 )
+GAME( 1987, roadblstcg, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, roadblstc1, roadblst, atarisy1, roadblst, roadb109, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", GAME_IMPERFECT_GRAPHICS )

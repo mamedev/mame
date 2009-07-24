@@ -1633,7 +1633,7 @@ ROM_START( hellfire )
 	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( hellfir1 )
+ROM_START( hellfire1 )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_14x.0",   0x000000, 0x20000, CRC(a3141ea5) SHA1(9b456cb908e193198110a628d98567a3b8351591) )
 	ROM_LOAD16_BYTE( "b90_15x.1",   0x000001, 0x20000, CRC(e864daf4) SHA1(382f02df8419310cef5d7fb68a9376eeac2f3685) )
@@ -1658,7 +1658,7 @@ ROM_START( hellfir1 )
 	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( hellfir2 )/* Original version, by rom numbers (IE: 01 & 02) */
+ROM_START( hellfire2 )/* Original version, by rom numbers (IE: 01 & 02) */
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_01.0",   0x000000, 0x20000, CRC(c94acf53) SHA1(5710861dbe976fe53b93d3428147d1ce7aaae18a) ) /* Territory block seems to have no effect and it's licensed */
 	ROM_LOAD16_BYTE( "b90_02.1",   0x000001, 0x20000, CRC(d17f03c3) SHA1(ac41e6c29aa507872caeeaec6a3bc24c705a3702) ) /* to "Taito Corp." the later set shows "Taito Corporation" */
@@ -1710,7 +1710,7 @@ ROM_START( zerowing )
 	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( zerowng2 ) /* 2 player simultaneous version */
+ROM_START( zerowing2 ) /* 2 player simultaneous version */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11iiw.bin",  0x000000, 0x08000, CRC(38b0bb5b) SHA1(e5a4c0b6c279a55701c82bf9e285a806054f8d23) )
 	ROM_LOAD16_BYTE( "o15-12iiw.bin",  0x000001, 0x08000, CRC(74c91e6f) SHA1(8cf5d10a5f4efda0903a4c5d56599861ccc8f1c1) )
@@ -1766,7 +1766,7 @@ ROM_START( demonwld )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( demonwl1 )
+ROM_START( demonwld1 )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.rom", 0x000000, 0x20000, CRC(036ee46c) SHA1(60868e5e08e0c9a538ae786de0de6b2531b30b11) )
 	ROM_LOAD16_BYTE( "o16-09.rom", 0x000001, 0x20000, CRC(bed746e3) SHA1(056668edb7df99bbd240e387af17cf252d1448f3) )
@@ -1795,7 +1795,7 @@ ROM_START( demonwl1 )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( demonwl2 )
+ROM_START( demonwld2 )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10-2.bin", 0x000000, 0x20000, CRC(84ee5218) SHA1(dc2b017ee630330163be320008d8a0d761cb0cfb) )
 	ROM_LOAD16_BYTE( "o16-09-2.bin", 0x000001, 0x20000, CRC(cf474cb2) SHA1(5c049082b8d7118e0d2e50c6ae07f9d3d0110498) )
@@ -1824,7 +1824,7 @@ ROM_START( demonwl2 )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( demonwl3 )
+ROM_START( demonwld3 )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.bin", 0x000000, 0x20000, CRC(6f7468e0) SHA1(87ef7733fd0d00d0d375dbf30332cf0614480dc2) )
 	ROM_LOAD16_BYTE( "o16-09.bin", 0x000001, 0x20000, CRC(a572f5f7) SHA1(3d6a443cecd46734c7e1b761130909482c7a9914) )
@@ -1853,7 +1853,7 @@ ROM_START( demonwl3 )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( demonwl4 )
+ROM_START( demonwld4 )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o16_10ii", 0x000000, 0x20000, CRC(84EE5218) SHA1(DC2B017EE630330163BE320008D8A0D761CB0CFB) )
 	ROM_LOAD16_BYTE( "o16_09ii", 0x000001, 0x20000, CRC(CF474CB2) SHA1(5C049082B8D7118E0D2E50C6AE07F9D3D0110498) )
@@ -1910,7 +1910,7 @@ ROM_START( samesame )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( samesam2 )
+ROM_START( samesame2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09x.bin", 0x000000, 0x08000, CRC(3472e03e) SHA1(a0f12622a1963bfac2d5f357afbfb5d7db2cd8df) )
 	ROM_LOAD16_BYTE( "o17_10x.bin", 0x000001, 0x08000, CRC(a3ac49b5) SHA1(c5adf026b9129b64acee5a079e102377a8488220) )
@@ -1966,7 +1966,7 @@ ROM_START( fireshrk )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( fireshd )
+ROM_START( fireshrkd )
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09dyn.8j",0x000000, 0x10000, CRC(e25eee27) SHA1(1ff3f838123180a0b6672c9beee6c0f0092a0f94) )
 	ROM_LOAD16_BYTE( "o17_10dyn.8l",0x000001, 0x10000, CRC(c4c58cf6) SHA1(5867ecf66cd6c16cfcc54a581d3f4a8b666fd839) )
@@ -1994,7 +1994,7 @@ ROM_START( fireshd )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( fireshdh )
+ROM_START( fireshrkdh )
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09dyh.8j",0x000000, 0x10000, CRC(7b4c14dd) SHA1(d40dcf223f16c0f507aeb282d1524dbf1349c536) )
 	ROM_LOAD16_BYTE( "o17_10dyh.8l",0x000001, 0x10000, CRC(a3f159f9) SHA1(afc9630ca38da730f7cf4954d1333954e8d75787) )
@@ -2240,20 +2240,20 @@ static DRIVER_INIT( vimana )
 GAME( 1988, rallybik, 0,        rallybik, rallybik, toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", 0 )
 GAME( 1988, truxton,  0,        truxton,  truxton,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
 GAME( 1989, hellfire, 0,        hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
-GAME( 1989, hellfir1, hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
-GAME( 1989, hellfir2, hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
+GAME( 1989, hellfire1,hellfire, hellfire, hellfir1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
+GAME( 1989, hellfire2,hellfire, hellfire, hellfire, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
 GAME( 1989, zerowing, 0,        zerowing, zerowing, toaplan1, ROT0,   "Toaplan", "Zero Wing", 0 )
-GAME( 1989, zerowng2, zerowing, zerowing, zerowng2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (2 player simultaneous ver.)", 0 )
+GAME( 1989, zerowing2,zerowing, zerowing, zerowng2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (2 player simultaneous ver.)", 0 )
 GAME( 1990, demonwld, 0,        demonwld, demonwld, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwl1, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
-GAME( 1989, demonwl2, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwl3, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1989, demonwl4, demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1989, demonwld1,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
+GAME( 1989, demonwld2,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwld4,demonwld, demonwld, demonwl1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
 GAME( 1990, fireshrk, 0,        samesame, fireshrk, toaplan1, ROT270, "Toaplan", "Fire Shark", GAME_NO_SOUND )
-GAME( 1990, fireshd,  fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
-GAME( 1990, fireshdh, fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 1, easier)", GAME_NO_SOUND )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
 GAME( 1989, samesame, fireshrk, samesame, samesame, toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2 player alternating ver.)", GAME_NO_SOUND )
-GAME( 1989, samesam2, fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan", "Same! Same! Same!", GAME_NO_SOUND )
+GAME( 1989, samesame2,fireshrk, samesame, samesam2, toaplan1, ROT270, "Toaplan", "Same! Same! Same!", GAME_NO_SOUND )
 GAME( 1990, outzone,  0,        outzone,  outzone,  toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
 GAME( 1990, outzonea, outzone,  outzone,  outzone,  toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
 GAME( 1990, outzoneb, outzone,  outzone,  outzoneb, toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least

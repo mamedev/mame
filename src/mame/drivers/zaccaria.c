@@ -705,7 +705,7 @@ ROM_START( jackrabt )
 	ROM_LOAD( "jr-pal16l8.6k",   0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( jackrab2 )
+ROM_START( jackrabt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1cpu2.1a",     0x0000, 0x1000, CRC(f9374113) SHA1(521f293f1894bcaf21e44bc7841a20ae29232da3) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
@@ -740,7 +740,7 @@ ROM_START( jackrab2 )
 	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
 ROM_END
 
-ROM_START( jackrabs )
+ROM_START( jackrabts )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1cpu.1a",      0x0000, 0x1000, CRC(6698dc65) SHA1(33e3518846e88dc34f4b6c4e9ca9f8999c0460c8) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
@@ -777,7 +777,7 @@ ROM_END
 
 
 
-GAME( 1983, monymony, 0,        zaccaria, monymony, 0, ROT90, "Zaccaria", "Money Money", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrabt, 0,        zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrab2, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrabs, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", GAME_IMPERFECT_SOUND )
+GAME( 1983, monymony,  0,        zaccaria, monymony, 0, ROT90, "Zaccaria", "Money Money", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", GAME_IMPERFECT_SOUND )

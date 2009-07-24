@@ -275,7 +275,7 @@ ROM_START( sstrangr )
 	ROM_LOAD( "hss-08.65",     0x1c00, 0x0400, CRC(bd14d0b0) SHA1(9665f639afef9c1291f2efc054216ff44c595b45) )
 ROM_END
 
-ROM_START( sstrngr2 )
+ROM_START( sstrangr2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4764.09",      0x0000, 0x2000, CRC(d88f86cc) SHA1(9f284ee50caf3c64bd04a79a798de620348881bc) )
 	ROM_LOAD( "2708.10",      0x6000, 0x0400, CRC(eba304c1) SHA1(3fa6fbb29fa46c146283f69a712bfc51cbb2a43c) )
@@ -286,4 +286,4 @@ ROM_END
 
 
 GAME( 1978, sstrangr, 0,        sstrangr, sstrangr, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", GAME_NO_SOUND )
-GAME( 1979, sstrngr2, sstrangr, sstrngr2, sstrngr2, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", GAME_NO_SOUND )
+GAME( 1979, sstrangr2,sstrangr, sstrngr2, sstrngr2, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", GAME_NO_SOUND )

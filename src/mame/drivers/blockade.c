@@ -552,7 +552,7 @@ ROM_START( mineswpr )
     ROM_LOAD_NIB_LOW(  "mineswee.uls", 0x0000, 0x0200, CRC(3a4f66e1) SHA1(bd7f6c51d568a79fb06414b2a6ef245d0d983c3e) )
 ROM_END
 
-ROM_START( minesw4p )
+ROM_START( mineswpr4 )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "mineswee.h0p", 0x0000, 0x0400, CRC(5850a4ba) SHA1(9f097d31428f4494573187049c53fbed2075ff32) )
     ROM_LOAD_NIB_LOW(  "mineswee.l0p", 0x0000, 0x0400, CRC(05961379) SHA1(3d59341be8a663e8c54c1556442c992a6eb886ab) )
@@ -567,4 +567,4 @@ GAME( 1976, comotion, 0, comotion, comotion, blockade, ROT0, "Gremlin", "Comotio
 GAME( 1978, blasto,   0, blasto,   blasto,   blockade, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND )
 GAME( 1977, hustle,   0, hustle,   hustle,   blockade, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND )
 GAME( 1977, mineswpr, 0, blasto,   mineswpr, blockade, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND )
-GAME( 1977, minesw4p, 0, blasto,   minesw4p, blockade, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND )
+GAME( 1977, mineswpr4,0, blasto,   minesw4p, blockade, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND )

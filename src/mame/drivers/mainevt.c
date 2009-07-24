@@ -543,7 +543,7 @@ ROM_END
 
 /* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
 
-ROM_START( mainev2p )
+ROM_START( mainevt2p )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -627,7 +627,7 @@ ROM_START( devstors )
  	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstor2 )
+ROM_START( devstors2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890x02.k11",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
@@ -652,7 +652,7 @@ ROM_START( devstor2 )
  	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstor3 )
+ROM_START( devstors3 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -714,9 +714,9 @@ static DRIVER_INIT( mainevt )
 
 GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", 0 )
 GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt, ROT0,  "Konami", "The Main Event (4 Players ver. F)", 0 )
-GAME( 1988, mainev2p, mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "The Main Event (2 Players ver. X)", 0 )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "The Main Event (2 Players ver. X)", 0 )
 GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", 0 )
 GAME( 1988, devstors, 0,        devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. Z)", 0 )
-GAME( 1988, devstor2, devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Devastators (ver. X)", 0 )
-GAME( 1988, devstor3, devstors, devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. V)", 0 )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Devastators (ver. X)", 0 )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt, ROT90, "Konami", "Devastators (ver. V)", 0 )
 GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt, ROT90, "Konami", "Garuka (Japan ver. W)", 0 )

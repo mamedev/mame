@@ -831,7 +831,7 @@ ROM_START( stratvox )
 	ROM_LOAD( "im5623.f12", 0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
-ROM_START( stratvob )
+ROM_START( stratvoxb )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "j0-1",       0x0000, 0x0800, CRC(93c78274) SHA1(d7c8b5a064eaf96bcfd261b9857f06249477f6b8) )
 	ROM_LOAD( "j0-2",       0x0800, 0x0800, CRC(93b2b02d) SHA1(f08772d581f9825976199f39cb6d85fb3aa83db0) )
@@ -893,7 +893,7 @@ Spacech2:    0x008b:  im 1          ed 56
 So... spacech2 is avoiding to enter the sub at $2929.
 
 */
-ROM_START( spacech2 )
+ROM_START( spacecho2 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "c11.5.6t",    0x0000, 0x0800, CRC(90637f25) SHA1(820d2f326a5d8d0a04a0fca46b035624dfd7222c) )	// 3 bytes different at 0x8e
 	ROM_LOAD( "c2.5t",       0x0800, 0x0800, CRC(a5f0a34f) SHA1(359e7a9954dedb464f7456cd071db77b2219ab2c) )
@@ -1005,7 +1005,7 @@ GAME( 1981, route16b, route16,  route16,  route16,  0,        ROT270, "bootleg",
 GAME( 1981, routex,   route16,  routex,   route16,  0,        ROT270, "bootleg", "Route X (bootleg)", 0 )
 GAME( 1980, speakres, 0,        speakres, speakres, 0,        ROT270, "Sun Electronics", "Speak & Rescue", 0 )
 GAME( 1980, stratvox, speakres, stratvox, stratvox, 0,        ROT270, "[Sun Electronics] (Taito license)", "Stratovox", 0 )
-GAME( 1980, stratvob, speakres, stratvox, stratvox, 0,        ROT270, "bootleg", "Stratovox (bootleg)", 0 )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, 0,        ROT270, "bootleg", "Stratovox (bootleg)", 0 )
 GAME( 1980, spacecho, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 1)", 0 )
-GAME( 1980, spacech2, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 2)", 0 )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 2)", 0 )
 GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, 0,        ROT0,   "Taito", "T.T Mahjong", 0 )

@@ -551,7 +551,7 @@ ROM_START( exprraid )
 	ROM_LOAD( "pal16r4a.5e",   0x0200, 0x0104, CRC(9a8766a7) SHA1(5f84ad9e633daeb14531ef527827ef3d9b269437) )
 ROM_END
 
-ROM_START( exprrada )
+ROM_START( exprraida )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cz01-2e.15a", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
 	ROM_LOAD( "cz00-4e.16b", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
@@ -629,7 +629,7 @@ ROM_START( wexpress )
 	ROM_LOAD( "pal16r4a.5e",   0x0200, 0x0104, CRC(9a8766a7) SHA1(5f84ad9e633daeb14531ef527827ef3d9b269437) )
 ROM_END
 
-ROM_START( wexpresb )
+ROM_START( wexpressb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wexpress.3", 0x4000, 0x4000, CRC(b4dd0fa4) SHA1(8d17eb28ae92486c67859871ea2bef8f50f39dbd) )
 	ROM_LOAD( "wexpress.1", 0x8000, 0x8000, CRC(e8466596) SHA1(dbbd3b84d0f017292595fc19f7412b984851221a) )
@@ -664,7 +664,7 @@ ROM_START( wexpresb )
 	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 ROM_END
 
-ROM_START( wexpresc )
+ROM_START( wexpressb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s2",      0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
 	ROM_LOAD( "s1",      0x8000, 0x8000, CRC(7c573824) SHA1(f5e4d4f0866c08c88d012a77e8aa2e74a779f986) )
@@ -757,7 +757,7 @@ static DRIVER_INIT( wexpresc )
 
 
 GAME( 1986, exprraid, 0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", 0 )
-GAME( 1986, exprrada, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", 0 )
+GAME( 1986, exprraida,exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", 0 )
 GAME( 1986, wexpress, exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", 0 )
-GAME( 1986, wexpresb, exprraid, exprboot, exprraid, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 )
-GAME( 1986, wexpresc, exprraid, exprboot, exprraid, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 )
+GAME( 1986, wexpressb, exprraid, exprboot, exprraid, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 )
+GAME( 1986, wexpressb2,exprraid, exprboot, exprraid, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 )

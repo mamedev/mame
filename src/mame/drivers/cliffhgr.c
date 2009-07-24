@@ -739,7 +739,7 @@ ROM_START( cliffhgr )
 	DISK_IMAGE_READONLY( "cliffhgr", 0, SHA1(4442995c824d7891a2a19c607bb3301d696fbdc8) )
 ROM_END
 
-ROM_START( cliffhga )
+ROM_START( cliffhgra )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cliff_alt_0.bin",	0x0000, 0x2000, CRC(27caa67c) SHA1(70d8270766b8712d4250b1a23489007d59eb262f) )
 	ROM_LOAD( "cliff_alt_1.bin",	0x2000, 0x2000, CRC(6e5f1515) SHA1(1c4116f4f5910857408826d73c630abbf1434119) )
@@ -784,5 +784,5 @@ static DRIVER_INIT( cliff )
  *************************************/
 
 GAME( 1983, cliffhgr, 0,        cliffhgr, cliffhgr, cliff, ROT0, "Stern Electronics", "Cliff Hanger", 0)
-GAME( 1983, cliffhga, cliffhgr, cliffhgr, cliffhga, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", 0)
+GAME( 1983, cliffhgra,cliffhgr, cliffhgr, cliffhga, cliff, ROT0, "Stern Electronics", "Cliff Hanger (Alt)", 0)
 GAME( 1983, goaltogo, 0,        cliffhgr, goaltogo, cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NOT_WORKING)

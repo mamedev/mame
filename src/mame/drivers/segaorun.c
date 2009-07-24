@@ -1678,7 +1678,7 @@ ROM_END
      CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, rom would be "OPR")
 */
-ROM_START( shangnle )
+ROM_START( shangonle )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code  */
 	ROM_LOAD16_BYTE( "epr-13944.133", 0x000000, 0x10000, CRC(989a80db) SHA1(5026e5cf52d4fd85a0bab6c4ea7a34cf266b2a3b) )
 	ROM_LOAD16_BYTE( "epr-13943.118", 0x000001, 0x10000, CRC(426e3050) SHA1(f332ea76285b4e1361d818cbe5aab0640b4185c3) )
@@ -1821,7 +1821,7 @@ GAME( 1987, shangon,  0,        shangon,  shangon,  shangon,  ROT0, "Sega",    "
 GAME( 1987, shangon3, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon1, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
-GAME( 1991, shangnle, shangon,  shangon,  shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 )
+GAME( 1991, shangonle,shangon,  shangon,  shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 )
 GAMEL(1989, toutrun,  0,        outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-0109)", 0, layout_outrun )
 GAMEL(1989, toutrun2, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0, layout_outrun )
 GAMEL(1989, toutrun1, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */

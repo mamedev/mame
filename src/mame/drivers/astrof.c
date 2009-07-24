@@ -1124,7 +1124,7 @@ ROM_START( spfghmk2 )
 ROM_END
 
 
-ROM_START( spfgmk22 )
+ROM_START( spfghmk22 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2708mkii.5e",  0xe400, 0x0400, CRC(27d7060d) SHA1(796c44a395e1c54769dc57050503b4b111bde7ef) )
 	ROM_LOAD( "2708mkii.5d",  0xe800, 0x0400, CRC(6ccb3b0a) SHA1(566104ca2e0fae741d4650e7159c9ddb48f59e8b) )
@@ -1156,7 +1156,7 @@ ROM_START( tomahawk )
 ROM_END
 
 
-ROM_START( tomahaw1 )
+ROM_START( tomahawk1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l8-1",         0xdc00, 0x0400, CRC(7c911661) SHA1(3fc75bb0e6a89d41d76f82eeb0fde7d33809dddf) )
 	ROM_LOAD( "l7-1",         0xe000, 0x0400, CRC(adeffb69) SHA1(8ff7ada883825a8b56cae3368ce377228922ab1d) )
@@ -1241,6 +1241,6 @@ GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",  
 GAME( 1979, acombato, astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (older, PZ)", GAME_SUPPORTS_SAVE )
 GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", GAME_SUPPORTS_SAVE )
 GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, spfgmk22, spfghmk2, spfghmk2, spfgmk22, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfgmk22, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 5)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, tomahaw1, tomahawk, tomahawk, tomahaw1, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahaw1, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

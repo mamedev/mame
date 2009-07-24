@@ -263,7 +263,7 @@ ROM_START( blstroid )
 ROM_END
 
 
-ROM_START( blstroi3 )
+ROM_START( blstroid3 )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136057-3123.6c",  0x000000, 0x010000, CRC(8fb050f5) SHA1(4944ffb0843262afe41fc6b876ab6858dcefc95f) )
 	ROM_LOAD16_BYTE( "136057-3121.6b",  0x000001, 0x010000, CRC(21fae262) SHA1(2516a75d76bcfdea5ab41a4898d47ed166bd1996) )
@@ -300,7 +300,7 @@ ROM_START( blstroi3 )
 ROM_END
 
 
-ROM_START( blstroi2 )
+ROM_START( blstroid2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136057-2123.6c",  0x000000, 0x010000, CRC(5a092513) SHA1(11396125842ea3a43d61b4ce266bb8053fdefd73) )
 	ROM_LOAD16_BYTE( "136057-2121.6b",  0x000001, 0x010000, CRC(486aac51) SHA1(5e7fe7eb225d1c2701c21658ba2bad14ef7b64b1) )
@@ -337,7 +337,7 @@ ROM_START( blstroi2 )
 ROM_END
 
 
-ROM_START( blstroig )
+ROM_START( blstroidg )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136057-2223.6c",  0x000000, 0x010000, CRC(cc82108b) SHA1(487a80cac2a196e9b17c64c5d0b884d1ed8da401) )
 	ROM_LOAD16_BYTE( "136057-2221.6b",  0x000001, 0x010000, CRC(84822e68) SHA1(763edc9b3605e583506ca1d9befab66411fc720a) )
@@ -374,7 +374,7 @@ ROM_START( blstroig )
 ROM_END
 
 
-ROM_START( blsthead )
+ROM_START( blstroidh )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "eheadh0.c6",  0x00000, 0x10000, CRC(061f0898) SHA1(a277399aa8af665b1fb40c2bb4cf5d36d333db8d) )
 	ROM_LOAD16_BYTE( "eheadl0.b6",  0x00001, 0x10000, CRC(ae8df7cb) SHA1(9eaf377bbfa09e2d3ae77764dbf09ff79b65b34f) )
@@ -432,8 +432,8 @@ static DRIVER_INIT( blstroid )
  *
  *************************************/
 
-GAME( 1987, blstroid, 0,        blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
-GAME( 1987, blstroi3, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
-GAME( 1987, blstroi2, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
-GAME( 1987, blstroig, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
-GAME( 1987, blsthead, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )
+GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
+GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
+GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
+GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
+GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )

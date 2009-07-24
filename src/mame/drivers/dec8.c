@@ -2434,7 +2434,7 @@ ROM_START( cobracom )
 	ROM_CONTINUE(            0x60000, 0x08000 )
 ROM_END
 
-ROM_START( cobracmj )
+ROM_START( cobracomj )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "eh-11.rom",    0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
 	ROM_LOAD( "eh-12.rom",    0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
@@ -2796,7 +2796,7 @@ ROM_START( srdarwin )
 	ROM_LOAD( "dy12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )	/* Priority (Not yet used) */
 ROM_END
 
-ROM_START( srdarwnj )
+ROM_START( srdarwinj )
 	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "dy_01.rom", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
@@ -3091,7 +3091,7 @@ ROM_START( lastmisn )
 	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )	/* Priority (Not yet used) */
 ROM_END
 
-ROM_START( lastmsno )
+ROM_START( lastmisno )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "lm_dl03.13h", 0x08000, 0x08000, CRC(357f5f6b) SHA1(a114aac50db62a6bcb943681e517ad7c88ec47f4) ) /* Rev 5 roms */
 	ROM_LOAD( "lm_dl04.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
@@ -3127,7 +3127,7 @@ ROM_START( lastmsno )
 	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )	/* Priority (Not yet used) */
 ROM_END
 
-ROM_START( lastmsnj )
+ROM_START( lastmisnj )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "dl03-.13h",   0x08000, 0x08000, CRC(4be5e7e1) SHA1(9f943658663da31947cebdcbcb5f4e2be0714c06) )
 	ROM_LOAD( "dl04-.7h",    0x10000, 0x10000, CRC(f026adf9) SHA1(4ccd0e714a6eb7cee388c93beee2d5510407c961) )
@@ -3444,13 +3444,13 @@ static DRIVER_INIT( ghostb )
 /******************************************************************************/
 
 GAME( 1988, cobracom, 0,        cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", 0 )
-GAME( 1988, cobracmj, cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
+GAME( 1988, cobracomj,cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", 0 )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", 0 )
 GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
 GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (World)", 0 )
-GAME( 1987, srdarwnj, srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
+GAME( 1987, srdarwinj,srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
 GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )
 GAME( 1987, makyosen, gondo,    gondo,    gondo,    0,       ROT270, "Data East Corporation", "Makyou Senshi (Japan)", 0 )
 GAME( 1988, oscar,    0,        oscar,    oscar,    deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", 0 )
@@ -3458,8 +3458,8 @@ GAME( 1987, oscaru,   oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East 
 GAME( 1987, oscarj1,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", 0 )
 GAME( 1987, oscarj2,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", 0 )
 GAME( 1986, lastmisn, 0,        lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 6)", 0 )
-GAME( 1986, lastmsno, lastmisn, lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 5)", 0 )
-GAME( 1986, lastmsnj, lastmisn, lastmiss, lastmsnj, 0,       ROT270, "Data East Corporation", "Last Mission (Japan)", 0 )
+GAME( 1986, lastmisno,lastmisn, lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 5)", 0 )
+GAME( 1986, lastmisnj,lastmisn, lastmiss, lastmsnj, 0,       ROT270, "Data East Corporation", "Last Mission (Japan)", 0 )
 GAME( 1986, shackled, 0,        shackled, shackled, 0,       ROT0,   "Data East USA", "Shackled (US)", 0 )
 GAME( 1986, breywood, shackled, shackled, shackled, 0,       ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", 0 )
 GAME( 1987, csilver,  0,        csilver,  csilver,  0,       ROT0,   "Data East Corporation", "Captain Silver (World)", 0 )

@@ -779,7 +779,7 @@ ROM_START( elecyoyo )
 ROM_END
 
 
-ROM_START( elecyoy2 )
+ROM_START( elecyoyo2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yy14",  0xa000, 0x1000, CRC(0d2edcb9) SHA1(36e1a1aa81111f38e1c06a8174e7de406478cc67) )
 	ROM_LOAD( "yy15",  0xb000, 0x1000, CRC(a91f01e3) SHA1(7818299d25a0816b856e83fae02d8019e5e8b4a3) )
@@ -1311,7 +1311,7 @@ GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito Amer
 GAME( 1981, qix2,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
 GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram2,    kram,     mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram3,    kram,     qix,      kram,     kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )

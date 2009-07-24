@@ -658,7 +658,7 @@ ROM_START( ringking )
 	ROM_LOAD( "82s129.1a",    0x0100, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )	/* blue component */
 ROM_END
 
-ROM_START( ringkin2 )
+ROM_START( ringking2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rkngm1.bin",   0x00000, 0x8000, CRC(086921ea) SHA1(c5a594be0738a80c5f912dc819332ff61aa6fc4b) )
 	ROM_LOAD( "rkngm2.bin",   0x08000, 0x4000, CRC(c0b636a4) SHA1(c3640a5597242e735673e1dbf8bf866e9122a20f) )
@@ -695,7 +695,7 @@ ROM_START( ringkin2 )
 	ROM_LOAD( "82s129.1a",    0x0100, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )	/* blue component */
 ROM_END
 
-ROM_START( ringkin3 )
+ROM_START( ringking3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "14.9d",        0x00000, 0x4000, CRC(63627b8b) SHA1(eea736c8eec59fa561b9d1b5aa43df5410d8dde7) )
 	ROM_LOAD( "15.9e",        0x04000, 0x4000, CRC(e7557489) SHA1(49dce8f6ce26283fbdca17d75699de4d636a900a) )
@@ -737,7 +737,7 @@ ROM_START( ringkin3 )
 	ROM_LOAD( "82s129.1a",    0x0200, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )	/* blue component */
 ROM_END
 
-ROM_START( ringkinw )
+ROM_START( ringkingw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "15.9d",        0x00000, 0x4000, CRC(8263f517) SHA1(942012bfcc98dd2cd0437e015a164933c99d0f36) )
 	ROM_LOAD( "16.9e",        0x04000, 0x4000, CRC(daadd700) SHA1(2405e954a28d18ae8c30955d0ad7c25c9abb2bd3) )
@@ -814,8 +814,8 @@ static DRIVER_INIT( ringkinw )
 
 
 
-GAME( 1985, kingofb,  0,       kingofb,  kingofb,  0,        ROT90, "Woodplace", "King of Boxer (English)", 0 )
-GAME( 1985, ringking, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 1)", 0 )
-GAME( 1985, ringkin2, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 2)", 0 )
-GAME( 1985, ringkin3, kingofb, kingofb,  kingofb,  ringkin3, ROT90, "Data East USA", "Ring King (US set 3)", 0 )
-GAME( 1985, ringkinw, kingofb, kingofb,  kingofb,  ringkinw, ROT90, "Woodplace", "Ring King (US, Woodplace license)", 0 )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  0,        ROT90, "Woodplace", "King of Boxer (English)", 0 )
+GAME( 1985, ringking,  kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 1)", 0 )
+GAME( 1985, ringking2, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 2)", 0 )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  ringkin3, ROT90, "Data East USA", "Ring King (US set 3)", 0 )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  ringkinw, ROT90, "Woodplace", "Ring King (US, Woodplace license)", 0 )

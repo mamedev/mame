@@ -559,7 +559,7 @@ ROM_START( magicard )
 	ROM_LOAD16_WORD_SWAP("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
-ROM_START( magicrda )
+ROM_START( magicarda )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
@@ -570,7 +570,7 @@ ROM_START( magicrda )
 	ROM_LOAD("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
-ROM_START( magicrdb )
+ROM_START( magicardb )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
@@ -590,9 +590,9 @@ static DRIVER_INIT( magicard )
 
 /*    YEAR  NAME      PARENT MACHINE   INPUT  INIT  ROT    COMPANY   FULLNAME             FLAGS... */
 
-GAME( 199?, magicard, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicrda, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicrdb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicard, 0,      magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicarda, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicardb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*Below here there are CD-I bios defines,to be removed in the end*/
 ROM_START( mcdi200 )

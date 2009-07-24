@@ -2338,7 +2338,7 @@ ROM_START( galaxian )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-ROM_START( galaxiaj )
+ROM_START( galaxiana )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "7f.bin",       0x0000, 0x1000, CRC(4335b1de) SHA1(e41e3d90dac738cf71377f3b476ec67b14dee27a) )
 	ROM_LOAD( "7j.bin",       0x1000, 0x1000, CRC(4e6f66a1) SHA1(ee2a675ab34485c0f58c51be7630a51e27a7a8f3) )
@@ -2352,7 +2352,7 @@ ROM_START( galaxiaj )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-ROM_START( galmidw )
+ROM_START( galaxianm )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "galmidw.u",    0x0000, 0x0800, CRC(745e2d61) SHA1(e65f74e35b1bfaccd407e168ea55678ae9b68edf) )
 	ROM_LOAD( "galmidw.v",    0x0800, 0x0800, CRC(9c999a40) SHA1(02fdcd95d8511e64c0d2b007b874112d53e41045) )
@@ -2368,7 +2368,7 @@ ROM_START( galmidw )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-ROM_START( galmidwo )
+ROM_START( galaxianmo )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "galaxian.u",   0x0000, 0x0800, CRC(fac42d34) SHA1(0b96d9f1c6bf0e0b7f757dcbaeacfbfafefc54d1) )
 	ROM_LOAD( "galaxian.v",   0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
@@ -2384,7 +2384,7 @@ ROM_START( galmidwo )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-ROM_START( galtaito )
+ROM_START( galaxiant )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gl-03.8g",  0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) ) /* All eprom are HN462716 eproms */
 	ROM_LOAD( "gl-04.8f",  0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
@@ -3181,7 +3181,7 @@ ROM_START( mooncrst )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
-ROM_START( mooncrsu )
+ROM_START( mooncrstu )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "smc1f",        0x0000, 0x0800, CRC(389ca0d6) SHA1(51cf6d190a0ebf23b70c2bcf1ccaa4705e29cd09) )
 	ROM_LOAD( "smc2f",        0x0800, 0x0800, CRC(410ab430) SHA1(d89abff6ac4afbf69377a1d63043d629a634aab7) )
@@ -3202,7 +3202,7 @@ ROM_START( mooncrsu )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
-ROM_START( mooncrsa )
+ROM_START( mooncrsto )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "mc1.7d",       0x0000, 0x0800, CRC(92a86aac) SHA1(f5818ac97d8b779e1fb29bf903f74185d24afb0d) )
 	ROM_LOAD( "mc2.7e",       0x0800, 0x0800, CRC(438c2b4b) SHA1(11f56b489b5489999952e91919c5e1f622c59c36) )
@@ -3223,7 +3223,7 @@ ROM_START( mooncrsa )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
-ROM_START( mooncrsg )
+ROM_START( mooncrstg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "epr194",       0x0000, 0x0800, CRC(0e5582b1) SHA1(946ad4aeb10c0b7b3f93fd24925cc9bcb49e443c) )
 	ROM_LOAD( "epr195",       0x0800, 0x0800, CRC(12cb201b) SHA1(ebb01ec646b9e015cbcb93f70dfdaf448afefc12) )
@@ -3730,7 +3730,7 @@ ROM_START( checkman )
 	ROM_LOAD( "checkman.clr", 0x0000, 0x0020, CRC(57a45057) SHA1(d4ec6a54f72640e5b485aa59e206c090e67ff640) )
 ROM_END
 
-ROM_START( checkmaj )
+ROM_START( checkmanj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm_1.bin",     0x0000, 0x1000, CRC(456a118f) SHA1(7c2e8343360f446af4391012784a1ccfecae3299) )
 	ROM_LOAD( "cm_2.bin",     0x1000, 0x1000, CRC(146b2c44) SHA1(80455396a9b1802fcefaec1340b76461c0601bf9) )
@@ -3805,7 +3805,7 @@ ROM_START( mshuttle )
 	ROM_LOAD( "my06",         0x1000, 0x1000, CRC(466415f2) SHA1(a05f8238cdcebe926a564ef6268b3cd677987fa2) )
 ROM_END
 
-ROM_START( mshuttlj )
+ROM_START( mshuttlej )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "mcs.5",        0x0000, 0x1000, CRC(a5a292b4) SHA1(b4e9d969c762f4114eba88051917df122fc7181f) )
 	ROM_LOAD( "mcs.4",        0x1000, 0x1000, CRC(acdc0f9e) SHA1(8cd6d6566fe3f4090ccb625c3c1e5850a371826f) )
@@ -3828,7 +3828,7 @@ ROM_START( mshuttlj )
 	ROM_LOAD( "my06.4r",      0x1000, 0x1000, CRC(4162be4d) SHA1(84fa8651796e498a37893ea90ef51b274c70e568) )
 ROM_END
 
-ROM_START( mshutlj2 )
+ROM_START( mshuttlej2 )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "ali5.bin",     0x0000, 0x1000, CRC(320fe630) SHA1(df4fe25989783c8851f41c9b4b63dedfa365c1e9) )
 	ROM_LOAD( "mcs.4",        0x1000, 0x1000, CRC(acdc0f9e) SHA1(8cd6d6566fe3f4090ccb625c3c1e5850a371826f) )
@@ -3874,7 +3874,7 @@ ROM_START( kingball )
 	ROM_LOAD( "kb2-1",        0x0000, 0x0020, CRC(15dd5b16) SHA1(3d2ca2b42bf508a9e5198e970abcbbedf5729164) )
 ROM_END
 
-ROM_START( kingbalj )
+ROM_START( kingballj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg1.7f",      0x0000, 0x1000, CRC(6cb49046) SHA1(a0891605dff7f9ff51bc7ad85f831a749f2f61e9) )
 	ROM_LOAD( "prg2.7j",      0x1000, 0x1000, CRC(c223b416) SHA1(ca2d9f6b8ef6db4f382089161f4147d9828c3554) )
@@ -3924,7 +3924,7 @@ ROM_START( frogger )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-ROM_START( frogseg1 )
+ROM_START( froggers1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogger.26",   0x0000, 0x1000, CRC(597696d6) SHA1(e7e021776cad00f095a1ebbef407b7c0a8f5d835) )
 	ROM_LOAD( "frogger.27",   0x1000, 0x1000, CRC(b6e6fcc3) SHA1(5e8692f2b0c7f4b3642b3ee6670e1c3b20029cdc) )
@@ -3943,7 +3943,7 @@ ROM_START( frogseg1 )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-ROM_START( frogseg2 )
+ROM_START( froggers2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frogger.ic5",  0x0000, 0x1000, CRC(efab0c79) SHA1(68c99b6cdcb9396bb473739a62ffc009b4bf57d5) )
 	ROM_LOAD( "frogger.ic6",  0x1000, 0x1000, CRC(aeca9c13) SHA1(cdf560adbd7f2813e86e378da7781cccf7928a44) )
@@ -3963,7 +3963,7 @@ ROM_START( frogseg2 )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-ROM_START( froggrmc )
+ROM_START( froggermc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-1031.15",  0x0000, 0x1000, CRC(4b7c8d11) SHA1(9200b33cac0ef5a6647c95ebd25237fa62fcdf30) )
 	ROM_LOAD( "epr-1032.16",  0x1000, 0x1000, CRC(ac00b9d9) SHA1(6414d2aa2c0ccb8cb567ffde3acdb693cfd28dbb) )
@@ -4755,7 +4755,7 @@ ROM_START( losttomb )
 	ROM_LOAD( "ltprom",       0x0000, 0x0020, CRC(1108b816) SHA1(49fdb08f8f31fefa2f3dca3d3455318cb21847a3) )
 ROM_END
 
-ROM_START( losttmbh )
+ROM_START( losttombh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(d6176d2c) SHA1(bc2bf63ee8d3e376f155d218704ceb5adcdf8e54) )
 	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(a5f55f4a) SHA1(3609fc2b15b6856e81738bbd370250735dba694d) )
@@ -4798,7 +4798,7 @@ ROM_START( armorcar )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
-ROM_START( armorca2 )
+ROM_START( armorcar2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(e393bd2f) SHA1(6a5079d1f5d724e5f643cbc5352fc43d0b652e05) )
 	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(b7d443af) SHA1(1ce41e11a7fcfd039fbff03c4382ae29b601ed50) )
@@ -4975,11 +4975,11 @@ ROM_END
  *************************************/
 
 /* basic galaxian hardware */
-GAME( 1979, galaxian, 0,        galaxian, galaxian, galaxian, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiaj, galaxian, galaxian, superg,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galmidw,  galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galmidwo, galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galtaito, galaxian, galaxian, galtaito, galaxian, ROT90,  "[Namco] (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiana,  galaxian, galaxian, superg,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiant,  galaxian, galaxian, galtaito, galaxian, ROT90,  "[Namco] (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
 GAME( 1979, moonaln,  galaxian, galaxian, superg,   galaxian, ROT90,  "[Nichibutsu] (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
@@ -5050,14 +5050,14 @@ GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg",
  *************************************/
 
 /* based on Galaxian, but with altered address map for more ROM */
-GAME( 1980, mooncrst, 0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu, unencrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsa, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Gremlin", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrst,  0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsto, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Gremlin", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
 
 /* straight Moon Cresta ripoffs on basic mooncrst hardware */
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
 GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "Subelectro", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Centuri", "Eagle (set 1)", GAME_SUPPORTS_SAVE )
@@ -5078,24 +5078,24 @@ GAME( 1980, moonal2b, galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibuts
 GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
-GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Rock-ola", "Jump Bug", GAME_SUPPORTS_SAVE )
+GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "[Sega] (Rock-ola license)", "Jump Bug", GAME_SUPPORTS_SAVE )
 GAME( 1981, jumpbugb, jumpbug,  jumpbug,  jumpbug,  jumpbug,  ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1983, levers,   0,        jumpbug,  levers,   jumpbug,  ROT90,  "Rock-ola", "Levers", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving AY8910 for sound */
 GAME( 1982, checkman, 0,        checkman, checkman, checkman, ROT90,  "Zilec-Zenitone", "Check Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, checkmaj, checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Jaleco", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Jaleco", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Computers and Graphics LTD. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
 GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics LTD.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI */
-GAME( 1981, mshuttle, 0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US?)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttlj, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshutlj2, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US?)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlej, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlej2,mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving DAC for sound */
 GAME( 1980, kingball, 0,        kingball, kingball, kingball, ROT90,  "Namco", "King & Balloon (US)", GAME_SUPPORTS_SAVE )
-GAME( 1980, kingbalj, kingball, kingball, kingball, kingball, ROT90,  "Namco", "King & Balloon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1980, kingballj,kingball, kingball, kingball, kingball, ROT90,  "Namco", "King & Balloon (Japan)", GAME_SUPPORTS_SAVE )
 
 
 
@@ -5108,9 +5108,9 @@ GAME( 1980, kingbalj, kingball, kingball, kingball, kingball, ROT90,  "Namco", "
 
 /* Frogger based hardware: 2nd Z80, AY-8910A, 2 8255 PPI for I/O, custom background */
 GAME( 1981, frogger,  0,        frogger,  frogger,  frogger,  ROT90,  "Konami", "Frogger", GAME_SUPPORTS_SAVE )
-GAME( 1981, frogseg1, frogger,  frogger,  frogger,  frogger,  ROT90,  "[Konami] (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, frogseg2, frogger,  frogger,  frogger,  frogger,  ROT90,  "[Konami] (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggrmc, frogger,  froggrmc, froggrmc, froggrmc, ROT90,  "[Konami] (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers1, frogger, frogger,  frogger,  frogger,  ROT90,  "[Konami] (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers2, frogger, frogger,  frogger,  frogger,  ROT90,  "[Konami] (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggermc, frogger, froggrmc, froggrmc, froggrmc, ROT90,  "[Konami] (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggers, frogger,  froggers, frogger,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "Falcon", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
@@ -5166,10 +5166,10 @@ GAME( 1981, scobrab,  scobra,   scobra,   scobras,  scobra,   ROT90,  "bootleg",
 GAME( 1981, suprheli, scobra,   scobra,   scobras,  scobra,   ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, losttomb, 0,        scobra,   losttomb, losttomb, ROT90,  "Stern", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
-GAME( 1982, losttmbh, losttomb, scobra,   losttomb, losttomb, ROT90,  "Stern", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
+GAME( 1982, losttombh,losttomb, scobra,   losttomb, losttomb, ROT90,  "Stern", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, armorcar, 0,        scobra,   armorcar, scobra,   ROT90,  "Stern", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, armorca2, armorcar, scobra,   armorcar, scobra,   ROT90,  "Stern", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, armorcar2,armorcar, scobra,   armorcar, scobra,   ROT90,  "Stern", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, tazmania, 0,        scobra,   tazmania, scobra,   ROT90,  "Stern", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 

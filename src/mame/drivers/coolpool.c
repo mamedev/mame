@@ -790,7 +790,7 @@ ROM_START( amerdart )
 	ROM_LOAD16_WORD( "u23",  0x0f0000, 0x10000, CRC(d7c2b13b) SHA1(3561e08011f649e4d0c47792745b2a014167e816) )
 ROM_END
 
-ROM_START( amerdar2 )
+ROM_START( amerdart2 )
 	ROM_REGION16_LE( 0x0a0000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "u31",     0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "u32",     0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
@@ -888,7 +888,7 @@ ROM_END
   all ROMs for this set were missing except for the main program,
   I assume the others are the same.
  */
-ROM_START( 9ballsh2 )
+ROM_START( 9ballsht2 )
 	ROM_REGION16_LE( 0x80000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "e-scape.112",  0x00000, 0x40000, CRC(aee8114f) SHA1(a0d0e9e3a879393585b85ac6d04e31a7d4221179) )
 	ROM_LOAD16_BYTE( "e-scape.113",  0x00001, 0x40000, CRC(ccd472a7) SHA1(d074080e987c233b26b3c72248411c575f7a2293) )
@@ -906,7 +906,7 @@ ROM_START( 9ballsh2 )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
 
-ROM_START( 9ballsh3 )
+ROM_START( 9ballsht3 )
 	ROM_REGION16_LE( 0x80000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "8e_1826.112",  0x00000, 0x40000, CRC(486f7a8b) SHA1(635e3b1e7a21a86dd3d0ea994e9b923b06df587e) )
 	ROM_LOAD16_BYTE( "8e_6166.113",  0x00001, 0x40000, CRC(c41db70a) SHA1(162112f9f5bb6345920a45c41da6a249796bd21f) )
@@ -926,7 +926,7 @@ ROM_END
 
 /* If you use the roms from the other set this will boot as 9 Ball Shootout Championship, it looks however like the TMS32026 data
    should differ at least (the correct data in the bad dump is very different to the other dumps) */
-ROM_START( 9ballshc )
+ROM_START( 9ballshtc )
 	ROM_REGION16_LE( 0x80000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "escape.112",  0x00000, 0x40000, CRC(7ba2749a) SHA1(e2ddc2600234dbebbb423f201cc4061fd0b9911a) )
 	ROM_LOAD16_BYTE( "escape.113",  0x00001, 0x40000, CRC(1e0f3c62) SHA1(3c24a38dcb553fd84b0b44a5a8d93a14435e22b0) )
@@ -1009,9 +1009,9 @@ static DRIVER_INIT( 9ballsht )
  *************************************/
 
 GAME( 1989, amerdart, 0,        amerdart, amerdart, 0,        ROT0, "Ameri",   "AmeriDarts (set 1)", GAME_NO_SOUND )
-GAME( 1989, amerdar2, amerdart, amerdart, amerdart, 0,        ROT0, "Ameri",   "AmeriDarts (set 2)", GAME_NO_SOUND )
+GAME( 1989, amerdart2,amerdart, amerdart, amerdart, 0,        ROT0, "Ameri",   "AmeriDarts (set 2)", GAME_NO_SOUND )
 GAME( 1992, coolpool, 0,        coolpool, coolpool, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
 GAME( 1993, 9ballsht, 0,        9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
-GAME( 1993, 9ballsh2, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
-GAME( 1993, 9ballsh3, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
-GAME( 1993, 9ballshc, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", GAME_NOT_WORKING )
+GAME( 1993, 9ballsht2,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
+GAME( 1993, 9ballsht3,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
+GAME( 1993, 9ballshtc,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", GAME_NOT_WORKING )

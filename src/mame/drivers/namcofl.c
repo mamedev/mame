@@ -604,7 +604,7 @@ ROM_START( speedrcr )
     ROM_LOAD( "sysfl-5.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 19D */
 ROM_END
 
-ROM_START( finalapb )
+ROM_START( finalaprb )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2mpob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
@@ -643,7 +643,7 @@ ROM_START( finalapb )
 	ROM_LOAD("flr1voi.23s",   0x000000, 0x200000, CRC(ff6077cd) SHA1(73c289125ddeae3e43153e4c570549ca04501262) )
 ROM_END
 
-ROM_START( finalapo )
+ROM_START( finalapro )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpe.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2mpo.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
@@ -741,7 +741,7 @@ static DRIVER_INIT(finalapr)
 	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME( 1995, speedrcr,        0, namcofl, namcofl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapr,        0, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapb, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapo, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND )
+GAME( 1995, speedrcr,         0, namcofl, namcofl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, finalapr,         0, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND )
+GAME( 1995, finalaprb, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND )
+GAME( 1995, finalapro, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND )

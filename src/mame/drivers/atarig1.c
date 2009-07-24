@@ -724,7 +724,7 @@ ROM_START( pitfight )
 ROM_END
 
 
-ROM_START( pitfigh6 )
+ROM_START( pitfight6 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-6028.05d", 0x00000, 0x10000, CRC(dae1d895) SHA1(d3852b932e318e3f6ab034aba8210d896f9f08da) )
 	ROM_LOAD16_BYTE( "136081-6029.05b", 0x00001, 0x10000, CRC(4df13418) SHA1(e5469fbdd7263ca651d5cb7518576e4f9c4892e7) )
@@ -775,7 +775,7 @@ ROM_START( pitfigh6 )
 ROM_END
 
 
-ROM_START( pitfigh5 )
+ROM_START( pitfight5 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-5028.05d", 0x00000, 0x10000, CRC(dd34b528) SHA1(806e01f3fd6a1335cdcfd2e41f04e9046fe433b5) )
 	ROM_LOAD16_BYTE( "136081-5029.05b", 0x00001, 0x10000, CRC(b0ee9a09) SHA1(df85aeae2c497fbb22732704c2d581a3c195fcfb) )
@@ -826,7 +826,7 @@ ROM_START( pitfigh5 )
 ROM_END
 
 
-ROM_START( pitfigh4 )
+ROM_START( pitfight4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-4028.05d", 0x00000, 0x10000, CRC(f7cb1a4b) SHA1(024eb80d822559d9f3756710d1988f592639cd5e) )
 	ROM_LOAD16_BYTE( "136081-4029.05b", 0x00001, 0x10000, CRC(13ae0d4f) SHA1(1816f40f7e3fee2427e11623c9f1d1b3515cbf72) )
@@ -889,7 +889,7 @@ ROM_START( pitfigh4 )
 ROM_END
 
 
-ROM_START( pitfigh3 )
+ROM_START( pitfight3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-3028.05d", 0x00000, 0x10000, CRC(99530da4) SHA1(b542910127553d285f699d2b75e5d6fb071ff046) )
 	ROM_LOAD16_BYTE( "136081-3029.05b", 0x00001, 0x10000, CRC(78c7afbf) SHA1(7588dfee1e120b69591499ddf2860490b1c66885) )
@@ -952,7 +952,7 @@ ROM_START( pitfigh3 )
 ROM_END
 
 
-ROM_START( pitfighj )
+ROM_START( pitfightj )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136081-3428.05d", 0x00000, 0x10000, CRC(39be5484) SHA1(683ab8cf21f2b82aee11ce21b9dfbdb82083d6b6) )
 	ROM_LOAD16_BYTE( "136081-3429.05b", 0x00001, 0x10000, CRC(2cb14a58) SHA1(004178b4869766c11904d1fdf72725ba481bc8cc) )
@@ -1015,7 +1015,7 @@ ROM_START( pitfighj )
 ROM_END
 
 
-ROM_START( pitfighb )
+ROM_START( pitfightb )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "pit9.bin", 0x00000, 0x10000, CRC(946fb15b) SHA1(dbde8daf60a6bda242ea0d627c1fe5034de18090) )
 	ROM_LOAD16_BYTE( "pit7.bin", 0x00001, 0x10000, CRC(a9e7163a) SHA1(d1536bde0df20fb5f78e5ce55d453cb0c2c0b663) )
@@ -1110,10 +1110,10 @@ GAME( 1990, hydra,    0,        atarig1, hydra,    hydra,    ROT0, "Atari Games"
 GAME( 1990, hydrap,   hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hydrap2,  hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight, 0,        atarig1, pitfight, pitfigh7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfigh6, pitfight, atarig1, pitfight, pitfighj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfigh5, pitfight, atarig1, pitfight, pitfigh7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfigh4, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfigh3, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfighj, pitfight, atarig1, pitfighj, pitfighj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfighb, pitfight, atarig1, pitfight, pitfighb, ROT0, "Atari Games", "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        atarig1, pitfight, pitfigh7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, atarig1, pitfight, pitfighj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, atarig1, pitfight, pitfigh7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, atarig1, pitfight, pitfight, ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, atarig1, pitfighj, pitfighj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfighb, ROT0, "Atari Games", "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )

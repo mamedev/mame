@@ -690,7 +690,7 @@ ROM_START( lethalen )	// US version UAE
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 ROM_END
 
-ROM_START( lethalej )	// Japan version JAD
+ROM_START( lethalenj )	// Japan version JAD
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191jad01.u4",    0x10000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
@@ -724,7 +724,7 @@ ROM_START( lethalej )	// Japan version JAD
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 ROM_END
 
-ROM_START( lethalux )	// US version ?, proto / hack?, very different to other sets
+ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other sets
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191xxx01.u4",    0x10000,  0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test
@@ -758,7 +758,7 @@ ROM_START( lethalux )	// US version ?, proto / hack?, very different to other se
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 ROM_END
 
-ROM_START( letheab )	// Euro ver. EAB
+ROM_START( lethaleneab )	// Euro ver. EAB
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eab01.u4",    0x10000,  0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
@@ -792,7 +792,7 @@ ROM_START( letheab )	// Euro ver. EAB
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 ROM_END
 
-ROM_START( letheae )	// Euro ver. EAE
+ROM_START( lethaleneae )	// Euro ver. EAE
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eae01.u4",    0x10000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
@@ -826,7 +826,7 @@ ROM_START( letheae )	// Euro ver. EAE
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 ROM_END
 
-ROM_START( lethalua )	// *might* be UAA (writes UA to Eeprom)
+ROM_START( lethalenua )	// *might* be UAA (writes UA to Eeprom)
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "6_usa.u4",    0x10000,  0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )
@@ -869,10 +869,10 @@ static DRIVER_INIT( lethalen )
 	konami_rom_deinterleave_2(machine, "gfx4");
 }
 
-GAME( 1992, lethalen, 0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", GAME_IMPERFECT_GRAPHICS) // writes UE to eeprom
-GAME( 1992, lethalua, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/17/92 21:38)", GAME_IMPERFECT_GRAPHICS) // UAA? (writes UA to eeprom)
-GAME( 1992, lethalux, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", GAME_IMPERFECT_GRAPHICS) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test
-GAME( 1992, letheab,  lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", GAME_IMPERFECT_GRAPHICS) // writes EC to eeprom?!
-GAME( 1992, letheae,  lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", GAME_IMPERFECT_GRAPHICS) // writes EE to eeprom
+GAME( 1992, lethalen,   0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", GAME_IMPERFECT_GRAPHICS) // writes UE to eeprom
+GAME( 1992, lethalenua, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/17/92 21:38)", GAME_IMPERFECT_GRAPHICS) // UAA? (writes UA to eeprom)
+GAME( 1992, lethalenux, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", GAME_IMPERFECT_GRAPHICS) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test
+GAME( 1992, lethaleneab,lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", GAME_IMPERFECT_GRAPHICS) // writes EC to eeprom?!
+GAME( 1992, lethaleneae,lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", GAME_IMPERFECT_GRAPHICS) // writes EE to eeprom
 // different mirror / display setup, shoot off the top of the screen to reload..
-GAME( 1992, lethalej, lethalen, lethalej, lethalej, lethalen, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", GAME_IMPERFECT_GRAPHICS) // writes JC to eeprom?!
+GAME( 1992, lethalenj,  lethalen, lethalej, lethalej, lethalen, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", GAME_IMPERFECT_GRAPHICS) // writes JC to eeprom?!

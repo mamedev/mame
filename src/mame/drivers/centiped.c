@@ -1785,7 +1785,7 @@ ROM_START( centipdd ) /* Centipede "Dux" graphics hack by Two Bit Score */
 ROM_END
 
 
-ROM_START( centipd2 )
+ROM_START( centiped2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136001-207.d1",  0x2000, 0x0800, CRC(b2909e2f) SHA1(90ec90bd1e262861730afd5b113ec8dddd958ed8) )
 	ROM_LOAD( "136001-208.e1",  0x2800, 0x0800, CRC(110e04ff) SHA1(4cb481792411b6aefac561744cfbe107aba8bab3) )
@@ -2006,7 +2006,7 @@ static DRIVER_INIT( bullsdrt )
  *************************************/
 
 GAME( 1980, centiped, 0,        centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 3)", GAME_SUPPORTS_SAVE)
-GAME( 1980, centipd2, centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, centiped2,centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack",    "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )

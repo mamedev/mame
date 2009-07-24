@@ -337,7 +337,7 @@ ROM_START( srumbler )
 	ROM_LOAD( "63s141.8j",    0x0200, 0x0100, CRC(1a89a7ff) SHA1(437160ad5d61a257b7deaf5f5e8b3d4cf56a9663) )	/* priority (not used) */
 ROM_END
 
-ROM_START( srumblr2 )
+ROM_START( srumbler2 )
 	ROM_REGION( 0x40000, "user1", 0 ) /* Paged ROMs */
 	ROM_LOAD( "14e_sr04.bin", 0x00000, 0x08000, CRC(a68ce89c) SHA1(cb5dd8c47c24f9d8ac9a6135c0b7942d16002d25) )  /* RC4 */
 	ROM_LOAD( "rc03.13e",     0x08000, 0x08000, CRC(e82f78d4) SHA1(39cb5d9c18e7635d48aa29221ae99e6a500e2841) )  /* RC3 (different) */
@@ -426,5 +426,5 @@ ROM_END
 
 
 GAME( 1986, srumbler, 0,        srumbler, srumbler, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", 0 )
-GAME( 1986, srumblr2, srumbler, srumbler, srumbler, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", 0 )
+GAME( 1986, srumbler2,srumbler, srumbler, srumbler, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", 0 )
 GAME( 1986, rushcrsh, srumbler, srumbler, srumbler, 0, ROT270, "Capcom", "Rush & Crash (Japan)", 0 )

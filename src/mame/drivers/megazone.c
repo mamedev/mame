@@ -331,7 +331,7 @@ ROM_START( megazone )
 	ROM_LOAD( "319b15.e8",   0x0240, 0x020, CRC(31fd7ab9) SHA1(04d6e51b4930619c8ee12fb0d7b5f981e4d6d8d3) ) /* timing (not used) */
 ROM_END
 
-ROM_START( megaznik )
+ROM_START( megazonei )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic59_cpu.bin",  0x6000, 0x2000, CRC(f41922a0) SHA1(9f54509da18721a76593921c6e52085e62e6ea6b) )
 	ROM_LOAD( "ic58_cpu.bin",  0x8000, 0x2000, CRC(7fd7277b) SHA1(e773247e0c9419cae49e04962ea362a2976c2db2) )
@@ -414,7 +414,7 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 
 */
 
-ROM_START( megazona )
+ROM_START( megazonea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.12g",  0x6000, 0x2000, CRC(d42d67bf) SHA1(adac80d183ad26a9b1ec25a2da7ebbb33b441b63) )
 	ROM_LOAD( "6.10g",  0x8000, 0x2000, CRC(692398eb) SHA1(518001d738c2fb9417e52edfe9a7b74a074af3b0) )
@@ -446,7 +446,7 @@ ROM_START( megazona )
 	ROM_LOAD( "319b15.e8",   0x0240, 0x020, CRC(31fd7ab9) SHA1(04d6e51b4930619c8ee12fb0d7b5f981e4d6d8d3) ) /* timing (not used) */
 ROM_END
 
-ROM_START( megazonb )
+ROM_START( megazoneb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "319-j07",  0x6000, 0x2000,  CRC(5161a523) SHA1(90b456c30bccaaca96c75c2f421af3a2875b0b6b) )
 	ROM_LOAD( "319-j06",  0x8000, 0x2000,  CRC(7344c3de) SHA1(d3867738d4828afa50c8b43116d68cc6074d6cb5) )
@@ -478,7 +478,7 @@ ROM_START( megazonb )
 	ROM_LOAD( "319b15.e8",   0x0240, 0x020, CRC(31fd7ab9) SHA1(04d6e51b4930619c8ee12fb0d7b5f981e4d6d8d3) ) /* timing (not used) */
 ROM_END
 
-ROM_START( megazonc )
+ROM_START( megazonec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "319-h07",  0x6000, 0x2000,  CRC(8ca47f64) SHA1(1a20db5ac504b9b004116cfa6992d63a86a04cc5) )
 	ROM_LOAD( "319-h06",  0x8000, 0x2000,  CRC(ed35b12e) SHA1(69e88c4801c838a24aba0a867af205a7169ad089) )
@@ -518,11 +518,11 @@ static DRIVER_INIT( megazone )
 
 /* these just display a Konami copyright, no logo */
 GAME( 1983, megazone, 0,        megazone, megazone, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 1)", 0 )
-GAME( 1983, megazona, megazone, megazone, megazona, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 2)", 0 )
+GAME( 1983, megazonea, megazone, megazone, megazona, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 2)", 0 )
 
 /* these display Konami and Kosuka copyright, no logo */
-GAME( 1983, megazonb, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 1)", 0 )
-GAME( 1983, megazonc, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 2)", 0 )
+GAME( 1983, megazoneb, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 1)", 0 )
+GAME( 1983, megazonec, megazone, megazone, megazone, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 2)", 0 )
 
 /* this displays Konami and Kosuka copyright with a Konami / Interlogic logo */
-GAME( 1983, megaznik, megazone, megazone, megazone, megazone, ROT90, "Konami / Interlogic + Kosuka", "Mega Zone (Interlogic + Kosuka)", 0 )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone, ROT90, "Konami / Interlogic + Kosuka", "Mega Zone (Interlogic + Kosuka)", 0 )

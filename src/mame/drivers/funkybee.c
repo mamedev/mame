@@ -346,7 +346,7 @@ ROM_END
 /* This is a bootleg of "Funky Bee", where ORCA copyright has been removed and difficulty is harder,
    there are 2 lives less then in the original game
    TODO: insert correct DIPSWITCH, where lives is "1,2,3,4" instead of "3,4,5,6" */
-ROM_START( funkbeeb )
+ROM_START( funkybeeb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "senza_orca.fb1", 0x0000, 0x1000, CRC(7f2e7f85) SHA1(d4b63add3a97fc80aeafcd72a261302ab52d60a7) )
 	ROM_LOAD( "funkybee.3",     0x1000, 0x1000, CRC(7bf7c62f) SHA1(f8e5514c17fddb8ed95e5e18aab81ad0ebcc41af) )
@@ -409,7 +409,7 @@ ROM_START( skylancr )
 	ROM_LOAD( "18s030.1a",     0x0000, 0x0020, CRC(e645bacb) SHA1(5f4c299c4cf165fd229731c0e5799a34892bf28e) )
 ROM_END
 
-ROM_START( skylance )
+ROM_START( skylancre )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.5a",          0x0000, 0x2000, CRC(82d55824) SHA1(5c457e720ac8611bea4bc7e63ba4ee1c11200471) )
 	ROM_LOAD( "2.5c",          0x2000, 0x2000, CRC(dff3a682) SHA1(e3197e106c2c6d198d2769b63701222d48a196d1) )
@@ -426,7 +426,7 @@ ROM_START( skylance )
 ROM_END
 
 GAME( 1982, funkybee, 0,        funkybee, funkybee, 0, ROT90, "Orca",                           "Funky Bee",                            0 )
-GAME( 1982, funkbeeb, funkybee, funkybee, funkbeeb, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          0 )
+GAME( 1982, funkybeeb,funkybee, funkybee, funkbeeb, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          0 )
 GAME( 1983, skylancr, 0,        funkybee, skylancr, 0, ROT90, "Orca",                           "Sky Lancer",                           0 )
-GAME( 1983, skylance, skylancr, funkybee, skylance, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", 0 )
+GAME( 1983, skylancre,skylancr, funkybee, skylance, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", 0 )
 

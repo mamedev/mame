@@ -375,7 +375,7 @@ ROM_START( dynduke )
 	ROM_LOAD( "7.x10",   0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
-ROM_START( dyndukf )
+ROM_START( dyndukef )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("1.cd8",     0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE("2.cd7",     0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
@@ -533,6 +533,6 @@ static DRIVER_INIT( dynduke )
 /* Game Drivers */
 
 GAME( 1989, dynduke, 0,       dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", 0 )
-GAME( 1989, dyndukf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", 0 )
+GAME( 1989, dyndukef,dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", 0 )
 GAME( 1989, dbldyn,  dynduke, dbldyn,  dynduke, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", 0 )
 GAME( 1989, dbldynf, dynduke, dynduke, dynduke, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", 0 )

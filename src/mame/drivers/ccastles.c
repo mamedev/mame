@@ -547,7 +547,7 @@ ROM_START( ccastles )
 ROM_END
 
 
-ROM_START( ccastleg )
+ROM_START( ccastlesg )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
@@ -567,7 +567,7 @@ ROM_START( ccastleg )
 ROM_END
 
 
-ROM_START( ccastlep )
+ROM_START( ccastlesp )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
@@ -587,7 +587,7 @@ ROM_START( ccastlep )
 ROM_END
 
 
-ROM_START( ccastlef )
+ROM_START( ccastlesf )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
@@ -607,7 +607,7 @@ ROM_START( ccastlef )
 ROM_END
 
 
-ROM_START( ccastle3 )
+ROM_START( ccastles3 )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
@@ -627,7 +627,7 @@ ROM_START( ccastle3 )
 ROM_END
 
 
-ROM_START( ccastle2 )
+ROM_START( ccastles2 )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-203.1k", 0x0a000, 0x2000, CRC(348a96f0) SHA1(76de7bf6a01ccb15a4fe7333c1209f623a2e0d1b) )
 	ROM_LOAD( "136022-204.1l", 0x0c000, 0x2000, CRC(d48d8c1f) SHA1(8744182a3e2096419de63e341feb77dd8a8bcb34) )
@@ -647,7 +647,7 @@ ROM_START( ccastle2 )
 ROM_END
 
 
-ROM_START( ccastle1 )
+ROM_START( ccastles1 )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-103.1k", 0x0a000, 0x2000, CRC(9d10e314) SHA1(3474ae0f0617c1dc9aaa02ca2a912a72d57eba73) )
 	ROM_LOAD( "136022-104.1l", 0x0c000, 0x2000, CRC(fe2647a4) SHA1(532b236043449b35bd444fff63a7e083d0e2d8c8) )
@@ -667,7 +667,7 @@ ROM_START( ccastle1 )
 ROM_END
 
 
-ROM_START( ccastlej )
+ROM_START( ccastlesj )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "a000.12m",      0x0a000, 0x2000, CRC(0d911ef4) SHA1(fbd6a5a0e4e865421ed3720aa61221d03583f248) )
 	ROM_LOAD( "c000.13m",      0x0c000, 0x2000, CRC(246079de) SHA1(ade2c63656339c3e7e634470a17bc30da1006979) )
@@ -695,10 +695,10 @@ ROM_END
  *************************************/
 
 GAME( 1983, ccastles, 0,        ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 4)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastleg, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlep, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlef, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastle3, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastle2, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastle1, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlej, ccastles, ccastles, ccastlej, 0, ROT0, "Atari", "Crystal Castles (joystick version)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlej, 0, ROT0, "Atari", "Crystal Castles (joystick version)", GAME_SUPPORTS_SAVE )

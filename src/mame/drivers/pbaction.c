@@ -341,7 +341,7 @@ ROM_START( pbaction )
 ROM_END
 
 
-ROM_START( pbactio2 )
+ROM_START( pbaction2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pba16.bin",     0x0000, 0x4000, CRC(4a239ebd) SHA1(74e6da0485ac78093b4f09953fa3accb14bc3e43) )
 	ROM_LOAD( "pba15.bin",     0x4000, 0x4000, CRC(3afef03a) SHA1(dec714415d2fd00c9021171a48f6c94b40888ae8) )
@@ -370,7 +370,7 @@ ROM_START( pbactio2 )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
-ROM_START( pbactio3 )
+ROM_START( pbaction3 )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )
 	ROM_LOAD( "14.bin",     0x0000, 0x4000, CRC(f17a62eb) SHA1(8dabfc0ad127c154c0293a65df32d52d57dd9755) )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
@@ -426,5 +426,5 @@ static DRIVER_INIT( pbactio3 )
 
 
 GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", 0 )
-GAME( 1985, pbactio2, pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 )
-GAME( 1985, pbactio3, pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 )
+GAME( 1985, pbaction2,pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 )
+GAME( 1985, pbaction3,pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 )

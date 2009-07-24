@@ -286,7 +286,7 @@ ROM_START( funybubl )
 	ROM_CONTINUE(       0x60000,  0x20000 )
 ROM_END
 
-ROM_START( funybubc )
+ROM_START( funybublc )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
@@ -319,5 +319,5 @@ ROM_END
 
 
 GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl, ROT0, "In Chang Electronic Co", "Funny Bubble", 0 )
-GAME( 1999, funybubc, funybubl, funybubl, funybubl, funybubl, ROT0, "Comad Industry Co Ltd", "Funny Bubble (Comad version)", 0 )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl, ROT0, "Comad Industry Co Ltd", "Funny Bubble (Comad version)", 0 )
 

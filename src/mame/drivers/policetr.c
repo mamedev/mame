@@ -506,7 +506,7 @@ ROM_START( policetr ) /* Rev 0.3 PCB , with all chips dated 04/01/97 */
 ROM_END
 
 
-ROM_START( polict11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
+ROM_START( policetr11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
@@ -527,7 +527,7 @@ ROM_START( polict11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
 ROM_END
 
 
-ROM_START( polict10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
+ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
 	/* Same data as the other sets, but split in 4 meg roms */
 	ROM_LOAD16_BYTE( "pt-u121.v10", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) )
@@ -558,7 +558,7 @@ ROM_START( polict10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
 ROM_END
 
 
-ROM_START( plctr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual version is V1.3B */
+ROM_START( policetr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
@@ -589,7 +589,7 @@ Note: With this version, the program roms are twice the size of those found on a
 ROM_END
 
 
-ROM_START( plctr13b ) /* Rev 0.5B PCB , unknown program rom date Actual version is V1.3B */
+ROM_START( policetr13b ) /* Rev 0.5B PCB , unknown program rom date Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
 	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
@@ -642,7 +642,7 @@ ROM_START( sshooter ) /* Rev 0.5B PCB , unknown program rom date */
 ROM_END
 
 
-ROM_START( sshoot12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
+ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
@@ -667,7 +667,7 @@ ROM_START( sshoot12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 ROM_END
 
 
-ROM_START( sshoot11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
+ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
@@ -732,12 +732,13 @@ static DRIVER_INIT( sshoot12 )
  *
  *************************************/
 
-GAME( 1996, policetr, 0,        policetr, policetr, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3)", 0 )
-GAME( 1996, polict11, policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.1)", 0 )
-GAME( 1996, polict10, policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.0)", 0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3)", 0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.1)", 0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.0)", 0 )
 
-GAME( 1996, plctr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, plctr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B)", 0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B)", 0 )
+
 GAME( 1998, sshooter, 0,        sshooter, policetr, sshooter, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.7)", 0 )
-GAME( 1998, sshoot12, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.2)", 0 )
-GAME( 1998, sshoot11, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.1)", 0 )
+GAME( 1998, sshooter12, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.2)", 0 )
+GAME( 1998, sshooter11, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.1)", 0 )

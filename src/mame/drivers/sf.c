@@ -1010,7 +1010,7 @@ ROM_START( sfus )
 	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
 ROM_END
 
-ROM_START( sfjp )
+ROM_START( sfj )
 	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("sf-19.bin", 0x00000, 0x10000, CRC(116027d7) SHA1(6bcb117ee415aff4d8ea962d4eff4088ca94c251) )
 	ROM_LOAD16_BYTE("sf-22.bin", 0x00001, 0x10000, CRC(d3cbd09e) SHA1(7274c603100132102de09e10d2129cfeb6c06369) )
@@ -1138,5 +1138,5 @@ ROM_END
 
 GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", 0 )
 GAME( 1987, sfus, sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US)", 0 )
-GAME( 1987, sfjp, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", 0 )
+GAME( 1987, sfj, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", 0 )
 GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", 0 )

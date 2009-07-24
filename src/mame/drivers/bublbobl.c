@@ -962,7 +962,7 @@ ALL RIGHTS RESERVED
 VER 0.018.AUG,1986 SUMMER
 */
 
-ROM_START( bublbob1 )
+ROM_START( bublbobl1 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "a78-06.51",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
     /* ROMs banked at 8000-bfff */
@@ -1011,7 +1011,7 @@ LICENSED TO ROMSTAR FOR U.S.A.
 VER 5.1 8.NOV,1986 SUMMER
 */
 
-ROM_START( bublbobr )
+ROM_START( bublboblr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "a78-25.51",    0x00000, 0x08000, CRC(2d901c9d) SHA1(72504225d3a26212e8f35508a79200eeb91138b6) )
     /* ROMs banked at 8000-bfff */
@@ -1060,7 +1060,7 @@ LICENSED TO ROMSTAR FOR U.S.A.
 VER 1.0 26.AUG,1986 SUMMER
 */
 
-ROM_START( bubbobr1 )
+ROM_START( bublboblr1 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "a78-06.51",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
     /* ROMs banked at 8000-bfff */
@@ -1284,10 +1284,10 @@ GAME( 1986, tokio,    0,        tokio,    tokio,    tokio,    ROT90, "Taito Corp
 GAME( 1986, tokiou,   tokio,    tokio,    tokio,    tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", GAME_NOT_WORKING )
 GAME( 1986, tokiob,   tokio,    tokio,    tokio,    tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", 0 )
 
-GAME( 1986, bublbobl, 0,        bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble", 0 )
-GAME( 1986, bublbob1, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (older)", 0 )
-GAME( 1986, bublbobr, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US with mode select)", 0 )
-GAME( 1986, bubbobr1, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US)", 0 )
+GAME( 1986, bublbobl,  0,        bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble", 0 )
+GAME( 1986, bublbobl1, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (older)", 0 )
+GAME( 1986, bublboblr, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US with mode select)", 0 )
+GAME( 1986, bublboblr1,bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US)", 0 )
 
 GAME( 1986, boblbobl, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Bobble Bobble", 0 )
 GAME( 1986, sboblboa, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", 0 )

@@ -601,7 +601,7 @@ ROM_START( crimep2 )
 	ROM_LOAD16_BYTE( "cp2_1.3_2.bin", 0x000001, 0x20000, CRC(dbdaa79a) SHA1(998044909d5c93e3bd1baafefab818fdb7b3f55e) )
 ROM_END
 
-ROM_START( crime211 )
+ROM_START( crimep211 )
 	ALG_BIOS
 
 	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF )
@@ -798,7 +798,7 @@ GAME( 1992, gallgall, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Las
   /* all good, but no holster */
 GAME( 1993, crimepat, alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2,  alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, crime211, crimep2, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, crimep211,crimep2, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, lastbh,   alg_bios, alg_r2,   alg_2p, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fastdraw, alg_bios, alg_r2,   alg_2p, palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
   /* works ok but uses right player (2) controls only for trigger and holster */

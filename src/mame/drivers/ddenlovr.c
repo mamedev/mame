@@ -7579,7 +7579,7 @@ ROM_END
 
 ***************************************************************************/
 
-ROM_START( rongrngg )
+ROM_START( rongrongg )
 	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "rr_8002g.rom", 0x00000, 0x80000, CRC(9a5d2885) SHA1(9ca049085d14b1cfba6bd48adbb0b883494e7d29) )
 	ROM_RELOAD(               0x10000, 0x80000 )
@@ -7624,7 +7624,7 @@ ROMs  : 8001.2F      [9fc8a367] - Samples
 
 ***************************************************************************/
 
-ROM_START( rongrngj )
+ROM_START( rongrongj )
 	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "8002.3e", 0x00000, 0x80000, CRC(27142684) SHA1(4626576d032a89b558c8542f82b286e5673f8662) )
 	ROM_RELOAD(          0x10000, 0x80000 )
@@ -8897,8 +8897,8 @@ GAME( 1994, mjmyuniv, 0,        mjmyuniv, mjmyster, 0,        ROT0, "Dynax",    
 GAME( 1994, quiz365,  0,        quiz365,  quiz365,  0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t, quiz365,  quiz365,  quiz365,  0,        ROT0, "Nakanihon + Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1994, rongrong, 0,        rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Europe)",                                  GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrngj, rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrngg, rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
+GAME( 1994, rongrongj,rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
+GAME( 1994, rongrongg,rongrong, rongrong, rongrong, rongrong, ROT0, "Nakanihon (Activision licence)",              "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
 GAME( 1994, hparadis, 0,        hparadis, hparadis, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL )
 GAME( 1995, hgokou,   0,        hgokou,   hgokou,   0,        ROT0, "Dynax (Alba licence)",					       "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL )
 GAME( 1995, mjdchuka, 0,        mjchuuka, mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL )

@@ -378,7 +378,7 @@ ROM_END
                                     0  1  2  3  4
 */
 
-ROM_START( jailbrkb )
+ROM_START( jailbrekb )
     ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.k6",    0x8000, 0x8000, CRC(df0e8fc7) SHA1(62e59dbb3941ed8af365e96906315318d9aee060) )
 
@@ -431,5 +431,5 @@ static DRIVER_INIT( jailbrek )
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )
-GAME( 1986, jailbrkb, jailbrek, jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break (Bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb,jailbrek, jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break (Bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", GAME_SUPPORTS_SAVE )

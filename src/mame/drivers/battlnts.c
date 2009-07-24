@@ -247,7 +247,7 @@ ROM_START( battlnts )
 	ROM_LOAD( "777_c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
 ROM_END
 
-ROM_START( battlntj )
+ROM_START( battlntsj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "777_e02.7e",  0x08000, 0x08000, CRC(d631cfcb) SHA1(7787da0dd8cd218abc27204e517e04d7a1913a3b) ) /* fixed ROM */
 	ROM_LOAD( "777_e03.8e",  0x10000, 0x10000, CRC(5ef1f4ef) SHA1(e3e6e1fc5a65328d94c23e2e76eef3504b70e58b) ) /* banked ROM */
@@ -292,7 +292,7 @@ ROM_START( thehustl )
 	ROM_LOAD( "765_e05.13e", 0x00000, 0x40000, CRC(ef044655) SHA1(c8272283eab8fc2899979da398819cb72c92a299) ) /* sprites */
 ROM_END
 
-ROM_START( thehustj )
+ROM_START( thehustlj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_j02.7e",  0x08000, 0x08000, CRC(2ac14c75) SHA1(b88f6279ab88719f4207e28486a0022554668382) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
@@ -345,7 +345,7 @@ static DRIVER_INIT( rackemup )
 
 
 GAME( 1987, battlnts, 0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", 0 )
-GAME( 1987, battlntj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", 0 )
+GAME( 1987, battlntsj,battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", 0 )
 GAME( 1987, rackemup, 0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL )
 GAME( 1987, thehustl, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL )
-GAME( 1987, thehustj, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL )
+GAME( 1987, thehustlj,rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL )

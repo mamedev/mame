@@ -269,7 +269,7 @@ ROM_START( labyrunr )
 															/* there is no char lookup table */
 ROM_END
 
-ROM_START( labyrunk )
+ROM_START( labyrunrk )
 	ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "771k04.10f", 0x10000, 0x08000, CRC(9816ab35) SHA1(6efb0332f4a62f20889f212682ee7225e4a182a9) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
@@ -289,4 +289,4 @@ ROM_END
 
 GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, 0, ROT90, "Konami", "Trick Trap (World?)", 0 )
 GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", 0 )
-GAME( 1987, labyrunk, tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", 0 )
+GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", 0 )

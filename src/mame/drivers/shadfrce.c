@@ -635,7 +635,7 @@ ROM_START( shadfrce )
 	ROM_LOAD( "32j9-0.76",  0x000000, 0x080000, CRC(16001e81) SHA1(67928d2024f963aee91f1498b6f4c76101d2f3b8) )
 ROM_END
 
-ROM_START( shadfrcj )
+ROM_START( shadfrcej )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "32a12-011.34", 0x00001, 0x40000, CRC(0c041e08) SHA1(7b9d52cb1f6bc217c6e64287bd9630aa37243513) ) /* Japan Version 3 */
 	ROM_LOAD16_BYTE( "32a13-010.26", 0x00000, 0x40000, CRC(00985361) SHA1(e9da1b096b25a6ee46bab6230dda66dccdd4bed8) )
@@ -664,7 +664,7 @@ ROM_START( shadfrcj )
 	ROM_LOAD( "32j9-0.76",  0x000000, 0x080000, CRC(16001e81) SHA1(67928d2024f963aee91f1498b6f4c76101d2f3b8) )
 ROM_END
 
-ROM_START( shadfrcjv2 )
+ROM_START( shadfrcejv2 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "32j12-01.34", 0x00001, 0x40000, CRC(38fdbe1d) SHA1(476d8ef2c0d2a8c568ce44631f93f8c730f91b08) ) /* Japan Version 2 */
 	ROM_LOAD16_BYTE( "32j13-01.26", 0x00000, 0x40000, CRC(6e1df6f1) SHA1(c165553fe967b437413dd7ddc87a267548dd0ca9) )
@@ -694,6 +694,6 @@ ROM_START( shadfrcjv2 )
 ROM_END
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
-GAME( 1993, shadfrcj,   shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 3)", GAME_NO_COCKTAIL )
-GAME( 1993, shadfrcjv2, shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrce,    0,        shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrcej,   shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 3)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrcejv2, shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )

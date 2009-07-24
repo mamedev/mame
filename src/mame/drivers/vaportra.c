@@ -301,7 +301,7 @@ ROM_START( vaportra )
 	ROM_LOAD( "pal16l8b.14h", 0x0800, 0x0104, CRC(bf421fce) SHA1(e8b0895b1fe99a3d5b3dcca004a7bfd1a09766b2) )
 ROM_END
 
-ROM_START( vaportru )
+ROM_START( vaportrau )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fj02",   0x00000, 0x20000, CRC(a2affb73) SHA1(0d49397cc9891047a0b92e92e2e3d0e7fcaf8db9) )
   	ROM_LOAD16_BYTE( "fj00",   0x00001, 0x20000, CRC(ef05e07b) SHA1(0e505709fa251e6b30f019c0c28ee9ba2b29a50a) )
@@ -773,5 +773,5 @@ static DRIVER_INIT( vaportra )
 /******************************************************************************/
 
 GAME( 1989, vaportra, 0,        vaportra, vaportra, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)", 0 )
-GAME( 1989, vaportru, vaportra, vaportra, vaportra, vaportra, ROT270, "Data East USA", "Vapor Trail - Hyper Offence Formation (US)", 0 )
+GAME( 1989, vaportrau,vaportra, vaportra, vaportra, vaportra, ROT270, "Data East USA", "Vapor Trail - Hyper Offence Formation (US)", 0 )
 GAME( 1989, kuhga,    vaportra, vaportra, vaportra, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)", 0 )

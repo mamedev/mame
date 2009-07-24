@@ -2038,7 +2038,7 @@ ROM_START( wfortune )
 ROM_END
 
 
-ROM_START( wfortuna )
+ROM_START( wfortunea )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "wofpgmr1.bin", 0x04000, 0x4000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) )
 	ROM_CONTINUE(             0x10000, 0xc000 )
@@ -2236,7 +2236,7 @@ ROM_START( slikshot )
 ROM_END
 
 
-ROM_START( sliksh17 )
+ROM_START( slikshot17 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin", 0x04000, 0x4000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
 	ROM_CONTINUE(       0x10000, 0xc000 )
@@ -2260,7 +2260,7 @@ ROM_START( sliksh17 )
 ROM_END
 
 
-ROM_START( sliksh16 )
+ROM_START( slikshot16 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "poolpgm-16.u5", 0x04000, 0x4000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
 	ROM_CONTINUE(              0x10000, 0xc000 )
@@ -2376,7 +2376,7 @@ ROM_START( hstennis )
 ROM_END
 
 
-ROM_START( hstenn10 )
+ROM_START( hstennis10 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "tenbim.v10", 0x04000, 0x4000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
@@ -2509,7 +2509,7 @@ ROM_START( rimrockn )
 ROM_END
 
 
-ROM_START( rimrck20 )
+ROM_START( rimrockn20 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
 	ROM_LOAD( "rrb.bin",   0x04000, 0x4000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
 	ROM_CONTINUE(          0x10000, 0x4000 )
@@ -2534,7 +2534,7 @@ ROM_START( rimrck20 )
 ROM_END
 
 
-ROM_START( rimrck16 )
+ROM_START( rimrockn16 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
 	ROM_LOAD( "rrbbv16.u5",0x04000, 0x4000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
 	ROM_CONTINUE(          0x10000, 0x4000 )
@@ -2559,7 +2559,7 @@ ROM_START( rimrck16 )
 ROM_END
 
 
-ROM_START( rimrck12 )
+ROM_START( rimrockn12 )
 	ROM_REGION( 0x34000, "maincpu", 0 )
 	ROM_LOAD( "rrbbv12.u5",0x04000, 0x4000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
 	ROM_CONTINUE(          0x10000, 0x4000 )
@@ -2734,7 +2734,7 @@ static DRIVER_INIT( rimrockn )
 
 /* Wheel of Fortune-style PCB */
 GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune", 0 )
-GAME( 1989, wfortuna, wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 )
+GAME( 1989, wfortunea, wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 )
 
 /* Grudge Match-style PCB */
 GAME( 1989, grmatch,  0,        grmatch,           grmatch,  grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
@@ -2749,15 +2749,15 @@ GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "
 
 /* Slick Shot-style PCB */
 GAME( 1990, slikshot, 0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 )
-GAME( 1990, sliksh17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
-GAME( 1990, sliksh16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
+GAME( 1990, slikshot17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
+GAME( 1990, slikshot16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
 GAME( 1990, dynobop,  0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
 GAME( 1990, sstrike,  0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
 GAME( 1991, pokrdice, 0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis, 0,        hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
-GAME( 1990, hstenn10, hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
+GAME( 1990, hstennis10, hstennis, hstennis_hi,       hstennis, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
 GAME( 1991, arlingtn, 0,        hstennis_hi,       arlingtn, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
 GAME( 1991, peggle,   0,        hstennis_lo,       peggle,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
 GAME( 1991, pegglet,  peggle,   hstennis_lo,       pegglet,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
@@ -2765,9 +2765,9 @@ GAME( 1992, neckneck, 0,        hstennis_lo,       neckneck, neckneck, ROT0,   "
 
 /* Rim Rockin' Basketball-style PCB */
 GAME( 1991, rimrockn, 0,        rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrck20, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrck16, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrck12, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
 GAME( 1991, ninclown, 0,        ninclown,          ninclown, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 )

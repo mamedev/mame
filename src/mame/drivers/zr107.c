@@ -859,7 +859,7 @@ static DRIVER_INIT(jetwave)
 
 /*****************************************************************************/
 
-ROM_START(midnrun)
+ROM_START( midnrun )
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE( "476ea1a01.20u", 0x000003, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) )
 	ROM_LOAD32_BYTE( "476ea1a02.17u", 0x000002, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
@@ -885,7 +885,7 @@ ROM_START(midnrun)
 	ROM_LOAD( "477a08.5r", 0x400000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
 ROM_END
 
-ROM_START(windheat)
+ROM_START( windheat )
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE( "677eaa01.20u", 0x000003, 0x080000, CRC(500b61f4) SHA1(ec39165412978c0dbd3cbf1f7b6989b5d7ba20a0) )
 	ROM_LOAD32_BYTE( "677eaa02.17u", 0x000002, 0x080000, CRC(99f9fd3b) SHA1(aaec5d7f4e46648aab3738ab09e46b312caee58f) )
@@ -911,7 +911,7 @@ ROM_START(windheat)
 	ROM_LOAD( "677a08.5r", 0x400000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
 ROM_END
 
-ROM_START(windheau)
+ROM_START( windheatu )
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE( "677ubc01.20u", 0x000003, 0x080000, CRC(63198721) SHA1(7f34131bf51d573d0c683b28df2567a0b911c98c) )
 	ROM_LOAD32_BYTE( "677ubc02.17u", 0x000002, 0x080000, CRC(bdb00e2d) SHA1(c54b2250047576e12e9936300989e40494b4659d) )
@@ -937,7 +937,7 @@ ROM_START(windheau)
 	ROM_LOAD( "677a08.5r", 0x400000, 0x200000, CRC(bde38850) SHA1(aaf1bdfc25ecdffc1f6076c9c1b2edbe263171d2) )
 ROM_END
 
-ROM_START(jetwave)
+ROM_START( jetwave )
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE( "678uab01.20u", 0x000003, 0x080000, CRC(a9b9ceed) SHA1(36f0d18481d7c3e7358e02473e54bc6b52d5c26b) )
 	ROM_LOAD32_BYTE( "678uab02.17u", 0x000002, 0x080000, CRC(5ed24ac8) SHA1(d659c751558d4f8d89314466a37c04ac2df46879) )
@@ -967,5 +967,5 @@ ROM_END
 
 GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107,   ROT0, "Konami", "Midnight Run (Euro v1.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, windheat, 0,        zr107,   windheat, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheau, windheat, zr107,   windheat, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, windheatu,windheat, zr107,   windheat, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, jetwave,  0,        jetwave, jetwave,  jetwave, ROT0, "Konami", "Jet Wave (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

@@ -1142,7 +1142,7 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
 ROM_END
 
-ROM_START( spacfura ) /* Revision A */
+ROM_START( spacfurya ) /* Revision A */
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960a.prom-u1",    0x0800, 0x0800, CRC(e1ea7964) SHA1(9c84c525973fcf1437b062d98195272723249d02) )
@@ -1169,7 +1169,7 @@ ROM_START( spacfura ) /* Revision A */
 	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
 ROM_END
 
-ROM_START( spacfurb ) /* Revision B */
+ROM_START( spacfuryb ) /* Revision B */
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960b.prom-u1",    0x0800, 0x0800, CRC(8a99b63f) SHA1(4b9ec152e0fad50afeea11f5d61331f3211da606) )
@@ -1440,8 +1440,8 @@ GAME( 1981, elim2c,	  elim2,	elim2,	  elim2c,	elim2,	  ORIENTATION_FLIP_Y,   "Gr
 GAME( 1981, elim4,	  elim2,    elim2,    elim4,    elim4,    ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players)", 0 )
 GAME( 1981, elim4p,	  elim2,	elim2,	  elim4,	elim4,	  ORIENTATION_FLIP_Y,   "Gremlin", "Eliminator (4 Players, prototype)", 0 )
 GAME( 1981, spacfury, 0,        spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision C)", 0 )
-GAME( 1981, spacfura, spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision A)", 0 )
-GAME( 1981, spacfurb, spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision B)", 0 )
+GAME( 1981, spacfurya,spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision A)", 0 )
+GAME( 1981, spacfuryb,spacfury, spacfury, spacfury, spacfury, ORIENTATION_FLIP_Y,   "Sega", "Space Fury (revision B)", 0 )
 GAME( 1982, zektor,   0,        zektor,   zektor,   zektor,   ORIENTATION_FLIP_Y,   "Sega", "Zektor (revision B)", 0 )
 GAME( 1982, tacscan,  0,        tacscan,  tacscan,  tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega", "Tac/Scan", GAME_IMPERFECT_SOUND )
 GAME( 1982, startrek, 0,        startrek, startrek, startrek, ORIENTATION_FLIP_Y,   "Sega", "Star Trek", GAME_IMPERFECT_SOUND )

@@ -644,7 +644,7 @@ ROM_START( spacefev )
 	ROM_LOAD( "sf.prm",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) )
 ROM_END
 
-ROM_START( spacefva )
+ROM_START( spacefeva )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sf-a.f1",  0x0000, 0x0400, CRC(7fa305e8) SHA1(cda9fc9c76f57800de25ddf65f69fef19fd28481) )
 	ROM_LOAD( "sf-a.f2",  0x0400, 0x0400, CRC(7c1429aa) SHA1(8d8e0a4fc09fb1ecbfb86c67c20000ef30ab3fac) )
@@ -679,7 +679,7 @@ ROM_START( highsplt )
 	ROM_LOAD( "sf.prm",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) )
 ROM_END
 
-ROM_START( highspla )
+ROM_START( highsplta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hs.f1",    0x0000, 0x0400, CRC(b8887351) SHA1(ccd49937f1cbd7a157b3715474ccc3e8fdcea2b2) )
 	ROM_LOAD( "hs.f2",    0x0400, 0x0400, CRC(cda933a7) SHA1(a0447c8c98e24674081c9bf4b1ef07dc186c6e2b) )
@@ -771,7 +771,7 @@ ROM_START( helifire )
 	ROM_LOAD( "hf.snd",   0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
 
-ROM_START( helifira )
+ROM_START( helifirea )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hf-a.f1",  0x0000, 0x0400, CRC(92c9d6c1) SHA1(860a7b3980e9e11d48769fad347c965e04ed3f89) )
 	ROM_LOAD( "hf-a.f2",  0x0400, 0x0400, CRC(a264dde8) SHA1(48f972ad5af6c2ab61117f60d9244df6df6d313c) )
@@ -790,11 +790,11 @@ ROM_END
 
 
 GAME( 1979, spacefev, 0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 1)", 0 )
-GAME( 1979, spacefva, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 2)", 0 )
+GAME( 1979, spacefeva,spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 2)", 0 )
 GAME( 1979, highsplt, 0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", 0 )
-GAME( 1979, highspla, highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 )
+GAME( 1979, highsplta,highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 )
 GAME( 1979, spacelnc, 0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_NOT_WORKING )
 GAME( 1979, sheriff,  0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", 0 )
 GAME( 1980, bandido,  sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", 0 )
 GAME( 1980, helifire, 0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1980, helifira, helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1980, helifirea,helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )

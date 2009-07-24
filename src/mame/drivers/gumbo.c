@@ -291,7 +291,7 @@ ROM_START( gumbo )
 	ROM_LOAD( "u511.bin", 0x20000, 0x20000, CRC(1411451b) SHA1(941d5f311f727e3a8d41ecbbe35b687d48cc2cef) )
 ROM_END
 
-ROM_START( mspuzzlg ) /* This version is a clone of Gumbo... NOT the other Miss Puzzle sets */
+ROM_START( mspuzzleg ) /* This version is a clone of Gumbo... NOT the other Miss Puzzle sets */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1", 0x00001, 0x20000, CRC(95218ff1) SHA1(9617d979d026872dbe68eaae21c3ab1f5f9f4bfd) ) /* Korean bootleg / clone / hack??? */
 	ROM_LOAD16_BYTE( "u2", 0x00000, 0x20000, CRC(7ea7d96c) SHA1(17b9afb3214a07b1af5913f1926c7aeac27ea0e8) )
@@ -344,7 +344,7 @@ ROM_START( mspuzzle )
 	ROM_LOAD( "u511.bin", 0x40000, 0x40000, CRC(3d6b6c78) SHA1(3016423102b4d47c0f1296471cf1670258acc856) )
 ROM_END
 
-ROM_START( mspuzzln )
+ROM_START( mspuzzlen )
 	/* all the roms for this game could do with checking on another board, this one was in pretty bad condition
        and reads weren't always consistent */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
@@ -383,7 +383,7 @@ ROM_START( dblpoint )
 ROM_END
 
 /* based on the labels this doesn't seem to be an original Min Corp. board */
-ROM_START( dblpoind )
+ROM_START( dblpointd )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d12.bin", 0x00001, 0x20000, CRC(44bc1bd9) SHA1(8b72909c53b09b9287bf90bcd8970bdf9c1b8798) )
 	ROM_LOAD16_BYTE( "d13.bin", 0x00000, 0x20000, CRC(625a311b) SHA1(38fa0d240b253fcc8dc89438582a9c446410b636) )
@@ -401,9 +401,9 @@ ROM_START( dblpoind )
 ROM_END
 
 GAME( 1994, gumbo,    0,        gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Gumbo", 0 )
-GAME( 1994, mspuzzlg, gumbo,    gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", 0 )
+GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", 0 )
 GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss Bingo", 0 )
 GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", 0 )
-GAME( 1994, mspuzzln, mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING )
+GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING )
 GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, 0, ROT0,  "Min Corp.", "Double Point", 0 )
-GAME( 1995, dblpoind, dblpoint, dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point (Dong Bang Electron, bootleg?)", 0 )
+GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point (Dong Bang Electron, bootleg?)", 0 )

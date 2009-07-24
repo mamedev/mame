@@ -509,7 +509,7 @@ ROM_START( wwfwfest )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-ROM_START( wwfwfsta )
+ROM_START( wwfwfesta )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "wf_18.rom", 0x00000, 0x40000, CRC(933ea1a0) SHA1(61da142cfa7abd3b77ab21979c061a078c0d0c63) )
 	ROM_LOAD16_BYTE( "wf_19.rom", 0x00001, 0x40000, CRC(bd02e3c4) SHA1(7ae63e48caf9919ce7b63b4c5aa9474ba8c336da) )
@@ -538,7 +538,7 @@ ROM_START( wwfwfsta )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-ROM_START( wwfwfstb )
+ROM_START( wwfwfestb )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "3",      0x00000, 0x40000, CRC(ea73369c) SHA1(be614a342f9014251810fa30ec56fec03f7c8ef3) )
 	ROM_LOAD16_BYTE( "2",      0x00001, 0x40000, CRC(632bb3a4) SHA1(9c04fed5aeefc683810cfbd9b3318e155ed9813f) )
@@ -569,7 +569,7 @@ ROM_START( wwfwfstb )
 	ROM_LOAD16_BYTE( "8",     0x00001, 0x20000, CRC(7b2ecba7) SHA1(1ed2451132448930ac4afcdc67ca14e3e922863e) ) /* 3 */
 ROM_END
 
-ROM_START( wwfwfstj )
+ROM_START( wwfwfestj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "31j13-0.ic19", 0x00001, 0x40000, CRC(2147780d) SHA1(9a7a5db06117f3780e084d3f0c7b642ff8a9db55) )
 	ROM_LOAD16_BYTE( "31j14-0.ic18", 0x00000, 0x40000, CRC(d76fc747) SHA1(5f6819bc61756d1df4ac0776ac420a59c438cf8a) )
@@ -598,7 +598,7 @@ ROM_START( wwfwfstj )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-GAME( 1991, wwfwfest, 0,        wwfwfest, wwfwfest, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US set 1)",   GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfsta, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)",   GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfstb, wwfwfest, wwfwfstb, wwfwfest, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfstj, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (Japan)",      GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,  0,        wwfwfest, wwfwfest, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US set 1)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfesta, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb, wwfwfest, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj, wwfwfest, wwfwfest, wwfwfest, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (Japan)",      GAME_SUPPORTS_SAVE )

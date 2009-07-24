@@ -747,7 +747,7 @@ ROM_START( magicbub )
 
 ROM_END
 
-ROM_START( magicbua )
+ROM_START( magicbuba )
 
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "u33.bin", 0x000000, 0x040000, CRC(a8164a02) SHA1(7275209d5d73881839f7fa3ac7d362194ef2cfd9) )
@@ -921,7 +921,7 @@ ROM_END
 ***************************************************************************/
 
 GAME( 199?, magicbub, 0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL )
-GAME( 199?, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
+GAME( 199?, magicbuba,magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
 GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL )
 GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",     GAME_NO_COCKTAIL )
 GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL )

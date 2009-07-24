@@ -535,7 +535,7 @@ ROM_START( powerins )
 	ROM_LOAD( "20.u54",       0x000100, 0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) )
 ROM_END
 
-ROM_START( powerinj )
+ROM_START( powerinsj )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "93095-3j.u108", 0x00000, 0x80000, CRC(3050a3fb) SHA1(e7e729bf62266e2e78ccd84cf937abb99de18ad5) )
 	ROM_LOAD16_WORD_SWAP( "93095-4.u109",  0x80000, 0x80000, CRC(d3d7a782) SHA1(7846de0ebb09bd9b2534cd451ff9aa5175e60647) )
@@ -605,7 +605,7 @@ Sound processor -  Main processor
 
 ***************************************************************************/
 
-ROM_START( powerina )
+ROM_START( powerinsa )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "rom1", 0x000000, 0x080000, CRC(b86c84d6) SHA1(2ec0933130925dfae859ea6abe62a8c92385aee8) )
 	ROM_LOAD16_WORD_SWAP( "rom2", 0x080000, 0x080000, CRC(d3d7a782) SHA1(7846de0ebb09bd9b2534cd451ff9aa5175e60647) )
@@ -679,7 +679,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( powerinb )
+ROM_START( powerinsb )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "2q.bin", 0x000000, 0x80000, CRC(11bf3f2a) SHA1(c840add78da9b19839c667f9bbd77e0a7c560ed7) )
 	ROM_LOAD16_BYTE( "2r.bin", 0x000001, 0x80000, CRC(d8d621be) SHA1(91d501ac661c1ff52c85eee96c455c008a7dad1c) )
@@ -735,6 +735,6 @@ ROM_END
 
 /* all supported sets give a 93.10.20 date */
 GAME( 1993, powerins, 0,        powerins, powerins, 0, ROT0, "Atlus", "Power Instinct (USA)", 0 )
-GAME( 1993, powerinj, powerins, powerins, powerinj, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
-GAME( 1993, powerina, powerins, powerina, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 1)", 0 )
-GAME( 1993, powerinb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 2)", 0 )
+GAME( 1993, powerinsj, powerins, powerins, powerinj, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
+GAME( 1993, powerinsa, powerins, powerina, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 1)", 0 )
+GAME( 1993, powerinsb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 2)", 0 )

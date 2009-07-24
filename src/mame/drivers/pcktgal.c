@@ -340,7 +340,7 @@ ROM_START( pcktgal2 )
 	ROM_LOAD( "eb06.k15",     0x0200, 0x0200, CRC(1fbd4b59) SHA1(84e20329003cf09b849b49e1d83edc330d49f404) ) /* 82s131.101 */
 ROM_END
 
-ROM_START( pcktgl2j )
+ROM_START( pcktgal2j )
 	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
@@ -459,6 +459,6 @@ static DRIVER_INIT( pcktgal )
 GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", 0 )
 GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, deco222,  ROT0, "bootleg", "Pocket Gal (bootleg)", 0 )
 GAME( 1989, pcktgal2, pcktgal, pcktgal, pcktgal, graphics, ROT0, "Data East Corporation", "Pocket Gal 2 (English)", 0 )
-GAME( 1989, pcktgl2j, pcktgal, pcktgal, pcktgal, graphics, ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", 0 )
+GAME( 1989, pcktgal2j,pcktgal, pcktgal, pcktgal, graphics, ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", 0 )
 GAME( 1989, spool3,   pcktgal, pcktgal, pcktgal, graphics, ROT0, "Data East Corporation", "Super Pool III (English)", 0 )
 GAME( 1990, spool3i,  pcktgal, pcktgal, pcktgal, graphics, ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", 0 )

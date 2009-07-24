@@ -1738,7 +1738,7 @@ ROM_START( superpac )
 	ROM_LOAD( "superpac.3m",  0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 ROM_END
 
-ROM_START( superpcm )
+ROM_START( superpacm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spc-2.1c",     0xc000, 0x2000, CRC(1a38c30e) SHA1(ae0ee9f3df0991a80698fe745a7a853a4bb60710) )
 	ROM_LOAD( "spc-1.1b",     0xe000, 0x2000, CRC(730e95a9) SHA1(ca73c8bcb03c2f5c05968c707a5d3f7f9956b886) )
@@ -2018,7 +2018,7 @@ ROM_START( todruaga )
 	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
 ROM_END
 
-ROM_START( todruago )
+ROM_START( todruagao )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "td1_3.1d",	0x8000, 0x4000, CRC(7ab4f5b2) SHA1(65035a5ecdff14bf23e01fe0f5e0935d156d94ff) )
 	ROM_LOAD( "td1_1.1b",	0xc000, 0x4000, CRC(8c20ef10) SHA1(12ea4875ce4d4590b88862139d3379ab9f5cec03) )
@@ -2148,7 +2148,7 @@ static DRIVER_INIT( digdug2 )
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
 GAME( 1982, superpac, 0,        superpac, superpac, 56_56,    ROT90, "Namco", "Super Pac-Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, superpcm, superpac, superpac, superpac, 56_56,    ROT90, "[Namco] (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac, 56_56,    ROT90, "[Namco] (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnpal,  0,        superpac, pacnpal,  56out_59, ROT90, "Namco", "Pac & Pal", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnpal2, pacnpal,  superpac, pacnpal,  56out_59, ROT90, "Namco", "Pac & Pal (older)", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnchmp, pacnpal,  superpac, pacnpal,  56out_59, ROT90, "Namco", "Pac-Man & Chomp Chomp", GAME_SUPPORTS_SAVE )
@@ -2163,7 +2163,7 @@ GAME( 1983, phozon,   0,        phozon,   phozon,   58_56i,   ROT90, "Namco", "P
 GAME( 1983, mappy,    0,        mappy,    mappy,    58_58,    ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mappyj,   mappy,    mappy,    mappy,    58_58,    ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, todruaga, 0,        todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruago, todruaga, todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, motos,    0,        mappy,    motos,    56out_56, ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )

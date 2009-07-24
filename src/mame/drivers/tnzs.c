@@ -1997,7 +1997,7 @@ ROM_START( extrmatn )
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( extrmatu )
+ROM_START( extrmatnu )
 	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-20.11c", 0x00000, 0x08000, CRC(04e3fc1f) SHA1(b1cf2f79f43fa33d6175368c897f84ec6aa6e746) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2021,7 +2021,7 @@ ROM_START( extrmatu )
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( extrmatj )
+ROM_START( extrmatnj )
 	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-05.11c", 0x00000, 0x08000, CRC(918e1fe3) SHA1(1aa69e7ae393f275d440b3d5bf817475e443045d) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2069,7 +2069,7 @@ ROM_START( arknoid2 )
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( arknid2u )
+ROM_START( arknoid2u )
 	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b08_11.11c", 0x00000, 0x08000, CRC(99555231) SHA1(2798f3f5b3f1fa27598fe7a6e95c75d9142c8d34) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
@@ -2093,7 +2093,7 @@ ROM_START( arknid2u )
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( arknid2j )
+ROM_START( arknoid2j )
 	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b08_05.11c", 0x00000, 0x08000, CRC(136edf9d) SHA1(f632321650897eee585511a84f451a205d1f7704) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
@@ -2145,7 +2145,7 @@ ROM_START( drtoppel )
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( drtopplu )
+ROM_START( drtoppelu )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2173,7 +2173,7 @@ ROM_START( drtopplu )
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
-ROM_START( drtopplj )
+ROM_START( drtoppelj )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2341,7 +2341,7 @@ ROM_START( chukatai )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 ROM_END
 
-ROM_START( chukatau )
+ROM_START( chukataiu )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
 	ROM_CONTINUE(       0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2365,7 +2365,7 @@ ROM_START( chukatau )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 ROM_END
 
-ROM_START( chukataj )
+ROM_START( chukataij )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
 	ROM_CONTINUE(       0x18000, 0x08000 )				/* banked at 8000-bfff */
@@ -2686,20 +2686,20 @@ ROM_END
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
 GAME( 1987, plumppop, 0,        drtoppel, plumppop, plumpop,  ROT0,   "Taito Corporation", "Plump Pop (Japan)", 0 )
 GAME( 1987, extrmatn, 0,        arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation Japan", "Extermination (World)", 0 )
-GAME( 1987, extrmatu, extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "[Taito] World Games", "Extermination (US)", 0 )
-GAME( 1987, extrmatj, extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation", "Extermination (Japan)", 0 )
+GAME( 1987, extrmatnu,extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "[Taito] World Games", "Extermination (US)", 0 )
+GAME( 1987, extrmatnj,extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation", "Extermination (Japan)", 0 )
 GAME( 1987, arknoid2, 0,        arknoid2, arknoid2, arknoid2, ROT270, "Taito Corporation Japan", "Arkanoid - Revenge of DOH (World)", 0 )
-GAME( 1987, arknid2u, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", 0 )
-GAME( 1987, arknid2j, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito Corporation", "Arkanoid - Revenge of DOH (Japan)", 0 )
+GAME( 1987, arknoid2u,arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", 0 )
+GAME( 1987, arknoid2j,arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito Corporation", "Arkanoid - Revenge of DOH (Japan)", 0 )
 GAME( 1987, drtoppel, 0,        drtoppel, drtoppel, drtoppel, ROT90,  "Taito Corporation Japan", "Dr. Toppel's Adventure (World)", 0 ) /* Possible region hack */
-GAME( 1987, drtopplu, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito America Corporation", "Dr. Toppel's Adventure (US)", 0 ) /* Possible region hack */
-GAME( 1987, drtopplj, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito Corporation", "Dr. Toppel's Tankentai (Japan)", 0 )
+GAME( 1987, drtoppelu,drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito America Corporation", "Dr. Toppel's Adventure (US)", 0 ) /* Possible region hack */
+GAME( 1987, drtoppelj,drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito Corporation", "Dr. Toppel's Tankentai (Japan)", 0 )
 GAME( 1988, kageki,   0,        kageki,   kageki,   kageki,   ROT90,  "Taito America Corporation (Romstar license)", "Kageki (US)", 0 )
 GAME( 1988, kagekij,  kageki,   kageki,   kagekij,  kageki,   ROT90,  "Taito Corporation", "Kageki (Japan)", 0 )
 GAME( 1992, kagekih,  kageki,   kageki,   kageki,   kageki,   ROT90,  "Taito Corporation", "Kageki (hack)", 0 ) // date is hacked at least, might also be a Japan set hacked to show english
 GAME( 1988, chukatai, 0,        tnzs,     chukatai, chukatai, ROT0,   "Taito Corporation Japan", "Chuka Taisen (World)", 0 ) /* Possible region hack */
-GAME( 1988, chukatau, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", 0 ) /* Possible region hack */
-GAME( 1988, chukataj, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito Corporation", "Chuka Taisen (Japan)", 0 )
+GAME( 1988, chukataiu,chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", 0 ) /* Possible region hack */
+GAME( 1988, chukataij,chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito Corporation", "Chuka Taisen (Japan)", 0 )
 GAME( 1988, tnzs,     0,        tnzsb,    tnzs,     tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, new version) (newer PCB)", 0 )
 GAME( 1988, tnzsj,    tnzs,     tnzsb,    tnzsj,    tnzsb,    ROT0,   "Taito Corporation", "The NewZealand Story (Japan, new version) (newer PCB)", 0 )
 GAME( 1988, tnzsjo,   tnzs,     tnzs,     tnzsjo,   tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan, old version) (older PCB)", 0 )

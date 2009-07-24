@@ -312,7 +312,7 @@ ROM_START( commando )
 	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
 ROM_END
 
-ROM_START( commandu )
+ROM_START( commandou )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "u4-f.9m",  0x0000, 0x8000, CRC(a6118935) SHA1(d5811968b23d61e344e151747bcc3c0ed2b9497b) )
 	ROM_LOAD( "u3-f.8m",  0x8000, 0x4000, CRC(24f49684) SHA1(d38a7bd9f3b506747a03f6b94c3f8a2d9fc59166) )
@@ -348,7 +348,7 @@ ROM_START( commandu )
 	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
 ROM_END
 
-ROM_START( commandj )
+ROM_START( commandoj )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "so04.9m", 0x0000, 0x8000, CRC(d3f2bfb3) SHA1(738a5673ac6a907cb04cfb125e8aab3f7437b9d2) )
 	ROM_LOAD( "so03.8m", 0x8000, 0x4000, CRC(ed01f472) SHA1(fa181293ae8f0fee78d412259eb81f6de1e1307a) )
@@ -384,7 +384,7 @@ ROM_START( commandj )
 	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
 ROM_END
 
-ROM_START( commandb )
+ROM_START( commandob )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "commandb_04_9m_27256.bin",  0x0000, 0x8000, CRC(348a7654) SHA1(f3668c47c154a9c7d7afeabb0259c9bc56e847ac) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
@@ -544,8 +544,8 @@ static DRIVER_INIT( spaceinv )
 /* Game Drivers */
 
 GAME( 1985, commando, 0,        commando, commando, commando, ROT270, "Capcom", "Commando (World)", 0 )
-GAME( 1985, commandu, commando, commando, commandu, commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", 0 )
-GAME( 1985, commandj, commando, commando, commando, commando, ROT270, "Capcom", "Senjou no Ookami", 0 )
-GAME( 1985, commandb, commando, commando, commando, spaceinv, ROT270, "bootleg", "Commando (bootleg)", 0 )
+GAME( 1985, commandou,commando, commando, commandu, commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", 0 )
+GAME( 1985, commandoj,commando, commando, commando, commando, ROT270, "Capcom", "Senjou no Ookami", 0 )
+GAME( 1985, commandob,commando, commando, commando, spaceinv, ROT270, "bootleg", "Commando (bootleg)", 0 )
 GAME( 1985, sinvasn,  commando, commando, commando, commando, ROT270, "Capcom", "Space Invasion (Europe)", 0 )
 GAME( 1985, sinvasnb, commando, commando, commando, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", 0 )

@@ -1024,7 +1024,7 @@ ROM_START( gradius2 )
 	ROM_LOAD( "785_f02.7c",			0x00000, 0x20000, CRC(c39f5ca4) SHA1(92ebea11b7d3a72d0f58c456f16a6ff36d6b3062) )
 ROM_END
 
-ROM_START( grdius2a )
+ROM_START( gradius2a )
 	ROM_REGION( 0x40000, "maincpu", 0 )	// 68000 code (CPU A)
 	ROM_LOAD16_BYTE( "785_p05.6n",	0x00000, 0x10000, CRC(4db0e736) SHA1(45edf094da448d039af18a7b47a592a3de02f17b) )
 	ROM_LOAD16_BYTE( "785_p04.4n",	0x00001, 0x10000, CRC(765b99e6) SHA1(4acae0cf2bf23f8a1cf7b650b018d22a9ae947c9) )
@@ -1058,7 +1058,7 @@ ROM_START( grdius2a )
 	ROM_LOAD( "785_f02.7c",			0x00000, 0x20000, CRC(c39f5ca4) SHA1(92ebea11b7d3a72d0f58c456f16a6ff36d6b3062) )
 ROM_END
 
-ROM_START( grdius2b )
+ROM_START( gradius2b )
 	ROM_REGION( 0x40000, "maincpu", 0 ) 	// 68000 code (CPU A)
 	ROM_LOAD16_BYTE( "785_p05.6n",	0x00000, 0x10000, CRC(4db0e736) SHA1(45edf094da448d039af18a7b47a592a3de02f17b) )
 	ROM_LOAD16_BYTE( "785_p04.4n",	0x00001, 0x10000, CRC(765b99e6) SHA1(4acae0cf2bf23f8a1cf7b650b018d22a9ae947c9) )
@@ -1288,8 +1288,8 @@ GAME( 1987, majuu,    devilw,   devilw,		devilw,   twin16,   ROT0, "Konami", "Ma
 GAME( 1987, darkadv,  devilw,   devilw,		darkadv,  twin16,   ROT0, "Konami", "Dark Adventure", 0 )
 GAME( 1988, vulcan,   0,        twin16,		vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture", 0 )
 GAME( 1988, gradius2, vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", 0 )
-GAME( 1988, grdius2a, vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", 0 )
-GAME( 1988, grdius2b, vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", 0 )
+GAME( 1988, gradius2a,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", 0 )
+GAME( 1988, gradius2b,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", 0 )
 
 GAME( 1988, fround,   0,        fround,		fround,   fround,   ROT0, "Konami", "The Final Round (version M)", 0 )
 GAME( 1988, froundl,  fround,   fround,		fround,   fround,   ROT0, "Konami", "The Final Round (version L)", 0 )

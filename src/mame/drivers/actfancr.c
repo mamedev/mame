@@ -416,7 +416,7 @@ ROM_START( actfancr )
 	ROM_LOAD( "18",   0x00000, 0x10000, CRC(5c55b242) SHA1(62ba60b2f02483875da12aefe849f7e2fd137ef1) )
 ROM_END
 
-ROM_START( actfanc1 )
+ROM_START( actfancr1 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "08-1", 0x00000, 0x10000, CRC(3bf214a4) SHA1(f7513672b2292d3acb4332b392695888bf6560a5) )
 	ROM_LOAD( "09-1", 0x10000, 0x10000, CRC(13ae78d5) SHA1(eba77d3dbfe273e18c7fa9c0ca305ac2468f9381) )
@@ -449,7 +449,7 @@ ROM_START( actfanc1 )
 	ROM_LOAD( "18",   0x00000, 0x10000, CRC(5c55b242) SHA1(62ba60b2f02483875da12aefe849f7e2fd137ef1) )
 ROM_END
 
-ROM_START( actfancj )
+ROM_START( actfancrj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
@@ -516,7 +516,7 @@ ROM_START( triothep )
 ROM_END
 
 /* All roms are FF even the ones matching the parent FG roms */
-ROM_START( triothej )
+ROM_START( triothepj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "ff-16.bin", 0x00000, 0x20000, CRC(84d7e1b6) SHA1(28381d2e1f6d22a959383eb2e8d73f2e03f4d39f) )
 	ROM_LOAD( "ff-15.bin", 0x20000, 0x10000, CRC(6eada47c) SHA1(98fc4e93c47bc42ea7c20e8ac994b117cd7cb5a5) )
@@ -594,7 +594,7 @@ static DRIVER_INIT( actfancj )
 
 
 GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, actfanc1, actfancr, actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, actfancj, actfancr, actfancr, actfancr, actfancj, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancr1,actfancr, actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancrj,actfancr, actfancr, actfancr, actfancj, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", GAME_SUPPORTS_SAVE )
 GAME( 1989, triothep, 0,        triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, triothej, triothep, triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, triothepj,triothep, triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", GAME_SUPPORTS_SAVE )

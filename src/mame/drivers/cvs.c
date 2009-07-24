@@ -1192,7 +1192,7 @@ ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( hunchbka )
+ROM_START( hunchbaka )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "1b.gp1", 0x0000, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
 	ROM_LOAD_STAGGERED( "2a.gp2", 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
@@ -1276,7 +1276,7 @@ ROM_START( radarzon )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( radarzn1 )
+ROM_START( radarzon1 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "r1-gp1.bin", 0x0000, CRC(7c73c21f) SHA1(1113025ea16cfcc500b9624a031f3d25290db163) )
 	ROM_LOAD_STAGGERED( "r1-gp2.bin", 0x0400, CRC(dedbd2ce) SHA1(ef80bf1b4a9561ad7f54e795c78e72664abf0501) )
@@ -1297,7 +1297,7 @@ ROM_START( radarzn1 )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( radarznt )
+ROM_START( radarzont )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "rt-gp1.bin", 0x0000, CRC(43573974) SHA1(854fe7022e9bdd94bb119c014156e9ffdb6682fa) )
 	ROM_LOAD_STAGGERED( "rt-gp2.bin", 0x0400, CRC(257a11ce) SHA1(ca7f9260d9879ebce202f83a41838cb6dc9a6480) )
@@ -1651,14 +1651,14 @@ GAME( 1982, logger,   0,        cvs,     logger,   0,        ROT90, "Century Ele
 GAME( 1982, dazzler,  0,        cvs,     dazzler,  0,        ROT90, "Century Electronics", "Dazzler", GAME_NO_COCKTAIL )
 GAME( 1982, wallst,   0,        cvs,     wallst,   0,        ROT90, "Century Electronics", "Wall Street", GAME_NO_COCKTAIL )
 GAME( 1982, radarzon, 0,        cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone", GAME_NO_COCKTAIL )
-GAME( 1982, radarzn1, radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL )
-GAME( 1982, radarznt, radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL )
+GAME( 1982, radarzon1,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL )
+GAME( 1982, radarzont,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL )
 GAME( 1982, outline,  radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Outline", GAME_NO_COCKTAIL )
 GAME( 1982, goldbug,  0,        cvs,     goldbug,  0,        ROT90, "Century Electronics", "Gold Bug", GAME_NO_COCKTAIL )
 GAME( 1982, diggerc,  0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL )
 GAME( 1983, heartatk, 0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL )
 GAME( 1983, hunchbak, 0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL )
-GAME( 1983, hunchbka, hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL )
+GAME( 1983, hunchbaka,hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL )
 GAME( 1983, superbik, 0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL )
 GAME( 1983, raiders,  0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL )
 GAME( 1983, hero,     0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL )

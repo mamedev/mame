@@ -278,7 +278,7 @@ ROM_START( prehisle )
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
-ROM_START( prehislu )
+ROM_START( prehisleu )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) ) /* red "U" stamped on printed label */
 	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) ) /* red "U" stamped on printed label */
@@ -338,5 +338,5 @@ ROM_END
 
 
 GAME( 1989, prehisle, 0,        prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, prehislu, prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehisleu,prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )

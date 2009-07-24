@@ -1738,7 +1738,7 @@ ROM_END
 
     GAME BD NO. 834-6493-03 (Uses "MPR" mask roms) or 834-6493-05 (Uses "EPR" eproms)
 */
-ROM_START( thndrbd1 )
+ROM_START( thndrbld1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11304.ic58", 0x000000, 0x20000, CRC(a90630ef) SHA1(8f29e020119b2243b1c95e15546af1773327ae85) ) // patched?
 	ROM_LOAD16_BYTE( "epr-11305.ic63", 0x000001, 0x20000, CRC(9ba3ef61) SHA1(f75748b37ce35b0ef881804f73417643068dfbb2) ) // patched?
@@ -2856,7 +2856,7 @@ static DRIVER_INIT( gprider )
 GAME( 1987, aburner2, 0,        xboard,  aburner2, aburner2,       ROT0, "Sega", "After Burner II", 0 )
 GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner,        ROT0, "Sega", "After Burner (Japan)", 0 )
 GAME( 1987, thndrbld, 0,        xboard,  thndrbld, generic_xboard, ROT0, "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
-GAME( 1987, thndrbd1, thndrbld, xboard,  thndrbd1, generic_xboard, ROT0, "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
+GAME( 1987, thndrbld1,thndrbld, xboard,  thndrbd1, generic_xboard, ROT0, "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
 GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
 GAME( 1989, loffireu, loffire,  xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
 GAME( 1989, loffirej, loffire,  xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )

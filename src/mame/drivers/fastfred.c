@@ -806,7 +806,7 @@ ROM_START( jumpcoas )
 	ROM_LOAD( "jumpcoas.blu", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) )
 ROM_END
 
-ROM_START( jumpcoat )
+ROM_START( jumpcoast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) )
 	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
@@ -990,7 +990,7 @@ GAME( 1982, flyboy,   0,        fastfred, flyboy,   flyboy,   ROT90, "Kaneko", "
 GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   flyboyb,  ROT90, "Kaneko", "Fly-Boy (bootleg)", 0 )
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred, ROT90, "Atari", "Fast Freddie", 0 )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "Jump Coaster", 0 )
-GAME( 1983, jumpcoat, jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )
+GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )
 GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84", 0 )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
 GAME( 1984, imago,	  0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )

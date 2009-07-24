@@ -900,7 +900,7 @@ ROM_START( warpwarp )
 	ROM_LOAD( "g-9611n.4c",   0x0000, 0x0800, CRC(380994c8) SHA1(0cdf6a05db52c423365bff9c9df6d93ac885794e) )
 ROM_END
 
-ROM_START( warpwarr )
+ROM_START( warpwarpr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-09601.2r",   0x0000, 0x1000, CRC(916ffa35) SHA1(bca2087f8b78a128cdffc55db9814854b72daab5) )
 	ROM_LOAD( "g-09602.2m",   0x1000, 0x1000, CRC(398bb87b) SHA1(74373336288dc13d59e6f7e7c718aa51d857b087) )
@@ -911,7 +911,7 @@ ROM_START( warpwarr )
 	ROM_LOAD( "g-9611.4c",    0x0000, 0x0800, CRC(00e6a326) SHA1(67b7ab5b7b2c9a97d4d690d88561da48b86bc66e) )
 ROM_END
 
-ROM_START( warpwar2 )
+ROM_START( warpwarpr2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-09601.2r",   0x0000, 0x1000, CRC(916ffa35) SHA1(bca2087f8b78a128cdffc55db9814854b72daab5) )
 	ROM_LOAD( "g-09602.2m",   0x1000, 0x1000, CRC(398bb87b) SHA1(74373336288dc13d59e6f7e7c718aa51d857b087) )
@@ -997,13 +997,13 @@ GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "G
 GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "[Namco] (F.lli Bertolino license)", "Gee Bee (F.lli Bertolino license)", 0, layout_geebee )
 GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "[Namco] (Gremlin license)", "Gee Bee (Gremlin)", 0, layout_geebee )
 GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
-GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "Namco", "Kaitei Takara Sagashi", 0 )
+GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "[K.K. Tokki] (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
 GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (K'K-Tokki)", 0 )
 GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos )
 
 /* Color games */
-GAME( 1979, bombbee,  0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
-GAME( 1979, cutieq,   0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
-GAME( 1981, warpwarp, 0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
-GAME( 1981, warpwarr, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 1)", 0 )
-GAME( 1981, warpwar2, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 2)", 0 )
+GAME( 1979, bombbee,    0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
+GAME( 1979, cutieq,     0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
+GAME( 1981, warpwarp,   0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
+GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 1)", 0 )
+GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "[Namco] (Rock-ola license)", "Warp Warp (Rock-ola set 2)", 0 )

@@ -536,7 +536,7 @@ ROM_START( wwfsstar )
 	ROM_LOAD( "wwfs44.bin",    0x70000, 0x10000, CRC(4f965fa9) SHA1(4312838e216d2a90fe413d027f46d77c74a0aa07) )
 ROM_END
 
-ROM_START( wwfsstau )
+ROM_START( wwfsstaru )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-04.34", 0x00000, 0x20000, CRC(ee9b850e) SHA1(6b634ad98b6104b9e860d05e73f3a139c2a19a78) )
 	ROM_LOAD16_BYTE( "24ad-04.35", 0x00001, 0x20000, CRC(057c2eef) SHA1(6eb5f60fa51b3e7f17fc6a81182a01ea406febea) )
@@ -599,7 +599,7 @@ ROM_START( wwfsstau )
 ROM_END
 
 /* this set is using the proper mask rom dumps */
-ROM_START( wwfsstaa )
+ROM_START( wwfsstara )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-06.34", 0x00000, 0x20000, CRC(924a50e4) SHA1(e163ffc6bada5db0d979523dde77355acedcd456) )
 	ROM_LOAD16_BYTE( "24ad-07.35", 0x00001, 0x20000, CRC(9a76a50e) SHA1(adde96956a7602ae1ece797732e8295dc176b071) )
@@ -627,7 +627,7 @@ ROM_START( wwfsstaa )
 	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
 ROM_END
 
-ROM_START( wwfsstaj )
+ROM_START( wwfsstarj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-0_j-1_japan.34", 0x00000, 0x20000, CRC(f872e968) SHA1(e52298817348601ed88c369018d3110e467cf602) )
 	ROM_LOAD16_BYTE( "24ad-0_j-1_japan.35", 0x00001, 0x20000, NO_DUMP )
@@ -693,7 +693,7 @@ ROM_END
 
 
 
-GAME( 1989, wwfsstar, 0,        wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
-GAME( 1989, wwfsstau, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
-GAME( 1989, wwfsstaa, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
-GAME( 1989, wwfsstaj, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ) // missing a program rom
+GAME( 1989, wwfsstar,  0,        wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
+GAME( 1989, wwfsstaru, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
+GAME( 1989, wwfsstara, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
+GAME( 1989, wwfsstarj, wwfsstar, wwfsstar, wwfsstar,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ) // missing a program rom

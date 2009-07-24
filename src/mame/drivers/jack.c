@@ -1040,7 +1040,7 @@ ROM_START( zzyzzyxx )
 	ROM_LOAD( "l.1a",         0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
 ROM_END
 
-ROM_START( zzyzzyx2 )
+ROM_START( zzyzzyxx2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.2f",         0x0000, 0x1000, CRC(a9102e34) SHA1(80d71df7d235980603f35aa3f474aaf58fb39946) )
 	ROM_LOAD( "b.3f",         0x1000, 0x1000, CRC(4277beab) SHA1(269338a165286ed44b0fad1873e409f847b8d476) )
@@ -1435,7 +1435,7 @@ GAME( 1982, jack2,    jack,     jack,    jack2,    jack,     ROT90, "Cinematroni
 GAME( 1982, jack3,    jack,     jack,    jack3,    jack,     ROT90, "Cinematronics", "Jack the Giantkiller (set 3)", 0 )
 GAME( 1982, treahunt, jack,     jack,    treahunt, treahunt, ROT90, "Hara Industries", "Treasure Hunt (bootleg?)", 0 )
 GAME( 1982, zzyzzyxx, 0,        jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", 0 )
-GAME( 1982, zzyzzyx2, zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", 0 )
+GAME( 1982, zzyzzyxx2,zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", 0 )
 GAME( 1982, brix,     zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Brix", 0 )
 GAME( 1984, freeze,   0,        jack,    freeze,   jack,     ROT90, "Cinematronics", "Freeze", 0 )
 GAME( 1984, sucasino, 0,        jack,    sucasino, jack,     ROT90, "Data Amusement", "Super Casino", 0 )

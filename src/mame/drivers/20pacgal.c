@@ -327,7 +327,7 @@ ROM_START( 20pacgal ) /* Version 1.04 */
 	ROM_LOAD( "20th_101.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
-ROM_START( 20pacgaa ) /* Version 1.01 */
+ROM_START( 20pacgala ) /* Version 1.01 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "20th_101.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
@@ -344,4 +344,4 @@ ROM_END
  *************************************/
 
 GAME( 2000, 20pacgal,         0, 20pacgal, 20pacgal, 0, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, 20pacgaa,  20pacgal, 20pacgal, 20pacgal, 0, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, 20pacgala, 20pacgal, 20pacgal, 20pacgal, 0, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS )

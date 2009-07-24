@@ -576,7 +576,7 @@ ROM_START( fredmem )
 ROM_END
 
 
-ROM_START( fredmeus )
+ROM_START( fredmemus )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.us.hiscore", 0x00000, 0x20000, CRC(4460c690) SHA1(08fec2704baac4b83add8f1d5936f15336a67599) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.us.hiscore", 0x00001, 0x20000, CRC(ff5bfdc3) SHA1(c38b856d6a74df68bfc6fb15b521180f78742d45) ) /* Program 1 - V2.0 at U103 */
@@ -608,7 +608,7 @@ ROM_START( fredmeus )
 	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
 ROM_END
 
-ROM_START( fredmeuk )
+ROM_START( fredmemuk )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.uk", 0x00000, 0x20000, CRC(e810daab) SHA1(99be21eb5df49fd8b665935c774798be270e0f27) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.uk", 0x00001, 0x20000, CRC(0f2e65fb) SHA1(533a45d2de0ee3c306197d2559355c3193f9ac6b) ) /* Program 1 - V2.0 at U103 */
@@ -800,8 +800,8 @@ GAME( 1993, dcheese,  0,       dcheese, dcheese, dcheese, ROT90, "HAR", "Double 
 GAME( 1993, lottof2,  0,       dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE )
 GAME( 1993, cecmatch, 0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmem,  0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmeus, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmeuk, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemus,fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemuk,fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )

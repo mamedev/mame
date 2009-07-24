@@ -2031,7 +2031,7 @@ ROM_START( qberta )
 	ROM_LOAD( "qb-fg0.bin",   0x6000, 0x2000, CRC(2f695b85) SHA1(807d16459838f129e10b913890bbc95065d5dd40) )
 ROM_END
 
-ROM_START( qbertjp )
+ROM_START( qbertj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbj-rom2.bin", 0xa000, 0x2000, CRC(67bb1cb2) SHA1(23a7f8c86d6db9220a98b3f630c5d000e80f2d53) )
 	ROM_LOAD( "qbj-rom1.bin", 0xc000, 0x2000, CRC(c61216e7) SHA1(e727b85dddc2963e33af6c02b675243f6fbe2710) )
@@ -2211,7 +2211,7 @@ ROM_START( mplanets )
 	ROM_LOAD( "fg0.k4",       0x6000, 0x2000, CRC(a920e325) SHA1(60f15d5014a55d9c18b06c17c7587d45716619e4) )
 ROM_END
 
-ROM_START( mplanuk )
+ROM_START( mplanetsuk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpt_rom4.bin", 0x6000, 0x2000, CRC(cd88e23c) SHA1(03222e2600f7fb1c6844340d4a56eedfcdeaa3c8) )
 	ROM_LOAD( "mpt_rom3.bin", 0x8000, 0x2000, CRC(dc355b2d) SHA1(ae3e376afc7a8cb049d0dd28bf3959cb76780999) )
@@ -2584,23 +2584,23 @@ static DRIVER_INIT( vidvince )
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,  0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", 0 )
-GAME( 1982, qbert,    0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
-GAME( 1982, qberta,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
-GAME( 1982, qbertjp,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
-GAME( 1982, myqbert,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
-GAME( 1982, qberttst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
-GAME( 1982, qbtrktst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
-GAME( 1982, insector, 0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,     0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,   0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets, 0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
-GAME( 1983, mplanuk,  mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,    0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
-GAME( 1983, kngtmare, 0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,   0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, qbertqub, 0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", 0 )
-GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
+GAME( 1982, reactor,   0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", 0 )
+GAME( 1982, qbert,     0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
+GAME( 1982, qberta,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
+GAME( 1982, qbertj,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
+GAME( 1982, myqbert,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
+GAME( 1982, qberttst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
+GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
+GAME( 1982, insector,  0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
+GAME( 1982, tylz,      0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,    0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,  0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
+GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,     0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
+GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
+GAME( 1983, sqbert,    0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
+GAME( 1983, qbertqub,  0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", 0 )
+GAME( 1984, curvebal,  0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
 GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )

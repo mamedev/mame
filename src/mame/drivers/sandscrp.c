@@ -504,7 +504,7 @@ ROM_START( sandscrp ) /* Z03VA-003 PCB */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
-ROM_START( sandscra ) /* Z03VA-003 PCB, earlier program version */
+ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "1.ic4", 0x000000, 0x040000, CRC(c0943ae2) SHA1(04dac4e1f116cd96d6292daa61ef40efc7eba919) )
 	ROM_LOAD16_BYTE( "2.ic5", 0x000001, 0x040000, CRC(6a8e0012) SHA1(2350b11c9bd545c8ba4b3c25cd6547ba2ad474b5) )
@@ -526,7 +526,7 @@ ROM_START( sandscra ) /* Z03VA-003 PCB, earlier program version */
 ROM_END
 
 
-ROM_START( sandscrb ) /* Different rev PCB */
+ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) )
 	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) )
@@ -546,6 +546,6 @@ ROM_START( sandscrb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp, 0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
-GAME( 1992, sandscra, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
-GAME( 1992, sandscrb, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Revised Hardware)", 0 )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Revised Hardware)", 0 )

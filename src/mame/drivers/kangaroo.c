@@ -519,7 +519,7 @@ ROM_START( kangaroo )
 ROM_END
 
 
-ROM_START( kangaroa )
+ROM_START( kangarooa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136008-101.ic7",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
 	ROM_LOAD( "136008-102.ic8",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
@@ -545,7 +545,7 @@ ROM_START( kangaroa )
 ROM_END
 
 
-ROM_START( kangarob )
+ROM_START( kangaroob )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "tvg_75.0",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
 	ROM_LOAD( "tvg_76.1",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
@@ -574,5 +574,5 @@ ROM_END
 
 GAME( 1981, fnkyfish, 0,        nomcu, fnkyfish, 0, ROT90, "Sun Electronics", "Funky Fish", 0 )
 GAME( 1982, kangaroo, 0,        mcu,   kangaroo, 0, ROT90, "Sun Electronics", "Kangaroo", 0 )
-GAME( 1982, kangaroa, kangaroo, mcu,   kangaroo, 0, ROT90, "[Sun Electronics] (Atari license)", "Kangaroo (Atari)", 0 )
-GAME( 1982, kangarob, kangaroo, nomcu, kangaroo, 0, ROT90, "bootleg", "Kangaroo (bootleg)", 0 )
+GAME( 1982, kangarooa,kangaroo, mcu,   kangaroo, 0, ROT90, "[Sun Electronics] (Atari license)", "Kangaroo (Atari)", 0 )
+GAME( 1982, kangaroob,kangaroo, nomcu, kangaroo, 0, ROT90, "bootleg", "Kangaroo (bootleg)", 0 )

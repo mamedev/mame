@@ -910,7 +910,7 @@ ROM_START( sslama )
 ROM_END
 
 // it's a conversion for a sslam pcb
-ROM_START( powerbls )
+ROM_START( powerbals )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x40000, CRC(4e302381) SHA1(5685d15fd3137866093ff13b95a7df2265a8bc64) )
 	ROM_LOAD16_BYTE( "22.u66", 0x00001, 0x40000, CRC(89b70599) SHA1(57a5d71e4d8ca62fffe2e81116c5236d2194ae11) )
@@ -964,4 +964,4 @@ static DRIVER_INIT( powerbls )
 
 GAME( 1993, sslam,    0,        sslam,    sslam,    sslam,    ROT0, "Playmark", "Super Slam (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam,    ROT0, "Playmark", "Super Slam (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994, powerbls, powerbal, powerbls, powerbls, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1994, powerbals,powerbal, powerbls, powerbls, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", GAME_SUPPORTS_SAVE )

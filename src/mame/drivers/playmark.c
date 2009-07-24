@@ -1165,7 +1165,7 @@ ROM_START( wbeachvl )
 	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
 ROM_END
 
-ROM_START( wbeachv2 )
+ROM_START( wbeachvl2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.bin",   0x000000, 0x40000, CRC(8993487e) SHA1(c927ae655807f9046f66ff96a30bd2c6fa671566) )
 	ROM_LOAD16_BYTE( "3.bin",   0x000001, 0x40000, CRC(15904789) SHA1(640c80bbf7302529e1a39c2ae60e018ecb176478) )
@@ -1361,7 +1361,7 @@ ROM_END
 
 /* Different revision of the PCB, uses larger gfx ROMs, however the content is the same */
 
-ROM_START( hrdtimea )
+ROM_START( hrdtimesa )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "u67.bin",       0x00000, 0x80000, CRC(3e1334cb) SHA1(9523c04f92371a35c297280b42b1604e23790a1e) )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
@@ -1470,8 +1470,8 @@ static DRIVER_INIT( bigtwin )
 
 GAME( 1995, bigtwin,  0,        bigtwin,  bigtwin,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL )
 GAME( 1995, wbeachvl, 0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1995, wbeachv2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1995, wbeachvl2,wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1996, excelsr,  0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", 0 )
 GAME( 1995, hotmind,  0,        hotmind,  hotmind,  bigtwin, ROT0, "Playmark", "Hot Mind", 0 )
 GAME( 1994, hrdtimes, 0,        hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND )
-GAME( 1994, hrdtimea, hrdtimes, hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND )
+GAME( 1994, hrdtimesa,hrdtimes, hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND )

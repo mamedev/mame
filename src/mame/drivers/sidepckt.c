@@ -336,7 +336,7 @@ ROM_START( sidepckt )
     ROM_LOAD( "dh-08.bpr",    0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
 ROM_END
 
-ROM_START( sidepctj )
+ROM_START( sidepcktj )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "dh00.bin",     0x00000, 0x10000, CRC(a66bc28d) SHA1(cd62ce1dce6fe42d9745eec50d11e86b076d28e1) )
 
@@ -361,7 +361,7 @@ ROM_START( sidepctj )
     ROM_LOAD( "dh-08.bpr",    0x0100, 0x0100, CRC(cdf2180f) SHA1(123215d096f88b66396d40d7a579380d0b5b2b89) )
 ROM_END
 
-ROM_START( sidepctb )
+ROM_START( sidepcktb )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "sp_09.bin",    0x04000, 0x4000, CRC(3c6fe54b) SHA1(4025ac48d75f171f4c979d3fcd6a2f8da18cef4f) )
     ROM_LOAD( "sp_08.bin",    0x08000, 0x8000, CRC(347f81cd) SHA1(5ab06130f35788e51a881cc0f387649532145bd6) )
@@ -399,5 +399,5 @@ static DRIVER_INIT( sidepctj )
 
 
 GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", 0 )
-GAME( 1986, sidepctj, sidepckt, sidepckt, sidepckt, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 )
-GAME( 1986, sidepctb, sidepckt, sidepckt, sidepckt, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", 0 )
+GAME( 1986, sidepcktj,sidepckt, sidepckt, sidepckt, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 )
+GAME( 1986, sidepcktb,sidepckt, sidepckt, sidepckt, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", 0 )

@@ -1344,7 +1344,7 @@ ROM_START( quarterb )
 ROM_END
 
 
-ROM_START( quartrba )
+ROM_START( quarterba )
 	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "15219-02.49t",   0x00000, 0x10000, CRC(7fbe1e5a) SHA1(a4af54328935e348f2903fe7f7dea8612660b899) )
 	ROM_LOAD( "15218-02.48t",   0x10000, 0x10000, CRC(6fbd4b27) SHA1(8146f276af5e3ef968851fa95c8f979b8b969ef6) )
@@ -2459,7 +2459,7 @@ GAME( 1988, strkzone, 0,       leland,   basebal2, strkzone, ROT0,   "Leland Cor
 /* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p, 0,       redline,  redline,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
 GAME( 1987, quarterb, 0,       quarterb, quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 1)", 0 )
-GAME( 1987, quartrba, quarterb,quarterb, quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
+GAME( 1987, quarterba,quarterb,quarterb, quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
 GAME( 1988, viper,    0,       lelandi,  dangerz,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )

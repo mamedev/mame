@@ -1042,7 +1042,7 @@ ROM_START( satansat )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
 
-ROM_START( satansaa )
+ROM_START( satansata )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic7.bin",   0x4000, 0x0800, CRC(549dd13a) SHA1(06b55d0b1da84bef30857faa398aabfd04365eb6) )
 	ROM_LOAD( "ic8.bin",   0x4800, 0x0800, CRC(04972fa8) SHA1(89833a7c893168acd5599ca7ad4b33a8f3df40c5) )
@@ -1127,7 +1127,7 @@ ROM_START( vanguard )
 	ROM_LOAD( "sk6_ic11.bin", 0x5000, 0x0800, CRC(c36df041) SHA1(8b51934229b961180d1edb99be3a4d337d37f66f) )
 ROM_END
 
-ROM_START( vangrdce )
+ROM_START( vanguardc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
 	ROM_LOAD( "sk4_ic08.bin", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
@@ -1158,7 +1158,7 @@ ROM_START( vangrdce )
 	ROM_LOAD( "sk6_ic11.bin", 0x5000, 0x0800, CRC(c36df041) SHA1(8b51934229b961180d1edb99be3a4d337d37f66f) )
 ROM_END
 
-ROM_START( vanguarj )
+ROM_START( vanguardj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
 	ROM_LOAD( "sk4_ic08.bin", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
@@ -1430,11 +1430,11 @@ ROM_END
 
 GAME( 1980, sasuke,   0,        sasuke,   sasuke,   0, ROT90, "SNK", "Sasuke vs. Commander", 0 )
 GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1981, satansaa, satansat, satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1981, satansata,satansat, satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, zarzon,   satansat, satansat, satansat, 0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguard, 0,        vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (SNK)", 0 )
-GAME( 1981, vangrdce, vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 )
-GAME( 1981, vanguarj, vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 )
+GAME( 1981, vanguardc,vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 )
+GAME( 1981, vanguardj,vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 )
 GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (World)", 0 )
 GAME( 1981, fantasyu, fantasy,  fantasy,  fantasyu, 0, ROT90, "[SNK] (Rock-Ola license)", "Fantasy (US)", 0 )
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK", "Fantasy (Japan)", 0 )

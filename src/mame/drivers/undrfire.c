@@ -841,7 +841,7 @@ ROM_START( undrfire )
 ROM_END
 
 
-ROM_START( undrfiru )
+ROM_START( undrfireu )
 	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2048K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d67-19", 0x00000, 0x80000, CRC(1d88fa5a) SHA1(5e498efb9535a8f4e82b5525390b8bde7c45c07e) )
 	ROM_LOAD32_BYTE( "d67-18", 0x00001, 0x80000, CRC(f41ae7fd) SHA1(bdd0df01b11205c263d2fa280746826b831d58bc) )
@@ -877,7 +877,7 @@ ROM_START( undrfiru )
 	ROM_LOAD16_BYTE( "d67-02", 0xc00000, 0x200000, CRC(fceb715e) SHA1(9326513acb0696669d4f2345649ab37c8c6ed171) )
 ROM_END
 
-ROM_START( undrfirj )
+ROM_START( undrfirej )
 	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2048K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d67-19", 0x00000, 0x80000, CRC(1d88fa5a) SHA1(5e498efb9535a8f4e82b5525390b8bde7c45c07e) )
 	ROM_LOAD32_BYTE( "d67-18", 0x00001, 0x80000, CRC(f41ae7fd) SHA1(bdd0df01b11205c263d2fa280746826b831d58bc) )
@@ -1026,6 +1026,6 @@ static DRIVER_INIT( cbombers )
 
 
 GAME( 1993, undrfire, 0,        undrfire, undrfire, undrfire, ROT0, "Taito Corporation Japan", "Under Fire (World)", 0 )
-GAME( 1993, undrfiru, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
-GAME( 1993, undrfirj, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito Corporation", "Under Fire (Japan)", 0 )
+GAME( 1993, undrfireu,undrfire, undrfire, undrfire, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
+GAME( 1993, undrfirej,undrfire, undrfire, undrfire, undrfire, ROT0, "Taito Corporation", "Under Fire (Japan)", 0 )
 GAMEL(1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", GAME_IMPERFECT_GRAPHICS, layout_cbombers )

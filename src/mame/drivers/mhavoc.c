@@ -705,7 +705,7 @@ ROM_START( alphaone )
 ROM_END
 
 
-ROM_START( alphaona )
+ROM_START( alphaonea )
 	ROM_REGION( 0x20000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
@@ -744,4 +744,4 @@ GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   0,        ROT0, "Atari", "Majo
 GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavocrv, ROT0, "JMA",   "Major Havoc (Return to Vax)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  0,        ROT0, "Atari", "Major Havoc (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1983, alphaone, mhavoc, alphaone, alphaone, 0,        ROT0, "Atari", "Alpha One (prototype, 3 lives)", GAME_SUPPORTS_SAVE )
-GAME( 1983, alphaona, mhavoc, alphaone, alphaone, 0,        ROT0, "Atari", "Alpha One (prototype, 5 lives)", GAME_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, 0,        ROT0, "Atari", "Alpha One (prototype, 5 lives)", GAME_SUPPORTS_SAVE )

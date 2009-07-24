@@ -336,7 +336,7 @@ ROM_START( rockrage )
 	ROM_LOAD( "620k04.6e", 0x00000, 0x08000, CRC(8be969f3) SHA1(9856b4c13fac77b645aed67a08cb4965b4966492) )
 ROM_END
 
-ROM_START( rockraga )
+ROM_START( rockragea )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "620n01.16c", 0x08000, 0x10000, CRC(f89f56ea) SHA1(64ba2575e09af257b242d913eab69130f7341894) )	/* fixed ROM */
 	ROM_LOAD( "620n02.15c", 0x10000, 0x10000, CRC(5bc1f1cf) SHA1(d5bb9971d778449e0c01495f9888c0da7ac617a7) )	/* banked ROM */
@@ -365,7 +365,7 @@ ROM_START( rockraga )
 	ROM_LOAD( "620k04.6e", 0x00000, 0x08000, CRC(8be969f3) SHA1(9856b4c13fac77b645aed67a08cb4965b4966492) ) /* Same rom but labeled as ver "G" */
 ROM_END
 
-ROM_START( rockragj )
+ROM_START( rockragej )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "620k01.16c", 0x08000, 0x08000, CRC(4f5171f7) SHA1(5bce9e3f9d01c113c697853763cd891b91297eb2) )	/* fixed ROM */
 	ROM_LOAD( "620k02.15c", 0x10000, 0x10000, CRC(04c4d8f7) SHA1(2a1a024fc38bb934c454092b0aed74d0f1d1c4af) )	/* banked ROM */
@@ -397,5 +397,5 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", 0 )
-GAME( 1986, rockraga, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", 0 )
-GAME( 1986, rockragj, rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 )
+GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", 0 )
+GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 )

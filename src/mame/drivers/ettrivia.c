@@ -302,7 +302,7 @@ ROM_START( promutrv )
 	ROM_LOAD( "soaps.hi3",    0x38000, 0x8000, CRC(9e20614d) SHA1(02121f2c17768763658e77bf19ccaae38a07e509) )
 ROM_END
 
-ROM_START( promutra )
+ROM_START( promutrva )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
@@ -329,7 +329,7 @@ ROM_START( promutra )
 	ROM_LOAD( "enter3.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
 
-ROM_START( promutrb )
+ROM_START( promutrvb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
@@ -360,7 +360,7 @@ ROM_START( promutrb )
 	ROM_LOAD( "pal16l8a-ep-0.u9",  0x0200, 0x0104, CRC(180e95ad) SHA1(9c8dbe159aaf2595b9934fd4afff16b2e9ab584c) )
 ROM_END
 
-ROM_START( promutrc )
+ROM_START( promutrvc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
@@ -419,7 +419,7 @@ ROM_START( strvmstr )
 ROM_END
 
 GAME( 1985, promutrv, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutra, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrb, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrc, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
+GAME( 1985, promutrva,promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
+GAME( 1985, promutrvb,promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrvc,promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
 GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", GAME_WRONG_COLORS )

@@ -2306,7 +2306,7 @@ ROM_START( depthch )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
-ROM_START( depthv1 )
+ROM_START( depthcho )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD_NIB_LOW ( "316-0025.u63", 0x0000, 0x0400, CRC(bec75b9c) SHA1(8abe8b63be892e6abb7a886222b9eab40c5fcda0) )
 	ROM_LOAD_NIB_HIGH( "316-0022.u51", 0x0000, 0x0400, CRC(977b7889) SHA1(dc1e874c2fd44709117474c5b210d67130ac361f) )
@@ -2449,7 +2449,7 @@ ROM_START( sspaceat )
 	ROM_LOAD( "316-0042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
-ROM_START( sspacat2 )
+ROM_START( sspaceat2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "81.u48",       0x0000, 0x0400, CRC(3e4b29f6) SHA1(ec99b7e156bad1f9f900fdebb289f0c9abf08647) )
 	ROM_LOAD( "58.u47",       0x0400, 0x0400, CRC(176adb80) SHA1(9798d3b2d59fe4b7d26927b444746f135f0f0d8e) )
@@ -2468,7 +2468,7 @@ ROM_START( sspacat2 )
 	ROM_LOAD( "316-0042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
-ROM_START( sspacat3 )
+ROM_START( sspaceat3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr115.u48",   0x0000, 0x0400, CRC(9bc36d80) SHA1(519b3f810b133ac82f066851626b73460956a807) )
 	ROM_LOAD( "epr116.u47",   0x0400, 0x0400, CRC(2c2750b3) SHA1(eab297678e6ee45d6f723d8ff7e6a29086ad4c78) )
@@ -2487,7 +2487,7 @@ ROM_START( sspacat3 )
 	ROM_LOAD( "316-0042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
-ROM_START( sspacatc )
+ROM_START( sspaceatc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "139.u27",      0x0000, 0x0400, CRC(9f2112fc) SHA1(89c129ef1a95c5934a7c775994aafc91911b0051) )
 	ROM_LOAD( "140.u26",      0x0400, 0x0400, CRC(ddbeed35) SHA1(48b33d7b35457675b545ca42c8afd79b86ce6035) )
@@ -2906,7 +2906,7 @@ ROM_START( spacetrk )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
-ROM_START( sptrekct )
+ROM_START( spacetrkc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u33c.bin",     0x0000, 0x0400, CRC(b056b928) SHA1(1bbf5c30b226c5ca3c09fcff36a1b21132a524b6) )
 	ROM_LOAD( "u32c.bin",     0x0400, 0x0400, CRC(dffb11d9) SHA1(5c95b7e493ac9e8714d91d19b6f01967559ce55c) )
@@ -2962,7 +2962,7 @@ ROM_START( carnival )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
 ROM_END
 
-ROM_START( carnvckt )
+ROM_START( carnivalc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr501",       0x0000, 0x0400, CRC(688503d2) SHA1(a1fe03c23276d458ba74f7473524918eb9b7c7e5) )
 	ROM_LOAD( "652u32.cpu",   0x0400, 0x0400, CRC(a1f58beb) SHA1(e027beca7bf3ef5ef67e2195f909332fd194b5dc) )
@@ -3219,14 +3219,14 @@ ROM_END
  *************************************/
 
 GAME( 1977, depthch,  0,        depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge", 0 )
-GAME( 1977, depthv1,  depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", 0 )
+GAME( 1977, depthcho, depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", 0 )
 GAME( 1977, subhunt,  depthch,  depthch,  depthch,  0, ROT0,   "Taito", "Sub Hunter", 0 )
 GAME( 1977, safari,   0,        safari,   safari,   0, ROT0,   "Gremlin", "Safari", GAME_NO_SOUND )
 GAME( 1978, frogs,    0,        frogs,    frogs,    0, ROT0,   "Gremlin", "Frogs", 0 )
 GAME( 1979, sspaceat, 0,        sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 1)", GAME_NO_SOUND )
-GAME( 1979, sspacat2, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 2)", GAME_NO_SOUND )
-GAME( 1979, sspacat3, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 3)", GAME_NO_SOUND )
-GAME( 1979, sspacatc, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (cocktail)", GAME_NO_SOUND )
+GAME( 1979, sspaceat2,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 2)", GAME_NO_SOUND )
+GAME( 1979, sspaceat3,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 3)", GAME_NO_SOUND )
+GAME( 1979, sspaceatc,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (cocktail)", GAME_NO_SOUND )
 GAME( 1979, sspacaho, 0,        sspacaho, sspacaho, 0, ROT270, "Sega", "Space Attack / Head On", GAME_NO_SOUND )
 GAME( 1979, headon,   0,        headon,   headon,   0, ROT0,   "Gremlin", "Head On (2 players)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head On (1 player)",  GAME_IMPERFECT_SOUND )
@@ -3241,9 +3241,9 @@ GAME( 1979, invinco,  0,        invinco,  invinco,  0, ROT270, "Sega", "Invinco"
 GAME( 1979, invds,    0,        invds,    invds,    0, ROT270, "Sega", "Invinco / Deep Scan", GAME_IMPERFECT_SOUND )
 GAME( 1980, tranqgun, 0,        tranqgun, tranqgun, 0, ROT270, "Sega", "Tranquillizer Gun", GAME_NO_SOUND )
 GAME( 1980, spacetrk, 0,        spacetrk, spacetrk, 0, ROT270, "Sega", "Space Trek (upright)", GAME_NO_SOUND )
-GAME( 1980, sptrekct, spacetrk, spacetrk, sptrekct, 0, ROT270, "Sega", "Space Trek (cocktail)", GAME_NO_SOUND )
+GAME( 1980, spacetrkc,spacetrk, spacetrk, sptrekct, 0, ROT270, "Sega", "Space Trek (cocktail)", GAME_NO_SOUND )
 GAME( 1980, carnival, 0,        carnival, carnival, 0, ROT270, "Sega", "Carnival (upright)", 0 )
-GAME( 1980, carnvckt, carnival, carnival, carnvckt, 0, ROT270, "Sega", "Carnival (cocktail)", 0 )
+GAME( 1980, carnivalc,carnival, carnival, carnvckt, 0, ROT270, "Sega", "Carnival (cocktail)", 0 )
 GAME( 1981, brdrline, 0,        brdrline, brdrline, 0, ROT270, "Sega", "Borderline", GAME_NO_SOUND )
 GAME( 1981, brdrlins, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Sidam bootleg)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinb, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Karateco bootleg)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )

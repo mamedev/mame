@@ -1142,7 +1142,7 @@ ROM_END
     - CPU Board (labeled TC041, middle board, uses 15.000 MHz xtal)
     - Video Board (labeled TC042, bottom board, uses 18.000 MHz xtal)
 */
-ROM_START( buggybjr )
+ROM_START( buggyboyjr )
 	ROM_REGION( 0x100000, "main_cpu", 0 )
 	ROM_LOAD16_BYTE( "bug1a.214", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
 	ROM_LOAD16_BYTE( "bug4a.175", 0x20001, 0x8000, CRC(40ce3930) SHA1(4bf62ebeea1549a13a21a32cb860717f064b186a) )
@@ -1246,7 +1246,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy, 0,        buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",        0, layout_buggyboy )
-GAMEL( 1986, buggybjr, buggyboy, buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)", 0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1a,       tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",        0, layout_buggyboy )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)", 0, layout_buggybjr )

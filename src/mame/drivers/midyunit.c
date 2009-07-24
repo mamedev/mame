@@ -1648,7 +1648,7 @@ ROM_START( hiimpact )
 ROM_END
 
 
-ROM_START( hiimpac4 )
+ROM_START( hiimpact4 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
@@ -1683,7 +1683,7 @@ ROM_START( hiimpac4 )
 ROM_END
 
 
-ROM_START( hiimpac3 )
+ROM_START( hiimpact3 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
@@ -1718,7 +1718,7 @@ ROM_START( hiimpac3 )
 ROM_END
 
 
-ROM_START( hiimpac1 )
+ROM_START( hiimpact1 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
@@ -1753,7 +1753,7 @@ ROM_START( hiimpac1 )
 ROM_END
 
 
-ROM_START( hiimpacp )
+ROM_START( hiimpactp )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
@@ -1816,7 +1816,7 @@ ROM_START( shimpact )
 ROM_END
 
 
-ROM_START( shimpap6 )
+ROM_START( shimpactp6 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
@@ -1844,7 +1844,7 @@ ROM_START( shimpap6 )
 ROM_END
 
 
-ROM_START( shimpap5 )
+ROM_START( shimpactp5 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
@@ -1872,7 +1872,7 @@ ROM_START( shimpap5 )
 ROM_END
 
 
-ROM_START( shimpap4 ) /* You must manualy reset the high score table or game will hang after initial demo screen, it's best to do a "Full Factory Restore" */
+ROM_START( shimpactp4 ) /* You must manualy reset the high score table or game will hang after initial demo screen, it's best to do a "Full Factory Restore" */
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
@@ -2346,15 +2346,17 @@ GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0,
 GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", GAME_SUPPORTS_SAVE )
 GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", GAME_SUPPORTS_SAVE )
 GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact, 0,        yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpac4, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpac3, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpac1, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpacp, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpact, 0,        yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpap6, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpap5, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpap4, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
+
+GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
+
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
 GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", GAME_SUPPORTS_SAVE )
 GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_faster, term2,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", GAME_SUPPORTS_SAVE )

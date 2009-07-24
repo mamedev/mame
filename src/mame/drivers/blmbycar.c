@@ -452,7 +452,7 @@ ROM_START( blmbycar )
 	ROM_COPY( "oki", 0x040000, 0x000000,   0x040000 )
 ROM_END
 
-ROM_START( blmbycau )
+ROM_START( blmbycaru )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bc_rom4", 0x000000, 0x080000, CRC(76f054a2) SHA1(198efd152b13033e5249119ca48b9e0f6351b0b9) )
 	ROM_LOAD16_BYTE( "bc_rom6", 0x000001, 0x080000, CRC(2570b4c5) SHA1(706465950023a6ef7c85ceb9c76246d7556b3859) )
@@ -526,5 +526,5 @@ static DRIVER_INIT( blmbycar )
 ***************************************************************************/
 
 GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", 0 )
-GAME( 1994, blmbycau, blmbycar, blmbycar, blmbycar, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", 0 )
+GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", 0 )
 GAME( 1996, watrball, 0,        watrball, watrball, 0,        ROT0, "ABM", "Water Balls", 0 )

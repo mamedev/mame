@@ -260,7 +260,7 @@ ROM_START( mystston )
 ROM_END
 
 
-ROM_START( myststno )
+ROM_START( myststono )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ms0",          0x4000, 0x2000, CRC(6dacc05f) SHA1(43054199901639516205c7ea145462d0abea8fb1) )
 	ROM_LOAD( "ms1",          0x6000, 0x2000, CRC(a3546df7) SHA1(89c0349885a9369406a1121cd3db28963b25f2e6) )
@@ -298,4 +298,4 @@ ROM_END
  *************************************/
 
 GAME( 1984, mystston, 0,        mystston, mystston, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1984, myststno, mystston, mystston, mystston, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )
+GAME( 1984, myststono,mystston, mystston, mystston, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )

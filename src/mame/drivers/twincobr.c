@@ -803,7 +803,7 @@ ROM_START( twincobr )
 	ROM_LOAD( "82s123.b24",	0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )	/* tile to sprite priority ?? */
 ROM_END
 
-ROM_START( twincobu )
+ROM_START( twincobru )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b30-01", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30-03", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
@@ -1147,7 +1147,7 @@ static DRIVER_INIT( twincobr )
 
 
 GAME( 1987, twincobr, 0,        twincobr, twincobr, twincobr, ROT270, "[Toaplan] Taito Corporation", "Twin Cobra (World)", 0 )
-GAME( 1987, twincobu, twincobr, twincobr, twincobu, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Twin Cobra (US)", 0 )
+GAME( 1987, twincobru,twincobr, twincobr, twincobu, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Twin Cobra (US)", 0 )
 GAME( 1987, ktiger,   twincobr, twincobr, ktiger,   twincobr, ROT270, "[Toaplan] Taito Corporation", "Kyukyoku Tiger (Japan)", 0 )
 GAME( 1987, fshark,   0,        twincobr, fshark,   twincobr, ROT270, "[Toaplan] Taito Corporation", "Flying Shark (World)", 0 )
 GAME( 1987, skyshark, fshark,   twincobr, skyshark, twincobr, ROT270, "[Toaplan] Taito America Corporation (Romstar license)", "Sky Shark (US)", 0 )

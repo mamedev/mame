@@ -5174,7 +5174,7 @@ ROM_START( lastfort )
 	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
 ROM_END
 
-ROM_START( lastfork )
+ROM_START( lastfortk )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "7f-9",  0x000000, 0x020000, CRC(d2894c1f) SHA1(4f4ab6d8ce69999cd7c4a9ddabec8d1e8fefc6fc) )
 	ROM_LOAD16_BYTE( "8f-10", 0x000001, 0x020000, CRC(9696ea39) SHA1(27af0c6399cd7be40aa8a1c1b58e0db8408aff11) )
@@ -5199,7 +5199,7 @@ ROM_END
 
 /* German version on PCB VG460-(A) */
 
-ROM_START( lastforg )
+ROM_START( lastfortg )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "trma02.bin",    0x000000, 0x020000, CRC(e6f40918) SHA1(c8c9369103530b2214c779c8a643ba9349b3eac5) )
 	ROM_LOAD16_BYTE( "trma03.bin",    0x000001, 0x020000, CRC(b00fb126) SHA1(7dd4b7a2d1c5401fde2275ef76fac1ccc586a0bd) )
@@ -5232,7 +5232,7 @@ OSC: 24.000 MHz
 
 ***************************************************************************/
 
-ROM_START( lastfero )
+ROM_START( lastforte )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tre_jc09", 0x000000, 0x020000, CRC(32f43390) SHA1(b5bad9d80f2155f277265fe487a59f0f4ec6575d) )
 	ROM_LOAD16_BYTE( "tre_jc10", 0x000001, 0x020000, CRC(9536369c) SHA1(39291e92c107be35d130ff29533b42581efc308b) )
@@ -5479,7 +5479,7 @@ ROM_START( pangpoms )
 	ROM_LOAD( "ppoms11.bin", 0x000000, 0x020000, CRC(e89bd565) SHA1(6c7c1ad67ba708dbbe9654c1d290af290207d2be) )
 ROM_END
 
-ROM_START( pangpomm )
+ROM_START( pangpomsm )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "pa.c09", 0x000000, 0x020000, CRC(e01a7a08) SHA1(1890b290dfb1521ab73b2392409aaf44b99d63bb) )
 	ROM_LOAD16_BYTE( "pa.c10", 0x000001, 0x020000, CRC(5e509cee) SHA1(821cfbf5f65cc3091eb8008310266f9f2c838072) )
@@ -5821,7 +5821,7 @@ ROM_START( toride2g )
 	ROM_LOAD( "tr2aja-7.3g", 0x000000, 0x020000, CRC(630c6193) SHA1(ddb63724e0b0f7264cb02904e49b24b87beb35a9) )
 ROM_END
 
-ROM_START( torid2gg )
+ROM_START( toride2gg )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "trii_ge_5", 0x000000, 0x040000, CRC(5e0815a8) SHA1(574c1bf1149b7e98222876b402b20d824f207c79) )
 	ROM_LOAD16_BYTE( "trii_ge_6", 0x000001, 0x040000, CRC(55eba67d) SHA1(c12a11a98d49baf3643404a594d2b87b434acb01) )
@@ -5869,7 +5869,7 @@ ROM_END
 
 GAME( 1992, karatour, 0,        karatour, karatour, karatour, ROT0,   "Mitchell",                               "The Karate Tournament",             GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, pangpoms, 0,        pangpoms, pangpoms, metro,    ROT0,   "Metro",                                  "Pang Pom's",                        0 )
-GAME( 1992, pangpomm, pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",               "Pang Pom's (Mitchell)",             0 )
+GAME( 1992, pangpomsm,pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",               "Pang Pom's (Mitchell)",             0 )
 GAME( 1992, skyalert, 0,        skyalert, skyalert, metro,    ROT270, "Metro",                                  "Sky Alert",                         0 )
 GAME( 1993, ladykill, 0,        karatour, ladykill, karatour, ROT90,  "Yanyaka (Mitchell license)",             "Lady Killer",                       GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, moegonta, ladykill, karatour, moegonta, karatour, ROT90,  "Yanyaka",                                "Moeyo Gonta!! (Japan)",             GAME_IMPERFECT_GRAPHICS )
@@ -5878,11 +5878,11 @@ GAME( 1994, blzntrnd, 0,        blzntrnd, blzntrnd, blzntrnd, ROT0,   "Human Amu
 GAME( 1994, dharma,   0,        dharma,   dharma,   metro,    ROT0,   "Metro",                                  "Dharma Doujou",                     0 )
 GAME( 1994, dharmak,  dharma,   dharma,   dharma,   dharmak,  ROT0,   "Metro",                                  "Dharma Doujou (Korea)",             0 )
 GAME( 1994, lastfort, 0,        lastfort, lastfort, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride",            0 )
-GAME( 1994, lastfero, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic)",   0 )
-GAME( 1994, lastfork, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Korea)",    0 )
-GAME( 1994, lastforg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   0 )
+GAME( 1994, lastforte,lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic)",   0 )
+GAME( 1994, lastfortk,lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Korea)",    0 )
+GAME( 1994, lastfortg,lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   0 )
 GAME( 1994, toride2g, 0,        toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, toride2gg,toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        0 )
 GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS )

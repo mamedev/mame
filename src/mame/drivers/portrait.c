@@ -317,7 +317,7 @@ ROM_START( portrait )
 	ROM_LOAD( "port_pr2.n4",  0x0820, 0x0020, CRC(008634f3) SHA1(7cde6b09ede672d562569866d944428198f2ba9c) )
 ROM_END
 
-ROM_START( portrata )
+ROM_START( portraita )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for the cpu */
 	ROM_LOAD( "portp0f.m1",   0x0000, 0x2000, CRC(333eace3) SHA1(8f02df09d8b50d7e37d5abf7d539624c59a7201e) )
 	ROM_LOAD( "portp0f.p1",   0x2000, 0x2000, CRC(fe258052) SHA1(f453eb05c68d61dfd644688732ff5c07366c68c0) )
@@ -354,4 +354,4 @@ ROM_START( portrata )
 ROM_END
 
 GAME( 1983, portrait, 0,        portrait, portrait,  0, ROT270, "Olympia", "Portraits (set 1)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
-GAME( 1983, portrata, portrait, portrait, portrait,  0, ROT270, "Olympia", "Portraits (set 2)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1983, portraita,portrait, portrait, portrait,  0, ROT270, "Olympia", "Portraits (set 2)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )

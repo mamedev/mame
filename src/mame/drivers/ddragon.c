@@ -1231,7 +1231,7 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
 ROM_END
 
-ROM_START( ddragnw1 )
+ROM_START( ddragonw1 )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "e1-1.26",       0x08000, 0x08000, CRC(4b951643) SHA1(efb1f9ef2e46597d76123c9770854c1d83639eb2) )
 	ROM_LOAD( "21a-2-4.25",    0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
@@ -1313,7 +1313,7 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
 ROM_END
 
-ROM_START( ddragoua )
+ROM_START( ddragonua )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1",     0x08000, 0x08000, CRC(1d625008) SHA1(84cc19a55e7c91fca1943d9624d93e0347ed4150) )
 	ROM_LOAD( "21a-2_4",   0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
@@ -1395,7 +1395,7 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
 ROM_END
 
-ROM_START( ddragnba )
+ROM_START( ddragonba )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "5.bin",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "4.bin",     0x10000, 0x08000, CRC(48045762) SHA1(ca39eea71ca76627a98210ce9cc61457a58f16b9) ) /* banked at 0x4000-0x8000 */
@@ -1436,7 +1436,7 @@ ROM_START( ddragnba )
 	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
 ROM_END
 
-ROM_START( ddragob2 )
+ROM_START( ddragonb2 )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "4.bin",        0x08000, 0x08000, CRC(668dfa19) SHA1(9b2ff1b66eeba0989e4ed850b7df1f5719ba5572) )
 	ROM_LOAD( "5.bin",        0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
@@ -1484,7 +1484,7 @@ ROM_END
  the graphic roms are all scrambled.  The game also runs on 3x M6809 rather than the original CPUs.
 
  */
-ROM_START( ddgn6809 )
+ROM_START( ddragon6809 )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 	ROM_LOAD( "17.bin",   0x10000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
@@ -1561,7 +1561,7 @@ Note
 
 */
 
-ROM_START( dd6809a )
+ROM_START( ddragon6809a )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "20.7f",   0x08000, 0x08000, CRC(c804819f) SHA1(cc570a90b7bef1c6263f5e1fd96ed377c508fe2b) )
 	ROM_LOAD( "19.7g",   0x10000, 0x08000, CRC(de08db4d) SHA1(e63b90c3bb3af01d2855de9a996b51068bed7b52) ) /* banked at 0x4000-0x8000 */
@@ -1646,7 +1646,7 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown (same as ddragon) */
 ROM_END
 
-ROM_START( ddragn2u )
+ROM_START( ddragon2u )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
 	ROM_LOAD( "26aa-03.bin",  0x10000, 0x8000, CRC(44dd5d4b) SHA1(427c4e419668b41545928cfc96435c010ecdc88b) )
@@ -1811,7 +1811,7 @@ ROM_END
    this version uses the sound program from double dragon, and as this configuration has been found on at least
    4 boards it's likely that the updated sound rom in the parent set was only shipped with the 'game room'
    version of the game */
-ROM_START( ddungene )
+ROM_START( ddungeone )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main CPU? */
 	ROM_LOAD( "dd25.25",    0x10000, 0x8000,  CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) ) /* 3 on this board */
 	ROM_LOAD( "dd26.26",    0x08000, 0x8000,  CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) ) /* 2 on this board */
@@ -2025,24 +2025,24 @@ static DRIVER_INIT( ddgn6809 )
  *
  *************************************/
 
-GAME( 1987, ddragon,  0,        ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan", "Double Dragon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragoua, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragob2, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
-GAME( 1987, ddragnba, ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddgn6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
-GAME( 1987, dd6809a,  ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
-GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragon,     0,        ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan", "Double Dragon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonw,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonw1,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonu,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonua,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonb2,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonb,    ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
+GAME( 1987, ddragonba,   ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragon6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
+GAME( 1987, ddragon6809a,ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
+GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", GAME_SUPPORTS_SAVE )
 GAME( 1991, tstrikea, tstrike,  darktowr, tstrike,  darktowr, ROT0, "Game Room", "Thunder Strike (Older)", GAME_SUPPORTS_SAVE )
 GAME( 1992, ddungeon, 0,        darktowr, ddungeon, darktowr, ROT0, "Game Room", "Dangerous Dungeons", GAME_SUPPORTS_SAVE )
-GAME( 1992, ddungene, ddungeon, darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons (East Coast Coin Company)", GAME_SUPPORTS_SAVE )
+GAME( 1992, ddungeone,ddungeon, darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons (East Coast Coin Company)", GAME_SUPPORTS_SAVE )
 GAME( 1992, darktowr, 0,        darktowr, darktowr, darktowr, ROT0, "Game Room", "Dark Tower", GAME_SUPPORTS_SAVE )
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */

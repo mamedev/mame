@@ -593,7 +593,7 @@ ROM_START( backfire )
 	ROM_LOAD( "gal16v8b.12n", 0x0400, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( backfira )
+ROM_START( backfirea )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "rb-00h.h2",    0x000002, 0x080000, CRC(60973046) SHA1(e70d9be9cb172920da2a2ac9d317768b1438c59d) )
 	ROM_LOAD32_WORD( "rb-01l.h3",    0x000000, 0x080000, CRC(27472f60) SHA1(d73b1e68dc51e28b1148db39ce22bd2e93f6fd0a) )
@@ -672,4 +672,4 @@ static DRIVER_INIT( backfire )
 }
 
 GAME( 1995, backfire, 0,        backfire,      backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", 0 )
-GAME( 1995, backfira, backfire, backfire,      backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 2)", 0 ) // defaults to wheel controls, must change to joystick to play
+GAME( 1995, backfirea,backfire, backfire,      backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 2)", 0 ) // defaults to wheel controls, must change to joystick to play

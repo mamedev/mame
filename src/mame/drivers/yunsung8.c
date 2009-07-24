@@ -625,7 +625,7 @@ ROM_START( cannball )
 ROM_END
 
 
-ROM_START( cannbalv )
+ROM_START( cannballv )
 
 	ROM_REGION( 0x24000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "yunsung1", 0x00000, 0x0c000, CRC(f7398b0d) SHA1(f2cdb9c4662cd325376d25ae9611f689605042db) )
@@ -703,6 +703,6 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1995,  cannball, 0,        yunsung8, cannball, 0, ROT0,   "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung) (horizontal)",  GAME_IMPERFECT_SOUND )
-GAME( 1995,  cannbalv, cannball, yunsung8, cannbalv, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung) (vertical)",  GAME_IMPERFECT_SOUND )
+GAME( 1995,  cannballv,cannball, yunsung8, cannbalv, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung) (vertical)",  GAME_IMPERFECT_SOUND )
 GAME( 1995,  magix,    0,        yunsung8, magix,    0, ROT0,   "Yun Sung",               "Magix / Rock", GAME_IMPERFECT_SOUND ) // Title: DSW
 GAME( 1994?, rocktris, 0,        yunsung8, rocktris, 0, ROT0,   "Yun Sung",               "Rock Tris",    GAME_IMPERFECT_SOUND )

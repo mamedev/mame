@@ -832,7 +832,7 @@ ROM_START( intrepid )
 	ROM_LOAD( "ic3.prm",      0x0000, 0x0020, CRC(927ff40a) SHA1(3d699d981851989e9190505b0dede5202d688f2b) )
 ROM_END
 
-ROM_START( intrepi2 )
+ROM_START( intrepid2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "intrepid.001", 0x0000, 0x1000, CRC(9505df1e) SHA1(83ad91e92038231c9351d11e5471e6ef6bb4b743) )
 	ROM_LOAD( "intrepid.002", 0x1000, 0x1000, CRC(27e9f53f) SHA1(06efd4482971b00632dae2d528f96371e98e5e2a) )
@@ -1061,6 +1061,6 @@ GAME( 1982, funnymou, 0,        suprmous, suprmous, 0,     ROT90, "Chuo Co. Ltd"
 GAME( 1982, suprmous, funnymou, suprmous, suprmous, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
 GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
-GAME( 1983, intrepi2, intrepid, intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
+GAME( 1983, intrepid2,intrepid, intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
 GAME( 1984, zaryavos, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games of Canada", "Zarya Vostoka", GAME_NOT_WORKING )
 GAME( 198?, rtriv,    0,        intrepid, rtriv,    rtriv, ROT90, "Romar", "Romar Triv", GAME_WRONG_COLORS )
