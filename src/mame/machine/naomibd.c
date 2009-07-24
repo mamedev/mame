@@ -107,7 +107,8 @@ typedef struct _naomibd_config_table naomibd_config_table;
 struct _naomibd_config_table
 {
 	const char *name;
-	UINT32	transtbl[MAX_PROT_REGIONS*2];
+	int reverse_bytes;
+	UINT32	transtbl[MAX_PROT_REGIONS*3];
 };
 
 typedef struct _naomibd_state naomibd_state;
@@ -126,19 +127,36 @@ struct _naomibd_state
 	UINT32				prot_offset, prot_key;
 
 	UINT32				*prot_translate;
+	int				prot_reverse_bytes;
 };
 
 // maps protection offsets to real addresses
+// format of array: encryption key, address written, address to switch out with.  if key is -1 it's ignored and address written is the match.
+// if key is not -1, it's used for the match instead of the address written.
 static naomibd_config_table naomibd_translate_tbl[] =
 {
-	{ "doa2", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
-		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x118a3a, 0x120000,
-		    0x12c0d8, 0x140000, 0x147e22, 0x160000, 0x1645ce, 0x180000, 0x17c6b2, 0x1a0000,
-		    0x19902e, 0x1c0000, 0x1b562a, 0x1e0000, 0xffffffff, 0xffffffff } },
-	{ "doa2m", { 0x500, 0, 0x20504, 0x20000, 0x40508, 0x40000, 0x6050c, 0x60000, 0x80510, 0x80000,
-		    0xa0514, 0xa0000, 0xc0518, 0xc0000, 0xe051c, 0xe0000, 0x100520,0x100000, 0x11a5b4, 0x120000,
-		    0x12e7c4, 0x140000, 0x1471f6, 0x160000, 0x1640c4, 0x180000, 0x1806ca, 0x1a0000,
-		    0x199df4, 0x1c0000, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
+	{ "doa2", 0, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
+		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x118a3a, 0x120000,
+		    -1, 0x12c0d8, 0x140000, -1, 0x147e22, 0x160000, -1, 0x1645ce, 0x180000, -1, 0x17c6b2, 0x1a0000,
+		    -1, 0x19902e, 0x1c0000, -1, 0x1b562a, 0x1e0000, -1, 0xffffffff, 0xffffffff } },
+	{ "doa2m", 0, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
+		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x11a5b4, 0x120000,
+		    -1, 0x12e7c4, 0x140000, -1, 0x1471f6, 0x160000, -1, 0x1640c4, 0x180000, -1, 0x1806ca, 0x1a0000,
+		    -1, 0x199df4, 0x1c0000, -1, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
+	{ "csmash", 1, { -1, 0x2000000, 0xbb614, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "csmasho", 1, { -1, 0x2000000, 0xbb5b4, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "capsnk", 0, { 0x8c2a, 0, 0, 0x3d3e, 0, 0x10000, 0x65b7, 0, 0x20000, 0x5896, 0, 0x30000, 0x16d2, 0, 0x40000,
+			0x9147, 0, 0x50000, 0x7ac, 0, 0x60000, 0xee67, 0, 0x70000, 0xeb63, 0, 0x80000, 0x2a04, 0, 0x90000,
+			0x3e41, 0, 0xa0000, 0xb7af, 0, 0xb0000, 0x9651, 0, 0xc0000, 0xd208, 0, 0xd0000, 0x4769, 0, 0xe0000,
+			0xad8c, 0, 0xf0000, 0x923d, 0, 0x100000, 0x4a65, 0, 0x110000, 0x9958, 0, 0x120000, 0x8216, 0, 0x130000,
+			0xaa91, 0, 0x140000, 0xd007, 0, 0x150000, 0xead, 0, 0x160000, 0x492, 0, 0x170000,
+			0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "capsnka", 0, { 0x8c2a, 0, 0, 0x3d3e, 0, 0x10000, 0x65b7, 0, 0x20000, 0x5896, 0, 0x30000, 0x16d2, 0, 0x40000,
+			0x9147, 0, 0x50000, 0x7ac, 0, 0x60000, 0xee67, 0, 0x70000, 0xeb63, 0, 0x80000, 0x2a04, 0, 0x90000,
+			0x3e41, 0, 0xa0000, 0xb7af, 0, 0xb0000, 0x9651, 0, 0xc0000, 0xd208, 0, 0xd0000, 0x4769, 0, 0xe0000,
+			0xad8c, 0, 0xf0000, 0x923d, 0, 0x100000, 0x4a65, 0, 0x110000, 0x9958, 0, 0x120000, 0x8216, 0, 0x130000,
+			0xaa91, 0, 0x140000, 0xd007, 0, 0x150000, 0xead, 0, 0x160000, 0x492, 0, 0x170000,
+			0xffffffff, 0xffffffff, 0xffffffff } },
 };
 
 /***************************************************************************
@@ -251,13 +269,20 @@ READ64_DEVICE_HANDLER( naomibd_r )
 				UINT8 *prot = (UINT8 *)v->protdata;
 				UINT32 byte_offset = v->prot_offset*2;
 
-				if (!prot)
+				if (v->prot_translate == NULL)
 				{
 					logerror("naomibd: reading protection data, but none was supplied\n");
 					return 0;
 				}
 
-				ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
+			 	if (v->prot_reverse_bytes)
+				{
+					ret = (UINT64)(prot[byte_offset+1] | (prot[byte_offset]<<8));
+				}
+				else
+				{
+					ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
+				}
 
 				v->prot_offset++;
 			}
@@ -389,25 +414,46 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 					case 0x1fffc:	// decryption key
 						v->prot_key = data;
 
-						mame_printf_verbose("Protection: set up read @ %x, key %x [%s]\n", v->prot_offset, v->prot_key, cpuexec_describe_context(device->machine));
+						mame_printf_verbose("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset, v->prot_key, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
 
 						// translate address if necessary
 						if (v->prot_translate != NULL)
 						{
 							i = 0;
-							while (v->prot_translate[i] != 0xffffffff)
+							while (v->prot_translate[i+1] != 0xffffffff)
 							{
-								if (v->prot_translate[i] == (v->prot_offset*2))
+								// should we match by key or address?
+								if (v->prot_translate[i] != -1)
 								{
-									mame_printf_verbose("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+1]);
-									v->prot_offset = v->prot_translate[i+1]/2;
-									break;
+									if (v->prot_translate[i] == v->prot_key)
+									{
+										mame_printf_verbose("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
+										v->prot_offset = v->prot_translate[i+2]/2;
+										break;
+									}
+									else
+									{
+										i+= 3;
+									}
 								}
 								else
 								{
-									i += 2;
+									if (v->prot_translate[i+1] == (v->prot_offset*2))
+									{
+										mame_printf_verbose("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
+										v->prot_offset = v->prot_translate[i+2]/2;
+										break;
+									}
+									else
+									{
+										i += 3;
+									}
 								}
 							}
+						}
+						else
+						{
+							mame_printf_verbose("naomibd: protection not handled for this game\n");
 						}
 						break;
 
@@ -688,6 +734,7 @@ static DEVICE_START( naomibd )
 		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
 		{
 			v->prot_translate = &naomibd_translate_tbl[i].transtbl[0];
+			v->prot_reverse_bytes = naomibd_translate_tbl[i].reverse_bytes;
 			break;
 		}
 	}
