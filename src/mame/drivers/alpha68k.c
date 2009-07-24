@@ -56,11 +56,16 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
  3)  'paddlema'
 
-  - "Game Time" Dip Switch is the time for match type A. Here is what you
-    have to add for games B to E :
+  - "Game Time" The effects of "Game Time" and "Match Type"
 
-      Match Type       B        C        D        E
-      Time to add    00:10    01:00    01:30    02:00
+      Time Setting
+                       A            B            C            D            E
+       Match Type  1P vs Comp.  2P vs Comp.  1P vs 1P     2P vs 1P     2P vs 2P
+            A        1:00         1:10         2:00         2:30         3:00
+            B        1:10         1:20         2:10         2:40         3:10
+            C        1:20         1:30         2:20         2:50         3:20
+            D        1:30         1:40         2:30         3:00         3:30
+
 
   - When "Game Mode" Dip Switch is set to "Win Match Against CPU", this has
     an effect on matches types A and B : player is awarded 99 points at the
@@ -1087,47 +1092,41 @@ static INPUT_PORTS_START( paddlema )
 	ALPHA68K_PLAYER_INPUT_MSB( 4, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
 	PORT_START("IN3") //DSW0
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )				// See notes
-	PORT_DIPSETTING(    0x00, "1:00" )
-	PORT_DIPSETTING(    0x20, "1:10" )
-	PORT_DIPSETTING(    0x10, "1:20" )
-	PORT_DIPSETTING(    0x30, "1:30" )
-	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )
-	PORT_DIPSETTING(    0x80, "A to B" )
-	PORT_DIPSETTING(    0x00, "A to C" )
-	PORT_DIPSETTING(    0x40, "A to E" )
-//  PORT_DIPSETTING(    0xc0, "A to B" )                // Possibility of "A only" in another version ?
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
+	PORT_DIPSETTING(    0x00, "Defualt Time" )
+	PORT_DIPSETTING(    0x20, "+10 Seconds" )
+	PORT_DIPSETTING(    0x10, "+20 Seconds" )
+	PORT_DIPSETTING(    0x30, "+30 Seconds" )
+	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )		PORT_DIPLOCATION("SW1:2,1") /* Styles are for Upright/Table & Single/Dual controls???? */
+	PORT_DIPSETTING(    0x80, "A to B" )	/* Manual shows "Upright Sytle B" */
+	PORT_DIPSETTING(    0x00, "A to C" )	/* Manual shows "Upright Sytle A" */
+	PORT_DIPSETTING(    0x40, "A to E" )	/* Manual shows "Table Sytle C"   */
+//  PORT_DIPSETTING(    0xc0, "A to B" )	/* Manual shows "Table Sytle D"   */
 
 	PORT_START("IN4")	// DSW1
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )
+	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )			PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x20, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x00, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x10, "Win Match Against CPU (Cheat)")
 	PORT_DIPSETTING(    0x30, "Freeze" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:2") /* Manual shows "Off" for this dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1146,28 +1145,28 @@ static INPUT_PORTS_START( timesold )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )					/* "Difficult" */
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPUNUSED( 0x40, 0x40 )								/* See notes */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )		/* Listed as "Unused" - See notes */
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6") /* Listed in the manual as "Free Play" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1203,12 +1202,12 @@ static INPUT_PORTS_START( btlfield )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )				/* "Difficult" */
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:4") /* Listed as "Unused". */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )			/* Listed as "Unused", see notes. */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1217,7 +1216,7 @@ static INPUT_PORTS_START( btlfield )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1271,30 +1270,30 @@ static INPUT_PORTS_START( skysoldr )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )					// "1"
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )				// "2"
-	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )					// "3"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )				// "4"
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4") /* Manual states "Always On" */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )			// See notes
+	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )		PORT_DIPLOCATION("SW1:5") /* Manual states "Always Off"  See notes */
 	PORT_DIPSETTING(    0x40, "SNK" )
 	PORT_DIPSETTING(    0x00, "Romstar" )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1336,19 +1335,19 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x00, "Event Select" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x00, "Event Select" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:2,6")
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, "Upright 4 Players" )
 	PORT_DIPSETTING(    0x88, DEF_STR( Cocktail ) )
-	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )     /* Not documented. */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )			PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
+	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )		/* Not documented. */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )		PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
 	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10 Beats For Max Speed" )
 	PORT_DIPSETTING(    0x20, "14 Beats For Max Speed" )
-	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
@@ -1406,7 +1405,7 @@ static INPUT_PORTS_START( skyadvnt )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1420,7 +1419,7 @@ static INPUT_PORTS_START( skyadvnu )
 	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
@@ -1449,8 +1448,8 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )			PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
-	PORT_DIPSETTING(    0x00, "Slow" )					// 1 second = 0x01ff
+	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )		PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
+	PORT_DIPSETTING(    0x00, "Slow" )			// 1 second = 0x01ff
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// 1 second = 0x013f
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
@@ -1465,7 +1464,7 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
@@ -1476,7 +1475,7 @@ static INPUT_PORTS_START( gangwars )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1493,7 +1492,7 @@ static INPUT_PORTS_START( gangwarb )
 	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4,5")
@@ -1622,10 +1621,10 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )					PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )				PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )	PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, "Game Mode" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:5,6")
