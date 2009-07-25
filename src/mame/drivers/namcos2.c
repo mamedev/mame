@@ -464,7 +464,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #define M68B09_CPU_CLOCK	(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 68B09 sound CPU */
 #define C65_CPU_CLOCK		(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
 #define YM2151_SOUND_CLOCK	XTAL_3_579545MHz		/* 3.579545MHz FM clock */
-#define C140_SOUND_CLOCK	(MAIN_OSC_CLOCK / 384 / 6)	/* 21.334kHz C140 clock (was 8000000/374 or 21.390kHz) */
+#define C140_SOUND_CLOCK	(MAIN_OSC_CLOCK / 384 / 6)	/* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
 
 /*************************************************************/
@@ -1623,7 +1623,7 @@ static MACHINE_DRIVER_START( default )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1637,7 +1637,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default2 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1647,7 +1647,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default3 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1697,7 +1697,7 @@ static MACHINE_DRIVER_START( gollygho )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1747,7 +1747,7 @@ static MACHINE_DRIVER_START( finallap )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1797,7 +1797,7 @@ static MACHINE_DRIVER_START( sgunner )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( luckywld )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1897,7 +1897,7 @@ static MACHINE_DRIVER_START( metlhawk )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
