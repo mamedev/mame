@@ -951,15 +951,15 @@ ROM_START( hedpanico ) /* Story line & game instructions in English, copyright y
 	ROM_CONTINUE(          0x10000, 0x34000)
 
 	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "sm1.bin", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
-	ROM_LOAD( "sm2.bin", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
+	ROM_LOAD( "sm1.ju01", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
+	ROM_LOAD( "sm2.ju02", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) )
 	ROM_FILL(                    0x500000, 0x100000, 0 )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
-	ROM_LOAD16_BYTE( "sm3.bin", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
-	ROM_LOAD16_BYTE( "sm4.bin", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
+	ROM_LOAD16_BYTE( "sm3.fu35", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
+	ROM_LOAD16_BYTE( "sm4.fu34", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
