@@ -64,12 +64,122 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 #define PXA255_DCSR13			(PXA255_DMA_BASE_ADDR + 0x00000034)
 #define PXA255_DCSR14			(PXA255_DMA_BASE_ADDR + 0x00000038)
 #define PXA255_DCSR15			(PXA255_DMA_BASE_ADDR + 0x0000003c)
-/* More DMA registers TODO */
+#define PXA255_DINT				(PXA255_DMA_BASE_ADDR + 0x000000f0)
+#define PXA255_DRCMR0			(PXA255_DMA_BASE_ADDR + 0x00000100)
+#define PXA255_DRCMR1			(PXA255_DMA_BASE_ADDR + 0x00000104)
+#define PXA255_DRCMR2			(PXA255_DMA_BASE_ADDR + 0x00000108)
+#define PXA255_DRCMR3			(PXA255_DMA_BASE_ADDR + 0x0000010c)
+#define PXA255_DRCMR4			(PXA255_DMA_BASE_ADDR + 0x00000110)
+#define PXA255_DRCMR5			(PXA255_DMA_BASE_ADDR + 0x00000114)
+#define PXA255_DRCMR6			(PXA255_DMA_BASE_ADDR + 0x00000118)
+#define PXA255_DRCMR7			(PXA255_DMA_BASE_ADDR + 0x0000011c)
+#define PXA255_DRCMR8			(PXA255_DMA_BASE_ADDR + 0x00000120)
+#define PXA255_DRCMR9			(PXA255_DMA_BASE_ADDR + 0x00000124)
+#define PXA255_DRCMR10			(PXA255_DMA_BASE_ADDR + 0x00000128)
+#define PXA255_DRCMR11			(PXA255_DMA_BASE_ADDR + 0x0000012c)
+#define PXA255_DRCMR12			(PXA255_DMA_BASE_ADDR + 0x00000130)
+#define PXA255_DRCMR13			(PXA255_DMA_BASE_ADDR + 0x00000134)
+#define PXA255_DRCMR14			(PXA255_DMA_BASE_ADDR + 0x00000138)
+#define PXA255_DRCMR15			(PXA255_DMA_BASE_ADDR + 0x0000013c)
+#define PXA255_DRCMR16			(PXA255_DMA_BASE_ADDR + 0x00000140)
+#define PXA255_DRCMR17			(PXA255_DMA_BASE_ADDR + 0x00000144)
+#define PXA255_DRCMR18			(PXA255_DMA_BASE_ADDR + 0x00000148)
+#define PXA255_DRCMR19			(PXA255_DMA_BASE_ADDR + 0x0000014c)
+#define PXA255_DRCMR20			(PXA255_DMA_BASE_ADDR + 0x00000150)
+#define PXA255_DRCMR21			(PXA255_DMA_BASE_ADDR + 0x00000154)
+#define PXA255_DRCMR22			(PXA255_DMA_BASE_ADDR + 0x00000158)
+#define PXA255_DRCMR23			(PXA255_DMA_BASE_ADDR + 0x0000015c)
+#define PXA255_DRCMR24			(PXA255_DMA_BASE_ADDR + 0x00000160)
+#define PXA255_DRCMR25			(PXA255_DMA_BASE_ADDR + 0x00000164)
+#define PXA255_DRCMR26			(PXA255_DMA_BASE_ADDR + 0x00000168)
+#define PXA255_DRCMR27			(PXA255_DMA_BASE_ADDR + 0x0000016c)
+#define PXA255_DRCMR28			(PXA255_DMA_BASE_ADDR + 0x00000170)
+#define PXA255_DRCMR29			(PXA255_DMA_BASE_ADDR + 0x00000174)
+#define PXA255_DRCMR30			(PXA255_DMA_BASE_ADDR + 0x00000178)
+#define PXA255_DRCMR31			(PXA255_DMA_BASE_ADDR + 0x0000017c)
+#define PXA255_DRCMR32			(PXA255_DMA_BASE_ADDR + 0x00000180)
+#define PXA255_DRCMR33			(PXA255_DMA_BASE_ADDR + 0x00000184)
+#define PXA255_DRCMR34			(PXA255_DMA_BASE_ADDR + 0x00000188)
+#define PXA255_DRCMR35			(PXA255_DMA_BASE_ADDR + 0x0000018c)
+#define PXA255_DRCMR36			(PXA255_DMA_BASE_ADDR + 0x00000190)
+#define PXA255_DRCMR37			(PXA255_DMA_BASE_ADDR + 0x00000194)
+#define PXA255_DRCMR38			(PXA255_DMA_BASE_ADDR + 0x00000198)
+#define PXA255_DRCMR39			(PXA255_DMA_BASE_ADDR + 0x0000019c)
+#define PXA255_DDADR0			(PXA255_DMA_BASE_ADDR + 0x00000200)
+#define PXA255_DSADR0			(PXA255_DMA_BASE_ADDR + 0x00000204)
+#define PXA255_DTADR0			(PXA255_DMA_BASE_ADDR + 0x00000208)
+#define PXA255_DCMD0			(PXA255_DMA_BASE_ADDR + 0x0000020c)
+#define PXA255_DDADR1			(PXA255_DMA_BASE_ADDR + 0x00000210)
+#define PXA255_DSADR1			(PXA255_DMA_BASE_ADDR + 0x00000214)
+#define PXA255_DTADR1			(PXA255_DMA_BASE_ADDR + 0x00000218)
+#define PXA255_DCMD1			(PXA255_DMA_BASE_ADDR + 0x0000021c)
+#define PXA255_DDADR2			(PXA255_DMA_BASE_ADDR + 0x00000220)
+#define PXA255_DSADR2			(PXA255_DMA_BASE_ADDR + 0x00000224)
+#define PXA255_DTADR2			(PXA255_DMA_BASE_ADDR + 0x00000228)
+#define PXA255_DCMD2			(PXA255_DMA_BASE_ADDR + 0x0000022c)
+#define PXA255_DDADR3			(PXA255_DMA_BASE_ADDR + 0x00000230)
+#define PXA255_DSADR3			(PXA255_DMA_BASE_ADDR + 0x00000234)
+#define PXA255_DTADR3			(PXA255_DMA_BASE_ADDR + 0x00000238)
+#define PXA255_DCMD3			(PXA255_DMA_BASE_ADDR + 0x0000023c)
+#define PXA255_DDADR4			(PXA255_DMA_BASE_ADDR + 0x00000240)
+#define PXA255_DSADR4			(PXA255_DMA_BASE_ADDR + 0x00000244)
+#define PXA255_DTADR4			(PXA255_DMA_BASE_ADDR + 0x00000248)
+#define PXA255_DCMD4			(PXA255_DMA_BASE_ADDR + 0x0000024c)
+#define PXA255_DDADR5			(PXA255_DMA_BASE_ADDR + 0x00000250)
+#define PXA255_DSADR5			(PXA255_DMA_BASE_ADDR + 0x00000254)
+#define PXA255_DTADR5			(PXA255_DMA_BASE_ADDR + 0x00000258)
+#define PXA255_DCMD5			(PXA255_DMA_BASE_ADDR + 0x0000025c)
+#define PXA255_DDADR6			(PXA255_DMA_BASE_ADDR + 0x00000260)
+#define PXA255_DSADR6			(PXA255_DMA_BASE_ADDR + 0x00000264)
+#define PXA255_DTADR6			(PXA255_DMA_BASE_ADDR + 0x00000268)
+#define PXA255_DCMD6			(PXA255_DMA_BASE_ADDR + 0x0000026c)
+#define PXA255_DDADR7			(PXA255_DMA_BASE_ADDR + 0x00000270)
+#define PXA255_DSADR7			(PXA255_DMA_BASE_ADDR + 0x00000274)
+#define PXA255_DTADR7			(PXA255_DMA_BASE_ADDR + 0x00000278)
+#define PXA255_DCMD7			(PXA255_DMA_BASE_ADDR + 0x0000027c)
+#define PXA255_DDADR8			(PXA255_DMA_BASE_ADDR + 0x00000280)
+#define PXA255_DSADR8			(PXA255_DMA_BASE_ADDR + 0x00000284)
+#define PXA255_DTADR8			(PXA255_DMA_BASE_ADDR + 0x00000288)
+#define PXA255_DCMD8			(PXA255_DMA_BASE_ADDR + 0x0000028c)
+#define PXA255_DDADR9			(PXA255_DMA_BASE_ADDR + 0x00000290)
+#define PXA255_DSADR9			(PXA255_DMA_BASE_ADDR + 0x00000294)
+#define PXA255_DTADR9			(PXA255_DMA_BASE_ADDR + 0x00000298)
+#define PXA255_DCMD9			(PXA255_DMA_BASE_ADDR + 0x0000029c)
+#define PXA255_DDADR10			(PXA255_DMA_BASE_ADDR + 0x000002a0)
+#define PXA255_DSADR10			(PXA255_DMA_BASE_ADDR + 0x000002a4)
+#define PXA255_DTADR10			(PXA255_DMA_BASE_ADDR + 0x000002a8)
+#define PXA255_DCMD10			(PXA255_DMA_BASE_ADDR + 0x000002ac)
+#define PXA255_DDADR11			(PXA255_DMA_BASE_ADDR + 0x000002b0)
+#define PXA255_DSADR11			(PXA255_DMA_BASE_ADDR + 0x000002b4)
+#define PXA255_DTADR11			(PXA255_DMA_BASE_ADDR + 0x000002b8)
+#define PXA255_DCMD11			(PXA255_DMA_BASE_ADDR + 0x000002bc)
+#define PXA255_DDADR12			(PXA255_DMA_BASE_ADDR + 0x000002c0)
+#define PXA255_DSADR12			(PXA255_DMA_BASE_ADDR + 0x000002c4)
+#define PXA255_DTADR12			(PXA255_DMA_BASE_ADDR + 0x000002c8)
+#define PXA255_DCMD12			(PXA255_DMA_BASE_ADDR + 0x000002cc)
+#define PXA255_DDADR13			(PXA255_DMA_BASE_ADDR + 0x000002d0)
+#define PXA255_DSADR13			(PXA255_DMA_BASE_ADDR + 0x000002d4)
+#define PXA255_DTADR13			(PXA255_DMA_BASE_ADDR + 0x000002d8)
+#define PXA255_DCMD13			(PXA255_DMA_BASE_ADDR + 0x000002dc)
+#define PXA255_DDADR14			(PXA255_DMA_BASE_ADDR + 0x000002e0)
+#define PXA255_DSADR14			(PXA255_DMA_BASE_ADDR + 0x000002e4)
+#define PXA255_DTADR14			(PXA255_DMA_BASE_ADDR + 0x000002e8)
+#define PXA255_DCMD14			(PXA255_DMA_BASE_ADDR + 0x000002ec)
+#define PXA255_DDADR15			(PXA255_DMA_BASE_ADDR + 0x000002f0)
+#define PXA255_DSADR15			(PXA255_DMA_BASE_ADDR + 0x000002f4)
+#define PXA255_DTADR15			(PXA255_DMA_BASE_ADDR + 0x000002f8)
+#define PXA255_DCMD15			(PXA255_DMA_BASE_ADDR + 0x000002fc)
 
+typedef struct
+{
+	UINT32 dcsr[16];
+} PXA255_DMA_Regs;
+
+static PXA255_DMA_Regs dma_regs;
+
+/* TODO */
 static READ32_HANDLER( pxa255_dma_r )
 {
-	verboselog( space->machine, 0, "pxa255_dma_r: Placeholder functionality.  Read: %08x & %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2), mem_mask );
-	/* TODO: Everything placeholder, DCSR3 just needs to flag that it's ready to accept data so everything boots. */
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_DCSR0:
@@ -88,11 +198,44 @@ static READ32_HANDLER( pxa255_dma_r )
 		case PXA255_DCSR13:
 		case PXA255_DCSR14:
 		case PXA255_DCSR15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Channel Control/Status Register %d Read: %08x & %08x\n", offset, 0x00000008, mem_mask );
 			return 0x00000008; // Report channel as stopped
 		default:
+			verboselog( space->machine, 0, "pxa255_dma_r: Unknown address: %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2));
 			break;
 	}
 	return 0;
+}
+
+/* TODO */
+static WRITE32_HANDLER( pxa255_dma_w )
+{
+	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_DCSR0:
+		case PXA255_DCSR1:
+		case PXA255_DCSR2:
+		case PXA255_DCSR3:
+		case PXA255_DCSR4:
+		case PXA255_DCSR5:
+		case PXA255_DCSR6:
+		case PXA255_DCSR7:
+		case PXA255_DCSR8:
+		case PXA255_DCSR9:
+		case PXA255_DCSR10:
+		case PXA255_DCSR11:
+		case PXA255_DCSR12:
+		case PXA255_DCSR13:
+		case PXA255_DCSR14:
+		case PXA255_DCSR15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Channel Control/Status Register %d Write: %08x & %08x\n", offset, data, mem_mask );
+			//dma_regs.dcsr[offset] = data & 0xe0000007;
+			// TODO: DMA kickoff, etc.
+			break;
+		default:
+			verboselog( space->machine, 0, "pxa255_dma_w: Unknown address: %08x = %08x & %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2), data, mem_mask);
+			break;
+	}
 }
 
 /*
@@ -700,8 +843,7 @@ typedef struct
 
 	UINT32 pad0[4];
 
-	UINT32 fbr0;
-	UINT32 fbr1;
+	UINT32 fbr[2];
 
 	UINT32 pad1[4];
 
@@ -717,13 +859,13 @@ typedef struct
 
 static PXA255_LCD_Regs lcd_regs;
 
-static void pxa255_lcd_initiate_dma(const address_space* space, UINT32 address, int channel)
+static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel)
 {
 	lcd_regs.dma[channel].fdadr = memory_read_dword_32le(space, address);
 	lcd_regs.dma[channel].fsadr = memory_read_dword_32le(space, address + 0x04);
 	lcd_regs.dma[channel].fidr  = memory_read_dword_32le(space, address + 0x08);
 	lcd_regs.dma[channel].ldcmd = memory_read_dword_32le(space, address + 0x0c);
-	verboselog( space->machine, 3, "pxa255_lcd_initiate_dma, address = %08x, channel = %d\n", address, channel);
+	verboselog( space->machine, 3, "pxa255_lcd_load_dma_descriptor, address = %08x, channel = %d\n", address, channel);
 	verboselog( space->machine, 3, "    DMA Frame Descriptor: %08x\n", lcd_regs.dma[channel].fdadr );
 	verboselog( space->machine, 3, "    DMA Frame Source Address: %08x\n", lcd_regs.dma[channel].fsadr );
 	verboselog( space->machine, 3, "    DMA Frame ID: %08x\n", lcd_regs.dma[channel].fidr );
@@ -744,6 +886,40 @@ static void pxa255_lcd_irq_check(running_machine *machine)
 	}
 }
 
+static void pxa255_lcd_dma_kickoff(running_machine *machine, int channel)
+{
+	if(lcd_regs.dma[channel].fdadr != 0)
+	{
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), lcd_regs.dma[channel].ldcmd & 0x000fffff);
+
+		timer_adjust_oneshot(lcd_regs.dma[channel].eof, period, channel);
+
+		if(lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_SOFINT)
+		{
+			//printf( "LCD SOF: %d\n", channel );
+			lcd_regs.liidr = lcd_regs.dma[channel].fidr;
+			lcd_regs.lcsr |= PXA255_LCSR_SOF;
+			pxa255_lcd_irq_check(machine);
+		}
+	}
+}
+
+static void pxa255_lcd_check_load_next_branch(running_machine *machine, int channel)
+{
+
+	if(lcd_regs.fbr[channel] & 1)
+	{
+		lcd_regs.fbr[channel] &= ~1;
+		lcd_regs.fbr[channel] |= memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) & 0xfffffff0;
+		pxa255_lcd_load_dma_descriptor(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0, 0);
+		pxa255_lcd_dma_kickoff(machine, 0);
+		if(!(lcd_regs.lccr0 & PXA255_LCCR0_BM))
+		{
+			lcd_regs.lcsr |= PXA255_LCSR_BS;
+		}
+	}
+}
+
 static READ32_HANDLER( pxa255_lcd_r )
 {
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
@@ -761,11 +937,11 @@ static READ32_HANDLER( pxa255_lcd_r )
 			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Control 3: %08x & %08x\n", lcd_regs.lccr3, mem_mask );
 			return lcd_regs.lccr3;
 		case PXA255_FBR0:		// 0x44000020
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Frame Branch Register 0: %08x & %08x\n", lcd_regs.fbr0, mem_mask );
-			return lcd_regs.fbr0;
+			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Frame Branch Register 0: %08x & %08x\n", lcd_regs.fbr[0], mem_mask );
+			return lcd_regs.fbr[0];
 		case PXA255_FBR1:		// 0x44000024
-			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Frame Branch Register 1: %08x & %08x\n", lcd_regs.fbr1, mem_mask );
-			return lcd_regs.fbr1;
+			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Frame Branch Register 1: %08x & %08x\n", lcd_regs.fbr[1], mem_mask );
+			return lcd_regs.fbr[1];
 		case PXA255_LCSR:		// 0x44000038
 			verboselog( space->machine, 3, "pxa255_lcd_r: LCD Status Register: %08x & %08x\n", lcd_regs.lcsr, mem_mask );
 			return lcd_regs.lcsr;
@@ -831,30 +1007,20 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 			break;
 		case PXA255_FBR0:		// 0x44000020
 			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Frame Branch Register 0: %08x & %08x\n", data, mem_mask );
-			lcd_regs.fbr0 = data & 2;
-			if(data & 1)
+			lcd_regs.fbr[0] = data & 0xfffffff3;
+			if(!timer_enabled(lcd_regs.dma[0].eof))
 			{
-				pxa255_lcd_initiate_dma(space, data & 0xfffffff0, 0);
-				lcd_regs.fbr0 |= memory_read_dword_32le(space, data & 0xfffffff0) & 0xfffffff0;
-				if(!(lcd_regs.lccr0 & PXA255_LCCR0_BM))
-				{
-					lcd_regs.lcsr |= PXA255_LCSR_BS;
-					pxa255_lcd_irq_check(space->machine);
-				}
+				pxa255_lcd_check_load_next_branch(space->machine, 0);
+				pxa255_lcd_irq_check(space->machine);
 			}
 			break;
 		case PXA255_FBR1:		// 0x44000024
 			verboselog( space->machine, 3, "pxa255_lcd_w: LCD Frame Branch Register 1: %08x & %08x\n", data, mem_mask );
-			lcd_regs.fbr1 = data & 2;
-			if(data & 1)
+			lcd_regs.fbr[1] = data & 0xfffffff3;
+			if(!timer_enabled(lcd_regs.dma[1].eof))
 			{
-				pxa255_lcd_initiate_dma(space, data & 0xfffffff0, 1);
-				lcd_regs.fbr1 |= memory_read_dword_32le(space, data & 0xfffffff0) & 0xfffffff0;
-				if(!(lcd_regs.lccr0 & PXA255_LCCR0_BM))
-				{
-					lcd_regs.lcsr |= PXA255_LCSR_BS;
-					pxa255_lcd_irq_check(space->machine);
-				}
+				pxa255_lcd_check_load_next_branch(space->machine, 1);
+				pxa255_lcd_irq_check(space->machine);
 			}
 			break;
 		case PXA255_LCSR:		// 0x44000038
@@ -875,7 +1041,7 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 			break;
 		case PXA255_FDADR0:		// 0x44000200
 			verboselog( space->machine, 3, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask );
-			pxa255_lcd_initiate_dma(space, data & 0xfffffff0, 0);
+			pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 0);
 			break;
 		case PXA255_FSADR0:		// 0x44000204
 			verboselog( space->machine, 3, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 0: %08x & %08x\n", data, mem_mask );
@@ -888,7 +1054,7 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 			break;
 		case PXA255_FDADR1:		// 0x44000210
 			verboselog( space->machine, 3, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask );
-			pxa255_lcd_initiate_dma(space, data & 0xfffffff0, 1);
+			pxa255_lcd_load_dma_descriptor(space, data & 0xfffffff0, 1);
 			break;
 		case PXA255_FSADR1:		// 0x44000214
 			verboselog( space->machine, 3, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 1: %08x & %08x\n", data, mem_mask );
@@ -907,43 +1073,22 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 
 static TIMER_CALLBACK( pxa255_lcd_dma_eof )
 {
-	printf( "LCD EOF: %d\n", param );
-	lcd_regs.liidr = lcd_regs.dma[param].fidr;
-	lcd_regs.lcsr |= PXA255_LCSR_EOF;
-	pxa255_lcd_irq_check(machine);
+	if(lcd_regs.dma[param].ldcmd & PXA255_LDCMD_EOFINT)
+	{
+		//printf( "LCD EOF: %d\n", param );
+		lcd_regs.liidr = lcd_regs.dma[param].fidr;
+		lcd_regs.lcsr |= PXA255_LCSR_EOF;
+	}
+	pxa255_lcd_check_load_next_branch(machine, param);
 }
 
 static INTERRUPT_GEN( pxa255_vblank_start )
 {
-	if(lcd_regs.lccr0 & PXA255_LCCR0_ENB)
-	{
-		// Mark the start of the current DMA frame as appropriate
-		int channel = 0;
-		for(channel = 0; channel < 2; channel++)
-		{
-			if(lcd_regs.dma[channel].fdadr != 0)
-			{
-				if(lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_SOFINT)
-				{
-					printf( "LCD SOF: %d\n", channel );
-					lcd_regs.liidr = lcd_regs.dma[channel].fidr;
-					lcd_regs.lcsr |= PXA255_LCSR_SOF;
-					pxa255_lcd_irq_check(device->machine);
-				}
-				if(lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_EOFINT)
-				{
-					attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), lcd_regs.dma[channel].ldcmd & 0x000fffff);
-
-					timer_adjust_oneshot(lcd_regs.dma[channel].eof, period, channel);
-				}
-			}
-		}
-	}
 }
 
 static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-	AM_RANGE(0x40000000, 0x400002ff) AM_READ( pxa255_dma_r )
+	AM_RANGE(0x40000000, 0x400002ff) AM_READWRITE( pxa255_dma_r, pxa255_dma_w )
 	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE( pxa255_ostimer_r, pxa255_ostimer_w )
 	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE( pxa255_intc_r, pxa255_intc_w )
 	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE( pxa255_gpio_r, pxa255_gpio_w )
@@ -962,9 +1107,16 @@ static VIDEO_UPDATE( 39in1 )
 /* To be moved to DEVICE_START( pxa255 ) upon completion */
 static void pxa255_start(running_machine *machine)
 {
+	int index = 0;
+
     //pxa255_t* pxa255 = pxa255_get_safe_token( device );
 
     //pxa255->iface = device->static_config;
+
+	for(index = 0; index < 16; index++)
+	{
+		dma_regs.dcsr[index] = 0x00000008;
+	}
 
 	ostimer_regs.osmr0 = ostimer_regs.osmr1 = ostimer_regs.osmr2 = ostimer_regs.osmr3 = 0;
 	ostimer_regs.oscr = ostimer_regs.ossr = ostimer_regs.ower = ostimer_regs.oier = 0;
@@ -978,7 +1130,7 @@ static void pxa255_start(running_machine *machine)
 	lcd_regs.dma[0].ldcmd = lcd_regs.dma[1].ldcmd = 0;
 	lcd_regs.dma[0].eof = timer_alloc(machine, pxa255_lcd_dma_eof, 0);
 	lcd_regs.dma[1].eof = timer_alloc(machine, pxa255_lcd_dma_eof, 0);
-	lcd_regs.fbr0 = lcd_regs.fbr1 = lcd_regs.lcsr = lcd_regs.liidr = 0;
+	lcd_regs.fbr[0] = lcd_regs.fbr[1] = lcd_regs.lcsr = lcd_regs.liidr = 0;
 	lcd_regs.trgbr = 0x00aa5500;
 	lcd_regs.tcr = 0x0000754f;
 
