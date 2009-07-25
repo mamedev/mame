@@ -457,6 +457,15 @@ $a00000 checks have been seen on the Final Lap boards.
 
 #include "finallap.lh"
 
+/* Define clocks based on actual OSC on the PCB */
+
+#define MAIN_OSC_CLOCK		XTAL_49_152MHz
+#define M68K_CPU_CLOCK		(MAIN_OSC_CLOCK / 4)		/* 12.288MHz clock for 68000 (Master & Slave) */
+#define M68B09_CPU_CLOCK	(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 68B09 sound CPU */
+#define C65_CPU_CLOCK		(MAIN_OSC_CLOCK / 24)		/* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
+#define YM2151_SOUND_CLOCK	XTAL_3_579545MHz		/* 3.579545MHz FM clock */
+#define C140_SOUND_CLOCK	(MAIN_OSC_CLOCK / 384 / 6)	/* 21.334kHz C140 clock (was 8000000/374 or 21.390kHz) */
+
 
 /*************************************************************/
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
@@ -1575,20 +1584,20 @@ via software as INT1
 /*************************************************************/
 
 static MACHINE_DRIVER_START( default )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /*  12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1614,12 +1623,12 @@ static MACHINE_DRIVER_START( default )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -1628,7 +1637,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default2 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1638,31 +1647,31 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( default3 )
 	MDRV_IMPORT_FROM(default)
 
-	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
+	MDRV_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_REPLACE("ym", YM2151, 3579580)
+	MDRV_SOUND_REPLACE("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gollygho )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1688,31 +1697,31 @@ static MACHINE_DRIVER_START( gollygho )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( finallap )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1738,31 +1747,31 @@ static MACHINE_DRIVER_START( finallap )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgunner )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1788,31 +1797,31 @@ static MACHINE_DRIVER_START( sgunner )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luckywld )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1838,31 +1847,31 @@ static MACHINE_DRIVER_START( luckywld )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( metlhawk )
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(slave_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MDRV_CPU_PROGRAM_MAP(sound_default_am)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1880,7 +1889,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-    MDRV_GFXDECODE(metlhawk)
+	MDRV_GFXDECODE(metlhawk)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(metlhawk)
@@ -1888,12 +1897,12 @@ static MACHINE_DRIVER_START( metlhawk )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
+	MDRV_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 256.000kHz */
 	MDRV_SOUND_CONFIG(c140_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ym", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -2996,70 +3005,230 @@ ROM_START( finehour )
 	ROM_LOAD( "fh1_vo1.bin",  0x000000, 0x080000, CRC(07560fc7) SHA1(76f3855f5a4567dc65d513e37072072c2a011e7e) )
 ROM_END
 
-/* FOUR TRAX */
+/*
+
+Four Trax
+Namco 1989
+
+The video board and CPU board are the same type as those used on Final Lap.
+
+PCB Layouts
+-----------
+
+Top Board
+
+8618961200
+(8618963200)
+|--------------------------------------------------------------------|
+| TA7630  C116     M5M5178                                 49.152MHz |
+|  TL084  TL084    M5M5178                                      137  |
+| LC7880 YM3012    M5M5178   FX_CHR-7.9S  FX_CHR-3.11S   FX_DAT0.13S |
+| LA4700     156         123 FX_CHR-6.9R  FX2_CH2.11R    FX_DAT2.13R |
+|                            FX_CHR-5.9P  FX_CHR-1.11P   FX_DAT1.13P |
+|140              FX_SHA.7N  FX_CHR-4.9N  FX_CHR-0.11N   FX_DAT3.13N |
+|      3N*                                                           |
+|  FX_VOI-1.3M        145     84256                                  |
+|J     3L*                    84256       65256          65256       |
+|A                                                                   |
+|M   8464       2018                      FX2_SP0.11K    FX2_SP1.13K |
+|M              2018                                                 |
+|A   YM2151                  FX1_SD0.7J                              |
+|          121  68B09           7G*            68000         148     |
+|          SYS87B-1(PAL)   8464                                      |
+|               SYS87B-2B(PAL)                                       |
+|        SYS2C65C.3F                                                 |
+|N                                                                   |
+|A  DSW(8)    C65                                                    |
+|M 3.579545MHz           MB8422                                      |
+|C   149           LB1760     SYS87B-3(PAL)     65256       65256    |
+|O                 LB1760          139                               |
+|4                                  HN58C65  FX2_MP0.11D  FX2_MP1.13D|
+|8         MB3771 PC900 6N137   M5M5179               68000      148 |
+|--------------------------------------------------------------------|
+Notes:
+      68000 clocks - 12.288MHz [49.152/4]
+      68B09 clock  - 2.048MHz [49.152/24]
+      YM2151 clock - 3.579545MHz
+      C65 clock    - 2.048MHz [49.152/24], 8.192MHz [49.152/6]
+      C140 clocks  - 1.365333334MHz [49.152/36], 42.6667kHz, 85.3334kHz, 128.000kHz [49.152/384],
+                     256.000kHz [49.152/192], 512.000kHz [49.152/96], 4.096MHz [49.152/12],
+                     2.730666667MHz [49.152/18], 2.048MHz [49.152/24], 12.288MHz [49.152/4],
+                     8.192MHz [49.152/6]
+      *            - Unpopulated socket
+
+      Namco customs
+      -------------
+                    C116 (QFP80)
+                    156  (QFP64)
+                    123  (QFP80)
+                    145  (QFP80)
+                    148  (QFP64, x2)
+                    139  (QFP64)
+                    C65  (QFP80). This is a 63B05 MCU
+                    149  (DIP28)
+                    137  (DIP28)
+                    140  (QFP120)
+                    121  (QFP64)
+
+      Measurements
+      ------------
+      HSync - 15.9398kHz
+      VSync - 60.6061Hz
+      OSC1  - 49.15200MHz
+      OSC2  - 3.57962MHz
+
+
+Bottom Board
+
+V56 VIDEO
+2272961200
+(2272963100)
+|--------------------------------------------------------------------|
+|                                                                    |
+|                TMM2063     135                                     |
+|                                              137                   |
+| FL1-1(PAL)     TMM2063                                             |
+|                                     LH5762                         |
+|                TMM2063                                             |
+|                                                                    |
+|                TMM2063                                             |
+|                                          2018             2018     |
+|                134                                                 |
+|                           J203           2018             2018     |
+|                                                                    |
+|                                                                    |
+|   45                                                               |
+|                                                                    |
+|                                                         FL1-2(PAL) |
+|                                                                    |
+|                                                                    |
+|                        4H*      5H*                                |
+|                                                145                 |
+|                        4F*      5F*                                |
+|                                                                    |
+|  MB81464  MB81464                                                  |
+|                                                                    |
+|  MB81464  MB81464                                                  |
+|                    2018    107                                     |
+|                                                                    |
+|                    2018    FX1-1.5B                                |
+|--------------------------------------------------------------------|
+Notes:
+      FX1-1.5B - PROM type MB7118
+      *        - Unpopulated socket
+
+      Namco customs:
+                    45   (QFP80)
+                    107  (SDIP64)
+                    145  (QFP80)
+                    134  (NDIP28)
+                    135  (NDIP28)
+                    137  (NDIP28)
+
+
+ROM Board (mounts onto J203 of VIDEO board)
+
+2294961301
+(2294963201)
+|--------------------------------------|
+|      JP1       J2                    |
+| 74F244  74F139    74F244             |
+|                                      |
+| 74F244  74F244    74F244             |
+|               J1                     |
+|                                      |
+|FX_OBJ-12.8A     FX_OBJ-8.8C          |
+|                                      |
+|FX_OBJ-13.7A     FX_OBJ-9.7C          |
+|                                      |
+|FX_OBJ-14.6A     FX_OBJ10.6C          |
+|                                      |
+|FX_OBJ15.5A      FX_OBJ-11.5C         |
+|                                      |
+|                                      |
+|                                      |
+|FX_OBJ-4.4A      FX_OBJ-0.4C          |
+|                                      |
+|FX_OBJ-5.3A      FX_OBJ-1.3C          |
+|                                      |
+|FX_OBJ6.2A       FX_OBJ2.2C           |
+|                                      |
+|FX_OBJ7.1A       FX_OBJ-3.1C          |
+|                                      |
+|                                      |
+|--------------------------------------|
+Notes: (All ICs shown)
+      JP1 - jumper, set to 2M. Alt setting is 4M
+      J1  - 32 pin connector joining to VIDEO board
+      J2  - 2 pin connector tied with 1 wire to a logic chip on the VIDEO board. If the connector
+            is unplugged, all of the bike sprites are bad. The scenary and spectator objects are not affected.
+      All ROMs are 2MBit. ROMs at 1A, 2A, 5A, 2C and 6C are 27C2001 EPROMs, all others
+      are 2M 32 pin MASK ROMs.
+*/
+
 ROM_START( fourtrax )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "fx2mp0",  0x000000, 0x020000, CRC(f147cd6b) SHA1(7cdadd68d55dd8fa9b19cbee1434d9266ae1f4b9) )
-	ROM_LOAD16_BYTE( "fx2mp1",  0x000001, 0x020000, CRC(8af4a309) SHA1(538076359cfd08e99e42c05bcccd95df71856696) )
+	ROM_LOAD16_BYTE( "fx2_mp0.11d",  0x000000, 0x020000, CRC(f147cd6b) SHA1(7cdadd68d55dd8fa9b19cbee1434d9266ae1f4b9) )
+	ROM_LOAD16_BYTE( "fx2_mp1.13d",  0x000001, 0x020000, CRC(8af4a309) SHA1(538076359cfd08e99e42c05bcccd95df71856696) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "fx2sp0",  0x000000, 0x020000, CRC(48548e78) SHA1(b3a9de8682fe63c1c3ecab3e3f9380a884efd4af) )
-	ROM_LOAD16_BYTE( "fx2sp1",  0x000001, 0x020000, CRC(d2861383) SHA1(36be5a8c8a19f35f9a9bd3ef725a83c5e58ccbe0) )
+	ROM_LOAD16_BYTE( "fx2_sp0.11k", 0x000000, 0x020000, CRC(48548e78) SHA1(b3a9de8682fe63c1c3ecab3e3f9380a884efd4af) )
+	ROM_LOAD16_BYTE( "fx2_sp1.13k", 0x000001, 0x020000, CRC(d2861383) SHA1(36be5a8c8a19f35f9a9bd3ef725a83c5e58ccbe0) )
 
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "fx1sd0",  0x00c000, 0x004000, CRC(acccc934) SHA1(98f1a823ba7e3f258a73d5780953f9339d438e1a) )
+	ROM_LOAD( "fx1_sd0.7j", 0x00c000, 0x004000, CRC(acccc934) SHA1(98f1a823ba7e3f258a73d5780953f9339d438e1a) )
 	ROM_CONTINUE( 0x010000, 0x01c000 )
-	ROM_RELOAD(  0x010000, 0x020000 )
+	ROM_RELOAD(   0x010000, 0x020000 )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "fxobj0",  0x000000, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
-	ROM_LOAD( "fxobj1",  0x040000, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
-	ROM_LOAD( "fxobj4",  0x080000, 0x040000, CRC(30add52a) SHA1(ff782d9dca96967233e435c3dd7d69ffde45db43) )
-	ROM_LOAD( "fxobj5",  0x0c0000, 0x040000, CRC(e3cd2776) SHA1(6155e9ad90b8a885125c8a76e9c068247e7693ae) )
-	ROM_LOAD( "fxobj8",  0x100000, 0x040000, CRC(b165acab) SHA1(86bd2cc22e25ddbf73e62426762aa72205868660) )
-	ROM_LOAD( "fxobj9",  0x140000, 0x040000, CRC(90f0735b) SHA1(2adbe72c6547075c0cc0386789cc1b8c1a0bc84f) )
-	ROM_LOAD( "fxobj12", 0x180000, 0x040000, CRC(f5e23b78) SHA1(99896bd7c6663e3f57cb5d206964b81b5d64c8b6) )
-	ROM_LOAD( "fxobj13", 0x1c0000, 0x040000, CRC(04a25007) SHA1(0c33450b0d6907754dbf1914849d1630baa824bd) )
-	ROM_LOAD( "fxobj2",  0x200000, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
-	ROM_LOAD( "fxobj3",  0x240000, 0x040000, CRC(b7e5d17d) SHA1(3d8ea7cbf33b595ddf739024e8d0fccd5f9e073b) )
-	ROM_LOAD( "fxobj6",  0x280000, 0x040000, CRC(a2d5ce4a) SHA1(bbe9df3914632a573a95fcba76442404d149fb9d) )
-	ROM_LOAD( "fxobj7",  0x2c0000, 0x040000, CRC(4d91c929) SHA1(97470a4ad7b28df83c632bfc8c309b24701275fe) )
-	ROM_LOAD( "fxobj10", 0x300000, 0x040000, CRC(7a01e86f) SHA1(5fde10e53cb192df0f3873cd6d59c725430948f5) )
-	ROM_LOAD( "fxobj11", 0x340000, 0x040000, CRC(514b3fe5) SHA1(19562ba2ac04a16d335bdc81b34d929f7ff9161c) )
-	ROM_LOAD( "fxobj14", 0x380000, 0x040000, CRC(c1658c77) SHA1(ec689d0e5cf95085c193aa8949c6ec6e7243338b) )
-	ROM_LOAD( "fxobj15", 0x3c0000, 0x040000, CRC(2bc909b3) SHA1(29c668d6d12ccdee25e97373bc4786894858d463) )
+	ROM_LOAD( "fx_obj-0.4c",  0x000000, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
+	ROM_LOAD( "fx_obj-1.3c",  0x040000, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
+	ROM_LOAD( "fx_obj-4.4a",  0x080000, 0x040000, CRC(30add52a) SHA1(ff782d9dca96967233e435c3dd7d69ffde45db43) )
+	ROM_LOAD( "fx_obj-5.3a",  0x0c0000, 0x040000, CRC(e3cd2776) SHA1(6155e9ad90b8a885125c8a76e9c068247e7693ae) )
+	ROM_LOAD( "fx_obj-8.8c",  0x100000, 0x040000, CRC(b165acab) SHA1(86bd2cc22e25ddbf73e62426762aa72205868660) )
+	ROM_LOAD( "fx_obj-9.7c",  0x140000, 0x040000, CRC(90f0735b) SHA1(2adbe72c6547075c0cc0386789cc1b8c1a0bc84f) )
+	ROM_LOAD( "fx_obj-12.8a", 0x180000, 0x040000, CRC(f5e23b78) SHA1(99896bd7c6663e3f57cb5d206964b81b5d64c8b6) )
+	ROM_LOAD( "fx_obj-13.7a", 0x1c0000, 0x040000, CRC(04a25007) SHA1(0c33450b0d6907754dbf1914849d1630baa824bd) )
+	ROM_LOAD( "fx_obj2.2c",   0x200000, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
+	ROM_LOAD( "fx_obj-3.1c",  0x240000, 0x040000, CRC(b7e5d17d) SHA1(3d8ea7cbf33b595ddf739024e8d0fccd5f9e073b) )
+	ROM_LOAD( "fx_obj6.2a",   0x280000, 0x040000, CRC(a2d5ce4a) SHA1(bbe9df3914632a573a95fcba76442404d149fb9d) )
+	ROM_LOAD( "fx_obj7.1a",   0x2c0000, 0x040000, CRC(4d91c929) SHA1(97470a4ad7b28df83c632bfc8c309b24701275fe) )
+	ROM_LOAD( "fx_obj10.6c",  0x300000, 0x040000, CRC(7a01e86f) SHA1(5fde10e53cb192df0f3873cd6d59c725430948f5) )
+	ROM_LOAD( "fx_obj-11.5c", 0x340000, 0x040000, CRC(514b3fe5) SHA1(19562ba2ac04a16d335bdc81b34d929f7ff9161c) )
+	ROM_LOAD( "fx_obj-14.6a", 0x380000, 0x040000, CRC(c1658c77) SHA1(ec689d0e5cf95085c193aa8949c6ec6e7243338b) )
+	ROM_LOAD( "fx_obj15.5a",  0x3c0000, 0x040000, CRC(2bc909b3) SHA1(29c668d6d12ccdee25e97373bc4786894858d463) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr0",  0x000000, CRC(6658c1c3) SHA1(64b5466e0f94cf5f3cb92915a26331748f67041a) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr1",  0x080000, CRC(3a888943) SHA1(6540b417003045dfa1401a1ff04ac55b86cc177f) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxch2",	 0x100000, CRC(fdf1e86b) SHA1(91a61c10a9e92f8bbc26ffc9cb72deb31378a843) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr3",  0x180000, CRC(47fa7e61) SHA1(cc2eed81ddb4f942dd7a07e474760e4608eb4da0) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr4",  0x200000, CRC(c720c5f5) SHA1(f68f369bbefe01c770314ea597dd88587638c62a) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr5",  0x280000, CRC(9eacdbc8) SHA1(ca4061afc9e61eeb543f2a3740812abf6a1049bc) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr6",  0x300000, CRC(c3dba42e) SHA1(2b5a8fabec11ccd44156ecfccf86fc713845d262) )
-	NAMCOS2_GFXROM_LOAD_128K( "fxchr7",  0x380000, CRC(c009f3ae) SHA1(394beed29bda97f4f5ba532bc0bd22177154746b) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-0.11n", 0x000000, CRC(6658c1c3) SHA1(64b5466e0f94cf5f3cb92915a26331748f67041a) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-1.11p", 0x080000, CRC(3a888943) SHA1(6540b417003045dfa1401a1ff04ac55b86cc177f) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx2_ch2.11r",  0x100000, CRC(fdf1e86b) SHA1(91a61c10a9e92f8bbc26ffc9cb72deb31378a843) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-3.11s", 0x180000, CRC(47fa7e61) SHA1(cc2eed81ddb4f942dd7a07e474760e4608eb4da0) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-4.9n",  0x200000, CRC(c720c5f5) SHA1(f68f369bbefe01c770314ea597dd88587638c62a) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-5.9p",  0x280000, CRC(9eacdbc8) SHA1(ca4061afc9e61eeb543f2a3740812abf6a1049bc) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-6.9r",  0x300000, CRC(c3dba42e) SHA1(2b5a8fabec11ccd44156ecfccf86fc713845d262) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_chr-7.9s",  0x380000, CRC(c009f3ae) SHA1(394beed29bda97f4f5ba532bc0bd22177154746b) )
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASEFF ) /* ROZ Tiles */
 	/* No ROZ files in zip */
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
-	NAMCOS2_GFXROM_LOAD_128K( "fxsha",	0x000000, CRC(f7aa4af7) SHA1(b18ffda9e35beb0f072825e2899691be370f33b1) )
+	NAMCOS2_GFXROM_LOAD_128K( "fx_sha.7n", 0x000000, CRC(f7aa4af7) SHA1(b18ffda9e35beb0f072825e2899691be370f33b1) )
 
 	ROM_REGION16_BE( 0x200000, "user1", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_256K( "fxdat0",  0x000000, CRC(63abf69b) SHA1(6776991eeff434bf9720f49ad6e62c37fc7ddf40) )
-	NAMCOS2_DATA_LOAD_O_256K( "fxdat1",  0x000000, CRC(725bed14) SHA1(bbf886ac7f8c2c7857bc0b5d7f8fc7e63e8e9559) )
-	NAMCOS2_DATA_LOAD_E_256K( "fxdat2",  0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
-	NAMCOS2_DATA_LOAD_O_256K( "fxdat3",  0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
+	NAMCOS2_DATA_LOAD_E_256K( "fx_dat0.13s", 0x000000, CRC(63abf69b) SHA1(6776991eeff434bf9720f49ad6e62c37fc7ddf40) )
+	NAMCOS2_DATA_LOAD_O_256K( "fx_dat1.13r", 0x000000, CRC(725bed14) SHA1(bbf886ac7f8c2c7857bc0b5d7f8fc7e63e8e9559) )
+	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13p", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
+	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
 	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "fxvoi1",  0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
+	ROM_LOAD( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
 ROM_END
 
 /* MARVEL LAND (USA) */
