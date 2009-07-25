@@ -180,7 +180,7 @@ ToDo / Notes:
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
-#define PIXEL_CLOCK MASTER_CLOCK_352/4
+#define PIXEL_CLOCK 50160000/2/4 /*hand-tuned to match fps ~59.82*/
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -2754,7 +2754,7 @@ static MACHINE_DRIVER_START( stv )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 704, 0, 703, 512, 0, 511) // we need to use a resolution as high as the max size it can change to
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 400, 0, 320, 262, 0, 224)
 
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MDRV_GFXDECODE(stv)
