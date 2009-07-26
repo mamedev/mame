@@ -2984,7 +2984,7 @@ V-V                           TP-027
 	DRIVER( raystormj )	/* Ray Storm (Ver 2.05J) */
 	DRIVER( ftimpact )	/* Fighters' Impact (Ver 2.02O) */
 	DRIVER( ftimpactj )	/* Fighters' Impact (Ver 2.02J) */
-	DRIVER( ftimpacta )	/* Fighters' Impact A (Ver 2.00J) */
+	DRIVER( ftimpcta )	/* Fighters' Impact A (Ver 2.00J) */
 	DRIVER( gdarius )	/* G-Darius (Ver 2.01J) */
 	DRIVER( gdariusb )	/* G-Darius (Ver 2.02A) */
 	DRIVER( gdarius2 )	/* G-Darius Ver.2 (Ver 2.03J) */
