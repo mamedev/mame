@@ -167,7 +167,7 @@ static const struct
 	{ "sfchampj", tt01, tt02 }, /* OK */
 	{ "psyforce", tt01, tt03 }, /* OK */
 	{ "psyforcej",tt01, tt03 }, /* OK */
-	{ "psyfrocex",tt01, tt03 }, /* OK */
+	{ "psyforcex",tt01, tt03 }, /* OK */
 	{ "raystorm", tt01, tt04 }, /* OK */
 	{ "raystormj",tt01, tt04 }, /* OK */
 	{ "ftimpact", tt01, tt05 }, /* OK */
