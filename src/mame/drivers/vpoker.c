@@ -4,6 +4,9 @@ Videotronics Poker (c) 198? Videotronics
 
 preliminary driver by Angelo Salese
 
+Notes:
+- Looks like the 2nd generation of Noraut Poker / Draw Poker Hi-Lo HW.
+
 TODO:
 - Understand how the 6840PTM hooks up, needed to let it work properly;
 - I/Os;
