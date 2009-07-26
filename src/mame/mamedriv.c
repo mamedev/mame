@@ -9065,9 +9065,13 @@ Other Sun games
 	DRIVER( pesadelo )	/* (c) 1989 Forte II Games */
 	DRIVER( spool99 )	/* (c) 1998 Electronic Projects */
 	DRIVER( spool99a )	/* (c) 1998 Electronic Projects */
-	DRIVER( 4roses )	/* 1999 Unknown */
-	DRIVER( 4rosesa )	/* 1999 Unknown */
-	DRIVER( big10 )		/* 198? Unknown */
+	DRIVER( 4roses )	/* (c) 1999 Unknown */
+	DRIVER( 4rosesa )	/* (c) 1999 Unknown */
+	DRIVER( big10 )		/* (c) 198? Unknown */
+	DRIVER( bingor1 )	/* (c) 198? Unknown */
+	DRIVER( bingor2 )	/* (c) 198? Unknown */
+	DRIVER( bingor3 )	/* (c) 198? Unknown */
+	DRIVER( bingor4 )	/* (c) 198? Unknown */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
