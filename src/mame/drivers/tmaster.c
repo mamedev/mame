@@ -22,15 +22,18 @@ To Do:
 
 To be dumped and added:
 
-Touch Master 2000
-Touch Master 6000
+Touch Master 6000 <-- There doesn't seem to be a "6000" version
 Touch Master 7000 *
 Touch Master 8000 *
 
 * There is a reported "Minnesota" version with modifications due to legal issues
   Touch Master (current set) is a Euro version, all other sets are "DOMESTIC" (AKA "Standard").
   Is there a Touch Master 6000?  TM5K is version 7.10, then TM7K is version 8, TM8K is version 9.xx
-  Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
+
+- There are known regional versions like California, Minnesota and likely others.  The difference
+  between regional sets are not known at this time.
+
+- Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
    IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
   Each version (IE: 2000, 3000, 7000 ect) has different girls for Strip Poker ;-)
 
@@ -905,6 +908,44 @@ ROM_END
 
 /***************************************************************************
 
+Touchmaster 2000
+by Midway (c) 1996
+touchscreen game
+
+Name_Board Location        Version               Use             Checksum
+-------------------------------------------------------------------------
+TM2K_v402.u51              4.02 Game Program & Cpu instructions   c625
+TM2K_v402.u52              4.02 Game Program & Cpu instructions   e8a7
+
+TM2K_graphic.u36           4.0  Video Images & Graphics           20cb
+TM2K_graphic.u37           4.0  Video Images & Graphics           f5cf
+TM2K_graphic.u38           4.0  Video Images & Graphics           14c7
+TM2K_graphic.u39           4.0  Video Images & Graphics           043e
+TM2K_sound.u8              4.0  Audio Program & sounds            9307
+u62 (NOT INCLUDED)         N/A  Battery Memory Module             N/A
+
+Does not require a security key
+
+***************************************************************************/
+
+ROM_START( tm2k )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm2k_v402.u51", 0x000000, 0x100000, CRC(fa6d168c) SHA1(c458d1114c658ac963a22cdb74ee5ea489ddcbba) ) /* Ver: 4.02 Standard 5-30-97 */
+	ROM_LOAD16_BYTE( "tm2k_v402.u52", 0x000001, 0x100000, CRC(4e9c2d42) SHA1(67e34778f21010c43c1247179faa3f7ede5ad8d0) ) /* Ver: 4.02 Standard 5-30-97 */
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u37", 0x300001, 0x080000, CRC(4cf65950) SHA1(74d49166da19ecc4b8fc1e8e3f01361dfb645eea) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm2k_sound.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) )
+	ROM_CONTINUE(              0xc0000, 0x040000 )
+ROM_END
+
+/***************************************************************************
+
 Touchmaster 3000
 by Midway (c) 1997
 touchscreen game
@@ -1429,6 +1470,7 @@ static DRIVER_INIT( galgames )
 }
 
 GAME( 1996, tm,       0,    tm,       tm,       0,        ROT0, "Midway",                         "Touchmaster (v3.00 Euro)",           0 )
+GAME( 1996, tm2k,     0,    tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 2000 (v4.02 Standard)",  0 )
 GAME( 1997, tm3k,     0,    tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 3000 (v5.02 Standard)",  0 )
 GAME( 1997, tm3ka,    tm3k, tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 3000 (v5.01 Standard)",  0 )
 GAME( 1998, tm4k,     0,    tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02 Standard)",  0 )
