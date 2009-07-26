@@ -77,7 +77,15 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 	last = data;
 }
 
+static WRITE8_HANDLER( sonson_coin1_counter_w )
+{
+	coin_counter_w(0,data & 1);
+}
 
+static WRITE8_HANDLER( sonson_coin2_counter_w )
+{
+	coin_counter_w(1,data & 1);
+}
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
@@ -94,6 +102,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sonson_flipscreen_w)
 	AM_RANGE(0x3019, 0x3019) AM_WRITE(sonson_sh_irqtrigger_w)
+	AM_RANGE(0x301e, 0x301e) AM_WRITE(sonson_coin2_counter_w)
+	AM_RANGE(0x301f, 0x301f) AM_WRITE(sonson_coin1_counter_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
