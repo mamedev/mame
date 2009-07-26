@@ -9595,10 +9595,14 @@ Other Sun games
 	/* MPU5 */
 	DRIVER( m_honmon )
 
-	DRIVER( roul )
+	/* Leisure Ent. */
+	DRIVER( roul )		/* (c) 1990 */
 
 	/* Accept LTD. */
 	DRIVER( hitpoker )	/* (c) 1997 */
+
+	/* Videotronics */
+	DRIVER( vpoker )	/* (c) 198? */
 
 	/* Play Mechanix */
 	DRIVER( jnero )		/* (c) 2004 */

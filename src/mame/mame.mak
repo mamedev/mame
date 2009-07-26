@@ -1107,6 +1107,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/dotrikun.o $(VIDEO)/dotrikun.o \
 	$(DRIVERS)/genesis.o $(VIDEO)/genesis.o \
 	$(DRIVERS)/gpworld.o \
+	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/megadriv.o \
@@ -1486,6 +1487,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
+	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -1565,6 +1567,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mole.o $(VIDEO)/mole.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
+	$(DRIVERS)/multfish.o \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
@@ -1593,6 +1596,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/re900.o \
+	$(DRIVERS)/roul.o \
+	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skeetsht.o \
 	$(DRIVERS)/skimaxx.o \
@@ -1628,14 +1633,10 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vcombat.o \
 	$(DRIVERS)/videopkr.o \
 	$(DRIVERS)/vp101.o \
+	$(DRIVERS)/vpoker.o \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-	$(DRIVERS)/hikaru.o \
-	$(DRIVERS)/cb2001.o \
-	$(DRIVERS)/sfbonus.o \
-	$(DRIVERS)/multfish.o \
-	$(DRIVERS)/roul.o \
 
 #-------------------------------------------------
 # layout dependencies
