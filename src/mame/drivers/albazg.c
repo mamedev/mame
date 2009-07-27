@@ -10,12 +10,14 @@ Notes:
  from 1991.
 
 TODO:
--Add coin counter,coin lock etc.;
--Controls dynamically changes if you turn on the Panel Type DIP-SW,I'd imagine that the "royal
- panel" is just a dedicated panel for this game;
+-Player-2 inputs are unemulated;
 -"Custom RAM" emulation: might be a (weak) protection device or related to the "Back-up RAM NG"
  msg that pops up at every start-up.
--Video emulation requires a major conversion to the HD46505SP C.R.T. chip (MC6845 clone)
+-Video emulation requires a major conversion to the HD46505SP C.R.T. chip (MC6845 clone),
+ there's an heavy x offsetting with the flip screen right now due of that (sets register
+ 0x0d to 0x80 when the screen is upside-down)
+-You can actually configure the coin chutes / coin lockout active high/low (!), obviously
+ MAME isn't really suitable for it at the current time;
 
 ============================================================================================
 Code disassembling
@@ -55,6 +57,8 @@ Code disassembling
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "machine/8255ppi.h"
 
 static tilemap *bg_tilemap;
 static UINT8 mux_data;
@@ -62,7 +66,7 @@ static int bank;
 static UINT8 *cus_ram;
 static UINT8 prot_lock;
 
-
+#define MASTER_CLOCK XTAL_12MHz
 
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
@@ -102,7 +106,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( yumefuda )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
 
 
@@ -128,7 +132,7 @@ static READ8_HANDLER( custom_ram_r )
 static WRITE8_HANDLER( custom_ram_w )
 {
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n",offset+0xaf80,data,cpu_get_pc(space->cpu));
-	if(prot_lock)	{ cus_ram[offset] = data; }
+	if(prot_lock) { cus_ram[offset] = data; }
 }
 
 /*this might be used as NVRAM commands btw*/
@@ -145,35 +149,29 @@ static WRITE8_HANDLER( eeprom_w )
 	eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( port_c0_w )
+
+static READ8_DEVICE_HANDLER( eeprom_r )
 {
-//  logerror("PC %04x (Port $c0) value written %02x\n",cpu_get_pc(space->cpu),data);
+	return ((~eeprom_read_bit() & 0x01)<<6) | (input_port_read(device->machine, "SYSTEM") & ~0x40);
 }
 
-
-static READ8_HANDLER( eeprom_r )
-{
-	return ((~eeprom_read_bit() & 0x01)<<6) | (0xff & ~0x40);
-}
-
-static READ8_HANDLER( mux_r )
+static READ8_DEVICE_HANDLER( mux_r )
 {
 	switch(mux_data)
 	{
-		case 0x00: return input_port_read(space->machine, "IN0");
-		case 0x01: return input_port_read(space->machine, "IN1");
-		case 0x02: return input_port_read(space->machine, "IN2");
-		case 0x04: return input_port_read(space->machine, "IN3");
-		case 0x08: return input_port_read(space->machine, "IN4");
-		case 0x10: return input_port_read(space->machine, "IN5");
-		case 0x20: return input_port_read(space->machine, "IN6");
+		case 0x00: return input_port_read(device->machine, "IN0");
+		case 0x01: return input_port_read(device->machine, "IN1");
+		case 0x02: return input_port_read(device->machine, "IN2");
+		case 0x04: return input_port_read(device->machine, "IN3");
+		case 0x08: return input_port_read(device->machine, "IN4");
+		case 0x10: return input_port_read(device->machine, "IN5");
+		case 0x20: return input_port_read(device->machine, "IN6");
 	}
 
-	//popmessage("%02x",mux_data);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mux_w )
+static WRITE8_DEVICE_HANDLER( mux_w )
 {
 	int new_bank = (data&0xc0)>>6;
 
@@ -182,32 +180,25 @@ static WRITE8_HANDLER( mux_w )
 	//0x14000 bonus game
 	//0x16000 ?
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(space->machine, "maincpu");
+		UINT8 *ROM = memory_region(device->machine, "maincpu");
 		UINT32 bankaddress;
 
 		bank = new_bank;
 		bankaddress = 0x10000 + 0x2000 * bank;
-		memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+		memory_set_bankptr(device->machine, 1, &ROM[bankaddress]);
 	}
 
 	mux_data = data & ~0xc0;
 }
 
-static WRITE8_HANDLER( yumefuda_videoregs_w )
+static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
-	static UINT8 address;
-
-	if(offset == 0)
-		address = data;
-	else
-	{
-		switch(address)
-		{
-			case 0x0d: flip_screen_set(space->machine, data & 0x80); break;
-			default:
-				logerror("Video Register %02x called with %02x data\n",address,data);
-		}
-	}
+	coin_counter_w(0,~data & 4);
+	coin_counter_w(1,~data & 2);
+	coin_lockout_global_w(data & 1);
+	//data & 0x10 hopper-c (active LOW)
+	//data & 0x08 divider (active HIGH)
+	flip_screen_set(device->machine, ~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -216,8 +207,32 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW1"),
 	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL,
+	DEVCB_HANDLER(yumefuda_output_w),
 	DEVCB_NULL
+};
+
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+static const ppi8255_interface ppi8255_intf =
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_HANDLER(eeprom_r),		/* Port B read */
+	DEVCB_HANDLER(mux_r),			/* Port C read */
+	DEVCB_HANDLER(mux_w),			/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL						/* Port C write */
 };
 
 /***************************************************************************************/
@@ -237,13 +252,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(yumefuda_videoregs_w) // HD46505SP video registers
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
-	AM_RANGE(0x81, 0x81) AM_READ(eeprom_r)
-	AM_RANGE(0x82, 0x82) AM_READ(mux_r)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(port_c0_w) // video timing
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( yumefuda )
@@ -256,13 +270,17 @@ static MACHINE_RESET( yumefuda )
 static MACHINE_DRIVER_START( yumefuda )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80 , 6000000) /*???*/
+	MDRV_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(port_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(yumefuda)
 	MDRV_NVRAM_HANDLER(93C46)
+
+	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
+
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -271,6 +289,8 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+
+	MDRV_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
 
 	MDRV_GFXDECODE( yumefuda )
 	MDRV_PALETTE_LENGTH(0x80)
@@ -281,7 +301,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -289,14 +309,24 @@ MACHINE_DRIVER_END
 /***************************************************************************************/
 
 static INPUT_PORTS_START( yumefuda )
-	PORT_START( "IN0")
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset SW") //doesn't work?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter SW")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coin Out")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Init SW")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //eeprom read bit
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Flip-Flop")  PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coupon Credit") PORT_CODE(KEYCODE_7) PORT_IMPULSE(2) //coupon
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Note Credit")   PORT_CODE(KEYCODE_6) PORT_IMPULSE(2) //note
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coupon") PORT_IMPULSE(2) //coupon
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note") PORT_IMPULSE(2)  //note
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START( "IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1") PORT_CODE(KEYCODE_Z) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2") PORT_CODE(KEYCODE_X) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
@@ -307,7 +337,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
-	PORT_START( "IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Button 5") PORT_CODE(KEYCODE_B) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 No Button") PORT_CODE(KEYCODE_A) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
@@ -318,7 +348,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1") PORT_CODE(KEYCODE_Z) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button 4") PORT_CODE(KEYCODE_V) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
-	PORT_START( "IN3")
+	PORT_START("IN3")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_2) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
@@ -326,49 +356,47 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Button 5") PORT_CODE(KEYCODE_B) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
 	/* Some bits of these three are actually used if you use the Royal Panel type */
-	PORT_START( "IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START( "IN5")
+	PORT_START("IN5")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 No Button") PORT_CODE(KEYCODE_A) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 Yes Button") PORT_CODE(KEYCODE_Q) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
-    PORT_START( "IN6")
+	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
     /*Unused,on the PCB there's just one bank*/
-    PORT_START("DSW1")
+	PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/*Added by translating the manual*/
-    PORT_START("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Learn Mode" )//SW Dip-Switches
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x04, 0x04, "Hopper Payout" )
 	PORT_DIPSETTING(    0x04, "Hanafuda Type" )//hanaawase
 	PORT_DIPSETTING(    0x00, "Royal Type" )
-   	PORT_DIPNAME( 0x08, 0x08, "Panel Type" )
-    PORT_DIPSETTING(    0x08, "Hanafuda Panel" )//hanaawase
-    PORT_DIPSETTING(    0x00, "Royal Panel" )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )//Screen Orientation
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )//Screen Flip
-    PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )//pressing Flip-Flop button makes the screen flip
+	PORT_DIPNAME( 0x08, 0x08, "Panel Type" )
+	PORT_DIPSETTING(    0x08, "Hanafuda Panel" )//hanaawase
+	PORT_DIPSETTING(    0x00, "Royal Panel" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )//Screen Orientation
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )//Screen Flip
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )//pressing Flip-Flop button makes the screen flip
 INPUT_PORTS_END
 
 /***************************************************************************************/
@@ -386,4 +414,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
 ROM_END
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", 0 )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NO_COCKTAIL )
