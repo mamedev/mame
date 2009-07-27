@@ -770,8 +770,8 @@ static const struct game_keys keys_table[] =
 	{ "ddtoda",   { 0xdecac105,0x19710411 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtodh",   { 0x19691019,0xe825dde0 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ecofghtr", { 0x931031dc,0xba987654 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
-	{ "ecofghtu", { 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
-	{ "ecofgtu1", { 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
+	{ "ecofghtru",{ 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
+	{ "ecofghtru1",{ 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "uecology", { 0x931031fe,0xdcba9876 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "ecofghta", { 0x931031ba,0x98765432 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "ssf2t",    { 0x944e8302,0x56d3143c }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
@@ -858,7 +858,7 @@ static const struct game_keys keys_table[] =
 	{ "ddsoma",   { 0x8719abcd,0xef028345 }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsomb",   { 0x7149a782,0xf3a5bfce }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "megaman2", { 0x50501cac,0xed346550 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
-	{ "megamn2a", { 0x3f148a2b,0xd6790a15 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
+	{ "megaman2a",{ 0x3f148a2b,0xd6790a15 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "rckman2j", { 0x319eca73,0x10551270 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "qndream",  { 0x5804ea73,0xf66b0798 }, 0x080000 },	// 0C81 1973 0827  cmpi.l  #$19730827,D1
 	{ "sfa2",     { 0xfc4acf9c,0x3bfbe1f9 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
@@ -940,9 +940,9 @@ static const struct game_keys keys_table[] =
 	{ "hsf2",     { 0xb8ed3630,0xaae30a3d }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "hsf2j",    { 0x65d82fe0,0xdbb83e47 }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "gigawing", { 0xe52de290,0x1b60d780 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
-	{ "gwingj",   { 0x1126196a,0xbef50895 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
-	{ "gwinga",   { 0x3506a85a,0x66b1b768 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
-	{ "gwingb",   { 0x0fe745b0,0x96ef7f9d }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "gigawingj",{ 0x1126196a,0xbef50895 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "gigawinga",{ 0x3506a85a,0x66b1b768 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "gigawingb",{ 0x0fe745b0,0x96ef7f9d }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mmatrix",  { 0xac9ebd79,0x410467df }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mmatrixj", { 0x4df81e95,0x72ed9823 }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mpang",    { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
