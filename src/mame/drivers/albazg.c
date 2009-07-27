@@ -122,7 +122,7 @@ static WRITE8_HANDLER( yumefuda_cram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-/*Custom RAM (Protection)*/
+/*Custom RAM (Thrash Protection)*/
 static READ8_HANDLER( custom_ram_r )
 {
 //  logerror("Custom RAM read at %02x PC = %x\n",offset+0xaf80,cpu_get_pc(space->cpu));
