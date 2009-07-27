@@ -227,7 +227,7 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 {
 	/* OKI BANKING  (still far from perfect, based on game behaviour)
 
-    The two OKis can independently play music or samples and are switched on the fly during game
+    The two OKIs can independently play music or samples and are switched on the fly during game
     This is a preliminary table of the banks:
 
     BANK    MUSIC   SAMPLES
