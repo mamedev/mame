@@ -2,6 +2,7 @@
  *
  * 39in1.c - bootleg MAME-based "39-in-1" arcade PCB
  * Skeleton by R. Belmont, thanks to the Guru
+ * PXA255 Peripheral hookup by MooglyGuy
  * Decrypt by Andreas Naive
  *
  * CPU: Intel Xscale PXA255 series @ 200 MHz, configured little-endian
@@ -23,10 +24,45 @@
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/pxa255.h"
+
+static void pxa255_dma_irq_check(running_machine* machine);
+static READ32_HANDLER( pxa255_dma_r );
+static WRITE32_HANDLER( pxa255_dma_w );
+
+static READ32_HANDLER( pxa255_i2s_r );
+static WRITE32_HANDLER( pxa255_i2s_w );
+
+static void pxa255_ostimer_irq_check(running_machine* machine);
+static TIMER_CALLBACK( pxa255_ostimer_match );
+static READ32_HANDLER( pxa255_ostimer_r );
+static WRITE32_HANDLER( pxa255_ostimer_w );
+
+static void pxa255_update_interrupts(running_machine* machine);
+static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int state);
+static READ32_HANDLER( pxa255_intc_r );
+static WRITE32_HANDLER( pxa255_intc_w );
+
+static READ32_HANDLER( pxa255_gpio_r );
+static WRITE32_HANDLER( pxa255_gpio_w );
+
+static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel);
+static void pxa255_lcd_irq_check(running_machine* machine);
+static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel);
+static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel);
+static READ32_HANDLER( pxa255_lcd_r );
+static WRITE32_HANDLER( pxa255_lcd_w );
+
+static PXA255_DMA_Regs dma_regs;
+static PXA255_I2S_Regs i2s_regs;
+static PXA255_OSTMR_Regs ostimer_regs;
+static PXA255_INTC_Regs intc_regs;
+static PXA255_GPIO_Regs gpio_regs;
+static PXA255_LCD_Regs lcd_regs;
 
 #define VERBOSE_LEVEL ( 3 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine* machine, int n_level, const char* s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -41,165 +77,236 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 
 /*
 
-  PXA255 DMA registers (placeholder)
+  PXA255 Inter-Integrated-Circuit Sound (I2S) Controller
+
+  pg. 489 to 504, PXA255 Processor Developers Manual [278693-002].pdf
+
+*/
+
+static READ32_HANDLER( pxa255_i2s_r )
+{
+	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_SACR0:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller Global Control Register: %08x & %08x\n", i2s_regs.sacr0, mem_mask );
+			return i2s_regs.sacr0;
+		case PXA255_SACR1:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", i2s_regs.sacr1, mem_mask );
+			return i2s_regs.sacr1;
+		case PXA255_SASR0:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", i2s_regs.sasr0, mem_mask );
+			return i2s_regs.sasr0;
+		case PXA255_SAIMR:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Interrupt Mask Register: %08x & %08x\n", i2s_regs.saimr, mem_mask );
+			return i2s_regs.saimr;
+		case PXA255_SAICR:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Interrupt Clear Register: %08x & %08x\n", i2s_regs.saicr, mem_mask );
+			return i2s_regs.saicr;
+		case PXA255_SADIV:
+			verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Clock Divider Register: %08x & %08x\n", i2s_regs.sadiv, mem_mask );
+			return i2s_regs.sadiv;
+		case PXA255_SADR:
+			//verboselog( space->machine, 3, "pxa255_i2s_r: Serial Audio Data Register: %08x & %08x\n", i2s_regs.sadr, mem_mask );
+			return i2s_regs.sadr;
+		default:
+			verboselog( space->machine, 0, "pxa255_i2s_r: Unknown address: %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+
+static WRITE32_HANDLER( pxa255_i2s_w )
+{
+	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_SACR0:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller Global Control Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.sacr0 = data & 0x0000ff3d;
+			break;
+		case PXA255_SACR1:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Control Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.sacr1 = data & 0x00000039;
+			break;
+		case PXA255_SASR0:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Controller I2S/MSB-Justified Status Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.sasr0 = data & 0x0000ff7f;
+			break;
+		case PXA255_SAIMR:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Interrupt Mask Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.saimr = data & 0x00000078;
+			break;
+		case PXA255_SAICR:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Interrupt Clear Register: %08x & %08x\n", data, mem_mask );
+			if(i2s_regs.saicr & PXA255_SAICR_ROR)
+			{
+				i2s_regs.sasr0 &= ~PXA255_SASR0_ROR;
+			}
+			if(i2s_regs.saicr & PXA255_SAICR_TUR)
+			{
+				i2s_regs.sasr0 &= ~PXA255_SASR0_TUR;
+			}
+			break;
+		case PXA255_SADIV:
+			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Clock Divider Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.sadiv = data & 0x0000007f;
+			break;
+		case PXA255_SADR:
+			verboselog( space->machine, 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
+			i2s_regs.sadr = data;
+			break;
+		default:
+			verboselog( space->machine, 0, "pxa255_i2s_w: Unknown address: %08x = %08x & %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2), data, mem_mask);
+			break;
+	}
+}
+
+/*
+
+  PXA255 DMA controller (placeholder)
 
   pg. 151 to 182, PXA255 Processor Developers Manual [278693-002].pdf
 
 */
 
-#define PXA255_DMA_BASE_ADDR	(0x40000000)
-#define PXA255_DCSR0			(PXA255_DMA_BASE_ADDR + 0x00000000)
-#define PXA255_DCSR1			(PXA255_DMA_BASE_ADDR + 0x00000004)
-#define PXA255_DCSR2			(PXA255_DMA_BASE_ADDR + 0x00000008)
-#define PXA255_DCSR3			(PXA255_DMA_BASE_ADDR + 0x0000000c)
-#define PXA255_DCSR4			(PXA255_DMA_BASE_ADDR + 0x00000010)
-#define PXA255_DCSR5			(PXA255_DMA_BASE_ADDR + 0x00000014)
-#define PXA255_DCSR6			(PXA255_DMA_BASE_ADDR + 0x00000018)
-#define PXA255_DCSR7			(PXA255_DMA_BASE_ADDR + 0x0000001c)
-#define PXA255_DCSR8			(PXA255_DMA_BASE_ADDR + 0x00000020)
-#define PXA255_DCSR9			(PXA255_DMA_BASE_ADDR + 0x00000024)
-#define PXA255_DCSR10			(PXA255_DMA_BASE_ADDR + 0x00000028)
-#define PXA255_DCSR11			(PXA255_DMA_BASE_ADDR + 0x0000002c)
-#define PXA255_DCSR12			(PXA255_DMA_BASE_ADDR + 0x00000030)
-#define PXA255_DCSR13			(PXA255_DMA_BASE_ADDR + 0x00000034)
-#define PXA255_DCSR14			(PXA255_DMA_BASE_ADDR + 0x00000038)
-#define PXA255_DCSR15			(PXA255_DMA_BASE_ADDR + 0x0000003c)
-#define PXA255_DINT				(PXA255_DMA_BASE_ADDR + 0x000000f0)
-#define PXA255_DRCMR0			(PXA255_DMA_BASE_ADDR + 0x00000100)
-#define PXA255_DRCMR1			(PXA255_DMA_BASE_ADDR + 0x00000104)
-#define PXA255_DRCMR2			(PXA255_DMA_BASE_ADDR + 0x00000108)
-#define PXA255_DRCMR3			(PXA255_DMA_BASE_ADDR + 0x0000010c)
-#define PXA255_DRCMR4			(PXA255_DMA_BASE_ADDR + 0x00000110)
-#define PXA255_DRCMR5			(PXA255_DMA_BASE_ADDR + 0x00000114)
-#define PXA255_DRCMR6			(PXA255_DMA_BASE_ADDR + 0x00000118)
-#define PXA255_DRCMR7			(PXA255_DMA_BASE_ADDR + 0x0000011c)
-#define PXA255_DRCMR8			(PXA255_DMA_BASE_ADDR + 0x00000120)
-#define PXA255_DRCMR9			(PXA255_DMA_BASE_ADDR + 0x00000124)
-#define PXA255_DRCMR10			(PXA255_DMA_BASE_ADDR + 0x00000128)
-#define PXA255_DRCMR11			(PXA255_DMA_BASE_ADDR + 0x0000012c)
-#define PXA255_DRCMR12			(PXA255_DMA_BASE_ADDR + 0x00000130)
-#define PXA255_DRCMR13			(PXA255_DMA_BASE_ADDR + 0x00000134)
-#define PXA255_DRCMR14			(PXA255_DMA_BASE_ADDR + 0x00000138)
-#define PXA255_DRCMR15			(PXA255_DMA_BASE_ADDR + 0x0000013c)
-#define PXA255_DRCMR16			(PXA255_DMA_BASE_ADDR + 0x00000140)
-#define PXA255_DRCMR17			(PXA255_DMA_BASE_ADDR + 0x00000144)
-#define PXA255_DRCMR18			(PXA255_DMA_BASE_ADDR + 0x00000148)
-#define PXA255_DRCMR19			(PXA255_DMA_BASE_ADDR + 0x0000014c)
-#define PXA255_DRCMR20			(PXA255_DMA_BASE_ADDR + 0x00000150)
-#define PXA255_DRCMR21			(PXA255_DMA_BASE_ADDR + 0x00000154)
-#define PXA255_DRCMR22			(PXA255_DMA_BASE_ADDR + 0x00000158)
-#define PXA255_DRCMR23			(PXA255_DMA_BASE_ADDR + 0x0000015c)
-#define PXA255_DRCMR24			(PXA255_DMA_BASE_ADDR + 0x00000160)
-#define PXA255_DRCMR25			(PXA255_DMA_BASE_ADDR + 0x00000164)
-#define PXA255_DRCMR26			(PXA255_DMA_BASE_ADDR + 0x00000168)
-#define PXA255_DRCMR27			(PXA255_DMA_BASE_ADDR + 0x0000016c)
-#define PXA255_DRCMR28			(PXA255_DMA_BASE_ADDR + 0x00000170)
-#define PXA255_DRCMR29			(PXA255_DMA_BASE_ADDR + 0x00000174)
-#define PXA255_DRCMR30			(PXA255_DMA_BASE_ADDR + 0x00000178)
-#define PXA255_DRCMR31			(PXA255_DMA_BASE_ADDR + 0x0000017c)
-#define PXA255_DRCMR32			(PXA255_DMA_BASE_ADDR + 0x00000180)
-#define PXA255_DRCMR33			(PXA255_DMA_BASE_ADDR + 0x00000184)
-#define PXA255_DRCMR34			(PXA255_DMA_BASE_ADDR + 0x00000188)
-#define PXA255_DRCMR35			(PXA255_DMA_BASE_ADDR + 0x0000018c)
-#define PXA255_DRCMR36			(PXA255_DMA_BASE_ADDR + 0x00000190)
-#define PXA255_DRCMR37			(PXA255_DMA_BASE_ADDR + 0x00000194)
-#define PXA255_DRCMR38			(PXA255_DMA_BASE_ADDR + 0x00000198)
-#define PXA255_DRCMR39			(PXA255_DMA_BASE_ADDR + 0x0000019c)
-#define PXA255_DDADR0			(PXA255_DMA_BASE_ADDR + 0x00000200)
-#define PXA255_DSADR0			(PXA255_DMA_BASE_ADDR + 0x00000204)
-#define PXA255_DTADR0			(PXA255_DMA_BASE_ADDR + 0x00000208)
-#define PXA255_DCMD0			(PXA255_DMA_BASE_ADDR + 0x0000020c)
-#define PXA255_DDADR1			(PXA255_DMA_BASE_ADDR + 0x00000210)
-#define PXA255_DSADR1			(PXA255_DMA_BASE_ADDR + 0x00000214)
-#define PXA255_DTADR1			(PXA255_DMA_BASE_ADDR + 0x00000218)
-#define PXA255_DCMD1			(PXA255_DMA_BASE_ADDR + 0x0000021c)
-#define PXA255_DDADR2			(PXA255_DMA_BASE_ADDR + 0x00000220)
-#define PXA255_DSADR2			(PXA255_DMA_BASE_ADDR + 0x00000224)
-#define PXA255_DTADR2			(PXA255_DMA_BASE_ADDR + 0x00000228)
-#define PXA255_DCMD2			(PXA255_DMA_BASE_ADDR + 0x0000022c)
-#define PXA255_DDADR3			(PXA255_DMA_BASE_ADDR + 0x00000230)
-#define PXA255_DSADR3			(PXA255_DMA_BASE_ADDR + 0x00000234)
-#define PXA255_DTADR3			(PXA255_DMA_BASE_ADDR + 0x00000238)
-#define PXA255_DCMD3			(PXA255_DMA_BASE_ADDR + 0x0000023c)
-#define PXA255_DDADR4			(PXA255_DMA_BASE_ADDR + 0x00000240)
-#define PXA255_DSADR4			(PXA255_DMA_BASE_ADDR + 0x00000244)
-#define PXA255_DTADR4			(PXA255_DMA_BASE_ADDR + 0x00000248)
-#define PXA255_DCMD4			(PXA255_DMA_BASE_ADDR + 0x0000024c)
-#define PXA255_DDADR5			(PXA255_DMA_BASE_ADDR + 0x00000250)
-#define PXA255_DSADR5			(PXA255_DMA_BASE_ADDR + 0x00000254)
-#define PXA255_DTADR5			(PXA255_DMA_BASE_ADDR + 0x00000258)
-#define PXA255_DCMD5			(PXA255_DMA_BASE_ADDR + 0x0000025c)
-#define PXA255_DDADR6			(PXA255_DMA_BASE_ADDR + 0x00000260)
-#define PXA255_DSADR6			(PXA255_DMA_BASE_ADDR + 0x00000264)
-#define PXA255_DTADR6			(PXA255_DMA_BASE_ADDR + 0x00000268)
-#define PXA255_DCMD6			(PXA255_DMA_BASE_ADDR + 0x0000026c)
-#define PXA255_DDADR7			(PXA255_DMA_BASE_ADDR + 0x00000270)
-#define PXA255_DSADR7			(PXA255_DMA_BASE_ADDR + 0x00000274)
-#define PXA255_DTADR7			(PXA255_DMA_BASE_ADDR + 0x00000278)
-#define PXA255_DCMD7			(PXA255_DMA_BASE_ADDR + 0x0000027c)
-#define PXA255_DDADR8			(PXA255_DMA_BASE_ADDR + 0x00000280)
-#define PXA255_DSADR8			(PXA255_DMA_BASE_ADDR + 0x00000284)
-#define PXA255_DTADR8			(PXA255_DMA_BASE_ADDR + 0x00000288)
-#define PXA255_DCMD8			(PXA255_DMA_BASE_ADDR + 0x0000028c)
-#define PXA255_DDADR9			(PXA255_DMA_BASE_ADDR + 0x00000290)
-#define PXA255_DSADR9			(PXA255_DMA_BASE_ADDR + 0x00000294)
-#define PXA255_DTADR9			(PXA255_DMA_BASE_ADDR + 0x00000298)
-#define PXA255_DCMD9			(PXA255_DMA_BASE_ADDR + 0x0000029c)
-#define PXA255_DDADR10			(PXA255_DMA_BASE_ADDR + 0x000002a0)
-#define PXA255_DSADR10			(PXA255_DMA_BASE_ADDR + 0x000002a4)
-#define PXA255_DTADR10			(PXA255_DMA_BASE_ADDR + 0x000002a8)
-#define PXA255_DCMD10			(PXA255_DMA_BASE_ADDR + 0x000002ac)
-#define PXA255_DDADR11			(PXA255_DMA_BASE_ADDR + 0x000002b0)
-#define PXA255_DSADR11			(PXA255_DMA_BASE_ADDR + 0x000002b4)
-#define PXA255_DTADR11			(PXA255_DMA_BASE_ADDR + 0x000002b8)
-#define PXA255_DCMD11			(PXA255_DMA_BASE_ADDR + 0x000002bc)
-#define PXA255_DDADR12			(PXA255_DMA_BASE_ADDR + 0x000002c0)
-#define PXA255_DSADR12			(PXA255_DMA_BASE_ADDR + 0x000002c4)
-#define PXA255_DTADR12			(PXA255_DMA_BASE_ADDR + 0x000002c8)
-#define PXA255_DCMD12			(PXA255_DMA_BASE_ADDR + 0x000002cc)
-#define PXA255_DDADR13			(PXA255_DMA_BASE_ADDR + 0x000002d0)
-#define PXA255_DSADR13			(PXA255_DMA_BASE_ADDR + 0x000002d4)
-#define PXA255_DTADR13			(PXA255_DMA_BASE_ADDR + 0x000002d8)
-#define PXA255_DCMD13			(PXA255_DMA_BASE_ADDR + 0x000002dc)
-#define PXA255_DDADR14			(PXA255_DMA_BASE_ADDR + 0x000002e0)
-#define PXA255_DSADR14			(PXA255_DMA_BASE_ADDR + 0x000002e4)
-#define PXA255_DTADR14			(PXA255_DMA_BASE_ADDR + 0x000002e8)
-#define PXA255_DCMD14			(PXA255_DMA_BASE_ADDR + 0x000002ec)
-#define PXA255_DDADR15			(PXA255_DMA_BASE_ADDR + 0x000002f0)
-#define PXA255_DSADR15			(PXA255_DMA_BASE_ADDR + 0x000002f4)
-#define PXA255_DTADR15			(PXA255_DMA_BASE_ADDR + 0x000002f8)
-#define PXA255_DCMD15			(PXA255_DMA_BASE_ADDR + 0x000002fc)
-
-typedef struct
+static void pxa255_dma_irq_check(running_machine* machine)
 {
-	UINT32 dcsr[16];
-} PXA255_DMA_Regs;
+	int channel = 0;
+	int set_intr = 0;
+	for(channel = 0; channel < 16; channel++)
+	{
+		if(dma_regs.dcsr[channel] & (PXA255_DCSR_ENDINTR | PXA255_DCSR_STARTINTR | PXA255_DCSR_BUSERRINTR))
+		{
+			dma_regs.dint |= 1 << channel;
+			set_intr = 1;
+		}
+		else
+		{
+			dma_regs.dint &= ~(1 << channel);
+		}
+	}
+	pxa255_set_irq_line(machine, PXA255_INT_DMA, set_intr);
+}
 
-static PXA255_DMA_Regs dma_regs;
+static TIMER_CALLBACK( pxa255_dma_dma_end )
+{
+	UINT32 sadr = dma_regs.dsadr[param];
+	UINT32 tadr = dma_regs.dtadr[param];
+	UINT32 count = dma_regs.dcmd[param] & 0x00001fff;
+	UINT32 index = 0;
+	dma_regs.dcsr[param] &= ~PXA255_DCSR_RUN;
+	dma_regs.dcsr[param] |= PXA255_DCSR_STOPSTATE;
+	for(index = 0; index < count; index++)
+	{
+		switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+		{
+			case PXA255_DCMD_SIZE_8:
+				memory_write_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr,
+										memory_read_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr));
+				break;
+			case PXA255_DCMD_SIZE_16:
+				memory_write_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr,
+									   memory_read_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr));
+				break;
+			case PXA255_DCMD_SIZE_32:
+				memory_write_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr,
+										memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr));
+				break;
+			default:
+				printf( "pxa255_dma_dma_end: Unsupported DMA size\n" );
+				break;
+		}
+		if(dma_regs.dcmd[param] & PXA255_DCMD_INCSRCADDR)
+		{
+			switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+			{
+				case PXA255_DCMD_SIZE_8:
+					sadr++;
+					break;
+				case PXA255_DCMD_SIZE_16:
+					sadr += 2;
+					break;
+				case PXA255_DCMD_SIZE_32:
+					sadr += 4;
+					break;
+				default:
+					break;
+			}
+		}
+		if(dma_regs.dcmd[param] & PXA255_DCMD_INCTRGADDR)
+		{
+			switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+			{
+				case PXA255_DCMD_SIZE_8:
+					tadr++;
+					break;
+				case PXA255_DCMD_SIZE_16:
+					tadr += 2;
+					break;
+				case PXA255_DCMD_SIZE_32:
+					tadr += 4;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	if(dma_regs.dcmd[param] & PXA255_DCMD_ENDIRQEN)
+	{
+		dma_regs.dcsr[param] |= PXA255_DCSR_ENDINTR;
+	}
+	pxa255_dma_irq_check(machine);
+}
 
-/* TODO */
 static READ32_HANDLER( pxa255_dma_r )
 {
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_DCSR0:
-		case PXA255_DCSR1:
-		case PXA255_DCSR2:
-		case PXA255_DCSR3:
-		case PXA255_DCSR4:
-		case PXA255_DCSR5:
-		case PXA255_DCSR6:
-		case PXA255_DCSR7:
-		case PXA255_DCSR8:
-		case PXA255_DCSR9:
-		case PXA255_DCSR10:
-		case PXA255_DCSR11:
-		case PXA255_DCSR12:
-		case PXA255_DCSR13:
-		case PXA255_DCSR14:
-		case PXA255_DCSR15:
-			verboselog( space->machine, 0, "pxa255_dma_r: DMA Channel Control/Status Register %d Read: %08x & %08x\n", offset, 0x00000008, mem_mask );
-			return 0x00000008; // Report channel as stopped
+		case PXA255_DCSR0:		case PXA255_DCSR1:		case PXA255_DCSR2:		case PXA255_DCSR3:
+		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
+		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
+		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, dma_regs.dcsr[offset], mem_mask );
+			return dma_regs.dcsr[offset];
+		case PXA255_DINT:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Interrupt Register: %08x & %08x\n", dma_regs.dint, mem_mask );
+			return dma_regs.dint;
+		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
+		case PXA255_DRCMR4:		case PXA255_DRCMR5:		case PXA255_DRCMR6:		case PXA255_DRCMR7:
+		case PXA255_DRCMR8:		case PXA255_DRCMR9:		case PXA255_DRCMR10:	case PXA255_DRCMR11:
+		case PXA255_DRCMR12:	case PXA255_DRCMR13:	case PXA255_DRCMR14:	case PXA255_DRCMR15:
+		case PXA255_DRCMR16:	case PXA255_DRCMR17:	case PXA255_DRCMR18:	case PXA255_DRCMR19:
+		case PXA255_DRCMR20:	case PXA255_DRCMR21:	case PXA255_DRCMR22:	case PXA255_DRCMR23:
+		case PXA255_DRCMR24:	case PXA255_DRCMR25:	case PXA255_DRCMR26:	case PXA255_DRCMR27:
+		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
+		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
+		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), 0, mem_mask );
+			return dma_regs.drcmr[offset - (0x100 >> 2)];
+		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
+		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
+		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
+		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			return dma_regs.ddadr[(offset - (0x200 >> 2)) >> 2];
+		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
+		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
+		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
+		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			return dma_regs.dsadr[(offset - (0x200 >> 2)) >> 2];
+		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
+		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
+		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
+		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			return dma_regs.dtadr[(offset - (0x200 >> 2)) >> 2];
+		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
+		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
+		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
+		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
+			verboselog( space->machine, 0, "pxa255_dma_r: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
+			return dma_regs.dcmd[(offset - (0x200 >> 2)) >> 2];
 		default:
 			verboselog( space->machine, 0, "pxa255_dma_r: Unknown address: %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2));
 			break;
@@ -207,30 +314,100 @@ static READ32_HANDLER( pxa255_dma_r )
 	return 0;
 }
 
-/* TODO */
 static WRITE32_HANDLER( pxa255_dma_w )
 {
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_DCSR0:
-		case PXA255_DCSR1:
-		case PXA255_DCSR2:
-		case PXA255_DCSR3:
-		case PXA255_DCSR4:
-		case PXA255_DCSR5:
-		case PXA255_DCSR6:
-		case PXA255_DCSR7:
-		case PXA255_DCSR8:
-		case PXA255_DCSR9:
-		case PXA255_DCSR10:
-		case PXA255_DCSR11:
-		case PXA255_DCSR12:
-		case PXA255_DCSR13:
-		case PXA255_DCSR14:
-		case PXA255_DCSR15:
-			verboselog( space->machine, 0, "pxa255_dma_w: DMA Channel Control/Status Register %d Write: %08x & %08x\n", offset, data, mem_mask );
-			//dma_regs.dcsr[offset] = data & 0xe0000007;
-			// TODO: DMA kickoff, etc.
+		case PXA255_DCSR0:		case PXA255_DCSR1:		case PXA255_DCSR2:		case PXA255_DCSR3:
+		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
+		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
+		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, data, mem_mask );
+			dma_regs.dcsr[offset] &= ~(data & 0x00000007);
+			dma_regs.dcsr[offset] &= ~0xe0000000;
+			dma_regs.dcsr[offset] |= data & 0xe0000000;
+			if(data & PXA255_DCSR_RUN)
+			{
+				attotime period;
+
+				// Shut down any transfers that are currently going on, software should be smart enough to check if a
+				// transfer is running before starting another one on the same channel.
+				if(timer_enabled(dma_regs.timer[offset]))
+				{
+					timer_adjust_oneshot(dma_regs.timer[offset], attotime_never, 0);
+				}
+
+				if(data & PXA255_DCSR_NODESCFETCH)
+				{
+					verboselog( space->machine, 0, "              No-Descriptor-Fetch mode is not supported.\n" );
+					break;
+				}
+
+				// Load the next descriptor
+				dma_regs.dsadr[offset] = memory_read_dword_32le(space, dma_regs.ddadr[offset] + 0x4);
+				dma_regs.dtadr[offset] = memory_read_dword_32le(space, dma_regs.ddadr[offset] + 0x8);
+				dma_regs.dcmd[offset] = memory_read_dword_32le(space, dma_regs.ddadr[offset] + 0xc);
+				dma_regs.ddadr[offset] = memory_read_dword_32le(space, dma_regs.ddadr[offset]);
+
+				// Start our end-of-transfer timer
+				period = attotime_mul(ATTOTIME_IN_HZ(200000000), dma_regs.dcmd[offset] & 0x00001fff);
+
+				timer_adjust_oneshot(dma_regs.timer[offset], period, offset);
+
+				// Interrupt as necessary
+				if(dma_regs.dcmd[offset] & PXA255_DCMD_STARTIRQEN)
+				{
+					dma_regs.dcsr[offset] |= PXA255_DCSR_STARTINTR;
+				}
+
+				dma_regs.dcsr[offset] &= ~PXA255_DCSR_STOPSTATE;
+			}
+			pxa255_dma_irq_check(space->machine);
+			break;
+		case PXA255_DINT:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Interrupt Register: %08x & %08x\n", data, mem_mask );
+			dma_regs.dint &= ~data;
+			break;
+		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
+		case PXA255_DRCMR4:		case PXA255_DRCMR5:		case PXA255_DRCMR6:		case PXA255_DRCMR7:
+		case PXA255_DRCMR8:		case PXA255_DRCMR9:		case PXA255_DRCMR10:	case PXA255_DRCMR11:
+		case PXA255_DRCMR12:	case PXA255_DRCMR13:	case PXA255_DRCMR14:	case PXA255_DRCMR15:
+		case PXA255_DRCMR16:	case PXA255_DRCMR17:	case PXA255_DRCMR18:	case PXA255_DRCMR19:
+		case PXA255_DRCMR20:	case PXA255_DRCMR21:	case PXA255_DRCMR22:	case PXA255_DRCMR23:
+		case PXA255_DRCMR24:	case PXA255_DRCMR25:	case PXA255_DRCMR26:	case PXA255_DRCMR27:
+		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
+		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
+		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), data, mem_mask );
+			dma_regs.drcmr[offset - (0x100 >> 2)] = data & 0x0000008f;
+			break;
+		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
+		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
+		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
+		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			dma_regs.ddadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffff1;
+			break;
+		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
+		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
+		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
+		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			dma_regs.dsadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
+			break;
+		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
+		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
+		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
+		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			dma_regs.dtadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
+			break;
+		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
+		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
+		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
+		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
+			verboselog( space->machine, 0, "pxa255_dma_w: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
+			dma_regs.dcmd[(offset - (0x200 >> 2)) >> 2] = data & 0xf067dfff;
 			break;
 		default:
 			verboselog( space->machine, 0, "pxa255_dma_w: Unknown address: %08x = %08x & %08x\n", PXA255_DMA_BASE_ADDR | (offset << 2), data, mem_mask);
@@ -240,60 +417,42 @@ static WRITE32_HANDLER( pxa255_dma_w )
 
 /*
 
-  PXA255 OS Timer registers
+  PXA255 OS Timer register
 
   pg. 138 to 142, PXA255 Processor Developers Manual [278693-002].pdf
 
 */
 
-#define PXA255_OSTMR_BASE_ADDR	(0x40a00000)
-#define PXA255_OSMR0			(PXA255_OSTMR_BASE_ADDR + 0x00000000)
-#define PXA255_OSMR1			(PXA255_OSTMR_BASE_ADDR + 0x00000004)
-#define PXA255_OSMR2			(PXA255_OSTMR_BASE_ADDR + 0x00000008)
-#define PXA255_OSMR3			(PXA255_OSTMR_BASE_ADDR + 0x0000000c)
-#define PXA255_OSCR				(PXA255_OSTMR_BASE_ADDR + 0x00000010)
-#define PXA255_OSSR				(PXA255_OSTMR_BASE_ADDR + 0x00000014)
-	#define PXA255_OSSR_M0		(0x00000001)
-	#define PXA255_OSSR_M1		(0x00000002)
-	#define PXA255_OSSR_M2		(0x00000004)
-	#define PXA255_OSSR_M3		(0x00000008)
-#define PXA255_OWER				(PXA255_OSTMR_BASE_ADDR + 0x00000018)
-#define PXA255_OIER				(PXA255_OSTMR_BASE_ADDR + 0x0000001c)
-	#define PXA255_OIER_E0		(0x00000001)
-	#define PXA255_OIER_E1		(0x00000002)
-	#define PXA255_OIER_E2		(0x00000004)
-	#define PXA255_OIER_E3		(0x00000008)
-
-typedef struct
+static void pxa255_ostimer_irq_check(running_machine* machine)
 {
-	UINT32 osmr0;
-	UINT32 osmr1;
-	UINT32 osmr2;
-	UINT32 osmr3;
-	UINT32 oscr;
-	UINT32 ossr;
-	UINT32 ower;
-	UINT32 oier;
-} PXA255_OSTMR_Regs;
+	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER0, (ostimer_regs.ossr & PXA255_OSSR_M0) ? 1 : 0);
+	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER1, (ostimer_regs.ossr & PXA255_OSSR_M1) ? 1 : 0);
+	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER2, (ostimer_regs.ossr & PXA255_OSSR_M2) ? 1 : 0);
+	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER3, (ostimer_regs.ossr & PXA255_OSSR_M3) ? 1 : 0);
+}
 
-static PXA255_OSTMR_Regs ostimer_regs;
+static TIMER_CALLBACK( pxa255_ostimer_match )
+{
+	ostimer_regs.ossr |= (1 << param);
+	pxa255_ostimer_irq_check(machine);
+}
 
 static READ32_HANDLER( pxa255_ostimer_r )
 {
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
-			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs.osmr0, mem_mask );
-			return ostimer_regs.osmr0;
+			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs.osmr[0], mem_mask );
+			return ostimer_regs.osmr[0];
 		case PXA255_OSMR1:
-			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs.osmr1, mem_mask );
-			return ostimer_regs.osmr1;
+			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs.osmr[1], mem_mask );
+			return ostimer_regs.osmr[1];
 		case PXA255_OSMR2:
-			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs.osmr2, mem_mask );
-			return ostimer_regs.osmr2;
+			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs.osmr[2], mem_mask );
+			return ostimer_regs.osmr[2];
 		case PXA255_OSMR3:
-			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs.osmr3, mem_mask );
-			return ostimer_regs.osmr3;
+			verboselog( space->machine, 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs.osmr[3], mem_mask );
+			return ostimer_regs.osmr[3];
 		case PXA255_OSCR:
 			verboselog( space->machine, 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs.oscr, mem_mask );
 			// free-running 3.something MHz counter.  this is a complete hack.
@@ -315,26 +474,49 @@ static READ32_HANDLER( pxa255_ostimer_r )
 	return 0;
 }
 
-
 static WRITE32_HANDLER( pxa255_ostimer_w )
 {
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_OSMR0:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
-			ostimer_regs.osmr0 = data;
+			ostimer_regs.osmr[0] = data;
+			if(ostimer_regs.oier & PXA255_OIER_E0)
+			{
+				attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs.osmr[0]);
+
+				timer_adjust_oneshot(ostimer_regs.timer[0], period, 0);
+			}
 			break;
 		case PXA255_OSMR1:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
-			ostimer_regs.osmr1 = data;
+			ostimer_regs.osmr[1] = data;
+			if(ostimer_regs.oier & PXA255_OIER_E1)
+			{
+				attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs.osmr[1]);
+
+				timer_adjust_oneshot(ostimer_regs.timer[1], period, 1);
+			}
 			break;
 		case PXA255_OSMR2:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
-			ostimer_regs.osmr2 = data;
+			ostimer_regs.osmr[2] = data;
+			if(ostimer_regs.oier & PXA255_OIER_E2)
+			{
+				attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs.osmr[2]);
+
+				timer_adjust_oneshot(ostimer_regs.timer[2], period, 2);
+			}
 			break;
 		case PXA255_OSMR3:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
-			ostimer_regs.osmr3 = data;
+			ostimer_regs.osmr[3] = data;
+			if(ostimer_regs.oier & PXA255_OIER_E3)
+			{
+				attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs.osmr[3]);
+
+				timer_adjust_oneshot(ostimer_regs.timer[3], period, 3);
+			}
 			break;
 		case PXA255_OSCR:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
@@ -343,15 +525,29 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 		case PXA255_OSSR:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs.ossr &= ~data;
+			pxa255_ostimer_irq_check(space->machine);
 			break;
 		case PXA255_OWER:
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs.ower = data & 0x00000001;
 			break;
 		case PXA255_OIER:
+		{
+			int index = 0;
 			verboselog( space->machine, 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
 			ostimer_regs.oier = data & 0x0000000f;
+			for(index = 0; index < 4; index++)
+			{
+				if(ostimer_regs.oier & (1 << index))
+				{
+					attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs.osmr[index]);
+
+					timer_adjust_oneshot(ostimer_regs.timer[index], period, index);
+				}
+			}
+
 			break;
+		}
 		default:
 			verboselog( space->machine, 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
 			break;
@@ -366,52 +562,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 
 */
 
-#define PXA255_INTC_BASE_ADDR	(0x40d00000)
-#define PXA255_ICIP				(PXA255_INTC_BASE_ADDR + 0x00000000)
-#define PXA255_ICMR				(PXA255_INTC_BASE_ADDR + 0x00000004)
-#define PXA255_ICLR				(PXA255_INTC_BASE_ADDR + 0x00000008)
-#define PXA255_ICFP				(PXA255_INTC_BASE_ADDR + 0x0000000c)
-#define PXA255_ICPR				(PXA255_INTC_BASE_ADDR + 0x00000010)
-#define PXA255_ICCR				(PXA255_INTC_BASE_ADDR + 0x00000014)
-
-#define PXA255_INT_HUART		(1 << 7)
-#define PXA255_INT_GPIO0		(1 << 8)
-#define PXA255_INT_GPIO1		(1 << 9)
-#define PXA255_INT_GPIO84_2		(1 << 10)
-#define PXA255_INT_USB			(1 << 11)
-#define PXA255_INT_PMU			(1 << 12)
-#define PXA255_INT_I2S			(1 << 13)
-#define PXA255_INT_AC97			(1 << 14)
-#define PXA255_INT_NETWORK		(1 << 16)
-#define PXA255_INT_LCD			(1 << 17)
-#define PXA255_INT_I2C			(1 << 18)
-#define PXA255_INT_ICP			(1 << 19)
-#define PXA255_INT_STUART		(1 << 20)
-#define PXA255_INT_BTUART		(1 << 21)
-#define PXA255_INT_FFUART		(1 << 22)
-#define PXA255_INT_MMC			(1 << 23)
-#define PXA255_INT_SSP			(1 << 24)
-#define PXA255_INT_DMA			(1 << 25)
-#define PXA255_INT_OSTIMER0		(1 << 26)
-#define PXA255_INT_OSTIMER1		(1 << 27)
-#define PXA255_INT_OSTIMER2		(1 << 28)
-#define PXA255_INT_OSTIMER3		(1 << 29)
-#define PXA255_INT_RTC_HZ		(1 << 30)
-#define PXA255_INT_RTC_ALARM	(1 << 31)
-
-typedef struct
-{
-	UINT32 icip;
-	UINT32 icmr;
-	UINT32 iclr;
-	UINT32 icfp;
-	UINT32 icpr;
-	UINT32 iccr;
-} PXA255_INTC_Regs;
-
-static PXA255_INTC_Regs intc_regs;
-
-static void pxa255_update_interrupts(running_machine *machine)
+static void pxa255_update_interrupts(running_machine* machine)
 {
 	intc_regs.icfp = (intc_regs.icpr & intc_regs.icmr) & intc_regs.iclr;
 	intc_regs.icip = (intc_regs.icpr & intc_regs.icmr) & (~intc_regs.iclr);
@@ -419,7 +570,7 @@ static void pxa255_update_interrupts(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", ARM7_IRQ_LINE,  intc_regs.icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void pxa255_set_irq_line(running_machine *machine, UINT32 line, int state)
+static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int state)
 {
 	intc_regs.icpr &= ~line;
 	intc_regs.icpr |= state ? line : 0;
@@ -494,82 +645,16 @@ static WRITE32_HANDLER( pxa255_intc_w )
 
 */
 
-#define PXA255_GPIO_BASE_ADDR	(0x40E00000)
-#define PXA255_GPLR0			(PXA255_GPIO_BASE_ADDR + 0x00000000)
-#define PXA255_GPLR1			(PXA255_GPIO_BASE_ADDR + 0x00000004)
-#define PXA255_GPLR2			(PXA255_GPIO_BASE_ADDR + 0x00000008)
-#define PXA255_GPDR0			(PXA255_GPIO_BASE_ADDR + 0x0000000c)
-#define PXA255_GPDR1			(PXA255_GPIO_BASE_ADDR + 0x00000010)
-#define PXA255_GPDR2			(PXA255_GPIO_BASE_ADDR + 0x00000014)
-#define PXA255_GPSR0			(PXA255_GPIO_BASE_ADDR + 0x00000018)
-#define PXA255_GPSR1			(PXA255_GPIO_BASE_ADDR + 0x0000001c)
-#define PXA255_GPSR2			(PXA255_GPIO_BASE_ADDR + 0x00000020)
-#define PXA255_GPCR0			(PXA255_GPIO_BASE_ADDR + 0x00000024)
-#define PXA255_GPCR1			(PXA255_GPIO_BASE_ADDR + 0x00000028)
-#define PXA255_GPCR2			(PXA255_GPIO_BASE_ADDR + 0x0000002c)
-#define PXA255_GRER0			(PXA255_GPIO_BASE_ADDR + 0x00000030)
-#define PXA255_GRER1			(PXA255_GPIO_BASE_ADDR + 0x00000034)
-#define PXA255_GRER2			(PXA255_GPIO_BASE_ADDR + 0x00000038)
-#define PXA255_GFER0			(PXA255_GPIO_BASE_ADDR + 0x0000003c)
-#define PXA255_GFER1			(PXA255_GPIO_BASE_ADDR + 0x00000040)
-#define PXA255_GFER2			(PXA255_GPIO_BASE_ADDR + 0x00000044)
-#define PXA255_GEDR0			(PXA255_GPIO_BASE_ADDR + 0x00000048)
-#define PXA255_GEDR1			(PXA255_GPIO_BASE_ADDR + 0x0000004c)
-#define PXA255_GEDR2			(PXA255_GPIO_BASE_ADDR + 0x00000050)
-#define PXA255_GAFR0_L			(PXA255_GPIO_BASE_ADDR + 0x00000054)
-#define PXA255_GAFR0_U			(PXA255_GPIO_BASE_ADDR + 0x00000058)
-#define PXA255_GAFR1_L			(PXA255_GPIO_BASE_ADDR + 0x0000005c)
-#define PXA255_GAFR1_U			(PXA255_GPIO_BASE_ADDR + 0x00000060)
-#define PXA255_GAFR2_L			(PXA255_GPIO_BASE_ADDR + 0x00000064)
-#define PXA255_GAFR2_U			(PXA255_GPIO_BASE_ADDR + 0x00000068)
-
-typedef struct
-{
-	UINT32 gplr0; // GPIO Pin-Leve
-	UINT32 gplr1;
-	UINT32 gplr2;
-
-	UINT32 gpdr0;
-	UINT32 gpdr1;
-	UINT32 gpdr2;
-
-	UINT32 gpsr0;
-	UINT32 gpsr1;
-	UINT32 gpsr2;
-
-	UINT32 gpcr0;
-	UINT32 gpcr1;
-	UINT32 gpcr2;
-
-	UINT32 grer0;
-	UINT32 grer1;
-	UINT32 grer2;
-
-	UINT32 gfer0;
-	UINT32 gfer1;
-	UINT32 gfer2;
-
-	UINT32 gedr0;
-	UINT32 gedr1;
-	UINT32 gedr2;
-
-	UINT32 gafr0l;
-	UINT32 gafr0u;
-	UINT32 gafr1l;
-	UINT32 gafr1u;
-	UINT32 gafr2l;
-	UINT32 gafr2u;
-} PXA255_GPIO_Regs;
-
-static PXA255_GPIO_Regs gpio_regs;
-
 static READ32_HANDLER( pxa255_gpio_r )
 {
+	static int toggler = 0;
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs.gplr0 | (1 << 1), mem_mask );
-			return gpio_regs.gplr0 | (1 << 1); // Must be on.  Probably a DIP switch.
+			printf("\n");
+			toggler ^= 1;
+			return gpio_regs.gplr0 | (1 << 1) | (toggler << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
 			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs.gplr1, mem_mask );
 			return gpio_regs.gplr1;
@@ -682,6 +767,10 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			break;
 		case PXA255_GPSR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask );
+			if(data & 0x00000010)
+			{
+				printf("1");
+			}
 			gpio_regs.gpsr0 |= data & gpio_regs.gpdr0;
 			break;
 		case PXA255_GPSR1:
@@ -695,6 +784,10 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 		case PXA255_GPCR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs.gpsr0 &= ~(data & gpio_regs.gpdr0);
+			if(data & 0x00000010)
+			{
+				printf("0");
+			}
 			break;
 		case PXA255_GPCR1:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 1: %08x & %08x\n", data, mem_mask );
@@ -778,87 +871,6 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 
 */
 
-#define PXA255_LCD_BASE_ADDR	(0x44000000)
-#define PXA255_LCCR0			(PXA255_LCD_BASE_ADDR + 0x00000000)
-	#define PXA255_LCCR0_OUM	(0x00200000)
-	#define PXA255_LCCR0_BM		(0x00100000)
-	#define PXA255_LCCR0_PDD	(0x000ff000)
-	#define PXA255_LCCR0_QDM	(0x00000800)
-	#define PXA255_LCCR0_DIS	(0x00000400)
-	#define PXA255_LCCR0_DPD	(0x00000200)
-	#define PXA255_LCCR0_PAS	(0x00000080)
-	#define PXA255_LCCR0_EFM	(0x00000040)
-	#define PXA255_LCCR0_IUM	(0x00000020)
-	#define PXA255_LCCR0_SFM	(0x00000010)
-	#define PXA255_LCCR0_LDM	(0x00000008)
-	#define PXA255_LCCR0_SDS	(0x00000004)
-	#define PXA255_LCCR0_CMS	(0x00000002)
-	#define PXA255_LCCR0_ENB	(0x00000001)
-#define PXA255_LCCR1			(PXA255_LCD_BASE_ADDR + 0x00000004)
-#define PXA255_LCCR2			(PXA255_LCD_BASE_ADDR + 0x00000008)
-#define PXA255_LCCR3			(PXA255_LCD_BASE_ADDR + 0x0000000c)
-#define PXA255_FBR0				(PXA255_LCD_BASE_ADDR + 0x00000020)
-#define PXA255_FBR1				(PXA255_LCD_BASE_ADDR + 0x00000024)
-#define PXA255_LCSR				(PXA255_LCD_BASE_ADDR + 0x00000038)
-	#define PXA255_LCSR_LDD		(0x00000001)
-	#define PXA255_LCSR_SOF		(0x00000002)
-	#define PXA255_LCSR_BER		(0x00000004)
-	#define PXA255_LCSR_ABC		(0x00000008)
-	#define PXA255_LCSR_IUL		(0x00000010)
-	#define PXA255_LCSR_IUU		(0x00000020)
-	#define PXA255_LCSR_OU		(0x00000040)
-	#define PXA255_LCSR_QD		(0x00000080)
-	#define PXA255_LCSR_EOF		(0x00000100)
-	#define PXA255_LCSR_BS		(0x00000200)
-	#define PXA255_LCSR_SINT	(0x00000400)
-#define PXA255_LIIDR			(PXA255_LCD_BASE_ADDR + 0x0000003c)
-#define PXA255_TRGBR			(PXA255_LCD_BASE_ADDR + 0x00000040)
-#define PXA255_TCR				(PXA255_LCD_BASE_ADDR + 0x00000044)
-#define PXA255_FDADR0			(PXA255_LCD_BASE_ADDR + 0x00000200)
-#define PXA255_FSADR0			(PXA255_LCD_BASE_ADDR + 0x00000204)
-#define PXA255_FIDR0			(PXA255_LCD_BASE_ADDR + 0x00000208)
-#define PXA255_LDCMD0			(PXA255_LCD_BASE_ADDR + 0x0000020c)
-	#define PXA255_LDCMD_SOFINT	(0x00400000)
-	#define PXA255_LDCMD_EOFINT	(0x00200000)
-#define PXA255_FDADR1			(PXA255_LCD_BASE_ADDR + 0x00000210)
-#define PXA255_FSADR1			(PXA255_LCD_BASE_ADDR + 0x00000214)
-#define PXA255_FIDR1			(PXA255_LCD_BASE_ADDR + 0x00000218)
-#define PXA255_LDCMD1			(PXA255_LCD_BASE_ADDR + 0x0000021c)
-
-typedef struct
-{
-	UINT32 fdadr;
-	UINT32 fsadr;
-	UINT32 fidr;
-	UINT32 ldcmd;
-	emu_timer *eof;
-} PXA255_LCD_DMA_Regs;
-
-typedef struct
-{
-	UINT32 lccr0;
-	UINT32 lccr1;
-	UINT32 lccr2;
-	UINT32 lccr3;
-
-	UINT32 pad0[4];
-
-	UINT32 fbr[2];
-
-	UINT32 pad1[4];
-
-	UINT32 lcsr;
-	UINT32 liidr;
-	UINT32 trgbr;
-	UINT32 tcr;
-
-	UINT32 pad2[110];
-
-	PXA255_LCD_DMA_Regs dma[2];
-} PXA255_LCD_Regs;
-
-static PXA255_LCD_Regs lcd_regs;
-
 static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel)
 {
 	lcd_regs.dma[channel].fdadr = memory_read_dword_32le(space, address);
@@ -872,7 +884,7 @@ static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 ad
 	verboselog( space->machine, 3, "    DMA Command: %08x\n", lcd_regs.dma[channel].ldcmd );
 }
 
-static void pxa255_lcd_irq_check(running_machine *machine)
+static void pxa255_lcd_irq_check(running_machine* machine)
 {
 	if(((lcd_regs.lcsr & PXA255_LCSR_BS)  != 0 && (lcd_regs.lccr0 & PXA255_LCCR0_BM)  == 0) ||
 	   ((lcd_regs.lcsr & PXA255_LCSR_EOF) != 0 && (lcd_regs.lccr0 & PXA255_LCCR0_EFM) == 0) ||
@@ -886,7 +898,7 @@ static void pxa255_lcd_irq_check(running_machine *machine)
 	}
 }
 
-static void pxa255_lcd_dma_kickoff(running_machine *machine, int channel)
+static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 {
 	if(lcd_regs.dma[channel].fdadr != 0)
 	{
@@ -896,7 +908,6 @@ static void pxa255_lcd_dma_kickoff(running_machine *machine, int channel)
 
 		if(lcd_regs.dma[channel].ldcmd & PXA255_LDCMD_SOFINT)
 		{
-			//printf( "LCD SOF: %d\n", channel );
 			lcd_regs.liidr = lcd_regs.dma[channel].fidr;
 			lcd_regs.lcsr |= PXA255_LCSR_SOF;
 			pxa255_lcd_irq_check(machine);
@@ -904,12 +915,12 @@ static void pxa255_lcd_dma_kickoff(running_machine *machine, int channel)
 	}
 }
 
-static void pxa255_lcd_check_load_next_branch(running_machine *machine, int channel)
+static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel)
 {
-
 	if(lcd_regs.fbr[channel] & 1)
 	{
 		lcd_regs.fbr[channel] &= ~1;
+		printf( "%08x\n", memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) );
 		lcd_regs.fbr[channel] |= memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) & 0xfffffff0;
 		pxa255_lcd_load_dma_descriptor(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0, 0);
 		pxa255_lcd_dma_kickoff(machine, 0);
@@ -918,6 +929,16 @@ static void pxa255_lcd_check_load_next_branch(running_machine *machine, int chan
 			lcd_regs.lcsr |= PXA255_LCSR_BS;
 		}
 	}
+}
+
+static TIMER_CALLBACK( pxa255_lcd_dma_eof )
+{
+	if(lcd_regs.dma[param].ldcmd & PXA255_LDCMD_EOFINT)
+	{
+		lcd_regs.liidr = lcd_regs.dma[param].fidr;
+		lcd_regs.lcsr |= PXA255_LCSR_EOF;
+	}
+	pxa255_lcd_check_load_next_branch(machine, param);
 }
 
 static READ32_HANDLER( pxa255_lcd_r )
@@ -1071,17 +1092,6 @@ static WRITE32_HANDLER( pxa255_lcd_w )
 	}
 }
 
-static TIMER_CALLBACK( pxa255_lcd_dma_eof )
-{
-	if(lcd_regs.dma[param].ldcmd & PXA255_LDCMD_EOFINT)
-	{
-		//printf( "LCD EOF: %d\n", param );
-		lcd_regs.liidr = lcd_regs.dma[param].fidr;
-		lcd_regs.lcsr |= PXA255_LCSR_EOF;
-	}
-	pxa255_lcd_check_load_next_branch(machine, param);
-}
-
 static INTERRUPT_GEN( pxa255_vblank_start )
 {
 }
@@ -1089,11 +1099,12 @@ static INTERRUPT_GEN( pxa255_vblank_start )
 static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x40000000, 0x400002ff) AM_READWRITE( pxa255_dma_r, pxa255_dma_w )
+	AM_RANGE(0x40400000, 0x40400083) AM_READWRITE( pxa255_i2s_r, pxa255_i2s_w )
 	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE( pxa255_ostimer_r, pxa255_ostimer_w )
 	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE( pxa255_intc_r, pxa255_intc_w )
 	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE( pxa255_gpio_r, pxa255_gpio_w )
 	AM_RANGE(0x44000000, 0x4400021f) AM_READWRITE( pxa255_lcd_r,  pxa255_lcd_w )
-	AM_RANGE(0xa0000000, 0xa3ffffff) AM_RAM
+	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 39in1 )
@@ -1105,7 +1116,7 @@ static VIDEO_UPDATE( 39in1 )
 }
 
 /* To be moved to DEVICE_START( pxa255 ) upon completion */
-static void pxa255_start(running_machine *machine)
+static void pxa255_start(running_machine* machine)
 {
 	int index = 0;
 
@@ -1116,10 +1127,15 @@ static void pxa255_start(running_machine *machine)
 	for(index = 0; index < 16; index++)
 	{
 		dma_regs.dcsr[index] = 0x00000008;
+		dma_regs.timer[index] = timer_alloc(machine, pxa255_dma_dma_end, 0);
 	}
 
-	ostimer_regs.osmr0 = ostimer_regs.osmr1 = ostimer_regs.osmr2 = ostimer_regs.osmr3 = 0;
 	ostimer_regs.oscr = ostimer_regs.ossr = ostimer_regs.ower = ostimer_regs.oier = 0;
+	for(index = 0; index < 4; index++)
+	{
+		ostimer_regs.osmr[index] = 0;
+		ostimer_regs.timer[index] = timer_alloc(machine, pxa255_ostimer_match, 0);
+	}
 
 	intc_regs.icmr = intc_regs.iclr = intc_regs.iccr = intc_regs.icip = intc_regs.icfp = intc_regs.icpr = 0;
 
@@ -1178,4 +1194,15 @@ ROM_START( 39in1 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END
 
+ROM_START( arm4in1 )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+        ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+        ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+ROM_END
+
 GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT0, "????", "39 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "????", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)

@@ -2837,6 +2837,7 @@ src/mame/machine/pgmprot.c svneol=native#text/plain
 src/mame/machine/pitnrun.c svneol=native#text/plain
 src/mame/machine/playch10.c svneol=native#text/plain
 src/mame/machine/psx.c svneol=native#text/plain
+src/mame/machine/pxa255.h svneol=native#text/plain
 src/mame/machine/qix.c svneol=native#text/plain
 src/mame/machine/r2crypt.c svneol=native#text/plain
 src/mame/machine/rainbow.c svneol=native#text/plain
