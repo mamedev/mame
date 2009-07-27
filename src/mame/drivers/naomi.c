@@ -926,15 +926,17 @@ Notes:
                ----------------------
                Chase 1929
                Dirty Pigskin
-               Faster Than Speed
+               Faster Than Speed *
                Force Five
                Guilty Gear X Version 1.5 *
                Kenju
-               Maximum Speed
+               Maximum Speed *
                Metal Slug 6 *
                Premier Eleven
                Sushi Bar
                The King Of Fighters XI *
+               Sega Clay Challenge *
+               Sega Bass Fishing Challenge *
 
 
 Network Board
