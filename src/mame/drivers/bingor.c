@@ -63,7 +63,7 @@ static READ16_HANDLER( test_r )
 static ADDRESS_MAP_START( bingor_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16) //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE(&paletteram16) //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE(&blit_ram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -143,6 +143,12 @@ static INTERRUPT_GEN( vblank_irq )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x4c/4); // ?
 }
 
+static INTERRUPT_GEN( unk_irq )
+{
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x48/4); // ?
+}
+
+
 static const gfx_layout bingor_layout =
 {
 	8,8,
@@ -164,7 +170,8 @@ static MACHINE_DRIVER_START( bingor )
 	MDRV_CPU_PROGRAM_MAP(bingor_map)
 	MDRV_CPU_IO_MAP(bingor_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
-//	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 30)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 30)
+	MDRV_CPU_PERIODIC_INT(unk_irq, 30)
 
 	MDRV_CPU_ADD("pic", PIC16C57, 12000000) //?? Mhz
 	MDRV_CPU_IO_MAP(pic_io_map)
