@@ -1209,7 +1209,7 @@ ROM_START( 39in1 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END
 
-ROM_START( arm4in1 )
+/*ROM_START( arm4in1 )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
         ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
@@ -1217,7 +1217,7 @@ ROM_START( arm4in1 )
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x200000, "data", 0 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
-ROM_END
+ROM_END*/
 
 GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT0, "????", "39 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "????", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+//GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "????", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
