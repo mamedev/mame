@@ -24,6 +24,7 @@
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/eeprom.h"
 #include "machine/pxa255.h"
 
 static void pxa255_dma_irq_check(running_machine* machine);
@@ -647,14 +648,11 @@ static WRITE32_HANDLER( pxa255_intc_w )
 
 static READ32_HANDLER( pxa255_gpio_r )
 {
-	static int toggler = 0;
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs.gplr0 | (1 << 1), mem_mask );
-			printf("\n");
-			toggler ^= 1;
-			return gpio_regs.gplr0 | (1 << 1) | (toggler << 5); // Must be on.  Probably a DIP switch.
+			return gpio_regs.gplr0 | (1 << 1) | (eeprom_read_bit() << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
 			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs.gplr1, mem_mask );
 			return gpio_regs.gplr1;
@@ -767,11 +765,19 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 			break;
 		case PXA255_GPSR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask );
+			gpio_regs.gpsr0 |= data & gpio_regs.gpdr0;
+			if(data & 0x00000004)
+			{
+				eeprom_set_cs_line(ASSERT_LINE);
+			}
+			if(data & 0x00000008)
+			{
+				eeprom_set_clock_line(ASSERT_LINE);
+			}
 			if(data & 0x00000010)
 			{
-				printf("1");
+				eeprom_write_bit(1);
 			}
-			gpio_regs.gpsr0 |= data & gpio_regs.gpdr0;
 			break;
 		case PXA255_GPSR1:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 1: %08x & %08x\n", data, mem_mask );
@@ -784,9 +790,17 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 		case PXA255_GPCR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs.gpsr0 &= ~(data & gpio_regs.gpdr0);
+			if(data & 0x00000004)
+			{
+				eeprom_set_cs_line(CLEAR_LINE);
+			}
+			if(data & 0x00000008)
+			{
+				eeprom_set_clock_line(CLEAR_LINE);
+			}
 			if(data & 0x00000010)
 			{
-				printf("0");
+				eeprom_write_bit(0);
 			}
 			break;
 		case PXA255_GPCR1:
@@ -920,7 +934,7 @@ static void pxa255_lcd_check_load_next_branch(running_machine* machine, int chan
 	if(lcd_regs.fbr[channel] & 1)
 	{
 		lcd_regs.fbr[channel] &= ~1;
-		printf( "%08x\n", memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) );
+		//printf( "%08x\n", memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) );
 		lcd_regs.fbr[channel] |= memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0) & 0xfffffff0;
 		pxa255_lcd_load_dma_descriptor(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lcd_regs.fbr[channel] & 0xfffffff0, 0);
 		pxa255_lcd_dma_kickoff(machine, 0);
@@ -1178,6 +1192,7 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)	// completely bogus for this h/w
 
 	MDRV_MACHINE_START(39in1)
+	MDRV_NVRAM_HANDLER(93C66B)
 
 	MDRV_VIDEO_UPDATE(39in1)
 
