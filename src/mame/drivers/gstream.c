@@ -2,7 +2,7 @@
 
     G-Stream (c)2002 Oriental Soft Japan
 
-    Are 'Oriental Soft Japan' actually a Korean company?
+    Is 'Oriental Soft Japan' actually a Korean company?
 
     Hyperstone based hardware
 
@@ -87,10 +87,38 @@
     gs_snd_02.bin  524288  0xe49ed92c    27C040
     gs_snd_03.bin  524288  0x2bfff4ac    27C040
     gs_snd_04.bin  524288  0xb259de3b    27C040
-    u56.bin        524288  0x0d0c6a38    27C040
+    gs_prg_01.bin  524288  0x0d0c6a38    27C040
 
     . Board supplied by Tormod
     . Board dumped by Tormod
+
++------------------------------------------------+
+|        GS_SND_01   RAM4  16MHz     RAM1 S2 BT1 |
+|  AD-65 GS_SND_02 GS_PRG_01 E1-32XT RAM1        |
+| VOL    GS_SND_03                               |
+|J AD-65 GS_SND_04                      GS_GR_07 |
+|A    1MHz     GS_PRG_02 XC95288   RAM2 GS_GR_08 |
+|M             GS_GR_01  RAM2           GS_GR_09 |
+|M      RAM4   GS_GR_02   XC95288 27MHz GS_GR_10 |
+|A      RAM4   GS_GR_03           54MHz GS_GR_11 |
+|              GS_GR_04       S3        GS_GR_12 |
+|    GAL       GS_GR_05       RAM3 RAM3 GS_GR_13 |
+|    GAL       GS_GR_06       RAM3 RAM3 GS_GR_13 |
++------------------------------------------------+
+
+  CPU: Hyperstone E1-32XT
+Sound: OKI 6295 x 2 (rebaged as AD-65)
+  OSC: 54.000MHz, 27.000MHz, 16.000MHz & 1.000MHz
+Other: Sigma Xilinx XC95255 x 2
+
+S2 is Toggle switch to reset high scores.
+S3 is a 2 position dipswitch bank.
+BT1 is 3.6V battery for high scores backup.
+
+RAM1 is SEC KM416C1204CJ-6
+RAM2 is SEC KM416C1002CJ-12
+RAM3 is EliteMT LP621024DM-70LL
+RAM4 is HMC HM6264LP-70
 
 *********************************************************************/
 
@@ -199,7 +227,7 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 {
 	/* OKI BANKING  (still far from perfect, based on game behaviour)
 
-    The two okis can indifferently play music or samples and are switched on the fly during game
+    The two OKis can independently play music or samples and are switched on the fly during game
     This is a preliminary table of the banks:
 
     BANK    MUSIC   SAMPLES
@@ -474,34 +502,34 @@ MACHINE_DRIVER_END
 
 ROM_START( gstream )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "u56.bin", 0x000000, 0x080000, CRC(0d0c6a38) SHA1(a810bfc1c9158cccc37710d0ea7268e26e520cc2) )
+	ROM_LOAD( "gs_prg_01.u56", 0x000000, 0x080000, CRC(0d0c6a38) SHA1(a810bfc1c9158cccc37710d0ea7268e26e520cc2) )
 
 	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "gs_prg_02.bin", 0x000000, 0x200000, CRC(2f8a6bea) SHA1(c0a32838f4bd8599f09002139f87562db625c1c5) )
+	ROM_LOAD16_WORD_SWAP( "gs_prg_02.u197", 0x000000, 0x200000, CRC(2f8a6bea) SHA1(c0a32838f4bd8599f09002139f87562db625c1c5) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* sprite tiles (16x16x8) */
-	ROM_LOAD32_WORD( "gs_gr_07.bin", 0x000000, 0x200000, CRC(84e66fe1) SHA1(73d828714f9ed9baffdc06998f5bf3298396fe9c) )
-	ROM_LOAD32_WORD( "gs_gr_11.bin", 0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
-	ROM_LOAD32_WORD( "gs_gr_08.bin", 0x400000, 0x200000, CRC(abd0d6aa) SHA1(dd294bbdda05697df84247257f735ab51bc26ca3) )
-	ROM_LOAD32_WORD( "gs_gr_12.bin", 0x400002, 0x200000, CRC(94b56e4e) SHA1(7c3877f993e575326dbd4c2e5d7570747277b20d) )
-	ROM_LOAD32_WORD( "gs_gr_09.bin", 0x800000, 0x200000, CRC(f2c4fd77) SHA1(284c850688e3c0fd292a91a53e24fe3436dc4076) )
-	ROM_LOAD32_WORD( "gs_gr_13.bin", 0x800002, 0x200000, CRC(7daaeff0) SHA1(5766d9a3a8c0931305424e0089108ce8df7dfe41) )
-	ROM_LOAD32_WORD( "gs_gr_10.bin", 0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
-	ROM_LOAD32_WORD( "gs_gr_14.bin", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
+	ROM_LOAD32_WORD( "gs_gr_07.u107", 0x000000, 0x200000, CRC(84e66fe1) SHA1(73d828714f9ed9baffdc06998f5bf3298396fe9c) )
+	ROM_LOAD32_WORD( "gs_gr_11.bin",  0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
+	ROM_LOAD32_WORD( "gs_gr_08.u109", 0x400000, 0x200000, CRC(abd0d6aa) SHA1(dd294bbdda05697df84247257f735ab51bc26ca3) )
+	ROM_LOAD32_WORD( "gs_gr_12.u110", 0x400002, 0x200000, CRC(94b56e4e) SHA1(7c3877f993e575326dbd4c2e5d7570747277b20d) )
+	ROM_LOAD32_WORD( "gs_gr_09.bin",  0x800000, 0x200000, CRC(f2c4fd77) SHA1(284c850688e3c0fd292a91a53e24fe3436dc4076) )
+	ROM_LOAD32_WORD( "gs_gr_13.u181", 0x800002, 0x200000, CRC(7daaeff0) SHA1(5766d9a3a8c0931305424e0089108ce8df7dfe41) )
+	ROM_LOAD32_WORD( "gs_gr_10.bin",  0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
+	ROM_LOAD32_WORD( "gs_gr_14.u183", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
 
 	ROM_REGION( 0xc00000, "gfx2", 0 )  /* bg tiles (32x32x8) */
-	ROM_LOAD( "gs_gr_01.bin", 0x000000, 0x200000, CRC(b82cfab8) SHA1(08f0eaef5c927fb056c6cc9342e39f445aae9062) )
-	ROM_LOAD( "gs_gr_02.bin", 0x200000, 0x200000, CRC(37e19cbd) SHA1(490ebb037fce09100ec4bba3f73ecdf101526641) )
-	ROM_LOAD( "gs_gr_03.bin", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
-	ROM_LOAD( "gs_gr_04.bin", 0x600000, 0x200000, CRC(a4e8906c) SHA1(b285d7697cdaa62014cf65d09a19fcbd6a95bb98) )
-	ROM_LOAD( "gs_gr_05.bin", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
-	ROM_LOAD( "gs_gr_06.bin", 0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
+	ROM_LOAD( "gs_gr_01.u120", 0x000000, 0x200000, CRC(b82cfab8) SHA1(08f0eaef5c927fb056c6cc9342e39f445aae9062) )
+	ROM_LOAD( "gs_gr_02.u121", 0x200000, 0x200000, CRC(37e19cbd) SHA1(490ebb037fce09100ec4bba3f73ecdf101526641) )
+	ROM_LOAD( "gs_gr_03.u125", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
+	ROM_LOAD( "gs_gr_04.u126", 0x600000, 0x200000, CRC(a4e8906c) SHA1(b285d7697cdaa62014cf65d09a19fcbd6a95bb98) )
+	ROM_LOAD( "gs_gr_05.u174", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
+	ROM_LOAD( "gs_gr_06.bin",  0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
 
 	ROM_REGION( 0x200000, "oki1", 0 )
-	ROM_LOAD( "gs_snd_01.bin", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
-	ROM_LOAD( "gs_snd_02.bin", 0x080000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
-	ROM_LOAD( "gs_snd_03.bin", 0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
-	ROM_LOAD( "gs_snd_04.bin", 0x180000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
+	ROM_LOAD( "gs_snd_01.u192", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
+	ROM_LOAD( "gs_snd_02.u194", 0x080000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
+	ROM_LOAD( "gs_snd_03.bin",  0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
+	ROM_LOAD( "gs_snd_04.u193", 0x180000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_COPY( "oki1", 0, 0, 0x200000 )
