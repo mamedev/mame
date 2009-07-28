@@ -174,24 +174,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aquarium )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x000c, "Winning Rounds (Player VS CPU)" )
+	PORT_DIPNAME( 0x000c, 0x000c, "Winning Rounds (Player VS CPU)" )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x000c, "1/1" )
 	PORT_DIPSETTING(      0x0008, "2/3" )
 	PORT_DIPSETTING(      0x0004, "3/5" )
-//  PORT_DIPSETTING(      0x0000, "1/1" )
-	PORT_DIPNAME( 0x0030, 0x0030, "Winning Rounds (Player VS Player)" )
+//  PORT_DIPSETTING(      0x0000, "1/1" )					/* Not used or listed in manual */
+	PORT_DIPNAME( 0x0030, 0x0030, "Winning Rounds (Player VS Player)" )	PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0030, "1/1" )
 	PORT_DIPSETTING(      0x0020, "2/3" )
 	PORT_DIPSETTING(      0x0010, "3/5" )
-//  PORT_DIPSETTING(      0x0000, "1/1" )
-	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )
+//  PORT_DIPSETTING(      0x0000, "1/1" )					/* Not used or listed in manual */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )			/* Listed in the manual as always OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )			/* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -200,15 +200,15 @@ static INPUT_PORTS_START( aquarium )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPUNUSED( 0x0800, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )	// to be confirmed - code at 0x01f82c
+	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" )			/* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )			/* Listed in the manual as always OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )			/* Listed in the manual as always OFF */
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
