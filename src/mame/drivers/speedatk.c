@@ -77,13 +77,15 @@ PS / PD :  key matrix
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
 
 static UINT8 mux_data;
 static UINT8 km_status,coin_settings;
 
+#define MASTER_CLOCK XTAL_12MHz
+
 extern WRITE8_HANDLER( speedatk_videoram_w );
 extern WRITE8_HANDLER( speedatk_colorram_w );
-extern WRITE8_HANDLER( speedatk_videoregs_w );
 extern PALETTE_INIT( speedatk );
 extern VIDEO_START( speedatk );
 extern VIDEO_UPDATE( speedatk );
@@ -165,10 +167,20 @@ static READ8_HANDLER( key_matrix_status_r )
 	return (km_status & 0xfe) | 1;
 }
 
+/*
+high four bits are for command, low four are for param
+My guess is that the other commands configs the key matrix, it probably needs some tests on the real thing.
+1f
+3f
+41
+61
+8x coinage setting command
+a1
+*/
 static WRITE8_HANDLER( key_matrix_status_w )
 {
 	km_status = data;
-	if(km_status & 0x80 && km_status < 0xa0)
+	if((km_status & 0xf0) == 0x80) //coinage setting command
 		coin_settings = km_status & 0xf;
 }
 
@@ -176,24 +188,19 @@ static ADDRESS_MAP_START( speedatk_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_videoregs_w) // HD46505SP video registers
-	AM_RANGE(0x24, 0x24) AM_WRITENOP //video timing
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW") /* likely ay8910 input port, not direct */
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)  //watchdog
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
-	/*Used only during attract mode,unknown meaning.*/
-	AM_RANGE(0x60, 0x60) AM_READWRITE(SMH_NOP,SMH_NOP)//write the result to $62/$65
-	AM_RANGE(0x61, 0x61) AM_READNOP//write the result to $66
-	AM_RANGE(0x62, 0x62) AM_WRITENOP
-	AM_RANGE(0x65, 0x65) AM_WRITENOP
-	AM_RANGE(0x66, 0x66) AM_WRITENOP
-	AM_RANGE(0x68, 0x68) AM_READNOP//bit 7 controls writings to ram address at $880f-$8810
+	//what's 60-6f for? Seems used only in attract mode...
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speedatk )
@@ -220,28 +227,28 @@ static INPUT_PORTS_START( speedatk )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
 	PORT_START("P1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //P1 A
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //P1 B
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //P1 C
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) //P1 D
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 D") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Left") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Right") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) //P1 Turn
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Turn") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //P2 A
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //P2 B
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //P2 C
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) //P2 D
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Left")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Right")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) //P2 Turn
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Turn")
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -278,11 +285,45 @@ static GFXDECODE_START( speedatk )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+static WRITE8_DEVICE_HANDLER( speedatk_output_w )
+{
+	//flip_screen_set(device->machine, data & 0x80); //breaks the video emulation?
+
+	//if((data & 0x7f) != 0x7f)
+	//popmessage("%02x",data);
+}
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_HANDLER(speedatk_output_w),
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( speedatk )
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
 	MDRV_CPU_IO_MAP(speedatk_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -290,7 +331,9 @@ static MACHINE_DRIVER_START( speedatk )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 29*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+
+	MDRV_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
 
 	MDRV_GFXDECODE(speedatk)
 	MDRV_PALETTE_LENGTH(0x100)
@@ -302,8 +345,9 @@ static MACHINE_DRIVER_START( speedatk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 4000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/4) //divider is unknown
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
 ROM_START( speedatk )
@@ -327,5 +371,5 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", 0 )
+GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", GAME_NO_COCKTAIL )
 
