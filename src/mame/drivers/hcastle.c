@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( hcastle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
 	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
 	AM_RANGE(0x0413, 0x0413) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0418, 0x0418) AM_READWRITE(hcastle_gfxbank_r, hcastle_gfxbank_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)
 	AM_RANGE(0x0700, 0x1fff) AM_RAM
@@ -110,44 +110,40 @@ static INPUT_PORTS_START( hcastle )
 	KONAMI8_COCKTAIL_B12_UNK
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Unused SW 1-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unused SW 1-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
+	/* "Invalid" = both coin slots disabled */
+
+	PORT_START("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )	// "Difficulty 1"
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			// DEF_STR( Easy )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// "Nomal" !
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			// "Difficult"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// "Very Difficult"
-	PORT_DIPNAME( 0x60, 0x40, "Damage" )				// "Difficulty 2"
-	PORT_DIPSETTING(    0x60, "Small" )					// "Strong"
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// "Nomal" !
-	PORT_DIPSETTING(    0x20, "Big" )					// "Weak"
-	PORT_DIPSETTING(    0x00, "Biggest" )				// "Very Weak"
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x18, 0x10, "Difficulty 1 (Game)" )		PORT_DIPLOCATION("SW2:4,5")	/* Overall difficulty of game */
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x60, 0x40, "Difficulty 2 (Strength)" )		PORT_DIPLOCATION("SW2:6,7")	/* Listed in manual as "Strength of Player" */
+	PORT_DIPSETTING(    0x00, "Very Weak" )							/* Takes most damage per hit */
+	PORT_DIPSETTING(    0x20, "Weak" )							/* Takes more damage per hit */
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )						/* Takes average damage per hit */
+	PORT_DIPSETTING(    0x60, "Strong" )							/* Takes least damage per hit */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")
-	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
-	/* "Invalid" = both coin slots disabled */
-
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x08, "Up to 3 Times" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
