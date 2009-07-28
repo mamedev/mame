@@ -211,7 +211,7 @@ const game_driver * const drivers[] =
 	DRIVER( blkhole )	/* TDS (Tokyo Denshi Sekkei) */
 	DRIVER( kingball )	/* (c) 1980 Namco */
 	DRIVER( kingballj )	/* (c) 1980 Namco */
-	DRIVER( scorpnmc )	/* bootleg */
+	DRIVER( scorpionmc )/* bootleg */
 	DRIVER( frogg )		/* bootleg */
 	DRIVER( 4in1 )		/* (c) 1981 Armenia / Food and Fun */
 	DRIVER( bagmanmc )	/* bootleg */
@@ -241,13 +241,13 @@ const game_driver * const drivers[] =
 
 	/* "Scramble hardware" (and variations) games */
 	DRIVER( scramble )	/* GX387 (c) 1981 Konami */
-	DRIVER( scrambls )	/* GX387 (c) 1981 Stern */
+	DRIVER( scrambles )	/* GX387 (c) 1981 Stern */
 	DRIVER( scramblb )	/* bootleg */
 	DRIVER( scramb2 )	/* bootleg */
 	DRIVER( explorer )	/* bootleg */
 	DRIVER( strfbomb )	/* bootleg */
 	DRIVER( atlantis )	/* (c) 1981 Comsoft */
-	DRIVER( atlants2 )	/* (c) 1981 Comsoft */
+	DRIVER( atlantis2 )	/* (c) 1981 Comsoft */
 	DRIVER( theend )	/* (c) 1980 Konami */
 	DRIVER( theends )	/* (c) 1980 Stern */
 	DRIVER( omega )		/* bootleg */
@@ -327,8 +327,8 @@ const game_driver * const drivers[] =
 	DRIVER( imago )		/* (c) 1984 Acom */
 	DRIVER( imagoa )	/* (c) 1983 Acom */
 	DRIVER( scorpion )	/* (c) 1982 Zaccaria */
-	DRIVER( scrpiona )	/* (c) 1982 Zaccaria */
-	DRIVER( scrpionb )	/* (c) 1982 Zaccaria */
+	DRIVER( scorpiona )	/* (c) 1982 Zaccaria */
+	DRIVER( scorpionb )	/* (c) 1982 Zaccaria */
 	DRIVER( ad2083 )	/* (c) 1983 Midcoin */
 	DRIVER( turpins )	/* (c) 1981 bootleg */
 
@@ -583,12 +583,12 @@ const game_driver * const drivers[] =
 	DRIVER( capitol )	/* bootleg? */
 	DRIVER( survival )	/* (c) 1982 Rock-ola */
 	DRIVER( naughtyb )	/* (c) 1982 Jaleco */
-	DRIVER( naughtya )	/* bootleg */
-	DRIVER( naughtyc )	/* (c) 1982 Jaleco + Cinematronics */
+	DRIVER( naughtyba )	/* bootleg */
+	DRIVER( naughtybc )	/* (c) 1982 Jaleco + Cinematronics */
 	DRIVER( popflame )	/* (c) 1982 Jaleco */
-	DRIVER( popflama )	/* (c) 1982 Jaleco */
-	DRIVER( popflamb )	/* (c) 1982 Jaleco */
-	DRIVER( popflamn )	/* (c) 1982 Jaleco */
+	DRIVER( popflamea )	/* (c) 1982 Jaleco */
+	DRIVER( popflameb )	/* (c) 1982 Jaleco */
+	DRIVER( popflamen )	/* (c) 1982 Jaleco */
 	DRIVER( trvmstr )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstra )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstrb )	/* (c) 1985 Enerdyne Technologies Inc. */
@@ -974,7 +974,7 @@ const game_driver * const drivers[] =
 	DRIVER( helifire )	/* (c) 1980 Nintendo */
 	DRIVER( helifirea )	/* (c) 1980 Nintendo */
 	DRIVER( radarscp )	/* (c) 1980 Nintendo */
-	DRIVER( radarsc1 )	/* (c) 1980 Nintendo */
+	DRIVER( radarscp1 )	/* (c) 1980 Nintendo */
 	DRIVER( dkong )		/* (c) 1981 Nintendo of America */
 	DRIVER( dkongo )	/* (c) 1981 Nintendo */
 	DRIVER( dkongj )	/* (c) 1981 Nintendo */
@@ -1389,7 +1389,7 @@ const game_driver * const drivers[] =
 	/* trivia: IREM means "International Rental Electronics Machines" */
 	DRIVER( andromed )	/* (c) 1979 */
 	DRIVER( ipminvad )	/* M10 no copyright notice (Arcade TV Game List - P.67, Left, 26 from top) */
-	DRIVER( ipminva1 )	/* M10 incomplete dump */
+	DRIVER( ipminvad1 )	/* M10 incomplete dump */
 	DRIVER( ptrmj )		/* M14 (c) 1979  */
 	DRIVER( skychut )	/* Irem [1980] */
 	DRIVER( spacbeam )	/* M15 no copyright notice */

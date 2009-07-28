@@ -1806,7 +1806,7 @@ ROM_START( radarscp )
     ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( radarsc1 )
+ROM_START( radarscp1 )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
     ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -2943,7 +2943,7 @@ static DRIVER_INIT( strtheat )
  *************************************/
 
 GAME( 1980, radarscp, 0,        radarscp, radarscp,       0, ROT90, "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
-GAME( 1980, radarsc1, radarscp, radarsc1, radarscp,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarscp1,radarscp, radarsc1, radarscp,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, dkong,    0,        dkong2b,  dkong,          0,  ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongo,   dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )

@@ -468,7 +468,7 @@ ROM_START( naughtyb )
 	ROM_LOAD( "6301-1.64", 0x0100, 0x0100, CRC(909107d4) SHA1(138ace7845424bc3ca86b0889be634943c8c2d19) ) /* palette high bits */
 ROM_END
 
-ROM_START( naughtya )
+ROM_START( naughtyba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "91", 	   0x0000, 0x0800, CRC(42b14bc7) SHA1(a5890834105b83f6761a5ea819e94533473f0e44) )
 	ROM_LOAD( "92", 	   0x0800, 0x0800, CRC(a24674b4) SHA1(2d93981c2f0dea190745cbc3926b012cfd561ec3) )
@@ -496,7 +496,7 @@ ROM_START( naughtya )
 	ROM_LOAD( "6301-1.64", 0x0100, 0x0100, CRC(909107d4) SHA1(138ace7845424bc3ca86b0889be634943c8c2d19) ) /* palette high bits */
 ROM_END
 
-ROM_START( naughtyc )
+ROM_START( naughtybc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nb1ic30",   0x0000, 0x0800, CRC(3f482fa3) SHA1(5c670ad37be5bed12a65b8b02330525cfe5ae303) )
 	ROM_LOAD( "nb2ic29",   0x0800, 0x0800, CRC(7ddea141) SHA1(8a725614b156f1fdb249c2767ddb3f04681e7a3f) )
@@ -544,7 +544,7 @@ ROM_START( popflame )
 	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
 ROM_END
 
-ROM_START( popflama )
+ROM_START( popflamea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic86.pop",	  0x0000, 0x1000, CRC(5e32bbdf) SHA1(b75e3125301d05f5fb6bcef85d0028de2ee75fab) )
 	ROM_LOAD( "ic80.pop",	  0x1000, 0x1000, CRC(b77abf3d) SHA1(8626af8fe7d10c52bea7570dd6237de60607bab6) )
@@ -564,7 +564,7 @@ ROM_START( popflama )
 	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
 ROM_END
 
-ROM_START( popflamb )
+ROM_START( popflameb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "popflama.30",	 0x0000, 0x1000, CRC(a9bb0e8a) SHA1(1948be9545401b8163e0f2fa8e962ea66c26d9e0) )
 	ROM_LOAD( "popflama.28",	 0x1000, 0x1000, CRC(debe6d03) SHA1(2365c57a0a08563bea31ab150934dcfc1e6eba58) )
@@ -602,7 +602,7 @@ Note
 This romset comes from a bootleg pcb.It's a Naughty Boy conversion.
 */
 
-ROM_START( popflamn )
+ROM_START( popflamen )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pfb2-1.bin",	  0x0000, 0x0800, CRC(88cd3faa) SHA1(5232aaadfc0a7275e19176a6e49e178c29cd463b) )
 	ROM_LOAD( "pfb2-2.bin",	  0x0800, 0x0800, CRC(a09892e8) SHA1(7a56878e3b01023cfa412f7ce7515e34877ff062) )
@@ -818,12 +818,12 @@ static DRIVER_INIT( trvmstr )
 
 
 GAME( 1982, naughtyb, 0,		naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Naughty Boy", 0 )
-GAME( 1982, naughtya, naughtyb, naughtyb, naughtyb, 0,        ROT90, "bootleg", "Naughty Boy (bootleg)", 0 )
-GAME( 1982, naughtyc, naughtyb, naughtyb, naughtyb, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", 0 )
+GAME( 1982, naughtyba,naughtyb, naughtyb, naughtyb, 0,        ROT90, "bootleg", "Naughty Boy (bootleg)", 0 )
+GAME( 1982, naughtybc,naughtyb, naughtyb, naughtyb, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", 0 )
 GAME( 1982, popflame, 0,		popflame, naughtyb, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", 0 )
-GAME( 1982, popflama, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", 0 )
-GAME( 1982, popflamb, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", 0 )
-GAME( 1982, popflamn, popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", 0 )
+GAME( 1982, popflamea,popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", 0 )
+GAME( 1982, popflameb,popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", 0 )
+GAME( 1982, popflamen,popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", 0 )
 GAME( 1985, trvmstr,  0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", 0 )
 GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", 0 )
 GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", 0 )

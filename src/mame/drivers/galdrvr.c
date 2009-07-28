@@ -4291,7 +4291,7 @@ ROM_START( scramble )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( scrambls )
+ROM_START( scrambles )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2d",           0x0000, 0x0800, CRC(b89207a1) SHA1(5422df979e82bcc73df49f50515fe76c126c037b) )
 	ROM_LOAD( "2e",           0x0800, 0x0800, CRC(e9b4b9eb) SHA1(a8ee9ddfadf5e9accedfaf81da757a88a2e55a0a) )
@@ -4381,7 +4381,7 @@ ROM_START( atlantis )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( atlants2 )
+ROM_START( atlantis2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1",         0x0000, 0x0800, CRC(ad348089) SHA1(3548b94192c451c0126e7aaecefa7137ae074cd3) )
 	ROM_LOAD( "rom2",         0x0800, 0x0800, CRC(caa705d1) SHA1(b4aefbea21fa9608e1dae2a09ae0d31270eb8c78) )
@@ -4432,7 +4432,7 @@ ROM_START( scorpion )
 	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( scrpiona )
+ROM_START( scorpiona )
 	/* this dump is bad (at least one rom) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scor_d2.bin",  0x0000, 0x1000, BAD_DUMP CRC(c5b9daeb) SHA1(faf7a22013dd5f063eb8f506f3722cfd5522539a) )
@@ -4459,7 +4459,7 @@ ROM_START( scrpiona )
 	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( scrpionb )
+ROM_START( scorpionb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic109.2d",         0x0000, 0x1000, CRC(f54688c9) SHA1(2881d5238733353b9c277a2829d157688a87601b) )
 	ROM_LOAD( "ic110.2e",         0x1000, 0x1000, CRC(91aaaa12) SHA1(2a5e5eb5aeec5637ee4675930f67158a969e0d5d) )
@@ -4485,7 +4485,7 @@ ROM_START( scrpionb )
 	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( scorpnmc )
+ROM_START( scorpionmc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p1.bin",       0x0000, 0x0800, CRC(58818d88) SHA1(d9fbfb6fff9ba1d078c3735889b8878ab0442ded) )
 	ROM_LOAD( "p2.bin",       0x0800, 0x0800, CRC(8bec5f9f) SHA1(78642124edbf946140f62985bafe2dca314cb257) )
@@ -5139,18 +5139,18 @@ GAME( 1980, theend,   0,        theend,   theend,   theend,   ROT90,  "Konami", 
 GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "[Konami] (Stern license)", "The End (Stern)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, scramble, 0,        scramble, scramble, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
-GAME( 1981, scrambls, scramble, scramble, scramble, scramble, ROT90,  "[Konami] (Stern license)", "Scramble (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "[Konami] (Stern license)", "Scramble (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1981, strfbomb, scramble, scramble, strfbomb, scramble, ROT90,  "Omni", "Strafe Bomb", GAME_SUPPORTS_SAVE )
 GAME( 1981, explorer, scramble, explorer, explorer, explorer, ROT90,  "bootleg", "Explorer", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, atlantis, 0,        theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, atlants2, atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, atlantis2,atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion, 0,		scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1982, scrpiona, scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1982, scrpionb, scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 19??, scorpnmc, scorpion, mooncrst, scorpnmc, scorpnmc, ROT90,  "Dorneer",  "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, scorpiona,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1982, scorpionb,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 19??, scorpionmc,scorpion, mooncrst, scorpnmc, scorpnmc, ROT90,  "Dorneer",  "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
