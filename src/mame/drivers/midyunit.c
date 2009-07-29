@@ -1161,6 +1161,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( narc )
+	ROM_REGION( 0x90000, "narc1cpu", 0 )    /* sound CPU */
 	ROM_LOAD( "narcrev2.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) )
 	ROM_RELOAD(              0x60000, 0x10000 )
 	ROM_LOAD( "narcrev2.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
