@@ -98,7 +98,7 @@ endif
 #-------------------------------------------------
 
 # uncomment next line to build a debug version
-# DEBUG = 1
+DEBUG = 1
 
 # uncomment next line to include the internal profiler
 # PROFILER = 1
