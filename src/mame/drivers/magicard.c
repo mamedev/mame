@@ -588,11 +588,11 @@ static DRIVER_INIT( magicard )
 	//...
 }
 
-/*    YEAR  NAME      PARENT MACHINE   INPUT  INIT  ROT    COMPANY   FULLNAME             FLAGS... */
+/*    YEAR  NAME      PARENT     MACHINE  INPUT  INIT   ROT    COMPANY   FULLNAME             FLAGS... */
 
-GAME( 199?, magicard, 0,      magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicarda, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicardb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicard,  0,        magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicarda, magicard, magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicardb, magicard, magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*Below here there are CD-I bios defines,to be removed in the end*/
 ROM_START( mcdi200 )
