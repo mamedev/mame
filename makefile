@@ -128,13 +128,13 @@ BUILD_EXPAT = 1
 BUILD_ZLIB = 1
 
 # uncomment next line to include the symbols
-SYMBOLS = 1
+# SYMBOLS = 1
 
 # uncomment next line to include profiling information from the compiler
 # PROFILE = 1
 
 # uncomment next line to generate a link map for exception handling in windows
-MAP = 1
+# MAP = 1
 
 # uncomment next line to generate verbose build information
 # VERBOSE = 1
