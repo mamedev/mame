@@ -4137,7 +4137,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( harley )	/* 1997.12 Harley Davidson & L.A.Riders */
 	DRIVER( skichamp )	/* 1998.01 Ski Champ */
 	DRIVER( srally2 )	/* 1998.02 Sega Rally 2 Championship */
-	DRIVER( srally2dx )
+	DRIVER( srally2x )
 	DRIVER( von2 )		/* 1998.03 Dennou Senki Virtual-On Oratorio Tangram */
 	DRIVER( fvipers2 )	/* 1998.04 Fighting Vipers 2 */
 	DRIVER( vs298 )		/* 1998.05 Virtua Striker 2 ver.98*/
@@ -4155,9 +4155,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( swtrilgya )
 						/* 1998.11 Magical Torokko Adventure (Japan) */
 						/* 1998.12 L.A. Machine Guns */
-	DRIVER( daytona2pe )	/* 1998.12 Daytone USA 2 Power Edition */
+	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
 						/* 1998.12 Virtua Striker 2 ver.99 */
-	DRIVER( spikeoutfe )	/* 1999.01 Spikeout Final Edition */
+	DRIVER( spikeofe )	/* 1999.01 Spikeout Final Edition */
 	DRIVER( magtruck )	/* 1999.03 Magical Truck Adventure (US) */
 	DRIVER( eca )		/* 1999.10 Kyukyuusya Emergency Call Ambulance */
 	DRIVER( ecax )
