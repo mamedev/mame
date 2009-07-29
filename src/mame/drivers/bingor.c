@@ -221,9 +221,9 @@ ROM_START( bingor2 )
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_l.bin", 0x000000, 0x08000, CRC(aa464ef9) SHA1(e74e60396478d7a6556b0d16c4d8c0acefa8faad) )
 	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_h.bin", 0x000001, 0x08000, CRC(02816885) SHA1(b98b527a72847412479b6b8e153f236757d9eb4e) )
 
-	ROM_REGION( 0x10000, "gfx", 0 ) /* blitter data? */
-	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x08000, CRC(764bf28e) SHA1(b11923d456c132e680ba85bd10797f4c674cc357) )
-	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x08000, CRC(409b6de4) SHA1(04bacade622b17116ef55dc9b44826b62e8b36e8) )
+	ROM_REGION( 0x20000, "gfx", 0 ) /* blitter data? */
+	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
+	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
 	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
@@ -238,7 +238,7 @@ ROM_START( bingor3 )
 	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_2.bin", 0x000001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
 	ROM_REGION( 0x10000, "gfx", 0 ) /* blitter data? */
-	ROM_LOAD16_BYTE( "bsg-11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) )
+	ROM_LOAD16_BYTE( "bsg-11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "bsg-11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
 	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
@@ -255,9 +255,9 @@ ROM_START( bingor4 )
 	ROM_LOAD16_BYTE( "01.bin", 0x000000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
 	ROM_LOAD16_BYTE( "02.bin", 0x000001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
-	ROM_REGION( 0x10000, "gfx", 0 ) /* blitter data? */
-	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x08000, CRC(764bf28e) SHA1(b11923d456c132e680ba85bd10797f4c674cc357) )
-	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x08000, CRC(409b6de4) SHA1(04bacade622b17116ef55dc9b44826b62e8b36e8) )
+	ROM_REGION( 0x20000, "gfx", 0 ) /* blitter data? */
+	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
+	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
 	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
 	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
