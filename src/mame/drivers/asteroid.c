@@ -39,7 +39,14 @@ For kit 08-0303008 (from rev 02) swap the following:
  035144-02 --> 034144-04E
  035145-02 --> 034145-04E
 
-There is not a rev 3 known, mentioned or dumped
+  A rom set was found labeled:
+
+    035144-02-03
+    035145-02-03
+
+  However, when dumped they matched the rev 02 set.
+
+There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in any known Atari docs found to date.
 
     Asteroids-deluxe state-prom added by HIGHWAYMAN.
     The prom pcb location is:C8 and is 256x4
