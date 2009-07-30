@@ -36,6 +36,7 @@
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
+    * Royal Card Professional 2.0,                      Digital Dreams,     1993.
     * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
     * Lucky Lady (4x1 aces),                            TAB-Austria,        1991.
     * Magic Card II (bulgarian),                        Impera,             1996.
@@ -216,6 +217,11 @@
     * Jolly Card (croatian sets) and Jolly Card Professional 2.0
 
     These games don't operate with regular coins/tokens. Only remote credits are allowed.
+
+
+    * Royal Card Professional 2.0 (Digital Dreams)
+
+    Same generated code as Jolly Card Professional.
 
 
     * Magic Card II (Impera)
@@ -2687,6 +2693,21 @@ ROM_START( royalcdc )	/* encrypted program rom */
 	ROM_LOAD( "2-peel18cv8p.bin",   0x0400, 0x0155, NO_DUMP )	/* not present in the set */
 ROM_END
 
+ROM_START( royalcdp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u16_m27c256b.bin", 0x8000, 0x8000, CRC(162996ff) SHA1(122c13ee9842e692d31490f216eb972df2321b7f) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "u11_tms27c256.bin",0x0000, 0x8000, CRC(d6834c3a) SHA1(4b071b9826c086439b9763393b23c671261b3788) )
+	ROM_LOAD( "u4_nmc27c256.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+	
+	ROM_REGION( 0x0200, "proms", 0 )	/* not present in the set */
+	ROM_LOAD( "n82s147.bin",      0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+
+	ROM_REGION( 0x0200, "plds", 0 )	/* correct PAL dump */
+	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+ROM_END
+
 ROM_START( lluck3x3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l3x3.bin", 0x8000, 0x8000, CRC(dbdb07ff) SHA1(6be43aa0b2c10d83373f20f477606cb031bc6dd9) )
@@ -3156,6 +3177,7 @@ GAME( 1996, bottl10b, bottle10, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",   
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
 GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
 GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, funworld, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1993, royalcdp, royalcrd, cuoreuno, royalcrd, funworld, ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1991, lluck3x3, royalcrd, cuoreuno, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
 GAME( 1991, lluck4x1, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
 GAME( 1996, magicrd2, 0,        magicrd2, magicrd2, funworld, ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
