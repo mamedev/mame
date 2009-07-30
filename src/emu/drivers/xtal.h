@@ -61,7 +61,7 @@ enum
 	XTAL_4_608MHz		= 4608000,		/* Luxor ABC-77 keyboard */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
-	XTAL_5_0688MHz		= 5068800,		/* Xerox 820 */
+	XTAL_5_0688MHz		= 5068800,		/* Xerox 820, DEC VK100 */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
 	XTAL_6MHz    		= 6000000,		/* American Poker II */
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
@@ -118,7 +118,7 @@ enum
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_477MHz 		= 21477000,		/* Super Othello */
-	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
+	XTAL_21_4772MHz 	= 21477270,		/* BMC bowling, some Data East 90's games, Vtech Socrates; NTSC color subcarrier * 6 */
 	XTAL_22MHz   		= 22000000,
 	XTAL_22_1184MHz		= 22118400,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
@@ -150,6 +150,7 @@ enum
 	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz   		= 45000000,		/* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz  	= 45158000,		/* Sega Model 2A video board, Model 3 CPU board */
+	XTAL_45_6192Mhz 	= 45619200,		/* DEC VK100 */
 	XTAL_48MHz   		= 48000000,		/* Williams/Midway Y/Z-unit system */
 	XTAL_48_66MHz  		= 48660000,		/* Zaxxon */
 	XTAL_49_152MHz  	= 49152000,		/* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
