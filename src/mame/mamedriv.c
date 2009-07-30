@@ -7853,6 +7853,7 @@ Other Sun games
 	DRIVER( redhawki )	/* (c) 1997 Haedong Corp. license */
 	DRIVER( redhawkb )	/* (c) 1997 */
 	DRIVER( grdnstrm )	/* (c) 1998 */
+	DRIVER( grdnstrmk )	/* (c) 1998 */
 	DRIVER( bubl2000 )	/* (c) 1998 Tuning */
 	DRIVER( hotbubl )	/* (c) 1998 Pandora */
 	DRIVER( popspops )	/* (c) 1999 */
