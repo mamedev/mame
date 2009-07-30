@@ -37,6 +37,7 @@
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
+    * Royal Card Professional 2.0,                      Digital Dreams,     1993.
     * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
     * Lucky Lady (4x1 aces),                            TAB-Austria,        1991.
     * Magic Card II (bulgarian),                        Impera,             1996.

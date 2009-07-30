@@ -1080,7 +1080,9 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 
 static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 {
-/* TAB and Impera games are writting 0x01 constantly, and 0x00 with each screen change */
+/* TAB and Impera games are writting 0x01 constantly, and 0x00 with each screen change.
+   This line is tied to sort of reset circuitery.
+*/
 //  popmessage("PIA1 CA2: %02X", data);
 }
 
@@ -1948,6 +1950,35 @@ GFXDECODE_END
 ***********************/
 
 static const pia6821_interface pia0_intf =
+/*
+    TAB light green board
+	---------------------
+
+                PIA 0                                       PIA 1
+         .--------u--------.                         .--------u--------.
+         |01 VSS     CA1 40|- GND                    |01 VSS     CA1 40|- GND
+         |02 PA0     CA2 39|- N/C                    |02 PA0     CA2 39|- RESET circuitery
+         |03 PA1   /IRQA 38|- N/C                    |03 PA1   /IRQA 38|- 04 CPU (65C02)
+         |04 PA2   /IRQB 37|- N/C                    |04 PA2   /IRQB 37|- N/C
+         |05 PA3    /RS0 36|- 10 ROM(PRG)            |05 PA3    /RS0 36|- 10 ROM(PRG)
+         |06 PA4    /RS1 35|- 09 ROM(PRG)            |06 PA4    /RS1 35|- 23 AY(SOUND)
+         |07 PA5  /RESET 34|- 09 GAL/PAL             |07 PA5  /RESET 34|- 37 AY(SOUND)
+         |08 PA6      D0 33|                         |08 PA6      D0 33|
+         |09 PA7      D1 32|                         |09 PA7      D1 32|
+         |10 PB0      D2 31|                         |10 PB0      D2 31|
+         |11 PB1      D3 30|                         |11 PB1      D3 30|
+         |12 PB2      D4 29|                         |12 PB2      D4 29|
+         |13 PB3      D5 28|                         |13 PB3      D5 28|
+         |14 PB4      D6 27|                         |14 PB4      D6 27|
+         |15 PB5      D7 26|                         |15 PB5      D7 26|
+         |16 PB6       E 25|                         |16 PB6       E 25|
+         |17 PB7     CS1 24|                         |17 PB7     CS1 24|
+    GND -|18 CB1    /CS2 23|                    N/C -|18 CB1    /CS2 23|
+    GND -|19 CB2     CS0 22|                    N/C -|19 CB2     CS0 22|
+         |20 VCC     R/W 21|                         |20 VCC     R/W 21|
+         '-----------------'                         '-----------------'
+
+*/
 {
 	DEVCB_INPUT_PORT("IN0"),		/* port A in */
 	DEVCB_INPUT_PORT("IN1"),		/* port B in */
@@ -2074,7 +2105,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( royalcrd )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 MACHINE_DRIVER_END
 
@@ -2916,10 +2947,6 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-static DRIVER_INIT( funworld )
-{
-}
-
 static DRIVER_INIT( tabblue )
 {
 /****************************************************************************************************
@@ -3149,46 +3176,46 @@ static DRIVER_INIT( saloon )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT             COMPANY            FULLNAME                                          FLAGS  */
-GAME( 1985, jollycrd, 0,        funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0 )
-GAME( 1985, jolyc3x3, jollycrd, funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0 )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                                          FLAGS  */
+GAME( 1985, jollycrd, 0,        funworld, funworld, 0,        ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0 )
+GAME( 1985, jolyc3x3, jollycrd, funworld, funworld, 0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0 )
 GAME( 2000, jolyc980, jollycrd, jolyc980, jolyc980, jolyc980, ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
-GAME( 1998, jolycdev, jollycrd, funworld, funworld, funworld, ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0 )
-GAME( 1985, jolyccra, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0 )
-GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0 )
+GAME( 1998, jolycdev, jollycrd, funworld, funworld, 0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0 )
+GAME( 1985, jolyccra, jollycrd, cuoreuno, jolycdcr, 0,        ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0 )
+GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, 0,        ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0 )
 GAME( 199?, jolycdit, jollycrd, cuoreuno, jolycdit, tabblue,  ROT0, "bootleg",         "Jolly Card (italian, blue TAB board, encrypted)", 0 )
 GAME( 1990, jolycdib, jollycrd, cuoreuno, jolycdib, tabblue,  ROT0, "bootleg",         "Jolly Card (italian, encrypted bootleg)",         0 )	/* not a real TAB blue PCB */
-GAME( 1985, sjcd2kx3, jollycrd, funworld, funworld, funworld, ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0 )
-GAME( 1986, jolycdab, jollycrd, funworld, funworld, funworld, ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
-GAME( 1986, bigdeal,  0,        funworld, bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS )
-GAME( 1986, bigdealb, bigdeal,  funworld, bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS )
-GAME( 1986, jolycdat, bigdeal,  funworld, bigdeal,  funworld, ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS )
-GAME( 1996, cuoreuno, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Cuore 1 (italian)",                               0 )
-GAME( 1997, elephfam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, new)",                  0 )
-GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0 )
-GAME( 1996, pool10,   0,        cuoreuno, pool10,   funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
-GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
-GAME( 1996, pool10c,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 3)",                        0 )
-GAME( 1997, pool10d,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 4)",                        0 )
-GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
-GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
-GAME( 1996, bottle10, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Bottle 10 (italian, set 1)",                      0 )
-GAME( 1996, bottl10b, bottle10, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Bottle 10 (italian, set 2)",                      0 )
-GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
-GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
-GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, funworld, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1993, royalcdp, royalcrd, cuoreuno, royalcrd, funworld, ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1991, lluck3x3, royalcrd, cuoreuno, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
-GAME( 1991, lluck4x1, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
-GAME( 1996, magicrd2, 0,        magicrd2, magicrd2, funworld, ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
+GAME( 1985, sjcd2kx3, jollycrd, funworld, funworld, 0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0 )
+GAME( 1986, jolycdab, jollycrd, funworld, funworld, 0,        ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
+GAME( 1986, bigdeal,  0,        funworld, bigdeal,  0,        ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS )
+GAME( 1986, bigdealb, bigdeal,  funworld, bigdeal,  0,        ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS )
+GAME( 1986, jolycdat, bigdeal,  funworld, bigdeal,  0,        ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS )
+GAME( 1996, cuoreuno, 0,        cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Cuore 1 (italian)",                               0 )
+GAME( 1997, elephfam, 0,        cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Elephant Family (italian, new)",                  0 )
+GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0 )
+GAME( 1996, pool10,   0,        cuoreuno, pool10,   0,        ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
+GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
+GAME( 1996, pool10c,  pool10,   cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Pool 10 (italian, set 3)",                        0 )
+GAME( 1997, pool10d,  pool10,   cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Pool 10 (italian, set 4)",                        0 )
+GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
+GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
+GAME( 1996, bottle10, 0,        cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Bottle 10 (italian, set 1)",                      0 )
+GAME( 1996, bottl10b, bottle10, cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",          "Bottle 10 (italian, set 2)",                      0 )
+GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
+GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
+GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, 0,        ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1993, royalcdp, royalcrd, cuoreuno, royalcrd, 0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1991, lluck3x3, royalcrd, cuoreuno, royalcrd, 0,        ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
+GAME( 1991, lluck4x1, royalcrd, royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
+GAME( 1996, magicrd2, 0,        magicrd2, magicrd2, 0,        ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
 GAME( 1996, magicd2a, magicrd2, magicrd2, magicrd2, magicd2a, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
 GAME( 1996, magicd2b, magicrd2, magicrd2, magicrd2, magicd2b, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )
-GAME( 1993, vegasslw, 0,        funworld, funworld, funworld, ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0 )
-GAME( 1993, vegasfst, vegasslw, funworld, funworld, funworld, ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0 )
-GAME( 1993, vegasfte, vegasslw, funworld, funworld, funworld, ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0 )
-GAME( 198?, jolyjokr, 0,        funworld, funworld, funworld, ROT0, "Impera",          "Jolly Joker",                                     0 )
-GAME( 198?, jolyjkra, jolyjokr, funworld, jolyjkra, funworld, ROT0, "Impera",          "Jolly Joker (50bet)",                             0 )
-GAME( 1993, jokercrd, 0,        funworld, funworld, funworld, ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 199?, mongolnw, 0,        royalmcu, royalcrd, funworld, ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, vegasslw, 0,        funworld, funworld, 0,        ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0 )
+GAME( 1993, vegasfst, vegasslw, funworld, funworld, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0 )
+GAME( 1993, vegasfte, vegasslw, funworld, funworld, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0 )
+GAME( 198?, jolyjokr, 0,        funworld, funworld, 0,        ROT0, "Impera",          "Jolly Joker",                                     0 )
+GAME( 198?, jolyjkra, jolyjokr, funworld, jolyjkra, 0,        ROT0, "Impera",          "Jolly Joker (50bet)",                             0 )
+GAME( 1993, jokercrd, 0,        funworld, funworld, 0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 199?, mongolnw, 0,        royalmcu, royalcrd, 0,        ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 198?, saloon,   0,        saloon,   saloon,   saloon,   ROT0, "Unknown",         "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
