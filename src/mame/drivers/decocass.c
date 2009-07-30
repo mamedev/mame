@@ -169,15 +169,19 @@ static INPUT_PORTS_START( decocass )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK)
 
-	PORT_START("DSW2") /* Start with all Unknown as each can change per game */
+	PORT_START("DSW2") /* Start with all Unknown as each can change per game, except for Country Code */
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1")		/* Most Dipswitch Settings sheets show this as "Number of Players" (Lives) */ 
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2")		/* Most Dipswitch Settings sheets show 2 & 3 as "Bonus Players" */ 
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4")		/* Most Dipswitch Settings sheets show 4 (with/without 5) as some form of Diffculty */
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6")		/* Most Dipswitch Settings sheets show 6-7 as Country Code, listed as Don't Change */
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8")
+	PORT_DIPNAME( 0xe0, 0xe0, "Country Code" )		PORT_DIPLOCATION("SW2:6,7,8") /* Always Listed as "DON'T CHANGE" */
+	PORT_DIPSETTING(    0xe0, "A" )
+	PORT_DIPSETTING(    0xc0, "B" )
+	PORT_DIPSETTING(    0xa0, "C" )
+	PORT_DIPSETTING(    0x80, "D" )
+	PORT_DIPSETTING(    0x60, "E" )
+	PORT_DIPSETTING(    0x40, "F" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cbtime )
@@ -208,8 +212,8 @@ static INPUT_PORTS_START( cnightst )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(    0x06, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x06, "When Night Star Completed (First 2 Times)" )
+	PORT_DIPSETTING(    0x04, "When Night Star Completed (First Time Only)" )
 	PORT_DIPSETTING(    0x02, "Every 70000"  )
 	PORT_DIPSETTING(    0x00, "30000 Only"  )
 	PORT_DIPNAME( 0x08, 0x08, "Number of Missles" )		PORT_DIPLOCATION("SW2:4")
@@ -233,7 +237,7 @@ static INPUT_PORTS_START( ctornado )
 	PORT_DIPSETTING(    0x06, "10000" )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
-	PORT_DIPNAME( 0x08, 0x08, "Hero Destructor" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Crash Bombs" )		PORT_DIPLOCATION("SW2:4") /* Printed English translation "Hero Destructor" */
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x10, 0x10, "Alens' Speed" )		PORT_DIPLOCATION("SW2:5")
@@ -374,10 +378,10 @@ static INPUT_PORTS_START( cmissnx )
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x02, "15000" )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5") /* Listed as "Game Level" */
-	PORT_DIPSETTING(    0x10, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Very_Difficult ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
 INPUT_PORTS_END
 
