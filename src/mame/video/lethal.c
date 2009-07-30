@@ -55,7 +55,7 @@ VIDEO_START(lethalen)
 	K056832_SetExtLinescroll();
 
 	// the US and Japanese cabinets apparently use different mirror setups
-	if (!strcmp(machine->gamedrv->name, "lethalej"))
+	if (!strcmp(machine->gamedrv->name, "lethalenj"))
 	{
 		K056832_set_LayerOffset(0, -196, 0);
 		K056832_set_LayerOffset(1, -194, 0);

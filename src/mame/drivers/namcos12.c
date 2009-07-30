@@ -1252,7 +1252,7 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "pacapp" ) == 0 ||
 		strcmp( machine->gamedrv->name, "pacappsp" ) == 0 ||
 		strcmp( machine->gamedrv->name, "pacapp2" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tenkomoj" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tenkomorj" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tenkomor" ) == 0 ||
 		strcmp( machine->gamedrv->name, "ptblank2" ) == 0 ||
 		strcmp( machine->gamedrv->name, "sws2000" ) == 0 ||

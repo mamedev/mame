@@ -557,7 +557,7 @@ static void set_default_key_params(running_machine *machine)
 		UINT32			seed;
 	} default_keys[] =
 	{
-		{ "altbeaj1", 0xFCAFF9F9, 0x177AC6 },
+		{ "altbeastj1", 0xFCAFF9F9, 0x177AC6 },
 		{ "bullet",   0x12A8F9EC, 0x1B1FC3 },
 	};
 	int keynum;

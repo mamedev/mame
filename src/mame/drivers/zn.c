@@ -669,7 +669,7 @@ static DRIVER_INIT( coh1000c )
 	zn_driver_init(machine);
 
 	if( strcmp( machine->gamedrv->name, "glpracr" ) == 0 ||
-		strcmp( machine->gamedrv->name, "glprac2l" ) == 0 )
+		strcmp( machine->gamedrv->name, "glpracr2l" ) == 0 )
 	{
 		/* disable:
             the QSound CPU for glpracr as it doesn't have any roms &

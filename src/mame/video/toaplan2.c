@@ -553,7 +553,7 @@ VIDEO_START( truxton2_0 )
 	if (machine->gfx[2]->srcdata == NULL)
 		gfx_element_set_source(machine->gfx[2], (UINT8 *)toaplan2_tx_gfxram16);
 
-	if(!strcmp(machine->gamedrv->name,"fixeighb"))
+	if(!strcmp(machine->gamedrv->name,"fixeightb"))
 	{
 		xoffset[0]=-26;
 		xoffset[1]=-22;

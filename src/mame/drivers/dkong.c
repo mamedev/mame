@@ -423,7 +423,7 @@ static MACHINE_START( s2650 )
     else if (strcmp(game_name,"herodk") == 0) state->protect_type = DK2650_HUNCHBKD;
     else if (strcmp(game_name,"herodku") == 0) state->protect_type = DK2650_HUNCHBKD;
     else if (strcmp(game_name,"8ballact") == 0) state->protect_type = DK2650_EIGHTACT;
-    else if (strcmp(game_name,"8ballat2") == 0) state->protect_type = DK2650_EIGHTACT;
+    else if (strcmp(game_name,"8ballact2") == 0) state->protect_type = DK2650_EIGHTACT;
     else if (strcmp(game_name,"shootgal") == 0) state->protect_type = DK2650_SHOOTGAL;
     else if (strcmp(game_name,"spclforc") == 0) state->protect_type = DK2650_SPCLFORC;
     else if (strcmp(game_name,"spcfrcii") == 0) state->protect_type = DK2650_SPCLFORC;

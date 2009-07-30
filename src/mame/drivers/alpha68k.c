@@ -501,7 +501,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(space->machine->gamedrv->name, "btlfieldb"))
 						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
 						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;
@@ -524,7 +524,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					if(!strcmp(space->machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(space->machine->gamedrv->name, "btlfieldb"))
 						coinvalue = (input_port_read(space->machine, "IN4")>>0) & 7;
 					else
 						coinvalue = (~input_port_read(space->machine, "IN4")>>0) & 7;

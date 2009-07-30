@@ -1180,7 +1180,7 @@ static NVRAM_HANDLER( model3 )
 	const char *name = machine->gamedrv->name;
 	if( mame_stricmp(name, "lostwsga") == 0 ||
 		mame_stricmp(name, "dirtdvls") == 0 ||
-		mame_stricmp(name, "dirtdvla") == 0 ||
+		mame_stricmp(name, "dirtdvlsa") == 0 ||
 		mame_stricmp(name, "lemans24") == 0 ||
 		mame_stricmp(name, "magtruck") == 0 ||
 		mame_stricmp(name, "von2") == 0 ||
@@ -1751,7 +1751,7 @@ static READ64_HANDLER(model3_security_r)
 				return (UINT64)vs299_prot_data[prot_data_ptr++] << 48;
 			}
 			else if (mame_stricmp(space->machine->gamedrv->name, "swtrilgy") == 0 ||
-					 mame_stricmp(space->machine->gamedrv->name, "swtrilga") == 0)
+					 mame_stricmp(space->machine->gamedrv->name, "swtrilgya") == 0)
 			{
 				UINT64 data = (UINT64)swt_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr > 0x38)
