@@ -4688,13 +4688,15 @@ static ADDRESS_MAP_START( afega, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_BASE(&afega_scroll_0)	// Scroll
 /**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_BASE(&afega_scroll_1)	//
 	AM_RANGE(0x08c008, 0x08ffff) AM_WRITE(SMH_RAM)				//
-/**/AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(afega_vram_0_w) AM_BASE(&afega_vram_0)	// Layer 0
-/**/AM_RANGE(0x092000, 0x093fff) AM_RAM								// ?
+/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(afega_vram_0_w) AM_BASE(&afega_vram_0)	// Layer 0					// ?
 /**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(afega_vram_1_w) AM_BASE(&afega_vram_1)	// Layer 1
 
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1) AM_BASE(&nmk16_mainram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1)
 ADDRESS_MAP_END
+
+
+
 
 #if 0
 // The high byte of the word written is the address to write to (byte offset), the low byte is data
@@ -4925,11 +4927,26 @@ static MACHINE_DRIVER_START( grdnstrm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stagger1)
+	
+	/* video hardware */
+	MDRV_GFXDECODE(grdnstrm)
+	MDRV_VIDEO_START(firehawk)
+	MDRV_VIDEO_UPDATE(firehawk)
+MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( grdnstrmk )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(stagger1)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
+	
 	/* video hardware */
 	MDRV_GFXDECODE(grdnstrm)
 	MDRV_VIDEO_START(grdnstrm)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( popspops )
 
@@ -7118,8 +7135,8 @@ GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega (Ne
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
-GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, 0,        ROT0,   "Afega (Apples Industries license)", "Guardian Storm", GAME_NOT_WORKING )
-GAME( 1998, grdnstrmk,grdnstrm, grdnstrm, grdnstrk, grdnstrm, ROT270, "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
+GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, 0,        ORIENTATION_FLIP_Y,   "Afega (Apples Industries license)", "Guardian Storm", 0 )
+GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, grdnstrm, ROT270, "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                             "Pop's Pop's", 0 )

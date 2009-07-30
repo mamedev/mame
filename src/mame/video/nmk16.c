@@ -733,10 +733,8 @@ UINT16 *afega_vram_1, *afega_scroll_1;
 
 #define TILES_PER_PAGE_X	(0x10)
 #define TILES_PER_PAGE_Y	(0x10)
-#define PAGES_PER_TMAP_X	(0x4)
-#define PAGES_PER_TMAP_Y	(0x4)
-#define FIREHAWK_PAGES_PER_TMAP_X	(0x1)
-#define FIREHAWK_PAGES_PER_TMAP_Y	(0x1)
+#define PAGES_PER_TMAP_X	(0x10)
+#define PAGES_PER_TMAP_Y	(0x2)
 #define TWINACTN_TILES_PER_PAGE_X	(0x100)
 #define TWINACTN_TILES_PER_PAGE_Y	(0x10)
 #define TWINACTN_PAGES_PER_TMAP_X	(0x1)
@@ -746,15 +744,6 @@ UINT16 *afega_vram_1, *afega_scroll_1;
 static TILEMAP_MAPPER( afega_tilemap_scan_pages )
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
-			(row % TILES_PER_PAGE_Y) +
-
-			(col / TILES_PER_PAGE_X) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y +
-			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
-}
-
-static TILEMAP_MAPPER( firehawk_tilemap_scan_pages )
-{
-	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * FIREHAWK_PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
 
 			(col / TILES_PER_PAGE_X) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y +
@@ -856,10 +845,10 @@ VIDEO_START( firehawk )
 	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 
-	tilemap_0 = tilemap_create(	machine, get_tile_info_0_8bit, firehawk_tilemap_scan_pages,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0_8bit, afega_tilemap_scan_pages,
 
 								16,16,
-								TILES_PER_PAGE_X*FIREHAWK_PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*FIREHAWK_PAGES_PER_TMAP_Y);
+								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_cols,
 
@@ -894,11 +883,13 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 		flip_screen_y_set(machine, ~input_port_read(machine, "DSW1") & 0x0200);
 	}
 
+
 	tilemap_set_scrollx(tilemap_0, 0, afega_scroll_0[1] + xoffset);
 	tilemap_set_scrolly(tilemap_0, 0, afega_scroll_0[0] + yoffset);
 
 	tilemap_set_scrollx(tilemap_1, 0, afega_scroll_1[1]);
 	tilemap_set_scrolly(tilemap_1, 0, afega_scroll_1[0]);
+
 
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
 
