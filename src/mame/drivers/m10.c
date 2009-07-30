@@ -918,8 +918,8 @@ static DRIVER_INIT( andromed )
 	int i;
 	m10_state *state = (m10_state *)machine->driver_data;
 
-	for (i=0x1c00;i<0x2000;i++)
-		state->rom[i]=0x60;
+	for (i = 0x1c00; i < 0x2000; i++)
+		state->rom[i] = 0x60;
 }
 
 static DRIVER_INIT( ipminva1 )
@@ -927,8 +927,8 @@ static DRIVER_INIT( ipminva1 )
 	int i;
 	m10_state *state = (m10_state *)machine->driver_data;
 
-	for (i=0x1400;i<0x17ff;i++)
-		state->rom[i]=0x60;
+	for (i = 0x1400; i < 0x17ff; i++)
+		state->rom[i] = 0x60;
 }
 
 /***************************************************************************
@@ -1039,10 +1039,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed, 0, m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1979, ipminvad, 0, m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1979, ipminvad1,0, m10,     ipminvad, ipminva1, ROT270, "Irem", "I P M Invader (Incomplete Dump)", GAME_NOT_WORKING )
-GAME( 1980, skychut,  0, m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, spacbeam, 0, m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, headoni,  0, headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1980, greenber, 0, m15,     spacbeam, 0,        ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1979, andromed,  0,        m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, ipminva1, ROT270, "Irem", "I P M Invader (Incomplete Dump)", GAME_NOT_WORKING )
+GAME( 1980, skychut,   0,        m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, headoni,   0,        headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1980, greenber,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
