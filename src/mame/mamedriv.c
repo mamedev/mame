@@ -3814,9 +3814,10 @@ DokiDoki Penguin Land *not confirmed
 						/* 1986.09 Outrun (Japan) */
 						/* 1986.11 Outrun (US) */
 						/* 1986.?? Outrun (World) */
-	DRIVER( outrun )
-	DRIVER( outrun2 )
-	DRIVER( outrun1 )
+	DRIVER( outrun )	/* Revision B */
+	DRIVER( outrunra )	/* Revision A */
+	DRIVER( outruno )	/* First version */
+	DRIVER( outrundx )	/* Deluxe version */
 	DRIVER( outrunb )	/* 1986 (protected beta bootleg) */
 						/* 1987.04 Super Hang-On (Japan) */
 						/* 1987.06 Super Hang-On (US) */
