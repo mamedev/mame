@@ -65,6 +65,13 @@
         * Game is NOT_WORKING due to missing graphics layer
         * Everything needs to be verified on real PCB or schematics
 
+    Known issues/to-do's Panther:
+        * Hangs with a read at $c120 bit 0, wants it to be high for
+          whatever reason
+        * Sound comms doesn't work
+        * Vertical cannon mechanism doesn't work (uses a paddle maybe?)
+        * No title screen?
+
     ********************************************************************
     IREM 'WW III' 1981
 
@@ -354,6 +361,24 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+ROM_START( panther )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qr-1.bin",      0x8000, 0x0800, CRC(406dc606) SHA1(c12b91145aa579813b7b0e8eb7933bf35e4a5b97) )
+	ROM_LOAD( "qr-2.bin",      0x8800, 0x0800, CRC(e7e64b11) SHA1(0fcfbce552b22edce9051b6fad0974f81ab44973) )
+	ROM_LOAD( "qr-3.bin",      0x9000, 0x0800, CRC(dfec33f2) SHA1(4e631a3a8c7873e8f51a81e8b73704729269ee01) )
+	ROM_LOAD( "qr-4.bin",      0x9800, 0x0800, CRC(60571aa0) SHA1(257474383ad7cb90e9e4f9236b3f865a991d688a) )
+	ROM_LOAD( "qr-5.bin",      0xa000, 0x0800, CRC(2ac19b54) SHA1(613a800179f9705df03967889eb23ef71baed493) )
+	ROM_LOAD( "qr-6.bin",      0xa800, 0x0800, CRC(02fbd9d9) SHA1(65b5875c78886b51c9bdfc75e730b9f67ce72cfc) )
+	ROM_LOAD( "qr-7.bin",      0xb000, 0x0800, CRC(b3e2d6cc) SHA1(7bb18f17d635196e617e8f68bf8d866134c362d1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
+	ROM_LOAD( "m-27sc.1a",	  0x0000, 0x0200, BAD_DUMP CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+ROM_END
+
+
 ROM_START( ww3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w3i5.3f",      0x5000, 0x1000, CRC(9fc24ad3) SHA1(697ab22555ff5aae09f50051ccda545c17a0ac8a) )
@@ -423,6 +448,7 @@ ROM_END
  *
  *************************************/
 
+GAME( 1981, panther,  0, ww3,      redalert, 0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_WRONG_COLORS )
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

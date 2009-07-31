@@ -1396,9 +1396,10 @@ const game_driver * const drivers[] =
 	DRIVER( greenber )	/* Irem */
 	DRIVER( headoni )	/* Irem no copyright notice (1979 - Arcade TV Game List - P.98, Left, 7 from top ) */
 
-	DRIVER( redalert )	/* (c) 1981 + "GDI presents" */
-	DRIVER( demoneye )	/* (c) 1981 */
-	DRIVER( ww3 )		/* (c) 1981 */
+	DRIVER( panther )	/* M27 no copyright notice */
+	DRIVER( redalert )	/* M27 (c) 1981 + "GDI presents" */
+	DRIVER( demoneye )	/* M27 (c) 1981 */
+	DRIVER( ww3 )		/* M27 (c) 1981 */
 
 	DRIVER( olibochu )	/* M47 (c) 1981 + "GDI presents" */
 	DRIVER( mpatrol )	/* M52 (c) 1982 */
