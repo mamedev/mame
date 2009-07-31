@@ -109,14 +109,11 @@ DEVICE_GET_INFO(ppu2c07);
 /* routines */
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 
-void ppu2c0x_set_videorom_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size ) ATTR_NONNULL(1);
-void ppu2c0x_set_videoram_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size ) ATTR_NONNULL(1);
 void ppu2c0x_spriteram_dma(const address_space *space, const device_config *device, const UINT8 page ) ATTR_NONNULL(1);
 void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
 int ppu2c0x_get_pixel( const device_config *device, int x, int y ) ATTR_NONNULL(1);
 int ppu2c0x_get_colorbase( const device_config *device ) ATTR_NONNULL(1);
 int ppu2c0x_get_current_scanline( const device_config *device ) ATTR_NONNULL(1);
-void ppu2c0x_set_mirroring( const device_config *device, int mirroring ) ATTR_NONNULL(1);
 void ppu2c0x_set_scanline_callback( const device_config *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
 void ppu2c0x_set_hblank_callback( const device_config *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
 void ppu2c0x_set_vidaccess_callback( const device_config *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);

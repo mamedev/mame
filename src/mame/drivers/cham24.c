@@ -60,10 +60,58 @@ Notes:
 #include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
+static UINT8* nt_ram;
+static UINT8* nt_page[4];
+
+void cham24_set_mirroring( int mirroring )
+{
+	switch(mirroring)
+	{
+	case PPU_MIRROR_LOW:
+		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram;
+		break;
+	case PPU_MIRROR_HIGH:
+		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_HORZ:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram;
+		nt_page[2] = nt_ram + 0x400;
+		nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_VERT:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram + 0x400;
+		nt_page[2] = nt_ram;
+		nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_NONE:
+	default:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram + 0x400;
+		nt_page[2] = nt_ram + 0x800;
+		nt_page[3] = nt_ram + 0xc00;
+		break;
+	}
+}
+
+static WRITE8_HANDLER( nt_w )
+{
+	int page = ((offset & 0xc00) >> 10);
+	nt_page[page][offset & 0x3ff] = data;
+}
+
+static READ8_HANDLER( nt_r )
+{
+	int page = ((offset & 0xc00) >> 10);
+	return nt_page[page][offset & 0x3ff];
+
+}
+
 static WRITE8_HANDLER( sprite_dma_w )
 {
-	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
+	int source = (data & 7);
+	ppu2c0x_spriteram_dma(space, devtag_get_device(space->machine, "ppu"), source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -93,12 +141,12 @@ static READ8_HANDLER( cham24_IN0_r )
 
 static WRITE8_HANDLER( cham24_IN0_w )
 {
-	if ( data & 0xfe )
+	if (data & 0xfe)
 	{
-		//logerror( "Unhandled cham24_IN0_w write: data = %02X\n", data );
+		//logerror("Unhandled cham24_IN0_w write: data = %02X\n", data);
 	}
 
-	if ( data & 0x01 )
+	if (data & 0x01)
 	{
 		return;
 	}
@@ -123,36 +171,35 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank = (offset >> 7) & 0x1f;
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
-	const device_config *ppu = devtag_get_device(space->machine, "ppu");
 
-	UINT8* dst = memory_region( space->machine, "maincpu" );
-	UINT8* src = memory_region( space->machine, "user1" );
+	UINT8* dst = memory_region(space->machine, "maincpu");
+	UINT8* src = memory_region(space->machine, "user1");
 
 	// switch PPU VROM bank
-	ppu2c0x_set_videorom_bank( ppu, 0, 8, gfx_bank, 512 );
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
-	ppu2c0x_set_mirroring( ppu, gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	// switch PRG bank
-	if ( prg_bank_page_size == 0 )
+	if (prg_bank_page_size == 0)
 	{
 		// 32K
-		memcpy( &dst[0x8000], &src[prg_bank * 0x8000], 0x8000 );
+		memcpy(&dst[0x8000], &src[prg_bank * 0x8000], 0x8000);
 	}
 	else
 	{
-		if ( prg_16k_bank_page == 1 )
+		if (prg_16k_bank_page == 1)
 		{
 			// upper half of 32K page
-			memcpy( &dst[0x8000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000 );
-			memcpy( &dst[0xC000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000 );
+			memcpy(&dst[0x8000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000);
+			memcpy(&dst[0xC000], &src[(prg_bank * 0x8000) + 0x4000], 0x4000);
 		}
 		else
 		{
 			// lower half of 32K page
-			memcpy( &dst[0x8000], &src[(prg_bank * 0x8000)], 0x4000 );
-			memcpy( &dst[0xC000], &src[(prg_bank * 0x8000)], 0x4000 );
+			memcpy(&dst[0x8000], &src[(prg_bank * 0x8000)], 0x4000);
+			memcpy(&dst[0xC000], &src[(prg_bank * 0x8000)], 0x4000);
 		}
 	}
 }
@@ -188,7 +235,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 static const nes_interface cham24_interface_1 =
@@ -199,21 +245,21 @@ static const nes_interface cham24_interface_1 =
 static MACHINE_RESET( cham24 )
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, "maincpu" );
-	UINT8* src = memory_region( machine, "user1" );
+	UINT8* dst = memory_region(machine, "maincpu");
+	UINT8* src = memory_region(machine, "user1");
 
-	memcpy( &dst[0x8000], &src[0x0f8000], 0x4000 );
-	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );
+	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
+	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 }
 
 static PALETTE_INIT( cham24 )
 {
-	ppu2c0x_init_palette(machine, 0 );
+	ppu2c0x_init_palette(machine, 0);
 }
 
 static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -233,12 +279,21 @@ static VIDEO_START( cham24 )
 static VIDEO_UPDATE( cham24 )
 {
 	/* render the ppu */
-	ppu2c0x_render( devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render(devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
 static DRIVER_INIT( cham24 )
 {
+	/* uses 8K swapping, all ROM!*/
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
+	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
+
+	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
+	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+
+	/* and read/write handlers */
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
 }
 
 static GFXDECODE_START( cham24 )

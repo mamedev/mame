@@ -47,14 +47,77 @@
 
 /******************************************************
 
+   PPU external bus interface
+
+*******************************************************/
+static UINT8* nt_ram;
+static UINT8* nt_page[4];
+
+void set_mirroring(int mirroring)
+{
+	switch(mirroring)
+	{
+	case PPU_MIRROR_LOW:
+		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram;
+		break;
+	case PPU_MIRROR_HIGH:
+		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_HORZ:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram;
+		nt_page[2] = nt_ram + 0x400;
+		nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_VERT:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram + 0x400;
+		nt_page[2] = nt_ram;
+		nt_page[3] = nt_ram + 0x400;
+		break;
+	case PPU_MIRROR_NONE:
+	default:
+		nt_page[0] = nt_ram;
+		nt_page[1] = nt_ram + 0x400;
+		nt_page[2] = nt_ram + 0x800;
+		nt_page[3] = nt_ram + 0xc00;
+		break;
+	}
+}
+static WRITE8_HANDLER (multigam_nt_w)
+{
+	int page = ((offset & 0xc00) >> 10);
+	nt_page[page][offset & 0x3ff] = data;
+}
+static READ8_HANDLER (multigam_nt_r)
+{
+	int page = ((offset & 0xc00) >> 10);
+	return nt_page[page][offset & 0x3ff];
+}
+
+void set_videorom_bank(running_machine* machine, int start, int count, int bank, int bank_size_in_kb)
+{
+	int i, j;
+	int offset = bank * (bank_size_in_kb * 0x400);
+	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
+	/* count determines the size of the area mapped in KB */
+	for (i = 0; i < count; i++)
+	{
+		j = i + start + 1;
+		memory_set_bankptr(machine, j, memory_region(machine, "gfx1") + offset);
+	}
+}
+
+/******************************************************
+
    NES interface
 
 *******************************************************/
 
 static WRITE8_HANDLER( sprite_dma_w )
 {
-	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
+	int source = (data & 7);
+	ppu2c0x_spriteram_dma(space, devtag_get_device(space->machine, "ppu"), source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -92,7 +155,7 @@ static READ8_HANDLER( multigam_IN0_r )
 
 static WRITE8_HANDLER( multigam_IN0_w )
 {
-	if ( data & 0x01 )
+	if (data & 0x01)
 	{
 		return;
 	}
@@ -131,43 +194,41 @@ static int multigam_game_gfx_bank = 0;
 static WRITE8_HANDLER(multigam_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( space->machine, "maincpu" );
-	UINT8* src = memory_region( space->machine, "user1" );
+	UINT8* dst = memory_region(space->machine, "maincpu");
+	UINT8* src = memory_region(space->machine, "user1");
 
-	if ( data & 0x80 )
+	if (data & 0x80)
 	{
-		if ( data & 0x01 )
+		if (data & 0x01)
 		{
 			data &= ~0x01;
 		}
-		memcpy( &dst[0x8000], &src[(data & 0x7f) * 0x4000], 0x8000 );
+		memcpy(&dst[0x8000], &src[(data & 0x7f) * 0x4000], 0x8000);
 	}
 	else
 	{
-		memcpy( &dst[0x8000], &src[data*0x4000], 0x4000 );
-		memcpy( &dst[0xc000], &src[data*0x4000], 0x4000 );
+		memcpy(&dst[0x8000], &src[data*0x4000], 0x4000);
+		memcpy(&dst[0xc000], &src[data*0x4000], 0x4000);
 	}
 };
 
 static WRITE8_HANDLER(multigam_switch_gfx_rom)
 {
-	const device_config *ppu = devtag_get_device(space->machine, "ppu");
-	ppu2c0x_set_videorom_bank( ppu, 0, 8, data /*& 0x3f*/, 512 );
-	ppu2c0x_set_mirroring( ppu, data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * data));
+	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	multigam_game_gfx_bank = data;
 };
 
 
 static WRITE8_HANDLER(multigam_mapper2_w)
 {
-	if ( multigam_game_gfx_bank & 0x80 )
+	if (multigam_game_gfx_bank & 0x80)
 	{
-		const device_config *ppu = devtag_get_device(space->machine, "ppu");
-		ppu2c0x_set_videorom_bank( ppu, 0, 8, multigam_game_gfx_bank + (data & 0xf), 512 );
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * ((data & 0xf) + multigam_game_gfx_bank)));
 	}
 	else
 	{
-		logerror( "Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data );
+		logerror("Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data);
 	}
 }
 
@@ -210,9 +271,9 @@ static UINT8* multigmc_mmc3_6000_ram;
 
 static void multigam3_mmc3_scanline_cb( const device_config *device, int scanline, int vblank, int blanked )
 {
-	if ( !vblank && !blanked )
+	if (!vblank && !blanked)
 	{
-		if ( --multigam3_mmc3_scanline_counter == -1 )
+		if (--multigam3_mmc3_scanline_counter == -1)
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
 			generic_pulse_irq_line(cputag_get_cpu(device->machine, "maincpu"), 0);
@@ -227,38 +288,38 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
 
-	switch( offset & 0x7001 )
+	switch(offset & 0x7001)
 	{
 		case 0x0000:
 			multigam3_mmc3_command = data;
 
-			if ( multigam3_mmc3_last_bank != ( data & 0xc0 ) )
+			if (multigam3_mmc3_last_bank != (data & 0xc0))
 			{
 				int bank;
-				UINT8 *prg = memory_region( space->machine, "maincpu" );
-				UINT8 *src = memory_region( space->machine, "user1" );
+				UINT8 *prg = memory_region(space->machine, "maincpu");
+				UINT8 *src = memory_region(space->machine, "user1");
 
 				/* reset the banks */
-				if ( multigam3_mmc3_command & 0x40 )
+				if (multigam3_mmc3_command & 0x40)
 				{
 					/* high bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &prg[0x0c000], &src[bank], 0x2000 );
-					memcpy( &prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000 );
+					memcpy(&prg[0x0c000], &src[bank], 0x2000);
+					memcpy(&prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000);
 				}
 				else
 				{
 					/* low bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &prg[0x08000], &src[bank], 0x2000 );
-					memcpy( &prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000 );
+					memcpy(&prg[0x08000], &src[bank], 0x2000);
+					memcpy(&prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000);
 				}
 
 				/* mid bank */
 				bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
-				memcpy( &prg[0x0a000], &src[bank], 0x2000 );
+				memcpy(&prg[0x0a000], &src[bank], 0x2000);
 
 				multigam3_mmc3_last_bank = data & 0xc0;
 			}
@@ -267,16 +328,16 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		case 0x0001:
 			{
 				UINT8 cmd = multigam3_mmc3_command & 0x07;
-				int page = ( multigam3_mmc3_command & 0x80 ) >> 5;
+				int page = (multigam3_mmc3_command & 0x80) >> 5;
 				int bank;
 
-				switch( cmd )
+				switch (cmd)
 				{
 					case 0:	/* char banking */
 					case 1: /* char banking */
 						data &= 0xfe;
-						page ^= ( cmd << 1 );
-						ppu2c0x_set_videorom_bank( ppu, page, 2, 0x180 + data, 64 );
+						page ^= (cmd << 1);
+						set_videorom_bank(space->machine, page, 2, 0x180 + data, 1);
 					break;
 
 					case 2: /* char banking */
@@ -284,30 +345,30 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						ppu2c0x_set_videorom_bank( ppu, page, 1, 0x180 + data, 64 );
+						set_videorom_bank(space->machine, page, 1, 0x180 + data, 1);
 					break;
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( space->machine, "maincpu" );
-						UINT8 *src = memory_region( space->machine, "user1" );
-						if ( multigam3_mmc3_command & 0x40 )
+						UINT8 *prg = memory_region(space->machine, "maincpu");
+						UINT8 *src = memory_region(space->machine, "user1");
+						if (multigam3_mmc3_command & 0x40)
 						{
 							/* high bank */
 							multigam3_mmc3_banks[0] = data & 0x1f;
-							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
+							bank = (multigam3_mmc3_banks[0]) * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x0c000], &src[bank], 0x2000 );
-							memcpy( &prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000 );
+							memcpy(&prg[0x0c000], &src[bank], 0x2000);
+							memcpy(&prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000);
 						}
 						else
 						{
 							/* low bank */
 							multigam3_mmc3_banks[0] = data & 0x1f;
-							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
+							bank = (multigam3_mmc3_banks[0]) * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x08000], &src[bank], 0x2000 );
-							memcpy( &prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000 );
+							memcpy(&prg[0x08000], &src[bank], 0x2000);
+							memcpy(&prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000);
 						}
 					}
 					break;
@@ -315,13 +376,13 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( space->machine, "maincpu" );
-							UINT8 *src = memory_region( space->machine, "user1" );
+							UINT8 *prg = memory_region(space->machine, "maincpu");
+							UINT8 *src = memory_region(space->machine, "user1");
 
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x0a000], &src[bank], 0x2000 );
+							memcpy(&prg[0x0a000], &src[bank], 0x2000);
 						}
 					break;
 				}
@@ -329,12 +390,12 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x2000: /* mirroring */
-			if( !multigam3_mmc3_4screen )
+			if (!multigam3_mmc3_4screen)
 			{
-				if ( data & 0x40 )
-					ppu2c0x_set_mirroring( ppu, PPU_MIRROR_HIGH );
+				if (data & 0x40)
+					set_mirroring(PPU_MIRROR_HIGH);
 				else
-					ppu2c0x_set_mirroring( ppu, ( data & 1 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+					set_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			}
 		break;
 
@@ -351,19 +412,19 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu2c0x_set_scanline_callback( ppu, 0 );
+			ppu2c0x_set_scanline_callback(ppu, 0);
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu2c0x_set_scanline_callback( ppu, multigam3_mmc3_scanline_cb );
+			ppu2c0x_set_scanline_callback(ppu, multigam3_mmc3_scanline_cb);
 		break;
 	}
 }
 
 static void multigam_init_smb3(running_machine *machine)
 {
-	UINT8* dst = memory_region( machine, "maincpu" );
-	UINT8* src = memory_region( machine, "user1" );
+	UINT8* dst = memory_region(machine, "maincpu");
+	UINT8* src = memory_region(machine, "user1");
 
 	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
 	memcpy(&dst[0xc000], &src[0xa0000 + 0x3c000], 0x4000);
@@ -383,24 +444,23 @@ static void multigam_init_smb3(running_machine *machine)
 
 static WRITE8_HANDLER(multigm3_mapper2_w)
 {
-	if ( multigam_game_gfx_bank & 0x80 )
+	if (multigam_game_gfx_bank & 0x80)
 	{
-		const device_config *ppu = devtag_get_device(space->machine, "ppu");
-		ppu2c0x_set_videorom_bank( ppu, 0, 8, (multigam_game_gfx_bank & 0xfc)  + (data & 0x3), 512 );
+		set_videorom_bank(space->machine, 0, 8, (multigam_game_gfx_bank & 0xfc)  + (data & 0x3), 8);
 	}
 	else
 	{
-		logerror( "Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data );
+		logerror("Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data);
 	}
 };
 
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( space->machine, "maincpu" );
-	UINT8* src = memory_region( space->machine, "user1" );
+	UINT8* dst = memory_region(space->machine, "maincpu");
+	UINT8* src = memory_region(space->machine, "user1");
 
-	if ( data == 0xa8 )
+	if (data == 0xa8)
 	{
 		multigam_init_smb3(space->machine);
 		return;
@@ -411,18 +471,18 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x6000);
 	}
 
-	if ( data & 0x80 )
+	if (data & 0x80)
 	{
-		if ( data & 0x01 )
+		if (data & 0x01)
 		{
 			data &= ~0x01;
 		}
-		memcpy( &dst[0x8000], &src[(data & 0x7f) * 0x4000], 0x8000 );
+		memcpy(&dst[0x8000], &src[(data & 0x7f) * 0x4000], 0x8000);
 	}
 	else
 	{
-		memcpy( &dst[0x8000], &src[data*0x4000], 0x4000 );
-		memcpy( &dst[0xc000], &src[data*0x4000], 0x4000 );
+		memcpy(&dst[0x8000], &src[data*0x4000], 0x4000);
+		memcpy(&dst[0xc000], &src[data*0x4000], 0x4000);
 	}
 };
 
@@ -530,12 +590,12 @@ static const nes_interface multigam_interface_1 =
 
 static PALETTE_INIT( multigam )
 {
-	ppu2c0x_init_palette(machine, 0 );
+	ppu2c0x_init_palette(machine, 0);
 }
 
 static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -555,7 +615,7 @@ static VIDEO_START( multigam )
 static VIDEO_UPDATE( multigam )
 {
 	/* render the ppu */
-	ppu2c0x_render( devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render(devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
@@ -580,6 +640,28 @@ static MACHINE_RESET( multigm3 )
 	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
 
+static MACHINE_START( multigam )
+{
+	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
+	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
+}
+
+static MACHINE_START( multigm3 )
+{
+	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(1), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, SMH_BANK(2), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, SMH_BANK(3), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, SMH_BANK(4), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, SMH_BANK(5), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(6), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(7), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(8), 0);
+};
 
 static MACHINE_DRIVER_START( multigam )
 	/* basic machine hardware */
@@ -587,6 +669,7 @@ static MACHINE_DRIVER_START( multigam )
 	MDRV_CPU_PROGRAM_MAP(multigam_map)
 
 	MDRV_MACHINE_RESET( multigam )
+	MDRV_MACHINE_START( multigam )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -620,6 +703,7 @@ static MACHINE_DRIVER_START( multigm3 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(multigm3_map)
 
+	MDRV_MACHINE_START( multigm3 )
 	MDRV_MACHINE_RESET( multigm3 )
 MACHINE_DRIVER_END
 
@@ -704,7 +788,7 @@ ROM_END
 static DRIVER_INIT( multigam )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	multigam_switch_prg_rom( space, 0x0, 0x01 );
+	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
 static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble)
@@ -727,7 +811,7 @@ static DRIVER_INIT(multigm3)
 
 	multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 
-	multigam_switch_prg_rom( space, 0x0, 0x01 );
+	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )

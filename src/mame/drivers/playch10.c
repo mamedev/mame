@@ -702,6 +702,7 @@ static MACHINE_DRIVER_START( playch10 )
 	MDRV_CPU_PROGRAM_MAP(cart_map)
 
 	MDRV_MACHINE_RESET(pc10)
+	MDRV_MACHINE_START(pc10)
 
 	// video hardware
 	MDRV_GFXDECODE(playch10)
@@ -746,6 +747,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( playch10_hboard )
 	MDRV_IMPORT_FROM(playch10)
 	MDRV_VIDEO_START(playch10_hboard)
+	MDRV_MACHINE_START(playch10_hboard)
 
 	MDRV_DEVICE_REMOVE("ppu")
 	MDRV_PPU2C03B_ADD("ppu", playch10_ppu_interface)

@@ -15,6 +15,8 @@ extern const ppu2c0x_interface vsnes_ppu_interface_2;
 
 MACHINE_RESET( vsnes );
 MACHINE_RESET( vsdual );
+MACHINE_START( vsnes );
+MACHINE_START( vsdual );
 DRIVER_INIT( suprmrio );
 DRIVER_INIT( excitebk );
 DRIVER_INIT( excitbkj );

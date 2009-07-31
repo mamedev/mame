@@ -1,6 +1,8 @@
 /*----------- defined in machine/playch10.c -----------*/
 
 MACHINE_RESET( pc10 );
+MACHINE_START( pc10 );
+MACHINE_START( playch10_hboard );
 DRIVER_INIT( playch10 );	/* standard games */
 DRIVER_INIT( pc_gun );	/* gun games */
 DRIVER_INIT( pc_hrz );	/* horizontal games */

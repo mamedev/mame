@@ -1768,6 +1768,7 @@ static MACHINE_DRIVER_START( vsnes )
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsnes)
+	MDRV_MACHINE_START(vsnes)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1806,6 +1807,7 @@ static MACHINE_DRIVER_START( vsdual )
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu2_map)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsdual)
+	MDRV_MACHINE_START(vsdual)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(2*8*4*16)
