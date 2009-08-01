@@ -134,7 +134,10 @@ static WRITE8_HANDLER( redalert_interrupt_clear_w )
 	redalert_interrupt_clear_r(space, 0);
 }
 
-
+static READ8_HANDLER( panther_unk_r )
+{
+	return mame_rand(space->machine) & 0x01;
+}
 
 /*************************************
  *
@@ -173,6 +176,20 @@ static ADDRESS_MAP_START( ww3_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( panther_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&redalert_charmap_videoram)
+	AM_RANGE(0x5000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ(panther_unk_r) /* vblank? */
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_audio_command_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demoneye_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -250,6 +267,45 @@ static INPUT_PORTS_START( redalert )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( panther )
+	PORT_START("C000")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x00, "Cabinet in Service Mode" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x08, "7000" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
+
+	PORT_START("C010")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 35 - N.C. */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 36 - N.C. */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Meter */
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
 	PORT_START("C000")
@@ -330,6 +386,20 @@ static MACHINE_DRIVER_START( ww3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ww3_main_map)
+	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(ww3_video)
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(ww3_audio)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( panther )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(panther_main_map)
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
@@ -449,7 +519,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0, ww3,      redalert, 0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_WRONG_COLORS )
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
