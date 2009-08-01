@@ -129,14 +129,22 @@ static READ8_HANDLER( redalert_interrupt_clear_r )
 }
 
 
+
 static WRITE8_HANDLER( redalert_interrupt_clear_w )
 {
 	redalert_interrupt_clear_r(space, 0);
 }
 
+static READ8_HANDLER( panther_interrupt_clear_r )
+{
+	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+
+	return input_port_read(space->machine, "STICK0");
+}
+
 static READ8_HANDLER( panther_unk_r )
 {
-	return mame_rand(space->machine) & 0x01;
+	return ((mame_rand(space->machine) & 0x01) | (input_port_read(space->machine, "C020") & 0xfe));
 }
 
 /*************************************
@@ -187,7 +195,7 @@ static ADDRESS_MAP_START( panther_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_audio_command_w)
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(panther_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -294,17 +302,30 @@ static INPUT_PORTS_START( panther )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 35 - N.C. */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 36 - N.C. */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_Q) /* pin 35 - N.C. */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_W) /* pin 36 - N.C. */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Meter */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_E) /* Meter */
+
+	PORT_START("C020")
+	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
+	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("STICK0")
+	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(16) /* PORT_REVERSE */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
@@ -519,7 +540,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAME( 1981, panther,  0, panther,  panther,  0, ROT270, "Irem",       "Panther",    GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
