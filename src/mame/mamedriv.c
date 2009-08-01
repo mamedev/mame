@@ -6775,14 +6775,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wargods )	/* (c) 1996 Midway */
 
 	/* Midway Zeus games */
-	DRIVER( mk4 )		/* (c) 1997 Midway */
-	DRIVER( mk4a )		/* (c) 1997 Midway */
-	DRIVER( invasnab )	/* (c) 1999 Midway */
-	DRIVER( invasnv4 )	/* (c) 1999 Midway */
-	DRIVER( crusnexo )	/* (c) 1999 Midway */
-	DRIVER( crusnexoa )	/* (c) 1999 Midway */
-	DRIVER( thegrid )	/* (c) 2001 Midway */
-	DRIVER( thegrida )	/* (c) 2001 Midway */
+	DRIVER( mk4 )		/* (c) 1997 Midway (v3.0) Latest offical release */
+	DRIVER( mk4a )		/* (c) 1997 Midway (v2.1) */
+	DRIVER( invasnab )	/* (c) 1999 Midway (v5.0) Latest offical release */
+	DRIVER( invasnv4 )	/* (c) 1999 Midway (v4.0) */
+	DRIVER( crusnexo )	/* (c) 1999 Midway (v2.4) Latest offical release */
+	DRIVER( crusnexoa )	/* (c) 1999 Midway (v2.0) */
+	DRIVER( crusnexob )	/* (c) 1999 Midway (v1.6) */
+	DRIVER( thegrid )	/* (c) 2001 Midway (v1.2) Latest offical release */
+	DRIVER( thegrida )	/* (c) 2001 Midway (v1.1) */
 
 	/* Midway / Atari  Voodoo based Hardware (Seattle, Flagstaff) */
 	DRIVER( wg3dh )		/* (c) 1996 Atari Games */
