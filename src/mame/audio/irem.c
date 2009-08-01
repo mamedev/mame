@@ -217,7 +217,7 @@ static void adpcm_int(const device_config *device)
 
 static const ay8910_interface irem_ay8910_interface_1 =
 {
-	AY8910_SINGLE_OUTPUT,
+	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
 	{470, 0, 0},
 	DEVCB_MEMORY_HANDLER("iremsound", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
@@ -227,7 +227,7 @@ static const ay8910_interface irem_ay8910_interface_1 =
 
 static const ay8910_interface irem_ay8910_interface_2 =
 {
-	AY8910_SINGLE_OUTPUT,
+	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
 	{470, 0, 0},
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -258,16 +258,19 @@ static const msm5205_interface irem_msm5205_interface_2 =
  * I did my test to verify against pcb pictures of "tropical angel"
  */
 
+#define M52_R9		560
+#define M52_R10		330
 #define M52_R12		RES_K(10)
 #define M52_R13		RES_K(10)
 #define M52_R14		RES_K(10)
-#define M52_R15		RES_K(2.2)	/* schematics RES_K(22) */
+#define M52_R15		RES_K(2.2)	/* schematics RES_K(22) , althought 10-Yard states 2.2 */
 #define M52_R19		RES_K(10)
-#define M52_R22		RES_K(4.7)	/* schematics RES_K(47) */
+#define M52_R22		RES_K(47)	
 #define M52_R23		RES_K(2.2)
 #define M52_R25		RES_K(10)
 #define M52_VR1		RES_K(50)
 
+#define M52_C28		CAP_U(1)
 #define M52_C30		CAP_U(0.022)
 #define M52_C32		CAP_U(0.022)
 #define M52_C35		CAP_U(47)
@@ -283,12 +286,12 @@ static const msm5205_interface irem_msm5205_interface_2 =
 
 static const discrete_mixer_desc m52_sound_c_stage1 =
 	{DISC_MIXER_IS_RESISTOR,
-		{M52_R19, M52_R22 },
-		{      0,       0 },	/* variable resistors   */
-		{M52_C37,		0 },    /* node capacitors      */
-		       0, M52_R23,		/* rI, rF               */
-		M52_C35*0,				/* cF                   */
-		0,						/* cAmp                 */
+		{M52_R19, M52_R22, M52_R23 },
+		{      0,       0,		 0 },	/* variable resistors   */
+		{M52_C37,		0,		 0 },	/* node capacitors      */
+		       0, 		0,				/* rI, rF               */
+		M52_C35*0,						/* cF                   */
+		0,								/* cAmp                 */
 		0, 1};
 
 static const discrete_op_amp_filt_info m52_sound_c_sallen_key =
@@ -320,14 +323,16 @@ static DISCRETE_SOUND_START( m52_sound_c )
 	DISCRETE_DIVIDE(NODE_10, 1, NODE_09, 2.0)
 
 	/* Mix in 5 V to MSM5250 signal */
-	DISCRETE_MIXER2(NODE_20, 1, NODE_03, 32767.0, &m52_sound_c_stage1)
+	DISCRETE_MIXER3(NODE_20, 1, NODE_03, 32767.0, 0, &m52_sound_c_stage1)
 
 	/* Sallen - Key Filter */
 	/* TODO: R12, C30: This looks like a band pass */
-	DISCRETE_SALLEN_KEY_FILTER(NODE_30, 1, NODE_20, DISC_SALLEN_KEY_LOW_PASS, &m52_sound_c_sallen_key)
+	DISCRETE_RCFILTER(NODE_25, 1, NODE_20, M52_R12, M52_C30)
+	DISCRETE_SALLEN_KEY_FILTER(NODE_30, 1, NODE_25, DISC_SALLEN_KEY_LOW_PASS, &m52_sound_c_sallen_key)
 
 	/* Mix signals */
-	DISCRETE_MIXER2(NODE_40, 1, NODE_10, NODE_30, &m52_sound_c_mix1)
+	DISCRETE_MIXER2(NODE_40, 1, NODE_10, NODE_25, &m52_sound_c_mix1)
+	DISCRETE_CRFILTER(NODE_45, 1, NODE_40, M52_R10+M52_R9, M52_C28)
 
 	DISCRETE_OUTPUT(NODE_40, 18.0)
 
