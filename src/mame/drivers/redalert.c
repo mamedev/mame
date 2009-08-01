@@ -66,10 +66,7 @@
         * Everything needs to be verified on real PCB or schematics
 
     Known issues/to-do's Panther:
-        * Hangs with a read at $c120 bit 0, wants it to be high for
-          whatever reason
         * Sound comms doesn't work
-        * Vertical cannon mechanism doesn't work (uses a paddle maybe?)
         * No title screen?
 
     ********************************************************************
@@ -325,7 +322,7 @@ static INPUT_PORTS_START( panther )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STICK0")
-	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(16) /* PORT_REVERSE */
+	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(3) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
