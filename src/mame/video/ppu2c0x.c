@@ -80,8 +80,6 @@ static const pen_t default_colortable[] =
 typedef struct
 {
 	bitmap_t				*bitmap;				/* target bitmap */
-	UINT8					*videomem;				/* video mem */
-	UINT8					*videoram;				/* video ram */
 	UINT8					*spriteram;				/* sprite ram */
 	pen_t					*colortable;			/* color table modified at run time */
 	pen_t					*colortable_mono;		/* monochromatic color table modified at run time */
@@ -92,10 +90,6 @@ typedef struct
 	ppu2c0x_scanline_cb		scanline_callback_proc;	/* optional scanline callback */
 	ppu2c0x_hblank_cb		hblank_callback_proc;	/* optional hblank callback */
 	ppu2c0x_vidaccess_cb	vidaccess_callback_proc;/* optional video access callback */
-	int						has_videorom;			/* whether we access a video rom or not */
-	int						videorom_banks;			/* number of banks in the videorom (if available) */
-	int						has_videoram;
-	int						videoram_banks_indices[0x2000/VIDEOMEM_PAGE_SIZE];
 	int						regs[PPU_MAX_REG];		/* registers */
 	int						refresh_data;			/* refresh-related */
 	int						refresh_latch;			/* refresh-related */
@@ -109,7 +103,6 @@ typedef struct
 	int						tile_page;				/* current tile page */
 	int						sprite_page;			/* current sprite page */
 	int						back_color;				/* background color */
-	UINT8					*ppu_page[4];			/* ppu pages */
 	int						nes_vram[8];			/* keep track of 8 .5k vram pages to speed things up */
 	UINT8					palette_ram[0x20];		/* shouldn't be in main memory! */
 	int						scan_scale;				/* scan scale */
@@ -179,7 +172,7 @@ INLINE const ppu2c0x_interface *get_interface( const device_config *device )
 /* default address map */
 // make this INTERNAL, default should just be enough to avoid compile errors, print error messages!
 static ADDRESS_MAP_START( ppu2c0x, 0, 8 )
-	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE (ppu2c0x_palette_read, ppu2c0x_palette_write)
+	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(ppu2c0x_palette_read, ppu2c0x_palette_write)
 ADDRESS_MAP_END
 
 void ppu2c0x_init_palette( running_machine *machine, int first_entry )
@@ -318,7 +311,6 @@ static const gfx_layout ppu_charlayout =
 static DEVICE_START( ppu2c0x )
 {
 	ppu2c0x_chip *chip = get_token(device);
-	// const ppu2c0x_interface *intf = get_interface(device);
 
 	memset(chip, 0, sizeof(*chip));
 	chip->scanlines_per_frame = (int) device_get_info_int(device, PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
@@ -527,7 +519,6 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 
 static void draw_sprites( const device_config *device, UINT8 *line_priority )
 {
-	// const ppu2c0x_interface *intf = get_interface(device);
 	ppu2c0x_chip *this_ppu = get_token(device);
 
 	/* cache some values locally */
@@ -1017,9 +1008,6 @@ static DEVICE_RESET( ppu2c0x )
 	/* set the vram bank-switch values to the default */
 	for (i = 0; i < 8; i++)
 		this_ppu->nes_vram[i] = i * 64;
-
-//  if (this_ppu->has_videorom)
-//      ppu2c0x_set_videorom_bank(device, 0, 8, 0, 512);
 }
 
 /*************************************
@@ -1266,21 +1254,11 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 				/* see if it's on the chargen portion */
 				if (tempAddr < 0x2000)
 				{
-					/* if we have a videorom mapped there, dont write and log the problem */
-					if (this_ppu->has_videorom && !this_ppu->has_videoram)
-					{
-						/* if there is a vidaccess callback, assume it coped with it */
-						if (this_ppu->vidaccess_callback_proc == NULL)
-							logerror("PPU: Attempting to write to the chargen when there's a ROM there!\n");
-					}
-					else
-					{
-						/* store the data */
-						memory_write_byte(device->space[0], tempAddr, data);
+					/* store the data */
+					memory_write_byte(device->space[0], tempAddr, data);
 
-						/* mark the char dirty */
-						// gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
-					}
+					/* mark the char dirty */
+					// gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
 				}
 
 				else

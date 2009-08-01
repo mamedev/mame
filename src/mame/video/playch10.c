@@ -69,22 +69,18 @@ static void ppu_irq( const device_config *device, int *ppu_regs )
 
 const ppu2c0x_interface playch10_ppu_interface =
 {
-	"gfx2",				/* vrom gfx region */
 	1,					/* gfxlayout num */
 	256,				/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq,			/* irq */
-	0					/* vram */
+	ppu_irq				/* irq */
 };
 
 const ppu2c0x_interface playch10_ppu_interface_hboard =
 {
-	"gfx2",				/* vrom gfx region */
 	1,					/* gfxlayout num */
 	256,				/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq,			/* irq */
-	1					/* vram */
+	ppu_irq				/* irq */
 };
 
 static TILE_GET_INFO( get_bg_tile_info )

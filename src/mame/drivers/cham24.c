@@ -265,7 +265,6 @@ static void ppu_irq( const device_config *device, int *ppu_regs )
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
-	"gfx1",				/* vrom gfx region */
 	0,					/* gfxlayout num */
 	0,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -291,6 +290,10 @@ static DRIVER_INIT( cham24 )
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	nt_page[0] = nt_ram;
+	nt_page[1] = nt_ram + 0x400;
+	nt_page[2] = nt_ram + 0x800;
+	nt_page[3] = nt_ram + 0xc00;
 
 	/* and read/write handlers */
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);

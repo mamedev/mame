@@ -87,12 +87,10 @@ typedef int  (*ppu2c0x_vidaccess_cb)( const device_config *device, int address, 
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
 {
-	const char *	vrom_region;			/* region id of gfx vrom (or REGION_INVALID if none) */
 	int				gfx_layout_number;		/* gfx layout number used by each chip */
 	int				color_base;				/* color base to use per ppu */
 	int				mirroring;				/* mirroring options (PPU_MIRROR_* flag) */
 	ppu2c0x_nmi_cb	nmi_handler;			/* NMI handler */
-	int				vram_enabled;			/* PPU uses vram together with vrom */
 };
 
 

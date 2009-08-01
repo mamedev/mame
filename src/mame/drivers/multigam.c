@@ -50,6 +50,7 @@
    PPU external bus interface
 
 *******************************************************/
+
 static UINT8* nt_ram;
 static UINT8* nt_page[4];
 
@@ -84,11 +85,14 @@ void set_mirroring(int mirroring)
 		break;
 	}
 }
+
 static WRITE8_HANDLER (multigam_nt_w)
 {
 	int page = ((offset & 0xc00) >> 10);
 	nt_page[page][offset & 0x3ff] = data;
 }
+
+
 static READ8_HANDLER (multigam_nt_r)
 {
 	int page = ((offset & 0xc00) >> 10);
@@ -101,7 +105,7 @@ void set_videorom_bank(running_machine* machine, int start, int count, int bank,
 	int offset = bank * (bank_size_in_kb * 0x400);
 	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
 	/* count determines the size of the area mapped in KB */
-	for (i = 0; i < count; i++)
+	for (i = 0; i < count; i++, offset += 0x400)
 	{
 		j = i + start + 1;
 		memory_set_bankptr(machine, j, memory_region(machine, "gfx1") + offset);
@@ -214,7 +218,7 @@ static WRITE8_HANDLER(multigam_switch_prg_rom)
 
 static WRITE8_HANDLER(multigam_switch_gfx_rom)
 {
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * data));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	multigam_game_gfx_bank = data;
 };
@@ -601,7 +605,6 @@ static void ppu_irq( const device_config *device, int *ppu_regs )
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
-	"gfx1",				/* vrom gfx region */
 	0,					/* gfxlayout num */
 	0,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -643,6 +646,11 @@ static MACHINE_RESET( multigm3 )
 static MACHINE_START( multigam )
 {
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	nt_page[0] = nt_ram;
+	nt_page[1] = nt_ram + 0x400;
+	nt_page[2] = nt_ram + 0x800;
+	nt_page[3] = nt_ram + 0xc00;
+
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
 	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
@@ -651,6 +659,11 @@ static MACHINE_START( multigam )
 static MACHINE_START( multigm3 )
 {
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	nt_page[0] = nt_ram;
+	nt_page[1] = nt_ram + 0x400;
+	nt_page[2] = nt_ram + 0x800;
+	nt_page[3] = nt_ram + 0xc00;
+
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(1), 0);
@@ -661,6 +674,8 @@ static MACHINE_START( multigm3 )
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(6), 0);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(7), 0);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(8), 0);
+
+	set_videorom_bank(machine, 0, 8, 0, 8);
 };
 
 static MACHINE_DRIVER_START( multigam )

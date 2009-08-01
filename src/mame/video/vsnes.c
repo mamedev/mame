@@ -27,7 +27,6 @@ static void ppu_irq_2( const device_config *device, int *ppu_regs )
 /* our ppu interface                                            */
 const ppu2c0x_interface vsnes_ppu_interface_1 =
 {
-	"gfx1",				/* vrom gfx region */
 	0,					/* gfxlayout num */
 	0,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -37,7 +36,6 @@ const ppu2c0x_interface vsnes_ppu_interface_1 =
 /* our ppu interface for dual games                             */
 const ppu2c0x_interface vsnes_ppu_interface_2 =
 {
-	"gfx2",				/* vrom gfx region */
 	1,					/* gfxlayout num */
 	64,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
