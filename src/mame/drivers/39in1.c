@@ -18,10 +18,6 @@
  * TODO:
  *   PXA255 peripherals
  *
- * 65b8: load from 138288+14 must be zero, if BNE at 65c0 is taken = deathq
- *
- * 6740: System Check Error death (don't let it branch here)
- *
  **************************************************************************/
 
 #include "driver.h"
@@ -1228,11 +1224,11 @@ static UINT32 seed, magic;
 static UINT32 state = 0;
 static READ32_HANDLER( cpld_r )
 {
-//  printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
+//	if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
 
 	if (cpu_get_pc(space->cpu) == 0x3f04)
 	{
-		return 0x63;
+		return 0xf0;	  // any non-zero value works here
 	}
 	else if (cpu_get_pc(space->cpu) == 0xe3af4)
 	{
@@ -1300,6 +1296,16 @@ static WRITE32_HANDLER( cpld_w )
 //  {
 //      printf("%08x: CPLD_W: %08x = %08x & %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 //  }
+}
+
+static READ32_HANDLER( prot_cheater_r )
+{
+	return 0x37;
+}
+
+static DRIVER_INIT( 39in1 )
+{
+	memory_install_read32_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa0151648, 0xa015164b, 0, 0, prot_cheater_r);
 }
 
 static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1452,7 +1458,6 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	//MDRV_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)    // completely bogus for this h/w
 	MDRV_SCREEN_SIZE(1024, 1024)
 	MDRV_SCREEN_VISIBLE_AREA(0, 295, 0, 479)
 	MDRV_PALETTE_LENGTH(256)
@@ -1489,5 +1494,5 @@ ROM_END
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END*/
 
-GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2004, 39in1, 0, 39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_NO_SOUND)
 //GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "<unknown>", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
