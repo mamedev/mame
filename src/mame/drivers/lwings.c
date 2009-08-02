@@ -735,11 +735,11 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( lwings )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 4 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(lwings_map)
 	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(lwings_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ??? */
 
@@ -763,13 +763,13 @@ static MACHINE_DRIVER_START( lwings )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2203a", YM2203, 1500000)
+	MDRV_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.10)
 
-	MDRV_SOUND_ADD("2203b", YM2203, 1500000)
+	MDRV_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)        /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trojan_map)
 
-	MDRV_CPU_ADD("adpcm", Z80, 4000000) // 3.579545 Mhz (?)
+	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map)
 	MDRV_CPU_IO_MAP(trojan_adpcm_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
@@ -794,7 +794,7 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_VIDEO_UPDATE(trojan)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("5205", MSM5205, 384000)
+	MDRV_SOUND_ADD("5205", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
