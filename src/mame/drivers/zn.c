@@ -4484,7 +4484,7 @@ GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony/Eighting/R
 
 GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, beastrzb,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA Bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1997, beastrzb,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (WORLD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (ASIA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

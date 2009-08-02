@@ -987,7 +987,7 @@ static DRIVER_INIT( imago )
 }
 
 GAME( 1982, flyboy,   0,        fastfred, flyboy,   flyboy,   ROT90, "Kaneko", "Fly-Boy", 0 )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   flyboyb,  ROT90, "Kaneko", "Fly-Boy (bootleg)", 0 )
+GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", 0 )
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred, ROT90, "Atari", "Fast Freddie", 0 )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "Jump Coaster", 0 )
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )

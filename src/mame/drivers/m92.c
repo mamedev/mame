@@ -2179,7 +2179,7 @@ GAME( 1992, skingame2,majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem
 GAME( 1992, hook,     0,        hook,          hook,     hook,     ROT0,   "Irem",         "Hook (World)", 0 )
 GAME( 1992, hooku,    hook,     hook,          hook,     hook,     ROT0,   "Irem America", "Hook (US)", 0 )
 GAME( 1992, hookj,    hook,     hook,          hook,     hook,     ROT0,   "Irem",         "Hook (Japan)", 0 )
-GAME( 1992, ppan,     hook,     ppan,          hook,     hook,     ROT0,   "Irem",         "Peter Pan (bootleg of Hook)", GAME_NOT_WORKING ) // PCB marked 'Peter Pan', no title screen, made in Italy?
+GAME( 1992, ppan,     hook,     ppan,          hook,     hook,     ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", GAME_NOT_WORKING ) // PCB marked 'Peter Pan', no title screen, made in Italy?
 GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, rtypeleo, ROT0,   "Irem",         "R-Type Leo (World)", 0 )
 GAME( 1992, rtypeleoj,rtypeleo, rtypeleo,      rtypeleo, rtypelej, ROT0,   "Irem",         "R-Type Leo (Japan)", 0 )
 GAME( 1993, inthunt,  0,        inthunt,       inthunt,  inthunt,  ROT0,   "Irem",         "In The Hunt (World)", 0 )

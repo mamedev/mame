@@ -228,7 +228,7 @@ Notes:
     See Input Port definition header below, for instructions
       on how to enter pause/slow motion modes.
     Code at $20A26 forces territory to Japan in V-Five. Some stuff
-      NOP'd at reset vector, and NEC V25+ CPU post test is skipped (bootleg ?)
+      NOP'd at reset vector, and NEC V25+ CPU post test is skipped (bootleg?)
 
 To Do / Unknowns:
     - Whoopee/Teki Paki sometimes tests bit 5 of the territory port
@@ -5233,7 +5233,7 @@ GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan",
 
 GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu)", GAME_SUPPORTS_SAVE )
 GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg ?)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg?)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )

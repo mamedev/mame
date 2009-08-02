@@ -550,4 +550,4 @@ ROM_END
 
 GAME( 1988, vball,    0,     vball,    vball,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", 0 )
 GAME( 1988, vball2pj, vball, vball,    vball2pj, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", 0 )
-GAME( 1988, vballb,   vball, vball,    vball,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (bootleg)", 0 )
+GAME( 1988, vballb,   vball, vball,    vball,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg)", 0 )

@@ -5772,7 +5772,7 @@ GAME( 1983, bwcasino, 0,        acitya,   bwcasino, 0,        ROT90,  "Epos Corp
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   0,        ROT90,  "Epos Corporation", "Atlantic City Action", GAME_SUPPORTS_SAVE )
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, 0,        ROT90,  "Bootleg", "Super Glob (Pac-Man hardware) German", GAME_SUPPORTS_SAVE )
+GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) German", GAME_SUPPORTS_SAVE )
 GAME( 1984, beastf,   suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Beastie Feastie", GAME_SUPPORTS_SAVE )
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, drivfrcp, ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Driving Force (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 8bpm,     8ballact, 8bpm,     8bpm,     8bpm,     ROT90,  "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (Pac-Man conversion)", GAME_SUPPORTS_SAVE )

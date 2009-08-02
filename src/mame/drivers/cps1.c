@@ -8669,7 +8669,7 @@ GAME( 1991, captcommb,captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "bootleg
 GAME( 1991, knights,  0,        cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)" , 0)			// "ETC"
 GAME( 1991, knightsu, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (US 911127)", 0 )
 GAME( 1991, knightsj, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127)", 0 )
-GAME( 1991, knightsb, knights,  knightsb,   knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127, bootleg)" , GAME_NOT_WORKING)
+GAME( 1991, knightsb, knights,  knightsb,   knights,  cps1,     ROT0,   "bootleg", "Knights of the Round (World 911127, bootleg)" , GAME_NOT_WORKING)
 GAME( 1992, sf2ce,    0,        cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (World 920313)" , 0)	// "ETC"
 GAME( 1992, sf2ceua,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920313)", 0 )
 GAME( 1992, sf2ceub,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920513)", 0 )

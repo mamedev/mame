@@ -7133,7 +7133,7 @@ GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",  
 // these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb, mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
 GAME( 1990, mustangb2,mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and roms have TAB Austria stickers
-GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",	               "Thunder Dragon (Bootleg)", 0 )
+GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "bootleg",	               "Thunder Dragon (bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
 GAME( 1992, ssmissin, 0,        ssmissin, ssmissin, ssmissin, ROT270, "Comad",                         "S.S. Mission", GAME_NO_COCKTAIL )
