@@ -518,33 +518,36 @@ static DRIVER_INIT( progolf )
 static DRIVER_INIT( progolfa )
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
+
+	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
+
+	for (A = 0x0000;A < 0x10000;A++)
+		decrypted[A] = rom[A];
 
 	/* TODO: data is likely to not be encrypted, just the opcodes are. */
-	for (A = 0x0000;A < 0x10000;A++)
+	for (A = 0x0001 ; A < 0x10000 ; A += 2)
 	{
-		switch(A & 0x1f)
+		switch(rom[A] & 0xf0)
 		{
-			// 0xda (1011) -> 0xea (1110)
-			// 0xc5 (1100) -> 0xa5 (1010)
-			// 0x4c (0100) -> 0x4c (0100) <- data!!!
-			case 0x03: rom[A] = BITSWAP8(rom[A],7,4,6,5,3,2,1,0); break;
-			// 0x59 (0101) -> 0xc9 (1100)
-			case 0x05: rom[A] = BITSWAP8(rom[A],4,6,7,5,3,2,1,0); break;
-			//case 0x04: rom[A] = BITSWAP8(rom[A],7,,4,3,2,1,0); break;
-			case 0x0b: rom[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0); break;
-			// 0x6a (0110) -> 0x9a (1001)
-			case 0x0d: rom[A] = BITSWAP8(rom[A],6,7,4,5,3,2,1,0); break;
-			// 0x70 (0111) -> 0xd0 (1101)
-			case 0x0f: rom[A] = BITSWAP8(rom[A],5,6,7,4,3,2,1,0); break;
-			case 0x13: rom[A] = BITSWAP8(rom[A],5,6,7,4,3,2,1,0); break;
-			// 0xc0 (1100) -> 0xa0 (1010)
-			// 0x4d (0100) -> 0x8d (1000)
-			case 0x17: rom[A] = BITSWAP8(rom[A],6,5,7,4,3,2,1,0); break;
-			// 0xed (1110) -> 0xbd (1011)
-			case 0x1b: rom[A] = BITSWAP8(rom[A],7,4,6,5,3,2,1,0); break;
-			// 0xcd (1100) -> 0xad (1010)
-			case 0x1f: rom[A] = BITSWAP8(rom[A],6,5,7,4,3,2,1,0); break;
+			case 0x00: decrypted[A] = 0x00 | (rom[A] & 0x0f); break;
+			case 0x10: decrypted[A] = 0x40 | (rom[A] & 0x0f); break;
+			case 0x20: decrypted[A] = 0x10 | (rom[A] & 0x0f); break;
+			case 0x30: decrypted[A] = 0x50 | (rom[A] & 0x0f); break; // guessed
+			case 0x40: decrypted[A] = 0x80 | (rom[A] & 0x0f); break;
+			case 0x50: decrypted[A] = 0xc0 | (rom[A] & 0x0f); break;
+			case 0x60: decrypted[A] = 0x90 | (rom[A] & 0x0f); break;
+			case 0x70: decrypted[A] = 0xd0 | (rom[A] & 0x0f); break;
+			case 0x80: decrypted[A] = 0x20 | (rom[A] & 0x0f); break;
+			case 0x90: decrypted[A] = 0x60 | (rom[A] & 0x0f); break;
+			case 0xa0: decrypted[A] = 0x30 | (rom[A] & 0x0f); break; // guessed
+			case 0xb0: decrypted[A] = 0x70 | (rom[A] & 0x0f); break; // guessed
+			case 0xc0: decrypted[A] = 0xa0 | (rom[A] & 0x0f); break;
+			case 0xd0: decrypted[A] = 0xe0 | (rom[A] & 0x0f); break;
+			case 0xe0: decrypted[A] = 0xb0 | (rom[A] & 0x0f); break;
+			case 0xf0: decrypted[A] = 0xf0 | (rom[A] & 0x0f); break;
 		}
 	}
 }
