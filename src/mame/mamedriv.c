@@ -6421,6 +6421,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Nor does Digger Man */
 	DRIVER( diggerma )  /* No Game ID (unlicensed), (c) 2000 Kyle Hodgetts, prototype */
 
+	/* Neo Print */
+	DRIVER( 98best44 )
+
 	/* Hyper NeoGeo 64 uses a 3 digit rom code? */
 
  	DRIVER( hng64 )
