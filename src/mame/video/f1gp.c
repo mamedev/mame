@@ -232,7 +232,7 @@ static void f1gp_draw_sprites(running_machine *machine,bitmap_t *bitmap,const re
 						flipx,flipy,
 						sx,sy,
 						0x1000 * zoomx,0x1000 * zoomy,
-						priority_bitmap,
+						machine->priority_bitmap,
 //                      pri ? 0 : 0x2);
 						primask,15);
 				map_start++;
@@ -298,7 +298,7 @@ static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 			color,
 			flipx,flipy,
 			x,y,
-			priority_bitmap,
+			machine->priority_bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
@@ -307,7 +307,7 @@ static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 			color,
 			flipx,flipy,
 			x - 512,y,
-			priority_bitmap,
+			machine->priority_bitmap,
 			pri ? 0 : 0x2,15);
 	}
 }
@@ -315,7 +315,7 @@ static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 
 VIDEO_UPDATE( f1gp )
 {
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0,1);
 
@@ -348,7 +348,7 @@ VIDEO_UPDATE( f1gpb )
 
 	tilemap_set_scrolly(fg_tilemap,0,f1gpb_fgregs[0] + 8);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	tilemap_draw_roz(bitmap, cliprect, roz_tilemap,
 		startx << 13, starty << 13,

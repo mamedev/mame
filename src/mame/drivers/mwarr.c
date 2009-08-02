@@ -361,7 +361,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						  color,
 						  flipx,0,
 						  x,y+i*16,
-						  priority_bitmap,pri_mask,0 );
+						  machine->priority_bitmap,pri_mask,0 );
 
 				/* wrap around x */
 				pdrawgfx_transpen( bitmap,
@@ -371,7 +371,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						  color,
 						  flipx,0,
 						  x-1024,y+i*16,
-						  priority_bitmap,pri_mask,0 );
+						  machine->priority_bitmap,pri_mask,0 );
 
 				/* wrap around y */
 				pdrawgfx_transpen( bitmap,
@@ -381,7 +381,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						  color,
 						  flipx,0,
 						  x,y-512+i*16,
-						 priority_bitmap,pri_mask,0 );
+						 machine->priority_bitmap,pri_mask,0 );
 
 				/* wrap around x & y */
 				pdrawgfx_transpen( bitmap,
@@ -391,7 +391,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						  color,
 						  flipx,0,
 						  x-1024,y-512+i*16,
-						  priority_bitmap,pri_mask,0 );
+						  machine->priority_bitmap,pri_mask,0 );
 			}
 		}
 
@@ -403,7 +403,7 @@ static VIDEO_UPDATE( mwarr )
 {
 	int i;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if(vidattrram[6] & 1)
 	{

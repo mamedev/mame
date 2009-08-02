@@ -165,7 +165,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y+i*16,
-					priority_bitmap,
+					machine->priority_bitmap,
 					(colour & 0x08) ? 0x00 : 0x02,0);
 			else if (m90_video_control_data[7] & 0x02)
 				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -173,7 +173,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y+i*16,
-					priority_bitmap,
+					machine->priority_bitmap,
 					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
 			else
 				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -181,7 +181,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y+i*16,
-					priority_bitmap,
+					machine->priority_bitmap,
 					0x02,0);
 	}
 }
@@ -219,7 +219,7 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				colour,
 				fx,fy,
 				x,y,
-				priority_bitmap,
+				machine->priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
@@ -256,7 +256,7 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				colour,
 				fx,fy,
 				x,y,
-				priority_bitmap,
+				machine->priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
@@ -349,7 +349,7 @@ VIDEO_UPDATE( m90 )
 		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_control_data[3]+256-2 );
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (video_enable) {
 		if (!pf2_enable)
@@ -445,7 +445,7 @@ VIDEO_UPDATE( m90 )
 VIDEO_UPDATE( bomblord )
 {
 	int i;
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	/* Setup scrolling */
@@ -496,7 +496,7 @@ VIDEO_UPDATE( bomblord )
 
 VIDEO_UPDATE( dynablsb )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!(m90_video_data[0xf008/2] & 0x4000)) {

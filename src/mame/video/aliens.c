@@ -75,7 +75,7 @@ VIDEO_UPDATE( aliens )
 {
 	K052109_tilemap_update();
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,layer_colorbase[1] * 16);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,2);

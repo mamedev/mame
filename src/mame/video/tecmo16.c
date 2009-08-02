@@ -416,7 +416,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
@@ -424,7 +424,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
@@ -432,7 +432,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 					}
 				}
 			}
@@ -459,7 +459,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
@@ -467,7 +467,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
@@ -475,7 +475,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								priority_bitmap, priority_mask,0);
+								machine->priority_bitmap, priority_mask,0);
 					}
 				}
 			}
@@ -487,7 +487,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 
 VIDEO_UPDATE( tecmo16 )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	bitmap_fill(tile_bitmap_bg, cliprect, 0x300);
 	bitmap_fill(tile_bitmap_fg,     cliprect, 0);

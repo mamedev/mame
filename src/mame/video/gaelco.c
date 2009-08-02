@@ -175,7 +175,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				pdrawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						priority_bitmap,pri_mask,0);
+						machine->priority_bitmap,pri_mask,0);
 			}
 		}
 	}
@@ -195,7 +195,7 @@ VIDEO_UPDATE( maniacsq )
 	tilemap_set_scrolly(pant[1], 0, gaelco_vregs[2]);
 	tilemap_set_scrollx(pant[1], 0, gaelco_vregs[3]);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill( bitmap, cliprect , 0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],3,0);
@@ -222,7 +222,7 @@ VIDEO_UPDATE( bigkarnk )
 	tilemap_set_scrolly(pant[1], 0, gaelco_vregs[2]);
 	tilemap_set_scrollx(pant[1], 0, gaelco_vregs[3]);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill( bitmap, cliprect , 0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 3,0);

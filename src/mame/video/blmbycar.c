@@ -205,7 +205,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					0x20 + (attr & 0xf),
 					flipx, flipy,
 					x, y,
-					priority_bitmap,
+					machine->priority_bitmap,
 					pri_mask,0	);
 	}
 }
@@ -242,7 +242,7 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layers_ctrl&1)
 		for (i = 0; i <= 1; i++)

@@ -341,6 +341,7 @@ static void zdrawgfxzoom(
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
+					bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 					if( priority_bitmap )
 					{
 						for( y=sy; y<ey; y++ )
@@ -416,7 +417,7 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( priority_bitmap, cliprect , 0);
+		bitmap_fill( machine->priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -527,7 +528,7 @@ namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( priority_bitmap, cliprect , 0);
+		bitmap_fill( machine->priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -945,7 +946,7 @@ namco_obj_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *clip
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
-		bitmap_fill( priority_bitmap, cliprect , 0);
+		bitmap_fill( machine->priority_bitmap, cliprect , 0);
 	}
 //  if( offs==0 )
 	{ /* boot */

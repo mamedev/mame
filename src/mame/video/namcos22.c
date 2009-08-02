@@ -253,6 +253,7 @@ struct _poly_extra_data
 	rgbint fogColor;
 	rgbint fadeColor;
 	const pen_t *pens;
+	bitmap_t *priority_bitmap;
 	int bn;
 	UINT16 flags;
 	int cmode;
@@ -287,7 +288,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	rgbint fadeColor = extra->fadeColor;
 	int penmask, penshift;
 	int prioverchar;
-	const UINT8 *pCharPri = BITMAP_ADDR8(priority_bitmap, scanline, 0);
+	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	UINT32 *pDest = BITMAP_ADDR32(bitmap, scanline, 0);
 	int x;
 
@@ -437,6 +438,7 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 	extra = (poly_extra_data *)poly_get_extra_data(poly);
 
 	extra->pens = &machine->pens[(color&0x7f)<<8];
+	extra->priority_bitmap = machine->priority_bitmap;
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cmode = cmode;
@@ -496,7 +498,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int alpha = extra->alpha;
 	UINT8 *source = (UINT8 *)extra->source + (y_index>>16) * extra->line_modulo;
 	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
-	const UINT8 *pCharPri = BITMAP_ADDR8(priority_bitmap, scanline, 0);
+	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
 
 	int bFogEnable = 0;
@@ -596,6 +598,7 @@ mydrawgfxzoom(
 		extra->prioverchar = prioverchar;
 		extra->line_modulo = gfx->line_modulo;
 		extra->pens = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		extra->priority_bitmap = gfx->machine->priority_bitmap;
 		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 #ifdef RENDER_AS_QUADS
 		poly_render_quad_fan(poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
@@ -1557,7 +1560,7 @@ static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const
     * namcos22_tilemapattr[0x8/4] == 0x01ff0000
     * namcos22_tilemapattr[0xe/4] == ?
     */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(machine->priority_bitmap,cliprect,0);
 	tilemap_set_scrollx( bgtilemap,0, (dx-0x35c)&0x3ff );
 	tilemap_set_scrolly( bgtilemap,0, dy&0x3ff );
 	tilemap_set_palette_offset( bgtilemap, mixer.palBase*256 );

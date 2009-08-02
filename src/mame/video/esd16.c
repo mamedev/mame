@@ -252,7 +252,7 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 						color,
 						flipx, flipy,
 						sx, y,
-						priority_bitmap, pri_mask, 0	);
+						machine->priority_bitmap, pri_mask, 0	);
 		}
 	}
 }
@@ -315,7 +315,7 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 						color,
 						flipx, flipy,
 						sx, y,
-						priority_bitmap, pri_mask, 0	);
+						machine->priority_bitmap, pri_mask, 0	);
 		}
 	}
 }
@@ -334,7 +334,7 @@ VIDEO_UPDATE( esd16 )
 {
 	int layers_ctrl = -1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_set_scrollx(esdtilemap_0, 0, esd16_scroll_0[0]);
 	tilemap_set_scrolly(esdtilemap_0, 0, esd16_scroll_0[1]);
@@ -365,7 +365,7 @@ VIDEO_UPDATE( hedpanic )
 {
 	int layers_ctrl = -1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 
 #ifdef MAME_DEBUG
@@ -427,7 +427,7 @@ VIDEO_UPDATE( hedpanio )
 {
 	int layers_ctrl = -1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 
 #ifdef MAME_DEBUG

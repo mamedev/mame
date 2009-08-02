@@ -172,13 +172,13 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT8        *prib = (UINT8 *)priority_bitmap->base;
+	UINT8        *prib = (UINT8 *)machine->priority_bitmap->base;
 	UINT16       *dest = (UINT16 *)dm->base;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
 	dest += yy1*dm->rowpixels + xx1;
-	prib += yy1*priority_bitmap->rowpixels + xx1;
+	prib += yy1*machine->priority_bitmap->rowpixels + xx1;
 	mask += yy1*4;
 	yy2 -= yy1;
 
@@ -290,7 +290,7 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 		source += bm->rowpixels;
 		trans  += tm->rowpixels;
 		dest   += dm->rowpixels;
-		prib   += priority_bitmap->rowpixels;
+		prib   += machine->priority_bitmap->rowpixels;
 		mask   += 4;
 	}
 }
@@ -298,7 +298,7 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 
 // The rgb version is used by model 1 & 2 which do not need to care
 // about sprite priority hence the lack of support for the
-// priority_bitmap
+// machine->priority_bitmap
 
 static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
 									 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
@@ -679,7 +679,7 @@ void sys24_sprite_vh_start(running_machine *machine)
     0   11------    --------
 */
 
-void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
+void sys24_sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;
@@ -841,7 +841,7 @@ void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *s
 										int zx1 = flipx ? 7-zx : zx;
 										UINT32 neweroffset = (newoffset+(zx1>>2))&0x1ffff; // crackdown sometimes attempts to use data past the end of spriteram
 										int c = (sys24_sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
-										UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos1, xpos2);
+										UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, ypos1, xpos2);
 										if(!(*pri & pm[c])) {
 											c = colors[c];
 											if(c) {

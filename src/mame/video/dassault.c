@@ -170,7 +170,7 @@ VIDEO_UPDATE( dassault )
 
 	/* Draw playfields/update priority bitmap */
 	deco16_clear_sprite_priority_bitmap();
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[3072]);
 	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 

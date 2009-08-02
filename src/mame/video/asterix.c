@@ -116,7 +116,7 @@ VIDEO_UPDATE( asterix )
 
 	sortlayers(layer, layerpri);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[0], 0, 1);

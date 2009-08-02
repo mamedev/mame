@@ -373,7 +373,7 @@ static void taito_f2_tc360_spritemixdraw( bitmap_t *dest_bmp,const rectangle *cl
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-
+	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 	int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
 
@@ -880,7 +880,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
-					priority_bitmap,sprite_ptr->primask,0);
+					machine->priority_bitmap,sprite_ptr->primask,0);
 		else
 			taito_f2_tc360_spritemixdraw(bitmap,cliprect,machine->gfx[0],
 					sprite_ptr->code,
@@ -1045,7 +1045,7 @@ VIDEO_UPDATE( ssi )
 
 	/* SSI only uses sprites, the tilemap registers are not even initialized.
        (they are in Majestic 12, but the tilemaps are not used anyway) */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites(screen->machine, bitmap,cliprect,NULL, 0);
 	return 0;
@@ -1058,7 +1058,7 @@ VIDEO_UPDATE( yesnoj )
 
 	TC0100SCN_tilemap_update(screen->machine);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 	draw_sprites(screen->machine, bitmap,cliprect,NULL, 0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
@@ -1074,7 +1074,7 @@ VIDEO_UPDATE( taitof2 )
 
 	TC0100SCN_tilemap_update(screen->machine);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
@@ -1106,7 +1106,7 @@ VIDEO_UPDATE( taitof2_pri )
 
 	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],0,1);
@@ -1165,7 +1165,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 
 	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 	drawn=0;
@@ -1228,7 +1228,7 @@ VIDEO_UPDATE( thundfox )
 	spritepri[3] = TC0360PRI_regs[7] >> 4;
 
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 
@@ -1361,14 +1361,14 @@ VIDEO_UPDATE( metalb )
 
 	f2_spriteblendmode = TC0360PRI_regs[0]&0xc0;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,16);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,16);
 
 	draw_sprites(screen->machine, bitmap,cliprect,NULL,1);
 	return 0;
@@ -1408,13 +1408,13 @@ VIDEO_UPDATE( deadconx )
 	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
 	spritepri[3] = TC0360PRI_regs[7] >> 4;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -1437,6 +1437,6 @@ VIDEO_UPDATE( deadconx )
     that the FG layer is always on top of sprites.
     */
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
 	return 0;
 }

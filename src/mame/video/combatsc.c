@@ -516,7 +516,7 @@ VIDEO_UPDATE( combasc )
 	tilemap_set_scrolly(bg_tilemap[0],0,K007121_ctrlram[0][0x02]);
 	tilemap_set_scrolly(bg_tilemap[1],0,K007121_ctrlram[1][0x02]);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (priority == 0)
 	{

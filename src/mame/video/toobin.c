@@ -231,6 +231,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 VIDEO_UPDATE( toobin )
 {
+	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	const rgb_t *palette = palette_entry_list_adjusted(screen->machine->palette);
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;

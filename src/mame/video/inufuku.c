@@ -149,7 +149,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							flipx, flipy,
 							sx - 16, sy - 16,
 							zoomx << 11, zoomy << 11,
-							priority_bitmap,priority_mask, 15);
+							machine->priority_bitmap,priority_mask, 15);
 
 					map_start += 2;
 				}
@@ -233,7 +233,7 @@ VIDEO_UPDATE( inufuku )
 	int i;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bitmap_fill(priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
 	if (inufuku_bg_raster) {
 		tilemap_set_scroll_rows(inufuku_bg_tilemap, 512);

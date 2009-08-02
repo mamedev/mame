@@ -1046,7 +1046,7 @@ void konamigx_mixer_init(running_machine *machine, int objdma)
 	gx_objdma = 0;
 	gx_primode = 0;
 
-	gx_objzbuf = (UINT8 *)priority_bitmap->base;
+	gx_objzbuf = (UINT8 *)machine->priority_bitmap->base;
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 

@@ -124,7 +124,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y)) {
 					destline = BITMAP_ADDR16(bitmap, drawypos, 0);
-					priline = BITMAP_ADDR8(priority_bitmap, drawypos, 0);
+					priline = BITMAP_ADDR8(machine->priority_bitmap, drawypos, 0);
 
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc) {
 						drawxpos = x+xcnt-global_x;
@@ -202,7 +202,7 @@ VIDEO_UPDATE( mcatadv )
 	int i;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	if(mcatadv_scroll[2] != palette_bank1) {
 		palette_bank1 = mcatadv_scroll[2];

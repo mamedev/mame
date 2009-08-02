@@ -629,7 +629,7 @@ VIDEO_UPDATE( punkshot )
 
 	sortlayers(sorted_layer,layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
@@ -658,7 +658,7 @@ VIDEO_UPDATE( lgtnfght )
 
 	sortlayers(sorted_layer,layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
@@ -703,7 +703,7 @@ VIDEO_UPDATE( glfgreat )
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
 	if (layerpri[0] >= 0x30 && layerpri[1] < 0x30)
@@ -798,7 +798,7 @@ VIDEO_UPDATE( thndrx2 )
 
 	sortlayers(sorted_layer,layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);

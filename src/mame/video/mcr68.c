@@ -217,7 +217,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 	sprite_clip.max_x -= mcr68_sprite_clip;
 	sect_rect(&sprite_clip, cliprect);
 
-	bitmap_fill(priority_bitmap,&sprite_clip,1);
+	bitmap_fill(machine->priority_bitmap,&sprite_clip,1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -250,11 +250,11 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 		/* first draw the sprite, visible */
 		pdrawgfx_transmask(bitmap, &sprite_clip, machine->gfx[1], code, color, flipx, flipy, x, y,
-				priority_bitmap, 0x00, 0x0101);
+				machine->priority_bitmap, 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
 		pdrawgfx_transmask(bitmap, &sprite_clip, machine->gfx[1], code, color, flipx, flipy, x, y,
-				priority_bitmap, 0x02, 0xfeff);
+				machine->priority_bitmap, 0x02, 0xfeff);
 	}
 }
 
@@ -263,7 +263,7 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
 {
 	int offs;
 
-	bitmap_fill(priority_bitmap,cliprect,1);
+	bitmap_fill(machine->priority_bitmap,cliprect,1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -306,11 +306,11 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
 
 		/* first draw the sprite, visible */
 		pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, x, y,
-				priority_bitmap, 0x00, 0x0101);
+				machine->priority_bitmap, 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
 		pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, x, y,
-				priority_bitmap, 0x02, 0xfeff);
+				machine->priority_bitmap, 0x02, 0xfeff);
 	}
 }
 

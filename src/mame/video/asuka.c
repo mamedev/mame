@@ -53,7 +53,7 @@ VIDEO_UPDATE( asuka )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -78,7 +78,7 @@ VIDEO_UPDATE( bonzeadv )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);

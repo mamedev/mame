@@ -127,7 +127,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						priority_bitmap,
+						machine->priority_bitmap,
 						priority_mask,0);
 
 					number++;
@@ -146,7 +146,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						priority_bitmap,
+						machine->priority_bitmap,
 						priority_mask,0);
 				}
 		}
@@ -156,7 +156,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( shootout )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);
@@ -166,7 +166,7 @@ VIDEO_UPDATE( shootout )
 
 VIDEO_UPDATE( shootouj )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);

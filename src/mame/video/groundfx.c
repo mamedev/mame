@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,primasks[sprite_ptr->pri],0);
+				machine->priority_bitmap,primasks[sprite_ptr->pri],0);
 	}
 }
 
@@ -239,7 +239,7 @@ VIDEO_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
@@ -262,22 +262,22 @@ VIDEO_UPDATE( groundfx )
 
     */
 	if (TC0100SCN_long_r(space,0x4090/4,0xffffffff) || TC0480SCP_long_r(space,0x20/4,0xffffffff)==0x240866) { /* Anything in text layer - really stupid hack */
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
-//      TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
+		//TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
 		if (TC0480SCP_long_r(space,0x20/4,0xffffffff)!=0x240866) /* Stupid hack for start of race */
-			TC0480SCP_tilemap_draw(bitmap,&hack_cliprect,layer[0],0,0);
+			TC0480SCP_tilemap_draw(screen->machine,bitmap,&hack_cliprect,layer[0],0,0);
 		draw_sprites(screen->machine,bitmap,cliprect,1,44,-574);
 	} else {
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
 		TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
 		draw_sprites(screen->machine,bitmap,cliprect,0,44,-574);
 	}
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
 	return 0;
 }

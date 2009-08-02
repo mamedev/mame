@@ -548,7 +548,7 @@ static void rallyx_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 				color,
 				flipx,flipy,
 				sx,sy,
-				priority_bitmap,0x02,
+				machine->priority_bitmap,0x02,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
@@ -569,7 +569,7 @@ static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				color,
 				flip,flip,
 				sx,sy,
-				priority_bitmap,0x02,
+				machine->priority_bitmap,0x02,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
@@ -685,7 +685,7 @@ VIDEO_UPDATE( rallyx )
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
@@ -717,7 +717,7 @@ VIDEO_UPDATE( jungler )
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* tile priority doesn't seem to be supported in Jungler */
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
@@ -762,7 +762,7 @@ VIDEO_UPDATE( locomotn )
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);

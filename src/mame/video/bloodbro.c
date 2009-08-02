@@ -175,7 +175,7 @@ static void bloodbro_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 						color,
 						flipx,flipy,
 						flipx ? (sx + 16*(width-x)) : (sx + 16*x),flipy ? (sy + 16*(height-y)) : (sy + 16*y),
-						priority_bitmap,
+						machine->priority_bitmap,
 						pri_mask,15);
 			}
 		}
@@ -219,7 +219,7 @@ static void weststry_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				color,
 				flipx,flipy,
 				sx,sy,
-				priority_bitmap,
+				machine->priority_bitmap,
 				pri_mask,15);
 	}
 }
@@ -233,7 +233,7 @@ VIDEO_UPDATE( bloodbro )
 	tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x12]);
 	tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x13]);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
@@ -249,7 +249,7 @@ VIDEO_UPDATE( weststry )
 //  tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x12]);
 //  tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x13]);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
@@ -266,7 +266,7 @@ VIDEO_UPDATE( skysmash )
 	tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x0a]);
 	tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x0b]);	/* ? */
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);

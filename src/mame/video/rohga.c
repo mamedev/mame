@@ -135,7 +135,7 @@ static void rohga_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -440,7 +440,7 @@ static void update_rohga(const device_config *screen, bitmap_t *bitmap, const re
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[768]);
 
 	switch (deco16_priority&3)
@@ -527,7 +527,7 @@ VIDEO_UPDATE( nitrobal )
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[512]);
-	bitmap_fill(priority_bitmap,NULL,0);
+	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 	deco16_clear_sprite_priority_bitmap();
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */

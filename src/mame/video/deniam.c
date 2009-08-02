@@ -258,9 +258,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]&0x0f);
-								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -278,9 +278,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]>>4);
-								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -302,9 +302,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]>>4);
-								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -322,9 +322,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]&0x0f);
-								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(machine->priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -390,7 +390,7 @@ VIDEO_UPDATE( deniam )
 	tilemap_set_scrollx(fg_tilemap,0,fg_scrollx & 0x1ff);
 	tilemap_set_scrolly(fg_tilemap,0,fg_scrolly & 0x0ff);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);

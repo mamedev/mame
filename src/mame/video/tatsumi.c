@@ -1095,10 +1095,10 @@ VIDEO_UPDATE( roundup5 )
 	tilemap_set_scrolly(tx_layer,0,0); //(((roundupt_crt_reg[0xe]<<8)|roundupt_crt_reg[0xf])>>5) + 96);
 
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[384]); // todo
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	draw_sprites(screen->machine, priority_bitmap,cliprect,1,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_road(screen->machine, bitmap,cliprect,priority_bitmap);
+	draw_sprites(screen->machine, screen->machine->priority_bitmap,cliprect,1,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_road(screen->machine, bitmap,cliprect,screen->machine->priority_bitmap);
 	draw_sprites(screen->machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;

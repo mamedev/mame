@@ -284,7 +284,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						priority_bitmap,prival,0);
+						machine->priority_bitmap,prival,0);
 
 				// wrap-around y
 				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
@@ -292,7 +292,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y) - 512,
-						priority_bitmap,prival,0);
+						machine->priority_bitmap,prival,0);
 			}
 		}
 	}
@@ -1258,7 +1258,7 @@ VIDEO_UPDATE( captaven )
 	tilemap_set_enable(pf2_tilemap,pf2_enable);
 	tilemap_set_enable(pf3_tilemap,pf3_enable);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	if ((deco32_pri&1)==0) {
 		if (pf3_enable)
 			tilemap_draw(bitmap,cliprect,pf3_tilemap,TILEMAP_DRAW_OPAQUE,1);
@@ -1415,7 +1415,7 @@ VIDEO_UPDATE( fghthist )
 
 	/* Draw screen */
 	deco16_clear_sprite_priority_bitmap();
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,0);
 	if(deco32_pri&1)
@@ -1443,15 +1443,16 @@ VIDEO_UPDATE( fghthist )
 */
 static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pens = gfx0->machine->pens;
+	running_machine *machine = gfx0->machine;
+	const pen_t *pens = machine->pens;
 	const pen_t *pal0 = &pens[gfx0->color_base];
 	const pen_t *pal1 = &pens[gfx1->color_base];
-	const pen_t *pal2 = &pens[gfx0->machine->gfx[(deco32_pri&1) ? 1 : 2]->color_base];
+	const pen_t *pal2 = &pens[machine->gfx[(deco32_pri&1) ? 1 : 2]->color_base];
 	int x,y;
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
-		UINT8* tilemapPri=BITMAP_ADDR8(priority_bitmap, y, 0);
+		UINT8* tilemapPri=BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 		UINT16* sprite0=BITMAP_ADDR16(sprite0_mix_bitmap, y, 0);
 		UINT16* sprite1=BITMAP_ADDR16(sprite1_mix_bitmap, y, 0);
 		UINT32* destLine=BITMAP_ADDR32(bitmap, y, 0);
@@ -1614,7 +1615,7 @@ VIDEO_UPDATE( nslasher )
 
 	bitmap_fill(sprite0_mix_bitmap,cliprect,0);
 	bitmap_fill(sprite1_mix_bitmap,cliprect,0);
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	if ((deco32_pf34_control[5]&0x8000)==0)
 		bitmap_fill(bitmap,cliprect,screen->machine->pens[0x200]);
 

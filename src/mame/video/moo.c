@@ -146,7 +146,7 @@ VIDEO_UPDATE(moo)
 	K054338_update_all_shadows(screen->machine);
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layerpri[0] < K053251_get_priority(K053251_CI1))	/* bucky hides back layer behind background */
 		K056832_tilemap_draw(screen->machine, bitmap, cliprect, layers[0], 0, 1);

@@ -126,7 +126,7 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( volfied )
 {
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	refresh_pixel_layer(screen->machine, bitmap);
 	PC090OJ_draw_sprites(screen->machine, bitmap, cliprect, 0);
 	return 0;

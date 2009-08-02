@@ -432,7 +432,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,sprite_ptr->primask,0);
+				machine->priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -576,28 +576,28 @@ VIDEO_UPDATE( slapshot )
 	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
 	spritepri[3] = TC0360PRI_regs[7] >> 4;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+		TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -623,7 +623,7 @@ VIDEO_UPDATE( slapshot )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[4]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
 	return 0;
 }
 

@@ -368,7 +368,7 @@ if (input_code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
 				color,
 				flipx, flipy,
 				sx,sy,
-				xzoom, yzoom, priority_bitmap,pri_mask, 0);
+				xzoom, yzoom, machine->priority_bitmap,pri_mask, 0);
 	}	/* end sprite loop */
 }
 
@@ -479,7 +479,7 @@ VIDEO_UPDATE( ms32 )
 	tilemap_set_scrolly(ms32_bg_tilemap, 0, scrolly);
 
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */

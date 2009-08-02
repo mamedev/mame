@@ -147,7 +147,7 @@ static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,con
 		colour = cps1_gfxram[base+pos+1]&0x1f;
 		ypos = 256-ypos;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],tileno,colour,flipx,flipy,xpos+49,ypos-16,priority_bitmap,0x02,15);
+		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],tileno,colour,flipx,flipy,xpos+49,ypos-16,machine->priority_bitmap,0x02,15);
 
 	}
 
@@ -257,7 +257,7 @@ static VIDEO_UPDATE( fcrash )
 	/* Blank screen */
 	bitmap_fill(bitmap,cliprect,0xbff);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
@@ -328,7 +328,7 @@ static VIDEO_UPDATE( kodb )
 	/* Blank screen */
 	bitmap_fill(bitmap,cliprect,0xbff);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;

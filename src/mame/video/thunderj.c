@@ -154,6 +154,7 @@ void thunderj_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x,
 
 VIDEO_UPDATE( thunderj )
 {
+	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

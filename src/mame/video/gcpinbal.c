@@ -236,7 +236,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						col,
 						flipx, flipy,
 						curx,cury,
-						priority_bitmap,
+						machine->priority_bitmap,
 						priority ? 0xfc : 0xf0,0);
 
 				code++;
@@ -317,7 +317,7 @@ VIDEO_UPDATE( gcpinbal )
 		tilemap_set_scrolly(gcpinbal_tilemap[i], 0, gcpinbal_scrolly[i]);
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	layer[0] = 0;

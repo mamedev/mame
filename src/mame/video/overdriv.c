@@ -77,7 +77,7 @@ VIDEO_UPDATE( overdriv )
 	zoom_colorbase[1] = K053251_get_palette_index(K053251_CI3);
 	zoom_colorbase[0] = K053251_get_palette_index(K053251_CI4);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	K051316_zoom_draw_0(bitmap,cliprect,0,0);
 	K051316_zoom_draw_1(bitmap,cliprect,0,1);

@@ -1505,7 +1505,7 @@ VIDEO_UPDATE(model1)
 	ayyc = cos(ayy);
 	ayys = sin(ayy);
 
-	bitmap_fill(priority_bitmap, NULL, 0);
+	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 6, 0, 0);

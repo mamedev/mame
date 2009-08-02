@@ -208,7 +208,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,sprite_ptr->primask,0);
+				machine->priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -227,7 +227,7 @@ VIDEO_UPDATE( othunder )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);

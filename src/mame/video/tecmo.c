@@ -230,7 +230,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 							flags & 0xf,
 							flipx,flipy,
 							sx,sy,
-							priority_bitmap,
+							machine->priority_bitmap,
 							priority_mask,0);
 				}
 			}
@@ -241,7 +241,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tecmo )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x100);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);

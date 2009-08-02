@@ -105,7 +105,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					priority_bitmap,primasks[priority],0);
+					machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -164,7 +164,7 @@ VIDEO_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
@@ -175,12 +175,12 @@ VIDEO_UPDATE( topspeed )
 #ifdef MAME_DEBUG
 	if (dislayer[2]==0)
 #endif
-	PC080SN_tilemap_draw_special(bitmap,cliprect,1,layer[1],0,2,topspeed_raster_ctrl);
+	PC080SN_tilemap_draw_special(screen->machine,bitmap,cliprect,1,layer[1],0,2,topspeed_raster_ctrl);
 
 #ifdef MAME_DEBUG
 	if (dislayer[1]==0)
 #endif
- 	PC080SN_tilemap_draw_special(bitmap,cliprect,0,layer[2],0,4,topspeed_raster_ctrl + 0x100);
+ 	PC080SN_tilemap_draw_special(screen->machine,bitmap,cliprect,0,layer[2],0,4,topspeed_raster_ctrl + 0x100);
 
 #ifdef MAME_DEBUG
 	if (dislayer[0]==0)

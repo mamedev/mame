@@ -345,7 +345,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								colour,
 								!fx,!fy,
 								464-x,240-(y-i*16),
-								priority_bitmap,pri_back,0);
+								machine->priority_bitmap,pri_back,0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -353,14 +353,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								colour,
 								!fx,!fy,
 								464-x+512,240-(y-i*16),
-								priority_bitmap,pri_back,0);
+								machine->priority_bitmap,pri_back,0);
 					} else {
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
 								fx,fy,
 								x,y-i*16,
-								priority_bitmap,pri_back,0);
+								machine->priority_bitmap,pri_back,0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -368,7 +368,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								colour,
 								fx,fy,
 								x-512,y-i*16,
-								priority_bitmap,pri_back,0);
+								machine->priority_bitmap,pri_back,0);
 					}
 					if (fy) s_ptr++; else s_ptr--;
 				}
@@ -430,7 +430,7 @@ static void m92_update_scroll_positions(void)
 
 static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(machine->priority_bitmap, cliprect, 0);
 
 	if ((~pf_master_control[2] >> 4) & 1)
 	{

@@ -70,7 +70,7 @@ VIDEO_UPDATE( scontra )
 {
 	K052109_tilemap_update();
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* The background color is always from layer 1 - but it's always black anyway */
 //  bitmap_fill(bitmap,cliprect,16 * layer_colorbase[1]);

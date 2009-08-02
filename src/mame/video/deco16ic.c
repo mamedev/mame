@@ -842,7 +842,7 @@ void deco16_pdrawgfx(
 {
 	int ox,oy,cx,cy;
 	int x_index,y_index,x,y;
-
+	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
@@ -1019,9 +1019,9 @@ static void custom_tilemap_draw(
 				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
 				{
 					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[p];
-					if (priority_bitmap)
+					if (machine->priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 						pri[x]|=priority;
 					}
 				}
@@ -1044,9 +1044,9 @@ static void custom_tilemap_draw(
 				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
 				{
 					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[p];
-					if (priority_bitmap)
+					if (machine->priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 						pri[x]|=priority;
 					}
 				}

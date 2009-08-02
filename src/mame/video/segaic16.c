@@ -1558,7 +1558,7 @@ static void segaic16_sprites_hangon_draw(running_machine *machine, struct sprite
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -1723,7 +1723,7 @@ static void segaic16_sprites_sharrier_draw(running_machine *machine, struct spri
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -1891,7 +1891,7 @@ static void segaic16_sprites_16a_draw(running_machine *machine, struct sprite_in
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */
@@ -2079,7 +2079,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -2231,7 +2231,7 @@ static void segaic16_sprites_yboard_16b_draw(running_machine *machine, struct sp
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -2399,7 +2399,7 @@ static void segaic16_sprites_outrun_draw(running_machine *machine, struct sprite
 			if (y >= cliprect->min_y && y <= cliprect->max_y)
 			{
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 				int xacc = 0;
 
 				/* non-flipped case */
@@ -2734,7 +2734,7 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 			if (y >= cliprect->min_y && y <= cliprect->max_y)							\
 			{																			\
 				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);								\
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);						\
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);						\
 																						\
 				/* note that the System 16A sprites have a design flaw that allows the address */		\
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */		\
@@ -3741,7 +3741,7 @@ void segaic16_rotate_init(running_machine *machine, int which, int type, int col
  *
  *************************************/
 
-void segaic16_rotate_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap)
+void segaic16_rotate_draw(running_machine *machine, int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap)
 {
 	struct rotate_info *info = &rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
@@ -3761,7 +3761,7 @@ void segaic16_rotate_draw(int which, bitmap_t *bitmap, const rectangle *cliprect
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 		UINT16 *src = (UINT16 *)srcbitmap->base;
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 		INT32 tx = currx;
 		INT32 ty = curry;
 

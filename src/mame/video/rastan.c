@@ -102,7 +102,7 @@ VIDEO_UPDATE( rastan )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -122,7 +122,7 @@ VIDEO_UPDATE( opwolf )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -146,7 +146,7 @@ VIDEO_UPDATE( rainbow )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
@@ -178,7 +178,7 @@ VIDEO_UPDATE( jumping )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 

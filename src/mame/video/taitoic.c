@@ -542,11 +542,11 @@ Newer version of the I/O chip ?
 /* These scanline drawing routines lifted from Taito F3: optimise / merge ? */
 
 INLINE void taitoic_drawscanline(
-		bitmap_t *bitmap,int x,int y,
-		const UINT16 *src,int transparent,UINT32 orient,int pri, const rectangle *cliprect)
+		bitmap_t *bitmap,const rectangle *cliprect,int x,int y,
+		const UINT16 *src,int transparent,UINT32 orient,bitmap_t *priority,int pri)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
-	UINT8 *dstp = BITMAP_ADDR8(priority_bitmap, y, x);
+	UINT8 *dstp = BITMAP_ADDR8(priority, y, x);
 	int length=cliprect->max_x - cliprect->min_x + 1;
 
 	src+=cliprect->min_x;
@@ -1068,7 +1068,7 @@ static UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
 }
 
 
-static void topspeed_custom_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
+static void topspeed_custom_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
 							UINT32 priority,UINT16 *color_ctrl_ram)
 {
 	UINT16 *dst16,*src16;
@@ -1147,10 +1147,7 @@ static void topspeed_custom_draw(bitmap_t *bitmap,const rectangle *cliprect,int 
 			}
 		}
 
-		if (flags & TILEMAP_DRAW_OPAQUE)
-			taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
-		else
-			taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
+		taitoic_drawscanline(bitmap,cliprect,0,y,scanline,(flags & TILEMAP_DRAW_OPAQUE)?0:1,ROT0,machine->priority_bitmap,priority);
 
 		y_index++;
 		if (!machine_flip) y++; else y--;
@@ -1178,9 +1175,9 @@ void PC080SN_tilemap_draw_offset(bitmap_t *bitmap,const rectangle *cliprect,int 
 	tilemap_set_scrolldy(PC080SN_tilemap[chip][layer], basedy, basedyflip);
 }
 
-void PC080SN_tilemap_draw_special(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
+void PC080SN_tilemap_draw_special(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
 {
-	topspeed_custom_draw(bitmap,cliprect,chip,layer,flags,priority,ram);
+	topspeed_custom_draw(machine,bitmap,cliprect,chip,layer,flags,priority,ram);
 }
 
 
@@ -1325,7 +1322,7 @@ void PC090OJ_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rect
 				color,
 				flipx,flipy,
 				x,y,
-				priority_bitmap,
+				machine->priority_bitmap,
 				priority ? 0xfc : 0xf0,0);
 	}
 }
@@ -1699,7 +1696,7 @@ void TC0080VCO_tilemap_update(running_machine *machine)
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-static void TC0080VCO_bg0_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg0_tilemap_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT16 zoom = TC0080VCO_scroll_ram[6];
 	int zx, zy;
@@ -1838,10 +1835,7 @@ static void TC0080VCO_bg0_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprec
 //                      scanline,0,0,rot,priority);
 
 /*** NEW ***/
-			if (flags & TILEMAP_DRAW_OPAQUE)
-				taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
-			else
-				taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
+			taitoic_drawscanline(bitmap,cliprect,0,y,scanline,(flags & TILEMAP_DRAW_OPAQUE)?0:1,ROT0,machine->priority_bitmap,priority);
 /***********/
 
 			y_index += zoomy;
@@ -1942,7 +1936,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, bitmap_t *bitma
 			INT32 incyy = zy;
 			int wraparound = 0;
 			UINT32 privalue = priority;
-			bitmap_t *priority = priority_bitmap;
+			bitmap_t *priority = machine->priority_bitmap;
 
 			if (dest->bpp == 16)
 				COPYROZBITMAP_CORE(UINT16, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, UINT8);
@@ -1965,11 +1959,11 @@ void TC0080VCO_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rec
 	{
 		case 0:
 			if (disable & 0x01) return;
-			TC0080VCO_bg0_tilemap_draw(bitmap,cliprect,flags,priority);
+			TC0080VCO_bg0_tilemap_draw(machine,bitmap,cliprect,flags,priority);
 			break;
 		case 1:
 			if (disable & 0x02) return;
-			TC0080VCO_bg1_tilemap_draw(machine, bitmap,cliprect,flags,priority);
+			TC0080VCO_bg1_tilemap_draw(machine,bitmap,cliprect,flags,priority);
 			break;
 		case 2:
 			if (disable & 0x04) return;
@@ -2618,7 +2612,7 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(bitmap_t *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, tilemap* tmap, int flags, UINT32 priority)
 {
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
@@ -2649,9 +2643,9 @@ static void TC0100SCN_tilemap_draw_fg(bitmap_t *bitmap,const rectangle *cliprect
 			if ((p&0xf)!=0 || (flags & TILEMAP_DRAW_OPAQUE))
 			{
 				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = p;
-				if (priority_bitmap)
+				if (machine->priority_bitmap)
 				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+					UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 					pri[x + cliprect->min_x]|=priority;
 				}
 			}
@@ -2680,7 +2674,7 @@ if (disable != 0 && disable != 3 && disable != 7)
 			break;
 		case 1:
 			if (disable & 0x02) return 1;
-			TC0100SCN_tilemap_draw_fg(bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
+			TC0100SCN_tilemap_draw_fg(machine,bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
 			break;
 		case 2:
 			if (disable & 0x04) return 1;
@@ -3458,7 +3452,7 @@ Historical Issues
 
 **********************************************************************/
 
-static void TC0480SCP_bg01_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg01_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
        Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
@@ -3555,10 +3549,7 @@ static void TC0480SCP_bg01_draw(bitmap_t *bitmap,const rectangle *cliprect,int l
 				}
 			}
 
-			if (flags & TILEMAP_DRAW_OPAQUE)
-				taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
-			else
-				taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
+			taitoic_drawscanline(bitmap,cliprect,0,y,scanline,(flags & TILEMAP_DRAW_OPAQUE)?0:1,ROT0,machine->priority_bitmap,priority);
 
 			y_index += zoomy;
 			if (!machine_flip) y++; else y--;
@@ -3609,7 +3600,7 @@ flipscreen.
 
 ****************************************************************/
 
-static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg23_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	bitmap_t *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 	bitmap_t *flagsbitmap = tilemap_get_flagsmap
@@ -3721,10 +3712,7 @@ static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int l
 			}
 		}
 
-		if (flags & TILEMAP_DRAW_OPAQUE)
-			taitoic_drawscanline(bitmap,0,y,scanline,0,ROT0,priority,cliprect);
-		else
-			taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,priority,cliprect);
+		taitoic_drawscanline(bitmap,cliprect,0,y,scanline,(flags & TILEMAP_DRAW_OPAQUE)?0:1,ROT0,machine->priority_bitmap,priority);
 
 		y_index += zoomy;
 		if (!machine_flip) y++; else y--;
@@ -3735,23 +3723,23 @@ static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int l
 
 
 
-void TC0480SCP_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0480SCP_tilemap_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* no layer disable bits */
 
 	switch (layer)
 	{
 		case 0:
-			TC0480SCP_bg01_draw(bitmap,cliprect,0,flags,priority);
+			TC0480SCP_bg01_draw(machine,bitmap,cliprect,0,flags,priority);
 			break;
 		case 1:
-			TC0480SCP_bg01_draw(bitmap,cliprect,1,flags,priority);
+			TC0480SCP_bg01_draw(machine,bitmap,cliprect,1,flags,priority);
 			break;
 		case 2:
-			TC0480SCP_bg23_draw(bitmap,cliprect,2,flags,priority);
+			TC0480SCP_bg23_draw(machine,bitmap,cliprect,2,flags,priority);
 			break;
 		case 3:
-			TC0480SCP_bg23_draw(bitmap,cliprect,3,flags,priority);
+			TC0480SCP_bg23_draw(machine,bitmap,cliprect,3,flags,priority);
 			break;
 		case 4:
 			tilemap_draw(bitmap,cliprect,TC0480SCP_tilemap[4][TC0480SCP_dblwidth],flags,priority);
@@ -4522,10 +4510,7 @@ void TC0150ROD_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *
 				}
 			}
 
-			if (y > priority_switch_line)
-				taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,high_priority,cliprect);
-			else
-				taitoic_drawscanline(bitmap,0,y,scanline,1,ROT0,low_priority,cliprect);
+			taitoic_drawscanline(bitmap,cliprect,0,y,scanline,1,ROT0,machine->priority_bitmap,(y > priority_switch_line)?high_priority:low_priority);
 		}
 
 		y++;

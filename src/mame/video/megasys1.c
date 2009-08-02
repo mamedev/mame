@@ -626,7 +626,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						color,
 						flipx, flipy,
 						sx, sy,
-						priority_bitmap,
+						machine->priority_bitmap,
 						(attr & 0x08) ? 0x0c : 0x0a,15);
 			}	/* sprite */
 		}	/* offs */
@@ -666,7 +666,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					color,
 					flipx, flipy,
 					sx, sy,
-					priority_bitmap,
+					machine->priority_bitmap,
 					(attr & 0x08) ? 0x0c : 0x0a,15);
 		}	/* sprite */
 	}	/* Z hw */
@@ -981,7 +981,7 @@ VIDEO_UPDATE( megasys1 )
 		}
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;

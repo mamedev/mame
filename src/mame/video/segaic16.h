@@ -88,5 +88,5 @@ WRITE16_HANDLER( segaic16_road_control_0_w );
 #define SEGAIC16_ROTATE_YBOARD		0
 
 void segaic16_rotate_init(running_machine *machine, int which, int type, int colorbase);
-void segaic16_rotate_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap);
+void segaic16_rotate_draw(running_machine *machine, int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap);
 READ16_HANDLER( segaic16_rotate_control_0_r );

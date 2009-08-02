@@ -401,7 +401,7 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 	}
 }
 
-static void copy_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *sprites_bitmap, const rectangle *cliprect)
+static void copy_sprites(bitmap_t *bitmap, bitmap_t *sprites_bitmap, bitmap_t *priority_bitmap, const rectangle *cliprect)
 {
 	int y;
 	for( y=cliprect->min_y; y<=cliprect->max_y; y++ )
@@ -440,7 +440,7 @@ static VIDEO_UPDATE( limenko )
 {
 	// limenko_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_set_enable(bg_tilemap, limenko_videoreg[0] & 4);
 	tilemap_set_enable(md_tilemap, limenko_videoreg[0] & 2);
@@ -459,7 +459,7 @@ static VIDEO_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 
 	if(limenko_videoreg[0] & 8)
-		copy_sprites(screen->machine, bitmap, sprites_bitmap, cliprect);
+		copy_sprites(bitmap, sprites_bitmap, screen->machine->priority_bitmap, cliprect);
 
 	return 0;
 }

@@ -154,7 +154,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipx,flipy,
 				sx&0xff,
 				sy + 16*y,
-				priority_bitmap,
+				machine->priority_bitmap,
 				priority_mask,0 );
 		}
 		source+=4;
@@ -195,7 +195,7 @@ VIDEO_UPDATE( lkage )
 	tilemap_set_scrollx(bg_tilemap,0,lkage_scroll[4]);
 	tilemap_set_scrolly(bg_tilemap,0,lkage_scroll[5]);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	if ((lkage_vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap,0,1 );

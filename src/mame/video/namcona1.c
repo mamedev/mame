@@ -393,7 +393,7 @@ static void pdraw_tile(running_machine *machine,
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
 				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -596,7 +596,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
                  */
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
-					BITMAP_ADDR8(priority_bitmap, line, 0),
+					BITMAP_ADDR8(machine->priority_bitmap, line, 0),
 					videoram16 + ydata + 25,
 					paldata );
 			}
@@ -666,7 +666,7 @@ VIDEO_UPDATE( namcona1 )
 			}
 		}
 
-		bitmap_fill( priority_bitmap,cliprect ,0);
+		bitmap_fill( screen->machine->priority_bitmap,cliprect ,0);
 
 		bitmap_fill( bitmap, cliprect , 0xff); /* background color? */
 

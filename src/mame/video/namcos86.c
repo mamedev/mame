@@ -316,7 +316,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipx,flipy,
 				sx & 0x1ff,
 				((sy + 16) & 0xff) - 16,
-				priority_bitmap, pri_mask,0xf);
+				machine->priority_bitmap, pri_mask,0xf);
 
 		source -= 0x10;
 	}
@@ -353,7 +353,7 @@ VIDEO_UPDATE( namcos86 )
 	set_scroll(screen->machine, 2);
 	set_scroll(screen->machine, 3);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	bitmap_fill(bitmap,cliprect,screen->machine->gfx[0]->color_base + 8*backcolor+7);
 

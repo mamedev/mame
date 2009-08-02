@@ -203,7 +203,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,sprite_ptr->primask,0);
+				machine->priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -228,24 +228,24 @@ VIDEO_UPDATE( gunbustr )
 	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* We have to assume 2nd to bottom layer is always underneath
        sprites as pdrawgfx cannot yet cope with more than 4 layers */
 
 #ifdef MAME_DEBUG
-	if (!input_code_pressed (KEYCODE_Z)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
-	if (!input_code_pressed (KEYCODE_X)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,1);
-	if (!input_code_pressed (KEYCODE_C)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
-	if (!input_code_pressed (KEYCODE_V)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
-	if (!input_code_pressed (KEYCODE_B)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);
+	if (!input_code_pressed (KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
+	if (!input_code_pressed (KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,1);
+	if (!input_code_pressed (KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,2);
+	if (!input_code_pressed (KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,4);
+	if (!input_code_pressed (KEYCODE_B)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,8);
 	if (!input_code_pressed (KEYCODE_N)) draw_sprites(screen->machine,bitmap,cliprect,primasks,48,-116);
 #else
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,1);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);	/* text layer */
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,2);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,8);	/* text layer */
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,48,-116);
 #endif
 	return 0;

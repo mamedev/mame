@@ -366,7 +366,7 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 						gfx->color_base + color * gfx->color_granularity,
 						flipx, flipy,
 						sx, sy,
-						priority_bitmap, priority_mask, 0);
+						machine->priority_bitmap, priority_mask, 0);
 				}
 			}
 		}
@@ -466,7 +466,7 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							priority_bitmap, priority_mask, 0);
+							machine->priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -486,7 +486,7 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							priority_bitmap, priority_mask, 0);
+							machine->priority_bitmap, priority_mask, 0);
 					}
 				}
 			}
@@ -542,21 +542,21 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 				code,
 				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
 				flipx,flipy,x,y,
-				priority_bitmap, priority_mask,15);
+				machine->priority_bitmap, priority_mask,15);
 
 		/* wrap x*/
 		pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[3],
 				code,
 				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
 				flipx,flipy,x-512,y,
-				priority_bitmap, priority_mask,15);
+				machine->priority_bitmap, priority_mask,15);
 
 	}
 }
 
 VIDEO_UPDATE( gaiden )
 {
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0x200);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
@@ -569,7 +569,7 @@ VIDEO_UPDATE( gaiden )
 
 VIDEO_UPDATE( raiga )
 {
-	bitmap_fill(priority_bitmap,    cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
 
 	bitmap_fill(tile_bitmap_bg, cliprect, 0x200);
 	bitmap_fill(tile_bitmap_fg,     cliprect, 0);
@@ -593,7 +593,7 @@ VIDEO_UPDATE( raiga )
 
 VIDEO_UPDATE( drgnbowl )
 {
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);

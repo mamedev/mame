@@ -402,7 +402,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						flipx,flipy,
 						sx,sy,
 						zoom,zoom,
-						priority_bitmap,0xffcc,0 );
+						machine->priority_bitmap,0xffcc,0 );
 				}
 			} /* if sprite */
 		} /* for loop */
@@ -416,7 +416,7 @@ VIDEO_UPDATE( nemesis )
 	int offs;
 	rectangle clip;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 
 	clip.min_x = 0;

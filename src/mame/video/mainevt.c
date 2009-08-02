@@ -93,7 +93,7 @@ VIDEO_UPDATE( mainevt )
 {
 	K052109_tilemap_update();
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],1,2);	/* low priority part of layer */
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);	/* high priority part of layer */

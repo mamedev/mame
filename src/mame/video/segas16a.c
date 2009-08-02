@@ -46,7 +46,7 @@ VIDEO_UPDATE( system16a )
 	}
 
 	/* reset priorities */
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);

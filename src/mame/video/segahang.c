@@ -65,7 +65,7 @@ VIDEO_UPDATE( hangon )
 	}
 
 	/* reset priorities */
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	/* draw the low priority road layer */
 	segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);

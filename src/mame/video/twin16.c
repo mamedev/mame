@@ -82,7 +82,7 @@ WRITE16_HANDLER( twin16_video_register_w )
 }
 
 /* slow slow slow, but it's ok for now */
-static void draw_sprite( bitmap_t *bitmap,const UINT16 *pen_data, int pal_base, int xpos, int ypos, int width, int height, int flipx, int flipy, int pri )
+static void draw_sprite( running_machine *machine, bitmap_t *bitmap,const UINT16 *pen_data, int pal_base, int xpos, int ypos, int width, int height, int flipx, int flipy, int pri )
 {
 	int x,y,pval;
 	if( xpos>=320 ) xpos -= 65536;
@@ -96,7 +96,7 @@ static void draw_sprite( bitmap_t *bitmap,const UINT16 *pen_data, int pal_base, 
 		if( sy>=16 && sy<256-16 )
 		{
 			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-			UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, sy, 0);
+			UINT8 *pdest = BITMAP_ADDR8(machine->priority_bitmap, sy, 0);
 
 			for( x=0; x<width; x++ )
 			{
@@ -185,7 +185,7 @@ shadow bit?
 
  */
 
-static void draw_sprites( bitmap_t *bitmap )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 {
 	int count = 0;
 
@@ -271,14 +271,14 @@ static void draw_sprites( bitmap_t *bitmap )
 			}
 
 			//if( sprite_which==count || !input_code_pressed( KEYCODE_B ) )
-			draw_sprite( bitmap, pen_data, pal_base, xpos, ypos, width, height, flipx, flipy, (attributes&0x4000) );
+			draw_sprite( machine, bitmap, pen_data, pal_base, xpos, ypos, width, height, flipx, flipy, (attributes&0x4000) );
 		}
 
 		count++;
 	}
 }
 
-static void draw_layer( bitmap_t *bitmap, int opaque )
+static void draw_layer( running_machine *machine, bitmap_t *bitmap, int opaque )
 {
 	const UINT16 *gfx_base;
 	const UINT16 *source = videoram16;
@@ -374,7 +374,7 @@ static void draw_layer( bitmap_t *bitmap, int opaque )
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -391,7 +391,7 @@ static void draw_layer( bitmap_t *bitmap, int opaque )
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -436,18 +436,18 @@ VIDEO_START( fround )
 
 VIDEO_UPDATE( twin16 )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
-	draw_layer( bitmap,1 );
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	draw_layer( screen->machine, bitmap, 1 );
 
 	if (twin16_custom_video)
 	{
-		draw_layer( bitmap,0 );
-		draw_sprites( bitmap );
+		draw_layer( screen->machine, bitmap, 0 );
+		draw_sprites( screen->machine, bitmap );
 	}
 	else	// devilw, vulcan - different priorities order? there should be an enable bit somewhere...
 	{
-		draw_sprites( bitmap );
-		draw_layer( bitmap,0 );
+		draw_sprites( screen->machine, bitmap );
+		draw_layer( screen->machine, bitmap, 0 );
 	}
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

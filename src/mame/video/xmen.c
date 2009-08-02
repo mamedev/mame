@@ -117,7 +117,7 @@ VIDEO_UPDATE( xmen )
 
 	sortlayers(layer,layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase+1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],0,1);
@@ -240,7 +240,7 @@ VIDEO_EOF( xmen6p )
 
 	sortlayers(layer,layerpri);
 
-	bitmap_fill(priority_bitmap, &cliprect, 0);
+	bitmap_fill(machine->priority_bitmap, &cliprect, 0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(renderbitmap, &cliprect, 16 * bg_colorbase + 1);
 	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[0]], 0, 1);

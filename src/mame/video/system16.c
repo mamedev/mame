@@ -932,7 +932,7 @@ VIDEO_UPDATE( system16 )
 
 	update_page();
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_set_scrollx( background, 0, -320-sys16_bg_scrollx+sys16_bgxoffset );
 	tilemap_set_scrolly( background, 0, -256+sys16_bg_scrolly+system16_bootleg_back_tilemap_yscroll );
@@ -993,7 +993,7 @@ VIDEO_UPDATE( system18old )
 
 	update_page();
 
-	bitmap_fill(priority_bitmap,NULL,0);
+	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 	if(sys18_bg2_active)
 		tilemap_draw( bitmap,cliprect, background2, 0, 0 );
 	else

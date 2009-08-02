@@ -460,7 +460,7 @@ static void turbofrc_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 							 flipx,flipy,
 							 sx,sy,
 							 zoomx << 11, zoomy << 11,
-							 priority_bitmap,pri ? 0 : 2,15);
+							 machine->priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 
@@ -534,7 +534,7 @@ static void spinlbrk_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 							 flipx,flipy,
 							 sx,sy,
 							 zoomx << 11, zoomy << 11,
-							 priority_bitmap,pri ? 2 : 0,15);
+							 machine->priority_bitmap,pri ? 2 : 0,15);
 				map_start++;
 			}
 
@@ -609,7 +609,7 @@ static void aerfboo2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 							 flipx,flipy,
 							 sx,sy,
 							 zoomx << 11, zoomy << 11,
-							 priority_bitmap,pri ? 0 : 2,15);
+							 machine->priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 
@@ -731,7 +731,7 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				flipx,flipy,
 				sx,sy,
 				zoomx << 11,zoomy << 11,
-				priority_bitmap,pri ? 0 : 2,15);
+				machine->priority_bitmap,pri ? 0 : 2,15);
 
 	}
 
@@ -768,7 +768,7 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 				flipx,flipy,
 				sx,sy,
 				zoomx << 11,zoomy << 11,
-				priority_bitmap,pri ? 0 : 2,15);
+				machine->priority_bitmap,pri ? 0 : 2,15);
 
 	}
 }
@@ -803,7 +803,7 @@ VIDEO_UPDATE( pspikes )
 		tilemap_set_scrollx(bg1_tilemap,(i + scrolly) & 0xff,aerofgt_rasterram[i]);
 	tilemap_set_scrolly(bg1_tilemap,0,scrolly);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,0,-1);
@@ -873,7 +873,7 @@ VIDEO_UPDATE( karatblz )
 	tilemap_set_scrollx(bg2_tilemap,0,bg2scrollx-4);
 	tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
@@ -898,7 +898,7 @@ VIDEO_UPDATE( spinlbrk )
 	tilemap_set_scrollx(bg2_tilemap,0,bg2scrollx-4);
 //  tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
@@ -924,7 +924,7 @@ VIDEO_UPDATE( turbofrc )
 	tilemap_set_scrollx(bg2_tilemap,0,bg2scrollx-7);
 	tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly+2);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
@@ -944,7 +944,7 @@ VIDEO_UPDATE( aerofgt )
 	tilemap_set_scrollx(bg2_tilemap,0,aerofgt_rasterram[0x0200]-20);
 	tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 
@@ -971,7 +971,7 @@ VIDEO_UPDATE( aerfboot )
 	tilemap_set_scrollx(bg2_tilemap,0,bg2scrollx+172);
 	tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly+2);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
@@ -994,7 +994,7 @@ VIDEO_UPDATE( aerfboo2 )
 	tilemap_set_scrollx(bg2_tilemap,0,bg2scrollx-7);
 	tilemap_set_scrolly(bg2_tilemap,0,bg2scrolly+2);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
@@ -1017,7 +1017,7 @@ VIDEO_UPDATE( wbbc97 )
 		tilemap_set_scrollx(bg1_tilemap,(i + scrolly) & 0xff,aerofgt_rasterram[i]);
 	tilemap_set_scrolly(bg1_tilemap,0,scrolly);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if(wbbc97_bitmap_enable)
 	{

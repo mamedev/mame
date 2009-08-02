@@ -263,7 +263,7 @@ static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						priority_bitmap,
+						machine->priority_bitmap,
 						pri_mask,0x00	);
 		}
 	}
@@ -316,7 +316,7 @@ static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						priority_bitmap,
+						machine->priority_bitmap,
 						pri_mask,0x00	);
 		}
 	}
@@ -359,7 +359,7 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 
 	/* The background color is the first of the last palette */
 	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,2);
@@ -398,7 +398,7 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 
 	/* The background color is the first of the last palette */
 	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,2);

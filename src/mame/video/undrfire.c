@@ -217,7 +217,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,sprite_ptr->primask,0);
+				machine->priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -350,7 +350,7 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				priority_bitmap,sprite_ptr->primask,0);
+				machine->priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -421,7 +421,7 @@ VIDEO_UPDATE( undrfire )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 
@@ -437,22 +437,22 @@ VIDEO_UPDATE( undrfire )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
 
 #ifdef MAME_DEBUG
 	if (dislayer[4]==0)
@@ -476,7 +476,7 @@ VIDEO_UPDATE( undrfire )
 #endif
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
 
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
@@ -565,7 +565,7 @@ VIDEO_UPDATE( cbombers )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 
@@ -581,22 +581,22 @@ VIDEO_UPDATE( cbombers )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],0,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[3]]==0)
 #endif
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,8);
 
 #ifdef MAME_DEBUG
 	if (dislayer[4]==0)
@@ -620,7 +620,7 @@ VIDEO_UPDATE( cbombers )
 #endif
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
 
 /* Enable this to see rotation (?) control words */
 #if 0

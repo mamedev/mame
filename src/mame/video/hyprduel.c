@@ -536,7 +536,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								priority_bitmap,primask[pri], 255);
+								machine->priority_bitmap,primask[pri], 255);
 			}
 			else
 			{
@@ -552,7 +552,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								priority_bitmap,primask[pri], 15);
+								machine->priority_bitmap,primask[pri], 15);
 			}
 #if 0
 {	/* Display priority + zoom on each sprite */
@@ -670,7 +670,7 @@ VIDEO_UPDATE( hyprduel )
 	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - video_screen_get_height(screen) / 2 - hyprduel_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,((hyprduel_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:

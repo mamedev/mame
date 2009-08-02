@@ -385,7 +385,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							priority_bitmap,
+							machine->priority_bitmap,
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
 					pdrawgfxzoom_transpen(bitmap,cliprect,machine->gfx[0],
@@ -394,7 +394,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
 								zoomx << 11,zoomy << 11,
-								priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
+								machine->priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}
@@ -577,7 +577,7 @@ VIDEO_UPDATE( psikyo )
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap,cliprect,tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);

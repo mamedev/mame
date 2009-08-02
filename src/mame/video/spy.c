@@ -68,7 +68,7 @@ VIDEO_UPDATE( spy )
 {
 	K052109_tilemap_update();
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	if (!spy_video_enable)
 		bitmap_fill(bitmap,cliprect,16 * layer_colorbase[0]);

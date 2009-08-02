@@ -187,7 +187,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					attr & 0x1f,
 					flipx, flipy,
 					x,y,
-					priority_bitmap,
+					machine->priority_bitmap,
 					pri_mask,15	);
 	}
 }
@@ -212,7 +212,7 @@ VIDEO_UPDATE( yunsun16 )
 
 //  popmessage("%04X", *yunsun16_priority);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if((*yunsun16_priority & 0x0c) == 4)
 	{

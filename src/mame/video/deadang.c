@@ -118,7 +118,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				sprite,
 				color,fx,fy,x,y,
-				priority_bitmap,pri,15);
+				machine->priority_bitmap,pri,15);
 	}
 }
 
@@ -148,7 +148,7 @@ VIDEO_UPDATE( deadang )
 	flip_screen_set(screen->machine,  deadang_scroll_ram[0x34]&0x40 );
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,pf3_layer,0,1);
 	tilemap_draw(bitmap,cliprect,pf1_layer,0,2);
 	tilemap_draw(bitmap,cliprect,pf2_layer,0,4);

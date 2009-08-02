@@ -328,7 +328,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					flipx,flipy,
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
-					priority_bitmap, pri_mask,
+					machine->priority_bitmap, pri_mask,
 					0xf);
 		else
 			pdrawgfx_transtable( bitmap, cliprect, gfx,
@@ -337,7 +337,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					flipx,flipy,
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
-					priority_bitmap, pri_mask,
+					machine->priority_bitmap, pri_mask,
 					drawmode_table, machine->shadow_table);
 
 		source -= 0x10;
@@ -397,7 +397,7 @@ VIDEO_UPDATE( namcos1 )
 	}
 
 
-	bitmap_fill(priority_bitmap, &new_clip, 0);
+	bitmap_fill(screen->machine->priority_bitmap, &new_clip, 0);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */

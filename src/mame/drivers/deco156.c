@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -135,7 +135,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static VIDEO_UPDATE( wcvol95 )
 {
-	bitmap_fill(priority_bitmap,NULL,0);
+	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 	bitmap_fill(bitmap,NULL,0);
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);

@@ -448,7 +448,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				color,
 				flipx, flipy,
 				sx,sy,
-				xzoom, yzoom, priority_bitmap,pri_mask, 0);
+				xzoom, yzoom, machine->priority_bitmap,pri_mask, 0);
 	}	/* end sprite loop */
 }
 
@@ -489,7 +489,7 @@ static VIDEO_UPDATE(bnstars)
 	const device_config *left_screen  = devtag_get_device(screen->machine, "lscreen");
 	const device_config *right_screen = devtag_get_device(screen->machine, "rscreen");
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (screen==left_screen)
 	{

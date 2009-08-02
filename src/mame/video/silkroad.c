@@ -37,13 +37,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (!flipx) {
 			for (wcount=0;wcount<width;wcount++) {
-			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,priority_bitmap,pri_mask,0);
+			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine->priority_bitmap,pri_mask,0);
 			}
 
 		} else {
 
 			for (wcount=width;wcount>0;wcount--) {
-			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,priority_bitmap,pri_mask,0);
+			pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine->priority_bitmap,pri_mask,0);
 			}
 
 		}
@@ -132,7 +132,7 @@ VIDEO_START(silkroad)
 
 VIDEO_UPDATE(silkroad)
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x7c0);
 
 	tilemap_set_scrollx( fg_tilemap, 0, ((silkroad_regs[0] & 0xffff0000) >> 16) );

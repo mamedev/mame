@@ -163,6 +163,7 @@ struct _running_machine
 	const pen_t *			pens;				/* remapped palette pen numbers */
 	struct _colortable_t *	colortable;			/* global colortable for remapping */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
+	bitmap_t *priority_bitmap;			/* priority bitmap */
 
 	/* audio-related information */
 	int						sample_rate;		/* the digital audio sample rate */

@@ -31,7 +31,7 @@ VIDEO_UPDATE(system24)
 		return 0;
 	}
 
-	bitmap_fill(priority_bitmap, 0, 0);
+	bitmap_fill(screen->machine->priority_bitmap, 0, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	for(i=0; i<12; i++)
@@ -47,6 +47,6 @@ VIDEO_UPDATE(system24)
 			level++;
 		}
 
-	sys24_sprite_draw(bitmap, cliprect, spri);
+	sys24_sprite_draw(screen->machine, bitmap, cliprect, spri);
 	return 0;
 }

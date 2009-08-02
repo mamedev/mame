@@ -83,7 +83,7 @@ VIDEO_UPDATE(bishi)
 
 	sortlayers(layers, layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	for (i = 0; i < 4; i++)
 	{

@@ -334,14 +334,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						priority_bitmap,0,transmask[whichmask][color]);
+						machine->priority_bitmap,0,transmask[whichmask][color]);
 			}
 		}
 	}
 }
 
 
-static void draw_fg(bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int y, x;
 
@@ -353,7 +353,7 @@ static void draw_fg(bitmap_t *bitmap, const rectangle *cliprect, int priority )
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		const UINT8 *pri = BITMAP_ADDR8(machine->priority_bitmap, y, 0);
 		UINT16 *src = BITMAP_ADDR16(fg_bitmap, y, 0);
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -384,20 +384,20 @@ VIDEO_UPDATE( pacland )
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
-	bitmap_fill(priority_bitmap, cliprect, 0x00);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	/* draw background */
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(bitmap, cliprect, 0);
+	draw_fg(screen->machine, bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
 	draw_sprites(screen->machine, bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
-	draw_fg(bitmap, cliprect, 1);
+	draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
 	draw_sprites(screen->machine, bitmap, cliprect, 2);

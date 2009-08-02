@@ -703,7 +703,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								priority_bitmap,primask[pri], 255);
+								machine->priority_bitmap,primask[pri], 255);
 			}
 			else
 			{
@@ -719,7 +719,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								priority_bitmap,primask[pri], 15);
+								machine->priority_bitmap,primask[pri], 15);
 			}
 #if 0
 {	/* Display priority + zoom on each sprite */
@@ -888,7 +888,7 @@ VIDEO_UPDATE( metro )
 	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
 
 	/* The background color is selected by a register */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,((metro_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:

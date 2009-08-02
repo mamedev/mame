@@ -121,6 +121,8 @@ WRITE16_HANDLER( foodf_paletteram_w )
 VIDEO_UPDATE( foodf )
 {
 	int offs;
+	const gfx_element *gfx = screen->machine->gfx[1];
+	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 
 	/* first draw the playfield opaquely */
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
@@ -143,11 +145,11 @@ VIDEO_UPDATE( foodf )
 		int vflip = (data1 >> 14) & 1;
 		int pri = (data1 >> 13) & 1;
 
-		pdrawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], pict, color, hflip, vflip,
+		pdrawgfx_transpen(bitmap, cliprect, gfx, pict, color, hflip, vflip,
 				xpos, ypos, priority_bitmap, pri * 2, 0);
 
 		/* draw again with wraparound (needed to get the end of level animation right) */
-		pdrawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], pict, color, hflip, vflip,
+		pdrawgfx_transpen(bitmap, cliprect, gfx, pict, color, hflip, vflip,
 				xpos - 256, ypos, priority_bitmap, pri * 2, 0);
 	}
 

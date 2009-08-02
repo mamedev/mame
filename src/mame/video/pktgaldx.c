@@ -88,7 +88,7 @@ VIDEO_UPDATE(pktgaldx)
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
 	bitmap_fill(bitmap,cliprect,0); /* not Confirmed */
-	bitmap_fill(priority_bitmap,NULL,0);
+	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);

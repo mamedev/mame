@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			if (xsize)
 			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],
@@ -132,7 +132,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x-16,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 
 			multi--;
@@ -159,7 +159,7 @@ static VIDEO_UPDATE(dblewing)
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
 	bitmap_fill(bitmap,cliprect,0); /* not Confirmed */
-	bitmap_fill(priority_bitmap,NULL,0);
+	bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,4);

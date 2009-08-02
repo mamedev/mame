@@ -210,7 +210,7 @@ static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -278,7 +278,7 @@ static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -383,7 +383,7 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						priority_bitmap,0,
+						machine->priority_bitmap,0,
 						0,alpha);
 			}
 		}
@@ -401,7 +401,7 @@ VIDEO_UPDATE( cninja )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,512);
 	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
@@ -418,7 +418,7 @@ VIDEO_UPDATE( edrandy )
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
 	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	if (deco16_raster_display_position)
@@ -450,7 +450,7 @@ VIDEO_UPDATE( robocop2 )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x200);
 	if ((deco16_priority&4)==0)
 		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
@@ -510,14 +510,14 @@ VIDEO_UPDATE( mutantf )
         then when two alpha blended shadows overlapped then they would be 25%
         transparent against the background, rather than 50% */
 	if (deco16_priority&1) {
-		bitmap_fill(priority_bitmap,cliprect,0);
+		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
-		bitmap_fill(priority_bitmap,cliprect,0);
+		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
 	} else {
-		bitmap_fill(priority_bitmap,cliprect,0);
+		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
-		bitmap_fill(priority_bitmap,cliprect,0);
+		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
 	}
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);

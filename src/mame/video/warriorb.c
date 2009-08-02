@@ -93,7 +93,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				 color,
 				 flipx,flipy,
 				 x,y,
-				 priority_bitmap,pri_mask,0);
+				 machine->priority_bitmap,pri_mask,0);
 	}
 
 #ifdef MAME_DEBUG
@@ -133,7 +133,7 @@ VIDEO_UPDATE( warriorb )
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer

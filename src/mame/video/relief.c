@@ -106,6 +106,7 @@ VIDEO_START( relief )
 
 VIDEO_UPDATE( relief )
 {
+	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

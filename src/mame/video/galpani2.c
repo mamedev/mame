@@ -162,7 +162,7 @@ if (input_code_pressed(KEYCODE_Z))
 #endif
 
 	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 0x1)
 	{

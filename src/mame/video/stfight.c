@@ -286,7 +286,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					 color,
 					 flipx,flip_screen_get(machine),
 					 sx,sy,
-				     priority_bitmap,
+				     machine->priority_bitmap,
 					 pri ? 0x02 : 0,0x0f);
 		}
 	}
@@ -297,7 +297,7 @@ VIDEO_UPDATE( stfight )
 {
 	set_pens(screen->machine->colortable);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	bitmap_fill(bitmap,cliprect,0);	/* in case bg_tilemap is disabled */
     tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

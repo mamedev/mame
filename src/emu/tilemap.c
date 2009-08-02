@@ -126,8 +126,6 @@ struct _tilemap
     GLOBAL VARIABLES
 ***************************************************************************/
 
-bitmap_t *				priority_bitmap;
-
 static tilemap *		tilemap_list;
 static tilemap **		tilemap_tailptr;
 static int				tilemap_instance;
@@ -303,7 +301,7 @@ void tilemap_init(running_machine *machine)
 		tilemap_tailptr  = &tilemap_list;
 		tilemap_instance = 0;
 
-		priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
 	}
 }
@@ -1564,6 +1562,7 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitm
 
 static void tilemap_draw_instance(tilemap *tmap, const blit_parameters *blit, int xpos, int ypos)
 {
+	bitmap_t *priority_bitmap = tmap->machine->priority_bitmap;
 	bitmap_t *dest = blit->bitmap;
 	const UINT16 *source_baseaddr;
 	const UINT8 *mask_baseaddr;
@@ -1743,6 +1742,7 @@ static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &tmap->machine->pens[blit->tilemap_priority_code >> 16];
+	bitmap_t *priority_bitmap = tmap->machine->priority_bitmap;
 	bitmap_t *destbitmap = blit->bitmap;
 	bitmap_t *srcbitmap = tmap->pixmap;
 	bitmap_t *flagsmap = tmap->flagsmap;

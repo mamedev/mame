@@ -366,11 +366,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				 color,
 				 flipx,0,
 				 sx + xoffset,sy + yoffset,
-				 priority_bitmap,pri_masks[pri],0);
+				 machine->priority_bitmap,pri_masks[pri],0);
 	}
 }
 
-static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y,count;
 	int color;
@@ -389,7 +389,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 				{
 					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = BITMAP_ADDR8(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
+					pri = BITMAP_ADDR8(machine->priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
 					pri[(x + bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -399,7 +399,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 					{
 						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = BITMAP_ADDR8(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
+						pri = BITMAP_ADDR8(machine->priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
 						pri[(x / 2 + bgscrollx) & 0x1ff] |= 2;
 					}
 				}
@@ -412,11 +412,11 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( bigtwin )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	if (bg_enable)
-		draw_bitmap(bitmap, cliprect);
+		draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap,cliprect,4);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -424,11 +424,11 @@ VIDEO_UPDATE( bigtwin )
 
 VIDEO_UPDATE( excelsr )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 	if (bg_enable)
-		draw_bitmap(bitmap, cliprect);
+		draw_bitmap(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 	draw_sprites(screen->machine,bitmap,cliprect,2);
 	return 0;
@@ -450,7 +450,7 @@ VIDEO_UPDATE( wbeachvl )
 		tilemap_set_scrollx(fg_tilemap,0,fgscrollx);
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
@@ -461,7 +461,7 @@ VIDEO_UPDATE( wbeachvl )
 
 VIDEO_UPDATE( hrdtimes )
 {
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	// video enabled
 	if(playmark_scroll[6] & 1)

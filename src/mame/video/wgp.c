@@ -441,7 +441,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
+							machine->priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
 				}
 			}
 			else
@@ -472,7 +472,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
+							machine->priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
 				}
 			}
 		}
@@ -495,10 +495,10 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 
 INLINE void bryan2_drawscanline(
 		bitmap_t *bitmap,int x,int y,int length,
-		const UINT16 *src,int transparent,UINT32 orient,int pri)
+		const UINT16 *src,int transparent,UINT32 orient,bitmap_t *priority,int pri)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
-	UINT8 *dstp = BITMAP_ADDR8(priority_bitmap, y, x);
+	UINT8 *dstp = BITMAP_ADDR8(priority, y, x);
 
 	if (transparent) {
 		while (length--) {
@@ -520,7 +520,7 @@ INLINE void bryan2_drawscanline(
 
 
 
-static void wgp_piv_layer_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void wgp_piv_layer_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	bitmap_t *srcbitmap = tilemap_get_pixmap(wgp_piv_tilemap[layer]);
 	bitmap_t *flagsbitmap = tilemap_get_flagsmap(wgp_piv_tilemap[layer]);
@@ -628,10 +628,7 @@ static void wgp_piv_layer_draw(bitmap_t *bitmap,const rectangle *cliprect,int la
 			}
 		}
 
-		if (flags & TILEMAP_DRAW_OPAQUE)
-			bryan2_drawscanline(bitmap,0,y,screen_width,scanline,0,ROT0,priority);
-		else
-			bryan2_drawscanline(bitmap,0,y,screen_width,scanline,1,ROT0,priority);
+		bryan2_drawscanline(bitmap,0,y,screen_width,scanline,(flags & TILEMAP_DRAW_OPAQUE)?0:1,ROT0,machine->priority_bitmap,priority);
 
 		y_index += zoomy;
 		if (!machine_flip) y++; else y--;
@@ -706,17 +703,17 @@ VIDEO_UPDATE( wgp )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	wgp_piv_layer_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)
 #endif
-	wgp_piv_layer_draw(bitmap,cliprect,layer[1],0,2);
+	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[1],0,2);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[2]]==0)
 #endif
-	wgp_piv_layer_draw(bitmap,cliprect,layer[2],0,4);
+	wgp_piv_layer_draw(screen->machine,bitmap,cliprect,layer[2],0,4);
 
 	draw_sprites(screen->machine, bitmap,cliprect,16);
 

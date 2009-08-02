@@ -41,7 +41,7 @@ void PC080SN_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,in
 void PC080SN_tilemap_draw_offset(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs);
 
 /* For Topspeed */
-void PC080SN_tilemap_draw_special(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram);
+void PC080SN_tilemap_draw_special(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram);
 
 
 /***************************************************************************/
@@ -157,7 +157,7 @@ READ32_HANDLER ( TC0480SCP_ctrl_long_r );
 WRITE32_HANDLER( TC0480SCP_ctrl_long_w );
 
 void TC0480SCP_tilemap_update(running_machine *machine);
-void TC0480SCP_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
+void TC0480SCP_tilemap_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
 
 /* Returns the priority order of the bg tilemaps set in the internal
    register. The order in which the four layers should be drawn is

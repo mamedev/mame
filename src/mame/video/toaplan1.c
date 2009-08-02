@@ -935,7 +935,7 @@ static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const rectangle *clip
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-
+	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
 
@@ -1162,7 +1162,7 @@ VIDEO_UPDATE( toaplan1 )
 	toaplan1_log_vram();
 #endif
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x120);
 
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,TILEMAP_DRAW_OPAQUE,0);
@@ -1189,7 +1189,7 @@ VIDEO_UPDATE( demonwld )
 	toaplan1_log_vram();
 #endif
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x120);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE | 0,0);

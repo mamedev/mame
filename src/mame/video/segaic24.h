@@ -27,7 +27,7 @@ WRITE32_HANDLER(sys24_char32_w);
 // Sprites
 //  System24
 void sys24_sprite_vh_start(running_machine *machine);
-void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri);
+void sys24_sprite_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *spri);
 
 WRITE16_HANDLER (sys24_sprite_w);
 READ16_HANDLER (sys24_sprite_r);

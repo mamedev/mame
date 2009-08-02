@@ -438,7 +438,7 @@ static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *cli
 {
 	pen_t pen_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-
+	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
 
@@ -989,7 +989,7 @@ static VIDEO_UPDATE( common )
 {
 	int i;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	kaneko16_prepare_first_tilemap_chip(screen->machine, bitmap, cliprect);
 	kaneko16_prepare_second_tilemap_chip(screen->machine, bitmap, cliprect);

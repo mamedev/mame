@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int offs;
 
-	bitmap_fill(priority_bitmap,NULL,1);
+	bitmap_fill(machine->priority_bitmap,NULL,1);
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
@@ -202,7 +202,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				color,
 				flipx,flipy,
 				sx,sy,
-				priority_bitmap,
+				machine->priority_bitmap,
 				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				color,
 				flipx,flipy,
 				sx,sy,
-				priority_bitmap,
+				machine->priority_bitmap,
 				0x02,0x7fff);
 	}
 }

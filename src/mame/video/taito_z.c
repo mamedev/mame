@@ -248,7 +248,7 @@ static void contcirc_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,priority_bitmap,primasks[priority],0);
+					zx<<12,zy<<13,machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -343,7 +343,7 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 						flipx,flipy,
 						curx,cury,
 						zx<<12,zy<<12,
-						priority_bitmap,primasks[priority],0);
+						machine->priority_bitmap,primasks[priority],0);
 			}
 		}
 		else if ((zoomx-1) & 0x20)	/* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
@@ -386,7 +386,7 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 						flipx,flipy,
 						curx,cury,
 						zx<<12,zy<<12,
-						priority_bitmap,primasks[priority],0);
+						machine->priority_bitmap,primasks[priority],0);
 			}
 		}
 		else if (!((zoomx-1) & 0x60))	/* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
@@ -429,7 +429,7 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 						flipx,flipy,
 						curx,cury,
 						zx<<12,zy<<12,
-						priority_bitmap,primasks[priority],0);
+						machine->priority_bitmap,primasks[priority],0);
 			}
 		}
 
@@ -522,7 +522,7 @@ static void bshark_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					priority_bitmap,primasks[priority],0);
+					machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -623,7 +623,7 @@ static void sci_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,con
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					priority_bitmap,primasks[priority],0);
+					machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -714,7 +714,7 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					priority_bitmap,primasks[priority],0);
+					machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -805,7 +805,7 @@ static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					priority_bitmap,primasks[priority],0);
+					machine->priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -847,7 +847,7 @@ VIDEO_UPDATE( contcirc )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -873,7 +873,7 @@ VIDEO_UPDATE( chasehq )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -898,7 +898,7 @@ VIDEO_UPDATE( bshark )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect,0);
@@ -923,7 +923,7 @@ VIDEO_UPDATE( sci )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -948,7 +948,7 @@ VIDEO_UPDATE( aquajack )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -973,7 +973,7 @@ VIDEO_UPDATE( spacegun )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -1003,21 +1003,21 @@ VIDEO_UPDATE( dblaxle )
 	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked - this shouldn't be necessary! */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,0);
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,1);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[1],0,0);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[2],0,1);
 
 	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0xc0,0,0,1,2);
 	bshark_draw_sprites_16x8(screen->machine, bitmap,cliprect,7);
 
 	/* This layer used for the big numeric displays */
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[3],0,4);
 
-	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* Text layer */
+	TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);	/* Text layer */
 	return 0;
 }

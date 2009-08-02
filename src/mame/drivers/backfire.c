@@ -158,7 +158,7 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					priority_bitmap,pri,0);
+					machine->priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -181,7 +181,7 @@ static VIDEO_UPDATE(backfire)
 	if (screen == left_screen)
 	{
 
-		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 		bitmap_fill(bitmap,cliprect,0x100);
 
 		if (backfire_left_priority[0] == 0)
@@ -201,7 +201,7 @@ static VIDEO_UPDATE(backfire)
 	}
 	else if (screen == right_screen)
 	{
-		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(screen->machine->priority_bitmap,NULL,0);
 		bitmap_fill(bitmap,cliprect,0x500);
 
 		if (backfire_right_priority[0] == 0)

@@ -192,7 +192,7 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 {
 	int offs;
 
-	bitmap_fill(priority_bitmap, cliprect, 1);
+	bitmap_fill(machine->priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
@@ -234,21 +234,21 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		{
 			/* first draw the sprite, visible */
 			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					priority_bitmap, 0x00, 0x0101);
+					machine->priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
 			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-					priority_bitmap, 0x02, 0xfeff);
+					machine->priority_bitmap, 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
 			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					priority_bitmap, 0x00, 0x0101);
+					machine->priority_bitmap, 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
 			pdrawgfx_transmask(bitmap, cliprect, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					priority_bitmap, 0x02, 0xfeff);
+					machine->priority_bitmap, 0x02, 0xfeff);
 		}
 	}
 }

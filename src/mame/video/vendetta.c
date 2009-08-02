@@ -114,7 +114,7 @@ VIDEO_UPDATE( vendetta )
 
 	sortlayers(layer,layerpri);
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);

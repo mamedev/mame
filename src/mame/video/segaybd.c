@@ -67,7 +67,7 @@ VIDEO_UPDATE( yboard )
 	segaic16_sprites_draw(screen, yboard_bitmap, &yboard_clip, 1);
 
 	/* apply rotation */
-	segaic16_rotate_draw(0, bitmap, cliprect, yboard_bitmap);
+	segaic16_rotate_draw(screen->machine, 0, bitmap, cliprect, yboard_bitmap);
 
 	/* draw the 16B sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);

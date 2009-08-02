@@ -196,7 +196,7 @@ VIDEO_UPDATE( othldrby )
 		}
 	}
 
-	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	bitmap_fill(bitmap,cliprect,0);
 
