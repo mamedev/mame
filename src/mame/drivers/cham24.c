@@ -63,7 +63,7 @@ Notes:
 static UINT8* nt_ram;
 static UINT8* nt_page[4];
 
-void cham24_set_mirroring( int mirroring )
+static void cham24_set_mirroring( int mirroring )
 {
 	switch(mirroring)
 	{

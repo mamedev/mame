@@ -54,7 +54,7 @@
 static UINT8* nt_ram;
 static UINT8* nt_page[4];
 
-void set_mirroring(int mirroring)
+static void set_mirroring(int mirroring)
 {
 	switch(mirroring)
 	{
@@ -99,7 +99,7 @@ static READ8_HANDLER (multigam_nt_r)
 	return nt_page[page][offset & 0x3ff];
 }
 
-void set_videorom_bank(running_machine* machine, int start, int count, int bank, int bank_size_in_kb)
+static void set_videorom_bank(running_machine* machine, int start, int count, int bank, int bank_size_in_kb)
 {
 	int i, j;
 	int offset = bank * (bank_size_in_kb * 0x400);

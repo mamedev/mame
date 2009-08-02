@@ -35,11 +35,11 @@ static UINT8* nt_ram[2];
 static UINT8* nt_page[2][4]; // because mirroring is used.
 
 /* Prototypes for mapping board components to PPU bus */
-WRITE8_HANDLER( vsnes_nt0_w );
-WRITE8_HANDLER( vsnes_nt1_w );
-READ8_HANDLER( vsnes_nt0_r );
-READ8_HANDLER( vsnes_nt1_r );
-void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb );
+static WRITE8_HANDLER( vsnes_nt0_w );
+static WRITE8_HANDLER( vsnes_nt1_w );
+static READ8_HANDLER( vsnes_nt0_r );
+static READ8_HANDLER( vsnes_nt1_r );
+static void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb );
 
 /*************************************
  *
@@ -355,33 +355,31 @@ MACHINE_START( vsdual )
  *
  *************************************/
 
-WRITE8_HANDLER( vsnes_nt0_w )
+static WRITE8_HANDLER( vsnes_nt0_w )
 {
 	int page = ((offset & 0xc00) >> 10);
 	nt_page[0][page][offset & 0x3ff] = data;
-
 }
 
-WRITE8_HANDLER( vsnes_nt1_w )
+static WRITE8_HANDLER( vsnes_nt1_w )
 {
 	int page = ((offset & 0xc00) >> 10);
 	nt_page[1][page][offset & 0x3ff] = data;
-
 }
 
-READ8_HANDLER( vsnes_nt0_r )
+static READ8_HANDLER( vsnes_nt0_r )
 {
 	int page = ((offset&0xc00) >> 10);
 	return nt_page[0][page][offset & 0x3ff];
 }
 
-READ8_HANDLER( vsnes_nt1_r )
+static READ8_HANDLER( vsnes_nt1_r )
 {
 	int page = ((offset & 0xc00) >> 10);
 	return nt_page[1][page][offset & 0x3ff];
 }
 
-void v_set_mirroring( int ppu, int mirroring )
+static void v_set_mirroring( int ppu, int mirroring )
 {
 	switch (mirroring)
 	{
@@ -414,7 +412,7 @@ void v_set_mirroring( int ppu, int mirroring )
 
 }
 
-void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb )
+static void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb )
 {
 	int i, j;
 	int offset = bank * (bank_size_in_kb * 0x400);

@@ -4,13 +4,13 @@
 #include "includes/playch10.h"
 
 /* prototypes */
-void pc10_set_mirroring( int mirroring );
-WRITE8_HANDLER( pc10_nt_w );
-READ8_HANDLER( pc10_nt_r );
-WRITE8_HANDLER( pc10_chr_w );
-READ8_HANDLER( pc10_chr_r );
-void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size );
-void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size );
+static void pc10_set_mirroring( int mirroring );
+static WRITE8_HANDLER( pc10_nt_w );
+static READ8_HANDLER( pc10_nt_r );
+static WRITE8_HANDLER( pc10_chr_w );
+static READ8_HANDLER( pc10_chr_r );
+static void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size );
+static void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size );
 
 typedef struct
 {
@@ -318,19 +318,19 @@ READ8_HANDLER( pc10_in1_r )
  *
  *************************************/
 
-WRITE8_HANDLER( pc10_nt_w )
+static WRITE8_HANDLER( pc10_nt_w )
 {
 	int page = ((offset & 0xc00) >> 10);
 	nametable[page][offset & 0x3ff] = data;
 }
 
-READ8_HANDLER( pc10_nt_r )
+static READ8_HANDLER( pc10_nt_r )
 {
 	int page = ((offset & 0xc00) >> 10);
 	return nametable[page][offset & 0x3ff];
 }
 
-WRITE8_HANDLER( pc10_chr_w )
+static WRITE8_HANDLER( pc10_chr_w )
 {
 	int bank = offset >> 10;
 	if (chr_page[bank].writable)
@@ -339,14 +339,13 @@ WRITE8_HANDLER( pc10_chr_w )
 	}
 }
 
-READ8_HANDLER( pc10_chr_r )
+static READ8_HANDLER( pc10_chr_r )
 {
 	int bank = offset >> 10;
 	return chr_page[bank].chr[offset & 0x3ff];
 }
 
-
-void pc10_set_mirroring( int mirroring )
+static void pc10_set_mirroring( int mirroring )
 {
 	switch (mirroring)
 	{
@@ -386,7 +385,7 @@ void pc10_set_mirroring( int mirroring )
  *  64         1 *
 \*****************/
 
-void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size )
+static void pc10_set_videorom_bank( running_machine *machine, int first, int count, int bank, int size )
 {
 	int i, len;
 	/* first = first bank to map */
@@ -411,7 +410,7 @@ void pc10_set_videorom_bank( running_machine *machine, int first, int count, int
 	}
 }
 
-void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size )
+static void set_videoram_bank( running_machine *machine, int first, int count, int bank, int size )
 {
 	int i;
 	/* first = first bank to map */
