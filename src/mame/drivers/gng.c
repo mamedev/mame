@@ -329,11 +329,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gng )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ? */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gng_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -359,13 +359,13 @@ static MACHINE_DRIVER_START( gng )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 	MDRV_SOUND_ROUTE(2, "mono", 0.40)
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 	MDRV_SOUND_ROUTE(2, "mono", 0.40)
