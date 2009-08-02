@@ -524,12 +524,12 @@ static DRIVER_INIT( progolfa )
 
 	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
 
-	for (A = 0x0000;A < 0x10000;A++)
-		decrypted[A] = rom[A];
-
-	/* TODO: data is likely to not be encrypted, just the opcodes are. */
-	for (A = 0x0001 ; A < 0x10000 ; A += 2)
-		decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
+	/* data is likely to not be encrypted, just the opcodes are. */
+	for (A = 0x0000 ; A < 0x10000 ; A++)
+		if (A & 1)
+			decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
+		else
+			decrypted[A] = rom[A];
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
