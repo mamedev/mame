@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( vandyke_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(vandyke_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
 	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( manybloc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001c, 0x08001d) AM_WRITENOP			/* See notes at the top of the driver */
 	AM_RANGE(0x08001e, 0x08001f) AM_READWRITE(soundlatch2_word_r,soundlatch_word_w)
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(manybloc_scroll_w) AM_BASE(&gunnail_scrollram)
 	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( tharrier_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080202, 0x080203) AM_READ_PORT("IN2")
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 //  AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM /* Unused txvideoram area? */
 	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( mustang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( mustangb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( twinactn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( acrobatm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc001e, 0xc001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0xc4000, 0xc45ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc8000, 0xc8007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 ADDRESS_MAP_END
 
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( bioship_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(bioshipbg_scroll_w)
 	AM_RANGE(0x08c010, 0x08c017) AM_RAM_WRITE(bioship_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( hachamf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* Video Region */
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	/* Main RAM, inc sprites, shared with MCU */
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(hachamf_mainram_w) AM_BASE(&nmk16_mainram) // ram is shared with MCU
@@ -887,7 +887,7 @@ static ADDRESS_MAP_START( tdragon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 ADDRESS_MAP_END
 
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( tdragonb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(seibu_main_mustb_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 ADDRESS_MAP_END
 
@@ -920,7 +920,7 @@ static ADDRESS_MAP_START( ssmissin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(ssmissin_sound_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram) //mirror for airattck
 ADDRESS_MAP_END
 
@@ -945,7 +945,7 @@ static ADDRESS_MAP_START( strahl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x84000, 0x84007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x88000, 0x88007) AM_RAM_WRITE(nmk_scroll_2_w)
 	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE(nmk_fgvideoram_w) AM_BASE(&nmk_fgvideoram)
 	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE(&nmk16_mainram)
@@ -964,7 +964,7 @@ static ADDRESS_MAP_START( macross_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -984,7 +984,7 @@ static ADDRESS_MAP_START( gunnail_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE(&gunnail_scrollram)
 	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE(&gunnail_scrollramy)
 	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY	// unknown
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -1001,9 +1001,16 @@ static ADDRESS_MAP_START( macross2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x130000, 0x130007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x130008, 0x1307ff) AM_WRITENOP	/* 0 only? */
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(&gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x130400, 0x1307ff) AM_RAM
+	
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE(&nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE(&nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE(&nmk_bgvideoram3)
+	
 	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -1020,8 +1027,17 @@ static ADDRESS_MAP_START( raphero_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(nmk_scroll_3_w) AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(&gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x130400, 0x1307ff) AM_RAM
+	
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE(&nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE(&nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE(&nmk_bgvideoram3)
+	
+	
 	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
@@ -1089,7 +1105,7 @@ static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP	/* IRQ enable? */
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
@@ -3716,7 +3732,7 @@ static MACHINE_DRIVER_START( bioship )
 	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,100)/* 112 breaks the title screen */
 
 	MDRV_MACHINE_RESET(NMK004)
 
@@ -4247,7 +4263,7 @@ static MACHINE_DRIVER_START( macross2 )
 
 	MDRV_VIDEO_START(macross2)
 	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MDRV_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -4290,9 +4306,9 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_GFXDECODE(macross2)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(tdragon2)
+	MDRV_VIDEO_START(macross2)
 	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MDRV_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -4334,9 +4350,9 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_GFXDECODE(macross2)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross2)
+	MDRV_VIDEO_START(raphero)
 	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MDRV_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -4687,8 +4703,8 @@ static ADDRESS_MAP_START( afega, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_BASE(&afega_scroll_0)	// Scroll
 /**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_BASE(&afega_scroll_1)	//
 	AM_RANGE(0x08c008, 0x08ffff) AM_WRITE(SMH_RAM)				//
-/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(afega_vram_0_w) AM_BASE(&afega_vram_0)	// Layer 0					// ?
-/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(afega_vram_1_w) AM_BASE(&afega_vram_1)	// Layer 1
+/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)	// Layer 0					// ?
+/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)	// Layer 1
 
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1) AM_BASE(&nmk16_mainram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1)
@@ -4830,20 +4846,20 @@ static const gfx_layout layout_16x16x4_swapped =
 };
 
 static GFXDECODE_START( grdnstrm )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8,	256*0, 1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,	256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8,	256*0, 1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,	256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( stagger1 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,	256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,	256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,	256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,	256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( redhawkb )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4_swapped,	256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,			256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4_swapped,	256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4_swapped,	256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
@@ -4937,9 +4953,6 @@ static MACHINE_DRIVER_START( grdnstrmk )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stagger1)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	
 	/* video hardware */
 	MDRV_GFXDECODE(grdnstrm)
