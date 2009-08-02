@@ -9175,7 +9175,17 @@ Other Sun games
 	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk4 hardware */
+	DRIVER( 3bagflnz )	/* (c) 1994 */
+	DRIVER( blkrhino )	/* (c) 1996 */
+	DRIVER( coralr2 )	/* (c) 2002 */
 	DRIVER( eforest )	/* (c) 1994 */
+	DRIVER( eforesta )	/* (c) 1995 */
+	DRIVER( eforestb )	/* (c) 1996 */
+	DRIVER( goldenc )	/* (c) 1996 */
+	DRIVER( kgbird )	/* (c) 1996 */
+	DRIVER( kgbirda )	/* (c) 1996 */
+	DRIVER( phantomp )	/* (c) 1998 */
+	DRIVER( topgear )	/* (c) 1996 */	
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
@@ -9559,6 +9569,8 @@ Other Sun games
     */
 
 	/* Scorpion 2 */
+	DRIVER( m_brkfst )
+	
 	DRIVER( m_bdrwho )
 	DRIVER( m_bdrwh1 )
 	DRIVER( m_bdrwh2 )

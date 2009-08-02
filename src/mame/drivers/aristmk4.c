@@ -498,6 +498,77 @@ static MACHINE_DRIVER_START( aristmk4 )
 
 MACHINE_DRIVER_END
 
+ROM_START( 3bagflnz )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(ba97a469) SHA1(fee56fe7116d1f1aab2b0f2526101d4eb87f0bf1)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(c632c7c7) SHA1(f3090d037f71a0cf099bb55abbc509cf95f0cbba)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, BAD_DUMP CRC(44babe95) SHA1(047c00ebb21030563921108b8e24f62e9ef44a10)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, BAD_DUMP CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, BAD_DUMP CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, BAD_DUMP CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, BAD_DUMP CRC(7a4e8b80) SHA1(35711d6a8f5675ad6c6496bf8e7e5a73504f2409))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, BAD_DUMP CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( blkrhino )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(7aed16f5) SHA1(0229387e352da8e7278e5bc5c61079742d05d900)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(4739f0f0) SHA1(231b6ad26b6b5d413dbd0a23257e86814978449b)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(0559fe98) SHA1(2ffb7b3ce3b7ba3bd846cae514b66b1c1a3be91f)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(c0b94f7b) SHA1(8fc3bc53c532407b77682e5e9ac6a625081d22a3))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(2f4f0fe5) SHA1(b6c75bd3b6281a2de7bfea8162c39d58b0e8fa32))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e483b4cd) SHA1(1cb3f77e7d470d7dcd8e50a0f59298d5546e8b58))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(4a0ce91d) SHA1(e2f853c69fb256870c9809cdfbba2b40b47a0004))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(b265276e) SHA1(8fc0b7a0c12549b4138c51eb91b74f13282909dd))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( coralr2 )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(f51e541b) SHA1(00f5b9019cdae77d4b5745156b92343d22ad3a6e)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(d8d27f65) SHA1(19aec2a29e9d3ecbd8ecfd74ae60cfbf197d2faa)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(5156f5ec) SHA1(8b4d0699b4477531d513e21f549fcc0ee6ea82ee)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(bf27732a) SHA1(9383dfc37c5c3ad0d628f2134f010e977e25ef39))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(a563c2fa) SHA1(10dab35515e2d8332d114a5f103343403334a65f))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(73814767) SHA1(91c77d7b634bd8a5c32e0ceeb54a8bbeedfe8130))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e13ec0ed) SHA1(80d5ef2d980a8fe1f2bb28b512022518ffc82de1))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(30e88bb4) SHA1(dfcd21c6fc50123dfcc0e60429948c650a6de625))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
 
 ROM_START( eforest )
 
@@ -523,9 +594,212 @@ ROM_START( eforest )
 	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
+ROM_START( eforesta )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(03c2890f) SHA1(10d479b7ccece813676ad815a96169bbf259c49d)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(36125194) SHA1(dc681dc60b25893ca3ee101f6813c22b914771f5)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(00446ff1) SHA1(e37e2782669667efab07ab3cd4e2c9f87770add5)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(75670af6) SHA1(c6ce3dcc9e46ebdee65220cc0e0c8b43ee786ec0))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(75ad8e3f) SHA1(87812850f08f8ad3057d0e5a2a20ad8acba01a26))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( eforestb )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(49b9c5ef) SHA1(bd1761f41ddb3f19b6b923de77743a2b5ec078e1)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a3eb0c09) SHA1(5a0947f2f36a87dffe4041fbaebaabb1c694bafe)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(bf3a23b0) SHA1(00405e0c0ac03ecffba1077bacf61265cca72130)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(ba171964) SHA1(7d43559965f467f07419f77d07d7d34ae60d2e90))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(a3ca69b0) SHA1(c4bdd8afbb4d076f07d4a14a7e7ac8907a0cb7ec))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( goldenc )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(49b9c5ef) SHA1(bd1761f41ddb3f19b6b923de77743a2b5ec078e1)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a3eb0c09) SHA1(5a0947f2f36a87dffe4041fbaebaabb1c694bafe)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(d4b18412) SHA1(a42a06dbfc55730b27b3857646bfa34ae0e3cb32)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(80e22d51) SHA1(5e187070d300209e31f603aa561011e17d4305d2))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(1f84ed74) SHA1(df2af247972d6540fd4aac31b51f3aa44248061c))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(9d267ef1) SHA1(3781e63552036dc7613b21704a4456ddfb67433f))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(a3ca369e) SHA1(e3076c9f3017991b93214bebf7f5227d995eeda1))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(844fa43b) SHA1(b8ef6cc2aca955f41b15cd8e3c281eee4b611e80))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( swtht2nz )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(ae10c63f) SHA1(80e5aca4dec7d2503bf7be81ed8b761ebbe4c174)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(053e71f0) SHA1(4a45bd11b53347be90402cea7bd94a648d6b8129)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(1e38dfc3) SHA1(40a75fc35ebd49ea9c21cb42c30a2aba988c3139)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(77caf3fa) SHA1(559898ccffffd8f59c555722dea75600c823997f))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(76babc55) SHA1(0902497ad2222490a690fe77feacc350d2997403))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(da9514b5) SHA1(d63562095cec463864dfd2c580aa93f45adef853))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(4d03c73f) SHA1(7ae629a90feb87019cc01ecef804c5ba28861f00))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(c51e37bb) SHA1(8f3d9b61926fe21089559736b3458fe3b84618f2))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( kgbird )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(5e7c1762) SHA1(2e80be06c7737aca304d46f3c3f1efd24c570cfd)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( kgbirda )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(21c05874) SHA1(9ddcd34817bc6f88cb2a94374e492d29dd56fb9a)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( phantomp )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(84e8eeb5) SHA1(95dcbae79b42463480fb3dd2594570070ba1a3ef)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a6aa3d6f) SHA1(64d97c52355d5d0faebe1ee704f6ad46cc90f0f1)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(0f73cf57) SHA1(f99aa9671297d8cefeff86e642af5ea3e7f6f6fb)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(2449d69e) SHA1(181d7d093dce1acc332255cab5d56a9043bcab47))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5cb0f179) SHA1(041f7baa5a36f544a98832753ff54ca5238f12c5))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(75f94143) SHA1(aac2b0bee1a0d83b25c6fd21f00803209b621543))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(6ead5ffc) SHA1(1611d5e2dd5ea06525b6079577a45e713a8065d5))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(c1fb4f23) SHA1(6c9a4e52bd0312c9b49f91a1f563fecd87e5bb82))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
+ROM_START( topgear )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(5628f477) SHA1(8517905b4d4174fea79e2e3ed38c80fcc6506c6a)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(d5afa54e) SHA1(4268c0ddb9beab68348ba520d47bea64b875d8a7)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(e3163956) SHA1(b3b55be33fad96858dc683860d72c81ed02b3d97)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(9ce936cb) SHA1(cca6ec0190a61cb0b52fbe1b11fb678f5e0960df))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(972f091a) SHA1(b94a04e9503fb6f1a687c854076cfc9629ed7b6a))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(27fd4204) SHA1(0d082a4297a384c992188dd43be0ecb706117c13))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(186f3e3b) SHA1(57f82a79a3d24090f33f5525207d6697e954cdf5))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(dc7d2dab) SHA1(16d223f28b377fafb478d6124fc0eb6d7dd7d591))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
 static DRIVER_INIT( aristmk4 )
 {
 	//...
 }
 
-GAME( 1994, eforest,0, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994, eforest,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, eforesta,eforest, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, eforestb,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994, 3bagflnz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, blkrhino,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, kgbird,			0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, kgbirda,kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, swtht2nz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, goldenc,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, topgear,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, phantomp,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, coralr2,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
