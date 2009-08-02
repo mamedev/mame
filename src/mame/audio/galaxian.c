@@ -5,7 +5,7 @@
 
 #define VERBOSE 0
 
-#define NEW_LFO 0
+#define NEW_LFO 1
 
 #define XTAL		18432000
 
@@ -478,7 +478,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 #undef Cap
 #undef Vbe
 #undef Vcc
-	logerror("lfo timer bits:%d%d%d%d r1:%d, r2:%d, re: %d, td: %9.2fsec\n", lfobit[0], lfobit[1], lfobit[2], lfobit[3], (int)r1, (int)r2, (int)Re, td);
+	LOG(("lfo timer bits:%d%d%d%d r1:%d, r2:%d, re: %d, td: %9.2fsec\n", lfobit[0], lfobit[1], lfobit[2], lfobit[3], (int)r1, (int)r2, (int)Re, td));
 	timer_adjust_periodic(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td));
 #else
 	double r0, r1, rx = 100000.0;
