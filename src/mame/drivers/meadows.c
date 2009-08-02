@@ -338,7 +338,6 @@ static PALETTE_INIT( meadows )
 }
 
 
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -358,6 +357,18 @@ static ADDRESS_MAP_START( meadows_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bowl3d_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS1")
+	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("INPUTS2")
+	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
+	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
+	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE(&spriteram)
+	AM_RANGE(0x0e00, 0x0eff) AM_RAM
+	AM_RANGE(0x1000, 0x1bff) AM_ROM
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minferno_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
@@ -411,7 +422,7 @@ static INPUT_PORTS_START( meadows )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("STICK")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:3,2,1")
@@ -442,6 +453,57 @@ static INPUT_PORTS_START( meadows )
 	PORT_BIT( 0x8e, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bowl3d )
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1         )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("FAKE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x8e, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( minferno )
 	PORT_START("JOY1")
@@ -653,7 +715,39 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bowl3d )
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(meadows)
+	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)
+	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt) 	/* one interrupt per frame!? */
+
+	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
+
+	MDRV_QUANTUM_TIME(HZ(600))
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 30*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(meadows)
+	MDRV_PALETTE_LENGTH(2)
+
+	MDRV_PALETTE_INIT(meadows)
+	MDRV_VIDEO_START(meadows)
+	MDRV_VIDEO_UPDATE(meadows)
+
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_CONFIG(meadows_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
  	/* audio hardware */
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
@@ -831,6 +925,6 @@ static DRIVER_INIT( minferno )
  *************************************/
 
 GAMEL( 1978, deadeye,  0, meadows,  meadows,  0,        ROT0,  "Meadows", "Dead Eye", 0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   meadows,  0,        ROT90, "Meadows", "3-D Bowling", GAME_NOT_WORKING )
+GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   0,        ROT90, "Meadows", "3-D Bowling", GAME_NO_SOUND )
 GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  gypsyjug, ROT0,  "Meadows", "Gypsy Juggler", GAME_IMPERFECT_GRAPHICS, layout_gypsyjug )
 GAME ( 1978, minferno, 0, minferno, minferno, minferno, ROT0,  "Meadows", "Inferno (Meadows)", GAME_NO_SOUND )
