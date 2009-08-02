@@ -1172,7 +1172,7 @@ const game_driver * const drivers[] =
 	DRIVER( m4 )		/* 626 [1977] */
 	DRIVER( clowns )	/* 630 [1978] */
 	DRIVER( clowns1 )	/* 630 [1978] */
-						/* 640 - Space Walk [1978] */
+	DRIVER( spacwalk )	/* 640 [1978] */
 	DRIVER( einning )	/* 642 [1978] Midway */
 	DRIVER( shuffle )	/* 643 [1978] */
 	DRIVER( dogpatch )	/* 644 [1977] */
