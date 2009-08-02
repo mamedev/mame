@@ -447,7 +447,6 @@ UINT16 scudhamm_motor_command;
 
 READ16_HANDLER( scudhamm_motor_status_r )
 {
-//  return 1 << (mame_rand(space->machine)&1);         // Motor Status
 	return scudhamm_motor_command;	// Motor Status
 }
 
@@ -474,7 +473,24 @@ static WRITE16_HANDLER( scudhamm_motor_command_w )
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return input_port_read(space->machine, "IN1");
+	static int prev=0;
+	int i=input_port_read(space->machine, "IN1"),j;
+	
+	if ((i^prev)&0x4000) {
+		if (i<prev) prev-=0x8000;
+		else prev+=0x8000;
+	}
+	
+	j=i-prev;
+	prev=i;
+	
+	/* effect of hammer collision 'accelerometer':
+	$00 - $09 - no hit
+	$0A - $3F - soft hit
+	$40 - $FF - hard hit */
+	if (j<0) return 0;
+	else if (j>0xff) return 0xff;
+	return j;
 }
 
 /*
@@ -530,7 +546,7 @@ static ADDRESS_MAP_START( scudhamm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
 	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)											// ?
 	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r) AM_WRITE(SMH_NOP)							// A / D
-	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r		)									// Motor Position
+	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r)									// Motor Position
 	AM_RANGE(0x100050, 0x100051) AM_READWRITE(scudhamm_motor_status_r, scudhamm_motor_command_w)		// Motor Limit Switches
 	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("IN2")													// 2 x DSW
 ADDRESS_MAP_END
@@ -1302,9 +1318,9 @@ static INPUT_PORTS_START( scudhamm )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Gu
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Choki
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pa
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Gu (rock)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Choki (scissors)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Pa (paper)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1312,7 +1328,7 @@ static INPUT_PORTS_START( scudhamm )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN1")	// A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
+	PORT_BIT( 0x7fff, 0x0000, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
 
 	PORT_START("IN2")	// DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1,2")
