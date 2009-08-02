@@ -5454,6 +5454,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* GX Type 3 */
 	DRIVER( soccerss )	/* 1994.?? GX427 (Europe) */
 	DRIVER( soccerssj )	/* 1994.12 GX427 (Japan) */
+	DRIVER( soccerssja )/* 1994.12 GX427 (Japan) */
 	DRIVER( soccerssa )	/* 1994.?? GX427 (Asia) */
 						/* 1995.04 GX427 (US) */
 

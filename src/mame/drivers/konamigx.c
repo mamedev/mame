@@ -2557,8 +2557,52 @@ ROM_START( soccerss )
 	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
 ROM_END
 
-/* Soccer Superstars (Japan ver JAA)*/
+/* Soccer Superstars (Japan ver JAC)*/
 ROM_START( soccerssj )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "427c02.28m", 0x200000, 512*1024, CRC(399fe89d) SHA1(e42cf87cff8cd421afd121621ba1f67c43f728ef) )
+	ROM_LOAD32_WORD_SWAP( "427c03.30m", 0x200002, 512*1024, CRC(f9c6ab08) SHA1(371b05a3990436a16b77b3d58aa235202abe78db) )
+
+	/* data roms */
+	ROM_LOAD32_WORD_SWAP( "427a04.28r",   0x400000, 0x080000, CRC(c7d3e1a2) SHA1(5e1e4f4c97def36902ad853248014a7af62e0c5e) )
+	ROM_LOAD32_WORD_SWAP( "427a05.30r",   0x400002, 0x080000, CRC(5372f0a5) SHA1(36e8d0a73918cbd018c1865d1a05445daba8997c) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("427a07.6m", 0x000000, 128*1024, CRC(8dbaf4c7) SHA1(cb69bf94090a4871b35e7ba1f58e3225077b82cd) )
+	ROM_LOAD16_BYTE("427a06.9m", 0x000001, 128*1024, CRC(979df65d) SHA1(7499e9a27aa562692bd3a296789696492a6254bc) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORDS2_ROM_LOAD( "427a15.11r", 0x000000, 0x100000, CRC(33ce2b8e) SHA1(b0936386cdc7c41f33b1d7b4f5ce25fe618d1286) )
+	TILE_BYTES2_ROM_LOAD( "427a14.143", 0x000004, 0x080000, CRC(7575a0ed) SHA1(92fda2747ac090f93e60cff8478af6721b949dc2) )
+
+	/* sprites */
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "427a08.140", 0x000000, 2*1024*1024, CRC(221250af) SHA1(fd24e7f0e3024df5aa08506523953c5e35d2267b) )
+	ROM_LOAD32_WORD( "427a09.137", 0x000002, 2*1024*1024, CRC(56bdd480) SHA1(01d164aedc77f71f6310cfd739c00b33289a2e7e) )
+	ROM_LOAD32_WORD( "427a10.25r", 0x400000, 2*1024*1024, CRC(6b3ccb41) SHA1(b246ef350a430e60f0afd1b80ff48139c325e926) )
+	ROM_LOAD32_WORD( "427a11.23r", 0x400002, 2*1024*1024, CRC(c1ca74c1) SHA1(b7286df8e59f8f1939ebf17aaf9345a857b0b100) )
+	ROM_LOAD32_WORD( "427a12.21r", 0x800000, 2*1024*1024, CRC(97d6fd38) SHA1(8d2895850cafdea95db08c84e7eeea90a1921515) )
+	ROM_LOAD32_WORD( "427a13.18r", 0x800002, 2*1024*1024, CRC(815a9b87) SHA1(7d9d5932fff7dd7aa4cbccf0c8d3784dc8042e70) )
+
+	/* PSAC2 tiles */
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 )
+	ROM_LOAD( "427a18.145", 0x000000, 0x100000, CRC(bb6e6ec6) SHA1(aa1365a4318866d9e7e74461a6e6c113f83b6771) )
+
+	/* PSAC2 map data */
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_ERASE00 )
+	ROM_LOAD( "427a17.24c", 0x000000, 0x080000, CRC(fb6eb01f) SHA1(28cdb30ff70ee5fc7624e18fe048dd85dfa49ace) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "427a16.9r", 0x000000, 2*1024*1024,  CRC(39547265) SHA1(c0efd68c0c1ea59141045150842f36d43e1f01d8) )
+ROM_END
+
+/* Soccer Superstars (Japan ver JAA)*/
+ROM_START( soccerssja )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
@@ -3600,7 +3644,8 @@ GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx, ROT0, "Konami", "W
 
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
 GAME( 1994, soccerss, konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_NOT_WORKING )
-GAME( 1994, soccerssj,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING )
+GAME( 1994, soccerssj,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAC)", GAME_NOT_WORKING ) // writes JAB to EEPROM, but should be version JAC according to labels
+GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver JAA)", GAME_NOT_WORKING )
 GAME( 1994, soccerssa,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_NOT_WORKING )
 
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
