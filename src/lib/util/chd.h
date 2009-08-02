@@ -331,7 +331,7 @@ chd_error chd_compress_begin(chd_file *chd);
 chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio);
 
 /* finish compressing data to a CHD */
-chd_error chd_compress_finish(chd_file *chd);
+chd_error chd_compress_finish(chd_file *chd, int write_protect);
 
 
 

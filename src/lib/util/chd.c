@@ -1448,7 +1448,7 @@ chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio)
     a CHD
 -------------------------------------------------*/
 
-chd_error chd_compress_finish(chd_file *chd)
+chd_error chd_compress_finish(chd_file *chd, int write_protect)
 {
 	/* error if in the wrong state */
 	if (!chd->compressing)
@@ -1461,7 +1461,8 @@ chd_error chd_compress_finish(chd_file *chd)
 	metadata_compute_hash(chd, chd->header.rawsha1, chd->header.sha1);
 
 	/* turn off the writeable flag and re-write the header */
-	chd->header.flags &= ~CHDFLAGS_IS_WRITEABLE;
+	if (chd->header.compression != CHDCOMPRESSION_NONE || write_protect)
+		chd->header.flags &= ~CHDFLAGS_IS_WRITEABLE;
 	chd->compressing = FALSE;
 	return header_write(chd->file, &chd->header);
 }

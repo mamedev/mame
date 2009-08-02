@@ -656,7 +656,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	}
 
 	/* cleanup */
-	err = chd_compress_finish(chd);
+	err = chd_compress_finish(chd, TRUE);
 	if (err != CHDERR_NONE)
 		fprintf(stderr, "Error during compression finalization: %s\n", chd_error_string(err));
 	else
@@ -1055,7 +1055,7 @@ static int do_createav(int argc, char *argv[], int param)
 	}
 
 	/* finish compression */
-	err = chd_compress_finish(chd);
+	err = chd_compress_finish(chd, TRUE);
 	if (err != CHDERR_NONE)
 		goto cleanup;
 	else
@@ -2874,7 +2874,7 @@ static chd_error chdman_compress_file(chd_file *chd, const char *rawfile, UINT32
 	}
 
 	/* finish compression */
-	err = chd_compress_finish(chd);
+	err = chd_compress_finish(chd, TRUE);
 	if (err != CHDERR_NONE)
 		goto cleanup;
 
@@ -3031,7 +3031,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 	}
 
 	/* finish compression */
-	err = chd_compress_finish(chd);
+	err = chd_compress_finish(chd, !(source_header->flags & CHDFLAGS_IS_WRITEABLE));
 	if (err != CHDERR_NONE)
 		goto cleanup;
 
