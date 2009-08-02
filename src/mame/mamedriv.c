@@ -153,6 +153,7 @@ const game_driver * const drivers[] =
 	DRIVER( zerotime )	/* hack */
 	DRIVER( starfght )	/* hack */
 	DRIVER( galaxbsf )	/* hack */
+	DRIVER( kamakazi3 )	/* Video Games (UK) Ltd., hack or bootleg? */
 	DRIVER( tst_galx )	/* Galaxian Test ROM */
 	DRIVER( gmgalax )	/* bootleg */
 	DRIVER( pisces )	/* Subelectro */
