@@ -126,7 +126,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		UINT8 potvalue = input_port_read(machine, "PADDLE");
-		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
+		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 56 + (potvalue / 2), (potvalue % 2) * 128), 0);
 	}
 
 	/* call us back in 4 scanlines */
