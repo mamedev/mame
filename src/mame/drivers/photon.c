@@ -248,4 +248,4 @@ ROM_START( phtetris )
 	ROM_LOAD( "foton_tetris.bin", 0x10000, 0x4000, BAD_DUMP CRC(a8af10bb) SHA1(5e2ea9a5d38399cbe156638eea73a3d25c442f77) )
 ROM_END
 
-GAME( 19??, phtetris, 0,      photon, photon, 0, ROT0, "unknown", "Tetris (Photon System)", 0 )
+GAME( 19??, phtetris, 0,      photon, photon, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )

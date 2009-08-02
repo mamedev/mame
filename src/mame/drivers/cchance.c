@@ -222,5 +222,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance,  0, ROT0, "unknown", "Cherry Chance", GAME_NOT_WORKING | GAME_WRONG_COLORS )
-
+GAME( 1987?, cchance,  0,    cchance, cchance,  0, ROT0, "<unknown>", "Cherry Chance", GAME_NOT_WORKING | GAME_WRONG_COLORS )

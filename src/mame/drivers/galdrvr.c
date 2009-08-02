@@ -4999,7 +4999,7 @@ GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM"
 GAME( 1981, blkhole,  0,        galaxian, blkhole,  galaxian, ROT90,  "TDS", "Black Hole", GAME_SUPPORTS_SAVE )
 GAME( 1982, orbitron, 0,        galaxian, orbitron, galaxian, ROT270, "Signatron USA", "Orbitron", GAME_SUPPORTS_SAVE )
 GAME( 1980, luctoday, 0,        galaxian, luctoday, galaxian, ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian, ROT90,  "unknown", "Chewing Gum", GAME_SUPPORTS_SAVE )
+GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian, ROT90,  "<unknown>", "Chewing Gum", GAME_SUPPORTS_SAVE )
 GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian, ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?", "Omega", GAME_SUPPORTS_SAVE )
 

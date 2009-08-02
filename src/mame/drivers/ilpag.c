@@ -534,6 +534,6 @@ ROM_START( steaser )
 	ROM_LOAD( "u66.5", 0x180000, 0x80000, CRC(da309671) SHA1(66baf8a83024547c471da39748ff99a9a9013ea4) )
 ROM_END
 
-GAME( 199?, ilpag,   0, ilpag,   ilpag, 0, ROT0,  "unknown", "Il Pagliaccio (Italy, Version 2.7C)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, ilpag,   0, ilpag,   ilpag, 0, ROT0,  "<unknown>", "Il Pagliaccio (Italy, Version 2.7C)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS )
 /* In-game strings are in Italian but service mode is half English / half French?*/
-GAME( 1993, steaser, 0, steaser, steaser, 0, ROT0,  "Unknown", "Strip Teaser (Italy, Version 1.22)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, steaser, 0, steaser, steaser, 0, ROT0,  "<unknown>", "Strip Teaser (Italy, Version 1.22)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS )

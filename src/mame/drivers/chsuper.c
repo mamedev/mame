@@ -264,5 +264,5 @@ static DRIVER_INIT( chsuper3 )
 }
 
 
-GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "unknown",    "Champion Super 3 (V0.35)", GAME_NO_SOUND ) //24/02/99
-GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "unknown",    "Champion Super 2 (V0.13)", GAME_NO_SOUND ) //26/01/99
+GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", GAME_NO_SOUND ) //24/02/99
+GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", GAME_NO_SOUND ) //26/01/99

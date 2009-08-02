@@ -3218,4 +3218,4 @@ GAME( 198?, jolyjkra, jolyjokr, funworld, jolyjkra, 0,        ROT0, "Impera",   
 GAME( 1993, jokercrd, 0,        funworld, funworld, 0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 199?, mongolnw, 0,        royalmcu, royalcrd, 0,        ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 198?, saloon,   0,        saloon,   saloon,   saloon,   ROT0, "Unknown",         "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 198?, saloon,   0,        saloon,   saloon,   saloon,   ROT0, "<unknown>",       "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

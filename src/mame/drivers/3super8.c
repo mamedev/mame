@@ -119,4 +119,4 @@ ROM_START( 3super8 )
 	ROM_LOAD( "sound.bin", 0x00000, 0x40000, BAD_DUMP CRC(230b31c3) SHA1(38c107325d3a4e9781912078b1317dc9ba3e1ced) )
 ROM_END
 
-GAME( 199?, 3super8,  0,    3super8, 3super8,  0, ROT0, "unknown", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, 3super8,  0,    3super8, 3super8,  0, ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )

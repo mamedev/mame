@@ -1137,5 +1137,5 @@ GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10,  ROT0, "A.W.P. Gam
 GAME(  1997, magic102, 0,        magic102, magic102, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",       GAME_NOT_WORKING                 )
 GAME(  1997, suprpool, 0,        magic102, magic102, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",     GAME_NOT_WORKING                 )
 GAME(  1996, hotslot,  0,        hotslot,  hotslot,  hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",        GAME_NOT_WORKING                 )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic102, ROT0, "unknown",              "Magic Colors (ver. 1.7a)",     GAME_NOT_WORKING                 )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",     GAME_NOT_WORKING                 )
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)", 0,               layout_sgsafari )

@@ -1301,5 +1301,5 @@ ROM_END
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END*/
 
-GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT0, "????", "39 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
-//GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "????", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT0, "<unknown>", "39 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+//GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "<unknown>", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)

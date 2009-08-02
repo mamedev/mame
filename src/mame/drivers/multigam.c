@@ -829,7 +829,7 @@ static DRIVER_INIT(multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
-GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 2)", 0 )
-GAME( 1992, multigm2, 0,        multigm3, multigm2, multigm3, ROT0, "Seo Jin", "Multi Game 2", 0 )
-GAME( 1992, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin", "Multi Game III", 0 )
+GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
+GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
+GAME( 1992, multigm2, 0,        multigm3, multigm2, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
+GAME( 1992, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )

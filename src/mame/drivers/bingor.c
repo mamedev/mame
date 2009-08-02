@@ -266,7 +266,7 @@ ROM_START( bingor4 )
 	ROM_LOAD( "bingor4_24c04a.bin", 0x000000, 0x200,  CRC(38cf70a9) SHA1(ba9a1640200963e2d58d761edc13a24fa5ef44c2) )
 ROM_END
 
-GAME( 199?, bingor1,    0,      bingor,   bingor,   0,       ROT0,  "unknown", "Bingo Roll / Bellstar? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor2,    0,      bingor,   bingor,   0,       ROT0,  "unknown", "Bingo Roll / Bellstar? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor3,    0,      bingor,   bingor,   0,       ROT0,  "unknown", "Bingo Roll / Bellstar? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor4,    0,      bingor,   bingor,   0,       ROT0,  "unknown", "Bingo Roll / Bellstar? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, bingor1,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, bingor2,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, bingor3,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, bingor4,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
