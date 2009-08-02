@@ -7970,7 +7970,7 @@ GAME( 2000, bangbead, neogeo,   neogeo,   neogeo,   bangbead, ROT0, "Visco", "Ba
 //GAME( 2000, bangbedp, bangbead, neogeo,   neogeo,   neogeo,   ROT0, "Visco", "Bang Bead (prototype)", 0 )
 
 /* Mega Enterprise */
-GAME( 2002, mslug4,   neogeo,   neogeo,   neogeo,   mslug4,   ROT0, "Mega", "Metal Slug 4", 0 )
+GAME( 2002, mslug4,   neogeo,   neogeo,   neogeo,   mslug4,   ROT0, "Mega / Playmore", "Metal Slug 4", 0 )
 GAME( 2002, ms4plus,  mslug4,   neogeo,   neogeo,   ms4plus,  ROT0, "bootleg", "Metal Slug 4 Plus (bootleg)", 0 )
 
 /* Evoga */
