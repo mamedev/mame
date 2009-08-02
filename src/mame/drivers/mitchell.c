@@ -1125,7 +1125,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, 8000000)	/* (verified on pcb) */
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mitchell_map)
 	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1134,7 +1134,7 @@ static MACHINE_DRIVER_START( pang )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(57.42)   /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -1149,11 +1149,11 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) /* (verified on pcb) */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym",YM2413, 4000000) /* (verified on pcb) */
+	MDRV_SOUND_ADD("ym",YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
