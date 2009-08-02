@@ -1,5 +1,6 @@
 /***************************************************************************
 
+City Connection (c) 1985 Jaleco
 
 2008-07
 Dip locations added from dip listing at crazykong.com
@@ -28,26 +29,32 @@ static READ8_HANDLER( citycon_in_r )
 	return input_port_read(space->machine, flip_screen_get(space->machine) ? "P2" : "P1");
 }
 
+static READ8_HANDLER( citycon_irq_ack_r )
+{
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
+	return 0;
+}
 
 static ADDRESS_MAP_START( citycon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE(&citycon_videoram)
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(citycon_linecolor_w) AM_BASE(&citycon_linecolor)
-	AM_RANGE(0x2800, 0x28ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_BASE(&citycon_linecolor)
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(citycon_in_r, citycon_background_w)	/* player 1 & 2 inputs multiplexed */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x3004, 0x3005) AM_WRITE(SMH_RAM) AM_BASE(&citycon_scroll)
-	AM_RANGE(0x3007, 0x3007) AM_READ(watchdog_reset_r)	/* ? */
-	AM_RANGE(0x3800, 0x3cff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE(&citycon_scroll)
+	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay", ay8910_address_data_w)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
+//	AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -194,11 +201,11 @@ static MACHINE_DRIVER_START( citycon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(citycon_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -210,6 +217,7 @@ static MACHINE_DRIVER_START( citycon )
 
 	MDRV_GFXDECODE(citycon)
 	MDRV_PALETTE_LENGTH(640+1024)	/* 640 real palette + 1024 virtual palette */
+	MDRV_PALETTE_INIT(all_black) /* guess */
 
 	MDRV_VIDEO_START(citycon)
 	MDRV_VIDEO_UPDATE(citycon)
