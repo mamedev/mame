@@ -2249,8 +2249,8 @@ GAME( 1999, bm4thmix, 0,        djmain,   bm4thmix, bm4thmix,  ROT0, "Konami", "
 GAME( 1999, bm5thmix, 0,        djmain,   bm5thmix, bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )
 GAME( 2000, bmcompm2, 0,        djmain,   bm5thmix, bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", 0 )
 GAME( 2000, hmcompm2, bmcompm2, djmain,   hmcompm2, hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", 0 )
-GAME( 2000, bmclubmx, 0,        djmain,   bmclubmx, bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", GAME_NOT_WORKING ) // misisng hd
-GAME( 2000, bmdct,    0,        djmain,   bmdct,    bmdct,     ROT0, "Konami", "beatmania f. Dreams Come True (ver JA-A)", 0 )
+GAME( 2000, bmclubmx, 0,        djmain,   bmclubmx, bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", GAME_NOT_WORKING ) // missing hd
+GAME( 2000, bmdct,    0,        djmain,   bmdct,    bmdct,     ROT0, "Konami", "beatmania featuring Dreams Come True (ver JA-A)", 0 )
 GAME( 2000, bmcorerm, 0,        djmain,   bmcorerm, bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
 GAME( 2001, bm6thmix, 0,        djmain,   bm6thmix, bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
 GAME( 2001, bm7thmix, 0,        djmain,   bm6thmix, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
