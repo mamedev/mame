@@ -16,6 +16,9 @@ Namco System II
 
 extern void namcos21_kickstart(running_machine *, int);
 
+static TIMER_CALLBACK( namcos2_posirq_tick );
+static emu_timer *namcos2_posirq_timer;
+
 int namcos2_gametype;
 
 static unsigned mFinalLapProtCount;
@@ -101,6 +104,7 @@ ResetAllSubCPUs( running_machine *machine, int state )
 MACHINE_START( namcos2 )
 {
 	namcos2_eeprom = auto_alloc_array(machine, UINT8, namcos2_eeprom_size);
+	namcos2_posirq_timer = timer_alloc(machine, namcos2_posirq_tick, NULL);
 }
 
 MACHINE_RESET( namcos2 )
@@ -128,6 +132,9 @@ MACHINE_RESET( namcos2 )
 		namcos2_68k_slave_C148[loop] = 0;
 		namcos2_68k_gpu_C148[loop] = 0;
 	}
+	
+	/* reset POSIRQ timer */
+	timer_adjust_oneshot(namcos2_posirq_timer, attotime_never, 0);
 }
 
 /*************************************************************/
@@ -310,7 +317,6 @@ READ16_HANDLER( namcos2_68k_key_r )
 		switch(offset)
 		{
 		case 1: return 0xBD;
-		// case 7: return 0xBD;
 		}
 		break;
 
@@ -508,72 +514,64 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 
 	switch(addr)
 	{
-	case 0x1c0000: break; /* NAMCOS2_C148_0 level */
-	case 0x1c2000: break; /* NAMCOS2_C148_1 level */
-	case 0x1c4000: break; /* NAMCOS2_C148_2 level */
-	case 0x1c6000: break; /* NAMCOS2_C148_CPUIRQ level */
-	case 0x1c8000: break; /* NAMCOS2_C148_EXIRQ level */
-	case 0x1ca000: break; /* NAMCOS2_C148_POSIRQ level */
-	case 0x1cc000: break; /* NAMCOS2_C148_SERIRQ level */
-	case 0x1ce000: break; /* NAMCOS2_C148_VBLANKIRQ level */
+	case 0x1c0000: break; /* ? NAMCOS2_C148_0 */
+	case 0x1c2000: break; /* ? NAMCOS2_C148_1 */
+	case 0x1c4000: break; /* ? NAMCOS2_C148_2 */
+	
+	/* IRQ level */
+	case 0x1c6000: break; /* NAMCOS2_C148_CPUIRQ */
+	case 0x1c8000: break; /* NAMCOS2_C148_EXIRQ */
+	case 0x1ca000: break; /* NAMCOS2_C148_POSIRQ */
+	case 0x1cc000: break; /* NAMCOS2_C148_SERIRQ */
+	case 0x1ce000: break; /* NAMCOS2_C148_VBLANKIRQ */
 
-	case 0x1d0000:
+	case 0x1d0000: /* ? NAMCOS2_C148_0 */
 		if( bWrite )
 		{
 			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-			// cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
+			/* Dubious to assert IRQ for other CPU here, but Starblade seems to rely on it.
+			   It fails to show large polygons otherwise. */
+			cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
-		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_0], CLEAR_LINE);
 		break;
 
-	case 0x1d2000:
-		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_1], CLEAR_LINE);
-		break;
+	case 0x1d2000: break; /* ? NAMCOS2_C148_1 */
 
-	case 0x1d4000:
+	case 0x1d4000: /* ? NAMCOS2_C148_2 */
 		if( bWrite )
 		{
 			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
+			/* Dubious to assert IRQ for other CPU here: Rolling Thunder 2 and Fine Hour break. */
 			// cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
-		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_2], CLEAR_LINE);
 		break;
 
-	case 0x1d6000:
-		if( bWrite )
-		{
-		//  mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		}
+
+	/* IRQ ack */
+	case 0x1d6000: /* NAMCOS2_C148_CPUIRQ */
+		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_CPUIRQ], CLEAR_LINE);
 		break;
 
-	case 0x1d8000: /* ack EXIRQ */
-		if( bWrite )
-		{
-		//  mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		}
+	case 0x1d8000: /* NAMCOS2_C148_EXIRQ */
+		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_EXIRQ], CLEAR_LINE);
 		break;
 
-	case 0x1da000: /* ack POSIRQ */
-		if( bWrite )
-		{
-		//  mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		}
+	case 0x1da000: /* NAMCOS2_C148_POSIRQ */
+		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_POSIRQ], CLEAR_LINE);
 		break;
 
-	case 0x1dc000: /* ack SCIRQ */
-		if( bWrite )
-		{
-		//  mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		}
+	case 0x1dc000: /* NAMCOS2_C148_SERIRQ */
+		// if( bWrite ) mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_SERIRQ], CLEAR_LINE);
 		break;
 
-	case 0x1de000: /* ack VBLANK */
+	case 0x1de000: /* NAMCOS2_C148_VBLANKIRQ */
 		cpu_set_input_line(space->cpu, pC148Reg[NAMCOS2_C148_VBLANKIRQ], CLEAR_LINE);
 		break;
+
 
 	case 0x1e0000: /* EEPROM Status Register */
 		result = ~0; /* Only BIT0 used: 1=EEPROM READY 0=EEPROM BUSY */
@@ -660,60 +658,55 @@ READ16_HANDLER( namcos2_68k_gpu_C148_r )
 	return ReadWriteC148(space, offset, 0, 0);
 }
 
-static TIMER_CALLBACK( namcos2_68k_master_posirq )
-{
-	video_screen_update_partial(machine->primary_screen, param);
-	cputag_set_input_line(machine, "maincpu", namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-}
 
-static int
-GetPosIRQScanline( running_machine *machine )
+static int GetPosIRQScanline( running_machine *machine )
 {
 	if (IsSystem21()) return 0;
 	return namcos2_GetPosIrqScanline(machine);
 }
 
-INTERRUPT_GEN( namcos2_68k_master_vblank )
+static TIMER_CALLBACK( namcos2_posirq_tick )
 {
-	if (IsSystem21() == 0 && namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ])
-	{
-		int scanline = GetPosIRQScanline(device->machine);
-		timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namcos2_68k_master_posirq );
+	if (IsSystem21()) {
+		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
+			video_screen_update_partial(machine->primary_screen, param);
+			cputag_set_input_line(machine, "gpu", namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		}
+		return;
 	}
-	cpu_set_input_line(device, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
+	
+	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
+		video_screen_update_partial(machine->primary_screen, param);
+		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "maincpu", namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "slave", namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+	}
 }
 
-static TIMER_CALLBACK( namcos2_68k_slave_posirq )
+void namcos2_adjust_posirq_timer( running_machine *machine, int scanline )
 {
-	video_screen_update_partial(machine->primary_screen, param);
-	cputag_set_input_line(machine, "slave", namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+	timer_adjust_oneshot(namcos2_posirq_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 80), scanline);
+}
+
+INTERRUPT_GEN( namcos2_68k_master_vblank )
+{
+	if (!IsSystem21()) namcos2_adjust_posirq_timer(device->machine, GetPosIRQScanline(device->machine));
+	cpu_set_input_line(device, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
 INTERRUPT_GEN( namcos2_68k_slave_vblank )
 {
-	if (IsSystem21() == 0 && namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ])
-	{
-		int scanline = GetPosIRQScanline(device->machine);
-		timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namcos2_68k_slave_posirq );
-	}
+	if (!IsSystem21()) namcos2_adjust_posirq_timer(device->machine, GetPosIRQScanline(device->machine));
 	cpu_set_input_line(device, namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
-}
-
-static TIMER_CALLBACK( namcos2_68k_gpu_posirq )
-{
-	//printf( "namcos2_68k_gpu_posirq(%d)\n", param );
-	video_screen_update_partial(machine->primary_screen, param);
-	cputag_set_input_line(machine, "gpu", namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 
 INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 {
+	/* only used by namcos21 */
+	int scanline = GetPosIRQScanline(device->machine);
+	scanline = 0x50+0x89; /* HACK for Winning Run */
+	
 	//printf( "namcos2_68k_gpu_vblank(%d)\n",namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
-	if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ])
-	{
-		int scanline = 0x50+0x89; /* HACK for Winning Run */
-		timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namcos2_68k_gpu_posirq );
-	}
+	namcos2_adjust_posirq_timer(device->machine, scanline);
 	cpu_set_input_line(device, namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 

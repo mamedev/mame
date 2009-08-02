@@ -203,6 +203,8 @@ WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
 READ16_HANDLER( namcos2_68k_gpu_C148_r );
 INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 
+void namcos2_adjust_posirq_timer( running_machine *machine, int scanline );
+
 /**************************************************************/
 /* MASTER CPU RAM MEMORY                                      */
 /**************************************************************/

@@ -31,10 +31,6 @@ known issues:
     Final Lap 3:
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
 
-    Four Trax
-    - some graphics glitches (POSIRQ-related?)
-    - sprite banking (for rear view mirror) isn't working
-
     Suzuka 8 Hours II
     - some sprite cropping issues
 
@@ -42,6 +38,7 @@ known issues:
     - gives ADSMISS error on startup
 
     Bubble Trouble (Golly Ghost II)
+    - no artwork
     - MCU not dumped
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
@@ -395,7 +392,7 @@ C148pin     Master CPU      Slave CPU
 -------------------------------------
 YBNK        VBLANK          VBLANK
 IRQ4        SCIRQ           SCIRQ       (Serial comms IC Interrupt)
-IRQ3        POSIRQ          POSIRQ      (Comes from C116, pixel generator, Position interrup ?? line based ??)
+IRQ3        POSIRQ          POSIRQ      (Comes from C116, pixel generator, line based position interrupt?)
 IRQ2        EXIRQ           EXIRQ       (Goes to video board but does not appear to be connected)
 IRQ1        SCPUIRQ         MCPUIRQ     (Master/Slave interrupts)
 
@@ -1601,7 +1598,7 @@ static MACHINE_DRIVER_START( default )
 	MDRV_CPU_PROGRAM_MAP(mcu_default_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(12000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
