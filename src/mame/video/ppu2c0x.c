@@ -103,7 +103,6 @@ typedef struct
 	int						tile_page;				/* current tile page */
 	int						sprite_page;			/* current sprite page */
 	int						back_color;				/* background color */
-	int						nes_vram[8];			/* keep track of 8 .5k vram pages to speed things up */
 	UINT8					palette_ram[0x20];		/* shouldn't be in main memory! */
 	int						scan_scale;				/* scan scale */
 	int						scanlines_per_frame;	/* number of scanlines per frame */
@@ -370,7 +369,6 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 	const int *ppu_regs = &this_ppu->regs[0];
 	const int scanline = this_ppu->scanline;
 	const int refresh_data = this_ppu->refresh_data;
-	const int *nes_vram = &this_ppu->nes_vram[0];
 	const int tile_page = this_ppu->tile_page;
 
 	int	start_x = (this_ppu->x_fine ^ 0x07) - 7;
@@ -423,11 +421,9 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 		int pos;
 		int index1;
 		int page, page2, address;
-		int index2;
 		UINT16 pen;
 
 		index1 = tile_index + x;
-
 
 		// this is attribute table stuff! (actually read 2 in PPUspeak)!
 		/* Figure out which byte in the color table to use */
@@ -442,7 +438,6 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
 		address = index1 & 0x3ff;
 		page2 = memory_read_byte(device->space[0], index1);
-		index2 = nes_vram[(page2 >> 6) | tile_page] + (page2 & 0x3f);
 
 		// 27/12/2002
 		if (ppu_latch)
@@ -465,8 +460,6 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 			plane1 = memory_read_byte(device->space[0], (address & 0x1fff));
 			plane2 = memory_read_byte(device->space[0], (address + 8) & 0x1fff);
 			// plane2 = plane2 << 1;
-
-//          sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index2 % total_elements) + start;
 
 			/* render the pixel */
 			for (i = 0; i < 8; i++)
@@ -599,9 +592,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		}
 		else
 			page = (tile >> 6) | sprite_page;
-
-
-		// index1 = this_ppu->nes_vram[page] + (tile & 0x3f);
 
 		if (ppu_latch)
 			(*ppu_latch)(device, (sprite_page << 10) | ((tile & 0xff) << 4));
@@ -1004,10 +994,6 @@ static DEVICE_RESET( ppu2c0x )
 			this_ppu->colortable[i] = default_colortable[i] + color_base;
 		}
 	}
-
-	/* set the vram bank-switch values to the default */
-	for (i = 0; i < 8; i++)
-		this_ppu->nes_vram[i] = i * 64;
 }
 
 /*************************************
