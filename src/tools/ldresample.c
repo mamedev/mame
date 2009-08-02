@@ -322,7 +322,7 @@ static void create_close_chd(chd_file *file)
 {
 	chd_error err;
 
-	err = chd_compress_finish(file);
+	err = chd_compress_finish(file, TRUE);
 	if (err != CHDERR_NONE)
 		fprintf(stderr, "Error finishing compression: %s\n", chd_error_string(err));
 
