@@ -700,9 +700,27 @@ at the road split point.
 
 Strange page in test mode which lets you alter all sorts of settings,
 may relate to sit-in cockpit version. Can't find a dip that disables
-this.
+this. <- Test Mode 1? That's used for lamps and motor testing... -AS
 
-Does a variety of writes to TC0220IOC offset 3... significant?
+Motors (located at the 0xe000**) are mirrored, they uses both bytes of a
+word, the high one is used during gameplay and the other one is used on service
+mode. The gameplay port is xor'ed (!).
+It works like this:
+--xx xx-- Force Feedback power
+---- --x- "Reverse" motor
+---- ---x "Turn" motor
+
+TC0220IOC offset 3 is used for lamps, both upright and cockpit version afaik:
+x--- ---- spot 2 lamp (right)
+-x-- ---- spot 1 lamp (left)
+--x- ---- motor lamp 3 (right)
+---x ---- motor lamp 2 (center)
+---- x--- motor lamp 1 (left)
+---- -x-- trigger lamp
+---- --x- start lamp
+---- ---x shot lamp
+The two spot lamps are big red lamps located at the sides of the screen (at least
+in the upright version), they lights when the player gets hit and/or if he's dying.
 
 
 Aqua Jack
@@ -1630,9 +1648,9 @@ static ADDRESS_MAP_START( nightstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-//  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* ??? */
-//  AM_RANGE(0xe00008, 0xe00009) AM_WRITENOP    /* ??? */
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP    /* ??? */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* Motor 1 (left) */
+	AM_RANGE(0xe00008, 0xe00009) AM_WRITENOP    /* Motor 2 (center) */
+	AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP    /* Motor 3 (right) */
 	AM_RANGE(0xe40000, 0xe40007) AM_READWRITE(nightstr_stick_r, bshark_stick_w)
 ADDRESS_MAP_END
 
