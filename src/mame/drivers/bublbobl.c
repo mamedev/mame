@@ -561,6 +561,24 @@ static INPUT_PORTS_START( sboblbob )
 	PORT_DIPSETTING(    0x20, "100 (Cheat)")
 INPUT_PORTS_END
 
+// default to 'Dream Land' not 'Super Dream Land'
+static INPUT_PORTS_START( dland )
+	PORT_INCLUDE( boblbobl )
+
+	PORT_MODIFY( "DSW0" )
+	PORT_DIPNAME( 0x01, 0x01, "Game" )
+	PORT_DIPSETTING(    0x01, "Dream Land" )
+	PORT_DIPSETTING(    0x00, "Super Dream Land" )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+
+	PORT_MODIFY( "DSW1" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "100 (Cheat)")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tokio )
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW A:1")
@@ -1250,6 +1268,35 @@ ROM_START( bub68705 )
 ROM_END
 
 
+ROM_START( dland )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "dl_3.bin",    0x00000, 0x08000, CRC(01eb3e4f) SHA1(8edc0f2e98b928b1d9d508948bcff947df697b6f) )
+    /* ROMs banked at 8000-bfff */
+	ROM_LOAD( "dl_5.bin",    0x10000, 0x08000, CRC(75740b61) SHA1(7ebfbb9abfcc44c31b31f146d7bc37004a1b528c) )
+	ROM_LOAD( "dl_4.bin",    0x18000, 0x08000, CRC(c6a3776f) SHA1(473fc8c990046f90517f2506f1ca59eeb7ea13e5) )
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the second CPU */
+	ROM_LOAD( "dl_1.bin",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the third CPU */
+	ROM_LOAD( "dl_2.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "dl_6.bin",     0x00000, 0x10000, CRC(6352d3fa) SHA1(eacaddd476952f3c048138184e712ca1fbba4ce2) )
+	ROM_LOAD( "dl_7.bin",     0x10000, 0x10000, CRC(37a38b69) SHA1(3d28fbf1725b35f664836ee45f705c05f6ccd78a) )
+	ROM_LOAD( "dl_8.bin",     0x20000, 0x10000, CRC(509ee5b1) SHA1(b5edc7346d43db0157deadece60e478ba6d63eab) )
+	/* 0x30000-0x3ffff empty */	
+	ROM_LOAD( "dl_9.bin",     0x40000, 0x10000, CRC(ae8514d7) SHA1(5205a3faf354f5b5616be4494f5bd553de4c7965) )
+	ROM_LOAD( "dl_10.bin",    0x50000, 0x10000, CRC(6d406fb7) SHA1(26d9236d259f8b3876087797b77994b299eeea63) )
+	ROM_LOAD( "dl_11.bin",    0x60000, 0x10000, CRC(bdf9c0ab) SHA1(d5afc5205e8e391a4a095a4e2efbeee96e780638) )
+	/* 0x70000-0x7ffff empty */
+	
+	ROM_REGION( 0x0100, "proms", 0 ) // not on this? (but needed for the bublbobl video driver to work)
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
+ROM_END
+
+
 
 static void configure_banks(running_machine* machine)
 {
@@ -1278,6 +1325,19 @@ static DRIVER_INIT( tokiob )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 }
 
+static DRIVER_INIT( dland )
+{
+	// rearrange gfx to original format
+	int i;
+	UINT8* src = memory_region(machine,"gfx1");
+	for (i=0;i<0x40000;i++)
+		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
+		
+	for (i=0x40000;i<0x80000;i++)
+		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
+
+	DRIVER_INIT_CALL(bublbobl);
+}
 
 
 GAME( 1986, tokio,    0,        tokio,    tokio,    tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation", GAME_NOT_WORKING )
@@ -1293,3 +1353,5 @@ GAME( 1986, boblbobl, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", 
 GAME( 1986, sboblboa, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", 0 )
 GAME( 1986, sboblbob, bublbobl, boblbobl, sboblbob, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 2)", 0 )
 GAME( 1986, bub68705, bublbobl, bub68705, bublbobl, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", 0 )
+
+GAME( 1987, dland,    bublbobl, boblbobl, dland,    dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", 0 )

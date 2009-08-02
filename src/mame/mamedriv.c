@@ -1700,6 +1700,7 @@ const game_driver * const drivers[] =
 	DRIVER( sboblboa )	/* bootleg */
 	DRIVER( sboblbob )	/* bootleg */
 	DRIVER( bub68705 )	/* bootleg */
+	DRIVER( dland )		/* bootleg */
 	DRIVER( missb2 )	/* bootleg on enhanced hardware */
 	DRIVER( kikikai )	/* A85 (c) 1986 Taito Corporation */
 	DRIVER( knightb )	/* bootleg */
