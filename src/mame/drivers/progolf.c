@@ -529,27 +529,7 @@ static DRIVER_INIT( progolfa )
 
 	/* TODO: data is likely to not be encrypted, just the opcodes are. */
 	for (A = 0x0001 ; A < 0x10000 ; A += 2)
-	{
-		switch(rom[A] & 0xf0)
-		{
-			case 0x00: decrypted[A] = 0x00 | (rom[A] & 0x0f); break;
-			case 0x10: decrypted[A] = 0x40 | (rom[A] & 0x0f); break;
-			case 0x20: decrypted[A] = 0x10 | (rom[A] & 0x0f); break;
-			case 0x30: decrypted[A] = 0x50 | (rom[A] & 0x0f); break; // guessed
-			case 0x40: decrypted[A] = 0x80 | (rom[A] & 0x0f); break;
-			case 0x50: decrypted[A] = 0xc0 | (rom[A] & 0x0f); break;
-			case 0x60: decrypted[A] = 0x90 | (rom[A] & 0x0f); break;
-			case 0x70: decrypted[A] = 0xd0 | (rom[A] & 0x0f); break;
-			case 0x80: decrypted[A] = 0x20 | (rom[A] & 0x0f); break;
-			case 0x90: decrypted[A] = 0x60 | (rom[A] & 0x0f); break;
-			case 0xa0: decrypted[A] = 0x30 | (rom[A] & 0x0f); break; // guessed
-			case 0xb0: decrypted[A] = 0x70 | (rom[A] & 0x0f); break; // guessed
-			case 0xc0: decrypted[A] = 0xa0 | (rom[A] & 0x0f); break;
-			case 0xd0: decrypted[A] = 0xe0 | (rom[A] & 0x0f); break;
-			case 0xe0: decrypted[A] = 0xb0 | (rom[A] & 0x0f); break;
-			case 0xf0: decrypted[A] = 0xf0 | (rom[A] & 0x0f); break;
-		}
-	}
+		decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
