@@ -396,6 +396,36 @@ ROM_START( pbaction3 )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
+ROM_START( pbaction4 )
+	ROM_REGION( 2*0x10000, "maincpu", 0 )
+	ROM_LOAD( "pinball_09.bin",     0x0000, 0x4000, CRC(c8e81ece) SHA1(04eafbd79263225f6c6fb5f04951b54179144f17) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "pinball_10.bin",     0x4000, 0x8000, CRC(04b56c7c) SHA1(d09c22fd0235e1c6a9b1978ba69338bb1ae5667d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_LOAD( "pinball_01.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
+
+	ROM_REGION( 0x06000, "fgchars", 0 )
+	ROM_LOAD( "pinball_06.bin",     0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
+	ROM_LOAD( "pinball_07.bin",     0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
+	ROM_LOAD( "pinball_08.bin",     0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
+
+	ROM_REGION( 0x10000, "bgchars", 0 )
+	ROM_LOAD( "pinball_02.bin",     0x00000, 0x4000, CRC(01ba32c9) SHA1(196f8c6e037a7ebdcefc80b453f3801b3b6eb075) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "pinball_03.bin",     0x04000, 0x4000, CRC(f605ae40) SHA1(9a28869014d2df513090d15ccb478de9f5d65b24) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "pinball_04.bin",     0x08000, 0x4000, CRC(9e23a780) SHA1(2d49ee79b9261bdb8367b28bfca9940b4527c87a) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "pinball_05.bin",     0x0c000, 0x4000, CRC(c9a4dfea) SHA1(38fb34f21773d652b14108e4a083d7c7acecdd03) )
+	ROM_IGNORE(0x4000)
+	
+	ROM_REGION( 0x06000, "sprites", 0 )
+	ROM_LOAD( "pinball_14.bin",     0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
+	ROM_LOAD( "pinball_13.bin",     0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
+	ROM_LOAD( "pinball_12.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
+ROM_END
+
 
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
@@ -424,7 +454,15 @@ static DRIVER_INIT( pbactio3 )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
 }
 
+static DRIVER_INIT( pbactio4 )
+{
+	/* this one only has the Sega decryption */
+	pbaction_decode(machine, "maincpu");
+}
+
+
 
 GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", 0 )
 GAME( 1985, pbaction2,pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 )
 GAME( 1985, pbaction3,pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 )
+GAME( 1985, pbaction4,pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", 0 )

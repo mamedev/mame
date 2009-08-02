@@ -5040,6 +5040,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pbaction )	/* (c) 1985 Tehkan */
 	DRIVER( pbaction2 )	/* (c) 1985 Tehkan */
 	DRIVER( pbaction3 )	/* (c) 1985 Tehkan */
+	DRIVER( pbaction4 )	/* (c) 1985 Tehkan */
 						/* 6009 Tank Busters */
 	DRIVER( ponttehk )	/* 6011 - (c) 1985 Tehkan */
 	DRIVER( lvpoker )	/* ???? - (c) 1985 Tehkan */
