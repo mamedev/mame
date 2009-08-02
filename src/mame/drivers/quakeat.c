@@ -48,10 +48,19 @@ Obsidian2 90-4440 AGP Voodoo2-based realtime 3D graphics accelerator
 Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem
     designed to interface coin-op and industrial input/output control devices to a PC
 
+===============================================================================
+TODO:
+	* Add BIOS dump (custom 440LX motherboard or standard?)
+	* Hook up PC hardware
+	* Hook up the GCI (details? ROMs?)
+	* What's the dongle do?
+===============================================================================
 */
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
+#include "machine/pic8259.h"
+/* Insert IBM PC includes here */
 
 static VIDEO_START(quake)
 {
@@ -62,18 +71,98 @@ static VIDEO_UPDATE(quake)
 	return 0;
 }
 
+static struct {
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+} quakeat_devices;
+
 static ADDRESS_MAP_START( quake_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM AM_REGION("pc_bios", 0) /* BIOS */
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( quake_io, ADDRESS_SPACE_IO, 32 )
+//	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+//	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+//	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
+//	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+//	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+//	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+//	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
+	AM_RANGE(0x0300, 0x03af) AM_NOP
+	AM_RANGE(0x03b0, 0x03df) AM_NOP
+//	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
+//	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
+//	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
+//	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
+ADDRESS_MAP_END
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( quakeat_pic8259_1_set_int_line )
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( quakeat_pic8259_2_set_int_line )
+{
+	pic8259_set_irq_line( quakeat_devices.pic8259_1, 2, interrupt);
+}
+
+
+static const struct pic8259_interface quakeat_pic8259_1_config = {
+	quakeat_pic8259_1_set_int_line
+};
+
+
+static const struct pic8259_interface quakeat_pic8259_2_config = {
+	quakeat_pic8259_2_set_int_line
+};
+
+/*************************************************************/
 
 static INPUT_PORTS_START( quake )
 INPUT_PORTS_END
 
+/*************************************************************/
+
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge( quakeat_devices.pic8259_2);
+	if (r==0)
+	{
+		r = pic8259_acknowledge( quakeat_devices.pic8259_1);
+	}
+	return r;
+}
+
+static MACHINE_START(quakeat)
+{
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+
+	quakeat_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
+	quakeat_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
+}
+/*************************************************************/
 
 static MACHINE_DRIVER_START( quake )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
+	MDRV_CPU_ADD("maincpu", PENTIUM, 233000000) /* Pentium II, 233MHz */
 	MDRV_CPU_PROGRAM_MAP(quake_map)
+	MDRV_CPU_IO_MAP(quake_io)
+
+	MDRV_MACHINE_START(quakeat)
+
+	MDRV_PIC8259_ADD( "pic8259_1", quakeat_pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_2", quakeat_pic8259_2_config )
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -91,7 +180,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(quake)
-	ROM_REGION32_LE(0x20000, "maincpu", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x20000, "pc_bios", 0)	/* motherboard bios */
 	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "disks" )
@@ -99,4 +188,4 @@ ROM_START(quake)
 ROM_END
 
 
-GAME( 19??, quake,  0,   quake, quake, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, quake,  0,   quake, quake, 0, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
