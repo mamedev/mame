@@ -9187,6 +9187,7 @@ Other Sun games
 	DRIVER( kgbird )	/* (c) 1996 */
 	DRIVER( kgbirda )	/* (c) 1996 */
 	DRIVER( phantomp )	/* (c) 1998 */
+	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( topgear )	/* (c) 1996 */	
 
 	/* Aristocrat Mk5 hardware */
