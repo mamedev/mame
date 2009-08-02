@@ -1111,7 +1111,7 @@ static INPUT_PORTS_START( paddlema )
 	PORT_DIPSETTING(    0x80, "A to B" )	/* Manual shows "Upright Sytle B" */
 	PORT_DIPSETTING(    0x00, "A to C" )	/* Manual shows "Upright Sytle A" */
 	PORT_DIPSETTING(    0x40, "A to E" )	/* Manual shows "Table Sytle C"   */
-//  PORT_DIPSETTING(    0xc0, "A to B" )	/* Manual shows "Table Sytle D"   */
+//  PORT_DIPSETTING(    0xc0, "A to B" )    /* Manual shows "Table Sytle D"   */
 
 	PORT_START("IN4")	// DSW1
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
@@ -1342,7 +1342,7 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, "Upright 4 Players" )
 	PORT_DIPSETTING(    0x88, DEF_STR( Cocktail ) )
-	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )		/* Not documented. */
+	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )     /* Not documented. */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )		PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
 	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10 Beats For Max Speed" )

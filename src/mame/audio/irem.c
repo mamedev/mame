@@ -265,7 +265,7 @@ static const msm5205_interface irem_msm5205_interface_2 =
 #define M52_R14		RES_K(10)
 #define M52_R15		RES_K(2.2)	/* schematics RES_K(22) , althought 10-Yard states 2.2 */
 #define M52_R19		RES_K(10)
-#define M52_R22		RES_K(47)	
+#define M52_R22		RES_K(47)
 #define M52_R23		RES_K(2.2)
 #define M52_R25		RES_K(10)
 #define M52_VR1		RES_K(50)

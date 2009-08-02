@@ -475,19 +475,19 @@ READ16_HANDLER( scudhamm_analog_r )
 {
 	static int prev=0;
 	int i=input_port_read(space->machine, "IN1"),j;
-	
+
 	if ((i^prev)&0x4000) {
 		if (i<prev) prev-=0x8000;
 		else prev+=0x8000;
 	}
-	
+
 	j=i-prev;
 	prev=i;
-	
+
 	/* effect of hammer collision 'accelerometer':
-	$00 - $09 - no hit
-	$0A - $3F - soft hit
-	$40 - $FF - hard hit */
+    $00 - $09 - no hit
+    $0A - $3F - soft hit
+    $40 - $FF - hard hit */
 	if (j<0) return 0;
 	else if (j>0xff) return 0xff;
 	return j;

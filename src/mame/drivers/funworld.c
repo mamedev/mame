@@ -1952,7 +1952,7 @@ GFXDECODE_END
 static const pia6821_interface pia0_intf =
 /*
     TAB light green board
-	---------------------
+    ---------------------
 
                 PIA 0                                       PIA 1
          .--------u--------.                         .--------u--------.
@@ -2731,7 +2731,7 @@ ROM_START( royalcdp )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "u11_tms27c256.bin",0x0000, 0x8000, CRC(d6834c3a) SHA1(4b071b9826c086439b9763393b23c671261b3788) )
 	ROM_LOAD( "u4_nmc27c256.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
-	
+
 	ROM_REGION( 0x0200, "proms", 0 )	/* not present in the set */
 	ROM_LOAD( "n82s147.bin",      0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 

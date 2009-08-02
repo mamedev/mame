@@ -183,12 +183,12 @@ static INPUT_PORTS_START( aquarium )
 	PORT_DIPSETTING(      0x000c, "1/1" )
 	PORT_DIPSETTING(      0x0008, "2/3" )
 	PORT_DIPSETTING(      0x0004, "3/5" )
-//  PORT_DIPSETTING(      0x0000, "1/1" )					/* Not used or listed in manual */
+//  PORT_DIPSETTING(      0x0000, "1/1" )                   /* Not used or listed in manual */
 	PORT_DIPNAME( 0x0030, 0x0030, "Winning Rounds (Player VS Player)" )	PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0030, "1/1" )
 	PORT_DIPSETTING(      0x0020, "2/3" )
 	PORT_DIPSETTING(      0x0010, "3/5" )
-//  PORT_DIPSETTING(      0x0000, "1/1" )					/* Not used or listed in manual */
+//  PORT_DIPSETTING(      0x0000, "1/1" )                   /* Not used or listed in manual */
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )			/* Listed in the manual as always OFF */
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )			/* Listed in the manual as always OFF */
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW2:1,2,3")

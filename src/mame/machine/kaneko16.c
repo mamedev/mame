@@ -383,7 +383,7 @@ static UINT8 calc3_table04[64] = {
     0xff,0x4a,0x62,0xa3,0xf4,0xb4,0x8c,0x2d,0x84,0xbd,0x87,0x3a,0x9e,0xe9,0xd7,0x12,
     0xff,0x50,0x40,0x39,0xa6,0x47,0xd9,0x38,0x89,0x3c,0x62,0xa0,0x86,0xe2,0xd7,0x4d,
 	0x9c,0x8e,0x45,0xe8,0x5b,0xe1,0xdd,0xaf,0x99,0xa8,0x47,0x79,0x67,0x00,0x38,0xf4,
-	0x43,0xbe,0x47,0x32,0x8f,0x0e,0xfd,0x64,0x42,0x59,0x2b,0xe5,0xde,0x6d,0x80,0x7a, 
+	0x43,0xbe,0x47,0x32,0x8f,0x0e,0xfd,0x64,0x42,0x59,0x2b,0xe5,0xde,0x6d,0x80,0x7a,
  };
 
 
@@ -742,7 +742,7 @@ UINT16 cakc3_checkumaddress;
 extern UINT16 calc3_mcu_crc;
 extern UINT16* kaneko16_calc3_fakeram;
 // from brap boys, might be polluted with shogun warriors values tho as was running shogun code at the time
-static UINT16 kaneko16_eeprom_data[0x40] = 
+static UINT16 kaneko16_eeprom_data[0x40] =
 {
 	0x0001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,	0x0000, 0x0000,
 	0x0000, 0x0003, 0x0002, 0x1020, 0x0002, 0x6010, 0x0101, 0x0101,
@@ -751,14 +751,14 @@ static UINT16 kaneko16_eeprom_data[0x40] =
 	0x3038, 0x7FFF, 0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
 	0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
 	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF,
-	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0x003B, 0xFFFF, 0xFFFF, 0xFFFF						
+	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0x003B, 0xFFFF, 0xFFFF, 0xFFFF
 };
 
 static void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
 	int i;
-	
+
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
 	//calc3_mcu_status = 0;
@@ -778,7 +778,7 @@ static void calc3_mcu_run(running_machine *machine)
 		{
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[(calc3_mcu_command_offset>>1)+0] = 0x0000;
-			
+
 
 			calc3_dsw_addr =           kaneko16_mcu_ram[(0>>1) + 1];
 			calc3_eeprom_addr =        kaneko16_mcu_ram[(0>>1) + 2];
@@ -787,19 +787,19 @@ static void calc3_mcu_run(running_machine *machine)
 			cakc3_checkumaddress =     kaneko16_mcu_ram[(0>>1) + 5];
 			calc3_writeaddress =      (kaneko16_mcu_ram[(0>>1) + 6] << 16) |
 			                          (kaneko16_mcu_ram[(0>>1) + 7]);
-	
+
 			printf("Calc 3 Init Command - %04x DSW addr\n",  calc3_dsw_addr);
 			printf("Calc 3 Init Command - %04x Eeprom Address\n",  calc3_eeprom_addr);
 			printf("Calc 3 Init Command - %04x Future Commands Base\n",  calc3_mcu_command_offset);
 			printf("Calc 3 Init Command - %04x Poll / Busy Address\n",  calc3_poll_addr);
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  cakc3_checkumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3_writeaddress);
-			
+
 			kaneko16_mcu_ram[calc3_dsw_addr/2] = ~input_port_read(machine, "DSW1");	// DSW
 			kaneko16_mcu_ram[cakc3_checkumaddress / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
 
 			for (i=0;i<0x40;i++)
-			{				
+			{
 				kaneko16_mcu_ram[(calc3_eeprom_addr / 2)+i] = kaneko16_eeprom_data[i];//((eepromData[i]&0xff00)>>8) |  ((eepromData[i]&0x00ff)<<8);
 			}
 
@@ -812,7 +812,7 @@ static void calc3_mcu_run(running_machine *machine)
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset>>1] = 0x0000;;
-			
+
 			logerror("Calc3 transfer request, %d transfers\n", num_transfers);
 
 			for (i=0;i<num_transfers;i++)
@@ -822,7 +822,7 @@ static void calc3_mcu_run(running_machine *machine)
 				UINT8  commandtabl = (param1&0xff00) >> 8;
 				UINT16 commandaddr = (param1&0x00ff) | (param2&0xff00);
 				UINT8  commandunk =  (param2&0x00ff); // brap boys sets.. seems to cause further writebasck address displacement??
-				
+
 				UINT32 fakeoffs;
 
 				printf("transfer %d table %02x writeback address %04x unknown %02x\n", i, commandtabl, commandaddr, commandunk);
@@ -831,7 +831,7 @@ static void calc3_mcu_run(running_machine *machine)
 				// but I'm not sure how, for now write it back to a FAKE region instead
 				fakeoffs = 0x1e00*commandtabl;
 				fakeoffs+=0xf00000;
-				
+
 				// HACK HACK HACK, I don't know what commandunk does, but Brap Boys polls a table of addresses and doesn't do anything
 				// more unless they change.  The usual writeback address doesn't touch this table, so I think this unknown value must
 				// cause an additional displacement to cause the writeback address to populate that table.. maybe
@@ -842,8 +842,8 @@ static void calc3_mcu_run(running_machine *machine)
 
 					printf("writing back address %08x to %08x\n", calc3_writeaddress, commandaddr);
 					kaneko16_mcu_ram[(commandaddr>>1)+0] = (calc3_writeaddress>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (calc3_writeaddress&0xffff);			
-					
+					kaneko16_mcu_ram[(commandaddr>>1)+1] = (calc3_writeaddress&0xffff);
+
 				}
 				else
 				{
@@ -854,7 +854,7 @@ static void calc3_mcu_run(running_machine *machine)
 
 					printf("writing back fake address %08x to %08x\n", fakeoffs, commandaddr);
 					kaneko16_mcu_ram[(commandaddr>>1)+0] = (fakeoffs>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (fakeoffs&0xffff);			
+					kaneko16_mcu_ram[(commandaddr>>1)+1] = (fakeoffs&0xffff);
 				}
 			}
 

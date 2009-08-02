@@ -1946,7 +1946,7 @@ static ADDRESS_MAP_START( jjsquawb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x908000, 0x908005) AM_RAM AM_BASE(&seta_vctrl_0)		// VRAM 0&1 Ctrl
 	AM_RANGE(0x909000, 0x909005) AM_RAM AM_BASE(&seta_vctrl_2)		// VRAM 2&3 Ctrl
 	AM_RANGE(0xa0a000, 0xa0a607) AM_RAM AM_BASE(&spriteram16)		// RZ: Sprites Y
-// AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
+// AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM AM_BASE(&spriteram16_2)		// RZ: Sprites Code + X + Attr
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
 #if __uPD71054_TIMER

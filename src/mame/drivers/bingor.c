@@ -69,10 +69,10 @@ static ADDRESS_MAP_START( bingor_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, ADDRESS_SPACE_IO, 16 )
-//	AM_RANGE(0x0000, 0x00ff) AM_READ( test_r )
+//  AM_RANGE(0x0000, 0x00ff) AM_READ( test_r )
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-//	AM_RANGE(0x0200, 0x0201) AM_READ( test_r )
+//  AM_RANGE(0x0200, 0x0201) AM_READ( test_r )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( test8_r )
@@ -139,7 +139,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-//	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
+//  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x4c/4); // ?
 }
 

@@ -2015,7 +2015,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cobram3 )
 	MDRV_IMPORT_FROM(g2laser)
-	
+
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("dac1")
 	MDRV_SOUND_ROUTES_RESET()

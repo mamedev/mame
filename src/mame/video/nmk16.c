@@ -55,8 +55,8 @@ extern UINT16* nmk16_mainram;
 #define TILES_PER_PAGE_X	(0x10)
 #define TILES_PER_PAGE_Y	(0x10)
 #define PAGES_PER_TMAP_X	(0x10)
-#define PAGES_PER_TMAP_Y	(0x02)						
-								
+#define PAGES_PER_TMAP_Y	(0x02)
+
 static TILEMAP_MAPPER( afega_tilemap_scan_pages )
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
@@ -177,7 +177,7 @@ VIDEO_START( gunnail )
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-	
+
 	nmk16_simple_scroll = 0;
 }
 
@@ -187,17 +187,17 @@ VIDEO_START( macross2 )
 	bg_tilemap1 = tilemap_create(machine, macross_get_bg1_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	bg_tilemap2 = tilemap_create(machine, macross_get_bg2_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	bg_tilemap3 = tilemap_create(machine, macross_get_bg3_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-							
+
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
 	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
-	
+
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-	
+
 	nmk16_simple_scroll = 1;
 }
 
@@ -290,7 +290,7 @@ WRITE16_HANDLER( bioshipbg_scroll_w )
 }
 
 WRITE16_HANDLER( nmk_scroll_w )
-{	
+{
 	if (ACCESSING_BITS_0_7)
 	{
 		static UINT8 scroll[4];
@@ -589,17 +589,17 @@ VIDEO_UPDATE( gunnail )
 	y1 = cliprect->min_y;
 
 	if (!nmk16_simple_scroll)
-	{			
+	{
 		while (y1 <= cliprect->max_y)
 		{
 			int const yscroll = gunnail_scrollramy[0] + gunnail_scrollramy[y1];
 			int tilemap_bank_select;
 			tilemap* bg_tilemap = bg_tilemap0;
-		
+
 			bgclip.min_y = y1;
 			bgclip.max_y = y1;
 
-			
+
 			tilemap_bank_select = (gunnail_scrollram[0]&0x3000)>>12;
 			switch (tilemap_bank_select)
 			{
@@ -608,9 +608,9 @@ VIDEO_UPDATE( gunnail )
 				case 2: if (bg_tilemap2) bg_tilemap = bg_tilemap2; break;
 				case 3: if (bg_tilemap3) bg_tilemap = bg_tilemap3; break;
 			}
-			
+
 			tilemap_set_scroll_rows(bg_tilemap,512);
-			
+
 			tilemap_set_scrolly(bg_tilemap, 0, yscroll);
 			tilemap_set_scrollx(bg_tilemap,(i + yscroll) & 0x1ff, gunnail_scrollram[0] + gunnail_scrollram[i] - videoshift);
 
@@ -626,7 +626,7 @@ VIDEO_UPDATE( gunnail )
 		UINT16 xscroll = ((gunnail_scrollram[0]&0xff)<<8) | ((gunnail_scrollram[1]&0xff)<<0);
 		int tilemap_bank_select;
 		tilemap* bg_tilemap = bg_tilemap0;
-			
+
 		//popmessage( "scroll %04x, %04x", yscroll,xscroll);
 
 		tilemap_bank_select = (xscroll&0x3000)>>12;
@@ -637,13 +637,13 @@ VIDEO_UPDATE( gunnail )
 			case 2: if (bg_tilemap2) bg_tilemap = bg_tilemap2; break;
 			case 3: if (bg_tilemap3) bg_tilemap = bg_tilemap3; break;
 		}
-			
+
 		tilemap_set_scroll_rows(bg_tilemap,1);
-	
+
 		tilemap_set_scrolly(bg_tilemap, 0, yscroll);
 		tilemap_set_scrollx(bg_tilemap, 0, xscroll - videoshift);
 
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);		
+		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 
 	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);

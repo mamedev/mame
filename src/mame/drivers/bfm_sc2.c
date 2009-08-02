@@ -4059,12 +4059,12 @@ static DRIVER_INIT (bbrkfst)
 	Scorpion2_SetSwitchState(4,1, 1);	  /* 20p Low Level Switch */
 	Scorpion2_SetSwitchState(4,2, 1);	  /* Token Front Low Level Switch */
 	Scorpion2_SetSwitchState(4,3, 1);	  /* Token Rear  Low Level Switch */
-	Scorpion2_SetSwitchState(4,4, 1);	  
+	Scorpion2_SetSwitchState(4,4, 1);
 	Scorpion2_SetSwitchState(6,0, 0);
 	Scorpion2_SetSwitchState(6,1, 1);
 	Scorpion2_SetSwitchState(6,2, 0);
 	Scorpion2_SetSwitchState(6,3, 1);
-	
+
 }
 
 static DRIVER_INIT (drwho)

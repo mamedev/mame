@@ -1,81 +1,81 @@
 /*
-	Polygonet Commanders (Konami, 1993)
-	Poly-Net Warriors (Konami, 1993)
+    Polygonet Commanders (Konami, 1993)
+    Poly-Net Warriors (Konami, 1993)
 
-	Preliminary driver by R. Belmont
-	Additional work by Andrew Gardner
+    Preliminary driver by R. Belmont
+    Additional work by Andrew Gardner
 
-	This is Konami's first 3D game!
+    This is Konami's first 3D game!
 
-	Hardware:
-	68EC020 @ 16 MHz
-	Motorola XC56156-40 DSP @ 40 MHz
-	Z80 + K054539 for sound
-	Network to connect up to 4 PCBs.
+    Hardware:
+    68EC020 @ 16 MHz
+    Motorola XC56156-40 DSP @ 40 MHz
+    Z80 + K054539 for sound
+    Network to connect up to 4 PCBs.
 
-	Video hardware:
-	TTL text plane similar to Run and Gun.
-	Konami K054009(x2) + K054010(x2) (polygon rasterizers)
-	Konami K053936 "PSAC2" (3d roz plane, used for backgrounds)
-	24.0 MHz crystal to drive the video hardware
+    Video hardware:
+    TTL text plane similar to Run and Gun.
+    Konami K054009(x2) + K054010(x2) (polygon rasterizers)
+    Konami K053936 "PSAC2" (3d roz plane, used for backgrounds)
+    24.0 MHz crystal to drive the video hardware
 
-	Driver includes:
-	- 68020 memory map
-	- Z80 + sound system
-	- EEPROM
-	- service switch
-	- TTL text plane
+    Driver includes:
+    - 68020 memory map
+    - Z80 + sound system
+    - EEPROM
+    - service switch
+    - TTL text plane
 
-	Driver needs:
-	- Handle network at 580800 so game starts
-	- Polygon rasterization (K054009 + K054010)
-	- Hook up PSAC2 (gfx decode for it is already present and correct)
-	- Palettes
-	- Controls
-	- Priorities.  From the original board it appears they're fixed, in front to back order:
-	  (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
+    Driver needs:
+    - Handle network at 580800 so game starts
+    - Polygon rasterization (K054009 + K054010)
+    - Hook up PSAC2 (gfx decode for it is already present and correct)
+    - Palettes
+    - Controls
+    - Priorities.  From the original board it appears they're fixed, in front to back order:
+      (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
 
-	Tech info by Phil Bennett, from the schematics:
+    Tech info by Phil Bennett, from the schematics:
 
-	68000 address map
-	=================
+    68000 address map
+    =================
 
-	400000-43ffff = PSAC
-	440000-47ffff = PSVR
-	480000-4bffff = IO
-	4c0000-4fffff = SYS
-	500000-53ffff = DSP
-	540000-57ffff = FIX
-	580000-5bffff = OP1
-	5c0000-5fffff = UNUSED
-
-
-	SYS (Write only?)
-	=================
-
-	D28 = /FIXKILL     - Disable 'FIX' layer?
-	D27 = MUTE
-	D26 = EEPROM CLK
-	D25 = EEPROM CS
-	D24 = EEPROM DATA
-	D23 = BRMAS        - 68k bus error mask
-	D22 = L7MAS        - L7 interrupt mask (unusued - should always be '1')
-	D21 = /L5MAS       - L5 interrupt mask/acknowledge
-	D20 = L3MAS        - L3 interrupt mask
-	D19 = VFLIP        - Flip video vertically
-	D18 = HFLIP        - Flip video horizontally
-	D17 = COIN2        - Coin counter 2
-	D16 = COIN1        - Coin counter 1
+    400000-43ffff = PSAC
+    440000-47ffff = PSVR
+    480000-4bffff = IO
+    4c0000-4fffff = SYS
+    500000-53ffff = DSP
+    540000-57ffff = FIX
+    580000-5bffff = OP1
+    5c0000-5fffff = UNUSED
 
 
-	DSP
-	===
+    SYS (Write only?)
+    =================
 
-	500000-503fff = HCOM     - 16kB common RAM
-	504000-504fff = CONTROL  - DSP/Host Control
-					D10? = COMBNK - Switch between 68k and DSP access to common RAM
-					D08? = RESN   - Reset DSP
-	506000-506fff = HEN      - DSP/Host interface
+    D28 = /FIXKILL     - Disable 'FIX' layer?
+    D27 = MUTE
+    D26 = EEPROM CLK
+    D25 = EEPROM CS
+    D24 = EEPROM DATA
+    D23 = BRMAS        - 68k bus error mask
+    D22 = L7MAS        - L7 interrupt mask (unusued - should always be '1')
+    D21 = /L5MAS       - L5 interrupt mask/acknowledge
+    D20 = L3MAS        - L3 interrupt mask
+    D19 = VFLIP        - Flip video vertically
+    D18 = HFLIP        - Flip video horizontally
+    D17 = COIN2        - Coin counter 2
+    D16 = COIN1        - Coin counter 1
+
+
+    DSP
+    ===
+
+    500000-503fff = HCOM     - 16kB common RAM
+    504000-504fff = CONTROL  - DSP/Host Control
+                    D10? = COMBNK - Switch between 68k and DSP access to common RAM
+                    D08? = RESN   - Reset DSP
+    506000-506fff = HEN      - DSP/Host interface
 
 */
 
@@ -723,7 +723,7 @@ static DRIVER_INIT(polygonet)
 ROM_START( plygonet )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD32_BYTE( "305uaa01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) ) /* Boards exist without the "UA" in the label IE: 305a01, ect... */ 
+	ROM_LOAD32_BYTE( "305uaa01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) ) /* Boards exist without the "UA" in the label IE: 305a01, ect... */
 	ROM_LOAD32_BYTE( "305uaa02.2k", 0x000002, 512*1024, CRC(4d7e32b3) SHA1(25731526535036972577637d186f02ae467296bd) )
 	ROM_LOAD32_BYTE( "305uaa03.2h", 0x000001, 512*1024, CRC(36e4e3fe) SHA1(e8fcad4f196c9b225a0fbe70791493ff07c648a9) )
 	ROM_LOAD32_BYTE( "305uaa04.4h", 0x000000, 512*1024, CRC(d8394e72) SHA1(eb6bcf8aedb9ba5843204ab8aacb735cbaafb74d) )

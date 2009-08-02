@@ -4,7 +4,7 @@ static UINT8 pk8000_text_start;
 static UINT8 pk8000_chargen_start;
 static UINT8 pk8000_video_start;
 static UINT8 pk8000_color_start;
-	
+
 UINT8 pk8000_video_mode;
 static UINT8 pk8000_video_color;
 static UINT8 pk8000_color[32];
@@ -41,7 +41,7 @@ WRITE8_HANDLER(pk8000_chargen_start_w)
 }
 
 READ8_HANDLER(pk8000_video_start_r)
-{	
+{
 	return pk8000_video_start;
 }
 
@@ -50,7 +50,7 @@ WRITE8_HANDLER(pk8000_video_start_w)
 	pk8000_video_start = data;
 }
 
-READ8_HANDLER(pk8000_color_start_r) 
+READ8_HANDLER(pk8000_color_start_r)
 {
 	return pk8000_color_start;
 }
@@ -60,7 +60,7 @@ WRITE8_HANDLER(pk8000_color_start_w)
 	pk8000_color_start = data;
 }
 
-READ8_HANDLER(pk8000_color_r) 
+READ8_HANDLER(pk8000_color_r)
 {
 	return pk8000_color[offset];
 }
@@ -73,20 +73,20 @@ WRITE8_HANDLER(pk8000_color_w)
 static const rgb_t pk8000_palette[16] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // 0
 	MAKE_RGB(0x00, 0x00, 0x00), // 1
-	MAKE_RGB(0x00, 0xc0, 0x00), // 2 
-	MAKE_RGB(0x00, 0xff, 0x00), // 3  
-	MAKE_RGB(0x00, 0x00, 0xc0), // 4  
-	MAKE_RGB(0x00, 0x00, 0xff), // 5  
-	MAKE_RGB(0x00, 0xc0, 0xc0), // 6  
-	MAKE_RGB(0x00, 0xff, 0xff), // 7  
-	MAKE_RGB(0xc0, 0x00, 0x00), // 8  
-	MAKE_RGB(0xff, 0x00, 0x00), // 9  
-	MAKE_RGB(0xc0, 0xc0, 0x00), // A  
-	MAKE_RGB(0xff, 0xff, 0x00), // B  
-	MAKE_RGB(0xc0, 0x00, 0xc0), // C  
-	MAKE_RGB(0xff, 0x00, 0xff), // D  
-	MAKE_RGB(0xc0, 0xc0, 0xc0), // E  
-	MAKE_RGB(0xff, 0xff, 0xff),	// F  
+	MAKE_RGB(0x00, 0xc0, 0x00), // 2
+	MAKE_RGB(0x00, 0xff, 0x00), // 3
+	MAKE_RGB(0x00, 0x00, 0xc0), // 4
+	MAKE_RGB(0x00, 0x00, 0xff), // 5
+	MAKE_RGB(0x00, 0xc0, 0xc0), // 6
+	MAKE_RGB(0x00, 0xff, 0xff), // 7
+	MAKE_RGB(0xc0, 0x00, 0x00), // 8
+	MAKE_RGB(0xff, 0x00, 0x00), // 9
+	MAKE_RGB(0xc0, 0xc0, 0x00), // A
+	MAKE_RGB(0xff, 0xff, 0x00), // B
+	MAKE_RGB(0xc0, 0x00, 0xc0), // C
+	MAKE_RGB(0xff, 0x00, 0xff), // D
+	MAKE_RGB(0xc0, 0xc0, 0xc0), // E
+	MAKE_RGB(0xff, 0xff, 0xff),	// F
 };
 
 PALETTE_INIT( pk8000 )
@@ -103,11 +103,11 @@ UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const 
 	my_rect.max_x = 256+32-1;
 	my_rect.min_y = 0;
 	my_rect.max_y = 192+32-1;
-	
+
 	if (pk8000_video_enable) {
 		bitmap_fill(bitmap, &my_rect, (pk8000_video_color >> 4) & 0x0f);
-		
-		if (BIT(pk8000_video_mode,4)==0){	
+
+		if (BIT(pk8000_video_mode,4)==0){
 			// Text mode
 			if (BIT(pk8000_video_mode,5)==0){
 				// 32 columns
@@ -119,9 +119,9 @@ UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const 
 						UINT8 color= pk8000_color[chr>>3];
 						for (j = 0; j < 8; j++) {
 							UINT8 code = videomem[((chr<<3) + j) + ((pk8000_chargen_start & 0x0e) << 10)+offset];
-							
+
 							for (b = 0; b < 8; b++)
-							{								
+							{
 								UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
 								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
 							}
@@ -129,7 +129,7 @@ UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const 
 					}
 				}
 			} else {
-				// 40 columns						
+				// 40 columns
 				for (y = 0; y < 24; y++)
 				{
 					for (x = 0; x < 42; x++)
@@ -138,7 +138,7 @@ UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const 
 						for (j = 0; j < 8; j++) {
 							UINT8 code = videomem[((chr<<3) + j) + ((pk8000_chargen_start  & 0x0e) << 10)+offset];
 							for (b = 2; b < 8; b++)
-							{								
+							{
 								UINT8 col = ((code >> b) & 0x01) ? (pk8000_video_color) & 0x0f : (pk8000_video_color>>4) & 0x0f;
 								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*6+(7-b)+16+8) =  col;
 							}
@@ -158,10 +158,10 @@ UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const 
 					for (j = 0; j < 8; j++) {
 						UINT8 color= videomem[((chr<<3) + j)+off_color];
 						UINT8 code = videomem[((chr<<3) + j)+off_code];
-						
+
 						for (b = 0; b < 8; b++)
-						{								
-							UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);						
+						{
+							UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
 							*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
 						}
 					}

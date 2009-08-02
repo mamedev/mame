@@ -170,8 +170,8 @@ static INPUT_PORTS_START( decocass )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK)
 
 	PORT_START("DSW2") /* Start with all Unknown as each can change per game, except for Country Code */
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1")		/* Most Dipswitch Settings sheets show this as "Number of Players" (Lives) */ 
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2")		/* Most Dipswitch Settings sheets show 2 & 3 as "Bonus Players" */ 
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1")		/* Most Dipswitch Settings sheets show this as "Number of Players" (Lives) */
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2")		/* Most Dipswitch Settings sheets show 2 & 3 as "Bonus Players" */
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4")		/* Most Dipswitch Settings sheets show 4 (with/without 5) as some form of Diffculty */
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5")

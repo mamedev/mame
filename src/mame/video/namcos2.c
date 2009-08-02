@@ -228,7 +228,7 @@ READ16_HANDLER( namcos2_68k_video_palette_r )
 	{
 		/* palette register */
 		offset &= 0x180f;
-		
+
 		/* registers 6,7: unmapped? */
 		if (offset > 0x180b) return 0xff;
 	}
@@ -241,27 +241,27 @@ WRITE16_HANDLER( namcos2_68k_video_palette_w )
 	{
 		/* palette register */
 		offset &= 0x180f;
-		
+
 		if( ACCESSING_BITS_0_7 ) data&=0xff;
 		else data>>=8;
-		
+
 		switch (offset) {
 			/* registers 0-3: clipping */
-			
+
 			/* register 4: ? */
 			/* sets using it:
-			assault:	$0020
-			burnforc:	$0130 after titlescreen
-			dirtfoxj:	$0108 at game start
-			finalap1/2/3:	$00C0
-			finehour:	$0168 after titlescreen
-			fourtrax:	$00E8 and $00F0
-			luckywld:	$00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
-			suzuka8h1/2:	$00E8 and $00A0 */
+            assault:    $0020
+            burnforc:   $0130 after titlescreen
+            dirtfoxj:   $0108 at game start
+            finalap1/2/3:   $00C0
+            finehour:   $0168 after titlescreen
+            fourtrax:   $00E8 and $00F0
+            luckywld:   $00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
+            suzuka8h1/2:    $00E8 and $00A0 */
 			case 0x1808: case 0x1809:
 				// if (data^namcos2_68k_palette_ram[offset]) printf("%04X\n",data<<((~offset&1)<<3)|namcos2_68k_palette_ram[offset^1]<<((offset&1)<<3));
 				break;
-			
+
 			/* register 5: POSIRQ scanline (only 8 bits used) */
 			/*case 0x180a:*/ case 0x180b:
 				if (data^namcos2_68k_palette_ram[offset]) {
@@ -269,11 +269,11 @@ WRITE16_HANDLER( namcos2_68k_video_palette_w )
 					namcos2_adjust_posirq_timer(space->machine,namcos2_GetPosIrqScanline(space->machine));
 				}
 				break;
-			
+
 			/* registers 6,7: nothing? */
 			default: break;
 		}
-		
+
 		namcos2_68k_palette_ram[offset] = data;
 	}
 	else

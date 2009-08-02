@@ -470,7 +470,7 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 				plane2 = plane2 << 1;
 				if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 				{
-					
+
 					if (pix)
 					{
 						pen = paldata[pix];
@@ -599,7 +599,7 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		/* compute the character's line to draw */
 		sprite_line = scanline - spriteYPos;
 
-		
+
 		if (flipy)
 			sprite_line = (size - 1) - sprite_line;
 
@@ -618,16 +618,16 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		plane1 = memory_read_byte(device->space[0], (index1 + sprite_line) & 0x1fff);
 		plane2 = memory_read_byte(device->space[0], (index1 + sprite_line + 8) & 0x1fff);
 
-//		sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
-//		if (size > 8)
-//			gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
+//      sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
+//      if (size > 8)
+//          gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
 
 		if (pri)
 		{
 			/* draw the low-priority sprites */
 			for (pixel = 0; pixel < 8; pixel++)
 			{
-//				UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
+//              UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
 				UINT8 pixelData;
 				if (flipx)
 				{
@@ -998,7 +998,7 @@ static DEVICE_RESET( ppu2c0x )
 
 /*************************************
 *
-*	PPU Memory functions
+*   PPU Memory functions
 *
 *************************************/
 
@@ -1278,7 +1278,7 @@ void ppu2c0x_spriteram_dma( const address_space *space, const device_config *dev
 	{
 		UINT8 spriteData = memory_read_byte(space, address + i);
 		memory_write_byte(space, 0x2004, spriteData);
-//		ppu2c0x_w(device, PPU_SPRITE_DATA, spriteData);
+//      ppu2c0x_w(device, PPU_SPRITE_DATA, spriteData);
 	}
 
 	// should last 513 CPU cycles.

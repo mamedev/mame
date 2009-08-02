@@ -132,7 +132,7 @@ MACHINE_RESET( namcos2 )
 		namcos2_68k_slave_C148[loop] = 0;
 		namcos2_68k_gpu_C148[loop] = 0;
 	}
-	
+
 	/* reset POSIRQ timer */
 	timer_adjust_oneshot(namcos2_posirq_timer, attotime_never, 0);
 }
@@ -517,7 +517,7 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 	case 0x1c0000: break; /* ? NAMCOS2_C148_0 */
 	case 0x1c2000: break; /* ? NAMCOS2_C148_1 */
 	case 0x1c4000: break; /* ? NAMCOS2_C148_2 */
-	
+
 	/* IRQ level */
 	case 0x1c6000: break; /* NAMCOS2_C148_CPUIRQ */
 	case 0x1c8000: break; /* NAMCOS2_C148_EXIRQ */
@@ -530,7 +530,7 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 		{
 			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 			/* Dubious to assert IRQ for other CPU here, but Starblade seems to rely on it.
-			   It fails to show large polygons otherwise. */
+               It fails to show large polygons otherwise. */
 			cpu_set_input_line(altcpu, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
 		break;
@@ -674,7 +674,7 @@ static TIMER_CALLBACK( namcos2_posirq_tick )
 		}
 		return;
 	}
-	
+
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
 		video_screen_update_partial(machine->primary_screen, param);
 		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "maincpu", namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
@@ -704,7 +704,7 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 	/* only used by namcos21 */
 	int scanline = GetPosIRQScanline(device->machine);
 	scanline = 0x50+0x89; /* HACK for Winning Run */
-	
+
 	//printf( "namcos2_68k_gpu_vblank(%d)\n",namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
 	namcos2_adjust_posirq_timer(device->machine, scanline);
 	cpu_set_input_line(device, namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);

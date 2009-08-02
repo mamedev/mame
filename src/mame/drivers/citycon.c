@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay", ay8910_address_data_w)
-//	AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -205,7 +205,7 @@ static MACHINE_DRIVER_START( citycon )
 
 	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

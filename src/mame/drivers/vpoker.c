@@ -16,64 +16,64 @@ TODO:
 
 Bought as "old poker game by videotronics early 80's"
 
-Scratched on the CPU board	SN1069
-Scratched on the CPU board	SN1069
+Scratched on the CPU board  SN1069
+Scratched on the CPU board  SN1069
 
 CPU board
-.0	2716	stickered	DRAWPKR2	located top left
-				8-F
-				REV A
+.0  2716    stickered   DRAWPKR2    located top left
+                8-F
+                REV A
 
-.1	2716	stickered	DRAWPKR2	located next to .0
-				0-7
-				REV A
+.1  2716    stickered   DRAWPKR2    located next to .0
+                0-7
+                REV A
 
 ROM board
 Top of board left to right
-.R0	2716	stickered	RA
-				0-7
+.R0 2716    stickered   RA
+                0-7
 
-.R1	2716	stickered	RA
-				8-F
+.R1 2716    stickered   RA
+                8-F
 
-.R2	2716	stickered	BA
-				0-7
+.R2 2716    stickered   BA
+                0-7
 
-.R3	2716	stickered	BA
-				8-F
+.R3 2716    stickered   BA
+                8-F
 
-.R4	2716	stickered	GA
-				0-7
+.R4 2716    stickered   GA
+                0-7
 
-.R5	2716	stickered	GA
-				8-F
+.R5 2716    stickered   GA
+                8-F
 
 
 Below top row left to right
-.R6	2716	stickered	RB
-				0-7
+.R6 2716    stickered   RB
+                0-7
 
-.R7	2716	stickered	RB
-				8-F
+.R7 2716    stickered   RB
+                8-F
 
-.R8	2716	stickered	BB
-				0-7
+.R8 2716    stickered   BB
+                0-7
 
-.R9	2716	stickered	BB
-				8-F
+.R9 2716    stickered   BB
+                8-F
 
-.R10	2716	stickered	GB
-				0-7
+.R10    2716    stickered   GB
+                0-7
 
-.R11	2716	stickered	GB
-				8-F
+.R11    2716    stickered   GB
+                8-F
 
 ROM data showed cards
 
 6809 cpu
 4.000Mhz crystal
 MC6840P
-mm74c920J/mmc6551j-9	x2
+mm74c920J/mmc6551j-9    x2
 
 
 **************************************************************************************************************/
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( blitter_w )
 		blit_offs = (blit_ram[1] & 0x01)<<8|(blit_ram[2] & 0xff);
 
 		videoram[blit_offs] = blit_ram[0];
-//		printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3],blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]);
+//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3],blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]);
 	}
 }
 
@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( vpoker )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
-//	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //irq0 valid too
+//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //irq0 valid too
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -420,8 +420,8 @@ static MACHINE_DRIVER_START( vpoker )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /***************************************************************************

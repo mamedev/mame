@@ -541,13 +541,13 @@ static CPU_EXECUTE( m68k )
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	m68k->initial_cycles = cycles;
-	
+
 	/* eat up any reset cycles */
 	if (m68k->reset_cycles) {
 		int rc = m68k->reset_cycles;
 		m68k->reset_cycles = 0;
 		cycles -= rc;
-		
+
 		if (cycles <= 0) return rc;
 	}
 

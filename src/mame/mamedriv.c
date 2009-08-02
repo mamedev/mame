@@ -9573,7 +9573,7 @@ Other Sun games
 
 	/* Scorpion 2 */
 	DRIVER( m_brkfst )
-	
+
 	DRIVER( m_bdrwho )
 	DRIVER( m_bdrwh1 )
 	DRIVER( m_bdrwh2 )

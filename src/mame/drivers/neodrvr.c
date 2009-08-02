@@ -7044,7 +7044,7 @@ title: '98 NeoPri Best 44 version
 ROM_START( 98best44 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
-	
+
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_LOAD16_WORD_SWAP( "neoprint.bios",    0x00000, 0x020000, NO_DUMP ) // should be different
 	ROM_COPY( "maincpu", 0x00000, 0x00000, 0x80000 ) // just copy the program rom to stop it crashing
@@ -7056,14 +7056,14 @@ ROM_START( 98best44 )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) // maybe
-	
+
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASE00 )
 	/* no S1 rom */
-	
+
 	ROM_REGION( 0x30000, "audiocpu", 0 )
 	ROM_LOAD( "pt004-m1", 	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 	ROM_RELOAD(          0x10000, 0x20000 )
-	
+
 	ROM_REGION( 0x200000, "ym", 0 )
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 

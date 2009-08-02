@@ -737,7 +737,7 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
 	    	fatalerror("ARM7: Unhandled coprocessor %d\n", cpnum);
 	    }
     }
-    
+
     switch( cReg )
     {
         case 0:

@@ -396,13 +396,13 @@ static void pc10_set_videorom_bank( running_machine *machine, int first, int cou
 
 	/* yeah, this is probably a horrible assumption to make.*/
 	/* but the driver is 100% consistant */
-	
+
 	len = memory_region_length(machine, "gfx2");
 	len /= 0x400;	// convert to KB
 	len /= size;	// convert to bank resolution
 	len--;			// convert to mask
 	bank &= len;	// should be the right mask
-	
+
 	for (i = 0; i < count; i++)
 	{
 		chr_page[i + first].writable = 0;
@@ -422,7 +422,7 @@ static void set_videoram_bank( running_machine *machine, int first, int count, i
 	/* assumes 8K of vram */
 	/* need 8K to fill address space */
 	/* only pinbot (8k) banks at all */
-		
+
 	for (i = 0; i < count; i++)
 	{
 		chr_page[i + first].writable = 1;

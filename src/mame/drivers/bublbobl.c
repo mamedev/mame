@@ -1286,12 +1286,12 @@ ROM_START( dland )
 	ROM_LOAD( "dl_6.bin",     0x00000, 0x10000, CRC(6352d3fa) SHA1(eacaddd476952f3c048138184e712ca1fbba4ce2) )
 	ROM_LOAD( "dl_7.bin",     0x10000, 0x10000, CRC(37a38b69) SHA1(3d28fbf1725b35f664836ee45f705c05f6ccd78a) )
 	ROM_LOAD( "dl_8.bin",     0x20000, 0x10000, CRC(509ee5b1) SHA1(b5edc7346d43db0157deadece60e478ba6d63eab) )
-	/* 0x30000-0x3ffff empty */	
+	/* 0x30000-0x3ffff empty */
 	ROM_LOAD( "dl_9.bin",     0x40000, 0x10000, CRC(ae8514d7) SHA1(5205a3faf354f5b5616be4494f5bd553de4c7965) )
 	ROM_LOAD( "dl_10.bin",    0x50000, 0x10000, CRC(6d406fb7) SHA1(26d9236d259f8b3876087797b77994b299eeea63) )
 	ROM_LOAD( "dl_11.bin",    0x60000, 0x10000, CRC(bdf9c0ab) SHA1(d5afc5205e8e391a4a095a4e2efbeee96e780638) )
 	/* 0x70000-0x7ffff empty */
-	
+
 	ROM_REGION( 0x0100, "proms", 0 ) // not on this? (but needed for the bublbobl video driver to work)
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing */
 ROM_END
@@ -1332,7 +1332,7 @@ static DRIVER_INIT( dland )
 	UINT8* src = memory_region(machine,"gfx1");
 	for (i=0;i<0x40000;i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
-		
+
 	for (i=0x40000;i<0x80000;i++)
 		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
 

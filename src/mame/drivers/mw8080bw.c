@@ -1845,7 +1845,7 @@ static ADDRESS_MAP_START( spacwalk_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)	
+	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)
 
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 
