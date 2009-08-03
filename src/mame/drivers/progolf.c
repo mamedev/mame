@@ -5,9 +5,9 @@
 driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- We need to patch a rom to get the games to do more, there's also a "rom test error 6"
-  in service mode (that is the g2-m.6a rom), so a rom might be bad or the decryption
-  isn't complete. Yet the problem is in progolf and progolfa too (different encryption)
+- We need to patch a rom to get the games to do more; there's also a "rom test error 6"
+  in service mode (that is the g2-m.6a rom in progolf and g2-m.a6 in progolfa); probably
+  not a bad dump (progolf and progolfa have different encryption);
 - Hazards doesn't have any effect, might be the same issue as above;
 - There's no "rough" display on the sides on the screen, might be the same issue as above;
 - Map displays are currently wrong, they are drawn with the framebuffer;
@@ -437,7 +437,7 @@ ROM_START( progolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
 	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
-	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, BAD_DUMP CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) ) //bit-rotted?
+	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
