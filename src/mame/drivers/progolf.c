@@ -7,12 +7,11 @@ driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Hay
 TODO:
 - We need to patch a rom to get the games to do more, there's also a "rom test error 6"
   in service mode (that is the g2-m.6a rom), so a rom might be bad or the decryption
-  isn't complete.
+  isn't complete. Yet the problem is in progolf and progolfa too (different encryption)
 - Hazards doesn't have any effect, might be the same issue as above;
 - There's no "rough" display on the sides on the screen, might be the same issue as above;
 - Map displays are currently wrong, they are drawn with the framebuffer;
 - Flip screen support;
-- progolfa: decryption isn't yet correct;
 
 =========================================================================================
 
@@ -530,6 +529,8 @@ static DRIVER_INIT( progolfa )
 			decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
 		else
 			decrypted[A] = rom[A];
+
+	decrypted[0xce21] = 0xd0; // like progolf
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
