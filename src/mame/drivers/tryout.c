@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_BASE(&tryout_gfx_control)
 	AM_RANGE(0xe414, 0xe414) AM_WRITE(tryout_sound_w)
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(tryout_nmi_ack_w)
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* resect vectors */
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -198,12 +198,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( tryout )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,800) /* ? */
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
