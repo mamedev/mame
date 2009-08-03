@@ -26,6 +26,11 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/eeprom.h"
 #include "machine/pxa255.h"
+#include "sound/dmadac.h"
+
+static UINT32* ram;
+
+static const device_config *dmadac[2];
 
 static void pxa255_dma_irq_check(running_machine* machine);
 static READ32_HANDLER( pxa255_dma_r );
@@ -119,9 +124,24 @@ static READ32_HANDLER( pxa255_i2s_r )
 	return 0;
 }
 
+//static FILE* audio_dump = NULL;
 
 static WRITE32_HANDLER( pxa255_i2s_w )
 {
+	/*
+	if(!audio_dump)
+	{
+		int count = 0;
+		char filename[256];
+		do
+		{
+			sprintf(filename, "39in1_%04d.raw", count++);
+			audio_dump = fopen(filename, "rb");
+		}while(audio_dump != NULL);
+		count--;
+		sprintf(filename, "39in1_%04d.raw", count);
+		audio_dump = fopen(filename, "wb");
+	}*/
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
@@ -154,10 +174,18 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 		case PXA255_SADIV:
 			verboselog( space->machine, 3, "pxa255_i2s_w: Serial Audio Clock Divider Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs.sadiv = data & 0x0000007f;
+			dmadac[0] = devtag_get_device(space->machine, "dac1");
+			dmadac[1] = devtag_get_device(space->machine, "dac2");
+			dmadac_set_frequency(&dmadac[0], 2, ((double)147600000 / (double)i2s_regs.sadiv) / 256.0);
+			dmadac_enable(&dmadac[0], 2, 1);
 			break;
 		case PXA255_SADR:
 			verboselog( space->machine, 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs.sadr = data;
+			/*if(audio_dump)
+			{
+				fwrite(&data, 4, 1, audio_dump);
+			}*/
 			break;
 		default:
 			verboselog( space->machine, 0, "pxa255_i2s_w: Unknown address: %08x = %08x & %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2), data, mem_mask);
@@ -241,60 +269,82 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	UINT8 temp8;
 	UINT16 temp16;
 	UINT32 temp32;
-	for(index = 0; index < count; index++)
+    static UINT32 words[0x800];
+    static INT16 samples[0x1000];
+	switch(param)
 	{
-		switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
-		{
-			case PXA255_DCMD_SIZE_8:
-				temp8 = memory_read_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
-				memory_write_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp8);
-				break;
-			case PXA255_DCMD_SIZE_16:
-				temp16 = memory_read_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
-				memory_write_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp16);
-				break;
-			case PXA255_DCMD_SIZE_32:
-				temp32 = memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
-				memory_write_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp32);
-				break;
-			default:
-				printf( "pxa255_dma_dma_end: Unsupported DMA size\n" );
-				break;
-		}
-		if(dma_regs.dcmd[param] & PXA255_DCMD_INCSRCADDR)
-		{
-			switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+		case 3:
+			for(index = 0; index < count; index += 4)
 			{
-				case PXA255_DCMD_SIZE_8:
-					sadr++;
-					break;
-				case PXA255_DCMD_SIZE_16:
-					sadr += 2;
-					break;
-				case PXA255_DCMD_SIZE_32:
-					sadr += 4;
-					break;
-				default:
-					break;
+				words[index >> 2] = memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
+				samples[(index >> 1) + 0] = (INT16)(words[index >> 2] >> 16);
+				samples[(index >> 1) + 1] = (INT16)(words[index >> 2] & 0xffff);
+				sadr += 4;
 			}
-		}
-		if(dma_regs.dcmd[param] & PXA255_DCMD_INCTRGADDR)
-		{
-			switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+			dmadac[0] = devtag_get_device(machine, "dac1");
+			dmadac[1] = devtag_get_device(machine, "dac2");
+    		dmadac_transfer(&dmadac[0], 2, 2, 2, count/4, samples);
+			break;
+		default:
+			for(index = 0; index < count;)
 			{
-				case PXA255_DCMD_SIZE_8:
-					tadr++;
-					break;
-				case PXA255_DCMD_SIZE_16:
-					tadr += 2;
-					break;
-				case PXA255_DCMD_SIZE_32:
-					tadr += 4;
-					break;
-				default:
-					break;
+				switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+				{
+					case PXA255_DCMD_SIZE_8:
+						temp8 = memory_read_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
+						memory_write_byte_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp8);
+						index++;
+						break;
+					case PXA255_DCMD_SIZE_16:
+						temp16 = memory_read_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
+						memory_write_word_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp16);
+						index += 2;
+						break;
+					case PXA255_DCMD_SIZE_32:
+						temp32 = memory_read_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sadr);
+						memory_write_dword_32le(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tadr, temp32);
+						index += 4;
+						break;
+					default:
+						printf( "pxa255_dma_dma_end: Unsupported DMA size\n" );
+						break;
+				}
+				if(dma_regs.dcmd[param] & PXA255_DCMD_INCSRCADDR)
+				{
+					switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+					{
+						case PXA255_DCMD_SIZE_8:
+							sadr++;
+							break;
+						case PXA255_DCMD_SIZE_16:
+							sadr += 2;
+							break;
+						case PXA255_DCMD_SIZE_32:
+							sadr += 4;
+							break;
+						default:
+							break;
+					}
+				}
+				if(dma_regs.dcmd[param] & PXA255_DCMD_INCTRGADDR)
+				{
+					switch(dma_regs.dcmd[param] & PXA255_DCMD_SIZE)
+					{
+						case PXA255_DCMD_SIZE_8:
+							tadr++;
+							break;
+						case PXA255_DCMD_SIZE_16:
+							tadr += 2;
+							break;
+						case PXA255_DCMD_SIZE_32:
+							tadr += 4;
+							break;
+						default:
+								break;
+					}
+				}
 			}
-		}
+			break;
 	}
 	if(dma_regs.dcmd[param] & PXA255_DCMD_ENDIRQEN)
 	{
@@ -1318,7 +1368,7 @@ static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE( pxa255_intc_r, pxa255_intc_w )
 	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE( pxa255_gpio_r, pxa255_gpio_w )
 	AM_RANGE(0x44000000, 0x4400021f) AM_READWRITE( pxa255_lcd_r,  pxa255_lcd_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM
+	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_BASE(&ram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 39in1 )
@@ -1468,6 +1518,11 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_VIDEO_UPDATE(39in1)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( 39in1 )
@@ -1494,5 +1549,5 @@ ROM_END
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END*/
 
-GAME(2004, 39in1, 0, 39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_NO_SOUND)
+GAME(2004, 39in1, 0, 39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
 //GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "<unknown>", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
