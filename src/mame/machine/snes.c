@@ -280,6 +280,21 @@ static TIMER_CALLBACK( snes_hblank_tick )
 
 *************************************/
 
+static READ8_HANDLER( snes_open_bus_r )
+{
+	static UINT8 recurse = 0;
+	UINT16 result;
+
+	/* prevent recursion */
+	if (recurse)
+		return 0xff;
+
+	recurse = 1;
+	result = memory_read_byte_8le(space, cpu_get_pc(space->cpu)+2); //TODO: must be the LAST opcode that's fetched on the bus
+	recurse = 0;
+	return result;
+}
+
 /*
  * DR   - Double read : address is read twice to return a 16bit value.
  * low  - This is the low byte of a 16 or 24 bit value
@@ -299,7 +314,7 @@ READ8_HANDLER( snes_r_io )
 	/* offset is from 0x000000 */
 	switch( offset )
 	{
-		/* hacks for SimCity 2000 to boot - I presume openbus emulation will fix */
+		/* hacks for SimCity 2000 (J) to boot - I presume openbus emulation will fix */
 		case 0x221a:
 		case 0x231c:
 		case 0x241e:
@@ -312,6 +327,9 @@ READ8_HANDLER( snes_r_io )
 		case 0x2016:
 			return 2;
 
+		/* Shien The Blade Chaser / Shien's Revenge reads here instead */
+		case NMITIMEN:
+			return snes_open_bus_r(space,0);
 		case OAMADDL:
 		case OAMADDH:
 		case VMADDL:

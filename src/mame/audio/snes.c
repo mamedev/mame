@@ -1241,6 +1241,8 @@ READ8_HANDLER( spc_io_r )
 {
 	switch( offset )	/* Offset is from 0x00f0 */
 	{
+		case 0x1:
+			return 0; //Super Kick Boxing reads port 1 and wants it to be zero.
 		case 0x2:		/* Register address */
 			return spc_ram[0xf2];
 		case 0x3:		/* Register data */
@@ -1265,7 +1267,7 @@ READ8_HANDLER( spc_io_r )
 		}
 	}
 
-	return 0; //Super Kick Boxing reads port 1 and wants it to be zero.
+	return 0xff;
 }
 
 WRITE8_HANDLER( spc_io_w )
