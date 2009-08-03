@@ -1270,26 +1270,26 @@ ROM_END
 
 ROM_START( dland )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "dl_3.bin",    0x00000, 0x08000, CRC(01eb3e4f) SHA1(8edc0f2e98b928b1d9d508948bcff947df697b6f) )
-    /* ROMs banked at 8000-bfff */
-	ROM_LOAD( "dl_5.bin",    0x10000, 0x08000, CRC(75740b61) SHA1(7ebfbb9abfcc44c31b31f146d7bc37004a1b528c) )
-	ROM_LOAD( "dl_4.bin",    0x18000, 0x08000, CRC(c6a3776f) SHA1(473fc8c990046f90517f2506f1ca59eeb7ea13e5) )
+	ROM_LOAD( "dl_3.u69",    0x00000, 0x08000, CRC(01eb3e4f) SHA1(8edc0f2e98b928b1d9d508948bcff947df697b6f) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "dl_5.u67",    0x10000, 0x08000, CRC(75740b61) SHA1(7ebfbb9abfcc44c31b31f146d7bc37004a1b528c) )
+	ROM_LOAD( "dl_4.u68",    0x18000, 0x08000, CRC(c6a3776f) SHA1(473fc8c990046f90517f2506f1ca59eeb7ea13e5) )
 	/* 20000-2ffff empty */
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the second CPU */
-	ROM_LOAD( "dl_1.bin",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+	ROM_LOAD( "dl_1.u42",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the third CPU */
-	ROM_LOAD( "dl_2.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+	ROM_LOAD( "dl_2.u74",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "dl_6.bin",     0x00000, 0x10000, CRC(6352d3fa) SHA1(eacaddd476952f3c048138184e712ca1fbba4ce2) )
-	ROM_LOAD( "dl_7.bin",     0x10000, 0x10000, CRC(37a38b69) SHA1(3d28fbf1725b35f664836ee45f705c05f6ccd78a) )
-	ROM_LOAD( "dl_8.bin",     0x20000, 0x10000, CRC(509ee5b1) SHA1(b5edc7346d43db0157deadece60e478ba6d63eab) )
+	ROM_LOAD( "dl_6.58",     0x00000, 0x10000, CRC(6352d3fa) SHA1(eacaddd476952f3c048138184e712ca1fbba4ce2) )
+	ROM_LOAD( "dl_7.59",     0x10000, 0x10000, CRC(37a38b69) SHA1(3d28fbf1725b35f664836ee45f705c05f6ccd78a) )
+	ROM_LOAD( "dl_8.60",     0x20000, 0x10000, CRC(509ee5b1) SHA1(b5edc7346d43db0157deadece60e478ba6d63eab) )
 	/* 0x30000-0x3ffff empty */
-	ROM_LOAD( "dl_9.bin",     0x40000, 0x10000, CRC(ae8514d7) SHA1(5205a3faf354f5b5616be4494f5bd553de4c7965) )
-	ROM_LOAD( "dl_10.bin",    0x50000, 0x10000, CRC(6d406fb7) SHA1(26d9236d259f8b3876087797b77994b299eeea63) )
-	ROM_LOAD( "dl_11.bin",    0x60000, 0x10000, CRC(bdf9c0ab) SHA1(d5afc5205e8e391a4a095a4e2efbeee96e780638) )
+	ROM_LOAD( "dl_9.61",     0x40000, 0x10000, CRC(ae8514d7) SHA1(5205a3faf354f5b5616be4494f5bd553de4c7965) )
+	ROM_LOAD( "dl_10.62",    0x50000, 0x10000, CRC(6d406fb7) SHA1(26d9236d259f8b3876087797b77994b299eeea63) )
+	ROM_LOAD( "dl_11.63",    0x60000, 0x10000, CRC(bdf9c0ab) SHA1(d5afc5205e8e391a4a095a4e2efbeee96e780638) )
 	/* 0x70000-0x7ffff empty */
 
 	ROM_REGION( 0x0100, "proms", 0 ) // not on this? (but needed for the bublbobl video driver to work)
