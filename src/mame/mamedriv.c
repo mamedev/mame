@@ -825,7 +825,7 @@ const game_driver * const drivers[] =
 	DRIVER( swcourtj )	/* (c) 1992 (Japan) */
 	DRIVER( emeralda )	/* (c) 1993 (Japan) */
 	DRIVER( emeraldaj )	/* (c) 1993 (Japan) */
-	DRIVER( emeraldaja )/* (c) 1993 (Japan) */
+	DRIVER( emeraldaja )	/* (c) 1993 (Japan) */
 	DRIVER( numanath )	/* (c) 1993 (World) */
 	DRIVER( numanathj )	/* (c) 1993 (Japan) */
 	DRIVER( quiztou )	/* (c) 1993 (Japan) */
@@ -835,8 +835,9 @@ const game_driver * const drivers[] =
 	/* Namco NB-1 / NB-2 System games */
 	DRIVER( nebulray )	/* (c) 1994 (World) */
 	DRIVER( nebulrayj )	/* (c) 1994 (Japan) */
-	DRIVER( ptblank )	/* (c) 1994 */
-	DRIVER( gunbulet )	/* (c) 1994 (Japan) */
+	DRIVER( ptblank )	/* (c) 1994 (GN2 World) */
+	DRIVER( gunbuletj )	/* (c) 1994 (GN1 Japan) */
+	DRIVER( gunbuletw )	/* (c) 1994 (GN3 World) */
 	DRIVER( gslugrsj )	/* (c) 1993 (Japan) */
 	DRIVER( gslgr94u )	/* (c) 1994 */
 	DRIVER( gslgr94j )	/* (c) 1994 (Japan) */
@@ -844,7 +845,7 @@ const game_driver * const drivers[] =
 	DRIVER( sws96 )		/* (c) 1996 (Japan) */
 	DRIVER( sws97 )		/* (c) 1997 (Japan) */
 	DRIVER( vshoot )	/* (c) 1994 */
-	DRIVER( outfxies )	/* (c) 1994 */
+	DRIVER( outfxies )	/* (c) 1994 (World) */
 	DRIVER( outfxiesj )	/* (c) 1994 (Japan) */
 	DRIVER( machbrkr )	/* (c) 1995 (Japan) */
 
