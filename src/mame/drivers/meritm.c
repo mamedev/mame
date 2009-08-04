@@ -1438,15 +1438,30 @@ ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat5 ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-B-RO1 C1998 MII */
+ROM_START( megat5 ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-C-RO1 C1998 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-60-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) )
 	ROM_LOAD( "qs9255-05_u36-r0",   0x100000, 0x80000,  CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-60-01_u38-r0c", 0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) ) /* Location U38, 07/10/1997 16:27:51 Dumped at half size */
-	ROM_RELOAD(                     0x380000, 0x80000)
+	ROM_LOAD( "9255-60-01_u38-r0i", 0x300000, 0x100000, CRC(82a4471d) SHA1(e66ab64bb7047e248f9edbf99eb83c480895dc68) ) /* Location U38, 09/26/1997 12:09:52 - Standard Version */
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat5a ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-C-RO1 C1998 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-60-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) )
+	ROM_LOAD( "qs9255-05_u36-r0",   0x100000, 0x80000,  CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-60-01_u38-r0c", 0x300000, 0x100000, BAD_DUMP CRC(1091e7fd) SHA1(3c31c178eb7bea0d2c7e839dc3ec549463092296) ) /* Location U38, 07/10/1997 16:49:56 - Standard Version */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -1610,6 +1625,7 @@ GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Me
 GAME( 1996, megat4sn,  megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Super Megatouch IV (9255-41-07 ROG, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )
