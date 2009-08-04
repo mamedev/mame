@@ -154,6 +154,8 @@ static const struct SNES_MODE_CONFIG snes_modedefs[8] =
 /*7*/	{ {snes_update_line_mode7, NULL, NULL, NULL}, 1 }					/* Supports direct colour */
 };
 
+extern UINT16 snes_htmult;
+
 /*****************************************
  * snes_draw_blend()
  *
@@ -1880,7 +1882,7 @@ static void snes_refresh_scanline(bitmap_t *bitmap, UINT16 curline )
 #endif /* SNES_DBG_video */
 		if( snes_ram[CGADSUB] & 0x20 )
 		{
-			for( ii = 0; ii < SNES_SCR_WIDTH; ii++ )
+			for( ii = 0; ii < SNES_SCR_WIDTH * snes_htmult; ii++ )
 			{
 				snes_draw_blend(ii, &scanlines[MAINSCREEN].buffer[ii], (snes_ram[CGADSUB] & 0x80)?SNES_BLEND_SUB:SNES_BLEND_ADD, (snes_ram[CGWSEL] & 0x30) >> 4 );
 			}
@@ -1911,7 +1913,7 @@ static void snes_refresh_scanline(bitmap_t *bitmap, UINT16 curline )
 		/* Phew! Draw the line to screen */
 		fade = (snes_ram[INIDISP] & 0xf) + 1;
 
-		for (x = 0; x < SNES_SCR_WIDTH; x++)
+		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult; x++)
 		{
 			int r = ((scanline->buffer[x] & 0x1f) * fade) >> 4;
 			int g = (((scanline->buffer[x] & 0x3e0) >> 5) * fade) >> 4;
