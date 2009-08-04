@@ -22,10 +22,6 @@ TODO:
 
 - Telmajan cannot set to JAMMA type. I don't know why.
 
-- Controls in gionbana: 1~8 is assigned to A~H, "Yes" is LShift, "No" is Z.
-
-- Controls in maiko,hanaoji,hnxmasev and hnageman: 1~8 is assigned to A~H, "Yes" is M, "No" is N.
-
 - Real machine has ROMs for protection, but I don't know how to access the ROM,
   so I'm doing something that works but is probably wrong.
   The interesting thing about that ROM is that it comes from other, older games,
@@ -1086,7 +1082,7 @@ static INPUT_PORTS_START( gionbana )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf1_ctrl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgion )
@@ -1152,7 +1148,7 @@ static INPUT_PORTS_START( mgion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf1_ctrl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( omotesnd )
@@ -1218,7 +1214,7 @@ static INPUT_PORTS_START( omotesnd )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf1_ctrl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abunai )
@@ -1283,7 +1279,7 @@ static INPUT_PORTS_START( abunai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf1_ctrl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgmen89 )
@@ -2217,7 +2213,7 @@ static INPUT_PORTS_START( maiko )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )			//
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf2_ctrl )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			//
@@ -2293,7 +2289,7 @@ static INPUT_PORTS_START( mmaiko )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf2_ctrl )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2369,7 +2365,7 @@ static INPUT_PORTS_START( hanaoji )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )			//
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
-	PORT_INCLUDE( nbmjcontrols )
+	PORT_INCLUDE( nbhf2_ctrl )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			//
@@ -3878,9 +3874,6 @@ ROM_START( hnageman )
 	DISK_REGION( "vhs" ) /* Video Home System tape */
 	DISK_IMAGE_READONLY( "hnageman", 0, NO_DUMP )
 ROM_END
-
-
-
 
 //     YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
 GAME( 1988, msjiken,   0,        msjiken,  msjiken,  msjiken,  ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", 0 )

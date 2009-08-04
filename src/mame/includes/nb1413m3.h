@@ -148,6 +148,8 @@ CUSTOM_INPUT( nb1413m3_outcoin_flag_r );
 
 /* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/
 INPUT_PORTS_EXTERN( nbmjcontrols );
+INPUT_PORTS_EXTERN( nbhf1_ctrl );
+INPUT_PORTS_EXTERN( nbhf2_ctrl );
 
 extern int nb1413m3_type;
 extern const char * nb1413m3_sndromrgntag;
