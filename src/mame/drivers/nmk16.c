@@ -3676,53 +3676,6 @@ static MACHINE_DRIVER_START( mustangb )
 
 MACHINE_DRIVER_END
 
-/*
-
-S.B.S. Gomorrah
-UPL, 1993
-
-PCB Layout
-----------
-
-UPL-90062
-|-------------------------------------------------------------------------|
-| LA4460  4558  YM2203   6116       NMK004                   68000        |
-|         3014  M6295    6.IC120                                          |
-|               M6295               8MHz                 62256  10.IC15   |
-|        SBS-G_05.IC160                                                   |
-|               SBS-G_04.IC139                           62256  11.IC14   |
-|DSW2   DSW1             12MHz                                            |
-|                                   82S129.IC69                           |
-|    NMK005                                                               |
-|                           82S135.IC94                                   |
-|                                   NMK902                                |
-|J        6116                             NMK903     NMK901              |
-|A                                                                        |
-|M        6116                      7.IC46                                |
-|M           82S123.IC154     6116                 6264           NMK903  |
-|A                                                                        |
-|                     6116                         6264                   |
-|                             6116                            SBS-G_01.IC9|
-|                     6116                                                |
-|                                                                         |
-|                                                  NMK901                 |
-|                                                                         |
-|                                                                 NMK903  |
-|                                                                         |
-|                            62256    62256        8.IC27     SBS-G_02.IC4|
-|                                                                         |
-|                            62256    62256        9.IC26                 |
-|SBS-G_03.IC194                                                    10MHz  |
-|-------------------------------------------------------------------------|
-Notes:
-      680000 @ 10.0MHz
-      YM2203 @ 1.5MHz [12/8]
-      M6295 @ 4.0MHz [12/3], pin 7 HIGH
-      VSync 60Hz
-      HSync 15.27kHz
-
-*/
-
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
@@ -3895,8 +3848,7 @@ static MACHINE_DRIVER_START( acrobatm )
 MACHINE_DRIVER_END
 
 
-/* bootleg using Raiden sound hardware */
-static MACHINE_DRIVER_START( tdragonb )
+static MACHINE_DRIVER_START( tdragonb )	/* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -4010,7 +3962,6 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( strahl )
 
 	/* basic machine hardware */
@@ -4054,7 +4005,6 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( hachamf )
 
@@ -4100,7 +4050,6 @@ static MACHINE_DRIVER_START( hachamf )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( macross )
 
@@ -4190,7 +4139,6 @@ static MACHINE_DRIVER_START( blkheart )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( gunnail )
 
 	/* basic machine hardware */
@@ -4234,7 +4182,6 @@ static MACHINE_DRIVER_START( gunnail )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( macross2 )
 
@@ -4883,7 +4830,6 @@ static const ym2151_interface afega_ym2151_intf =
 };
 
 
-
 static MACHINE_DRIVER_START( stagger1 )
 
 	/* basic machine hardware */
@@ -4969,7 +4915,6 @@ static MACHINE_DRIVER_START( popspops )
 	MDRV_VIDEO_UPDATE(bubl2000)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( firehawk )
 
 	/* basic machine hardware */
@@ -5006,8 +4951,6 @@ static MACHINE_DRIVER_START( firehawk )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
-
-
 
 static MACHINE_DRIVER_START( twinactn )
 
@@ -5361,10 +5304,9 @@ ROM_START( mustangb )
 	ROM_LOAD( "mustang.17",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
-/* bootleg manufacturered by TAB AUSTRIA */
 ROM_START( mustangb2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "05.bin",    0x00000, 0x20000, CRC(13c6363b) SHA1(e2c1985d1c8ec9751c47cd7e1b85e007f3aeb6fd) )
+	ROM_LOAD16_BYTE( "05.bin",    0x00000, 0x20000, CRC(13c6363b) SHA1(e2c1985d1c8ec9751c47cd7e1b85e007f3aeb6fd) )	/* bootleg manufacturered by TAB AUSTRIA */
 	ROM_LOAD16_BYTE( "04.bin",    0x00001, 0x20000, CRC(0d06f723) SHA1(28d5899114746d186e1ddd207deb177b31ff614d) )
 
 	ROM_REGION(0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
@@ -5394,8 +5336,6 @@ ROM_START( mustangb2 )
 	ROM_REGION( 0x040000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "02.bin",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
-
-
 
 ROM_START( acrobatm )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -5428,10 +5368,57 @@ ROM_START( acrobatm )
 	ROM_LOAD( "11_ic80.bin",    0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )	/* unknown */
 ROM_END
 
+/*
+
+S.B.S. Gomorrah (and Bio-ship Paladin with correct roms in place)
+UPL, 1993
+
+PCB Layout
+----------
+
+UPL-90062
+|-------------------------------------------------------------------------|
+| LA4460  4558  YM2203   6116       NMK004                   68000        |
+|         3014  M6295    6.IC120                                          |
+|               M6295               8MHz                 62256  10.IC15   |
+|        SBS-G_05.IC160                                                   |
+|               SBS-G_04.IC139                           62256  11.IC14   |
+|DSW2   DSW1             12MHz                                            |
+|                                   82S129.IC69                           |
+|    NMK005                                                               |
+|                           82S135.IC94                                   |
+|                                   NMK902                                |
+|J        6116                             NMK903     NMK901              |
+|A                                                                        |
+|M        6116                      7.IC46                                |
+|M           82S123.IC154     6116                 6264           NMK903  |
+|A                                                                        |
+|                     6116                         6264                   |
+|                             6116                            SBS-G_01.IC9|
+|                     6116                                                |
+|                                                                         |
+|                                                  NMK901                 |
+|                                                                         |
+|                                                                 NMK903  |
+|                                                                         |
+|                            62256    62256        8.IC27     SBS-G_02.IC4|
+|                                                                         |
+|                            62256    62256        9.IC26                 |
+|SBS-G_03.IC194                                                    10MHz  |
+|-------------------------------------------------------------------------|
+Notes:
+      680000 @ 10.0MHz
+      YM2203 @ 1.5MHz [12/8]
+      M6295 @ 4.0MHz [12/3], pin 7 HIGH
+      VSync 60Hz
+      HSync 15.27kHz
+
+*/
+
 ROM_START( bioship )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "2",    0x00000, 0x20000, CRC(acf56afb) SHA1(0e8ec494ab406cfee24cf586059878332265de75) )
-	ROM_LOAD16_BYTE( "1",    0x00001, 0x20000, CRC(820ef303) SHA1(d2ef29557b05abf8ae79a2c7ce0d15a91b36eeff) )
+	ROM_LOAD16_BYTE( "2.ic14",    0x00000, 0x20000, CRC(acf56afb) SHA1(0e8ec494ab406cfee24cf586059878332265de75) )
+	ROM_LOAD16_BYTE( "1.ic15",    0x00001, 0x20000, CRC(820ef303) SHA1(d2ef29557b05abf8ae79a2c7ce0d15a91b36eeff) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "7",         0x000000, 0x10000, CRC(2f3f5a10) SHA1(c1006eb755eec75f69dc7972d78d0c59088eb140) ) /* Characters */
@@ -5677,6 +5664,28 @@ ROM_START( ssmissin )
 	ROM_LOAD( "ssm-pr1.114",  0x0100, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )	/* unknown */
 ROM_END
 
+/*
+
+Air Attack
+Comad, 1996
+
+68000 @ 8MHz
+Z80A @ 2MHz [8/4]
+M6295 @ 1MHz [8/8]. Pin 7 HIGH
+VSync 50Hz
+HSync 15.35kHz
+XTALs 8MHz (for 68000/Z80/M6295), 12MHz (for FPGAs)
+2x 62256 RAM (main program RAM)
+4x 62256 RAM (graphics)
+2x 6264 RAM (graphics)
+1x 6116 RAM (sound program)
+6x 6116 RAM (other/ shared RAM etc)
+2x PROMs
+1x Lattice pLSI1032 FPGA
+1x Actel 1020B FPGA
+
+*/
+
 ROM_START( airattck )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "ue10.bin",     0x000000, 0x20000, CRC(71deb9d8) SHA1(21da5a68a13c9017d787e88f7b293f263fbc6b20) )
@@ -5705,28 +5714,6 @@ ROM_START( airattck )
 	ROM_LOAD( "82s147.uh6",  0x0100, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )	/* unknown */
 ROM_END
 
-/*
-
-Air Attack
-Comad, 1996
-
-68000 @ 8MHz
-Z80A @ 2MHz [8/4]
-M6295 @ 1MHz [8/8]. Pin 7 HIGH
-VSync 50Hz
-HSync 15.35kHz
-XTALs 8MHz (for 68000/Z80/M6295), 12MHz (for FPGAs)
-2x 62256 RAM (main program RAM)
-4x 62256 RAM (graphics)
-2x 6264 RAM (graphics)
-1x 6116 RAM (sound program)
-6x 6116 RAM (other/ shared RAM etc)
-2x PROMs
-1x Lattice pLSI1032 FPGA
-1x Actel 1020B FPGA
-
-*/
-
 ROM_START( airattcka )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "6.uc10",     0x000000, 0x20000, CRC(3572baf0) SHA1(0a2fe3be16d95896dc757ef231b3708093fc7ffa) )
@@ -5754,7 +5741,6 @@ ROM_START( airattcka )
 	ROM_LOAD( "82s129.ug6",  0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* unknown */
 	ROM_LOAD( "82s147.uh6",  0x0100, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )	/* unknown */
 ROM_END
-
 
 ROM_START( strahl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -5876,8 +5862,6 @@ ROM_END
 
 
 /*
-Gunnail (JPN Ver.)
-(c)1992 NMK
 
 Gun Nail
 NMK/Tecmo, 1993
@@ -6231,10 +6215,9 @@ ROM_START( sabotenba )
 	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) )	/* all banked */
 ROM_END
 
-// PCB is marked 'Cactus', actual game has no title screen
 ROM_START( cactus )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
-	ROM_LOAD16_BYTE( "02.bin",  0x00000, 0x40000, CRC(15b2ff2f) SHA1(432cfd58daa0fdbe62157b36ca73eb9af6ce91e9) )
+	ROM_LOAD16_BYTE( "02.bin",  0x00000, 0x40000, CRC(15b2ff2f) SHA1(432cfd58daa0fdbe62157b36ca73eb9af6ce91e9) ) /* PCB is marked 'Cactus', actual game has no title screen */
 	ROM_LOAD16_BYTE( "01.bin",  0x00001, 0x40000, CRC(5b8ba46a) SHA1(617e414fda1bd3e9f391676d312b0cdd4700adee) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
@@ -6362,8 +6345,6 @@ ROM_START( manybloc )
 	ROM_LOAD( "u120.bpr",    0x0320, 0x0100, CRC(576c5984) SHA1(6e9b7f30de0d91cb766a62abc5888ec9af085a27) )	/* unknown */
 ROM_END
 
-
-
 /***************************************************************************
 
                                     Stagger I
@@ -6399,29 +6380,44 @@ ROM_START( stagger1 ) /* Japan only, with later (c) year of 1998 */
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-
 /***************************************************************************
 
                             Red Hawk (c)1997 Afega
 
+  CPU: MC68HC000P10 (68000)
+Sound: Z0840006PSC (Z80)
+       AD-65  rebadged OKI M6295
+       PD2001 rebadged YM2151, 24 pin DIP
+       KA3002 rebadged YM3012, 16 pin DIP
+  OSC: 12.000MHz & 4.000MHz
+  RAM: GM76C256CLL-70 x 6, HT6116-70 x 5, GM76C88AL-12 X 2
+ Dips: 2 x 8 position
+Other: Lattice pLSI 1032 x 2
+       GAL22V10B x 2, GAL16V8B
 
-
-    6116         ym2151     MSM6295   5    4MHz
-    1
-    Z80        pLSI1032    4
-                                      76C88
-       6116   76C256                  76C88
-       6116   76C256
-    2  76C256 76C256
-    3  76C256 76C256
-
-    68000-10        6116
-                    6116
-   SW1                             6
-   SW21                pLSI1032    7
-    12MHz
++-----------------------------------------+
+|   6116  YM3012 YM2151  M6295   5  4MHz  |
+|VOL 1                                    |
+|   Z80        pLSI1032  4                |
+|                                76C88    |
+|J       6116   76C256           76C88    |
+|A       6116   76C256                    |
+|M    2  76C256 76C256                    |
+|M    3  76C256 76C256       GAL          |
+|A SW1                                    |
+|     68000-10       6116                 |
+|                    6116                 |
+|                                   6     |
+|  SW2                 pLSI1032     7     |
+|      12MHz GAL   GAL                    |
++-----------------------------------------+
 
 ***************************************************************************/
+
+static DRIVER_INIT( redhawk )
+{
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
 
 ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
@@ -6504,11 +6500,6 @@ ROM_START( redhawki )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-static DRIVER_INIT( redhawk )
-{
-	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
-}
-
 ROM_START( redhawkb )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rhb-1.bin", 0x000000, 0x020000, CRC(e733ea07) SHA1(b1ffeda633d5e701f0e97c79930a54d7b89a85c5) )
@@ -6529,7 +6520,6 @@ ROM_START( redhawkb )
 	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
-
 
 /***************************************************************************
 
@@ -6597,6 +6587,11 @@ AF1-B1.UC3   MASK ROM read as 27C160  - Backgrounds
 
 ***************************************************************************/
 
+static DRIVER_INIT( grdnstrm )
+{
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
 ROM_START( grdnstrm )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "afega4.u112", 0x000000, 0x040000, CRC(2244713a) SHA1(41ae66a38931c12462ecae53e1e44c3420d0d235) )
@@ -6641,14 +6636,7 @@ ROM_START( grdnstrmk )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-static DRIVER_INIT( grdnstrm )
-{
-	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
-}
-
-/* Pop's Pop's */
-
-/*
+/***************************************************************************
 
 Pop's Pop's by Afega (1999)
 
@@ -6665,7 +6653,7 @@ The pcb might be missing an eprom in a socket
 1x Afega AF1-CF5K custom chip socketed
 2x dipswitch banks
 
-*/
+****************************************************************************/
 
 ROM_START( popspops )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
@@ -6689,7 +6677,7 @@ ROM_START( popspops )
 	ROM_LOAD( "afega2.u95", 0x00000, 0x40000, CRC(ecd8eeac) SHA1(849beba8f04cc322bb8435fa4c26551a6d0dec64) )
 ROM_END
 
-/*
+/****************************************************************************
 Mang-chi by Afega
 
 1x osc 4mhz
@@ -6703,7 +6691,7 @@ Mang-chi by Afega
 1x smd ASIC not marked
 
 Dumped by Corrado Tomaselli
-*/
+****************************************************************************/
 
 ROM_START( mangchi )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
@@ -6767,6 +6755,11 @@ rom11.107   27C040   /
 
 ***************************************************************************/
 
+static DRIVER_INIT( bubl2000 )
+{
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+}
+
 ROM_START( bubl2000 )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom10.112", 0x00000, 0x20000, CRC(87f960d7) SHA1(d22fe1740217ac20963bd9003245850598ccecf2) )
@@ -6794,8 +6787,7 @@ ROM_START( bubl2000 )
 	ROM_LOAD( "rom02.95", 0x00000, 0x40000, CRC(859a86e5) SHA1(7b51964227411a40aac54b9cd9ff64f091bdf2b0) )
 ROM_END
 
-
-/*
+/***************************************************************************
 
 Hot Bubble
 Afega, 1998
@@ -6861,7 +6853,7 @@ Notes:
       * - Unknown PLCC68 IC
       + - Not populated
 
-*/
+***************************************************************************/
 
 ROM_START( hotbubl )
 	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
@@ -6891,12 +6883,7 @@ ROM_START( hotbubl )
 	ROM_LOAD( "s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
 ROM_END
 
-static DRIVER_INIT( bubl2000 )
-{
-	decryptcode( machine, 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
-}
-
-/*
+/***************************************************************************
 
 Fire Hawk - ESD, 2001
 ---------------------
@@ -6936,7 +6923,7 @@ Notes:
       6295 clocks: 1.000MHz (both), sample rate = 1000000 / 132 (both)
             VSync: 56Hz
 
-*/
+***************************************************************************/
 
 ROM_START( firehawk )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 Code */
@@ -6963,28 +6950,57 @@ ROM_START( firehawk )
 	ROM_LOAD( "fhawk_s3.u41", 0x00000, 0x40000, CRC(3fdcfac2) SHA1(c331f2ea6fd682cfb00f73f9a5b995408eaab5cf) )
 ROM_END
 
-/*
+/***************************************************************************
 
-CPU
-1x unknown custom chip
-1x FPGA
-1x oscillator 4.000MHz
-1x oscillator 12.000MHz
-2x AD-65
+Spectrum 2000 (c) 2000 YONA Tech
+
+  CPU: 68HC000FN10 (68000, 68 pin PLCC)
+Sound: Z84C000FEC (Z80, 44 pin PQFP)
+       AD-65 x 2 rebadged OKI M6295
+  OSC: 12.000MHz & 4.000MHz
+  RAM: IS61C256AH-20N x 6, HT6116-70 x 7, UM6164DK-12 X 2
+ Dips: 2 x 8 position
+Other: 208 pin PQFP labeled YONA Tech 2000 K (silkscreened on the PCB as LTC1)
+       GAL16V8B (not dumped)
+
++-----------------------------------------------------+
+|         6116    4MHz  AD-65  2.U101    29F1610.UC1  |
+|VOL    1.U103          AD-65  3.U106                 |
+|         Z80                           61C256        |
++-+                 6116                61C256        |
+  | SW1 SW2         6116                61C256        |
++-+                                     61C256        |
+|                                                     |
+|J                           +--------+               |
+|A                           |  YONA  |               |
+|M                           |  Tech  |               |
+|M      61C256 61C256        | 2000 K |               |
+|A      5.U124 6.U120  GAL   |        |               |
+|             +-------+      +--------+     6116      |
++-+           |MC68000|                     6116      |
+  |           | FN10  |    6164                       |
++-+           |       |    6164          29F1610.UC2  |
+|             +-------+                  29F1610.UC3  |
+|      6116                                      12MHz|
+|      6116                      4.U3                 |
++-----------------------------------------------------+
 
 ROMs
-1x TMS27C512 (1)
-1x MX27C4000 (3)
-2x TMS27C010A (2,4)
-2x TMS27C020 (5,6)
-3x MX29F1610ML (uc1,uc2,uc3)
+YONATech1 is a TMS27C512
+YONATech3 is a MX27C4000
+YONATech2 & YONATech4 are TMS27C010A
+YONATech5 & YONATech6 are TMS27C020
 
-Note
-1x JAMMA connector
-1x trimmer (volume)
-2x8 dip switches
+UC1, UC2 & UC3 are all Micronix MX29F1610ML 16Mb Flash roms
 
-*/
+UC1, UC2 & UC3 have solder pads for both MX29F1610 Flash & 27C160 EPROMs
+
+***************************************************************************/
+
+static DRIVER_INIT( spec2k )
+{
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9,  8, 7,  6,  5,  4, 3,  2,  1,  0 );
+}
 
 ROM_START( spec2k )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 Code */
@@ -6995,11 +7011,11 @@ ROM_START( spec2k )
 	ROM_LOAD( "yonatech1.u103", 0x00000, 0x10000, CRC(ef5acda7) SHA1(e55b36a1598ecbbbad984997d61599dfa3958f60) )
 
 	ROM_REGION( 0x200000, "gfx1",0 ) /* Sprites, 16x16x4 */
-	ROM_LOAD( "u154.bin", 0x00000, 0x200000, CRC(f77b764e) SHA1(37e249bd4d7174c5232261880ce8debf42723716) )
+	ROM_LOAD( "u154.bin", 0x00000, 0x200000, CRC(f77b764e) SHA1(37e249bd4d7174c5232261880ce8debf42723716) ) /* UC1 MX29F1610ML Flash ROM */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Layer 0, 16x16x8 */
-	ROM_LOAD( "u153.bin", 0x000000, 0x200000, CRC(a00bbf8f) SHA1(622f52ef50d52cdd5e6b250d68439caae5c13404) )
-	ROM_LOAD( "u152.bin", 0x200000, 0x200000, CRC(f6423fab) SHA1(253e0791eb58efa1df42e9c74d397e6e65c8c252) )
+	ROM_LOAD( "u153.bin", 0x000000, 0x200000, CRC(a00bbf8f) SHA1(622f52ef50d52cdd5e6b250d68439caae5c13404) ) /* UC2 MX29F1610ML Flash ROM */
+	ROM_LOAD( "u152.bin", 0x200000, 0x200000, CRC(f6423fab) SHA1(253e0791eb58efa1df42e9c74d397e6e65c8c252) ) /* UC3 MX29F1610ML Flash ROM */
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
 	ROM_LOAD( "yonatech4.u3", 0x00000, 0x20000, CRC(5626b08e) SHA1(63207ed6b4fc8684690bf3fe1991a4f3babd73e8) )
@@ -7011,17 +7027,7 @@ ROM_START( spec2k )
 	ROM_LOAD( "yonatech3.u106", 0x00000, 0x80000, CRC(6644c404) SHA1(b7ad3f9f08971432d024ef8be3fa3140f0bbae67) )
 ROM_END
 
-static DRIVER_INIT( spec2k )
-{
-	decryptcode( machine, 23, 22, 21, 20,
-		         19, 18, 17, 13,
-	             14, 15, 16, 12,
-		         11, 10, 9,  8,
-		         7,  6,  5,  4,
-	             3,  2,  1,  0 );
-}
-
-/*
+/***************************************************************************
     1995, Afega
 
     1x TMP68000P-10 (main)
@@ -7040,7 +7046,7 @@ static DRIVER_INIT( spec2k )
 
     1x JAMMA edge connector
     1x trimmer (volume)
-*/
+***************************************************************************/
 
 ROM_START( twinactn )
 	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 Code */
@@ -7153,7 +7159,7 @@ GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning", 
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                             "Pop's Pop's", 0 )
 GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,   "Afega",                             "Mang-Chi", 0 )
-GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech",              "Spectrum 2000 (Euro)", 0 )
+GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "YONA Tech",             "Spectrum 2000 (Euro)", 0 )
 GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
