@@ -2788,7 +2788,7 @@ static MACHINE_DRIVER_START( mmaiko )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(maiko)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(maiko_map)
+	MDRV_CPU_PROGRAM_MAP(mmaiko_map)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
