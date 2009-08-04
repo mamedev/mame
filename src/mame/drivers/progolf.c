@@ -64,6 +64,7 @@ static UINT8 *progolf_fg_fb;
 static UINT8 *progolf_fbram;
 static UINT8 scrollx_hi;
 static UINT8 scrollx_lo;
+static UINT8 progolf_gfx_switch;
 
 static UINT8 sound_cmd;
 
@@ -153,6 +154,7 @@ static WRITE8_HANDLER( progolf_charram_w )
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
 	char_pen = data & 0x07;
+	progolf_gfx_switch = data & 0x40;
 	if(data & 0xf0)
 		char_pen_vreg = data & 0xf0;
 }
@@ -190,7 +192,7 @@ static READ8_HANDLER( progolf_videoram_r )
 {
 	UINT8 *gfx_rom = memory_region(space->machine, "bg_map");
 
-	if(char_pen_vreg & 0x40)
+	if(progolf_gfx_switch)
 		return gfx_rom[offset];
 	else
 		return videoram[offset];
@@ -198,7 +200,7 @@ static READ8_HANDLER( progolf_videoram_r )
 
 static WRITE8_HANDLER( progolf_videoram_w )
 {
-	//if(char_pen_vreg & 0x40)
+	//if(progolf_gfx_switch & 0x40)
 	videoram[offset] = data;
 }
 
