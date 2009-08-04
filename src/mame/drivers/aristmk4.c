@@ -58,9 +58,9 @@ static VIDEO_UPDATE(aristmk4)
 			int tile = (mkiv_vram[count+1]|mkiv_vram[count]<<8) & 0x3ff;
 			int color = ((mkiv_vram[count]) & 0xe0) >> 5;
 			int flipx = ((mkiv_vram[count]) & 0x04);
-			// 0x0800 probably flipy
+			int flipy = ((mkiv_vram[count]) & 0x08);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,x*8,y*8);
 			count+=2;
 		}
 	}
@@ -264,16 +264,18 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 
 static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
-	  AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&mkiv_vram) // video ram -  chips U49 / U50
-	  AM_RANGE(0x0800, 0x1fff) AM_RAM
-      AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
-      AM_RANGE(0x4000, 0x4fff) AM_RAM  // SRAM for meters - U74
-      // VIA
-      AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_DEVREADWRITE("via6522_0",via_r,via_w)
-      // PIA
-      AM_RANGE(0x5380, 0x5383) AM_READWRITE(mkiv_dataout_pia_r,mkiv_datain_pia_w) // RTC data - PORT A , mechanical meters - PORTB ??
-      AM_RANGE(0x5468, 0x5468) AM_READWRITE(test_r,test_w) // audit switch and cage door switch ???
-      AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0800, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
+	AM_RANGE(0x4000, 0x4fff) AM_RAM  // SRAM for meters - U74
+	// VIA
+	AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_DEVREADWRITE("via6522_0",via_r,via_w)
+	// PIA
+	AM_RANGE(0x5380, 0x5383) AM_READWRITE(mkiv_dataout_pia_r,mkiv_datain_pia_w) // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE(test_r,test_w) // audit switch and cage door switch ???
+	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(aristmk4)
@@ -649,8 +651,8 @@ ROM_START( goldenc )
 	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
 	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(49b9c5ef) SHA1(bd1761f41ddb3f19b6b923de77743a2b5ec078e1)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a3eb0c09) SHA1(5a0947f2f36a87dffe4041fbaebaabb1c694bafe)) // game code
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(11b569f7) SHA1(270e1be6bf2a75400af174ceb65436bb6a381a62)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(9714b080) SHA1(41c7d840f600ddff31794ebe949f89c89bd4f2ad)) // game code
 
 	/* SHAPE EPROMS */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
