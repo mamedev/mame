@@ -320,7 +320,7 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 	return mcu_sample_latch;
 }
 
-INLINE DRIVER_INIT( loht_mcu )
+INLINE DRIVER_INIT( m72_8751 )
 {
 	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
@@ -339,6 +339,7 @@ INLINE DRIVER_INIT( loht_mcu )
 	memory_install_write8_device_handler(sndio, dac, 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
 	memory_install_read8_handler (sndio, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
+	/* lohtb2 */
 #if 0
 	/* running the mcu at twice the speed, the following
      * timeouts have to be modified.
@@ -723,13 +724,6 @@ static DRIVER_INIT( mrheli )
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
-
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
-}
-
-static DRIVER_INIT( nspiritj )
-{
-	install_protection_handler(machine, nspirit_code,nspiritj_crc);
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
@@ -2580,8 +2574,8 @@ ROM_START( nspirit )
 	ROM_LOAD16_BYTE( "nin-c-l3.rom", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "nspirit_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "nspirit_i8751.mcu",  0x00000, 0x01000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )	/* sprites */
@@ -2618,8 +2612,8 @@ ROM_START( nspiritj )
 	ROM_LOAD16_BYTE( "c-l3",         0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "nspiritj_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "nin_c-pr.bin",  0x00000, 0x1000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) ) /* checksum correct for Japan version only (see test mode) */
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )	/* sprites */
@@ -3496,13 +3490,13 @@ GAME( 1987, rtypeb,      rtype,    rtype,    rtype,    0,        ROT0,   "bootle
 GAME( 1987, bchopper,    0,        m72,      bchopper, bchopper, ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
 GAME( 1987, mrheli,      bchopper, m72,      bchopper, mrheli,   ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,     0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
-GAME( 1988, nspiritj,    nspirit,  m72,      nspirit,  nspiritj, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )
+GAME( 1988, nspiritj,    nspirit,  m72_8751, nspirit,  m72_8751, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL ) /* some corruption on warning screen (layer enable?) */
 GAME( 1988, imgfight,    0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (revision A, Japan)", 0 )
 GAME( 1988, imgfighto,   imgfight, m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
 GAME( 1989, loht,        0,        m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
 GAME( 1989, lohtj,       loht,     m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, lohtb,       loht,     m72,      loht,     0,        ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
-GAME( 1989, lohtb2,      loht,     m72_8751, loht,     loht_mcu, ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
+GAME( 1989, lohtb2,      loht,     m72_8751, loht,     m72_8751, ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultipl,    0,        xmultipl, xmultipl, xmultipl, ROT0,   "Irem", "X Multiply (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreed,      0,        dbreed,   dbreed,   0,        ROT0,   "Irem", "Dragon Breed (M81 pcb version)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreedm72,   dbreed,   dbreed72, dbreed,   dbreed72, ROT0,   "Irem", "Dragon Breed (M72 pcb version)", GAME_NO_COCKTAIL )
