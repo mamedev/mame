@@ -463,7 +463,6 @@ ROM_START( panther )
 	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	/* taken from ww3, almost surely doesn't match. */
 	ROM_LOAD( "6349-1j-8026.1a",	  0x0000, 0x0200, CRC(ea9c2ada) SHA1(cb720c0d77b24f995e0750b3fa42a68962c7a977) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
 ROM_END
 
