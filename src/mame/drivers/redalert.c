@@ -421,7 +421,7 @@ static MACHINE_DRIVER_START( panther )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(ww3_video)
+	MDRV_IMPORT_FROM(panther_video)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(ww3_audio)

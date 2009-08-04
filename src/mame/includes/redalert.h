@@ -28,5 +28,6 @@ extern UINT8 *redalert_video_control;
 WRITE8_HANDLER( redalert_bitmap_videoram_w );
 
 MACHINE_DRIVER_EXTERN( ww3_video );
+MACHINE_DRIVER_EXTERN( panther_video );
 MACHINE_DRIVER_EXTERN( redalert_video );
 MACHINE_DRIVER_EXTERN( demoneye_video );
