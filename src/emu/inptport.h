@@ -248,6 +248,7 @@ enum
 	IPT_SLOT_STOP1,
 	IPT_SLOT_STOP2,
 	IPT_SLOT_STOP3,
+	IPT_SLOT_STOP4,
 	IPT_SLOT_STOP_ALL,
 
 	/* analog inputs */
