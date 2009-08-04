@@ -73,6 +73,7 @@ static VIDEO_START( progolf )
     scrollx_lo = 0;
 
 	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
+	videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 
@@ -185,10 +186,26 @@ static READ8_HANDLER( audio_command_r )
 	return sound_cmd;
 }
 
+static READ8_HANDLER( progolf_videoram_r )
+{
+	UINT8 *gfx_rom = memory_region(space->machine, "bg_map");
+
+	if(char_pen_vreg & 0x40)
+		return gfx_rom[offset];
+	else
+		return videoram[offset];
+}
+
+static WRITE8_HANDLER( progolf_videoram_w )
+{
+	//if(char_pen_vreg & 0x40)
+	videoram[offset] = data;
+}
+
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE(&progolf_fbram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(progolf_videoram_r,progolf_videoram_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_char_vregs_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(progolf_scrollx_hi_w) //p1 inputs
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(progolf_scrollx_lo_w) //p2 inputs
@@ -449,6 +466,14 @@ ROM_START( progolf )
 	ROM_LOAD( "g8-m.9a",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.10a",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
+	ROM_REGION( 0x1000, "bg_map", ROMREGION_ERASE00 )
+	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
+	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
+	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
+	ROM_COPY( "gfx1", 0x0800, 0x0400, 0x0400 )
+	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0400 )
+	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
+
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
 	ROM_LOAD( "gbm.k4",       0x0020, 0x0020, CRC(1ea3319f) SHA1(809af38e73fa1f30410e7d6b4504fe360ee9b091) )
@@ -470,6 +495,14 @@ ROM_START( progolfa )
 	ROM_LOAD( "g7-m.a8",      0x0000, 0x1000, CRC(16b42975) SHA1(29268a8a660781ff0de77b3b1bfc16edff7be134) )
 	ROM_LOAD( "g8-m.a9",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.a10",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
+
+	ROM_REGION( 0x1000, "bg_map", ROMREGION_ERASE00 )
+	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
+	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
+	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
+	ROM_COPY( "gfx1", 0x0800, 0x0400, 0x0400 )
+	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0400 )
+	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
 
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
@@ -511,7 +544,7 @@ static DRIVER_INIT( progolf )
     CE4F: 60            rts
     */
 
-	decrypted[0xce21] = 0xd0;
+	//decrypted[0xce21] = 0xd0;
 }
 
 static DRIVER_INIT( progolfa )
@@ -530,7 +563,7 @@ static DRIVER_INIT( progolfa )
 		else
 			decrypted[A] = rom[A];
 
-	decrypted[0xce21] = 0xd0; // like progolf
+	//decrypted[0xce21] = 0xd0; // like progolf
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
