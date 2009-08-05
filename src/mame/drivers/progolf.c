@@ -5,7 +5,6 @@
 driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- There's a "rom test error 6" in service mode; the problem is in banking (from 8000 to 87ff)
 - Hazards doesn't have any effect, might be the same issue as above;
 - There's no "rough" display on the sides on the screen, might be the same issue as above;
 - Flip screen support;
@@ -67,8 +66,8 @@ static UINT8 sound_cmd;
 
 static VIDEO_START( progolf )
 {
-    scrollx_hi = 0;
-    scrollx_lo = 0;
+	scrollx_hi = 0;
+	scrollx_lo = 0;
 
 	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
 	videoram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -150,11 +149,9 @@ static WRITE8_HANDLER( progolf_charram_w )
 
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
-//	if(data & 0x40) printf("\n%02x  ",data & 0xf0);
 	char_pen = data & 0x07;
 	progolf_gfx_switch = data & 0xf0;
-	if(data & 0x30)
-		char_pen_vreg = data & 0x30;
+	char_pen_vreg = data & 0x30;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_lo_w )
@@ -188,17 +185,28 @@ static READ8_HANDLER( audio_command_r )
 
 static READ8_HANDLER( progolf_videoram_r )
 {
-	UINT8 *gfx_rom = memory_region(space->machine, "bg_map");
+	UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
 
-//	if(progolf_gfx_switch & 0x40) printf("%04x-%04x ",offset,gfx_rom[offset]);
-	if      (progolf_gfx_switch == 0x50)
-		return gfx_rom[offset];
-	else if (progolf_gfx_switch == 0x60)
-		return gfx_rom[offset + 0x1000];
-	else if (progolf_gfx_switch == 0x70)
-		return gfx_rom[offset + 0x2000];
-	else
-		return videoram[offset];
+	if (offset >= 0x0800)
+	{
+		if      (progolf_gfx_switch == 0x50)
+			return gfx_rom[offset];
+		else if (progolf_gfx_switch == 0x60)
+			return gfx_rom[offset + 0x1000];
+		else if (progolf_gfx_switch == 0x70)
+			return gfx_rom[offset + 0x2000];
+		else
+			return videoram[offset];
+	} else {
+		if      (progolf_gfx_switch == 0x10)
+			return gfx_rom[offset];
+		else if (progolf_gfx_switch == 0x20)
+			return gfx_rom[offset + 0x1000];
+		else if (progolf_gfx_switch == 0x30)
+			return gfx_rom[offset + 0x2000];
+		else
+			return videoram[offset];
+	}
 }
 
 static WRITE8_HANDLER( progolf_videoram_w )
@@ -471,15 +479,6 @@ ROM_START( progolf )
 	ROM_LOAD( "g8-m.9a",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.10a",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
-	ROM_REGION( 0x3000, "bg_map", ROMREGION_ERASE00 )
-//	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
-//	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
-//	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
-	ROM_COPY( "gfx1", 0x0800, 0x0800, 0x0800 )
-	ROM_COPY( "gfx1", 0x1800, 0x1800, 0x0800 )
-	ROM_COPY( "gfx1", 0x2800, 0x2800, 0x0800 )
-//	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
-
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
 	ROM_LOAD( "gbm.k4",       0x0020, 0x0020, CRC(1ea3319f) SHA1(809af38e73fa1f30410e7d6b4504fe360ee9b091) )
@@ -501,15 +500,6 @@ ROM_START( progolfa )
 	ROM_LOAD( "g7-m.a8",      0x0000, 0x1000, CRC(16b42975) SHA1(29268a8a660781ff0de77b3b1bfc16edff7be134) )
 	ROM_LOAD( "g8-m.a9",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.a10",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
-
-	ROM_REGION( 0x3000, "bg_map", ROMREGION_ERASE00 )
-//	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
-//	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
-//	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
-	ROM_COPY( "gfx1", 0x0800, 0x0800, 0x0800 )
-	ROM_COPY( "gfx1", 0x1800, 0x1800, 0x0800 )
-	ROM_COPY( "gfx1", 0x2800, 0x2800, 0x0800 )
-//	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
 
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
