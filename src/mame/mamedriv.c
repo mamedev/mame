@@ -5508,7 +5508,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( popn7 )		/* not sure, doesn't boot yet (c) 2001 */
 
 	/* PowerPC based Konami games */
-	DRIVER( fiveside )	/*   479 (c)1995 */
+	DRIVER( fiveside )	/* GX479 (c)1995 */
 	DRIVER( thunderh )	/* GX680 (c)1996 Euro EAA */
 	DRIVER( thunderhu )	/* GX680 (c)1996 USA UAA */
 	DRIVER( slrasslt )	/* GX792 (c)1996 */
@@ -5517,8 +5517,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gticlubj )	/* GX688 (c)1996 Japan JAA */
 	DRIVER( hangplt )	/* GX685 (c)1997 */
 	DRIVER( nbapbp )	/* GX778 (c)1998 */
-	DRIVER( terabrst )	/* GX??? (c)1998 USA UEL 1998/07/17*/
-	DRIVER( terabrsta )	/* GX??? (c)1998 Asia AAA 1998/02/25 */
+	DRIVER( terabrst )	/* GX715 (c)1998 USA UEL 1998/07/17*/
+	DRIVER( terabrsta )	/* GX715 (c)1998 Asia AAA 1998/02/25 */
 	DRIVER( gradius4 )	/* GX837 (c)1999 */
 	DRIVER( sscope )	/* GX830 (c)1999 */
 	DRIVER( sscopea )	/* GX830 (c)1999 */
@@ -5526,10 +5526,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( racingj )	/* GX676 (c)1998 */
 	DRIVER( racingj2 )	/* GX888 (c)1999 */
 	DRIVER( thrilld )	/* GX713 (c)1998 */
-	DRIVER( midnrun )	/* GX??? (c)1995 */
+	DRIVER( midnrun )	/* GX476 (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
 	DRIVER( windheatu )	/* GX677 (c)1996 */
-	DRIVER( jetwave )	/* GX??? (c)1996 */
+	DRIVER( windheatj )	/* GX677 (c)1996 */
+	DRIVER( jetwave )	/* GX678 (c)1996 */
 
 	/* Konami M2 games */
 	DRIVER( polystar )	/* GX623 (c)1997 */
