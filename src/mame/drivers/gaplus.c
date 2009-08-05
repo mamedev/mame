@@ -817,9 +817,9 @@ static void unpack_gfx(running_machine *machine)
 }
 
 
-GAME( 1984, gaplus,   0,        gaplus,   gaplus,   56_58l, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   56_58l, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gapluso,  gaplus,   gaplus,   gapluso,  56_58,  ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusa,  gaplus,   gaplus,   gapluso,  58_56,  ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, 56_58l, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, 56_58l, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplus,   0,        gaplus,   gaplus,   56_58l, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   56_58l, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gapluso,  gaplus,   gaplus,   gapluso,  56_58,  ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplusa,  gaplus,   gaplus,   gapluso,  58_56,  ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, 56_58l, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, 56_58l, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

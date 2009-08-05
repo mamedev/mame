@@ -1439,13 +1439,13 @@ static DRIVER_INIT( fax )
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, sidetrac, ROT0, "Exidy", "Side Track", GAME_SUPPORTS_SAVE )
-GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Targ", GAME_SUPPORTS_SAVE )
-GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spectar,  0,       spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas", GAME_SUPPORTS_SAVE )
+GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, sidetrac, ROT0, "Exidy", "Side Track", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Targ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spectar,  0,       spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )

@@ -3318,6 +3318,6 @@ GAME( 1981, gallag,   galaga,  galagab, galaga,   galaga,  ROT90, "bootleg", "Ga
 GAME( 1984, gatsbee,  galaga,  galagab, gatsbee,  gatsbee, ROT90, "hack", "Gatsbee", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1982, xevios,   xevious, xevious, xevious,  xevios,  ROT90, "bootleg", "Xevios", GAME_SUPPORTS_SAVE )
-GAME( 1982, battles,  xevious, battles, xevious,  battles, ROT90, "bootleg", "Battles", GAME_SUPPORTS_SAVE )
+GAME( 1982, battles,  xevious, battles, xevious,  battles, ROT90, "bootleg", "Battles", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1982, dzigzag,  digdug,  dzigzag, digdug,   0,       ROT90, "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )

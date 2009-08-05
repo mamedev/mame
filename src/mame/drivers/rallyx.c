@@ -1272,9 +1272,9 @@ ROM_END
 
 
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx,   0, ROT0,  "Namco", "Rally X", 0 )
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   0, ROT0,  "[Namco] (Midway license)", "Rally X (Midway)", 0 )
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X", 0 )
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   0, ROT0,  "Namco", "Rally X", GAME_IMPERFECT_SOUND )
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   0, ROT0,  "[Namco] (Midway license)", "Rally X (Midway)", GAME_IMPERFECT_SOUND )
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X", GAME_IMPERFECT_SOUND )
 GAME( 1981, jungler,  0,        jungler,  jungler,  0, ROT90, "Konami", "Jungler", 0 )
 GAME( 1981, junglers, jungler,  jungler,  jungler,  0, ROT90, "[Konami] (Stern license)", "Jungler (Stern)", 0 )
 GAME( 1982, tactcian, 0,        tactcian, tactcian, 0, ROT90, "[Konami] (Sega license)", "Tactician (set 1)", 0 )

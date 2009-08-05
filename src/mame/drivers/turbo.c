@@ -1768,10 +1768,10 @@ static DRIVER_INIT( buckrog_enc )
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,    turbo,    0,           ROT270,             "Sega", "Turbo", 0, layout_turbo )
-GAMEL( 1981, turboa,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 1)", 0, layout_turbo )
-GAMEL( 1981, turbob,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 2)", 0, layout_turbo )
-GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", 0, layout_subroc3d )
-GAMEL( 1982, buckrog,  0,       buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", 0, layout_buckrog )
-GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_COLORS, layout_buckrog ) // bad PROM
-GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", 0, layout_buckrog )
+GAMEL( 1981, turbo,    0,       turbo,    turbo,    0,           ROT270,             "Sega", "Turbo", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboa,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 1)", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbob,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 2)", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", GAME_IMPERFECT_SOUND , layout_subroc3d )
+GAMEL( 1982, buckrog,  0,       buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS, layout_buckrog ) // bad PROM
+GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", GAME_IMPERFECT_SOUND , layout_buckrog )
