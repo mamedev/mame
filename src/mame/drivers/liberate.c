@@ -242,10 +242,9 @@ static WRITE8_HANDLER( prosport_charram_w )
 
 static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0000, 0x03ff) AM_SHARE(2) AM_RAM
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE(&prosport_bg_vram)
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1ff isn't charram!
-	AM_RANGE(0x2000, 0x23ff) AM_SHARE(2) AM_RAM
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
  	AM_RANGE(0x2400, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&videoram)
@@ -891,12 +890,12 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+//	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
