@@ -28,9 +28,13 @@ To do:
 - Protection emulation instead of patching the roms
 - A few graphical bugs
 - vbowl, vbowlj: trackball support, sound is slow and low volume
+
 - lhb: in the copyright screen the '5' in '1995' is drawn by the cpu on layer 5,
   but with wrong colors (since the top nibble of the affected pixels is left to 0xf)
+  (drgnwrld is like this too, maybe hacked, or a cheap year replacement by IGS)
+  
 - dbc: in the title screen the '5' in '1995' is drawn by the cpu with wrong colors.
+  (see above comment)
   Also the background palette is wrong since the fade routine is called with wrong
   parameters, but in this case the PCB does the same.
 
@@ -440,7 +444,7 @@ static void lhb_decrypt(running_machine *machine)
 }
 
 
-static void chindrag_decrypt(running_machine *machine)
+static void drgnwrld_type3_decrypt(running_machine *machine)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
@@ -468,8 +472,40 @@ static void chindrag_decrypt(running_machine *machine)
 	}
 }
 
+static void drgnwrld_type2_decrypt(running_machine *machine)
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
-static void drgnwrld_decrypt(running_machine *machine)
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		if(((i & 0x000090) == 0x000000) || ((i & 0x002004) != 0x002004))
+		  x ^= 0x0004;
+
+		if((((i & 0x000050) == 0x000000) || ((i & 0x000142) != 0x000000)) && ((i & 0x000150) != 0x000000))
+		  x ^= 0x0020;
+
+		if(((i & 0x004280) == 0x004000) || ((i & 0x004080) == 0x000000))
+		  x ^= 0x0200;
+
+		if((i & 0x0011a0) != 0x001000)
+		  x ^= 0x0200;
+
+		if((i & 0x000180) == 0x000100)
+		  x ^= 0x0200;
+
+		if((x & 0x0024) == 0x0020 || (x & 0x0024) == 0x0004)
+		  x ^= 0x0024;
+
+		src[i] = x;
+	}
+}
+
+static void drgnwrld_type1_decrypt(running_machine *machine)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
@@ -635,7 +671,7 @@ static void chmplst2_decrypt_gfx(running_machine *machine)
 	free(result_data);
 }
 
-static void chindrag_gfx_decrypt(running_machine *machine)
+static void drgnwrld_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
@@ -752,7 +788,7 @@ static READ16_HANDLER( chmplst2_magic_r )
 
 
 
-static WRITE16_HANDLER( chindrag_magic_w )
+static WRITE16_HANDLER( drgnwrld_magic_w )
 {
 	COMBINE_DATA(&igs_magic[offset]);
 
@@ -777,7 +813,7 @@ static WRITE16_HANDLER( chindrag_magic_w )
 	}
 }
 
-static READ16_HANDLER( chindrag_magic_r )
+static READ16_HANDLER( drgnwrld_magic_r )
 {
 	switch(igs_magic[0])
 	{
@@ -1078,7 +1114,7 @@ static READ16_HANDLER( xymg_magic_r )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( chindrag, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
@@ -1086,8 +1122,8 @@ static ADDRESS_MAP_START( chindrag, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8( "ym", ym3812_w, 0x00ff )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( chindrag_magic_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( chindrag_magic_r )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( drgnwrld_magic_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( drgnwrld_magic_r )
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
 	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs_blit_x_w )
@@ -1314,7 +1350,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static INPUT_PORTS_START( chindrac )
+static INPUT_PORTS_START( drgnwrldc )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -1410,7 +1446,7 @@ static INPUT_PORTS_START( chindrac )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( chindrag )
+static INPUT_PORTS_START( drgnwrld )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -1631,7 +1667,7 @@ static INPUT_PORTS_START( chmplst2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( drgnwrld )
+static INPUT_PORTS_START( drgnwrldj )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -2440,10 +2476,10 @@ static MACHINE_DRIVER_START( chmplst2 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( chindrag )
+static MACHINE_DRIVER_START( drgnwrld )
 	MDRV_IMPORT_FROM(igs_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chindrag)
+	MDRV_CPU_PROGRAM_MAP(drgnwrld)
 	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
@@ -2566,8 +2602,8 @@ static DRIVER_INIT( drgnwrld )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	drgnwrld_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
@@ -2585,12 +2621,12 @@ static DRIVER_INIT( drgnwrld )
 	rom[0x2a16c/2]	=	0x606c;		// 02A16C: 676C        beq 2a1da    (ASIC11 CHECK PORT ERROR 2)
 }
 
-static DRIVER_INIT( drgwrld3 )
+static DRIVER_INIT( drgnwrldv30 )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	drgnwrld_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
@@ -2609,12 +2645,39 @@ static DRIVER_INIT( drgwrld3 )
 	rom[0x2a162/2]	=	0x606c;		// 02A162: 676C        beq 2a1d0    (ASIC11 CHECK PORT ERROR 2)
 }
 
-static DRIVER_INIT( chindrac )
+static DRIVER_INIT( drgnwrldv21 )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	drgnwrld_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type2_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+
+	// PROTECTION CHECKS
+	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
+	rom[0x11ca8/2]	=	0x606c;		// ??
+	rom[0x23d5e/2]	=	0x606c;		// 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
+	rom[0x23fd0/2]	=	0x606c;		// 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
+	rom[0x24170/2]	=	0x606c;		// 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
+	rom[0x24348/2]	=	0x606c;		// 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
+	rom[0x2454e/2]	=	0x606c;		// 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
+	rom[0x246cc/2]	=	0x606c;		// 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
+	rom[0x24922/2]	=	0x606c;		// 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
+	rom[0x24b66/2]	=	0x606c;		// 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
+	rom[0x24de2/2]	=	0x606c;		// 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
+	rom[0x2502a/2]	=	0x606c;		// 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
+	rom[0x25556/2]	=	0x6000;		// 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+	rom[0x269de/2]	=	0x606c;		// ??
+	rom[0x2766a/2]	=	0x606c;		// ??
+	rom[0x2a830/2]	=	0x606c;		// ??	
+}
+
+
+static DRIVER_INIT( drgnwrldv10c )
+{
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -2630,23 +2693,24 @@ static DRIVER_INIT( chindrac )
 	rom[0x24f8a/2]	=	0x606c;		// 024F8A: 676C        beq 24ff8    (ASIC12 CHECK PORT ERROR 2)
 	rom[0x254b6/2]	=	0x6000;		// 0254B6: 6700 E5FC   beq 23ab4    (ASIC12 CHECK PORT ERROR 1)
 	rom[0x2a23a/2]	=	0x606c;		// 02A23A: 676C        beq 2a2a8    (ASIC11 CHECK PORT ERROR 2)
+
 }
 
-static DRIVER_INIT( chindrah )
+static DRIVER_INIT( drgnwrldv11h )
 {
-	drgnwrld_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	// the protection checks are already pathed out like we do!
 }
 
-static DRIVER_INIT( chindrag )
+static DRIVER_INIT( drgnwrldv21j )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	chindrag_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type3_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -2667,12 +2731,12 @@ static DRIVER_INIT( chindrag )
 	rom[0x2a870/2]	=	0x606c;		// 02A870: 676C        beq 2a8de    (ASIC11 CHECK PORT ERROR 2)
 }
 
-static DRIVER_INIT( chugokur )
+static DRIVER_INIT( drgnwrldv20j )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	chindrag_decrypt(machine);
-	chindrag_gfx_decrypt(machine);
+	drgnwrld_type3_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -2689,7 +2753,7 @@ static DRIVER_INIT( chugokur )
 	rom[0x24f8e/2]	=	0x606c;		// 024F8E: 676C        beq 24ffc
 	rom[0x254ba/2]	=	0x6000;		// 0254BA: 6700 E620   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
 	rom[0x26a52/2]	=	0x606c;		// 026A52: 676C        beq 26ac0    (ASIC12 CHECK PORT ERROR 1)
-	// different from chindrag:
+	// different from drgnwrldv21j:
 	rom[0x276a0/2]	=	0x606c;		// 0276A0: 676C        beq 2770e    (CHECK PORT ERROR 3)
 	rom[0x2a86e/2]	=	0x606c;		// 02A86E: 676C        beq 2a8dc    (ASIC11 CHECK PORT ERROR 2)
 }
@@ -2949,7 +3013,7 @@ ROMs:
 
 ***************************************************************************/
 
-ROM_START( drgwrld3 )
+ROM_START( drgnwrldv30 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0300.u3", 0x00000, 0x80000, CRC(5ac243e5) SHA1(50cccff0307239187ac2b65331ad2bcc666f8033) )
 
@@ -2959,6 +3023,18 @@ ROM_START( drgwrld3 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
+
+ROM_START( drgnwrldv21 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "china-dr-v-0210.u3", 0x00000, 0x80000, CRC(60c2b018) SHA1(58563e3ccb51bd9d8362aa17c23743bb5a593c3b) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "china-dr-sp.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -2996,7 +3072,7 @@ The PCB is perfectly working, empty spaces and empty sockets are clearly intende
 
 ***************************************************************************/
 
-ROM_START( chindrac )
+ROM_START( drgnwrldv10c )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
 
@@ -3035,7 +3111,7 @@ SOUND DATA?: "CHINA DRAGON U44"
 
 ***************************************************************************/
 
-ROM_START( chugokur )
+ROM_START( drgnwrldv20j )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "china_jp.v20", 0x00000, 0x80000, CRC(9e018d1a) SHA1(fe14e6344434cabf43685e50fd49c90f05f565be) )
 
@@ -3048,7 +3124,7 @@ ROM_START( chugokur )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) ) // original label: "sp"
 ROM_END
 
-ROM_START( chindrag )
+ROM_START( drgnwrldv21j )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v-021j", 0x00000, 0x80000, CRC(2f87f6e4) SHA1(d43065b078fdd9605c121988ad3092dce6cf0bf1) )
 
@@ -3066,7 +3142,7 @@ ROM_END
 
 ***************************************************************************/
 
-ROM_START( chindrah )
+ROM_START( drgnwrldv11h )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "c_drgn_hk.u3", 0x00000, 0x80000, CRC(182037ce) SHA1(141b698777533e57493e588d2526523d4bd3e17d) )
 
@@ -3360,9 +3436,11 @@ GAME( 1996, xymg,     0,        xymg,     xymg,     xymg,     ROT0, "IGS",      
 GAME( 1996, grtwall,  xymg,     grtwall,  grtwall,  grtwall,  ROT0, "IGS",        "Wan Li Chang Cheng (V638C)",           0 )
 GAME( 1996, vbowl,    0,        vbowl,    vbowl,    vbowl,    ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,   vbowl,    vbowl,    vbowlj,   vbowlj,   ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1997, drgnwrld, 0,        chindrag, drgnwrld, drgnwrld, ROT0, "IGS",        "Dragon World (World, V0400)",          0 )
-GAME( 1995, drgwrld3, drgnwrld, chindrag, drgnwrld, drgwrld3, ROT0, "IGS",        "Dragon World (World, V0300)",          0 )
-GAME( 1995, chindrag, drgnwrld, chindrag, chindrag, chindrag, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        0 )
-GAME( 1995, chugokur, drgnwrld, chindrag, chindrag, chugokur, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        0 )
-GAME( 1995, chindrac, drgnwrld, chindrag, chindrac, chindrac, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        0 )
-GAME( 1995, chindrah, drgnwrld, chindrag, chindrac, chindrah, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", 0 )
+
+GAME( 1997, drgnwrld,     0,        drgnwrld, drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
+GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )
+GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          0 )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld, drgnwrldj, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        0 )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld, drgnwrldj, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        0 )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld, drgnwrldc, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        0 )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld, drgnwrldc, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", 0 )

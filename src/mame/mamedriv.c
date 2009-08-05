@@ -8039,17 +8039,18 @@ Other Sun games
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
-	DRIVER( chindrag )	/* (c) 1995 */
-	DRIVER( chugokur )	/* (c) 1995 */
 	DRIVER( chmplst2 )	/* (c) 1996 */
 	DRIVER( xymg )		/* (c) 1996 */
 	DRIVER( grtwall )	/* (c) 1996 */
 	DRIVER( vbowl )		/* (c) 1996 */
 	DRIVER( vbowlj )	/* (c) 1996 */
 	DRIVER( drgnwrld )	/* (c) 1997 */
-	DRIVER( drgwrld3 )	/* (c) 1995 */
-	DRIVER( chindrac )	/* (c) 1995 */
-	DRIVER( chindrah )	/* (c) 1995 */
+	DRIVER( drgnwrldv30 )	/* (c) 1995 */
+	DRIVER( drgnwrldv21 )	/* (c) 1995 */
+	DRIVER( drgnwrldv21j )	/* (c) 1995 */
+	DRIVER( drgnwrldv20j )	/* (c) 1995 */
+	DRIVER( drgnwrldv10c )	/* (c) 1995 */
+	DRIVER( drgnwrldv11h )	/* (c) 1995 */
 
 	DRIVER( lordgun )	/* (c) 1994 */
 	DRIVER( hfh )		/* (c) 199? */
