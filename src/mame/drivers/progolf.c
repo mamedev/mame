@@ -2,9 +2,11 @@
 
 18 Holes Pro Golf (c) 1981 Data East
 
-driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
+driver by Angelo Salese and Roberto Zandona',
+based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
+- Map display is (almost) correct but color pens aren't;
 - Flip screen support;
 
 =========================================================================================
@@ -518,27 +520,6 @@ static DRIVER_INIT( progolf )
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xb000 ; A < 0x10000 ; A++)
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
-
-	/*
-    CE12: B1 66         lda  ($66),y
-    CE14: 20 39 A7      jsr  $C759
-        C759: E6 66         inc  $66
-        C75B: D0 02         bne  $C75F
-        C75D: E6 67         inc  $67
-        C75F: 60            rts
-    CE17: C9 FD         cmp  #$FD
-    CE19: F0 44         beq  $CE3F
-    CE1B: C9 FE         cmp  #$FE
-    CE1D: F0 13         beq  $CE32
-    CE1F: C9 FF         cmp  #$FF
-    CE21: F0 4C         beq  $CE4F <- might go out there, this is the only branch in the entire rom that points to the rts
-    ...
-    CE48: 90 A3         bcc  $CE0D
-    CE4A: E6 69         inc  $69
-    CE4C: 4C 0D AE      jmp  $CE0D
-    CE4F: 60            rts
-    */
-
 }
 
 static DRIVER_INIT( progolfa )
@@ -552,13 +533,14 @@ static DRIVER_INIT( progolfa )
 
 	/* data is likely to not be encrypted, just the opcodes are. */
 	for (A = 0x0000 ; A < 0x10000 ; A++)
+	{
 		if (A & 1)
 			decrypted[A] = BITSWAP8(rom[A],6,4,7,5,3,2,1,0);
 		else
 			decrypted[A] = rom[A];
-
+	}
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
-GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NO_COCKTAIL )
+GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

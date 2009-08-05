@@ -3,7 +3,7 @@
   Sega Naomi / Naomi 2 / Atomiswave
 
   Driver by Samuele Zannoli, R. Belmont, ElSemi,
-            David Haywood and Angelo Salese
+            David Haywood, Angelo Salese and Olivier Galibert
 
  Notes:
   NAMCO Naomi games require a Namco specific BIOS
