@@ -971,7 +971,7 @@ WRITE8_HANDLER( snes_w_io )
 			} break;
 		case SETINI:	/* Screen mode/video select */
 			/* FIXME: We only support line count here */
-			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 224;
+			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 225;
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x8) != (snes_ram[SETINI] & 0x8) )
 				mame_printf_debug( "Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off" );
