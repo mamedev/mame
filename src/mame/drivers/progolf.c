@@ -5,8 +5,6 @@
 driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- Hazards doesn't have any effect, might be the same issue as above;
-- There's no "rough" display on the sides on the screen, might be the same issue as above;
 - Flip screen support;
 
 =========================================================================================
