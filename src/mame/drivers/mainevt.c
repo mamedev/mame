@@ -263,14 +263,14 @@ static INPUT_PORTS_START( mainevt )
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )		/* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )		PORT_DIPLOCATION("SW2:4,5")	// Typo on US manual "SW2:1,2"
 	PORT_DIPSETTING(    0x00, "60" )
 	PORT_DIPSETTING(    0x08, "70" )
-	PORT_DIPSETTING(    0x10, "80" )
+	PORT_DIPSETTING(    0x10, "80" )	// factory default
 	PORT_DIPSETTING(    0x18, "90" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )	// factory default
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
@@ -339,13 +339,13 @@ static INPUT_PORTS_START( devstors )
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x02, "3" )		// factory default
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "150 and every 200" )
-	PORT_DIPSETTING(    0x10, "150 and every 250" )
+	PORT_DIPSETTING(    0x10, "150 and every 250" )	// factory default
 	PORT_DIPSETTING(    0x08, "150 Only" )
 	PORT_DIPSETTING(    0x00, "200 Only" )
 INPUT_PORTS_END
