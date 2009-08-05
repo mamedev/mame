@@ -5,12 +5,9 @@
 driver by Angelo Salese, based on early work by Pierpaolo Prazzoli and David Haywood
 
 TODO:
-- We need to patch a rom to get the games to do more; there's also a "rom test error 6"
-  in service mode (that is the g2-m.6a rom in progolf and g2-m.a6 in progolfa); probably
-  not a bad dump (progolf and progolfa have different encryption);
+- There's a "rom test error 6" in service mode; the problem is in banking (from 8000 to 87ff)
 - Hazards doesn't have any effect, might be the same issue as above;
 - There's no "rough" display on the sides on the screen, might be the same issue as above;
-- Map displays are currently wrong, they are drawn with the framebuffer;
 - Flip screen support;
 
 =========================================================================================
@@ -153,10 +150,11 @@ static WRITE8_HANDLER( progolf_charram_w )
 
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
+//	if(data & 0x40) printf("\n%02x  ",data & 0xf0);
 	char_pen = data & 0x07;
-	progolf_gfx_switch = data & 0x40;
-	if(data & 0xf0)
-		char_pen_vreg = data & 0xf0;
+	progolf_gfx_switch = data & 0xf0;
+	if(data & 0x30)
+		char_pen_vreg = data & 0x30;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_lo_w )
@@ -192,8 +190,13 @@ static READ8_HANDLER( progolf_videoram_r )
 {
 	UINT8 *gfx_rom = memory_region(space->machine, "bg_map");
 
-	if(progolf_gfx_switch)
+//	if(progolf_gfx_switch & 0x40) printf("%04x-%04x ",offset,gfx_rom[offset]);
+	if      (progolf_gfx_switch == 0x50)
 		return gfx_rom[offset];
+	else if (progolf_gfx_switch == 0x60)
+		return gfx_rom[offset + 0x1000];
+	else if (progolf_gfx_switch == 0x70)
+		return gfx_rom[offset + 0x2000];
 	else
 		return videoram[offset];
 }
@@ -468,13 +471,14 @@ ROM_START( progolf )
 	ROM_LOAD( "g8-m.9a",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.10a",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
-	ROM_REGION( 0x1000, "bg_map", ROMREGION_ERASE00 )
-	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
-	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
-	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
-	ROM_COPY( "gfx1", 0x0800, 0x0400, 0x0400 )
-	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0400 )
-	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
+	ROM_REGION( 0x3000, "bg_map", ROMREGION_ERASE00 )
+//	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
+//	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
+//	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
+	ROM_COPY( "gfx1", 0x0800, 0x0800, 0x0800 )
+	ROM_COPY( "gfx1", 0x1800, 0x1800, 0x0800 )
+	ROM_COPY( "gfx1", 0x2800, 0x2800, 0x0800 )
+//	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
 
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
@@ -498,13 +502,14 @@ ROM_START( progolfa )
 	ROM_LOAD( "g8-m.a9",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.a10",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
-	ROM_REGION( 0x1000, "bg_map", ROMREGION_ERASE00 )
-	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
-	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
-	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
-	ROM_COPY( "gfx1", 0x0800, 0x0400, 0x0400 )
-	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0400 )
-	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
+	ROM_REGION( 0x3000, "bg_map", ROMREGION_ERASE00 )
+//	ROM_COPY( "gfx1", 0x0c00, 0x0000, 0x0100 )
+//	ROM_COPY( "gfx1", 0x1c00, 0x0100, 0x0100 )
+//	ROM_COPY( "gfx1", 0x2c00, 0x0200, 0x0100 )
+	ROM_COPY( "gfx1", 0x0800, 0x0800, 0x0800 )
+	ROM_COPY( "gfx1", 0x1800, 0x1800, 0x0800 )
+	ROM_COPY( "gfx1", 0x2800, 0x2800, 0x0800 )
+//	ROM_COPY( "gfx1", 0x2800, 0x0c00, 0x0400 )
 
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
@@ -523,7 +528,7 @@ static DRIVER_INIT( progolf )
 	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
 
 	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0xb000;A < 0x10000;A++)
+	for (A = 0xb000 ; A < 0x10000 ; A++)
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
 
 	/*
@@ -546,7 +551,6 @@ static DRIVER_INIT( progolf )
     CE4F: 60            rts
     */
 
-	//decrypted[0xce21] = 0xd0;
 }
 
 static DRIVER_INIT( progolfa )
@@ -565,9 +569,8 @@ static DRIVER_INIT( progolfa )
 		else
 			decrypted[A] = rom[A];
 
-	//decrypted[0xce21] = 0xd0; // like progolf
 }
 
 /* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
 GAME( 1981, progolf,  0,       progolf, progolf, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // doesn't display anything
+GAME( 1981, progolfa, progolf, progolf, progolf, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
