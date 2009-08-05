@@ -82,11 +82,17 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 {
 	int tile;
 
-	/* TODO: bits 0-3 are used and there's an unimplemented per-tile flip y / +0x10 tile banking, understand where. */
+	/*
+		robiza notes:
+		- flip y (handled with a +0x10 tile banking) depends only by position of the tile in the screen
+		- bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
+	*/
 
 	tile = (prosport_bg_vram[tile_index] & 0xf0)>>4;
-//  if(!(tile & 0x08)) { tile+=0x10; }
-	tile+= deco16_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
+
+	if (tile_index & 0x8) tile += 0x10;
+
+	tile += deco16_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
 	SET_TILE_INFO(8, tile, 0, 0);
 }
@@ -383,13 +389,13 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			sy2=sy+16;
 		}
 
-    	drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
-        		code,
+	drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
+	        		code,
 				color,
 				fx,fy,
 				sx,sy,0);
-        if (multi)
-    		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
+	if (multi)
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_region],
 				code2,
 				color,
 				fx,fy,
@@ -468,7 +474,7 @@ static void prosoccr_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		fy = spriteram[offs+0] & 2;
 
     	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-        		code,
+        			code,
 				0,
 				fx,fy,
 				sx,sy,0);
@@ -502,7 +508,7 @@ VIDEO_UPDATE( prosport )
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
-    scrolly = ((deco16_io_ram[0] & 0x8)<<5);
+	scrolly = ((deco16_io_ram[0] & 0x8)<<5);
 	scrollx = ((deco16_io_ram[0] & 0x2)<<7) | (deco16_io_ram[1]);
 
 	tilemap_set_scrolly(background_tilemap,0,scrolly);
