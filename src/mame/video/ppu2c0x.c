@@ -19,6 +19,7 @@
 
     * Micro Machines has minor rendering glitches (needs better timing).
     * Mach Rider has minor road rendering glitches (needs better timing).
+    * Rad Racer demonstrates road glitches: it changes horizontal scrolling mid-line.
 
 ******************************************************************************/
 
@@ -380,7 +381,6 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 
 	const pen_t *color_table;
 	const pen_t *paldata;
-	// const UINT8 *sd;
 
 	int tilecount = 0;
 
@@ -447,19 +447,16 @@ static void draw_background( const device_config *device, UINT8 *line_priority )
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
-			UINT8 plane1, plane2;	// use extended size so I can shift!
+			UINT8 plane1, plane2;
 			paldata = &color_table[4 * (((color_byte >> color_bits) & 0x03))];
-			// start = scroll_y_fine * line_modulo;
 
 			// need to read 0x0000 or 0x1000 + 16*nametable data
 			address = ((this_ppu->tile_page) ? 0x1000 : 0) + (page2 * 16);
 			// plus something that accounts for y
-			// address -= (scanline % 8);
 			address += scroll_y_fine;
 
 			plane1 = memory_read_byte(device->space[0], (address & 0x1fff));
 			plane2 = memory_read_byte(device->space[0], (address + 8) & 0x1fff);
-			// plane2 = plane2 << 1;
 
 			/* render the pixel */
 			for (i = 0; i < 8; i++)
@@ -618,30 +615,23 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		plane1 = memory_read_byte(device->space[0], (index1 + sprite_line) & 0x1fff);
 		plane2 = memory_read_byte(device->space[0], (index1 + sprite_line + 8) & 0x1fff);
 
-//      sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
-//      if (size > 8)
-//          gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
-
 		if (pri)
 		{
 			/* draw the low-priority sprites */
 			for (pixel = 0; pixel < 8; pixel++)
 			{
-//              UINT8 pixelData = flipx ? sd[7-pixel] : sd[pixel];
 				UINT8 pixelData;
 				if (flipx)
 				{
 					pixelData = (plane1 & 1) + ((plane2 & 1) << 1);
 					plane1 = plane1 >> 1;
 					plane2 = plane2 >> 1;
-					// sd[7 - pixel]
 				}
 				else
 				{
 					pixelData = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
 					plane1 = plane1 << 1;
 					plane2 = plane2 << 1;
-					// sd[pixel];
 				}
 
 				/* is this pixel non-transparent? */
@@ -1037,11 +1027,11 @@ READ8_HANDLER( ppu2c0x_palette_read )
 {
 	ppu2c0x_chip *this_ppu = get_token(space->cpu);
 	{
-		// it's a palette
-		// ERROR: doesn't currently handle monochrome!
 		if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 			return (this_ppu->palette_ram[offset & 0x1f] & 0x30);
-		else return (this_ppu->palette_ram[offset & 0x1f] & 0x3f);
+
+		else 
+			return (this_ppu->palette_ram[offset & 0x1f] & 0x3f);
 	}
 }
 
@@ -1242,9 +1232,6 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 				{
 					/* store the data */
 					memory_write_byte(device->space[0], tempAddr, data);
-
-					/* mark the char dirty */
-					// gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
 				}
 
 				else
@@ -1273,28 +1260,14 @@ void ppu2c0x_spriteram_dma( const address_space *space, const device_config *dev
 	int i;
 	int address = page << 8;
 
-//  logerror("sprite DMA: %d (scanline: %d)\n", page, this_ppu->scanline);
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
 		UINT8 spriteData = memory_read_byte(space, address + i);
 		memory_write_byte(space, 0x2004, spriteData);
-//      ppu2c0x_w(device, PPU_SPRITE_DATA, spriteData);
 	}
 
 	// should last 513 CPU cycles.
 	cpu_adjust_icount(space->cpu, -513);
-
-	// ????TODO : need to account for PPU rendering - this is roughly 4.5 scanlines eaten up.
-	// Because the DMA is only useful during vblank, this may not be strictly necessary since
-	// the scanline timers should catch us up before drawing actually happens.
-#if 0
-{
-	scanline_callback(device);
-	scanline_callback(device);
-	scanline_callback(device);
-	scanline_callback(device);
-}
-#endif
 }
 
 /*************************************

@@ -50,8 +50,8 @@ typedef UINT8         boolean;
 
 typedef struct queue_s
 {
-  int pos;
-  unsigned char reg,val;
+	int pos;
+	unsigned char reg,val;
 } queue_t;
 
 #endif
@@ -86,88 +86,89 @@ typedef struct queue_s
 /* Square Wave */
 typedef struct square_s
 {
-   uint8 regs[4];
-   int vbl_length;
-   int freq;
-   float phaseacc;
-   float output_vol;
-   float env_phase;
-   float sweep_phase;
-   uint8 adder;
-   uint8 env_vol;
-   boolean enabled;
+	uint8 regs[4];
+	int vbl_length;
+	int freq;
+	float phaseacc;
+	float output_vol;
+	float env_phase;
+	float sweep_phase;
+	uint8 adder;
+	uint8 env_vol;
+	boolean enabled;
 } square_t;
 
 /* Triangle Wave */
 typedef struct triangle_s
 {
-   uint8 regs[4]; /* regs[1] unused */
-   int linear_length;
-   int vbl_length;
-   int write_latency;
-   float phaseacc;
-   float output_vol;
-   uint8 adder;
-   boolean counter_started;
-   boolean enabled;
+	uint8 regs[4]; /* regs[1] unused */
+	int linear_length;
+	int vbl_length;
+	int write_latency;
+	float phaseacc;
+	float output_vol;
+	uint8 adder;
+	boolean counter_started;
+	boolean enabled;
 } triangle_t;
 
 /* Noise Wave */
 typedef struct noise_s
 {
-   uint8 regs[4]; /* regs[1] unused */
-   int cur_pos;
-   int vbl_length;
-   float phaseacc;
-   float output_vol;
-   float env_phase;
-   uint8 env_vol;
-   boolean enabled;
+	uint8 regs[4]; /* regs[1] unused */
+	int cur_pos;
+	int vbl_length;
+	float phaseacc;
+	float output_vol;
+	float env_phase;
+	uint8 env_vol;
+	boolean enabled;
 } noise_t;
 
 /* DPCM Wave */
 typedef struct dpcm_s
 {
-   uint8 regs[4];
-   uint32 address;
-   uint32 length;
-   int bits_left;
-   float phaseacc;
-   float output_vol;
-   uint8 cur_byte;
-   boolean enabled;
-   boolean irq_occurred;
-   const address_space *memory;
-   signed char vol;
+	uint8 regs[4];
+	uint32 address;
+	uint32 length;
+	int bits_left;
+	float phaseacc;
+	float output_vol;
+	uint8 cur_byte;
+	boolean enabled;
+	boolean irq_occurred;
+	const address_space *memory;
+	signed char vol;
 } dpcm_t;
 
 /* APU type */
 typedef struct apu
 {
-   /* Sound channels */
-   square_t   squ[2];
-   triangle_t tri;
-   noise_t    noi;
-   dpcm_t     dpcm;
+	/* Sound channels */
+	square_t   squ[2];
+	triangle_t tri;
+	noise_t    noi;
+	dpcm_t     dpcm;
 
-   /* APU registers */
-   unsigned char regs[0x17];
+	/* APU registers */
+	unsigned char regs[0x17];
 
-   /* Sound pointers */
-   void *buffer;
+	/* Sound pointers */
+	void *buffer;
 
 #ifdef USE_QUEUE
 
-   /* Event queue */
-   queue_t queue[QUEUE_SIZE];
-   int head,tail;
+	/* Event queue */
+	queue_t queue[QUEUE_SIZE];
+	int head, tail;
 
 #else
 
-   int buf_pos;
+	int buf_pos;
 
 #endif
 
+	int step_mode;
 } apu_t;
 
 /* CONSTANTS */

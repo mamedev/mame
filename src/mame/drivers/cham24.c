@@ -244,12 +244,6 @@ static const nes_interface cham24_interface_1 =
 
 static MACHINE_RESET( cham24 )
 {
-	/* switch PRG rom */
-	UINT8* dst = memory_region(machine, "maincpu");
-	UINT8* src = memory_region(machine, "user1");
-
-	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
-	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 }
 
 static PALETTE_INIT( cham24 )
@@ -282,8 +276,16 @@ static VIDEO_UPDATE( cham24 )
 	return 0;
 }
 
-static DRIVER_INIT( cham24 )
+
+static MACHINE_START( cham24 )
 {
+	/* switch PRG rom */
+	UINT8* dst = memory_region(machine, "maincpu");
+	UINT8* src = memory_region(machine, "user1");
+
+	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
+	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
+
 	/* uses 8K swapping, all ROM!*/
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
 	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
@@ -299,6 +301,10 @@ static DRIVER_INIT( cham24 )
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
 }
 
+static DRIVER_INIT( cham24 )
+{
+}
+
 static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
@@ -309,6 +315,7 @@ static MACHINE_DRIVER_START( cham24 )
 	MDRV_CPU_PROGRAM_MAP(cham24_map)
 
 	MDRV_MACHINE_RESET( cham24 )
+	MDRV_MACHINE_START( cham24 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
