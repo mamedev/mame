@@ -300,7 +300,6 @@ static SOUND_START( gottlieb1 )
 {
 	score_sample = 7;
 	random_offset = 0;
-	dac_data[0] = dac_data[1] = 0xff;
 
 	state_save_register_global_array(machine, votrax_queue);
 	state_save_register_global(machine, votrax_queuepos);
@@ -539,6 +538,8 @@ static SOUND_START( gottlieb2 )
 	nmi_timer = timer_alloc(machine, nmi_callback, NULL);
 	nmi_rate = 0;
 	nmi_timer_adjust();
+
+	dac_data[0] = dac_data[1] = 0xff;
 
 	/* register for save states */
 	state_save_register_global(machine, nmi_rate);

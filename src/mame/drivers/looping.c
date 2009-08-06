@@ -513,6 +513,7 @@ static ADDRESS_MAP_START( looping_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x008, 0x008) AM_DEVWRITE("ay", ay_enable_w)
 	AM_RANGE(0x009, 0x009) AM_DEVWRITE("tms", speech_enable_w)
 	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
+	AM_RANGE(0x00b, 0x00f) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -525,6 +526,9 @@ static ADDRESS_MAP_START( looping_cop_data_map, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( looping_cop_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0100, 0x0107) AM_NOP /* ? */
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -602,6 +606,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_CPU_ADD("mcu", COP420, COP_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_cop_map)
 	MDRV_CPU_DATA_MAP(looping_cop_data_map)
+	MDRV_CPU_IO_MAP(looping_cop_io_map)
 	MDRV_CPU_CONFIG(looping_cop_intf)
 
 	MDRV_MACHINE_START(looping)
