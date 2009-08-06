@@ -276,14 +276,14 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
  *****************************************/
 INLINE void snes_draw_tile_common(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal )
 {
-	UINT8 mask, plane[planes];
+	UINT8 mask, plane[8];
 	UINT16 c;
 	INT16 ii, jj;
 
 	for (ii = 0; ii < planes / 2; ii++)
 	{
 		plane[2 * ii] = snes_vram[tileaddr + 16 * ii];
-		plane[2 * ii + 1] = snes_vram[tileaddr + 16 * ii + 1];	
+		plane[2 * ii + 1] = snes_vram[tileaddr + 16 * ii + 1];
 	}
 
 	if (flip)
@@ -652,7 +652,7 @@ INLINE void snes_update_line_common( UINT8 screen, UINT8 color_depth, UINT8 hire
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tmap > 0x10000) 
+		if (tmap > 0x10000)
 			tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
