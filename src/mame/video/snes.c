@@ -585,6 +585,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 		/* below, only color_planes depends on color_depth */
 		if (tile_size)
 		{
+			#if 0
+			/* Bishoujo Janshi SuchiiPai and Desert Fighter sets this in hires, no noticeable difference apart that x must be doubled somehow... */
 			if (hires)	/* Hi-Res: 2bpp & 4bpp */
 			{
 				if (hflip)
@@ -599,6 +601,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 				}
 			}
 			else	/* No Hi-Res: 2bpp, 4bpp & 8bpp */
+			#endif
 			{
 				snes_draw_tile_x2(screen, color_planes, layer, snes_ppu.layer[layer].data + (tile  * 8 * color_planes) + tile_line, ((ii >> 1) * (8 << tile_size)) - hshift, priority, hflip, pal);
 			}
@@ -979,14 +982,14 @@ static void snes_draw_screen( UINT8 screen, UINT16 curline )
 {
 	switch (snes_ppu.mode)
 	{
-	case 0: snes_update_mode_0(screen, curline); break;		/* Mode 0 */
-	case 1: snes_update_mode_1(screen, curline); break;		/* Mode 1 */
-	case 2: snes_update_mode_2(screen, curline); break;		/* Mode 2 - Supports offset per tile */
-	case 3: snes_update_mode_3(screen, curline); break;		/* Mode 3 - Supports direct colour */
-	case 4: snes_update_mode_4(screen, curline); break;		/* Mode 4 - Supports offset per tile and direct colour */
-	case 5: snes_update_mode_5(screen, curline); break;		/* Mode 5 - Supports hires */
-	case 6: snes_update_mode_6(screen, curline); break;		/* Mode 6 - Supports offset per tile and hires */
-	case 7: snes_update_mode_7(screen, curline); break;		/* Mode 7 - Supports direct colour */
+		case 0: snes_update_mode_0(screen, curline); break;		/* Mode 0 */
+		case 1: snes_update_mode_1(screen, curline); break;		/* Mode 1 */
+		case 2: snes_update_mode_2(screen, curline); break;		/* Mode 2 - Supports offset per tile */
+		case 3: snes_update_mode_3(screen, curline); break;		/* Mode 3 - Supports direct colour */
+		case 4: snes_update_mode_4(screen, curline); break;		/* Mode 4 - Supports offset per tile and direct colour */
+		case 5: snes_update_mode_5(screen, curline); break;		/* Mode 5 - Supports hires */
+		case 6: snes_update_mode_6(screen, curline); break;		/* Mode 6 - Supports offset per tile and hires */
+		case 7: snes_update_mode_7(screen, curline); break;		/* Mode 7 - Supports direct colour */
 	}
 }
 
