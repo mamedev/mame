@@ -119,8 +119,8 @@ static const UINT8 table_bgd_pty[10][4][2] = {{ {7,10}, {6,9}, {1,4}, {0,3} },	/
 											  { {2,6}, {0,4}, {0,0}, {0,0} },	// mode 4
 											  { {2,6}, {0,4}, {0,0}, {0,0} },	// mode 5
 											  { {1,4}, {0,0}, {0,0}, {0,0} },	// mode 6
-											  { {3,6}, {1,4}, {0,0}, {0,0} },	// mode 7 - this is what it was using earlier... probably incorrect
-											  { {4,7}, {3,6}, {0,9}, {0,0} }	// mode 1 + BG3 priority bit (current code do not use this!)
+											  { {3,6}, {1,4}, {0,0}, {0,0} },	// mode 7 - this was used earlier... correct one: {1,1},{0,0}; or {2,2},{0,4} when EXTBG=1!
+											  { {4,7}, {3,6}, {0,9}, {0,0} }	// mode 1 + BG3 priority bit (current code does not use this!)
 											};
 static const UINT8 table_obj_pty[10][4] = { {2, 5, 8, 11},	// mode 0
 											{1, 3, 6, 9},	// mode 1
@@ -129,8 +129,8 @@ static const UINT8 table_obj_pty[10][4] = { {2, 5, 8, 11},	// mode 0
 											{1, 3, 5, 7},	// mode 4
 											{1, 3, 5, 7},	// mode 5
 											{0, 2, 3, 5},	// mode 6
-											{2, 5, 8, 11},	// mode 7 - this is what it was using earlier... probably incorrect
-											{1, 2, 5, 8}	// mode 1 + BG3 priority bit (current code do not use this!)
+											{2, 5, 8, 11},	// mode 7 - this was used earlier... correct one: {0,2,3,4}; or {1,3,5,6} when EXTBG=1!
+											{1, 2, 5, 8}	// mode 1 + BG3 priority bit (current code does not use this!)
 										};
 static const UINT16 table_obj_offset[8][8] =
 {
@@ -309,9 +309,9 @@ INLINE void snes_draw_tile_common(UINT8 screen, UINT8 planes, UINT8 layer, UINT1
 			mask >>= 1;
 		}
 
-#ifdef SNES_DBG_VIDEO
+#ifdef MAME_DEBUG
 		if(!debug_options.windows_disabled)
-#endif /* SNES_DBG_VIDEO */
+#endif /* MAME_DEBUG */
 		/* Clip to windows */
 		if ((screen == MAINSCREEN && (snes_ram[TMW] & (0x1 << layer))) || (screen == SUBSCREEN && (snes_ram[TSW] & (0x1 << layer))))
 			colour &= snes_ppu.clipmasks[layer][ii];
