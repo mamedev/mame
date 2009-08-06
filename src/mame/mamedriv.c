@@ -6913,6 +6913,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Photon hardware games */
 	DRIVER( phtetris )
+	DRIVER( phpython )
 
 	/* Valadon Automation games */
 	DRIVER( bagman )	/* (c) 1982 */

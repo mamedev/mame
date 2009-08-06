@@ -11,25 +11,13 @@
     - Tetris
     - Python
     - Treasure/Labyrinth
-
-    Dump was made using custom adaptor, hence it is marked as bad dump.
-    The real machine has following roms:
-    0000...07FFh - ROM1 (D41)
-    0800...0FFFh - ROM2 (D42)
-    1000...17FFh - ROM3 (D43)
-    1800...1FFFh - not chip sealed (D44)
-    2000...27FFh - ROM5 (D45)
-    2800...2FFFh - ROM6 (D46)
-    3000...37FFh - ROM7 (D47)
-    3000...37FFh - ROM8 (D48)
-
 */
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/pk8000.h"
 #include "machine/i8255a.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 
 static void pk8000_set_bank(running_machine *machine,UINT8 data)
 {
@@ -102,7 +90,7 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	dac_signed_data_w (devtag_get_device(device->machine, "dac"), (BIT(data,7) ? 0 : 0x7f));
+	speaker_level_w(devtag_get_device(device->machine, "speaker"), BIT(data,7));
 }
 
 static I8255A_INTERFACE( pk8000_ppi8255_interface_1 )
@@ -173,14 +161,7 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("JOY2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -238,14 +219,39 @@ static MACHINE_DRIVER_START( photon )
 
     /* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-
+/*
+    Dump was made using custom adaptor, hence it is marked as bad dump.
+    The real machine has following roms:
+    0000...07FFh - ROM1 (D41)
+    0800...0FFFh - ROM2 (D42)
+    1000...17FFh - ROM3 (D43)
+    1800...1FFFh - not chip sealed (D44)
+    2000...27FFh - ROM5 (D45)
+    2800...2FFFh - ROM6 (D46)
+    3000...37FFh - ROM7 (D47)
+    3000...37FFh - ROM8 (D48)
+*/
 ROM_START( phtetris )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "foton_tetris.bin", 0x10000, 0x4000, BAD_DUMP CRC(a8af10bb) SHA1(5e2ea9a5d38399cbe156638eea73a3d25c442f77) )
 ROM_END
 
-GAME( 19??, phtetris, 0,      photon, photon, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )
+/*
+    Dump was made using custom adaptor, hence it is marked as bad dump.
+    The real machine has following roms:
+
+	0000...07FFh - ROM1 (D41) 
+	0800...0FFFh - ROM2 (D42) 
+	1000...17FFh - ROM3 (D43) 
+*/
+ROM_START( phpython )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "foton_piton.bin", 0x10000, 0x1800, BAD_DUMP CRC(4eac925a) SHA1(26f9a18c7aed31b7daacdc003bafb60a5e6d6300) )
+ROM_END
+
+GAME( 19??,  phtetris, 0,      photon, photon, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )
+GAME( 1989?, phpython,  0,     photon, photon, 0, ROT0, "<unknown>", "Python (Photon System)", 0 )
