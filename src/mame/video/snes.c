@@ -461,8 +461,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	UINT16 vscroll, hscroll, vtilescroll;
 	UINT8 vshift, hshift, tile_size;
 	/* variables depending on color_depth */
-	UINT8 color_shift = 0; 
-	UINT8 color_planes = 2; 
+	UINT8 color_shift = 0;
+	UINT8 color_planes = 2;
 	UINT8 tile_divider = 1;
 
 #ifdef MAME_DEBUG
@@ -619,7 +619,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
  *
  * Update an entire line of mode7 tiles.
  *
- * 2009-08: Missing MOSAIC in Mode 7 
+ * 2009-08: Missing MOSAIC in Mode 7
  *  (different behaviors in BG1 & BG2)
  *********************************************/
 static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priority_b, UINT8 layer, UINT16 curline )
@@ -758,7 +758,7 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 	INT16 i, x, y;
 	UINT8 *oamram = (UINT8 *)snes_oam;
 	UINT32 name_sel = 0;
-	static const UINT8 table_obj_priority[10][4] = { 
+	static const UINT8 table_obj_priority[10][4] = {
 						{2, 5, 8, 11},	// mode 0
 						{1, 3, 6, 9},	// mode 1
 						{1, 3, 5, 7},	// mode 2
@@ -766,7 +766,7 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 						{1, 3, 5, 7},	// mode 4
 						{1, 3, 5, 7},	// mode 5
 						{0, 2, 3, 5},	// mode 6
-						{0, 2, 3, 4},	// mode 7 
+						{0, 2, 3, 4},	// mode 7
 						{1, 3, 5, 6},	// mode 7 EXTBG
 						{1, 2, 5, 8}	// mode 1 + BG3 priority bit
 					};
@@ -967,7 +967,7 @@ static void snes_update_mode_7( UINT8 screen, UINT16 curline )
 		if (snes_ram[bg_enable_reg] & 0x10) snes_update_objects(screen, 8, curline);
 		if (snes_ram[bg_enable_reg] & 0x01) snes_update_line_mode7(screen, 2, 2, 0, curline);
 		if (snes_ram[bg_enable_reg] & 0x02) snes_update_line_mode7(screen, 0, 4, 1, curline);
-	}	
+	}
 }
 
 /*********************************************
