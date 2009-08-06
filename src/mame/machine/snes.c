@@ -756,14 +756,14 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.layer[3].data = (data & 0xf0) << 9;
 			break;
 
-		// Anomie says "Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7);"
+		// Anomie says "H Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7); V Current = (Current<<8) | Prev;"
 		case BG1HOFS:	/* BG1 - horizontal scroll (DW) */
 			snes_ppu.layer[0].offset.horizontal = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[0].offset.horizontal>>8) & 7);
 			ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG1VOFS:	/* BG1 - vertical scroll (DW) */
-			snes_ppu.layer[0].offset.vertical = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[0].offset.vertical>>8) & 7);
+			snes_ppu.layer[0].offset.vertical = (data<<8) | (ppu_last_scroll);
 			ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
@@ -773,7 +773,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG2VOFS:	/* BG2 - vertical scroll (DW) */
-			snes_ppu.layer[1].offset.vertical = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[1].offset.vertical>>8) & 7);
+			snes_ppu.layer[1].offset.vertical = (data<<8) | (ppu_last_scroll);
 			ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
@@ -783,7 +783,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG3VOFS:	/* BG3 - vertical scroll (DW) */
-			snes_ppu.layer[2].offset.vertical = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[2].offset.vertical>>8) & 7);
+			snes_ppu.layer[2].offset.vertical = (data<<8) | (ppu_last_scroll);
 			ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
@@ -793,7 +793,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG4VOFS:	/* BG4 - vertical scroll (DW) */
-			snes_ppu.layer[3].offset.vertical = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[3].offset.vertical>>8) & 7);
+			snes_ppu.layer[3].offset.vertical = (data<<8) | (ppu_last_scroll);
 			ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
