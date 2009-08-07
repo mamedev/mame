@@ -967,9 +967,11 @@ const game_driver * const drivers[] =
 
 	/* Nintendo games */
 	DRIVER( spacefev )	/* (c) 1979 Nintendo */
-	DRIVER( spacefeva )	/* (c) 1979 Nintendo */
+	DRIVER( spacefevo )	/* (c) 1979 Nintendo */
+	DRIVER( spacefevo2 )/* (c) 1979 Nintendo */
 	DRIVER( highsplt )	/* (c) 1979 Nintendo */
 	DRIVER( highsplta )	/* (c) 1979 Nintendo */
+	DRIVER( highspltb )	/* (c) 1979 Nintendo */
 	DRIVER( spacelnc )	/* (c) 1979 Nintendo */
 	DRIVER( sheriff )	/* (c) 1979 Nintendo */
 	DRIVER( bandido )	/* (c) 1980 Exidy */
