@@ -950,6 +950,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
 			}
+//			printf("ROM board DMA to %x (PC %x)\n", g1bus_regs[SB_GDSTAR], cpu_get_pc(space->cpu));
  			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, "rom_board", DEVINFO_PTR_MEMORY);
  			dmaoffset = (UINT32)devtag_get_info_int(space->machine, "rom_board", DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
@@ -1089,9 +1090,9 @@ READ64_HANDLER( dc_modem_r )
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
-	if ((reg == 0x280/4) && (mem_mask == U64(0x00000000ffffffff)))
+	if (reg == 0x280/4)
 	{
-		return 1;
+		return U64(0xffffffffffffffff);
 	}
 
 	mame_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
