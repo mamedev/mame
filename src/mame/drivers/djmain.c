@@ -286,7 +286,7 @@ static READ32_HANDLER( turntable_r )
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read(space->machine, ttnames[turntable_select]);
+		pos = input_port_read_safe(space->machine, ttnames[turntable_select], 0);
 		delta = pos - turntable_last_pos[turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -1080,7 +1080,6 @@ INPUT_PORTS_END
 
 //--------- Pop'n Music
 
-#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnmusic_btn )
 	PORT_START("BTN1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1114,7 +1113,6 @@ static INPUT_PORTS_START( popnmusic_btn )
 	//PORT_START("TT2")     /* turn table 2P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
-#endif
 
 #define POPN_DSW1_COINAGE_OLD \
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:8,7,6,5") \
@@ -1204,7 +1202,6 @@ INPUT_PORTS_END
 	PORT_DIPNAME( 0x20, 0x20, "Normal Mode Jamming" ) PORT_DIPLOCATION("SW1:3") \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) \
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:4" ) \
 	POPN_DSW1_COINAGE_NEW
 
 #define POPN1_DSW2 \
@@ -1266,14 +1263,12 @@ static INPUT_PORTS_START( popn1 )
 INPUT_PORTS_END
 #endif
 
-#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnmusic )	/* popn2 and popn3 */
 	PORT_INCLUDE( popnmusic_btn )
-	POPN_DSW1
-	POPN_DSW2
-	POPN_DSW3
+	POPN2_DSW1
+	POPN2_DSW2
+	POPN2_DSW3
 INPUT_PORTS_END
-#endif
 
 //--------- Pop'n Stage
 
@@ -1904,6 +1899,29 @@ ROM_START( bmfinal )
 	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )		/* K054539 RAM */
 ROM_END
 
+ROM_START( popn2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "831jaa01.8a", 0x000000, 0x80000, CRC(D6214CAC) SHA1(18e74c81710228c91ab9eb554b63d9bd69b93ec8) )
+	ROM_LOAD16_BYTE( "831jaa02.6a", 0x000001, 0x80000, CRC(AABE8689) SHA1(d51d277e9b5d0233d1c6bdfec40c32587f84b31a) )
+									      
+	ROM_REGION( 0x200000, "gfx1", 0)		/* SPRITE */
+	ROM_LOAD16_BYTE( "831jaa03.19a", 0x000000, 0x80000, CRC(A07AEB72) SHA1(4d957c15d1b989e955249c34b0aa5679fb3e4fbf) )
+	ROM_LOAD16_BYTE( "831jaa04.20a", 0x000001, 0x80000, CRC(9277D1D2) SHA1(6946845973f0ce15db383032343f6852873698eb) )
+	ROM_LOAD16_BYTE( "831jaa05.22a", 0x100000, 0x80000, CRC(F3B63033) SHA1(c3c6de0d8c749ddf4926040637f03b11c2a21b99) )
+	ROM_LOAD16_BYTE( "831jaa06.24a", 0x100001, 0x80000, CRC(43564E9C) SHA1(54b792b8aaf22876f9eb806e31b86af4b354bcf6) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )		/* TILEMAP */
+	ROM_LOAD16_BYTE( "831jaa07.22d", 0x000000, 0x80000, CRC(25AF75F5) SHA1(c150514a3bc6f3f88a5b98ef0db5440e2c5fec2d) )
+	ROM_LOAD16_BYTE( "831jaa08.23d", 0x000001, 0x80000, CRC(3B1B5629) SHA1(95b6bed5c5218a3bfb10996cd9af31bd7e08c1c4) )
+	ROM_LOAD16_BYTE( "831jaa09.25d", 0x100000, 0x80000, CRC(AE7838D2) SHA1(4f8a6793065c6c1eb08161f65b1d6246987bf47e) )
+	ROM_LOAD16_BYTE( "831jaa10.27d", 0x100001, 0x80000, CRC(85173CB6) SHA1(bc4d86bf4654a9a0a58e624f77090854950f3993) )
+
+	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
+	DISK_IMAGE( "831jhdda01", 0, SHA1(24734177a517898ad5797ffd6974a45b073efc23) )
+
+	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )		/* K054539 RAM */
+ROM_END
+
 #if 0
 // for reference, these sets have not been verified
 ROM_START( bm3rdmxb )
@@ -1948,29 +1966,6 @@ ROM_START( popn1 )
 
 	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "803jaa11", 0, MD5(54a8ac87857d81740621c622e27736d7) )	/* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )		/* K054539 RAM */
-ROM_END
-
-ROM_START( popn2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )		/* MC68EC020FG25 MPU */
-	ROM_LOAD16_BYTE( "831jaa01.8a", 0x000000, 0x80000, CRC(D6214CAC) SHA1(d51d277e9b5d0233d1c6bdfec40c32587f84b31a) )
-	ROM_LOAD16_BYTE( "831jaa02.6a", 0x000001, 0x80000, CRC(AABE8689) SHA1(18e74c81710228c91ab9eb554b63d9bd69b93ec8) )
-
-	ROM_REGION( 0x200000, "gfx1", 0)		/* SPRITE */
-	ROM_LOAD16_BYTE( "831jaa03.19a", 0x000000, 0x80000, CRC(A07AEB72) SHA1(4d957c15d1b989e955249c34b0aa5679fb3e4fbf) )
-	ROM_LOAD16_BYTE( "831jaa04.20a", 0x000001, 0x80000, CRC(9277D1D2) SHA1(6946845973f0ce15db383032343f6852873698eb) )
-	ROM_LOAD16_BYTE( "831jaa05.22a", 0x100000, 0x80000, CRC(F3B63033) SHA1(c3c6de0d8c749ddf4926040637f03b11c2a21b99) )
-	ROM_LOAD16_BYTE( "831jaa06.24a", 0x100001, 0x80000, CRC(43564E9C) SHA1(54b792b8aaf22876f9eb806e31b86af4b354bcf6) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )		/* TILEMAP */
-	ROM_LOAD16_BYTE( "831jaa07.22d", 0x000000, 0x80000, CRC(25AF75F5) SHA1(c150514a3bc6f3f88a5b98ef0db5440e2c5fec2d) )
-	ROM_LOAD16_BYTE( "831jaa08.23d", 0x000001, 0x80000, CRC(3B1B5629) SHA1(95b6bed5c5218a3bfb10996cd9af31bd7e08c1c4) )
-	ROM_LOAD16_BYTE( "831jaa09.25d", 0x100000, 0x80000, CRC(AE7838D2) SHA1(4f8a6793065c6c1eb08161f65b1d6246987bf47e) )
-	ROM_LOAD16_BYTE( "831jaa10.27d", 0x100001, 0x80000, CRC(85173CB6) SHA1(bc4d86bf4654a9a0a58e624f77090854950f3993) )
-
-	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "831jaa11", 0, NO_DUMP )
 
 	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )		/* K054539 RAM */
 ROM_END
@@ -2256,12 +2251,13 @@ GAME( 2001, bm6thmix, 0,        djmain,   bm6thmix, bm6thmix,  ROT0, "Konami", "
 GAME( 2001, bm7thmix, 0,        djmain,   bm6thmix, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
 GAME( 2002, bmfinal,  0,        djmain,   bm6thmix, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
+GAME( 1998, popn2,    0,        djmain,   popnmusic, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
+
 #if 0
 // for reference, these sets have not been verified
 GAME( 1998, bm3rdmxb, bm3rdmix, djmain,   bm3rdmix,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
 
 GAME( 1998, popn1,    0,        djmain,   popn1,     beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
-GAME( 1998, popn2,    0,        djmain,   popnmusic, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 GAME( 1999, popn3,    0,        djmain,   popnmusic, beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
 
 GAME( 1999, popnstex, 0,        djmain,   popnstex,  beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )

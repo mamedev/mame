@@ -5494,7 +5494,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bmfinal )	/* GXC01 (c) 2002 (Japan) */
 
 	//DRIVER( popn1 )       /* GX803 (c) 1998 (Japan) */
-	//DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
+	DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
 	//DRIVER( popn3 )       /* GX980 (c) 1999 (Japan) */
 	//DRIVER( popnstex )    /* GX970 (c) 1999 (Japan) */
 
