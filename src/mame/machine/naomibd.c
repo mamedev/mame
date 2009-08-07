@@ -70,6 +70,102 @@
     Or it could really be the last address bit to allow up to 512MB of data on a cart?
 
     Normal address starts with 0xa0000000 to enable auto-advance and standard addressing mode.
+
+------------------------
+
+Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/some-atomiswave-info/
+
+ AW_EPR_OFFSETL                                          Register addres: 0x5f7000
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                         EPR data offset low word                              |
+ +-------------------------------------------------------------------------------+
+
+ AW_EPR_OFFSETH                                          Register addres: 0x5f7004
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                          EPR data offset hi word                              |
+ +-------------------------------------------------------------------------------+
+
+  Both low and high words of 32-bit offset from start of EPR-ROM area. Used for
+  reading header and programm code data, cannot be used for reading MPR-ROMs data.
+
+ AW_MPR_RECORD_INDEX                                     Register addres: 0x5f700c
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                          File system record index                             |
+ +-------------------------------------------------------------------------------+
+
+  This register contains index of MPR-ROM file system record (64-bytes in size) to
+  read throught DMA. Internal DMA offset register is assigned as AW_MPR_RECORD_INDEX<<6
+  from start of MPR-ROM area. Size of DMA transaction not limited, it is possible
+  to read any number of records or just part of it.
+
+ AW_MPR_FIRST_FILE_INDEX                                 Register addres: 0x5f7010
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                           First file record index                             |
+ +-------------------------------------------------------------------------------+
+
+  This register assign for internal cart circuit index of record in MPR-ROM file
+  system sub-area that contain information about first file of MPR-ROM files
+  sub-area. Internal circuit using this record to read absolute first file offset
+  from start of MPR-ROM area and calculate normal offset for each other file
+  requested, since MPR-ROM file data sub-area can be assighed only with relative
+  offsets from start of such sub-area.
+
+ AW_MPR_FILE_OFFSETL                                     Register addres: 0x5f7014
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                         MPR file offset low word                              |
+ +-------------------------------------------------------------------------------+
+
+ AW_MPR_FILE_OFFSETH                                     Register addres: 0x5f7018
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                          MPR file offset hi word                              |
+ +-------------------------------------------------------------------------------+
+
+  Both low and high words of 32-bit relative offset from start of MPR-ROM files
+  sub-area. Used by internal circuit to calculate absolute offset using data
+  from AW_MPR_FIRST_FILE_INDEX register. Cannot be used for reading EPR-ROM
+  data nor even MPR-ROM file system sub-area data.
+
+ In short:
+
+     EPR-ROM
+ +--------------+ 0x00000000
+ |              |
+ |    HEADER    +- AW_EPR_OFFSET << 1
+ |              |
+ +--------------+
+ |              |
+ |     CODE     +- AW_EPR_OFFSET << 1
+ |              |
+ |              |
+ +--------------+ 0x007fffff
+
+     MPR-ROMS
+ +--------------+ 0x00000000
+ | FS_HEADER    |
+ | FS_RECORD[1] +- (AW_MPR_RECORD_INDEX << 6)
+ | FS_RECORD[2] |
+ | FS_RECORD[3] +- (AW_MPR_FIRST_FILE_INDEX << 6)
+ |     ...      |
+ | FS_RECORD[N] |
+ +--------------+- FS_RECORD[AW_MPR_FIRST_FILE_INDEX].FILE_ABS_OFFSET
+ | FILE_0       |
+ | FILE_1       +- (AW_MPR_FILE_OFFSET << 1) + FS_RECORD[AW_MPR_FIRST_FILE_INDEX].FILE_ABS_OFFSET
+ |     ...      |
+ | FILE_N       |
+ +--------------+ 0x07ffffff
+
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -125,6 +221,7 @@ struct _naomibd_state
 	UINT32				rom_offset, rom_offset_flags, dma_count;
 	UINT32				dma_offset, dma_offset_flags;
 	UINT32				prot_offset, prot_key;
+	UINT32				aw_offset, aw_file_base, aw_file_offset;
 
 	UINT32				*prot_translate;
 	int				prot_reverse_bytes;
@@ -230,7 +327,10 @@ static void init_save_state(const device_config *device)
 	state_save_register_device_item(device, 0, v->dma_offset_flags);
 	state_save_register_device_item(device, 0, v->prot_offset);
 	state_save_register_device_item(device, 0, v->prot_key);
-}
+	state_save_register_device_item(device, 0, v->aw_offset);
+	state_save_register_device_item(device, 0, v->aw_file_base);
+	state_save_register_device_item(device, 0, v->aw_file_offset);
+}							 
 
 
 
@@ -256,6 +356,13 @@ READ64_DEVICE_HANDLER( naomibd_r )
 {
 	naomibd_state *v = get_safe_token(device);
 	UINT8 *ROM = (UINT8 *)v->memory;
+
+	// AW board is different, shouldn't ever be read
+	if (v->type == AW_ROM_BOARD)
+	{
+		mame_printf_debug("AW_ROM_BOARD read @ %x mask %llx\n", offset, mem_mask);
+		return 0xffffffffffffffff;
+	}
 
 	// ROM_DATA
 	if ((offset == 1) && ACCESSING_BITS_0_15)
@@ -353,6 +460,92 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 {
 	naomibd_state *v = get_safe_token(device);
 	INT32 i;
+
+	// AW board
+	if (v->type == AW_ROM_BOARD)
+	{
+		//printf("AW: %llx to ROM board @ %x (mask %llx)\n", data, offset, mem_mask);
+
+		switch (offset)
+		{
+			case 0:
+			{
+				if(ACCESSING_BITS_0_15)
+				{
+					// EPR_OFFSETL
+					v->aw_offset &= 0xffff0000;
+					v->aw_offset |= (data & 0xffff);
+					v->dma_offset = v->aw_offset*2;
+					//printf("EPR_OFFSETL = %x, dma_offset %x\n", (UINT32)data, v->dma_offset);
+				}
+				else if(ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63)
+				{
+					// EPR_OFFSETH
+					v->aw_offset &= 0xffff;
+					v->aw_offset |= ((data>>16) & 0xffff0000);
+					v->dma_offset = v->aw_offset*2;
+					v->dma_offset_flags = NAOMIBD_FLAG_ADDRESS_SHUFFLE|NAOMIBD_FLAG_AUTO_ADVANCE;	// force normal DMA mode
+					//printf("EPR_OFFSETH = %x, dma_offset %x\n", (UINT32)(data>>32), v->dma_offset);
+				}
+
+			}
+			break;
+
+			case 1:
+			{
+				if(ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63)
+				{
+					// MPR_RECORD_INDEX
+					//printf("%x to RECORD_INDEX\n", (UINT32)(data>>32));
+					v->dma_offset = 0x1000000 + (0x40 * (data>>32));
+				}
+			}
+			break;
+
+			case 2:
+			{
+				if(ACCESSING_BITS_0_15)
+				{
+					UINT8 *ROM = (UINT8 *)v->memory;
+					UINT32 base;
+
+					// MPR_FIRST_FILE_INDEX (usually 3)
+					base = data * 64;
+					v->aw_file_base = ROM[0x100000b+base]<<24 | ROM[0x100000a+base]<<16 | ROM[0x1000009+base]<<8 | ROM[0x1000008+base];
+					v->aw_file_base += 0x1000000;
+					//printf("%x to FIRST_FILE_INDEX, file_base = %x\n", (UINT32)data, v->aw_file_base);
+				}
+				else if(ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63)
+				{
+					// MPR_FILE_OFFSETL
+					v->aw_file_offset &= 0xffff0000;
+					v->aw_file_offset |= (data>>32) & 0xffff;
+					v->dma_offset = v->aw_file_base + (v->aw_file_offset*2);
+					//printf("%x to FILE_OFFSETL, file_offset %x, dma_offset %x\n", (UINT32)(data>>32), v->aw_file_offset, v->dma_offset);
+				}
+			}
+			break;
+
+			case 3:
+			{
+				if(ACCESSING_BITS_0_15)
+				{
+					// MPR_FILE_OFFSETH
+					v->aw_file_offset &= 0xffff;
+					v->aw_file_offset |= (data & 0xffff)<<16;
+					v->dma_offset = v->aw_file_base + (v->aw_file_offset*2);
+					//printf("%x to FILE_OFFSETH, file_offset %x, dma_offset %x\n", (UINT32)data, v->aw_file_offset, v->dma_offset);
+				}
+			}
+			break;
+
+			default:
+				logerror("AW: unhandled %llx to ROM board @ %x (mask %llx)\n", data, offset, mem_mask);
+			break;
+		}
+
+		return;
+	}
 
 	switch(offset)
 	{
@@ -747,6 +940,10 @@ static DEVICE_START( naomibd )
 			v->protdata = (UINT8 *)memory_region(device->machine, "naomibd_prot");
 			break;
 
+		case AW_ROM_BOARD:
+			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
+			break;
+
 		case DIMM_BOARD:
 			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
 			v->gdromchd = get_disk_handle(config->gdromregiontag);
@@ -865,10 +1062,11 @@ DEVICE_GET_INFO( naomibd )
 			{
 				default:
 				case ROM_BOARD:					strcpy(info->s, "Naomi Rom Board");				break;
+				case AW_ROM_BOARD:				strcpy(info->s, "Atomiswave Rom Board");				break;
 				case DIMM_BOARD:				strcpy(info->s, "Naomi Dimm Board");			break;
 			}
 			break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Naomi plug-in board");			break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Naomi/Atomiswave plug-in board");			break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;

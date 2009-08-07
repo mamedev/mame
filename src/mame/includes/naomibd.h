@@ -16,6 +16,7 @@ enum
 {
 	ROM_BOARD,
 	DIMM_BOARD,
+	AW_ROM_BOARD,
 	MAX_NAOMIBD_TYPES
 };
 
@@ -54,6 +55,10 @@ struct _naomibd_config
 
 #define MDRV_NAOMI_ROM_BOARD_ADD(_tag, _region) \
 	MDRV_NAOMIBD_ADD(_tag, ROM_BOARD) \
+	MDRV_NAOMIBD_REGION(_region)
+
+#define MDRV_AW_ROM_BOARD_ADD(_tag, _region) \
+	MDRV_NAOMIBD_ADD(_tag, AW_ROM_BOARD) \
 	MDRV_NAOMIBD_REGION(_region)
 
 #define MDRV_NAOMI_DIMM_BOARD_ADD(_tag, _gdrom, _region, _pic) \

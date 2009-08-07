@@ -1013,6 +1013,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "video/generic.h"
 #include "machine/eeprom.h"
+#include "machine/intelfsh.h"
 #include "naomibd.h"
 #include "naomi.h"
 #include "cpu/sh4/sh4.h"
@@ -1090,6 +1091,13 @@ jvseeprom_default_game[] =
 	{ "keyboard", { 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xF0, 0x4A, 0x0C, 0x0C, 0xF0, 0x4A, 0x0C, 0x0C, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 };
 
+static NVRAM_HANDLER( aw_nvram )
+{
+	nvram_handler_intelflash(machine, 0, file, read_or_write);
+
+	// TODO: save AW NVRAM at 00200000
+}
+
 static NVRAM_HANDLER( naomi_eeproms )
 {
 	if (read_or_write)
@@ -1097,10 +1105,8 @@ static NVRAM_HANDLER( naomi_eeproms )
 		/* JVS 'eeprom' */
 		mame_fwrite(file,maple0x86data1,0x80);
 
-
 		// mainboard eeprom?
 		eeprom_save(file);
-
 	}
 	else
 	{
@@ -1119,7 +1125,7 @@ static NVRAM_HANDLER( naomi_eeproms )
             eeprom_load(file);
 
 		}
-        else
+        	else
 		{
 		//  int a;
 
@@ -1320,17 +1326,41 @@ static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
+static READ64_HANDLER( aw_flash_r )
+{
+	return (UINT64)intelflash_read(0, offset*8) | (UINT64)intelflash_read(0, (offset*8)+1)<<8 | (UINT64)intelflash_read(0, (offset*8)+2)<<16 | (UINT64)intelflash_read(0, (offset*8)+3)<<24 |
+	       (UINT64)intelflash_read(0, (offset*8)+4)<<32 | (UINT64)intelflash_read(0, (offset*8)+5)<<40 | (UINT64)intelflash_read(0, (offset*8)+6)<<48 | (UINT64)intelflash_read(0, (offset*8)+7)<<56;
+}
+
+static WRITE64_HANDLER( aw_flash_w )
+{
+	int i;
+	UINT32 addr = offset * 8;
+
+	for (i = 0; i < 8; i++)
+	{
+		if (mem_mask & ((UINT64)0xff)<< (i*8))
+		{
+			addr += i;
+			break;
+		}
+	}
+
+	data >>= (i*8);
+	intelflash_write(0, addr, data);
+}
+
 
 /*
- * Atomiswave address map, identical to Dreamcast
+ * Atomiswave address map, almost identical to Dreamcast
  */
 
 static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
 
-	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
+	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
@@ -1650,9 +1680,11 @@ MACHINE_DRIVER_END
  */
 
 static MACHINE_DRIVER_START( aw )
-	MDRV_IMPORT_FROM(naomi)
+	MDRV_IMPORT_FROM(naomi_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
+	MDRV_NVRAM_HANDLER(aw_nvram)
+	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1842,11 +1874,10 @@ Region byte encoding is as follows:
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
 
-/* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+/* First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS as necessary */
 #define AW_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */ \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolphin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
 
 
 ROM_START( naomi )
@@ -5236,6 +5267,16 @@ static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswav
     return (b3<<13)|(b2<<9)|(b1<<5)|b0;
 }
 
+static DRIVER_INIT( atomiswave )
+{
+	UINT64 *ROM = (UINT64 *)memory_region(machine, "maincpu");
+
+	// patch out long startup delay
+	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffff) | (UINT64)0x0009<<48;
+
+	intelflash_init(machine, 0, FLASH_MACRONIX_29L001MC, memory_region(machine, "maincpu"));
+}
+
 
 static DRIVER_INIT(fotns)
 {
@@ -5249,21 +5290,7 @@ static DRIVER_INIT(fotns)
 		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
 	}
 
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 
@@ -5280,21 +5307,7 @@ static DRIVER_INIT(demofist)
 		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
 	}
 
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(sprtshot)
@@ -5308,6 +5321,8 @@ static DRIVER_INIT(sprtshot)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &ssu_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(rangrmsn)
@@ -5321,6 +5336,8 @@ static DRIVER_INIT(rangrmsn)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &rm_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 static DRIVER_INIT(xtrmhunt)
@@ -5334,6 +5351,8 @@ static DRIVER_INIT(xtrmhunt)
 	{
 		src[i] = atomiswave_decrypt(src[i], i*2, &xh_key);
 	}
+
+	DRIVER_INIT_CALL(atomiswave);
 }
 
 ROM_START( fotns )
@@ -5407,11 +5426,10 @@ ROM_END
 
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,        naomi,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, awbios,   0,        aw,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
-GAME( 2002, sprtshot, awbios,   naomi,    naomi,    sprtshot, ROT0, "Sammy",                           "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2004, rangrmsn, awbios,   naomi,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, xtrmhunt, awbios,   naomi,    naomi,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-
+GAME( 2002, sprtshot, awbios,   aw,    naomi,    sprtshot, ROT0, "Sammy",                           "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, demofist, awbios,   aw,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, rangrmsn, awbios,   aw,    naomi,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, fotns,    awbios,   aw,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, xtrmhunt, awbios,   aw,    naomi,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

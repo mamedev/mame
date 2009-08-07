@@ -38,6 +38,7 @@ struct flash_chip
 	int size;
 	int bits;
 	int status;
+	int erase_sector;
 	INT32 flash_mode;
 	INT32 flash_master_lock;
 	int device_id;
@@ -121,6 +122,18 @@ void intelflash_init(running_machine *machine, int chip, int type, void *data)
 		c->size = 0x200000;
 		c->maker_id = 0xb0;
 		c->device_id = 0xd0;
+		break;
+	case FLASH_SHARP_UNK128MBIT:
+		c->bits = 16;
+		c->size = 0x800000;
+		c->maker_id = 0xb0;
+		c->device_id = 0xb0;
+		break;
+	case FLASH_MACRONIX_29L001MC:
+		c->bits = 8;
+		c->size = 0x20000;
+		c->maker_id = 0xc2;
+		c->device_id = 0x51;
 		break;
 	}
 	if( data == NULL )
@@ -208,8 +221,30 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		}
 		break;
 	case FM_ERASEAMD4:
-		c->status ^= ( 1 << 6 ) | ( 1 << 2 );
-		data = c->status;
+		// reads outside of the erasing sector return normal data
+		if ((address < c->erase_sector) || (address >= c->erase_sector+(64*1024)))
+		{
+			switch( c->bits )
+			{
+			case 8:
+				{
+					UINT8 *flash_memory = (UINT8 *)c->flash_memory;
+					data = flash_memory[ address ];
+				}
+				break;
+			case 16:
+				{
+					UINT16 *flash_memory = (UINT16 *)c->flash_memory;
+					data = flash_memory[ address ];
+				}
+				break;
+			}
+		}
+		else
+		{
+			c->status ^= ( 1 << 6 ) | ( 1 << 2 );
+			data = c->status;
+		}
 		break;
 	}
 
@@ -348,12 +383,14 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 				{
 					UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
+					c->erase_sector = address & ~0xffff;
 				}
 				break;
 			case 16:
 				{
 					UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
+					c->erase_sector = address & ~0x7fff;
 				}
 				break;
 			}
