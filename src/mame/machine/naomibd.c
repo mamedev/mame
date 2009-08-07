@@ -361,7 +361,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	if (v->type == AW_ROM_BOARD)
 	{
 		mame_printf_debug("AW_ROM_BOARD read @ %x mask %llx\n", offset, mem_mask);
-		return 0xffffffffffffffff;
+		return U64(0xffffffffffffffff);
 	}
 
 	// ROM_DATA
