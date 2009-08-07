@@ -66,28 +66,28 @@
     g-stream_title.jpg    152672  0xf7b9bfd3
     g-stream_pcb.jpg     2563664  0x5ec864f3
 
-    Name          Size     CRC32         Chip Type
-    ---------------------------------------------
-    gs_prg_02.bin 2097152  0x2f8a6bea    27C160
-    gs_gr_01.bin  2097152  0xb82cfab8    27C160
-    gs_gr_02.bin  2097152  0x37e19cbd    27C160
-    gs_gr_03.bin  2097152  0x1a3b2b11    27C160
-    gs_gr_04.bin  2097152  0xa4e8906c    27C160
-    gs_gr_05.bin  2097152  0xef283a73    27C160
-    gs_gr_06.bin  2097152  0xd4e3a2b2    27C160
-    gs_gr_07.bin  2097152  0x84e66fe1    27C160
-    gs_gr_08.bin  2097152  0xabd0d6aa    27C160
-    gs_gr_09.bin  2097152  0xf2c4fd77    27C160
-    gs_gr_10.bin  2097152  0xd696d15d    27C160
-    gs_gr_11.bin  2097152  0x946d71d1    27C160
-    gs_gr_12.bin  2097152  0x94b56e4e    27C160
-    gs_gr_13.bin  2097152  0x7daaeff0    27C160
-    gs_gr_14.bin  2097152  0x6bd2a1e1    27C160
-    gs_snd_01.bin  524288  0x79b64d3f    27C040
-    gs_snd_02.bin  524288  0xe49ed92c    27C040
-    gs_snd_03.bin  524288  0x2bfff4ac    27C040
-    gs_snd_04.bin  524288  0xb259de3b    27C040
-    gs_prg_01.bin  524288  0x0d0c6a38    27C040
+    Name           Size     CRC32        Chip Type
+    ----------------------------------------------
+    gs_prg_02.u197 2097152  0x2f8a6bea    27C160
+    gs_gr_01.u120  2097152  0xb82cfab8    27C160
+    gs_gr_02.u121  2097152  0x37e19cbd    27C160
+    gs_gr_03.u125  2097152  0x1a3b2b11    27C160
+    gs_gr_04.u126  2097152  0xa4e8906c    27C160
+    gs_gr_05.u174  2097152  0xef283a73    27C160
+    gs_gr_06.u175  2097152  0xd4e3a2b2    27C160
+    gs_gr_07.u107  2097152  0x84e66fe1    27C160
+    gs_gr_08.u109  2097152  0xabd0d6aa    27C160
+    gs_gr_09.u180  2097152  0xf2c4fd77    27C160
+    gs_gr_10.u182  2097152  0xd696d15d    27C160
+    gs_gr_11.u108  2097152  0x946d71d1    27C160
+    gs_gr_12.u110  2097152  0x94b56e4e    27C160
+    gs_gr_13.u181  2097152  0x7daaeff0    27C160
+    gs_gr_14.u183  2097152  0x6bd2a1e1    27C160
+    gs_snd_01.u192  524288  0x79b64d3f    27C040
+    gs_snd_02.u194  524288  0xe49ed92c    27C040
+    gs_snd_03.u191  524288  0x2bfff4ac    27C040
+    gs_snd_04.u193  524288  0xb259de3b    27C040
+    gs_prg_01.u56   524288  0x0d0c6a38    27C040
 
     . Board supplied by Tormod
     . Board dumped by Tormod
@@ -509,12 +509,12 @@ ROM_START( gstream )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* sprite tiles (16x16x8) */
 	ROM_LOAD32_WORD( "gs_gr_07.u107", 0x000000, 0x200000, CRC(84e66fe1) SHA1(73d828714f9ed9baffdc06998f5bf3298396fe9c) )
-	ROM_LOAD32_WORD( "gs_gr_11.bin",  0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
+	ROM_LOAD32_WORD( "gs_gr_11.u108", 0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
 	ROM_LOAD32_WORD( "gs_gr_08.u109", 0x400000, 0x200000, CRC(abd0d6aa) SHA1(dd294bbdda05697df84247257f735ab51bc26ca3) )
 	ROM_LOAD32_WORD( "gs_gr_12.u110", 0x400002, 0x200000, CRC(94b56e4e) SHA1(7c3877f993e575326dbd4c2e5d7570747277b20d) )
-	ROM_LOAD32_WORD( "gs_gr_09.bin",  0x800000, 0x200000, CRC(f2c4fd77) SHA1(284c850688e3c0fd292a91a53e24fe3436dc4076) )
+	ROM_LOAD32_WORD( "gs_gr_09.u180", 0x800000, 0x200000, CRC(f2c4fd77) SHA1(284c850688e3c0fd292a91a53e24fe3436dc4076) )
 	ROM_LOAD32_WORD( "gs_gr_13.u181", 0x800002, 0x200000, CRC(7daaeff0) SHA1(5766d9a3a8c0931305424e0089108ce8df7dfe41) )
-	ROM_LOAD32_WORD( "gs_gr_10.bin",  0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
+	ROM_LOAD32_WORD( "gs_gr_10.u182", 0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
 	ROM_LOAD32_WORD( "gs_gr_14.u183", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
 
 	ROM_REGION( 0xc00000, "gfx2", 0 )  /* bg tiles (32x32x8) */
@@ -523,12 +523,12 @@ ROM_START( gstream )
 	ROM_LOAD( "gs_gr_03.u125", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
 	ROM_LOAD( "gs_gr_04.u126", 0x600000, 0x200000, CRC(a4e8906c) SHA1(b285d7697cdaa62014cf65d09a19fcbd6a95bb98) )
 	ROM_LOAD( "gs_gr_05.u174", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
-	ROM_LOAD( "gs_gr_06.bin",  0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
+	ROM_LOAD( "gs_gr_06.u175", 0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
 
 	ROM_REGION( 0x200000, "oki1", 0 )
 	ROM_LOAD( "gs_snd_01.u192", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
 	ROM_LOAD( "gs_snd_02.u194", 0x080000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
-	ROM_LOAD( "gs_snd_03.bin",  0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
+	ROM_LOAD( "gs_snd_03.u191", 0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
 	ROM_LOAD( "gs_snd_04.u193", 0x180000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
