@@ -1401,8 +1401,9 @@ VIDEO_UPDATE( snes )
 {
 	int y;
 
+	/*NTSC SNES draw range is 1-225. */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		snes_refresh_scanline(screen->machine, bitmap, y);
+		snes_refresh_scanline(screen->machine, bitmap, y+1);
 	return 0;
 }
 
