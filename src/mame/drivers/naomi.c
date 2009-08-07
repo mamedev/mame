@@ -5272,7 +5272,7 @@ static DRIVER_INIT( atomiswave )
 	UINT64 *ROM = (UINT64 *)memory_region(machine, "maincpu");
 
 	// patch out long startup delay
-	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffff) | (UINT64)0x0009<<48;
+	ROM[0x98e/8] = (ROM[0x98e/8] & (UINT64)0xffffffffffff) | (UINT64)0x0009<<48;
 
 	intelflash_init(machine, 0, FLASH_MACRONIX_29L001MC, memory_region(machine, "maincpu"));
 }
