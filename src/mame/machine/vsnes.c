@@ -783,11 +783,12 @@ static WRITE8_HANDLER( drmario_rom_banking )
 			break;
 
 			case 1:	/* video rom banking - bank 0 - 4k or 8k */
-				v_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, drmario_shiftreg, (vrom4k) ? 4 : 8);
+				if (!vram) 
+					v_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, drmario_shiftreg, (vrom4k) ? 4 : 8);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
-				if (vrom4k)
+				if (vrom4k && !vram)
 					v_set_videorom_bank(space->machine, 4, 4, drmario_shiftreg, 4);
 			break;
 

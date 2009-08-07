@@ -555,12 +555,20 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 			break;
 
 			case 1:	/* video rom banking - bank 0 - 4k or 8k */
-				pc10_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
+				if (vram) 
+					set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
+				else 
+					pc10_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
-				if (vrom4k)
-					pc10_set_videorom_bank(space->machine, 4, 4, (mmc1_shiftreg & 0x1f), 4);
+				if (vrom4k) 
+				{
+					if (vram) 
+						set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
+					else 
+						pc10_set_videorom_bank(space->machine, 4, 4, (mmc1_shiftreg & 0x1f), 4);
+				}
 			break;
 
 			case 3:	/* program banking */
