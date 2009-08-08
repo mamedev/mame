@@ -476,8 +476,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 #endif /* MAME_DEBUG */
 
 	/* Handle Mosaic effects */
-	if (snes_ram[MOSAIC] & (1 << layer))
-		curline -= (curline % ((snes_ram[MOSAIC] >> 4) + 1));
+	if (snes_ppu.layer[layer].mosaic_enabled)
+		curline -= (curline % (snes_ppu.mosaic_size + 1));
 
 	/* Find the size of the tiles (8x8 or 16x16) */
 	tile_size = snes_ppu.layer[layer].tile_size;
@@ -623,9 +623,6 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
  * snes_update_line_mode7()
  *
  * Update an entire line of mode7 tiles.
- *
- * 2009-08: Missing MOSAIC in Mode 7
- *  (different behaviors in BG1 & BG2)
  *********************************************/
 #define MODE7_CLIP(x) (((x) & 0x2000) ? ((x) | ~0x03ff) : ((x) & 0x03ff))
 
@@ -636,6 +633,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 	INT32 xc, yc, tx, ty, sx, sy, hs, vs, xpos, xdir;
 	UINT8 priority = priority_a;
 	UINT8 colour = 0;
+	UINT16 *mosaic_x, *mosaic_y;
 
 #ifdef MAME_DEBUG
 	if (debug_options.bg_disabled[layer])
@@ -682,11 +680,23 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 		xdir = 1;
 	}
 
+	/* MOSAIC - to be verified */
+	if (layer == 1)	// BG2 use two different bits for horizontal and vertical mosaic
+	{
+		mosaic_x = snes_ppu.mosaic_table[snes_ppu.layer[1].mosaic_enabled ? snes_ppu.mosaic_size : 0];
+		mosaic_y = snes_ppu.mosaic_table[snes_ppu.layer[0].mosaic_enabled ? snes_ppu.mosaic_size : 0]; 
+	}
+	else	// BG1 works as usual
+	{
+		mosaic_x =  snes_ppu.mosaic_table[snes_ppu.layer[0].mosaic_enabled ? snes_ppu.mosaic_size : 0];
+		mosaic_y =  snes_ppu.mosaic_table[snes_ppu.layer[0].mosaic_enabled ? snes_ppu.mosaic_size : 0];
+	}
+
 	/* Let's do some mode7 drawing huh? */
 	for (sx = 0; sx < 256; sx++, xpos += xdir)
 	{
-		tx = (((ma * MODE7_CLIP(hs - xc)) & ~0x3f) + ((mb * MODE7_CLIP(vs - yc)) & ~0x3f) + (xc << 8) + ((ma * sx) & ~0x3f) + ((mb * sy) & ~0x3f)) >> 8;
-		ty = (((mc * MODE7_CLIP(hs - xc)) & ~0x3f) + ((md * MODE7_CLIP(vs - yc)) & ~0x3f) + (yc << 8) + ((mc * sx) & ~0x3f) + ((md * sy) & ~0x3f)) >> 8;
+		tx = (((ma * MODE7_CLIP(hs - xc)) & ~0x3f) + ((mb * MODE7_CLIP(vs - yc)) & ~0x3f) + (xc << 8) + (ma * mosaic_x[sx]) + ((mb * mosaic_y[sy]) & ~0x3f)) >> 8;
+		ty = (((mc * MODE7_CLIP(hs - xc)) & ~0x3f) + ((md * MODE7_CLIP(vs - yc)) & ~0x3f) + (yc << 8) + (mc * mosaic_x[sx]) + ((md * mosaic_y[sy]) & ~0x3f)) >> 8;
 
 		switch (snes_ppu.mode7.repeat)
 		{
