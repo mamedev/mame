@@ -739,6 +739,11 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case MOSAIC:	/* Size and screen designation for mosaic */
 			/* FIXME: We don't support horizontal mosaic yet */
+			snes_ppu.mosaic_size = (data & 0xf0) >> 4;
+			snes_ppu.layer[0].mosaic_enabled = data & 0x01;
+			snes_ppu.layer[1].mosaic_enabled = data & 0x02;
+			snes_ppu.layer[2].mosaic_enabled = data & 0x04;
+			snes_ppu.layer[3].mosaic_enabled = data & 0x08;
 			break;
 		case BG1SC:		/* Address for storing SC data BG1 SC size designation */
 		case BG2SC:		/* Address for storing SC data BG2 SC size designation  */
@@ -889,6 +894,9 @@ WRITE8_HANDLER( snes_w_io )
 			}
 			return;
 		case M7SEL:		/* Mode 7 initial settings */
+			snes_ppu.mode7.repeat = (data >> 6) & 3;
+			snes_ppu.mode7.vflip  = data & 0x02;
+			snes_ppu.mode7.hflip  = data & 0x01;
 			break;
 		case M7A:		/* Mode 7 COS angle/x expansion (DW) */
 			snes_ppu.mode7.matrix_a = ((snes_ppu.mode7.matrix_a >> 8) & 0xff) + (data << 8);
@@ -936,6 +944,10 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case CGWSEL:	/* Initial settings for Fixed colour addition or screen addition */
 			/* FIXME: We don't support direct select for modes 3 & 4 or subscreen window stuff */
+			snes_ppu.main_color_mask = (data >> 6) & 0x03;
+			snes_ppu.sub_color_mask = (data >> 4) & 0x03;
+			snes_ppu.sub_add_mode = data & 0x02;
+			snes_ppu.direct_color  = data & 0x01;
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x2) != (snes_ram[CGWSEL] & 0x2) )
 				mame_printf_debug( "Add/Sub Layer: %s\n", ((data & 0x2) >> 1) ? "Subscreen" : "Fixed colour" );
@@ -1538,7 +1550,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 static void snes_init_ram(running_machine *machine)
 {
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int i;
+	int i, j;
 
 	/* Init DSP1 */
 	DSP1_reset(machine);
@@ -1570,6 +1582,15 @@ static void snes_init_ram(running_machine *machine)
 	cgram_address = 0;
 	vram_read_offset = 2;
 	joy1l = joy1h = joy2l = joy2h = joy3l = joy3h = 0;
+
+	/* Inititialize mosaic table */
+	for (j = 0; j < 16; j++)
+	{
+		for (i = 0; i < 4096; i++)
+		{
+			snes_ppu.mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
+		}
+	}
 
 	// set up some known register power-up defaults
 	snes_ram[WRIO] = 0xff;

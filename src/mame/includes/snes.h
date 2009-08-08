@@ -422,6 +422,7 @@ struct SNES_PPU_STRUCT
 		UINT32 map;
 		UINT8 map_size;
 		UINT8 tile_size;
+		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
 		struct
 		{
 			UINT16 horizontal;
@@ -462,13 +463,23 @@ struct SNES_PPU_STRUCT
 	} beam;
 	struct
 	{
-		INT16 matrix_a;
-		INT16 matrix_b;
-		INT16 matrix_c;
-		INT16 matrix_d;
-		INT16 origin_x;
-		INT16 origin_y;
+		UINT8 repeat;
+		UINT8 hflip;
+		UINT8 vflip;
+		UINT16 matrix_a;
+		UINT16 matrix_b;
+		UINT16 matrix_c;
+		UINT16 matrix_d;
+		UINT16 origin_x;
+		UINT16 origin_y;
 	} mode7;
+	UINT8 mosaic_size;
+	UINT8 main_color_mask;
+	UINT8 sub_color_mask;
+	UINT8 sub_add_mode;
+	UINT8 direct_color;
+
+	UINT16 mosaic_table[16][4096];
 	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];
 	UINT8 update_windows;
 	UINT8 update_offsets;
