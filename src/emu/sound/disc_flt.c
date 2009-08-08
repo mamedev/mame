@@ -833,8 +833,7 @@ static DISCRETE_STEP( dst_rcdisc5)
 		diff = u - node->output[0];
 
 		if(diff < 0)
-			//diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent0));
-			diff = -node->output[0] + (node->output[0] *  context->exponent0);
+			diff = diff * context->exponent0;
 		node->output[0] += diff;
 	}
 	else

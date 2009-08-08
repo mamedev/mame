@@ -1650,6 +1650,7 @@
  *   + - Pop two values from stack, add and push result to stack
  *   / - Pop two values from stack, divide and push result to stack
  *   * - Pop two values from stack, multiply and push result to stack
+ *   a - Pop one value from stack, multiply -1 if less than 0 and push result to stack
  *   i - Pop one value from stack, multiply -1 and push result to stack
  *   ! - Pop one value from stack, logical invert, push result to stack
  *   = - Pop two values from stack, logical = and push result to stack

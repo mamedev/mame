@@ -1680,6 +1680,9 @@ static DISCRETE_STEP(dst_transform)
 			case 'P':
 				dst_transform_push(trans_stack, &trans_stack_ptr, top);
 				break;
+			case 'a':	/* absolute value */
+				top = fabs(top);
+				break;
 			case 'i':	/* * -1 */
 				top = -top;
 				break;
