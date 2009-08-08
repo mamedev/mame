@@ -2,36 +2,39 @@
 
 /*
 
-Sega Hikaru Hardware Overview (last updated 4th July 2008 at 9:06pm)
+Sega Hikaru Hardware Overview (last updated 5th August 2009 at 3:45pm)
 -----------------------------
 
-Note! This document will be updated from time to time when more dumps are available
+Note! This document will be updated from time to time when more dumps are available.
 
-This document covers all the known Sega Hikaru games, including....
-!Air Trix                    (C) Sega, 2001
-*Brave Fire Fighters         (C) Sega, 1999
+This document covers all the known Sega Hikaru games. The graphics are quite breath-taking
+and this system is said to be one of the most expensive arcade boards developed by Sega.
+The games on this system include....
+Air Trix                     (C) Sega, 2001
+!Brave Fire Fighters         (C) Sega, 1999
 *Cyber Troopers Virtual On 4 (C) Sega, 2001
-*Nascar Racing               (C) Sega, 2000
+!Nascar Racing               (C) Sega, 2000
 !Planet Harriers             (C) Sega, 2001
 !Star Wars Racer Arcade      (C) Sega, 2000
 
 ! - denotes secured but not fully dumped yet
 * - denotes not dumped yet. If you can help with the remaining undumped games,
-    please contact http://www.mameworld.net/gurudumps/
+    please contact http://guru.mameworld.info/ or http://mamedev.org/
 
 The Sega Hikaru system comprises the following PCBs.....
-Mainboard      - 2 known versions exists. They're mostly the same. It contains many thin BGAs,
-                 lots of RAM, 2x SH4 CPUs and 1x 16MBit boot EPROM
+Main board     - 2 known versions exists. They're mostly the same. It contains many thin BGAs,
+                 lots of RAM, 2x SH4 CPUs and 1x 16MBit boot EPROM. Because of the use of many thin BGA
+                 ICs, the main board is VERY fragile and is mounted inside a metal box.
 ROM PCB        - 2 known versions exist. They contain EPROMs, up to 16x TSOP48 flashROMs or SOP44
                  maskROMs, a small amount of SRAM and some security ICs that are also used on
                  NAOMI ROM carts (315-5881 - with a unique 317-xxxx number per game, a couple
                  of PLCC FPGAs and a X76F100 secured EEPROM). Plugs into mainboard into CONN3 and CONN4
 Network PCB    - Contains a 68000, some SRAM, a few Sega ICs and a CPLD. Plugs into the top of the ROM board
-Protection PCB - Contains one RAM and one QFP100 IC. Plugs into the mainboard into CONN5
-Filter PCB     - Contains external connectors for power, controls, network, USB etc. Plugs into mainboard
-                 into CONN1 and CONN2
+AICA PCB       - Contains one RAM and one QFP100 IC. Plugs into the mainboard into CONN5
 I/O PCB        - Uses a standard Sega JVS I/O board. Contains USB connectors type A & B, a
                  couple of long IDC cable connectors for controls and a Toshiba TMP90PH44 MCU
+Filter PCB     - Contains external connectors for power, network, USB, audio and video. This board is mounted
+                 to the metal box and plugs into the main board into CONN1 and CONN2
 
 
 Main Board
@@ -39,40 +42,45 @@ Main Board
 Version 1 - 837-13402 171-7639E SEGA 1998
 Version 2 - 837-14097 171-7639F SEGA 1998
 |------------------------------------------------------------------------------------|
-|       MC33470                DSW(4)                           CONN4                |
-|                                    93C46                                           |
-|                          SH-4                             62256 62256    93C46     |-|
-|        SH-4                                  PAL1                                  | |
-|                        5264165FTTA60         (GAL16V8)                    3771     | |
-|                        5264165FTTA60                         315-6146              | |
-|    5264165FTTA60       5264165FTTA60                                   14.7456MHz  | |
-|    5264165FTTA60       5264165FTTA60                                   32MHz       | |CONN1
-|    5264165FTTA60                                                                   | |
-|    5264165FTTA60                                             3771 3771             | |
-|                         315-6415                                                   | |
-|      315-6415                                                               PC910  | |
-|               33.3333MHz                                        CY37128            | |
-|               CY2308SC                             CY2292SL     (315-6202)         |-|
-|HY57V161610                                                      62256      ADM485  |
-| PAL2                      CONN3                                 62256              |
-| (GAL16V8)                                                                          |
-|                                                                                    |
-|HY57V161610                       315-6087  HY57V161610                             |-|
-|              315-6083A                     HY57V161610              EPR-23400(A)   | |
-|HY57V161610              D432232                      24.576MHz                     | |
-|(PAL on V2 MB)                              HY57V161610   ADV7120         BATTERY   | |CONN2
-|LED1                                        HY57V161610   ADV7120                   | |
+|       MC33470.103            DSW(4)                           CONN4                |
+|                                    93C46.115                                       |
+|                          SH-4.13                          62256.72       93C46.78  |-|
+|        SH-4.21                               PAL1         62256.73                 | |
+|                        5264165FTTA60.15      (GAL16V8)                    3771     | |
+|                        5264165FTTA60.16                      315-6146.74           | |
+|    5264165FTTA60.22    5264165FTTA60.17S                               14.7456MHz  | |
+|    5264165FTTA60.23    5264165FTTA60.18S                               32MHz       | |CONN1
+|    5264165FTTA60.24S                                                               | |
+|    5264165FTTA60.25S                                         3771 3771             | |
+|                         315-6154.19                                                | |
+|      315-6154.26                                                          PC910.102| |
+|               33.3333MHz                                        CY37128.95         | |
+|               CY2308SC.4                         CY2292SL.1     (=315-6202)        |-|
+|HY57V161610.28                                                           ADM485.80  |
+| PAL2                      CONN3                                 62256.91S          |
+| (GAL16V8)                                                       62256.92S          |
+|HY57V161610.35                                                                      |
+|HY57V161610.36S                 315-6087.43  HY57V161610.44                         |-|
+|HY57V161610.33 315-6083A.31                  HY57V161610.45S         EPR-23400(A).94| |
+|HY57V161610.34S          D432232.32                   24.576MHz                     | |
+|(PAL on V2 MB)                              HY57V161610.46   ADV7120      BATTERY   | |CONN2
+|LED1                                        HY57V161610.47S  ADV7120                | |
 |LED2                                                                                | |
 |LED3                                                                                |-|
-|LED4               315-6197                        315-6084     CONN5               |
-|SW1                                315-6085                           K4S641632     |
+|LED4               315-6197.38                     315-6084.41  CONN5               |
+|SW1                                315-6085.40                        K4S641632.98  |
 |SW2                                                                                 |
-|SW3    315-6086                                                      315-6232       |
-|                                                   315-6084                         |
-|                   315-6197        CY2308SC                    33.8688MHz           |
+|SW3    315-6086.37                                                   315-6232.96    |
+|                                                   315-6084.42                      |
+|                   315-6197.39     CY2308SC.2                  33.8688MHz           |
 |(LED 1-4 moved here)          41.6666MHz                       25MHz                |
 |(on V2 MB)                                                                          |
 |------------------------------------------------------------------------------------|
+Notes:
+      In test mode, the ROM test will show only 'GOOD' for all ROMs. On test completion
+      the screen will show 'PRESS TEST BUTTON TO EXIT'
+      However if the SERVICE button is pressed, the screen will show the byte
+      checksums of all ROMs.
 
 
 ROM PCB
@@ -97,57 +105,58 @@ Type 1 - 837-14140   171-8144B
 |                                                                 315-5881   PLSI2032|
 |                                                                          (315-6050)|
 |------------------------------------------------------------------------------------|
-ROM usage -
-           Game       Sega Part No.     ROM Type
-           ------------------------------------------------
+ROM usage -                                                   CRC (from ROM test)
+           Game       Sega Part No.     ROM Type              Byte   Word
+           --------------------------------------------------------------
            Air Trix -
-                      MPR-23573.IC37    128M TSOP48 MASKROM
-                      MPR-23577.IC38    "
-                      MPR-23574.IC41    "
-                      MPR-23578.IC42    "
-                      MPR-23575.IC45    "
-                      MPR-23579.IC46    "
-                      MPR-23576.IC49    "
-                      MPR-23580.IC50    "
+                      MPR-23573.IC37    128M TSOP48 MASKROM   B9A5   9E67
+                      MPR-23577.IC38    "                     A52A   BCE0
+                      MPR-23574.IC41    "                     DABB   B621
+                      MPR-23578.IC42    "                     4BD4   5E6B
+                      MPR-23575.IC45    "                     0D06   AD63
+                      MPR-23579.IC46    "                     790F   A27E
+                      MPR-23576.IC49    "                     BDBB   4F01
+                      MPR-23580.IC50    "                     14A7   6A4E
                       IC53, IC54, IC57, \
                       IC58, IC61, IC62,  Not Used
                       IC65, IC66        /
 
-                      EPR-23601A.IC29   27C322 EPROM
-                      EPR-23602A.IC30   "
+                      EPR-23601A.IC29   27C322 EPROM          FEE8   C889
+                      EPR-23602A.IC30   "                     97C2   620C
                       other EPROM sockets not used
 
                       315-5881 stamped 317-0294-COM
 
 
-           Game       Sega Part No.     ROM Type
-           ------------------------------------------------
+                                                              CRC (from ROM test)
+           Game       Sega Part No.     ROM Type              Byte   Word
+           --------------------------------------------------------------
            Planet Harriers -
-                      MPR-23549.IC37    128M TSOP48 MASKROM
-                      MPR-23553.IC38    "
-                      MPR-23550.IC41    "
-                      MPR-23554.IC42    "
-                      MPR-23551.IC45    "
-                      MPR-23555.IC46    "
-                      MPR-23552.IC49    "
-                      MPR-23556.IC50    "
-                      MPR-23557.IC53    "
-                      MPR-23558.IC57    "
-                      MPR-23559.IC61    "
-                      MPR-23560.IC65    "
-                      MPR-23564.IC66    "
-                      MPR-23563.IC62    "
-                      MPR-23562.IC58    "
-                      MPR-23561.IC54    "
+                      MPR-23549.IC37    128M TSOP48 MASKROM   7F16   2C37
+                      MPR-23553.IC38    "                     1F9F   AAE5
+                      MPR-23550.IC41    "                     986C   8D7A
+                      MPR-23554.IC42    "                     BD1D   5304
+                      MPR-23551.IC45    "                     9784   B33D
+                      MPR-23555.IC46    "                     CB75   B08B
+                      MPR-23552.IC49    "                     5056   B3A9
+                      MPR-23556.IC50    "                     CBDE   BE85
+                      MPR-23557.IC53    "                     3D36   05BF
+                      MPR-23561.IC54    "                     D629   8ED6
+                      MPR-23558.IC57    "                     B9F5   0082
+                      MPR-23562.IC58    "                     5875   8163
+                      MPR-23559.IC61    "                     B19D   E7CC
+                      MPR-23563.IC62    "                     158C   D180
+                      MPR-23560.IC65    "                     34BC   677B
+                      MPR-23564.IC66    "                     5524   349E
 
-                      EPR-23565A.IC29   27C322 EPROM
-                      EPR-23566A.IC30   "
-                      EPR-23567A.IC31   "
-                      EPR-23568A.IC32   "
-                      EPR-23569A.IC33   "
-                      EPR-23570A.IC34   "
-                      EPR-23571A.IC35   "
-                      EPR-23572A.IC36   "
+                      EPR-23565A.IC29   27C322 EPROM          8AC6
+                      EPR-23566A.IC30   "                     1CC3
+                      EPR-23567A.IC31   "                     388C   13B5
+                      EPR-23568A.IC32   "                     D289   5910
+                      EPR-23569A.IC33   "                     09A8   578F
+                      EPR-23570A.IC34   "                     73E5   94F7
+                      EPR-23571A.IC35   "                     B1DE   6DAD
+                      EPR-23572A.IC36   "                     9019   6DD5
                       all EPROM sockets populated
 
                       315-5881 stamped 317-0297-COM
@@ -172,53 +181,53 @@ Type 2 - 837-13403   171-7640B
 | IC54  IC56  IC58  IC60  IC62  IC64  IC66  IC68 <-- these on other side of PCB      |
 |                                                                                    |
 |------------------------------------------------------------------------------------|
-ROM usage -
-           Game       Sega Part No.     ROM Type
-           ------------------------------------------------
+ROM usage -                                                   CRC (from ROM test)
+           Game       Sega Part No.     ROM Type              Byte   Word
+           --------------------------------------------------------------
            Star Wars Racer Arcade
-                      MPR-23086.IC37    64M SOP44 MASKROM
-                      MPR-23087.IC38    "
-                      MPR-23088.IC39    "
-                      MPR-23089.IC40    "
-                      MPR-23090.IC41    "
-                      MPR-23091.IC42    "
-                      MPR-23092.IC43    "
-                      MPR-23093.IC44    "
-                      MPR-23094.IC45    "
-                      MPR-23095.IC46    "
-                      MPR-23096.IC47    "
-                      MPR-23097.IC48    "
-                      MPR-23098.IC49    "
-                      MPR-23099.IC50    "
-                      MPR-23100.IC51    "
-                      MPR-23101.IC52    "
-                      MPR-23102.IC53    "
-                      MPR-23103.IC54    "
-                      MPR-23104.IC55    "
-                      MPR-23105.IC56    "
-                      MPR-23106.IC57    "
-                      MPR-23107.IC58    "
-                      MPR-23108.IC59    "
-                      MPR-23109.IC60    "
-                      MPR-23110.IC61    "
-                      MPR-23111.IC62    "
-                      MPR-23112.IC63    "
-                      MPR-23113.IC64    "
-                      MPR-23114.IC65    "
-                      MPR-23115.IC66    "
-                      MPR-23116.IC67    "
-                      MPR-23117.IC68    "
+                      MPR-23086.IC37    64M SOP44 MASKROM     7993	8E18
+                      MPR-23087.IC38    "                     4D44	D239
+                      MPR-23088.IC39    "                     4135	BEAB
+                      MPR-23089.IC40    "                     F0C8	04E2
+                      MPR-23090.IC41    "                     9532	4C1C
+                      MPR-23091.IC42    "                     925D	02FB
+                      MPR-23092.IC43    "                     0809	7050
+                      MPR-23093.IC44    "                     72BC	9311
+                      MPR-23094.IC45    "                     DE84	9D8A
+                      MPR-23095.IC46    "                     7A5C	E7FC
+                      MPR-23096.IC47    "                     6806	1392
+                      MPR-23097.IC48    "                     EDF1	7BD1
+                      MPR-23098.IC49    "                     B82D	E114
+                      MPR-23099.IC50    "                     5792	E5E5
+                      MPR-23100.IC51    "                     3AF3	A97C
+                      MPR-23101.IC52    "                     A8CC	721D
+                      MPR-23102.IC53    "                     CED7	D3CF
+                      MPR-23103.IC54    "                     6B67	FC76
+                      MPR-23104.IC55    "                     586C	6954
+                      MPR-23105.IC56    "                     13A0	DB38
+                      MPR-23106.IC57    "                     4F03	42BF
+                      MPR-23107.IC58    "                     8EA6	ADB6
+                      MPR-23108.IC59    "                     8645	FC30
+                      MPR-23109.IC60    "                     3847	CA6B
+                      MPR-23110.IC61    "                     4140	01C4
+                      MPR-23111.IC62    "                     EBE6	8085
+                      MPR-23112.IC63    "                     B68B	7467
+                      MPR-23113.IC64    "                     4715	4787
+                      MPR-23114.IC65    "                     3CD6	144A
+                      MPR-23115.IC66    "                     E5D3	BA35
+                      MPR-23116.IC67    "                     E668	08ED
+                      MPR-23117.IC68    "                     1FE8	C4A1
 
-                      EPR-23174.IC29    27C322 EPROM
-                      EPR-23175.IC30  "
-                      EPR-23176.IC31  "
-                      EPR-23177.IC32  "
+                      EPR-23174.IC29    27C322 EPROM          3B2E
+                      EPR-23175.IC30    "                     F377
+                      EPR-23176.IC31    "                     5F01   4174
+                      EPR-23177.IC32    "                     3594   38B3
                       other EPROM sockets not used
 
                       315-5881 stamped 317-0277-COM
 
 
-Protection PCB
+AICA PCB
 --------------
 
 837-13629  171-7911B  SEGA 1998
@@ -231,6 +240,8 @@ Protection PCB
 |                  |
 |                  |
 |------------------|
+Notes:
+      K4S641632 - Samsung K4S641632 64Mbit SDRAM (1M x 16Bit x 4 Banks Synchronous DRAM)
 
 
 Network PCB
@@ -250,6 +261,61 @@ Network PCB
 |  62256                            |
 |  62256          PAL               |
 |-----------------------------------|
+Notes:
+      62256 - 32k x8 SRAM
+
+
+I/O PCB
+-------
+
+837-13551  171-7780D
+|----------------------------|
+|CN4  CN5     CN6     CN7 CN8|
+| LED2  ADM485               |
+|       TMP90PH44            |
+|    14.745MHz          LED1 |
+|CN1 CN2     CN3             |
+|----------------------------|
+Notes:
+      TMP90PH44 - Toshiba TMP90PH44 TLCS-90 series microcontroller with
+                  16k internal OTP PROM and 512 bytes internal RAM
+            CN1 - 5 pin connector for +12v
+            CN2 - 5 pin connector for +12v
+            CN3 - 60 pin flat cable connector for digital controls & buttons
+            CN4 - USB connector
+            CN5 - USB connector
+            CN6 - 26 pin flat cable connector for analog controls
+            CN7 - 4 pin connector for +5v
+            CN8 - 4 pin connector for +5v
+
+
+Filter PCB
+----------
+
+839-1079  171-7789B SEGA 1998
+|----------------------------------------------------|
+|                CN6                CN11        CN9  |
+|                               CN12   CN10          |
+|                CN5  CN4   CN3           CN2   CN1  |
+|                                                    |
+|                                                    |
+|  CNTX CNRX CN7       DN2               DN1         |
+|----------------------------------------------------|
+Notes:
+      CN1  - 8 pin JVS power connector
+      CN2  - 6 pin JVS power connector
+      CN3  - 15 pin VGA connector 24k/31k
+      CN4  - 15 pin VGA connector 24k/31k. Not populated
+      CN5  - red/white RCA audio connectors
+      CN6  - red/white RCA audio connectors
+      CN7  - USB connector. Plugs into JVS I/O PCB using common A-B USB cable
+      CN8  - Optical network connector, re-labelled CNTX. Sometimes not populated
+      CN9  - Optical network connector, re-labelled CNTR. Sometimes not populated
+      CN10 - Unknown. Not populated
+      CN11 - RS422 connector. Not populated
+      CN12 - Midi connector. Not populated
+   DN1/DN2 - Connectors joining to main board. These connectors
+             are on the other side of the PCB
 
 */
 
@@ -482,8 +548,6 @@ ROM_START( podrace )
 	ROM_LOAD("mpr-23116.ic67" , 0xf000000, 0x0800000, NO_DUMP )
 	ROM_LOAD("mpr-23117.ic68" , 0xf800000, 0x0800000, NO_DUMP )
 ROM_END
-
-
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2000, airtrix,  hikaru,   hikaru,   hikaru,   0, ROT0, "Sega",            "Air Trix", GAME_NO_SOUND|GAME_NOT_WORKING )
