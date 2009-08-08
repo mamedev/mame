@@ -466,12 +466,12 @@ struct SNES_PPU_STRUCT
 		UINT8 repeat;
 		UINT8 hflip;
 		UINT8 vflip;
-		UINT16 matrix_a;
-		UINT16 matrix_b;
-		UINT16 matrix_c;
-		UINT16 matrix_d;
-		UINT16 origin_x;
-		UINT16 origin_y;
+		INT16 matrix_a;
+		INT16 matrix_b;
+		INT16 matrix_c;
+		INT16 matrix_d;
+		INT16 origin_x;
+		INT16 origin_y;
 	} mode7;
 	UINT8 mosaic_size;
 	UINT8 main_color_mask;
