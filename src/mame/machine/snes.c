@@ -587,8 +587,8 @@ READ8_HANDLER( snes_r_io )
 
 	}
 
-	/* Unsupported reads return 0xff */
-	return 0xff;
+	/* Unsupported reads returns open bus */
+	return snes_open_bus_r(space,0);
 }
 
 /*
