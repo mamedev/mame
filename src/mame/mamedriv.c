@@ -9470,8 +9470,8 @@ Other Sun games
 	DRIVER( moneymacv1 )/* (c) 200? Amcoe */
 	DRIVER( moneymacd2 )/* (c) 200? Amcoe */
 	DRIVER( moneymacv2 )/* (c) 200? Amcoe */
-	DRIVER( atworld )	/* (c) 200? Amcoe - Around The World */
-	DRIVER( atworldd1 )	/* (c) 200? Amcoe */
+	//DRIVER( atworld )	/* (c) 200? Amcoe - Around The World */
+	//DRIVER( atworldd1 )	/* (c) 200? Amcoe */
 
 
 	DRIVER( chsuper3 )	/* unknown */
