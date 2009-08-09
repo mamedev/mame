@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( looping_cop_data_map, ADDRESS_SPACE_DATA, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_cop_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0100, 0x0107) AM_NOP /* ? */
+//	AM_RANGE(0x0100, 0x0107) AM_NOP /* ? */
 ADDRESS_MAP_END
 
 
@@ -723,7 +723,20 @@ ROM_START( looping )
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -745,9 +758,20 @@ ROM_START( loopinga )
 	ROM_LOAD( "i-o-v2.13c",		0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
     ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
-
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -769,8 +793,20 @@ ROM_START( skybump )
 	ROM_LOAD( "snd.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+/*
+	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+	ROM_CONTINUE(			0x0000, 0x0400)
+*/
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "vid.8a",			0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )

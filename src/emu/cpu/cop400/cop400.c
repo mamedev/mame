@@ -976,7 +976,7 @@ static void cop410_init_opcodes(const device_config *device)
 
 	/* initialize LBI opcode array */
 
-	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
 	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
 	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
 	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
@@ -1008,7 +1008,7 @@ static void cop420_init_opcodes(const device_config *device)
 
 	/* initialize LBI opcode array */
 
-	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
 	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
 	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
 	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
@@ -1043,7 +1043,7 @@ static void cop444_init_opcodes(const device_config *device)
 
 	/* initialize LBI opcode array */
 
-	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
 	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
 	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
 	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
