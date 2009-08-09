@@ -578,26 +578,26 @@ MACHINE_DRIVER_END
 
 #else
 
-#define XTAL		18432000
+#define XTAL					18432000
 
-#define SOUND_CLOCK (XTAL/6/2)			/* 1.536 MHz */
-#define RNG_RATE	(XTAL/3*2)			/* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
+#define SOUND_CLOCK 			(XTAL/6/2)			/* 1.536 MHz */
+#define RNG_RATE				(XTAL/3*2)			/* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
 
 #define DISCRETE_BITSET(_N, _N1, _B, _OV) DISCRETE_TRANSFORM4(_N, _N1, (1 << ((_B)-1)), 0, _OV, "01&2>3*")
 
 /* 74LS259 */
-#define GAL_9M_Q4_Q7			NODE_10
+#define GAL_INP_BG_DAC			NODE_10		/* at 9M Q4 to Q7 in schematics */
 
-#define GAL_9L_Q0				NODE_20		/* FS1 */
-#define GAL_9L_Q1				NODE_21		/* FS2 */
-#define GAL_9L_Q2				NODE_22		/* FS3 */
-#define GAL_9L_Q3				NODE_23		/* HIT */
+#define GAL_INP_FS1				NODE_20		/* FS1 9L Q0 */
+#define GAL_INP_FS2				NODE_21		/* FS2 9L Q1 */
+#define GAL_INP_FS3				NODE_22		/* FS3 9L Q2 */
+#define GAL_INP_HIT				NODE_23		/* HIT 9L Q3 */
 //#define GAL_9L_Q4				NODE_24		
-#define GAL_9L_Q5				NODE_25		/* FIRE */
-#define GAL_9L_Q6				NODE_26		/* VOL1 */
-#define GAL_9L_Q7				NODE_27		/* VOL2 */
+#define GAL_INP_FIRE			NODE_25		/* FIRE 9L Q5 */
+#define GAL_INP_VOL1			NODE_26		/* VOL1 9L Q6 */
+#define GAL_INP_VOL2			NODE_27		/* VOL2 9L Q7 */
 
-#define GAL_6T					NODE_28	
+#define GAL_INP_PITCH_HIGH		NODE_28		/* at 6T in schematics */
 
 #define TTL_OUT					(4)
 
@@ -617,7 +617,6 @@ MACHINE_DRIVER_END
 #define GAL_R27					RES_K(10)
 #define GAL_R28					RES_K(100)
 #define GAL_R29					RES_K(220)
-
 
 #define GAL_R30					RES_K(10)
 #define GAL_R31					RES_K(47)
@@ -693,7 +692,7 @@ static const discrete_555_desc galaxian_555_vco_desc =
 
 static const discrete_555_desc galaxian_555_fire_vco_desc =
 {
-	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
+	DISC_555_OUT_DC,
 	5.0,
 	DEFAULT_555_CHARGE,
 	1.0 // Logic output			
@@ -730,7 +729,7 @@ static const discrete_mixer_desc galaxian_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{GAL_R51, 0, GAL_R50, 0, GAL_R34, GAL_R40, GAL_R43},		/* A, C, C, D */
-	{0, GAL_9L_Q6, 0, GAL_9L_Q7, 0, 0, 0},
+	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2, 0, 0, 0},
 	{0,0,0,0,0,0,GAL_C26},  
 	0, GAL_R91,
 	0,
@@ -752,40 +751,40 @@ static DISCRETE_SOUND_START(galaxian)
 	/************************************************/
 	/* Input register mapping for galaxian          */
 	/************************************************/
-	DISCRETE_INPUT_DATA(GAL_9M_Q4_Q7)
+	DISCRETE_INPUT_DATA(GAL_INP_BG_DAC)
 	
 	/* FS1 to FS3 */
-	DISCRETE_INPUT_LOGIC(GAL_9L_Q0)
-	DISCRETE_INPUT_LOGIC(GAL_9L_Q1)
-	DISCRETE_INPUT_LOGIC(GAL_9L_Q2)
+	DISCRETE_INPUT_LOGIC(GAL_INP_FS1)
+	DISCRETE_INPUT_LOGIC(GAL_INP_FS2)
+	DISCRETE_INPUT_LOGIC(GAL_INP_FS3)
 
 	/* HIT */
-	DISCRETE_INPUTX_DATA(GAL_9L_Q3, TTL_OUT, 0, 0)
+	DISCRETE_INPUTX_DATA(GAL_INP_HIT, TTL_OUT, 0, 0)
 	
 	/* FIRE */
-	DISCRETE_INPUT_LOGIC(GAL_9L_Q5)
+	DISCRETE_INPUT_LOGIC(GAL_INP_FIRE)
 	
 	/* Turns on / off resistors in mixer */
-	DISCRETE_INPUTX_DATA(GAL_9L_Q6, GAL_R49, 0, 0)
-	DISCRETE_INPUTX_DATA(GAL_9L_Q7, GAL_R52, 0, 0)
+	DISCRETE_INPUTX_DATA(GAL_INP_VOL1, GAL_R49, 0, 0)
+	DISCRETE_INPUTX_DATA(GAL_INP_VOL2, GAL_R52, 0, 0)
 
 	/* Pitch */
-	DISCRETE_INPUT_DATA(GAL_6T)
+	DISCRETE_INPUT_DATA(GAL_INP_PITCH_HIGH)
 	
 	/************************************************/
 	/* Background                                   */
 	/************************************************/
 	
-	DISCRETE_DAC_R1(NODE_100, 1, GAL_9M_Q4_Q7, TTL_OUT, &galaxian_bck_dac)
+	DISCRETE_DAC_R1(NODE_100, 1, GAL_INP_BG_DAC, TTL_OUT, &galaxian_bck_dac)
 	DISCRETE_555_CC(NODE_105, 1, NODE_100, GAL_R21, GAL_C15, 0, 0, 0, &galaxian_bck_vco)
 	// Next is mult/add opamp circuit
 	DISCRETE_MULTADD(NODE_110, 1, NODE_105, GAL_R33/RES_3_PARALLEL(GAL_R31,GAL_R32,GAL_R33),
 			-5.0*GAL_R33/GAL_R31)
 	DISCRETE_CLAMP(NODE_111,1,NODE_110,0.0,5.0,0.0)
 	// The three 555
-	DISCRETE_555_ASTABLE_CV(NODE_115, GAL_9L_Q0, GAL_R22, GAL_R23, GAL_C17, NODE_111, &galaxian_555_vco_desc)
-	DISCRETE_555_ASTABLE_CV(NODE_116, GAL_9L_Q1, GAL_R25, GAL_R26, GAL_C18, NODE_111, &galaxian_555_vco_desc)
-	DISCRETE_555_ASTABLE_CV(NODE_117, GAL_9L_Q2, GAL_R28, GAL_R29, GAL_C19, NODE_111, &galaxian_555_vco_desc)
+	DISCRETE_555_ASTABLE_CV(NODE_115, GAL_INP_FS1, GAL_R22, GAL_R23, GAL_C17, NODE_111, &galaxian_555_vco_desc)
+	DISCRETE_555_ASTABLE_CV(NODE_116, GAL_INP_FS2, GAL_R25, GAL_R26, GAL_C18, NODE_111, &galaxian_555_vco_desc)
+	DISCRETE_555_ASTABLE_CV(NODE_117, GAL_INP_FS3, GAL_R28, GAL_R29, GAL_C19, NODE_111, &galaxian_555_vco_desc)
 
 	DISCRETE_MIXER3(NODE_120, 1, NODE_115, NODE_116, NODE_117, &galaxian_bck_mixer_desc)
 
@@ -794,9 +793,9 @@ static DISCRETE_SOUND_START(galaxian)
 	/************************************************/
 
 	/* Needs to be replaced by timer ... */
-    DISCRETE_BITSET(NODE_133, GAL_6T, 1, TTL_OUT)		/* QA 74393 */	
-    DISCRETE_BITSET(NODE_134, GAL_6T, 3, TTL_OUT)		/* QC 74393 */	
-    DISCRETE_BITSET(NODE_135, GAL_6T, 4, TTL_OUT)		/* QD 74393 */	
+    DISCRETE_BITSET(NODE_133, GAL_INP_PITCH_HIGH, 1, TTL_OUT)		/* QA 74393 */	
+    DISCRETE_BITSET(NODE_134, GAL_INP_PITCH_HIGH, 3, TTL_OUT)		/* QC 74393 */	
+    DISCRETE_BITSET(NODE_135, GAL_INP_PITCH_HIGH, 4, TTL_OUT)		/* QD 74393 */	
 
 	/************************************************/
 	/* HIT                                        */
@@ -812,22 +811,24 @@ static DISCRETE_SOUND_START(galaxian)
 
 
 	/* Not 100% correct - Factor 2 to account for being always enabled */
-	DISCRETE_RCDISC5(NODE_155, 1, GAL_9L_Q3, (GAL_R35 + GAL_R36)*2, GAL_C21)
+	DISCRETE_RCDISC5(NODE_155, 1, GAL_INP_HIT, (GAL_R35 + GAL_R36)*2, GAL_C21)
 	DISCRETE_MULTIPLY(NODE_156, 1, NODE_152, NODE_155)
 	DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_156, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
 
-	/************************************************/
+	/************************************************/ 	
 	/* FIRE                                         */
 	/************************************************/
-	DISCRETE_LOGIC_INVERT(NODE_160, 1, GAL_9L_Q5)
-	DISCRETE_MULTIPLY(NODE_161, 1, TTL_OUT, GAL_9L_Q5) 
+	DISCRETE_LOGIC_INVERT(NODE_160, 1, GAL_INP_FIRE)
+	DISCRETE_MULTIPLY(NODE_161, 1, TTL_OUT, GAL_INP_FIRE) 
 	DISCRETE_MULTIPLY(NODE_162, 1, TTL_OUT, NODE_160) // inverted
 	DISCRETE_RCFILTER(NODE_163, 1, NODE_162, GAL_R47, GAL_C28)
 	/* Mix noise and 163 */
-	DISCRETE_MULTIPLY(NODE_164, 1, TTL_OUT, NODE_152) 
-	DISCRETE_MULTIPLY(NODE_165, 1, 1.0/GAL_R46, NODE_164) 
-	DISCRETE_MULTIPLY(NODE_166, 1, 1.0/GAL_R48, NODE_163) 
-	DISCRETE_ADDER2(NODE_167, 1, NODE_165, NODE_166) 
+	DISCRETE_TRANSFORM5(NODE_167, NODE_152, TTL_OUT, 1.0/GAL_R46, NODE_163, 1.0/GAL_R48,
+			"01*2*34*+" )
+	//DISCRETE_MULTIPLY(NODE_164, 1, TTL_OUT, NODE_152) 
+	//DISCRETE_MULTIPLY(NODE_165, 1, 1.0/GAL_R46, NODE_164) 
+	//DISCRETE_MULTIPLY(NODE_166, 1, 1.0/GAL_R48, NODE_163) 
+	//DISCRETE_ADDER2(NODE_167, 1, NODE_165, NODE_166) 
 	DISCRETE_MULTIPLY(NODE_168, 1, RES_2_PARALLEL(GAL_R46, GAL_R48), NODE_167)
 	
 	DISCRETE_RCDISC5(NODE_170, 1, NODE_161, (GAL_R41)*2, GAL_C25)
@@ -843,7 +844,6 @@ static DISCRETE_SOUND_START(galaxian)
 
 	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*1.5)
 
-	//DISCRETE_WAVELOG2(GAL_9L_Q3, 10000, NODE_156, 10000)
 DISCRETE_SOUND_END
 
 static UINT8 lfo_val;
@@ -854,12 +854,12 @@ static UINT8 pitch_h;
 static TIMER_CALLBACK( pitch_callback )
 {
 	const device_config *device = devtag_get_device(machine, GAL_AUDIO);
-	
+
 	timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
 	pitch_h++;
 	if (pitch_h > 15)
 		pitch_h = 0;
-	discrete_sound_w(device, GAL_6T, pitch_h );
+	discrete_sound_w(device, GAL_INP_PITCH_HIGH, pitch_h );
 }
 
 static SOUND_START(galaxian)
@@ -879,29 +879,29 @@ WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w )
 	if (lfo_val != lfo_val_new)
 	{
 		lfo_val = lfo_val_new;
-		discrete_sound_w(device, GAL_9M_Q4_Q7, lfo_val);
+		discrete_sound_w(device, GAL_INP_BG_DAC, lfo_val);
 	}
 }
 
 WRITE8_DEVICE_HANDLER( galaxian_background_enable_w )
 {
-	discrete_sound_w(device, NODE_RELATIVE(GAL_9L_Q0, offset), data & 0x01);
+	discrete_sound_w(device, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( galaxian_noise_enable_w )
 {
-	discrete_sound_w(device, GAL_9L_Q3, data & 0x01);
+	discrete_sound_w(device, GAL_INP_HIT, data & 0x01);
 }
 
 WRITE8_DEVICE_HANDLER( galaxian_vol_w )
 {
-	discrete_sound_w(device, GAL_9L_Q6, data & 0x01);
+	discrete_sound_w(device, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
 }
 
 /* FIXME: rename to fire to be consistent */
 WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w )
 {
-	discrete_sound_w(device, GAL_9L_Q5, data & 0x01);
+	discrete_sound_w(device, GAL_INP_FIRE, data & 0x01);
 }
 
 /* FIXME: use timer ! -- IC 9J */
