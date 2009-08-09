@@ -423,6 +423,8 @@ struct SNES_PPU_STRUCT
 		UINT8 map_size;
 		UINT8 tile_size;
 		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
+		UINT8 main_window_enabled;
+		UINT8 sub_window_enabled;
 		struct
 		{
 			UINT16 horizontal;

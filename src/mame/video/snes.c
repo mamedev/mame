@@ -228,7 +228,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
  *****************************************/
 INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal )
 {
-	UINT8 mask, plane[8];
+	UINT8 mask, plane[8], window_enabled = 0;
 	UINT16 c;
 	INT16 ii, jj;
 
@@ -265,7 +265,8 @@ INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tilea
 		if(!debug_options.windows_disabled)
 #endif /* MAME_DEBUG */
 		/* Clip to windows */
-		if ((screen == MAINSCREEN && (snes_ram[TMW] & (0x1 << layer))) || (screen == SUBSCREEN && (snes_ram[TSW] & (0x1 << layer))))
+		window_enabled = (screen == MAINSCREEN) ? snes_ppu.layer[layer].main_window_enabled : snes_ppu.layer[layer].sub_window_enabled;
+		if (window_enabled)
 			colour &= snes_ppu.clipmasks[layer][ii];
 
 		/* Only draw if we have a colour (0 == transparent) */
@@ -324,26 +325,30 @@ INLINE void snes_draw_tile_x2(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 ti
  * The same as snes_draw_tile_4() except
  * that it takes a blend parameter.
  *****************************************/
-INLINE void snes_draw_tile_object(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal, UINT8 blend )
+INLINE void snes_draw_tile_object(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal, UINT8 blend, UINT8 wide )
 {
-	UINT8 mask, plane[4];
+	UINT8 mask, plane[4], window_enabled = 0;
 	UINT16 c;
 	INT16 ii;
+	UINT8 x_shift = wide ? 1 : 0;
+	UINT8 size = wide ? 16 : 8;
+	UINT8 step = wide ? 1 : 0;
 
 	plane[0] = snes_vram[tileaddr];
 	plane[1] = snes_vram[tileaddr + 1];
 	plane[2] = snes_vram[tileaddr + 16];
 	plane[3] = snes_vram[tileaddr + 17];
 
-	if( flip )
-		mask = 0x1;
+	if (flip)
+		mask = 0x01;
 	else
 		mask = 0x80;
 
-	for( ii = x; ii < (x + 8); ii++ )
+	x <<= x_shift;
+	for (ii = x; ii < (x + size); ii += 1 + step)
 	{
 		UINT8 colour;
-		if( flip )
+		if (flip)
 		{
 			colour = (plane[0] & mask ? 1 : 0) | (plane[1] & mask ? 2 : 0) |
 					 (plane[2] & mask ? 4 : 0) | (plane[3] & mask ? 8 : 0);
@@ -357,89 +362,29 @@ INLINE void snes_draw_tile_object(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 
 		}
 
 #ifdef MAME_DEBUG
-		if( !debug_options.windows_disabled )
+		if (!debug_options.windows_disabled)
 #endif /* MAME_DEBUG */
 		/* Clip to windows */
-		if( (screen == MAINSCREEN && (snes_ram[TMW] & 0x10)) || (screen == SUBSCREEN && (snes_ram[TSW] & 0x10)))
+		window_enabled = (screen == MAINSCREEN) ? snes_ppu.layer[4].main_window_enabled : snes_ppu.layer[4].sub_window_enabled;
+		if (window_enabled)
 			colour &= snes_ppu.clipmasks[4][ii];
 
 		/* Only draw if we have a colour (0 == transparent) */
-		if( colour )
+		if (colour)
 		{
-			if( ii >= 0 )
+			if (ii >= 0)
 			{
 				c = snes_cgram[pal + colour];
-				if( blend && screen == MAINSCREEN )	/* Only blend main screens */
+				if (blend && screen == MAINSCREEN)	/* Only blend main screens */
 					snes_draw_blend(ii, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
 
 				scanlines[screen].buffer[ii] = c;
 				scanlines[screen].zbuf[ii] = priority;
-			}
-		}
-	}
-}
-
-/*****************************************
- * snes_draw_tile_object_w()
- *
- * Draw tiles with 4 bit planes(16 colors)
- * The same as snes_draw_tile_4() except
- * that it takes a blend parameter.
- * Wide version.
- *****************************************/
-INLINE void snes_draw_tile_object_w(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal, UINT8 blend )
-{
-	UINT8 mask, plane[4];
-	UINT16 c;
-	INT16 ii;
-
-	plane[0] = snes_vram[tileaddr];
-	plane[1] = snes_vram[tileaddr + 1];
-	plane[2] = snes_vram[tileaddr + 16];
-	plane[3] = snes_vram[tileaddr + 17];
-
-	if( flip )
-		mask = 0x1;
-	else
-		mask = 0x80;
-
-	x <<= 1;
-	for( ii = x; ii < (x + 16); ii += 2 )
-	{
-		UINT8 colour;
-		if( flip )
-		{
-			colour = (plane[0] & mask ? 1 : 0) | (plane[1] & mask ? 2 : 0) |
-					 (plane[2] & mask ? 4 : 0) | (plane[3] & mask ? 8 : 0);
-			mask <<= 1;
-		}
-		else
-		{
-			colour = (plane[0] & mask ? 1 : 0) | (plane[1] & mask ? 2 : 0) |
-					 (plane[2] & mask ? 4 : 0) | (plane[3] & mask ? 8 : 0);
-			mask >>= 1;
-		}
-
-#ifdef MAME_DEBUG
-		if( !debug_options.windows_disabled )
-#endif /* MAME_DEBUG */
-		/* Clip to windows */
-		if( (screen == MAINSCREEN && (snes_ram[TMW] & 0x10)) || (screen == SUBSCREEN && (snes_ram[TSW] & 0x10)))
-			colour &= snes_ppu.clipmasks[4][ii];
-
-		/* Only draw if we have a colour (0 == transparent) */
-		if( colour )
-		{
-			if( ii >= 0 )
-			{
-				c = snes_cgram[pal + colour];
-				if( blend && screen == MAINSCREEN )	/* Only blend main screens */
-					snes_draw_blend(ii, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
-
-				scanlines[screen].buffer[ii] = c;
-				scanlines[screen].zbuf[ii] = priority;
-				scanlines[screen].buffer[ii + 1] = c;
-				scanlines[screen].zbuf[ii + 1] = priority;
+				if (wide)
+				{
+					scanlines[screen].buffer[ii + 1] = c;
+					scanlines[screen].zbuf[ii + 1] = priority;
+				}
 			}
 		}
 	}
@@ -741,7 +686,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 			UINT16 clr;
 			/* Direct select, but only outside EXTBG! */
 			if (snes_ppu.direct_color && layer == 1)
-				clr = ((colour & 0x7) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
+				clr = ((colour & 0x07) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
 			else
 				clr = snes_cgram[colour];
 			/* Only blend main screens */
@@ -846,9 +791,9 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 					if( (x + (count << 3) < SNES_SCR_WIDTH + 8) )
 					{
 						if( widemode )
-							snes_draw_tile_object_w(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend );
+							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend, 1);
 						else
-							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend );
+							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (count++ << 3), priority, hflip, pal, blend, 0);
 					}
 					time_over++;	/* Increase time_over. Should we stop drawing if exceeded 34 tiles? */
 				}
@@ -860,9 +805,9 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 					if( (x + (xs << 3) < SNES_SCR_WIDTH + 8) )
 					{
 						if( widemode )
-							snes_draw_tile_object_w(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend );
+							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend, 1);
 						else
-							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend );
+							snes_draw_tile_object(screen, snes_ppu.layer[4].data + name_sel + tile + table_obj_offset[ys][xs] + line, x + (xs << 3), priority, hflip, pal, blend, 0);
 					}
 					time_over++;	/* Increase time_over. Should we stop drawing if exceeded 34 tiles? */
 				}

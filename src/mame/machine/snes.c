@@ -738,7 +738,7 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			break;
 		case MOSAIC:	/* Size and screen designation for mosaic */
-			/* FIXME: We don't support horizontal mosaic yet */
+			/* FIXME: We support horizontal mosaic only partially */
 			snes_ppu.mosaic_size = (data & 0xf0) >> 4;
 			snes_ppu.layer[0].mosaic_enabled = data & 0x01;
 			snes_ppu.layer[1].mosaic_enabled = data & 0x02;
@@ -939,8 +939,20 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case TM:		/* Main screen designation */
 		case TS:		/* Subscreen designation */
+			break;
 		case TMW:		/* Window mask for main screen designation */
+			snes_ppu.layer[0].main_window_enabled = data & 0x01;
+			snes_ppu.layer[1].main_window_enabled = data & 0x02;
+			snes_ppu.layer[2].main_window_enabled = data & 0x04;
+			snes_ppu.layer[3].main_window_enabled = data & 0x08;
+			snes_ppu.layer[4].main_window_enabled = data & 0x10;
+			break;
 		case TSW:		/* Window mask for subscreen designation */
+			snes_ppu.layer[0].sub_window_enabled = data & 0x01;
+			snes_ppu.layer[1].sub_window_enabled = data & 0x02;
+			snes_ppu.layer[2].sub_window_enabled = data & 0x04;
+			snes_ppu.layer[3].sub_window_enabled = data & 0x08;
+			snes_ppu.layer[4].sub_window_enabled = data & 0x10;
 			break;
 		case CGWSEL:	/* Initial settings for Fixed colour addition or screen addition */
 			/* FIXME: We don't support direct select for modes 3 & 4 or subscreen window stuff */
@@ -1021,6 +1033,7 @@ WRITE8_HANDLER( snes_w_io )
 				// external latch
 				snes_latch_counters(space->machine);
 			}
+			break;
 		case WRMPYA:	/* Multiplier A */
 			break;
 		case WRMPYB:	/* Multiplier B */
