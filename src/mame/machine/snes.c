@@ -31,7 +31,6 @@ static UINT16 cgram_address;	/* CGRAM address */
 static UINT8  vram_read_offset;	/* VRAM read offset */
 UINT8  spc_port_in[4];	/* Port for sending data to the SPC700 */
 UINT8  spc_port_out[4];	/* Port for receiving data from the SPC700 */
-static UINT8 ppu_last_scroll;	/* as per Theme Park, this is shared by all scroll regs */
 static UINT8 snes_hdma_chnl;	/* channels enabled for HDMA */
 static UINT8 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
 static UINT8 read_ophct = 0, read_opvct = 0;
@@ -340,15 +339,25 @@ READ8_HANDLER( snes_r_io )
 		case CGDATA:
 			return snes_ram[offset];
 		case MPYL:		/* Multiplication result (low) */
+			{
+				/* Perform 16bit * 8bit multiply */
+				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
+				snes_ram[MPYL] = c & 0xff;
+				return snes_ram[MPYL];
+			}
 		case MPYM:		/* Multiplication result (mid) */
+			{
+				/* Perform 16bit * 8bit multiply */
+				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
+				snes_ram[MPYM] = (c >> 8) & 0xff;
+				return snes_ram[MPYM];
+			}
 		case MPYH:		/* Multiplication result (high) */
 			{
 				/* Perform 16bit * 8bit multiply */
-				INT32 c = snes_ppu.mode7.matrix_a * (snes_ppu.mode7.matrix_b >> 8);
-				snes_ram[MPYL] = c & 0xff;
-				snes_ram[MPYM] = (c >> 8) & 0xff;
+				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
 				snes_ram[MPYH] = (c >> 16) & 0xff;
-				return snes_ram[offset];
+				return snes_ram[MPYH];
 			}
 		case SLHV:		/* Software latch for H/V counter */
 			snes_latch_counters(space->machine);
@@ -680,7 +689,7 @@ WRITE8_HANDLER( snes_w_io )
 					else
 					{
 						snes_oam[oam_addr] &= 0x00ff;
-						snes_oam[oam_addr] |= (data<<8);
+						snes_oam[oam_addr] |= (data << 8);
 					}
 				}
 				else
@@ -692,7 +701,7 @@ WRITE8_HANDLER( snes_w_io )
 					}
 					else
 					{
-						snes_oam[oam_addr] = (data<<8) | snes_ppu.oam.write_latch;
+						snes_oam[oam_addr] = (data << 8) | snes_ppu.oam.write_latch;
 					}
 				}
 				snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
@@ -706,7 +715,7 @@ WRITE8_HANDLER( snes_w_io )
 				return;
 			}
 		case BGMODE:	/* BG mode and character size settings */
-			snes_ppu.mode = data & 0x7;
+			snes_ppu.mode = data & 0x07;
 			{
 				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
@@ -730,7 +739,7 @@ WRITE8_HANDLER( snes_w_io )
 				else
 					video_screen_configure(space->machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 			}
-
+			snes_ppu.bg3_priority_bit = data & 0x08;
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;
 			snes_ppu.layer[1].tile_size = (data >> 5) & 0x1;
 			snes_ppu.layer[2].tile_size = (data >> 6) & 0x1;
@@ -761,45 +770,53 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.layer[3].data = (data & 0xf0) << 9;
 			break;
 
-		// Anomie says "H Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7); V Current = (Current<<8) | Prev;"
+		// Anomie says "H Current = (Byte<<8) | (Prev&~7) | ((Current>>8)&7); V Current = (Current<<8) | Prev;" and Prev is shared by all scrolls but in Mode 7!
 		case BG1HOFS:	/* BG1 - horizontal scroll (DW) */
-			snes_ppu.layer[0].offset.horizontal = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[0].offset.horizontal>>8) & 7);
-			ppu_last_scroll = data;
+			/* In Mode 0->6 we use ppu_last_scroll as Prev */
+			snes_ppu.layer[0].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[0].offset.horizontal >> 8) & 7);
+			snes_ppu.ppu_last_scroll = data;
+			/* In Mode 7 we use mode7_last_scroll as Prev */
+			snes_ppu.mode7.hor_offset = (data << 8) | (snes_ppu.mode7_last_scroll & ~7) | ((snes_ppu.mode7.hor_offset >> 8) & 7);
+			snes_ppu.mode7_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG1VOFS:	/* BG1 - vertical scroll (DW) */
-			snes_ppu.layer[0].offset.vertical = (data<<8) | (ppu_last_scroll);
-			ppu_last_scroll = data;
+			/* In Mode 0->6 we use ppu_last_scroll as Prev */
+			snes_ppu.layer[0].offset.vertical = (data << 8) | snes_ppu.ppu_last_scroll;
+			snes_ppu.ppu_last_scroll = data;
+			/* In Mode 7 we use mode7_last_scroll as Prev */
+			snes_ppu.mode7.ver_offset = (data << 8) | snes_ppu.mode7_last_scroll;
+			snes_ppu.mode7_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG2HOFS:	/* BG2 - horizontal scroll (DW) */
-			snes_ppu.layer[1].offset.horizontal = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[1].offset.horizontal>>8) & 7);
-			ppu_last_scroll = data;
+			snes_ppu.layer[1].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[1].offset.horizontal >> 8) & 7);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG2VOFS:	/* BG2 - vertical scroll (DW) */
-			snes_ppu.layer[1].offset.vertical = (data<<8) | (ppu_last_scroll);
-			ppu_last_scroll = data;
+			snes_ppu.layer[1].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG3HOFS:	/* BG3 - horizontal scroll (DW) */
-			snes_ppu.layer[2].offset.horizontal = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[2].offset.horizontal>>8) & 7);
-			ppu_last_scroll = data;
+			snes_ppu.layer[2].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[2].offset.horizontal >> 8) & 7);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG3VOFS:	/* BG3 - vertical scroll (DW) */
-			snes_ppu.layer[2].offset.vertical = (data<<8) | (ppu_last_scroll);
-			ppu_last_scroll = data;
+			snes_ppu.layer[2].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG4HOFS:	/* BG4 - horizontal scroll (DW) */
-			snes_ppu.layer[3].offset.horizontal = (data<<8) | (ppu_last_scroll & ~7) | ((snes_ppu.layer[3].offset.horizontal>>8) & 7);
-			ppu_last_scroll = data;
+			snes_ppu.layer[3].offset.horizontal = (data << 8) | (snes_ppu.ppu_last_scroll & ~7) | ((snes_ppu.layer[3].offset.horizontal >> 8) & 7);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case BG4VOFS:	/* BG4 - vertical scroll (DW) */
-			snes_ppu.layer[3].offset.vertical = (data<<8) | (ppu_last_scroll);
-			ppu_last_scroll = data;
+			snes_ppu.layer[3].offset.vertical = (data << 8) | (snes_ppu.ppu_last_scroll);
+			snes_ppu.ppu_last_scroll = data;
 			snes_ppu.update_offsets = 1;
 			return;
 		case VMAIN:		/* VRAM address increment value designation */
@@ -898,23 +915,30 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.mode7.vflip  = data & 0x02;
 			snes_ppu.mode7.hflip  = data & 0x01;
 			break;
+		/* As per Anomie's doc: Reg = (Current<<8) | Prev; and there is only one Prev, shared by these matrix regs and Mode 7 scroll regs */
 		case M7A:		/* Mode 7 COS angle/x expansion (DW) */
-			snes_ppu.mode7.matrix_a = ((snes_ppu.mode7.matrix_a >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.matrix_a = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case M7B:		/* Mode 7 SIN angle/ x expansion (DW) */
-			snes_ppu.mode7.matrix_b = ((snes_ppu.mode7.matrix_b >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.matrix_b = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case M7C:		/* Mode 7 SIN angle/y expansion (DW) */
-			snes_ppu.mode7.matrix_c = ((snes_ppu.mode7.matrix_c >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.matrix_c = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case M7D:		/* Mode 7 COS angle/y expansion (DW) */
-			snes_ppu.mode7.matrix_d = ((snes_ppu.mode7.matrix_d >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.matrix_d = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case M7X:		/* Mode 7 x center position (DW) */
-			snes_ppu.mode7.origin_x = ((snes_ppu.mode7.origin_x >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.origin_x = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case M7Y:		/* Mode 7 y center position (DW) */
-			snes_ppu.mode7.origin_y = ((snes_ppu.mode7.origin_y >> 8) & 0xff) + (data << 8);
+			snes_ppu.mode7.origin_y = snes_ppu.mode7_last_scroll + (data << 8);
+			snes_ppu.mode7_last_scroll = data;
 			break;
 		case CGADD:		/* Initial address for colour RAM writing */
 			/* CGRAM is 16-bit, but when reading/writing we treat it as
@@ -938,7 +962,18 @@ WRITE8_HANDLER( snes_w_io )
 				snes_ppu.update_windows = 1;
 			break;
 		case TM:		/* Main screen designation */
+			snes_ppu.main_bg_enabled[0] = data & 0x01;
+			snes_ppu.main_bg_enabled[1] = data & 0x02;
+			snes_ppu.main_bg_enabled[2] = data & 0x04;
+			snes_ppu.main_bg_enabled[3] = data & 0x08;
+			snes_ppu.main_bg_enabled[4] = data & 0x10;
+			break;
 		case TS:		/* Subscreen designation */
+			snes_ppu.sub_bg_enabled[0] = data & 0x01;
+			snes_ppu.sub_bg_enabled[1] = data & 0x02;
+			snes_ppu.sub_bg_enabled[2] = data & 0x04;
+			snes_ppu.sub_bg_enabled[3] = data & 0x08;
+			snes_ppu.sub_bg_enabled[4] = data & 0x10;
 			break;
 		case TMW:		/* Window mask for main screen designation */
 			snes_ppu.layer[0].main_window_enabled = data & 0x01;

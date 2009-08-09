@@ -413,7 +413,7 @@ extern UINT8  *snes_ram;			/* Main memory */
 extern UINT8  *spc_ram;				/* SPC main memory */
 extern UINT8  spc_port_in[4];		/* SPC input ports */
 extern UINT8  spc_port_out[4];		/* SPC output ports */
-struct SNES_PPU_STRUCT
+struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 	struct
 	{
@@ -474,12 +474,21 @@ struct SNES_PPU_STRUCT
 		INT16 matrix_d;
 		INT16 origin_x;
 		INT16 origin_y;
+		UINT16 hor_offset;
+		UINT16 ver_offset;
 	} mode7;
 	UINT8 mosaic_size;
 	UINT8 main_color_mask;
 	UINT8 sub_color_mask;
 	UINT8 sub_add_mode;
+	UINT8 bg3_priority_bit;
 	UINT8 direct_color;
+	UINT8 ppu_last_scroll;		/* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same 
+									'previous' scroll value */
+	UINT8 mode7_last_scroll;	/* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
+
+	UINT8 main_bg_enabled[5];	// these would probably better fit the layer struct, but it would make worse the code in snes_update_mode_X()
+	UINT8 sub_bg_enabled[5];
 
 	UINT16 mosaic_table[16][4096];
 	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];
