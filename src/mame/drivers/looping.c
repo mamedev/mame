@@ -431,12 +431,14 @@ static WRITE8_HANDLER( plr2_w )
 
 static READ8_HANDLER( cop_io_r )
 {
-	return cop_io[offset];
+	// if (offset == 1) return mame_rand(space->machine) & 0x01;
+	return 1; // cop_io[offset];
 }
 
 static WRITE8_HANDLER( cop_io_w )
 {
 	cop_io[offset] = data;
+if (offset == 0) logerror("%02x  ",data);
 }
 
 static READ8_HANDLER( protection_r )
@@ -456,12 +458,10 @@ static READ8_HANDLER( protection_r )
 //        it is trivial to bypass the protection.
 
 //        cop write alternately $02 $01 $08 $04 in port $102
+//        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
-	// wrong!?
-	if(cop_io[2] == 1) return 0xff;
-	if(cop_io[2] == 2) return 0xfd;
-	if(cop_io[2] == 4) return 0xf7;
-	if(cop_io[2] == 8) return 0xf3;
+	// missing something
+	if(cop_io[0] != 0xfc) return cop_io[0];
 	return 0xff;
 }
 
