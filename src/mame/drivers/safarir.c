@@ -40,41 +40,10 @@
 
           ----------------------------------
 
-----------------------------------------
-Safari Rally (Japan Ver.)
-(c)1979 Shin Nihon Kikaku
-
-----------------------------------------
-Top
-RLO70002
-RLN00001
-CPU:M5L8080AP
-SND:SN76477N
-18.000MHz
-----------------------------------------
-Bottom
-RLO70003
-RLN00002
-11.000MHz
-----------------------------------------
-RL-01.9      [cf7703c9]
-RL-02.1      [1013ecd3]
-RL-03.10     [84545894]
-RL-04.2      [5dd12f96]
-RL-05.11     [935ed469]
-RL-06.3      [24c1cd42]
-
-RL-07.40     [ba525203]
-RL-08.43     [d6a50aac]
-
-
-
---- Team Japump!!! ---
 Dumped by Chack'n
 27/Jun/2009
-----------------------------------------
 modified by Hau
-07/06/2009
+08/09/2009
 ****************************************************************************/
 
 #include "driver.h"
@@ -232,12 +201,14 @@ static VIDEO_UPDATE( safarir )
 #define SAMPLE_SOUND5_2		7
 #define SAMPLE_SOUND6		8
 #define SAMPLE_SOUND7		9
+#define SAMPLE_SOUND8		10
 
 #define CHANNEL_SOUND1		0
 #define CHANNEL_SOUND2		1
 #define CHANNEL_SOUND3		2
 #define CHANNEL_SOUND4		3
 #define CHANNEL_SOUND5		4
+#define CHANNEL_SOUND6		5
 
 static UINT8 port_last;
 static UINT8 port_last2;
@@ -259,7 +230,7 @@ static WRITE8_HANDLER( safarir_audio_w )
 
 	if (data == 0x13)
 	{
-		if (rising_bits == 0x13 || (rising_bits == 0x01 && port_last == 0x12))
+		if ((rising_bits == 0x13 && port_last != 0x04) || (rising_bits == 0x01 && port_last == 0x12))
 		{
 			sample_start(samples, CHANNEL_SOUND4, SAMPLE_SOUND7, 0);
 		}
@@ -272,6 +243,9 @@ static WRITE8_HANDLER( safarir_audio_w )
 
 	if (data == 0x1f && rising_bits == 0x1f) sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5_1, 0);
 	if (data == 0x14 && (rising_bits == 0x14 || rising_bits == 0x04)) sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5_2, 0);
+
+	if (data == 0x07 && rising_bits == 0x07 && !sample_playing(samples, CHANNEL_SOUND6))
+		sample_start(samples, CHANNEL_SOUND6, SAMPLE_SOUND8, 0);
 
 	port_last2 = port_last;
 	port_last = data;
@@ -291,13 +265,14 @@ static const char *const safarir_sample_names[] =
 	"sound5-2.wav",
 	"sound6.wav",
 	"sound7.wav",
+	"sound8.wav",
 	0
 };
 
 
 static const samples_interface safarir_samples_interface =
 {
-	5,	/* 5 channels */
+	6,	/* 6 channels */
 	safarir_sample_names
 };
 
@@ -433,6 +408,36 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/*
+Safari Rally (Japan Ver.)
+(c)1979 Shin Nihon Kikaku
+
+----------------------------------------
+Top
+RLO70002
+RLN00001
+CPU:M5L8080AP
+SND:SN76477N
+18.000MHz
+----------------------------------------
+Bottom
+RLO70003
+RLN00002
+11.000MHz
+----------------------------------------
+RL-01.9      [cf7703c9]
+RL-02.1      [1013ecd3]
+RL-03.10     [84545894]
+RL-04.2      [5dd12f96]
+RL-05.11     [935ed469]
+RL-06.3      [24c1cd42]
+
+RL-07.40     [ba525203]
+RL-08.43     [d6a50aac]
+
+--- Team Japump!!! ---
+*/
+
 ROM_START( safarir )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rl-01.9",  0x0000, 0x0400, CRC(cf7703c9) SHA1(b4182df9332b355edaa518462217a6e31e1c07b2) )
@@ -457,4 +462,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0, safarir, safarir, 0, ROT90, "SNK", "Safari Rally (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, safarir, 0, safarir, safarir, 0, ROT90, "SNK", "Safari Rally (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
