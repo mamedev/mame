@@ -73,7 +73,7 @@ static void snes_latch_counters(running_machine *machine)
 	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
-	read_ophct = read_opvct = 0;	// clear read flags
+//	read_ophct = read_opvct = 0;	// clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", snes_ppu.beam.latch_horz, snes_ppu.beam.latch_vert);
 }
@@ -351,39 +351,56 @@ READ8_HANDLER( snes_r_io )
 			return 0;
 		case 0x2016:
 			return 2;
+		case OAMDATA:	/* 21xy for x=0,1,2 and y=4,5,6,8,9,a returns PPU1 open bus*/
+		case BGMODE:
+		case MOSAIC:
+		case BG2SC:
+		case BG3SC:
+		case BG4SC:
+		case BG4VOFS:
+		case VMAIN:
+		case VMADDL:
+		case VMDATAL:
+		case VMDATAH:
+		case M7SEL:
+		case W34SEL:
+		case WOBJSEL:
+		case WH0:
+		case WH2:
+		case WH3:
+		case WBGLOG:
+			return snes_ppu.ppu1_open_bus;
 
 		/* Shien The Blade Chaser / Shien's Revenge reads here instead */
 		case NMITIMEN:
 			return snes_open_bus_r(space,0);
-		case OAMADDL:
-		case OAMADDH:
-		case VMADDL:
-		case VMADDH:
-		case VMDATAL:
-		case VMDATAH:
-		case CGADD:
-		case CGDATA:
-			return snes_ram[offset];
+// According to BSNES, these should return snes_open_bus_r!
+//		case OAMADDL:
+//		case OAMADDH:
+//		case VMADDH:
+//		case CGADD:
+//		case CGDATA:
+//			return snes_ram[offset];
 		case MPYL:		/* Multiplication result (low) */
 			{
 				/* Perform 16bit * 8bit multiply */
 				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
-				snes_ram[MPYL] = c & 0xff;
-				return snes_ram[MPYL];
+				snes_ppu.ppu1_open_bus = c & 0xff;
+				return snes_ppu.ppu1_open_bus;
 			}
 		case MPYM:		/* Multiplication result (mid) */
 			{
 				/* Perform 16bit * 8bit multiply */
 				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
-				snes_ram[MPYM] = (c >> 8) & 0xff;
-				return snes_ram[MPYM];
+				snes_ppu.ppu1_open_bus = (c >> 8) & 0xff;
+				return snes_ppu.ppu1_open_bus;
 			}
 		case MPYH:		/* Multiplication result (high) */
 			{
 				/* Perform 16bit * 8bit multiply */
 				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
-				snes_ram[MPYH] = (c >> 16) & 0xff;
-				return snes_ram[MPYH];
+				snes_ppu.ppu1_open_bus = (c >> 16) & 0xff;
+				return snes_ppu.ppu1_open_bus;
 			}
 		case SLHV:		/* Software latch for H/V counter */
 			snes_latch_counters(space->machine);
@@ -401,7 +418,7 @@ READ8_HANDLER( snes_r_io )
 					oam_addr &= 0x1ff;
 				}
 
-				value = (snes_oam[oam_addr] >> (snes_ram[OAMDATA] << 3)) & 0xff;
+				snes_ppu.ppu1_open_bus = (snes_oam[oam_addr] >> (snes_ram[OAMDATA] << 3)) & 0xff;
 				snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
 				if( snes_ram[OAMDATA] == 0 )
 				{
@@ -409,13 +426,13 @@ READ8_HANDLER( snes_r_io )
 					snes_ppu.oam.address_low = snes_ram[OAMADDL] = snes_ppu.oam.address & 0xff;
 					snes_ppu.oam.address_high = snes_ram[OAMADDH] = (snes_ppu.oam.address >> 8) & 0x1;
 				}
-				return value;
+				return snes_ppu.ppu1_open_bus;
 			}
 		case RVMDATAL:	/* Read data from VRAM (low) */
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				value = vram_read_buffer & 0xff;
+				snes_ppu.ppu1_open_bus = vram_read_buffer & 0xff;
 
 				if (!vram_fgr_high)
 				{
@@ -437,12 +454,12 @@ READ8_HANDLER( snes_r_io )
 					snes_ram[VMADDH] = (addr>>8)&0xff;
 				}
 			}
-			return value;
+			return snes_ppu.ppu1_open_bus;
 		case RVMDATAH:	/* Read data from VRAM (high) */
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
 
-				value = (vram_read_buffer>>8) & 0xff;
+				snes_ppu.ppu1_open_bus = (vram_read_buffer>>8) & 0xff;
 
 				if (vram_fgr_high)
 				{
@@ -464,48 +481,65 @@ READ8_HANDLER( snes_r_io )
 					snes_ram[VMADDH] = (addr>>8)&0xff;
 				}
 			}
-			return value;
+			return snes_ppu.ppu1_open_bus;
 		case RCGDATA:	/* Read data from CGRAM */
-				value = ((UINT8 *)snes_cgram)[cgram_address];
+				if (cgram_address & 0x01)
+				{
+					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[cgram_address] & 0xff;
+				}
+				else
+				{
+					snes_ppu.ppu2_open_bus &= 0x80;
+					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[cgram_address] & 0x7f;
+				}
+					
 				cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
-				return value;
+				return snes_ppu.ppu2_open_bus;
 		case OPHCT:		/* Horizontal counter data by ext/soft latch */
 			{
 				/* FIXME: need to handle STAT78 reset */
 				if( read_ophct )
 				{
-					value = (snes_ppu.beam.latch_horz >> 8) & 0x1;
-					read_ophct = 0;
+					snes_ppu.ppu2_open_bus &= 0xfe;
+					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_horz >> 8) & 0x01;
 				}
 				else
 				{
-					value = snes_ppu.beam.latch_horz & 0xff;
-					read_ophct = 1;
+					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_horz & 0xff;
 				}
-				return value;
+				read_ophct ^= 1;
+				return snes_ppu.ppu2_open_bus;
 			}
 		case OPVCT:		/* Vertical counter data by ext/soft latch */
 			{
 				/* FIXME: need to handle STAT78 reset */
 				if( read_opvct )
 				{
-					value = (snes_ppu.beam.latch_vert >> 8) & 0x1;
-					read_opvct = 0;
+					snes_ppu.ppu2_open_bus &= 0xfe;
+					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_vert >> 8) & 0x01;
 				}
 				else
 				{
-					value = snes_ppu.beam.latch_vert & 0xff;
-					read_opvct = 1;
+					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_vert & 0xff;
 				}
-				return value;
+				read_opvct ^= 1;
+				return snes_ppu.ppu2_open_bus;
 			}
 		case STAT77:	/* PPU status flag and version number */
-			return snes_ram[offset];
+			value = snes_ram[offset] & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
+			// 0x20 - Master/slave mode select. Little is known about this bit. We always seem to read back 0 here.
+			value |= (snes_ppu.ppu1_open_bus & 0x10);
+			snes_ram[offset] = value;	// not sure if this is needed...
+			snes_ppu.ppu1_open_bus = value;
+			return snes_ppu.ppu1_open_bus;
 		case STAT78:	/* PPU status flag and version number */
 			/* FIXME: need to reset OPHCT and OPVCT */
 			value = snes_ram[offset];
-			snes_ram[offset] &= ~0x40;	// clear 'latched counters' flag
-			return value;
+			value &= ~0x40;	// clear 'latched counters' flag
+			value |= (snes_ppu.ppu1_open_bus & 0x20);
+			snes_ram[offset] = value;	// not sure if this is needed...
+			snes_ppu.ppu2_open_bus = value;
+			return snes_ppu.ppu2_open_bus;
 		case WMDATA:	/* Data to read from WRAM */
 			{
 				UINT32 addr = ((snes_ram[WMADDH] & 0x1) << 16) | (snes_ram[WMADDM] << 8) | snes_ram[WMADDL];

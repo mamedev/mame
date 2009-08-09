@@ -489,6 +489,8 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 
 	UINT8 main_bg_enabled[5];	// these would probably better fit the layer struct, but it would make worse the code in snes_update_mode_X()
 	UINT8 sub_bg_enabled[5];
+	UINT8 ppu1_open_bus;
+	UINT8 ppu2_open_bus;
 
 	UINT16 mosaic_table[16][4096];
 	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];
