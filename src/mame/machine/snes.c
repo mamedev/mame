@@ -80,7 +80,7 @@ static void snes_latch_counters(running_machine *machine)
 static TIMER_CALLBACK( snes_nmi_tick )
 {
 	// pull NMI
-	cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_NMI, ASSERT_LINE );
 
 	// don't happen again
 	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
@@ -289,7 +289,7 @@ static READ8_HANDLER( snes_open_bus_r )
 		return 0xff;
 
 	recurse = 1;
-	result = memory_read_byte_8le(space, cpu_get_pc(space->cpu)+2); //TODO: must be the LAST opcode that's fetched on the bus
+	result = memory_read_byte_8le(space, cpu_get_pc(space->cpu)-1); //LAST opcode that's fetched on the bus
 	recurse = 0;
 	return result;
 }
@@ -597,6 +597,7 @@ READ8_HANDLER( snes_r_io )
 	}
 
 	/* Unsupported reads returns open bus */
+//	printf("%02x %02x\n",offset,snes_open_bus_r(space,0));
 	return snes_open_bus_r(space,0);
 }
 
