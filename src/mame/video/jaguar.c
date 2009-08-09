@@ -661,6 +661,11 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				jaguar_set_palette(gpu_regs[VMODE]);
 				break;
 
+			case OBF:	/* clear GPU interrupt */
+				cpu_irq_state &= 0xfd;
+				update_cpu_irq(space->machine);
+				break;
+
 			case HP:
 			case HBB:
 			case HBE:
@@ -685,7 +690,8 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				{
 					rectangle visarea;
 					visarea.min_x = hbend / 2;
-					visarea.max_x = hbstart / 2 - 1;
+					visarea.max_x = MIN((hbstart >> 1) - 1, 0x19c);
+//					visarea.max_x = hbstart / 2 - 1;
 					visarea.min_y = vbend / 2;
 					visarea.max_y = vbstart / 2 - 1;
 					video_screen_configure(space->machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));

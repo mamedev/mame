@@ -872,8 +872,7 @@ static UINT32 *process_branch(running_machine *machine, UINT32 *objdata, int vc,
 		/* 3: branch if object processor flag is set */
 		case 3:
 			if (logit) logerror("        branch if object flag set to %06X\n", link << 3);
-			fprintf(stderr, "Unhandled branch!\n");
-			link = 0, taken = 1;
+			taken = gpu_regs[OBF] & 1;
 			break;
 
 		/* 4: branch on second half of display line */
@@ -884,7 +883,7 @@ static UINT32 *process_branch(running_machine *machine, UINT32 *objdata, int vc,
 
 		default:
 			fprintf(stderr, "Invalid branch!\n");
-			link = 0, taken = 1;
+			link = 0; taken = 1;
 			break;
 	}
 
@@ -909,7 +908,7 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 
 	/* erase the scanline first */
 	scanline = _scanline;
-	for (x = 0; x < 336; x++)
+	for (x = 0; x < 360; x++)
 		scanline[x] = gpu_regs[BG];
 
 	logit = LOG_OBJECTS;
@@ -933,6 +932,18 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 				if (logit)
 					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
 				objdata = process_scaled_bitmap(machine, objdata, vc, logit);
+				break;
+
+
+			/* GPU interrupt */
+			case 2:
+				gpu_regs[OB_HH]=objdata[1];
+				gpu_regs[OB_HL]=objdata[2];
+				gpu_regs[OB_LH]=objdata[3];
+				gpu_regs[OB_LL]=objdata[4];
+				cpu_irq_state |= 2;
+				update_cpu_irq(machine);
+				done=1;
 				break;
 
 			/* branch */
