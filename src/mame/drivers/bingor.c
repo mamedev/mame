@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( bingor_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE(&paletteram16) //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE(&blit_ram)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, ADDRESS_SPACE_IO, 16 )
@@ -200,9 +200,9 @@ MACHINE_DRIVER_END
 // I doubt we need to load the eeproms
 
 ROM_START( bingor1 )
-	ROM_REGION( 0x10000, "boot_prg", 0 ) /* i186 code */
-	ROM_LOAD16_BYTE( "bingo v 29.4.99 l.bin", 0x000000, 0x08000, CRC(b6773bff) SHA1(74e375662730e002e05186bd77098fa0d8e43ade) )
-	ROM_LOAD16_BYTE( "bingo v 29.4.99 h.bin", 0x000001, 0x08000, CRC(0e18f90a) SHA1(0743302e675f01f8ad42ac2e67ecb1c1bf870ae7) )
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+	ROM_LOAD16_BYTE( "bingo v 29.4.99 l.bin", 0x010000, 0x08000, CRC(b6773bff) SHA1(74e375662730e002e05186bd77098fa0d8e43ade) )
+	ROM_LOAD16_BYTE( "bingo v 29.4.99 h.bin", 0x010001, 0x08000, CRC(0e18f90a) SHA1(0743302e675f01f8ad42ac2e67ecb1c1bf870ae7) )
 
 	// gfx roms on this one are twice the size of the others
 	ROM_REGION( 0x20000, "gfx", 0 ) /* blitter data? */
@@ -217,9 +217,9 @@ ROM_START( bingor1 )
 ROM_END
 
 ROM_START( bingor2 )
-	ROM_REGION( 0x10000, "boot_prg", 0 ) /* i186 code */
-	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_l.bin", 0x000000, 0x08000, CRC(aa464ef9) SHA1(e74e60396478d7a6556b0d16c4d8c0acefa8faad) )
-	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_h.bin", 0x000001, 0x08000, CRC(02816885) SHA1(b98b527a72847412479b6b8e153f236757d9eb4e) )
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_l.bin", 0x000000, 0x10000, CRC(40df6ee8) SHA1(1e90ef906e47f95ebde85b6dd32fdfe50c0564fc) )
+	ROM_LOAD16_BYTE( "bingo roll vip2 v26.02.02_h.bin", 0x000001, 0x10000, CRC(9154c183) SHA1(a4060294295a9b8df07ce9fcfeefcf009e129817) )
 
 	ROM_REGION( 0x20000, "gfx", 0 ) /* blitter data? */
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
@@ -233,11 +233,11 @@ ROM_START( bingor2 )
 ROM_END
 
 ROM_START( bingor3 )
-	ROM_REGION( 0x10000, "boot_prg", 0 ) /* i186 code */
-	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_1.bin", 0x000000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
-	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_2.bin", 0x000001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_1.bin", 0x010000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
+	ROM_LOAD16_BYTE( "bellstar vip2l 27.07_2.bin", 0x010001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
-	ROM_REGION( 0x10000, "gfx", 0 ) /* blitter data? */
+	ROM_REGION( 0x20000, "gfx", ROMREGION_ERASE00 ) /* blitter data? */
 	ROM_LOAD16_BYTE( "bsg-11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "bsg-11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
@@ -251,9 +251,9 @@ ROM_END
 
 // this is a mix of 2 of the other sets.. I don't know if it's correct
 ROM_START( bingor4 )
-	ROM_REGION( 0x10000, "boot_prg", 0 ) /* i186 code */
-	ROM_LOAD16_BYTE( "01.bin", 0x000000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
-	ROM_LOAD16_BYTE( "02.bin", 0x000001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+	ROM_LOAD16_BYTE( "01.bin", 0x010000, 0x08000, CRC(0115bca7) SHA1(0b692b46bc6641296861666f00ec0475dc7296a1) )
+	ROM_LOAD16_BYTE( "02.bin", 0x010001, 0x08000, CRC(c689aa69) SHA1(fb1f477654909f156c30a6be29f84962f4edb1c3) )
 
 	ROM_REGION( 0x20000, "gfx", 0 ) /* blitter data? */
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
