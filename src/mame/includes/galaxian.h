@@ -4,7 +4,12 @@
 
 ***************************************************************************/
 
-#define GALAXIAN_USE_DISCRETE	(0)
+#define GALAXIAN_USE_DISCRETE	(1)
+
+#define HARDWARE_GALAXIAN		1
+#define HARDWARE_MCRESTA		2
+
+#define HARDWARE				HARDWARE_GALAXIAN
 
 #if GALAXIAN_USE_DISCRETE
 #include "sound/discrete.h"

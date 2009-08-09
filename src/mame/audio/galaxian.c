@@ -599,7 +599,7 @@ MACHINE_DRIVER_END
 
 #define GAL_INP_PITCH_HIGH		NODE_28		/* at 6T in schematics */
 
-#define TTL_OUT					(4)
+#define TTL_OUT					(4.0)
 
 #define GAL_R15					RES_K(100)
 #define GAL_R16					RES_K(220)
@@ -622,14 +622,25 @@ MACHINE_DRIVER_END
 #define GAL_R31					RES_K(47)
 #define GAL_R32					RES_K(47)
 #define GAL_R33					RES_K(10)
-#define GAL_R34					RES_K(5.1)
+/*
+ * R34 is given twice on galaxian board and both times as 5.1k. On moon cresta
+ * it is only listed once and given as 15k. This is more in line with recordings
+ */
+#if HARDWARE == HARDWARE_GALAXIAN
+#define GAL_R34					RES_K(5.1)			/* val from mcresta galaxian : RES_K(5.1) */
+#else
+#define GAL_R34					RES_K(15)			/* val from mcresta galaxian : RES_K(5.1) */
+#endif
 #define GAL_R35					RES_K(150)
 #define GAL_R36					RES_K(22)
 #define GAL_R37					RES_K(470)
 #define GAL_R38					RES_K(33)
 #define GAL_R39					RES_K(22)
 
-#define GAL_R40					RES_K(2.2)
+/* The hit sound is too low compared with recordings
+ * There may be an issue with the op-amp band filter
+ */
+#define GAL_R40					(RES_K(2.2)*0.6)	/* Volume adjust */		
 #define GAL_R41					RES_K(100)
 #define GAL_R43					RES_K(2.2)
 #define GAL_R44					RES_K(10)
@@ -725,21 +736,45 @@ static const discrete_lfsr_desc galaxian_lfsr =
 	0			          	/* Output bit */
 };
 
+#if HARDWARE == HARDWARE_GALAXIAN
+static const discrete_mixer_desc galaxian_mixerpre_desc =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{GAL_R51, 0, GAL_R50, 0, GAL_R34},		/* A, C, C, D */
+	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2, 0},
+	{0,0,0,0,0},  
+	0, 0,
+	0,
+	0,
+	0, 1
+};
+static const discrete_mixer_desc galaxian_mixer_desc =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{GAL_R34, GAL_R40, GAL_R43},		/* A, C, C, D */
+	{0, 0, 0},
+	{0,0,GAL_C26},  
+	0, GAL_R91,
+	0,
+	GAL_C46,
+	0, 1
+};
+#else
 static const discrete_mixer_desc galaxian_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{GAL_R51, 0, GAL_R50, 0, GAL_R34, GAL_R40, GAL_R43},		/* A, C, C, D */
 	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2, 0, 0, 0},
 	{0,0,0,0,0,0,GAL_C26},  
-	0, GAL_R91,
+	0, 0*GAL_R91,
 	0,
 	GAL_C46,
 	0, 1
 };
-
+#endif
 static const discrete_op_amp_filt_info galaxian_bandpass_desc =
 {
-	GAL_R35, GAL_R36, RES_M(10), 0,
+	GAL_R35, GAL_R36, 0, 0,
 	GAL_R37, 
 	GAL_C22, GAL_C23, 0, 
 	5.0*GAL_R39/(GAL_R38+GAL_R39), 
@@ -840,9 +875,13 @@ static DISCRETE_SOUND_START(galaxian)
 	/* FINAL MIX                                    */
 	/************************************************/
 
+#if HARDWARE == HARDWARE_GALAXIAN
+	DISCRETE_MIXER5(NODE_279, 1, NODE_133, NODE_134, NODE_134, NODE_135, NODE_120, &galaxian_mixerpre_desc)
+	DISCRETE_MIXER3(NODE_280, 1, NODE_279, NODE_157, NODE_172, &galaxian_mixer_desc)
+#else
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133, NODE_134, NODE_134, NODE_135, NODE_120, NODE_157, NODE_172, &galaxian_mixer_desc)
-
-	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*1.5)
+#endif
+	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
 
 DISCRETE_SOUND_END
 
