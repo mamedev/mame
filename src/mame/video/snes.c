@@ -478,7 +478,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			break;
 	}
 
-	for (ii = 0; ii < (66 >> tile_size); ii += 2)
+	for (ii = 0; ii < (66*(hires+1) >> tile_size); ii += 2)
 	{
 		/* Have we scrolled into the next map? */
 		if (hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)))
@@ -629,7 +629,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 	if (layer == 1)	// BG2 use two different bits for horizontal and vertical mosaic
 	{
 		mosaic_x = snes_ppu.mosaic_table[snes_ppu.layer[1].mosaic_enabled ? snes_ppu.mosaic_size : 0];
-		mosaic_y = snes_ppu.mosaic_table[snes_ppu.layer[0].mosaic_enabled ? snes_ppu.mosaic_size : 0]; 
+		mosaic_y = snes_ppu.mosaic_table[snes_ppu.layer[0].mosaic_enabled ? snes_ppu.mosaic_size : 0];
 	}
 	else	// BG1 works as usual
 	{
@@ -646,7 +646,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 	{
 		tx = (x0 + (ma * mosaic_x[sx])) >> 8;
 		ty = (y0 + (mc * mosaic_x[sx])) >> 8;
-		
+
 		switch (snes_ppu.mode7.repeat)
 		{
 			case 0x00:	/* Repeat if outside screen area */
