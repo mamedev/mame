@@ -39,6 +39,7 @@ static emu_timer *snes_hblank_timer;
 static emu_timer *snes_nmi_timer;
 static emu_timer *snes_hirq_timer;
 static UINT16 hblank_offset;
+static UINT8 snes_interlace; //doubles the visible resolution
 UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
 UINT8 snes_has_addon_chip;
 
@@ -278,6 +279,31 @@ static TIMER_CALLBACK( snes_hblank_tick )
     Input Handlers
 
 *************************************/
+
+static void snes_dynamic_res_change(running_machine *machine)
+{
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+
+	visarea.min_x = visarea.min_y = 0;
+	visarea.max_y = snes_ppu.beam.last_visible_line*snes_interlace - 1;
+
+	// fixme: should compensate for SNES_DBG_video
+	if( snes_ppu.mode == 5 || snes_ppu.mode == 6 )
+	{
+		visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
+		snes_htmult = 2;
+	}
+	else
+	{
+		visarea.max_x = SNES_SCR_WIDTH - 1;
+		snes_htmult = 1;
+	}
+
+	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC*snes_interlace, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+	else
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL*snes_interlace, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+}
 
 static READ8_HANDLER( snes_open_bus_r )
 {
@@ -717,29 +743,7 @@ WRITE8_HANDLER( snes_w_io )
 			}
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x07;
-			{
-				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
-
-				visarea.min_x = visarea.min_y = 0;
-				visarea.max_y = snes_ppu.beam.last_visible_line - 1;
-
-				// fixme: should compensate for SNES_DBG_video
-				if( snes_ppu.mode == 5 || snes_ppu.mode == 6 )
-				{
-					visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
-					snes_htmult = 2;
-				}
-				else
-				{
-					visarea.max_x = SNES_SCR_WIDTH - 1;
-					snes_htmult = 1;
-				}
-
-				if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-					video_screen_configure(space->machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
-				else
-					video_screen_configure(space->machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
-			}
+			snes_dynamic_res_change(space->machine);
 			snes_ppu.bg3_priority_bit = data & 0x08;
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;
 			snes_ppu.layer[1].tile_size = (data >> 5) & 0x1;
@@ -1030,8 +1034,11 @@ WRITE8_HANDLER( snes_w_io )
 				snes_cgram[FIXED_COLOUR] = (r | (g << 5) | (b << 10));
 			} break;
 		case SETINI:	/* Screen mode/video select */
-			/* FIXME: We only support line count here */
+			/* FIXME: We only support line count and interlace here */
+			snes_interlace = (data & 1) ? 2 : 1;
 			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 225;
+			/* FIXME: move to a common routine */
+			snes_dynamic_res_change(space->machine);
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x8) != (snes_ram[SETINI] & 0x8) )
 				mame_printf_debug( "Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off" );
@@ -1750,6 +1757,7 @@ MACHINE_RESET( snes )
 	snes_ram[VTIMEH] = 0x1;
 
 	snes_htmult = 1;
+	snes_interlace = 1;
 }
 
 
