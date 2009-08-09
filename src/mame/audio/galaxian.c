@@ -894,11 +894,16 @@ static TIMER_CALLBACK( pitch_callback )
 {
 	const device_config *device = devtag_get_device(machine, GAL_AUDIO);
 
-	timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
 	pitch_h++;
 	if (pitch_h > 15)
 		pitch_h = 0;
-	discrete_sound_w(device, GAL_INP_PITCH_HIGH, pitch_h );
+	if (pitch_l < 255)
+	{
+		/* performance tweak: The counter is always running, but
+		 * most of the time with a very (unaudible) frequency */
+		discrete_sound_w(device, GAL_INP_PITCH_HIGH, pitch_h );
+		timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
+	}
 }
 
 static SOUND_START(galaxian)
@@ -910,6 +915,16 @@ static SOUND_START(galaxian)
 	timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK/256), 0);
 }
 
+/* IC 9J */
+WRITE8_DEVICE_HANDLER( galaxian_pitch_w )
+{
+	UINT8 old_data;
+	
+	old_data = pitch_l;
+	pitch_l = data;
+	if (pitch_l < 255 && old_data == 255) 	/* turn the timer on again */
+		timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
+}
 
 WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w )
 {
@@ -941,12 +956,6 @@ WRITE8_DEVICE_HANDLER( galaxian_vol_w )
 WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w )
 {
 	discrete_sound_w(device, GAL_INP_FIRE, data & 0x01);
-}
-
-/* FIXME: use timer ! -- IC 9J */
-WRITE8_DEVICE_HANDLER( galaxian_pitch_w )
-{
-	pitch_l = data;
 }
 
 /* FIXME: May be replaced by one call! */
