@@ -50,21 +50,6 @@ static INPUT_PORTS_START( superg )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x01, "4000" )
-	PORT_DIPSETTING(    0x02, "5000" )
-	PORT_DIPSETTING(    0x03, "7000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x04, "5" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( galtaito )
-	PORT_INCLUDE(galaxian)
-
-	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "4000" )
 	PORT_DIPSETTING(    0x02, "5000" )
@@ -72,9 +57,6 @@ static INPUT_PORTS_START( galtaito )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -4995,7 +4977,7 @@ GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian, ROT90,  "Namco",
 GAME( 1979, galaxiana,  galaxian, galaxian, superg,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian, ROT90,  "[Namco] (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiant,  galaxian, galaxian, galtaito, galaxian, ROT90,  "[Namco] (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiant,  galaxian, galaxian, superg,   galaxian, ROT90,  "[Namco] (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
 GAME( 1979, moonaln,  galaxian, galaxian, superg,   galaxian, ROT90,  "[Nichibutsu] (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
@@ -5008,7 +4990,7 @@ GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "Subelectr
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "Petaco S.A.", "Zero Time", GAME_SUPPORTS_SAVE )
 GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "Jeutel", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1979, kamakazi3,galaxian, galaxian, galaxian, galaxian, ROT90,  "Video Games (UK) Ltd.", "Kamakazi III", GAME_SUPPORTS_SAVE )
+GAME( 1979, kamakazi3,galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 
