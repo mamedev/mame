@@ -17,15 +17,14 @@ Dip locations verified with manual
 #include "includes/galaxian.h"
 #include "includes/galaxold.h"
 
-
 static int noise_data = 0;
 
-
-static WRITE8_HANDLER( dambustr_noise_enable_w )
+/* FIXME: Really needed? - Should be handled by either interface */
+static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 {
 	if (data != noise_data) {
 		noise_data = data;
-		galaxian_noise_enable_w(space, offset, data);
+		galaxian_noise_enable_w(device, offset, data);
 	}
 }
 
@@ -48,14 +47,14 @@ static ADDRESS_MAP_START( dambustr_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xe004, 0xe007) AM_WRITE(galaxian_lfo_freq_w)
+	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE(GAL_AUDIO, galaxian_lfo_freq_w)
 
 	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
-	AM_RANGE(0xe800, 0xe802) AM_WRITE(galaxian_background_enable_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(galaxian_shoot_enable_w)	// probably louder than normal shot
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(galaxian_shoot_enable_w)	// normal shot (like Galaxian)
-	AM_RANGE(0xe806, 0xe807) AM_WRITE(galaxian_vol_w)
+	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE(GAL_AUDIO, galaxian_background_enable_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVWRITE(GAL_AUDIO, dambustr_noise_enable_w)
+	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)	// probably louder than normal shot
+	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)	// normal shot (like Galaxian)
+	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)
 
 	AM_RANGE(0xf000, 0xf7ff) AM_READ_PORT("DSW")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxold_nmi_enable_w)
@@ -63,10 +62,9 @@ static ADDRESS_MAP_START( dambustr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
 
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(galaxian_pitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( dambustr )
 	PORT_START("IN0")
@@ -206,10 +204,7 @@ static MACHINE_DRIVER_START( dambustr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	/* sound hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(galaxian_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_IMPORT_FROM(galaxian_audio)
 MACHINE_DRIVER_END
 
 

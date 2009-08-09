@@ -4,8 +4,13 @@
 
 ***************************************************************************/
 
-#include "sound/samples.h"
+#define GALAXIAN_USE_DISCRETE	(0)
 
+#if GALAXIAN_USE_DISCRETE
+#include "sound/discrete.h"
+#else
+#include "sound/samples.h"
+#endif
 
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE			3
@@ -126,13 +131,19 @@ void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-extern const samples_interface galaxian_samples_interface;
-extern const samples_interface galaxian_custom_interface;
+#if GALAXIAN_USE_DISCRETE
+#define GAL_AUDIO	"discrete"
+#else
+#define GAL_AUDIO	"samples"
+#endif
 
-WRITE8_HANDLER( galaxian_sound_w );
-WRITE8_HANDLER( galaxian_pitch_w );
-WRITE8_HANDLER( galaxian_vol_w );
-WRITE8_HANDLER( galaxian_noise_enable_w );
-WRITE8_HANDLER( galaxian_background_enable_w );
-WRITE8_HANDLER( galaxian_shoot_enable_w );
-WRITE8_HANDLER( galaxian_lfo_freq_w );
+MACHINE_DRIVER_EXTERN( galaxian_audio );
+
+WRITE8_DEVICE_HANDLER( galaxian_sound_w );
+WRITE8_DEVICE_HANDLER( galaxian_pitch_w );
+WRITE8_DEVICE_HANDLER( galaxian_vol_w );
+WRITE8_DEVICE_HANDLER( galaxian_noise_enable_w );
+WRITE8_DEVICE_HANDLER( galaxian_background_enable_w );
+WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w );
+WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w );
+
