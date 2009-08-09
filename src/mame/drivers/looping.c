@@ -87,7 +87,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #define VBEND				(16)
 #define VBSTART				(224+16)
 
-
+UINT8 *cop_io;
 
 /*************************************
  *
@@ -429,29 +429,41 @@ static WRITE8_HANDLER( plr2_w )
  *
  *************************************/
 
-static READ8_HANDLER( protection_r )
+static READ8_HANDLER( cop_io_r )
 {
-	/*
-        The code reads ($7002) ($7004) alternately
-        The result must change at least once every 10 reads
-        A read from ($34b0 + result) must == $01
-
-        Valid values:
-            $61 $67
-            $B7 $BF
-            $DB
-            $E1
-            $F3 $F7 $FD $FF
-
-        Because they read alternately from different locations,
-        it is trivial to bypass the protection.
-    */
-	if (offset == 2)
-		return 0xf3;
-	else
-		return 0xf7;
+	return cop_io[offset];
 }
 
+static WRITE8_HANDLER( cop_io_w )
+{
+	cop_io[offset] = data;
+}
+
+static READ8_HANDLER( protection_r )
+{
+//        The code reads ($7002) ($7004) alternately
+//        The result must change at least once every 10 reads
+//        A read from ($34b0 + result) must == $01
+
+//        Valid values:
+//            $61 $67
+//            $B7 $BF
+//            $DB
+//            $E1
+//            $F3 $F7 $FD $FF
+
+//        Because they read alternately from different locations,
+//        it is trivial to bypass the protection.
+
+//        cop write alternately $02 $01 $08 $04 in port $102
+
+	// wrong!?
+	if(cop_io[2] == 1) return 0xff;
+	if(cop_io[2] == 2) return 0xfd;
+	if(cop_io[2] == 4) return 0xf7;
+	if(cop_io[2] == 8) return 0xf3;
+	return 0xff;
+}
 
 
 /*************************************
@@ -527,7 +539,7 @@ static ADDRESS_MAP_START( looping_cop_data_map, ADDRESS_SPACE_DATA, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_cop_io_map, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x0100, 0x0107) AM_NOP /* ? */
+	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
 ADDRESS_MAP_END
 
 
@@ -832,6 +844,8 @@ static DRIVER_INIT( looping )
 	int length = memory_region_length(machine, "maincpu");
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
+
+	cop_io = auto_alloc_array(machine, UINT8, 0x08);
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)
