@@ -756,8 +756,10 @@ ROM_START( loopinga )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "i-o-v2.13c",		0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
-    ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
+	ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
 	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 	ROM_CONTINUE(			0x0000, 0x0400)
@@ -788,11 +790,12 @@ ROM_START( skybump )
 	ROM_LOAD( "cpu.9a",			0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
 	ROM_LOAD( "cpu.8a",			0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
-    ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "snd.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "snd.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
+	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
 	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 	ROM_CONTINUE(			0x0000, 0x0400)
