@@ -527,12 +527,10 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 	int size;
 	int spriteCount = 0;
 	int sprite_line;
-	int drawn;
 
 	int first_pixel;
 
 	const pen_t *paldata;
-	// const UINT8 *sd;
 	int pixel;
 
 	/* determine if the sprites are 8x8 or 8x16 */
@@ -567,9 +565,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		if ((spriteYPos + size <= scanline) || (spriteYPos > scanline))
 			continue;
 
-		/* clear our drawn flag */
-		drawn = 0;
-
 		tile = sprite_ram[spriteIndex + 1];
 		color = (sprite_ram[spriteIndex + 2] & 0x03) + 4;
 		pri = sprite_ram[spriteIndex + 2] & 0x20;
@@ -596,7 +591,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 		/* compute the character's line to draw */
 		sprite_line = scanline - spriteYPos;
 
-
 		if (flipy)
 			sprite_line = (size - 1) - sprite_line;
 
@@ -614,6 +608,22 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 
 		plane1 = memory_read_byte(device->space[0], (index1 + sprite_line) & 0x1fff);
 		plane2 = memory_read_byte(device->space[0], (index1 + sprite_line + 8) & 0x1fff);
+
+		/* if there are more than 8 sprites on this line, set the flag */
+		if (spriteCount == 8)
+		{
+			ppu_regs[PPU_STATUS] |= PPU_STATUS_8SPRITES;
+//          logerror ("> 8 sprites, scanline: %d\n", scanline);
+
+			/* the real NES only draws up to 8 sprites - the rest should be invisible */
+			break;
+		}
+
+		spriteCount++;
+
+		/* abort drawing if sprites aren't rendered */
+		if (!(ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_SPRITES))
+			continue;
 
 		if (pri)
 		{
@@ -645,7 +655,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 							/* no, draw */
 							if ((spriteXPos + pixel) < VISIBLE_SCREEN_WIDTH)
 								*BITMAP_ADDR16(bitmap, scanline, spriteXPos + pixel) = paldata[pixelData];
-							drawn = 1;
 						}
 						/* indicate that a sprite was drawn at this location, even if it's not seen */
 						if ((spriteXPos + pixel) < VISIBLE_SCREEN_WIDTH)
@@ -669,14 +678,12 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 					pixelData = (plane1 & 1) + ((plane2 & 1) << 1);
 					plane1 = plane1 >> 1;
 					plane2 = plane2 >> 1;
-					// sd[7 - pixel]
 				}
 				else
 				{
 					pixelData = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
 					plane1 = plane1 << 1;
 					plane2 = plane2 << 1;
-					// sd[pixel];
 				}
 
 				/* is this pixel non-transparent? */
@@ -693,7 +700,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 								*BITMAP_ADDR16(bitmap, scanline, spriteXPos + pixel) = paldata[pixelData];
 								line_priority[spriteXPos + pixel] |= 0x01;
 							}
-							drawn = 1;
 						}
 					}
 
@@ -701,20 +707,6 @@ static void draw_sprites( const device_config *device, UINT8 *line_priority )
 					if (spriteIndex == 0 && (pixelData & 0x03) && ((spriteXPos + pixel) < 255) && (line_priority[spriteXPos + pixel] & 0x02))
 						ppu_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
 				}
-			}
-		}
-
-		if (drawn)
-		{
-			/* if there are more than 8 sprites on this line, set the flag */
-			spriteCount++;
-			if (spriteCount == 8)
-			{
-				ppu_regs[PPU_STATUS] |= PPU_STATUS_8SPRITES;
-//              logerror ("> 8 sprites, scanline: %d\n", scanline);
-
-				/* the real NES only draws up to 8 sprites - the rest should be invisible */
-				break;
 			}
 		}
 	}
@@ -738,9 +730,6 @@ static void render_scanline( const device_config *device )
 
 	/* clear the line priority for this scanline */
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
-
-	/* clear the sprite count for this line */
-	ppu_regs[PPU_STATUS] &= ~PPU_STATUS_8SPRITES;
 
 	/* see if we need to render the background */
 	if (ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND)
@@ -767,9 +756,8 @@ static void render_scanline( const device_config *device )
 			*BITMAP_ADDR16(bitmap, scanline, i) = back_pen;
 	}
 
-	/* if sprites are on, draw them */
-	if (ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_SPRITES)
-		draw_sprites(device, line_priority);
+	/* if sprites are on, draw them, but we call always to process them */
+	draw_sprites(device, line_priority);
 
  	/* done updating, whew */
 	profiler_mark(PROFILER_END);
@@ -898,7 +886,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		// logerror("vblank ending\n");
 		/* clear the vblank & sprite hit flag */
-		ppu_regs[PPU_STATUS] &= ~(PPU_STATUS_VBLANK | PPU_STATUS_SPRITE0_HIT);
+		ppu_regs[PPU_STATUS] &= ~(PPU_STATUS_VBLANK | PPU_STATUS_SPRITE0_HIT | PPU_STATUS_8SPRITES);
 	}
 
 	/* see if we rolled */
