@@ -5607,6 +5607,9 @@ GAME( 2004, classice2,   classice, sfbonus,    amcoe1_reels3,    classice,      
 GAME( 2004, classiced2,  classice, sfbonus,    amcoe1_reels3,    classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", 0)
 GAME( 2004, classicev2,  classice, sfbonus,    amcoe1_reels3,    classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", 0)
 
+GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site - too new */
+GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site - too new */
+
 GAME( 200?, seawld,      0,        sfbonus,    amcoe1_reels3,    seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", 0)
 GAME( 200?, seawldd1,    seawld,   sfbonus,    amcoe1_reels3,    seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", 0)
 
@@ -5615,9 +5618,6 @@ GAME( 200?, moneymacd1,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,     
 GAME( 200?, moneymacv1,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", 0)
 GAME( 200?, moneymacd2,  moneymac, sfbonus,    amcoe1_reels3,    moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", 0)
 GAME( 200?, moneymacv2,  moneymac, sfbonus,    amcoe1_reels3,    moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", 0)
-
-GAME( 200?, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0)
-GAME( 200?, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0)
 
 GAME( 2005, fb5,         0,        sfbonus,    amcoe2_reels3,    fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 1)", 0)
 GAME( 2005, fb5c,        fb5,      sfbonus,    amcoe1_reels3,    fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 2)", 0)
