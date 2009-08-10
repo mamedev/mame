@@ -107,7 +107,7 @@ static void set_videorom_bank(running_machine* machine, int start, int count, in
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		j = i + start + 1;
+		j = i + start + 2;
 		memory_set_bankptr(machine, j, memory_region(machine, "gfx1") + offset);
 	}
 }
@@ -666,14 +666,14 @@ static MACHINE_START( multigm3 )
 
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(1), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, SMH_BANK(2), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, SMH_BANK(3), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, SMH_BANK(4), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, SMH_BANK(5), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(6), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(7), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(8), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(2), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, SMH_BANK(3), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, SMH_BANK(4), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, SMH_BANK(5), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, SMH_BANK(6), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(7), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(8), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(9), 0);
 
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };
@@ -683,8 +683,8 @@ static MACHINE_DRIVER_START( multigam )
 	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(multigam_map)
 
-	MDRV_MACHINE_RESET( multigam )
 	MDRV_MACHINE_START( multigam )
+	MDRV_MACHINE_RESET( multigam )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
