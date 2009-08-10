@@ -744,6 +744,8 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 	if( snes_ppu.mode == 5 || snes_ppu.mode == 6 )
 		widemode = 1;
 
+	curline/=snes_ppu.interlace;
+
 	oam = 0x1ff;
 	oam_extra = oam + 0x20;
 	extra = 0;
@@ -766,8 +768,8 @@ static void snes_update_objects( UINT8 screen, UINT8 priority_tbl, UINT16 curlin
 		extra <<= 1;
 
 		/* Adjust if past maximum position */
-		if( y >= snes_ppu.beam.last_visible_line )
-			y -= 256;
+		if( y >= snes_ppu.beam.last_visible_line*snes_ppu.interlace )
+			y -= 256*snes_ppu.interlace;
 		if( x > 255 )
 			x -= 512;
 

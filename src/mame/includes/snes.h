@@ -492,7 +492,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 sub_add_mode;
 	UINT8 bg3_priority_bit;
 	UINT8 direct_color;
-	UINT8 ppu_last_scroll;		/* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same 
+	UINT8 ppu_last_scroll;		/* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
 									'previous' scroll value */
 	UINT8 mode7_last_scroll;	/* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
@@ -507,6 +507,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 update_windows;
 	UINT8 update_offsets;
 	UINT8 mode;
+	UINT8 interlace; //doubles the visible resolution
 };
 
 struct snes_cart_info
