@@ -148,8 +148,8 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 	if( !debug_options.transparency_disabled )
 #endif /* MAME_DEBUG */
 	if( (clip == SNES_CLIP_ALL) ||
-		(clip == SNES_CLIP_IN  && snes_ppu.clipmasks[5][offset]) ||
-		(clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[5][offset]) )
+		(clip == SNES_CLIP_IN  && !snes_ppu.clipmasks[5][offset]) ||
+		(clip == SNES_CLIP_OUT && snes_ppu.clipmasks[5][offset]) )
 	{
 		UINT16 r, g, b;
 		if( mode == SNES_BLEND_ADD )
@@ -1040,8 +1040,6 @@ static void snes_update_windowmasks(void)
 		}
 
 		/* update colour window */
-		/* FIXME: Why is the colour window different to the other windows? *
-         * Have I overlooked something or done something wrong? */
 		snes_ppu.clipmasks[5][ii] = 0xff;
 		w1 = w2 = -1;
 		if (snes_ppu.colour.window1_enabled)
@@ -1069,29 +1067,23 @@ static void snes_update_windowmasks(void)
 			switch (snes_ppu.colour.wlog_mask)
 			{
 				case 0x0:	/* OR */
-					snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0xff : 0x00;
-/*                  snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0x00 : 0xff;*/
+					snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0x00 : 0xff;
 					break;
 				case 0x4:	/* AND */
-					snes_ppu.clipmasks[5][ii] = w1 & w2 ? 0xff : 0x00;
-/*                  snes_ppu.clipmasks[5][ii] = w1 & w2 ? 0x00 : 0xff;*/
+					snes_ppu.clipmasks[5][ii] = w1 & w2 ? 0x00 : 0xff;
 					break;
 				case 0x8:	/* XOR */
-					snes_ppu.clipmasks[5][ii] = w1 ^ w2 ? 0xff : 0x00;
-/*                  snes_ppu.clipmasks[5][ii] = w1 ^ w2 ? 0x00 : 0xff;*/
+					snes_ppu.clipmasks[5][ii] = w1 ^ w2 ? 0x00 : 0xff;
 					break;
 				case 0xc:	/* XNOR */
-					snes_ppu.clipmasks[5][ii] = !(w1 ^ w2) ? 0xff : 0x00;
-/*                  snes_ppu.clipmasks[5][ii] = !(w1 ^ w2) ? 0x00 : 0xff;*/
+					snes_ppu.clipmasks[5][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
 					break;
 			}
 		}
 		else if( w1 >= 0 )
-			snes_ppu.clipmasks[5][ii] = w1 ? 0xff : 0x00;
-/*          snes_ppu.clipmasks[5][ii] = w1 ? 0x00 : 0xff;*/
+			snes_ppu.clipmasks[5][ii] = w1 ? 0x00 : 0xff;
 		else if( w2 >= 0 )
-			snes_ppu.clipmasks[5][ii] = w2 ? 0xff : 0x00;
-/*          snes_ppu.clipmasks[5][ii] = w2 ? 0x00 : 0xff;*/
+			snes_ppu.clipmasks[5][ii] = w2 ? 0x00 : 0xff;
 	}
 }
 
