@@ -276,7 +276,7 @@ INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tilea
 			{
 				c = snes_cgram[pal + colour];
 				if (screen == MAINSCREEN)	/* Only blend main screens */
-					snes_draw_blend(ii, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
+					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
 				if (snes_ppu.layer[layer].mosaic_enabled) // handle horizontal mosaic
 				{
 					int x_mos;
@@ -376,7 +376,7 @@ INLINE void snes_draw_tile_object(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 
 			{
 				c = snes_cgram[pal + colour];
 				if (blend && screen == MAINSCREEN)	/* Only blend main screens */
-					snes_draw_blend(ii, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
+					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
 
 				scanlines[screen].buffer[ii] = c;
 				scanlines[screen].zbuf[ii] = priority;
@@ -989,7 +989,7 @@ static void snes_update_windowmasks(void)
 
 	snes_ppu.update_windows = 0;		/* reset the flag */
 
-	for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
+	for (ii = 0; ii < SNES_SCR_WIDTH + 8; ii++)
 	{
 		/* update bg 1, 2, 3, 4 & obj */
 		/* jj = layer */
@@ -1110,6 +1110,18 @@ static void snes_update_offsets(void)
 		snes_ppu.layer[ii].offset.tile_vert = (snes_ppu.layer[ii].offset.vertical & 0x3ff) >> (3 + snes_ppu.layer[ii].tile_size);
 		snes_ppu.layer[ii].offset.shift_vert = snes_ppu.layer[ii].offset.vertical & ((8 << snes_ppu.layer[ii].tile_size) - 1);
 	}
+	#if 0
+	popmessage("%04x %04x|%04x %04x|%04x %04x|%04x %04x",
+	snes_ppu.layer[0].offset.tile_horz,
+	snes_ppu.layer[0].offset.tile_vert,
+	snes_ppu.layer[1].offset.tile_horz,
+	snes_ppu.layer[1].offset.tile_vert,
+	snes_ppu.layer[2].offset.tile_horz,
+	snes_ppu.layer[2].offset.tile_vert,
+	snes_ppu.layer[3].offset.tile_horz,
+	snes_ppu.layer[3].offset.tile_vert
+	);
+	#endif
 	snes_ppu.update_offsets = 0;
 }
 
@@ -1164,7 +1176,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		{
 			for(ii = 0; ii < SNES_SCR_WIDTH * snes_htmult; ii++)
 			{
-				snes_draw_blend(ii, &scanlines[MAINSCREEN].buffer[ii], (snes_ram[CGADSUB] & 0x80) ? SNES_BLEND_SUB : SNES_BLEND_ADD, (snes_ram[CGWSEL] & 0x30) >> 4);
+				snes_draw_blend(ii/snes_htmult, &scanlines[MAINSCREEN].buffer[ii], (snes_ram[CGADSUB] & 0x80) ? SNES_BLEND_SUB : SNES_BLEND_ADD, (snes_ram[CGWSEL] & 0x30) >> 4);
 			}
 		}
 
