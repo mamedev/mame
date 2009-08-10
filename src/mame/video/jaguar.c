@@ -435,7 +435,7 @@ static void jaguar_set_palette(UINT16 vmode)
 
 		/* YCC/RGB VARMOD */
 		case 0x100:
-		case 0x107:
+		case 0x106:
 			for (i = 0; i < 65536; i++)
 			{
 				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
@@ -646,6 +646,8 @@ READ16_HANDLER( jaguar_tom_regs_r )
 
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
+	UINT32 reg_store = gpu_regs[offset];
+
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
@@ -658,7 +660,8 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				break;
 
 			case VMODE:
-				jaguar_set_palette(gpu_regs[VMODE]);
+				if (reg_store != gpu_regs[offset])
+					jaguar_set_palette(gpu_regs[VMODE]);
 				break;
 
 			case OBF:	/* clear GPU interrupt */
@@ -678,23 +681,25 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 			case VDB:
 			case VDE:
 			{
-				int hperiod = 2 * ((gpu_regs[HP] & 0x3ff) + 1);
-				int hbend = effective_hvalue(ENABLE_BORDERS ? gpu_regs[HBE] : MIN(gpu_regs[HDB1], gpu_regs[HDB2]));
-				int hbstart = effective_hvalue(gpu_regs[ENABLE_BORDERS ? HBB : HDE]);
-				int vperiod = (gpu_regs[VP] & 0x7ff) + 1;
-				int vbend = gpu_regs[VBE] & 0x7ff;
-				int vbstart = gpu_regs[VBB] & 0x7ff;
-
-				/* adjust for the half-lines */
-				if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
+				if (reg_store != gpu_regs[offset])
 				{
-					rectangle visarea;
-					visarea.min_x = hbend / 2;
-					visarea.max_x = MIN((hbstart >> 1) - 1, 0x19c);
-//					visarea.max_x = hbstart / 2 - 1;
-					visarea.min_y = vbend / 2;
-					visarea.max_y = vbstart / 2 - 1;
-					video_screen_configure(space->machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+					int hperiod = 2 * ((gpu_regs[HP] & 0x3ff) + 1);
+					int hbend = effective_hvalue(ENABLE_BORDERS ? gpu_regs[HBE] : MIN(gpu_regs[HDB1], gpu_regs[HDB2]));
+					int hbstart = effective_hvalue(gpu_regs[ENABLE_BORDERS ? HBB : HDE]);
+					int vperiod = (gpu_regs[VP] & 0x7ff) + 1;
+					int vbend = gpu_regs[VBE] & 0x7ff;
+					int vbstart = gpu_regs[VBB] & 0x7ff;
+
+					/* adjust for the half-lines */
+					if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
+					{
+						rectangle visarea;
+						visarea.min_x = hbend / 2;
+						visarea.max_x = hbstart / 2 - 1;
+						visarea.min_y = vbend / 2;
+						visarea.max_y = vbstart / 2 - 1;
+						video_screen_configure(space->machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+					}
 				}
 				break;
 			}
@@ -772,8 +777,8 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc / 2, 0);
 		int maxx = visarea->max_x;
 		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
-		UINT16 scanline[360];
-		int x;
+		UINT16 x,scanline[760];
+		UINT8 y,pixel_width = ((gpu_regs[VMODE]>>10)&3)+1;
 
 		/* if we are first on this scanline, clear to the border color */
 		if (ENABLE_BORDERS && vc % 2 == 0)
@@ -787,8 +792,9 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		process_object_list(machine, vc, scanline);
 
 		/* copy the data to the target, clipping */
-		for (x = 0; x < 360 && hdb <= maxx && hdb < hde; x++, hdb++)
-			dest[hdb] = pen_table[scanline[x]];
+		for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x++)
+			for (y = 0; y < pixel_width; y++)
+				dest[hdb++] = pen_table[scanline[x]];
 	}
 
 	/* adjust the timer in a loop, to handle missed cases */
@@ -822,7 +828,7 @@ VIDEO_START( cojag )
 	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
-	screen_bitmap = auto_bitmap_alloc(machine, 720, 512, BITMAP_FORMAT_RGB32);
+	screen_bitmap = auto_bitmap_alloc(machine, 760, 512, BITMAP_FORMAT_RGB32);
 
 	jagobj_init(machine);
 

@@ -84,7 +84,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		while (firstpix & 7)
 		{
 			int pix = (pixsrc >> (4 * (~firstpix & 7))) & 0x0f;
-			if ((!(flags & 4) || pix) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix)];
@@ -105,7 +105,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		UINT32 pix = src[firstpix++];
 		if (!(flags & 4) || pix)
 		{
-			if ((!(flags & 4) || (pix & 0xf0000000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0xf0000000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix >> 28)];
@@ -114,7 +114,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x0f000000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x0f000000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 24) & 0x0f)];
@@ -123,7 +123,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x00f00000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x00f00000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 20) & 0x0f)];
@@ -132,7 +132,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x000f0000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x000f0000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 16) & 0x0f)];
@@ -141,7 +141,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x0000f000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x0000f000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 12) & 0x0f)];
@@ -150,7 +150,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x00000f00)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x00000f00)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 8) & 0x0f)];
@@ -159,7 +159,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x000000f0)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x000000f0)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 4) & 0x0f)];
@@ -168,7 +168,7 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x0000000f)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x0000000f)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix & 0x0f)];
@@ -250,7 +250,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		while (firstpix & 3)
 		{
 			UINT8 pix = pixsrc >> (8 * (~firstpix & 3));
-			if ((!(flags & 4) || pix) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix)];
@@ -271,7 +271,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 		UINT32 pix = src[firstpix++];
 		if (!(flags & 4) || pix)
 		{
-			if ((!(flags & 4) || (pix & 0xff000000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0xff000000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix >> 24)];
@@ -280,7 +280,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x00ff0000)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x00ff0000)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 16) & 0xff)];
@@ -289,7 +289,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x0000ff00)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x0000ff00)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 8) & 0xff)];
@@ -298,7 +298,7 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0x000000ff)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0x000000ff)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = clutbase[BYTE_XOR_BE(pix & 0xff)];
@@ -377,7 +377,7 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 	if (firstpix & 1)
 	{
 		UINT16 pix = src[firstpix / 2];
-		if ((!(flags & 4) || pix) && (UINT32)xpos < 360)
+		if ((!(flags & 4) || pix) && (UINT32)xpos < 760)
 		{
 			if (!(flags & 2))
 				scanline[xpos] = pix;
@@ -396,7 +396,7 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 		UINT32 pix = src[firstpix++];
 		if (!(flags & 4) || pix)
 		{
-			if ((!(flags & 4) || (pix >> 16)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix >> 16)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = pix >> 16;
@@ -405,7 +405,7 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 			}
 			xpos += dxpos;
 
-			if ((!(flags & 4) || (pix & 0xffff)) && (UINT32)xpos < 360)
+			if ((!(flags & 4) || (pix & 0xffff)) && (UINT32)xpos < 760)
 			{
 				if (!(flags & 2))
 					scanline[xpos] = pix;
@@ -557,7 +557,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 					{
 						UINT8 pix = lookup_pixel(src, i, pitch, 1);
 
-						if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 							scanline[xpos] = clut[BYTE_XOR_BE(pix)];
 						xpos += dxpos;
 					}
@@ -570,7 +570,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 					{
 						UINT8 pix = lookup_pixel(src, i, pitch, 1);
 
-						if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 							BLEND(scanline[xpos], clut[BYTE_XOR_BE(pix)]);
 						xpos += dxpos;
 					}
@@ -591,7 +591,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 					{
 						UINT8 pix = lookup_pixel(src, i, pitch, 2);
 
-						if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 							scanline[xpos] = clut[BYTE_XOR_BE(pix)];
 						xpos += dxpos;
 					}
@@ -604,7 +604,7 @@ static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc,
 					{
 						UINT8 pix = lookup_pixel(src, i, pitch, 2);
 
-						if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 							BLEND(scanline[xpos], clut[BYTE_XOR_BE(pix)]);
 						xpos += dxpos;
 					}
@@ -754,7 +754,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 
 						while (xleft > 0)
 						{
-							if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 								scanline[xpos] = clut[BYTE_XOR_BE(pix)];
 							xpos += dxpos;
 							xleft -= 0x20;
@@ -776,7 +776,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 
 						while (xleft > 0)
 						{
-							if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 								scanline[xpos] = clut[BYTE_XOR_BE(pix)];
 							xpos += dxpos;
 							xleft -= 0x20;
@@ -794,7 +794,7 @@ static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, 
 
 						while (xleft > 0)
 						{
-							if (xpos >= 0 && xpos < 360 && (pix || !(flags & 4)))
+							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
 								scanline[xpos] = pix;
 							xpos += dxpos;
 							xleft -= 0x20;
@@ -908,7 +908,7 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 
 	/* erase the scanline first */
 	scanline = _scanline;
-	for (x = 0; x < 360; x++)
+	for (x = 0; x < 760; x++)
 		scanline[x] = gpu_regs[BG];
 
 	logit = LOG_OBJECTS;
