@@ -425,6 +425,9 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
+		UINT8 window1_enabled, window1_invert;
+		UINT8 window2_enabled, window2_invert;
+		UINT8 wlog_mask;
 		struct
 		{
 			UINT16 horizontal;
@@ -434,7 +437,13 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 			UINT16 tile_vert;
 			UINT16 shift_vert;
 		} offset;
-	} layer[5];
+	} layer[5];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ layers
+	struct
+	{
+		UINT8 window1_enabled, window1_invert;
+		UINT8 window2_enabled, window2_invert;
+		UINT8 wlog_mask;
+	} colour;	// this is for the color (which is 'seen' as a layer by the window masking code)
 	struct
 	{
 		UINT8 address_low;
@@ -489,8 +498,9 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 
 	UINT8 main_bg_enabled[5];	// these would probably better fit the layer struct, but it would make worse the code in snes_update_mode_X()
 	UINT8 sub_bg_enabled[5];
-	UINT8 ppu1_open_bus;
-	UINT8 ppu2_open_bus;
+	UINT8 ppu1_open_bus, ppu2_open_bus;
+	UINT8 ppu1_version, ppu2_version;
+	UINT8 window1_left, window1_right, window2_left, window2_right;
 
 	UINT16 mosaic_table[16][4096];
 	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];

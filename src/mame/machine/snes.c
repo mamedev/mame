@@ -497,8 +497,7 @@ READ8_HANDLER( snes_r_io )
 				return snes_ppu.ppu2_open_bus;
 		case OPHCT:		/* Horizontal counter data by ext/soft latch */
 			{
-				/* FIXME: need to handle STAT78 reset */
-				if( read_ophct )
+				if (read_ophct)
 				{
 					snes_ppu.ppu2_open_bus &= 0xfe;
 					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_horz >> 8) & 0x01;
@@ -512,8 +511,7 @@ READ8_HANDLER( snes_r_io )
 			}
 		case OPVCT:		/* Vertical counter data by ext/soft latch */
 			{
-				/* FIXME: need to handle STAT78 reset */
-				if( read_opvct )
+				if (read_opvct)
 				{
 					snes_ppu.ppu2_open_bus &= 0xfe;
 					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_vert >> 8) & 0x01;
@@ -529,14 +527,17 @@ READ8_HANDLER( snes_r_io )
 			value = snes_ram[offset] & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
 			// 0x20 - Master/slave mode select. Little is known about this bit. We always seem to read back 0 here.
 			value |= (snes_ppu.ppu1_open_bus & 0x10);
+			value |= (snes_ppu.ppu1_version & 0x0f);
 			snes_ram[offset] = value;	// not sure if this is needed...
 			snes_ppu.ppu1_open_bus = value;
 			return snes_ppu.ppu1_open_bus;
 		case STAT78:	/* PPU status flag and version number */
-			/* FIXME: need to reset OPHCT and OPVCT */
+			read_ophct = 0;
+			read_opvct = 0;
 			value = snes_ram[offset];
 			value &= ~0x40;	// clear 'latched counters' flag
 			value |= (snes_ppu.ppu1_open_bus & 0x20);
+			value |= (snes_ppu.ppu2_version & 0x0f);
 			snes_ram[offset] = value;	// not sure if this is needed...
 			snes_ppu.ppu2_open_bus = value;
 			return snes_ppu.ppu2_open_bus;
@@ -989,16 +990,92 @@ WRITE8_HANDLER( snes_w_io )
 			cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
-		case W34SEL:	/* Window mask settings for BG3-4 */
-		case WOBJSEL:	/* Window mask settings for objects */
-		case WH0:		/* Window 1 left position */
-		case WH1:		/* Window 1 right position */
-		case WH2:		/* Window 2 left position */
-		case WH3:		/* Window 2 right position */
-		case WBGLOG:	/* Window mask logic for BG's */
-		case WOBJLOG:	/* Window mask logic for objects */
-			if( data != snes_ram[offset] )
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.layer[0].window1_invert = data & 0x01;
+				snes_ppu.layer[0].window1_enabled = data & 0x02;
+				snes_ppu.layer[0].window2_invert = data & 0x04;
+				snes_ppu.layer[0].window2_enabled = data & 0x08;
+				snes_ppu.layer[1].window1_invert = data & 0x10;
+				snes_ppu.layer[1].window1_enabled = data & 0x20;
+				snes_ppu.layer[1].window2_invert = data & 0x40;
+				snes_ppu.layer[1].window2_enabled = data & 0x80;
 				snes_ppu.update_windows = 1;
+			}
+			break;
+		case W34SEL:	/* Window mask settings for BG3-4 */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.layer[2].window1_invert = data & 0x01;
+				snes_ppu.layer[2].window1_enabled = data & 0x02;
+				snes_ppu.layer[2].window2_invert = data & 0x04;
+				snes_ppu.layer[2].window2_enabled = data & 0x08;
+				snes_ppu.layer[3].window1_invert = data & 0x10;
+				snes_ppu.layer[3].window1_enabled = data & 0x20;
+				snes_ppu.layer[3].window2_invert = data & 0x40;
+				snes_ppu.layer[3].window2_enabled = data & 0x80;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WOBJSEL:	/* Window mask settings for objects */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.layer[4].window1_invert = data & 0x01;
+				snes_ppu.layer[4].window1_enabled = data & 0x02;
+				snes_ppu.layer[4].window2_invert = data & 0x04;
+				snes_ppu.layer[4].window2_enabled = data & 0x08;
+				snes_ppu.colour.window1_invert = data & 0x10;
+				snes_ppu.colour.window1_enabled = data & 0x20;
+				snes_ppu.colour.window2_invert = data & 0x40;
+				snes_ppu.colour.window2_enabled = data & 0x80;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WH0:		/* Window 1 left position */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.window1_left = data;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WH1:		/* Window 1 right position */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.window1_right = data;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WH2:		/* Window 2 left position */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.window2_left = data;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WH3:		/* Window 2 right position */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.window2_right = data;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WBGLOG:	/* Window mask logic for BG's */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.layer[0].wlog_mask = data & 0x03;
+				snes_ppu.layer[1].wlog_mask = (data & 0x0c) >> 2;
+				snes_ppu.layer[2].wlog_mask = (data & 0x30) >> 4;
+				snes_ppu.layer[3].wlog_mask = (data & 0xc0) >> 6;
+				snes_ppu.update_windows = 1;
+			}
+			break;
+		case WOBJLOG:	/* Window mask logic for objects */
+			if (data != snes_ram[offset])
+			{
+				snes_ppu.layer[4].wlog_mask = data & 0x03;
+				snes_ppu.colour.wlog_mask = (data & 0x0c) >> 2;
+				snes_ppu.update_windows = 1;
+			}
 			break;
 		case TM:		/* Main screen designation */
 			snes_ppu.main_bg_enabled[0] = data & 0x01;
@@ -1669,6 +1746,8 @@ static void snes_init_ram(running_machine *machine)
 	snes_ppu.beam.current_horz = 0;
 	snes_ppu.beam.last_visible_line = 240;
 	snes_ppu.mode = 0;
+	snes_ppu.ppu1_version = 1;	// 5C77 chip version number, read by STAT77, only '1' is known
+	snes_ppu.ppu2_version = 3;	// 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
 	cgram_address = 0;
 	vram_read_offset = 2;
 	joy1l = joy1h = joy2l = joy2h = joy3l = joy3h = 0;

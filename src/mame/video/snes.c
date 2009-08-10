@@ -577,7 +577,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 	INT16 ma, mb, mc, md;
 	INT32 xc, yc, tx, ty, sx, sy, hs, vs, xpos, xdir, x0, y0;
 	UINT8 priority = priority_a;
-	UINT8 colour = 0;
+	UINT8 colour = 0, window_enabled = 0;
 	UINT16 *mosaic_x, *mosaic_y;
 
 #ifdef MAME_DEBUG
@@ -682,7 +682,9 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 			colour &= 0x7f;
 		}
 
-		colour &= snes_ppu.clipmasks[layer][xpos];
+		window_enabled = (screen == MAINSCREEN) ? snes_ppu.layer[layer].main_window_enabled : snes_ppu.layer[layer].sub_window_enabled;
+		if (window_enabled)
+			colour &= snes_ppu.clipmasks[layer][xpos];
 
 		/* Draw pixel if appropriate */
 		if (scanlines[screen].zbuf[xpos] <= priority && colour > 0)
@@ -980,263 +982,89 @@ static void snes_draw_screen( UINT8 screen, UINT16 curline )
  *********************************************/
 static void snes_update_windowmasks(void)
 {
-	UINT16 ii;
+	UINT16 ii, jj;
 	INT8 w1, w2;
 
 	snes_ppu.update_windows = 0;		/* reset the flag */
 
-	for( ii = 0; ii < SNES_SCR_WIDTH; ii++ )
+	for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
 	{
-		/* update bg 1 */
-		snes_ppu.clipmasks[0][ii] = 0xff;
-		w1 = w2 = -1;
-		if( snes_ram[W12SEL] & 0x2 )
+		/* update bg 1, 2, 3, 4 & obj */
+		/* jj = layer */
+		for (jj = 0; jj < 5; jj++)
 		{
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
-				w1 = 0;
-			else
-				w1 = 1;
-			if( snes_ram[W12SEL] & 0x1 )
-				w1 = !w1;
-		}
-		if( snes_ram[W12SEL] & 0x8 )
-		{
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
-				w2 = 0;
-			else
-				w2 = 1;
-			if( snes_ram[W12SEL] & 0x4 )
-				w2 = !w2;
-		}
-		if( w1 >= 0 && w2 >= 0 )
-		{
-			switch( snes_ram[WBGLOG] & 0x3 )
+			snes_ppu.clipmasks[jj][ii] = 0xff;
+			w1 = w2 = -1;
+			if (snes_ppu.layer[jj].window1_enabled)
 			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[0][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x1:	/* AND */
-					snes_ppu.clipmasks[0][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x2:	/* XOR */
-					snes_ppu.clipmasks[0][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0x3:	/* XNOR */
-					snes_ppu.clipmasks[0][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
+				if ((ii < snes_ppu.window1_left) || (ii > snes_ppu.window1_right))
+					w1 = 0;
+				else
+					w1 = 1;
+				if (snes_ppu.layer[jj].window1_invert)
+					w1 = !w1;
 			}
-		}
-		else if( w1 >= 0 )
-			snes_ppu.clipmasks[0][ii] = w1 ? 0x00 : 0xff;
-		else if( w2 >= 0 )
-			snes_ppu.clipmasks[0][ii] = w2 ? 0x00 : 0xff;
-
-		/* update bg 2 */
-		snes_ppu.clipmasks[1][ii] = 0xff;
-		w1 = w2 = -1;
-		if( snes_ram[W12SEL] & 0x20 )
-		{
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
-				w1 = 0;
-			else
-				w1 = 1;
-			if( snes_ram[W12SEL] & 0x10 )
-				w1 = !w1;
-		}
-		if( snes_ram[W12SEL] & 0x80 )
-		{
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
-				w2 = 0;
-			else
-				w2 = 1;
-			if( snes_ram[W12SEL] & 0x40 )
-				w2 = !w2;
-		}
-		if( w1 >= 0 && w2 >= 0 )
-		{
-			switch( snes_ram[WBGLOG] & 0xc )
+			if (snes_ppu.layer[jj].window2_enabled)
 			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[1][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x4:	/* AND */
-					snes_ppu.clipmasks[1][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x8:	/* XOR */
-					snes_ppu.clipmasks[1][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0xc:	/* XNOR */
-					snes_ppu.clipmasks[1][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
+				if ((ii < snes_ppu.window2_left) || (ii > snes_ppu.window2_right))
+					w2 = 0;
+				else
+					w2 = 1;
+				if (snes_ppu.layer[jj].window2_invert)
+					w2 = !w2;
 			}
-		}
-		else if( w1 >= 0 )
-			snes_ppu.clipmasks[1][ii] = w1 ? 0x00 : 0xff;
-		else if( w2 >= 0 )
-			snes_ppu.clipmasks[1][ii] = w2 ? 0x00 : 0xff;
-
-		/* update bg 3 */
-		snes_ppu.clipmasks[2][ii] = 0xff;
-		w1 = w2 = -1;
-		if( snes_ram[W34SEL] & 0x2 )
-		{
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
-				w1 = 0;
-			else
-				w1 = 1;
-			if( snes_ram[W34SEL] & 0x1 )
-				w1 = !w1;
-		}
-		if( snes_ram[W34SEL] & 0x8 )
-		{
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
-				w2 = 0;
-			else
-				w2 = 1;
-			if( snes_ram[W34SEL] & 0x4 )
-				w2 = !w2;
-		}
-		if( w1 >= 0 && w2 >= 0 )
-		{
-			switch( snes_ram[WBGLOG] & 0x30 )
+			if (w1 >= 0 && w2 >= 0)
 			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[2][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x10:	/* AND */
-					snes_ppu.clipmasks[2][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x20:	/* XOR */
-					snes_ppu.clipmasks[2][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0x30:	/* XNOR */
-					snes_ppu.clipmasks[2][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
+				switch (snes_ppu.layer[jj].wlog_mask)
+				{
+					case 0x00:	/* OR */
+						snes_ppu.clipmasks[jj][ii] = w1 | w2 ? 0x00 : 0xff;
+						break;
+					case 0x01:	/* AND */
+						snes_ppu.clipmasks[jj][ii] = w1 & w2 ? 0x00 : 0xff;
+						break;
+					case 0x02:	/* XOR */
+						snes_ppu.clipmasks[jj][ii] = w1 ^ w2 ? 0x00 : 0xff;
+						break;
+					case 0x03:	/* XNOR */
+						snes_ppu.clipmasks[jj][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
+						break;
+				}
 			}
+			else if( w1 >= 0 )
+				snes_ppu.clipmasks[jj][ii] = w1 ? 0x00 : 0xff;
+			else if( w2 >= 0 )
+				snes_ppu.clipmasks[jj][ii] = w2 ? 0x00 : 0xff;
 		}
-		else if( w1 >= 0 )
-			snes_ppu.clipmasks[2][ii] = w1 ? 0x00 : 0xff;
-		else if( w2 >= 0 )
-			snes_ppu.clipmasks[2][ii] = w2 ? 0x00 : 0xff;
-
-		/* update bg 4 */
-		snes_ppu.clipmasks[3][ii] = 0xff;
-		w1 = w2 = -1;
-		if( snes_ram[W34SEL] & 0x20 )
-		{
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
-				w1 = 0;
-			else
-				w1 = 1;
-			if( snes_ram[W34SEL] & 0x10 )
-				w1 = !w1;
-		}
-		if( snes_ram[W34SEL] & 0x80 )
-		{
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
-				w2 = 0;
-			else
-				w2 = 1;
-			if( snes_ram[W34SEL] & 0x40 )
-				w2 = !w2;
-		}
-		if( w1 >= 0 && w2 >= 0 )
-		{
-			switch( snes_ram[WBGLOG] & 0xc0 )
-			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[3][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x40:	/* AND */
-					snes_ppu.clipmasks[3][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x80:	/* XOR */
-					snes_ppu.clipmasks[3][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0xc0:	/* XNOR */
-					snes_ppu.clipmasks[3][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
-			}
-		}
-		else if( w1 >= 0 )
-			snes_ppu.clipmasks[3][ii] = w1 ? 0x00 : 0xff;
-		else if( w2 >= 0 )
-			snes_ppu.clipmasks[3][ii] = w2 ? 0x00 : 0xff;
-
-		/* update objects */
-		snes_ppu.clipmasks[4][ii] = 0xff;
-		w1 = w2 = -1;
-		if( snes_ram[WOBJSEL] & 0x2 )
-		{
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
-				w1 = 0;
-			else
-				w1 = 1;
-			if( snes_ram[WOBJSEL] & 0x1 )
-				w1 = !w1;
-		}
-		if( snes_ram[WOBJSEL] & 0x8 )
-		{
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
-				w2 = 0;
-			else
-				w2 = 1;
-			if( snes_ram[WOBJSEL] & 0x4 )
-				w2 = !w2;
-		}
-		if( w1 >= 0 && w2 >= 0 )
-		{
-			switch( snes_ram[WOBJLOG] & 0x3 )
-			{
-				case 0x0:	/* OR */
-					snes_ppu.clipmasks[4][ii] = w1 | w2 ? 0x00 : 0xff;
-					break;
-				case 0x1:	/* AND */
-					snes_ppu.clipmasks[4][ii] = w1 & w2 ? 0x00 : 0xff;
-					break;
-				case 0x2:	/* XOR */
-					snes_ppu.clipmasks[4][ii] = w1 ^ w2 ? 0x00 : 0xff;
-					break;
-				case 0x3:	/* XNOR */
-					snes_ppu.clipmasks[4][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
-					break;
-			}
-		}
-		else if( w1 >= 0 )
-			snes_ppu.clipmasks[4][ii] = w1 ? 0x00 : 0xff;
-		else if( w2 >= 0 )
-			snes_ppu.clipmasks[4][ii] = w2 ? 0x00 : 0xff;
 
 		/* update colour window */
 		/* FIXME: Why is the colour window different to the other windows? *
          * Have I overlooked something or done something wrong? */
 		snes_ppu.clipmasks[5][ii] = 0xff;
 		w1 = w2 = -1;
-		if( snes_ram[WOBJSEL] & 0x20 )
+		if (snes_ppu.colour.window1_enabled)
 		{
 			/* Default to mask area inside */
-			if( (ii < snes_ram[WH0]) || (ii > snes_ram[WH1]) )
+			if ((ii < snes_ppu.window1_left) || (ii > snes_ppu.window1_right))
 				w1 = 0;
 			else
 				w1 = 1;
 			/* If mask area is outside then swap */
-			if( snes_ram[WOBJSEL] & 0x10 )
+			if (snes_ppu.colour.window1_invert)
 				w1 = !w1;
 		}
-		if( snes_ram[WOBJSEL] & 0x80 )
+		if (snes_ppu.colour.window2_enabled)
 		{
-			/* Default to mask area inside */
-			if( (ii < snes_ram[WH2]) || (ii > snes_ram[WH3]) )
+			if ((ii < snes_ppu.window2_left) || (ii > snes_ppu.window2_right))
 				w2 = 0;
 			else
 				w2 = 1;
-			/* If mask area is outside then swap */
-			if( snes_ram[WOBJSEL] & 0x40 )
+			if (snes_ppu.colour.window2_invert)
 				w2 = !w2;
 		}
 		if( w1 >= 0 && w2 >= 0 )
 		{
-			switch( snes_ram[WOBJLOG] & 0xc )
+			switch (snes_ppu.colour.wlog_mask)
 			{
 				case 0x0:	/* OR */
 					snes_ppu.clipmasks[5][ii] = w1 | w2 ? 0xff : 0x00;
