@@ -1132,7 +1132,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	profiler_mark(PROFILER_VIDEO);
 
 	if (snes_ram[INIDISP] & 0x80) /* screen is forced blank */
-		for (x = 0; x < SNES_SCR_WIDTH; x++)
+		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult; x++)
 			*BITMAP_ADDR32(bitmap, curline, x) = RGB_BLACK;
 	else
 	{
