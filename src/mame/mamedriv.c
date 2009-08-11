@@ -1109,6 +1109,7 @@ const game_driver * const drivers[] =
 	DRIVER( vspinbalj )	/* (c) 1984 Nintendo */
 	DRIVER( vsslalom )	/* (c) 1986 Nintendo */
 	DRIVER( vssoccer )	/* (c) 1985 Nintendo */
+	DRIVER( vssoccerj )	/* (c) 1985 Nintendo */
 	DRIVER( vsgradus )	/* (c) 1986 Konami */
 	DRIVER( platoon )	/* (c) 1987 Ocean */
 	DRIVER( vstetris )	/* (c) 1988 Atari */
@@ -1124,12 +1125,12 @@ const game_driver * const drivers[] =
 	DRIVER( vsbball )	/* (c) 1984 Nintendo */
 	DRIVER( vsbballj )	/* (c) 1984 Nintendo */
 	DRIVER( vsbballja )	/* (c) 1984 Nintendo */
+	DRIVER( vsbballjb )	/* (c) 1984 Nintendo */
 	DRIVER( iceclmrj )	/* (c) 1984 Nintendo */
 	DRIVER( vsgshoe )	/* (c) 1986 Nintendo */
 	DRIVER( supxevs )	/* (c) 1986 Nintendo */
 	DRIVER( vsfdf )		/* (c) 1986 Sunsoft */
 	DRIVER( smgolfb )	/* (c) 1985 Nintendo */
-	DRIVER( vsbballjb )	/* (c) 1984 Nintendo */
 
 	/* NES-based hacks */
 	DRIVER( multigam )	/* 1992 */
