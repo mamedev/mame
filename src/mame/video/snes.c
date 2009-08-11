@@ -411,6 +411,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	UINT8 color_shift = 0;
 	UINT8 color_planes = 2;
 	UINT8 tile_divider = 1;
+	UINT8 wrap_around_x; //helper for wrap-around
 
 #ifdef MAME_DEBUG
 	if (debug_options.bg_disabled[layer])
@@ -478,14 +479,16 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			break;
 	}
 
+	wrap_around_x = 1;
+
 	for (ii = 0; ii < (66*(hires+1) >> tile_size); ii += 2)
 	{
 		/* Have we scrolled into the next map? */
-		if (hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)))
+		if (wrap_around_x && ((ii >> 1) >= 32 - (hscroll & 0x1f)))
 		{
 			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
-			hscroll = 0;	/* Make sure we don't do this again */
+			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
 		if (tmap > 0x10000)
 			tmap %= 0x10000;
