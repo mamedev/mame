@@ -876,6 +876,7 @@ const game_driver * const drivers[] =
 	DRIVER( ridgerac )	/* (c) 1993 */
 	DRIVER( ridgeracb )	/* (c) 1993 */
 	DRIVER( ridgeracj )	/* (c) 1993 */
+	DRIVER( ridgerac3 )	/* (c) 1993 */
 	DRIVER( acedrvrw )	/* (c) 1994 */
 	DRIVER( alpinerd )	/* (c) 1994 */
 	DRIVER( alpinerc )	/* (c) 1994 */
