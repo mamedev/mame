@@ -66,24 +66,23 @@ Graphic hack games:
 - Skate Kids                                (by Two-Bit Score, 1988; hack of Vs. Super Mario Bros.)
 
 Needed roms:
-- Babel no Tou                              (by Namco, 198?)
-- Family Boxing                             (by Namco/Woodplace, 198?)
+- Babel no Tou                              (by Namco, 1986)
+- Family Boxing                             (by Namco/Woodplace, 1987)
 - Family Stadium '87                        (by Namco, 1987)
 - Family Stadium '88                        (by Namco, 1988)
-- Family Tennis                             (by Namco, 198?)
+- Family Tennis                             (by Namco, 1987)
 - Head to Head Baseball                     (ever finished/released?, by Nintendo, 1986)
-- Japanese version of Vs. Super Mario Bros. (1986)
 - Lionex                                    (prototype by Sunsoft, 1987)
 - Madura no Tsubasa                         (prototype by Sunsoft, 1987)
-- Predators                                 (prototype by Williams, 84)
-- Pro Yakyuu Family Stadium                 (by Namco, 1986?)
-- Quest of Ki                               (by Namco/Game Studio, 198?)
+- Predators                                 (prototype by Williams, 1984)
+- Pro Yakyuu Family Stadium                 (by Namco, 1986)
+- Quest of Ki                               (by Namco/Game Studio, 1988)
 - Super Chinese                             (by Namco/Culture Brain, 1988)
 - Toukaidou 53tsugi                         (prototype by Sunsoft, 1985)
 - Trojan                                    (by Capcom, 1987)
 - Urban Champion                            (1984)
 - Volleyball                                (1986)
-- Walkure no Bouken                         (by Namco, 198?)
+- Walkure no Bouken                         (by Namco, 1986)
 - Wild Gunman                               (1984, light gun game)
 
 TO DO:
@@ -1852,6 +1851,13 @@ MACHINE_DRIVER_END
 
 /******************************************************************************/
 
+/*	correct label format. revision number is stamped(red), other letters are printed(black)
+	game code in line 1, ROM position in line 2
+	i.e.
+	MDS-DH3
+	1B or 6B e
+*/
+
 
 ROM_START( suprmrio )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
@@ -1916,14 +1922,14 @@ ROM_END
 /* Gun games */
 ROM_START( duckhunt )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-dh3.1d",  0x8000, 0x2000, CRC(3f51f0ed) SHA1(984d8a5cecddde776ffd4f718ee0ca7a9959228b) )
-	ROM_LOAD( "mds-dh3.1c",  0xa000, 0x2000, CRC(8bc7376c) SHA1(d90d663c5e5b6d5247089c8ba618912305049b19) )
-	ROM_LOAD( "mds-dh3.1b",  0xc000, 0x2000, CRC(a042b6e1) SHA1(df571c31a6a52df56869eda0621f7615a625e66d) )
-	ROM_LOAD( "mds-dh3.1a",  0xe000, 0x2000, CRC(1906e3ab) SHA1(bff68829a96e2d251dd12129f84bdf1dbdf61d06) )
+	ROM_LOAD( "mds-dh3_1d or 6d e.bin",  0x8000, 0x2000, CRC(3f51f0ed) SHA1(984d8a5cecddde776ffd4f718ee0ca7a9959228b) )
+	ROM_LOAD( "mds-dh3_1c or 6c e.bin",  0xa000, 0x2000, CRC(8bc7376c) SHA1(d90d663c5e5b6d5247089c8ba618912305049b19) )
+	ROM_LOAD( "mds-dh3_1b or 6b e.bin",  0xc000, 0x2000, CRC(a042b6e1) SHA1(df571c31a6a52df56869eda0621f7615a625e66d) )
+	ROM_LOAD( "mds-dh3_1a or 6a e.bin",  0xe000, 0x2000, CRC(1906e3ab) SHA1(bff68829a96e2d251dd12129f84bdf1dbdf61d06) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-dh3.2b",  0x0000, 0x2000, CRC(0c52ec28) SHA1(c8fb6a5d4c13a7075d313326e2da9ce88780a88d) )
-	ROM_LOAD( "mds-dh3.2a",  0x2000, 0x2000, CRC(3d238df3) SHA1(e868ef3d5357ef5294e4faeecc9dbf801c5253e8) )
+	ROM_LOAD( "mds-dh3_2b or 8b e.bin",  0x0000, 0x2000, CRC(0c52ec28) SHA1(c8fb6a5d4c13a7075d313326e2da9ce88780a88d) )
+	ROM_LOAD( "mds-dh3_2a or 8a e.bin",  0x2000, 0x2000, CRC(3d238df3) SHA1(e868ef3d5357ef5294e4faeecc9dbf801c5253e8) )
 ROM_END
 
 ROM_START( hogalley )
