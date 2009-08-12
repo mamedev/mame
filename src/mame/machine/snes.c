@@ -255,7 +255,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 			if( snes_ram[HDMAEN] )
 				snes_hdma(cpu0space);
 
-			video_screen_update_partial(machine->primary_screen, snes_ppu.beam.current_vert-1);
+			video_screen_update_partial(machine->primary_screen, (snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert*snes_ppu.interlace) : snes_ppu.beam.current_vert-1);
 		}
 	}
 
