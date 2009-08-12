@@ -329,11 +329,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gng )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/4)		/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gng_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/8)		/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
