@@ -370,9 +370,6 @@ READ8_HANDLER( snes_r_io )
 		case WBGLOG:
 			return snes_ppu.ppu1_open_bus;
 
-		/* Shien The Blade Chaser / Shien's Revenge reads here instead */
-		case NMITIMEN:
-			return snes_open_bus_r(space,0);
 // According to BSNES, these should return snes_open_bus_r!
 //		case OAMADDL:
 //		case OAMADDH:
@@ -403,7 +400,7 @@ READ8_HANDLER( snes_r_io )
 			}
 		case SLHV:		/* Software latch for H/V counter */
 			snes_latch_counters(space->machine);
-			return 0x0;		/* Return value is meaningless */
+			return snes_open_bus_r(space,0);		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
 			{
 				int oam_addr = snes_ppu.oam.address;
@@ -555,39 +552,36 @@ READ8_HANDLER( snes_r_io )
 		case WMADDM:	/* Address to read/write to wram (mid) */
 		case WMADDH:	/* Address to read/write to wram (high) */
 			return snes_ram[offset];
-		case OLDJOY1:	/* Data for old NES controllers */
+		case OLDJOY1:	/* Data for old NES controllers (JOYSER1) */
 			{
 				if( snes_ram[offset] & 0x1 )
 				{
-					return 0;
+					return 0 | (snes_open_bus_r(space,0) & 0xfc); //correct?
 				}
 				value = ((joypad[0].low | (joypad[0].high << 8) | 0x10000) >> (15 - (joypad[0].oldrol++ % 16))) & 0x1;
 				if( !(joypad[0].oldrol % 17) )
 					value = 0x1;
-				return value;
+				return (value & 0x03) | (snes_open_bus_r(space,0) & 0xfc); //correct?
 			}
-		case OLDJOY2:	/* Data for old NES controllers */
+		case OLDJOY2:	/* Data for old NES controllers (JOYSER2) */
 			{
 				if( snes_ram[OLDJOY1] & 0x1 )
 				{
-					return 0;
+					return 0 | 0x1c | (snes_open_bus_r(space,0) & 0xe0); //correct?
 				}
 				value = ((joypad[1].low | (joypad[1].high << 8) | 0x10000) >> (15 - (joypad[1].oldrol++ % 16))) & 0x1;
 				if( !(joypad[1].oldrol % 17) )
 					value = 0x1;
-				value |= 0x1c;	// bits 4, 3, and 2 are always set
-				return value;
+				//value |= 0x1c;	// bits 4, 3, and 2 are always set
+				return value | 0x1c | (snes_open_bus_r(space,0) & 0xe0); //correct?
 			}
 		case HTIMEL:
 		case HTIMEH:
 		case VTIMEL:
 		case VTIMEH:
 			return snes_ram[offset];
-		case MDMAEN:		/* GDMA channel designation and trigger */
-			/* FIXME: Is this really read-only? - Villgust needs to read it */
-			return snes_ram[offset];
 		case RDNMI:			/* NMI flag by v-blank and version number */
-			value = snes_ram[offset];
+			value = (snes_ram[offset] & 0x8f) | (snes_open_bus_r(space,0) & 0x70);
 			snes_ram[offset] &= 0x7f;	/* NMI flag is reset on read */
 			return value;
 		case TIMEUP:		/* IRQ flag by H/V count timer */
@@ -599,7 +593,7 @@ READ8_HANDLER( snes_r_io )
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
 //          if (video_screen_get_hpos(space->machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
-			return snes_ram[offset];
+			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space,0) & 0x3e);
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
 			return snes_ram[WRIO];
 		case RDDIVL:		/* Quotient of divide result (low) */
@@ -623,21 +617,30 @@ READ8_HANDLER( snes_r_io )
 			return joypad[3].low;
 		case JOY4H:			/* Joypad 4 status register (high) */
 			return joypad[3].high;
-		case DMAP0: case BBAD0: case A1T0L: case A1T0H: case A1B0: case DAS0L:
+		case DMAP0:
+		case DMAP1:
+		case DMAP2:
+		case DMAP3:
+		case DMAP4:
+		case DMAP5:
+		case DMAP6:
+		case DMAP7:
+			return (snes_ram[offset] & 0xdf) | (snes_open_bus_r(space,0) & 0x20);
+		case BBAD0: case A1T0L: case A1T0H: case A1B0: case DAS0L:
 		case DAS0H: case DSAB0: case A2A0L: case A2A0H: case NTRL0:
-		case DMAP1: case BBAD1: case A1T1L: case A1T1H: case A1B1: case DAS1L:
+	 	case BBAD1: case A1T1L: case A1T1H: case A1B1: case DAS1L:
 		case DAS1H: case DSAB1: case A2A1L: case A2A1H: case NTRL1:
-		case DMAP2: case BBAD2: case A1T2L: case A1T2H: case A1B2: case DAS2L:
+		case BBAD2: case A1T2L: case A1T2H: case A1B2: case DAS2L:
 		case DAS2H: case DSAB2: case A2A2L: case A2A2H: case NTRL2:
-		case DMAP3: case BBAD3: case A1T3L: case A1T3H: case A1B3: case DAS3L:
+		case BBAD3: case A1T3L: case A1T3H: case A1B3: case DAS3L:
 		case DAS3H: case DSAB3: case A2A3L: case A2A3H: case NTRL3:
-		case DMAP4: case BBAD4: case A1T4L: case A1T4H: case A1B4: case DAS4L:
+		case BBAD4: case A1T4L: case A1T4H: case A1B4: case DAS4L:
 		case DAS4H: case DSAB4: case A2A4L: case A2A4H: case NTRL4:
-		case DMAP5: case BBAD5: case A1T5L: case A1T5H: case A1B5: case DAS5L:
+		case BBAD5: case A1T5L: case A1T5H: case A1B5: case DAS5L:
 		case DAS5H: case DSAB5: case A2A5L: case A2A5H: case NTRL5:
-		case DMAP6: case BBAD6: case A1T6L: case A1T6H: case A1B6: case DAS6L:
+		case BBAD6: case A1T6L: case A1T6H: case A1B6: case DAS6L:
 		case DAS6H: case DSAB6: case A2A6L: case A2A6H: case NTRL6:
-		case DMAP7: case BBAD7: case A1T7L: case A1T7H: case A1B7: case DAS7L:
+		case BBAD7: case A1T7L: case A1T7H: case A1B7: case DAS7L:
 		case DAS7H: case DSAB7: case A2A7L: case A2A7H: case NTRL7:
 			return snes_ram[offset];
 
