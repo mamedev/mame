@@ -92,7 +92,7 @@ static void snes_hirq_tick(running_machine *machine)
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, ASSERT_LINE );
 
 	// don't happen again
 	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
 			snes_latch_counters(machine);
-			cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, HOLD_LINE );
+			cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -591,8 +591,9 @@ READ8_HANDLER( snes_r_io )
 			snes_ram[offset] &= 0x7f;	/* NMI flag is reset on read */
 			return value;
 		case TIMEUP:		/* IRQ flag by H/V count timer */
-			value = snes_ram[offset];
-			snes_ram[offset] = 0;	/* Register is reset on read */
+			value = (snes_open_bus_r(space,0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
+			cputag_set_input_line(space->machine, "maincpu", G65816_LINE_IRQ, CLEAR_LINE );
+			snes_ram[TIMEUP] = 0;
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
@@ -1237,6 +1238,9 @@ WRITE8_HANDLER( snes_w_io )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
 #endif
 			break;
+		case TIMEUP:
+			snes_ram[TIMEUP] = data &~0x7f;
+			return;
 	/* Following are read-only */
 		case HVBJOY:	/* H/V blank and joypad enable */
 		case MPYL:		/* Multiplication result (low) */
