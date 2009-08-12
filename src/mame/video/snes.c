@@ -490,8 +490,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			tmap -= ii;
 			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
-		if (tmap > 0x10000)
-			tmap %= 0x10000;
+		//if (tmap > 0x10000) //<- causes corrupt tiles in places, needed?
+		//	tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;
