@@ -338,18 +338,6 @@ READ8_HANDLER( snes_r_io )
 	/* offset is from 0x000000 */
 	switch( offset )
 	{
-		/* hacks for SimCity 2000 (J) to boot - I presume openbus emulation will fix */
-		case 0x221a:
-		case 0x231c:
-		case 0x241e:
-			return 1;
-		case 0x2017:
-		case 0x221b:
-		case 0x231d:
-		case 0x241f:
-			return 0;
-		case 0x2016:
-			return 2;
 		case OAMDATA:	/* 21xy for x=0,1,2 and y=4,5,6,8,9,a returns PPU1 open bus*/
 		case BGMODE:
 		case MOSAIC:

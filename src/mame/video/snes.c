@@ -473,7 +473,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			tile_divider = 2;
 			break;
 		case SNES_COLOR_DEPTH_8BPP:
-			color_shift = 6;	// 2009-08 FP: this should be 6 or 8, if I'm following correctly the drawing code
+			color_shift = 0;	//n/a, pal offset is always zero
 			color_planes = 8;
 			tile_divider = 4;
 			break;
@@ -496,7 +496,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;
 		priority = ((snes_vram[tmap + ii + 1] & 0x20) >> 5) ? priority_b : priority_a;
-		pal = (snes_vram[tmap + ii + 1] & 0x1c) << color_shift;		/* 8 palettes of (4 * color_shift) colours */
+		pal = (color_depth == SNES_COLOR_DEPTH_8BPP) ? 0 : (snes_vram[tmap + ii + 1] & 0x1c) << color_shift;		/* 8 palettes of (4 * color_shift) colours */
 		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
 		tile |= snes_vram[tmap + ii] & 0xff;
 
