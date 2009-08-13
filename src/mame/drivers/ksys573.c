@@ -1011,7 +1011,7 @@ static void atapi_exit(running_machine* machine)
 
 	for( i = 0; i < 2; i++ )
 	{
-		if( get_disk_handle( diskregions[i] ) != NULL )
+		if( get_disk_handle( machine, diskregions[i] ) != NULL )
 		{
 			SCSIDeleteInstance( available_cdroms[ i ] );
 		}
@@ -1039,7 +1039,7 @@ static void atapi_init(running_machine *machine)
 
 	for( i = 0; i < 2; i++ )
 	{
-		if( get_disk_handle( diskregions[i] ) != NULL )
+		if( get_disk_handle( machine, diskregions[i] ) != NULL )
 		{
 			SCSIAllocInstance( machine, &SCSIClassCr589, &available_cdroms[ i ], diskregions[i] );
 		}

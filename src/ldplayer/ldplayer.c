@@ -141,7 +141,7 @@ static chd_file *get_disc(const device_config *device)
 	if (image_file == NULL)
 		fatalerror("No valid image file found!\n");
 
-	return get_disk_handle("laserdisc");
+	return get_disk_handle(device->machine, "laserdisc");
 }
 
 

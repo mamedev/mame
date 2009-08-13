@@ -455,9 +455,9 @@ static cdrom_toc cde_toc;
 static CDE_DMA cde_dma[2];
 
 
-static void cde_init(void)
+static void cde_init(running_machine *machine)
 {
-	cdrom_file *cd = cdrom_open(get_disk_handle("cdrom"));
+	cdrom_file *cd = cdrom_open(get_disk_handle(machine, "cdrom"));
 	const cdrom_toc *toc = cdrom_get_toc(cd);
 
 	if (cd)
@@ -1231,7 +1231,7 @@ static DRIVER_INIT( m2 )
 {
 	unk3 = U64(0xffffffffffffffff);
 	unk20004 = 0;
-	cde_init();
+	cde_init(machine);
 }
 
 GAME( 1997, polystar, 0,       m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )

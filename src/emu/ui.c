@@ -876,11 +876,11 @@ static astring *warnings_string(running_machine *machine, astring *string)
 	astring_reset(string);
 
 	/* if no warnings, nothing to return */
-	if (rom_load_warnings() == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
+	if (rom_load_warnings(machine) == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
 		return string;
 
 	/* add a warning if any ROMs were loaded with warnings */
-	if (rom_load_warnings() > 0)
+	if (rom_load_warnings(machine) > 0)
 	{
 		astring_catc(string, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
 		if (machine->gamedrv->flags & WARNING_FLAGS)

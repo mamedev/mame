@@ -261,7 +261,7 @@ void stvcd_reset(running_machine *machine)
 	#ifdef MESS
 	cdrom = mess_cd_get_cdrom_file(devtag_get_device( machine, "cdrom" ));
 	#else
-	cdrom = cdrom_open(get_disk_handle("cdrom"));
+	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
 	#endif
 
 	if (cdrom)

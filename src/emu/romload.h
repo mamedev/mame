@@ -276,7 +276,7 @@ struct _rom_entry
 void rom_init(running_machine *machine);
 
 /* return the number of warnings we generated */
-int rom_load_warnings(void);
+int rom_load_warnings(running_machine *machine);
 
 
 
@@ -320,7 +320,7 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mam
 chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
 
 /* return a pointer to the CHD file associated with the given region */
-chd_file *get_disk_handle(const char *region);
+chd_file *get_disk_handle(running_machine *machine, const char *region);
 
 /* set a pointer to the CHD file associated with the given region */
 void set_disk_handle(running_machine *machine, const char *region, mame_file *file, chd_file *chd);

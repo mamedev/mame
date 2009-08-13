@@ -102,7 +102,7 @@ void amiga_akiko_init(running_machine* machine)
 	akiko.cdrom_cmd_start = 0;
 	akiko.cdrom_cmd_end = 0;
 	akiko.cdrom_cmd_resp = 0;
-	akiko.cdrom = cdrom_open(get_disk_handle("cdrom"));
+	akiko.cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
 	akiko.cdrom_toc = NULL;
 	akiko.dma_timer = timer_alloc(machine, akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(machine, akiko_frame_proc, NULL);

@@ -946,7 +946,7 @@ static DEVICE_START( naomibd )
 
 		case DIMM_BOARD:
 			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
-			v->gdromchd = get_disk_handle(config->gdromregiontag);
+			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
 			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
 			load_rom_gdrom(device->machine, v);
 			break;

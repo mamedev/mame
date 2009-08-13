@@ -133,6 +133,7 @@ typedef struct _palette_private palette_private;
 typedef struct _tilemap_private tilemap_private;
 typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
+typedef struct _romload_private romload_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
@@ -182,6 +183,7 @@ struct _running_machine
 	tilemap_private *		tilemap_data;		/* internal data from tilemap.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 	devices_private *		devices_data;		/* internal data from devices.c */
+	romload_private *		romload_data;		/* internal data from romload.c */
 	input_port_private *	input_port_data;	/* internal data from inptport.c */
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
@@ -223,7 +225,7 @@ struct _mame_system_time
 
 
 /***************************************************************************
-    GLOBAL VARAIBLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 extern const char mame_disclaimer[];

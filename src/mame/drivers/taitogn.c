@@ -423,7 +423,7 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			pos++;
 		} else
 			v = data;
-		chd_get_metadata(get_disk_handle("card"), HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
+		chd_get_metadata(get_disk_handle(space->machine, "card"), HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
 		k = pos < 5 ? key[pos] : 0;
 		if(v == k)
 			locked &= ~(1 << pos);
@@ -834,7 +834,7 @@ static DRIVER_INIT( coh3002t )
 	dip_timer = timer_alloc(machine,  dip_timer_fired, NULL );
 
 	memset(cis, 0xff, 512);
-	chd_get_metadata(get_disk_handle("card"), PCMCIA_CIS_METADATA_TAG, 0, cis, 512, 0, 0, 0);
+	chd_get_metadata(get_disk_handle(machine, "card"), PCMCIA_CIS_METADATA_TAG, 0, cis, 512, 0, 0, 0);
 }
 
 static DRIVER_INIT( coh3002t_mp )

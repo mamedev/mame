@@ -85,16 +85,15 @@ struct _quark_table
 };
 
 
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static quark_table *source_table;
-static quark_table *name_table;
-static quark_table *description_table;
-static quark_table *roms_table;
-static quark_table *defstr_table;
+typedef struct _quark_tables quark_tables;
+struct _quark_tables
+{
+	quark_table *source;
+	quark_table *name;
+	quark_table *description;
+	quark_table *roms;
+	quark_table *defstr;
+};
 
 
 
@@ -254,15 +253,15 @@ static quark_table *quark_table_alloc(UINT32 entries, UINT32 hashsize)
     string operations
 -------------------------------------------------*/
 
-static void quark_tables_create(void)
+static void quark_tables_create(quark_tables *tables)
 {
 	int drivnum = driver_list_get_count(drivers), strnum;
 
 	/* allocate memory for the quark tables */
-	source_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
-	name_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
-	description_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
-	roms_table = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
+	tables->source = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
+	tables->name = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
+	tables->description = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
+	tables->roms = quark_table_alloc(drivnum, QUARK_HASH_SIZE);
 
 	/* build the quarks and the hash tables */
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
@@ -270,24 +269,24 @@ static void quark_tables_create(void)
 		const game_driver *driver = drivers[drivnum];
 
 		/* fill in the quark with hashes of the strings */
-		quark_add(source_table,      drivnum, quark_string_crc(driver->source_file));
-		quark_add(name_table,        drivnum, quark_string_crc(driver->name));
-		quark_add(description_table, drivnum, quark_string_crc(driver->description));
+		quark_add(tables->source,      drivnum, quark_string_crc(driver->source_file));
+		quark_add(tables->name,        drivnum, quark_string_crc(driver->name));
+		quark_add(tables->description, drivnum, quark_string_crc(driver->description));
 
 		/* only track actual driver ROM entries */
 		if (driver->rom && (driver->flags & GAME_NO_STANDALONE) == 0)
-			quark_add(roms_table,    drivnum, (FPTR)driver->rom);
+			quark_add(tables->roms,    drivnum, (FPTR)driver->rom);
 	}
 
 	/* allocate memory for a quark table of strings */
-	defstr_table = quark_table_alloc(INPUT_STRING_COUNT, 97);
+	tables->defstr = quark_table_alloc(INPUT_STRING_COUNT, 97);
 
 	/* add all the default strings */
 	for (strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
 	{
 		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
-			quark_add(defstr_table, strnum, quark_string_crc(string));
+			quark_add(tables->defstr, strnum, quark_string_crc(string));
 	}
 }
 
@@ -296,27 +295,27 @@ static void quark_tables_create(void)
     quark_tables_free - free allocated tables
 -------------------------------------------------*/
 
-static void quark_tables_free(void)
+static void quark_tables_free(quark_tables *tables)
 {
-	if (source_table != NULL)
-		free(source_table);
-	source_table = NULL;
+	if (tables->source != NULL)
+		free(tables->source);
+	tables->source = NULL;
 
-	if (name_table != NULL)
-		free(name_table);
-	name_table = NULL;
+	if (tables->name != NULL)
+		free(tables->name);
+	tables->name = NULL;
 
-	if (description_table != NULL)
-		free(description_table);
-	description_table = NULL;
+	if (tables->description != NULL)
+		free(tables->description);
+	tables->description = NULL;
 
-	if (roms_table != NULL)
-		free(roms_table);
-	roms_table = NULL;
+	if (tables->roms != NULL)
+		free(tables->roms);
+	tables->roms = NULL;
 
-	if (defstr_table != NULL)
-		free(defstr_table);
-	defstr_table = NULL;
+	if (tables->defstr != NULL)
+		free(tables->defstr);
+	tables->defstr = NULL;
 }
 
 
@@ -483,9 +482,12 @@ static int validate_inlines(void)
     information
 -------------------------------------------------*/
 
-static int validate_driver(int drivnum, const machine_config *config)
+static int validate_driver(int drivnum, const machine_config *config, const quark_tables *tables)
 {
 	const game_driver *driver = drivers[drivnum];
+	quark_table *name_table = tables->name;
+	quark_table *description_table = tables->description;
+	quark_table *roms_table = tables->roms;
 	const game_driver *clone_of;
 	quark_entry *entry;
 	int error = FALSE, is_clone;
@@ -1005,7 +1007,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
     strings
 -------------------------------------------------*/
 
-static int get_defstr_index(const char *name, const game_driver *driver, int *error)
+static int get_defstr_index(quark_table *defstr_table, const char *name, const game_driver *driver, int *error)
 {
 	UINT32 crc = quark_string_crc(name);
 	quark_entry *entry;
@@ -1144,7 +1146,7 @@ static void validate_analog_input_field(const input_field_config *field, const g
     setting
 -------------------------------------------------*/
 
-static void validate_dip_settings(const input_field_config *field, const game_driver *driver, int *error)
+static void validate_dip_settings(const input_field_config *field, const game_driver *driver, quark_table *defstr_table, int *error)
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
@@ -1155,7 +1157,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 	/* iterate through the settings */
 	for (setting = field->settinglist; setting != NULL; setting = setting->next)
 	{
-		int strindex = get_defstr_index(setting->name, driver, error);
+		int strindex = get_defstr_index(defstr_table, setting->name, driver, error);
 
 		/* note any coinage strings */
 		if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C)
@@ -1185,7 +1187,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 		/* if we have a neighbor, compare ourselves to him */
 		if (setting->next != NULL)
 		{
-			int next_strindex = get_defstr_index(setting->next->name, driver, error);
+			int next_strindex = get_defstr_index(defstr_table, setting->next->name, driver, error);
 
 			/* check for inverted off/on dispswitch order */
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
@@ -1235,7 +1237,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *config, const input_port_config **portlistptr)
+static int validate_inputs(int drivnum, const machine_config *config, quark_table *defstr_table, const input_port_config **portlistptr)
 {
 	const input_port_config *scanport;
 	const input_port_config *port;
@@ -1289,7 +1291,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				}
 
 				/* verify the settings list */
-				validate_dip_settings(field, driver, &error);
+				validate_dip_settings(field, driver, defstr_table, &error);
 			}
 
 			/* look for invalid (0) types which should be mapped to IPT_OTHER */
@@ -1324,7 +1326,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				}
 
 				/* look up the string and print an error if default strings are not used */
-				/*strindex = */get_defstr_index(field->name, driver, &error);
+				/*strindex = */get_defstr_index(defstr_table, field->name, driver, &error);
 			}
 
 			/* verify conditions on the field */
@@ -1593,6 +1595,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 
 int mame_validitychecks(const game_driver *curdriver)
 {
+	quark_tables tables;
 	osd_ticks_t prep = 0;
 	osd_ticks_t expansion = 0;
 	osd_ticks_t driver_checks = 0;
@@ -1647,7 +1650,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 	/* prepare by pre-scanning all the drivers and adding their info to hash tables */
 	prep -= osd_profiling_ticks();
-	quark_tables_create();
+	quark_tables_create(&tables);
 	prep += osd_profiling_ticks();
 
 	/* iterate over all drivers */
@@ -1671,7 +1674,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate the driver entry */
 		driver_checks -= osd_profiling_ticks();
-		error = validate_driver(drivnum, config) || error;
+		error = validate_driver(drivnum, config, &tables) || error;
 		driver_checks += osd_profiling_ticks();
 
 		/* validate the ROM information */
@@ -1681,7 +1684,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate input ports */
 		input_checks -= osd_profiling_ticks();
-		error = validate_inputs(drivnum, config, &portlist) || error;
+		error = validate_inputs(drivnum, config, tables.defstr, &portlist) || error;
 		input_checks += osd_profiling_ticks();
 
 		/* validate the CPU information */
@@ -1741,7 +1744,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 	end_resource_tracking();
 	exit_resource_tracking();
-	quark_tables_free();
+	quark_tables_free(&tables);
 
 	return error;
 }

@@ -1327,7 +1327,7 @@ static void init_disc(const device_config *device)
 	if (config->getdisc != NULL)
 		ldcore->disc = (*config->getdisc)(device);
 	else
-		ldcore->disc = get_disk_handle(device->tag);
+		ldcore->disc = get_disk_handle(device->machine, device->tag);
 
 	/* set default parameters */
 	ldcore->width = 720;
