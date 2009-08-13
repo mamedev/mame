@@ -143,7 +143,6 @@ src/emu/cpu/i8085/8085dasm.c svneol=native#text/plain
 src/emu/cpu/i8085/i8085.c svneol=native#text/plain
 src/emu/cpu/i8085/i8085.h svneol=native#text/plain
 src/emu/cpu/i8085/i8085cpu.h svneol=native#text/plain
-src/emu/cpu/i8085/i8085daa.h svneol=native#text/plain
 src/emu/cpu/i86/ea.h svneol=native#text/plain
 src/emu/cpu/i86/host.h svneol=native#text/plain
 src/emu/cpu/i86/i286.c svneol=native#text/plain
