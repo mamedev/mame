@@ -2646,7 +2646,7 @@ static TIMER_CALLBACK( hblank_in_irq )
 		/*set the first Timer-1 event*/
 		cur_scan = scanline+1;
 		if(stv_irq.timer_1)
-			timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
+			timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, timer_1), scanline+1);
 	}
 
 	timer_0++;
@@ -2654,16 +2654,12 @@ static TIMER_CALLBACK( hblank_in_irq )
 
 static TIMER_CALLBACK( timer1_irq )
 {
-	int cur_point = param;
+	int scanline = param;
 
 	TIMER_1_IRQ;
 
-	if((cur_point+1) < h_sync && stv_irq.timer_1)
-	{
-		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
-	}
-
-	if(timer_1 > 0) timer_1--;
+	if(stv_irq.timer_1)
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, timer_1), scanline+1);
 }
 
 static TIMER_CALLBACK( vdp1_irq )
