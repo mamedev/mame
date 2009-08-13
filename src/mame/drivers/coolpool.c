@@ -924,24 +924,24 @@ ROM_START( 9ballsht3 )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
 
-/* If you use the roms from the other set this will boot as 9 Ball Shootout Championship, it looks however like the TMS32026 data
-   should differ at least (the correct data in the bad dump is very different to the other dumps) */
+
+// all checksums correctly match sum16 printed on rom labels
 ROM_START( 9ballshtc )
 	ROM_REGION16_LE( 0x80000, "user1", 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "escape.112",  0x00000, 0x40000, CRC(7ba2749a) SHA1(e2ddc2600234dbebbb423f201cc4061fd0b9911a) )
-	ROM_LOAD16_BYTE( "escape.113",  0x00001, 0x40000, CRC(1e0f3c62) SHA1(3c24a38dcb553fd84b0b44a5a8d93a14435e22b0) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 3990.u112",  0x00000, 0x40000, CRC(7ba2749a) SHA1(e2ddc2600234dbebbb423f201cc4061fd0b9911a) ) 	
+	ROM_LOAD16_BYTE( "e-scape (c)1994 b72f.u113",  0x00001, 0x40000, CRC(1e0f3c62) SHA1(3c24a38dcb553fd84b0b44a5a8d93a14435e22b0) ) 	
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )	/* gfx data read by main CPU */
-	ROM_LOAD16_BYTE( "escape.110",  0x00000, 0x80000, BAD_DUMP CRC(1da8da18) SHA1(63455a7cccb21dc5afeb860e17527cd443f542eb) ) // xx1xxxxxxxxxxxxxxxx = 0x00
-	ROM_LOAD16_BYTE( "escape.111",  0x00001, 0x80000, BAD_DUMP CRC(65dea5e8) SHA1(291232dd19240b150e54a4ed300bcfd40bf5d1f2) ) // xx1xxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) ) 
+	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) ) 	
 
 	ROM_REGION( 0x40000, "dsp", 0 )	/* TMS320C26 */
-	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
-	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) ) 	
+	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) ) 	
 
 	ROM_REGION( 0x100000, "user2", 0 )	/* TMS32026 data */
-	ROM_LOAD( "escape.54",          0x00000, 0x80000, BAD_DUMP CRC(28b4dec6) SHA1(10e47105abb48b572da38709128cba961299d88e) ) // xx1xxxxxxxxxxxxxxxx = 0x00
-	ROM_LOAD( "escape.53",          0x80000, 0x80000, CRC(28f4dd51) SHA1(67ea5bf3dacc17ef4fcc999e4ae0857759fac838) )
+	ROM_LOAD( "e-scape (c)1994 0000.u54",          0x00000, 0x80000, CRC(04b509a0) SHA1(093343741a3d8d0786fd443e68dd85b414c6cf9e) )
+	ROM_LOAD( "e-scape (c)1994 2df8.u53",          0x80000, 0x80000, CRC(c8a7b576) SHA1(7eb71dd791fdcbfe71764a454f0a1d3130d8a57e) )
 ROM_END
 
 
@@ -1014,4 +1014,4 @@ GAME( 1992, coolpool, 0,        coolpool, coolpool, coolpool, ROT0, "Catalina", 
 GAME( 1993, 9ballsht, 0,        9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
 GAME( 1993, 9ballsht2,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
 GAME( 1993, 9ballsht3,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
-GAME( 1993, 9ballshtc,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", GAME_NOT_WORKING )
+GAME( 1993, 9ballshtc,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )
