@@ -3230,7 +3230,7 @@ VIDEO_UPDATE( f3 )
 	UINT32 sy_fix[5],sx_fix[5];
 
 	f3_skip_this_frame=0;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((f3_control_0[2]&0xffff0000)>> 7) + (1<<16);

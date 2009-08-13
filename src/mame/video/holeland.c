@@ -86,7 +86,7 @@ WRITE8_HANDLER( holeland_pal_offs_w )
 	{
 		po[offset] = data & 1;
 		palette_offset = (po[0] + (po[1] << 1)) << 4;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

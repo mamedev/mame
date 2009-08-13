@@ -141,7 +141,7 @@ WRITE8_HANDLER( kncljoe_control_w )
             set after IN0 - Coin 1 goes high AND the credit has been added
    */
 	flipscreen = data & 0x01;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	tilemap_set_flip_all(space->machine,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
 	coin_counter_w(0,data & 0x02);
 	coin_counter_w(1,data & 0x20);

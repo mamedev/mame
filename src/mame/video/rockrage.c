@@ -81,7 +81,7 @@ WRITE8_HANDLER( rockrage_vreg_w ){
 	/* bits 0-1: sprite bank select */
 
 	if ((data & 0x0c) != (rockrage_vreg & 0x0c))
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 
 	rockrage_vreg = data;
 }

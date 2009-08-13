@@ -442,7 +442,7 @@ WRITE16_HANDLER( rallybik_bcu_flipscreen_w )
 	{
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
 		bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
-		tilemap_set_flip(ALL_TILEMAPS, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+		tilemap_set_flip_all(space->machine, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (bcu_flipscreen)
 		{
 			scrollx_offs1 = 0x080 - 6;
@@ -469,7 +469,7 @@ WRITE16_HANDLER( toaplan1_bcu_flipscreen_w )
 	{
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
 		bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
-		tilemap_set_flip(ALL_TILEMAPS, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+		tilemap_set_flip_all(space->machine, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (bcu_flipscreen)
 		{
 			scrollx_offs1 = 0x011 - 6;

@@ -47,7 +47,7 @@ PALETTE_INIT( karnov );
 VIDEO_UPDATE( karnov );
 WRITE16_HANDLER( karnov_playfield_swap_w );
 WRITE16_HANDLER( karnov_videoram_w );
-void karnov_flipscreen_w(int data);
+void karnov_flipscreen_w(running_machine *machine, int data);
 
 VIDEO_START( karnov );
 VIDEO_START( wndrplnt );
@@ -317,7 +317,7 @@ static WRITE16_HANDLER( karnov_control_w )
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */
 			COMBINE_DATA(&karnov_scroll[0]);
-			karnov_flipscreen_w(data>>15);
+			karnov_flipscreen_w(space->machine, data>>15);
 			break;
 
 		case 0xa: /* VSHIFT */

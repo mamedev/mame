@@ -59,7 +59,7 @@ WRITE8_HANDLER( strnskil_scrl_ctrl_w )
 	if (flip_screen_get(space->machine) != (data & 0x08))
 	{
 		flip_screen_set(space->machine, data & 0x08);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

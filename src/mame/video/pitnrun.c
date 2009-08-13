@@ -98,7 +98,7 @@ WRITE8_HANDLER(pitnrun_v_heed_w)
 WRITE8_HANDLER(pitnrun_color_select_w)
 {
 	pitnrun_color_select=data;
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(space->machine);
 }
 
 static void pitnrun_spotlights(running_machine *machine)

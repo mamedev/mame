@@ -73,7 +73,7 @@ static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 WRITE8_HANDLER( sauro_palette_bank_w )
 {
 	palette_bank = (data & 0x03) << 4;
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(space->machine);
 }
 
 WRITE8_HANDLER( sauro_scroll_fg_w )

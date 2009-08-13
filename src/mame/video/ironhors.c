@@ -98,7 +98,7 @@ WRITE8_HANDLER( ironhors_charbank_w )
 	if (charbank != (data & 0x03))
 	{
 		charbank = data & 0x03;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	spriterambank = data & 0x08;
@@ -111,7 +111,7 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 	if (palettebank != (data & 0x07))
 	{
 		palettebank = data & 0x07;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	coin_counter_w(0, data & 0x10);
@@ -127,7 +127,7 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 	if (flip_screen_get(space->machine) != (~data & 0x08))
 	{
 		flip_screen_set(space->machine, ~data & 0x08);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* other bits are used too, but unknown */

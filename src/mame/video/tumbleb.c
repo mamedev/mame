@@ -541,7 +541,7 @@ VIDEO_UPDATE( tumblepb )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=-1;
 	if (flipscreen) offs2=-3; else offs2=-5;
 
@@ -566,7 +566,7 @@ VIDEO_UPDATE( jumpkids )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=-1;
 	if (flipscreen) offs2=-3; else offs2=-5;
 
@@ -591,7 +591,7 @@ VIDEO_UPDATE( semicom )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=-1;	/* fixed */
 	if (flipscreen) offs2=-3; else offs2=-5;	/* fixed */
 
@@ -642,7 +642,7 @@ VIDEO_UPDATE( bcstory )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=8;	/* not sure of this */
 	if (flipscreen) offs2=-3; else offs2=8;	/* not sure of this */
 
@@ -667,7 +667,7 @@ VIDEO_UPDATE( semibase )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs=-1;
 	offs2=-2;
 
@@ -694,7 +694,7 @@ VIDEO_UPDATE( sdfight )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs=-1;
 	offs2=-5; // foreground scroll..
 
@@ -723,7 +723,7 @@ VIDEO_UPDATE( fncywld )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=-1;
 	if (flipscreen) offs2=-3; else offs2=-5;
 
@@ -805,7 +805,7 @@ VIDEO_UPDATE( pangpang )
 	int offs,offs2;
 
 	flipscreen=tumblepb_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) offs=1; else offs=-1;
 	if (flipscreen) offs2=-3; else offs2=-5;
 

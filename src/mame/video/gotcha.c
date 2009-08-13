@@ -74,7 +74,7 @@ WRITE16_HANDLER( gotcha_gfxbank_w )
 		if (gfxbank[banksel] != ((data & 0x0f00) >> 8))
 		{
 			gfxbank[banksel] = (data & 0x0f00) >> 8;
-			tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 	}
 }

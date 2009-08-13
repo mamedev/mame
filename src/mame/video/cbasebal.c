@@ -90,7 +90,7 @@ WRITE8_HANDLER( cbasebal_gfxctrl_w )
 
 	/* bit 1 is flip screen */
 	flipscreen = data & 0x02;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 2 is unknown - unused? */
 

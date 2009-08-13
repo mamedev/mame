@@ -305,10 +305,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* ALL_TILEMAPS may be used with: tilemap_set_flip, tilemap_mark_all_tiles_dirty */
-#define ALL_TILEMAPS					NULL
-
-
 /* maximum number of groups */
 #define TILEMAP_NUM_GROUPS				256
 
@@ -436,8 +432,11 @@ void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset);
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */
 void tilemap_set_enable(tilemap *tmap, int enable);
 
-/* set a global flip for the tilemap; ALL_TILEMAPS can be passed here as well */
+/* set a global flip for the tilemap */
 void tilemap_set_flip(tilemap *tmap, UINT32 attributes);
+
+/* set a global flip for all tilemaps */
+void tilemap_set_flip_all(running_machine *machine, UINT32 attributes);
 
 
 
@@ -446,8 +445,11 @@ void tilemap_set_flip(tilemap *tmap, UINT32 attributes);
 /* mark a single tile dirty based on its memory index */
 void tilemap_mark_tile_dirty(tilemap *tmap, tilemap_memory_index memory_index);
 
-/* mark all the tiles in a tilemap dirty; ALL_TILEMAPS can be passed here as well */
+/* mark all the tiles dirty in a tilemap */
 void tilemap_mark_all_tiles_dirty(tilemap *tmap);
+
+/* mark all the tiles dirty in all tilemaps */
+void tilemap_mark_all_tiles_dirty_all(running_machine *machine);
 
 
 
@@ -519,13 +521,13 @@ void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap
 /* ----- indexed tilemap handling ----- */
 
 /* return the number of tilemaps */
-int tilemap_count(void);
+int tilemap_count(running_machine *machine);
 
 /* return the size of an indexed tilemap */
-void tilemap_size_by_index(int number, UINT32 *width, UINT32 *height);
+void tilemap_size_by_index(running_machine *machine, int number, UINT32 *width, UINT32 *height);
 
 /* render an indexed tilemap with fixed characteristics (no priority) */
-void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
+void tilemap_draw_by_index(running_machine *machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
 
 
 

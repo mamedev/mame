@@ -262,9 +262,9 @@ static VIDEO_UPDATE( mystston )
 
 	set_palette(screen->machine, state);
 
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
 	tilemap_set_scrolly(state->bg_tilemap, 0, *state->scroll);
-	tilemap_set_flip(ALL_TILEMAPS, flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine, flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(bitmap, cliprect, screen->machine->gfx[2], flip);

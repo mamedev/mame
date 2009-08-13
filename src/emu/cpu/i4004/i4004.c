@@ -90,7 +90,7 @@ INLINE i4004_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_4004);
+	assert(cpu_get_type(device) == CPU_I4004);
 	return (i4004_state *)device->token;
 }
 

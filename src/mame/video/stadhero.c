@@ -87,7 +87,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 VIDEO_UPDATE( stadhero )
 {
 	flipscreen=stadhero_pf2_control_0[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_scrollx( pf2_tilemap,0, stadhero_pf2_control_1[0] );
 	tilemap_set_scrolly( pf2_tilemap,0, stadhero_pf2_control_1[1] );
 

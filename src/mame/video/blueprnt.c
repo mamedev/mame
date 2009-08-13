@@ -61,7 +61,7 @@ WRITE8_HANDLER( blueprnt_flipscreen_w )
 	if (gfx_bank != ((data & 0x04) >> 2))
 	{
 		gfx_bank = ((data & 0x04) >> 2);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

@@ -205,7 +205,7 @@ static WRITE8_HANDLER( geebee_out7_w )
 			break;
 		case 5:
 			if( geebee_bgw != (data & 1) )
-				tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+				tilemap_mark_all_tiles_dirty_all(space->machine);
 			geebee_bgw = data & 1;
 			break;
 		case 6:

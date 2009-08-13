@@ -99,7 +99,7 @@ WRITE8_HANDLER( rocnrope_flipscreen_w )
 	if (flip_screen_get(space->machine) != (~data & 0x01))
 	{
 		flip_screen_set(space->machine, ~data & 0x01);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

@@ -978,7 +978,7 @@ VIDEO_UPDATE( dkong )
 {
 	dkong_state *state = (dkong_state *)screen->machine->driver_data;
 
-	tilemap_set_flip(ALL_TILEMAPS, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip_all(screen->machine, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ?  0 : 0);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->flip ? -8 : 0);
 

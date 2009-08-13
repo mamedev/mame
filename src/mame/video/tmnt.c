@@ -412,7 +412,7 @@ WRITE16_HANDLER( blswhstl_700300_w )
 		if (blswhstl_rombank != ((data & 0x80) >> 7))
 		{
 			blswhstl_rombank = (data & 0x80) >> 7;
-			tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 
 		/* other bits unknown */

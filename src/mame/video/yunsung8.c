@@ -102,7 +102,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 
 WRITE8_HANDLER( yunsung8_flipscreen_w )
 {
-	tilemap_set_flip(ALL_TILEMAPS, (data & 1) ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0);
+	tilemap_set_flip_all(space->machine, (data & 1) ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0);
 }
 
 

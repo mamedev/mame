@@ -137,9 +137,9 @@ VIDEO_UPDATE( alpha68k_II )
 	static int last_bank=0;
 
 	if (last_bank!=bank_base)
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	last_bank=bank_base;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap,cliprect,2047);
 //AT
@@ -275,9 +275,9 @@ VIDEO_UPDATE( alpha68k_V )
 	static int last_bank=0;
 
 	if (last_bank!=bank_base)
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	last_bank=bank_base;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap,cliprect,4095);
 
@@ -311,9 +311,9 @@ VIDEO_UPDATE( alpha68k_V_sb )
 	static int last_bank=0;
 
 	if (last_bank!=bank_base)
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	last_bank=bank_base;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap,cliprect,4095);
 

@@ -8,7 +8,7 @@ void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region)
 #define MAX_K007121 2
 extern UINT8 K007121_ctrlram[MAX_K007121][8];
 
-void K007121_ctrl_w(int chip,int offset,int data);
+void K007121_ctrl_w(running_machine *machine, int chip,int offset,int data);
 WRITE8_HANDLER( K007121_ctrl_0_w );
 WRITE8_HANDLER( K007121_ctrl_1_w );
 void K007121_sprites_draw(int chip,bitmap_t *bitmap,const rectangle *cliprect, gfx_element **gfxs, colortable_t *ctable,

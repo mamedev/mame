@@ -1725,7 +1725,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 		port_select = (data & 0x40) >> 6;
 
 		seta_tiles_offset = (data & 0x10) ? 0x4000: 0;
-		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty_all(space->machine);
 		old_tiles_offset = seta_tiles_offset;
 
 		seta_coin_lockout_w(space->machine, data);

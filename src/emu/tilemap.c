@@ -121,14 +121,12 @@ struct _tilemap
 };
 
 
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static tilemap *		tilemap_list;
-static tilemap **		tilemap_tailptr;
-static int				tilemap_instance;
+struct _tilemap_private
+{
+	tilemap *		list;
+	tilemap **		tailptr;
+	int				instance;
+};
 
 
 
@@ -239,12 +237,12 @@ INLINE INT32 effective_colscroll(tilemap *tmap, int index, UINT32 screen_height)
     indexed_tilemap - return a tilemap by index
 -------------------------------------------------*/
 
-INLINE tilemap *indexed_tilemap(int index)
+INLINE tilemap *indexed_tilemap(running_machine *machine, int index)
 {
 	tilemap *tmap;
 
 	/* find by the tilemap index */
-	for (tmap = tilemap_list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		if (index-- == 0)
 			return tmap;
 
@@ -297,9 +295,8 @@ void tilemap_init(running_machine *machine)
 
 	if (screen_width != 0 && screen_height != 0)
 	{
-		tilemap_list	 = NULL;
-		tilemap_tailptr  = &tilemap_list;
-		tilemap_instance = 0;
+		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
+		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
 
 		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
@@ -319,6 +316,7 @@ void tilemap_init(running_machine *machine)
 tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
+	int tilemap_instance = machine->tilemap_data->instance;
 	int group;
 
 	/* allocate the tilemap itself */
@@ -365,8 +363,8 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
 	/* add us to the end of the list of tilemaps */
-	*tilemap_tailptr = tmap;
-	tilemap_tailptr = &tmap->next;
+	*machine->tilemap_data->tailptr = tmap;
+	machine->tilemap_data->tailptr = &tmap->next;
 
 	/* save relevant state */
 	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->enable);
@@ -381,7 +379,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dx_flipped);
 	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dy);
 	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dy_flipped);
-	tilemap_instance++;
+	machine->tilemap_data->instance++;
 
 	/* reset everything after a load */
 	state_save_register_postload(machine, tilemap_postload, tmap);
@@ -426,25 +424,30 @@ void tilemap_set_enable(tilemap *tmap, int enable)
 
 /*-------------------------------------------------
     tilemap_set_flip - set a global flip for the
-    tilemap; ALL_TILEMAPS can be passed here as
-    well
+    tilemap
 -------------------------------------------------*/
 
 void tilemap_set_flip(tilemap *tmap, UINT32 attributes)
 {
-	/* handle ALL_TILEMAPS */
-	if (tmap == ALL_TILEMAPS)
-	{
-		for (tmap = tilemap_list; tmap != NULL; tmap = tmap->next)
-			tilemap_set_flip(tmap, attributes);
-	}
-
 	/* if we're changing things, force a refresh of the mappings and mark it all dirty */
-	else if (tmap->attributes != attributes)
+	if (tmap->attributes != attributes)
 	{
 		tmap->attributes = attributes;
 		mappings_update(tmap);
 	}
+}
+
+
+/*-------------------------------------------------
+    tilemap_set_flip_all - set a global flip for all
+    the tilemaps
+-------------------------------------------------*/
+
+void tilemap_set_flip_all(running_machine *machine, UINT32 attributes)
+{
+	tilemap *tmap;
+	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+		tilemap_set_flip(tmap, attributes);
 }
 
 
@@ -482,21 +485,23 @@ void tilemap_mark_tile_dirty(tilemap *tmap, tilemap_memory_index memindex)
 
 void tilemap_mark_all_tiles_dirty(tilemap *tmap)
 {
-	/* handle ALL_TILEMAPS */
-	if (tmap == ALL_TILEMAPS)
-	{
-		for (tmap = tilemap_list; tmap != NULL; tmap = tmap->next)
-			tilemap_mark_all_tiles_dirty(tmap);
-	}
-
 	/* mark all tiles dirty and clear the clean flag */
-	else
-	{
-		tmap->all_tiles_dirty = TRUE;
-		tmap->all_tiles_clean = FALSE;
-	}
+	tmap->all_tiles_dirty = TRUE;
+	tmap->all_tiles_clean = FALSE;
 }
 
+
+/*-------------------------------------------------
+    tilemap_mark_all_tiles_dirty_all - mark all the
+    tiles in all the tilemaps dirty
+-------------------------------------------------*/
+
+void tilemap_mark_all_tiles_dirty_all(running_machine *machine)
+{
+	tilemap *tmap;
+	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
+		tilemap_mark_all_tiles_dirty(tmap);
+}
 
 
 /***************************************************************************
@@ -936,13 +941,13 @@ profiler_mark(PROFILER_END);
     tilemap_count - return the number of tilemaps
 -------------------------------------------------*/
 
-int tilemap_count(void)
+int tilemap_count(running_machine *machine)
 {
 	tilemap *tmap;
 	int count = 0;
 
 	/* find by the tilemap index */
-	for (tmap = tilemap_list; tmap != NULL; tmap = tmap->next)
+	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		count++;
 	return count;
 }
@@ -953,9 +958,9 @@ int tilemap_count(void)
     indexed tilemap
 -------------------------------------------------*/
 
-void tilemap_size_by_index(int number, UINT32 *width, UINT32 *height)
+void tilemap_size_by_index(running_machine *machine, int number, UINT32 *width, UINT32 *height)
 {
-	tilemap *tmap = indexed_tilemap(number);
+	tilemap *tmap = indexed_tilemap(machine, number);
 	*width = tmap->width;
 	*height = tmap->height;
 }
@@ -967,9 +972,9 @@ void tilemap_size_by_index(int number, UINT32 *width, UINT32 *height)
     priority)
 -------------------------------------------------*/
 
-void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly)
+void tilemap_draw_by_index(running_machine *machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly)
 {
-	tilemap *tmap = indexed_tilemap(number);
+	tilemap *tmap = indexed_tilemap(machine, number);
 	blit_parameters blit;
 	int xpos,ypos;
 
@@ -1070,14 +1075,16 @@ TILEMAP_MAPPER( tilemap_scan_cols_flip_xy )
 
 static void tilemap_exit(running_machine *machine)
 {
+	tilemap_private *tilemap_data = machine->tilemap_data;
+
 	/* free all the tilemaps in the list */
-	while (tilemap_list != NULL)
+	while (tilemap_data->list != NULL)
 	{
-		tilemap *next = tilemap_list->next;
-		tilemap_dispose(tilemap_list);
-		tilemap_list = next;
+		tilemap *next = tilemap_data->list->next;
+		tilemap_dispose(tilemap_data->list);
+		tilemap_data->list = next;
 	}
-	tilemap_tailptr = NULL;
+	tilemap_data->tailptr = &tilemap_data->list;
 }
 
 
@@ -1103,7 +1110,7 @@ static void tilemap_dispose(tilemap *tmap)
 	tilemap **tmapptr;
 
 	/* walk the list of tilemaps; when we find ourself, remove it */
-	for (tmapptr = &tilemap_list; *tmapptr != NULL; tmapptr = &(*tmapptr)->next)
+	for (tmapptr = &tmap->machine->tilemap_data->list; *tmapptr != NULL; tmapptr = &(*tmapptr)->next)
 		if (*tmapptr == tmap)
 		{
 			*tmapptr = tmap->next;

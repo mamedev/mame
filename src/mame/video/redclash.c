@@ -113,7 +113,7 @@ WRITE8_HANDLER( redclash_gfxbank_w )
 	if (gfxbank != (data & 0x01))
 	{
 		gfxbank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

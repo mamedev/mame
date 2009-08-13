@@ -426,7 +426,7 @@ WRITE16_HANDLER( twineagl_tilebank_w )
 		if (twineagl_tilebank[offset] != data)
 		{
 			twineagl_tilebank[offset] = data;
-			tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 	}
 }
@@ -907,7 +907,7 @@ static VIDEO_UPDATE( seta_layers )
 
 	flip ^= tilemaps_flip;
 
-	tilemap_set_flip(ALL_TILEMAPS, flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
+	tilemap_set_flip_all(screen->machine, flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
 	x_0		=	seta_vctrl_0[ 0/2 ];
 	y_0		=	seta_vctrl_0[ 2/2 ];

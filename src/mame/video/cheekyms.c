@@ -155,8 +155,8 @@ VIDEO_UPDATE( cheekyms )
 	int scrolly = ((*cheekyms_port_80 >> 3) & 0x07);
 	int flip = *cheekyms_port_80 & 0x80;
 
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	tilemap_set_flip(ALL_TILEMAPS, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
+	tilemap_set_flip_all(screen->machine, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(bitmap_buffer, cliprect, 0);

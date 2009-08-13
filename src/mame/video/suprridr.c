@@ -101,14 +101,14 @@ PALETTE_INIT( suprridr )
 WRITE8_HANDLER( suprridr_flipx_w )
 {
 	flipx = data & 1;
-	tilemap_set_flip(ALL_TILEMAPS, (flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
+	tilemap_set_flip_all(space->machine, (flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
 }
 
 
 WRITE8_HANDLER( suprridr_flipy_w )
 {
 	flipy = data & 1;
-	tilemap_set_flip(ALL_TILEMAPS, (flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
+	tilemap_set_flip_all(space->machine, (flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
 }
 
 

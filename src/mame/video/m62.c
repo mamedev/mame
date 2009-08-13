@@ -301,9 +301,9 @@ WRITE8_HANDLER( m62_flipscreen_w )
 
 	flipscreen = data & 0x01;
 	if (flipscreen)
-		tilemap_set_flip(ALL_TILEMAPS, TILEMAP_FLIPX | TILEMAP_FLIPY);
+		tilemap_set_flip_all(space->machine, TILEMAP_FLIPX | TILEMAP_FLIPY);
 	else
-		tilemap_set_flip(ALL_TILEMAPS, 0);
+		tilemap_set_flip_all(space->machine, 0);
 
 	coin_counter_w(0,data & 2);
 	coin_counter_w(1,data & 4);

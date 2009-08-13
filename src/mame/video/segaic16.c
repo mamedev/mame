@@ -1353,7 +1353,7 @@ void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum,
 		const device_config *screen = machine->primary_screen;
 		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->bank[banknum] = offset;
-		tilemap_mark_all_tiles_dirty(NULL);
+		tilemap_mark_all_tiles_dirty_all(machine);
 	}
 }
 

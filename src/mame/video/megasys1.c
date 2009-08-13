@@ -968,7 +968,7 @@ VIDEO_UPDATE( megasys1 )
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);	// bottom layer can't be disabled
 	}
 
-	tilemap_set_flip( ALL_TILEMAPS, (megasys1_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
+	tilemap_set_flip_all( screen->machine, (megasys1_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
 
 	for (i = 0;i < 3;i++)
 	{

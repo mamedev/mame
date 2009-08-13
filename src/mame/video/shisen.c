@@ -28,7 +28,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 	if (gfxbank != bank)
 	{
 		gfxbank = bank;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* bits 6-7 unknown */

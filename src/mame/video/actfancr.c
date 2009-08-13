@@ -152,7 +152,7 @@ VIDEO_UPDATE( actfancr )
 
 	/* Draw playfield */
 	flipscreen=actfancr_control_2[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_set_scrollx( pf1_tilemap,0, scrollx );
 	tilemap_set_scrolly( pf1_tilemap,0, scrolly );
@@ -232,7 +232,7 @@ VIDEO_UPDATE( triothep )
 
 	/* Draw playfield */
 	flipscreen=actfancr_control_2[0]&0x80;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (actfancr_control_2[0]&0x4) {
 		tilemap_set_scroll_rows(pf1_tilemap,32);

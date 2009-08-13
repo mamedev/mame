@@ -124,7 +124,7 @@ WRITE8_HANDLER( yamyam_fg_scroll_w )
 WRITE8_HANDLER( gundealr_flipscreen_w )
 {
 	flipscreen = data;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 

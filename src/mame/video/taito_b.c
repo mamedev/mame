@@ -69,7 +69,7 @@ static UINT16 TC0180VCU_ctrl[0x10] = {0};
 *
 */
 
-static void taitob_video_control (UINT8 data)
+static void taitob_video_control (running_machine *machine, UINT8 data)
 {
 #if 0
 	if (data != video_control)
@@ -81,7 +81,7 @@ static void taitob_video_control (UINT8 data)
 	if (video_control & 0x80)
 		framebuffer_page = (~video_control & 0x40) >> 6;
 
-	tilemap_set_flip(ALL_TILEMAPS, (video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
+	tilemap_set_flip_all(machine, (video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
 }
 
 
@@ -129,7 +129,7 @@ WRITE16_HANDLER( taitob_v_control_w )
 			}
 			break;
 		case 7:
-			taitob_video_control( (TC0180VCU_ctrl[offset]>>8) & 0xff );
+			taitob_video_control( space->machine, (TC0180VCU_ctrl[offset]>>8) & 0xff );
 			break;
 		default:
 			break;

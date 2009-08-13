@@ -130,6 +130,7 @@ typedef struct _timer_private timer_private;
 typedef struct _state_private state_private;
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
+typedef struct _tilemap_private tilemap_private;
 typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
 typedef struct _input_port_private input_port_private;
@@ -178,6 +179,7 @@ struct _running_machine
 	state_private *			state_data;			/* internal data from state.c */
 	memory_private *		memory_data;		/* internal data from memory.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
+	tilemap_private *		tilemap_data;		/* internal data from tilemap.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 	devices_private *		devices_data;		/* internal data from devices.c */
 	input_port_private *	input_port_data;	/* internal data from inptport.c */

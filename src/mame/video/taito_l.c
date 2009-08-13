@@ -147,7 +147,7 @@ WRITE8_HANDLER( taitol_control_w )
 
 	/* bit 4 flip screen */
 	flipscreen = data & 0x10;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }

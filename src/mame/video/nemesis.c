@@ -105,7 +105,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 		else
 			tilemap_flip &= ~TILEMAP_FLIPX;
 
-		tilemap_set_flip(ALL_TILEMAPS, tilemap_flip);
+		tilemap_set_flip_all(space->machine, tilemap_flip);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -124,7 +124,7 @@ WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 		else
 			tilemap_flip &= ~TILEMAP_FLIPY;
 
-		tilemap_set_flip(ALL_TILEMAPS, tilemap_flip);
+		tilemap_set_flip_all(space->machine, tilemap_flip);
 	}
 }
 
@@ -150,7 +150,7 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 			tilemap_flip &= ~TILEMAP_FLIPY;
 
 		if (accessing_bits & 0x0c)
-			tilemap_set_flip(ALL_TILEMAPS, tilemap_flip);
+			tilemap_set_flip_all(space->machine, tilemap_flip);
 
 		irq_port_last = data;
 	}

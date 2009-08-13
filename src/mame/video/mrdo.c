@@ -221,7 +221,7 @@ WRITE8_HANDLER( mrdo_flipscreen_w )
 	/* Mr. Do! so we don't emulate them */
 
 	flipscreen = data & 0x01;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 

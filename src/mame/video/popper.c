@@ -87,7 +87,7 @@ WRITE8_HANDLER( popper_attribram_w )
 WRITE8_HANDLER( popper_flipscreen_w )
 {
 	popper_flipscreen = data;
-	tilemap_set_flip( ALL_TILEMAPS,popper_flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	tilemap_set_flip_all( space->machine,popper_flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
 	tilemap_clip = *video_screen_get_visible_area(space->machine->primary_screen);
 
@@ -107,7 +107,7 @@ WRITE8_HANDLER( popper_gfx_bank_w )
 	if (popper_gfx_bank != data)
 	{
 		popper_gfx_bank = data;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

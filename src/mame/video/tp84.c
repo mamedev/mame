@@ -187,12 +187,12 @@ VIDEO_UPDATE( tp84 )
 
 	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 
 		tilemap_set_scrollx(bg_tilemap, 0, *tp84_scroll_x);
 		tilemap_set_scrolly(bg_tilemap, 0, *tp84_scroll_y);
 
-		tilemap_set_flip(ALL_TILEMAPS, ((*tp84_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+		tilemap_set_flip_all(screen->machine, ((*tp84_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
 									   ((*tp84_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 

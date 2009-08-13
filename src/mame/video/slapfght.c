@@ -210,7 +210,7 @@ VIDEO_UPDATE( slapfight )
 {
 	int offs;
 
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (flipscreen) {
 		tilemap_set_scrollx( fix_tilemap,0,296);
 		tilemap_set_scrollx( pf1_tilemap,0,(*slapfight_scrollx_lo + 256 * *slapfight_scrollx_hi)+296 );

@@ -47,7 +47,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 	if (goindol_char_bank != ((data & 0x10) >> 4))
 	{
 		goindol_char_bank = (data & 0x10) >> 4;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	flip_screen_set(space->machine, data & 0x20);

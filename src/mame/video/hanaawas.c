@@ -84,7 +84,7 @@ WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 	if (flip_screen_get(device->machine) != (~data & 0x80))
 	{
 		flip_screen_set(device->machine, ~data & 0x80);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(device->machine);
 	}
 }
 

@@ -92,7 +92,7 @@ WRITE8_HANDLER( mario_gfxbank_w )
 	if (state->gfx_bank != (data & 0x01))
 	{
 		state->gfx_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -103,7 +103,7 @@ WRITE8_HANDLER( mario_palettebank_w )
 	if (state->palette_bank != (data & 0x01))
 	{
 		state->palette_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -122,10 +122,10 @@ WRITE8_HANDLER( mario_flip_w )
 	{
 		state->flip = data & 0x01;
 		if (state->flip)
-			tilemap_set_flip(ALL_TILEMAPS, TILEMAP_FLIPX | TILEMAP_FLIPY);
+			tilemap_set_flip_all(space->machine, TILEMAP_FLIPX | TILEMAP_FLIPY);
 		else
-			tilemap_set_flip(ALL_TILEMAPS, 0);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			tilemap_set_flip_all(space->machine, 0);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -217,7 +217,7 @@ VIDEO_UPDATE( mario )
 	if (t != state->monitor)
 	{
 		state->monitor = t;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	}
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ? (HTOTAL-HBSTART) : 0);

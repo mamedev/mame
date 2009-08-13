@@ -234,7 +234,7 @@ static WRITE8_HANDLER( lasso_flip_screen_w )
 	flip_screen_x_set(space->machine, data & 0x01);
 	flip_screen_y_set(space->machine,  data & 0x02);
 
-	tilemap_set_flip(ALL_TILEMAPS, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) |
+	tilemap_set_flip_all(space->machine, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) |
 								   (flip_screen_y_get(space->machine) ? TILEMAP_FLIPY : 0));
 }
 
@@ -246,7 +246,7 @@ WRITE8_HANDLER( lasso_video_control_w )
 	if (gfxbank != bank)
 	{
 		gfxbank = bank;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	lasso_flip_screen_w(space, offset, data);
@@ -260,7 +260,7 @@ WRITE8_HANDLER( wwjgtin_video_control_w )
 	if (gfxbank != bank)
 	{
 		gfxbank = bank;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	lasso_flip_screen_w(space, offset, data);

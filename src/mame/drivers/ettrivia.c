@@ -56,7 +56,7 @@ static WRITE8_HANDLER( ettrivia_bg_w )
 
 static WRITE8_HANDLER( ettrivia_control_w )
 {
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(space->machine);
 
 	palreg  = (data >> 1) & 3;
 	gfx_bank = (data >> 2) & 1;

@@ -158,8 +158,8 @@ VIDEO_UPDATE( gyruss )
 {
 	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-		tilemap_set_flip(ALL_TILEMAPS, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
+		tilemap_set_flip_all(screen->machine, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, TILEMAP_DRAW_OPAQUE, 0);

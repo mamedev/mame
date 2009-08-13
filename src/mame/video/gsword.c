@@ -111,7 +111,7 @@ WRITE8_HANDLER( gsword_charbank_w )
 	if (charbank != data)
 	{
 		charbank = data;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -127,7 +127,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (charpalbank != ((data & 0x60) >> 5))
 	{
 		charpalbank = (data & 0x60) >> 5;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* bit 4 is flip screen */
@@ -135,7 +135,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (flipscreen != (data & 0x10))
 	{
 		flipscreen = data & 0x10;
-	    tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	    tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* bit 0 could be used but unknown */

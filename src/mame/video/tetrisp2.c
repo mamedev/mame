@@ -513,7 +513,7 @@ VIDEO_UPDATE( tetrisp2 )
 	if (flipscreen != flipscreen_old)
 	{
 		flipscreen_old = flipscreen;
-		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -597,7 +597,7 @@ VIDEO_UPDATE( rockntread )
 	if (flipscreen != flipscreen_old)
 	{
 		flipscreen_old = flipscreen;
-		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */

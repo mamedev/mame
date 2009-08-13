@@ -70,7 +70,7 @@ VIDEO_START( sidepckt )
 	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
-	tilemap_set_flip(ALL_TILEMAPS,TILEMAP_FLIPX);
+	tilemap_set_flip_all(machine,TILEMAP_FLIPX);
 }
 
 
@@ -96,7 +96,7 @@ WRITE8_HANDLER( sidepckt_colorram_w )
 WRITE8_HANDLER( sidepckt_flipscreen_w )
 {
 	flipscreen = data;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
+	tilemap_set_flip_all(space->machine,flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
 }
 
 

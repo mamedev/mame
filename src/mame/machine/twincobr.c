@@ -230,8 +230,8 @@ static void toaplan0_control_w(running_machine *machine, int offset, int data)
 	switch (data) {
 		case 0x0004: twincobr_intenable = 0; break;
 		case 0x0005: twincobr_intenable = 1; break;
-		case 0x0006: twincobr_flipscreen(0); break;
-		case 0x0007: twincobr_flipscreen(1); break;
+		case 0x0006: twincobr_flipscreen(machine, 0); break;
+		case 0x0007: twincobr_flipscreen(machine, 1); break;
 		case 0x0008: twincobr_bg_ram_bank = 0x0000; break;
 		case 0x0009: twincobr_bg_ram_bank = 0x1000; break;
 		case 0x000a: twincobr_fg_rom_bank = 0x0000; break;

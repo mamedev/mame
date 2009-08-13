@@ -151,7 +151,7 @@ WRITE8_HANDLER( kyugo_flipscreen_w )
 	{
 		flipscreen = (data & 0x01);
 
-		tilemap_set_flip(ALL_TILEMAPS, (flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY): 0));
+		tilemap_set_flip_all(space->machine, (flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY): 0));
 	}
 }
 

@@ -146,7 +146,7 @@ WRITE8_HANDLER( ojankohs_flipscreen_w )
 
 		ojankohs_flipscreen = data & 0x01;
 
-		tilemap_set_flip(ALL_TILEMAPS, ojankohs_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine, ojankohs_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		if (ojankohs_flipscreen) {
 			ojankohs_scrollx = -0xe0;

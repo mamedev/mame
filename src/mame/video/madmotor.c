@@ -231,7 +231,7 @@ VIDEO_UPDATE( madmotor )
 		flipscreen=1;
 	else
 		flipscreen=0;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll registers */
 	for (offs = 0;offs < 512;offs++)

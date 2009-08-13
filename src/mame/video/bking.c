@@ -151,7 +151,7 @@ WRITE8_HANDLER( bking_cont1_w )
 
 	flip_screen_set_no_update(space->machine, data & 0x04);
 
-	tilemap_set_flip(ALL_TILEMAPS, flip_screen_get(space->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip_all(space->machine, flip_screen_get(space->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	controller = data & 0x02;
 

@@ -173,7 +173,7 @@ VIDEO_UPDATE( sshangha )
 	int offs;
 
 	flip_screen_set_no_update(screen->machine, sshangha_control_0[0]&0x80);
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen_x_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flip_screen_x_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_set_enable( pf2_tilemap, sshangha_control_0[5]&0x8000);
 	tilemap_set_enable( pf1_8x8_tilemap, sshangha_control_0[5]&0x0080);

@@ -137,7 +137,7 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		flipscreen = data & 0x08;
-		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
@@ -154,7 +154,7 @@ WRITE16_HANDLER( searchar_flipscreen16_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		flipscreen = data & 0x08;
-		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		sprite_flip_axis = data & 0x04;
 	}

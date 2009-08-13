@@ -279,7 +279,7 @@ VIDEO_START( darkseal )
 VIDEO_UPDATE( darkseal )
 {
 	flipscreen=!(darkseal_control_0[0]&0x80);
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Update scroll registers */
 	tilemap_set_scrollx( pf1_tilemap,0, darkseal_control_1[3] );

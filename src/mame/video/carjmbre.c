@@ -40,7 +40,7 @@ PALETTE_INIT( carjmbre )
 WRITE8_HANDLER( carjmbre_flipscreen_w )
 {
 	carjmbre_flipscreen = data?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
-	tilemap_set_flip( ALL_TILEMAPS,carjmbre_flipscreen );
+	tilemap_set_flip_all( space->machine,carjmbre_flipscreen );
 }
 
 WRITE8_HANDLER( carjmbre_bgcolor_w )

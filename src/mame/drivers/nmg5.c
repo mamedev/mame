@@ -266,7 +266,7 @@ static WRITE16_HANDLER( gfx_bank_w )
 	if( gfx_bank != (data & 3) )
 	{
 		gfx_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

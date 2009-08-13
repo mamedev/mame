@@ -50,7 +50,7 @@ WRITE8_HANDLER( tiamc1_videoram_w )
 WRITE8_HANDLER( tiamc1_bankswitch_w )
 {
 	if ((data & 128) != (tiamc1_layers_ctrl & 128))
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 
 	tiamc1_layers_ctrl = data;
 }

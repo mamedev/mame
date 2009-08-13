@@ -55,7 +55,7 @@ WRITE8_HANDLER (mustache_video_control_w)
 	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
 		flip_screen_set(space->machine, data & 0x01);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* tile bank */
@@ -63,7 +63,7 @@ WRITE8_HANDLER (mustache_video_control_w)
 	if ((control_byte ^ data) & 0x08)
 	{
 		control_byte = data;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

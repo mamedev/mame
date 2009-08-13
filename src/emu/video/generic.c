@@ -454,7 +454,7 @@ static void updateflip(running_machine *machine)
 	attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_set_flip(ALL_TILEMAPS,(TILEMAP_FLIPX & flip_screen_x) | (TILEMAP_FLIPY & flip_screen_y));
+	tilemap_set_flip_all(machine,(TILEMAP_FLIPX & flip_screen_x) | (TILEMAP_FLIPY & flip_screen_y));
 
 	if (flip_screen_x)
 	{

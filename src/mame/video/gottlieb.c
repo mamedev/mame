@@ -67,14 +67,14 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 	if (flip_screen_x_get(space->machine) != (data & 0x02))
 	{
 		flip_screen_x_set(space->machine, data & 0x02);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* bit 2 controls horizonal flip screen */
 	if (flip_screen_y_get(space->machine) != (data & 0x04))
 	{
 		flip_screen_y_set(space->machine, data & 0x04);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* in Q*Bert Qubes only, bit 4 controls the sprite bank */

@@ -96,7 +96,7 @@ WRITE16_HANDLER( raiden_control_w )
 	/* Flipscreen */
 	if (offset==3 && ACCESSING_BITS_0_7) {
 		flipscreen=data&0x2;
-		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 }
 
@@ -107,7 +107,7 @@ WRITE16_HANDLER( raidena_control_w )
 	/* Flipscreen */
 	if (offset==3 && ACCESSING_BITS_0_7) {
 		flipscreen=data&0x40;
-		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 }
 

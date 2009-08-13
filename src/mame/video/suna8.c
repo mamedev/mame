@@ -416,12 +416,12 @@ VIDEO_UPDATE( suna8 )
 	{
 		int max_tiles = memory_region_length(machine, "gfx1") / (0x400 * 0x20);
 
-		if (input_code_pressed_once(KEYCODE_Q))	{ page--;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
-		if (input_code_pressed_once(KEYCODE_W))	{ page++;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
-		if (input_code_pressed_once(KEYCODE_E))	{ tiles--;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
-		if (input_code_pressed_once(KEYCODE_R))	{ tiles++;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
-		if (input_code_pressed_once(KEYCODE_A))	{ rombank--;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
-		if (input_code_pressed_once(KEYCODE_S))	{ rombank++;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
+		if (input_code_pressed_once(KEYCODE_Q))	{ page--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(KEYCODE_W))	{ page++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(KEYCODE_E))	{ tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(KEYCODE_R))	{ tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(KEYCODE_A))	{ rombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(KEYCODE_S))	{ rombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
 
 		rombank  &= 0xf;
 		page  &= (suna8_text_dim > 0)?3:7;

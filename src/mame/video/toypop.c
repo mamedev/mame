@@ -143,7 +143,7 @@ WRITE8_HANDLER( toypop_palettebank_w )
 	if (palettebank != (offset & 1))
 	{
 		palettebank = offset & 1;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 

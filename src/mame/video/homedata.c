@@ -588,7 +588,7 @@ WRITE8_HANDLER( reikaids_gfx_bank_w )
 	if (reikaids_gfx_bank[reikaids_which] != data)
 	{
 		reikaids_gfx_bank[reikaids_which] = data;
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+		tilemap_mark_all_tiles_dirty_all( space->machine );
 	}
 
 	reikaids_which ^= 1;
@@ -600,7 +600,7 @@ WRITE8_HANDLER( pteacher_gfx_bank_w )
 	if (pteacher_gfx_bank != data)
 	{
 		pteacher_gfx_bank = data;
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+		tilemap_mark_all_tiles_dirty_all( space->machine );
 	}
 }
 
@@ -620,7 +620,7 @@ WRITE8_HANDLER( mrokumei_blitter_bank_w )
      */
 
 	if ((blitter_bank ^ data) & 0x3b)
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all( space->machine);
 
 	blitter_bank = data;
 }
@@ -643,7 +643,7 @@ WRITE8_HANDLER( pteacher_blitter_bank_w )
      */
 
 	if ((blitter_bank ^ data) & 0x03)
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all( space->machine);
 
 	blitter_bank = data;
 }
@@ -689,7 +689,7 @@ VIDEO_UPDATE( mrokumei )
 	if (flags != homedata_flipscreen)
 	{
 		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+		tilemap_mark_all_tiles_dirty_all( screen->machine );
 	}
 
 	switch (homedata_vreg[0x3])
@@ -739,7 +739,7 @@ VIDEO_UPDATE( reikaids )
     if (flags != homedata_flipscreen)
     {
         homedata_flipscreen = flags;
-        tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+        tilemap_mark_all_tiles_dirty_all( screen->machine );
     }
 
 
@@ -785,7 +785,7 @@ VIDEO_UPDATE( reikaids )
 	if (flags != homedata_flipscreen)
 	{
 		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+		tilemap_mark_all_tiles_dirty_all( screen->machine );
 	}
 
 
@@ -814,7 +814,7 @@ VIDEO_UPDATE( pteacher )
 	if (flags != homedata_flipscreen)
 	{
 		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty( ALL_TILEMAPS );
+		tilemap_mark_all_tiles_dirty_all( screen->machine );
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,

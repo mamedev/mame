@@ -67,10 +67,10 @@ PALETTE_INIT( karnov )
 	}
 }
 
-void karnov_flipscreen_w(int data)
+void karnov_flipscreen_w(running_machine *machine, int data)
 {
 	flipscreen=data;
-	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

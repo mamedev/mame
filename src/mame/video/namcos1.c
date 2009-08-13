@@ -354,7 +354,7 @@ VIDEO_UPDATE( namcos1 )
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen->machine, ) because the visible area is asymmetrical */
 	flip_screen_set_no_update(screen->machine, spriteram[0x07f6] & 1);
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen->machine,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */

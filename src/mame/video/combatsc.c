@@ -443,7 +443,7 @@ MACHINE_RESET( combasc )
 
 WRITE8_HANDLER( combasc_pf_control_w )
 {
-	K007121_ctrl_w(combasc_video_circuit,offset,data);
+	K007121_ctrl_w(space->machine,combasc_video_circuit,offset,data);
 
 	if (offset == 7)
 		tilemap_set_flip(bg_tilemap[combasc_video_circuit],(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

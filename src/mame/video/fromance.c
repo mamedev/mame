@@ -158,7 +158,7 @@ WRITE8_HANDLER( fromance_gfxreg_w )
 	if (flipscreen != flipscreen_old)
 	{
 		flipscreen_old = flipscreen;
-		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 

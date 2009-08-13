@@ -26,7 +26,7 @@ WRITE8_HANDLER(ksayakyu_videoctrl_w)
     video_ctrl=data;
 
     flipscreen = (data&4)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
-	tilemap_set_flip( ALL_TILEMAPS,flipscreen );
+	tilemap_set_flip_all( space->machine,flipscreen );
 	tilemap_set_scrolly( ksayakyu_tilemap, 0, (data&0xe0)<<3 );
 }
 

@@ -47,7 +47,7 @@ extern UINT8 *twincobr_sharedram;
 
 /*----------- defined in video/twincobr.c -----------*/
 
-extern void twincobr_flipscreen(int flip);
+extern void twincobr_flipscreen(running_machine *machine, int flip);
 extern void twincobr_display(int enable);
 
 READ16_HANDLER(  twincobr_txram_r );
@@ -79,9 +79,9 @@ WRITE8_HANDLER( wardner_sprite_w );
 WRITE8_HANDLER( wardner_CRTC_reg_sel_w );
 WRITE8_HANDLER( wardner_CRTC_data_w );
 
-extern int twincobr_fg_rom_bank;
-extern int twincobr_bg_ram_bank;
-extern int wardner_sprite_hack;
+extern INT32 twincobr_fg_rom_bank;
+extern INT32 twincobr_bg_ram_bank;
+extern INT32 wardner_sprite_hack;
 
 VIDEO_START( toaplan0 );
 VIDEO_UPDATE( toaplan0 );

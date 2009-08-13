@@ -751,9 +751,9 @@ WRITE8_HANDLER( butasan_unknown_w )
   Screen refresh
 ***************************************************************************/
 
-static void bg_setting(void)
+static void bg_setting(running_machine *machine)
 {
-	tilemap_set_flip(ALL_TILEMAPS, argus_flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
+	tilemap_set_flip_all(machine, argus_flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
 
 	if (!argus_flipscreen)
 	{
@@ -1206,7 +1206,7 @@ static void butasan_log_vram(void)
 
 VIDEO_UPDATE( argus )
 {
-	bg_setting();
+	bg_setting(screen->machine);
 
 	/* scroll BG0 and render tile at proper position */
 	argus_bg0_scroll_handle(screen->machine);
@@ -1222,7 +1222,7 @@ VIDEO_UPDATE( argus )
 
 VIDEO_UPDATE( valtric )
 {
-	bg_setting();
+	bg_setting(screen->machine);
 
 	if (argus_bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
@@ -1235,7 +1235,7 @@ VIDEO_UPDATE( valtric )
 
 VIDEO_UPDATE( butasan )
 {
-	bg_setting();
+	bg_setting(screen->machine);
 
 	if (argus_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);

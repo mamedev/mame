@@ -256,8 +256,8 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 
 		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
-		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_set_flip_all(space->machine, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* Phoenix has only one palette select effecting both layers */
@@ -265,7 +265,7 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 	{
 		palette_bank = (data >> 1) & 1;
 
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -279,8 +279,8 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 
 		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
-		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_set_flip_all(space->machine, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 
@@ -292,7 +292,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	{
    		palette_bank = ((data >> 1) & 3);
 
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 
 		logerror("Palette: %02X\n", (data & 0x06) >> 1);
 	}

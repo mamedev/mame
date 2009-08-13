@@ -1229,14 +1229,14 @@ UINT8 K007121_ctrlram[MAX_K007121][8];
 static int K007121_flipscreen[MAX_K007121];
 
 
-void K007121_ctrl_w(int chip,int offset,int data)
+void K007121_ctrl_w(running_machine *machine,int chip,int offset,int data)
 {
 	switch (offset)
 	{
 		case 6:
 /* palette bank change */
 if ((K007121_ctrlram[chip][offset] & 0x30) != (data & 0x30))
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(machine);
 			break;
 		case 7:
 			K007121_flipscreen[chip] = data & 0x08;
@@ -1248,12 +1248,12 @@ if ((K007121_ctrlram[chip][offset] & 0x30) != (data & 0x30))
 
 WRITE8_HANDLER( K007121_ctrl_0_w )
 {
-	K007121_ctrl_w(0,offset,data);
+	K007121_ctrl_w(space->machine,0,offset,data);
 }
 
 WRITE8_HANDLER( K007121_ctrl_1_w )
 {
-	K007121_ctrl_w(1,offset,data);
+	K007121_ctrl_w(space->machine,1,offset,data);
 }
 
 
@@ -1578,7 +1578,7 @@ WRITE8_HANDLER( K007342_vreg_w )
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != K007342_regs[1])
-				tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+				tilemap_mark_all_tiles_dirty_all(space->machine);
 		case 0x02:
 			K007342_scrollx[0] = (K007342_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			K007342_scrollx[1] = (K007342_scrollx[1] & 0xff) | ((data & 0x02) << 7);
@@ -5124,7 +5124,7 @@ WRITE8_HANDLER( K053251_w )
 			}
 
 			if (!K053251_tilemaps_set)
-				tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+				tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 		else if (offset == 10)
 		{
@@ -5142,7 +5142,7 @@ WRITE8_HANDLER( K053251_w )
 			}
 
 			if (!K053251_tilemaps_set)
-				tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+				tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 	}
 }

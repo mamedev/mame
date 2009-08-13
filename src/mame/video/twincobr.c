@@ -17,8 +17,6 @@
 #include "twincobr.h"
 
 
-void twincobr_flipscreen(int flip);
-void twincobr_display(int enable);
 static STATE_POSTLOAD( twincobr_restore_screen );
 
 INT32 twincobr_fg_rom_bank;
@@ -152,7 +150,7 @@ VIDEO_START( toaplan0 )
 static STATE_POSTLOAD( twincobr_restore_screen )
 {
 	twincobr_display(twincobr_display_on);
-	twincobr_flipscreen(twincobr_flip_screen);
+	twincobr_flipscreen(machine, twincobr_flip_screen);
 }
 
 
@@ -168,9 +166,9 @@ void twincobr_display(int enable)
 	tilemap_set_enable(tx_tilemap, enable);
 }
 
-void twincobr_flipscreen(int flip)
+void twincobr_flipscreen(running_machine *machine, int flip)
 {
-	tilemap_set_flip(ALL_TILEMAPS, (flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+	tilemap_set_flip_all(machine, (flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 	twincobr_flip_screen = flip;
 	if (flip) {
 		scroll_x = -58;

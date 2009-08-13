@@ -363,7 +363,7 @@ static void check_collision(int which)
 
 VIDEO_UPDATE( firetrk )
 {
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
 	tilemap_set_scrollx(tilemap1, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrollx(tilemap2, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);
@@ -397,7 +397,7 @@ VIDEO_UPDATE( firetrk )
 
 VIDEO_UPDATE( superbug )
 {
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
 	tilemap_set_scrollx(tilemap1, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrollx(tilemap2, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);
@@ -426,7 +426,7 @@ VIDEO_UPDATE( superbug )
 
 VIDEO_UPDATE( montecar )
 {
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
 	tilemap_set_scrollx(tilemap1, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrollx(tilemap2, 0, *firetrk_scroll_x - 37);
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);

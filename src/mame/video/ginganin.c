@@ -178,7 +178,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
  */
 	case 6:
 		flipscreen = !(data & 1);
-		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
 		soundlatch_w(space, 0, data);

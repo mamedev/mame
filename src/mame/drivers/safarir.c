@@ -86,7 +86,7 @@ static WRITE8_HANDLER( ram_bank_w )
 {
 	ram_bank = data & 0x01;
 
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty_all(space->machine);
 }
 
 

@@ -164,7 +164,7 @@ WRITE8_HANDLER( ladybug_flipscreen_w )
 	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
 		flip_screen_set(space->machine, data & 0x01);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
@@ -253,7 +253,7 @@ WRITE8_HANDLER( sraider_io_w )
 	if (flip_screen_get(space->machine) != (data & 0x80))
 	{
 		flip_screen_set(space->machine, data & 0x80);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	sraider_grid_color = data & 0x70;

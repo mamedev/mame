@@ -138,8 +138,8 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 
 VIDEO_UPDATE( xxmissio )
 {
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	tilemap_set_flip(ALL_TILEMAPS, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_mark_all_tiles_dirty_all(screen->machine);
+	tilemap_set_flip_all(screen->machine, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_set_scrollx(bg_tilemap, 0, xscroll * 2);
 	tilemap_set_scrolly(bg_tilemap, 0, yscroll);

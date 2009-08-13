@@ -102,12 +102,12 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 	{
 		case 0x04:	/* ROM bank select */
 			if (data != K007121_ctrlram[0][0x04])
-				tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+				tilemap_mark_all_tiles_dirty_all(space->machine);
 			break;
 
 		case 0x07:	/* flip screen + IRQ control */
 			k007121_flip_screen = data & 0x08;
-			tilemap_set_flip(ALL_TILEMAPS, k007121_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			tilemap_set_flip_all(space->machine, k007121_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			flkatck_irq_enabled = data & 0x02;
 			break;
 	}

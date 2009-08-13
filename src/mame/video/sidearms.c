@@ -71,7 +71,7 @@ WRITE8_HANDLER( sidearms_c804_w )
 	{
 		flipon = data & 0x80;
 		flip_screen_set(space->machine, flipon);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
