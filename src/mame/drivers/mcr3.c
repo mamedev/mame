@@ -19,6 +19,25 @@
         * Spy Hunter crashes at the end of the boat level
         * sprite placement on the scrolling games seems a bit off
 
+
+****************************************************************************
+
+    Game Hardware
+
+    Sarge:
+        * Mono Board (A080-91787-C000)
+        * Turbo Cheap Squeak (A080-91779-B000)
+        * MCR/2 Dual Power Amp (A082-90910-F000)
+
+    Spy Hunter:
+        * MCR/III CPU (A080-91442-J000)
+        * Super Sound I/O (A082-90913-F000)
+        * MCR/III Video Gen (A082-91433-J000)
+        * Cheap Squeak Deluxe (A080-91671-E000)
+        * Absolute Position Board (A080-91649-C000)
+        * Lamp Driver Board (A080-91673-B000)
+        * MCR/2 Dual Power Amp (A082-90910-F000)
+
 ****************************************************************************
 
     Memory map
@@ -1211,6 +1230,15 @@ ROM_START( sarge )
 	ROM_LOAD( "spr_6e.bin",   0x08000, 0x8000, CRC(7cc6fb28) SHA1(5fe24d5114551b4a4bf303cd612da332555c0f93) )
 	ROM_LOAD( "spr_5e.bin",   0x10000, 0x8000, CRC(c832375c) SHA1(dfb7782b13e1e959e0ecd5da771cd38962f6952b) )
 	ROM_LOAD( "spr_4e.bin",   0x18000, 0x8000, CRC(c382267d) SHA1(6b459e9ec7948a529b5308357851a0bede085aef) )
+
+    ROM_REGION( 0x0007, "pals", 0) /* PAL's located on the Mono Board (91787) */
+    ROM_LOAD( "a59a26axlcxhd.13j.bin",  0x0000, 0x0001, NO_DUMP ) /* PLS153N */
+    ROM_LOAD( "a59a26axlbxhd.2j.bin",   0x0000, 0x0001, NO_DUMP ) /* PLS153N */
+    ROM_LOAD( "a59a26axlaxhd.3j.bin",   0x0000, 0x0001, NO_DUMP ) /* PLS153N */
+    ROM_LOAD( "0066-314bx-xxqx.6h.bin", 0x0000, 0x0001, NO_DUMP ) /* Unknown PAL Type */
+    ROM_LOAD( "0066-316bx-xxqx.5h.bin", 0x0000, 0x0001, NO_DUMP ) /* Unknown PAL Type */
+    ROM_LOAD( "0066-315bx-xxqx.5g.bin", 0x0000, 0x0001, NO_DUMP ) /* Unknown PAL Type */
+    ROM_LOAD( "0066-313bx-xxqx.4g.bin", 0x0000, 0x0001, NO_DUMP ) /* Unknown PAL Type */
 ROM_END
 
 
