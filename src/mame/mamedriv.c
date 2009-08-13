@@ -9505,12 +9505,12 @@ Other Sun games
 	DRIVER( streetg2 )    /* (c) 1993 */
 	DRIVER( streetg2r5 )  /* (c) 1993 */
 
-	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
-
+	/* Igrosoft */
 	/* Multifish */
-	//DRIVER( mfish )
+	DRIVER( mfish )
 	//DRIVER( mfish_2 )
-	//DRIVER( mfish_3 )
+	DRIVER( mfish_3 )
+	DRIVER( mfish_3a )
 	//DRIVER( mfish_4 )
 	//DRIVER( mfish_5 )
 	//DRIVER( mfish_6 )
@@ -9524,57 +9524,76 @@ Other Sun games
 	//DRIVER( mfish_13 )
 
 	/* Crazy Monkey */
-	//DRIVER( crzmon )
+	DRIVER( crzmon )
 	//DRIVER( crzmon_2 )
 	//DRIVER( crzmon_3 )
 	//DRIVER( crzmon_4 )
 	//DRIVER( crzmon_5 )
 	//DRIVER( crzmon_6 )
 	DRIVER( crzmon_7 )
+	DRIVER( crzmon_7a )
+	DRIVER( crzmon_7b )
+	DRIVER( crzmon_8 )
+	DRIVER( crzmon_8a )
+	DRIVER( crzmon_8b )
 
 	/* Fruit Cocktail */
-	//DRIVER( fcock )
-	//DRIVER( fcock_2 )
-	//DRIVER( fcock_3 )
-	//DRIVER( fcock_4 )
-	//DRIVER( fcock_5 )
-	DRIVER( fcock_6 )
+	DRIVER( fcockt )
+	//DRIVER( fcockt_2 )
+	//DRIVER( fcockt_3 )
+	//DRIVER( fcockt_4 )
+	//DRIVER( fcockt_5 )
+	DRIVER( fcockt_6 )
+	DRIVER( fcockt_6a )
+	DRIVER( fcockt_6b )
+	DRIVER( fcockt_7 )
+	DRIVER( fcockt_7a )
 
 	/* Lucky Haunter */
-	//DRIVER( lhaunt )
+	DRIVER( lhaunt )
 	//DRIVER( lhaunt_2 )
 	//DRIVER( lhaunt_3 )
 	DRIVER( lhaunt_4 )
+	DRIVER( lhaunt_4a )
 	DRIVER( lhaunt_5 )
+	DRIVER( lhaunt_5a )
 	DRIVER( lhaunt_6 )
+	DRIVER( lhaunt_6a )
 
 	/* Garage */
-	//DRIVER( garage )
+	DRIVER( garage )
 	//DRIVER( garage_2 )
 	//DRIVER( garage_3 )
 	DRIVER( garage_4 )
+	DRIVER( garage_4a )
+	DRIVER( garage_5 )
+	DRIVER( garage_5a )
 
 	/* Rock Climber */
-	//DRIVER( rclimb )
+	DRIVER( rclimb )
 	//DRIVER( rclimb_2 )
 	DRIVER( rclimb_3 )
+	DRIVER( rclimb_3a )
+	DRIVER( rclimb_3b )
 
 	/* Sweet Life */
 	DRIVER( sweetl )
+	DRIVER( sweetla )
 
 	/* Resident */
-	//DRIVER( resdnt )
+	DRIVER( resdnt )
 	DRIVER( resdnt_2 )
-
+	DRIVER( resdnt_2a )
+	
 	/* Rollfruit */
-	//DRIVER( rollfr )
-	//DRIVER( rollfr_2 )
-
+	DRIVER( rollfr )
+	DRIVER( rollfr_2 )
+	
 	/* Island */
 	DRIVER( island )
+	DRIVER( islanda )
 
-
-	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
+/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
        emulation for pinball machiens.
 
