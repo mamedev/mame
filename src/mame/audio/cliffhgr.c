@@ -14,7 +14,7 @@ static const discrete_555_desc desc_cliffhgr_555 =
 static const discrete_mixer_desc desc_cliffhgr_mixer =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{ 1.0/(1.0/RES_K(4.7)+1.0/RES_K(10))+RES_K(19), 1.0/(1.0/RES_K(5.1)+1.0/RES_K(12))+RES_K(19) },
+	{ 1.0/(1.0/RES_K(4.7)+1.0/RES_K(10))+RES_K(10), 1.0/(1.0/RES_K(5.1)+1.0/RES_K(12))+RES_K(10) },
 	{ 0, 0 },
 	{ CAP_U(4.7), CAP_U(4.7) },
 	0,
@@ -31,8 +31,8 @@ DISCRETE_SOUND_START(cliffhgr)
 	DISCRETE_INPUT_LOGIC(CLIFF_ENABLE_SND_1)
 	DISCRETE_INPUT_LOGIC(CLIFF_ENABLE_SND_2)
 
-	DISCRETE_555_ASTABLE(NODE_03, 1, RES_K(24), RES_K(19), CAP_U(0.047), &desc_cliffhgr_555)
-	DISCRETE_555_ASTABLE(NODE_04, 1, RES_K(24), RES_K(19), CAP_U(0.1), &desc_cliffhgr_555)
+	DISCRETE_555_ASTABLE(NODE_03, 1, RES_K(24), RES_K(10), CAP_U(0.047), &desc_cliffhgr_555)
+	DISCRETE_555_ASTABLE(NODE_04, 1, RES_K(24), RES_K(10), CAP_U(0.1), &desc_cliffhgr_555)
 
 	DISCRETE_ONOFF(NODE_05,CLIFF_ENABLE_SND_1,NODE_03)
 	DISCRETE_ONOFF(NODE_06,CLIFF_ENABLE_SND_2,NODE_04)
