@@ -142,6 +142,9 @@ MACHINE_DRIVER_EXTERN( clowns_audio );
 WRITE8_HANDLER( clowns_audio_1_w );
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
 
+MACHINE_DRIVER_EXTERN( spacwalk_audio );
+WRITE8_HANDLER( spacwalk_audio_1_w );
+
 MACHINE_DRIVER_EXTERN( shuffle_audio );
 WRITE8_HANDLER( shuffle_audio_1_w );
 WRITE8_HANDLER( shuffle_audio_2_w );

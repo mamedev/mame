@@ -2067,6 +2067,30 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 
 /*************************************
  *
+ *  Space Walk
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( spacwalk_audio )
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+MACHINE_DRIVER_END
+
+WRITE8_HANDLER( spacwalk_audio_1_w )
+{
+	coin_counter_w(0, (data >> 0) & 0x01);
+
+	clowns_set_controller_select((data >> 1) & 0x01);
+
+	// D2: ?
+	// D3: ?
+	// D4-7: unused?
+	// if (data&0xfc) printf("%02x ",data);
+}
+
+
+
+/*************************************
+ *
  *  Shuffleboard
  *
  *************************************/

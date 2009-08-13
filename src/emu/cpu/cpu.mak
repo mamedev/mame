@@ -572,8 +572,7 @@ endif
 
 $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 							$(CPUSRC)/i8085/i8085.h \
-							$(CPUSRC)/i8085/i8085cpu.h \
-							$(CPUSRC)/i8085/i8085daa.h
+							$(CPUSRC)/i8085/i8085cpu.h
 
 
 
