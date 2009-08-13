@@ -162,12 +162,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipx, flipy,
 			sx, sy, 0);
 
-		/* wrap-around x */
-		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[1],
-			code, color,
-			flipx, flipy,
-			sx - 256, sy, 0);
+		/* wrap-around */
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx - 256, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, flipx, flipy, sx, sy - 256, 0);
 	}
 }
 
