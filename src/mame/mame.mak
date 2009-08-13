@@ -1822,6 +1822,8 @@ $(DRIVERS)/tx1.o:		$(LAYOUT)/buggybjr.lh \
 
 $(DRIVERS)/undrfire.o:	$(LAYOUT)/cbombers.lh
 
+$(DRIVERS)/vicdual.o:	$(LAYOUT)/depthch.lh
+
 $(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh
 
 $(DRIVERS)/videopkr.o:	$(LAYOUT)/videopkr.lh \

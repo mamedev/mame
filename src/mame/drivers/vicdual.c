@@ -56,6 +56,8 @@
 #include "cpu/i8085/i8085.h"
 #include "vicdual.h"
 
+#include "depthch.lh"
+
 
 
 /*************************************
@@ -3218,8 +3220,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, depthch,  0,        depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge", GAME_IMPERFECT_SOUND )
-GAME( 1977, depthcho, depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", GAME_IMPERFECT_SOUND )
+GAMEL(1977, depthch,  0,        depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge", GAME_IMPERFECT_SOUND, layout_depthch )
+GAMEL(1977, depthcho, depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", GAME_IMPERFECT_SOUND, layout_depthch )
 GAME( 1977, subhunt,  depthch,  depthch,  depthch,  0, ROT0,   "Taito", "Sub Hunter", GAME_IMPERFECT_SOUND )
 GAME( 1977, safari,   0,        safari,   safari,   0, ROT0,   "Gremlin", "Safari", GAME_NO_SOUND )
 GAME( 1978, frogs,    0,        frogs,    frogs,    0, ROT0,   "Gremlin", "Frogs", GAME_IMPERFECT_SOUND )
