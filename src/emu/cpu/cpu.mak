@@ -1544,7 +1544,6 @@ endif
 
 $(CPUOBJ)/z180/z180.o:	$(CPUSRC)/z180/z180.c \
 						$(CPUSRC)/z180/z180.h \
-						$(CPUSRC)/z180/z180daa.h \
 						$(CPUSRC)/z180/z180op.c \
 						$(CPUSRC)/z180/z180ops.h \
 						$(CPUSRC)/z180/z180tbl.h \

@@ -418,11 +418,17 @@ INLINE UINT8 DEC(z180_state *cpustate, UINT8 value)
  * DAA
  ***************************************************************/
 #define DAA {													\
-	int idx = cpustate->_A;												\
-	if( cpustate->_F & CF ) idx |= 0x100; 								\
-	if( cpustate->_F & HF ) idx |= 0x200; 								\
-	if( cpustate->_F & NF ) idx |= 0x400; 								\
-	cpustate->_AF = DAATable[idx];										\
+	UINT8 r = cpustate->_A;											\
+	if (cpustate->_F&NF) {											\
+		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r-=6;						\
+		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r-=0x60;						\
+	}													\
+	else {													\
+		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r+=6;						\
+		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r+=0x60;						\
+	}													\
+	cpustate->_F=(cpustate->_F&3)|(cpustate->_A>0x99)|((cpustate->_A^r)&HF)|SZP[r];				\
+	cpustate->_A=r;												\
 }
 
 /***************************************************************

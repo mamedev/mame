@@ -912,7 +912,6 @@ static void z180_dma1(z180_state *cpustate);
 static CPU_BURN( z180 );
 static CPU_SET_INFO( z180 );
 
-#include "z180daa.h"
 #include "z180ops.h"
 #include "z180tbl.h"
 
