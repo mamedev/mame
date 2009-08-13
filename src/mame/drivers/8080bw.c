@@ -1734,11 +1734,51 @@ static INPUT_PORTS_START( shuttlei )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
+// 'no 1' which is displayed before each player plays actually refers to the wave number, not the player number!
+static INPUT_PORTS_START( skylove )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("INPUTS")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // must be off to boot
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )	
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+INPUT_PORTS_END
+
 static ADDRESS_MAP_START( shuttlei_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE(1) // shuttlei
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // skylove (is it mirrored, or different PCB hookup?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shuttlei_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1761,7 +1801,7 @@ static MACHINE_DRIVER_START( shuttlei )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-//  MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MDRV_VIDEO_UPDATE(shuttlei)
 
 	/* sound hardware */
@@ -2649,6 +2689,19 @@ ROM_START( shuttlei )
 	ROM_LOAD( "8.11f",   0x1c00, 0x0400, CRC(4978552b) SHA1(5a6b6e39f57a353580ed9281d7da24950f058426) )
 ROM_END
 
+ROM_START( skylove )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "01",   0x0000, 0x0400, CRC(391ad7d0) SHA1(73358fff44da5fffd4e08fbb615ccc0245e3365b) )
+	ROM_LOAD( "02",   0x0400, 0x0400, CRC(365ba070) SHA1(8493bde493ea0d04b3563f9bc752a6ec57022524) )
+	ROM_LOAD( "03",   0x0800, 0x0400, CRC(47364dad) SHA1(b49704f8d49a0866cb9cd8bb867f30246e3dabc9) )
+	ROM_LOAD( "04",   0x0c00, 0x0400, CRC(9d76f33d) SHA1(5aa6a081a3609e6c036843049d58cc763a86fedb) )
+	ROM_LOAD( "05",   0x1000, 0x0400, CRC(09084954) SHA1(f5c826188ffb7a572c45aad94e794f31bebfebe5) )
+	ROM_LOAD( "06",   0x1400, 0x0400, CRC(6d494e82) SHA1(8e5ee1b842621cd088e80124b92b8a517e8dfbb9) )
+	ROM_LOAD( "07",   0x1800, 0x0400, CRC(1a9aa4b8) SHA1(0da553c6343a2740312ebafc2b936ffbbf24af04) )
+	ROM_LOAD( "08",   0x1c00, 0x0400, CRC(ecaacacc) SHA1(b815366d3aaa8ef311cd54a5be9fb4d60324e5a7) )
+ROM_END
+
+
 ROM_START( darthvdr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom0",           0x0000, 0x0400, CRC(b15785b6) SHA1(f453a006019dc83bd746f3a26736e913186332e6) )
@@ -2756,4 +2809,4 @@ GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  0, ROT270, "Zilec Games", "S
 GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAME( 1979, yosakdona,yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
-
+GAMEL(1979, skylove,  0,        shuttlei, skylove,  0, ROT270, "Omori", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )

@@ -8137,6 +8137,7 @@ Other Sun games
 
 	/* Omori games */
 	DRIVER( shuttlei )	/* (c) 1979 Omori (Arcade Tv Game List - P.79, Left, 6 from bottom) */
+	DRIVER( skylove )	/* (c) 1979 Omori */
 	DRIVER( battlex )	/* (c) 1982 Omori E. Co., Ltd. */
 	DRIVER( carjmbre )	/* (c) 1983 Omori Electric Co., Ltd. */
 	DRIVER( popper )	/* (c) 1983 Omori Electric Co., Ltd. */
