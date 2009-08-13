@@ -1580,6 +1580,7 @@ const game_driver * const drivers[] =
 	DRIVER( qix )		/* LK  (c) 1981 Taito America Corporation */
 	DRIVER( qixa )		/* LK  (c) 1981 Taito America Corporation */
 	DRIVER( qixb )		/* LK  (c) 1981 Taito America Corporation */
+	DRIVER( qixo )		/* LK  (c) 1981 Taito America Corporation */
 	DRIVER( qix2 )		/* ??  (c) 1981 Taito America Corporation */
 	DRIVER( sdungeon )	/* SD  (c) 1981 Taito America Corporation */
 	DRIVER( elecyoyo )	/* YY  (c) 1982 Taito America Corporation */

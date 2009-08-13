@@ -657,8 +657,52 @@ ROM_START( qix )
 	ROM_LOAD( "u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
-
+// original taito board 08-00003-001
 ROM_START( qixa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12_", 0xc000, 0x0800, CRC(5adc046d) SHA1(aafd3ae7139a83fe64fc69c771a57fe7ee271469) )
+	ROM_LOAD( "u13_", 0xc800, 0x0800, CRC(e63283c6) SHA1(efb6e5c835c0511be024f664cb8d2fcfe8f842f1) )
+	ROM_LOAD( "u14_", 0xd000, 0x0800, CRC(a2fd4c28) SHA1(7da8bd1164d8d1a16f0841345ab6d73ae4fde97e) )
+	ROM_LOAD( "u15_", 0xd800, 0x0800, CRC(0e5e17d6) SHA1(fd6afe1ef87158868c266a0d39dd894c1f656a1f) )
+	ROM_LOAD( "u16_", 0xe000, 0x0800, CRC(6acfa3b8) SHA1(4759c72626cf287b068a1f14eae9fdb210b6ecfa) )
+	ROM_LOAD( "u17_", 0xe800, 0x0800, CRC(bc091f21) SHA1(f3db149a794640e0826def688ab19a26750d9f1e) )
+	ROM_LOAD( "u18_", 0xf000, 0x0800, CRC(610b19ce) SHA1(6d3d6012a4d0cd3ea82f4ab07582fa262feaaf97) )
+	ROM_LOAD( "u19_", 0xf800, 0x0800, CRC(11f957f4) SHA1(5700603b2d50eef6ab32316f59d70782a8ef4a6d) )
+	
+	ROM_REGION( 0x10000, "videocpu", 0 )
+	ROM_LOAD( "u3_",  0xc000, 0x0800, CRC(79cf997c) SHA1(853cb88d371cd2d47caf60baa795caef9461815c) )
+	ROM_LOAD( "u4_",  0xc800, 0x0800, CRC(e5ee74cd) SHA1(10fd95385d0d8667f739fe43a9fb26d2780840f9) )
+	ROM_LOAD( "u5_",  0xd000, 0x0800, CRC(4e939d87) SHA1(ca45f212bd419666716685931f18d2990444bb1b) )
+	ROM_LOAD( "u6_",  0xd800, 0x0800, CRC(b42ca7d8) SHA1(09907f7c2c5165ce5cdf270c33caafc9e5db534e) )
+	ROM_LOAD( "u7_",  0xe000, 0x0800, CRC(d6733019) SHA1(89e9e63c91e044fe1c6ce883e3ec18eec0cb39d3) )
+	ROM_LOAD( "u8_",  0xe800, 0x0800, CRC(8cab8fb2) SHA1(4ae58119d24ac70bea2cd4871a21a59ef20f7351) )
+	ROM_LOAD( "u9_",  0xf000, 0x0800, CRC(98fbac76) SHA1(5a9b5bdf930dc494cd50059f88256d7e561b4e09) )
+	ROM_LOAD( "u10_", 0xf800, 0x0800, CRC(b40f084a) SHA1(16811b8f24b955a72f2a0950e9688cbd0e26afa4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "u27",     0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+ROM_END
+
+// same set as above, but with larger roms
+ROM_START( qixb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lk14.bin", 0xc000, 0x1000, CRC(6d164986) SHA1(c805abe1a441e10080ceca8ba547835bafb61bcc) )
+	ROM_LOAD( "lk15.bin", 0xd000, 0x1000, CRC(16c6ce0f) SHA1(b8091d2db476d2acb4b3f0789e1f155336be9b39) )
+	ROM_LOAD( "lk16.bin", 0xe000, 0x1000, CRC(698b1f9c) SHA1(7e7637ca5985f072e821e16f8b65aedb87df136b) )
+	ROM_LOAD( "lk17.bin", 0xf000, 0x1000, CRC(7e3adde6) SHA1(dfe66317f87e10919f1ea4b4d565703e73039821) )
+
+	ROM_REGION( 0x10000, "videocpu", 0 )
+	ROM_LOAD( "lk10.bin", 0xc000, 0x1000, CRC(7eac67d0) SHA1(ca5938422aaa1e380af0afa505876d4682ac69b9) )
+	ROM_LOAD( "lk11.bin", 0xd000, 0x1000, CRC(90ccbb6a) SHA1(b65592384597dc2aafc02f49b6b6f477c9112580) )
+	ROM_LOAD( "lk12.bin", 0xe000, 0x1000, CRC(be9b9f7d) SHA1(e681bdb9aa8b8c31af1c14e23d0f420577d6db63) )
+	ROM_LOAD( "lk13.bin", 0xf000, 0x1000, CRC(51c9853b) SHA1(29a5221f2af866d2ee73110409ecddc2c96404fd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "u27",      0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+ROM_END
+
+
+ROM_START( qixo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qu12", 0xc000, 0x0800, CRC(1c55b44d) SHA1(6385e5e484e24cf396c14de86344170639c3cc65) )
 	ROM_LOAD( "qu13", 0xc800, 0x0800, CRC(20279e8c) SHA1(722da239636de3fe40318768ddbe687b19afcdb6) )
@@ -683,23 +727,6 @@ ROM_START( qixa )
 	ROM_LOAD( "u27",  0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
-
-ROM_START( qixb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lk14.bin", 0xc000, 0x1000, CRC(6d164986) SHA1(c805abe1a441e10080ceca8ba547835bafb61bcc) )
-	ROM_LOAD( "lk15.bin", 0xd000, 0x1000, CRC(16c6ce0f) SHA1(b8091d2db476d2acb4b3f0789e1f155336be9b39) )
-	ROM_LOAD( "lk16.bin", 0xe000, 0x1000, CRC(698b1f9c) SHA1(7e7637ca5985f072e821e16f8b65aedb87df136b) )
-	ROM_LOAD( "lk17.bin", 0xf000, 0x1000, CRC(7e3adde6) SHA1(dfe66317f87e10919f1ea4b4d565703e73039821) )
-
-	ROM_REGION( 0x10000, "videocpu", 0 )
-	ROM_LOAD( "lk10.bin", 0xc000, 0x1000, CRC(7eac67d0) SHA1(ca5938422aaa1e380af0afa505876d4682ac69b9) )
-	ROM_LOAD( "lk11.bin", 0xd000, 0x1000, CRC(90ccbb6a) SHA1(b65592384597dc2aafc02f49b6b6f477c9112580) )
-	ROM_LOAD( "lk12.bin", 0xe000, 0x1000, CRC(be9b9f7d) SHA1(e681bdb9aa8b8c31af1c14e23d0f420577d6db63) )
-	ROM_LOAD( "lk13.bin", 0xf000, 0x1000, CRC(51c9853b) SHA1(29a5221f2af866d2ee73110409ecddc2c96404fd) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "u27",      0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
-ROM_END
 
 
 ROM_START( qix2 )
@@ -1305,9 +1332,10 @@ static DRIVER_INIT( slither )
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixa,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qix,      0,        qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 1)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixo,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
 GAME( 1981, qix2,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
 GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
