@@ -439,7 +439,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	/* register for saving it */
 	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
 
-	/* do the same for the secon back buffer, if present */
+	/* do the same for the second back buffer, if present */
 	if (spriteram_2_size)
 	{
 		/* allocate memory */

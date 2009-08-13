@@ -5312,7 +5312,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gradius2 )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( gradius2a )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( gradius2b )	/* GX785 (c) 1988 (Japan) */
-	DRIVER( cuebrckj )	/* GX903 (c) 1989 */
+	DRIVER( cuebrickj )	/* GX903 (c) 1989 (Japan) */
 	DRIVER( fround )	/* GX870 (c) 1988 */
 	DRIVER( froundl )	/* GX870 (c) 1988 */
 	DRIVER( hpuncher )	/* GX870 (c) 1988 (Japan) */

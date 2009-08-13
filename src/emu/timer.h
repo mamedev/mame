@@ -204,7 +204,7 @@ void timer_device_adjust_periodic(const device_config *timer, attotime start_del
 /* ----- anonymous timer management ----- */
 
 /* allocate a one-shot timer, which calls the callback after the given duration */
-void _timer_set_internal(running_machine *machine, attotime druation, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
+void _timer_set_internal(running_machine *machine, attotime duration, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
 
 /* allocate a pulse timer, which repeatedly calls the callback using the given period */
 void _timer_pulse_internal(running_machine *machine, attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
