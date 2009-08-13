@@ -404,8 +404,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	/* scrolling */
 	UINT32 basevmap;
 	UINT16 vscroll, hscroll, vtilescroll;
-//  UINT16 offset_per_tile_valid;
-//  UINT8 offset_per_tile_mode;
+//	UINT16 offset_per_tile_valid;
+//	UINT8 offset_per_tile_mode;
 	UINT8 vshift, hshift, tile_size;
 	/* variables depending on color_depth */
 	UINT8 color_shift = 0;
@@ -476,6 +476,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			color_shift = 0;	//n/a, pal offset is always zero
 			color_planes = 8;
 			tile_divider = 4;
+			if(snes_ppu.direct_color) //we don't know what games trigger this one...
+				fatalerror("8bpp graphics with direct color, gfx mode used = %02x",snes_ppu.mode);
 			break;
 	}
 
@@ -491,7 +493,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
 		//if (tmap > 0x10000) //<- causes corrupt tiles in places, needed?
-		//  tmap %= 0x10000;
+		//	tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;
@@ -694,7 +696,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 		{
 			UINT16 clr;
 			/* Direct select, but only outside EXTBG! */
-			if (snes_ppu.direct_color && layer == 1)
+			if (snes_ppu.direct_color && layer == 0)
 				clr = ((colour & 0x07) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
 			else
 				clr = snes_cgram[colour];
