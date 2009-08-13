@@ -152,6 +152,7 @@
 #include "invaders.lh"
 #include "invad2ct.lh"
 #include "lagunar.lh"
+#include "spacwalk.lh"
 
 
 
@@ -3168,7 +3169,7 @@ ROM_END
 /* 626 */ GAME( 1977, m4,       0,        m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns,   clowns,   clowns1,  0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
-/* 640 */ GAME( 1978, spacwalk, 0,        spacwalk, spacwalk, 0, ROT0,   "Midway", "Space Walk", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+/* 640 */ GAMEL(1978, spacwalk, 0,        spacwalk, spacwalk, 0, ROT0,   "Midway", "Space Walk", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_spacwalk )
 /* 642 */ GAME( 1978, einning,  0,        dplay,    einning,  0, ROT0,   "Midway", "Extra Inning", GAME_SUPPORTS_SAVE  )
 /* 643 */ GAME( 1978, shuffle,  0,        shuffle,  shuffle,  0, ROT90,  "Midway", "Shuffleboard", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 644 */ GAME( 1977, dogpatch, 0,        dogpatch, dogpatch, 0, ROT0,   "Midway", "Dog Patch", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
