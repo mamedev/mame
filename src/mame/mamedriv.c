@@ -236,7 +236,8 @@ const game_driver * const drivers[] =
 	DRIVER( ckongg )	/* 1981 bootleg */
 	DRIVER( kkgalax )	/* 1981 bootleg */
 	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
-
+	DRIVER( tdpgal )	/* 1983 Design Labs / Thomas Automatics */
+ 
 	/* Has some similarities with Moon Cresta but Board is very different */
 	DRIVER( rockclim )	/* (c)1981 Taito */
 
