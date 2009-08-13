@@ -77,7 +77,7 @@ WRITE16_HANDLER( twin16_video_register_w )
 
 			flip_screen_x_set(space->machine, video_register & TWIN16_SCREEN_FLIPX);
 			flip_screen_y_set(space->machine, video_register & TWIN16_SCREEN_FLIPY);
-			
+
 			break;
 
 		case 1: COMBINE_DATA( &scrollx[0] ); break;
@@ -130,9 +130,9 @@ WRITE16_HANDLER( twin16_video_register_w )
  *   2  | -------xxxxxxxxx | xpos
  * -----+------------------+
  *   3  | x--------------- | enable
- *   3  | -x-------------- | priority	?
- *   3  | -----x---------- | no shadow	?
- *   3  | ------x--------- | yflip	?
+ *   3  | -x-------------- | priority   ?
+ *   3  | -----x---------- | no shadow  ?
+ *   3  | ------x--------- | yflip  ?
  *   3  | -------x-------- | xflip
  *   3  | --------xx------ | height
  *   3  | ----------xx---- | width
@@ -153,11 +153,11 @@ static TIMER_CALLBACK( twin16_sprite_tick )
 static int twin16_set_sprite_timer( running_machine *machine )
 {
 	if (twin16_sprite_busy) return 1;
-	
+
 	// sprite system busy, maybe a dma? time is guessed, assume 4 scanlines
 	twin16_sprite_busy = 1;
 	timer_adjust_oneshot(twin16_sprite_timer, attotime_make(0,(((screen_config *)(machine->primary_screen)->inline_config)->refresh) / video_screen_get_height(machine->primary_screen) * 4), 0);
-	
+
 	return 0;
 }
 
@@ -165,13 +165,13 @@ void twin16_spriteram_process( running_machine *machine )
 {
 	UINT16 dx = scrollx[0];
 	UINT16 dy = scrolly[0];
-	
+
 	const UINT16 *source = &spriteram16[0x0000];
 	const UINT16 *finish = &spriteram16[0x1800];
-	
+
 	twin16_set_sprite_timer(machine);
 	memset(&spriteram16[0x1800],0xff,0x800*sizeof(UINT16));
-	
+
 	while( source<finish )
 	{
 		UINT16 priority = source[0];
@@ -181,36 +181,36 @@ void twin16_spriteram_process( running_machine *machine )
 
 			UINT32 xpos = (0x10000*source[4])|source[5];
 			UINT32 ypos = (0x10000*source[6])|source[7];
-			
+
 			/* notes on uncertain attributes:
-			shadows: pen $F only (like other Konami hw), used in devilw, fround,
-			 miaj? (shadows are solid in tmnt hw version),
-			 gradius2? (ship exhaust)
-			
-			sprite-background priority: in devilw, most sprites look best at high priority,
-			in gradius2, most sprites look best at low priority. exceptions:
-			- devilw prologue: sprites behind crowd (maybe more, haven't completed the game)
-			- gradius2 intro showing earlier games: sprites above layers
-			
-			currently using (priority&0x200), broken:
-			- devilw prologue: sprites should be behind crowd
-			- gradius2 level 7: bosses should be behind portal (ok except brain boss and mouth boss)
-			- gradius2 ending: sun should be behind planet
-			
-			does TWIN16_PLANE_ORDER affect it?
-			
-			more?
-			devilw monster dens exploding monochrome, players fading to white in prologue, and trees in
-			the 1st level shrinking with a solid green color look odd, maybe alpha blended?
-			
-			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor. all sprites are expected
-			to be high priority, and shadows are enabled
-			*/
+            shadows: pen $F only (like other Konami hw), used in devilw, fround,
+             miaj? (shadows are solid in tmnt hw version),
+             gradius2? (ship exhaust)
+
+            sprite-background priority: in devilw, most sprites look best at high priority,
+            in gradius2, most sprites look best at low priority. exceptions:
+            - devilw prologue: sprites behind crowd (maybe more, haven't completed the game)
+            - gradius2 intro showing earlier games: sprites above layers
+
+            currently using (priority&0x200), broken:
+            - devilw prologue: sprites should be behind crowd
+            - gradius2 level 7: bosses should be behind portal (ok except brain boss and mouth boss)
+            - gradius2 ending: sun should be behind planet
+
+            does TWIN16_PLANE_ORDER affect it?
+
+            more?
+            devilw monster dens exploding monochrome, players fading to white in prologue, and trees in
+            the 1st level shrinking with a solid green color look odd, maybe alpha blended?
+
+            fround, hpuncher, miaj, cuebrickj, don't use the preprocessor. all sprites are expected
+            to be high priority, and shadows are enabled
+            */
 			UINT16 attributes = 0x8000|	// enabled
 				(source[2]&0x03ff)|	// scale,size,color
 				(source[2]&0x4000)>>4|	// no-shadow? (gradius2 level 7 boss sets this bit and appears to expect pen $F to be solid)
 				(priority&0x200)<<5;	// sprite-background priority?
-			
+
 			dest[0] = source[3]; /* gfx data */
 			dest[1] = ((xpos>>8) - dx)&0xffff;
 			dest[2] = ((ypos>>8) - dy)&0xffff;
@@ -236,7 +236,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 			int xpos = source[1];
 			int ypos = source[2];
 			int x,y;
-			
+
 			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height	= 16<<((attributes>>6)&0x3);
 			int width	= 16<<((attributes>>4)&0x3);
@@ -244,7 +244,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
 			int priority = (attributes&0x4000)?TWIN16_SPRITE_PRI_L1:TWIN16_SPRITE_PRI_L2;
-			
+
 			if( twin16_custom_video ) {
 				/* fround board */
 				pen_data = twin16_gfx_rom + 0x80000;
@@ -278,7 +278,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 			if ((height&width) == 64) code &= ~8;		// gradius2 ending sequence 64*64
 			else if ((height&width) == 32) code &= ~3;	// devilw 32*32
 			else if ((height|width) == 48) code &= ~1;	// devilw 32*16 / 16*32
-			
+
 			pen_data += code*0x40;
 
 			if( video_register&TWIN16_SCREEN_FLIPY )
@@ -295,7 +295,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 			}
 			if( xpos>=320 ) xpos -= 65536;
 			if( ypos>=256 ) ypos -= 65536;
-			
+
 			/* slow slow slow, but it's ok for now */
 			for( y=0; y<height; y++, pen_data += width/4 )
 			{
@@ -304,18 +304,18 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 				{
 					UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
 					UINT8 *pdest = BITMAP_ADDR8(machine->priority_bitmap, sy, 0);
-					
+
 					for( x=0; x<width; x++ )
 					{
 						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
 						if( sx>=0 && sx<320 )
 						{
 							UINT16 pen = pen_data[x>>2]>>((~x&3)<<2)&0xf;
-							
+
 							if( pen )
 							{
 								int shadow = (pen==0xf) & ((attributes&0x400)==0);
-								
+
 								if (pdest[sx]<priority) {
 									if (shadow) {
 										dest[sx] = machine->shadow_table[dest[sx]];
@@ -330,7 +330,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 									dest[sx] = machine->shadow_table[pal_base + pen];
 									pdest[sx]^=TWIN16_SPRITE_CAST_SHADOW;
 								}
-								
+
 								pdest[sx]|=TWIN16_SPRITE_OCCUPIED;
 							}
 						}
@@ -352,7 +352,7 @@ static void draw_layer( running_machine *machine, bitmap_t *bitmap, int opaque )
 	int dx, dy, palette;
 	int tile_flipx = video_register&TWIN16_TILE_FLIPX;
 	int tile_flipy = video_register&TWIN16_TILE_FLIPY;
-	
+
 	if( ((video_register&TWIN16_PLANE_ORDER)?1:0) != opaque ) {
 		source += 0x1000;
 		dx = scrollx[2];
@@ -421,10 +421,10 @@ static void draw_layer( running_machine *machine, bitmap_t *bitmap, int opaque )
 		{
 			int code = source[i];
 			/* fedcba9876543210
-			   xxx-------------	color
-			   ---xx-----------	tile bank
-			   -----xxxxxxxxxxx	tile number
-			*/
+               xxx------------- color
+               ---xx----------- tile bank
+               -----xxxxxxxxxxx tile number
+            */
 			const UINT16 *gfx_data = gfx_base + (code&0x7ff)*16 + bank_table[(code>>11)&0x3]*0x8000;
 			int color = (code>>13);
 			int pal_base = 16*(0x20+color+8*palette);
@@ -477,18 +477,18 @@ static TILE_GET_INFO( get_text_tile_info )
 	const UINT16 *source = twin16_text_ram;
 	int attr = source[tile_index];
 	/* fedcba9876543210
-	   -x--------------	yflip
-	   --x-------------	xflip
-	   ---xxxx---------	color
-	   -------xxxxxxxxx	tile number
-	*/
+       -x-------------- yflip
+       --x------------- xflip
+       ---xxxx--------- color
+       -------xxxxxxxxx tile number
+    */
 	int code = attr & 0x1ff;
 	int color = (attr >> 9) & 0x0f;
 	int flags=0;
-	
+
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
-	
+
 	SET_TILE_INFO(0, code, color, flags);
 }
 
@@ -496,17 +496,17 @@ VIDEO_START( twin16 )
 {
 	text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(text_tilemap, 0);
-	
+
 	memset(twin16_sprite_buffer,0xff,0x800*sizeof(UINT16));
 	twin16_sprite_busy = 0;
 	twin16_sprite_timer = timer_alloc(machine, twin16_sprite_tick, NULL);
 	timer_adjust_oneshot(twin16_sprite_timer, attotime_never, 0);
-	
+
 	/* register for savestates */
 	state_save_register_global_array(machine, twin16_sprite_buffer);
 	state_save_register_global_array(machine, scrollx);
 	state_save_register_global_array(machine, scrolly);
-	
+
 	state_save_register_global(machine, need_process_spriteram);
 	state_save_register_global(machine, gfx_bank);
 	state_save_register_global(machine, video_register);
@@ -518,12 +518,12 @@ VIDEO_UPDATE( twin16 )
 	int text_flip=0;
 	if (video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
-	
+
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	draw_layer( screen->machine, bitmap, 1 );
 	draw_layer( screen->machine, bitmap, 0 );
 	draw_sprites( screen->machine, bitmap );
-	
+
 	if (text_flip) tilemap_set_flip(text_tilemap, text_flip);
 	tilemap_draw(bitmap, cliprect, text_tilemap, 0, 0);
 	return 0;
@@ -532,14 +532,14 @@ VIDEO_UPDATE( twin16 )
 VIDEO_EOF( twin16 )
 {
 	twin16_set_sprite_timer(machine);
-	
+
 	if (twin16_spriteram_process_enable()) {
 		if (need_process_spriteram) twin16_spriteram_process(machine);
 		need_process_spriteram = 1;
-		
+
 		/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
-		as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
-		more to it than that */
+        as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
+        more to it than that */
 		memcpy(&buffered_spriteram16[0x1800],twin16_sprite_buffer,0x800*sizeof(UINT16));
 		memcpy(twin16_sprite_buffer,&spriteram16[0x1800],0x800*sizeof(UINT16));
 	}

@@ -1218,20 +1218,20 @@ static ADDRESS_MAP_START( mooncrst_map_base, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa000, 0xa002) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-//	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE(GAL_AUDIO, galaxian_lfo_freq_w)
+//  AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE(GAL_AUDIO, galaxian_lfo_freq_w)
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-//	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE(GAL_AUDIO, galaxian_sound_w)
+//  AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE(GAL_AUDIO, galaxian_sound_w)
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-//	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
+//  AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mooncrst_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_IMPORT_FROM(mooncrst_map_base)	
+	AM_IMPORT_FROM(mooncrst_map_base)
 	AM_IMPORT_FROM(mooncrst_map_discrete)
 ADDRESS_MAP_END
 
@@ -1838,7 +1838,7 @@ static MACHINE_DRIVER_START( zigzag )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1789750)
-	
+
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

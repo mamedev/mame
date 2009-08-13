@@ -2,8 +2,8 @@
  *
  *   i4004.c
  *
- *   Intel 4004 CPU 
- *   
+ *   Intel 4004 CPU
+ *
  *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
@@ -57,7 +57,7 @@ static const cpu_state_entry state_array[] =
 {
 	I4004_STATE_ENTRY(PC,   "%03X", PC.w.l, 0x0fff, 0)
 	I4004_STATE_ENTRY(GENPC,"%03X", PC.w.l, 0x0fff, CPUSTATE_NOSHOW)
-	I4004_STATE_ENTRY(A,   "%01X", A, 0x0f, 0)	
+	I4004_STATE_ENTRY(A,   "%01X", A, 0x0f, 0)
 	I4004_STATE_ENTRY(R01, "%02X", R[0], 0xff, 0)
 	I4004_STATE_ENTRY(R23, "%02X", R[1], 0xff, 0)
 	I4004_STATE_ENTRY(R45, "%02X", R[2], 0xff, 0)
@@ -164,7 +164,7 @@ INLINE UINT8 GET_REG(i4004_state *cpustate, UINT8 num)
 {
 	UINT8 r = cpustate->R[num>>1];
 	if (num & 1) {
-		return r & 0x0f;	
+		return r & 0x0f;
 	} else {
 		return (r >> 4) & 0x0f;
 	}
@@ -187,7 +187,7 @@ INLINE void PUSH_STACK(i4004_state *cpustate)
 INLINE void POP_STACK(i4004_state *cpustate)
 {
 	cpustate->ADDR[cpustate->pc_pos].d = 0;
-	cpustate->pc_pos = (cpustate->pc_pos - 1) & cpustate->addr_mask;	
+	cpustate->pc_pos = (cpustate->pc_pos - 1) & cpustate->addr_mask;
 }
 
 void i4004_set_test(const device_config *device, UINT8 val)
@@ -202,91 +202,91 @@ static void execute_one(i4004_state *cpustate, int opcode)
 	switch (opcode)
 	{
 		case 0x00: 	/* NOP  */
-			/* no op */		
+			/* no op */
 			break;
-		case 0x10: case 0x11: case 0x12: case 0x13: 
-		case 0x14: case 0x15: case 0x16: case 0x17: 
-		case 0x18: case 0x19: case 0x1a: case 0x1b: 
+		case 0x10: case 0x11: case 0x12: case 0x13:
+		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x18: case 0x19: case 0x1a: case 0x1b:
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f: /* JCN */
 			{
 				UINT8 arg =  ARG(cpustate);
-				
+
 				UINT8 C1 = BIT(opcode,3);
 				UINT8 C2 = BIT(opcode,2);
 				UINT8 C3 = BIT(opcode,1);
 				UINT8 C4 = BIT(opcode,0);
 				UINT8 JUMP = (((cpustate->A == 0) ? 1 : 0) & C2) | ((cpustate->C) & C3) | ((cpustate->TEST ^ 1) & C4);
 				cpustate->icount -= 8;
-								
+
 				if(((C1 ^ 1) &  JUMP) | (C1 & (JUMP ^ 1))) {
 					GET_PC.w.l = (GET_PC.w.l & 0x0f00) | arg;
 					cpustate->PC = GET_PC;
 				}
 			}
 			break;
-		case 0x20: case 0x22: case 0x24: case 0x26: 
+		case 0x20: case 0x22: case 0x24: case 0x26:
 		case 0x28: case 0x2a: case 0x2c: case 0x2e: /* FIM */
 			cpustate->icount -= 8;
 			cpustate->R[(opcode & 0x0f)>>1] = ROP(cpustate);
 			break;
-		case 0x21: case 0x23: case 0x25: case 0x27: 
+		case 0x21: case 0x23: case 0x25: case 0x27:
 		case 0x29: case 0x2b: case 0x2d: case 0x2f: /* SRC */
-			cpustate->RAM.b.l = cpustate->R[(opcode & 0x0f)>>1];			
+			cpustate->RAM.b.l = cpustate->R[(opcode & 0x0f)>>1];
 			break;
-		case 0x30: case 0x32: case 0x34: case 0x36: 
+		case 0x30: case 0x32: case 0x34: case 0x36:
 		case 0x38: case 0x3a: case 0x3c: case 0x3e: /* FIN */
 			cpustate->icount -= 8;
 			cpustate->R[(opcode & 0x0f)>>1] = READ_ROM(cpustate);
 			break;
-		case 0x31: case 0x33: case 0x35: case 0x37: 
+		case 0x31: case 0x33: case 0x35: case 0x37:
 		case 0x39: case 0x3b: case 0x3d: case 0x3f: /* JIN */
 			GET_PC.w.l = (GET_PC.w.l & 0x0f00) | cpustate->R[(opcode & 0x0f)>>1];
 			cpustate->PC = GET_PC;
 			break;
-		case 0x40: case 0x41: case 0x42: case 0x43: 
-		case 0x44: case 0x45: case 0x46: case 0x47: 
-		case 0x48: case 0x49: case 0x4a: case 0x4b: 
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4a: case 0x4b:
 		case 0x4c: case 0x4d: case 0x4e: case 0x4f: /* JUN */
 			cpustate->icount -= 8;
 			GET_PC.w.l = ((opcode & 0x0f) << 8) | ARG(cpustate);
 			cpustate->PC = GET_PC;
 			break;
-		case 0x50: case 0x51: case 0x52: case 0x53: 
-		case 0x54: case 0x55: case 0x56: case 0x57: 
-		case 0x58: case 0x59: case 0x5a: case 0x5b: 
+		case 0x50: case 0x51: case 0x52: case 0x53:
+		case 0x54: case 0x55: case 0x56: case 0x57:
+		case 0x58: case 0x59: case 0x5a: case 0x5b:
 		case 0x5c: case 0x5d: case 0x5e: case 0x5f: /* JMS */
 			{
 				UINT16 newPC = ((opcode & 0x0f) << 8) | ARG(cpustate);
-				cpustate->icount -= 8;			
+				cpustate->icount -= 8;
 				PUSH_STACK(cpustate);
 				GET_PC.w.l = newPC;
 				cpustate->PC = GET_PC;
 			}
 			break;
-		case 0x60: case 0x61: case 0x62: case 0x63: 
-		case 0x64: case 0x65: case 0x66: case 0x67: 
-		case 0x68: case 0x69: case 0x6a: case 0x6b: 
+		case 0x60: case 0x61: case 0x62: case 0x63:
+		case 0x64: case 0x65: case 0x66: case 0x67:
+		case 0x68: case 0x69: case 0x6a: case 0x6b:
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f: /* INC */
 			SET_REG(cpustate, opcode & 0x0f, GET_REG(cpustate, opcode & 0x0f) + 1);
 			break;
-		case 0x70: case 0x71: case 0x72: case 0x73: 
-		case 0x74: case 0x75: case 0x76: case 0x77: 
-		case 0x78: case 0x79: case 0x7a: case 0x7b: 
+		case 0x70: case 0x71: case 0x72: case 0x73:
+		case 0x74: case 0x75: case 0x76: case 0x77:
+		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f: /* ISZ */
-			{				
+			{
 				UINT8 val = (GET_REG(cpustate, opcode & 0x0f) + 1) & 0xf;
 				UINT16 addr = ARG(cpustate);
 				cpustate->icount -= 8;
-				SET_REG(cpustate, opcode & 0x0f, val);				
+				SET_REG(cpustate, opcode & 0x0f, val);
 				if (val!=0) {
-					GET_PC.w.l = (GET_PC.w.l & 0x0f00) | addr;					
-				}	
-				cpustate->PC = GET_PC;							
+					GET_PC.w.l = (GET_PC.w.l & 0x0f00) | addr;
+				}
+				cpustate->PC = GET_PC;
 			}
 			break;
-		case 0x80: case 0x81: case 0x82: case 0x83: 
-		case 0x84: case 0x85: case 0x86: case 0x87: 
-		case 0x88: case 0x89: case 0x8a: case 0x8b: 
+		case 0x80: case 0x81: case 0x82: case 0x83:
+		case 0x84: case 0x85: case 0x86: case 0x87:
+		case 0x88: case 0x89: case 0x8a: case 0x8b:
 		case 0x8c: case 0x8d: case 0x8e: case 0x8f: /* ADD */
 			{
 				UINT8 acc = cpustate->A + GET_REG(cpustate, opcode & 0x0f) + cpustate->C;
@@ -294,47 +294,47 @@ static void execute_one(i4004_state *cpustate, int opcode)
 				cpustate->C = (acc >> 4) & 1;
 			}
 			break;
-		case 0x90: case 0x91: case 0x92: case 0x93: 
-		case 0x94: case 0x95: case 0x96: case 0x97: 
-		case 0x98: case 0x99: case 0x9a: case 0x9b: 
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
 		case 0x9c: case 0x9d: case 0x9e: case 0x9f: /* SUB */
 			{
 				UINT8 acc = cpustate->A + (GET_REG(cpustate, opcode & 0x0f) ^ 0x0f) + (cpustate->C ^ 1);
-				cpustate->A = acc & 0x0f;				
+				cpustate->A = acc & 0x0f;
 				cpustate->C = (acc >> 4) & 1;
 			}
 			break;
-		case 0xa0: case 0xa1: case 0xa2: case 0xa3: 
-		case 0xa4: case 0xa5: case 0xa6: case 0xa7: 
-		case 0xa8: case 0xa9: case 0xaa: case 0xab: 
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab:
 		case 0xac: case 0xad: case 0xae: case 0xaf: /* LD */
 			cpustate->A = GET_REG(cpustate, opcode & 0x0f);
 			break;
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3: 
-		case 0xb4: case 0xb5: case 0xb6: case 0xb7: 
-		case 0xb8: case 0xb9: case 0xba: case 0xbb: 
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb:
 		case 0xbc: case 0xbd: case 0xbe: case 0xbf: /* XCH */
 			{
 				UINT8 temp = cpustate->A;
 				cpustate->A = GET_REG(cpustate, opcode & 0x0f);
 				SET_REG(cpustate, opcode & 0x0f, temp);
-			}			
+			}
 			break;
-		case 0xc0: case 0xc1: case 0xc2: case 0xc3: 
-		case 0xc4: case 0xc5: case 0xc6: case 0xc7: 
-		case 0xc8: case 0xc9: case 0xca: case 0xcb: 
-		case 0xcc: case 0xcd: case 0xce: case 0xcf: /*  BBL */			
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb:
+		case 0xcc: case 0xcd: case 0xce: case 0xcf: /*  BBL */
 		    POP_STACK(cpustate);
 		    cpustate->A = opcode & 0x0f;
 		    cpustate->PC = GET_PC;
 			break;
-		case 0xd0: case 0xd1: case 0xd2: case 0xd3: 
-		case 0xd4: case 0xd5: case 0xd6: case 0xd7: 
-		case 0xd8: case 0xd9: case 0xda: case 0xdb: 
+		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
+		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
+		case 0xd8: case 0xd9: case 0xda: case 0xdb:
 		case 0xdc: case 0xdd: case 0xde: case 0xdf: /* LDM */
 			cpustate->A = opcode & 0x0f;
 			break;
-		case 0xe0: /* WRM */		
+		case 0xe0: /* WRM */
 			WM(cpustate,cpustate->A);
 			break;
 		case 0xe1: /* WMP */
@@ -366,14 +366,14 @@ static void execute_one(i4004_state *cpustate, int opcode)
 		case 0xe9: /* RDM */
 			cpustate->A = RM(cpustate);
 			break;
-		case 0xea: /* RDR */			
+		case 0xea: /* RDR */
 			cpustate->A = RIO(cpustate);
 			break;
 		case 0xeb: /* ADM */
 			cpustate->A += RM(cpustate) + cpustate->C;
 			cpustate->C = cpustate->A >> 4;
 			cpustate->A &= 0x0f;
-			break; 
+			break;
 		case 0xec: /* RD0 */
 			cpustate->A = RMS(cpustate,0);
 			break;
@@ -386,16 +386,16 @@ static void execute_one(i4004_state *cpustate, int opcode)
 		case 0xef: /* RD3 */
 			cpustate->A = RMS(cpustate,3);
 			break;
-		           
+
 		case 0xf0: /* CLB */
 			cpustate->A = 0;
 			cpustate->C = 0;
-			break; 
+			break;
 		case 0xf1: /* CLC */
 			cpustate->C = 0;
 			break;
 		case 0xf2: /* IAC */
-			cpustate->A = cpustate->A++;			
+			cpustate->A = cpustate->A++;
 			cpustate->C = cpustate->A >> 4;
 			cpustate->A &= 0x0f;
 			break;
@@ -424,7 +424,7 @@ static void execute_one(i4004_state *cpustate, int opcode)
 		case 0xf8: /* DAC */
 			cpustate->A = cpustate->A + 0x0f;
 			cpustate->C = cpustate->A >> 4;
-			cpustate->A &= 0x0f;			
+			cpustate->A &= 0x0f;
 			break;
 		case 0xf9: /* TCS */
 			cpustate->A = cpustate->C ? 10 : 9;
@@ -481,20 +481,20 @@ static CPU_EXECUTE( i4004 )
 static CPU_INIT( i4004 )
 {
 	i4004_state *cpustate = get_safe_token(device);
-	
+
 	/* set up the state table */
 	cpustate->state = state_table_template;
 	cpustate->state.baseptr = cpustate;
 	cpustate->state.subtypemask = 1;
-	
+
 	cpustate->device = device;
 
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-	
+
 	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->A);	
+	state_save_register_device_item(device, 0, cpustate->A);
 	state_save_register_device_item(device, 0, cpustate->C);
 	state_save_register_device_item(device, 0, cpustate->TEST);
 	state_save_register_device_item(device, 0, cpustate->pc_pos);
@@ -509,8 +509,8 @@ static CPU_INIT( i4004 )
 	state_save_register_device_item(device, 0, cpustate->R[4]);
 	state_save_register_device_item(device, 0, cpustate->R[5]);
 	state_save_register_device_item(device, 0, cpustate->R[6]);
-	state_save_register_device_item(device, 0, cpustate->R[7]);		
-	state_save_register_device_item(device, 0, cpustate->RAM);	
+	state_save_register_device_item(device, 0, cpustate->R[7]);
+	state_save_register_device_item(device, 0, cpustate->RAM);
 }
 
 
@@ -531,7 +531,7 @@ static CPU_RESET( i4004 )
 	memset(cpustate->ADDR,0,sizeof(cpustate->ADDR));
 	cpustate->RAM.d = 0;
 	cpustate->PC = GET_PC;
-	
+
 }
 
 

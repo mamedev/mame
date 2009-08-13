@@ -890,7 +890,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-//	MDRV_QUANTUM_TIME(HZ(12000))
+//  MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

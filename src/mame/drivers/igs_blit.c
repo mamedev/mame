@@ -32,7 +32,7 @@ To do:
 - lhb: in the copyright screen the '5' in '1995' is drawn by the cpu on layer 5,
   but with wrong colors (since the top nibble of the affected pixels is left to 0xf)
   (drgnwrld is like this too, maybe hacked, or a cheap year replacement by IGS)
-  
+
 - dbc: in the title screen the '5' in '1995' is drawn by the cpu with wrong colors.
   (see above comment)
   Also the background palette is wrong since the fade routine is called with wrong
@@ -2668,7 +2668,7 @@ static DRIVER_INIT( drgnwrldv21 )
 	rom[0x25556/2]	=	0x6000;		// 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
 	rom[0x269de/2]	=	0x606c;		// ??
 	rom[0x2766a/2]	=	0x606c;		// ??
-	rom[0x2a830/2]	=	0x606c;		// ??	
+	rom[0x2a830/2]	=	0x606c;		// ??
 }
 
 

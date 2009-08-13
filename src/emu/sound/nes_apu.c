@@ -142,10 +142,10 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 	int8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold, 6-7=duty cycle
-	** reg1: 0-2=sweep shifts, 3=sweep inc/dec, 4-6=sweep length, 7=sweep on
-	** reg2: 8 bits of freq
-	** reg3: 0-2=high freq, 7-4=vbl length counter
-	*/
+    ** reg1: 0-2=sweep shifts, 3=sweep inc/dec, 4-6=sweep length, 7=sweep on
+    ** reg2: 8 bits of freq
+    ** reg3: 0-2=high freq, 7-4=vbl length counter
+    */
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -215,9 +215,9 @@ static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
 	int freq;
 	int8 output;
 	/* reg0: 7=holdnote, 6-0=linear length counter
-	** reg2: low 8 bits of frequency
-	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
-	*/
+    ** reg2: low 8 bits of frequency
+    ** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
+    */
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -275,9 +275,9 @@ static int8 apu_noise(nesapu_state *info, noise_t *chan)
 	uint8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold
-	** reg2: 7=small(93 byte) sample,3-0=freq lookup
-	** reg3: 7-4=vbl length counter
-	*/
+    ** reg2: 7=small(93 byte) sample,3-0=freq lookup
+    ** reg3: 7-4=vbl length counter
+    */
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -352,10 +352,10 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 	int freq, bit_pos;
 
 	/* reg0: 7=irq gen, 6=looping, 3-0=pointer to clock table
-	** reg1: output dc level, 7 bits unsigned
-	** reg2: 8 bits of 64-byte aligned address offset : $C000 + (value * 64)
-	** reg3: length, (value * 16) + 1
-	*/
+    ** reg1: output dc level, 7 bits unsigned
+    ** reg2: 8 bits of 64-byte aligned address offset : $C000 + (value * 64)
+    ** reg3: length, (value * 16) + 1
+    */
 
 	if (chan->enabled)
 	{
@@ -394,10 +394,10 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 			}
 
 			if (chan->cur_byte & (1 << bit_pos))
-//				chan->regs[1]++;
+//              chan->regs[1]++;
 				chan->vol+=2; /* FIXED * DPCM channel only uses the upper 6 bits of the DAC */
 			else
-//				chan->regs[1]--;
+//              chan->regs[1]--;
 				chan->vol-=2;
 		}
 	}
@@ -473,19 +473,19 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 		info->APU.tri.regs[3] = value;
 
 		/* this is somewhat of a hack.  there is some latency on the Real
-		** Thing between when trireg0 is written to and when the linear
-		** length counter actually begins its countdown.  we want to prevent
-		** the case where the program writes to the freq regs first, then
-		** to reg 0, and the counter accidentally starts running because of
-		** the sound queue's timestamp processing.
-		**
-		** set to a few NES sample -- should be sufficient
-		**
-		**	  3 * (1789772.727 / 44100) = ~122 cycles, just around one scanline
-		**
-		** should be plenty of time for the 6502 code to do a couple of table
-		** dereferences and load up the other triregs
-		*/
+        ** Thing between when trireg0 is written to and when the linear
+        ** length counter actually begins its countdown.  we want to prevent
+        ** the case where the program writes to the freq regs first, then
+        ** to reg 0, and the counter accidentally starts running because of
+        ** the sound queue's timestamp processing.
+        **
+        ** set to a few NES sample -- should be sufficient
+        **
+        **    3 * (1789772.727 / 44100) = ~122 cycles, just around one scanline
+        **
+        ** should be plenty of time for the 6502 code to do a couple of table
+        ** dereferences and load up the other triregs
+        */
 
 	/* used to be 3, but now we run the clock faster, so base it on samples/sync */
 		info->APU.tri.write_latency = (info->samps_per_sync + 239) / 240;
@@ -548,7 +548,7 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 	case APU_IRQCTRL:
 		if(value & 0x80)
 			info->APU.step_mode = 5;
-		else 
+		else
 			info->APU.step_mode = 4;
 		break;
 

@@ -26,7 +26,7 @@ Notes on version letters:
 
 E  = Export (It displays a "Outside USA use only" message)
 R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
-LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of poits 
+LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of poits
      needed to get a ticket)
 XT = Texas XT / Arkansas / Iowa
 N  = ??
@@ -304,10 +304,10 @@ static INPUT_PORTS_START( amcoecommon )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
 INPUT_PORTS_END
 
-/* Games use 2 types of inputs: type 1 and type 2 (which is type 1 with reversed bits). 
-Both come in 3 flavors (depending on the games): 
-- fruit machines with 3 reels: Stop All, Stop 1, Stop 2, Stop 3, Bet; 
-- fruit machines with 4 reels: Stop 1, Stop 2, Stop 3, Stop 4, Bet;  
+/* Games use 2 types of inputs: type 1 and type 2 (which is type 1 with reversed bits).
+Both come in 3 flavors (depending on the games):
+- fruit machines with 3 reels: Stop All, Stop 1, Stop 2, Stop 3, Bet;
+- fruit machines with 4 reels: Stop 1, Stop 2, Stop 3, Stop 4, Bet;
 - poker: Hold 1, Hold 2, Hold 3, Hold 4, Hold 5   */
 
 static INPUT_PORTS_START( amcoe1_reels3 )
@@ -796,7 +796,7 @@ static VIDEO_UPDATE(sfbonus)
     sfbonus_1800_regs[7]);
     */
 
-	if ((screen->machine->gamedrv->ipt == ipt_amcoe2_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe2_reels4) 
+	if ((screen->machine->gamedrv->ipt == ipt_amcoe2_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe2_reels4)
 		|| (screen->machine->gamedrv->ipt == ipt_amcoe2_poker))
 	{
 		// based on pirpok2
@@ -807,7 +807,7 @@ static VIDEO_UPDATE(sfbonus)
 		output_set_lamp_value(4, (sfbonus_1800_regs[4] & 0x4) >> 2);
 		output_set_lamp_value(5, (sfbonus_1800_regs[4] & 0x1) >> 0);
 	}
-	else if ((screen->machine->gamedrv->ipt == ipt_amcoe1_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe1_reels4) 
+	else if ((screen->machine->gamedrv->ipt == ipt_amcoe1_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe1_reels4)
 		|| (screen->machine->gamedrv->ipt == ipt_amcoe1_poker))
 	{
 		output_set_lamp_value(0, (sfbonus_1800_regs[0] & 0x2) >> 1);
@@ -5193,7 +5193,7 @@ static DRIVER_INIT( sfbonus_common)
 
 	// hack, because the debugger is broken
 	sfbonus_videoram = memory_region(machine, "debugram");
-	if (!sfbonus_videoram) 
+	if (!sfbonus_videoram)
 		sfbonus_videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
 	memset(sfbonus_videoram, 0xff, 0x10000);

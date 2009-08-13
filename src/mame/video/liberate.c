@@ -83,10 +83,10 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 	int tile;
 
 	/*
-		robiza notes:
-		- flip y (handled with a +0x10 tile banking) depends only by position of the tile in the screen
-		- bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
-	*/
+        robiza notes:
+        - flip y (handled with a +0x10 tile banking) depends only by position of the tile in the screen
+        - bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
+    */
 
 	tile = (prosport_bg_vram[tile_index] & 0xf0)>>4;
 

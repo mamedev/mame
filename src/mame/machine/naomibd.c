@@ -330,7 +330,7 @@ static void init_save_state(const device_config *device)
 	state_save_register_device_item(device, 0, v->aw_offset);
 	state_save_register_device_item(device, 0, v->aw_file_base);
 	state_save_register_device_item(device, 0, v->aw_file_offset);
-}							 
+}
 
 
 

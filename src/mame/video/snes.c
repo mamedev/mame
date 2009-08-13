@@ -404,8 +404,8 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	/* scrolling */
 	UINT32 basevmap;
 	UINT16 vscroll, hscroll, vtilescroll;
-//	UINT16 offset_per_tile_valid;
-//	UINT8 offset_per_tile_mode;
+//  UINT16 offset_per_tile_valid;
+//  UINT8 offset_per_tile_mode;
 	UINT8 vshift, hshift, tile_size;
 	/* variables depending on color_depth */
 	UINT8 color_shift = 0;
@@ -491,7 +491,7 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
 		//if (tmap > 0x10000) //<- causes corrupt tiles in places, needed?
-		//	tmap %= 0x10000;
+		//  tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;

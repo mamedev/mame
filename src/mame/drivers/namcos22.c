@@ -5675,7 +5675,7 @@ static DRIVER_INIT( aquajet )
 GAME( 1995, cybrcomm,  0,        namcos22,  cybrcomm, cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1995, raveracw,  0,        namcos22,  raveracw, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, raveracj,  raveracw, namcos22,  raveracw, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)"        , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, raveracja, raveracw, namcos22,  raveracw, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) 
+GAME( 1995, raveracja, raveracw, namcos22,  raveracw, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, ridgerac,  0,        namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) /* 1994-01-17 */
 GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) /* 1993-10-07 */
 GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) /* 1993-10-07 */

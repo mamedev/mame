@@ -1851,11 +1851,11 @@ MACHINE_DRIVER_END
 
 /******************************************************************************/
 
-/*	correct label format. revision number is stamped(red), other letters are printed(black)
-	game code in line 1, ROM position in line 2
-	i.e.
-	MDS-DH3
-	1B or 6B e
+/*  correct label format. revision number is stamped(red), other letters are printed(black)
+    game code in line 1, ROM position in line 2
+    i.e.
+    MDS-DH3
+    1B or 6B e
 */
 
 
@@ -2508,7 +2508,7 @@ ROM_START( iceclmrj )
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-ic4-4_8b a.bin",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
 	ROM_LOAD( "mds-ic4-4_8a a.bin",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
-ROM_END                    
+ROM_END
 
 /******************************************************************************/
 

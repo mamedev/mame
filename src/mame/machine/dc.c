@@ -950,7 +950,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
 			}
-//			printf("ROM board DMA to %x (PC %x)\n", g1bus_regs[SB_GDSTAR], cpu_get_pc(space->cpu));
+//          printf("ROM board DMA to %x (PC %x)\n", g1bus_regs[SB_GDSTAR], cpu_get_pc(space->cpu));
  			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, "rom_board", DEVINFO_PTR_MEMORY);
  			dmaoffset = (UINT32)devtag_get_info_int(space->machine, "rom_board", DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address

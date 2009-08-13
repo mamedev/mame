@@ -736,10 +736,10 @@ ROM_START( looping )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
-	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
 */
 	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(			0x0000, 0x00c2)
@@ -773,10 +773,10 @@ ROM_START( loopinga )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
-	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
 */
 	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(			0x0000, 0x00c2)
@@ -809,10 +809,10 @@ ROM_START( skybump )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
-	ROM_LOAD( "cop.bin",		0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
-	ROM_CONTINUE(			0x0000, 0x0400)
+    ROM_LOAD( "cop.bin",        0x0000, 0x0400, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
+    ROM_CONTINUE(           0x0000, 0x0400)
 */
 	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
 	ROM_CONTINUE(			0x0000, 0x00c2)

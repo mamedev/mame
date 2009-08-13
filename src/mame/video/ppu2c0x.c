@@ -1018,7 +1018,7 @@ READ8_HANDLER( ppu2c0x_palette_read )
 		if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 			return (this_ppu->palette_ram[offset & 0x1f] & 0x30);
 
-		else 
+		else
 			return (this_ppu->palette_ram[offset & 0x1f] & 0x3f);
 	}
 }

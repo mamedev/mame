@@ -129,19 +129,19 @@ static READ32_HANDLER( pxa255_i2s_r )
 static WRITE32_HANDLER( pxa255_i2s_w )
 {
 	/*
-	if(!audio_dump)
-	{
-		int count = 0;
-		char filename[256];
-		do
-		{
-			sprintf(filename, "39in1_%04d.raw", count++);
-			audio_dump = fopen(filename, "rb");
-		}while(audio_dump != NULL);
-		count--;
-		sprintf(filename, "39in1_%04d.raw", count);
-		audio_dump = fopen(filename, "wb");
-	}*/
+    if(!audio_dump)
+    {
+        int count = 0;
+        char filename[256];
+        do
+        {
+            sprintf(filename, "39in1_%04d.raw", count++);
+            audio_dump = fopen(filename, "rb");
+        }while(audio_dump != NULL);
+        count--;
+        sprintf(filename, "39in1_%04d.raw", count);
+        audio_dump = fopen(filename, "wb");
+    }*/
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_SACR0:
@@ -183,9 +183,9 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 			verboselog( space->machine, 4, "pxa255_i2s_w: Serial Audio Data Register: %08x & %08x\n", data, mem_mask );
 			i2s_regs.sadr = data;
 			/*if(audio_dump)
-			{
-				fwrite(&data, 4, 1, audio_dump);
-			}*/
+            {
+                fwrite(&data, 4, 1, audio_dump);
+            }*/
 			break;
 		default:
 			verboselog( space->machine, 0, "pxa255_i2s_w: Unknown address: %08x = %08x & %08x\n", PXA255_I2S_BASE_ADDR | (offset << 2), data, mem_mask);
@@ -1274,7 +1274,7 @@ static UINT32 seed, magic;
 static UINT32 state = 0;
 static READ32_HANDLER( cpld_r )
 {
-//	if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
+//  if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
 
 	if (cpu_get_pc(space->cpu) == 0x3f04)
 	{

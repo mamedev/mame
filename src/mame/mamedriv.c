@@ -237,7 +237,7 @@ const game_driver * const drivers[] =
 	DRIVER( kkgalax )	/* 1981 bootleg */
 	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
 	DRIVER( tdpgal )	/* 1983 Design Labs / Thomas Automatics */
- 
+
 	/* Has some similarities with Moon Cresta but Board is very different */
 	DRIVER( rockclim )	/* (c)1981 Taito */
 
@@ -9200,7 +9200,7 @@ Other Sun games
 	DRIVER( kgbirda )	/* (c) 1996 */
 	DRIVER( phantomp )	/* (c) 1998 */
 	DRIVER( swtht2nz )	/* (c) 1998 */
-	DRIVER( topgear )	/* (c) 1996 */	
+	DRIVER( topgear )	/* (c) 1996 */
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
@@ -9475,8 +9475,8 @@ Other Sun games
 	DRIVER( moneymacv1 )/* (c) 200? Amcoe */
 	DRIVER( moneymacd2 )/* (c) 200? Amcoe */
 	DRIVER( moneymacv2 )/* (c) 200? Amcoe */
-	//DRIVER( atworld )	/* (c) 2007 Amcoe - Around The World (year listed on Amcoe web site) */
-	//DRIVER( atworldd1 )	/* (c) 2007 Amcoe (year listed on Amcoe web site) */
+	//DRIVER( atworld ) /* (c) 2007 Amcoe - Around The World (year listed on Amcoe web site) */
+	//DRIVER( atworldd1 )   /* (c) 2007 Amcoe (year listed on Amcoe web site) */
 
 
 	DRIVER( chsuper3 )	/* unknown */

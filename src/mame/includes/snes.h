@@ -493,7 +493,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 bg3_priority_bit;
 	UINT8 direct_color;
 	UINT8 ppu_last_scroll;		/* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
-									'previous' scroll value */
+                                    'previous' scroll value */
 	UINT8 mode7_last_scroll;	/* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
 	UINT8 main_bg_enabled[5];	// these would probably better fit the layer struct, but it would make worse the code in snes_update_mode_X()

@@ -185,38 +185,38 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Star Wars Racer Arcade
-                      MPR-23086.IC37    64M SOP44 MASKROM     7993	8E18
-                      MPR-23087.IC38    "                     4D44	D239
-                      MPR-23088.IC39    "                     4135	BEAB
-                      MPR-23089.IC40    "                     F0C8	04E2
-                      MPR-23090.IC41    "                     9532	4C1C
-                      MPR-23091.IC42    "                     925D	02FB
-                      MPR-23092.IC43    "                     0809	7050
-                      MPR-23093.IC44    "                     72BC	9311
-                      MPR-23094.IC45    "                     DE84	9D8A
-                      MPR-23095.IC46    "                     7A5C	E7FC
-                      MPR-23096.IC47    "                     6806	1392
-                      MPR-23097.IC48    "                     EDF1	7BD1
-                      MPR-23098.IC49    "                     B82D	E114
-                      MPR-23099.IC50    "                     5792	E5E5
-                      MPR-23100.IC51    "                     3AF3	A97C
-                      MPR-23101.IC52    "                     A8CC	721D
-                      MPR-23102.IC53    "                     CED7	D3CF
-                      MPR-23103.IC54    "                     6B67	FC76
-                      MPR-23104.IC55    "                     586C	6954
-                      MPR-23105.IC56    "                     13A0	DB38
-                      MPR-23106.IC57    "                     4F03	42BF
-                      MPR-23107.IC58    "                     8EA6	ADB6
-                      MPR-23108.IC59    "                     8645	FC30
-                      MPR-23109.IC60    "                     3847	CA6B
-                      MPR-23110.IC61    "                     4140	01C4
-                      MPR-23111.IC62    "                     EBE6	8085
-                      MPR-23112.IC63    "                     B68B	7467
-                      MPR-23113.IC64    "                     4715	4787
-                      MPR-23114.IC65    "                     3CD6	144A
-                      MPR-23115.IC66    "                     E5D3	BA35
-                      MPR-23116.IC67    "                     E668	08ED
-                      MPR-23117.IC68    "                     1FE8	C4A1
+                      MPR-23086.IC37    64M SOP44 MASKROM     7993  8E18
+                      MPR-23087.IC38    "                     4D44  D239
+                      MPR-23088.IC39    "                     4135  BEAB
+                      MPR-23089.IC40    "                     F0C8  04E2
+                      MPR-23090.IC41    "                     9532  4C1C
+                      MPR-23091.IC42    "                     925D  02FB
+                      MPR-23092.IC43    "                     0809  7050
+                      MPR-23093.IC44    "                     72BC  9311
+                      MPR-23094.IC45    "                     DE84  9D8A
+                      MPR-23095.IC46    "                     7A5C  E7FC
+                      MPR-23096.IC47    "                     6806  1392
+                      MPR-23097.IC48    "                     EDF1  7BD1
+                      MPR-23098.IC49    "                     B82D  E114
+                      MPR-23099.IC50    "                     5792  E5E5
+                      MPR-23100.IC51    "                     3AF3  A97C
+                      MPR-23101.IC52    "                     A8CC  721D
+                      MPR-23102.IC53    "                     CED7  D3CF
+                      MPR-23103.IC54    "                     6B67  FC76
+                      MPR-23104.IC55    "                     586C  6954
+                      MPR-23105.IC56    "                     13A0  DB38
+                      MPR-23106.IC57    "                     4F03  42BF
+                      MPR-23107.IC58    "                     8EA6  ADB6
+                      MPR-23108.IC59    "                     8645  FC30
+                      MPR-23109.IC60    "                     3847  CA6B
+                      MPR-23110.IC61    "                     4140  01C4
+                      MPR-23111.IC62    "                     EBE6  8085
+                      MPR-23112.IC63    "                     B68B  7467
+                      MPR-23113.IC64    "                     4715  4787
+                      MPR-23114.IC65    "                     3CD6  144A
+                      MPR-23115.IC66    "                     E5D3  BA35
+                      MPR-23116.IC67    "                     E668  08ED
+                      MPR-23117.IC68    "                     1FE8  C4A1
 
                       EPR-23174.IC29    27C322 EPROM          3B2E
                       EPR-23175.IC30    "                     F377

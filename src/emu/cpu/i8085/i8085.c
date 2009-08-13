@@ -652,10 +652,10 @@ static void execute_one(i8085_state *cpustate, int opcode)
 				if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->XX.b.h+=6;
 				if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->XX.b.h+=0x60;
 			}
-			
+
 			cpustate->AF.b.l=(cpustate->AF.b.l&3) | (cpustate->AF.b.h&0x28) | (cpustate->AF.b.h>0x99) | ((cpustate->AF.b.h^cpustate->XX.b.h)&0x10) | ZSP[cpustate->XX.b.h];
 			cpustate->AF.b.h=cpustate->XX.b.h;
-			
+
 			if (IS_8080(cpustate))
 			{
 				cpustate->AF.b.l &= 0xd5; // Ignore not used flags

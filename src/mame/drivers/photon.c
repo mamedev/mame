@@ -244,9 +244,9 @@ ROM_END
     Dump was made using custom adaptor, hence it is marked as bad dump.
     The real machine has following roms:
 
-	0000...07FFh - ROM1 (D41) 
-	0800...0FFFh - ROM2 (D42) 
-	1000...17FFh - ROM3 (D43) 
+    0000...07FFh - ROM1 (D41)
+    0800...0FFFh - ROM2 (D42)
+    1000...17FFh - ROM3 (D43)
 */
 ROM_START( phpython )
 	ROM_REGION( 0x20000, "maincpu", 0 )
