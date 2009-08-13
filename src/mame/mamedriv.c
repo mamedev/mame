@@ -639,9 +639,9 @@ const game_driver * const drivers[] =
 	DRIVER( gallag )	/* bootleg */
 	DRIVER( gatsbee )	/* (c) 1984 Uchida / hack */
 	DRIVER( digdug )	/* (c) 1982 */
-	DRIVER( digdugb )	/* (c) 1982 */
+	DRIVER( digdug1 )	/* (c) 1982 */
 	DRIVER( digdugat )	/* 136007   (c) 1982 Atari */
-	DRIVER( digduga1 )	/* 136007   (c) 1982 Atari */
+	DRIVER( digdugat1 )	/* 136007   (c) 1982 Atari */
 	DRIVER( dzigzag )	/* bootleg */
 	DRIVER( digsid )	/* bootleg */
 	DRIVER( xevious )	/* (c) 1982 */
