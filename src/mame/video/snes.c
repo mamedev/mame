@@ -276,10 +276,9 @@ INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tilea
 			{
 				if(direct_colors)
 				{
-					/* format is  | BBb00 | GGGg0 | RRRr0, most significant data gets repeated on the least significant bytes */
+					/* format is  0 | BBb00 | GGGg0 | RRRr0, HW confirms that the data is zero padded. */
 					c = ((colour & 0x07) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
 					c |= ((pal & 0x01) << 1) | ((pal & 0x02) << 5) | ((pal & 0x4) << 10);
-					c |= (colour & 0x01) | (colour & 0x20) | ((colour & 0x80) << 4);
 				}
 				else
 					c = snes_cgram[pal + colour];
@@ -705,9 +704,8 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 			/* Direct select, but only outside EXTBG! */
 			if (snes_ppu.direct_color && layer == 0)
 			{
-				/* 0 | BBbbb | GGGgg | RRRrr */
+				/* 0 | BB000 | GGG00 | RRR00, HW confirms that the data is zero padded. */
 				clr = ((colour & 0x07) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
-				clr|= (colour & 0x03) | ((colour & 0x30) << 1) | ((colour & 0xc0) << 5) | ((colour & 0x80) << 3);
 			}
 			else
 				clr = snes_cgram[colour];
