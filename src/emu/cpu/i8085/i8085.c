@@ -125,7 +125,6 @@
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"
-#include "i8085daa.h"
 
 #define VERBOSE 0
 
@@ -644,11 +643,19 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_MVI(cpustate->HL.b.h);
 			break;
 		case 0x27: cpustate->icount -= 4;	/* DAA  */
-			cpustate->XX.d = cpustate->AF.b.h;
-			if (cpustate->AF.b.l & CF) cpustate->XX.d |= 0x100;
-			if (cpustate->AF.b.l & HF) cpustate->XX.d |= 0x200;
-			if (cpustate->AF.b.l & NF) cpustate->XX.d |= 0x400;
-			cpustate->AF.w.l = DAA[cpustate->XX.d];
+			cpustate->XX.b.h = cpustate->AF.b.h;
+			if (cpustate->AF.b.l&NF) {
+				if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->XX.b.h-=6;
+				if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->XX.b.h-=0x60;
+			}
+			else {
+				if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->XX.b.h+=6;
+				if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->XX.b.h+=0x60;
+			}
+			
+			cpustate->AF.b.l=(cpustate->AF.b.l&3) | (cpustate->AF.b.h&0x28) | (cpustate->AF.b.h>0x99) | ((cpustate->AF.b.h^cpustate->XX.b.h)&0x10) | ZSP[cpustate->XX.b.h];
+			cpustate->AF.b.h=cpustate->XX.b.h;
+			
 			if (IS_8080(cpustate))
 			{
 				cpustate->AF.b.l &= 0xd5; // Ignore not used flags
@@ -1024,7 +1031,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_ADD(cpustate->HL.b.l);
 			break;
 		case 0x86: cpustate->icount -= 7;	/* ADD  M */
-			M_ADD(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_ADD(cpustate->XX.b.l);
 			break;
 		case 0x87: cpustate->icount -= 4;	/* ADD  A */
 			M_ADD(cpustate->AF.b.h);
@@ -1049,7 +1057,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_ADC(cpustate->HL.b.l);
 			break;
 		case 0x8e: cpustate->icount -= 7;	/* ADC  M */
-			M_ADC(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_ADC(cpustate->XX.b.l);
 			break;
 		case 0x8f: cpustate->icount -= 4;	/* ADC  A */
 			M_ADC(cpustate->AF.b.h);
@@ -1074,7 +1083,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_SUB(cpustate->HL.b.l);
 			break;
 		case 0x96: cpustate->icount -= 7;	/* SUB  M */
-			M_SUB(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_SUB(cpustate->XX.b.l);
 			break;
 		case 0x97: cpustate->icount -= 4;	/* SUB  A */
 			M_SUB(cpustate->AF.b.h);
@@ -1099,7 +1109,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_SBB(cpustate->HL.b.l);
 			break;
 		case 0x9e: cpustate->icount -= 7;	/* SBB  M */
-			M_SBB(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_SBB(cpustate->XX.b.l);
 			break;
 		case 0x9f: cpustate->icount -= 4;	/* SBB  A */
 			M_SBB(cpustate->AF.b.h);
@@ -1124,7 +1135,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_ANA(cpustate->HL.b.l);
 			break;
 		case 0xa6: cpustate->icount -= 7;	/* ANA  M */
-			M_ANA(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_ANA(cpustate->XX.b.l);
 			break;
 		case 0xa7: cpustate->icount -= 4;	/* ANA  A */
 			M_ANA(cpustate->AF.b.h);
@@ -1149,7 +1161,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_XRA(cpustate->HL.b.l);
 			break;
 		case 0xae: cpustate->icount -= 7;	/* XRA  M */
-			M_XRA(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_XRA(cpustate->XX.b.l);
 			break;
 		case 0xaf: cpustate->icount -= 4;	/* XRA  A */
 			M_XRA(cpustate->AF.b.h);
@@ -1174,7 +1187,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_ORA(cpustate->HL.b.l);
 			break;
 		case 0xb6: cpustate->icount -= 7;	/* ORA  M */
-			M_ORA(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_ORA(cpustate->XX.b.l);
 			break;
 		case 0xb7: cpustate->icount -= 4;	/* ORA  A */
 			M_ORA(cpustate->AF.b.h);
@@ -1199,7 +1213,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			M_CMP(cpustate->HL.b.l);
 			break;
 		case 0xbe: cpustate->icount -= 7;	/* CMP  M */
-			M_CMP(RM(cpustate, cpustate->HL.d));
+			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
+			M_CMP(cpustate->XX.b.l);
 			break;
 		case 0xbf: cpustate->icount -= 4;	/* CMP  A */
 			M_CMP(cpustate->AF.b.h);

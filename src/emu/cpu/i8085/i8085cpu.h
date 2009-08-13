@@ -39,7 +39,7 @@
 #define M_DCR(R) {UINT8 hc = ((R & 0x0f) == 0x00) ? HF : 0; --R; cpustate->AF.b.l= (cpustate->AF.b.l & CF ) | ZSP[R] | hc | NF; }
 #define M_MVI(R) R=ARG(cpustate)
 
-#define M_ANA(R) { int i = (((cpustate->AF.b.h | R)>>3) & 1)*HF; cpustate->AF.b.h&=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]; if( cpustate->cputype ) { cpustate->AF.b.l |= HF; } else {cpustate->AF.b.l |= i; } }
+#define M_ANA(R) {UINT8 hc = ((cpustate->AF.b.h | R)<<1) & HF; cpustate->AF.b.h&=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]; if( cpustate->cputype ) { cpustate->AF.b.l |= HF; } else {cpustate->AF.b.l |= hc; } }
 #define M_ORA(R) cpustate->AF.b.h|=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]
 #define M_XRA(R) cpustate->AF.b.h^=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]
 
@@ -66,7 +66,7 @@
 }
 
 #define M_ADD(R) {							\
-int q = cpustate->AF.b.h+R; 							\
+	int q = cpustate->AF.b.h+R; 							\
 	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)| 				\
 		((cpustate->AF.b.h^q^R)&HF)|					\
 		(((R^cpustate->AF.b.h^SF)&(R^q)&SF)>>5);			\
