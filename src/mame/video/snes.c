@@ -278,7 +278,7 @@ INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tilea
 				{
 					/* format is  0 | BBb00 | GGGg0 | RRRr0, HW confirms that the data is zero padded. */
 					c = ((colour & 0x07) << 2) | ((colour & 0x38) << 4) | ((colour & 0xc0) << 7);
-					c |= ((pal & 0x01) << 1) | ((pal & 0x02) << 5) | ((pal & 0x4) << 10);
+					c |= ((pal & 0x04) >> 1) | ((pal & 0x08) << 3) | ((pal & 0x10) << 8);
 				}
 				else
 					c = snes_cgram[pal + colour];
@@ -498,13 +498,13 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 			tmap -= ii;
 			wrap_around_x = 0;	/* Make sure we don't do this again */
 		}
-		//if (tmap > 0x10000) //<- causes corrupt tiles in places, needed?
+		//if (tmap > 0x10000)
 		//	tmap %= 0x10000;
 
 		vflip = snes_vram[tmap + ii + 1] & 0x80;
 		hflip = snes_vram[tmap + ii + 1] & 0x40;
 		priority = ((snes_vram[tmap + ii + 1] & 0x20) >> 5) ? priority_b : priority_a;
-		pal = (color_depth == SNES_COLOR_DEPTH_8BPP) ? 0 : (snes_vram[tmap + ii + 1] & 0x1c) << color_shift;		/* 8 palettes of (4 * color_shift) colours */
+		pal = (color_depth == SNES_COLOR_DEPTH_8BPP && direct_colors == 0) ? 0 : (snes_vram[tmap + ii + 1] & 0x1c) << color_shift;		/* 8 palettes of (4 * color_shift) colours */
 		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
 		tile |= snes_vram[tmap + ii] & 0xff;
 
