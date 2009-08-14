@@ -60,10 +60,19 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
 		}
 	}
 	else
-		discrete_log("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
+		discrete_log(info, "discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
 
     return data;
 }
+
+#if 0
+static STREAM_BACKGROUND_CALLBACK( disc_cb )
+{
+	node_description *node = (node_description *) ptr;
+
+	node->output[0] = param * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
+}
+#endif
 
 WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
@@ -90,8 +99,10 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 				new_data = data ? 0 : 1;
 				break;
 		}
+
 		if (last_data != new_data)
 		{
+#if 1
 			/* Bring the system up to now */
 			stream_update(info->discrete_stream);
 
@@ -99,11 +110,17 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 			/* Update the node output here so we don't have to do it each step */
 			node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
+#else
+			*node_data = new_data;
+			/* Bring the system up to now */
+			stream_update_background(info->discrete_stream, disc_cb, (void *) node, *node_data);
+
+#endif
 		}
 	}
 	else
 	{
-		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
+		discrete_log(info, "discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
 	}
 }
 
@@ -155,12 +172,12 @@ static DISCRETE_RESET(dss_adjustment)
 
 	if (node->custom)
 	{
-		context->port = input_port_by_tag(device->machine->portconfig, (const char *)node->custom);
+		context->port = input_port_by_tag(disc_info->device->machine->portconfig, (const char *)node->custom);
 		if (context->port == NULL)
 			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
 	}
 	else
-		context->port = input_port_by_index(device->machine->portconfig, DSS_ADJUSTMENT__PORT);
+		context->port = input_port_by_index(disc_info->device->machine->portconfig, DSS_ADJUSTMENT__PORT);
 
 	context->lastpval = 0x7fffffff;
 	context->pmin     = DSS_ADJUSTMENT__PMIN;
@@ -270,6 +287,6 @@ static DISCRETE_RESET(dss_input_stream)
 {
 	int istream = DSS_INPUT_STREAM__STREAM;
 	/* we will use the node's context pointer to point to the input stream data */
-	assert(istream < discrete_current_context->discrete_input_streams);
-	node->context = &discrete_current_context->input_stream_data[istream];
+	assert(istream < disc_info->discrete_input_streams);
+	node->context = (discrete_info *) &disc_info->input_stream_data[istream];
 }

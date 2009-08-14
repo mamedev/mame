@@ -3261,13 +3261,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(discrete_current_context->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)				(1.0 - exp(disc_info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(discrete_current_context->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)			(exp(disc_info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3281,19 +3281,19 @@
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
 
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const discrete_info *disc_info, node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const discrete_info *disc_info, node_description *node)
+
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (disc_info, node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (disc_info, node)
+
+#if 0
 #define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const device_config *device, node_description *node)
 #define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const device_config *device, node_description *node)
 
 #define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (device, node)
 #define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (device, node)
-
-/*************************************
- *
- *  Profiling Nodes
- *
- *************************************/
-
-#define DISCRETE_PROFILING			(0)
+#endif
 
 /*************************************
  *
@@ -3532,6 +3532,7 @@ typedef struct _discrete_sound_block discrete_sound_block;
  *************************************/
 
 typedef struct _node_description node_description;
+typedef struct _discrete_info discrete_info;
 
 typedef struct _discrete_module discrete_module;
 struct _discrete_module
@@ -3540,8 +3541,8 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
 };
 
 
@@ -3565,9 +3566,7 @@ struct _node_description
 	void *			context;							/* Contextual information specific to this node type */
 	const char *	name;								/* Text name string for identification/debug */
 	const void *	custom;								/* Custom function specific initialisation data */
-#if (DISCRETE_PROFILING)
 	osd_ticks_t		run_time;
-#endif
 };
 
 
@@ -3581,7 +3580,6 @@ struct _node_description
  *
  *************************************/
 
-typedef struct _discrete_info discrete_info;
 struct _discrete_info
 {
 	const device_config *device;
@@ -3621,6 +3619,9 @@ struct _discrete_info
 	int num_wavelogs;
 	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
+	
+	/* profiling */
+	int total_samples;
 };
 
 
@@ -3882,8 +3883,8 @@ struct _discrete_adsr
 typedef struct _discrete_custom_info discrete_custom_info;
 struct _discrete_custom_info
 {
-	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
 	size_t contextsize;
 	const void *custom;						/* Custom function specific initialisation data */
 };
@@ -4000,6 +4001,7 @@ enum {
 enum
 {
 	DSS_NULL,			/* Nothing, nill, zippo, only to be used as terminating node */
+	DSS_NOP,			/* just do nothing, placeholder for potential DISCRETE_REPLACE in parent block */
 
 	/* from disc_inp.c */
 	DSS_ADJUSTMENT,		/* Adjustment node */
@@ -4105,7 +4107,15 @@ enum
 	DSO_WAVELOG,		/* Dump nodes as wav file */
 
 	/* Output Node -- this must be the last entry in this enum! */
-	DSO_OUTPUT			/* The final output node */
+	DSO_OUTPUT,			/* The final output node */
+	
+	/* Import another blocklist */	
+	DSO_IMPORT,			/* import from another discrete block */
+	DSO_REPLACE,		/* replace next node */
+	DSO_DELETE,			/* delete nodes */
+
+	/* Marks end of this enum -- must be last entry ! */
+	DSO_LAST
 };
 
 
@@ -4267,6 +4277,9 @@ enum
 #define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
+/* NOP */
+#define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, {  }, { }, NULL, "DISCRETE_NOP" },
+
 /* logging */
 #define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
 #define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
@@ -4275,6 +4288,13 @@ enum
 #define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)            { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
 #define DISCRETE_WAVELOG1(NODE1,GAIN1)                             { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
 #define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
+
+/* import */
+#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, {  }, {  }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
+#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                        { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
+#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, {  }, {  }, NULL, "DISCRETE_REPLACE" },
+
+
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
 
@@ -4287,13 +4307,6 @@ enum
  *  Interface to the external world
  *
  *************************************/
-
-extern discrete_info *discrete_current_context;
-
-node_description *discrete_find_node(void *chip, int node);
-
-void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data);
-UINT8 discrete_sound_n_r(void *chip, offs_t offset);
 
 WRITE8_DEVICE_HANDLER( discrete_sound_w );
 READ8_DEVICE_HANDLER( discrete_sound_r );
