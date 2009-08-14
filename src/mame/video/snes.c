@@ -152,6 +152,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 		(clip == SNES_CLIP_OUT && snes_ppu.clipmasks[5][offset]) )
 	{
 		UINT16 r, g, b;
+
 		if( mode == SNES_BLEND_ADD )
 		{
 			if( snes_ppu.sub_add_mode ) /* Subscreen*/
@@ -159,7 +160,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				r = (*colour & 0x1f) + (scanlines[SUBSCREEN].buffer[offset] & 0x1f);
 				g = ((*colour & 0x3e0) >> 5) + ((scanlines[SUBSCREEN].buffer[offset] & 0x3e0) >> 5);
 				b = ((*colour & 0x7c00) >> 10) + ((scanlines[SUBSCREEN].buffer[offset] & 0x7c00) >> 10);
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset]) ) /* FIXME: We shouldn't halve for the back colour */
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].buffer[offset]) ) /* FIXME: We shouldn't halve for the back colour */
 				{
 					r >>= 1;
 					g >>= 1;
@@ -193,7 +194,7 @@ INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 cli
 				if( r > 0x1f ) r = 0;
 				if( g > 0x1f ) g = 0;
 				if( b > 0x1f ) b = 0;
-				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].zbuf[offset]) ) /* FIXME: We shouldn't halve for the back colour */
+				if( (snes_ram[CGADSUB] & 0x40) && (scanlines[SUBSCREEN].buffer[offset]) ) /* FIXME: We shouldn't halve for the back colour */
 				{
 					r >>= 1;
 					g >>= 1;
