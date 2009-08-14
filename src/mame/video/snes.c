@@ -1257,15 +1257,15 @@ static void snes_dbg_draw_maps( bitmap_t *bitmap, UINT32 tmap, UINT8 bpl, UINT16
 			switch( bpl )
 			{
 				case 1:
-					snes_draw_tile(MAINSCREEN, 2, layer, snes_ppu.layer[layer].data + (tile << 4) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal);
+					snes_draw_tile(MAINSCREEN, 2, layer, snes_ppu.layer[layer].data + (tile << 4) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal, 0);
 					break;
 				case 2:
 					pal <<= 2;
-					snes_draw_tile(MAINSCREEN, 4, layer, snes_ppu.layer[layer].data + (tile << 5) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal);
+					snes_draw_tile(MAINSCREEN, 4, layer, snes_ppu.layer[layer].data + (tile << 5) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal, 0);
 					break;
 				case 4:
-					pal <<= 6;	// 2009-08 FP: it might be 8... still to investigate
-					snes_draw_tile(MAINSCREEN, 8, layer, snes_ppu.layer[layer].data + (tile << 6) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal);
+					pal <<= 0;	// n/a
+					snes_draw_tile(MAINSCREEN, 8, layer, snes_ppu.layer[layer].data + (tile << 6) + ((curline % 8) * 2), (ii >> 1) * 8, 255, hflip, pal, 0);
 					break;
 			}
 		}
@@ -1295,13 +1295,13 @@ static void snes_dbg_draw_all_tiles( running_machine *machine, bitmap_t *bitmap,
 				switch( bpl )
 				{
 					case 1:
-						snes_draw_tile(MAINSCREEN, 2, 0, addr, ii * 8, 255, 0, pal);
+						snes_draw_tile(MAINSCREEN, 2, 0, addr, ii * 8, 255, 0, pal, 0);
 						break;
 					case 2:
-						snes_draw_tile(MAINSCREEN, 4, 0, addr, ii * 8, 255, 0, pal);
+						snes_draw_tile(MAINSCREEN, 4, 0, addr, ii * 8, 255, 0, pal, 0);
 						break;
 					case 4:
-						snes_draw_tile(MAINSCREEN, 8, 0, addr, ii * 8, 255, 0, pal);
+						snes_draw_tile(MAINSCREEN, 8, 0, addr, ii * 8, 255, 0, pal, 0);
 						break;
 				}
 				addr += (bpl * 16);
