@@ -1853,11 +1853,14 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( mooncrst )
-	MDRV_IMPORT_FROM(galaxian)
+
+	MDRV_IMPORT_FROM(galaxian_base)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
+	
+	MDRV_IMPORT_FROM(mooncrst_audio)
 MACHINE_DRIVER_END
 
 

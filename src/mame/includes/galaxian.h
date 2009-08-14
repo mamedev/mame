@@ -4,19 +4,7 @@
 
 ***************************************************************************/
 
-#define GALAXIAN_USE_DISCRETE	(1)
-
-#define HARDWARE_GALAXIAN		1
-#define HARDWARE_MCRESTA		2
-
-#define HARDWARE				HARDWARE_GALAXIAN
-
-#if GALAXIAN_USE_DISCRETE
 #include "sound/discrete.h"
-#else
-#include "sound/samples.h"
-#endif
-
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE			3
 
@@ -38,6 +26,7 @@
 #define GALAXIAN_VBEND			(16)
 #define GALAXIAN_VBSTART		(224+16)
 
+#define GAL_AUDIO	"discrete"
 
 /*----------- defined in video/galaxian.c -----------*/
 
@@ -136,12 +125,7 @@ void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-#if GALAXIAN_USE_DISCRETE
-#define GAL_AUDIO	"discrete"
-#else
-#define GAL_AUDIO	"samples"
-#endif
-
+MACHINE_DRIVER_EXTERN( mooncrst_audio );
 MACHINE_DRIVER_EXTERN( galaxian_audio );
 
 WRITE8_DEVICE_HANDLER( galaxian_sound_w );
