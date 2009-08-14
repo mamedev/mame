@@ -434,6 +434,9 @@ INLINE void snes_update_line( UINT8 screen, UINT8 color_depth, UINT8 hires, UINT
 	if (snes_ppu.layer[layer].mosaic_enabled)
 		curline -= (curline % (snes_ppu.mosaic_size + 1));
 
+	if((snes_ppu.interlace == 2) && !hires)
+		curline/=2;
+
 	/* Find the size of the tiles (8x8 or 16x16) */
 	tile_size = snes_ppu.layer[layer].tile_size;
 	/* Find scroll info */
