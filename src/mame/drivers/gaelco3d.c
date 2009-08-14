@@ -150,6 +150,7 @@ REF. 970429
 #include "machine/eeprom.h"
 #include "sound/dmadac.h"
 
+#define	LOG				0
 
 #define SOUND_CHANNELS	4
 
@@ -271,7 +272,8 @@ static READ16_HANDLER( eeprom_data_r )
 	UINT16 result = 0xffff;
 	if (eeprom_read_bit())
 		result ^= 0x0004;
-	logerror("eeprom_data_r(%02X)\n", result);
+	if (LOG)
+		logerror("eeprom_data_r(%02X)\n", result);
 	return result;
 }
 
@@ -306,7 +308,8 @@ static WRITE16_HANDLER( eeprom_cs_w )
 
 static TIMER_CALLBACK( delayed_sound_w )
 {
-	logerror("delayed_sound_w(%02X)\n", param);
+	if (LOG)
+		logerror("delayed_sound_w(%02X)\n", param);
 	sound_data = param;
 	cputag_set_input_line(machine, "adsp", ADSP2115_IRQ2, ASSERT_LINE);
 }
@@ -314,7 +317,8 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE16_HANDLER( sound_data_w )
 {
-	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	if (LOG)
+		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
@@ -322,7 +326,8 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ16_HANDLER( sound_data_r )
 {
-	logerror("sound_data_r(%02X)\n", sound_data);
+	if (LOG)
+		logerror("sound_data_r(%02X)\n", sound_data);
 	cputag_set_input_line(space->machine, "adsp", ADSP2115_IRQ2, CLEAR_LINE);
 	return sound_data;
 }
@@ -330,7 +335,8 @@ static READ16_HANDLER( sound_data_r )
 
 static READ16_HANDLER( sound_status_r )
 {
-	logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(space->cpu), offset, sound_status);
+	if (LOG)
+		logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(space->cpu), offset, sound_status);
 	if (ACCESSING_BITS_0_7)
 		return sound_status;
 	return 0xffff;
@@ -339,7 +345,8 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE16_HANDLER( sound_status_w )
 {
-	logerror("sound_status_w(%02X)\n", sound_data);
+	if (LOG)
+		logerror("sound_status_w(%02X)\n", sound_data);
 	sound_status = data;
 }
 
@@ -372,7 +379,10 @@ static WRITE16_HANDLER( analog_port_clock_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	{
+		if (LOG)
+			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	}
 }
 
 
@@ -390,7 +400,11 @@ static WRITE16_HANDLER( analog_port_latch_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	{
+		if (LOG)
+			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	}
+
 }
 
 
@@ -416,7 +430,8 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 
 static void iack_w(const device_config *device, UINT8 state, offs_t addr)
 {
-	logerror("iack_w(%d) - %06X\n", state, addr);
+	if (LOG)
+		logerror("iack_w(%d) - %06X\n", state, addr);
 	cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
@@ -432,7 +447,8 @@ static WRITE16_HANDLER( tms_reset_w )
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
-	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	if (LOG)
+		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 		cputag_set_input_line(space->machine, "tms", INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -441,7 +457,8 @@ static WRITE16_HANDLER( tms_irq_w )
 {
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
-	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	if (LOG)
+		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		cputag_set_input_line(space->machine, "tms", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -449,14 +466,16 @@ static WRITE16_HANDLER( tms_irq_w )
 
 static WRITE16_HANDLER( tms_control3_w )
 {
-	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	if (LOG)
+		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 }
 
 
 static WRITE16_HANDLER( tms_comm_w )
 {
 	COMBINE_DATA(&tms_comm_base[offset ^ tms_offset_xor]);
-	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
+	if (LOG)
+		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 
@@ -500,7 +519,8 @@ ADSP control 3FFF W = 0C08  (SYSCONTROL_REG)
 
 static WRITE16_HANDLER( adsp_control_w )
 {
-	logerror("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
+	if (LOG)
+		logerror("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
 
 	adsp_control_regs[offset] = data;
 	switch (offset)
@@ -535,7 +555,8 @@ static WRITE16_HANDLER( adsp_control_w )
 
 static WRITE16_HANDLER( adsp_rombank_w )
 {
-	logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
+	if (LOG)
+		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
 	memory_set_bank(space->machine, 1, (offset & 1) * 0x80 + (data & 0x7f));
 }
 
