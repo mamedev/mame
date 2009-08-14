@@ -1204,6 +1204,28 @@ ROM_START( fantsia2a )
 	ROM_LOAD( "music1.1a",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
+ROM_START( wownfant)
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "ep-4001 42750001 u81.bin",    0x000000, 0x80000, CRC(9942d200) SHA1(d2f69c0949881ef4aef202b564eac069c030a497) )
+	ROM_LOAD16_BYTE( "ep-4001 42750001 u80.bin",    0x000001, 0x80000, CRC(17359eeb) SHA1(90bb9da6bdf56fa9eb0ad03691750518a2a3f879) )
+	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 1.bin",    0x100000, 0x200000, CRC(c318e841) SHA1(ba7af736d3b0accca474b0de1c8299eb3c449ef9) )
+	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 2.bin",    0x300000, 0x200000, CRC(8871dc3a) SHA1(8e028f1430474df19bb9a912ee9e407fe4582558) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* sprites */
+	ROM_LOAD( "ep-4001 42750001 u113.bin",      0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) )
+	ROM_LOAD( "ep-4001 42750001 u112.bin",      0x80000, 0x80000, CRC(51f4b604) SHA1(52e8ce0a2c1b9b00f04e0c775789bc550bad8ae0) )
+
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "ep-4001 42750001 u4.bin",    0x00000, 0x80000, BAD_DUMP CRC(1487dbdf) SHA1(11e5aa243e8d242514cace1468144a2d5e50e193) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+//	from fantasia 2, might be the good dump of the above because the other sound rom is identical
+//	ROM_LOAD( "music2.1b",    0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
+//	ROM_RELOAD(               0x40000, 0x80000 )
+
+	ROM_LOAD( "ep-4001 42750001 u1.bin",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
 ROM_START( galhustl )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) )
@@ -1294,5 +1316,6 @@ GAME( 1996, missw96,  0,        comad,    missw96,  0, ROT0,  "Comad", "Miss Wor
 GAME( 1996, missmw96, missw96,  comad,    missw96,  0, ROT0,  "Comad", "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,  0, ROT0,  "Comad", "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,  0, ROT0,  "Comad", "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
+GAME( 2002, wownfant, 0,        fantsia2, missw96,  0, ROT0,  "Comad", "WOW New Fantasia", GAME_NO_COCKTAIL )
 GAME( 1997, galhustl, 0,        galhustl, galhustl, 0, ROT0,  "ACE International", "Gals Hustler", 0 )
 GAME( 1995, zipzap,   0,        zipzap,   zipzap,   0, ROT90, "Barko Corp", "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

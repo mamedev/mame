@@ -7728,6 +7728,7 @@ Other Sun games
 	DRIVER( missmw96 )	/* (c) 1996 Comad */
 	DRIVER( fantsia2 )	/* (c) 1997 Comad */
 	DRIVER( fantsia2a )	/* (c) 1997 Comad */
+	DRIVER( wownfant )	/* (c) 2002 Comad */
 	DRIVER( galhustl )	/* (c) 1997 ACE International */
 
 	/* Playmark games */
