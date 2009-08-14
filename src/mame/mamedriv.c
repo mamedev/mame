@@ -9507,7 +9507,7 @@ Other Sun games
 
 	/* Igrosoft */
 	/* Multifish */
-	DRIVER( mfish )
+	//DRIVER( mfish )
 	//DRIVER( mfish_2 )
 	DRIVER( mfish_3 )
 	DRIVER( mfish_3a )
@@ -9524,7 +9524,7 @@ Other Sun games
 	//DRIVER( mfish_13 )
 
 	/* Crazy Monkey */
-	DRIVER( crzmon )
+	//DRIVER( crzmon )
 	//DRIVER( crzmon_2 )
 	//DRIVER( crzmon_3 )
 	//DRIVER( crzmon_4 )
@@ -9538,7 +9538,7 @@ Other Sun games
 	DRIVER( crzmon_8b )
 
 	/* Fruit Cocktail */
-	DRIVER( fcockt )
+	//DRIVER( fcockt )
 	//DRIVER( fcockt_2 )
 	//DRIVER( fcockt_3 )
 	//DRIVER( fcockt_4 )
@@ -9550,7 +9550,7 @@ Other Sun games
 	DRIVER( fcockt_7a )
 
 	/* Lucky Haunter */
-	DRIVER( lhaunt )
+	//DRIVER( lhaunt )
 	//DRIVER( lhaunt_2 )
 	//DRIVER( lhaunt_3 )
 	DRIVER( lhaunt_4 )
@@ -9561,7 +9561,7 @@ Other Sun games
 	DRIVER( lhaunt_6a )
 
 	/* Garage */
-	DRIVER( garage )
+	//DRIVER( garage )
 	//DRIVER( garage_2 )
 	//DRIVER( garage_3 )
 	DRIVER( garage_4 )
@@ -9570,7 +9570,7 @@ Other Sun games
 	DRIVER( garage_5a )
 
 	/* Rock Climber */
-	DRIVER( rclimb )
+	//DRIVER( rclimb )
 	//DRIVER( rclimb_2 )
 	DRIVER( rclimb_3 )
 	DRIVER( rclimb_3a )
@@ -9581,12 +9581,12 @@ Other Sun games
 	DRIVER( sweetla )
 
 	/* Resident */
-	DRIVER( resdnt )
+	//DRIVER( resdnt )
 	DRIVER( resdnt_2 )
 	DRIVER( resdnt_2a )
 	
 	/* Rollfruit */
-	DRIVER( rollfr )
+	//DRIVER( rollfr )
 	DRIVER( rollfr_2 )
 	
 	/* Island */

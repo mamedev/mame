@@ -460,6 +460,7 @@ MACHINE_DRIVER_END
    Multifish
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( mfish ) // 021120
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021120.rom", 0x00000, 0x40000, MD5(6021e2bfa67abdfc0beb7f291fdc9d9c) SHA1(eb7eb5aae00a77edcf328f460970eb180d86d058) )
@@ -475,7 +476,6 @@ ROM_START( mfish ) // 021120
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
 ROM_END
 
-#if ALL_REVISIONS
 ROM_START( mfish_2 ) // 021121
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021121.rom", 0x00000, 0x40000, MD5(727dc01459f6745caa2b19fbd4432055) SHA1(87a1fb81330cf4b66e17702c22fda694ebff58eb) )
@@ -695,6 +695,7 @@ ROM_END
    Crazy Monkey
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( crzmon ) // 030217
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm030217.rom", 0x00000, 0x40000, MD5(5e2e4eec4cb20437a3e389003f8e2bb7) SHA1(75787f32aa4c8e8ff7bc11c57a37ad5a65f71c52) )
@@ -710,7 +711,6 @@ ROM_START( crzmon ) // 030217
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
 ROM_END
 
-#if ALL_REVISIONS
 ROM_START( crzmon_2 ) // 030225
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm030225.rom", 0x00000, 0x40000, MD5(8f8d0ca97b5a2ad255d36094a6b30e0e) SHA1(3627a3d6a4a50ed8544456d53ab5a489af389a19) )
@@ -882,6 +882,7 @@ ROM_END
    Fruit Cocktail
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( fcockt ) // 030505
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc030505.rom", 0x00000, 0x40000, MD5(5ee5ad269498787e5eb69194874b6544) SHA1(cc65334e8dfae5ffef1d73bd5085e3555905e259) )
@@ -897,7 +898,6 @@ ROM_START( fcockt ) // 030505
 	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
 
-#if ALL_REVISIONS
 ROM_START( fcockt_2 ) // 030512
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc030512.rom", 0x00000, 0x40000, MD5(e94917c5935641601f17a3fe56dedb17) SHA1(c23ebcf64609a56a029f05101185f3adf73cdadd) )
@@ -942,7 +942,6 @@ ROM_START( fcockt_4 ) // 031028
 	ROM_LOAD( "7",  0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) ) // the same as newer sets?
 	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
-
 
 ROM_START( fcockt_5 ) // 031111
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
@@ -1039,6 +1038,7 @@ ROM_END
    Lucky Haunter
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( lhaunt ) // 030707
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh030707.rom", 0x00000, 0x40000, MD5(f2e42fb479888c21351e3029025e6700) SHA1(c7b8e1b98cd0aa665d62c1652716993539c9f3ef) )
@@ -1054,8 +1054,6 @@ ROM_START( lhaunt ) // 030707
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
 
-
-#if ALL_REVISIONS
 ROM_START( lhaunt_2 ) // 030804
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh030804.rom", 0x00000, 0x40000, MD5(01352f3dd0e7d301f8edfb170600e2a1) SHA1(b75702a678d716cd0ccb1f2d1e58c1d3e9f7ca98) )
@@ -1070,7 +1068,6 @@ ROM_START( lhaunt_2 ) // 030804
 	ROM_LOAD( "7", 0x280000, 0x80000, CRC(64d16ba9) SHA1(3b897183d6e0f1256be7657441f234fc72077682) )
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
-
 
 ROM_START( lhaunt_3 ) // 031027
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
@@ -1182,6 +1179,7 @@ ROM_END
    Garage
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( garage ) // 040122.
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gg040122.rom", 0x00000, 0x40000, MD5(b1fca0a1293d6891171b168ade2112c0) SHA1(327e55d1f4bdc0ad0556faa2fbdaa05b9a5f1c16) )
@@ -1197,7 +1195,6 @@ ROM_START( garage ) // 040122.
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
 ROM_END
 
-#if ALL_REVISIONS
 ROM_START( garage_2 ) // 040123.
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gg040123.rom", 0x00000, 0x40000, MD5(7b66e7c7b9ddf74bd344a626c64fce5e) SHA1(3051c99d22cfe46b532fcc59a0b98eec186f4a76) )
@@ -1293,6 +1290,7 @@ ROM_END
    Rock Clibmer
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( rclimb ) // 040815
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rc040815.rom", 0x00000, 0x40000, MD5(82c3ee54f8112c0d0f8007c7e87bb8a2) SHA1(593e64bfe57ba271c04bdd2a35c9484c4efaaa00))
@@ -1308,7 +1306,6 @@ ROM_START( rclimb ) // 040815
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
 ROM_END
 
-#if ALL_REVISIONS
 ROM_START( rclimb_2 ) // 040823
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rc040823.rom", 0x00000, 0x40000, MD5(f3f5edf6f838f07f4848fbcf9e566a38) SHA1(31cf4d7f50102d35556817273893182e30c9a70c) )
@@ -1408,6 +1405,7 @@ ROM_END
    Resident
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( resdnt ) // 040415
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rs040415.rom", 0x00000, 0x40000, MD5(a46e993839a7ce5c4a3d90ba0e961e69) SHA1(b9f07bc2765d4f366e548007e51b9f605c884ba1) )
@@ -1422,6 +1420,7 @@ ROM_START( resdnt ) // 040415
 	ROM_LOAD( "7", 0x280000, 0x80000, CRC(6e94728a) SHA1(ab414879cb957d9bc8d653b5e3bb2bbf91139ec0) )
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(a9f55043) SHA1(4771df3d45bdc0a21b1c479f45e09ac5bab6c94f) )
 ROM_END
+#endif
 
 ROM_START( resdnt_2 ) // 040513
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
@@ -1457,6 +1456,7 @@ ROM_END
    Roll Fruit
 **********************************************************/
 
+#if ALL_REVISIONS
 ROM_START( rollfr ) // 030821
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rf030821.rom", 0x00000, 0x40000, MD5(ef4e9d1845676fe655d2f415ca7bd953) SHA1(5e9c2235ea4207086db23870993d8e28356c9eb8) )
@@ -1471,6 +1471,7 @@ ROM_START( rollfr ) // 030821
 	ROM_LOAD( "7", 0x280000, 0x80000, CRC(81e3480b) SHA1(c0f006cf2a4747359cb79f14976ac3411951af1c) )
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(ed3558b8) SHA1(8ec808069053f0c07d81c45090b2ba22ef8e9c32) )
 ROM_END
+#endif
 
 ROM_START( rollfr_2 ) // 040318
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
@@ -1523,12 +1524,12 @@ ROM_END
 
 
 
-GAME( 2002, mfish,       0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021120)",  0 )
-GAME( 2002, mfish_3,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 1)",  0 )
-GAME( 2002, mfish_3a,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 2)",  0 )
-GAME( 2002, mfish_12,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 1)",  0 )
-GAME( 2002, mfish_12a,   mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 2)",  0 )
+GAME( 2002, mfish_3,     0,          multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 1)",  0 )
+GAME( 2002, mfish_3a,    mfish_3,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 2)",  0 )
+GAME( 2002, mfish_12,    mfish_3,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 1)",  0 )
+GAME( 2002, mfish_12a,   mfish_3,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 2)",  0 )
 #if ALL_REVISIONS
+GAME( 2002, mfish,       0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021120)",  0 )
 GAME( 2002, mfish_2,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021121)",  0 )
 GAME( 2002, mfish_4,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021219)",  0 )
 GAME( 2002, mfish_5,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021227)",  0 )
@@ -1541,14 +1542,14 @@ GAME( 2002, mfish_11,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi 
 GAME( 2002, mfish_13,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040316)",  0 )
 #endif
 
-GAME( 2003, crzmon,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030217)",  0 )
-GAME( 2003, crzmon_7,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 1)",  0 )
-GAME( 2003, crzmon_7a,   crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 2)",  0 )
-GAME( 2003, crzmon_7b,   crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 3)",  0 )
-GAME( 2003, crzmon_8,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 1)",  0 )
-GAME( 2003, crzmon_8a,   crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 2)",  0 )
-GAME( 2003, crzmon_8b,   crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 3)",  0 )
+GAME( 2003, crzmon_7,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 1)",  0 )
+GAME( 2003, crzmon_7a,   crzmon_7,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 2)",  0 )
+GAME( 2003, crzmon_7b,   crzmon_7,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 3)",  0 )
+GAME( 2003, crzmon_8,    crzmon_7,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 1)",  0 )
+GAME( 2003, crzmon_8a,   crzmon_7,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 2)",  0 )
+GAME( 2003, crzmon_8b,   crzmon_7,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 3)",  0 )
 #if ALL_REVISIONS
+GAME( 2003, crzmon,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030217)",  0 )
 GAME( 2003, crzmon_2,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030225)",  0 )
 GAME( 2003, crzmon_3,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030227)",  0 )
 GAME( 2003, crzmon_4,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030404)",  0 )
@@ -1556,58 +1557,62 @@ GAME( 2003, crzmon_5,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Cr
 GAME( 2003, crzmon_6,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031016)",  0 )
 #endif
 
-GAME( 2003, fcockt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030505)",  0 )
-GAME( 2003, fcockt_6,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 1)",  0 )
-GAME( 2003, fcockt_6a,   fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 2)",  0 )
-GAME( 2003, fcockt_6b,   fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 3)",  0 )
-GAME( 2003, fcockt_7,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 1)",  0 )
-GAME( 2003, fcockt_7a,   fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 2)",  0 )
+GAME( 2003, fcockt_6,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 1)",  0 )
+GAME( 2003, fcockt_6a,   fcockt_6,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 2)",  0 )
+GAME( 2003, fcockt_6b,   fcockt_6,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 3)",  0 )
+GAME( 2003, fcockt_7,    fcockt_6,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 1)",  0 )
+GAME( 2003, fcockt_7a,   fcockt_6,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 2)",  0 )
 #if ALL_REVISIONS
+GAME( 2003, fcockt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030505)",  0 )
 GAME( 2003, fcockt_2,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030512)",  0 )
 GAME( 2003, fcockt_3,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030623)",  0 )
 GAME( 2003, fcockt_4,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031028)",  0 )
 GAME( 2003, fcockt_5,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031111)",  0 )
 #endif
 
-GAME( 2003, lhaunt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030707)",  0 )
-GAME( 2003, lhaunt_4,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 1)",  0 )
-GAME( 2003, lhaunt_4a,   lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 2)",  0 )
-GAME( 2003, lhaunt_5,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, set 1)",  0 )
-GAME( 2003, lhaunt_5a,   lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, set 2)",  0 )
-GAME( 2003, lhaunt_6,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 1)",  0 )
-GAME( 2003, lhaunt_6a,   lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 2)",  0 )
+GAME( 2003, lhaunt_4,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 1)",  0 )
+GAME( 2003, lhaunt_4a,   lhaunt_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 2)",  0 )
+GAME( 2003, lhaunt_5,    lhaunt_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, set 1)",  0 )
+GAME( 2003, lhaunt_5a,   lhaunt_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, set 2)",  0 )
+GAME( 2003, lhaunt_6,    lhaunt_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 1)",  0 )
+GAME( 2003, lhaunt_6a,   lhaunt_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 2)",  0 )
 #if ALL_REVISIONS
+GAME( 2003, lhaunt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030707)",  0 )
 GAME( 2003, lhaunt_2,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030804)",  0 )
 GAME( 2003, lhaunt_3,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031027)",  0 )
 #endif
 
-GAME( 2004, garage,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040122)",  0 )
-GAME( 2004, garage_4,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 1)",  0 )
-GAME( 2004, garage_4a,   garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 2)",  0 )
-GAME( 2004, garage_5,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 1)",  0 )
-GAME( 2004, garage_5a,   garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 2)",  0 )
+GAME( 2004, garage_4,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 1)",  0 )
+GAME( 2004, garage_4a,   garage_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 2)",  0 )
+GAME( 2004, garage_5,    garage_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 1)",  0 )
+GAME( 2004, garage_5a,   garage_4,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 2)",  0 )
 #if ALL_REVISIONS
+GAME( 2004, garage,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040122)",  0 )
 GAME( 2004, garage_2,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040123)",  0 )
 GAME( 2004, garage_3,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040216)",  0 )
 #endif
 
-GAME( 2004, rclimb,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040815)", 0 )
-GAME( 2004, rclimb_3,    rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 1)", 0 )
-GAME( 2004, rclimb_3a,   rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 2)", 0 )
-GAME( 2004, rclimb_3b,   rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 3)", 0 ) // new service menu
+GAME( 2004, rclimb_3,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 1)", 0 )
+GAME( 2004, rclimb_3a,   rclimb_3,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 2)", 0 )
+GAME( 2004, rclimb_3b,   rclimb_3,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 3)", 0 ) // new service menu
 #if ALL_REVISIONS
+GAME( 2004, rclimb,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040815)", 0 )
 GAME( 2004, rclimb_2,    rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040823)", 0 )
 #endif
 
 GAME( 2004, sweetl,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, set 1)",  0 )
 GAME( 2004, sweetla,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, set 2)",  0 )
 
+#if ALL_REVISIONS
 GAME( 2004, resdnt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040415)",  0 )
-GAME( 2004, resdnt_2,    resdnt,   multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 1)",  0 )
-GAME( 2004, resdnt_2a,   resdnt,   multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 2)",  0 )
+#endif
+GAME( 2004, resdnt_2,    0,          multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 1)",  0 )
+GAME( 2004, resdnt_2a,   resdnt_2,   multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 2)",  0 )
 
+#if ALL_REVISIONS
 GAME( 2003, rollfr,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Roll Fruit (030821)",  0 )
-GAME( 2003, rollfr_2,    rollfr,   multfish, multfish,  0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
+#endif
+GAME( 2003, rollfr_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
 
 GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 1)",  0 )
 GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 2)",  0 )
