@@ -5633,22 +5633,22 @@ GAME( 200?, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,          
 GAME( 200?, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING) // no reel gfx
 GAME( 200?, fb6v2,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", 0)
 
-GAME( 200?, fb6se,       0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0)
-GAME( 200?, fb6sev,      fb6se,    sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)
-GAME( 200?, fb6sed1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R CGA)", 0)
-GAME( 200?, fb6sev1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R Dual)", 0)
-GAME( 200?, fb6sed2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", 0)
-GAME( 200?, fb6sev2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", 0)
+GAME( 2006, fb6se,       0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, fb6sev,      fb6se,    sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)
+GAME( 2006, fb6sed1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R CGA)", 0)
+GAME( 2006, fb6sev1,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R Dual)", 0)
+GAME( 2006, fb6sed2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", 0)
+GAME( 2006, fb6sev2,     fb6se,    sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", 0)
 
 // no gfx / sound roms
 GAME( 200?, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
 // no gfx / sound roms
-GAME( 200?, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING)
-GAME( 200?, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING)
-GAME( 200?, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING)
-GAME( 200?, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING)
+GAME( 2006, bugfever,    0,        sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,       ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING)
+GAME( 2006, bugfeverv,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverv,       ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING)
+GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING)
 // no gfx / sound roms
-GAME( 200?, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil's Island", GAME_NOT_WORKING)
+GAME( 200?, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island", GAME_NOT_WORKING)
 // no gfx / sound roms
 GAME( 200?, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
 GAME( 200?, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
