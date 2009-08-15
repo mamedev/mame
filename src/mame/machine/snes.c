@@ -103,11 +103,20 @@ static TIMER_CALLBACK( snes_hirq_tick_callback )
 	snes_hirq_tick(machine);
 }
 
-static TIMER_CALLBACK( snes_scanline_tick )
+static TIMER_CALLBACK( snes_reset_oam_address )
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
+	if(!(snes_ram[INIDISP]&0x80)) //Reset OAM address, byuu says it happens at H=10
+	{
+		memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low ); /* Reset oam address */
+		memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high );
+	}
+}
+
+static TIMER_CALLBACK( snes_scanline_tick )
+{
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
 
@@ -157,11 +166,8 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )
 	{
-		if(!(snes_ram[INIDISP]&0x80))
-		{
-			memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low ); /* Reset oam address */
-			memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high );
-		}
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, 10), NULL, 0, snes_reset_oam_address);
+
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
 
@@ -664,8 +670,8 @@ WRITE8_HANDLER( snes_w_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-//          printf("816: %02x to APU @ %d\n", data, offset&3);
-	     	spc_port_in[offset & 0x3] = data;
+//		printf("816: %02x to APU @ %d\n", data, offset&3);
+		spc_port_in[offset & 0x3] = data;
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}
@@ -674,6 +680,11 @@ WRITE8_HANDLER( snes_w_io )
 	switch( offset )
 	{
 		case INIDISP:	/* Initial settings for screen */
+			if((snes_ram[INIDISP] & 0x80) && (!(data & 0x80))) //a 1->0 force blank transition causes a reset OAM address
+			{
+				memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low );
+				memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high );
+			}
 			break;
 		case OBSEL:		/* Object size and data area designation */
 			snes_ppu.layer[4].data = ((data & 0x3) * 0x2000) << 1;
