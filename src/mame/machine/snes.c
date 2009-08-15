@@ -115,6 +115,11 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 	}
 }
 
+static TIMER_CALLBACK( snes_reset_hdma )
+{
+	snes_hdma_init();
+}
+
 static TIMER_CALLBACK( snes_scanline_tick )
 {
 	/* Increase current line - we want to latch on this line during it, not after it */
@@ -161,7 +166,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
 			}
 		}
-    	}
+   	}
 
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )
@@ -1230,6 +1235,8 @@ WRITE8_HANDLER( snes_w_io )
 			data = 0;	/* Once DMA is done we need to reset all bits to 0 */
 			break;
 		case HDMAEN:	/* HDMA channel designation */
+			if(data) //if a HDMA is enabled, data is inited at the next scanline
+				timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.current_vert+1, 0), NULL, 0, snes_reset_hdma);
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
@@ -2173,6 +2180,8 @@ void snes_gdma( const address_space *space, UINT8 channels )
 			length = (snes_ram[SNES_DMA_BASE + dma + 6] << 8) + snes_ram[SNES_DMA_BASE + dma + 5];
 			if( !length )
 				length = 0x10000;	/* 0x0000 really means 0x10000 */
+
+//			printf( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
 
 #ifdef SNES_DBG_GDMA
 			mame_printf_debug( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
