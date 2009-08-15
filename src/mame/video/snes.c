@@ -139,8 +139,13 @@ enum
  * Routine for additive/subtractive blending
  * between the main and sub screens.
  *****************************************/
-INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 clip )
+INLINE void snes_draw_blend(UINT16 offset, UINT16 *colour, UINT8 mode, UINT8 clip, UINT8 black_pen_clip )
 {
+	if( (black_pen_clip == SNES_CLIP_ALL2) ||
+		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[5][offset]) ||
+		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[5][offset]))
+		*colour = 0; //clip to black before color math
+
 	if (clip == SNES_CLIP_ALL2) // blending mode 3 == always OFF
 		return;
 
@@ -285,7 +290,7 @@ INLINE void snes_draw_tile(UINT8 screen, UINT8 planes, UINT8 layer, UINT16 tilea
 					c = snes_cgram[pal + colour];
 
 				if (screen == MAINSCREEN)	/* Only blend main screens */
-					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
+					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4, (snes_ram[CGWSEL] & 0xc0) >> 6);
 				if (snes_ppu.layer[layer].mosaic_enabled) // handle horizontal mosaic
 				{
 					int x_mos;
@@ -385,7 +390,7 @@ INLINE void snes_draw_tile_object(UINT8 screen, UINT16 tileaddr, INT16 x, UINT8 
 			{
 				c = snes_cgram[pal + colour];
 				if (blend && screen == MAINSCREEN)	/* Only blend main screens */
-					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4);
+					snes_draw_blend(ii/snes_htmult, &c, snes_ppu.layer[4].blend, (snes_ram[CGWSEL] & 0x30) >> 4, (snes_ram[CGWSEL] & 0xc0) >> 6);
 
 				scanlines[screen].buffer[ii] = c;
 				scanlines[screen].zbuf[ii] = priority;
@@ -715,7 +720,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 				clr = snes_cgram[colour];
 			/* Only blend main screens */
 			if (screen == MAINSCREEN)
-				snes_draw_blend(xpos, &clr, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4);		/* FIXME: Need to support clip mode */
+				snes_draw_blend(xpos, &clr, snes_ppu.layer[layer].blend, (snes_ram[CGWSEL] & 0x30) >> 4, (snes_ram[CGWSEL] & 0xc0) >> 6); /* FIXME: Need to support clip mode */
 
 			scanlines[screen].buffer[xpos] = clr;
 			scanlines[screen].zbuf[xpos] = priority;
@@ -1186,7 +1191,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		{
 			for(ii = 0; ii < SNES_SCR_WIDTH * snes_htmult; ii++)
 			{
-				snes_draw_blend(ii/snes_htmult, &scanlines[MAINSCREEN].buffer[ii], (snes_ram[CGADSUB] & 0x80) ? SNES_BLEND_SUB : SNES_BLEND_ADD, (snes_ram[CGWSEL] & 0x30) >> 4);
+				snes_draw_blend(ii/snes_htmult, &scanlines[MAINSCREEN].buffer[ii], (snes_ram[CGADSUB] & 0x80) ? SNES_BLEND_SUB : SNES_BLEND_ADD, (snes_ram[CGWSEL] & 0x30) >> 4, (snes_ram[CGWSEL] & 0xc0) >> 6);
 			}
 		}
 
