@@ -35,7 +35,6 @@ struct dss_counter_context
 	int		is_7492;
 	int		last;		/* Last clock state */
 	int		count;		/* current count */
-	double	t_clock;	/* fixed counter clock in seconds */
 	double	t_left;		/* time unused during last sample in seconds */
 };
 
@@ -185,6 +184,7 @@ static DISCRETE_STEP(dss_counter)
 {
 	struct	dss_counter_context *context = (struct	dss_counter_context *)node->context;
 	double	cycles;
+	double	ds_clock;
 	int		clock = 0, last_count, inc = 0;
 	int		max;
 	double	x_time = 0;
@@ -194,18 +194,19 @@ static DISCRETE_STEP(dss_counter)
 	else
 		max = DSS_COUNTER__MAX;
 
+	ds_clock = DSS_COUNTER__CLOCK;
 	if (context->clock_type == DISC_CLK_IS_FREQ)
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + disc_info->sample_time) / context->t_clock;
+		cycles = (context->t_left + disc_info->sample_time) * ds_clock;
 		inc    = (int)cycles;
-		context->t_left = (cycles - inc) * context->t_clock;
+		context->t_left = (cycles - inc) / ds_clock;
 		if (inc) x_time = context->t_left / disc_info->sample_time;
 	}
 	else
 	{
-		clock  = (int)DSS_COUNTER__CLOCK;
-		x_time = DSS_COUNTER__CLOCK - clock;
+		clock  = (int)ds_clock;
+		x_time = ds_clock - clock;
 	}
 
 
@@ -242,18 +243,16 @@ static DISCRETE_STEP(dss_counter)
 				}
 				break;
 
-		case DISC_CLK_BY_COUNT:
+			case DISC_CLK_BY_COUNT:
 				/* Clock number of times specified. */
 				inc = clock;
 				break;
 		}
 
-		for (clock = 0; clock < inc; clock++)
-		{
-			context->count += DSS_COUNTER__DIR ? 1 : -1; /* up/down */
-			if (context->count < 0) context->count = max;
-			if (context->count > max) context->count = 0;
-		}
+		if (DSS_COUNTER__DIR)
+			context->count = (context->count + inc) % (max + 1);
+		else
+			context->count = max - ((context->count + inc) % (max + 1));
 
 		node->output[0] = context->is_7492 ? disc_7492_count[context->count] : context->count;
 
@@ -297,7 +296,6 @@ static DISCRETE_RESET(dss_counter)
 	context->out_type    = context->clock_type & DISC_OUT_MASK;
 	context->clock_type &= DISC_CLK_MASK;
 
-	context->t_clock = 1.0 / DSS_COUNTER__CLOCK;
 	context->t_left  = 0;
 	context->last    = 0;
 	context->count   = DSS_COUNTER__INIT; /* count starts at reset value */

@@ -461,8 +461,7 @@
  *                           DISC_CLK_ON_R_EDGE - toggle on rising edge.
  *                           DISC_CLK_BY_COUNT  - toggle specified number of times.
  *                           DISC_CLK_IS_FREQ   - internally clock at this frequency.
- *                                                Clock node must be static if
- *                                                DISC_CLK_IS_FREQ is used.
+ *
  *               x_time options: you can also | these x_time features to the basic
  *                               types above if needed, or use seperately with 7492.
  *                           DISC_OUT_IS_ENERGY - This will uses the x_time to
