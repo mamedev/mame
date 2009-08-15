@@ -1171,7 +1171,7 @@ WRITE8_HANDLER( snes_w_io )
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
 		case OLDJOY2:	/* Old NES joystick support */
 			break;
-		case WRIO:		/* Programmable I/O port - latches H/V counters on a 1->0 transition */
+		case WRIO:		/* Programmable I/O port - latches H/V counters on a 0->1 transition */
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
@@ -2006,6 +2006,7 @@ void snes_hdma(const address_space *space)
 	UINT8 mask = 1, dma = 0, i, contmode;
 	UINT16 bbus;
 	UINT32 abus;
+	UINT32 abus_bank;
 
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for( i = 0; i < 8; i++ )
@@ -2015,7 +2016,8 @@ void snes_hdma(const address_space *space)
 			/* Check if we need to read a new line from the table */
 			if( !(snes_ram[SNES_DMA_BASE + dma + 0xa] & 0x7f ) )
 			{
-				abus = (snes_ram[SNES_DMA_BASE + dma + 4] << 16) + (snes_ram[SNES_DMA_BASE + dma + 9] << 8) + snes_ram[SNES_DMA_BASE + dma + 8];
+				abus = (snes_ram[SNES_DMA_BASE + dma + 9] << 8) + snes_ram[SNES_DMA_BASE + dma + 8];
+				abus_bank = (snes_ram[SNES_DMA_BASE + dma + 4] << 16);
 
 				/* Get the number of lines */
 				snes_ram[SNES_DMA_BASE + dma + 0xa] = memory_read_byte(space, abus);
@@ -2041,9 +2043,15 @@ void snes_hdma(const address_space *space)
 
 			/* Transfer addresses */
 			if( snes_ram[SNES_DMA_BASE + dma] & 0x40 )	/* Indirect */
-				abus = (snes_ram[SNES_DMA_BASE + dma + 7] << 16) + (snes_ram[SNES_DMA_BASE + dma + 6] << 8) + snes_ram[SNES_DMA_BASE + dma + 5];
+			{
+				abus = (snes_ram[SNES_DMA_BASE + dma + 6] << 8) + snes_ram[SNES_DMA_BASE + dma + 5];
+				abus_bank = (snes_ram[SNES_DMA_BASE + dma + 7] << 16);
+			}
 			else									/* Absolute */
-				abus = (snes_ram[SNES_DMA_BASE + dma + 4] << 16) + (snes_ram[SNES_DMA_BASE + dma + 9] << 8) + snes_ram[SNES_DMA_BASE + dma + 8];
+			{
+				abus = (snes_ram[SNES_DMA_BASE + dma + 9] << 8) + snes_ram[SNES_DMA_BASE + dma + 8];
+				abus_bank = (snes_ram[SNES_DMA_BASE + dma + 4] << 16);
+			}
 			bbus = 0x2100 + snes_ram[SNES_DMA_BASE + dma + 1];
 
 #ifdef SNES_DBG_HDMA
@@ -2054,40 +2062,40 @@ void snes_hdma(const address_space *space)
 			{
 				case 0:		/* 1 address */
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				case 5:		/* 4 bytes to 2 addresses (l,h,l,h) */
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				case 1:		/* 2 addresses (l,h) */
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				case 2:		/* Write twice (l,l) */
 				case 6:
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				case 3:		/* 2 addresses/Write twice (l,l,h,h) */
 				case 7:
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				case 4:		/* 4 addresses (l,h,l,h) */
 				{
-					memory_write_byte(space, bbus, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 1, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 2, memory_read_byte(space, abus++));
-					memory_write_byte(space, bbus + 3, memory_read_byte(space, abus++));
+					memory_write_byte(space, bbus, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 1, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 2, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
+					memory_write_byte(space, bbus + 3, memory_read_byte(space, ((abus++) & 0xffff) | (abus_bank)));
 				} break;
 				default:
 #ifdef MAME_DEBUG
