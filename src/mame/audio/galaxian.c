@@ -35,7 +35,7 @@ TODO:
 #define SOUND_CLOCK 			(XTAL/6/2)			/* 1.536 MHz */
 #define RNG_RATE				(XTAL/3*2)			/* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
 
-#define DISCRETE_BITSET(_N, _N1, _B, _OV) DISCRETE_TRANSFORM4(_N, _N1, (1 << ((_B)-1)), 0, _OV, "01&2>3*")
+//#define DISCRETE_BITSET(_N, _N1, _B, _OV) DISCRETE_TRANSFORM4(_N, _N1, (1 << ((_B)-1)), 0, _OV, "01&2>3*")
 
 /* 74LS259 */
 #define GAL_INP_BG_DAC			NODE_10		/* at 9M Q4 to Q7 in schematics */
@@ -291,16 +291,18 @@ static DISCRETE_SOUND_START(galaxian)
 	/* PITCH                                        */
 	/************************************************/
 
+	/* two cascaded LS164 which are reset to pitch latch value,
+	 * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
+	 */
 	DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
     DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
 
-	/* Needs to be replaced by timer ... */
-    DISCRETE_BITSET(NODE_133, NODE_132, 1, TTL_OUT)		/* QA 74393 */
-    DISCRETE_BITSET(NODE_134, NODE_132, 3, TTL_OUT)		/* QC 74393 */
-    DISCRETE_BITSET(NODE_135, NODE_132, 4, TTL_OUT)		/* QD 74393 */
+	DISCRETE_BIT_DECODE(NODE_133, NODE_132, 0, TTL_OUT)		/* QA 74393 */
+	DISCRETE_BIT_DECODE(NODE_134, NODE_132, 2, TTL_OUT)		/* QC 74393 */
+	DISCRETE_BIT_DECODE(NODE_135, NODE_132, 3, TTL_OUT)		/* QD 74393 */
 
 	/************************************************/
-	/* HIT                                        */
+	/* HIT                                          */
 	/************************************************/
 
     /* NOISE */

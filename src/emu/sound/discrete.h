@@ -255,6 +255,9 @@
  * DISCRETE_OP_AMP_ONESHOT(NODE,TRIG,INFO)
  * DISCRETE_OP_AMP_TRIG_VCA(NODE,TRG0,TRG1,TRG2,IN0,IN1,INFO)
  *
+ * DISCRETE_BIT_DECODE(NODE,INP,BIT_N,VOUT)
+ * DISCRETE_BITS_DECODE(NODE,INP,BIT_FROM,BIT_TO,VOUT)
+ *
  * DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)
  * DISCRETE_LOGIC_AND(NODE,ENAB,INP0,INP1)
  * DISCRETE_LOGIC_AND3(NODE,ENAB,INP0,INP1,INP2)
@@ -1242,6 +1245,41 @@
  *  to write a divide by zero error to the Mame log if enabled.
  *
  ***********************************************************************
+ *
+ * DISCRETE_BIT_DECODE - Decode a bit from value
+ * DISCRETE_BITS_DECODE - Decode a range of bits from value
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_BIT_DECODE(name of node,
+ *                         input0 node or static value,
+ *                         bit number static value,
+ *                         output voltage (logic high) static value)
+ *
+ *  Example config lines
+ *
+ *     DISCRETE_BIT_DECODE(NODE_03,7,0,5)
+ *
+ *  Node output is 5
+ *
+ *     DISCRETE_BIT_DECODE(NODE_03,7,3,5)
+ *
+ *  Node output is 0
+ * 
+ *  if the range variant is used, you may access the bits (up to 8)
+ *  by using NODE_SUB, i.e.
+ * 
+ *     DISCRETE_BITS_DECODE(NODE_03,5,0,4,5)
+ * 
+ * NODE_SUB(NODE_03, 0) = 5
+ * NODE_SUB(NODE_03, 1) = 0
+ * NODE_SUB(NODE_03, 2) = 5
+ * NODE_SUB(NODE_03, 3) = 0
+ * NODE_SUB(NODE_03, 4) = 0
+ * 
+ * EXAMPLES: galaxian, dkong, mario
+ * 
+# ***********************************************************************
  *
  * DISCRETE_LOGIC_INVERT - Logic invertor
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)
@@ -4038,6 +4076,7 @@ enum
 	DST_CLAMP,			/* Signal Clamp */
 	DST_DIVIDE,			/* Gain Block, C = A/B */
 	DST_GAIN,			/* Gain Block, D = (A*B) + C*/
+	DST_BITS_DECODE,	/* Decode bits from input value */
 	DST_LOGIC_INV,
 	DST_LOGIC_AND,
 	DST_LOGIC_NAND,
@@ -4179,6 +4218,10 @@ enum
 #define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
 #define DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)                           { NODE, DST_LOGIC_INV   , 2, { ENAB,INP0 }, { ENAB,INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
+
+#define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 3, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N, VOUT }, NULL, "DISCRETE_BIT_DECODE" },
+#define DISCRETE_BITS_DECODE(NODE, INP, BIT_FROM, BIT_TO, VOUT)         { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_FROM,BIT_TO, VOUT }, NULL, "DISCRETE_BITS_DECODE" },
+
 #define DISCRETE_LOGIC_AND(NODE,ENAB,INP0,INP1)                         { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,NODE_NC,NODE_NC }, { ENAB,INP0,INP1,1.0,1.0 }, NULL, "DISCRETE_LOGIC_AND" },
 #define DISCRETE_LOGIC_AND3(NODE,ENAB,INP0,INP1,INP2)                   { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,INP2,NODE_NC }, { ENAB,INP0,INP1,INP2,1.0 }, NULL, "DISCRETE_LOGIC_AND3" },
 #define DISCRETE_LOGIC_AND4(NODE,ENAB,INP0,INP1,INP2,INP3)              { NODE, DST_LOGIC_AND   , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 } ,NULL, "DISCRETE_LOGIC_AND4" },

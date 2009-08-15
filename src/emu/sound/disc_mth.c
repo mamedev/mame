@@ -48,6 +48,14 @@ struct dst_comp_adder_context
 	double	total[256];
 };
 
+struct dst_bits_decode_context
+{
+	int from;
+	int count;
+	int last_val;
+	int v_out;
+};
+
 struct dst_dac_r1_context
 {
 	double	i_bias;		/* current of the bias circuit */
@@ -667,6 +675,44 @@ static DISCRETE_STEP(dst_logic_inv)
 	}
 }
 
+/************************************************************************
+ *
+ * DST_BITS_DECODE - Decode Bits from input node
+ *
+ * input[0]    - input
+ * input[1]    - From bit
+ * input[2]    - To bit
+ *
+ ************************************************************************/
+#define DST_BITS_DECODE__IN		(*(node->input[0]))
+#define DST_BITS_DECODE__FROM	(*(node->input[1]))
+#define DST_BITS_DECODE__TO		(*(node->input[2]))
+#define DST_BITS_DECODE__VOUT	(*(node->input[3]))
+
+static DISCRETE_STEP(dst_bits_decode)
+{
+	struct dst_bits_decode_context *context = (struct dst_bits_decode_context *)node->context;
+	int v = DST_BITS_DECODE__IN;
+	int i;
+	
+	if (context->last_val != v)
+	{
+		context->last_val = v;
+		for (i = 0; i < context->count; i++ )
+			node->output[i] = ((v >> (i+context->from)) & 1) * context->v_out;
+	}
+}
+
+static DISCRETE_RESET(dst_bits_decode)
+{
+	struct dst_bits_decode_context *context = (struct dst_bits_decode_context *)node->context;
+
+	context->from = DST_BITS_DECODE__FROM;
+	context->count = DST_BITS_DECODE__TO - context->from + 1;
+	context->v_out = DST_BITS_DECODE__VOUT;
+	
+	DISCRETE_STEP_CALL(dst_bits_decode);
+}
 /************************************************************************
  *
  * DST_LOGIC_AND - Logic AND gate implementation
