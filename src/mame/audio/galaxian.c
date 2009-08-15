@@ -49,7 +49,7 @@ TODO:
 #define GAL_INP_VOL1			NODE_26		/* VOL1 9L Q6 */
 #define GAL_INP_VOL2			NODE_27		/* VOL2 9L Q7 */
 
-#define GAL_INP_PITCH_HIGH		NODE_28		/* at 6T in schematics */
+#define GAL_INP_PITCH			NODE_28		/* at 6T in schematics */
 
 #define TTL_OUT					(4.0)
 
@@ -268,7 +268,7 @@ static DISCRETE_SOUND_START(galaxian)
 	DISCRETE_INPUTX_DATA(GAL_INP_VOL2, GAL_R52, 0, 0)
 
 	/* Pitch */
-	DISCRETE_INPUT_DATA(GAL_INP_PITCH_HIGH)
+	DISCRETE_INPUT_DATA(GAL_INP_PITCH)
 
 	/************************************************/
 	/* Background                                   */
@@ -291,10 +291,13 @@ static DISCRETE_SOUND_START(galaxian)
 	/* PITCH                                        */
 	/************************************************/
 
+	DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+    DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+
 	/* Needs to be replaced by timer ... */
-    DISCRETE_BITSET(NODE_133, GAL_INP_PITCH_HIGH, 1, TTL_OUT)		/* QA 74393 */
-    DISCRETE_BITSET(NODE_134, GAL_INP_PITCH_HIGH, 3, TTL_OUT)		/* QC 74393 */
-    DISCRETE_BITSET(NODE_135, GAL_INP_PITCH_HIGH, 4, TTL_OUT)		/* QD 74393 */
+    DISCRETE_BITSET(NODE_133, NODE_132, 1, TTL_OUT)		/* QA 74393 */
+    DISCRETE_BITSET(NODE_134, NODE_132, 3, TTL_OUT)		/* QC 74393 */
+    DISCRETE_BITSET(NODE_135, NODE_132, 4, TTL_OUT)		/* QD 74393 */
 
 	/************************************************/
 	/* HIT                                        */
@@ -364,39 +367,10 @@ DISCRETE_SOUND_END
  *************************************/
 
 static UINT8 lfo_val;
-static emu_timer *pitch_timer;
-static UINT8 pitch_l;
-static UINT8 pitch_h;
-
-/*************************************
- *
- *  Callbacks
- *
- *************************************/
-
-static TIMER_CALLBACK( pitch_callback )
-{
-	const device_config *device = devtag_get_device(machine, GAL_AUDIO);
-
-	pitch_h++;
-	if (pitch_h > 15)
-		pitch_h = 0;
-	if (pitch_l < 255)
-	{
-		/* performance tweak: The counter is always running, but
-         * most of the time with a very (unaudible) frequency */
-		discrete_sound_w(device, GAL_INP_PITCH_HIGH, pitch_h );
-		timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
-	}
-}
 
 static SOUND_START(galaxian)
 {
 	lfo_val = 0;
-	pitch_l = 0;
-	pitch_h = 0;
-	pitch_timer = timer_alloc(machine, pitch_callback, NULL);
-	timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK/256), 0);
 }
 
 /*************************************
@@ -408,12 +382,7 @@ static SOUND_START(galaxian)
 /* IC 9J */
 WRITE8_DEVICE_HANDLER( galaxian_pitch_w )
 {
-	UINT8 old_data;
-
-	old_data = pitch_l;
-	pitch_l = data;
-	if (pitch_l < 255 && old_data == 255) 	/* turn the timer on again */
-		timer_adjust_oneshot(pitch_timer, ATTOTIME_IN_HZ(SOUND_CLOCK / (256 - pitch_l)), 0);
+	discrete_sound_w(device, GAL_INP_PITCH, data );
 }
 
 WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w )
