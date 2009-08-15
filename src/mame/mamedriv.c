@@ -9499,100 +9499,115 @@ Other Sun games
 	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* New Image Technologies */
-	DRIVER( bonanza )     /* (c) 1993 */
-	DRIVER( bonanzar2 )   /* (c) 1993 */
-	DRIVER( streetg )     /* (c) 1993 */
-	DRIVER( streetgr3 )   /* (c) 1993 */
-	DRIVER( streetg2 )    /* (c) 1993 */
-	DRIVER( streetg2r5 )  /* (c) 1993 */
+	DRIVER( bonanza )	/* (c) 1993 */
+	DRIVER( bonanzar2 )	/* (c) 1993 */
+	DRIVER( streetg )	/* (c) 1993 */
+	DRIVER( streetgr3 )	/* (c) 1993 */
+	DRIVER( streetg2 )	/* (c) 1993 */
+	DRIVER( streetg2r5 )	/* (c) 1993 */
 
 	/* Igrosoft */
 	/* Multifish */
-	//DRIVER( mfish )
-	//DRIVER( mfish_2 )
-	DRIVER( mfish_3 )
-	DRIVER( mfish_3a )
-	//DRIVER( mfish_4 )
-	//DRIVER( mfish_5 )
-	//DRIVER( mfish_6 )
-	//DRIVER( mfish_7 )
-	//DRIVER( mfish_8 )
-	//DRIVER( mfish_9 )
-	//DRIVER( mfish_10 )
-	//DRIVER( mfish_11 )
-	DRIVER( mfish_12 )
-	DRIVER( mfish_12a )
-	//DRIVER( mfish_13 )
+	//DRIVER( mfish )	/* (c) 2002 */
+	//DRIVER( mfish_2 )	/* (c) 2002 */
+	DRIVER( mfish_3 )	/* (c) 2002 */
+	DRIVER( mfish_3a )	/* (c) 2002 */
+	//DRIVER( mfish_4 )	/* (c) 2002 */
+	//DRIVER( mfish_5 )	/* (c) 2002 */
+	//DRIVER( mfish_6 )	/* (c) 2002 */
+	//DRIVER( mfish_7 )	/* (c) 2002 */
+	//DRIVER( mfish_8 )	/* (c) 2002 */
+	//DRIVER( mfish_9 )	/* (c) 2002 */
+	//DRIVER( mfish_10 )	/* (c) 2002 */
+	//DRIVER( mfish_11 )	/* (c) 2002 */
+	DRIVER( mfish_12 )	/* (c) 2002 */
+	DRIVER( mfish_12a )	/* (c) 2002 */
+	//DRIVER( mfish_13 )	/* (c) 2002 */
 
 	/* Crazy Monkey */
-	//DRIVER( crzmon )
-	//DRIVER( crzmon_2 )
-	//DRIVER( crzmon_3 )
-	//DRIVER( crzmon_4 )
-	//DRIVER( crzmon_5 )
+	//DRIVER( crzmon )	/* (c) 2003 */
+	//DRIVER( crzmon_2 )	/* (c) 2003 */
+	//DRIVER( crzmon_3 )	/* (c) 2003 */
+	//DRIVER( crzmon_4 )	/* (c) 2003 */
+	//DRIVER( crzmon_5 )	/* (c) 2003 */
 	//DRIVER( crzmon_6 )
-	DRIVER( crzmon_7 )
-	DRIVER( crzmon_7a )
-	DRIVER( crzmon_7b )
-	DRIVER( crzmon_8 )
-	DRIVER( crzmon_8a )
-	DRIVER( crzmon_8b )
+	DRIVER( crzmon_7 )	/* (c) 2003 */
+	DRIVER( crzmon_7a )	/* (c) 2003 */
+	DRIVER( crzmon_7b )	/* (c) 2003 */
+	DRIVER( crzmon_8 )	/* (c) 2003 */
+	DRIVER( crzmon_8a )	/* (c) 2003 */
+	DRIVER( crzmon_8b )	/* (c) 2003 */
 
 	/* Fruit Cocktail */
-	//DRIVER( fcockt )
-	//DRIVER( fcockt_2 )
-	//DRIVER( fcockt_3 )
-	//DRIVER( fcockt_4 )
-	//DRIVER( fcockt_5 )
-	DRIVER( fcockt_6 )
-	DRIVER( fcockt_6a )
-	DRIVER( fcockt_6b )
-	DRIVER( fcockt_7 )
-	DRIVER( fcockt_7a )
+	//DRIVER( fcockt )	/* (c) 2003 */
+	//DRIVER( fcockt_2 )	/* (c) 2003 */
+	//DRIVER( fcockt_3 )	/* (c) 2003 */
+	//DRIVER( fcockt_4 )	/* (c) 2003 */
+	//DRIVER( fcockt_5 )	/* (c) 2003 */
+	DRIVER( fcockt_6 )	/* (c) 2003 */
+	DRIVER( fcockt_6a )	/* (c) 2003 */
+	DRIVER( fcockt_6b )	/* (c) 2003 */
+	DRIVER( fcockt_7 )	/* (c) 2003 */
+	DRIVER( fcockt_7a )	/* (c) 2003 */
+	DRIVER( fcockt_8 )	/* (c) 2003 */
 
 	/* Lucky Haunter */
-	//DRIVER( lhaunt )
-	//DRIVER( lhaunt_2 )
-	//DRIVER( lhaunt_3 )
-	DRIVER( lhaunt_4 )
-	DRIVER( lhaunt_4a )
-	DRIVER( lhaunt_5 )
-	DRIVER( lhaunt_5a )
-	DRIVER( lhaunt_6 )
-	DRIVER( lhaunt_6a )
-
-	/* Garage */
-	//DRIVER( garage )
-	//DRIVER( garage_2 )
-	//DRIVER( garage_3 )
-	DRIVER( garage_4 )
-	DRIVER( garage_4a )
-	DRIVER( garage_5 )
-	DRIVER( garage_5a )
-
-	/* Rock Climber */
-	//DRIVER( rclimb )
-	//DRIVER( rclimb_2 )
-	DRIVER( rclimb_3 )
-	DRIVER( rclimb_3a )
-	DRIVER( rclimb_3b )
-
-	/* Sweet Life */
-	DRIVER( sweetl )
-	DRIVER( sweetla )
-
-	/* Resident */
-	//DRIVER( resdnt )
-	DRIVER( resdnt_2 )
-	DRIVER( resdnt_2a )
+	//DRIVER( lhaunt )	/* (c) 2003 */
+	//DRIVER( lhaunt_2 )	/* (c) 2003 */
+	//DRIVER( lhaunt_3 )	/* (c) 2003 */
+	DRIVER( lhaunt_4 )	/* (c) 2003 */
+	DRIVER( lhaunt_4a )	/* (c) 2003 */
+	DRIVER( lhaunt_5 )	/* (c) 2003 */
+	DRIVER( lhaunt_5a )	/* (c) 2003 */
+	DRIVER( lhaunt_6 )	/* (c) 2003 */
+	DRIVER( lhaunt_6a )	/* (c) 2003 */
 	
 	/* Rollfruit */
-	//DRIVER( rollfr )
-	DRIVER( rollfr_2 )
+	//DRIVER( rollfr )	/* (c) 2003 */
+	DRIVER( rollfr_2 )	/* (c) 2003 */
+
+	/* Garage */
+	//DRIVER( garage )	/* (c) 2004 */
+	//DRIVER( garage_2 )	/* (c) 2004 */
+	//DRIVER( garage_3 )	/* (c) 2004 */
+	DRIVER( garage_4 )	/* (c) 2004 */
+	DRIVER( garage_4a )	/* (c) 2004 */
+	DRIVER( garage_5 )	/* (c) 2004 */
+	DRIVER( garage_5a )	/* (c) 2004 */
+
+	/* Rock Climber */
+	//DRIVER( rclimb )	/* (c) 2004 */
+	//DRIVER( rclimb_2 )	/* (c) 2004 */
+	DRIVER( rclimb_3 )	/* (c) 2004 */
+	DRIVER( rclimb_3a )	/* (c) 2004 */
+	DRIVER( rclimb_3b )	/* (c) 2004 */
+
+	/* Sweet Life */
+	DRIVER( sweetl )	/* (c) 2004 */
+	DRIVER( sweetla )	/* (c) 2004 */
+
+	/* Resident */
+	//DRIVER( resdnt )	/* (c) 2004 */
+	DRIVER( resdnt_2 )	/* (c) 2004 */
+	DRIVER( resdnt_2a )	/* (c) 2004 */
 	
 	/* Island */
-	DRIVER( island )
-	DRIVER( islanda )
+	DRIVER( island )	/* (c) 2005 */
+	DRIVER( islanda )	/* (c) 2005 */
+
+	/* Pirate */
+	//DRIVER( pirate )	/* (c) 2005 */
+	DRIVER( pirate_1 )	/* (c) 2005 */
+
+	/* Island 2 */
+	DRIVER( island2 )	/* (c) 2006 */
+
+	/* Keks */
+	DRIVER( keks )		/* (c) 2006 */
+	DRIVER( keksa )		/* (c) 2006 */
+	DRIVER( keksb )		/* (c) 2006 */
+	DRIVER( keks_2 )	/* (c) 2006 */
+	DRIVER( keks_2a )	/* (c) 2006 */
 
 /* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
