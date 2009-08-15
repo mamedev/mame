@@ -819,6 +819,7 @@ src/emu/sound/flt_vol.c svneol=native#text/plain
 src/emu/sound/flt_vol.h svneol=native#text/plain
 src/emu/sound/fm.c svneol=native#text/plain
 src/emu/sound/fm.h svneol=native#text/plain
+src/emu/sound/fm2612.c svneol=native#text/plain
 src/emu/sound/fmopl.c svneol=native#text/plain
 src/emu/sound/fmopl.h svneol=native#text/plain
 src/emu/sound/gaelco.c svneol=native#text/plain

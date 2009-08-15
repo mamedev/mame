@@ -729,7 +729,7 @@ SOUNDOBJS += $(SOUNDOBJ)/2610intf.o $(SOUNDOBJ)/ay8910.o $(SOUNDOBJ)/fm.o $(SOUN
 endif
 
 ifneq ($(filter YM2612 YM3438,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/2612intf.o $(SOUNDOBJ)/ay8910.o $(SOUNDOBJ)/fm.o
+SOUNDOBJS += $(SOUNDOBJ)/2612intf.o $(SOUNDOBJ)/ay8910.o $(SOUNDOBJ)/fm2612.o
 endif
 
 ifneq ($(filter YM3812,$(SOUNDS)),)
