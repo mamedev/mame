@@ -293,13 +293,18 @@ static DISCRETE_SOUND_START(galaxian)
 
 	/* two cascaded LS164 which are reset to pitch latch value,
 	 * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
-	 */
-	DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
-    DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+	 *
+	 * One possibility to implement this is 
+	 * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+     * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+     * but there is a native choice:
+     */
+    DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
 
-	DISCRETE_BIT_DECODE(NODE_133, NODE_132, 0, TTL_OUT)		/* QA 74393 */
-	DISCRETE_BIT_DECODE(NODE_134, NODE_132, 2, TTL_OUT)		/* QC 74393 */
-	DISCRETE_BIT_DECODE(NODE_135, NODE_132, 3, TTL_OUT)		/* QD 74393 */
+    /* from the 74393 (counter 2 above) only QA, QC, QD are used.
+     * We decode three here and use SUB_NODE(133,x) below to access.
+     */
+    DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)		/* QA-QD 74393 */
 
 	/************************************************/
 	/* HIT                                          */
@@ -344,7 +349,7 @@ static DISCRETE_SOUND_START(galaxian)
 	/* FINAL MIX                                    */
 	/************************************************/
 
-	DISCRETE_MIXER5(NODE_279, 1, NODE_133, NODE_134, NODE_134, NODE_135, NODE_120, &galaxian_mixerpre_desc)
+	DISCRETE_MIXER5(NODE_279, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, &galaxian_mixerpre_desc)
 	DISCRETE_MIXER3(NODE_280, 1, NODE_279, NODE_157, NODE_172, &galaxian_mixer_desc)
 	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
 
@@ -359,7 +364,7 @@ static DISCRETE_SOUND_START(mooncrst)
 	/************************************************/
 	DISCRETE_DELETE(NODE_279, NODE_279)
 	DISCRETE_REPLACE
-	DISCRETE_MIXER7(NODE_280, 1, NODE_133, NODE_134, NODE_134, NODE_135, NODE_120, NODE_157, NODE_172, &mooncrst_mixer_desc)
+	DISCRETE_MIXER7(NODE_280, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, NODE_157, NODE_172, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
 /*************************************
