@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MDRV_CPU_PROGRAM_MAP(spc_mem)
 
-	MDRV_QUANTUM_TIME(HZ(36000))
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_MACHINE_START( snes )
 	MDRV_MACHINE_RESET( snes )
