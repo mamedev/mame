@@ -9536,7 +9536,6 @@ Other Sun games
 	DRIVER( crzmon_7b )	/* (c) 2003 */
 	DRIVER( crzmon_8 )	/* (c) 2003 */
 	DRIVER( crzmon_8a )	/* (c) 2003 */
-	DRIVER( crzmon_8b )	/* (c) 2003 */
 
 	/* Fruit Cocktail */
 	//DRIVER( fcockt )	/* (c) 2003 */
