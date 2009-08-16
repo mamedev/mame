@@ -858,6 +858,9 @@ static WRITE16_HANDLER(gn680_latch_w)
 	}
 }
 
+// WORD at 30000e: IRQ 4 tests bits 6 and 7, IRQ5 tests bits 4 and 5
+// (vsync and hsync status for each of the two screens?)
+
 static ADDRESS_MAP_START( gn680_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
@@ -1114,7 +1117,7 @@ static MACHINE_DRIVER_START( hornet )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
+	MDRV_SOUND_ADD("rf", RF5C400, 16934400)	// value from Guru readme, gives 44100 Hz sample rate
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
