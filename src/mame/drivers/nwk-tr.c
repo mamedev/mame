@@ -1073,7 +1073,7 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
+	MDRV_SOUND_ADD("rf", RF5C400, 16934400)	// as per Guru readme above
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
