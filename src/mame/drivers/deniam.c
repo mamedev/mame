@@ -28,6 +28,10 @@ Notes:
   and no cocktail mode)
 - if it's like System 16, the top bit of palette ram should be an additional bit
   for Green. But is it ever not 0?
+- Logic Pro 2 sound test menu is bugged. You can't change the sound sample
+  and it's caused by a wrongly setted compare/branch at pc=0x3fd0/0x3fd2 (for sfx)
+  and pc=0x3ffa/0x3ffc (for bgm). Patching the two compare opcodes with value 0xb041
+  let's you can change the value to test.
 
 ***************************************************************************/
 
