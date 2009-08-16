@@ -1383,14 +1383,14 @@ ROM_START( rclimb_3b ) // 040827 - new service menu
 	ROM_LOAD( "rc040827.rom", 0x00000, 0x40000, CRC(3ba55647) SHA1(56e96be0d9782da4b3d5d911ea67962257626ae0) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "rc1_.bin", 0x000000, 0x80000, CRC(4bc00c66) SHA1(e4d89c2b188f253b642ae341a1a4c04af33024c8) ) /* is this set a total hack??? */
+	ROM_LOAD( "rc1_.bin", 0x000000, 0x80000, CRC(4bc00c66) SHA1(e4d89c2b188f253b642ae341a1a4c04af33024c8) ) /* total hack??? these rom don't match any official hashes except rom 8 */
 	ROM_LOAD( "rc2_.bin", 0x100000, 0x80000, CRC(89237f10) SHA1(a493a03f79656332089f2794872be44e62d7e306) )
 	ROM_LOAD( "rc3_.bin", 0x200000, 0x80000, CRC(c4147d05) SHA1(8497fca6e64896cf8f03877c3455ee7bf9965b60) )
 	ROM_LOAD( "rc4_.bin", 0x300000, 0x80000, CRC(06176cb1) SHA1(0644861042ca4be2d459b31870369a2e46d80aa4) )
 	ROM_LOAD( "rc5_.bin", 0x080000, 0x80000, CRC(fb5f2036) SHA1(5f8885332a2d9249d34a0a50ac464a5637b9bc95) )
 	ROM_LOAD( "rc6_.bin", 0x180000, 0x80000, CRC(36a8148f) SHA1(57d84e44c77f2bb1e97ec8a1acd3ef71246e3274) )
 	ROM_LOAD( "rc7_.bin", 0x280000, 0x80000, CRC(26c620e3) SHA1(b14f2cfc0e5b740360e6ecca97f6bf941136141f) )
-	ROM_LOAD( "8",        0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) )
+	ROM_LOAD( "rc8_.bin", 0x380000, 0x80000, CRC(8cf6b4c2) SHA1(4c36c217b83c82acfdd615f5547bf597af7b8833) ) /* Same as rock_climber.008 */
 ROM_END
 
 /*********************************************************
