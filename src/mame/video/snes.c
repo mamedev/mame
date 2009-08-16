@@ -720,7 +720,7 @@ static void snes_update_line_mode7(UINT8 screen, UINT8 priority_a, UINT8 priorit
 				clr = snes_cgram[colour];
 			/* Only blend main screens */
 			if (screen == MAINSCREEN)
-				snes_draw_blend(xpos, &clr, snes_ppu.layer[layer].blend, snes_ppu.sub_color_mask, snes_ppu.main_color_mask);
+				snes_draw_blend(xpos, &clr, snes_ppu.layer[layer].blend, snes_ppu.sub_color_mask, snes_ppu.main_color_mask); /* FIXME: Need to support clip mode */
 
 			scanlines[screen].buffer[xpos] = clr;
 			scanlines[screen].zbuf[xpos] = priority;
@@ -1151,6 +1151,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	int x;
 	int fade;
 	struct SCANLINE *scanline;
+	UINT8 halve_x;
 
 	profiler_mark(PROFILER_VIDEO);
 
@@ -1215,12 +1216,30 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		/* Phew! Draw the line to screen */
 		fade = (snes_ram[INIDISP] & 0xf) + 1;
 
-		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult; x++)
+		/* resolution line gets halved if we are inside mode 5/6 and the end resolution is 256 */
+		if(snes_htmult == 1 && (snes_ppu.mode == 5 || snes_ppu.mode == 6))
+			halve_x = 2;
+		else
+			halve_x = 1;
+
+		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult * halve_x; x++)
 		{
 			int r = ((scanline->buffer[x] & 0x1f) * fade) >> 4;
 			int g = (((scanline->buffer[x] & 0x3e0) >> 5) * fade) >> 4;
 			int b = (((scanline->buffer[x] & 0x7c00) >> 10) * fade) >> 4;
-			*BITMAP_ADDR32(bitmap, curline, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+
+			if(snes_htmult == 2 && snes_ppu.mode != 5 && snes_ppu.mode != 6)
+			{
+				*BITMAP_ADDR32(bitmap, curline, x*2+0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				*BITMAP_ADDR32(bitmap, curline, x*2+1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+			}
+			else if(snes_htmult == 1 && (snes_ppu.mode == 5 || snes_ppu.mode == 6))
+			{
+				*BITMAP_ADDR32(bitmap, curline, x/2+0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				*BITMAP_ADDR32(bitmap, curline, x/2+1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+			}
+			else
+				*BITMAP_ADDR32(bitmap, curline, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 		}
 	}
 

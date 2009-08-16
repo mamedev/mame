@@ -290,7 +290,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 
 *************************************/
 
-static void snes_dynamic_res_change(running_machine *machine)
+static TIMER_CALLBACK( snes_dynamic_res_change )
 {
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 
@@ -785,7 +785,7 @@ WRITE8_HANDLER( snes_w_io )
 			}
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x07;
-			snes_dynamic_res_change(space->machine);
+			timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.last_visible_line, 0), NULL, 0, snes_dynamic_res_change);
 			snes_ppu.bg3_priority_bit = data & 0x08;
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;
 			snes_ppu.layer[1].tile_size = (data >> 5) & 0x1;
@@ -1155,7 +1155,7 @@ WRITE8_HANDLER( snes_w_io )
 			/* FIXME: We only support line count and interlace here */
 			snes_ppu.interlace = (data & 1) ? 2 : 1;
 			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 225;
-			snes_dynamic_res_change(space->machine);
+			timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.last_visible_line, 0), NULL, 0, snes_dynamic_res_change);
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x8) != (snes_ram[SETINI] & 0x8) )
 				mame_printf_debug( "Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off" );
