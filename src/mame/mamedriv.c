@@ -9600,6 +9600,7 @@ Other Sun games
 
 	/* Island 2 */
 	DRIVER( island2 )	/* (c) 2006 */
+	DRIVER( island2a )	/* (c) 2006 */
 
 	/* Keks */
 	DRIVER( keks )		/* (c) 2006 */
