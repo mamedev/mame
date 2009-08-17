@@ -1402,6 +1402,7 @@ src/mame/drivers/cmmb.c svneol=native#text/plain
 src/mame/drivers/cninja.c svneol=native#text/plain
 src/mame/drivers/cntsteer.c svneol=native#text/plain
 src/mame/drivers/coinmstr.c svneol=native#text/plain
+src/mame/drivers/coinmvga.c svneol=native#text/plain
 src/mame/drivers/cojag.c svneol=native#text/plain
 src/mame/drivers/combatsc.c svneol=native#text/plain
 src/mame/drivers/comebaby.c svneol=native#text/plain

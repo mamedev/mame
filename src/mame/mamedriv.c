@@ -9506,6 +9506,10 @@ Other Sun games
 	DRIVER( streetg2 )	/* (c) 1993 */
 	DRIVER( streetg2r5 )	/* (c) 1993 */
 
+	/* Coinmaster-Gaming VGA based */
+	DRIVER( colorama )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
+	DRIVER( cmrltv75 )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
+
 	/* Igrosoft */
 	/* Multifish */
 	//DRIVER( mfish )	/* (c) 2002 */
