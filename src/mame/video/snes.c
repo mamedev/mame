@@ -1151,12 +1151,11 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	int x;
 	int fade;
 	struct SCANLINE *scanline;
-	UINT8 halve_x;
 
 	profiler_mark(PROFILER_VIDEO);
 
 	if (snes_ram[INIDISP] & 0x80) /* screen is forced blank */
-		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult; x++)
+		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
 			*BITMAP_ADDR32(bitmap, curline, x) = RGB_BLACK;
 	else
 	{
@@ -1216,27 +1215,16 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		/* Phew! Draw the line to screen */
 		fade = (snes_ram[INIDISP] & 0xf) + 1;
 
-		/* resolution line gets halved if we are inside mode 5/6 and the end resolution is 256 */
-		if(snes_htmult == 1 && (snes_ppu.mode == 5 || snes_ppu.mode == 6))
-			halve_x = 2;
-		else
-			halve_x = 1;
-
-		for (x = 0; x < SNES_SCR_WIDTH * snes_htmult * halve_x; x++)
+		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
 		{
 			int r = ((scanline->buffer[x] & 0x1f) * fade) >> 4;
 			int g = (((scanline->buffer[x] & 0x3e0) >> 5) * fade) >> 4;
 			int b = (((scanline->buffer[x] & 0x7c00) >> 10) * fade) >> 4;
 
-			if(snes_htmult == 2 && snes_ppu.mode != 5 && snes_ppu.mode != 6)
+			if(snes_htmult == 1)
 			{
 				*BITMAP_ADDR32(bitmap, curline, x*2+0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 				*BITMAP_ADDR32(bitmap, curline, x*2+1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
-			}
-			else if(snes_htmult == 1 && (snes_ppu.mode == 5 || snes_ppu.mode == 6))
-			{
-				*BITMAP_ADDR32(bitmap, curline, x/2+0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
-				*BITMAP_ADDR32(bitmap, curline, x/2+1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 			else
 				*BITMAP_ADDR32(bitmap, curline, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));

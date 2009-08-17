@@ -290,29 +290,31 @@ static TIMER_CALLBACK( snes_hblank_tick )
 
 *************************************/
 
-static TIMER_CALLBACK( snes_dynamic_res_change )
+static void snes_dynamic_res_change( running_machine *machine )
 {
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_y = snes_ppu.beam.last_visible_line*snes_ppu.interlace - 1;
+	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
 
 	// fixme: should compensate for SNES_DBG_video
 	if( snes_ppu.mode == 5 || snes_ppu.mode == 6 )
-	{
-		visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
 		snes_htmult = 2;
-	}
 	else
-	{
-		visarea.max_x = SNES_SCR_WIDTH - 1;
 		snes_htmult = 1;
-	}
+
+	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
+	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
+		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
+	else
+		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 
 	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC*snes_ppu.interlace, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_NTSC*snes_ppu.interlace, &visarea, refresh);
 	else
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL*snes_ppu.interlace, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_PAL*snes_ppu.interlace, &visarea, refresh);
 }
 
 static READ8_HANDLER( snes_open_bus_r )
@@ -785,7 +787,7 @@ WRITE8_HANDLER( snes_w_io )
 			}
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x07;
-			timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.last_visible_line, 0), NULL, 0, snes_dynamic_res_change);
+			snes_dynamic_res_change(space->machine);
 			snes_ppu.bg3_priority_bit = data & 0x08;
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;
 			snes_ppu.layer[1].tile_size = (data >> 5) & 0x1;
@@ -1155,7 +1157,7 @@ WRITE8_HANDLER( snes_w_io )
 			/* FIXME: We only support line count and interlace here */
 			snes_ppu.interlace = (data & 1) ? 2 : 1;
 			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 225;
-			timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.last_visible_line, 0), NULL, 0, snes_dynamic_res_change);
+			snes_dynamic_res_change(space->machine);
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x8) != (snes_ram[SETINI] & 0x8) )
 				mame_printf_debug( "Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off" );
