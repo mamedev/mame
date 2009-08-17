@@ -376,6 +376,7 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w)
 	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w)
+	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // mirror banking for some games
 
 	AM_RANGE(0xf1, 0xf1)  AM_WRITE(multfish_rambank_w)
 	AM_RANGE(0xf3, 0xf3)  AM_WRITE(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
@@ -694,8 +695,8 @@ ROM_END
 /*********************************************************
    Crazy Monkey
 
-	Roms 1-4 were changed after the 070402 update.
-        The official list of hashes shows the 070402 updated roms.
+	Roms 1-4 were changed after the 070315 update.
+        The official list of hashes shows the 070315 updated roms.
 
 **********************************************************/
 
