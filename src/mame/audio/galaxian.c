@@ -319,10 +319,10 @@ static DISCRETE_SOUND_START(galaxian)
 	DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,1,NODE_151,NODE_150)
 
 
-	/* Not 100% correct - Factor 2 to account for being always enabled */
-	DISCRETE_RCDISC5(NODE_155, 1, GAL_INP_HIT, (GAL_R35 + GAL_R36)*2, GAL_C21)
-	DISCRETE_MULTIPLY(NODE_156, 1, NODE_152, NODE_155)
-	DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_156, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
+	/* Not 100% correct - switching causes high impedance input for node_157
+	 * this is not emulated */
+	DISCRETE_RCDISC5(NODE_155, NODE_152, GAL_INP_HIT, (GAL_R35 + GAL_R36), GAL_C21)
+	DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
 
 	/************************************************/
 	/* FIRE                                         */
@@ -340,10 +340,10 @@ static DISCRETE_SOUND_START(galaxian)
 	//DISCRETE_ADDER2(NODE_167, 1, NODE_165, NODE_166)
 	DISCRETE_MULTIPLY(NODE_168, 1, RES_2_PARALLEL(GAL_R46, GAL_R48), NODE_167)
 
-	DISCRETE_RCDISC5(NODE_170, 1, NODE_161, (GAL_R41)*2, GAL_C25)
-
 	DISCRETE_555_ASTABLE_CV(NODE_171, 1, GAL_R44, GAL_R45, GAL_C27, NODE_168, &galaxian_555_fire_vco_desc)
-	DISCRETE_MULTIPLY(NODE_172, 1, NODE_171, NODE_170)
+
+	/* 555 toggles discharge on rc discharge module */
+	DISCRETE_RCDISC5(NODE_172, NODE_171, NODE_161, (GAL_R41), GAL_C25)
 
 	/************************************************/
 	/* FINAL MIX                                    */

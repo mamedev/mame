@@ -66,6 +66,7 @@ struct dss_lfsr_context
 	UINT8			reset_on_high;
 	UINT8			invert_output;
 	UINT8			out_is_f0;
+	UINT8			out_lfsr_reg;
 };
 
 struct dss_noise_context
@@ -395,7 +396,7 @@ static DISCRETE_STEP(dss_lfsr)
 	struct dss_lfsr_context   *context   = (struct dss_lfsr_context *)node->context;
 	double cycles;
 	int clock, inc = 0;
-	int fb0, fb1, fbresult;
+	int fb0, fb1, fbresult = 0, noise_feed;
 
 	if (lfsr_desc->clock_type == DISC_CLK_IS_FREQ)
 	{
@@ -435,29 +436,33 @@ static DISCRETE_STEP(dss_lfsr)
 			break;
 	}
 
-	for (clock = 0; clock < inc; clock++)
+	if (inc > 0) 
 	{
-		/* Fetch the last feedback result */
-		fbresult = (context->lfsr_reg >> lfsr_desc->bitlength) & 0x01;
-
-		/* Stage 2 feedback combine fbresultNew with infeed bit */
-		fbresult = dss_lfsr_function(disc_info, lfsr_desc->feedback_function1, fbresult, (DSS_LFSR_NOISE__FEED ? 0x01 : 0x00), 0x01);
-
-		/* Stage 3 first we setup where the bit is going to be shifted into */
-		fbresult = fbresult * lfsr_desc->feedback_function2_mask;
-		/* Then we left shift the register, */
-		context->lfsr_reg = context->lfsr_reg << 1;
-		/* Now move the fbresult into the shift register and mask it to the bitlength */
-		context->lfsr_reg = dss_lfsr_function(disc_info, lfsr_desc->feedback_function2, fbresult, context->lfsr_reg, (1 << lfsr_desc->bitlength) - 1 );
-
-		/* Now get and store the new feedback result */
-		/* Fetch the feedback bits */
-		fb0 = (context->lfsr_reg >> lfsr_desc->feedback_bitsel0) & 0x01;
-		fb1 = (context->lfsr_reg >> lfsr_desc->feedback_bitsel1) & 0x01;
-		/* Now do the combo on them */
-		fbresult = dss_lfsr_function(disc_info, lfsr_desc->feedback_function0, fb0, fb1, 0x01);
-		context->lfsr_reg = dss_lfsr_function(disc_info, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << lfsr_desc->bitlength, (2 << lfsr_desc->bitlength) - 1);
-
+		noise_feed = (DSS_LFSR_NOISE__FEED ? 0x01 : 0x00);
+		for (clock = 0; clock < inc; clock++)
+		{
+			/* Fetch the last feedback result */
+			fbresult = (context->lfsr_reg >> lfsr_desc->bitlength) & 0x01;
+	
+			/* Stage 2 feedback combine fbresultNew with infeed bit */
+			fbresult = dss_lfsr_function(disc_info, lfsr_desc->feedback_function1, fbresult, noise_feed, 0x01);
+	
+			/* Stage 3 first we setup where the bit is going to be shifted into */
+			fbresult = fbresult * lfsr_desc->feedback_function2_mask;
+			/* Then we left shift the register, */
+			context->lfsr_reg = context->lfsr_reg << 1;
+			/* Now move the fbresult into the shift register and mask it to the bitlength */
+			context->lfsr_reg = dss_lfsr_function(disc_info, lfsr_desc->feedback_function2, fbresult, context->lfsr_reg, (1 << lfsr_desc->bitlength) - 1 );
+	
+			/* Now get and store the new feedback result */
+			/* Fetch the feedback bits */
+			fb0 = (context->lfsr_reg >> lfsr_desc->feedback_bitsel0) & 0x01;
+			fb1 = (context->lfsr_reg >> lfsr_desc->feedback_bitsel1) & 0x01;
+			/* Now do the combo on them */
+			fbresult = dss_lfsr_function(disc_info, lfsr_desc->feedback_function0, fb0, fb1, 0x01);
+			context->lfsr_reg = dss_lfsr_function(disc_info, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << lfsr_desc->bitlength, (2 << lfsr_desc->bitlength) - 1);
+	
+		}
 		/* Now select the output bit */
 		if (context->out_is_f0)
 			node->output[0] = fbresult & 0x01;
@@ -471,8 +476,12 @@ static DISCRETE_STEP(dss_lfsr)
 		node->output[0] = node->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
 		/* Bias input as required */
 		node->output[0] = node->output[0] + DSS_LFSR_NOISE__BIAS;
+		
+		/* output the lfsr reg ?*/
+		if (context->out_lfsr_reg)
+			node->output[1] = context->lfsr_reg;
+			
 	}
-
 	if(!DSS_LFSR_NOISE__ENABLE)
 	{
 		node->output[0] = 0;
@@ -488,6 +497,7 @@ static DISCRETE_RESET(dss_lfsr)
 	context->reset_on_high = (lfsr_desc->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
 	context->invert_output = lfsr_desc->flags & DISC_LFSR_FLAG_OUT_INVERT;
 	context->out_is_f0 = (lfsr_desc->flags & DISC_LFSR_FLAG_OUTPUT_F0) ? 1 : 0;
+	context->out_lfsr_reg = (lfsr_desc->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((lfsr_desc->clock_type < DISC_CLK_ON_F_EDGE) || (lfsr_desc->clock_type > DISC_CLK_IS_FREQ))
 		discrete_log(disc_info, "Invalid clock type passed in NODE_%d\n", NODE_INDEX(node->node));

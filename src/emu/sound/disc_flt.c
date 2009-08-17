@@ -72,6 +72,7 @@ struct dst_rcdisc_context
 	double t;           /* time */
 	double exponent0;
 	double exponent1;
+	double v_cap;		/* rcdisc5 */
 };
 
 struct dst_rcdisc_mod_context
@@ -825,20 +826,25 @@ static DISCRETE_STEP( dst_rcdisc5)
 
 	/* Exponential based in difference between input/output   */
 
+    u = DST_RCDISC5__IN - 0.7; /* Diode drop */
+	if( u < 0)
+		u = 0;
+
+	diff = u - context->v_cap;
+
 	if(DST_RCDISC5__ENABLE)
 	{
-	    u = DST_RCDISC5__IN - 0.7; /* Diode drop */
-		if( u < 0)
-			u = 0;
-
-		diff = u - node->output[0];
-
 		if(diff < 0)
 			diff = diff * context->exponent0;
-		node->output[0] += diff;
+
+		context->v_cap += diff;
+		node->output[0] = context->v_cap;
 	}
 	else
 	{
+		if(diff > 0)
+			context->v_cap = u;
+		
 		node->output[0] = 0;
 	}
 }
@@ -851,6 +857,7 @@ static DISCRETE_RESET( dst_rcdisc5)
 
 	context->state = 0;
 	context->t = 0;
+	context->v_cap = 0;
 	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC5__R * DST_RCDISC5__C);
 }
 

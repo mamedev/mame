@@ -526,6 +526,7 @@
  *            DISC_LFSR_FLAG_RESET_TYPE_L   - reset when LOW (Defalut)
  *            DISC_LFSR_FLAG_RESET_TYPE_H   - reset when HIGH
  *            DISC_LFSR_FLAG_OUTPUT_F0      - output is result of F0
+ *            DISC_LFSR_FLAG_OUTPUT_SR_SN1  - output shift register to sub-node output #1
  *
  *  The diagram below outlines the structure of the LFSR model.
  *
@@ -2475,6 +2476,8 @@
  *
  * DISCRETE_RCDISC3 - RC discharge network
  *
+ * FIXME: Diode direction (for bzone)
+ * 
  *                        .-----------------.
  *                        |                 |
  *    ENAB       -0------>|                 |
@@ -2590,19 +2593,19 @@
  *
  * DISCRETE_RCDISC5 - Diode in series with R//C
  *
- *                        .---------------.
- *                        |               |
- *    ENAB       -0------>|               |
- *                        |               |
- *    INPUT1     -1------>| -|>|--+---+-  |
- *                        |       |   |   |---->   Netlist node
- *    RVAL       -2------>|      ---  Z   |
- *                        |     C---  Z R |
- *    CVAL       -3------>|       |   Z   |
- *                        |       --+--   |
- *                        |         |gnd  |
- *                        '---------------'
- *
+ *                        .---------------------.
+ *                        |                     |
+ *    ENAB       -0------>| -----------.        |
+ *                        |           --        |
+ *    INPUT1     -1------>| -|>|--+--|SW|---+-  |---->   Netlist node
+ *                        |       |   --    |   |
+ *    RVAL       -2------>|      ---        Z   |
+ *                        |     C---        Z R |
+ *    CVAL       -3------>|       |         Z   |
+ *                        |       -----+-----   |
+ *                        |            |gnd     |
+ *                        '---------------------'
+ * 
  *  Declaration syntax
  *
  *     DISCRETE_RCDISC5(name of node,
@@ -2616,9 +2619,12 @@
  *     DISCRETE_RCDISC5(NODE_11,NODE_10,10,100,CAP_U(1))
  *
  *  When enabled by NODE_10, C discharges from 10v as indicated by RC
- *  of 100R & 1uF.
+ *  of 100R & 1uF. If not enabled, the capcitors keeps it load and may
+ *  still be charged through input1. The switch is assumed to be a CD4066,
+ *  thus if not enabled the output will be drawn by R to GND since 
+ *  the switch is in high impedance mode.
  *
- *  EXAMPLES: see Spiders
+ *  EXAMPLES: see Spiders, Galaxian
  *
  ***********************************************************************
  *
@@ -3399,6 +3405,7 @@
 #define DISC_LFSR_FLAG_RESET_TYPE_L		0x00
 #define DISC_LFSR_FLAG_RESET_TYPE_H		0x02
 #define DISC_LFSR_FLAG_OUTPUT_F0		0x04
+#define DISC_LFSR_FLAG_OUTPUT_SR_SN1	0x08
 
 /* Sample & Hold supported clock types */
 #define DISC_SAMPHOLD_REDGE				0
