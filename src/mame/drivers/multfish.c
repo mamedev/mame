@@ -869,6 +869,10 @@ ROM_END
 
 /*********************************************************
    Fruit Cocktail
+
+	All the roms were changed after the 070305 update.
+        The official list of hashes shows the 070305 updated roms.
+
 **********************************************************/
 
 #if ALL_REVISIONS
@@ -1028,14 +1032,14 @@ ROM_START( fcockt_8 ) // 060111
 	ROM_LOAD( "fc060111.rom", 0x00000, 0x40000, CRC(a4af79e3) SHA1(28f40573d6c61e1937b8d05da94e197da5236f57) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(64b547e3) SHA1(285421fa3aa67a16cf6a9dadb20d74e6a8471dc0) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(965d6363) SHA1(5c229238a09ec54147d492e9843595962ce79952) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(8384e4d4) SHA1(83d0bbbd7cca7328a66a69cf802632fd8d22d5b8) )
+	ROM_LOAD( "1b", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
+	ROM_LOAD( "2b", 0x100000, 0x80000, CRC(6239ba9d) SHA1(22486ad30c28341784e7e490255247b82782b72e) )
+	ROM_LOAD( "3b", 0x200000, 0x80000, CRC(2c14a464) SHA1(5fce2f4ef95c5054b055db94399946257bc7321f) )
+	ROM_LOAD( "4b", 0x300000, 0x80000, CRC(115898f4) SHA1(55b93bddaeede1c2f6b18083a6a2e6329af087cc) )
+	ROM_LOAD( "5b", 0x080000, 0x80000, CRC(f0176b60) SHA1(f764aea00ed306a28cacc62f8d2db9cc42895db8) )
+	ROM_LOAD( "6b", 0x180000, 0x80000, CRC(ef24f255) SHA1(6ff924627c179868a25f180f79cd57182b72d9d4) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(20f87a15) SHA1(cb60866a3543668f3592c270b445dee881d78128) ) // the same as newer sets?
+	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
 
 /*********************************************************
