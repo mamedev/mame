@@ -23,6 +23,7 @@
     pkrdewin |  clone   |  Poker De Win.
     ampkr95  |  clone   |  American Poker 95.
     videomat |  clone   |  Videomat (polish bootleg).
+    rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
     sigmapkr |  parent  |  Sigma Poker.
     sigma2k  |  parent  |  Sigma Poker 2000.
 
@@ -276,6 +277,13 @@
 
 
     --- DRIVER UPDATES ---
+
+
+    [2009-08-17]
+
+    - Added Rabbit Poker / Arizona Poker? set (with a PIC).
+    - Added proper decryption algorithms.
+    - Updated technical notes.
 
 
     [2008-10-07]
@@ -603,6 +611,34 @@ static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
+/*
+
+  Rabbit Poker writes...
+
+  12dc W \ Writting to the PIC?... The program doesn't seems to poll it.
+  12dd W /
+
+  Something is going wrong here. 12xx is ROM space. Put a BP on 12e5 and
+  you can see the NVRAM checking routine (NVRAM = c000-cfff)
+
+'maincpu' (000012E5): unmapped program memory byte write to 000012DC = E5
+'maincpu' (000012E5): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F0): unmapped program memory byte write to 000012DC = F0
+'maincpu' (000012F0): unmapped program memory byte write to 000012DD = 12
+'maincpu' (000012F2): unmapped program memory byte write to 000012DC = F2
+'maincpu' (000012F2): unmapped program memory byte write to 000012DD = 12
+
+*/
 
 /*************************
 *      Input ports       *
@@ -1208,20 +1244,75 @@ ROM_START( sigma2k )
 	ROM_LOAD( "82s147an_s2k.u48", 0x0000, 0x0200, CRC(715361cc) SHA1(cac239399c9ec5d7498e49a906fb5b934ef7f4dc) )
 ROM_END
 
+/*
+
+Rabbit Poker, or Arizona Poker 1.1 ??
+
+American Poker 2 board
+program rom on small daughter board
+with GAL22V10 and PIC16F84A
+prom not dumped
+
+*/
+ROM_START( rabbitpk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poldi_ren.u6", 0x0000, 0x10000, CRC(ef0d5b47) SHA1(5d209c803ab8ced08953d24202a364ce1aa677c2) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
+
+	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+
+/*************************
+*      Driver Init       *
+*************************/
+
+static DRIVER_INIT( rabbitpk )
+{
+
+	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *buffer;
+	int size = memory_region_length(machine, "maincpu");
+	int start = 0;
+	int i;
+
+	UINT8 dec_base[32] =
+	{
+		0x00, 0x43, 0x45, 0x06, 0xc3, 0x80, 0x86, 0xc5,
+		0x84, 0xc7, 0xc1, 0x82, 0x47, 0x04, 0x02, 0x41,
+		0x86, 0xc5, 0xc3, 0x80, 0x45, 0x06, 0x00, 0x43,
+		0x02, 0x41, 0x47, 0x04, 0xc1, 0x82, 0x84, 0xc7
+	};
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
+	}
+
+	buffer = alloc_array_or_die(UINT8, size);
+	memcpy(buffer, rom, size);
+
+	free(buffer);
+}
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY       FULLNAME                             FLAGS  LAYOUT      */
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,    ROT0, "Novomatic",  "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg?",   "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,    ROT0, "bootleg",    "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,    ROT0, "bootleg",    "Videomat (polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,    ROT0, "Sigma Inc.", "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,    ROT0, "Sigma Inc.", "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                             FLAGS  LAYOUT      */
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,        ROT0, "Novomatic",  "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg?",   "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,        ROT0, "bootleg",    "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Videomat (polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, rabbitpk, ROT0, "bootleg",    "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,        ROT0, "Sigma Inc.", "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,        ROT0, "Sigma Inc.", "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )

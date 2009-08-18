@@ -23,6 +23,7 @@
     pkrdewin |  clone   |  Poker De Win.
     ampkr95  |  clone   |  American Poker 95.
     videomat |  clone   |  Videomat (polish bootleg).
+    rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
     sigmapkr |  parent  |  Sigma Poker.
     sigma2k  |  parent  |  Sigma Poker 2000.
 
