@@ -1241,6 +1241,8 @@ READ8_HANDLER( spc_io_r )
 {
 	switch( offset )	/* Offset is from 0x00f0 */
 	{
+		case 0x0: //FIXME: Super Bomberman PBW reads from there, is it really write-only?
+			return 0;
 		case 0x1:
 			return 0; //Super Kick Boxing reads port 1 and wants it to be zero.
 		case 0x2:		/* Register address */
@@ -1253,6 +1255,9 @@ READ8_HANDLER( spc_io_r )
 		case 0x7:		/* Port 3 */
 //          mame_printf_debug("SPC: rd %02x @ %d, PC=%x\n", spc_port_in[offset-4], offset-4, cpu_get_pc(space->cpu));
 			return spc_port_in[offset - 4];
+		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
+		case 0x9:
+			return spc_ram[0xf0 + offset];
 		case 0xA:		/* Timer 0 */
 		case 0xB:		/* Timer 1 */
 		case 0xC:		/* Timer 2 */
@@ -1267,13 +1272,16 @@ READ8_HANDLER( spc_io_r )
 		}
 	}
 
-	return 0xff;
+	return 0;
 }
 
 WRITE8_HANDLER( spc_io_w )
 {
 	switch( offset )	/* Offset is from 0x00f0 */
 	{
+		case 0x0:
+			printf("Warning: write to SOUND TEST register with data %02x!\n",data);
+			break;
 		case 0x1:		/* Control */
 			if( data & 0x1 && !timers[0].enabled )
 			{
