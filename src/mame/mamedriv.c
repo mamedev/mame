@@ -9510,6 +9510,8 @@ Other Sun games
 	/* Coinmaster-Gaming VGA based */
 	DRIVER( colorama )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
 	DRIVER( cmrltv75 )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
+	DRIVER( cmkenosp )	/* (c) 2000 Coinmaster-Gaming, Ltd. */
+	DRIVER( cmkenospa )	/* (c) 2000 Coinmaster-Gaming, Ltd. */
 
 	/* Igrosoft */
 	/* Multifish */

@@ -184,6 +184,14 @@
     DRIVER UPDATES:
 
 
+    [2009-08-18]
+
+    - Renamed Roulette V75 to Coinmaster Roulette V75.
+    - Added Roulette controller program & sound ROMs.
+    - Added 2 complete spanish Keno sets.
+    - Added technical notes.
+
+
     [2009-08-17]
 
     - Initial release.
@@ -210,6 +218,7 @@
 #include "sound/ymz280b.h"
 
 static UINT16 *vram;
+
 
 /*************************
 *     Video Hardware     *
@@ -638,6 +647,7 @@ static INTERRUPT_GEN( vblank_irq )
 	cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -682,15 +692,15 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
-/* Colorama (english)
-
+/*
+   Colorama (english)
    Standalone. Phisical arm on marquee + bet station.
-
 */
+
 ROM_START( colorama )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p521_prg1.cp1", 0x000001, 0x80000, CRC(f5da12cb) SHA1(d75fdda09e57c8a4637b0bcc98931796b5449435) )
-	ROM_LOAD16_BYTE( "p521_prg2.cp2", 0x000000, 0x80000, CRC(6db85d66) SHA1(21009aa01db5193d1be588deaeba8f89582d53dd) )
+	ROM_LOAD16_BYTE( "p521_prg1.cp1", 0x00001, 0x80000, CRC(f5da12cb) SHA1(d75fdda09e57c8a4637b0bcc98931796b5449435) )
+	ROM_LOAD16_BYTE( "p521_prg2.cp2", 0x00000, 0x80000, CRC(6db85d66) SHA1(21009aa01db5193d1be588deaeba8f89582d53dd) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "p521_fore1.fg1",	0x00001, 0x80000, CRC(0a8fe27a) SHA1(29500040e2bd0b6f349abaf51bb7f8aaac73e8cf) )
@@ -711,15 +721,18 @@ ROM_START( colorama )
 ROM_END
 
 
-/* Roulette V75 (spanish)
-
-   Phisical Unit + 10 bet stations.
-
+/*
+   Coinmaster Roulette V75 (y2k, spanish)
+   Phisical Unit + 10/15 bet stations.
 */
+
 ROM_START( cmrltv75 )
+
+    /*** Bet Station ***/
+
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bet.cp1",   0x000001, 0x80000, CRC(2dc1c899) SHA1(2be488d23df5e50bbcfa4e66a49a455c617b29b4) )
-	ROM_LOAD16_BYTE( "bet.cp2",   0x000000, 0x80000, CRC(fcab8825) SHA1(79cb862ac5363ab90e91184efd9cfaec86bb82a5) )
+	ROM_LOAD16_BYTE( "bet.cp1",   0x00001, 0x80000, CRC(2dc1c899) SHA1(2be488d23df5e50bbcfa4e66a49a455c617b29b4) )
+	ROM_LOAD16_BYTE( "bet.cp2",   0x00000, 0x80000, CRC(fcab8825) SHA1(79cb862ac5363ab90e91184efd9cfaec86bb82a5) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "p497.fg1",	0x00001, 0x80000, CRC(ce5f9fe9) SHA1(a30f5f375eaa651ede4057449c1648c64d207577) )
@@ -737,7 +750,114 @@ ROM_START( cmrltv75 )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "palce22v10h25.u11",	0x0000, 0x0200, NO_DUMP )
 
+	/*** Wheel Controller ***/
+
+	ROM_REGION( 0x100000, "wheelcpu", 0 )
+	ROM_LOAD16_BYTE( "wheel.cp1",   0x00001, 0x80000, CRC(57f8a869) SHA1(2a3cdae1bad5e94506b9b42b7f2630c52ffcbbef) )
+	ROM_LOAD16_BYTE( "wheel.cp2",   0x00000, 0x80000, CRC(a8441b04) SHA1(cc8f10390947c2a15b2c94b11574c5eeb69fded5) )
+
+	ROM_REGION( 0x800000, "wheelsnd", 0 ) /* the wheel controller has 8 sockets */
+	ROM_LOAD( "rwc497ym.sp1",	0x000000, 0x100000, CRC(13d6cff5) SHA1(ad1858f251e11017a427cbf7219d78bb2b854528) )
+	ROM_LOAD( "rwc497ym.sp2",	0x100000, 0x100000, CRC(f8c7efd1) SHA1(e86a7ef0617c85415334e1f39a9059d5b16bc7d1) )
+	ROM_LOAD( "rwc497ym.sp3",	0x200000, 0x100000, CRC(a1977dff) SHA1(c405bf1f1721ae864a2ff91ec7d637f03e431ad4) )
+	ROM_LOAD( "rwc497ym.sp4",	0x300000, 0x100000, CRC(f8cb0fb8) SHA1(3ea8f268bc8745a257eb4b20d7e79196d0f1fb9e) )
+	ROM_LOAD( "rwc497ym.sp5",	0x400000, 0x100000, CRC(788b52f7) SHA1(1b339cb984b807a08e6fde260b5ee2bc8ca66f62) )
+	ROM_LOAD( "rwc497ym.sp6",	0x500000, 0x100000, CRC(be94fd18) SHA1(2884cae7cf96008a78e77f42e8efb5c3ca8f4a4d) )
+
 ROM_END
+
+
+/*
+   Coinmaster Keno (y2k, spanish, 2000-12-14)
+   Phisical Unit + 10 bet stations.
+*/
+
+ROM_START( cmkenosp )
+
+    /*** Bet Station ***/
+
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bet1.cp1",   0x00001, 0x80000, CRC(ee04b815) SHA1(cea29973cf9caa5c06bc312fc3b19e146c1ae063) )
+	ROM_LOAD16_BYTE( "bet2.cp2",   0x00000, 0x80000, CRC(32071845) SHA1(278217a70ea777f82ae91d11d51b832383eafdbe) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fore1.fg1",	0x00001, 0x80000, CRC(a3548c2a) SHA1(02f98ee09581a235df3704951683f9d2aab3b1e8) )
+	ROM_LOAD16_BYTE( "fore2.fg2",	0x00000, 0x80000, CRC(8b1afa73) SHA1(efd176dfb55f047b8e01b9460469936c86953417) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "back1.bg1",	0x200001, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
+	ROM_LOAD16_BYTE( "back2.bg2",	0x200000, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
+	ROM_LOAD16_BYTE( "back3.bg3",	0x000001, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
+	ROM_LOAD16_BYTE( "back4.bg4",	0x000000, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "betsound.sp1",	0x00000, 0x100000, CRC(979ecd0e) SHA1(827e8c86b27e5252368960fffe42ace167aa4495) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "palce22v10h25.u11",	0x0000, 0x0200, NO_DUMP )
+
+	/*** Wheel Controller ***/
+
+	ROM_REGION( 0x100000, "wheelcpu", 0 )
+	ROM_LOAD16_BYTE( "wheel_prog_1.cp1",   0x00001, 0x80000, CRC(d56b0d2c) SHA1(d8a79fecf8fca92cc4856d9dad9f1d16d51b68a3) )
+	ROM_LOAD16_BYTE( "wheel_prog_2.cp2",   0x00000, 0x80000, CRC(cfc02d3e) SHA1(09e41b26c62137b31f8673184dad565932881f47) )
+
+	ROM_REGION( 0x800000, "wheelsnd", 0 ) /* the wheel controller has 8 sockets */
+	ROM_LOAD( "rwc497ym.sp1",	0x000000, 0x100000, CRC(90a93951) SHA1(73603f402eb3b62e69a745af9d45738f35bc0b4e) )
+	ROM_LOAD( "rwc497ym.sp2",	0x100000, 0x100000, CRC(f5d0a6e7) SHA1(c4a1c333854c95e37c0040fed35b72ac1e853832) )
+	ROM_LOAD( "rwc497ym.sp3",	0x200000, 0x100000, CRC(0e53c1a9) SHA1(0785c52b24277c9ba24d0fbf0ac335acb0235e23) )
+	ROM_LOAD( "rwc497ym.sp4",	0x300000, 0x100000, CRC(b5729ae7) SHA1(0e63fbb81ff5f2fef3c653f769db8073dff1214b) )
+
+ROM_END
+
+
+/*
+   Coinmaster Keno (y2k, spanish, 2000-12-02)
+   Phisical Unit + 10 bet stations.
+*/
+
+ROM_START( cmkenospa )
+
+    /*** Bet Station ***/
+
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bet.cp1",   0x00001, 0x80000, CRC(ffdc69a0) SHA1(2ba6a36cb0953474164d4fb80a60bf8ca27e9a0c) )
+	ROM_LOAD16_BYTE( "bet.cp2",   0x00000, 0x80000, CRC(c46f237c) SHA1(75a60ace7277a90b3d7acd7838d1271fd41517f1) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fore1.fg1",	0x00001, 0x80000, CRC(a3548c2a) SHA1(02f98ee09581a235df3704951683f9d2aab3b1e8) )
+	ROM_LOAD16_BYTE( "fore2.fg2",	0x00000, 0x80000, CRC(8b1afa73) SHA1(efd176dfb55f047b8e01b9460469936c86953417) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "back1.bg1",	0x200001, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
+	ROM_LOAD16_BYTE( "back2.bg2",	0x200000, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
+	ROM_LOAD16_BYTE( "back3.bg3",	0x000001, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
+	ROM_LOAD16_BYTE( "back4.bg4",	0x000000, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "betsound.sp1",	0x00000, 0x100000, CRC(979ecd0e) SHA1(827e8c86b27e5252368960fffe42ace167aa4495) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "palce22v10h25.u11",	0x0000, 0x0200, NO_DUMP )
+
+	/*** Wheel Controller ***/
+
+	ROM_REGION( 0x100000, "wheelcpu", 0 )
+	ROM_LOAD16_BYTE( "wheel.cp1",   0x00001, 0x80000, CRC(16f750b7) SHA1(b1c99ec659cda1b2fe6ef9ec39f4cdd8f0ddecec) )
+	ROM_LOAD16_BYTE( "wheel.cp2",   0x00000, 0x80000, CRC(49a50ae7) SHA1(89857ebd94ebbfa040d99648a46779c9ba8f85dd) )
+
+	ROM_REGION( 0x800000, "wheelsnd", 0 ) /* the wheel controller has 8 sockets */
+	ROM_LOAD( "rwc497ym.sp1",	0x000000, 0x100000, CRC(90a93951) SHA1(73603f402eb3b62e69a745af9d45738f35bc0b4e) )
+	ROM_LOAD( "rwc497ym.sp2",	0x100000, 0x100000, CRC(f5d0a6e7) SHA1(c4a1c333854c95e37c0040fed35b72ac1e853832) )
+	ROM_LOAD( "rwc497ym.sp3",	0x200000, 0x100000, CRC(0e53c1a9) SHA1(0785c52b24277c9ba24d0fbf0ac335acb0235e23) )
+	ROM_LOAD( "rwc497ym.sp4",	0x300000, 0x100000, CRC(b5729ae7) SHA1(0e63fbb81ff5f2fef3c653f769db8073dff1214b) )
+
+ROM_END
+
+
+/*************************
+*      Driver Init       *
+*************************/
 
 static DRIVER_INIT( colorama )
 {
@@ -775,6 +895,8 @@ static DRIVER_INIT( cmrltv75 )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT     COMPANY                    FULLNAME                 FLAGS */
-GAME( 2001, colorama, 0,      coinmvga, coinmvga, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (english)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, cmrltv75, 0,      coinmvga, coinmvga, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Roulette V75 (spanish)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT     COMPANY                    FULLNAME                                     FLAGS */
+GAME( 2001, colorama,  0,        coinmvga, coinmvga, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (english)",                         GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette V75 (Y2K, spanish)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, spanish, 2000-12-14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, spanish, 2000-12-02)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
