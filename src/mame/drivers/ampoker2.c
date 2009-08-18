@@ -281,7 +281,7 @@
 
     [2009-08-17]
 
-    - Added Rabbit Poker / Arizona Poker? set (with a PIC).
+    - Added Rabbit Poker / Arizona Poker? set (with GAL22V10 and PIC16F84A).
     - Added proper decryption algorithms.
     - Updated technical notes.
 
