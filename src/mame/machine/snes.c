@@ -572,7 +572,9 @@ READ8_HANDLER( snes_r_io )
 				{
 					return 0 | 0x1c | (snes_open_bus_r(space,0) & 0xe0); //correct?
 				}
-				value = ((joypad[1].low | (joypad[1].high << 8) | 0x10000) >> (15 - (joypad[1].oldrol++ % 16))) & 0x1;
+				value = ((joy2l | (joy2h << 8) | 0x10000) >> (16 - (joypad[1].oldrol & 0xf))) & 0x1;
+				joypad[1].oldrol++;
+				joypad[1].oldrol&=0xf;
 				if( !(joypad[1].oldrol % 17) )
 					value = 0x1;
 				//value |= 0x1c;	// bits 4, 3, and 2 are always set
