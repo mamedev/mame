@@ -190,7 +190,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	}
 
 	/* three lines after start of vblank we update the controllers (value from snes9x) */
-	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line + 3)
+	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line + 2)
 	{
 		int i;
 
@@ -559,7 +559,9 @@ READ8_HANDLER( snes_r_io )
 				{
 					return 0 | (snes_open_bus_r(space,0) & 0xfc); //correct?
 				}
-				value = ((joypad[0].low | (joypad[0].high << 8) | 0x10000) >> (15 - (joypad[0].oldrol++ % 16))) & 0x1;
+				value = ((joy1l | (joy1h << 8) | 0x10000) >> (16 - (joypad[0].oldrol & 0xf))) & 0x1;
+				joypad[0].oldrol++;
+				joypad[0].oldrol&=0xf;
 				if( !(joypad[0].oldrol % 17) )
 					value = 0x1;
 				return (value & 0x03) | (snes_open_bus_r(space,0) & 0xfc); //correct?
@@ -603,21 +605,21 @@ READ8_HANDLER( snes_r_io )
 		case RDMPYH:		/* Product/Remainder of mult/div result (high) */
 			return snes_ram[offset];
 		case JOY1L:			/* Joypad 1 status register (low) */
-			return joypad[0].low;
+			return joy1l;
 		case JOY1H:			/* Joypad 1 status register (high) */
-			return joypad[0].high;
+			return joy1h;
 		case JOY2L:			/* Joypad 2 status register (low) */
-			return joypad[1].low;
+			return joy2l;
 		case JOY2H:			/* Joypad 2 status register (high) */
-			return joypad[1].high;
+			return joy2h;
 		case JOY3L:			/* Joypad 3 status register (low) */
-			return joypad[2].low;
+			return joy3l;
 		case JOY3H:			/* Joypad 3 status register (high) */
-			return joypad[2].high;
+			return joy3h;
 		case JOY4L:			/* Joypad 4 status register (low) */
-			return joypad[3].low;
+			return joy4l;
 		case JOY4H:			/* Joypad 4 status register (high) */
-			return joypad[3].high;
+			return joy4h;
 		case DMAP0:
 		case DMAP1:
 		case DMAP2:
@@ -1178,7 +1180,7 @@ WRITE8_HANDLER( snes_w_io )
 		case WMADDH:	/* Address to read/write to wram (high) */
 			break;
 		case OLDJOY1:	/* Old NES joystick support */
-			if( (data & 0x1) && !(snes_ram[offset] & 0x1) )
+			if( ((data & 0x1) && !(snes_ram[offset] & 0x1)) || ((!(data & 0x1)) && (snes_ram[offset] & 0x1)) )
 			{
 				joypad[0].oldrol = 0;
 				joypad[1].oldrol = 0;
