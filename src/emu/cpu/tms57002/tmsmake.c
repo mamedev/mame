@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include "osdcomm.h"
 
 enum {
   I_POST  = 0x00000001,
@@ -742,7 +743,7 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
       };
 
       char r[256];
-      sprintf(r, "tms57002_macc_to_output_%d%s(s, 0x%016llxULL, 0x%016llxULL)", cv[IxSFMO], cv[IxMOVM] ? "s" : "", rounding[cv[IxRND]], rmask[cv[IxRND]]);
+      sprintf(r, "tms57002_macc_to_output_%d%s(s, 0x%016" I64FMT "xULL, 0x%016" I64FMT "xULL)", cv[IxSFMO], cv[IxMOVM] ? "s" : "", rounding[cv[IxRND]], rmask[cv[IxRND]]);
       scs(p, r);
       break;
     }

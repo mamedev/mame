@@ -360,7 +360,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	// AW board is different, shouldn't ever be read
 	if (v->type == AW_ROM_BOARD)
 	{
-		mame_printf_debug("AW_ROM_BOARD read @ %x mask %llx\n", offset, mem_mask);
+		mame_printf_debug("AW_ROM_BOARD read @ %x mask %" I64FMT "x\n", offset, mem_mask);
 		return U64(0xffffffffffffffff);
 	}
 
@@ -450,7 +450,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	}
 	else
 	{
-		//mame_printf_verbose("%s:ROM: read mask %llx @ %x\n", cpuexec_describe_context(machine), mem_mask, offset);
+		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", cpuexec_describe_context(machine), mem_mask, offset);
 	}
 
 	return U64(0xffffffffffffffff);
@@ -464,7 +464,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 	// AW board
 	if (v->type == AW_ROM_BOARD)
 	{
-		//printf("AW: %llx to ROM board @ %x (mask %llx)\n", data, offset, mem_mask);
+		//printf("AW: %" I64FMT "x to ROM board @ %x (mask %" I64FMT "x)\n", data, offset, mem_mask);
 
 		switch (offset)
 		{
@@ -540,7 +540,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 			break;
 
 			default:
-				logerror("AW: unhandled %llx to ROM board @ %x (mask %llx)\n", data, offset, mem_mask);
+				logerror("AW: unhandled %" I64FMT "x to ROM board @ %x (mask %" I64FMT "x)\n", data, offset, mem_mask);
 			break;
 		}
 
@@ -709,7 +709,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		}
 		break;
 		default:
-			mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
+			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
 			break;
 	}
 }

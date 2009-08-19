@@ -158,6 +158,13 @@ __extension__ typedef signed long long		INT64;
 #define S64(val) val
 #endif
 
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSVC_VER)
+#define I64FMT   "I64"
+#else
+#define I64FMT   "ll"
+#endif
+
 
 /* Highly useful macro for compile-time knowledge of an array size */
 #define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))

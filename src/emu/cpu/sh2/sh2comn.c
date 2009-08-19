@@ -386,7 +386,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
 			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 '%s' div+mod %lld/%lld\n", sh2->device->tag, a, b));
+			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", sh2->device->tag, a, b));
 			if (b)
 			{
 				INT64 q = a / b;

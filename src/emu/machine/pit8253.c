@@ -640,7 +640,7 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
 	attotime elapsed_time = attotime_sub(now,timer->last_updated);
 	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) * timer->clockin;
 
-	LOG1(("pit8253: update(): timer %d, %lld elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG1(("pit8253: update(): timer %d, %" I64FMT "d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if ( timer->clockin )
 	{
