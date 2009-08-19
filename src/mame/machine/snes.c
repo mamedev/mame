@@ -729,6 +729,8 @@ WRITE8_HANDLER( snes_w_io )
 					break;
 				default:
 					/* Unknown size so default to 8 & 16 */
+					printf( "Object size unsupported: %d\n", (data & 0xe0) >> 5 );
+
 					snes_ppu.oam.size[0] = 1;
 					snes_ppu.oam.size[1] = 2;
 #ifdef SNES_DBG_REG_W
@@ -1451,8 +1453,8 @@ READ8_HANDLER( snes_r_bank3 )
 
 	if (snes_cart.mode & 5)							/* Mode 20 & 22 */
 	{
-		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20))
-			value =  0xff;							/* Reserved */
+		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20)) //FIXME: check this
+			value =  snes_ram[0x200000 + ((offset & ~0x8000) | 0x8000)];							/* Reserved */
 		else
 			value = snes_ram[0x400000 + offset];
 	}
@@ -1549,7 +1551,9 @@ READ8_HANDLER( snes_r_bank7 )
 	if (snes_cart.mode & 5)				/* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
+		{
 			value = memory_read_byte(space, 0x400000 + offset);
+		}
 		else
 			value = snes_ram[0xc00000 + offset];
 	}
