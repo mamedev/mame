@@ -57,7 +57,10 @@
 ***********************************************************************************************/
 
 #include "sndintrf.h"
+#include "streams.h"
 #include "tms5110.h"
+
+#define MAX_SAMPLE_CHUNK		512
 
 #define MAX_K					10
 #define MAX_SCALE_BITS			6
@@ -68,6 +71,18 @@
 #define SUBTYPE_TMS5110			4
 #define FIFO_SIZE 				64
 #define MAX_CHIRP_SIZE			51
+
+/* Variants */
+
+#define TMS5110_IS_5110A	(1)
+#define TMS5110_IS_5100		(2)
+#define TMS5110_IS_5110		(3)
+
+#define TMS5110_IS_CD2801	TMS5110_IS_5100
+#define TMS5110_IS_TMC0281	TMS5110_IS_5100
+
+#define TMS5110_IS_CD2802	TMS5110_IS_5110
+#define TMS5110_IS_M58817	TMS5110_IS_5110
 
 struct tms5100_coeffs
 {
@@ -83,7 +98,8 @@ struct tms5100_coeffs
 	INT8			interp_coeff[8];
 };
 
-struct tms5110
+typedef struct _tms5110_state tms5110_state;
+struct _tms5110_state
 {
 	/* coefficient tables */
 	int variant;				/* Variant of the 5110 - see tms5110.h */
@@ -141,6 +157,11 @@ struct tms5110
 	INT32 x[11];
 
 	INT32 RNG;	/* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+
+	const tms5110_interface *intf;
+	const UINT8 *table;
+	sound_stream *stream;
+	INT32 speech_rom_bitnum;
 };
 
 
@@ -149,16 +170,34 @@ struct tms5110
 
 
 
+INLINE tms5110_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_TMS5110 ||
+		   sound_get_type(device) == SOUND_TMS5100 ||
+		   sound_get_type(device) == SOUND_TMS5110A ||
+		   sound_get_type(device) == SOUND_CD2801 ||
+		   sound_get_type(device) == SOUND_TMC0281 ||
+		   sound_get_type(device) == SOUND_CD2802 ||
+		   sound_get_type(device) == SOUND_M58817);
+	return (tms5110_state *)device->token;
+}
+
+
 /* Static function prototypes */
-static void parse_frame(struct tms5110 *tms);
+static void tms5110_set_variant(tms5110_state *tms, int variant);
+static void tms5110_PDC_set(tms5110_state *tms, int data);
+static void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size);
+static void parse_frame(tms5110_state *tms);
+static STREAM_UPDATE( tms5110_update );
 
 
 #define DEBUG_5110	0
 
-void tms5110_set_variant(void *chip, int variant)
+void tms5110_set_variant(tms5110_state *tms, int variant)
 {
-	struct tms5110 *tms = (struct tms5110 *)chip;
-
 	switch (variant)
 	{
 		case TMS5110_IS_5110A:
@@ -177,134 +216,59 @@ void tms5110_set_variant(void *chip, int variant)
 	tms->variant = variant;
 }
 
-void *tms5110_create(const device_config *device, int variant)
+
+void register_for_save_states(tms5110_state *tms)
 {
-	struct tms5110 *tms;
+	state_save_register_device_item_array(tms->device, 0, tms->fifo);
+	state_save_register_device_item(tms->device, 0, tms->fifo_head);
+	state_save_register_device_item(tms->device, 0, tms->fifo_tail);
+	state_save_register_device_item(tms->device, 0, tms->fifo_count);
 
-	tms = alloc_clear_or_die(struct tms5110);
+	state_save_register_device_item(tms->device, 0, tms->PDC);
+	state_save_register_device_item(tms->device, 0, tms->CTL_pins);
+	state_save_register_device_item(tms->device, 0, tms->speaking_now);
+	state_save_register_device_item(tms->device, 0, tms->speak_delay_frames);
+	state_save_register_device_item(tms->device, 0, tms->talk_status);
 
-	tms->device = device;
-	tms5110_set_variant(tms, variant);
+	state_save_register_device_item(tms->device, 0, tms->old_energy);
+	state_save_register_device_item(tms->device, 0, tms->old_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->old_k);
 
-	state_save_register_device_item_array(device, 0, tms->fifo);
-	state_save_register_device_item(device, 0, tms->fifo_head);
-	state_save_register_device_item(device, 0, tms->fifo_tail);
-	state_save_register_device_item(device, 0, tms->fifo_count);
+	state_save_register_device_item(tms->device, 0, tms->new_energy);
+	state_save_register_device_item(tms->device, 0, tms->new_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->new_k);
 
-	state_save_register_device_item(device, 0, tms->PDC);
-	state_save_register_device_item(device, 0, tms->CTL_pins);
-	state_save_register_device_item(device, 0, tms->speaking_now);
-	state_save_register_device_item(device, 0, tms->speak_delay_frames);
-	state_save_register_device_item(device, 0, tms->talk_status);
+	state_save_register_device_item(tms->device, 0, tms->current_energy);
+	state_save_register_device_item(tms->device, 0, tms->current_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->current_k);
 
-	state_save_register_device_item(device, 0, tms->old_energy);
-	state_save_register_device_item(device, 0, tms->old_pitch);
-	state_save_register_device_item_array(device, 0, tms->old_k);
+	state_save_register_device_item(tms->device, 0, tms->target_energy);
+	state_save_register_device_item(tms->device, 0, tms->target_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->target_k);
 
-	state_save_register_device_item(device, 0, tms->new_energy);
-	state_save_register_device_item(device, 0, tms->new_pitch);
-	state_save_register_device_item_array(device, 0, tms->new_k);
+	state_save_register_device_item(tms->device, 0, tms->interp_count);
+	state_save_register_device_item(tms->device, 0, tms->sample_count);
+	state_save_register_device_item(tms->device, 0, tms->pitch_count);
 
-	state_save_register_device_item(device, 0, tms->current_energy);
-	state_save_register_device_item(device, 0, tms->current_pitch);
-	state_save_register_device_item_array(device, 0, tms->current_k);
+	state_save_register_device_item(tms->device, 0, tms->next_is_address);
+	state_save_register_device_item(tms->device, 0, tms->address);
+	state_save_register_device_item(tms->device, 0, tms->schedule_dummy_read);
+	state_save_register_device_item(tms->device, 0, tms->addr_bit);
 
-	state_save_register_device_item(device, 0, tms->target_energy);
-	state_save_register_device_item(device, 0, tms->target_pitch);
-	state_save_register_device_item_array(device, 0, tms->target_k);
+	state_save_register_device_item_array(tms->device, 0, tms->x);
 
-	state_save_register_device_item(device, 0, tms->interp_count);
-	state_save_register_device_item(device, 0, tms->sample_count);
-	state_save_register_device_item(device, 0, tms->pitch_count);
-
-	state_save_register_device_item(device, 0, tms->next_is_address);
-	state_save_register_device_item(device, 0, tms->address);
-	state_save_register_device_item(device, 0, tms->schedule_dummy_read);
-	state_save_register_device_item(device, 0, tms->addr_bit);
-
-	state_save_register_device_item_array(device, 0, tms->x);
-
-	state_save_register_device_item(device, 0, tms->RNG);
-
-	return tms;
-}
-
-
-void tms5110_destroy(void *chip)
-{
-	free(chip);
+	state_save_register_device_item(tms->device, 0, tms->RNG);
 }
 
 
 
-
-/**********************************************************************************************
-
-     tms5110_reset -- resets the TMS5110
-
-***********************************************************************************************/
-
-void tms5110_reset_chip(void *chip)
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-
-	/* initialize the FIFO */
-	memset(tms->fifo, 0, sizeof(tms->fifo));
-	tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
-
-	/* initialize the chip state */
-	tms->speaking_now = tms->speak_delay_frames = tms->talk_status = 0;
-	tms->CTL_pins = 0;
-		tms->RNG = 0x1fff;
-
-	/* initialize the energy/pitch/k states */
-	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_k, 0, sizeof(tms->old_k));
-	memset(tms->new_k, 0, sizeof(tms->new_k));
-	memset(tms->current_k, 0, sizeof(tms->current_k));
-	memset(tms->target_k, 0, sizeof(tms->target_k));
-
-	/* initialize the sample generators */
-	tms->interp_count = tms->sample_count = tms->pitch_count = 0;
-	memset(tms->x, 0, sizeof(tms->x));
-	tms->next_is_address = FALSE;
-	tms->address = 0;
-	tms->schedule_dummy_read = TRUE;
-	tms->addr_bit = 0;
-}
-
-
-/******************************************************************************************
-
-     tms5110_set_M0_callback -- set M0 callback for the TMS5110
-
-******************************************************************************************/
-
-void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *))
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-	tms->M0_callback = func;
-}
-
-/******************************************************************************************
-
-     tms5110_set_load_address -- set M0 callback for the TMS5110
-
-******************************************************************************************/
-
-void tms5110_set_load_address(void *chip, void (*func)(const device_config *, int))
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-	tms->set_load_address = func;
-}
 
 /******************************************************************************************
 
      FIFO_data_write -- handle bit data write to the TMS5110 (as a result of toggling M0 pin)
 
 ******************************************************************************************/
-static void FIFO_data_write(struct tms5110 *tms, int data)
+static void FIFO_data_write(tms5110_state *tms, int data)
 {
 	/* add this bit to the FIFO */
 	if (tms->fifo_count < FIFO_SIZE)
@@ -328,7 +292,7 @@ static void FIFO_data_write(struct tms5110 *tms, int data)
 
 ******************************************************************************************/
 
-static int extract_bits(struct tms5110 *tms, int count)
+static int extract_bits(tms5110_state *tms, int count)
 {
 	int val = 0;
 
@@ -341,7 +305,7 @@ static int extract_bits(struct tms5110 *tms, int count)
 	return val;
 }
 
-static void request_bits(struct tms5110 *tms, int no)
+static void request_bits(tms5110_state *tms, int no)
 {
 int i;
 	for (i=0; i<no; i++)
@@ -356,7 +320,7 @@ int i;
 	}
 }
 
-static void perform_dummy_read(struct tms5110 *tms)
+static void perform_dummy_read(tms5110_state *tms)
 {
 	if (tms->schedule_dummy_read)
 	{
@@ -371,41 +335,6 @@ static void perform_dummy_read(struct tms5110 *tms)
 	}
 }
 
-/**********************************************************************************************
-
-     tms5110_status_read -- read status from the TMS5110
-
-        bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
-                Talk Status goes active at the initiation of a SPEAK command.
-                It goes inactive (low) when the stop code (Energy=1111) is processed, or
-                immediately(?????? not TMS5110) by a RESET command.
-        TMS5110 datasheets mention this is only available as a result of executing
-                TEST TALK command.
-
-
-***********************************************************************************************/
-
-int tms5110_status_read(void *chip)
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-	if (DEBUG_5110) logerror("Status read: TS=%d\n", tms->talk_status);
-
-	return (tms->talk_status << 0); /*CTL1 = still talking ? */
-}
-
-
-
-/**********************************************************************************************
-
-     tms5110_ready_read -- returns the ready state of the TMS5110
-
-***********************************************************************************************/
-
-int tms5110_ready_read(void *chip)
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-	return (tms->fifo_count < FIFO_SIZE-1);
-}
 
 
 
@@ -415,9 +344,8 @@ int tms5110_ready_read(void *chip)
 
 ***********************************************************************************************/
 
-void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
+void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 {
-	struct tms5110 *tms = (struct tms5110 *)chip;
 	int buf_count=0;
 	int i, interp_period, bitout;
 	INT16 Y11, cliptemp;
@@ -728,28 +656,14 @@ empty:
 
 
 
-
-/******************************************************************************************
-
-     CTL_set -- set CTL pins named CTL1, CTL2, CTL4 and CTL8
-
-******************************************************************************************/
-
-void tms5110_CTL_set(void *chip, int data)
-{
-	struct tms5110 *tms = (struct tms5110 *)chip;
-	tms->CTL_pins = data & 0xf;
-}
-
 /******************************************************************************************
 
      PDC_set -- set Processor Data Clock. Execute CTL_pins command on hi-lo transition.
 
 ******************************************************************************************/
 
-void tms5110_PDC_set(void *chip, int data)
+void tms5110_PDC_set(tms5110_state *tms, int data)
 {
-	struct tms5110 *tms = (struct tms5110 *)chip;
 	if (tms->PDC != (data & 0x1) )
 	{
 		tms->PDC = data & 0x1;
@@ -778,7 +692,7 @@ void tms5110_PDC_set(void *chip, int data)
 
 				case TMS5110_CMD_RESET:
 					perform_dummy_read(tms);
-					tms5110_reset_chip(tms);
+					device_reset(tms->device);
 					break;
 
 				case TMS5110_CMD_READ_BIT:
@@ -813,7 +727,7 @@ void tms5110_PDC_set(void *chip, int data)
 
 ******************************************************************************************/
 
-static void parse_frame(struct tms5110 *tms)
+static void parse_frame(tms5110_state *tms)
 {
 	int bits, indx, i, rep_flag, ene;
 
@@ -959,3 +873,299 @@ static const unsigned int example_word_TEN[619]={
 };
 #endif
 
+
+static int speech_rom_read_bit(const device_config *device)
+{
+	tms5110_state *tms = get_safe_token(device);
+
+	int r;
+
+	if (tms->speech_rom_bitnum<0)
+		r = 0;
+	else
+		r = (tms->table[tms->speech_rom_bitnum >> 3] >> (0x07 - (tms->speech_rom_bitnum & 0x07))) & 1;
+
+	tms->speech_rom_bitnum++;
+
+	return r;
+}
+
+static void speech_rom_set_addr(const device_config *device, int addr)
+{
+	tms5110_state *tms = get_safe_token(device);
+
+	tms->speech_rom_bitnum = addr * 8 - 1;
+}
+
+/******************************************************************************
+
+     DEVICE_START( tms5110 ) -- allocate buffers and reset the 5110
+
+******************************************************************************/
+
+static DEVICE_START( tms5110 )
+{
+	static const tms5110_interface dummy = { 0 };
+	tms5110_state *tms = get_safe_token(device);
+
+	tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
+	tms->table = device->region;
+
+	tms->device = device;
+	tms5110_set_variant(tms, TMS5110_IS_5110A);
+
+	assert_always(tms != NULL, "Error creating TMS5110 chip");
+
+	/* initialize a stream */
+	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5110_update);
+
+	if (tms->table == NULL)
+	{
+		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+	    tms->M0_callback = tms->intf->M0_callback;
+	    tms->set_load_address = tms->intf->load_address;
+	}
+	else
+	{
+	    tms->M0_callback = speech_rom_read_bit;
+	    tms->set_load_address = speech_rom_set_addr;
+	}
+	
+	register_for_save_states(tms);
+}
+
+static DEVICE_START( tms5100 )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_5100);
+}
+
+static DEVICE_START( tms5110a )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_5110A);
+}
+
+static DEVICE_START( cd2801 )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_CD2801);
+}
+
+static DEVICE_START( tmc0281 )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_TMC0281);
+}
+
+static DEVICE_START( cd2802 )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_CD2802);
+}
+
+static DEVICE_START( m58817 )
+{
+	tms5110_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
+	tms5110_set_variant(tms, TMS5110_IS_M58817);
+}
+
+
+static DEVICE_RESET( tms5110 )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+	/* initialize the FIFO */
+	memset(tms->fifo, 0, sizeof(tms->fifo));
+	tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
+
+	/* initialize the chip state */
+	tms->speaking_now = tms->speak_delay_frames = tms->talk_status = 0;
+	tms->CTL_pins = 0;
+		tms->RNG = 0x1fff;
+
+	/* initialize the energy/pitch/k states */
+	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
+	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
+	memset(tms->old_k, 0, sizeof(tms->old_k));
+	memset(tms->new_k, 0, sizeof(tms->new_k));
+	memset(tms->current_k, 0, sizeof(tms->current_k));
+	memset(tms->target_k, 0, sizeof(tms->target_k));
+
+	/* initialize the sample generators */
+	tms->interp_count = tms->sample_count = tms->pitch_count = 0;
+	memset(tms->x, 0, sizeof(tms->x));
+	tms->next_is_address = FALSE;
+	tms->address = 0;
+	tms->schedule_dummy_read = TRUE;
+	tms->addr_bit = 0;
+}
+
+
+
+/******************************************************************************
+
+     tms5110_ctl_w -- write Control Command to the sound chip
+commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
+
+******************************************************************************/
+
+WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+	tms->CTL_pins = data & 0xf;
+}
+
+
+/******************************************************************************
+
+     tms5110_pdc_w -- write to PDC pin on the sound chip
+
+******************************************************************************/
+
+WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+    tms5110_PDC_set(tms, data);
+}
+
+
+
+/******************************************************************************
+
+     tms5110_status_r -- read status from the sound chip
+
+        bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
+                Talk Status goes active at the initiation of a SPEAK command.
+                It goes inactive (low) when the stop code (Energy=1111) is processed, or
+                immediately(?????? not TMS5110) by a RESET command.
+        TMS5110 datasheets mention this is only available as a result of executing
+                TEST TALK command.
+
+******************************************************************************/
+
+READ8_DEVICE_HANDLER( tms5110_status_r )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+    return (tms->talk_status << 0); /*CTL1 = still talking ? */
+}
+
+
+
+/******************************************************************************
+
+     tms5110_ready_r -- return the not ready status from the sound chip
+
+******************************************************************************/
+
+int tms5110_ready_r(const device_config *device)
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+    return (tms->fifo_count < FIFO_SIZE-1);
+}
+
+
+
+/******************************************************************************
+
+     tms5110_update -- update the sound chip so that it is in sync with CPU execution
+
+******************************************************************************/
+
+static STREAM_UPDATE( tms5110_update )
+{
+	tms5110_state *tms = (tms5110_state *)param;
+	INT16 sample_data[MAX_SAMPLE_CHUNK];
+	stream_sample_t *buffer = outputs[0];
+
+	/* loop while we still have samples to generate */
+	while (samples)
+	{
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
+		int index;
+
+		/* generate the samples and copy to the target buffer */
+		tms5110_process(tms, sample_data, length);
+		for (index = 0; index < length; index++)
+			*buffer++ = sample_data[index];
+
+		/* account for the samples */
+		samples -= length;
+	}
+}
+
+
+
+/******************************************************************************
+
+     tms5110_set_frequency -- adjusts the playback frequency
+
+******************************************************************************/
+
+void tms5110_set_frequency(const device_config *device, int frequency)
+{
+	tms5110_state *tms = get_safe_token(device);
+	stream_set_sample_rate(tms->stream, frequency / 80);
+}
+
+
+
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##tms5110##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"TMS5110"
+#define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5100##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMS5100"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5110a##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMS5110A"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##cd2801##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"CD2801"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tmc0281##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMC0281"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##cd2802##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"CD2802"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58817##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"M58817"
+#include "devtempl.h"

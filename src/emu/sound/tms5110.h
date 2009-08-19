@@ -3,7 +3,6 @@
 #ifndef __TMS5110_H__
 #define __TMS5110_H__
 
-
 /* TMS5110 commands */
                                      /* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
                                      /* (MSB)             (LSB) | required */
@@ -15,33 +14,40 @@
 #define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
 #define TMS5110_CMD_TEST_TALK   (14) /*    1     1     1     x  |     3    */
 
-/* Variants */
+/* clock rate = 80 * output sample rate,     */
+/* usually 640000 for 8000 Hz sample rate or */
+/* usually 800000 for 10000 Hz sample rate.  */
 
-#define TMS5110_IS_5110A	(1)
-#define TMS5110_IS_5100		(2)
-#define TMS5110_IS_5110		(3)
+typedef struct _tms5110_interface tms5110_interface;
+struct _tms5110_interface
+{
+	int (*M0_callback)(const device_config *device);	/* function to be called when chip requests another bit */
+	void (*load_address)(const device_config *device, int addr);	/* speech ROM load address callback */
+};
 
-#define TMS5110_IS_CD2801	TMS5110_IS_5100
-#define TMS5110_IS_TMC0281	TMS5110_IS_5100
+WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
+WRITE8_DEVICE_HANDLER( tms5110_pdc_w );
 
-#define TMS5110_IS_CD2802	TMS5110_IS_5110
-#define TMS5110_IS_M58817	TMS5110_IS_5110
+READ8_DEVICE_HANDLER( tms5110_status_r );
+int tms5110_ready_r(const device_config *device);
 
-void *tms5110_create(const device_config *device, int variant);
-void tms5110_destroy(void *chip);
+void tms5110_set_frequency(const device_config *device, int frequency);
 
-void tms5110_set_variant(void *chip, int variant);
+DEVICE_GET_INFO( tms5110 );
+DEVICE_GET_INFO( tms5100 );
+DEVICE_GET_INFO( tms5110a );
+DEVICE_GET_INFO( cd2801 );
+DEVICE_GET_INFO( tmc0281 );
+DEVICE_GET_INFO( cd2802 );
+DEVICE_GET_INFO( m58817 );
 
-void tms5110_reset_chip(void *chip);
-void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *));
-void tms5110_set_load_address(void *chip, void (*func)(const device_config *, int));
+#define SOUND_TMS5110 DEVICE_GET_INFO_NAME( tms5110 )
+#define SOUND_TMS5100 DEVICE_GET_INFO_NAME( tms5100 )
+#define SOUND_TMS5110A DEVICE_GET_INFO_NAME( tms5110a )
+#define SOUND_CD2801 DEVICE_GET_INFO_NAME( cd2801 )
+#define SOUND_TMC0281 DEVICE_GET_INFO_NAME( tmc0281 )
+#define SOUND_CD2802 DEVICE_GET_INFO_NAME( cd2802 )
+#define SOUND_M58817 DEVICE_GET_INFO_NAME( m58817 )
 
-void tms5110_CTL_set(void *chip, int data);
-void tms5110_PDC_set(void *chip, int data);
-
-int tms5110_status_read(void *chip);
-int tms5110_ready_read(void *chip);
-
-void tms5110_process(void *chip, INT16 *buffer, unsigned int size);
 
 #endif /* __TMS5110_H__ */

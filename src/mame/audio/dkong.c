@@ -6,7 +6,6 @@
 #include "machine/latch8.h"
 
 #include "sound/tms5110.h"
-#include "sound/5110intf.h"
 
 #include "includes/dkong.h"
 

@@ -186,7 +186,6 @@ INLINE tms5220_state *get_safe_token(const device_config *device)
 
 /* Static function prototypes */
 static void process_command(tms5220_state *tms);
-static int extract_bits(tms5220_state *tms, int count);
 static int parse_frame(tms5220_state *tms, int the_first_frame);
 static void check_buffer_low(tms5220_state *tms);
 static void set_interrupt_state(tms5220_state *tms, int state);

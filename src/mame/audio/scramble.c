@@ -15,7 +15,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "sound/flt_rc.h"
-#include "sound/5110intf.h"
 #include "sound/tms5110.h"
 #include "sound/ay8910.h"
 #include "includes/galaxold.h"

@@ -85,7 +85,6 @@ Hardware Info
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
-#include "sound/5110intf.h"
 #include "sound/tms5110.h"
 #include "video/s2636.h"
 #include "cvs.h"
