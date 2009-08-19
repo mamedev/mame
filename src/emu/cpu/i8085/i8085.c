@@ -120,6 +120,18 @@
  *
  * - Flag setting fix for some instructions and cycle count update
  *
+ * August 2009, hap
+ *
+ * - removed DAA table
+ * - fixed accidental double memory reads due to macro overuse
+ * - fixed cycle deduction on unconditional CALL / RET
+ * - added cycle tables and cleaned up big switch source layout (1 tab = 4 spaces)
+ * - removed HLT cycle eating (earlier, HLT after EI could theoretically fail)
+ * - fixed parity flag on add/sub/cmp
+ * - renamed temp register XX to official name WZ
+ * - renamed flags from Z80 style S Z Y H X V N C  to  S Z X5 H X3 P V C, and
+ *   fixed X5 / V flags where accidentally broken due to flag names confusion
+ *
  *****************************************************************************/
 
 #include "debugger.h"
@@ -144,7 +156,7 @@ struct _i8085_state
 {
 	i8085_config 		config;
 	int 				cputype;		/* 0 8080, 1 8085A */
-	PAIR				PC,SP,AF,BC,DE,HL,XX;
+	PAIR				PC,SP,AF,BC,DE,HL,WZ;
 	UINT8				HALT;
 	UINT8				IM; 			/* interrupt mask (8085A only) */
 	UINT8   			STATUS;			/* status word */
@@ -226,6 +238,57 @@ static const cpu_state_table state_table_template =
     STATIC TABLES
 ***************************************************************************/
 
+/* cycles lookup */
+const UINT8 lut_cycles_8080[256]={
+/*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
+/* 0 */ 4, 10,7, 5, 5, 5, 7, 4, 4, 10,7, 5, 5, 5, 7, 4,
+/* 1 */ 4, 10,7, 5, 5, 5, 7, 4, 4, 10,7, 5, 5, 5, 7, 4,
+/* 2 */ 4, 10,16,5, 5, 5, 7, 4, 4, 10,16,5, 5, 5, 7, 4,
+/* 3 */ 4, 10,13,5, 10,10,10,4, 4, 10,13,5, 5, 5, 7, 4,
+/* 4 */ 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5,
+/* 5 */ 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5,
+/* 6 */ 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5,
+/* 7 */ 7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 5, 5, 7, 5,
+/* 8 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 9 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* A */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* B */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* C */ 5, 10,10,10,11,11,7, 11,5, 10,10,10,11,11,7, 11,
+/* D */ 5, 10,10,10,11,11,7, 11,5, 10,10,10,11,11,7, 11,
+/* E */ 5, 10,10,18,11,11,7, 11,5, 5, 10,5, 11,11,7, 11,
+/* F */ 5, 10,10,4, 11,11,7, 11,5, 5, 10,4, 11,11,7, 11 };
+const UINT8 lut_cycles_8085[256]={
+/*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
+/* 0 */ 4, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
+/* 1 */ 7, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
+/* 2 */ 7, 10,16,6, 4, 4, 7, 4, 10,10,16,6, 4, 4, 7, 4,
+/* 3 */ 7, 10,13,6, 10,10,10,4, 10,10,13,6, 4, 4, 7, 4,
+/* 4 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 5 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 6 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 7 */ 7, 7, 7, 7, 7, 7, 5, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 8 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* 9 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* A */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* B */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/* C */ 6, 10,10,10,11,12,7, 12,6, 10,10,12,11,11,7, 12,
+/* D */ 6, 10,10,10,11,12,7, 12,6, 10,10,10,11,10,7, 12,
+/* E */ 6, 10,10,16,11,12,7, 12,6, 6, 10,5, 11,10,7, 12,
+/* F */ 6, 10,10,4, 11,12,7, 12,6, 6, 10,4, 11,10,7, 12 };
+
+/* special cases (partially taken care of elsewhere):
+               base c    taken?   not taken?
+M_RET  8080    5         +6(11)   -0			(conditional)
+M_RET  8085    6         +6(12)   -0			(conditional)
+M_JMP  8080    10        +0       -0
+M_JMP  8085    10        +0       -3(7)
+M_CALL 8080    11        +6(17)   -0
+M_CALL 8085    11        +7(18)   -2(9)
+
+*/
+static UINT8 lut_cycles[256];
+
+/* flags lookup */
 static UINT8 ZS[256];
 static UINT8 ZSP[256];
 
@@ -450,7 +513,6 @@ static void check_for_interrupts(i8085_state *cpustate)
 			case 0xcd0000:	/* CALL nnnn */
 				cpustate->icount -= 7;
 				M_PUSH(PC);
-
 			case 0xc30000:	/* JMP  nnnn */
 				cpustate->icount -= 10;
 				cpustate->PC.d = vector & 0xffff;
@@ -467,1013 +529,418 @@ static void check_for_interrupts(i8085_state *cpustate)
 
 static void execute_one(i8085_state *cpustate, int opcode)
 {
+	cpustate->icount -= lut_cycles[opcode];
+	
 	switch (opcode)
 	{
-		case 0x00: cpustate->icount -= 4;	/* NOP  */
-			/* no op */
-			break;
-		case 0x01: cpustate->icount -= 10;	/* LXI  B,nnnn */
-			cpustate->BC.w.l = ARG16(cpustate);
-			break;
-		case 0x02: cpustate->icount -= 7;	/* STAX B */
-			WM(cpustate, cpustate->BC.d, cpustate->AF.b.h);
-			break;
-		case 0x03: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  B */
-			cpustate->BC.w.l++;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->BC.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x04: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  B */
-			M_INR(cpustate->BC.b.h);
-			break;
-		case 0x05: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  B */
-			M_DCR(cpustate->BC.b.h);
-			break;
-		case 0x06: cpustate->icount -= 7;	/* MVI  B,nn */
-			M_MVI(cpustate->BC.b.h);
-			break;
-		case 0x07: cpustate->icount -= 4;	/* RLC  */
-			M_RLC;
-			break;
+		case 0x00:														break;	/* NOP  */
+		case 0x01:	cpustate->BC.w.l = ARG16(cpustate);					break;	/* LXI  B,nnnn */
+		case 0x02:	WM(cpustate, cpustate->BC.d, cpustate->AF.b.h);		break;	/* STAX B */
+		case 0x03:	cpustate->BC.w.l++;											/* INX  B */
+					if (IS_8085(cpustate)) { if (cpustate->BC.w.l == 0x0000) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x04:	M_INR(cpustate->BC.b.h);							break;	/* INR  B */
+		case 0x05:	M_DCR(cpustate->BC.b.h);							break;	/* DCR  B */
+		case 0x06:	M_MVI(cpustate->BC.b.h);							break;	/* MVI  B,nn */
+		case 0x07:	M_RLC;												break;	/* RLC  */
 
-		case 0x08:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* DSUB */
-				M_DSUB(cpustate);
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x09: cpustate->icount -= 10;	/* DAD  B */
-			M_DAD(BC);
-			break;
-		case 0x0a: cpustate->icount -= 7;	/* LDAX B */
-			cpustate->AF.b.h = RM(cpustate, cpustate->BC.d);
-			break;
-		case 0x0b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  B */
-			cpustate->BC.w.l--;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->BC.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x0c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  C */
-			M_INR(cpustate->BC.b.l);
-			break;
-		case 0x0d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  C */
-			M_DCR(cpustate->BC.b.l);
-			break;
-		case 0x0e: cpustate->icount -= 7;	/* MVI  C,nn */
-			M_MVI(cpustate->BC.b.l);
-			break;
-		case 0x0f: cpustate->icount -= 4;	/* RRC  */
-			M_RRC;
-			break;
+		case 0x08:	if (IS_8085(cpustate)) { M_DSUB(cpustate); }				/* DSUB */
+					/* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x09:	M_DAD(BC);											break;	/* DAD  B */
+		case 0x0a:	cpustate->AF.b.h = RM(cpustate, cpustate->BC.d);	break;	/* LDAX B */
+		case 0x0b:	cpustate->BC.w.l--;											/* DCX  B */
+					if (IS_8085(cpustate)) { if (cpustate->BC.w.l == 0xffff) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x0c:	M_INR(cpustate->BC.b.l);							break;	/* INR  C */
+		case 0x0d:	M_DCR(cpustate->BC.b.l);							break;	/* DCR  C */
+		case 0x0e:	M_MVI(cpustate->BC.b.l);							break;	/* MVI  C,nn */
+		case 0x0f:	M_RRC;												break;	/* RRC  */
 
-		case 0x10:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 7;		/* ASRH */
-				cpustate->AF.b.l = (cpustate->AF.b.l & ~CF) | (cpustate->HL.b.l & CF);
-				cpustate->HL.w.l = (cpustate->HL.w.l >> 1);
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x11: cpustate->icount -= 10;	/* LXI  D,nnnn */
-			cpustate->DE.w.l = ARG16(cpustate);
-			break;
-		case 0x12: cpustate->icount -= 7;	/* STAX D */
-			WM(cpustate, cpustate->DE.d, cpustate->AF.b.h);
-			break;
-		case 0x13: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  D */
-			cpustate->DE.w.l++;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->DE.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x14: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  D */
-			M_INR(cpustate->DE.b.h);
-			break;
-		case 0x15: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  D */
-			M_DCR(cpustate->DE.b.h);
-			break;
-		case 0x16: cpustate->icount -= 7;	/* MVI  D,nn */
-			M_MVI(cpustate->DE.b.h);
-			break;
-		case 0x17: cpustate->icount -= 4;	/* RAL  */
-			M_RAL;
-			break;
+		case 0x10:	if (IS_8085(cpustate)) {									/* ASRH */
+						cpustate->AF.b.l = (cpustate->AF.b.l & ~CF) | (cpustate->HL.b.l & CF);
+						cpustate->HL.w.l = (cpustate->HL.w.l >> 1);
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x11:	cpustate->DE.w.l = ARG16(cpustate);					break;	/* LXI  D,nnnn */
+		case 0x12:	WM(cpustate, cpustate->DE.d, cpustate->AF.b.h);		break;	/* STAX D */
+		case 0x13:	cpustate->DE.w.l++;											/* INX  D */
+					if (IS_8085(cpustate)) { if (cpustate->DE.w.l == 0x0000) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x14:	M_INR(cpustate->DE.b.h);							break;	/* INR  D */
+		case 0x15:	M_DCR(cpustate->DE.b.h);							break;	/* DCR  D */
+		case 0x16:	M_MVI(cpustate->DE.b.h);							break;	/* MVI  D,nn */
+		case 0x17:	M_RAL;												break;	/* RAL  */
 
-		case 0x18:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* RLDE */
-				cpustate->AF.b.l = (cpustate->AF.b.l & ~(CF | VF)) | (cpustate->DE.b.h >> 7);
-				cpustate->DE.w.l = (cpustate->DE.w.l << 1) | (cpustate->DE.w.l >> 15);
-				if (0 != (((cpustate->DE.w.l >> 15) ^ cpustate->AF.b.l) & CF))
-					cpustate->AF.b.l |= VF;
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x19: cpustate->icount -= 10;	/* DAD  D */
-			M_DAD(DE);
-			break;
-		case 0x1a: cpustate->icount -= 7;	/* LDAX D */
-			cpustate->AF.b.h = RM(cpustate, cpustate->DE.d);
-			break;
-		case 0x1b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  D */
-			cpustate->DE.w.l--;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->DE.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x1c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  E */
-			M_INR(cpustate->DE.b.l);
-			break;
-		case 0x1d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  E */
-			M_DCR(cpustate->DE.b.l);
-			break;
-		case 0x1e: cpustate->icount -= 7;	/* MVI  E,nn */
-			M_MVI(cpustate->DE.b.l);
-			break;
-		case 0x1f: cpustate->icount -= 4;	/* RAR  */
-			M_RAR;
-			break;
+		case 0x18:	if (IS_8085(cpustate)) {									/* RLDE */
+						cpustate->AF.b.l = (cpustate->AF.b.l & ~(CF | VF)) | (cpustate->DE.b.h >> 7);
+						cpustate->DE.w.l = (cpustate->DE.w.l << 1) | (cpustate->DE.w.l >> 15);
+						if (0 != (((cpustate->DE.w.l >> 15) ^ cpustate->AF.b.l) & CF)) cpustate->AF.b.l |= VF;
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x19:	M_DAD(DE);											break;	/* DAD  D */
+		case 0x1a:	cpustate->AF.b.h = RM(cpustate, cpustate->DE.d);	break;	/* LDAX D */
+		case 0x1b:	cpustate->DE.w.l--;											/* DCX  D */
+					if (IS_8085(cpustate)) { if (cpustate->DE.w.l == 0xffff) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x1c:	M_INR(cpustate->DE.b.l);							break;	/* INR  E */
+		case 0x1d:	M_DCR(cpustate->DE.b.l);							break;	/* DCR  E */
+		case 0x1e:	M_MVI(cpustate->DE.b.l);							break;	/* MVI  E,nn */
+		case 0x1f:	M_RAR;												break;	/* RAR  */
 
-		case 0x20:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 7;		/* RIM  */
-				cpustate->AF.b.h = get_rim_value(cpustate);
+		case 0x20:	if (IS_8085(cpustate)) {									/* RIM  */
+						cpustate->AF.b.h = get_rim_value(cpustate);
 
-				/* if we have remembered state from taking a TRAP, fix up the IE flag here */
-				if (cpustate->trap_im_copy & 0x80)
-					cpustate->AF.b.h = (cpustate->AF.b.h & ~IM_IE) | (cpustate->trap_im_copy & IM_IE);
-				cpustate->trap_im_copy = 0;
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x21: cpustate->icount -= 10;	/* LXI  H,nnnn */
-			cpustate->HL.w.l = ARG16(cpustate);
-			break;
-		case 0x22: cpustate->icount -= 16;	/* SHLD nnnn */
-			cpustate->XX.w.l = ARG16(cpustate);
-			WM(cpustate, cpustate->XX.d, cpustate->HL.b.l);
-			cpustate->XX.w.l++;
-			WM(cpustate, cpustate->XX.d, cpustate->HL.b.h);
-			break;
-		case 0x23: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  H */
-			cpustate->HL.w.l++;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->HL.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x24: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  H */
-			M_INR(cpustate->HL.b.h);
-			break;
-		case 0x25: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  H */
-			M_DCR(cpustate->HL.b.h);
-			break;
-		case 0x26: cpustate->icount -= 7;	/* MVI  H,nn */
-			M_MVI(cpustate->HL.b.h);
-			break;
-		case 0x27: cpustate->icount -= 4;	/* DAA  */
-			cpustate->XX.b.h = cpustate->AF.b.h;
-			if (cpustate->AF.b.l&NF) {
-				if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->XX.b.h-=6;
-				if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->XX.b.h-=0x60;
-			}
-			else {
-				if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->XX.b.h+=6;
-				if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->XX.b.h+=0x60;
-			}
+						/* if we have remembered state from taking a TRAP, fix up the IE flag here */
+						if (cpustate->trap_im_copy & 0x80) cpustate->AF.b.h = (cpustate->AF.b.h & ~IM_IE) | (cpustate->trap_im_copy & IM_IE);
+						cpustate->trap_im_copy = 0;
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x21:	cpustate->HL.w.l = ARG16(cpustate);					break;	/* LXI  H,nnnn */
+		case 0x22:	cpustate->WZ.w.l = ARG16(cpustate);							/* SHLD nnnn */
+					WM(cpustate, cpustate->WZ.d, cpustate->HL.b.l); cpustate->WZ.w.l++;
+					WM(cpustate, cpustate->WZ.d, cpustate->HL.b.h);
+					break;	
+		case 0x23:	cpustate->HL.w.l++;											/* INX  H */
+					if (IS_8085(cpustate)) { if (cpustate->HL.w.l == 0x0000) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x24:	M_INR(cpustate->HL.b.h);							break;	/* INR  H */
+		case 0x25:	M_DCR(cpustate->HL.b.h);							break;	/* DCR  H */
+		case 0x26:	M_MVI(cpustate->HL.b.h);							break;	/* MVI  H,nn */
+		case 0x27:	cpustate->WZ.b.h = cpustate->AF.b.h;						/* DAA  */
+					if (cpustate->AF.b.l&VF) {
+						if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->WZ.b.h-=6;
+						if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->WZ.b.h-=0x60;
+					}
+					else {
+						if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->WZ.b.h+=6;
+						if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->WZ.b.h+=0x60;
+					}
 
-			cpustate->AF.b.l=(cpustate->AF.b.l&3) | (cpustate->AF.b.h&0x28) | (cpustate->AF.b.h>0x99) | ((cpustate->AF.b.h^cpustate->XX.b.h)&0x10) | ZSP[cpustate->XX.b.h];
-			cpustate->AF.b.h=cpustate->XX.b.h;
+					cpustate->AF.b.l=(cpustate->AF.b.l&3) | (cpustate->AF.b.h&0x28) | (cpustate->AF.b.h>0x99) | ((cpustate->AF.b.h^cpustate->WZ.b.h)&0x10) | ZSP[cpustate->WZ.b.h];
+					cpustate->AF.b.h=cpustate->WZ.b.h;
 
-			if (IS_8080(cpustate))
-			{
-				cpustate->AF.b.l &= 0xd5; // Ignore not used flags
-			}
-			break;
+					if (IS_8080(cpustate)) cpustate->AF.b.l &= 0xd5; // Ignore not used flags
+					break;
 
-		case 0x28:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* LDEH nn */
-				cpustate->XX.d = ARG(cpustate);
-				cpustate->DE.d = (cpustate->HL.d + cpustate->XX.d) & 0xffff;
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x29: cpustate->icount -= 10;	/* DAD  H */
-			M_DAD(HL);
-			break;
-		case 0x2a: cpustate->icount -= 16;	/* LHLD nnnn */
-			cpustate->XX.d = ARG16(cpustate);
-			cpustate->HL.b.l = RM(cpustate, cpustate->XX.d);
-			cpustate->XX.w.l++;
-			cpustate->HL.b.h = RM(cpustate, cpustate->XX.d);
-			break;
-		case 0x2b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  H */
-			cpustate->HL.w.l--;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->HL.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x2c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  L */
-			M_INR(cpustate->HL.b.l);
-			break;
-		case 0x2d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  L */
-			M_DCR(cpustate->HL.b.l);
-			break;
-		case 0x2e: cpustate->icount -= 7;	/* MVI  L,nn */
-			M_MVI(cpustate->HL.b.l);
-			break;
-		case 0x2f: cpustate->icount -= 4;	/* CMA  */
-			if (IS_8085(cpustate))
-			{
-				cpustate->AF.b.h ^= 0xff;
-				cpustate->AF.b.l |= HF + NF;
-			}
-			else
-			{
-				cpustate->AF.b.h ^= 0xff;	/* 8080 */
-			}
-			break;
+		case 0x28:	if (IS_8085(cpustate)) {									/* LDEH nn */
+						cpustate->WZ.d = ARG(cpustate);
+						cpustate->DE.d = (cpustate->HL.d + cpustate->WZ.d) & 0xffff;
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x29:	M_DAD(HL);											break;	/* DAD  H */
+		case 0x2a:	cpustate->WZ.d = ARG16(cpustate);							/* LHLD nnnn */
+					cpustate->HL.b.l = RM(cpustate, cpustate->WZ.d); cpustate->WZ.w.l++;
+					cpustate->HL.b.h = RM(cpustate, cpustate->WZ.d);
+					break;
+		case 0x2b:	cpustate->HL.w.l--;											/* DCX  H */
+					if (IS_8085(cpustate)) { if (cpustate->HL.w.l == 0xffff) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x2c:	M_INR(cpustate->HL.b.l);							break;	/* INR  L */
+		case 0x2d:	M_DCR(cpustate->HL.b.l);							break;	/* DCR  L */
+		case 0x2e:	M_MVI(cpustate->HL.b.l);							break;	/* MVI  L,nn */
+		case 0x2f:	cpustate->AF.b.h ^= 0xff;									/* CMA  */
+					if (IS_8085(cpustate)) cpustate->AF.b.l |= HF | VF;
+					break;
 
-		case 0x30:
-			if (IS_8085(cpustate))
-			{
-				cpustate->icount -= 7;		/* SIM  */
+		case 0x30:	if (IS_8085(cpustate)) {									/* SIM  */
+						/* if bit 3 is set, bits 0-2 become the new masks */
+						if (cpustate->AF.b.h & 0x08) {
+							cpustate->IM &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
+							cpustate->IM |= cpustate->AF.b.h & (IM_M55 | IM_M65 | IM_M75);
 
-				/* if bit 3 is set, bits 0-2 become the new masks */
-				if (cpustate->AF.b.h & 0x08)
-				{
-					cpustate->IM &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
-					cpustate->IM |= cpustate->AF.b.h & (IM_M55 | IM_M65 | IM_M75);
+							/* update live state based on the new masks */
+							if ((cpustate->IM & IM_M55) == 0 && cpustate->irq_state[I8085_RST55_LINE]) cpustate->IM |= IM_I55;
+							if ((cpustate->IM & IM_M65) == 0 && cpustate->irq_state[I8085_RST65_LINE]) cpustate->IM |= IM_I65;
+						}
 
-					/* update live state based on the new masks */
-					if ((cpustate->IM & IM_M55) == 0 && cpustate->irq_state[I8085_RST55_LINE])
-						cpustate->IM |= IM_I55;
-					if ((cpustate->IM & IM_M65) == 0 && cpustate->irq_state[I8085_RST65_LINE])
-						cpustate->IM |= IM_I65;
-				}
+						/* bit if 4 is set, the 7.5 flip-flop is cleared */
+						if (cpustate->AF.b.h & 0x10) cpustate->IM &= ~IM_I75;
 
-				/* bit if 4 is set, the 7.5 flip-flop is cleared */
-				if (cpustate->AF.b.h & 0x10)
-					cpustate->IM &= ~IM_I75;
+						/* if bit 6 is set, then bit 7 is the new SOD state */
+						if (cpustate->AF.b.h & 0x40) set_sod(cpustate, cpustate->AF.b.h >> 7);
 
-				/* if bit 6 is set, then bit 7 is the new SOD state */
-				if (cpustate->AF.b.h & 0x40)
-					set_sod(cpustate, cpustate->AF.b.h >> 7);
+						/* check for revealed interrupts */
+						check_for_interrupts(cpustate);
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x31:	cpustate->SP.w.l = ARG16(cpustate);					break;	/* LXI  SP,nnnn */
+		case 0x32:	cpustate->WZ.d = ARG16(cpustate);							/* STAX nnnn */
+					WM(cpustate, cpustate->WZ.d, cpustate->AF.b.h);
+					break;
+		case 0x33:	cpustate->SP.w.l++;											/* INX  SP */
+					if (IS_8085(cpustate)) { if (cpustate->SP.w.l == 0x0000) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x34:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d);			/* INR  M */
+					M_INR(cpustate->WZ.b.l);
+					WM(cpustate, cpustate->HL.d, cpustate->WZ.b.l);
+					break;
+		case 0x35:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d);			/* DCR  M */
+					M_DCR(cpustate->WZ.b.l);
+					WM(cpustate, cpustate->HL.d, cpustate->WZ.b.l);
+					break;
+		case 0x36:	cpustate->WZ.b.l = ARG(cpustate);							/* MVI  M,nn */
+					WM(cpustate, cpustate->HL.d, cpustate->WZ.b.l);
+					break;
+		case 0x37:	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | CF;	break;	/* STC  */
 
-				/* check for revealed interrupts */
-				check_for_interrupts(cpustate);
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
+		case 0x38:	if (IS_8085(cpustate)) {									/* LDES nn */
+						cpustate->WZ.d = ARG(cpustate);
+						cpustate->DE.d = (cpustate->SP.d + cpustate->WZ.d) & 0xffff;
+					} /* else { ; } */											/* NOP  undocumented */
+					break;
+		case 0x39:	M_DAD(SP);											break;	/* DAD  SP */
+		case 0x3a:	cpustate->WZ.d = ARG16(cpustate);							/* LDAX nnnn */
+					cpustate->AF.b.h = RM(cpustate, cpustate->WZ.d);
+					break;
+		case 0x3b:	cpustate->SP.w.l--;											/* DCX  SP */
+					if (IS_8085(cpustate)) { if (cpustate->SP.w.l == 0xffff) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
+					break;
+		case 0x3c:	M_INR(cpustate->AF.b.h);							break;	/* INR  A */
+		case 0x3d:	M_DCR(cpustate->AF.b.h);							break;	/* DCR  A */
+		case 0x3e:	M_MVI(cpustate->AF.b.h);							break;	/* MVI  A,nn */
+		case 0x3f:	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | (~cpustate->AF.b.l & CF); break; /* CMC  */
 
-		case 0x31: cpustate->icount -= 10;	/* LXI SP,nnnn */
-			cpustate->SP.w.l = ARG16(cpustate);
-			break;
-		case 0x32: cpustate->icount -= 13;	/* STAX nnnn */
-			cpustate->XX.d = ARG16(cpustate);
-			WM(cpustate, cpustate->XX.d, cpustate->AF.b.h);
-			break;
-		case 0x33: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  SP */
-			cpustate->SP.w.l++;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->SP.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x34: cpustate->icount -= 10;	/* INR  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_INR(cpustate->XX.b.l);
-			WM(cpustate, cpustate->HL.d, cpustate->XX.b.l);
-			break;
-		case 0x35: cpustate->icount -= 10;	/* DCR  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_DCR(cpustate->XX.b.l);
-			WM(cpustate, cpustate->HL.d, cpustate->XX.b.l);
-			break;
-		case 0x36: cpustate->icount -= 10;	/* MVI  M,nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			WM(cpustate, cpustate->HL.d, cpustate->XX.b.l);
-			break;
-		case 0x37: cpustate->icount -= 4;	/* STC  */
-			cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | CF;
-			break;
+		case 0x40:														break;	/* MOV  B,B */
+		case 0x41:	cpustate->BC.b.h = cpustate->BC.b.l;				break;	/* MOV  B,C */
+		case 0x42:	cpustate->BC.b.h = cpustate->DE.b.h;				break;	/* MOV  B,D */
+		case 0x43:	cpustate->BC.b.h = cpustate->DE.b.l;				break;	/* MOV  B,E */
+		case 0x44:	cpustate->BC.b.h = cpustate->HL.b.h;				break;	/* MOV  B,H */
+		case 0x45:	cpustate->BC.b.h = cpustate->HL.b.l;				break;	/* MOV  B,L */
+		case 0x46:	cpustate->BC.b.h = RM(cpustate, cpustate->HL.d);	break;	/* MOV  B,M */
+		case 0x47:	cpustate->BC.b.h = cpustate->AF.b.h;				break;	/* MOV  B,A */
 
-		case 0x38:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* LDES nn */
-				cpustate->XX.d = ARG(cpustate);
-				cpustate->DE.d = (cpustate->SP.d + cpustate->XX.d) & 0xffff;
-			} else {
-				cpustate->icount -= 4;		/* NOP undocumented */
-			}
-			break;
-		case 0x39: cpustate->icount -= 10;	/* DAD SP */
-			M_DAD(SP);
-			break;
-		case 0x3a: cpustate->icount -= 13;	/* LDAX nnnn */
-			cpustate->XX.d = ARG16(cpustate);
-			cpustate->AF.b.h = RM(cpustate, cpustate->XX.d);
-			break;
-		case 0x3b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  SP */
-			cpustate->SP.w.l--;
-			if (IS_8085(cpustate))
-			{
-				if (cpustate->SP.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
-			}
-			break;
-		case 0x3c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  A */
-			M_INR(cpustate->AF.b.h);
-			break;
-		case 0x3d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  A */
-			M_DCR(cpustate->AF.b.h);
-			break;
-		case 0x3e: cpustate->icount -= 7;	/* MVI  A,nn */
-			M_MVI(cpustate->AF.b.h);
-			break;
-		case 0x3f: cpustate->icount -= 4;	/* CMC  */
-			cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | ((cpustate->AF.b.l & CF)==1 ? 0 : 1);
-			break;
+		case 0x48:	cpustate->BC.b.l = cpustate->BC.b.h;				break;	/* MOV  C,B */
+		case 0x49:														break;	/* MOV  C,C */
+		case 0x4a:	cpustate->BC.b.l = cpustate->DE.b.h;				break;	/* MOV  C,D */
+		case 0x4b:	cpustate->BC.b.l = cpustate->DE.b.l;				break;	/* MOV  C,E */
+		case 0x4c:	cpustate->BC.b.l = cpustate->HL.b.h;				break;	/* MOV  C,H */
+		case 0x4d:	cpustate->BC.b.l = cpustate->HL.b.l;				break;	/* MOV  C,L */
+		case 0x4e:	cpustate->BC.b.l = RM(cpustate, cpustate->HL.d);	break;	/* MOV  C,M */
+		case 0x4f:	cpustate->BC.b.l = cpustate->AF.b.h;				break;	/* MOV  C,A */
 
-		case 0x40: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,B */
-			/* no op */
-			break;
-		case 0x41: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,C */
-			cpustate->BC.b.h = cpustate->BC.b.l;
-			break;
-		case 0x42: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,D */
-			cpustate->BC.b.h = cpustate->DE.b.h;
-			break;
-		case 0x43: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,E */
-			cpustate->BC.b.h = cpustate->DE.b.l;
-			break;
-		case 0x44: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,H */
-			cpustate->BC.b.h = cpustate->HL.b.h;
-			break;
-		case 0x45: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,L */
-			cpustate->BC.b.h = cpustate->HL.b.l;
-			break;
-		case 0x46: cpustate->icount -= 7;	/* MOV  B,M */
-			cpustate->BC.b.h = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x47: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,A */
-			cpustate->BC.b.h = cpustate->AF.b.h;
-			break;
+		case 0x50:	cpustate->DE.b.h = cpustate->BC.b.h;				break;	/* MOV  D,B */
+		case 0x51:	cpustate->DE.b.h = cpustate->BC.b.l;				break;	/* MOV  D,C */
+		case 0x52:														break;	/* MOV  D,D */
+		case 0x53:	cpustate->DE.b.h = cpustate->DE.b.l;				break;	/* MOV  D,E */
+		case 0x54:	cpustate->DE.b.h = cpustate->HL.b.h;				break;	/* MOV  D,H */
+		case 0x55:	cpustate->DE.b.h = cpustate->HL.b.l;				break;	/* MOV  D,L */
+		case 0x56:	cpustate->DE.b.h = RM(cpustate, cpustate->HL.d);	break;	/* MOV  D,M */
+		case 0x57:	cpustate->DE.b.h = cpustate->AF.b.h;				break;	/* MOV  D,A */
 
-		case 0x48: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,B */
-			cpustate->BC.b.l = cpustate->BC.b.h;
-			break;
-		case 0x49: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,C */
-			/* no op */
-			break;
-		case 0x4a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,D */
-			cpustate->BC.b.l = cpustate->DE.b.h;
-			break;
-		case 0x4b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,E */
-			cpustate->BC.b.l = cpustate->DE.b.l;
-			break;
-		case 0x4c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,H */
-			cpustate->BC.b.l = cpustate->HL.b.h;
-			break;
-		case 0x4d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,L */
-			cpustate->BC.b.l = cpustate->HL.b.l;
-			break;
-		case 0x4e: cpustate->icount -= 7;	/* MOV  C,M */
-			cpustate->BC.b.l = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x4f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,A */
-			cpustate->BC.b.l = cpustate->AF.b.h;
-			break;
+		case 0x58:	cpustate->DE.b.l = cpustate->BC.b.h;				break;	/* MOV  E,B */
+		case 0x59:	cpustate->DE.b.l = cpustate->BC.b.l;				break;	/* MOV  E,C */
+		case 0x5a:	cpustate->DE.b.l = cpustate->DE.b.h;				break;	/* MOV  E,D */
+		case 0x5b:														break;	/* MOV  E,E */
+		case 0x5c:	cpustate->DE.b.l = cpustate->HL.b.h;				break;	/* MOV  E,H */
+		case 0x5d:	cpustate->DE.b.l = cpustate->HL.b.l;				break;	/* MOV  E,L */
+		case 0x5e:	cpustate->DE.b.l = RM(cpustate, cpustate->HL.d);	break;	/* MOV  E,M */
+		case 0x5f:	cpustate->DE.b.l = cpustate->AF.b.h;				break;	/* MOV  E,A */
 
-		case 0x50: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,B */
-			cpustate->DE.b.h = cpustate->BC.b.h;
-			break;
-		case 0x51: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,C */
-			cpustate->DE.b.h = cpustate->BC.b.l;
-			break;
-		case 0x52: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,D */
-			/* no op */
-			break;
-		case 0x53: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,E */
-			cpustate->DE.b.h = cpustate->DE.b.l;
-			break;
-		case 0x54: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,H */
-			cpustate->DE.b.h = cpustate->HL.b.h;
-			break;
-		case 0x55: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,L */
-			cpustate->DE.b.h = cpustate->HL.b.l;
-			break;
-		case 0x56: cpustate->icount -= 7;	/* MOV  D,M */
-			cpustate->DE.b.h = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x57: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,A */
-			cpustate->DE.b.h = cpustate->AF.b.h;
-			break;
+		case 0x60:	cpustate->HL.b.h = cpustate->BC.b.h;				break;	/* MOV  H,B */
+		case 0x61:	cpustate->HL.b.h = cpustate->BC.b.l;				break;	/* MOV  H,C */
+		case 0x62:	cpustate->HL.b.h = cpustate->DE.b.h;				break;	/* MOV  H,D */
+		case 0x63:	cpustate->HL.b.h = cpustate->DE.b.l;				break;	/* MOV  H,E */
+		case 0x64:														break;	/* MOV  H,H */
+		case 0x65:	cpustate->HL.b.h = cpustate->HL.b.l;				break;	/* MOV  H,L */
+		case 0x66:	cpustate->HL.b.h = RM(cpustate, cpustate->HL.d);	break;	/* MOV  H,M */
+		case 0x67:	cpustate->HL.b.h = cpustate->AF.b.h;				break;	/* MOV  H,A */
 
-		case 0x58: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,B */
-			cpustate->DE.b.l = cpustate->BC.b.h;
-			break;
-		case 0x59: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,C */
-			cpustate->DE.b.l = cpustate->BC.b.l;
-			break;
-		case 0x5a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,D */
-			cpustate->DE.b.l = cpustate->DE.b.h;
-			break;
-		case 0x5b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,E */
-			/* no op */
-			break;
-		case 0x5c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,H */
-			cpustate->DE.b.l = cpustate->HL.b.h;
-			break;
-		case 0x5d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,L */
-			cpustate->DE.b.l = cpustate->HL.b.l;
-			break;
-		case 0x5e: cpustate->icount -= 7;	/* MOV  E,M */
-			cpustate->DE.b.l = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x5f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,A */
-			cpustate->DE.b.l = cpustate->AF.b.h;
-			break;
+		case 0x68:	cpustate->HL.b.l = cpustate->BC.b.h;				break;	/* MOV  L,B */
+		case 0x69:	cpustate->HL.b.l = cpustate->BC.b.l;				break;	/* MOV  L,C */
+		case 0x6a:	cpustate->HL.b.l = cpustate->DE.b.h;				break;	/* MOV  L,D */
+		case 0x6b:	cpustate->HL.b.l = cpustate->DE.b.l;				break;	/* MOV  L,E */
+		case 0x6c:	cpustate->HL.b.l = cpustate->HL.b.h;				break;	/* MOV  L,H */
+		case 0x6d:														break;	/* MOV  L,L */
+		case 0x6e:	cpustate->HL.b.l = RM(cpustate, cpustate->HL.d);	break;	/* MOV  L,M */
+		case 0x6f:	cpustate->HL.b.l = cpustate->AF.b.h;				break;	/* MOV  L,A */
 
-		case 0x60: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,B */
-			cpustate->HL.b.h = cpustate->BC.b.h;
-			break;
-		case 0x61: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,C */
-			cpustate->HL.b.h = cpustate->BC.b.l;
-			break;
-		case 0x62: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,D */
-			cpustate->HL.b.h = cpustate->DE.b.h;
-			break;
-		case 0x63: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,E */
-			cpustate->HL.b.h = cpustate->DE.b.l;
-			break;
-		case 0x64: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,H */
-			/* no op */
-			break;
-		case 0x65: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,L */
-			cpustate->HL.b.h = cpustate->HL.b.l;
-			break;
-		case 0x66: cpustate->icount -= 7;	/* MOV  H,M */
-			cpustate->HL.b.h = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x67: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,A */
-			cpustate->HL.b.h = cpustate->AF.b.h;
-			break;
+		case 0x70:	WM(cpustate, cpustate->HL.d, cpustate->BC.b.h);		break;	/* MOV  M,B */
+		case 0x71:	WM(cpustate, cpustate->HL.d, cpustate->BC.b.l);		break;	/* MOV  M,C */
+		case 0x72:	WM(cpustate, cpustate->HL.d, cpustate->DE.b.h);		break;	/* MOV  M,D */
+		case 0x73:	WM(cpustate, cpustate->HL.d, cpustate->DE.b.l);		break;	/* MOV  M,E */
+		case 0x74:	WM(cpustate, cpustate->HL.d, cpustate->HL.b.h);		break;	/* MOV  M,H */
+		case 0x75:	WM(cpustate, cpustate->HL.d, cpustate->HL.b.l);		break;	/* MOV  M,L */
+		case 0x76:	cpustate->PC.w.l--; cpustate->HALT = 1;						/* HLT */
+					set_status(cpustate, 0x8a); // halt acknowledge
+					break;
+		case 0x77:	WM(cpustate, cpustate->HL.d, cpustate->AF.b.h);		break;	/* MOV  M,A */
 
-		case 0x68: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,B */
-			cpustate->HL.b.l = cpustate->BC.b.h;
-			break;
-		case 0x69: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,C */
-			cpustate->HL.b.l = cpustate->BC.b.l;
-			break;
-		case 0x6a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,D */
-			cpustate->HL.b.l = cpustate->DE.b.h;
-			break;
-		case 0x6b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,E */
-			cpustate->HL.b.l = cpustate->DE.b.l;
-			break;
-		case 0x6c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,H */
-			cpustate->HL.b.l = cpustate->HL.b.h;
-			break;
-		case 0x6d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,L */
-			/* no op */
-			break;
-		case 0x6e: cpustate->icount -= 7;	/* MOV  L,M */
-			cpustate->HL.b.l = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x6f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,A */
-			cpustate->HL.b.l = cpustate->AF.b.h;
-			break;
+		case 0x78:	cpustate->AF.b.h = cpustate->BC.b.h;				break;	/* MOV  A,B */
+		case 0x79:	cpustate->AF.b.h = cpustate->BC.b.l;				break;	/* MOV  A,C */
+		case 0x7a:	cpustate->AF.b.h = cpustate->DE.b.h;				break;	/* MOV  A,D */
+		case 0x7b:	cpustate->AF.b.h = cpustate->DE.b.l;				break;	/* MOV  A,E */
+		case 0x7c:	cpustate->AF.b.h = cpustate->HL.b.h;				break;	/* MOV  A,H */
+		case 0x7d:	cpustate->AF.b.h = cpustate->HL.b.l;				break;	/* MOV  A,L */
+		case 0x7e:	cpustate->AF.b.h = RM(cpustate, cpustate->HL.d);	break;	/* MOV  A,M */
+		case 0x7f:														break;	/* MOV  A,A */
 
-		case 0x70: cpustate->icount -= 7;	/* MOV  M,B */
-			WM(cpustate, cpustate->HL.d, cpustate->BC.b.h);
-			break;
-		case 0x71: cpustate->icount -= 7;	/* MOV  M,C */
-			WM(cpustate, cpustate->HL.d, cpustate->BC.b.l);
-			break;
-		case 0x72: cpustate->icount -= 7;	/* MOV  M,D */
-			WM(cpustate, cpustate->HL.d, cpustate->DE.b.h);
-			break;
-		case 0x73: cpustate->icount -= 7;	/* MOV  M,E */
-			WM(cpustate, cpustate->HL.d, cpustate->DE.b.l);
-			break;
-		case 0x74: cpustate->icount -= 7;	/* MOV  M,H */
-			WM(cpustate, cpustate->HL.d, cpustate->HL.b.h);
-			break;
-		case 0x75: cpustate->icount -= 7;	/* MOV  M,L */
-			WM(cpustate, cpustate->HL.d, cpustate->HL.b.l);
-			break;
-		case 0x76: cpustate->icount -= IS_8085(cpustate) ? 5 : 7;	/* HLT */
-			cpustate->PC.w.l--;
-			cpustate->HALT = 1;
-			set_status(cpustate, 0x8a); // halt acknowledge
-			if (cpustate->icount > 0) cpustate->icount = 0;
-			break;
-		case 0x77: cpustate->icount -= 7;	/* MOV  M,A */
-			WM(cpustate, cpustate->HL.d, cpustate->AF.b.h);
-			break;
+		case 0x80:	M_ADD(cpustate->BC.b.h);							break;	/* ADD  B */
+		case 0x81:	M_ADD(cpustate->BC.b.l);							break;	/* ADD  C */
+		case 0x82:	M_ADD(cpustate->DE.b.h);							break;	/* ADD  D */
+		case 0x83:	M_ADD(cpustate->DE.b.l);							break;	/* ADD  E */
+		case 0x84:	M_ADD(cpustate->HL.b.h);							break;	/* ADD  H */
+		case 0x85:	M_ADD(cpustate->HL.b.l);							break;	/* ADD  L */
+		case 0x86:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_ADD(cpustate->WZ.b.l); break; /* ADD  M */
+		case 0x87:	M_ADD(cpustate->AF.b.h);							break;	/* ADD  A */
 
-		case 0x78: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,B */
-			cpustate->AF.b.h = cpustate->BC.b.h;
-			break;
-		case 0x79: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,C */
-			cpustate->AF.b.h = cpustate->BC.b.l;
-			break;
-		case 0x7a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,D */
-			cpustate->AF.b.h = cpustate->DE.b.h;
-			break;
-		case 0x7b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,E */
-			cpustate->AF.b.h = cpustate->DE.b.l;
-			break;
-		case 0x7c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,H */
-			cpustate->AF.b.h = cpustate->HL.b.h;
-			break;
-		case 0x7d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,L */
-			cpustate->AF.b.h = cpustate->HL.b.l;
-			break;
-		case 0x7e: cpustate->icount -= 7;	/* MOV  A,M */
-			cpustate->AF.b.h = RM(cpustate, cpustate->HL.d);
-			break;
-		case 0x7f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,A */
-			/* no op */
-			break;
+		case 0x88:	M_ADC(cpustate->BC.b.h);							break;	/* ADC  B */
+		case 0x89:	M_ADC(cpustate->BC.b.l);							break;	/* ADC  C */
+		case 0x8a:	M_ADC(cpustate->DE.b.h);							break;	/* ADC  D */
+		case 0x8b:	M_ADC(cpustate->DE.b.l);							break;	/* ADC  E */
+		case 0x8c:	M_ADC(cpustate->HL.b.h);							break;	/* ADC  H */
+		case 0x8d:	M_ADC(cpustate->HL.b.l);							break;	/* ADC  L */
+		case 0x8e:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_ADC(cpustate->WZ.b.l); break; /* ADC  M */
+		case 0x8f:	M_ADC(cpustate->AF.b.h);							break;	/* ADC  A */
 
-		case 0x80: cpustate->icount -= 4;	/* ADD  B */
-			M_ADD(cpustate->BC.b.h);
-			break;
-		case 0x81: cpustate->icount -= 4;	/* ADD  C */
-			M_ADD(cpustate->BC.b.l);
-			break;
-		case 0x82: cpustate->icount -= 4;	/* ADD  D */
-			M_ADD(cpustate->DE.b.h);
-			break;
-		case 0x83: cpustate->icount -= 4;	/* ADD  E */
-			M_ADD(cpustate->DE.b.l);
-			break;
-		case 0x84: cpustate->icount -= 4;	/* ADD  H */
-			M_ADD(cpustate->HL.b.h);
-			break;
-		case 0x85: cpustate->icount -= 4;	/* ADD  L */
-			M_ADD(cpustate->HL.b.l);
-			break;
-		case 0x86: cpustate->icount -= 7;	/* ADD  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_ADD(cpustate->XX.b.l);
-			break;
-		case 0x87: cpustate->icount -= 4;	/* ADD  A */
-			M_ADD(cpustate->AF.b.h);
-			break;
+		case 0x90:	M_SUB(cpustate->BC.b.h);							break;	/* SUB  B */
+		case 0x91:	M_SUB(cpustate->BC.b.l);							break;	/* SUB  C */
+		case 0x92:	M_SUB(cpustate->DE.b.h);							break;	/* SUB  D */
+		case 0x93:	M_SUB(cpustate->DE.b.l);							break;	/* SUB  E */
+		case 0x94:	M_SUB(cpustate->HL.b.h);							break;	/* SUB  H */
+		case 0x95:	M_SUB(cpustate->HL.b.l);							break;	/* SUB  L */
+		case 0x96:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_SUB(cpustate->WZ.b.l); break; /* SUB  M */
+		case 0x97:	M_SUB(cpustate->AF.b.h);							break;	/* SUB  A */
 
-		case 0x88: cpustate->icount -= 4;	/* ADC  B */
-			M_ADC(cpustate->BC.b.h);
-			break;
-		case 0x89: cpustate->icount -= 4;	/* ADC  C */
-			M_ADC(cpustate->BC.b.l);
-			break;
-		case 0x8a: cpustate->icount -= 4;	/* ADC  D */
-			M_ADC(cpustate->DE.b.h);
-			break;
-		case 0x8b: cpustate->icount -= 4;	/* ADC  E */
-			M_ADC(cpustate->DE.b.l);
-			break;
-		case 0x8c: cpustate->icount -= 4;	/* ADC  H */
-			M_ADC(cpustate->HL.b.h);
-			break;
-		case 0x8d: cpustate->icount -= 4;	/* ADC  L */
-			M_ADC(cpustate->HL.b.l);
-			break;
-		case 0x8e: cpustate->icount -= 7;	/* ADC  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_ADC(cpustate->XX.b.l);
-			break;
-		case 0x8f: cpustate->icount -= 4;	/* ADC  A */
-			M_ADC(cpustate->AF.b.h);
-			break;
+		case 0x98:	M_SBB(cpustate->BC.b.h);							break;	/* SBB  B */
+		case 0x99:	M_SBB(cpustate->BC.b.l);							break;	/* SBB  C */
+		case 0x9a:	M_SBB(cpustate->DE.b.h);							break;	/* SBB  D */
+		case 0x9b:	M_SBB(cpustate->DE.b.l);							break;	/* SBB  E */
+		case 0x9c:	M_SBB(cpustate->HL.b.h);							break;	/* SBB  H */
+		case 0x9d:	M_SBB(cpustate->HL.b.l);							break;	/* SBB  L */
+		case 0x9e:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_SBB(cpustate->WZ.b.l); break; /* SBB  M */
+		case 0x9f:	M_SBB(cpustate->AF.b.h);							break;	/* SBB  A */
 
-		case 0x90: cpustate->icount -= 4;	/* SUB  B */
-			M_SUB(cpustate->BC.b.h);
-			break;
-		case 0x91: cpustate->icount -= 4;	/* SUB  C */
-			M_SUB(cpustate->BC.b.l);
-			break;
-		case 0x92: cpustate->icount -= 4;	/* SUB  D */
-			M_SUB(cpustate->DE.b.h);
-			break;
-		case 0x93: cpustate->icount -= 4;	/* SUB  E */
-			M_SUB(cpustate->DE.b.l);
-			break;
-		case 0x94: cpustate->icount -= 4;	/* SUB  H */
-			M_SUB(cpustate->HL.b.h);
-			break;
-		case 0x95: cpustate->icount -= 4;	/* SUB  L */
-			M_SUB(cpustate->HL.b.l);
-			break;
-		case 0x96: cpustate->icount -= 7;	/* SUB  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_SUB(cpustate->XX.b.l);
-			break;
-		case 0x97: cpustate->icount -= 4;	/* SUB  A */
-			M_SUB(cpustate->AF.b.h);
-			break;
+		case 0xa0:	M_ANA(cpustate->BC.b.h);							break;	/* ANA  B */
+		case 0xa1:	M_ANA(cpustate->BC.b.l);							break;	/* ANA  C */
+		case 0xa2:	M_ANA(cpustate->DE.b.h);							break;	/* ANA  D */
+		case 0xa3:	M_ANA(cpustate->DE.b.l);							break;	/* ANA  E */
+		case 0xa4:	M_ANA(cpustate->HL.b.h);							break;	/* ANA  H */
+		case 0xa5:	M_ANA(cpustate->HL.b.l);							break;	/* ANA  L */
+		case 0xa6:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_ANA(cpustate->WZ.b.l); break; /* ANA  M */
+		case 0xa7:	M_ANA(cpustate->AF.b.h);							break;	/* ANA  A */
 
-		case 0x98: cpustate->icount -= 4;	/* SBB  B */
-			M_SBB(cpustate->BC.b.h);
-			break;
-		case 0x99: cpustate->icount -= 4;	/* SBB  C */
-			M_SBB(cpustate->BC.b.l);
-			break;
-		case 0x9a: cpustate->icount -= 4;	/* SBB  D */
-			M_SBB(cpustate->DE.b.h);
-			break;
-		case 0x9b: cpustate->icount -= 4;	/* SBB  E */
-			M_SBB(cpustate->DE.b.l);
-			break;
-		case 0x9c: cpustate->icount -= 4;	/* SBB  H */
-			M_SBB(cpustate->HL.b.h);
-			break;
-		case 0x9d: cpustate->icount -= 4;	/* SBB  L */
-			M_SBB(cpustate->HL.b.l);
-			break;
-		case 0x9e: cpustate->icount -= 7;	/* SBB  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_SBB(cpustate->XX.b.l);
-			break;
-		case 0x9f: cpustate->icount -= 4;	/* SBB  A */
-			M_SBB(cpustate->AF.b.h);
-			break;
+		case 0xa8:	M_XRA(cpustate->BC.b.h);							break;	/* XRA  B */
+		case 0xa9:	M_XRA(cpustate->BC.b.l);							break;	/* XRA  C */
+		case 0xaa:	M_XRA(cpustate->DE.b.h);							break;	/* XRA  D */
+		case 0xab:	M_XRA(cpustate->DE.b.l);							break;	/* XRA  E */
+		case 0xac:	M_XRA(cpustate->HL.b.h);							break;	/* XRA  H */
+		case 0xad:	M_XRA(cpustate->HL.b.l);							break;	/* XRA  L */
+		case 0xae:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_XRA(cpustate->WZ.b.l); break; /* XRA  M */
+		case 0xaf:	M_XRA(cpustate->AF.b.h);							break;	/* XRA  A */
 
-		case 0xa0: cpustate->icount -= 4;	/* ANA  B */
-			M_ANA(cpustate->BC.b.h);
-			break;
-		case 0xa1: cpustate->icount -= 4;	/* ANA  C */
-			M_ANA(cpustate->BC.b.l);
-			break;
-		case 0xa2: cpustate->icount -= 4;	/* ANA  D */
-			M_ANA(cpustate->DE.b.h);
-			break;
-		case 0xa3: cpustate->icount -= 4;	/* ANA  E */
-			M_ANA(cpustate->DE.b.l);
-			break;
-		case 0xa4: cpustate->icount -= 4;	/* ANA  H */
-			M_ANA(cpustate->HL.b.h);
-			break;
-		case 0xa5: cpustate->icount -= 4;	/* ANA  L */
-			M_ANA(cpustate->HL.b.l);
-			break;
-		case 0xa6: cpustate->icount -= 7;	/* ANA  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_ANA(cpustate->XX.b.l);
-			break;
-		case 0xa7: cpustate->icount -= 4;	/* ANA  A */
-			M_ANA(cpustate->AF.b.h);
-			break;
+		case 0xb0:	M_ORA(cpustate->BC.b.h);							break;	/* ORA  B */
+		case 0xb1:	M_ORA(cpustate->BC.b.l);							break;	/* ORA  C */
+		case 0xb2:	M_ORA(cpustate->DE.b.h);							break;	/* ORA  D */
+		case 0xb3:	M_ORA(cpustate->DE.b.l);							break;	/* ORA  E */
+		case 0xb4:	M_ORA(cpustate->HL.b.h);							break;	/* ORA  H */
+		case 0xb5:	M_ORA(cpustate->HL.b.l);							break;	/* ORA  L */
+		case 0xb6:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_ORA(cpustate->WZ.b.l); break; /* ORA  M */
+		case 0xb7:	M_ORA(cpustate->AF.b.h);							break;	/* ORA  A */
 
-		case 0xa8: cpustate->icount -= 4;	/* XRA  B */
-			M_XRA(cpustate->BC.b.h);
-			break;
-		case 0xa9: cpustate->icount -= 4;	/* XRA  C */
-			M_XRA(cpustate->BC.b.l);
-			break;
-		case 0xaa: cpustate->icount -= 4;	/* XRA  D */
-			M_XRA(cpustate->DE.b.h);
-			break;
-		case 0xab: cpustate->icount -= 4;	/* XRA  E */
-			M_XRA(cpustate->DE.b.l);
-			break;
-		case 0xac: cpustate->icount -= 4;	/* XRA  H */
-			M_XRA(cpustate->HL.b.h);
-			break;
-		case 0xad: cpustate->icount -= 4;	/* XRA  L */
-			M_XRA(cpustate->HL.b.l);
-			break;
-		case 0xae: cpustate->icount -= 7;	/* XRA  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_XRA(cpustate->XX.b.l);
-			break;
-		case 0xaf: cpustate->icount -= 4;	/* XRA  A */
-			M_XRA(cpustate->AF.b.h);
-			break;
+		case 0xb8:	M_CMP(cpustate->BC.b.h);							break;	/* CMP  B */
+		case 0xb9:	M_CMP(cpustate->BC.b.l);							break;	/* CMP  C */
+		case 0xba:	M_CMP(cpustate->DE.b.h);							break;	/* CMP  D */
+		case 0xbb:	M_CMP(cpustate->DE.b.l);							break;	/* CMP  E */
+		case 0xbc:	M_CMP(cpustate->HL.b.h);							break;	/* CMP  H */
+		case 0xbd:	M_CMP(cpustate->HL.b.l);							break;	/* CMP  L */
+		case 0xbe:	cpustate->WZ.b.l = RM(cpustate, cpustate->HL.d); M_CMP(cpustate->WZ.b.l); break; /* CMP  M */
+		case 0xbf:	M_CMP(cpustate->AF.b.h);							break;	/* CMP  A */
 
-		case 0xb0: cpustate->icount -= 4;	/* ORA  B */
-			M_ORA(cpustate->BC.b.h);
-			break;
-		case 0xb1: cpustate->icount -= 4;	/* ORA  C */
-			M_ORA(cpustate->BC.b.l);
-			break;
-		case 0xb2: cpustate->icount -= 4;	/* ORA  D */
-			M_ORA(cpustate->DE.b.h);
-			break;
-		case 0xb3: cpustate->icount -= 4;	/* ORA  E */
-			M_ORA(cpustate->DE.b.l);
-			break;
-		case 0xb4: cpustate->icount -= 4;	/* ORA  H */
-			M_ORA(cpustate->HL.b.h);
-			break;
-		case 0xb5: cpustate->icount -= 4;	/* ORA  L */
-			M_ORA(cpustate->HL.b.l);
-			break;
-		case 0xb6: cpustate->icount -= 7;	/* ORA  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_ORA(cpustate->XX.b.l);
-			break;
-		case 0xb7: cpustate->icount -= 4;	/* ORA  A */
-			M_ORA(cpustate->AF.b.h);
-			break;
+		case 0xc0:	M_RET( !(cpustate->AF.b.l & ZF) );					break;	/* RNZ  */
+		case 0xc1:	M_POP(BC);											break;	/* POP  B */
+		case 0xc2:	M_JMP( !(cpustate->AF.b.l & ZF) );					break;	/* JNZ  nnnn */
+		case 0xc3:	M_JMP(1);											break;	/* JMP  nnnn */
+		case 0xc4:	M_CALL( !(cpustate->AF.b.l & ZF) );					break;	/* CNZ  nnnn */
+		case 0xc5:	M_PUSH(BC);											break;	/* PUSH B */
+		case 0xc6:	cpustate->WZ.b.l = ARG(cpustate); M_ADD(cpustate->WZ.b.l); break; /* ADI  nn */
+		case 0xc7:	M_RST(0);											break;	/* RST  0 */
 
-		case 0xb8: cpustate->icount -= 4;	/* CMP  B */
-			M_CMP(cpustate->BC.b.h);
-			break;
-		case 0xb9: cpustate->icount -= 4;	/* CMP  C */
-			M_CMP(cpustate->BC.b.l);
-			break;
-		case 0xba: cpustate->icount -= 4;	/* CMP  D */
-			M_CMP(cpustate->DE.b.h);
-			break;
-		case 0xbb: cpustate->icount -= 4;	/* CMP  E */
-			M_CMP(cpustate->DE.b.l);
-			break;
-		case 0xbc: cpustate->icount -= 4;	/* CMP  H */
-			M_CMP(cpustate->HL.b.h);
-			break;
-		case 0xbd: cpustate->icount -= 4;	/* CMP  L */
-			M_CMP(cpustate->HL.b.l);
-			break;
-		case 0xbe: cpustate->icount -= 7;	/* CMP  M */
-			cpustate->XX.b.l = RM(cpustate, cpustate->HL.d);
-			M_CMP(cpustate->XX.b.l);
-			break;
-		case 0xbf: cpustate->icount -= 4;	/* CMP  A */
-			M_CMP(cpustate->AF.b.h);
-			break;
+		case 0xc8:	M_RET( cpustate->AF.b.l & ZF );						break;	/* RZ   */
+		case 0xc9:	M_POP(PC);											break;	/* RET  */
+		case 0xca:	M_JMP( cpustate->AF.b.l & ZF );						break;	/* JZ   nnnn */
+		case 0xcb:	if (IS_8085(cpustate)) {									/* RST  V */
+						if (cpustate->AF.b.l & VF) { M_RST(8); }
+						else cpustate->icount += 6; // RST not taken
+					} else { M_JMP(1); }										/* JMP  nnnn undocumented */
+					break;
+		case 0xcc:	M_CALL( cpustate->AF.b.l & ZF );					break;	/* CZ   nnnn */
+		case 0xcd:	M_CALL(1);											break;	/* CALL nnnn */
+		case 0xce:	cpustate->WZ.b.l = ARG(cpustate); M_ADC(cpustate->WZ.b.l); break; /* ACI  nn */
+		case 0xcf:	M_RST(1);											break;	/* RST  1 */
 
-		case 0xc0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RNZ  */
-			M_RET( !(cpustate->AF.b.l & ZF) );
-			break;
-		case 0xc1: cpustate->icount -= 10;	/* POP  B */
-			M_POP(BC);
-			break;
-		case 0xc2: cpustate->icount -= 10;	/* JNZ  nnnn */
-			M_JMP( !(cpustate->AF.b.l & ZF) );
-			break;
-		case 0xc3: cpustate->icount -= 10;	/* JMP  nnnn */
-			M_JMP(1);
-			break;
-		case 0xc4: cpustate->icount -= 11;	/* CNZ  nnnn */
-			M_CALL( !(cpustate->AF.b.l & ZF) );
-			break;
-		case 0xc5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH B */
-			M_PUSH(BC);
-			break;
-		case 0xc6: cpustate->icount -= 7;	/* ADI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_ADD(cpustate->XX.b.l);
-				break;
-		case 0xc7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  0 */
-			M_RST(0);
-			break;
+		case 0xd0:	M_RET( !(cpustate->AF.b.l & CF) );					break;	/* RNC  */
+		case 0xd1:	M_POP(DE);											break;	/* POP  D */
+		case 0xd2:	M_JMP( !(cpustate->AF.b.l & CF) );					break;	/* JNC  nnnn */
+		case 0xd3:	M_OUT;												break;	/* OUT  nn */
+		case 0xd4:	M_CALL( !(cpustate->AF.b.l & CF) );					break;	/* CNC  nnnn */
+		case 0xd5:	M_PUSH(DE);											break;	/* PUSH D */
+		case 0xd6:	cpustate->WZ.b.l = ARG(cpustate); M_SUB(cpustate->WZ.b.l); break; /* SUI  nn */
+		case 0xd7:	M_RST(2);											break;	/* RST  2 */
 
-		case 0xc8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RZ   */
-			M_RET( cpustate->AF.b.l & ZF );
-			break;
-		case 0xc9: cpustate->icount -= 10;	/* RET  */
-			M_RET(1);
-			break;
-		case 0xca: cpustate->icount -= 10;	/* JZ   nnnn */
-			M_JMP( cpustate->AF.b.l & ZF );
-			break;
-		case 0xcb:
-			if (IS_8085(cpustate)) {
-				if (cpustate->AF.b.l & VF) {
-					cpustate->icount -= 12;
-					M_RST(8);			/* call 0x40 */
-				} else {
-					cpustate->icount -= 6;	/* RST  V */
-				}
-			} else {
-				cpustate->icount -= 10;	/* JMP  nnnn undocumented*/
-				M_JMP(1);
-			}
-			break;
-		case 0xcc: cpustate->icount -= 11;	/* CZ   nnnn */
-			M_CALL( cpustate->AF.b.l & ZF );
-			break;
-		case 0xcd: cpustate->icount -= 17;	/* CALL nnnn */
-			M_CALL(1);
-			break;
-		case 0xce: cpustate->icount -= 7;	/* ACI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_ADC(cpustate->XX.b.l);
-			break;
-		case 0xcf: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  1 */
-			M_RST(1);
-			break;
+		case 0xd8:	M_RET( cpustate->AF.b.l & CF );						break;	/* RC   */
+		case 0xd9:	if (IS_8085(cpustate)) {									/* SHLX */
+						cpustate->WZ.w.l = cpustate->DE.w.l;
+						WM(cpustate, cpustate->WZ.d, cpustate->HL.b.l); cpustate->WZ.w.l++;
+						WM(cpustate, cpustate->WZ.d, cpustate->HL.b.h);
+					} else { M_POP(PC); }										/* RET  undocumented */
+					break;
+		case 0xda:	M_JMP( cpustate->AF.b.l & CF );						break;	/* JC   nnnn */
+		case 0xdb:	M_IN;												break;	/* IN   nn */
+		case 0xdc:	M_CALL( cpustate->AF.b.l & CF );					break;	/* CC   nnnn */
+		case 0xdd:	if (IS_8085(cpustate)) { M_JMP( !(cpustate->AF.b.l & X5F) ); } /* JNX  nnnn */
+					else { M_CALL(1); }											/* CALL nnnn undocumented */
+					break;
+		case 0xde:	cpustate->WZ.b.l = ARG(cpustate); M_SBB(cpustate->WZ.b.l); break; /* SBI  nn */
+		case 0xdf:	M_RST(3);											break;	/* RST  3 */
 
-		case 0xd0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RNC  */
-			M_RET( !(cpustate->AF.b.l & CF) );
-			break;
-		case 0xd1: cpustate->icount -= 10;	/* POP  D */
-			M_POP(DE);
-			break;
-		case 0xd2: cpustate->icount -= 10;	/* JNC  nnnn */
-			M_JMP( !(cpustate->AF.b.l & CF) );
-			break;
-		case 0xd3: cpustate->icount -= 10;	/* OUT  nn */
-			M_OUT;
-			break;
-		case 0xd4: cpustate->icount -= 11;	/* CNC  nnnn */
-			M_CALL( !(cpustate->AF.b.l & CF) );
-			break;
-		case 0xd5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH D */
-			M_PUSH(DE);
-			break;
-		case 0xd6: cpustate->icount -= 7;	/* SUI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_SUB(cpustate->XX.b.l);
-			break;
-		case 0xd7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  2 */
-			M_RST(2);
-			break;
+		case 0xe0:	M_RET( !(cpustate->AF.b.l & PF) );					break;	/* RPO    */
+		case 0xe1:	M_POP(HL);											break;	/* POP  H */
+		case 0xe2:	M_JMP( !(cpustate->AF.b.l & PF) );					break;	/* JPO  nnnn */
+		case 0xe3:	M_POP(WZ); M_PUSH(HL);										/* XTHL */
+					cpustate->HL.d = cpustate->WZ.d;
+					break;
+		case 0xe4:	M_CALL( !(cpustate->AF.b.l & PF) );					break;	/* CPO  nnnn */
+		case 0xe5:	M_PUSH(HL);											break;	/* PUSH H */
+		case 0xe6:	cpustate->WZ.b.l = ARG(cpustate); M_ANA(cpustate->WZ.b.l); break; /* ANI  nn */
+		case 0xe7:	M_RST(4);											break;	/* RST  4 */
 
-		case 0xd8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RC   */
-			M_RET( cpustate->AF.b.l & CF );
-			break;
-		case 0xd9:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* SHLX */
-				cpustate->XX.w.l = cpustate->DE.w.l;
-				WM(cpustate, cpustate->XX.d, cpustate->HL.b.l);
-				cpustate->XX.w.l++;
-				WM(cpustate, cpustate->XX.d, cpustate->HL.b.h);
-			} else {
-				cpustate->icount -= 10;	/* RET undocumented */
-				M_RET(1);
-			}
-			break;
-		case 0xda: cpustate->icount -= 10;	/* JC   nnnn */
-			M_JMP( cpustate->AF.b.l & CF );
-			break;
-		case 0xdb: cpustate->icount -= 10;	/* IN   nn */
-			M_IN;
-			break;
-		case 0xdc: cpustate->icount -= 11;	/* CC   nnnn */
-			M_CALL( cpustate->AF.b.l & CF );
-			break;
-		case 0xdd:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 7;		/* JNX  nnnn */
-				M_JMP( !(cpustate->AF.b.l & XF) );
-			} else {
-				cpustate->icount -= 17;	/* CALL nnnn undocumented */
-				M_CALL(1);
-			}
-			break;
-		case 0xde: cpustate->icount -= 7;	/* SBI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_SBB(cpustate->XX.b.l);
-			break;
-		case 0xdf: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  3 */
-			M_RST(3);
-			break;
+		case 0xe8:	M_RET( cpustate->AF.b.l & PF );						break;	/* RPE  */
+		case 0xe9:	cpustate->PC.d = cpustate->HL.w.l;					break;	/* PCHL */
+		case 0xea:	M_JMP( cpustate->AF.b.l & PF );						break;	/* JPE  nnnn */
+		case 0xeb:	cpustate->WZ.d = cpustate->DE.d;							/* XCHG */
+					cpustate->DE.d = cpustate->HL.d;
+					cpustate->HL.d = cpustate->WZ.d;
+					break;
+		case 0xec:	M_CALL( cpustate->AF.b.l & PF );					break;	/* CPE  nnnn */
+		case 0xed:	if (IS_8085(cpustate)) {									/* LHLX */
+						cpustate->WZ.w.l = cpustate->DE.w.l;
+						cpustate->HL.b.l = RM(cpustate, cpustate->WZ.d); cpustate->WZ.w.l++;
+						cpustate->HL.b.h = RM(cpustate, cpustate->WZ.d);
+					} else { M_CALL(1); }										/* CALL nnnn undocumented */
+					break;
+		case 0xee:	cpustate->WZ.b.l = ARG(cpustate); M_XRA(cpustate->WZ.b.l); break; /* XRI  nn */
+		case 0xef:	M_RST(5);											break;	/* RST  5 */
 
-		case 0xe0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RPO    */
-			M_RET( !(cpustate->AF.b.l & VF) );
-			break;
-		case 0xe1: cpustate->icount -= 10;	/* POP  H */
-			M_POP(HL);
-			break;
-		case 0xe2: cpustate->icount -= 10;	/* JPO  nnnn */
-			M_JMP( !(cpustate->AF.b.l & VF) );
-			break;
-		case 0xe3: cpustate->icount -= IS_8085(cpustate) ? 16 : 18;	/* XTHL */
-			M_POP(XX);
-			M_PUSH(HL);
-			cpustate->HL.d = cpustate->XX.d;
-			break;
-		case 0xe4: cpustate->icount -= 11;	/* CPO  nnnn */
-			M_CALL( !(cpustate->AF.b.l & VF) );
-			break;
-		case 0xe5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH H */
-			M_PUSH(HL);
-			break;
-		case 0xe6: cpustate->icount -= 7;	/* ANI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_ANA(cpustate->XX.b.l);
-			break;
-		case 0xe7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  4 */
-			M_RST(4);
-			break;
+		case 0xf0:	M_RET( !(cpustate->AF.b.l&SF) );					break;	/* RP   */
+		case 0xf1:	M_POP(AF);											break;	/* POP  A */
+		case 0xf2:	M_JMP( !(cpustate->AF.b.l & SF) );					break;	/* JP   nnnn */
+		case 0xf3:	set_inte(cpustate, 0);								break;	/* DI   */
+		case 0xf4:	M_CALL( !(cpustate->AF.b.l & SF) );					break;	/* CP   nnnn */
+		case 0xf5:	M_PUSH(AF);											break;	/* PUSH A */
+		case 0xf6:	cpustate->WZ.b.l = ARG(cpustate); M_ORA(cpustate->WZ.b.l); break; /* ORI  nn */
+		case 0xf7:	M_RST(6);											break;	/* RST  6 */
 
-		case 0xe8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RPE  */
-			M_RET( cpustate->AF.b.l & VF );
-			break;
-		case 0xe9: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* PCHL */
-			cpustate->PC.d = cpustate->HL.w.l;
-			break;
-		case 0xea: cpustate->icount -= 10;	/* JPE  nnnn */
-			M_JMP( cpustate->AF.b.l & VF );
-			break;
-		case 0xeb: cpustate->icount -= 5;	/* XCHG */
-			cpustate->XX.d = cpustate->DE.d;
-			cpustate->DE.d = cpustate->HL.d;
-			cpustate->HL.d = cpustate->XX.d;
-			break;
-		case 0xec: cpustate->icount -= 11;	/* CPE  nnnn */
-			M_CALL( cpustate->AF.b.l & VF );
-			break;
-		case 0xed:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 10;		/* LHLX */
-				cpustate->XX.w.l = cpustate->DE.w.l;
-				cpustate->HL.b.l = RM(cpustate, cpustate->XX.d);
-				cpustate->XX.w.l++;
-				cpustate->HL.b.h = RM(cpustate, cpustate->XX.d);
-			} else {
-				cpustate->icount -= 17;	/* CALL nnnn undocumented */
-				M_CALL(1);
-			}
-			break;
-		case 0xee: cpustate->icount -= 7;	/* XRI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_XRA(cpustate->XX.b.l);
-			break;
-		case 0xef: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  5 */
-			M_RST(5);
-			break;
-
-		case 0xf0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RP   */
-			M_RET( !(cpustate->AF.b.l&SF) );
-			break;
-		case 0xf1: cpustate->icount -= 10;	/* POP  A */
-			M_POP(AF);
-			break;
-		case 0xf2: cpustate->icount -= 10;	/* JP   nnnn */
-			M_JMP( !(cpustate->AF.b.l & SF) );
-			break;
-		case 0xf3: cpustate->icount -= 4;	/* DI   */
-			/* remove interrupt enable */
-			set_inte(cpustate, 0);
-			break;
-		case 0xf4: cpustate->icount -= 11;	/* CP   nnnn */
-			M_CALL( !(cpustate->AF.b.l & SF) );
-			break;
-		case 0xf5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH A */
-			M_PUSH(AF);
-			break;
-		case 0xf6: cpustate->icount -= 7;	/* ORI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_ORA(cpustate->XX.b.l);
-			break;
-		case 0xf7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  6 */
-			M_RST(6);
-			break;
-
-		case 0xf8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RM   */
-			M_RET( cpustate->AF.b.l & SF );
-			break;
-		case 0xf9: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* SPHL */
-			cpustate->SP.d = cpustate->HL.d;
-			break;
-		case 0xfa: cpustate->icount -= 10;	/* JM   nnnn */
-			M_JMP( cpustate->AF.b.l & SF );
-			break;
-		case 0xfb: cpustate->icount -= 4;	/* EI */
-			/* set interrupt enable */
-			set_inte(cpustate, 1);
-			cpustate->after_ei = 2;
-			break;
-		case 0xfc: cpustate->icount -= 11;	/* CM   nnnn */
-			M_CALL( cpustate->AF.b.l & SF );
-			break;
-		case 0xfd:
-			if (IS_8085(cpustate)) {
-				cpustate->icount -= 7;		/* JX   nnnn */
-				M_JMP( cpustate->AF.b.l & XF );
-			} else {
-				cpustate->icount -= 17;	/* CALL nnnn undocumented */
-				M_CALL(1);
-			}
-			break;
-		case 0xfe: cpustate->icount -= 7;	/* CPI  nn */
-			cpustate->XX.b.l = ARG(cpustate);
-			M_CMP(cpustate->XX.b.l);
-			break;
-		case 0xff: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  7 */
-			M_RST(7);
-			break;
+		case 0xf8:	M_RET( cpustate->AF.b.l & SF );						break;	/* RM   */
+		case 0xf9:	cpustate->SP.d = cpustate->HL.d;					break;	/* SPHL */
+		case 0xfa:	M_JMP( cpustate->AF.b.l & SF );						break;	/* JM   nnnn */
+		case 0xfb:	set_inte(cpustate, 1); cpustate->after_ei = 2;		break;	/* EI */
+		case 0xfc:	M_CALL( cpustate->AF.b.l & SF );					break;	/* CM   nnnn */
+		case 0xfd:	if (IS_8085(cpustate)) { M_JMP( cpustate->AF.b.l & X5F ); }	/* JX   nnnn */
+					else { M_CALL(1); }											/* CALL nnnn undocumented */
+					break;
+		case 0xfe:	cpustate->WZ.b.l = ARG(cpustate); M_CMP(cpustate->WZ.b.l); break; /* CPI  nn */
+		case 0xff:	M_RST(7);											break;	/* RST  7 */
 	}
 }
 
@@ -1515,12 +982,16 @@ static CPU_EXECUTE( i808x )
     CORE INITIALIZATION
 ***************************************************************************/
 
-static void init_tables (void)
+static void init_tables (int type)
 {
 	UINT8 zs;
 	int i, p;
 	for (i = 0; i < 256; i++)
 	{
+		/* cycles */
+		lut_cycles[i] = type?lut_cycles_8085[i]:lut_cycles_8080[i];
+		
+		/* flags */
 		zs = 0;
 		if (i==0) zs |= ZF;
 		if (i&128) zs |= SF;
@@ -1534,7 +1005,7 @@ static void init_tables (void)
 		if (i&64) ++p;
 		if (i&128) ++p;
 		ZS[i] = zs;
-		ZSP[i] = zs | ((p&1) ? 0 : VF);
+		ZSP[i] = zs | ((p&1) ? 0 : PF);
 	}
 }
 
@@ -1543,7 +1014,7 @@ static void init_808x_common(const device_config *device, cpu_irq_callback irqca
 {
 	i8085_state *cpustate = get_safe_token(device);
 
-	init_tables();
+	init_tables(type);
 
 	/* set up the state table */
 	cpustate->state = state_table_template;
@@ -1755,20 +1226,20 @@ CPU_GET_INFO( i8085 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8085A");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 8080");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 8080");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.1");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
 				cpustate->AF.b.l & 0x80 ? 'S':'.',
 				cpustate->AF.b.l & 0x40 ? 'Z':'.',
-				cpustate->AF.b.l & 0x20 ? '?':'.',
+				cpustate->AF.b.l & 0x20 ? 'X':'.', // X5
 				cpustate->AF.b.l & 0x10 ? 'H':'.',
 				cpustate->AF.b.l & 0x08 ? '?':'.',
 				cpustate->AF.b.l & 0x04 ? 'P':'.',
-				cpustate->AF.b.l & 0x02 ? 'N':'.',
+				cpustate->AF.b.l & 0x02 ? 'V':'.',
 				cpustate->AF.b.l & 0x01 ? 'C':'.');
 			break;
 	}
