@@ -190,7 +190,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr)
 
 static CPU_TRANSLATE( arm7 )
 {
-	arm_state *cpustate = (device != NULL) ? device->token : NULL;
+	arm_state *cpustate = (device != NULL) ? (arm_state *)device->token : NULL;
 
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if( space == ADDRESS_SPACE_PROGRAM && ( COPRO_CTRL & COPRO_CTRL_MMU_EN ) )
@@ -228,7 +228,7 @@ static CPU_INIT( arm7 )
 
 static CPU_RESET( arm7 )
 {
-	arm_state *cpustate = device->token;
+	arm_state *cpustate = get_safe_token(device);
 
 	// must call core reset
 	arm7_core_reset(device);
@@ -239,7 +239,7 @@ static CPU_RESET( arm7 )
 
 static CPU_RESET( arm9 )
 {
-	arm_state *cpustate = device->token;
+	arm_state *cpustate = get_safe_token(device);
 
 	// must call core reset
 	arm7_core_reset(device);
@@ -250,7 +250,7 @@ static CPU_RESET( arm9 )
 
 static CPU_RESET( pxa255 )
 {
-	arm_state *cpustate = device->token;
+	arm_state *cpustate = get_safe_token(device);
 
 	// must call core reset
 	arm7_core_reset(device);
@@ -574,7 +574,7 @@ static WRITE32_DEVICE_HANDLER( arm7_do_callback )
 
 static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
     UINT32 opcode = offset;
     UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
     UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
@@ -717,7 +717,7 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 
 static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
     UINT32 opcode = offset;
     UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
     UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;

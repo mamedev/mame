@@ -411,7 +411,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 			fatalerror("Unable to allocate bank for oki6295 device '%s'", device->tag);
 
 		/* override our memory map with a bank */
-		memory_install_read8_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, SMH_BANK(info->bank_num));
+		memory_install_read8_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, (read8_space_func)SMH_BANK(info->bank_num));
 	}
 
 	/* if we have a bank number, set the base pointer */

@@ -1088,9 +1088,9 @@ static DRIVER_INIT( backfirt )
 	tecmo_video_type = 2;
 
 	/* no MSM */
-	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, SMH_NOP);
-	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xd000, 0xd000, 0, 0, SMH_NOP);
-	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xd000, 0xd000, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, (write8_space_func)SMH_NOP);
 
 
 }

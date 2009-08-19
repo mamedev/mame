@@ -655,11 +655,6 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 
 }
 
-static UINT8 calc3_decryption_key_byte;
-static UINT8 calc3_unknown;
-static UINT8 calc3_mode;
-static UINT8 calc3_blocksize_offset;
-
 DRIVER_INIT(calc3_scantables)
 {
 	UINT8* rom = memory_region(machine,"cpu1");
@@ -677,7 +672,7 @@ DRIVER_INIT(calc3_scantables)
 
 	for (x=0;x<numregions;x++)
 	{
-		UINT8* tmpdstram = malloc(0x2000);
+		UINT8* tmpdstram = (UINT8*)malloc(0x2000);
 		int length;
 		memset(tmpdstram, 0x00,0x2000);
 		length = calc3_decompress_table(machine, x, tmpdstram, 0);

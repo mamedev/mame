@@ -474,8 +474,8 @@ static CPU_RESET( tms0980 )
 */
 INLINE UINT8 tms0980_next_pc( UINT8 pc )
 {
-	UINT8	xor = ( pc & 0x3F ) == 0x3F ? 1 : 0;
-	UINT8	new_bit = ( ( pc ^ ( pc << 1 ) ) & 0x40 ) ? xor : 1 - xor;
+	UINT8	xorval = ( pc & 0x3F ) == 0x3F ? 1 : 0;
+	UINT8	new_bit = ( ( pc ^ ( pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
 
 	return ( pc << 1 ) | new_bit;
 }

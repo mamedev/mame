@@ -298,19 +298,19 @@ MACHINE_START( vsnes )
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
 	if (NULL != vrom[0])
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(2), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, SMH_BANK(3), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, SMH_BANK(4), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, SMH_BANK(5), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, SMH_BANK(6), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(7), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(8), 0);
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(9), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(2), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, (read8_space_func)SMH_BANK(3), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, (read8_space_func)SMH_BANK(4), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, (read8_space_func)SMH_BANK(6), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, (read8_space_func)SMH_BANK(7), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, (read8_space_func)SMH_BANK(8), 0);
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(9), 0);
 		v_set_videorom_bank(machine, 0, 8, 0, 8);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
 		memory_set_bankptr(machine, 2, vram);
 	}
 }
@@ -342,9 +342,9 @@ MACHINE_START( vsdual )
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
 	// read only!
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(2), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(2), 0);
 	// read only!
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(3), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(3), 0);
 	memory_set_bankptr(machine, 2, vrom[0]);
 	memory_set_bankptr(machine, 3, vrom[1]);
 }

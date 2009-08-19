@@ -782,7 +782,7 @@ static WRITE8_HANDLER( bosco_latch_w )
 	}
 }
 
-static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, param) >> 4; }
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {

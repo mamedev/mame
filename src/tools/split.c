@@ -42,7 +42,7 @@ static void compute_hash_as_string(astring *buffer, void *data, UINT32 length)
 
 	// compute the SHA1
 	sha1_init(&sha1);
-	sha1_update(&sha1, length, data);
+	sha1_update(&sha1, length, (const UINT8 *)data);
 	sha1_final(&sha1);
 	sha1_digest(&sha1, sizeof(sha1digest), sha1digest);
 

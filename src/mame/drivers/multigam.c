@@ -652,7 +652,7 @@ static MACHINE_START( multigam )
 	nt_page[3] = nt_ram + 0xc00;
 
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), 0);
 	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
 }
 
@@ -666,14 +666,14 @@ static MACHINE_START( multigm3 )
 
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(2), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, SMH_BANK(3), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, SMH_BANK(4), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, SMH_BANK(5), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, SMH_BANK(6), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, SMH_BANK(7), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK(8), 0);
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, SMH_BANK(9), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(2), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, (read8_space_func)SMH_BANK(3), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, (read8_space_func)SMH_BANK(4), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, (read8_space_func)SMH_BANK(6), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, (read8_space_func)SMH_BANK(7), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, (read8_space_func)SMH_BANK(8), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(9), 0);
 
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };

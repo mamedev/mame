@@ -347,7 +347,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, param) >> 4; }
+static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
 static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )

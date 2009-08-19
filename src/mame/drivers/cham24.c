@@ -287,7 +287,7 @@ static MACHINE_START( cham24 )
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK(1), 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), 0);
 	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
