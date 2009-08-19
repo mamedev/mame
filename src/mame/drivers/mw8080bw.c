@@ -1875,27 +1875,33 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	/* 8 pin DIP Switch on location C2 on PCB A084-90700-D640 */
+	/* PCB picture also shows a 2nd DIP Switch on location B2, supposedly for language selection,
+	but ROM contents suggests it's not connected (no different languages or unmapped reads) */
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Game_Time ) ) PORT_CONDITION("IN2", 0x80, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("SW:1,2")
-	PORT_DIPSETTING(    0x03, "40 seconds" ) // 45 for 2 players
-	PORT_DIPSETTING(    0x02, "50 seconds" ) // 60 for 2 players
-	PORT_DIPSETTING(    0x01, "60 seconds" ) // 75 for 2 players
-	PORT_DIPSETTING(    0x00, "70 seconds" ) // 90 for 2 players
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN2", 0x80, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("SW:3,4")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("C2:1,2")
+	PORT_DIPSETTING(    0x03, "40 seconds + 20 extended" ) PORT_CONDITION("IN2", 0x30, PORTCOND_NOTEQUALS, 0x00) // 45 + 20 for 2 players
+	PORT_DIPSETTING(    0x02, "50 seconds + 25 extended" ) PORT_CONDITION("IN2", 0x30, PORTCOND_NOTEQUALS, 0x00) // 60 + 30 for 2 players
+	PORT_DIPSETTING(    0x01, "60 seconds + 30 extended" ) PORT_CONDITION("IN2", 0x30, PORTCOND_NOTEQUALS, 0x00) // 75 + 35 for 2 players
+	PORT_DIPSETTING(    0x00, "70 seconds + 35 extended" ) PORT_CONDITION("IN2", 0x30, PORTCOND_NOTEQUALS, 0x00) // 90 + 45 for 2 players
+	PORT_DIPSETTING(    0x03, "40 seconds" ) PORT_CONDITION("IN2", 0x30, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "50 seconds" ) PORT_CONDITION("IN2", 0x30, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, "60 seconds" ) PORT_CONDITION("IN2", 0x30, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "70 seconds" ) PORT_CONDITION("IN2", 0x30, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("C2:3,4")
 	PORT_DIPSETTING(    0x00, "1 Coin per Player" )
 	PORT_DIPSETTING(    0x04, "1 Coin/1 or 2 Players" )
 	PORT_DIPSETTING(    0x0c, "2 Coins per Player" )
 	PORT_DIPSETTING(    0x08, "2 Coins/1 or 2 Players" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Input Test"  ) PORT_CONDITION("IN2", 0x80, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("SW:7")
+	PORT_DIPNAME( 0x30, 0x00, "Extended Time At" ) PORT_DIPLOCATION("C2:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x10, "5000" )
+	PORT_DIPSETTING(    0x20, "6000" )
+	PORT_DIPSETTING(    0x30, "7000" )
+	PORT_DIPNAME( 0x40, 0x00, "Springboard Alignment" ) PORT_DIPLOCATION("C2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "C2:8" ) // RAM-ROM Test
 
 	/* fake ports for two analog controls multiplexed */
 	PORT_START(CLOWNS_CONTROLLER_P1_TAG)
