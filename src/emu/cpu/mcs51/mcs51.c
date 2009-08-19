@@ -2025,7 +2025,7 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", mcs51_state->device->tag, offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", mcs51_state->device->tag, (UINT32)offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
@@ -2065,7 +2065,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag, offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag, (UINT32)offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
