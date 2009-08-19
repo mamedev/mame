@@ -33,7 +33,7 @@ Based on extensive tests on location, the factory settings for the
 most universal combinations are:
     60 second long game
     2500 points for extended play             12345678
-    On coin each player                       00+00000
+    One coin each player                      00+00000
 
 Ports:
  In:
