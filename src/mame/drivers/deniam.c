@@ -35,7 +35,10 @@ Notes:
   otherwise they're stuck at 19 and 03 respectively. Verified on real hardware.
 - Logic Pro has an unemulated graphical effect: when you insert a coin, the screen
   becomes very slightly darker until the next 'scene change'. This is not emulated
-  yet.  
+  yet.
+- Both Logic Pro and Logic Pro 2 have 4 pixels of garbage (related to fg layer?)
+  at the left edge of the screen on the real pcb. Sprites can properly be displayed
+  in this area. Mame displays this area as black.
 
 ***************************************************************************/
 
