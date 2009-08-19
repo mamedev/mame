@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  *   z80.c
- *   Portable Z80 emulator V3.8
+ *   Portable Z80 emulator V3.9
  *
  *   Copyright Juergen Buchmueller, all rights reserved.
  *
@@ -17,51 +17,68 @@
  *     terms of its usage and license at any time, including retroactively
  *   - This entire notice must remain in the source code.
  *
- *   Changes in 3.8 [Miodrag Milanovic]
- *   - Added MEMPTR register (according to informations provided
- *     by Vladimir Kladov
- *   - BIT n,(HL) now return valid values due to use of MEMPTR
- *   - Fixed BIT 6,(XY+o) undocumented instructions
- *   Changes in 3.7 [Aaron Giles]
- *   - Changed NMI handling. NMIs are now latched in set_irq_state
- *     but are not taken there. Instead they are taken at the start of the
- *     execute loop.
- *   - Changed IRQ handling. IRQ state is set in set_irq_state but not taken
- *     except during the inner execute loop.
- *   - Removed x86 assembly hacks and obsolete timing loop catchers.
- *   Changes in 3.6
- *   - Got rid of the code that would inexactly emulate a Z80, i.e. removed
- *     all the #if Z80_EXACT #else branches.
- *   - Removed leading underscores from local register name shortcuts as
- *     this violates the C99 standard.
- *   - Renamed the registers inside the Z80 context to lower case to avoid
- *     ambiguities (shortcuts would have had the same names as the fields
- *     of the structure).
- *   Changes in 3.5
- *   - Implemented OTIR, INIR, etc. without look-up table for PF flag.
- *     [Ramsoft, Sean Young]
- *   Changes in 3.4
- *   - Removed Z80-MSX specific code as it's not needed any more.
- *   - Implemented DAA without look-up table [Ramsoft, Sean Young]
- *   Changes in 3.3
- *   - Fixed undocumented flags XF & YF in the non-asm versions of CP,
- *     and all the 16 bit arithmetic instructions. [Sean Young]
- *   Changes in 3.2
- *   - Fixed undocumented flags XF & YF of RRCA, and CF and HF of
- *     INI/IND/OUTI/OUTD/INIR/INDR/OTIR/OTDR [Sean Young]
- *   Changes in 3.1
- *   - removed the REPEAT_AT_ONCE execution of LDIR/CPIR etc. opcodes
- *     for readabilities sake and because the implementation was buggy
- *     (and i was not able to find the difference)
- *   Changes in 3.0
- *   - 'finished' switch to dynamically overrideable cycle count tables
+ *   TODO:
+ *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
+ *      was set before this instruction
+ *    - Ideally, the tiny differences between Z80 types should be supported,
+ *      currently known differences:
+ *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
+ *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
+ *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
+ *         (flags & A & 0x28) on NEC NMOS Z80, other models unknown.
+ *         However, people from the Speccy scene mention that SCF/CCF X/Y results
+ *         are inconsistant and may be influenced by I and R registers.
+ *      This Z80 emulator assumes a ZiLOG NMOS model.
+ *
+ *   Changes in 3.9:
+ *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
+ *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
+ *    - Simplified DAA, renamed MEMPTR (3.8) to WZ, added TODO [hap]
+ *   Changes in 3.8 [Miodrag Milanovic]:
+ *    - Added MEMPTR register (according to informations provided
+ *      by Vladimir Kladov
+ *    - BIT n,(HL) now return valid values due to use of MEMPTR
+ *    - Fixed BIT 6,(XY+o) undocumented instructions
+ *   Changes in 3.7 [Aaron Giles]:
+ *    - Changed NMI handling. NMIs are now latched in set_irq_state
+ *      but are not taken there. Instead they are taken at the start of the
+ *      execute loop.
+ *    - Changed IRQ handling. IRQ state is set in set_irq_state but not taken
+ *      except during the inner execute loop.
+ *    - Removed x86 assembly hacks and obsolete timing loop catchers.
+ *   Changes in 3.6:
+ *    - Got rid of the code that would inexactly emulate a Z80, i.e. removed
+ *      all the #if Z80_EXACT #else branches.
+ *    - Removed leading underscores from local register name shortcuts as
+ *      this violates the C99 standard.
+ *    - Renamed the registers inside the Z80 context to lower case to avoid
+ *      ambiguities (shortcuts would have had the same names as the fields
+ *      of the structure).
+ *   Changes in 3.5:
+ *    - Implemented OTIR, INIR, etc. without look-up table for PF flag.
+ *      [Ramsoft, Sean Young]
+ *   Changes in 3.4:
+ *    - Removed Z80-MSX specific code as it's not needed any more.
+ *    - Implemented DAA without look-up table [Ramsoft, Sean Young]
+ *   Changes in 3.3:
+ *    - Fixed undocumented flags XF & YF in the non-asm versions of CP,
+ *      and all the 16 bit arithmetic instructions. [Sean Young]
+ *   Changes in 3.2:
+ *    - Fixed undocumented flags XF & YF of RRCA, and CF and HF of
+ *      INI/IND/OUTI/OUTD/INIR/INDR/OTIR/OTDR [Sean Young]
+ *   Changes in 3.1:
+ *    - removed the REPEAT_AT_ONCE execution of LDIR/CPIR etc. opcodes
+ *      for readabilities sake and because the implementation was buggy
+ *      (and i was not able to find the difference)
+ *   Changes in 3.0:
+ *    - 'finished' switch to dynamically overrideable cycle count tables
  *   Changes in 2.9:
- *   - added methods to access and override the cycle count tables
- *   - fixed handling and timing of multiple DD/FD prefixed opcodes
+ *    - added methods to access and override the cycle count tables
+ *    - fixed handling and timing of multiple DD/FD prefixed opcodes
  *   Changes in 2.8:
- *   - OUTI/OUTD/OTIR/OTDR also pre-decrement the B register now.
- *     This was wrong because of a bug fix on the wrong side
- *     (astrocade sound driver).
+ *    - OUTI/OUTD/OTIR/OTDR also pre-decrement the B register now.
+ *      This was wrong because of a bug fix on the wrong side
+ *      (astrocade sound driver).
  *   Changes in 2.7:
  *    - removed z80_vm specific code, it's not needed (and never was).
  *   Changes in 2.6:
@@ -120,7 +137,7 @@
 typedef struct _z80_state z80_state;
 struct _z80_state
 {
-	PAIR			prvpc,pc,sp,af,bc,de,hl,ix,iy,memptr;
+	PAIR			prvpc,pc,sp,af,bc,de,hl,ix,iy,wz;
 	PAIR			af2,bc2,de2,hl2;
 	UINT8			r,r2,iff1,iff2,halt,im,i;
 	UINT8			nmi_state;			/* nmi line state */
@@ -204,9 +221,9 @@ INLINE z80_state *get_safe_token(const device_config *device)
 #define HY 		iy.b.h
 #define LY 		iy.b.l
 
-#define MEMPTR 	memptr.w.l
-#define MEMPTR_H memptr.b.h
-#define MEMPTR_L memptr.b.l
+#define WZ 		wz.w.l
+#define WZ_H	wz.b.h
+#define WZ_L	wz.b.l
 
 
 /***************************************************************************
@@ -245,13 +262,13 @@ static const cpu_state_entry state_array[] =
 	Z80_STATE_ENTRY(DE2, "%04X", de2.w.l, 0xffff, 0)
 	Z80_STATE_ENTRY(HL2, "%04X", hl2.w.l, 0xffff, 0)
 
-	Z80_STATE_ENTRY(MEMPTR, "%04X", MEMPTR, 0xffff, 0)
-	Z80_STATE_ENTRY(R,      "%02X", rtemp, 0xff, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
-	Z80_STATE_ENTRY(I,      "%02X", i, 0xff, 0)
-	Z80_STATE_ENTRY(IM,     "%1u", im, 0x3, 0)
-	Z80_STATE_ENTRY(IFF1,   "%1u", iff1, 0x1, 0)
-	Z80_STATE_ENTRY(IFF2,   "%1u", iff2, 0x1, 0)
-	Z80_STATE_ENTRY(HALT,   "%1u", halt, 0x1, 0)
+	Z80_STATE_ENTRY(WZ,  "%04X", WZ,   0xffff, 0)
+	Z80_STATE_ENTRY(R,   "%02X", rtemp,0xff, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
+	Z80_STATE_ENTRY(I,   "%02X", i,    0xff, 0)
+	Z80_STATE_ENTRY(IM,  "%1u",  im,   0x3,  0)
+	Z80_STATE_ENTRY(IFF1,"%1u",  iff1, 0x1,  0)
+	Z80_STATE_ENTRY(IFF2,"%1u",  iff2, 0x1,  0)
+	Z80_STATE_ENTRY(HALT,"%1u",  halt, 0x1,  0)
 };
 
 static const cpu_state_table state_table_template =
@@ -499,7 +516,7 @@ PROTOTYPES(Z80xycb,xycb);
 
 /****************************************************************************/
 /* Burn an odd amount of cycles, that is instructions taking something      */
-/* different from 4 T-states per opcode (and r increment)              */
+/* different from 4 T-states per opcode (and r increment)                   */
 /****************************************************************************/
 INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 {
@@ -703,8 +720,8 @@ INLINE UINT32 ARG16(z80_state *z80)
  * Calculate the effective address EA of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
-#define EAX(Z) 		do { (Z)->ea = (UINT32)(UINT16)((Z)->IX + (INT8)ARG(Z)); (Z)->MEMPTR = (Z)->ea; } while (0)
-#define EAY(Z)		do { (Z)->ea = (UINT32)(UINT16)((Z)->IY + (INT8)ARG(Z)); (Z)->MEMPTR = (Z)->ea; } while (0)
+#define EAX(Z) 		do { (Z)->ea = (UINT32)(UINT16)((Z)->IX + (INT8)ARG(Z)); (Z)->WZ = (Z)->ea; } while (0)
+#define EAY(Z)		do { (Z)->ea = (UINT32)(UINT16)((Z)->IY + (INT8)ARG(Z)); (Z)->WZ = (Z)->ea; } while (0)
 
 /***************************************************************
  * POP
@@ -721,7 +738,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  ***************************************************************/
 #define JP(Z) do {												\
 	(Z)->PCD = ARG16(Z);										\
-	(Z)->MEMPTR = (Z)->PCD;										\
+	(Z)->WZ = (Z)->PCD;											\
 } while (0)
 
 /***************************************************************
@@ -731,11 +748,11 @@ INLINE UINT32 ARG16(z80_state *z80)
 	if (cond)													\
 	{															\
 		(Z)->PCD = ARG16(Z);									\
-		(Z)->MEMPTR = (Z)->PCD;									\
+		(Z)->WZ = (Z)->PCD;										\
 	}															\
 	else														\
 	{															\
-		(Z)->MEMPTR = ARG16(Z); /* implicit do PC += 2 */		\
+		(Z)->WZ = ARG16(Z); /* implicit do PC += 2 */			\
 	}															\
 } while (0)
 
@@ -745,7 +762,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define JR(Z) do {												\
 	INT8 arg = (INT8)ARG(Z); 	/* ARG() also increments PC */	\
 	(Z)->PC += arg;				/* so don't do PC += ARG() */	\
-	(Z)->MEMPTR = (Z)->PC;										\
+	(Z)->WZ = (Z)->PC;											\
 } while (0)
 
 /***************************************************************
@@ -765,7 +782,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  ***************************************************************/
 #define CALL(Z) do {											\
 	(Z)->ea = ARG16(Z);											\
-	(Z)->MEMPTR = (Z)->ea;										\
+	(Z)->WZ = (Z)->ea;											\
 	PUSH((Z), pc);												\
 	(Z)->PCD = (Z)->ea;											\
 } while (0)
@@ -777,14 +794,14 @@ INLINE UINT32 ARG16(z80_state *z80)
 	if (cond)													\
 	{															\
 		(Z)->ea = ARG16(Z);										\
-		(Z)->MEMPTR = (Z)->ea;									\
+		(Z)->WZ = (Z)->ea;										\
 		PUSH((Z), pc);											\
 		(Z)->PCD = (Z)->ea;										\
 		CC(Z, ex, opcode);										\
 	}															\
 	else														\
 	{															\
-		z80->MEMPTR = ARG16(z80);  /* implicit call PC+=2;   */	\
+		z80->WZ = ARG16(z80);  /* implicit call PC+=2;   */		\
 	}															\
 } while (0)
 
@@ -795,7 +812,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	if (cond)													\
 	{															\
 		POP((Z), pc);											\
-		(Z)->MEMPTR = (Z)->PC;									\
+		(Z)->WZ = (Z)->PC;										\
 		CC(Z, ex, opcode);										\
 	}															\
 } while (0)
@@ -807,7 +824,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	LOG(("Z80 '%s' RETN z80->iff1:%d z80->iff2:%d\n", 			\
 		(Z)->device->tag, (Z)->iff1, (Z)->iff2)); 				\
 	POP((Z), pc);												\
-	(Z)->MEMPTR = (Z)->PC;										\
+	(Z)->WZ = (Z)->PC;											\
 	(Z)->iff1 = (Z)->iff2;										\
 } while (0)
 
@@ -816,7 +833,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  ***************************************************************/
 #define RETI(Z) do {											\
 	POP((Z), pc);												\
-	(Z)->MEMPTR = (Z)->PC;										\
+	(Z)->WZ = (Z)->PC;											\
 /* according to http://www.msxnet.org/tech/z80-documented.pdf */\
 	(Z)->iff1 = (Z)->iff2;										\
 	if ((Z)->daisy != NULL)										\
@@ -860,7 +877,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define RST(Z, addr) do {										\
 	PUSH((Z), pc);												\
 	(Z)->PCD = addr;											\
-	(Z)->MEMPTR = (Z)->PC;										\
+	(Z)->WZ = (Z)->PC;											\
 } while (0)
 
 /***************************************************************
@@ -925,7 +942,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  ***************************************************************/
 #define RRD(Z) do {												\
 	UINT8 n = RM((Z), (Z)->HL);									\
-	(Z)->MEMPTR = (Z)->HL+1;									\
+	(Z)->WZ = (Z)->HL+1;										\
 	WM((Z), (Z)->HL, (n >> 4) | ((Z)->A << 4));					\
 	(Z)->A = ((Z)->A & 0xf0) | (n & 0x0f);						\
 	(Z)->F = ((Z)->F & CF) | SZP[(Z)->A];						\
@@ -936,7 +953,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  ***************************************************************/
 #define RLD(Z) do {												\
 	UINT8 n = RM((Z), (Z)->HL);									\
-	(Z)->MEMPTR = (Z)->HL+1;									\
+	(Z)->WZ = (Z)->HL+1;										\
 	WM((Z), (Z)->HL, (n << 4) | ((Z)->A & 0x0f));				\
 	(Z)->A = ((Z)->A & 0xf0) | (n >> 4);						\
 	(Z)->F = ((Z)->F & CF) | SZP[(Z)->A];						\
@@ -995,27 +1012,18 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  * DAA
  ***************************************************************/
 #define DAA(Z) do {												\
-	UINT8 cf, nf, hf, lo, hi, diff;								\
-	cf = (Z)->F & CF;											\
-	nf = (Z)->F & NF;											\
-	hf = (Z)->F & HF;											\
-	lo = (Z)->A & 15;											\
-	hi = (Z)->A / 16;											\
+	UINT8 a = (Z)->A;											\
+	if ((Z)->F & NF) {											\
+		if (((Z)->F&HF) | (((Z)->A&0xf)>9)) a-=6;				\
+		if (((Z)->F&CF) | ((Z)->A>0x99)) a-=0x60;				\
+	}															\
+	else {														\
+		if (((Z)->F&HF) | (((Z)->A&0xf)>9)) a+=6;				\
+		if (((Z)->F&CF) | ((Z)->A>0x99)) a+=0x60;				\
+	}															\
 																\
-	if (cf)														\
-		diff = (lo <= 9 && !hf) ? 0x60 : 0x66;					\
-	else if (lo >= 10)											\
-		diff = hi <= 8 ? 0x06 : 0x66;							\
-	else if (hi >= 10)											\
-		diff = hf ? 0x66 : 0x60;								\
-	else														\
-		diff = hf ? 0x06 : 0x00;								\
-	if (nf) (Z)->A -= diff;										\
-	else (Z)->A += diff;										\
-																\
-	(Z)->F = SZP[(Z)->A] | ((Z)->F & NF);						\
-	if (cf || (lo <= 9 ? hi >= 10 : hi >= 9)) (Z)->F |= CF;		\
-	if (nf ? hf && lo <= 5 : lo >= 10)	(Z)->F |= HF;			\
+	(Z)->F = ((Z)->F&(CF|NF)) | ((Z)->A>0x99) | (((Z)->A^a)&HF) | SZP[a]; \
+	(Z)->A = a;													\
 } while (0)
 
 /***************************************************************
@@ -1087,7 +1095,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
 	RM16((Z), (Z)->SPD, &tmp);									\
 	WM16((Z), (Z)->SPD, &(Z)->DR);								\
 	(Z)->DR = tmp;												\
-	(Z)->MEMPTR = (Z)->DR.d;									\
+	(Z)->WZ = (Z)->DR.d;										\
 } while (0)
 
 /***************************************************************
@@ -1095,7 +1103,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  ***************************************************************/
 #define ADD16(Z, DR, SR) do {									\
 	UINT32 res = (Z)->DR.d + (Z)->SR.d;							\
-	(Z)->MEMPTR = (Z)->DR.d + 1;								\
+	(Z)->WZ = (Z)->DR.d + 1;									\
 	(Z)->F = ((Z)->F & (SF | ZF | VF)) |						\
 		((((Z)->DR.d ^ res ^ (Z)->SR.d) >> 8) & HF) |			\
 		((res >> 16) & CF) | ((res >> 8) & (YF | XF));			\
@@ -1107,7 +1115,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  ***************************************************************/
 #define ADC16(Z, Reg) do {										\
 	UINT32 res = (Z)->HLD + (Z)->Reg.d + ((Z)->F & CF);			\
-	(Z)->MEMPTR = (Z)->HL + 1;									\
+	(Z)->WZ = (Z)->HL + 1;										\
 	(Z)->F = ((((Z)->HLD ^ res ^ (Z)->Reg.d) >> 8) & HF) |		\
 		((res >> 16) & CF) |									\
 		((res >> 8) & (SF | YF | XF)) |							\
@@ -1121,7 +1129,7 @@ INLINE UINT8 DEC(z80_state *z80, UINT8 value)
  ***************************************************************/
 #define SBC16(Z, Reg) do {										\
 	UINT32 res = (Z)->HLD - (Z)->Reg.d - ((Z)->F & CF);			\
-	(Z)->MEMPTR = (Z)->HL + 1;									\
+	(Z)->WZ = (Z)->HL + 1;										\
 	(Z)->F = ((((Z)->HLD ^ res ^ (Z)->Reg.d) >> 8) & HF) | NF |	\
 		((res >> 16) & CF) |									\
 		((res >> 8) & (SF | YF | XF)) |							\
@@ -1231,14 +1239,14 @@ INLINE UINT8 SRL(z80_state *z80, UINT8 value)
  ***************************************************************/
 #undef BIT
 #define BIT(Z, bit, reg) do {									\
-	(Z)->F = ((Z)->F & CF) | HF | SZ_BIT[reg & (1<<bit)];		\
+	(Z)->F = ((Z)->F & CF) | HF | (SZ_BIT[reg & (1<<bit)] & ~(YF|XF)) | (reg & (YF|XF)); \
 } while (0)
 
 /***************************************************************
  * BIT  bit,(HL)
  ***************************************************************/
 #define BIT_HL(Z, bit, reg) do {								\
-	(Z)->F = ((Z)->F & CF) | HF | (SZ_BIT[reg & (1<<bit)] & ~(YF|XF)) | ((Z)->MEMPTR_H & (YF|XF)); \
+	(Z)->F = ((Z)->F & CF) | HF | (SZ_BIT[reg & (1<<bit)] & ~(YF|XF)) | ((Z)->WZ_H & (YF|XF)); \
 } while (0)
 
 /***************************************************************
@@ -1283,7 +1291,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 #define CPI(Z) do {												\
 	UINT8 val = RM((Z), (Z)->HL);								\
 	UINT8 res = (Z)->A - val;									\
-	(Z)->MEMPTR++;												\
+	(Z)->WZ++;													\
 	(Z)->HL++; (Z)->BC--;										\
 	(Z)->F = ((Z)->F & CF) | (SZ[res]&~(YF|XF)) | (((Z)->A^val^res)&HF) | NF; \
 	if ((Z)->F & HF) res -= 1;									\
@@ -1298,7 +1306,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 #define INI(Z) do {												\
 	unsigned t;													\
 	UINT8 io = IN((Z), (Z)->BC);								\
-	(Z)->MEMPTR = (Z)->BC + 1;									\
+	(Z)->WZ = (Z)->BC + 1;										\
 	(Z)->B--;													\
 	WM((Z), (Z)->HL, io);										\
 	(Z)->HL++;													\
@@ -1316,7 +1324,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	unsigned t;													\
 	UINT8 io = RM((Z), (Z)->HL);								\
 	(Z)->B--;													\
-	(Z)->MEMPTR = (Z)->BC + 1;									\
+	(Z)->WZ = (Z)->BC + 1;										\
 	OUT((Z), (Z)->BC, io);										\
 	(Z)->HL++;													\
 	(Z)->F = SZ[(Z)->B];										\
@@ -1345,7 +1353,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 #define CPD(Z) do {												\
 	UINT8 val = RM((Z), (Z)->HL);								\
 	UINT8 res = (Z)->A - val;									\
-	(Z)->MEMPTR--;												\
+	(Z)->WZ--;													\
 	(Z)->HL--; (Z)->BC--;										\
 	(Z)->F = ((Z)->F & CF) | (SZ[res]&~(YF|XF)) | (((Z)->A^val^res)&HF) | NF; \
 	if ((Z)->F & HF) res -= 1;									\
@@ -1360,7 +1368,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 #define IND(Z) do {												\
 	unsigned t;													\
 	UINT8 io = IN((Z), (Z)->BC);								\
-	(Z)->MEMPTR = (Z)->BC - 1;									\
+	(Z)->WZ = (Z)->BC - 1;										\
 	(Z)->B--;													\
 	WM((Z), (Z)->HL, io);										\
 	(Z)->HL--;													\
@@ -1378,7 +1386,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	unsigned t;													\
 	UINT8 io = RM((Z), (Z)->HL);								\
 	(Z)->B--;													\
-	(Z)->MEMPTR = (Z)->BC - 1;									\
+	(Z)->WZ = (Z)->BC - 1;										\
 	OUT((Z), (Z)->BC, io);										\
 	(Z)->HL--;													\
 	(Z)->F = SZ[(Z)->B];										\
@@ -1396,7 +1404,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if ((Z)->BC != 0)											\
 	{															\
 		(Z)->PC -= 2;											\
-		(Z)->MEMPTR = (Z)->PC + 1;								\
+		(Z)->WZ = (Z)->PC + 1;									\
 		CC(Z, ex, 0xb0);										\
 	}															\
 } while (0)
@@ -1409,7 +1417,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if ((Z)->BC != 0 && !((Z)->F & ZF))							\
 	{															\
 		(Z)->PC -= 2;											\
-		(Z)->MEMPTR = (Z)->PC + 1;								\
+		(Z)->WZ = (Z)->PC + 1;									\
 		CC(Z, ex, 0xb1);										\
 	}															\
 } while (0)
@@ -1446,7 +1454,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if ((Z)->BC != 0)											\
 	{															\
 		(Z)->PC -= 2;											\
-		(Z)->MEMPTR = (Z)->PC + 1;								\
+		(Z)->WZ = (Z)->PC + 1;									\
 		CC(Z, ex, 0xb8);										\
 	}															\
 } while (0)
@@ -1459,7 +1467,7 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if ((Z)->BC != 0 && !((Z)->F & ZF))							\
 	{															\
 		(Z)->PC -= 2;											\
-		(Z)->MEMPTR = (Z)->PC + 1;								\
+		(Z)->WZ = (Z)->PC + 1;									\
 		CC(Z, ex, 0xb9);										\
 	}															\
 } while (0)
@@ -2127,7 +2135,7 @@ OP(dd,1f) { illegal_1(z80); op_1f(z80);												} /* DB   DD          */
 
 OP(dd,20) { illegal_1(z80); op_20(z80);												} /* DB   DD          */
 OP(dd,21) { z80->IX = ARG16(z80);													} /* LD   IX,w        */
-OP(dd,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->ix);	z80->MEMPTR = z80->ea+1; } /* LD   (w),IX      */
+OP(dd,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->ix);	z80->WZ = z80->ea+1;} /* LD   (w),IX      */
 OP(dd,23) { z80->IX++;																} /* INC  IX          */
 OP(dd,24) { z80->HX = INC(z80, z80->HX);											} /* INC  HX          */
 OP(dd,25) { z80->HX = DEC(z80, z80->HX);											} /* DEC  HX          */
@@ -2136,7 +2144,7 @@ OP(dd,27) { illegal_1(z80); op_27(z80);												} /* DB   DD          */
 
 OP(dd,28) { illegal_1(z80); op_28(z80);												} /* DB   DD          */
 OP(dd,29) { ADD16(z80, ix, ix);														} /* ADD  IX,IX       */
-OP(dd,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->ix);	z80->MEMPTR = z80->ea+1; } /* LD   IX,(w)      */
+OP(dd,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->ix);	z80->WZ = z80->ea+1;} /* LD   IX,(w)      */
 OP(dd,2b) { z80->IX--;																} /* DEC  IX          */
 OP(dd,2c) { z80->LX = INC(z80, z80->LX);											} /* INC  LX          */
 OP(dd,2d) { z80->LX = DEC(z80, z80->LX);											} /* DEC  LX          */
@@ -2418,7 +2426,7 @@ OP(fd,1f) { illegal_1(z80); op_1f(z80);												} /* DB   FD          */
 
 OP(fd,20) { illegal_1(z80); op_20(z80);												} /* DB   FD          */
 OP(fd,21) { z80->IY = ARG16(z80);													} /* LD   IY,w        */
-OP(fd,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->iy); z80->MEMPTR = z80->ea+1; } /* LD   (w),IY      */
+OP(fd,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->iy); z80->WZ = z80->ea+1;} /* LD   (w),IY      */
 OP(fd,23) { z80->IY++;																} /* INC  IY          */
 OP(fd,24) { z80->HY = INC(z80, z80->HY);											} /* INC  HY          */
 OP(fd,25) { z80->HY = DEC(z80, z80->HY);											} /* DEC  HY          */
@@ -2427,7 +2435,7 @@ OP(fd,27) { illegal_1(z80); op_27(z80);												} /* DB   FD          */
 
 OP(fd,28) { illegal_1(z80); op_28(z80);												} /* DB   FD          */
 OP(fd,29) { ADD16(z80, iy, iy);														} /* ADD  IY,IY       */
-OP(fd,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->iy); z80->MEMPTR = z80->ea+1; } /* LD   IY,(w)      */
+OP(fd,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->iy); z80->WZ = z80->ea+1;} /* LD   IY,(w)      */
 OP(fd,2b) { z80->IY--;																} /* DEC  IY          */
 OP(fd,2c) { z80->LY = INC(z80, z80->LY);											} /* INC  LY          */
 OP(fd,2d) { z80->LY = DEC(z80, z80->LY);											} /* DEC  LY          */
@@ -2752,16 +2760,16 @@ OP(ed,3f) { illegal_2(z80);															} /* DB   ED          */
 OP(ed,40) { z80->B = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->B];		} /* IN   B,(C)       */
 OP(ed,41) { OUT(z80, z80->BC, z80->B);												} /* OUT  (C),B       */
 OP(ed,42) { SBC16(z80, bc);															} /* SBC  HL,BC       */
-OP(ed,43) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->bc); z80->MEMPTR = z80->ea+1; } /* LD   (w),BC      */
+OP(ed,43) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->bc); z80->WZ = z80->ea+1;} /* LD   (w),BC      */
 OP(ed,44) { NEG(z80);																} /* NEG              */
-OP(ed,45) { RETN(z80);																} /* RETN            */
+OP(ed,45) { RETN(z80);																} /* RETN             */
 OP(ed,46) { z80->im = 0;															} /* im   0           */
 OP(ed,47) { LD_I_A(z80);															} /* LD   i,A         */
 
 OP(ed,48) { z80->C = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->C];		} /* IN   C,(C)       */
 OP(ed,49) { OUT(z80, z80->BC, z80->C);												} /* OUT  (C),C       */
 OP(ed,4a) { ADC16(z80, bc);															} /* ADC  HL,BC       */
-OP(ed,4b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->bc); z80->MEMPTR = z80->ea+1; } /* LD   BC,(w)      */
+OP(ed,4b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->bc); z80->WZ = z80->ea+1;} /* LD   BC,(w)      */
 OP(ed,4c) { NEG(z80);																} /* NEG              */
 OP(ed,4d) { RETI(z80);																} /* RETI             */
 OP(ed,4e) { z80->im = 0;															} /* im   0           */
@@ -2770,16 +2778,16 @@ OP(ed,4f) { LD_R_A(z80);															} /* LD   r,A         */
 OP(ed,50) { z80->D = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->D];		} /* IN   D,(C)       */
 OP(ed,51) { OUT(z80, z80->BC, z80->D);												} /* OUT  (C),D       */
 OP(ed,52) { SBC16(z80, de);															} /* SBC  HL,DE       */
-OP(ed,53) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->de); z80->MEMPTR = z80->ea+1; } /* LD   (w),DE      */
+OP(ed,53) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->de); z80->WZ = z80->ea+1;} /* LD   (w),DE      */
 OP(ed,54) { NEG(z80);																} /* NEG              */
-OP(ed,55) { RETN(z80);																} /* RETN            */
+OP(ed,55) { RETN(z80);																} /* RETN             */
 OP(ed,56) { z80->im = 1;															} /* im   1           */
 OP(ed,57) { LD_A_I(z80);															} /* LD   A,i         */
 
 OP(ed,58) { z80->E = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->E];		} /* IN   E,(C)       */
 OP(ed,59) { OUT(z80, z80->BC, z80->E);												} /* OUT  (C),E       */
 OP(ed,5a) { ADC16(z80, de);															} /* ADC  HL,DE       */
-OP(ed,5b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->de); z80->MEMPTR = z80->ea+1; } /* LD   DE,(w)      */
+OP(ed,5b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->de); z80->WZ = z80->ea+1;} /* LD   DE,(w)      */
 OP(ed,5c) { NEG(z80);																} /* NEG              */
 OP(ed,5d) { RETI(z80);																} /* RETI             */
 OP(ed,5e) { z80->im = 2;															} /* im   2           */
@@ -2788,16 +2796,16 @@ OP(ed,5f) { LD_A_R(z80);															} /* LD   A,r         */
 OP(ed,60) { z80->H = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->H];		} /* IN   H,(C)       */
 OP(ed,61) { OUT(z80, z80->BC, z80->H);												} /* OUT  (C),H       */
 OP(ed,62) { SBC16(z80, hl);															} /* SBC  HL,HL       */
-OP(ed,63) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->hl); z80->MEMPTR = z80->ea+1; } /* LD   (w),HL      */
+OP(ed,63) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->hl); z80->WZ = z80->ea+1;} /* LD   (w),HL      */
 OP(ed,64) { NEG(z80);																} /* NEG              */
-OP(ed,65) { RETN(z80);																} /* RETN            */
+OP(ed,65) { RETN(z80);																} /* RETN             */
 OP(ed,66) { z80->im = 0;															} /* im   0           */
 OP(ed,67) { RRD(z80);																} /* RRD  (HL)        */
 
 OP(ed,68) { z80->L = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->L];		} /* IN   L,(C)       */
 OP(ed,69) { OUT(z80, z80->BC, z80->L);												} /* OUT  (C),L       */
 OP(ed,6a) { ADC16(z80, hl);															} /* ADC  HL,HL       */
-OP(ed,6b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->hl); z80->MEMPTR = z80->ea+1; } /* LD   HL,(w)      */
+OP(ed,6b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->hl); z80->WZ = z80->ea+1;} /* LD   HL,(w)      */
 OP(ed,6c) { NEG(z80);																} /* NEG              */
 OP(ed,6d) { RETI(z80);																} /* RETI             */
 OP(ed,6e) { z80->im = 0;															} /* im   0           */
@@ -2806,16 +2814,16 @@ OP(ed,6f) { RLD(z80);																} /* RLD  (HL)        */
 OP(ed,70) { UINT8 res = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[res];		} /* IN   0,(C)       */
 OP(ed,71) { OUT(z80, z80->BC, 0);													} /* OUT  (C),0       */
 OP(ed,72) { SBC16(z80, sp);															} /* SBC  HL,SP       */
-OP(ed,73) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->sp); z80->MEMPTR = z80->ea+1; } /* LD   (w),SP      */
+OP(ed,73) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->sp); z80->WZ = z80->ea+1;} /* LD   (w),SP      */
 OP(ed,74) { NEG(z80);																} /* NEG              */
-OP(ed,75) { RETN(z80);																} /* RETN            */
+OP(ed,75) { RETN(z80);																} /* RETN             */
 OP(ed,76) { z80->im = 1;															} /* im   1           */
 OP(ed,77) { illegal_2(z80);															} /* DB   ED,77       */
 
-OP(ed,78) { z80->A = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->A]; z80->MEMPTR = z80->BC + 1;	} /* IN   A,(C)       */
-OP(ed,79) { OUT(z80, z80->BC, z80->A);	z80->MEMPTR = z80->BC + 1;					} /* OUT  (C),A       */
+OP(ed,78) { z80->A = IN(z80, z80->BC); z80->F = (z80->F & CF) | SZP[z80->A]; z80->WZ = z80->BC + 1;	} /* IN   A,(C)       */
+OP(ed,79) { OUT(z80, z80->BC, z80->A);	z80->WZ = z80->BC + 1;						} /* OUT  (C),A       */
 OP(ed,7a) { ADC16(z80, sp);															} /* ADC  HL,SP       */
-OP(ed,7b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->sp); z80->MEMPTR = z80->ea+1; } /* LD   SP,(w)      */
+OP(ed,7b) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->sp); z80->WZ = z80->ea+1;} /* LD   SP,(w)      */
 OP(ed,7c) { NEG(z80);																} /* NEG              */
 OP(ed,7d) { RETI(z80);																} /* RETI             */
 OP(ed,7e) { z80->im = 2;															} /* im   2           */
@@ -2971,7 +2979,7 @@ OP(ed,ff) { illegal_2(z80);															} /* DB   ED          */
  **********************************************************/
 OP(op,00) {																			} /* NOP              */
 OP(op,01) { z80->BC = ARG16(z80);													} /* LD   BC,w        */
-OP(op,02) { WM(z80,z80->BC,z80->A); z80->MEMPTR_L = (z80->BC + 1) & 0xFF;  z80->MEMPTR_H = z80->A; } /* LD   (BC),A      */
+OP(op,02) { WM(z80,z80->BC,z80->A); z80->WZ_L = (z80->BC + 1) & 0xFF;  z80->WZ_H = z80->A; } /* LD (BC),A */
 OP(op,03) { z80->BC++;																} /* INC  BC          */
 OP(op,04) { z80->B = INC(z80, z80->B);												} /* INC  B           */
 OP(op,05) { z80->B = DEC(z80, z80->B);												} /* DEC  B           */
@@ -2980,7 +2988,7 @@ OP(op,07) { RLCA(z80);																} /* RLCA             */
 
 OP(op,08) { EX_AF(z80);																} /* EX   AF,AF'      */
 OP(op,09) { ADD16(z80, hl, bc);														} /* ADD  HL,BC       */
-OP(op,0a) { z80->A = RM(z80, z80->BC);	z80->MEMPTR=z80->BC+1;    					} /* LD   A,(BC)      */
+OP(op,0a) { z80->A = RM(z80, z80->BC);	z80->WZ=z80->BC+1;    						} /* LD   A,(BC)      */
 OP(op,0b) { z80->BC--; 																} /* DEC  BC          */
 OP(op,0c) { z80->C = INC(z80, z80->C);												} /* INC  C           */
 OP(op,0d) { z80->C = DEC(z80, z80->C);												} /* DEC  C           */
@@ -2989,7 +2997,7 @@ OP(op,0f) { RRCA(z80);																} /* RRCA             */
 
 OP(op,10) { z80->B--; JR_COND(z80, z80->B, 0x10);									} /* DJNZ o           */
 OP(op,11) { z80->DE = ARG16(z80);													} /* LD   DE,w        */
-OP(op,12) { WM(z80,z80->DE,z80->A); z80->MEMPTR_L = (z80->DE + 1) & 0xFF;  z80->MEMPTR_H = z80->A; } /* LD   (DE),A      */
+OP(op,12) { WM(z80,z80->DE,z80->A); z80->WZ_L = (z80->DE + 1) & 0xFF;  z80->WZ_H = z80->A; } /* LD (DE),A */
 OP(op,13) { z80->DE++;																} /* INC  DE          */
 OP(op,14) { z80->D = INC(z80, z80->D);												} /* INC  D           */
 OP(op,15) { z80->D = DEC(z80, z80->D);												} /* DEC  D           */
@@ -2998,7 +3006,7 @@ OP(op,17) { RLA(z80);																} /* RLA              */
 
 OP(op,18) { JR(z80);																} /* JR   o           */
 OP(op,19) { ADD16(z80, hl, de);														} /* ADD  HL,DE       */
-OP(op,1a) { z80->A = RM(z80, z80->DE); z80->MEMPTR=z80->DE+1;						} /* LD   A,(DE)      */
+OP(op,1a) { z80->A = RM(z80, z80->DE); z80->WZ=z80->DE+1;							} /* LD   A,(DE)      */
 OP(op,1b) { z80->DE--; 																} /* DEC  DE          */
 OP(op,1c) { z80->E = INC(z80, z80->E);												} /* INC  E           */
 OP(op,1d) { z80->E = DEC(z80, z80->E);												} /* DEC  E           */
@@ -3007,7 +3015,7 @@ OP(op,1f) { RRA(z80);																} /* RRA              */
 
 OP(op,20) { JR_COND(z80, !(z80->F & ZF), 0x20);										} /* JR   NZ,o        */
 OP(op,21) { z80->HL = ARG16(z80);													} /* LD   HL,w        */
-OP(op,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->hl);	z80->MEMPTR = z80->ea+1; } /* LD   (w),HL      */
+OP(op,22) { z80->ea = ARG16(z80); WM16(z80, z80->ea, &z80->hl);	z80->WZ = z80->ea+1;} /* LD   (w),HL      */
 OP(op,23) { z80->HL++;																} /* INC  HL          */
 OP(op,24) { z80->H = INC(z80, z80->H);												} /* INC  H           */
 OP(op,25) { z80->H = DEC(z80, z80->H);												} /* DEC  H           */
@@ -3016,7 +3024,7 @@ OP(op,27) { DAA(z80);																} /* DAA              */
 
 OP(op,28) { JR_COND(z80, z80->F & ZF, 0x28);										} /* JR   Z,o         */
 OP(op,29) { ADD16(z80, hl, hl);														} /* ADD  HL,HL       */
-OP(op,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->hl);	z80->MEMPTR = z80->ea+1; } /* LD   HL,(w)      */
+OP(op,2a) { z80->ea = ARG16(z80); RM16(z80, z80->ea, &z80->hl);	z80->WZ = z80->ea+1;} /* LD   HL,(w)      */
 OP(op,2b) { z80->HL--; 																} /* DEC  HL          */
 OP(op,2c) { z80->L = INC(z80, z80->L);												} /* INC  L           */
 OP(op,2d) { z80->L = DEC(z80, z80->L);												} /* DEC  L           */
@@ -3025,21 +3033,21 @@ OP(op,2f) { z80->A ^= 0xff; z80->F = (z80->F&(SF|ZF|PF|CF))|HF|NF|(z80->A&(YF|XF
 
 OP(op,30) { JR_COND(z80, !(z80->F & CF), 0x30);										} /* JR   NC,o        */
 OP(op,31) { z80->SP = ARG16(z80);													} /* LD   SP,w        */
-OP(op,32) { z80->ea=ARG16(z80);WM(z80,z80->ea,z80->A);z80->MEMPTR_L=(z80->ea+1)&0xFF;z80->MEMPTR_H=z80->A; } /* LD   (w),A       */
+OP(op,32) { z80->ea=ARG16(z80);WM(z80,z80->ea,z80->A);z80->WZ_L=(z80->ea+1)&0xFF;z80->WZ_H=z80->A; } /* LD   (w),A       */
 OP(op,33) { z80->SP++;																} /* INC  SP          */
 OP(op,34) { WM(z80, z80->HL, INC(z80, RM(z80, z80->HL)));							} /* INC  (HL)        */
 OP(op,35) { WM(z80, z80->HL, DEC(z80, RM(z80, z80->HL)));							} /* DEC  (HL)        */
 OP(op,36) { WM(z80, z80->HL, ARG(z80));												} /* LD   (HL),n      */
-OP(op,37) { z80->F = (z80->F & (SF|ZF|PF)) | CF | (z80->A & (YF|XF));				} /* SCF              */
+OP(op,37) { z80->F = (z80->F & (SF|ZF|YF|XF|PF)) | CF | (z80->A & (YF|XF));			} /* SCF              */
 
 OP(op,38) { JR_COND(z80, z80->F & CF, 0x38);										} /* JR   C,o         */
 OP(op,39) { ADD16(z80, hl, sp);														} /* ADD  HL,SP       */
-OP(op,3a) { z80->ea = ARG16(z80); z80->A = RM(z80, z80->ea); z80->MEMPTR=z80->ea+1;	} /* LD   A,(w)       */
+OP(op,3a) { z80->ea = ARG16(z80); z80->A = RM(z80, z80->ea); z80->WZ=z80->ea+1;		} /* LD   A,(w)       */
 OP(op,3b) { z80->SP--;																} /* DEC  SP          */
 OP(op,3c) { z80->A = INC(z80, z80->A);												} /* INC  A           */
 OP(op,3d) { z80->A = DEC(z80, z80->A);												} /* DEC  A           */
 OP(op,3e) { z80->A = ARG(z80);														} /* LD   A,n         */
-OP(op,3f) { z80->F = ((z80->F&(SF|ZF|PF|CF))|((z80->F&CF)<<4)|(z80->A&(YF|XF)))^CF;	} /* CCF              */
+OP(op,3f) { z80->F = ((z80->F&(SF|ZF|YF|XF|PF|CF))|((z80->F&CF)<<4)|(z80->A&(YF|XF)))^CF; } /* CCF        */
 
 OP(op,40) {																			} /* LD   B,B         */
 OP(op,41) { z80->B = z80->C;														} /* LD   B,C         */
@@ -3195,7 +3203,7 @@ OP(op,c6) { ADD(z80, ARG(z80));														} /* ADD  A,n         */
 OP(op,c7) { RST(z80, 0x00);															} /* RST  0           */
 
 OP(op,c8) { RET_COND(z80, z80->F & ZF, 0xc8);										} /* RET  Z           */
-OP(op,c9) { POP(z80, pc); z80->MEMPTR=z80->PCD;										} /* RET              */
+OP(op,c9) { POP(z80, pc); z80->WZ=z80->PCD;											} /* RET              */
 OP(op,ca) { JP_COND(z80, z80->F & ZF);												} /* JP   Z,a         */
 OP(op,cb) { z80->r++; EXEC(z80,cb,ROP(z80));										} /* **** CB xx       */
 OP(op,cc) { CALL_COND(z80, z80->F & ZF, 0xcc);										} /* CALL Z,a         */
@@ -3206,7 +3214,7 @@ OP(op,cf) { RST(z80, 0x08);															} /* RST  1           */
 OP(op,d0) { RET_COND(z80, !(z80->F & CF), 0xd0);									} /* RET  NC          */
 OP(op,d1) { POP(z80, de);															} /* POP  DE          */
 OP(op,d2) { JP_COND(z80, !(z80->F & CF));											} /* JP   NC,a        */
-OP(op,d3) { unsigned n = ARG(z80) | (z80->A << 8); OUT(z80, n, z80->A);	z80->MEMPTR_L = ((n & 0xff) + 1) & 0xff;  z80->MEMPTR_H = z80->A;	} /* OUT  (n),A       */
+OP(op,d3) { unsigned n = ARG(z80) | (z80->A << 8); OUT(z80, n, z80->A);	z80->WZ_L = ((n & 0xff) + 1) & 0xff;  z80->WZ_H = z80->A;	} /* OUT  (n),A       */
 OP(op,d4) { CALL_COND(z80, !(z80->F & CF), 0xd4);									} /* CALL NC,a        */
 OP(op,d5) { PUSH(z80, de);															} /* PUSH DE          */
 OP(op,d6) { SUB(z80, ARG(z80));														} /* SUB  n           */
@@ -3215,7 +3223,7 @@ OP(op,d7) { RST(z80, 0x10);															} /* RST  2           */
 OP(op,d8) { RET_COND(z80, z80->F & CF, 0xd8);										} /* RET  C           */
 OP(op,d9) { EXX(z80);																} /* EXX              */
 OP(op,da) { JP_COND(z80, z80->F & CF);												} /* JP   C,a         */
-OP(op,db) { unsigned n = ARG(z80) | (z80->A << 8); z80->A = IN(z80, n);	z80->MEMPTR = n + 1; } /* IN   A,(n)       */
+OP(op,db) { unsigned n = ARG(z80) | (z80->A << 8); z80->A = IN(z80, n);	z80->WZ = n + 1; } /* IN   A,(n)  */
 OP(op,dc) { CALL_COND(z80, z80->F & CF, 0xdc);										} /* CALL C,a         */
 OP(op,dd) { z80->r++; EXEC(z80,dd,ROP(z80));										} /* **** DD xx       */
 OP(op,de) { SBC(z80, ARG(z80));														} /* SBC  A,n         */
@@ -3328,7 +3336,7 @@ static void take_interrupt(z80_state *z80)
 				break;
 		}
 	}
-	z80->MEMPTR=z80->PCD;
+	z80->WZ=z80->PCD;
 }
 
 /****************************************************************************
@@ -3430,7 +3438,7 @@ static CPU_INIT( z80 )
 	state_save_register_device_item(device, 0, z80->HL);
 	state_save_register_device_item(device, 0, z80->IX);
 	state_save_register_device_item(device, 0, z80->IY);
-	state_save_register_device_item(device, 0, z80->MEMPTR);
+	state_save_register_device_item(device, 0, z80->WZ);
 	state_save_register_device_item(device, 0, z80->af2.w.l);
 	state_save_register_device_item(device, 0, z80->bc2.w.l);
 	state_save_register_device_item(device, 0, z80->de2.w.l);
@@ -3491,7 +3499,7 @@ static CPU_RESET( z80 )
 	if (z80->daisy)
 		z80daisy_reset(z80->daisy);
 
-	z80->MEMPTR=z80->PCD;
+	z80->WZ=z80->PCD;
 }
 
 static CPU_EXIT( z80 )
@@ -3523,7 +3531,7 @@ static CPU_EXECUTE( z80 )
 		z80->iff1 = 0;
 		PUSH(z80, pc);
 		z80->PCD = 0x0066;
-		z80->MEMPTR=z80->PCD;
+		z80->WZ=z80->PCD;
 		z80->icount -= 11;
 		z80->nmi_pending = FALSE;
 	}
@@ -3699,18 +3707,18 @@ CPU_GET_INFO( z80 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z80");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Zilog Z80");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "3.8");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Zilog Z80");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "3.9");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
 				z80->F & 0x80 ? 'S':'.',
 				z80->F & 0x40 ? 'Z':'.',
-				z80->F & 0x20 ? '5':'.',
+				z80->F & 0x20 ? 'Y':'.',
 				z80->F & 0x10 ? 'H':'.',
-				z80->F & 0x08 ? '3':'.',
+				z80->F & 0x08 ? 'X':'.',
 				z80->F & 0x04 ? 'P':'.',
 				z80->F & 0x02 ? 'N':'.',
 				z80->F & 0x01 ? 'C':'.');
