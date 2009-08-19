@@ -41,7 +41,22 @@ TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 ***********************************************************************************************/
 
 #include "sndintrf.h"
+#include "streams.h"
 #include "tms5220.h"
+
+
+#define DEBUG_5220			0
+
+#define MAX_SAMPLE_CHUNK	512
+
+
+enum _tms5220_variant
+{
+	variant_tms5220,	/* TMS5220_IS_TMS5220, TMS5220_IS_TMS5220C,  TMS5220_IS_TSP5220C */
+	variant_tmc0285		/* TMS5220_IS_TMS5200, TMS5220_IS_CD2501 */
+};
+typedef enum _tms5220_variant tms5220_variant;
+
 
 
 /* Pull in the ROM tables */
@@ -55,15 +70,8 @@ TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 */
 
 
-#ifndef TRUE
-	#define TRUE 1
-#endif
-#ifndef FALSE
-	#define FALSE 0
-#endif
-
-
-struct tms5220
+typedef struct _tms5220_state tms5220_state;
+struct _tms5220_state
 {
 	/* these contain data that describes the 128-bit data FIFO */
 	#define FIFO_SIZE 16
@@ -126,9 +134,6 @@ struct tms5220
 	INT8 excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
-	int (*read_callback)(const device_config *device, int count);
-	void (*load_address_callback)(const device_config *device, int data);
-	void (*read_and_branch_callback)(const device_config *device);
 	UINT8 schedule_dummy_read;			/* set after each load address, so that next read operation
                                               is preceded by a dummy read */
 
@@ -159,192 +164,86 @@ struct tms5220
      */
 	UINT8 digital_select;
 	const device_config *device;
+
+	const tms5220_interface *intf;
+	sound_stream *stream;
+	int clock;
 };
 
 
+INLINE tms5220_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_TMS5220 ||
+		   sound_get_type(device) == SOUND_TMC0285 ||
+		   sound_get_type(device) == SOUND_TMS5200);
+	return (tms5220_state *)device->token;
+}
+
+
+
 /* Static function prototypes */
-static void process_command(struct tms5220 *tms);
-static int extract_bits(struct tms5220 *tms, int count);
-static int parse_frame(struct tms5220 *tms, int the_first_frame);
-static void check_buffer_low(struct tms5220 *tms);
-static void set_interrupt_state(struct tms5220 *tms, int state);
-static INT16 lattice_filter(void *chip);
+static void process_command(tms5220_state *tms);
+static int extract_bits(tms5220_state *tms, int count);
+static int parse_frame(tms5220_state *tms, int the_first_frame);
+static void check_buffer_low(tms5220_state *tms);
+static void set_interrupt_state(tms5220_state *tms, int state);
+static INT16 lattice_filter(tms5220_state *tms);
 static INT16 clip_and_wrap(INT16 cliptemp);
+static STREAM_UPDATE( tms5220_update );
 
 
-#define DEBUG_5220	0
-
-
-void *tms5220_create(const device_config *device)
+static void register_for_save_states(tms5220_state *tms)
 {
-	struct tms5220 *tms;
+	state_save_register_device_item_array(tms->device, 0, tms->fifo);
+	state_save_register_device_item(tms->device, 0, tms->fifo_head);
+	state_save_register_device_item(tms->device, 0, tms->fifo_tail);
+	state_save_register_device_item(tms->device, 0, tms->fifo_count);
+	state_save_register_device_item(tms->device, 0, tms->fifo_bits_taken);
 
-	tms = alloc_clear_or_die(struct tms5220);
+	state_save_register_device_item(tms->device, 0, tms->tms5220_speaking);
+	state_save_register_device_item(tms->device, 0, tms->speak_external);
+	state_save_register_device_item(tms->device, 0, tms->talk_status);
+	state_save_register_device_item(tms->device, 0, tms->first_frame);
+	state_save_register_device_item(tms->device, 0, tms->last_frame);
+	state_save_register_device_item(tms->device, 0, tms->buffer_low);
+	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
+	state_save_register_device_item(tms->device, 0, tms->irq_pin);
 
-	tms->device = device;
-	state_save_register_device_item_array(device, 0, tms->fifo);
-	state_save_register_device_item(device, 0, tms->fifo_head);
-	state_save_register_device_item(device, 0, tms->fifo_tail);
-	state_save_register_device_item(device, 0, tms->fifo_count);
-	state_save_register_device_item(device, 0, tms->fifo_bits_taken);
+	state_save_register_device_item(tms->device, 0, tms->old_energy);
+	state_save_register_device_item(tms->device, 0, tms->old_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->old_k);
 
-	state_save_register_device_item(device, 0, tms->tms5220_speaking);
-	state_save_register_device_item(device, 0, tms->speak_external);
-	state_save_register_device_item(device, 0, tms->talk_status);
-	state_save_register_device_item(device, 0, tms->first_frame);
-	state_save_register_device_item(device, 0, tms->last_frame);
-	state_save_register_device_item(device, 0, tms->buffer_low);
-	state_save_register_device_item(device, 0, tms->buffer_empty);
-	state_save_register_device_item(device, 0, tms->irq_pin);
+	state_save_register_device_item(tms->device, 0, tms->new_energy);
+	state_save_register_device_item(tms->device, 0, tms->new_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->new_k);
 
-	state_save_register_device_item(device, 0, tms->old_energy);
-	state_save_register_device_item(device, 0, tms->old_pitch);
-	state_save_register_device_item_array(device, 0, tms->old_k);
+	state_save_register_device_item(tms->device, 0, tms->current_energy);
+	state_save_register_device_item(tms->device, 0, tms->current_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->current_k);
 
-	state_save_register_device_item(device, 0, tms->new_energy);
-	state_save_register_device_item(device, 0, tms->new_pitch);
-	state_save_register_device_item_array(device, 0, tms->new_k);
+	state_save_register_device_item(tms->device, 0, tms->target_energy);
+	state_save_register_device_item(tms->device, 0, tms->target_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->target_k);
 
-	state_save_register_device_item(device, 0, tms->current_energy);
-	state_save_register_device_item(device, 0, tms->current_pitch);
-	state_save_register_device_item_array(device, 0, tms->current_k);
+	state_save_register_device_item(tms->device, 0, tms->previous_energy);
 
-	state_save_register_device_item(device, 0, tms->target_energy);
-	state_save_register_device_item(device, 0, tms->target_pitch);
-	state_save_register_device_item_array(device, 0, tms->target_k);
+	state_save_register_device_item(tms->device, 0, tms->interp_count);
+	state_save_register_device_item(tms->device, 0, tms->sample_count);
+	state_save_register_device_item(tms->device, 0, tms->pitch_count);
 
-	state_save_register_device_item(device, 0, tms->previous_energy);
+	state_save_register_device_item_array(tms->device, 0, tms->u);
+	state_save_register_device_item_array(tms->device, 0, tms->x);
 
-	state_save_register_device_item(device, 0, tms->interp_count);
-	state_save_register_device_item(device, 0, tms->sample_count);
-	state_save_register_device_item(device, 0, tms->pitch_count);
+	state_save_register_device_item(tms->device, 0, tms->RNG);
+	state_save_register_device_item(tms->device, 0, tms->excitation_data);
 
-	state_save_register_device_item_array(device, 0, tms->u);
-	state_save_register_device_item_array(device, 0, tms->x);
-
-	state_save_register_device_item(device, 0, tms->RNG);
-	state_save_register_device_item(device, 0, tms->excitation_data);
-
-	state_save_register_device_item(device, 0, tms->schedule_dummy_read);
-	state_save_register_device_item(device, 0, tms->data_register);
-	state_save_register_device_item(device, 0, tms->RDB_flag);
-	state_save_register_device_item(device, 0, tms->digital_select);
-
-	return tms;
-}
-
-
-void tms5220_destroy(void *chip)
-{
-	free(chip);
-}
-
-/**********************************************************************************************
-
-     tms5220_reset -- resets the TMS5220
-
-***********************************************************************************************/
-
-void tms5220_reset_chip(void *chip)
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-
-	/* initialize the FIFO */
-	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
-	tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
-
-	/* initialize the chip state */
-	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
-	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-	if (tms->irq_func) tms->irq_func(tms->device, 0);
-	tms->buffer_empty = tms->buffer_low = 1;
-
-	tms->RDB_flag = FALSE;
-
-	/* initialize the energy/pitch/k states */
-	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_k, 0, sizeof(tms->old_k));
-	memset(tms->new_k, 0, sizeof(tms->new_k));
-	memset(tms->current_k, 0, sizeof(tms->current_k));
-	memset(tms->target_k, 0, sizeof(tms->target_k));
-
-	/* initialize the sample generators */
-	tms->interp_count = tms->sample_count = tms->pitch_count = 0;
-        tms->RNG = 0x1FFF;
-	memset(tms->u, 0, sizeof(tms->u));
-	memset(tms->x, 0, sizeof(tms->x));
-
-	if (tms->load_address_callback)
-		(*tms->load_address_callback)(tms->device, 0);
-
-	tms->schedule_dummy_read = TRUE;
-}
-
-
-
-/**********************************************************************************************
-
-     tms5220_set_irq -- sets the interrupt handler
-
-***********************************************************************************************/
-
-void tms5220_set_irq(void *chip, void (*func)(const device_config *, int))
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-    tms->irq_func = func;
-}
-
-
-/**********************************************************************************************
-
-     tms5220_set_read -- sets the speech ROM read handler
-
-***********************************************************************************************/
-
-void tms5220_set_read(void *chip, int (*func)(const device_config *, int))
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-	tms->read_callback = func;
-}
-
-
-/**********************************************************************************************
-
-     tms5220_set_load_address -- sets the speech ROM load address handler
-
-***********************************************************************************************/
-
-void tms5220_set_load_address(void *chip, void (*func)(const device_config *, int))
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-	tms->load_address_callback = func;
-}
-
-
-/**********************************************************************************************
-
-     tms5220_set_read_and_branch -- sets the speech ROM read and branch handler
-
-***********************************************************************************************/
-
-void tms5220_set_read_and_branch(void *chip, void (*func)(const device_config *))
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-	tms->read_and_branch_callback = func;
-}
-
-
-/**********************************************************************************************
-
-     tms5220_set_variant -- sets the tms5220 core to emulate its buggy forerunner, the tmc0285
-
-***********************************************************************************************/
-
-void tms5220_set_variant(void *chip, tms5220_variant new_variant)
-{
-	struct tms5220 *tms = (struct tms5220 *)chip;
-	tms->variant = new_variant;
+	state_save_register_device_item(tms->device, 0, tms->schedule_dummy_read);
+	state_save_register_device_item(tms->device, 0, tms->data_register);
+	state_save_register_device_item(tms->device, 0, tms->RDB_flag);
+	state_save_register_device_item(tms->device, 0, tms->digital_select);
 }
 
 
@@ -354,10 +253,8 @@ void tms5220_set_variant(void *chip, tms5220_variant new_variant)
 
 ***********************************************************************************************/
 
-void tms5220_data_write(void *chip, int data)
+static void tms5220_data_write(tms5220_state *tms, int data)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
-
     /* add this byte to the FIFO */
     if (tms->fifo_count < FIFO_SIZE)
     {
@@ -408,10 +305,8 @@ void tms5220_data_write(void *chip, int data)
 
 ***********************************************************************************************/
 
-int tms5220_status_read(void *chip)
+static int tms5220_status_read(tms5220_state *tms)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
-
 	if (tms->RDB_flag)
 	{	/* if last command was read, return data register */
 		tms->RDB_flag = FALSE;
@@ -437,9 +332,8 @@ int tms5220_status_read(void *chip)
 
 ***********************************************************************************************/
 
-int tms5220_ready_read(void *chip)
+static int tms5220_ready_read(tms5220_state *tms)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
     return (tms->fifo_count < FIFO_SIZE-1);
 }
 
@@ -450,9 +344,8 @@ int tms5220_ready_read(void *chip)
 
 ***********************************************************************************************/
 
-int tms5220_cycles_to_ready(void *chip)
+static int tms5220_cycles_to_ready(tms5220_state *tms)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
 	int answer;
 
 
@@ -492,9 +385,8 @@ int tms5220_cycles_to_ready(void *chip)
 
 ***********************************************************************************************/
 
-int tms5220_int_read(void *chip)
+static int tms5220_int_read(tms5220_state *tms)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
     return tms->irq_pin;
 }
 
@@ -506,9 +398,8 @@ int tms5220_int_read(void *chip)
 
 ***********************************************************************************************/
 
-void tms5220_process(void *chip, INT16 *buffer, unsigned int size)
+static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size)
 {
-	struct tms5220 *tms = (struct tms5220 *)chip;
     int buf_count=0;
     int i, interp_period, bitout;
 
@@ -795,16 +686,15 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 
 ***********************************************************************************************/
 
-static INT16 lattice_filter(void *chip)
+static INT16 lattice_filter(tms5220_state *tms)
 {
-        struct tms5220 *tms = (struct tms5220 *)chip;
-        /* Lattice filter here */
-        /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
-        /* Copied verbatim from table I in US patent 4,209,804:
-           notation equivalencies from table:
-           Yn(i) == tms->u[n-1]
-           Kn = tms->current_k[n-1]
-           bn = tms->x[n-1]
+   /* Lattice filter here */
+   /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
+   /* Copied verbatim from table I in US patent 4,209,804:
+      notation equivalencies from table:
+      Yn(i) == tms->u[n-1]
+      Kn = tms->current_k[n-1]
+      bn = tms->x[n-1]
     */
         tms->u[10] = (tms->excitation_data * tms->previous_energy) >> 8; /* Y(11) */
         tms->u[9] = tms->u[10] - ((tms->current_k[9] * tms->x[9]) / 32768);
@@ -838,7 +728,7 @@ static INT16 lattice_filter(void *chip)
 
 ***********************************************************************************************/
 
-static void process_command(struct tms5220 *tms)
+static void process_command(tms5220_state *tms)
 {
     unsigned char cmd;
 
@@ -864,26 +754,26 @@ static void process_command(struct tms5220 *tms)
 			if (tms->schedule_dummy_read)
 			{
 				tms->schedule_dummy_read = FALSE;
-				if (tms->read_callback)
-					(*tms->read_callback)(tms->device, 1);
+				if (tms->intf->read)
+					(*tms->intf->read)(tms->device, 1);
 			}
-			if (tms->read_callback)
-				tms->data_register = (*tms->read_callback)(tms->device, 8);	/* read one byte from speech ROM... */
+			if (tms->intf->read)
+				tms->data_register = (*tms->intf->read)(tms->device, 8);	/* read one byte from speech ROM... */
 			tms->RDB_flag = TRUE;
 			break;
 
 		case 0x30 : /* read and branch */
 			if (DEBUG_5220) logerror("read and branch command received\n");
 			tms->RDB_flag = FALSE;
-			if (tms->read_and_branch_callback)
-				(*tms->read_and_branch_callback)(tms->device);
+			if (tms->intf->read_and_branch)
+				(*tms->intf->read_and_branch)(tms->device);
 			break;
 
 		case 0x40 : /* load address */
 			/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
               This code does not care about this. */
-			if (tms->load_address_callback)
-				(*tms->load_address_callback)(tms->device, cmd & 0x0f);
+			if (tms->intf->load_address)
+				(*tms->intf->load_address)(tms->device, cmd & 0x0f);
 			tms->schedule_dummy_read = TRUE;
 			break;
 
@@ -891,8 +781,8 @@ static void process_command(struct tms5220 *tms)
 			if (tms->schedule_dummy_read)
 			{
 				tms->schedule_dummy_read = FALSE;
-				if (tms->read_callback)
-					(*tms->read_callback)(tms->device, 1);
+				if (tms->intf->read)
+					(*tms->intf->read)(tms->device, 1);
 			}
 			tms->tms5220_speaking = 1;
 			tms->speak_external = 0;
@@ -921,10 +811,10 @@ static void process_command(struct tms5220 *tms)
 			if (tms->schedule_dummy_read)
 			{
 				tms->schedule_dummy_read = FALSE;
-				if (tms->read_callback)
-					(*tms->read_callback)(tms->device, 1);
+				if (tms->intf->read)
+					(*tms->intf->read)(tms->device, 1);
 			}
-			tms5220_reset_chip(tms);
+			device_reset(tms->device);
 			break;
         }
     }
@@ -941,7 +831,7 @@ static void process_command(struct tms5220 *tms)
 
 ***********************************************************************************************/
 
-static int extract_bits(struct tms5220 *tms, int count)
+static int extract_bits(tms5220_state *tms, int count)
 {
     int val = 0;
 
@@ -963,8 +853,8 @@ static int extract_bits(struct tms5220 *tms, int count)
 	else
 	{
 		/* extract from speech ROM */
-		if (tms->read_callback)
-			val = (* tms->read_callback)(tms->device, count);
+		if (tms->intf->read)
+			val = (* tms->intf->read)(tms->device, count);
 	}
 
     return val;
@@ -978,7 +868,7 @@ static int extract_bits(struct tms5220 *tms, int count)
 
 ***********************************************************************************************/
 
-static int parse_frame(struct tms5220 *tms, int the_first_frame)
+static int parse_frame(tms5220_state *tms, int the_first_frame)
 {
 	int bits = 0;	/* number of bits in FIFO (speak external only) */
 	int indx, i, rep_flag;
@@ -1160,7 +1050,7 @@ ranout:
 
 ***********************************************************************************************/
 
-static void check_buffer_low(struct tms5220 *tms)
+static void check_buffer_low(tms5220_state *tms)
 {
     /* did we just become low? */
     if (tms->fifo_count <= 8)
@@ -1190,9 +1080,237 @@ static void check_buffer_low(struct tms5220 *tms)
 
 ***********************************************************************************************/
 
-static void set_interrupt_state(struct tms5220 *tms, int state)
+static void set_interrupt_state(tms5220_state *tms, int state)
 {
-    if (tms->irq_func && state != tms->irq_pin)
-    	tms->irq_func(tms->device, state);
+    if (tms->intf->irq && state != tms->irq_pin)
+    	tms->intf->irq(tms->device, state);
     tms->irq_pin = state;
 }
+
+
+/**********************************************************************************************
+
+     DEVICE_START( tms5220 ) -- allocate buffers and reset the 5220
+
+***********************************************************************************************/
+
+static DEVICE_START( tms5220 )
+{
+	static const tms5220_interface dummy = { 0 };
+	tms5220_state *tms = get_safe_token(device);
+
+	/* set the interface and device */
+	tms->intf = device->static_config ? (const tms5220_interface *)device->static_config : &dummy;
+	tms->device = device;
+	tms->clock = device->clock;
+
+	/* initialize a stream */
+	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
+	
+	register_for_save_states(tms);
+}
+
+
+static DEVICE_START( tmc0285 )
+{
+	tms5220_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5220 );
+	tms->variant = variant_tmc0285;
+}
+
+
+static DEVICE_START( tms5200 )
+{
+	tms5220_state *tms = get_safe_token(device);
+	DEVICE_START_CALL( tms5220 );
+	tms->variant = variant_tmc0285;
+}
+
+
+static DEVICE_RESET( tms5220 )
+{
+	tms5220_state *tms = get_safe_token(device);
+
+	/* initialize the FIFO */
+	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
+	tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
+
+	/* initialize the chip state */
+	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
+	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
+	if (tms->intf->irq) tms->intf->irq(tms->device, 0);
+	tms->buffer_empty = tms->buffer_low = 1;
+
+	tms->RDB_flag = FALSE;
+
+	/* initialize the energy/pitch/k states */
+	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
+	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
+	memset(tms->old_k, 0, sizeof(tms->old_k));
+	memset(tms->new_k, 0, sizeof(tms->new_k));
+	memset(tms->current_k, 0, sizeof(tms->current_k));
+	memset(tms->target_k, 0, sizeof(tms->target_k));
+
+	/* initialize the sample generators */
+	tms->interp_count = tms->sample_count = tms->pitch_count = 0;
+        tms->RNG = 0x1FFF;
+	memset(tms->u, 0, sizeof(tms->u));
+	memset(tms->x, 0, sizeof(tms->x));
+
+	if (tms->intf->load_address)
+		(*tms->intf->load_address)(tms->device, 0);
+
+	tms->schedule_dummy_read = TRUE;
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_data_w -- write data to the sound chip
+
+***********************************************************************************************/
+
+WRITE8_DEVICE_HANDLER( tms5220_data_w )
+{
+	tms5220_state *tms = get_safe_token(device);
+    /* bring up to date first */
+    stream_update(tms->stream);
+    tms5220_data_write(tms, data);
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_status_r -- read status or data from the sound chip
+
+***********************************************************************************************/
+
+READ8_DEVICE_HANDLER( tms5220_status_r )
+{
+	tms5220_state *tms = get_safe_token(device);
+    /* bring up to date first */
+    stream_update(tms->stream);
+    return tms5220_status_read(tms);
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_ready_r -- return the not ready status from the sound chip
+
+***********************************************************************************************/
+
+int tms5220_ready_r(const device_config *device)
+{
+	tms5220_state *tms = get_safe_token(device);
+    /* bring up to date first */
+    stream_update(tms->stream);
+    return tms5220_ready_read(tms);
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_time_to_ready -- return the time in seconds until the ready line is asserted
+
+***********************************************************************************************/
+
+double tms5220_time_to_ready(const device_config *device)
+{
+	tms5220_state *tms = get_safe_token(device);
+	double cycles;
+
+	/* bring up to date first */
+	stream_update(tms->stream);
+	cycles = tms5220_cycles_to_ready(tms);
+	return cycles * 80.0 / tms->clock;
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_int_r -- return the int status from the sound chip
+
+***********************************************************************************************/
+
+int tms5220_int_r(const device_config *device)
+{
+	tms5220_state *tms = get_safe_token(device);
+    /* bring up to date first */
+    stream_update(tms->stream);
+    return tms5220_int_read(tms);
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_update -- update the sound chip so that it is in sync with CPU execution
+
+***********************************************************************************************/
+
+static STREAM_UPDATE( tms5220_update )
+{
+	tms5220_state *tms = (tms5220_state *)param;
+	INT16 sample_data[MAX_SAMPLE_CHUNK];
+	stream_sample_t *buffer = outputs[0];
+
+	/* loop while we still have samples to generate */
+	while (samples)
+	{
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
+		int index;
+
+		/* generate the samples and copy to the target buffer */
+		tms5220_process(tms, sample_data, length);
+		for (index = 0; index < length; index++)
+			*buffer++ = sample_data[index];
+
+		/* account for the samples */
+		samples -= length;
+	}
+}
+
+
+
+/**********************************************************************************************
+
+     tms5220_set_frequency -- adjusts the playback frequency
+
+***********************************************************************************************/
+
+void tms5220_set_frequency(const device_config *device, int frequency)
+{
+	tms5220_state *tms = get_safe_token(device);
+	stream_set_sample_rate(tms->stream, frequency / 80);
+	tms->clock = frequency;
+}
+
+
+
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##tms5220##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"TMS5220"
+#define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tmc0285##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMC0285"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5200##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"TMS5200"
+#include "devtempl.h"

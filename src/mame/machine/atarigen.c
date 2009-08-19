@@ -11,7 +11,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
 #include "slapstic.h"

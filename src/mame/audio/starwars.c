@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "includes/starwars.h"
 
 

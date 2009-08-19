@@ -122,7 +122,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
 #include "gauntlet.h"

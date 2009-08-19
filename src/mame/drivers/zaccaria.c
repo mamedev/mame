@@ -40,7 +40,7 @@ Notes:
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 
 
 extern UINT8 *zaccaria_videoram,*zaccaria_attributesram;

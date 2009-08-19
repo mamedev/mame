@@ -129,7 +129,7 @@
 #include "machine/atarigen.h"
 #include "slapstic.h"
 #include "atarisy2.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
 

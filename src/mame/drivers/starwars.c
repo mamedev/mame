@@ -26,7 +26,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "starwars.h"
 #include "slapstic.h"

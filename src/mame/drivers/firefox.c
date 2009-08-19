@@ -31,7 +31,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "machine/laserdsc.h"
 #include "machine/6532riot.h"
 #include "machine/x2212.h"

@@ -56,7 +56,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "video/resnet.h"
 #include "cpu/cop400/cop400.h"
 

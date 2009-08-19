@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/avgdvg.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
 #include "mhavoc.h"
 

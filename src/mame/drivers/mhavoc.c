@@ -188,7 +188,7 @@
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "mhavoc.h"
 

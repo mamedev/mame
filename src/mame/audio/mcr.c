@@ -11,7 +11,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "audio/williams.h"

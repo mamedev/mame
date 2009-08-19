@@ -31,7 +31,7 @@
 #include "machine/timekpr.h"
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
-#include "sound/5220intf.h"
+#include "sound/tms5220.h"
 #include "sound/2151intf.h"
 
 static int tomcat_control_num;
