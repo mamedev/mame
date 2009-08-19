@@ -5038,8 +5038,8 @@ ROM_START( tdpgal )
 	ROM_LOAD( "8.bin",         0x0000, 0x0800, CRC(d701b1d4) SHA1(8f23ba3c9f42fedd8b8f38d321118a86889f00dc) )
 	ROM_LOAD( "7.bin",         0x0800, 0x0800, CRC(3113bcfd) SHA1(e2792e5fe7d7f27bb329e3104dee3ca29d72ef48) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // from galaxian, not dumped
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, BAD_DUMP CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "bprom.bin",       0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) )
 ROM_END
 
 
@@ -5084,7 +5084,7 @@ GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?"
 GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
 GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "Subelectro", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
 
 /* different bullet color */
 GAME( 1982, azurian,  0,        galaxian, azurian,  azurian,  ROT90,  "Rait Electronics Ltd", "Azurian Attack", GAME_SUPPORTS_SAVE )
