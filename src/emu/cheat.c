@@ -82,6 +82,10 @@
 
 #include <ctype.h>
 
+#ifdef MESS
+#include "cheatms.h"
+#endif
+
 
 
 /***************************************************************************
@@ -374,8 +378,18 @@ void cheat_init(running_machine *machine)
 	cheatinfo = auto_alloc_clear(machine, cheat_private);
 	machine->cheat_data = cheatinfo;
 
-	/* load the cheat file */
+	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
+       and MAME will load gamename.xml */
+	#ifdef MESS
+	{
+		char mess_cheat_filename[9];
+		cheat_mess_init(machine);
+		sprintf(mess_cheat_filename, "%08X", this_game_crc);
+		cheatinfo->cheatlist = cheat_list_load(machine, mess_cheat_filename);
+	}
+	#else
 	cheatinfo->cheatlist = cheat_list_load(machine, machine->basename);
+	#endif
 
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
