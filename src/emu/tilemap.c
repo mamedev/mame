@@ -781,7 +781,7 @@ void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tm
 	if (!tmap->enable)
 		return;
 
-profiler_mark(PROFILER_TILEMAP_DRAW);
+profiler_mark_start(PROFILER_TILEMAP_DRAW);
 	/* configure the blit parameters based on the input parameters */
 	configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask);
 
@@ -884,7 +884,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 			}
 		}
 	}
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 
@@ -919,7 +919,7 @@ void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap
 		return;
 	}
 
-profiler_mark(PROFILER_TILEMAP_DRAW_ROZ);
+profiler_mark_start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* configure the blit parameters */
 	configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask);
 
@@ -928,7 +928,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW_ROZ);
 
 	/* then do the roz copy */
 	tilemap_draw_roz_core(tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 
@@ -1228,7 +1228,7 @@ static void pixmap_update(tilemap *tmap, const rectangle *cliprect)
 	if (tmap->all_tiles_clean)
 		return;
 
-profiler_mark(PROFILER_TILEMAP_DRAW);
+profiler_mark_start(PROFILER_TILEMAP_DRAW);
 
 	/* compute which columns and rows to update */
 	if (cliprect != NULL)
@@ -1268,7 +1268,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 	if (mincol == 0 && minrow == 0 && maxcol == tmap->cols - 1 && maxcol == tmap->rows - 1)
 		tmap->all_tiles_clean = TRUE;
 
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 
@@ -1283,7 +1283,7 @@ static void tile_update(tilemap *tmap, tilemap_logical_index logindex, UINT32 co
 	tilemap_memory_index memindex;
 	UINT32 flags;
 
-profiler_mark(PROFILER_TILEMAP_UPDATE);
+profiler_mark_start(PROFILER_TILEMAP_UPDATE);
 
 	/* call the get info callback for the associated memory index */
 	memindex = tmap->logical_to_memory[logindex];
@@ -1307,7 +1307,7 @@ profiler_mark(PROFILER_TILEMAP_UPDATE);
 		tmap->gfx_dirtyseq[tmap->tileinfo.gfxnum] = tmap->machine->gfx[tmap->tileinfo.gfxnum]->dirtyseq;
 	}
 
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 

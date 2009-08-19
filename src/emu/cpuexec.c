@@ -318,7 +318,7 @@ void cpuexec_timeslice(running_machine *machine)
 					/* if we're not suspended, actually execute */
 					if (classdata->suspend == 0)
 					{
-						profiler_mark(classdata->profiler);
+						profiler_mark_start(classdata->profiler);
 
 						/* note that this global variable cycles_stolen can be modified */
 						/* via the call to cpu_execute */
@@ -337,7 +337,7 @@ void cpuexec_timeslice(running_machine *machine)
 						/* adjust for any cycles we took back */
 						assert(ran >= classdata->cycles_stolen);
 						ran -= classdata->cycles_stolen;
-						profiler_mark(PROFILER_END);
+						profiler_mark_end();
 					}
 
 					/* account for these cycles */

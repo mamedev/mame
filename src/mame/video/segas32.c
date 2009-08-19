@@ -1900,7 +1900,7 @@ static void sprite_render_list(running_machine *machine)
 	int spritenum = 0;
 	UINT16 *sprite;
 
-	profiler_mark(PROFILER_USER2);
+	profiler_mark_start(PROFILER_USER2);
 
 	logerror("----\n");
 
@@ -1971,7 +1971,7 @@ static void sprite_render_list(running_machine *machine)
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 
@@ -2460,9 +2460,9 @@ VIDEO_UPDATE( system32 )
 	}
 
 	/* update the tilemaps */
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 	enablemask = update_tilemaps(screen, cliprect);
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
@@ -2475,9 +2475,9 @@ VIDEO_UPDATE( system32 )
 #endif
 
 	/* do the mixing */
-	profiler_mark(PROFILER_USER3);
+	profiler_mark_start(PROFILER_USER3);
 	mix_all_layers(0, 0, bitmap, cliprect, enablemask);
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	if (LOG_SPRITES && input_code_pressed(KEYCODE_L))
 	{
@@ -2640,9 +2640,9 @@ VIDEO_UPDATE( multi32 )
 	}
 
 	/* update the tilemaps */
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 	enablemask = update_tilemaps(screen, cliprect);
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
@@ -2655,9 +2655,9 @@ VIDEO_UPDATE( multi32 )
 #endif
 
 	/* do the mixing */
-	profiler_mark(PROFILER_USER3);
+	profiler_mark_start(PROFILER_USER3);
 	mix_all_layers(((screen == left_screen) ? 0 : 1), 0, bitmap, cliprect, enablemask);
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 if (PRINTF_MIXER_DATA)
 {

@@ -459,7 +459,7 @@ INLINE UINT8 read_byte_generic(const address_space *space, offs_t byteaddress)
 	UINT32 entry;
 	UINT8 result;
 
-	profiler_mark(PROFILER_MEMREAD);
+	profiler_mark_start(PROFILER_MEMREAD);
 
 	byteaddress &= space->bytemask;
 	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
@@ -473,7 +473,7 @@ INLINE UINT8 read_byte_generic(const address_space *space, offs_t byteaddress)
 	else
 		result = (*handler->handler.read.shandler8)((const address_space *)handler->object, byteoffset);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
@@ -489,7 +489,7 @@ INLINE void write_byte_generic(const address_space *space, offs_t byteaddress, U
 	offs_t byteoffset;
 	UINT32 entry;
 
-	profiler_mark(PROFILER_MEMWRITE);
+	profiler_mark_start(PROFILER_MEMWRITE);
 
 	byteaddress &= space->bytemask;
 	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
@@ -503,7 +503,7 @@ INLINE void write_byte_generic(const address_space *space, offs_t byteaddress, U
 	else
 		(*handler->handler.write.shandler8)((const address_space *)handler->object, byteoffset, data);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 
@@ -519,7 +519,7 @@ INLINE UINT16 read_word_generic(const address_space *space, offs_t byteaddress, 
 	UINT32 entry;
 	UINT16 result;
 
-	profiler_mark(PROFILER_MEMREAD);
+	profiler_mark_start(PROFILER_MEMREAD);
 
 	byteaddress &= space->bytemask;
 	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
@@ -533,7 +533,7 @@ INLINE UINT16 read_word_generic(const address_space *space, offs_t byteaddress, 
 	else
 		result = (*handler->handler.read.shandler16)((const address_space *)handler->object, byteoffset >> 1, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
@@ -549,7 +549,7 @@ INLINE void write_word_generic(const address_space *space, offs_t byteaddress, U
 	offs_t byteoffset;
 	UINT32 entry;
 
-	profiler_mark(PROFILER_MEMWRITE);
+	profiler_mark_start(PROFILER_MEMWRITE);
 
 	byteaddress &= space->bytemask;
 	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
@@ -566,7 +566,7 @@ INLINE void write_word_generic(const address_space *space, offs_t byteaddress, U
 	else
 		(*handler->handler.write.shandler16)((const address_space *)handler->object, byteoffset >> 1, data, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 
@@ -582,7 +582,7 @@ INLINE UINT32 read_dword_generic(const address_space *space, offs_t byteaddress,
 	UINT32 entry;
 	UINT32 result;
 
-	profiler_mark(PROFILER_MEMREAD);
+	profiler_mark_start(PROFILER_MEMREAD);
 
 	byteaddress &= space->bytemask;
 	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
@@ -596,7 +596,7 @@ INLINE UINT32 read_dword_generic(const address_space *space, offs_t byteaddress,
 	else
 		result = (*handler->handler.read.shandler32)((const address_space *)handler->object, byteoffset >> 2, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
@@ -612,7 +612,7 @@ INLINE void write_dword_generic(const address_space *space, offs_t byteaddress, 
 	offs_t byteoffset;
 	UINT32 entry;
 
-	profiler_mark(PROFILER_MEMWRITE);
+	profiler_mark_start(PROFILER_MEMWRITE);
 
 	byteaddress &= space->bytemask;
 	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
@@ -629,7 +629,7 @@ INLINE void write_dword_generic(const address_space *space, offs_t byteaddress, 
 	else
 		(*handler->handler.write.shandler32)((const address_space *)handler->object, byteoffset >> 2, data, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 
@@ -645,7 +645,7 @@ INLINE UINT64 read_qword_generic(const address_space *space, offs_t byteaddress,
 	UINT32 entry;
 	UINT64 result;
 
-	profiler_mark(PROFILER_MEMREAD);
+	profiler_mark_start(PROFILER_MEMREAD);
 
 	byteaddress &= space->bytemask;
 	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
@@ -659,7 +659,7 @@ INLINE UINT64 read_qword_generic(const address_space *space, offs_t byteaddress,
 	else
 		result = (*handler->handler.read.shandler64)((const address_space *)handler->object, byteoffset >> 3, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
@@ -675,7 +675,7 @@ INLINE void write_qword_generic(const address_space *space, offs_t byteaddress, 
 	offs_t offset;
 	UINT32 entry;
 
-	profiler_mark(PROFILER_MEMWRITE);
+	profiler_mark_start(PROFILER_MEMWRITE);
 
 	byteaddress &= space->bytemask;
 	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
@@ -692,7 +692,7 @@ INLINE void write_qword_generic(const address_space *space, offs_t byteaddress, 
 	else
 		(*handler->handler.write.shandler64)((const address_space *)handler->object, offset >> 3, data, mem_mask);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 

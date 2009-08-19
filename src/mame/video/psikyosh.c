@@ -433,7 +433,7 @@ static void psikyosh_drawgfxzoom(
 
 	if (!zoomx || !zoomy) return;
 
-	profiler_mark(PROFILER_DRAWGFX);
+	profiler_mark_start(PROFILER_DRAWGFX);
 
 	assert(dest_bmp->bpp == 32);
 
@@ -953,7 +953,7 @@ static void psikyosh_drawgfxzoom(
 			}
 		}
 	}
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 #define SPRITE_PRI(n) (((psikyosh_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
@@ -1112,7 +1112,7 @@ static void psikyosh_prelineblend( bitmap_t *bitmap, const rectangle *cliprect )
 
 	assert(bitmap->bpp == 32);
 
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
@@ -1121,7 +1121,7 @@ static void psikyosh_prelineblend( bitmap_t *bitmap, const rectangle *cliprect )
 			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
 					dstline[x] = linefill[y]>>8;
 	}
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect )
@@ -1133,7 +1133,7 @@ static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect 
 
 	assert(bitmap->bpp == 32);
 
-	profiler_mark(PROFILER_USER2);
+	profiler_mark_start(PROFILER_USER2);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
@@ -1149,7 +1149,7 @@ static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect 
 				dstline[x] = alpha_blend_r32(dstline[x], lineblend[y]>>8, 2*(lineblend[y]&0x7f));
 		}
 	}
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */

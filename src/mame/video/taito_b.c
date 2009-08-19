@@ -496,7 +496,7 @@ static void draw_framebuffer(bitmap_t *bitmap,const rectangle *cliprect,int prio
   rectangle myclip = *cliprect;
   int x,y;
 
-profiler_mark(PROFILER_USER1);
+profiler_mark_start(PROFILER_USER1);
 
   priority <<= 4;
 
@@ -587,7 +587,7 @@ profiler_mark(PROFILER_USER1);
 			}
 		}
 	}
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 VIDEO_UPDATE( taitob )

@@ -608,7 +608,7 @@ static void blitter_w(const address_space *space, int blitter, offs_t offset,UIN
 	static int ddenlovr_blit_reg[2];
 	int hi_bits;
 
-profiler_mark(PROFILER_VIDEO);
+profiler_mark_start(PROFILER_VIDEO);
 
 	switch(offset)
 	{
@@ -759,7 +759,7 @@ profiler_mark(PROFILER_VIDEO);
 		}
 	}
 
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 
@@ -771,7 +771,7 @@ static void blitter_w_funkyfig(running_machine *machine, int blitter, offs_t off
 	static int ddenlovr_blit_reg[2];
 	int hi_bits;
 
-profiler_mark(PROFILER_VIDEO);
+profiler_mark_start(PROFILER_VIDEO);
 
 	switch(offset)
 	{
@@ -917,7 +917,7 @@ profiler_mark(PROFILER_VIDEO);
 		}
 	}
 
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 
@@ -933,7 +933,7 @@ static WRITE8_HANDLER( hanakanz_blitter_data_w )
 {
 	int hi_bits;
 
-profiler_mark(PROFILER_VIDEO);
+profiler_mark_start(PROFILER_VIDEO);
 
 	hi_bits = (ddenlovr_blit_reg & 0x03) << 8;
 
@@ -1115,7 +1115,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 	}
 
-profiler_mark(PROFILER_END);
+profiler_mark_end();
 }
 
 

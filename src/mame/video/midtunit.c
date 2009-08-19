@@ -687,7 +687,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 	if (!(command & 0x8000))
 		return;
 
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 
 	/* determine bpp */
 	bpp = (command >> 12) & 7;
@@ -795,7 +795,7 @@ if (LOG_DMA)
 skipdma:
 	timer_set(space->machine, ATTOTIME_IN_NSEC(41 * pixels), NULL, 0, dma_callback);
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 

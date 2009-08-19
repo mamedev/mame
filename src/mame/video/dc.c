@@ -1045,7 +1045,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		}
 		break;
 	case STARTRENDER:
-		profiler_mark(PROFILER_USER1);
+		profiler_mark_start(PROFILER_USER1);
 		#if DEBUG_PVRTA
 		mame_printf_verbose("Start Render Received:\n");
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
@@ -1183,7 +1183,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		state_ta.grab[state_ta.grabsel].verts_size=0;
 		state_ta.grab[state_ta.grabsel].strips_size=0;
 
-		profiler_mark(PROFILER_END);
+		profiler_mark_end();
 		break;
 //#define TA_YUV_TEX_BASE       ((0x005f8148-0x005f8000)/4)
 	case TA_YUV_TEX_BASE:

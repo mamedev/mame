@@ -374,7 +374,7 @@ while (0)																			\
 
 #define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)								\
 do { 																					\
-	profiler_mark(PROFILER_DRAWGFX);													\
+	profiler_mark_start(PROFILER_DRAWGFX);													\
 	do { 																				\
 		const UINT8 *srcdata;															\
 		INT32 destendx, destendy;														\
@@ -617,7 +617,7 @@ do { 																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark(PROFILER_END);														\
+	profiler_mark_end();														\
 } while (0)
 
 
@@ -646,7 +646,7 @@ do { 																					\
 
 #define DRAWGFXZOOM_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
 do { 																					\
-	profiler_mark(PROFILER_DRAWGFX);													\
+	profiler_mark_start(PROFILER_DRAWGFX);													\
 	do { 																				\
 		const UINT8 *srcdata;															\
 		UINT32 dstwidth, dstheight;														\
@@ -798,7 +798,7 @@ do { 																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark(PROFILER_END);														\
+	profiler_mark_end();														\
 } while (0)
 
 
@@ -822,7 +822,7 @@ do { 																					\
 
 #define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
 do { 																					\
-	profiler_mark(PROFILER_COPYBITMAP);													\
+	profiler_mark_start(PROFILER_COPYBITMAP);													\
 	do { 																				\
 		const PIXEL_TYPE *srcdata;														\
 		UINT32 numblocks, leftovers;													\
@@ -976,7 +976,7 @@ do { 																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark(PROFILER_END);														\
+	profiler_mark_end();														\
 } while (0)
 
 
@@ -1007,7 +1007,7 @@ do { 																				\
 	UINT32 numblocks, leftovers;													\
 	INT32 curx, cury;																\
 																					\
-	profiler_mark(PROFILER_COPYBITMAP);												\
+	profiler_mark_start(PROFILER_COPYBITMAP);										\
 																					\
 	assert(dest != NULL);															\
 	assert(src != NULL);															\
@@ -1281,7 +1281,7 @@ do { 																				\
 			}																		\
 		}																			\
 	}																				\
-	profiler_mark(PROFILER_END);													\
+	profiler_mark_end();															\
 } while (0)
 
 

@@ -41,43 +41,54 @@ profiler_state global_profiler;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    _profiler_mark - mark the beginning/end of a
+    _profiler_mark_start - mark the beginning of a
     profiler entry
 -------------------------------------------------*/
 
-void _profiler_mark(int type)
+void _profiler_mark_start(int type)
 {
 	profiler_data *data = &global_profiler.data[global_profiler.dataindex];
 	osd_ticks_t curticks = osd_profiling_ticks();
+	profiler_filo_entry *entry;
+	int index;
 
 	/* track context switches */
 	if (type >= PROFILER_CPU_FIRST && type <= PROFILER_CPU_MAX)
 		data->context_switches++;
 
-	/* if we're starting a new bucket, begin now */
-	if (type != PROFILER_END)
+	/* we're starting a new bucket, begin now */
+	index = global_profiler.filoindex++;
+	entry = &global_profiler.filo[index];
+
+	/* fail if we overflow */
+	if (index > ARRAY_LENGTH(global_profiler.filo))
+		fatalerror("Profiler FILO overflow\n");
+
+	/* if we're nested, stop the previous entry */
+	if (index > 0)
 	{
-		int index = global_profiler.filoindex++;
-		profiler_filo_entry *entry = &global_profiler.filo[index];
-
-		/* fail if we overflow */
-		if (index > ARRAY_LENGTH(global_profiler.filo))
-			fatalerror("Profiler FILO overflow\n");
-
-		/* if we're nested, stop the previous entry */
-		if (index > 0)
-		{
-			profiler_filo_entry *preventry = entry - 1;
-			data->duration[preventry->type] += curticks - preventry->start;
-		}
-
-		/* fill in this entry */
-		entry->type = type;
-		entry->start = curticks;
+		profiler_filo_entry *preventry = entry - 1;
+		data->duration[preventry->type] += curticks - preventry->start;
 	}
 
-	/* if we're ending an existing bucket, update the time */
-	else if (global_profiler.filoindex > 0)
+	/* fill in this entry */
+	entry->type = type;
+	entry->start = curticks;
+}
+
+
+/*-------------------------------------------------
+    _profiler_mark_end - mark the end of a
+    profiler entry
+-------------------------------------------------*/
+
+void _profiler_mark_end(void)
+{
+	profiler_data *data = &global_profiler.data[global_profiler.dataindex];
+	osd_ticks_t curticks = osd_profiling_ticks();
+
+	/* we're ending an existing bucket, update the time */
+	if (global_profiler.filoindex > 0)
 	{
 		int index = --global_profiler.filoindex;
 		profiler_filo_entry *entry = &global_profiler.filo[index];
@@ -129,7 +140,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 	UINT64 computed, normalize, total;
 	int curtype, curmem, switches;
 
-	profiler_mark(PROFILER_PROFILER);
+	profiler_mark_start(PROFILER_PROFILER);
 
 	/* compute the total time for all bits, not including profiler or idle */
 	computed = 0;
@@ -194,7 +205,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 		astring_catprintf(string, "%d CPU switches\n", switches / (int) ARRAY_LENGTH(global_profiler.data));
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	/* advance to the next dataset and reset it to 0 */
 	global_profiler.dataindex = (global_profiler.dataindex + 1) % ARRAY_LENGTH(global_profiler.data);

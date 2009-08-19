@@ -10,10 +10,10 @@
 ****************************************************************************
 
     To start profiling a certain section, e.g. video:
-    profiler_mark(PROFILER_VIDEO);
+    profiler_mark_start(PROFILER_VIDEO);
 
     to end profiling the current section:
-    profiler_mark(PROFILER_END);
+    profiler_mark_end();
 
     the profiler handles a FILO list so calls may be nested.
 
@@ -114,14 +114,16 @@ extern profiler_state global_profiler;
 
 #ifdef MAME_PROFILER
 
-#define profiler_mark(x)		do { if (global_profiler.enabled) _profiler_mark(x); } while (0)
+#define profiler_mark_start(x)	do { if (global_profiler.enabled) _profiler_mark_start(x); } while (0)
+#define profiler_mark_end()		do { if (global_profiler.enabled) _profiler_mark_end(); } while (0)
 #define profiler_start()		do { global_profiler.enabled = TRUE; global_profiler.filoindex = global_profiler.dataindex = global_profiler.dataready = 0; } while (0)
 #define profiler_stop()			do { global_profiler.enabled = FALSE; } while (0)
 #define profiler_get_text(x,s)	_profiler_get_text(x, s)
 
 #else
 
-#define profiler_mark(x)		do { } while (0)
+#define profiler_mark_start(x)	do { } while (0)
+#define profiler_mark_end()		do { } while (0)
 #define profiler_start()		do { } while (0)
 #define profiler_stop()			do { } while (0)
 #define profiler_get_text(x,s) 	astring_reset(s)
@@ -137,8 +139,11 @@ extern profiler_state global_profiler;
 
 /* ----- core functions (do not call directly; use macros) ----- */
 
-/* mark the beginning/end of a profiler entry */
-void _profiler_mark(int type);
+/* mark the beginning of a profiler entry */
+void _profiler_mark_start(int type);
+
+/* mark the end of a profiler entry */
+void _profiler_mark_end(void);
 
 /* return the current text in an astring */
 astring *_profiler_get_text(running_machine *machine, astring *string);

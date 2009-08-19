@@ -1152,7 +1152,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	int fade;
 	struct SCANLINE *scanline;
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	if (snes_ram[INIDISP] & 0x80) /* screen is forced blank */
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
@@ -1201,7 +1201,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 #ifdef MAME_DEBUG
 		if (snes_dbg_video(machine, bitmap, curline))
 		{
-			profiler_mark(PROFILER_END);
+			profiler_mark_end();
 			return;
 		}
 
@@ -1231,7 +1231,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		}
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 }
 
 VIDEO_UPDATE( snes )

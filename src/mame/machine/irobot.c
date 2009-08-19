@@ -589,7 +589,7 @@ static void irmb_run(running_machine *machine)
 	UINT32 SP = 0;
 	UINT32 icount = 0;
 
-	profiler_mark(PROFILER_USER1);
+	profiler_mark_start(PROFILER_USER1);
 
 	while ((prevop->flags & (FL_DPSEL | FL_carry)) != (FL_DPSEL | FL_carry))
 	{
@@ -842,7 +842,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 				irmb_latch = Y;
 		}
 	}
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 	logerror("%d instructions for Mathbox \n", icount);
 

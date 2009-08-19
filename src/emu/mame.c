@@ -353,7 +353,7 @@ int mame_execute(core_options *options)
 			mame->hard_reset_pending = FALSE;
 			while ((!mame->hard_reset_pending && !mame->exit_pending) || mame->saveload_pending_file != NULL)
 			{
-				profiler_mark(PROFILER_EXTRA);
+				profiler_mark_start(PROFILER_EXTRA);
 
 				/* execute CPUs if not paused */
 				if (!mame->paused)
@@ -367,7 +367,7 @@ int mame_execute(core_options *options)
 				if (mame->saveload_schedule_callback != NULL)
 					(*mame->saveload_schedule_callback)(machine);
 
-				profiler_mark(PROFILER_END);
+				profiler_mark_end();
 			}
 
 			/* and out via the exit phase */
@@ -1218,7 +1218,7 @@ void CLIB_DECL logerror(const char *format, ...)
 		{
 			va_list arg;
 
-			profiler_mark(PROFILER_LOGERROR);
+			profiler_mark_start(PROFILER_LOGERROR);
 
 			/* dump to the buffer */
 			va_start(arg, format);
@@ -1229,7 +1229,7 @@ void CLIB_DECL logerror(const char *format, ...)
 			for (cb = mame->logerror_callback_list; cb; cb = cb->next)
 				(*cb->func.log)(machine, giant_string_buffer);
 
-			profiler_mark(PROFILER_END);
+			profiler_mark_end();
 		}
 	}
 }

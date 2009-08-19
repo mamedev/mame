@@ -200,7 +200,7 @@ static void execute_blit(running_machine *machine)
 }
 #endif
 
-	profiler_mark(PROFILER_VIDEO);
+	profiler_mark_start(PROFILER_VIDEO);
 
 	last = 0;
 	sy = y;
@@ -305,7 +305,7 @@ static void execute_blit(running_machine *machine)
 		offset += w/4;
 	}
 
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 
 #if (!INSTANT_BLIT)
 	blitter_busy_until = attotime_add(timer_get_time(machine), ATTOTIME_IN_NSEC(w*h*20));

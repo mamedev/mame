@@ -829,7 +829,7 @@ INT32 input_code_value(input_code code)
 	INT32 result = 0;
 	int curindex;
 
-	profiler_mark(PROFILER_INPUT);
+	profiler_mark_start(PROFILER_INPUT);
 
 	/* return 0 for any disabled or invalid device classes */
 	if (devclass <= DEVICE_CLASS_INVALID || devclass >= DEVICE_CLASS_MAXIMUM || !device_list[devclass].enabled)
@@ -880,7 +880,7 @@ INT32 input_code_value(input_code code)
 	}
 
 exit:
-	profiler_mark(PROFILER_END);
+	profiler_mark_end();
 	return result;
 }
 
