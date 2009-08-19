@@ -194,6 +194,50 @@ INLINE void rgbaint_subr(rgbaint *color1, const rgbaint *color2)
 }
 
 
+/*-------------------------------------------------
+    rgbint_shl - shift each component of an
+    rgbint struct by the given number of bits
+-------------------------------------------------*/
+
+INLINE void rgbint_shl(rgbint *color, UINT8 shift)
+{
+	*color = _mm_slli_epi16(*color, shift);
+}
+
+
+/*-------------------------------------------------
+    rgbaint_shl - shift each component of an
+    rgbaint struct by the given number of bits
+-------------------------------------------------*/
+
+INLINE void rgbaint_shl(rgbaint *color, UINT8 shift)
+{
+	*color = _mm_slli_epi16(*color, shift);
+}
+
+
+/*-------------------------------------------------
+    rgbint_shr - shift each component of an
+    rgbint struct by the given number of bits
+-------------------------------------------------*/
+
+INLINE void rgbint_shr(rgbint *color, UINT8 shift)
+{
+	*color = _mm_srli_epi16(*color, shift);
+}
+
+
+/*-------------------------------------------------
+    rgbaint_shr - shift each component of an
+    rgbaint struct by the given number of bits
+-------------------------------------------------*/
+
+INLINE void rgbaint_shr(rgbaint *color, UINT8 shift)
+{
+	*color = _mm_srli_epi16(*color, shift);
+}
+
+
 
 /***************************************************************************
     TABLES

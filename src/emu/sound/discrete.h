@@ -4327,7 +4327,7 @@ enum
 #define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */
-#define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, {  }, { }, NULL, "DISCRETE_NOP" },
+#define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
 
 /* logging */
 #define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
@@ -4339,9 +4339,9 @@ enum
 #define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
 
 /* import */
-#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, {  }, {  }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
+#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
 #define DISCRETE_DELETE(NODE_FROM, NODE_TO)                        { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
-#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, {  }, {  }, NULL, "DISCRETE_REPLACE" },
+#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
 
 
 /* output */

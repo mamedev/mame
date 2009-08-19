@@ -209,7 +209,7 @@ static STREAM_UPDATE( speaker_sound_update )
 	stream_sample_t *buffer = outputs[0];
 	int volume = sp->levels[sp->level];
 	double filtered_volume;
-	attotime sampled_time;
+	attotime sampled_time = attotime_zero;
 
 	if (samples > 0)
 	{
