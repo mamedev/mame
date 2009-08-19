@@ -478,7 +478,6 @@ src/emu/cpu/x86log.h svneol=native#text/plain
 src/emu/cpu/z180/z180.c svneol=native#text/plain
 src/emu/cpu/z180/z180.h svneol=native#text/plain
 src/emu/cpu/z180/z180cb.c svneol=native#text/plain
-src/emu/cpu/z180/z180daa.h svneol=native#text/plain
 src/emu/cpu/z180/z180dasm.c svneol=native#text/plain
 src/emu/cpu/z180/z180dd.c svneol=native#text/plain
 src/emu/cpu/z180/z180ed.c svneol=native#text/plain
