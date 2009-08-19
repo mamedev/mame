@@ -28,10 +28,14 @@ Notes:
   and no cocktail mode)
 - if it's like System 16, the top bit of palette ram should be an additional bit
   for Green. But is it ever not 0?
-- Logic Pro 2 sound test menu is bugged. You can't change the sound sample
-  and it's caused by a wrongly setted compare/branch at pc=0x3fd0/0x3fd2 (for sfx)
-  and pc=0x3ffa/0x3ffc (for bgm). Patching the two compare opcodes with value 0xb041
-  let's you can change the value to test.
+- Logic Pro 2 sound test menu is bugged on the real pcb. You can't change the sound
+  sample and music selected due to an incorrect compare/branch at pc=0x3fd0/0x3fd2
+  (for sfx) and pc=0x3ffa/0x3ffc (for bgm). Patching the two compare opcodes with
+  the value 0xb041 lets you properly change the sound and bgm in the test mode,
+  otherwise they're stuck at 19 and 03 respectively. Verified on real hardware.
+- Logic Pro has an unemulated graphical effect: when you insert a coin, the screen
+  becomes very slightly darker until the next 'scene change'. This is not emulated
+  yet.  
 
 ***************************************************************************/
 
@@ -241,11 +245,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( deniam16b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
 	MDRV_CPU_PROGRAM_MAP(deniam16b_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
+	MDRV_CPU_ADD("audiocpu", Z80,XTAL_25MHz/4)	/* 6.25Mhz verified */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_io_map)
 
@@ -257,7 +261,8 @@ static MACHINE_DRIVER_START( deniam16b )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1)
+	//MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1) // looks better but doesn't match hardware
+	MDRV_SCREEN_VISIBLE_AREA(24*8-4, 64*8-5, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(deniam)
 	MDRV_PALETTE_LENGTH(2048)
@@ -268,19 +273,19 @@ static MACHINE_DRIVER_START( deniam16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 25000000/6)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 verified high
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( deniam16c )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
 	MDRV_CPU_PROGRAM_MAP(deniam16c_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
@@ -292,7 +297,8 @@ static MACHINE_DRIVER_START( deniam16c )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1)
+	//MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1) // looks better but doesn't match hardware
+	MDRV_SCREEN_VISIBLE_AREA(24*8-4, 64*8-5, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(deniam)
 	MDRV_PALETTE_LENGTH(2048)
@@ -303,12 +309,12 @@ static MACHINE_DRIVER_START( deniam16c )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 25000000/6)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 verified high
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -406,7 +412,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", 0 )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Croquis (Germany)", 0 )
 GAME( 1996, karianx,  0,        deniam16b, karianx,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", 0 )
 GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND )
