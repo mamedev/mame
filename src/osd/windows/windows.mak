@@ -333,5 +333,5 @@ $(RESFILE): $(WINSRC)/mame.rc $(WINOBJ)/mamevers.rc
 
 $(WINOBJ)/mamevers.rc: $(BUILDOUT)/verinfo$(BUILD_EXE) $(SRC)/version.c
 	@echo Emitting $@...
-	@$(BUILDOUT)/verinfo$(BUILD_EXE) -b windows $(SRC)/version.c > $@
+	@"$(BUILDOUT)/verinfo$(BUILD_EXE)" -b windows $(SRC)/version.c > $@
 
