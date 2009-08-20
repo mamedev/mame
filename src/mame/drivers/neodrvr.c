@@ -2415,6 +2415,38 @@ ROM_START( samsho2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "063-c8.bin", 0xc00001, 0x200000, CRC(1ffc6dfa) SHA1(acea18aca76c072e0bac2a364fc96d49cfc86e77) ) /* Plane 2,3 */
 ROM_END
 
+// This has corrupt text if used with the Japan bios due to the replacement of the s1 rom to contain the new logo
+ROM_START( samsho2k ) 
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "063-p1-kan.p1", 0x100000, 0x100000, CRC(147cc6d7) SHA1(8e22305f41a0688786ff55437c25948e6c8fda58) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+	// the roms below apply as patch over the main program (I haven't checked what they change, the game boots as the Korean version even with just the above program)
+	ROM_LOAD16_WORD_SWAP( "063-ep1-kan.ep1", 0x000000, 0x080000, CRC(fa32e2d8) SHA1(94f56759ec04ab3a1e557bc2dc51b92176b3c147) )
+	ROM_LOAD16_WORD_SWAP( "063-ep2-kan.ep2", 0x080000, 0x080000, CRC(70b1a4d9) SHA1(387737e87a68d0ea4fd13693f1f30d3227a17c82) ) // this is exactly the same data anyway!
+	
+	NEO_SFIX_128K( "063-s1-kan.s1", CRC(ff08f80b) SHA1(240c6a1c52edebb49cc99ea08484c6a2d61ebf84) )
+
+	NEO_BIOS_AUDIO_128K( "063-m1.bin", CRC(56675098) SHA1(90429fc40d056d480d0e2bbefbc691d9fa260fc4) )
+
+	ROM_REGION( 0x700000, "ym", 0 )
+	ROM_LOAD( "063-v1.bin", 0x000000, 0x200000, CRC(37703f91) SHA1(a373ebef4c33ba1d8340e826981a58769aada238) )
+	ROM_LOAD( "063-v2.bin", 0x200000, 0x200000, CRC(0142bde8) SHA1(0be6c53acac44802bf70b6925452f70289a139d9) )
+	ROM_LOAD( "063-v3.bin", 0x400000, 0x200000, CRC(d07fa5ca) SHA1(1da7f081f8b8fc86a91feacf900f573218d82676) )
+	ROM_LOAD( "063-v4.bin", 0x600000, 0x100000, CRC(24aab4bb) SHA1(10ee4c5b3579865b93dcc1e4079963276aa700a6) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "063-c1.bin", 0x000000, 0x200000, CRC(86cd307c) SHA1(0d04336f7c436d74638d8c1cd8651faf436a6bec) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "063-c2.bin", 0x000001, 0x200000, CRC(cdfcc4ca) SHA1(179dc81432424d68cefedd20cc1c4b2a95deb891) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "063-c3.bin", 0x400000, 0x200000, CRC(7a63ccc7) SHA1(49d97c543bc2860d493a353ab0d059088c6fbd21) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "063-c4.bin", 0x400001, 0x200000, CRC(751025ce) SHA1(e1bbaa7cd67fd04e4aab7f7ea77f63ae1cbc90d0) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "063-c5.bin", 0x800000, 0x200000, CRC(20d3a475) SHA1(28da44a136bd14c73c62c147c3f6e6bcfa1066de) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "063-c6.bin", 0x800001, 0x200000, CRC(ae4c0a88) SHA1(cc8a7d11daa3821f83a6fd0942534706f939e576) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "063-c7.bin", 0xc00000, 0x200000, CRC(2df3cbcf) SHA1(e54f9022359963711451c2025825b862d36c6975) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "063-c8.bin", 0xc00001, 0x200000, CRC(1ffc6dfa) SHA1(acea18aca76c072e0bac2a364fc96d49cfc86e77) ) /* Plane 2,3 */
+ROM_END
+
 ROM_START( wh2j ) /* MVS VERSION */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "064-p1.bin", 0x100000, 0x100000, CRC(385a2e86) SHA1(cfde4a1aeae038a3d6ca9946065624f097682d3d) )
@@ -7751,7 +7783,7 @@ GAME( 1993, fatfursa, fatfursp, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Fata
 GAME( 1995, savagere, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Savage Reign / Fu'un Mokushiroku - kakutou sousei", 0 )
 GAME( 1994, ssideki2, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Super Sidekicks 2 - The World Championship / Tokuten Ou 2 - real fight football", 0 )
 GAME( 1994, samsho2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Samurai Shodown II / Shin Samurai Spirits - Haohmaru jigokuhen", 0 )
-/* Jin Saulabi Tu Hon (Samurai shodown 2) - Korean censored version - http://www.kmrb.or.kr/Game_Image/1999/%EC%A0%9C1273%ED%98%B8.jpg */
+GAME( 1994, samsho2k, samsho2,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)", 0 ) // official or hack?
 GAME( 1995, fatfury3, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - haruka-naru tatakai", 0 )
 GAME( 1995, ssideki3, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - eikoue no michi", 0 )
 GAME( 1995, kof95,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '95 (set 1)", 0 )

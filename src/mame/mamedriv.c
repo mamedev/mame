@@ -6244,6 +6244,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssideki2 )	/* 0061 (c) 1994 SNK */
 	DRIVER( spinmast )	/* 0062 (c) 1993 Data East Corporation */
 	DRIVER( samsho2 )	/* 0063 (c) 1994 SNK */
+	DRIVER( samsho2k )	/* 0063 (c) 1994 SNK (Korean hack) */
 	DRIVER( wh2j )		/* 0064 (c) 1994 ADK / SNK */
 	DRIVER( wh2jh )		/* 0064 (c) 1994 ADK / SNK */
 	DRIVER( wjammers )	/* 0065 (c) 1994 Data East Corporation */
