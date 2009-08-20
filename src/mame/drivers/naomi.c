@@ -5240,6 +5240,14 @@ static const atomiswave_key xh_key = {
     {4,0,1,2,5,7,3,6}
 };
 
+static const atomiswave_key xh2_key = {
+    {14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
+    {11,3,7,1,31,17,16,15,24,18,23,26,4,25,20,10,12,27,29,21,5,8,30,14,19,9,0,2,13,6,22,28},
+    {7,11,10,3,15,6,14,4,9,5,8,0,1,12,2,13},
+    {11,1,8,10,9,5,15,14,12,3,0,6,4,7,13,2},
+    {4,0,1,2,5,7,3,6}
+};
+
 static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswave_key* key)
 {
     int b0,b1,b2,b3;
@@ -5360,7 +5368,7 @@ static DRIVER_INIT(xtrmhnt2)
 
 	for(i=0; i<rom_size/2; i++)
 	{
-		src[i] = atomiswave_decrypt(src[i], i*2, &xh_key);	// wrong, need real key
+		src[i] = atomiswave_decrypt(src[i], i*2, &xh2_key);
 	}
 
 	DRIVER_INIT_CALL(atomiswave);
