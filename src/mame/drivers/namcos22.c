@@ -4690,6 +4690,10 @@ ROM_END
 
 ROM_START( aquajet )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "aj2ver-b.1",   0x000003, 0x100000, CRC(3a67b9f4) SHA1(8cd51f319e082297fdb99634486fe297a0ace654) )
+	ROM_LOAD32_BYTE( "aj2ver-b.2",   0x000002, 0x100000, CRC(f5e8fc96) SHA1(e23fcf6f84724d1de15870ff578ff8a6b26e8f31) )
+	ROM_LOAD32_BYTE( "aj2ver-b.3",   0x000001, 0x100000, CRC(ef6ebcf7) SHA1(358973b678b9a3065e945fb589af16e8102d437b) )
+	ROM_LOAD32_BYTE( "aj2ver-b.4",   0x000000, 0x100000, CRC(7799b909) SHA1(e40005f96f51742b2778605926b8184c9b2c1ad2) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -5782,4 +5786,4 @@ GAME( 1996, alpinesa, 0,        namcos22s, alpiner,  alpinesa, ROT0, "Namco", "A
 GAME( 1996, propcycl, 0,        namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, tokyowar, 0,        namcos22s, tokyowar, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )	/* missing sprite clear DMA?  or protection? */
 GAME( 1996, aquajet,  0,        namcos22s, aquajet,  aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-//GAME( 1997, armdilox, "Armidillo Racing")
+//GAME( 1997, armdilox, "Armadillo Racing")

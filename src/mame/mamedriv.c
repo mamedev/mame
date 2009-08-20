@@ -894,6 +894,7 @@ const game_driver * const drivers[] =
 	DRIVER( cybrcycc )	/* (c) 1995 */
 	DRIVER( timecris )	/* (c) 1995 */
 	DRIVER( timecrisa )	/* (c) 1995 */
+	DRIVER( dirtdash )	/* (c) 1995 */
 	DRIVER( victlapw )	/* (c) 1996 */
 	DRIVER( alpinesa )	/* (c) 1996 */
 	DRIVER( propcycl )	/* (c) 1996 */
