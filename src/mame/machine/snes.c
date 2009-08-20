@@ -1162,6 +1162,7 @@ WRITE8_HANDLER( snes_w_io )
 		case SETINI:	/* Screen mode/video select */
 			/* FIXME: We only support line count and interlace here */
 			snes_ppu.interlace = (data & 1) ? 2 : 1;
+			snes_ppu.obj_interlace = (data & 2) ? 2 : 1;
 			snes_ppu.beam.last_visible_line = (data & 0x4) ? 240 : 225;
 			snes_dynamic_res_change(space->machine);
 #ifdef SNES_DBG_REG_W
@@ -1892,6 +1893,7 @@ MACHINE_RESET( snes )
 
 	snes_htmult = 1;
 	snes_ppu.interlace = 1;
+	snes_ppu.obj_interlace = 1;
 }
 
 
