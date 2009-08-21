@@ -1132,7 +1132,7 @@ static ADDRESS_MAP_START( driftout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(TC0430GRW_word_r, TC0430GRW_word_w)	/* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_WRITE(TC0430GRW_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(taitof2_palette_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -3258,7 +3258,7 @@ static MACHINE_DRIVER_START( thundfox )
 	MDRV_GFXDECODE(thundfox)
 	MDRV_VIDEO_START(taitof2_thundfox)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)
-	MDRV_VIDEO_UPDATE(thundfox)
+	MDRV_VIDEO_UPDATE(taitof2_thundfox)
 MACHINE_DRIVER_END
 
 
@@ -3326,7 +3326,7 @@ static MACHINE_DRIVER_START( ssi )
 	/* video hardware */
 	MDRV_VIDEO_START(taitof2_ssi)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)	// buffer_delayed_thundfox instead of buffer_delayed fixes the butterfly powerup
-	MDRV_VIDEO_UPDATE(ssi)
+	MDRV_VIDEO_UPDATE(taitof2_ssi)
 MACHINE_DRIVER_END
 
 
@@ -3379,7 +3379,7 @@ static MACHINE_DRIVER_START( footchmp )
 	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_footchmp)
 	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MDRV_VIDEO_UPDATE(deadconx)
+	MDRV_VIDEO_UPDATE(taitof2_deadconx)
 MACHINE_DRIVER_END
 
 
@@ -3394,7 +3394,7 @@ static MACHINE_DRIVER_START( hthero )
 	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_hthero)
 	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MDRV_VIDEO_UPDATE(deadconx)
+	MDRV_VIDEO_UPDATE(taitof2_deadconx)
 MACHINE_DRIVER_END
 
 
@@ -3421,7 +3421,7 @@ static MACHINE_DRIVER_START( yuyugogo )
 	/* video hardware */
 	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_START(taitof2_yuyugogo)
-	MDRV_VIDEO_UPDATE(yesnoj)
+	MDRV_VIDEO_UPDATE(taitof2_yesnoj)
 MACHINE_DRIVER_END
 
 
@@ -3488,7 +3488,7 @@ static MACHINE_DRIVER_START( metalb )
 	MDRV_GFXDECODE(deadconx)
 	MDRV_PALETTE_LENGTH(8192)
 	MDRV_VIDEO_START(taitof2_metalb)
-	MDRV_VIDEO_UPDATE(metalb)
+	MDRV_VIDEO_UPDATE(taitof2_metalb)
 MACHINE_DRIVER_END
 
 
@@ -3515,7 +3515,7 @@ static MACHINE_DRIVER_START( yesnoj )
 	/* video hardware */
 	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_START(taitof2_yesnoj)
-	MDRV_VIDEO_UPDATE(yesnoj)
+	MDRV_VIDEO_UPDATE(taitof2_yesnoj)
 MACHINE_DRIVER_END
 
 
@@ -3529,7 +3529,7 @@ static MACHINE_DRIVER_START( deadconx )
 	/* video hardware */
 	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_deadconx)
-	MDRV_VIDEO_UPDATE(deadconx)
+	MDRV_VIDEO_UPDATE(taitof2_deadconx)
 MACHINE_DRIVER_END
 
 
@@ -3543,7 +3543,7 @@ static MACHINE_DRIVER_START( deadconxj )
 	/* video hardware */
 	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_deadconxj)
-	MDRV_VIDEO_UPDATE(deadconx)
+	MDRV_VIDEO_UPDATE(taitof2_deadconx)
 MACHINE_DRIVER_END
 
 
@@ -3609,7 +3609,7 @@ static MACHINE_DRIVER_START( driftout )
 	/* video hardware */
 	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_driftout)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MDRV_VIDEO_UPDATE(taitof2_driftout)
 MACHINE_DRIVER_END
 
 
