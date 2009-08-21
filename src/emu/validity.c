@@ -487,7 +487,9 @@ static int validate_driver(int drivnum, const machine_config *config, const quar
 	const game_driver *driver = drivers[drivnum];
 	quark_table *name_table = tables->name;
 	quark_table *description_table = tables->description;
+#ifndef MESS
 	quark_table *roms_table = tables->roms;
+#endif /* MESS */
 	const game_driver *clone_of;
 	quark_entry *entry;
 	int error = FALSE, is_clone;
