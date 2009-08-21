@@ -2758,11 +2758,11 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	/* video hardware */
@@ -2783,12 +2783,13 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, 3579545)
+	MDRV_SOUND_ADD("2151", YM2151, XTAL_3_579545MHz)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.35)
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/4/4) 
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -2799,7 +2800,7 @@ static MACHINE_DRIVER_START( cps1_12MHz )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_10MHz)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
+	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pang3 )
@@ -2815,11 +2816,11 @@ static MACHINE_DRIVER_START( qsound )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	// 12MHz verified
+	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
 	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
-	MDRV_CPU_REPLACE("audiocpu", Z80, 8000000)
+	MDRV_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
