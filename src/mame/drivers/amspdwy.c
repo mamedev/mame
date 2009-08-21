@@ -69,7 +69,7 @@ static READ8_HANDLER( amspdwy_wheel_0_r )
 
 static READ8_HANDLER( amspdwy_wheel_1_r )
 {
-    return amspdwy_wheel_r(space->machine, 0);
+    return amspdwy_wheel_r(space->machine, 1);
 }
 
 static READ8_DEVICE_HANDLER( amspdwy_sound_r )
