@@ -350,11 +350,11 @@ static MACHINE_START( xmen )
 static MACHINE_DRIVER_START( xmen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(xmen)
@@ -365,7 +365,7 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( xmen )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 

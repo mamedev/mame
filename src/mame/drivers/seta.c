@@ -6613,7 +6613,7 @@ static MACHINE_DRIVER_START( downtown )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(57.42) /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -6626,12 +6626,10 @@ static MACHINE_DRIVER_START( downtown )
 	MDRV_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -6709,11 +6707,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( calibr50 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(calibr50_map)
 	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
+	MDRV_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
@@ -6722,7 +6720,7 @@ static MACHINE_DRIVER_START( calibr50 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(57.42)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -6735,12 +6733,10 @@ static MACHINE_DRIVER_START( calibr50 )
 	MDRV_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
