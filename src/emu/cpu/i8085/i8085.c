@@ -132,6 +132,11 @@
  * - renamed flags from Z80 style S Z Y H X V N C  to  S Z X5 H X3 P V C, and
  *   fixed X5 / V flags where accidentally broken due to flag names confusion
  *
+ * 21-Aug-2009, Curt Coder
+ *
+ * - added 8080A variant
+ * - refactored callbacks to use devcb
+ *
  *****************************************************************************/
 
 #include "debugger.h"
@@ -155,6 +160,12 @@ typedef struct _i8085_state i8085_state;
 struct _i8085_state
 {
 	i8085_config 		config;
+
+	devcb_resolved_write8		out_status_func;
+	devcb_resolved_write_line	out_inte_func;
+	devcb_resolved_read_line	in_sid_func;
+	devcb_resolved_write_line	out_sod_func;
+
 	int 				cputype;		/* 0 8080, 1 8085A */
 	PAIR				PC,SP,AF,BC,DE,HL,WZ;
 	UINT8				HALT;
@@ -321,14 +332,12 @@ INLINE void set_sod(i8085_state *cpustate, int state)
 	if (state != 0 && cpustate->sod_state == 0)
 	{
 		cpustate->sod_state = 1;
-		if (cpustate->config.sod != NULL)
-			(*cpustate->config.sod)(cpustate->device, 1);
+		devcb_call_write_line(&cpustate->out_sod_func, cpustate->sod_state);
 	}
 	else if (state == 0 && cpustate->sod_state != 0)
 	{
 		cpustate->sod_state = 0;
-		if (cpustate->config.sod != NULL)
-			(*cpustate->config.sod)(cpustate->device, 0);
+		devcb_call_write_line(&cpustate->out_sod_func, cpustate->sod_state);
 	}
 }
 
@@ -338,22 +347,21 @@ INLINE void set_inte(i8085_state *cpustate, int state)
 	if (state != 0 && (cpustate->IM & IM_IE) == 0)
 	{
 		cpustate->IM |= IM_IE;
-		if (cpustate->config.inte != NULL)
-			(*cpustate->config.inte)(cpustate->device, 1);
+		devcb_call_write_line(&cpustate->out_inte_func, 1);
 	}
 	else if (state == 0 && (cpustate->IM & IM_IE) != 0)
 	{
 		cpustate->IM &= ~IM_IE;
-		if (cpustate->config.inte != NULL)
-			(*cpustate->config.inte)(cpustate->device, 0);
+		devcb_call_write_line(&cpustate->out_inte_func, 0);
 	}
 }
 
 
 INLINE void set_status(i8085_state *cpustate, UINT8 status)
 {
-	if (status != cpustate->STATUS && cpustate->config.status != NULL)
-		(*cpustate->config.status)(cpustate->device, status);
+	if (status != cpustate->STATUS)
+		devcb_call_write8(&cpustate->out_status_func, 0, status);
+
 	cpustate->STATUS = status;
 }
 
@@ -361,6 +369,7 @@ INLINE void set_status(i8085_state *cpustate, UINT8 status)
 INLINE UINT8 get_rim_value(i8085_state *cpustate)
 {
 	UINT8 result = cpustate->IM;
+	int sid = devcb_call_read_line(&cpustate->in_sid_func);
 
 	/* copy live RST5.5 and RST6.5 states */
 	result &= ~(IM_I65 | IM_I55);
@@ -370,8 +379,8 @@ INLINE UINT8 get_rim_value(i8085_state *cpustate)
 		result |= IM_I55;
 
 	/* fetch the SID bit if we have a callback */
-	if (cpustate->config.sid != NULL)
-		result = (result & 0x7f) | ((*cpustate->config.sid)(cpustate->device) ? 0x80 : 0);
+	result = (result & 0x7f) | (sid ? 0x80 : 0);
+
 	return result;
 }
 
@@ -1030,6 +1039,13 @@ static void init_808x_common(const device_config *device, cpu_irq_callback irqca
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
+	/* resolve callbacks */
+	devcb_resolve_write8(&cpustate->out_status_func, &cpustate->config.out_status_func, device);
+	devcb_resolve_write_line(&cpustate->out_inte_func, &cpustate->config.out_inte_func, device);
+	devcb_resolve_read_line(&cpustate->in_sid_func, &cpustate->config.in_sid_func, device);
+	devcb_resolve_write_line(&cpustate->out_sod_func, &cpustate->config.out_sod_func, device);
+
+	/* register for state saving */
 	state_save_register_device_item(device, 0, cpustate->PC.w.l);
 	state_save_register_device_item(device, 0, cpustate->SP.w.l);
 	state_save_register_device_item(device, 0, cpustate->AF.w.l);
@@ -1118,9 +1134,12 @@ static CPU_EXPORT_STATE( i808x )
 	switch (entry->index)
 	{
 		case I8085_SID:
+			{
+			int sid = devcb_call_read_line(&cpustate->in_sid_func);
+			
 			cpustate->ietemp = ((cpustate->IM & IM_SID) != 0);
-			if (cpustate->config.sid != NULL)
-				cpustate->ietemp = ((*cpustate->config.sid)(cpustate->device) != 0);
+			cpustate->ietemp = (sid != 0);
+			}
 			break;
 
 		case I8085_INTE:
@@ -1226,7 +1245,7 @@ CPU_GET_INFO( i8085 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8085A");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 8080");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-85");				break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.1");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
@@ -1263,6 +1282,31 @@ CPU_GET_INFO( i8080 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8080");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
+
+		default:										CPU_GET_INFO_CALL(i8085); break;
+	}
+}
+
+
+/***************************************************************************
+    8080A-SPECIFIC GET INFO
+***************************************************************************/
+
+CPU_GET_INFO( i8080a )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i8080);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "8080A");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
 
 		default:										CPU_GET_INFO_CALL(i8085); break;
 	}

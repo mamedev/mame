@@ -513,12 +513,12 @@ MACHINE_DRIVER_END
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
 
-static const i8085_config survival_i8085_config =
+static I8085_CONFIG( survival_i8085_config )
 {
-	NULL,					/* INTE changed callback */
-	NULL,					/* STATUS changed callback */
-	NULL,					/* SOD changed callback (8085A only) */
-	survival_sid_callback	/* SID changed callback (8085A only) */
+	DEVCB_NULL,							/* STATUS changed callback */
+	DEVCB_NULL,							/* INTE changed callback */
+	DEVCB_LINE(survival_sid_callback),	/* SID changed callback (8085A only) */
+	DEVCB_NULL							/* SOD changed callback (8085A only) */
 };
 
 static MACHINE_DRIVER_START( survival )

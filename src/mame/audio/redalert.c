@@ -168,24 +168,24 @@ WRITE8_HANDLER( redalert_voice_command_w )
 }
 
 
-static void sod_callback(const device_config *device, int data)
+static WRITE_LINE_DEVICE_HANDLER( sod_callback )
 {
-	hc55516_digit_w(devtag_get_device(device->machine, "cvsd"), data);
+	hc55516_digit_w(devtag_get_device(device->machine, "cvsd"), state);
 }
 
 
-static int sid_callback(const device_config *device)
+static READ_LINE_DEVICE_HANDLER( sid_callback )
 {
 	return hc55516_clock_state_r(devtag_get_device(device->machine, "cvsd"));
 }
 
 
-static const i8085_config redalert_voice_i8085_config =
+static I8085_CONFIG( redalert_voice_i8085_config )
 {
-	NULL,				/* INTE changed callback */
-	NULL,				/* STATUS changed callback */
-	sod_callback,		/* SOD changed callback (8085A only) */
-	sid_callback		/* SID changed callback (8085A only) */
+	DEVCB_NULL,					/* STATUS changed callback */
+	DEVCB_NULL,					/* INTE changed callback */
+	DEVCB_LINE(sid_callback),	/* SID changed callback (8085A only) */
+	DEVCB_LINE(sod_callback)	/* SOD changed callback (8085A only) */
 };
 
 

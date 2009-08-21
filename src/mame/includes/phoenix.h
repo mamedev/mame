@@ -1,3 +1,4 @@
+#include "devcb.h"
 #include "sound/discrete.h"
 
 
@@ -73,5 +74,5 @@ CUSTOM_INPUT( pleiads_protection_r );
 READ8_HANDLER( survival_input_port_0_r );
 READ8_DEVICE_HANDLER( survival_protection_r );
 
-int survival_sid_callback( const device_config *device );
+READ_LINE_DEVICE_HANDLER( survival_sid_callback );
 

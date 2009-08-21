@@ -81,26 +81,26 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xd7);
 }
 
-static void n8080_inte_callback(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
 {
 	inte = state;
 }
 
-static void n8080_status_callback(const device_config *device, UINT8 status)
+static WRITE8_DEVICE_HANDLER( n8080_status_callback )
 {
-	if (BIT(status, 0))
+	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
 		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
-static const i8085_config n8080_cpu_config =
+static I8085_CONFIG( n8080_cpu_config )
 {
-	n8080_inte_callback,	/* INTE changed callback */
-	n8080_status_callback,	/* STATUS changed callback */
-	NULL,					/* SOD changed callback (8085A only) */
-	NULL,					/* SID changed callback (8085A only) */
+	DEVCB_HANDLER(n8080_status_callback),	/* STATUS changed callback */
+	DEVCB_LINE(n8080_inte_callback),		/* INTE changed callback */
+	DEVCB_NULL,								/* SID changed callback (8085A only) */
+	DEVCB_NULL								/* SOD changed callback (8085A only) */
 };
 
 static MACHINE_DRIVER_START( spacefev )

@@ -2,7 +2,7 @@
 #define __I8085_H__
 
 #include "cpuintrf.h"
-
+#include "devcb.h"
 
 /***************************************************************************
     CONSTANTS
@@ -20,33 +20,33 @@ enum
 	I8085_GENPCBASE = REG_GENPCBASE
 };
 
-
 #define I8085_INTR_LINE     0
 #define I8085_RST55_LINE	1
 #define I8085_RST65_LINE	2
 #define I8085_RST75_LINE	3
 
-
+#define I8085_STATUS_INTA	0x01
+#define I8085_STATUS_WO		0x02
+#define I8085_STATUS_STACK	0x04
+#define I8085_STATUS_HLTA	0x08
+#define I8085_STATUS_OUT	0x10
+#define I8085_STATUS_M1		0x20
+#define I8085_STATUS_INP	0x40
+#define I8085_STATUS_MEMR	0x80
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*i8085_sod_func)(const device_config *device, int state);
-typedef int (*i8085_sid_func)(const device_config *device);
-typedef void (*i8085_inte_func)(const device_config *device, int state);
-typedef void (*i8085_status_func)(const device_config *device, UINT8 status);
-
 typedef struct _i8085_config i8085_config;
 struct _i8085_config
 {
-	i8085_inte_func		inte;				/* INTE changed callback */
-	i8085_status_func	status;				/* STATUS changed callback */
-	i8085_sod_func		sod;				/* SOD changed callback (8085A only) */
-	i8085_sid_func		sid;				/* SID changed callback (8085A only) */
+	devcb_write8		out_status_func;	/* STATUS changed callback */
+	devcb_write_line	out_inte_func;		/* INTE changed callback */
+	devcb_read_line		in_sid_func;		/* SID changed callback (8085A only) */
+	devcb_write_line	out_sod_func;		/* SOD changed callback (8085A only) */
 };
-
-
+#define I8085_CONFIG(name) const i8085_config (name) =
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -54,6 +54,9 @@ struct _i8085_config
 
 CPU_GET_INFO( i8080 );
 #define CPU_8080 CPU_GET_INFO_NAME( i8080 )
+
+CPU_GET_INFO( i8080a );
+#define CPU_8080A CPU_GET_INFO_NAME( i8080a )
 
 CPU_GET_INFO( i8085 );
 #define CPU_8085A CPU_GET_INFO_NAME( i8085 )

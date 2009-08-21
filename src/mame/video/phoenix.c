@@ -435,7 +435,7 @@ READ8_DEVICE_HANDLER( survival_protection_r )
 	return survival_protection_value;
 }
 
-int survival_sid_callback( const device_config *device )
+READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 {
 	return survival_sid_value;
 }

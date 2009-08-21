@@ -529,18 +529,18 @@ static VIDEO_UPDATE( dwarfd )
 	return 0;
 }
 
-static void dwarfd_sod_callback(const device_config *device, int nSO)
+static WRITE_LINE_DEVICE_HANDLER( dwarfd_sod_callback )
 {
-	crt_access=nSO;
+	crt_access = state;
 }
 
 
-static const i8085_config dwarfd_i8085_config =
+static I8085_CONFIG( dwarfd_i8085_config )
 {
-	NULL,					/* INTE changed callback */
-	NULL,					/* STATUS changed callback */
-	dwarfd_sod_callback,	/* SOD changed callback (8085A only) */
-	NULL					/* SID changed callback (8085A only) */
+	DEVCB_NULL,						/* STATUS changed callback */
+	DEVCB_NULL,						/* INTE changed callback */
+	DEVCB_NULL,						/* SID changed callback (8085A only) */
+	DEVCB_LINE(dwarfd_sod_callback)	/* SOD changed callback (8085A only) */
 };
 
 
