@@ -206,14 +206,12 @@
 #include "video/avgdvg.h"
 #include "machine/mathbox.h"
 #include "machine/atari_vg.h"
-#include "sound/pokey.h"
 #include "rendlay.h"
 #include "bzone.h"
 
-#include "bzone.lh"
+#include "sound/pokey.h"
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
+#include "bzone.lh"
 
 
 static UINT8 analog_data;
@@ -308,7 +306,11 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1810, 0x1810) AM_DEVREAD("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1818, 0x1818) AM_DEVREAD("mathbox", mathbox_hi_r)
 	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+#if BZONE_DISCRETE
+	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("discrete", bzone_sounds_w)
+#else
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
+#endif
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
@@ -419,6 +421,11 @@ static INPUT_PORTS_START( bzone )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+#if BZONE_DISCRETE
+	PORT_START("R11")
+	PORT_ADJUSTER( 50, "Engine Frequency" )
+#endif
 INPUT_PORTS_END
 
 
@@ -543,12 +550,12 @@ static const pokey_interface redbaron_pokey_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( bzone )
+static MACHINE_DRIVER_START( bzone_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(bzone_map)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
+	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
 	MDRV_MACHINE_START(bzone)
 
@@ -564,15 +571,25 @@ static MACHINE_DRIVER_START( bzone )
 	/* Drivers */
 	MDRV_MATHBOX_ADD("mathbox")
 
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( bzone )
+
+	MDRV_IMPORT_FROM(bzone_base)
+
+	/* sound hardware */
+#if BZONE_DISCRETE
+	MDRV_IMPORT_FROM(bzone_audio)
+#else
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	
 	MDRV_SOUND_ADD("pokey",  POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(bzone_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("custom", BZONE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
 MACHINE_DRIVER_END
 
 
@@ -582,7 +599,7 @@ static MACHINE_DRIVER_START( bradley )
 	MDRV_IMPORT_FROM(bzone)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", POKEY,  MASTER_CLOCK / 8)
+	MDRV_SOUND_REPLACE("pokey", POKEY,  BZONE_MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(bzone_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -591,10 +608,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( redbaron )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bzone)
+	MDRV_IMPORT_FROM(bzone_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(redbaron_map)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
+	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
 	MDRV_MACHINE_START(redbaron)
 
@@ -608,11 +625,14 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_VIDEO_START(avg_bzone)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", POKEY, 1500000)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("pokey", POKEY, 1500000)
 	MDRV_SOUND_CONFIG(redbaron_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REPLACE("custom", REDBARON, 0)
+	MDRV_SOUND_ADD("custom", REDBARON, 0)
+
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

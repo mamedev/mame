@@ -479,7 +479,7 @@ static DISCRETE_STEP(dss_lfsr)
 
 		/* output the lfsr reg ?*/
 		if (context->out_lfsr_reg)
-			node->output[1] = context->lfsr_reg;
+			node->output[1] = (double) context->lfsr_reg;
 
 	}
 	if(!DSS_LFSR_NOISE__ENABLE)

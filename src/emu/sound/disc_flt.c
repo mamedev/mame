@@ -73,6 +73,7 @@ struct dst_rcdisc_context
 	double exponent0;
 	double exponent1;
 	double v_cap;		/* rcdisc5 */
+	double v_diode;		/* rcdisc3 */
 };
 
 struct dst_rcdisc_mod_context
@@ -360,9 +361,21 @@ static DISCRETE_STEP(dst_op_amp_filt)
 		{
 			/* Millman the input voltages. */
 			i  = context->iFixed;
-			i += (DST_OP_AMP_FILT__INP1 - context->vRef) / info->r1;
-			if (info->r2 != 0)
-				i += (DST_OP_AMP_FILT__INP2 - context->vRef) / info->r2;
+			switch (context->type)
+			{
+				case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+					i += (DST_OP_AMP_FILT__INP1 - DST_OP_AMP_FILT__INP2) / info->r1;
+					if (info->r2 != 0)
+						i += (context->vP - DST_OP_AMP_FILT__INP2) / info->r2;
+					if (info->r3 != 0)
+						i += (context->vN - DST_OP_AMP_FILT__INP2) / info->r3;
+					break;
+				default:
+					i += (DST_OP_AMP_FILT__INP1 - context->vRef) / info->r1;
+					if (info->r2 != 0)
+						i += (DST_OP_AMP_FILT__INP2 - context->vRef) / info->r2;
+					break;
+			}
 			v = i * context->rTotal;
 		}
 
@@ -371,6 +384,11 @@ static DISCRETE_STEP(dst_op_amp_filt)
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
 				node->output[0] = context->vC1 * context->gain + info->vRef;
+				break;
+
+			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+				context->vC1 += (v - context->vC1) * context->exponentC1;
+				node->output[0] = context->vC1 * context->gain + DST_OP_AMP_FILT__INP2;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
@@ -470,6 +488,7 @@ static DISCRETE_RESET(dst_op_amp_filt)
 	switch (context->type)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
+		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
 			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
 			context->exponentC2 =  0;
 			break;
@@ -634,6 +653,7 @@ static DISCRETE_RESET(dst_rcdisc2)
  * input[2]    - Resistor0 value (initialization only)
  * input[4]    - Resistor1 value (initialization only)
  * input[5]    - Capacitor Value (initialization only)
+ * input[6]    - Diode Junction voltage (initialization only)
  *
  ************************************************************************/
 #define DST_RCDISC3__ENABLE	(*(node->input[0]))
@@ -641,6 +661,7 @@ static DISCRETE_RESET(dst_rcdisc2)
 #define DST_RCDISC3__R1		(*(node->input[2]))
 #define DST_RCDISC3__R2		(*(node->input[3]))
 #define DST_RCDISC3__C		(*(node->input[4]))
+#define DST_RCDISC3__DJV	(*(node->input[6]))
 
 static DISCRETE_STEP(dst_rcdisc3)
 {
@@ -653,15 +674,31 @@ static DISCRETE_STEP(dst_rcdisc3)
 	if(DST_RCDISC3__ENABLE)
 	{
 		diff = DST_RCDISC3__IN - node->output[0];
-		if( diff > 0 )
+		if (context->v_diode > 0)
 		{
-			diff = diff - (diff * context->exponent0);
-		} else if( diff < 0)
-		{
-			if(diff < -0.5)
-				diff = diff - (diff * context->exponent1);
-			else
+			if( diff > 0 )
+			{
 				diff = diff - (diff * context->exponent0);
+			} else if( diff < 0)
+			{
+				if(diff < -context->v_diode)
+					diff = diff - (diff * context->exponent1);
+				else
+					diff = diff - (diff * context->exponent0);
+			}
+		} 
+		else
+		{
+			if( diff < 0 )
+			{
+				diff = diff - (diff * context->exponent0);
+			} else if( diff > 0)
+			{
+				if(diff > -context->v_diode)
+					diff = diff - (diff * context->exponent1);
+				else
+					diff = diff - (diff * context->exponent0);
+			}
 		}
 		node->output[0] += diff;
 	}
@@ -679,6 +716,7 @@ static DISCRETE_RESET(dst_rcdisc3)
 
 	context->state = 0;
 	context->t = 0;
+	context->v_diode = DST_RCDISC3__DJV;
 	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC3__R1 * DST_RCDISC3__C);
 	context->exponent1 = RC_CHARGE_EXP(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
 }

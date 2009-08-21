@@ -1872,8 +1872,10 @@ static DISCRETE_RESET(dst_op_amp)
 			context->exponent = disc_info->sample_rate * info->c;
 	}
 
-	if (info->r3 >= 0)
+	if (info->r3 > 0)
 		context->i_fixed = (info->vP - OP_AMP_NORTON_VBE) / info->r3;
+	else
+		context->i_fixed = 0;
 }
 
 

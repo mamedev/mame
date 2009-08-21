@@ -287,7 +287,7 @@
  * DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)
  * DISCRETE_RCDISC(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)
- * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)
+ * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL, DJV)
  * DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)
@@ -2249,7 +2249,26 @@
  *  vRef >-----------------------'  |/
  *
  *          --------------------------------------------------
+  *
+ *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1M
+ *          First Order Low Pass Filter
  *
+ *                              c1
+ *                      .-------||---------.
+ *                      |                  |
+ *          r1          |       rF         |
+ *  IN0 >--ZZZZ--.      +------ZZZZ--------+
+ *               |      |                  |
+ *          r2   |      |           |\     |
+ *  VP  >--ZZZZ--+------+--------+  | \    |
+ *               |               '--|- \   |
+ *          r3   |                  |   >--+----------> Netlist Node
+ *  VN  >--ZZZZ--'               .--|+ /
+ *                               |  | /
+ *  IN1 >------------------------'  |/
+ *
+ *          --------------------------------------------------
+ * 
  *     DISC_OP_AMP_FILTER_IS_HIGH_PASS_1
  *          First Order High Pass Filter
  *
@@ -2482,7 +2501,10 @@
  *                        |                 |
  *    ENAB       -0------>|                 |
  *                        |    diode  R2    |
- *    INPUT1     -1------>| -+-|<|--ZZZZ-+- |---->   Netlist node
+ *    JV         -5------>| -+-|>|--ZZZZ-+- |---->   Netlist node (JV < 0)
+ *                        |                 |
+ *                        |    diode  R2    |
+ *    INPUT1     -1------>| -+-|<|--ZZZZ-+- |---->   Netlist node (JV > 0)
  *                        |  |           |  |
  *    RVAL1      -2------>|  '-ZZZZ-+----'  |
  *                        |     R1  |       |
@@ -2499,16 +2521,19 @@
  *                      input node (or value),
  *                      R1 resistor value in OHMS,
  *                      R2 resistor value in OHMS,
- *                      capacitor value in FARADS)
+ *                      capacitor value in FARADS,
+ *                      diode junction voltage)
  *
+ * The polarity of the diode junction voltage determines the polarity of the diode.
+ * 
  *  Example config line
  *
- *     DISCRETE_RCDISC3(NODE_11,NODE_10,10,100,220,CAP_U(1))
+ *     DISCRETE_RCDISC3(NODE_11,NODE_10,10,100,220,CAP_U(1), 0.5)
  *
  *  When enabled by NODE_10, C charges from 10v as indicated by RC
  *  of 100R & 1uF.
  *
- * EXAMPLES: see Tank8
+ * EXAMPLES: see Tank8, bzone
  *
  ***********************************************************************
  *
@@ -3460,6 +3485,7 @@ enum
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_1M	0x30
 #define DISC_OP_AMP_FILTER_IS_HIGH_PASS_0	0x40
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_0	0x50
+#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1M	0x60
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK		(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
@@ -4292,7 +4318,7 @@ enum
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
-#define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)               { NODE, DST_RCDISC3     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC3" },
+#define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL,DJV)           { NODE, DST_RCDISC3     , 6, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL,DJV }, NULL, "DISCRETE_RCDISC3" },
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "DISCRETE_RCDISC4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
