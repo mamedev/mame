@@ -1877,7 +1877,7 @@ static INPUT_PORTS_START( spacwalk )
 
 	/* 8 pin DIP Switch on location C2 on PCB A084-90700-D640 */
 	/* PCB picture also shows a 2nd DIP Switch on location B2, supposedly for language selection,
-	but ROM contents suggests it's not connected (no different languages or unmapped reads) */
+    but ROM contents suggests it's not connected (no different languages or unmapped reads) */
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("C2:1,2")
 	PORT_DIPSETTING(    0x03, "40 seconds + 20 extended" ) PORT_CONDITION("IN2", 0x30, PORTCOND_NOTEQUALS, 0x00) // 45 + 20 for 2 players

@@ -278,8 +278,8 @@ const UINT8 lut_cycles_8085[256]={
 
 /* special cases (partially taken care of elsewhere):
                base c    taken?   not taken?
-M_RET  8080    5         +6(11)   -0			(conditional)
-M_RET  8085    6         +6(12)   -0			(conditional)
+M_RET  8080    5         +6(11)   -0            (conditional)
+M_RET  8085    6         +6(12)   -0            (conditional)
 M_JMP  8080    10        +0       -0
 M_JMP  8085    10        +0       -3(7)
 M_CALL 8080    11        +6(17)   -0
@@ -530,7 +530,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 static void execute_one(i8085_state *cpustate, int opcode)
 {
 	cpustate->icount -= lut_cycles[opcode];
-	
+
 	switch (opcode)
 	{
 		case 0x00:														break;	/* NOP  */
@@ -600,7 +600,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 		case 0x22:	cpustate->WZ.w.l = ARG16(cpustate);							/* SHLD nnnn */
 					WM(cpustate, cpustate->WZ.d, cpustate->HL.b.l); cpustate->WZ.w.l++;
 					WM(cpustate, cpustate->WZ.d, cpustate->HL.b.h);
-					break;	
+					break;
 		case 0x23:	cpustate->HL.w.l++;											/* INX  H */
 					if (IS_8085(cpustate)) { if (cpustate->HL.w.l == 0x0000) cpustate->AF.b.l |= X5F; else cpustate->AF.b.l &= ~X5F; }
 					break;
@@ -990,7 +990,7 @@ static void init_tables (int type)
 	{
 		/* cycles */
 		lut_cycles[i] = type?lut_cycles_8085[i]:lut_cycles_8080[i];
-		
+
 		/* flags */
 		zs = 0;
 		if (i==0) zs |= ZF;

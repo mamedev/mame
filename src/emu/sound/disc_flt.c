@@ -844,7 +844,7 @@ static DISCRETE_STEP( dst_rcdisc5)
 	{
 		if(diff > 0)
 			context->v_cap = u;
-		
+
 		node->output[0] = 0;
 	}
 }

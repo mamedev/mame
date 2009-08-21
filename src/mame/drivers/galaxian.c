@@ -1859,7 +1859,7 @@ static MACHINE_DRIVER_START( mooncrst )
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
-	
+
 	MDRV_IMPORT_FROM(mooncrst_audio)
 MACHINE_DRIVER_END
 

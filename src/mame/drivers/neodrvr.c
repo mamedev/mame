@@ -2416,14 +2416,14 @@ ROM_START( samsho2 ) /* MVS AND AES VERSION */
 ROM_END
 
 // This has corrupt text if used with the Japan bios due to the replacement of the s1 rom to contain the new logo
-ROM_START( samsho2k ) 
+ROM_START( samsho2k )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "063-p1-kan.p1", 0x100000, 0x100000, CRC(147cc6d7) SHA1(8e22305f41a0688786ff55437c25948e6c8fda58) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 	// the roms below apply as patch over the main program (I haven't checked what they change, the game boots as the Korean version even with just the above program)
 	ROM_LOAD16_WORD_SWAP( "063-ep1-kan.ep1", 0x000000, 0x080000, CRC(fa32e2d8) SHA1(94f56759ec04ab3a1e557bc2dc51b92176b3c147) )
 	ROM_LOAD16_WORD_SWAP( "063-ep2-kan.ep2", 0x080000, 0x080000, CRC(70b1a4d9) SHA1(387737e87a68d0ea4fd13693f1f30d3227a17c82) ) // this is exactly the same data anyway!
-	
+
 	NEO_SFIX_128K( "063-s1-kan.s1", CRC(ff08f80b) SHA1(240c6a1c52edebb49cc99ea08484c6a2d61ebf84) )
 
 	NEO_BIOS_AUDIO_128K( "063-m1.bin", CRC(56675098) SHA1(90429fc40d056d480d0e2bbefbc691d9fa260fc4) )

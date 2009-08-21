@@ -10,7 +10,7 @@ Notes:
 - There is currently no way to exactly reproduce the CD4066 switch control
   mixing. This is changing impedance of the input resistor for e.g.
   following filters to >> 10M Ohm. These resistors are static values in
-  the discrete core. 
+  the discrete core.
 
 
 TODO:
@@ -78,8 +78,8 @@ TODO:
  * R34 is given twice on galaxian board and both times as 5.1k. On moon cresta
  * it is only listed once and given as 15k. This is more in line with recordings
  */
-#define GAL_R34					RES_K(5.1)	
-#define MCRST_R34					RES_K(15)	
+#define GAL_R34					RES_K(5.1)
+#define MCRST_R34					RES_K(15)
 
 #define GAL_R35					RES_K(150)
 #define GAL_R36					RES_K(22)
@@ -292,10 +292,10 @@ static DISCRETE_SOUND_START(galaxian)
 	/************************************************/
 
 	/* two cascaded LS164 which are reset to pitch latch value,
-	 * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
-	 *
-	 * One possibility to implement this is 
-	 * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+     * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
+     *
+     * One possibility to implement this is
+     * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
      * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
      * but there is a native choice:
      */
@@ -320,7 +320,7 @@ static DISCRETE_SOUND_START(galaxian)
 
 
 	/* Not 100% correct - switching causes high impedance input for node_157
-	 * this is not emulated */
+     * this is not emulated */
 	DISCRETE_RCDISC5(NODE_155, NODE_152, GAL_INP_HIT, (GAL_R35 + GAL_R36), GAL_C21)
 	DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
 
@@ -358,7 +358,7 @@ DISCRETE_SOUND_END
 
 static DISCRETE_SOUND_START(mooncrst)
 	DISCRETE_IMPORT(galaxian)
-	
+
 	/************************************************/
 	/* Moon Cresta mixing stage                     */
 	/************************************************/
@@ -473,9 +473,9 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( mooncrst_audio )
 
 	MDRV_SOUND_START(galaxian)
-	
+
 	MDRV_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(mooncrst)
-	
+
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -1266,20 +1266,20 @@
  *     DISCRETE_BIT_DECODE(NODE_03,7,3,5)
  *
  *  Node output is 0
- * 
+ *
  *  if the range variant is used, you may access the bits (up to 8)
  *  by using NODE_SUB, i.e.
- * 
+ *
  *     DISCRETE_BITS_DECODE(NODE_03,5,0,4,5)
- * 
+ *
  * NODE_SUB(NODE_03, 0) = 5
  * NODE_SUB(NODE_03, 1) = 0
  * NODE_SUB(NODE_03, 2) = 5
  * NODE_SUB(NODE_03, 3) = 0
  * NODE_SUB(NODE_03, 4) = 0
- * 
+ *
  * EXAMPLES: galaxian, dkong, mario
- * 
+ *
 # ***********************************************************************
  *
  * DISCRETE_LOGIC_INVERT - Logic invertor
@@ -2477,7 +2477,7 @@
  * DISCRETE_RCDISC3 - RC discharge network
  *
  * FIXME: Diode direction (for bzone)
- * 
+ *
  *                        .-----------------.
  *                        |                 |
  *    ENAB       -0------>|                 |
@@ -2605,7 +2605,7 @@
  *                        |       -----+-----   |
  *                        |            |gnd     |
  *                        '---------------------'
- * 
+ *
  *  Declaration syntax
  *
  *     DISCRETE_RCDISC5(name of node,
@@ -2621,7 +2621,7 @@
  *  When enabled by NODE_10, C discharges from 10v as indicated by RC
  *  of 100R & 1uF. If not enabled, the capcitors keeps it load and may
  *  still be charged through input1. The switch is assumed to be a CD4066,
- *  thus if not enabled the output will be drawn by R to GND since 
+ *  thus if not enabled the output will be drawn by R to GND since
  *  the switch is in high impedance mode.
  *
  *  EXAMPLES: see Spiders, Galaxian
@@ -3663,7 +3663,7 @@ struct _discrete_info
 	int num_wavelogs;
 	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
-	
+
 	/* profiling */
 	int total_samples;
 };
@@ -4153,8 +4153,8 @@ enum
 
 	/* Output Node -- this must be the last entry in this enum! */
 	DSO_OUTPUT,			/* The final output node */
-	
-	/* Import another blocklist */	
+
+	/* Import another blocklist */
 	DSO_IMPORT,			/* import from another discrete block */
 	DSO_REPLACE,		/* replace next node */
 	DSO_DELETE,			/* delete nodes */

@@ -9517,28 +9517,28 @@ Other Sun games
 
 	/* Igrosoft */
 	/* Multifish */
-	//DRIVER( mfish )	/* (c) 2002 */
-	//DRIVER( mfish_2 )	/* (c) 2002 */
+	//DRIVER( mfish )   /* (c) 2002 */
+	//DRIVER( mfish_2 ) /* (c) 2002 */
 	DRIVER( mfish_3 )	/* (c) 2002 */
 	DRIVER( mfish_3a )	/* (c) 2002 */
-	//DRIVER( mfish_4 )	/* (c) 2002 */
-	//DRIVER( mfish_5 )	/* (c) 2002 */
-	//DRIVER( mfish_6 )	/* (c) 2002 */
-	//DRIVER( mfish_7 )	/* (c) 2002 */
-	//DRIVER( mfish_8 )	/* (c) 2002 */
-	//DRIVER( mfish_9 )	/* (c) 2002 */
-	//DRIVER( mfish_10 )	/* (c) 2002 */
-	//DRIVER( mfish_11 )	/* (c) 2002 */
+	//DRIVER( mfish_4 ) /* (c) 2002 */
+	//DRIVER( mfish_5 ) /* (c) 2002 */
+	//DRIVER( mfish_6 ) /* (c) 2002 */
+	//DRIVER( mfish_7 ) /* (c) 2002 */
+	//DRIVER( mfish_8 ) /* (c) 2002 */
+	//DRIVER( mfish_9 ) /* (c) 2002 */
+	//DRIVER( mfish_10 )    /* (c) 2002 */
+	//DRIVER( mfish_11 )    /* (c) 2002 */
 	DRIVER( mfish_12 )	/* (c) 2002 */
 	DRIVER( mfish_12a )	/* (c) 2002 */
-	//DRIVER( mfish_13 )	/* (c) 2002 */
+	//DRIVER( mfish_13 )    /* (c) 2002 */
 
 	/* Crazy Monkey */
-	//DRIVER( crzmon )	/* (c) 2003 */
-	//DRIVER( crzmon_2 )	/* (c) 2003 */
-	//DRIVER( crzmon_3 )	/* (c) 2003 */
-	//DRIVER( crzmon_4 )	/* (c) 2003 */
-	//DRIVER( crzmon_5 )	/* (c) 2003 */
+	//DRIVER( crzmon )  /* (c) 2003 */
+	//DRIVER( crzmon_2 )    /* (c) 2003 */
+	//DRIVER( crzmon_3 )    /* (c) 2003 */
+	//DRIVER( crzmon_4 )    /* (c) 2003 */
+	//DRIVER( crzmon_5 )    /* (c) 2003 */
 	//DRIVER( crzmon_6 )
 	DRIVER( crzmon_7 )	/* (c) 2003 */
 	DRIVER( crzmon_7a )	/* (c) 2003 */
@@ -9547,11 +9547,11 @@ Other Sun games
 	DRIVER( crzmon_8a )	/* (c) 2003 */
 
 	/* Fruit Cocktail */
-	//DRIVER( fcockt )	/* (c) 2003 */
-	//DRIVER( fcockt_2 )	/* (c) 2003 */
-	//DRIVER( fcockt_3 )	/* (c) 2003 */
-	//DRIVER( fcockt_4 )	/* (c) 2003 */
-	//DRIVER( fcockt_5 )	/* (c) 2003 */
+	//DRIVER( fcockt )  /* (c) 2003 */
+	//DRIVER( fcockt_2 )    /* (c) 2003 */
+	//DRIVER( fcockt_3 )    /* (c) 2003 */
+	//DRIVER( fcockt_4 )    /* (c) 2003 */
+	//DRIVER( fcockt_5 )    /* (c) 2003 */
 	DRIVER( fcockt_6 )	/* (c) 2003 */
 	DRIVER( fcockt_6a )	/* (c) 2003 */
 	DRIVER( fcockt_6b )	/* (c) 2003 */
@@ -9560,32 +9560,32 @@ Other Sun games
 	DRIVER( fcockt_8 )	/* (c) 2003 */
 
 	/* Lucky Haunter */
-	//DRIVER( lhaunt )	/* (c) 2003 */
-	//DRIVER( lhaunt_2 )	/* (c) 2003 */
-	//DRIVER( lhaunt_3 )	/* (c) 2003 */
+	//DRIVER( lhaunt )  /* (c) 2003 */
+	//DRIVER( lhaunt_2 )    /* (c) 2003 */
+	//DRIVER( lhaunt_3 )    /* (c) 2003 */
 	DRIVER( lhaunt_4 )	/* (c) 2003 */
 	DRIVER( lhaunt_4a )	/* (c) 2003 */
 	DRIVER( lhaunt_5 )	/* (c) 2003 */
 	DRIVER( lhaunt_5a )	/* (c) 2003 */
 	DRIVER( lhaunt_6 )	/* (c) 2003 */
 	DRIVER( lhaunt_6a )	/* (c) 2003 */
-	
+
 	/* Rollfruit */
-	//DRIVER( rollfr )	/* (c) 2003 */
+	//DRIVER( rollfr )  /* (c) 2003 */
 	DRIVER( rollfr_2 )	/* (c) 2003 */
 
 	/* Garage */
-	//DRIVER( garage )	/* (c) 2004 */
-	//DRIVER( garage_2 )	/* (c) 2004 */
-	//DRIVER( garage_3 )	/* (c) 2004 */
+	//DRIVER( garage )  /* (c) 2004 */
+	//DRIVER( garage_2 )    /* (c) 2004 */
+	//DRIVER( garage_3 )    /* (c) 2004 */
 	DRIVER( garage_4 )	/* (c) 2004 */
 	DRIVER( garage_4a )	/* (c) 2004 */
 	DRIVER( garage_5 )	/* (c) 2004 */
 	DRIVER( garage_5a )	/* (c) 2004 */
 
 	/* Rock Climber */
-	//DRIVER( rclimb )	/* (c) 2004 */
-	//DRIVER( rclimb_2 )	/* (c) 2004 */
+	//DRIVER( rclimb )  /* (c) 2004 */
+	//DRIVER( rclimb_2 )    /* (c) 2004 */
 	DRIVER( rclimb_3 )	/* (c) 2004 */
 	DRIVER( rclimb_3a )	/* (c) 2004 */
 	DRIVER( rclimb_3b )	/* (c) 2004 */
@@ -9595,17 +9595,18 @@ Other Sun games
 	DRIVER( sweetla )	/* (c) 2004 */
 
 	/* Resident */
-	//DRIVER( resdnt )	/* (c) 2004 */
+	//DRIVER( resdnt )  /* (c) 2004 */
 	DRIVER( resdnt_2 )	/* (c) 2004 */
 	DRIVER( resdnt_2a )	/* (c) 2004 */
-	
+
 	/* Island */
 	DRIVER( island )	/* (c) 2005 */
 	DRIVER( islanda )	/* (c) 2005 */
 
 	/* Pirate */
-	//DRIVER( pirate )	/* (c) 2005 */
+	//DRIVER( pirate )  /* (c) 2005 */
 	DRIVER( pirate_1 )	/* (c) 2005 */
+	//DRIVER( pirate_2 )/* (c) 2005 */
 
 	/* Island 2 */
 	DRIVER( island2 )	/* (c) 2006 */

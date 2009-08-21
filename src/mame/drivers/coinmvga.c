@@ -95,9 +95,9 @@
   * Battery backed up RAM
 
 
-  Input Nº | Pin Nº | Colours | Ground
+  Input N? | Pin N? | Colours | Ground
   ---------+--------+---------+---------------------------------------------------------------
-  00       | 1A     | Brn-Wht | Universal Hopper Early / AWP hopper switch 1 (£1) / Y2K Hop 1.
+  00       | 1A     | Brn-Wht | Universal Hopper Early / AWP hopper switch 1 (?1) / Y2K Hop 1.
   01       | 2A     | Red-Wht | Universal Hopper Late / AWP hopper switch 2 (20p) / Y2K Hop 2.
   02       | 3A     | Org-Wht | CC46 Coin / C435 Accept 1.
   03       | 4A     | Yel-Wht | CC46 Error / C435 Accept 2.
@@ -123,9 +123,9 @@
   23       | 34A    | Pnk-Brn |
 
 
-  Output Nº | Pin Nº | Colours | Description
+  Output N? | Pin N? | Colours | Description
   ----------+--------+---------+---------------------------------------------------------------
-  00        | 4B     | Brn-Blu | Universal Hopper Drive / AWP hopper drive 1 (£1) / Y2K Hop 1.
+  00        | 4B     | Brn-Blu | Universal Hopper Drive / AWP hopper drive 1 (?1) / Y2K Hop 1.
   01        | 5B     | Red-Blu | Candle 1.
   02        | 6B     | Org-Blu | Candle 2.
   03        | 7B     | Yel-Blu | Cancel Button Lamp.
@@ -268,7 +268,7 @@ static PALETTE_INIT( coinmvga )
 
 //static WRITE8_HANDLER( debug_w )
 //{
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 //}
 
 static WRITE16_HANDLER( ramdac_bg_w )
@@ -337,7 +337,7 @@ static WRITE16_HANDLER( ramdac_fg_w )
 /*
 static READ16_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+    return mame_rand(space->machine);
 }*/
 
 /*************************
@@ -348,11 +348,11 @@ static ADDRESS_MAP_START( coinmvga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0) //maybe not
 
-//	AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
-//	AM_RANGE(0x100000, 0x1fffff) AM_RAM	//colorama
+//  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
+//  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(&vram)
-//	AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
-//	AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
+//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
+//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(ramdac_bg_w)
@@ -367,28 +367,28 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coinmvga_io_map, ADDRESS_SPACE_IO, 8 )
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
-//	AM_RANGE(H8_PORT_4, H8_PORT_4)
-//	AM_RANGE(H8_PORT_5, H8_PORT_5)
-//	AM_RANGE(H8_PORT_6, H8_PORT_6)
-//	AM_RANGE(H8_PORT_7, H8_PORT_7) <---- 0006 RW colorama
-//	AM_RANGE(H8_PORT_8, H8_PORT_8)
-//	AM_RANGE(H8_PORT_9, H8_PORT_9)
-//	AM_RANGE(H8_PORT_A, H8_PORT_A)
-//	AM_RANGE(H8_PORT_B, H8_PORT_B)
+//  AM_RANGE(H8_PORT_4, H8_PORT_4)
+//  AM_RANGE(H8_PORT_5, H8_PORT_5)
+//  AM_RANGE(H8_PORT_6, H8_PORT_6)
+//  AM_RANGE(H8_PORT_7, H8_PORT_7) <---- 0006 RW colorama
+//  AM_RANGE(H8_PORT_8, H8_PORT_8)
+//  AM_RANGE(H8_PORT_9, H8_PORT_9)
+//  AM_RANGE(H8_PORT_A, H8_PORT_A)
+//  AM_RANGE(H8_PORT_B, H8_PORT_B)
 
 /*  Analog Inputs */
-//	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L)
-//	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L)
-//	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L)
-//	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L)
+//  AM_RANGE(H8_ADC_0_H, H8_ADC_0_L)
+//  AM_RANGE(H8_ADC_1_H, H8_ADC_1_L)
+//  AM_RANGE(H8_ADC_2_H, H8_ADC_2_L)
+//  AM_RANGE(H8_ADC_3_H, H8_ADC_3_L)
 
 /*  Serial ports */
-//	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0)
-//	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1)
+//  AM_RANGE(H8_SERIAL_0, H8_SERIAL_0)
+//  AM_RANGE(H8_SERIAL_1, H8_SERIAL_1)
 
 ADDRESS_MAP_END
 
-/*	unknown writes (cmrltv75):
+/*  unknown writes (cmrltv75):
 
 CPU 'main' (PC=00000218): unmapped program memory word write to 00FFFFF2 = 001E & 00FF
 CPU 'main' (PC=0000021C): unmapped program memory word write to 00FFFFEC = E800 & FF00
@@ -403,7 +403,7 @@ CPU 'main' (PC=00000330): unmapped program memory word read from 0040FBEE & FFFF
 CPU 'main' (PC=00000330): unmapped program memory word read from 0040FBF0 & FFFF
 
 
-**	unknown writes (colorama):
+**  unknown writes (colorama):
 
 
 CPU 'main' (PC=00000218): unmapped program memory word write to 00FFFFF2 = 001E & 00FF
@@ -660,7 +660,7 @@ static MACHINE_DRIVER_START( coinmvga )
 	MDRV_CPU_IO_MAP(coinmvga_io_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)	/* wrong, fix me */
 
-//	MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

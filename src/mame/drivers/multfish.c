@@ -695,7 +695,7 @@ ROM_END
 /*********************************************************
    Crazy Monkey
 
-	Roms 1-4 were changed after the 070315 update.
+    Roms 1-4 were changed after the 070315 update.
         The official list of hashes shows the 070315 updated roms.
 
 **********************************************************/
@@ -870,7 +870,7 @@ ROM_END
 /*********************************************************
    Fruit Cocktail
 
-	All the roms were changed after the 070305 update.
+    All the roms were changed after the 070305 update.
         The official list of hashes shows the 070305 updated roms.
 
 **********************************************************/
@@ -1045,7 +1045,7 @@ ROM_END
 /*********************************************************
    Lucky Haunter
 
-	Roms 1-4 were changed after the 070402 update.
+    Roms 1-4 were changed after the 070402 update.
         The official list of hashes shows the 070402 updated roms.
 
 **********************************************************/
@@ -1190,7 +1190,7 @@ ROM_END
 /*********************************************************
    Garage
 
-	Roms 1-4 were changed after the 070213 update.
+    Roms 1-4 were changed after the 070213 update.
         The official list of hashes shows the 070213 updated roms.
 
 **********************************************************/
@@ -1305,7 +1305,7 @@ ROM_END
 /*********************************************************
    Rock Clibmer
 
-	Roms 1-4 were changed after the 070322 update.
+    Roms 1-4 were changed after the 070322 update.
         The official list of hashes shows the 070322 updated roms.
 
 **********************************************************/
@@ -1424,7 +1424,7 @@ ROM_END
 /*********************************************************
    Resident
 
-	Roms 1-4 were changed after the 070222 update.
+    Roms 1-4 were changed after the 070222 update.
         The official list of hashes shows the 070222 updated roms.
 
 **********************************************************/
@@ -1479,7 +1479,7 @@ ROM_END
 /*********************************************************
    Roll Fruit
 
-	Roms 4-8 were changed after the 080327 update.
+    Roms 4-8 were changed after the 080327 update.
         The official list of hashes shows both set of roms.
 
 **********************************************************/
@@ -1505,7 +1505,7 @@ ROM_START( rollfr_2 ) // 040318
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "rf5-040318.rom", 0x00000, 0x40000, CRC(d8efd395) SHA1(71edd1541df400fef97abacabb10d882ace4c8b0) )
 
-	ROM_REGION( 0x400000, "gfx", 0 ) 
+	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "1",  0x000000, 0x80000, CRC(caeb1fc3) SHA1(14b9f99f892849faecb3327e572dc134e1065463) )
 	ROM_LOAD( "2",  0x100000, 0x80000, CRC(f017c200) SHA1(a247bbbd1c4ca99978dcc705bd62590815a891f2) )
 	ROM_LOAD( "3",  0x200000, 0x80000, CRC(a2d6df11) SHA1(c2553136252aebe3b3ce0b5c33e740d0e27fb7b2) )
@@ -1585,7 +1585,7 @@ ROM_START( island2a ) // 060529
 ROM_END
 
 /*********************************************************
-   Pirate 
+   Pirate
 **********************************************************/
 
 #if ALL_REVISIONS
@@ -1623,7 +1623,7 @@ ROM_END
 /*********************************************************
    Keks
 
-	Roms 1-4 were changed after the 070119 update.
+    Roms 1-4 were changed after the 070119 update.
         The official list of hashes shows the 070119 updated roms.
 
 **********************************************************/

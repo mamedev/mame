@@ -593,7 +593,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 					case 0x1fffc:	// decryption key
 						v->prot_key = data;
 
-//						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset, v->prot_key, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
+//                      printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset, v->prot_key, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
 
 						// translate address if necessary
 						if (v->prot_translate != NULL)
@@ -1030,7 +1030,7 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(naomibd_config);				break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_DMAOFFSET:
-//			printf("DMA source %x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
+//          printf("DMA source %x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
 
 			// if the flag is cleared that lets the protection chip go,
 			// we need to handle this specially.
@@ -1041,7 +1041,7 @@ DEVICE_GET_INFO( naomibd )
 					info->i = 0x9000000;
 					break;
 				}
-				else if (!strcmp(device->machine->gamedrv->name, "mvsc2")) 
+				else if (!strcmp(device->machine->gamedrv->name, "mvsc2"))
 				{
 					switch (get_safe_token(device)->dma_offset)
 					{

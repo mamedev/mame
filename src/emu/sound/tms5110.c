@@ -930,7 +930,7 @@ static DEVICE_START( tms5110 )
 	    tms->M0_callback = speech_rom_read_bit;
 	    tms->set_load_address = speech_rom_set_addr;
 	}
-	
+
 	register_for_save_states(tms);
 }
 

@@ -694,7 +694,7 @@ static DISCRETE_STEP(dst_bits_decode)
 	struct dst_bits_decode_context *context = (struct dst_bits_decode_context *)node->context;
 	int v = DST_BITS_DECODE__IN;
 	int i;
-	
+
 	if (context->last_val != v)
 	{
 		context->last_val = v;
@@ -710,7 +710,7 @@ static DISCRETE_RESET(dst_bits_decode)
 	context->from = DST_BITS_DECODE__FROM;
 	context->count = DST_BITS_DECODE__TO - context->from + 1;
 	context->v_out = DST_BITS_DECODE__VOUT;
-	
+
 	DISCRETE_STEP_CALL(dst_bits_decode);
 }
 /************************************************************************

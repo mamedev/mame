@@ -128,7 +128,7 @@ static const discrete_module module_list[] =
 
 	/* nop */
 	{ DSS_NOP         ,"DSS_NOP"         , 0 ,0                                      ,NULL                  ,NULL                },
-	
+
 	/* from disc_inp.c */
 	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
 	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,dss_constant_reset    ,NULL                 },
@@ -252,22 +252,22 @@ static node_description *discrete_find_node(const discrete_info *info, int node)
 static int discrete_build_list(discrete_info *info, discrete_sound_block *intf, discrete_sound_block *out, int offset)
 {
 	int node_count = 0;
-	
+
 	for (; intf[node_count].type != DSS_NULL; )
 	{
 		/* scan imported */
 		if (intf[node_count].type == DSO_IMPORT)
 		{
 			offset = discrete_build_list(info, (discrete_sound_block *) intf[node_count].custom, out, offset);
-		} 
+		}
 		else if (intf[node_count].type == DSO_REPLACE)
 		{
 			int i;
-			
+
 			node_count++;
 			if (intf[node_count].type == DSS_NULL)
 				fatalerror("discrete_build_list: DISCRETE_REPLACE at end of node_list");
-			
+
 			for (i = 0; i < offset; i++)
 				if (out[i].type != NODE_SPECIAL )
 					if (out[i].node == intf[node_count].node)
@@ -275,15 +275,15 @@ static int discrete_build_list(discrete_info *info, discrete_sound_block *intf, 
 						out[i] = intf[node_count];
 						break;
 					}
-			
+
 			if (i >= offset)
 				fatalerror("discrete_build_list: DISCRETE_REPLACE did not found node %d", NODE_INDEX(intf[node_count].node));
-			
+
 		}
 		else if (intf[node_count].type == DSO_DELETE)
 		{
 			int i,p,deleted;
-			
+
 			p = 0;
 			deleted = 0;
 			for (i = 0; i < offset; i++)
@@ -332,7 +332,7 @@ static DEVICE_START( discrete )
 		info->sample_rate = device->machine->sample_rate;
 	info->sample_time = 1.0 / info->sample_rate;
 	info->neg_sample_time = - info->sample_time;
-	
+
 	info->total_samples = 0;
 
 	/* create the logfile */
@@ -343,7 +343,7 @@ static DEVICE_START( discrete )
 	/* Build the final block list */
 	intf = auto_alloc_array_clear(device->machine, discrete_sound_block, DISCRETE_MAX_NODES);
 	discrete_build_list(info, intf_start, intf, 0);
-	
+
 	/* first pass through the nodes: sanity check, fill in the indexed_nodes, and make a total count */
 	discrete_log(info, "discrete_start() - Doing node list sanity check");
 	for (info->node_count = 0; intf[info->node_count].type != DSS_NULL; info->node_count++)
@@ -476,8 +476,8 @@ static DEVICE_RESET( discrete )
 	}
 }
 
-/* This was a try which unfortunately did not provide 
- * any improvement. Left here for reference 
+/* This was a try which unfortunately did not provide
+ * any improvement. Left here for reference
  */
 #if 0
 INLINE void bigselect(const device_config *device, node_description *node)
@@ -591,7 +591,7 @@ static STREAM_UPDATE( discrete_stream_update )
 			if (node->module.step)
 				(*node->module.step)(info, node);
 				//bigselect(info->device, node);
-			
+
 			if (DISCRETE_PROFILING)
 				node->run_time += osd_profiling_ticks();
 

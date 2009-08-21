@@ -1220,7 +1220,7 @@ ROM_START( wownfant)
 	ROM_LOAD( "ep-4001 42750001 u4.bin",    0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // almost the same as fantasia2, just some changes to the sample references in the header
 	ROM_RELOAD(               0x40000, 0x80000 )
 	ROM_LOAD( "ep-4001 42750001 u1.bin",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
-ROM_END	
+ROM_END
 
 ROM_START( galhustl )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

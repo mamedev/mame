@@ -1105,7 +1105,7 @@ static DEVICE_START( tms5220 )
 
 	/* initialize a stream */
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
-	
+
 	register_for_save_states(tms);
 }
 

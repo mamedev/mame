@@ -14,7 +14,7 @@
 ** History:
 **
 ** 2006~2009  Eke-Eke (Genesis Plus GX):
-** Credits to Nemesis (@spritesmind.net), most of those fixes came from his tests on a Model 1 Sega Mega Drive 
+** Credits to Nemesis (@spritesmind.net), most of those fixes came from his tests on a Model 1 Sega Mega Drive
 ** More informations at http://gendev.spritesmind.net/forum/viewtopic.php?t=386
 **
 **  - fixed LFO implementation (Spider-Man & Venom : Separation Anxiety intro,Warlock birds, Aladdin bug sound):
@@ -24,7 +24,7 @@
 **  - improved internal timers emulation
 **  - fixed Attack Rate update in some specific case (Batman & Robin intro)
 **  - fixed EG behavior when Attack Rate is maximal
-**  - fixed EG behavior when SL=0 (Mega Turrican tracks 03,09...) or/and Key ON occurs at minimal attenuation 
+**  - fixed EG behavior when SL=0 (Mega Turrican tracks 03,09...) or/and Key ON occurs at minimal attenuation
 **  - added EG output immediate update on register writes
 **  - fixed YM2612 initial values (after the reset)
 **  - implemented Detune overflow (Ariel, Comix Zone, Shaq Fu, Spiderman & many others)
@@ -699,7 +699,7 @@ typedef struct
 
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
-	   but LFO works with one more bit of a precision so we really need 4096 elements */
+       but LFO works with one more bit of a precision so we really need 4096 elements */
 	UINT32  fn_table[4096]; /* fnumber->increment counter */
 	UINT32 fn_max;    /* maximal phase increment (used for phase overflow) */
 
@@ -1952,7 +1952,7 @@ static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 	init_timetables( &OPN->ST, dt_tab );
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
-	   but LFO works with one more bit of a precision so we really need 4096 elements */
+       but LFO works with one more bit of a precision so we really need 4096 elements */
 	for(i = 0; i < 4096; i++)
 	{
 		/* freq table for octave 7 */
@@ -2088,7 +2088,7 @@ static void OPNWriteReg(FM_OPN *OPN, int r, int v)
 
 	case 0x90:	/* SSG-EG */
 		SLOT->ssg  =  v&0x0f;
-		
+
 	      /* recalculate EG output */
 		if ((SLOT->ssg&0x08) && (SLOT->ssgn ^ (SLOT->ssg&0x04)) && (SLOT->state > EG_REL))
 			SLOT->vol_out = ((UINT32)(0x200 - SLOT->volume) & MAX_ATT_INDEX) + SLOT->tl;

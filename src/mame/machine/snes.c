@@ -72,7 +72,7 @@ static void snes_latch_counters(running_machine *machine)
 	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
-//	read_ophct = read_opvct = 0;	// clear read flags - 2009-08: I think we must clear these when STAT78 is read...
+//  read_ophct = read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", snes_ppu.beam.latch_horz, snes_ppu.beam.latch_vert);
 }
@@ -372,12 +372,12 @@ READ8_HANDLER( snes_r_io )
 			return snes_ppu.ppu1_open_bus;
 
 // According to BSNES, these should return snes_open_bus_r!
-//		case OAMADDL:
-//		case OAMADDH:
-//		case VMADDH:
-//		case CGADD:
-//		case CGDATA:
-//			return snes_ram[offset];
+//      case OAMADDL:
+//      case OAMADDH:
+//      case VMADDH:
+//      case CGADD:
+//      case CGDATA:
+//          return snes_ram[offset];
 		case MPYL:		/* Multiplication result (low) */
 			{
 				/* Perform 16bit * 8bit multiply */
@@ -577,7 +577,7 @@ READ8_HANDLER( snes_r_io )
 				joypad[1].oldrol&=0xf;
 				if( !(joypad[1].oldrol % 17) )
 					value = 0x1;
-				//value |= 0x1c;	// bits 4, 3, and 2 are always set
+				//value |= 0x1c;    // bits 4, 3, and 2 are always set
 				return value | 0x1c | (snes_open_bus_r(space,0) & 0xe0); //correct?
 			}
 		case HTIMEL:
@@ -666,7 +666,7 @@ READ8_HANDLER( snes_r_io )
 	}
 
 	/* Unsupported reads returns open bus */
-//	printf("%02x %02x\n",offset,snes_open_bus_r(space,0));
+//  printf("%02x %02x\n",offset,snes_open_bus_r(space,0));
 	return snes_open_bus_r(space,0);
 }
 
@@ -681,7 +681,7 @@ WRITE8_HANDLER( snes_w_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-//		printf("816: %02x to APU @ %d\n", data, offset&3);
+//      printf("816: %02x to APU @ %d\n", data, offset&3);
 		spc_port_in[offset & 0x3] = data;
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
@@ -2193,7 +2193,7 @@ void snes_gdma( const address_space *space, UINT8 channels )
 			if( !length )
 				length = 0x10000;	/* 0x0000 really means 0x10000 */
 
-//			printf( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
+//          printf( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
 
 #ifdef SNES_DBG_GDMA
 			mame_printf_debug( "GDMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + dma] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + dma] & 0x7 );
