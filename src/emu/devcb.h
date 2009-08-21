@@ -64,6 +64,8 @@
 
 /* standard line or read/write handlers with the calling device passed */
 #define DEVCB_LINE(func)					{ DEVCB_TYPE_SELF, NULL, (func), NULL, NULL }
+#define DEVCB_LINE_GND						{ DEVCB_TYPE_SELF, NULL, devcb_line_gnd_r, NULL, NULL }
+#define DEVCB_LINE_VCC						{ DEVCB_TYPE_SELF, NULL, devcb_line_vcc_r, NULL, NULL }
 #define DEVCB_HANDLER(func)					{ DEVCB_TYPE_SELF, NULL, NULL, (func), NULL }
 
 /* line or read/write handlers for another device */
@@ -269,5 +271,22 @@ INLINE void devcb_call_write8(const devcb_resolved_write8 *resolved, offs_t offs
 		(*resolved->write)((const device_config *)resolved->target, offset, data);
 }
 
+/*-------------------------------------------------
+    devcb_line_gnd_r - input tied to GND
+-------------------------------------------------*/
+
+INLINE READ_LINE_DEVICE_HANDLER( devcb_line_gnd_r )
+{
+	return 0;
+}
+
+/*-------------------------------------------------
+    devcb_line_vcc_r - input tied to Vcc
+-------------------------------------------------*/
+
+INLINE READ_LINE_DEVICE_HANDLER( devcb_line_vcc_r )
+{
+	return 1;
+}
 
 #endif	/* __DEVCB_H__ */
