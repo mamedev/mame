@@ -51,14 +51,17 @@ enum
 #define MODE_TRANSPARENT_BLANK(d)		(((d)->mode_control & 0x88) == 0x08)
 #define MODE_UPDATE_STROBE(d)			(((d)->mode_control & 0x40) != 0)
 
-/* capabilities */
+/* capabilities */                                     /* MC6845    MC6845-1    C6545-1    R6545-1    H46505    HD6845    SY6545-1 */
 static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE };
 static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };
 static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 
 /* FIXME: check other variants */
-static const int supports_transparent[NUM_TYPES]       = { FALSE,      FALSE,     FALSE,      TRUE,    FALSE,    FALSE,      FALSE };
+static const int supports_status_reg_d7[NUM_TYPES]     = { FALSE,      FALSE,     FALSE,      TRUE,    FALSE,    FALSE,       TRUE };
+
+/* FIXME: check other variants */
+static const int supports_transparent[NUM_TYPES]       = { FALSE,      FALSE,     FALSE,      TRUE,    FALSE,    FALSE,       TRUE };
 
 
 typedef struct _mc6845_t mc6845_t;
@@ -97,6 +100,7 @@ struct _mc6845_t
 	UINT8	hpixels_per_column;
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
+	UINT8	update_ready_bit;
 
 	/* timers */
 	emu_timer *de_changed_timer;
@@ -107,24 +111,27 @@ struct _mc6845_t
 	emu_timer *vsync_on_timer;
 	emu_timer *vsync_off_timer;
 	emu_timer *light_pen_latch_timer;
+	emu_timer *upd_adr_timer;
 
 	/* computed values - do NOT state save these! */
-	UINT16	horiz_pix_total;
-	UINT16	vert_pix_total;
-	UINT16	max_visible_x;
-	UINT16	max_visible_y;
-	UINT16	hsync_on_pos;
-	UINT16	hsync_off_pos;
-	UINT16	vsync_on_pos;
-	UINT16	vsync_off_pos;
-	UINT16  current_disp_addr;	/* the display address currently drawn */
-	UINT8	light_pen_latched;
-	int		has_valid_parameters;
+	UINT16	 horiz_pix_total;
+	UINT16	 vert_pix_total;
+	UINT16	 max_visible_x;
+	UINT16	 max_visible_y;
+	UINT16	 hsync_on_pos;
+	UINT16	 hsync_off_pos;
+	UINT16	 vsync_on_pos;
+	UINT16	 vsync_off_pos;
+	UINT16   current_disp_addr;	/* the display address currently drawn */
+	UINT8	 light_pen_latched;
+	attotime upd_time;
+	int		 has_valid_parameters;
 };
 
 
 static STATE_POSTLOAD( mc6845_state_save_postload );
 static void recompute_parameters(mc6845_t *mc6845, int postload);
+static void update_upd_adr_timer(mc6845_t *mc6845);
 static void update_de_changed_timer(mc6845_t *mc6845);
 static void update_cur_changed_timers(mc6845_t *mc6845);
 static void update_hsync_changed_timers(mc6845_t *mc6845);
@@ -166,6 +173,13 @@ static TIMER_CALLBACK( on_update_address_cb )
 
 	/* call the callback function -- we know it exists */
 	mc6845->intf->on_update_addr_changed(device, addr, strobe);
+
+	if(!mc6845->update_ready_bit && MODE_TRANSPARENT_BLANK(mc6845))
+	{
+		mc6845->update_addr++;
+		mc6845->update_addr &= 0x3fff;
+		mc6845->update_ready_bit = 1;
+	}
 }
 
 INLINE void call_on_update_address(const device_config *device, int strobe)
@@ -200,6 +214,10 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 	if (supports_status_reg_d6[mc6845->device_type] && mc6845->light_pen_latched)
 	   ret = ret | 0x40;
 
+	/* UPDATE ready */
+	if (supports_status_reg_d7[mc6845->device_type] && mc6845->update_ready_bit)
+	   ret = ret | 0x80;
+
 	return ret;
 }
 
@@ -220,9 +238,21 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 		case 0x1f:
 			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
 			{
-				mc6845->update_addr++;
-				mc6845->update_addr &= 0x3fff;
-				call_on_update_address(device, 0);
+				if(MODE_TRANSPARENT_PHI2(mc6845))
+				{
+					mc6845->update_addr++;
+					mc6845->update_addr &= 0x3fff;
+					call_on_update_address(device, 0);
+				}
+				else
+				{
+					/* MODE_TRANSPARENT_BLANK */
+					if(mc6845->update_ready_bit)
+					{
+						mc6845->update_ready_bit = 0;
+						update_upd_adr_timer(mc6845);
+					}
+				}
 			}
 			break;
 
@@ -264,22 +294,36 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 			if (supports_transparent[mc6845->device_type])
 			{
 				mc6845->update_addr = ((data & 0x3f) << 8) | (mc6845->update_addr & 0x00ff);
-				call_on_update_address(device, 0);
+				if(MODE_TRANSPARENT_PHI2(mc6845))
+					call_on_update_address(device, 0);
 			}
 			break;
 		case 0x13:
 			if (supports_transparent[mc6845->device_type])
 			{
 				mc6845->update_addr = ((data & 0xff) << 0) | (mc6845->update_addr & 0xff00);
-				call_on_update_address(device, 0);
+				if(MODE_TRANSPARENT_PHI2(mc6845))
+					call_on_update_address(device, 0);
 			}
 			break;
 		case 0x1f:
 			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
 			{
-				mc6845->update_addr++;
-				mc6845->update_addr &= 0x3fff;
-				call_on_update_address(device, 0);
+				if(MODE_TRANSPARENT_PHI2(mc6845))
+				{
+					mc6845->update_addr++;
+					mc6845->update_addr &= 0x3fff;
+					call_on_update_address(device, 0);
+				}
+				else
+				{
+					/* MODE_TRANSPARENT_BLANK */
+					if(mc6845->update_ready_bit)
+					{
+						mc6845->update_ready_bit = 0;
+						update_upd_adr_timer(mc6845);
+					}
+				}
 			}
 			break;
 		default: break;
@@ -287,7 +331,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 
 	/* display message if the Mode Control register is not zero */
 	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
-		if (!(supports_transparent[mc6845->device_type] && MODE_TRANSPARENT_PHI2(mc6845)))
+		if (!supports_transparent[mc6845->device_type])
 			popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
 
 	recompute_parameters(mc6845, FALSE);
@@ -317,6 +361,9 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 		if (vert_sync_pix_width == 0)
 			vert_sync_pix_width = 0x10;
+
+		/* determine the transparent update cycle time, 1 update every 4 character clocks */
+		mc6845->upd_time = attotime_mul(ATTOTIME_IN_HZ(mc6845->clock), 4 * mc6845->hpixels_per_column);
 
 		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->hpixels_per_column;
 		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->hpixels_per_column);
@@ -387,6 +434,12 @@ INLINE int is_display_enabled(mc6845_t *mc6845)
 }
 
 
+static void update_upd_adr_timer(mc6845_t *mc6845)
+{
+	if (!is_display_enabled(mc6845))
+		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
+}
+
 static void update_de_changed_timer(mc6845_t *mc6845)
 {
 	if (mc6845->has_valid_parameters && (mc6845->de_changed_timer != NULL))
@@ -413,6 +466,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 				if (next_y == mc6845->vert_pix_total)
 					next_y = -1;
 			}
+			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
 		}
 
 		/* we are in a blanking region, get the location of the next display start */
@@ -425,6 +479,10 @@ static void update_de_changed_timer(mc6845_t *mc6845)
                to go to the top of the screen */
 			if (next_y > mc6845->max_visible_y)
 				next_y = 0;
+
+			/* if transparent update was requested fire the update timer */
+			if(!mc6845->update_ready_bit)
+				update_upd_adr_timer(mc6845);
 		}
 
 		if (next_y != -1)
@@ -485,6 +543,15 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_on_pos,  0), 0);
 		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_off_pos, 0), 0);
 	}
+}
+
+
+static TIMER_CALLBACK( upd_adr_timer_cb )
+{
+	const device_config *device = (const device_config *)ptr;
+
+	/* fire a update address strobe */
+	call_on_update_address(device, 0);
 }
 
 
@@ -818,9 +885,13 @@ static void common_start(const device_config *device, int device_type)
 		assert(mc6845->screen != NULL);
 
 		/* create the timers */
-		if (mc6845->out_de_func.target != NULL)
+		if (mc6845->out_de_func.target != NULL || supports_transparent[mc6845->device_type])
 		{
 			mc6845->de_changed_timer = timer_alloc(device->machine, de_changed_timer_cb, (void *)device);
+			if(supports_transparent[mc6845->device_type])
+			{
+				mc6845->upd_adr_timer = timer_alloc(device->machine, upd_adr_timer_cb, (void *)device);
+			}
 		}
 
 		if (mc6845->out_cur_func.target != NULL)
@@ -869,6 +940,7 @@ static void common_start(const device_config *device, int device_type)
 	state_save_register_device_item(device, 0, mc6845->cursor_state);
 	state_save_register_device_item(device, 0, mc6845->cursor_blink_count);
 	state_save_register_device_item(device, 0, mc6845->update_addr);
+	state_save_register_device_item(device, 0, mc6845->update_ready_bit);
 }
 
 static DEVICE_START( mc6845 )
