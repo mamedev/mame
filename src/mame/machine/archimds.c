@@ -115,7 +115,7 @@ static void a310_set_timer(int tmr)
 {
 	double freq;
 
-	if((double)ioc_timercnt[tmr] != 0) // FIXME: dmdtouch does a divide by zero?
+	if(ioc_timercnt[tmr] != 0) // FIXME: dmdtouch does a divide by zero?
 	{
 		freq = 2000000.0 / (double)ioc_timercnt[tmr];
 	//  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
