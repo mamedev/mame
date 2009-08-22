@@ -1380,7 +1380,7 @@ WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 
 	/* set the new value */
     leland_gfx_control = data;
-	leland_dac_control &= data & 3;
+	leland_dac_control = data & 3;
 
     /* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)

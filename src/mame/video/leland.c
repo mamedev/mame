@@ -53,9 +53,8 @@ static emu_timer *scanline_timer;
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-
+	
 	/* update the DACs */
-
 	if (!(leland_dac_control & 0x01))
 		leland_dac_update(0, leland_video_ram[(last_scanline) * 256 + 160]);
 
@@ -65,12 +64,6 @@ static TIMER_CALLBACK( scanline_callback )
 	last_scanline = scanline;
 
 	scanline = (scanline+1) % 256;
-
-	if (scanline == 0)
-	{
-		/* turn off the DACs at the start of the frame */
-		leland_dac_control = 3;
-	}
 
 	/* come back at the next appropriate scanline */
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
