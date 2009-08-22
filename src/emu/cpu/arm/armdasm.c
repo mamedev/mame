@@ -391,3 +391,9 @@ UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 
 	return dasmflags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( arm )
+{
+	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	return 4 | arm_disasm(buffer, pc, opcode);
+}

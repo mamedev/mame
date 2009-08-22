@@ -9,6 +9,8 @@
 #include "debugger.h"
 #include "r3000.h"
 
+CPU_DISASSEMBLE( r3000be );
+CPU_DISASSEMBLE( r3000le );
 
 #define ENABLE_OVERFLOWS	0
 
@@ -887,24 +889,6 @@ static CPU_EXECUTE( r3000 )
 /***************************************************************************
     DISASSEMBLY HOOK
 ***************************************************************************/
-
-static CPU_DISASSEMBLE( r3000be )
-{
-	extern unsigned dasmr3k(char *, unsigned, UINT32);
-	UINT32 op = *(UINT32 *)oprom;
-	op = BIG_ENDIANIZE_INT32(op);
-	return dasmr3k(buffer, pc, op);
-}
-
-
-static CPU_DISASSEMBLE( r3000le )
-{
-	extern unsigned dasmr3k(char *, unsigned, UINT32);
-	UINT32 op = *(UINT32 *)oprom;
-	op = LITTLE_ENDIANIZE_INT32(op);
-	return dasmr3k(buffer, pc, op);
-}
-
 
 
 /***************************************************************************

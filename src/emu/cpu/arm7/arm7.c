@@ -279,16 +279,15 @@ static void set_irq_line(arm_state *cpustate, int irqline, int state)
 
 static CPU_DISASSEMBLE( arm7 )
 {
+	CPU_DISASSEMBLE( arm7arm );
+	CPU_DISASSEMBLE( arm7thumb );
+
     arm_state *cpustate = get_safe_token(device);
 
     if (T_IS_SET(GET_CPSR))
-    {
-        return thumb_disasm(buffer, pc, oprom[0] | (oprom[1] << 8)) | 2;
-    }
+    	return CPU_DISASSEMBLE_CALL(arm7thumb);
     else
-    {
-        return arm7_disasm(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24)) | 4;
-    }
+    	return CPU_DISASSEMBLE_CALL(arm7arm);
 }
 
 

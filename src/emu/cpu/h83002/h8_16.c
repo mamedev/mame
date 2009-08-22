@@ -17,6 +17,9 @@
 #include "h8.h"
 #include "h8priv.h"
 
+CPU_DISASSEMBLE(h8_24);
+CPU_DISASSEMBLE(h8_32);
+
 #define H8_SP	(7)
 
 #define h8_mem_read8(x) memory_read_byte(h8->program, x)
@@ -52,18 +55,6 @@ static void h8_check_irqs(h83xx_state *h8);
 /* implementation */
 
 extern offs_t h8_disasm(char *output, offs_t address, const UINT8 *oprom, const UINT8 *opram, UINT32 addr_mask);
-
-// disassembly hook for varients with 24-bit address bus (e.g. H8/3044)
-static CPU_DISASSEMBLE(h8_24)
-{
-	return h8_disasm(buffer, pc, oprom, opram, 0xffffff);
-}
-
-// disassembly hook for full 32-bit address bus
-static CPU_DISASSEMBLE(h8_32)
-{
-	return h8_disasm(buffer, pc, oprom, opram, 0xffffffff);
-}
 
 void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 {

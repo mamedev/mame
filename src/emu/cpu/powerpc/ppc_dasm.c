@@ -1166,3 +1166,10 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 	sprintf(buffer, "?");
     return 4 | flags;
 }
+
+CPU_DISASSEMBLE( powerpc )
+{
+	UINT32 op = *(UINT32 *)oprom;
+	op = BIG_ENDIANIZE_INT32(op);
+	return ppc_dasm_one(buffer, pc, op);
+}

@@ -600,3 +600,9 @@ unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode)
 	}
 	return 2 | flags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( sh2 )
+{
+	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
+}
+

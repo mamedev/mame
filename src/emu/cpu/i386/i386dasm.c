@@ -2055,7 +2055,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		case GROUP:
 			handle_modrm( modrm_string );
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
-				if( mame_stricmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
+				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
 					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
 					return;
 				}
@@ -2136,4 +2136,19 @@ static int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mo
 int i386_dasm_one(char *buffer, offs_t eip, const UINT8 *oprom, int mode)
 {
 	return i386_dasm_one_ex(buffer, eip, oprom, mode);
+}
+
+CPU_DISASSEMBLE( x86_16 )
+{
+	return i386_dasm_one_ex(buffer, pc, oprom, 16);
+}
+
+CPU_DISASSEMBLE( x86_32 )
+{
+	return i386_dasm_one_ex(buffer, pc, oprom, 32);
+}
+
+CPU_DISASSEMBLE( x86_64 )
+{
+	return i386_dasm_one_ex(buffer, pc, oprom, 64);
 }

@@ -3,6 +3,8 @@
 #include "i960dis.h"
 #include <math.h>
 
+CPU_DISASSEMBLE( i960  );
+
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
 #include <float.h>
@@ -2082,19 +2084,6 @@ static CPU_INIT( i960 )
  	state_save_register_device_item_array(device, 0, i960->fp);
 	state_save_register_device_item_2d_array(device, 0, i960->rcache);
 	state_save_register_device_item_array(device, 0, i960->rcache_frame_addr);
-}
-
-static CPU_DISASSEMBLE( i960  )
-{
-	disassemble_t dis;
-
-	dis.IP = pc;
-	dis.buffer = buffer;
-	dis.oprom = oprom;
-
-	i960_disassemble(&dis);
-
-	return dis.IPinc | dis.disflags | DASMFLAG_SUPPORTED;
 }
 
 static CPU_RESET( i960 )

@@ -20,6 +20,8 @@
 #include "sh2comn.h"
 #include "eminline.h"
 
+CPU_DISASSEMBLE( sh2 );
+
 #ifdef USE_SH2DRC
 
 /***************************************************************************
@@ -3170,15 +3172,6 @@ void sh2drc_add_pcflush(const device_config *device, offs_t address)
 		sh2->pcflushes[sh2->pcfsel++] = address;
 }
 
-
-/*-------------------------------------------------
-    sh2_dasm - disassemble an instruction
--------------------------------------------------*/
-
-static CPU_DISASSEMBLE( sh2 )
-{
-	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
-}
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for

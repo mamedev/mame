@@ -20,6 +20,7 @@
 #include "debugger.h"
 #include "ssp1601.h"
 
+CPU_DISASSEMBLE( ssp1601 );
 
 /* detect ops with unimplemented/invalid fields.
  * Useful for homebrew or if a new VR revision pops up. */
@@ -763,14 +764,6 @@ static CPU_EXECUTE( ssp1601 )
 /**************************************************************************
  * MAME interface
  **************************************************************************/
-
-static CPU_DISASSEMBLE( ssp1601 )
-{
-	//ssp1601_state_t *ssp1601_state = get_safe_token(device);
-
-	return dasm_ssp1601(buffer, pc, oprom);
-}
-
 
 static CPU_SET_INFO( ssp1601 )
 {

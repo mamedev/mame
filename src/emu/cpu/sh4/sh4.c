@@ -27,6 +27,8 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
+CPU_DISASSEMBLE( sh4 );
+
 INLINE SH4 *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
@@ -3417,11 +3419,6 @@ static CPU_EXECUTE( sh4 )
 	} while( sh4->sh4_icount > 0 );
 
 	return cycles - sh4->sh4_icount;
-}
-
-static CPU_DISASSEMBLE( sh4 )
-{
-	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
 
 static CPU_INIT( sh4 )

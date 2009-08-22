@@ -13,6 +13,8 @@
 #include "h8.h"
 #include "h8priv.h"
 
+CPU_DISASSEMBLE(h8);
+
 #define H8_SP	(7)
 
 #define h8_mem_read8(x)		memory_read_byte(h8->program, x)
@@ -70,13 +72,6 @@ INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
 static void h8_check_irqs(h83xx_state *h8);
 
 /* implementation */
-
-extern offs_t h8_disasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 addrmask);
-
-static CPU_DISASSEMBLE(h8)
-{
-	return h8_disasm(buffer, pc, oprom, opram, 0xffff);
-}
 
 static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 mode)
 {

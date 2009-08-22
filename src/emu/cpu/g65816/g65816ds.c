@@ -345,3 +345,8 @@ unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const 
 
 	return length | DASMFLAG_SUPPORTED | dasm_flags;
 }
+
+CPU_DISASSEMBLE( g65816_generic )
+{
+	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0, 0);
+}

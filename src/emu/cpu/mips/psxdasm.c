@@ -739,3 +739,10 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 	}
 	return ( opram - oldopram ) | flags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( psxcpu_generic )
+{
+	DasmPSXCPU_state state = {0};
+	state.pc = pc;
+	return DasmPSXCPU( &state, buffer, pc, opram );
+}

@@ -10,6 +10,9 @@
 #include "cpuexec.h"
 #include "jaguar.h"
 
+CPU_DISASSEMBLE( jaguargpu );
+CPU_DISASSEMBLE( jaguardsp );
+
 #define LOG_GPU_IO		0
 #define LOG_DSP_IO		0
 
@@ -552,24 +555,6 @@ static CPU_EXECUTE( jaguardsp )
 	} while (jaguar->icount > 0 || jaguar->icount == jaguar->bankswitch_icount);
 
 	return cycles - jaguar->icount;
-}
-
-
-
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
-
-static CPU_DISASSEMBLE( jaguargpu )
-{
-	extern unsigned dasmjag(int, char *, unsigned, const UINT8 *);
-    return dasmjag(JAGUAR_VARIANT_GPU, buffer, pc, oprom);
-}
-
-static CPU_DISASSEMBLE( jaguardsp )
-{
-	extern unsigned dasmjag(int, char *, unsigned, const UINT8 *);
-    return dasmjag(JAGUAR_VARIANT_DSP, buffer, pc, oprom);
 }
 
 

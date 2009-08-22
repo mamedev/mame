@@ -6,6 +6,8 @@
 #include "sharc.h"
 #include "debugger.h"
 
+CPU_DISASSEMBLE( sharc );
+
 enum
 {
 	SHARC_PC=1,		SHARC_PCSTK,	SHARC_MODE1,	SHARC_MODE2,
@@ -169,8 +171,6 @@ struct _SHARC_REGS
 	UINT32 astat_old_old_old;
 };
 
-
-static CPU_DISASSEMBLE( sharc );
 
 static void sharc_dma_exec(SHARC_REGS *cpustate, int channel);
 static void check_interrupts(SHARC_REGS *cpustate);
@@ -415,20 +415,6 @@ void sharc_external_dma_write(const device_config *device, UINT32 address, UINT6
 		}
 	}
 }
-
-static CPU_DISASSEMBLE( sharc )
-{
-	UINT64 op = 0;
-	UINT32 flags = 0;
-
-	op = ((UINT64)oprom[0] << 0)  | ((UINT64)oprom[1] << 8) |
-		 ((UINT64)oprom[2] << 16) | ((UINT64)oprom[3] << 24) |
-		 ((UINT64)oprom[4] << 32) | ((UINT64)oprom[5] << 40);
-
-	flags = sharc_dasm_one(buffer, pc, op);
-	return 1 | flags | DASMFLAG_SUPPORTED;
-}
-
 
 static CPU_INIT( sharc )
 {

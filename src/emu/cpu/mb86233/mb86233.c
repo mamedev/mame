@@ -16,6 +16,8 @@
 #include "mb86233.h"
 #include "debugger.h"
 
+CPU_DISASSEMBLE( mb86233 );
+
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
@@ -1556,20 +1558,6 @@ static CPU_EXECUTE( mb86233 )
 
 	return cycles - cpustate->icount;
 }
-
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
-
-static CPU_DISASSEMBLE( mb86233 )
-{
-	extern UINT32 dasm_mb86233(char *, UINT32);
-
-	UINT32 op = *(UINT32 *)oprom;
-	op = LITTLE_ENDIANIZE_INT32(op);
-	return dasm_mb86233(buffer, op);
-}
-
 
 /***************************************************************************
     Information Setters

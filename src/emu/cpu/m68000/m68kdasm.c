@@ -3715,6 +3715,37 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 }
 #endif
 
+CPU_DISASSEMBLE( m68000 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
+}
+
+CPU_DISASSEMBLE( m68008 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
+}
+
+CPU_DISASSEMBLE( m68010 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
+}
+
+CPU_DISASSEMBLE( m68020 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
+}
+
+CPU_DISASSEMBLE( m68030 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68030);
+}
+
+CPU_DISASSEMBLE( m68040 )
+{
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
+}
+
+
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

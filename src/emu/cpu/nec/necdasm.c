@@ -1485,7 +1485,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1 )
 		case GROUP:
 			handle_modrm( modrm_string );
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
-				if( mame_stricmp(op->mnemonic, group_op_table[i].mnemonic) == 0 )
+				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 )
 				{
 					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
 					return;
@@ -1543,3 +1543,9 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config
 	decode_opcode( buffer, &necv_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( nec_generic )
+{
+	return necv_dasm_one(buffer, pc, oprom, NULL);
+}
+

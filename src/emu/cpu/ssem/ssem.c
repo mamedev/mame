@@ -8,6 +8,9 @@
 #include "debugger.h"
 #include "ssem.h"
 
+CPU_DISASSEMBLE( ssem );
+
+
 #define SSEM_DISASM_ON_UNIMPL           0
 #define SSEM_DUMP_MEM_ON_UNIMPL         0
 
@@ -234,16 +237,6 @@ static CPU_EXECUTE( ssem )
     return cycles - cpustate->icount;
 }
 
-/*****************************************************************************/
-
-static CPU_DISASSEMBLE( ssem )
-{
-    UINT32 op = (*(UINT8 *)(opram + 0) << 24) |
-                (*(UINT8 *)(opram + 1) << 16) |
-                (*(UINT8 *)(opram + 2) <<  8) |
-                (*(UINT8 *)(opram + 3) <<  0);
-    return ssem_dasm_one(buffer, pc, op);
-}
 
 /*****************************************************************************/
 

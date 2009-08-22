@@ -8,6 +8,8 @@
 #include "debugger.h"
 #include "rsp.h"
 
+CPU_DISASSEMBLE( rsp );
+
 #define LOG_INSTRUCTION_EXECUTION		0
 #define SAVE_DISASM						0
 #define SAVE_DMEM						0
@@ -2864,14 +2866,6 @@ static CPU_EXECUTE( rsp )
 
 
 
-
-/*****************************************************************************/
-
-static CPU_DISASSEMBLE( rsp )
-{
-	UINT32 op = LITTLE_ENDIANIZE_INT32(*(UINT32 *)opram);
-	return rsp_dasm_one(buffer, pc, op);
-}
 
 /*****************************************************************************/
 

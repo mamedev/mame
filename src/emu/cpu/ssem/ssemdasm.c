@@ -73,3 +73,14 @@ offs_t ssem_dasm_one(char *buffer, offs_t pc, UINT32 op)
 
     return 4 | DASMFLAG_SUPPORTED;
 }
+
+/*****************************************************************************/
+
+CPU_DISASSEMBLE( ssem )
+{
+    UINT32 op = (*(UINT8 *)(opram + 0) << 24) |
+                (*(UINT8 *)(opram + 1) << 16) |
+                (*(UINT8 *)(opram + 2) <<  8) |
+                (*(UINT8 *)(opram + 3) <<  0);
+    return ssem_dasm_one(buffer, pc, op);
+}

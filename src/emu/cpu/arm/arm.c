@@ -18,6 +18,8 @@
 #include "arm.h"
 #include "debugger.h"
 
+CPU_DISASSEMBLE( arm );
+
 #define READ8(addr)			cpu_read8(cpustate,addr)
 #define WRITE8(addr,data)	cpu_write8(cpustate,addr,data)
 #define READ32(addr)		cpu_read32(cpustate,addr)
@@ -490,12 +492,6 @@ static void set_irq_line(ARM_REGS* cpustate, int irqline, int state)
 	}
 
 	arm_check_irq_state(cpustate);
-}
-
-static CPU_DISASSEMBLE( arm )
-{
-	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	return 4 | arm_disasm(buffer, pc, opcode);
 }
 
 static CPU_INIT( arm )

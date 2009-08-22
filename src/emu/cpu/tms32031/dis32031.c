@@ -731,3 +731,10 @@ unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
 
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }
+
+
+CPU_DISASSEMBLE( tms32031 )
+{
+	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+    return dasm_tms32031(buffer, pc, op);
+}

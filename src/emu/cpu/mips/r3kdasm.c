@@ -369,3 +369,19 @@ unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 	}
 	return 4 | flags | DASMFLAG_SUPPORTED;
 }
+
+
+CPU_DISASSEMBLE( r3000be )
+{
+	UINT32 op = *(UINT32 *)oprom;
+	op = BIG_ENDIANIZE_INT32(op);
+	return dasmr3k(buffer, pc, op);
+}
+
+
+CPU_DISASSEMBLE( r3000le )
+{
+	UINT32 op = *(UINT32 *)oprom;
+	op = LITTLE_ENDIANIZE_INT32(op);
+	return dasmr3k(buffer, pc, op);
+}

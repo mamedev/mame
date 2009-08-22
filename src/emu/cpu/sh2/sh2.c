@@ -103,6 +103,8 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
+CPU_DISASSEMBLE( sh2 );
+
 #ifndef USE_SH2DRC
 
 /* speed up delay loops, bail out of tight loops */
@@ -2237,11 +2239,6 @@ static CPU_EXECUTE( sh2 )
 	} while( sh2_icount > 0 );
 
 	return cycles - sh2_icount;
-}
-
-static CPU_DISASSEMBLE( sh2 )
-{
-	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
 
 static CPU_INIT( sh2 )

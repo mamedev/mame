@@ -289,3 +289,16 @@ char *i960_disassemble(disassemble_t *diss)
 
 
 
+CPU_DISASSEMBLE( i960  )
+{
+	disassemble_t dis;
+
+	dis.IP = pc;
+	dis.buffer = buffer;
+	dis.oprom = oprom;
+
+	i960_disassemble(&dis);
+
+	return dis.IPinc | dis.disflags | DASMFLAG_SUPPORTED;
+}
+

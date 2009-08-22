@@ -26,6 +26,7 @@ TOOLS += \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
+	unidasm$(EXE) \
 	ldresample$(EXE) \
 	ldverify$(EXE) \
 	regrep$(EXE) \
@@ -70,6 +71,19 @@ JEDUTILOBJS = \
 	$(TOOLSOBJ)/jedutil.o \
 
 jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# unidasm
+#-------------------------------------------------
+
+UNIDASMOBJS = \
+	$(TOOLSOBJ)/unidasm.o \
+
+unidasm$(EXE): $(UNIDASMOBJS) $(LIBUTIL) $(LIBOCORE) $(LIBDASM) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 

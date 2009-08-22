@@ -608,3 +608,9 @@ int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 
 
 	return length | flags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( m37710_generic )
+{
+	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, 0, 0);
+}
+

@@ -81,13 +81,13 @@ $(DRCOBJ): $(DRCDEPS)
 ifneq ($(filter ARM,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/arm
 CPUOBJS += $(CPUOBJ)/arm/arm.o
-DBGOBJS += $(CPUOBJ)/arm/armdasm.o
+DASMOBJS += $(CPUOBJ)/arm/armdasm.o
 endif
 
 ifneq ($(filter ARM7,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/arm7
 CPUOBJS += $(CPUOBJ)/arm7/arm7.o
-DBGOBJS += $(CPUOBJ)/arm7/arm7dasm.o
+DASMOBJS += $(CPUOBJ)/arm7/arm7dasm.o
 endif
 
 $(CPUOBJ)/arm/arm.o: 	$(CPUSRC)/arm/arm.c \
@@ -107,7 +107,7 @@ $(CPUOBJ)/arm7/arm7.o:	$(CPUSRC)/arm7/arm7.c \
 ifneq ($(filter SE3208,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/se3208
 CPUOBJS += $(CPUOBJ)/se3208/se3208.o
-DBGOBJS += $(CPUOBJ)/se3208/se3208dis.o
+DASMOBJS += $(CPUOBJ)/se3208/se3208dis.o
 endif
 
 $(CPUOBJ)/se3208/se3208.o: 	$(CPUSRC)/se3208/se3208.c \
@@ -122,7 +122,7 @@ $(CPUOBJ)/se3208/se3208.o: 	$(CPUSRC)/se3208/se3208.c \
 ifneq ($(filter ALPHA8201,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/alph8201
 CPUOBJS += $(CPUOBJ)/alph8201/alph8201.o
-DBGOBJS += $(CPUOBJ)/alph8201/8201dasm.o
+DASMOBJS += $(CPUOBJ)/alph8201/8201dasm.o
 endif
 
 $(CPUOBJ)/alph8201/alph8201.o:	$(CPUSRC)/alph8201/alph8201.c \
@@ -137,7 +137,7 @@ $(CPUOBJ)/alph8201/alph8201.o:	$(CPUSRC)/alph8201/alph8201.c \
 ifneq ($(filter ADSP21XX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/adsp2100
 CPUOBJS += $(CPUOBJ)/adsp2100/adsp2100.o
-DBGOBJS += $(CPUOBJ)/adsp2100/2100dasm.o
+DASMOBJS += $(CPUOBJ)/adsp2100/2100dasm.o
 endif
 
 $(CPUOBJ)/adsp2100/adsp2100.o:	$(CPUSRC)/adsp2100/adsp2100.c \
@@ -153,7 +153,7 @@ $(CPUOBJ)/adsp2100/adsp2100.o:	$(CPUSRC)/adsp2100/adsp2100.c \
 ifneq ($(filter ADSP21062,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sharc
 CPUOBJS += $(CPUOBJ)/sharc/sharc.o
-DBGOBJS += $(CPUOBJ)/sharc/sharcdsm.o
+DASMOBJS += $(CPUOBJ)/sharc/sharcdsm.o
 endif
 
 $(CPUOBJ)/sharc/sharc.o:	$(CPUSRC)/sharc/sharc.c \
@@ -175,7 +175,7 @@ $(CPUOBJ)/sharc/sharc.o:	$(CPUSRC)/sharc/sharc.c \
 ifneq ($(filter APEXC,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/apexc
 CPUOBJS += $(CPUOBJ)/apexc/apexc.o
-DBGOBJS += $(CPUOBJ)/apexc/apexcdsm.o
+DASMOBJS += $(CPUOBJ)/apexc/apexcdsm.o
 endif
 
 $(CPUOBJ)/apexc/apexc.o:	$(CPUSRC)/apexc/apexc.c \
@@ -190,7 +190,7 @@ $(CPUOBJ)/apexc/apexc.o:	$(CPUSRC)/apexc/apexc.c \
 ifneq ($(filter DSP32C,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/dsp32
 CPUOBJS += $(CPUOBJ)/dsp32/dsp32.o
-DBGOBJS += $(CPUOBJ)/dsp32/dsp32dis.o
+DASMOBJS += $(CPUOBJ)/dsp32/dsp32dis.o
 endif
 
 $(CPUOBJ)/dsp32/dsp32.o: 	$(CPUSRC)/dsp32/dsp32.c \
@@ -205,7 +205,7 @@ $(CPUOBJ)/dsp32/dsp32.o: 	$(CPUSRC)/dsp32/dsp32.c \
 ifneq ($(filter ASAP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/asap
 CPUOBJS += $(CPUOBJ)/asap/asap.o
-DBGOBJS += $(CPUOBJ)/asap/asapdasm.o
+DASMOBJS += $(CPUOBJ)/asap/asapdasm.o
 endif
 
 $(CPUOBJ)/asap/asap.o:	$(CPUSRC)/asap/asap.c \
@@ -220,7 +220,7 @@ $(CPUOBJ)/asap/asap.o:	$(CPUSRC)/asap/asap.c \
 ifneq ($(filter JAGUAR,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/jaguar
 CPUOBJS += $(CPUOBJ)/jaguar/jaguar.o
-DBGOBJS += $(CPUOBJ)/jaguar/jagdasm.o
+DASMOBJS += $(CPUOBJ)/jaguar/jagdasm.o
 endif
 
 $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
@@ -235,7 +235,7 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 ifneq ($(filter AVR8,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/avr8
 CPUOBJS += $(CPUOBJ)/avr8/avr8.o
-DBGOBJS += $(CPUOBJ)/avr8/avr8dasm.o
+DASMOBJS += $(CPUOBJ)/avr8/avr8dasm.o
 endif
 
 $(CPUOBJ)/avr8/avr8.o: 	$(CPUSRC)/avr8/avr8.c \
@@ -250,7 +250,7 @@ $(CPUOBJ)/avr8/avr8.o: 	$(CPUSRC)/avr8/avr8.c \
 ifneq ($(filter CUBEQCPU,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cubeqcpu
 CPUOBJS += $(CPUOBJ)/cubeqcpu/cubeqcpu.o
-#DBGOBJS += $(CPUOBJ)/cubeqcpu/cubedasm.o
+DASMOBJS += $(CPUOBJ)/cubeqcpu/cubedasm.o
 endif
 
 $(CPUOBJ)/cubeqcpu/cubeqcpu.o:	$(CPUSRC)/cubeqcpu/cubeqcpu.c \
@@ -265,7 +265,7 @@ $(CPUOBJ)/cubeqcpu/cubeqcpu.o:	$(CPUSRC)/cubeqcpu/cubeqcpu.c \
 ifneq ($(filter ESRIP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/esrip
 CPUOBJS += $(CPUOBJ)/esrip/esrip.o
-#DBGOBJS += $(CPUOBJ)/esrip/esrip.o
+DASMOBJS += $(CPUOBJ)/esrip/esripdsm.o
 endif
 
 $(CPUOBJ)/esrip/esrip.o:	$(CPUSRC)/esrip/esrip.c \
@@ -280,7 +280,7 @@ $(CPUOBJ)/esrip/esrip.o:	$(CPUSRC)/esrip/esrip.c \
 ifneq ($(filter CDP1802,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cdp1802
 CPUOBJS += $(CPUOBJ)/cdp1802/cdp1802.o
-DBGOBJS += $(CPUOBJ)/cdp1802/1802dasm.o
+DASMOBJS += $(CPUOBJ)/cdp1802/1802dasm.o
 endif
 
 $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
@@ -295,9 +295,9 @@ $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
 ifneq ($(filter COP400,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cop400
 CPUOBJS += $(CPUOBJ)/cop400/cop400.o
-DBGOBJS += $(CPUOBJ)/cop400/cop410ds.o
-DBGOBJS += $(CPUOBJ)/cop400/cop420ds.o
-DBGOBJS += $(CPUOBJ)/cop400/cop440ds.o
+DASMOBJS += $(CPUOBJ)/cop400/cop410ds.o
+DASMOBJS += $(CPUOBJ)/cop400/cop420ds.o
+DASMOBJS += $(CPUOBJ)/cop400/cop440ds.o
 endif
 
 $(CPUOBJ)/cop400/cop400.o:	$(CPUSRC)/cop400/cop400.c \
@@ -313,7 +313,7 @@ $(CPUOBJ)/cop400/cop400.o:	$(CPUSRC)/cop400/cop400.c \
 ifneq ($(filter CP1610,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cp1610
 CPUOBJS += $(CPUOBJ)/cp1610/cp1610.o
-DBGOBJS += $(CPUOBJ)/cp1610/1610dasm.o
+DASMOBJS += $(CPUOBJ)/cp1610/1610dasm.o
 endif
 
 $(CPUOBJ)/cp1610/cp1610.o:	$(CPUSRC)/cp1610/cp1610.c \
@@ -328,7 +328,7 @@ $(CPUOBJ)/cp1610/cp1610.o:	$(CPUSRC)/cp1610/cp1610.c \
 ifneq ($(filter CCPU,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/ccpu
 CPUOBJS += $(CPUOBJ)/ccpu/ccpu.o
-DBGOBJS += $(CPUOBJ)/ccpu/ccpudasm.o
+DASMOBJS += $(CPUOBJ)/ccpu/ccpudasm.o
 endif
 
 $(CPUOBJ)/ccpu/ccpu.o:	$(CPUSRC)/ccpu/ccpu.c \
@@ -343,7 +343,7 @@ $(CPUOBJ)/ccpu/ccpu.o:	$(CPUSRC)/ccpu/ccpu.c \
 ifneq ($(filter T11,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/t11
 CPUOBJS += $(CPUOBJ)/t11/t11.o
-DBGOBJS += $(CPUOBJ)/t11/t11dasm.o
+DASMOBJS += $(CPUOBJ)/t11/t11dasm.o
 endif
 
 $(CPUOBJ)/t11/t11.o:	$(CPUSRC)/t11/t11.c \
@@ -360,7 +360,7 @@ $(CPUOBJ)/t11/t11.o:	$(CPUSRC)/t11/t11.c \
 ifneq ($(filter F8,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/f8
 CPUOBJS += $(CPUOBJ)/f8/f8.o
-DBGOBJS += $(CPUOBJ)/f8/f8dasm.o
+DASMOBJS += $(CPUOBJ)/f8/f8dasm.o
 endif
 
 $(CPUOBJ)/f8/f8.o:	$(CPUSRC)/f8/f8.c \
@@ -381,7 +381,7 @@ CPUOBJS += \
 	$(CPUOBJ)/g65816/g65816o2.o \
 	$(CPUOBJ)/g65816/g65816o3.o \
 	$(CPUOBJ)/g65816/g65816o4.o
-DBGOBJS += $(CPUOBJ)/g65816/g65816ds.o
+DASMOBJS += $(CPUOBJ)/g65816/g65816ds.o
 endif
 
 G65816DEPS = \
@@ -416,7 +416,7 @@ $(CPUOBJ)/g65816/g65816o4.o:	$(CPUSRC)/g65816/g65816o4.c \
 ifneq ($(filter HD6309,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/hd6309
 CPUOBJS += $(CPUOBJ)/hd6309/hd6309.o
-DBGOBJS += $(CPUOBJ)/hd6309/6309dasm.o
+DASMOBJS += $(CPUOBJ)/hd6309/6309dasm.o
 endif
 
 $(CPUOBJ)/hd6309/hd6309.o:	$(CPUSRC)/hd6309/hd6309.c \
@@ -432,7 +432,7 @@ $(CPUOBJ)/hd6309/hd6309.o:	$(CPUSRC)/hd6309/hd6309.c \
 ifneq ($(filter H83002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
 CPUOBJS += $(CPUOBJ)/h83002/h8_16.o $(CPUOBJ)/h83002/h8periph.o
-DBGOBJS += $(CPUOBJ)/h83002/h8disasm.o
+DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
 endif
 
 $(CPUOBJ)/h83002/h8_16.o:		$(CPUSRC)/h83002/h8_16.c \
@@ -453,7 +453,7 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 ifneq ($(filter H83334,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
 CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o
-DBGOBJS += $(CPUOBJ)/h83002/h8disasm.o
+DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
 endif
 
 $(CPUOBJ)/h83002/h8_8.o:		$(CPUSRC)/h83002/h8_8.c \
@@ -473,7 +473,7 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 ifneq ($(filter SH2,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh2
 CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o $(DRCOBJ)
-DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
+DASMOBJS += $(CPUOBJ)/sh2/sh2dasm.o
 endif
 
 $(CPUOBJ)/sh2/sh2.o:	$(CPUSRC)/sh2/sh2.c \
@@ -499,7 +499,7 @@ $(CPUOBJ)/sh2/sh2fe.o:	$(CPUSRC)/sh2/sh2fe.c \
 ifneq ($(filter SH4,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh4
 CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o
-DBGOBJS += $(CPUOBJ)/sh4/sh4dasm.o
+DASMOBJS += $(CPUOBJ)/sh4/sh4dasm.o
 endif
 
 $(CPUOBJ)/sh4/sh4.o:	$(CPUSRC)/sh4/sh4.c \
@@ -519,7 +519,7 @@ $(CPUOBJ)/sh4/sh4comn.o:  $(CPUSRC)/sh4/sh4comn.c \
 ifneq ($(filter H6280,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h6280
 CPUOBJS += $(CPUOBJ)/h6280/h6280.o
-DBGOBJS += $(CPUOBJ)/h6280/6280dasm.o
+DASMOBJS += $(CPUOBJ)/h6280/6280dasm.o
 endif
 
 $(CPUOBJ)/h6280/h6280.o:	$(CPUSRC)/h6280/h6280.c \
@@ -536,7 +536,7 @@ $(CPUOBJ)/h6280/h6280.o:	$(CPUSRC)/h6280/h6280.c \
 ifneq ($(filter E1,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/e132xs
 CPUOBJS += $(CPUOBJ)/e132xs/e132xs.o
-DBGOBJS += $(CPUOBJ)/e132xs/32xsdasm.o
+DASMOBJS += $(CPUOBJ)/e132xs/32xsdasm.o
 endif
 
 $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
@@ -552,7 +552,7 @@ $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
 ifneq ($(filter I4004,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i4004
 CPUOBJS += $(CPUOBJ)/i4004/i4004.o
-DBGOBJS += $(CPUOBJ)/i4004/4004dasm.o
+DASMOBJS += $(CPUOBJ)/i4004/4004dasm.o
 endif
 
 $(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
@@ -567,7 +567,7 @@ $(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
 ifneq ($(filter I8085,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8085
 CPUOBJS += $(CPUOBJ)/i8085/i8085.o
-DBGOBJS += $(CPUOBJ)/i8085/8085dasm.o
+DASMOBJS += $(CPUOBJ)/i8085/8085dasm.o
 endif
 
 $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
@@ -583,7 +583,7 @@ $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 ifneq ($(filter MCS48,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs48
 CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
-DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
+DASMOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
 endif
 
 $(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
@@ -598,7 +598,7 @@ $(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
 ifneq ($(filter MCS51,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs51
 CPUOBJS += $(CPUOBJ)/mcs51/mcs51.o
-DBGOBJS += $(CPUOBJ)/mcs51/mcs51dasm.o
+DASMOBJS += $(CPUOBJ)/mcs51/mcs51dasm.o
 endif
 
 $(CPUOBJ)/mcs51/mcs51.o:	$(CPUSRC)/mcs51/mcs51.c \
@@ -613,13 +613,13 @@ ifneq ($(filter I86,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i86.o
 CPUOBJS += $(CPUOBJ)/i86/i286.o
-DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
+DASMOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 ifneq ($(filter I386,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i386/i386.o
-DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
+DASMOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 I86DEPS = \
@@ -662,7 +662,7 @@ $(CPUOBJ)/i386/i386.o:	$(CPUSRC)/i386/i386.c \
 ifneq ($(filter I860,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i860
 CPUOBJS += $(CPUOBJ)/i860/i860.o
-DBGOBJS += $(CPUOBJ)/i860/i860dis.o
+DASMOBJS += $(CPUOBJ)/i860/i860dis.o
 endif
 
 $(CPUOBJ)/i860/i860.o:  $(CPUSRC)/i860/i860.c \
@@ -676,7 +676,7 @@ $(CPUOBJ)/i860/i860.o:  $(CPUSRC)/i860/i860.c \
 ifneq ($(filter I960,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i960
 CPUOBJS += $(CPUOBJ)/i960/i960.o
-DBGOBJS += $(CPUOBJ)/i960/i960dis.o
+DASMOBJS += $(CPUOBJ)/i960/i960dis.o
 endif
 
 $(CPUOBJ)/i960/i960.o:	$(CPUSRC)/i960/i960.c \
@@ -691,7 +691,7 @@ $(CPUOBJ)/i960/i960.o:	$(CPUSRC)/i960/i960.c \
 ifneq ($(filter KONAMI,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/konami
 CPUOBJS += $(CPUOBJ)/konami/konami.o
-DBGOBJS += $(CPUOBJ)/konami/knmidasm.o
+DASMOBJS += $(CPUOBJ)/konami/knmidasm.o
 endif
 
 $(CPUOBJ)/konami/konami.o:	$(CPUSRC)/konami/konami.c \
@@ -708,7 +708,7 @@ $(CPUOBJ)/konami/konami.o:	$(CPUSRC)/konami/konami.c \
 ifneq ($(filter LH5801,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/lh5801
 CPUOBJS += $(CPUOBJ)/lh5801/lh5801.o
-DBGOBJS += $(CPUOBJ)/lh5801/5801dasm.o
+DASMOBJS += $(CPUOBJ)/lh5801/5801dasm.o
 endif
 
 $(CPUOBJ)/lh5801/lh5801.o:	$(CPUSRC)/lh5801/lh5801.c \
@@ -724,7 +724,7 @@ $(CPUOBJ)/lh5801/lh5801.o:	$(CPUSRC)/lh5801/lh5801.c \
 ifneq ($(filter SSEM,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/ssem
 CPUOBJS += $(CPUOBJ)/ssem/ssem.o
-DBGOBJS += $(CPUOBJ)/ssem/ssemdasm.o
+DASMOBJS += $(CPUOBJ)/ssem/ssemdasm.o
 endif
 
 $(CPUOBJ)/ssem/ssem.o:	$(CPUSRC)/ssem/ssem.c \
@@ -739,7 +739,7 @@ $(CPUOBJ)/ssem/ssem.o:	$(CPUSRC)/ssem/ssem.c \
 ifneq ($(filter MB88XX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mb88xx
 CPUOBJS += $(CPUOBJ)/mb88xx/mb88xx.o
-DBGOBJS += $(CPUOBJ)/mb88xx/mb88dasm.o
+DASMOBJS += $(CPUOBJ)/mb88xx/mb88dasm.o
 endif
 
 $(CPUOBJ)/mb88xx/mb88xx.o:	$(CPUSRC)/mb88xx/mb88xx.c \
@@ -754,7 +754,7 @@ $(CPUOBJ)/mb88xx/mb88xx.o:	$(CPUSRC)/mb88xx/mb88xx.c \
 ifneq ($(filter MB86233,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mb86233
 CPUOBJS += $(CPUOBJ)/mb86233/mb86233.o
-DBGOBJS += $(CPUOBJ)/mb86233/mb86233d.o
+DASMOBJS += $(CPUOBJ)/mb86233/mb86233d.o
 endif
 
 $(CPUOBJ)/mb86233/mb86233.o:	$(CPUSRC)/mb86233/mb86233.c \
@@ -769,7 +769,7 @@ $(CPUOBJ)/mb86233/mb86233.o:	$(CPUSRC)/mb86233/mb86233.c \
 ifneq ($(filter PIC16C5X,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/pic16c5x
 CPUOBJS += $(CPUOBJ)/pic16c5x/pic16c5x.o
-DBGOBJS += $(CPUOBJ)/pic16c5x/16c5xdsm.o
+DASMOBJS += $(CPUOBJ)/pic16c5x/16c5xdsm.o
 endif
 
 $(CPUOBJ)/pic16c5x/pic16c5x.o:	$(CPUSRC)/pic16c5x/pic16c5x.c \
@@ -788,9 +788,9 @@ OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/r3000.o
 CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
 CPUOBJS += $(CPUOBJ)/mips/psx.o
-DBGOBJS += $(CPUOBJ)/mips/r3kdasm.o
-DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
-DBGOBJS += $(CPUOBJ)/mips/psxdasm.o
+DASMOBJS += $(CPUOBJ)/mips/r3kdasm.o
+DASMOBJS += $(CPUOBJ)/mips/mips3dsm.o
+DASMOBJS += $(CPUOBJ)/mips/psxdasm.o
 endif
 
 $(CPUOBJ)/mips/r3000.o:	$(CPUSRC)/mips/r3000.c \
@@ -826,7 +826,7 @@ CPUOBJS += \
 	$(CPUOBJ)/m37710/m37710o1.o \
 	$(CPUOBJ)/m37710/m37710o2.o \
 	$(CPUOBJ)/m37710/m37710o3.o
-DBGOBJS += $(CPUOBJ)/m37710/m7700ds.o
+DASMOBJS += $(CPUOBJ)/m37710/m7700ds.o
 endif
 
 M37710DEPS = \
@@ -864,7 +864,7 @@ CPUOBJS += $(CPUOBJ)/m6502/m6502.o
 CPUOBJS += $(CPUOBJ)/m6502/m6509.o
 CPUOBJS += $(CPUOBJ)/m6502/m65ce02.o
 CPUOBJS += $(CPUOBJ)/m6502/m4510.o
-DBGOBJS += $(CPUOBJ)/m6502/6502dasm.o
+DASMOBJS += $(CPUOBJ)/m6502/6502dasm.o
 endif
 
 $(CPUOBJ)/m6502/m6502.o:	$(CPUSRC)/m6502/m6502.c \
@@ -895,7 +895,7 @@ $(CPUOBJ)/m6502/m6509.o:	$(CPUSRC)/m6502/m6509.c \
 ifneq ($(filter M6800,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m6800
 CPUOBJS += $(CPUOBJ)/m6800/m6800.o
-DBGOBJS += $(CPUOBJ)/m6800/6800dasm.o
+DASMOBJS += $(CPUOBJ)/m6800/6800dasm.o
 endif
 
 $(CPUOBJ)/m6800/m6800.o:	$(CPUSRC)/m6800/m6800.c \
@@ -912,7 +912,7 @@ $(CPUOBJ)/m6800/m6800.o:	$(CPUSRC)/m6800/m6800.c \
 ifneq ($(filter M6805,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m6805
 CPUOBJS += $(CPUOBJ)/m6805/m6805.o
-DBGOBJS += $(CPUOBJ)/m6805/6805dasm.o
+DASMOBJS += $(CPUOBJ)/m6805/6805dasm.o
 endif
 
 $(CPUOBJ)/m6805/m6805.o:	$(CPUSRC)/m6805/m6805.c \
@@ -928,7 +928,7 @@ $(CPUOBJ)/m6805/m6805.o:	$(CPUSRC)/m6805/m6805.c \
 ifneq ($(filter M6809,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m6809
 CPUOBJS += $(CPUOBJ)/m6809/m6809.o
-DBGOBJS += $(CPUOBJ)/m6809/6809dasm.o
+DASMOBJS += $(CPUOBJ)/m6809/6809dasm.o
 endif
 
 $(CPUOBJ)/m6809/m6809.o:	$(CPUSRC)/m6809/m6809.c \
@@ -945,7 +945,7 @@ $(CPUOBJ)/m6809/m6809.o:	$(CPUSRC)/m6809/m6809.c \
 ifneq ($(filter MC68HC11,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mc68hc11
 CPUOBJS += $(CPUOBJ)/mc68hc11/mc68hc11.o
-DBGOBJS += $(CPUOBJ)/mc68hc11/hc11dasm.o
+DASMOBJS += $(CPUOBJ)/mc68hc11/hc11dasm.o
 endif
 
 $(CPUOBJ)/mc68hc11/mc68hc11.o:	$(CPUSRC)/mc68hc11/mc68hc11.c \
@@ -960,7 +960,7 @@ $(CPUOBJ)/mc68hc11/mc68hc11.o:	$(CPUSRC)/mc68hc11/mc68hc11.c \
 ifneq ($(filter M680X0,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kops.o
-DBGOBJS += $(CPUOBJ)/m68000/m68kdasm.o
+DASMOBJS += $(CPUOBJ)/m68000/m68kdasm.o
 M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
 endif
 
@@ -1002,7 +1002,7 @@ $(CPUOBJ)/m68000/m68kcpu.o: 	$(CPUOBJ)/m68000/m68kops.c \
 ifneq ($(filter DSP56156,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/dsp56k
 CPUOBJS += $(CPUOBJ)/dsp56k/dsp56k.o
-DBGOBJS += $(CPUOBJ)/dsp56k/dsp56dsm.o
+DASMOBJS += $(CPUOBJ)/dsp56k/dsp56dsm.o
 endif
 
 $(CPUOBJ)/dsp56k/dsp56k.o:	$(CPUSRC)/dsp56k/dsp56k.c \
@@ -1020,8 +1020,8 @@ ifneq ($(filter PDP1,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/pdp1
 CPUOBJS += $(CPUOBJ)/pdp1/pdp1.o
 CPUOBJS += $(CPUOBJ)/pdp1/tx0.o
-DBGOBJS += $(CPUOBJ)/pdp1/pdp1dasm.o
-DBGOBJS += $(CPUOBJ)/pdp1/tx0dasm.o
+DASMOBJS += $(CPUOBJ)/pdp1/pdp1dasm.o
+DASMOBJS += $(CPUOBJ)/pdp1/tx0dasm.o
 endif
 
 $(CPUOBJ)/pdp1/pdp1.o:	$(CPUSRC)/pdp1/pdp1.c \
@@ -1041,7 +1041,7 @@ $(CPUOBJ)/pdp1/tx0dasm.o:	$(CPUSRC)/pdp1/tx0.h \
 ifneq ($(filter POWERPC,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
 CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
-DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
+DASMOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 endif
 
 $(CPUOBJ)/powerpc/ppccom.o:	$(CPUSRC)/powerpc/ppc.h \
@@ -1066,13 +1066,13 @@ $(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 ifneq ($(filter NEC,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/nec/nec.o
-DBGOBJS += $(CPUOBJ)/nec/necdasm.o
+DASMOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
 ifneq ($(filter V30MZ,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/v30mz $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/v30mz/v30mz.o
-DBGOBJS += $(CPUOBJ)/nec/necdasm.o
+DASMOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
 $(CPUOBJ)/nec/nec.o:	$(CPUSRC)/nec/nec.c \
@@ -1100,7 +1100,7 @@ $(CPUOBJ)/v30mz/v30mz.o:	$(CPUSRC)/v30mz/v30mz.c \
 ifneq ($(filter V60,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/v60
 CPUOBJS += $(CPUOBJ)/v60/v60.o
-DBGOBJS += $(CPUOBJ)/v60/v60d.o
+DASMOBJS += $(CPUOBJ)/v60/v60d.o
 endif
 
 $(CPUOBJ)/v60/v60.o:	$(CPUSRC)/v60/am.c \
@@ -1128,7 +1128,7 @@ $(CPUOBJ)/v60/v60.o:	$(CPUSRC)/v60/am.c \
 ifneq ($(filter V810,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/v810
 CPUOBJS += $(CPUOBJ)/v810/v810.o
-DBGOBJS += $(CPUOBJ)/v810/v810dasm.o
+DASMOBJS += $(CPUOBJ)/v810/v810dasm.o
 endif
 
 $(CPUOBJ)/v810/v810.o:	$(CPUSRC)/v810/v810.c \
@@ -1143,7 +1143,7 @@ $(CPUOBJ)/v810/v810.o:	$(CPUSRC)/v810/v810.c \
 ifneq ($(filter UPD7810,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/upd7810
 CPUOBJS += $(CPUOBJ)/upd7810/upd7810.o
-DBGOBJS += $(CPUOBJ)/upd7810/7810dasm.o
+DASMOBJS += $(CPUOBJ)/upd7810/7810dasm.o
 endif
 
 $(CPUOBJ)/upd7810/upd7810.o:	$(CPUSRC)/upd7810/upd7810.c \
@@ -1160,7 +1160,7 @@ $(CPUOBJ)/upd7810/upd7810.o:	$(CPUSRC)/upd7810/upd7810.c \
 ifneq ($(filter MINX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/minx
 CPUOBJS += $(CPUOBJ)/minx/minx.o
-DBGOBJS += $(CPUOBJ)/minx/minxd.o
+DASMOBJS += $(CPUOBJ)/minx/minxd.o
 endif
 
 $(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
@@ -1180,7 +1180,7 @@ $(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
 ifneq ($(filter RSP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/rsp
 CPUOBJS += $(CPUOBJ)/rsp/rsp.o
-DBGOBJS += $(CPUOBJ)/rsp/rsp_dasm.o
+DASMOBJS += $(CPUOBJ)/rsp/rsp_dasm.o
 endif
 
 $(CPUOBJ)/rsp/rsp.o:	$(CPUSRC)/rsp/rsp.c \
@@ -1195,7 +1195,7 @@ $(CPUOBJ)/rsp/rsp.o:	$(CPUSRC)/rsp/rsp.c \
 ifneq ($(filter SATURN,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/saturn
 CPUOBJS += $(CPUOBJ)/saturn/saturn.o
-DBGOBJS += $(CPUOBJ)/saturn/saturnds.o
+DASMOBJS += $(CPUOBJ)/saturn/saturnds.o
 endif
 
 $(CPUOBJ)/saturn/saturn.o:	$(CPUSRC)/saturn/saturn.c \
@@ -1212,7 +1212,7 @@ $(CPUOBJ)/saturn/saturn.o:	$(CPUSRC)/saturn/saturn.c \
 ifneq ($(filter S2650,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/s2650
 CPUOBJS += $(CPUOBJ)/s2650/s2650.o
-DBGOBJS += $(CPUOBJ)/s2650/2650dasm.o
+DASMOBJS += $(CPUOBJ)/s2650/2650dasm.o
 endif
 
 $(CPUOBJ)/s2650/s2650.o:	$(CPUSRC)/s2650/s2650.c \
@@ -1228,7 +1228,7 @@ $(CPUOBJ)/s2650/s2650.o:	$(CPUSRC)/s2650/s2650.c \
 ifneq ($(filter SC61860,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sc61860
 CPUOBJS += $(CPUOBJ)/sc61860/sc61860.o
-DBGOBJS += $(CPUOBJ)/sc61860/scdasm.o
+DASMOBJS += $(CPUOBJ)/sc61860/scdasm.o
 endif
 
 $(CPUOBJ)/sc61860/sc61860.o:	$(CPUSRC)/sc61860/sc61860.h \
@@ -1245,7 +1245,7 @@ $(CPUOBJ)/sc61860/sc61860.o:	$(CPUSRC)/sc61860/sc61860.h \
 ifneq ($(filter SM8500,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sm8500
 CPUOBJS += $(CPUOBJ)/sm8500/sm8500.o
-DBGOBJS += $(CPUOBJ)/sm8500/sm8500d.o
+DASMOBJS += $(CPUOBJ)/sm8500/sm8500d.o
 endif
 
 $(CPUOBJ)/sm8500/sm8500.o:	$(CPUSRC)/sm8500/sm8500.c \
@@ -1262,7 +1262,7 @@ ifneq ($(filter SPC700,$(CPUS)),)
 SPCD = cpu/spc700
 OBJDIRS += $(CPUOBJ)/spc700
 CPUOBJS += $(CPUOBJ)/spc700/spc700.o
-DBGOBJS += $(CPUOBJ)/spc700/spc700ds.o
+DASMOBJS += $(CPUOBJ)/spc700/spc700ds.o
 endif
 
 $(CPUOBJ)/spc700/spc700.o:	$(CPUSRC)/spc700/spc700.c \
@@ -1277,7 +1277,7 @@ $(CPUOBJ)/spc700/spc700.o:	$(CPUSRC)/spc700/spc700.c \
 ifneq ($(filter SSP1601,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/ssp1601
 CPUOBJS += $(CPUOBJ)/ssp1601/ssp1601.o
-DBGOBJS += $(CPUOBJ)/ssp1601/ssp1601d.o
+DASMOBJS += $(CPUOBJ)/ssp1601/ssp1601d.o
 endif
 
 $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
@@ -1292,7 +1292,7 @@ $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
 ifneq ($(filter TMS0980,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms0980
 CPUOBJS += $(CPUOBJ)/tms0980/tms0980.o
-DBGOBJS += $(CPUOBJ)/tms0980/tms0980d.o
+DASMOBJS += $(CPUOBJ)/tms0980/tms0980d.o
 endif
 
 $(CPUOBJ)/tms0980/tms0980.o:	$(CPUSRC)/tms0980/tms0980.h \
@@ -1310,7 +1310,7 @@ $(CPUOBJ)/tms0980/tms0980d.o:	$(CPUSRC)/tms0980/tms0980.h \
 ifneq ($(filter TMS7000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms7000
 CPUOBJS += $(CPUOBJ)/tms7000/tms7000.o
-DBGOBJS += $(CPUOBJ)/tms7000/7000dasm.o
+DASMOBJS += $(CPUOBJ)/tms7000/7000dasm.o
 endif
 
 $(CPUOBJ)/tms7000/tms7000.o:	$(CPUSRC)/tms7000/tms7000.h \
@@ -1331,7 +1331,7 @@ CPUOBJS += $(CPUOBJ)/tms9900/tms9900.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9980a.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9995.o
 CPUOBJS += $(CPUOBJ)/tms9900/ti990_10.o
-DBGOBJS += $(CPUOBJ)/tms9900/9900dasm.o
+DASMOBJS += $(CPUOBJ)/tms9900/9900dasm.o
 endif
 
 $(CPUOBJ)/tms9900/tms9900.o:	$(CPUSRC)/tms9900/tms9900.c \
@@ -1363,7 +1363,7 @@ $(CPUOBJ)/tms9900/ti990_10.o:	$(CPUSRC)/tms9900/ti990_10.c \
 ifneq ($(filter TMS340X0,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms34010
 CPUOBJS += $(CPUOBJ)/tms34010/tms34010.o
-DBGOBJS += $(CPUOBJ)/tms34010/34010dsm.o
+DASMOBJS += $(CPUOBJ)/tms34010/34010dsm.o
 endif
 
 $(CPUOBJ)/tms34010/tms34010.o:	$(CPUSRC)/tms34010/tms34010.c \
@@ -1382,7 +1382,7 @@ $(CPUOBJ)/tms34010/tms34010.o:	$(CPUSRC)/tms34010/tms34010.c \
 ifneq ($(filter TMS32010,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32010
 CPUOBJS += $(CPUOBJ)/tms32010/tms32010.o
-DBGOBJS += $(CPUOBJ)/tms32010/32010dsm.o
+DASMOBJS += $(CPUOBJ)/tms32010/32010dsm.o
 endif
 
 $(CPUOBJ)/tms32010/tms32010.o:	$(CPUSRC)/tms32010/tms32010.c \
@@ -1397,7 +1397,7 @@ $(CPUOBJ)/tms32010/tms32010.o:	$(CPUSRC)/tms32010/tms32010.c \
 ifneq ($(filter TMS32025,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32025
 CPUOBJS += $(CPUOBJ)/tms32025/tms32025.o
-DBGOBJS += $(CPUOBJ)/tms32025/32025dsm.o
+DASMOBJS += $(CPUOBJ)/tms32025/32025dsm.o
 endif
 
 $(CPUOBJ)/tms32025/tms32025.o:	$(CPUSRC)/tms32025/tms32025.c \
@@ -1412,7 +1412,7 @@ $(CPUOBJ)/tms32025/tms32025.o:	$(CPUSRC)/tms32025/tms32025.c \
 ifneq ($(filter TMS32031,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32031
 CPUOBJS += $(CPUOBJ)/tms32031/tms32031.o
-DBGOBJS += $(CPUOBJ)/tms32031/dis32031.o
+DASMOBJS += $(CPUOBJ)/tms32031/dis32031.o
 endif
 
 $(CPUOBJ)/tms32031/tms32031.o:	$(CPUSRC)/tms32031/tms32031.c \
@@ -1428,7 +1428,7 @@ $(CPUOBJ)/tms32031/tms32031.o:	$(CPUSRC)/tms32031/tms32031.c \
 ifneq ($(filter TMS32051,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32051
 CPUOBJS += $(CPUOBJ)/tms32051/tms32051.o
-DBGOBJS += $(CPUOBJ)/tms32051/dis32051.o
+DASMOBJS += $(CPUOBJ)/tms32051/dis32051.o
 endif
 
 $(CPUOBJ)/tms32051/tms32051.o:	$(CPUSRC)/tms32051/tms32051.c \
@@ -1443,6 +1443,7 @@ $(CPUOBJ)/tms32051/tms32051.o:	$(CPUSRC)/tms32051/tms32051.c \
 ifneq ($(filter TMS57002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms57002
 CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o
+DASMOBJS += $(CPUOBJ)/tms57002/57002dsm.o
 TMSMAKE += $(BUILDOUT)/tmsmake$(BUILD_EXE)
 endif
 
@@ -1474,7 +1475,7 @@ endif
 ifneq ($(filter TLCS90,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tlcs90
 CPUOBJS += $(CPUOBJ)/tlcs90/tlcs90.o
-#DBGOBJS += $(CPUOBJ)/tlcs90/tlcs90.o
+#DASMOBJS += $(CPUOBJ)/tlcs90/tlcs90.o
 endif
 
 $(CPUOBJ)/tlcs90/tlcs90.o:	$(CPUSRC)/tlcs90/tlcs90.c \
@@ -1489,7 +1490,7 @@ $(CPUOBJ)/tlcs90/tlcs90.o:	$(CPUSRC)/tlcs90/tlcs90.c \
 ifneq ($(filter TLCS900,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tlcs900
 CPUOBJS += $(CPUOBJ)/tlcs900/tlcs900.o
-DBGOBJS += $(CPUOBJ)/tlcs900/dasm900.o
+DASMOBJS += $(CPUOBJ)/tlcs900/dasm900.o
 endif
 
 $(CPUOBJ)/tlcs900/tlcs900.o:	$(CPUSRC)/tlcs900/tlcs900.c \
@@ -1507,7 +1508,7 @@ $(CPUOBJ)/tlcs900/dasm900.o:	$(CPUSRC)/tlcs900/dasm900.c
 ifneq ($(filter Z80,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/z80
 CPUOBJS += $(CPUOBJ)/z80/z80.o $(CPUOBJ)/z80/z80daisy.o
-DBGOBJS += $(CPUOBJ)/z80/z80dasm.o
+DASMOBJS += $(CPUOBJ)/z80/z80dasm.o
 endif
 
 $(CPUOBJ)/z80/z80.o:	$(CPUSRC)/z80/z80.c \
@@ -1522,7 +1523,7 @@ $(CPUOBJ)/z80/z80.o:	$(CPUSRC)/z80/z80.c \
 ifneq ($(filter LR35902,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/lr35902
 CPUOBJS += $(CPUOBJ)/lr35902/lr35902.o
-DBGOBJS += $(CPUOBJ)/lr35902/lr35902d.o
+DASMOBJS += $(CPUOBJ)/lr35902/lr35902d.o
 endif
 
 $(CPUOBJ)/lr35902/lr35902.o:	$(CPUSRC)/lr35902/lr35902.c \
@@ -1539,7 +1540,7 @@ $(CPUOBJ)/lr35902/lr35902.o:	$(CPUSRC)/lr35902/lr35902.c \
 ifneq ($(filter Z180,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/z180 $(CPUOBJ)/z80
 CPUOBJS += $(CPUOBJ)/z180/z180.o $(CPUOBJ)/z80/z80daisy.o
-DBGOBJS += $(CPUOBJ)/z180/z180dasm.o
+DASMOBJS += $(CPUOBJ)/z180/z180dasm.o
 endif
 
 $(CPUOBJ)/z180/z180.o:	$(CPUSRC)/z180/z180.c \
@@ -1562,7 +1563,7 @@ $(CPUOBJ)/z180/z180.o:	$(CPUSRC)/z180/z180.c \
 ifneq ($(filter Z8000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/z8000
 CPUOBJS += $(CPUOBJ)/z8000/z8000.o
-DBGOBJS += $(CPUOBJ)/z8000/8000dasm.o
+DASMOBJS += $(CPUOBJ)/z8000/8000dasm.o
 endif
 
 $(CPUOBJ)/z8000/z8000.o:	$(CPUSRC)/z8000/z8000.c \

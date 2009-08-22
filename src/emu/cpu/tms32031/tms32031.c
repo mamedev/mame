@@ -10,6 +10,7 @@
 #include "tms32031.h"
 #include "eminline.h"
 
+CPU_DISASSEMBLE( tms32031 );
 
 #define LOG_OPCODE_USAGE	(0)
 
@@ -531,19 +532,6 @@ static CPU_EXECUTE( tms32031 )
 	}
 
 	return cycles - tms->icount;
-}
-
-
-
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
-
-static CPU_DISASSEMBLE( tms32031 )
-{
-	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	extern unsigned dasm_tms32031(char *, unsigned, UINT32);
-    return dasm_tms32031(buffer, pc, op);
 }
 
 

@@ -689,3 +689,13 @@ unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 
 	return 4 | flags | DASMFLAG_SUPPORTED;
 }
+
+
+/***************************************************************************
+    DISASSEMBLY HOOK
+***************************************************************************/
+
+CPU_DISASSEMBLE( dsp32c )
+{
+	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
+}

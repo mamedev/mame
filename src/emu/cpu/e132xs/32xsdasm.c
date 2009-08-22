@@ -2133,3 +2133,8 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned
 
 	return size | flags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( hyperstone_generic )
+{
+	return dasm_hyperstone( buffer, pc, oprom, 0, 0 );
+}

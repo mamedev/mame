@@ -2,6 +2,27 @@
 #include "debugger.h"
 #include "v60.h"
 
+// Register names
+const char *const v60_reg_names[69] = {
+	"R0", "R1", "R2", "R3",
+	"R4", "R5", "R6", "R7",
+	"R8", "R9", "R10", "R11",
+	"R12", "R13", "R14", "R15",
+	"R16", "R17", "R18", "R19",
+	"R20", "R21", "R22", "R23",
+	"R24", "R25", "R26", "R27",
+	"R28", "AP", "FP", "SP",
+	"PC", "PSW","Unk","Unk",
+	"ISP", "L0SP", "L1SP", "L2SP",
+	"L3SP", "SBR","TR","SYCW",
+	"TKCW", "PIR", "Reserved","Reserved",
+	"Reserved","Reserved","Reserved","PSW2",
+	"ATBR0", "ATLR0", "ATBR1", "ATLR1",
+	"ATBR2", "ATLR2", "ATBR3", "ATLR3",
+	"TRMODE", "ADTR0", "ADTR1","ADTMR0",
+	"ADTMR1","Reserved","Reserved","Reserved"
+};
+
 static const UINT8 *rombase;
 static offs_t pcbase;
 

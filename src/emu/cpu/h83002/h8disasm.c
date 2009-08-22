@@ -1274,4 +1274,20 @@ static UINT32 h8disasm_7(UINT32 address, UINT32 opcode, char *buffer, const UINT
 	return size;
 }
 
+CPU_DISASSEMBLE(h8)
+{
+	return h8_disasm(buffer, pc, oprom, opram, 0xffff);
+}
+
+// disassembly hook for varients with 24-bit address bus (e.g. H8/3044)
+CPU_DISASSEMBLE(h8_24)
+{
+	return h8_disasm(buffer, pc, oprom, opram, 0xffffff);
+}
+
+// disassembly hook for full 32-bit address bus
+CPU_DISASSEMBLE(h8_32)
+{
+	return h8_disasm(buffer, pc, oprom, opram, 0xffffffff);
+}
 

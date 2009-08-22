@@ -30,6 +30,7 @@
 #include "debugger.h"
 #include "dsp32.h"
 
+CPU_DISASSEMBLE( dsp32c );
 
 
 /***************************************************************************
@@ -397,18 +398,6 @@ static CPU_EXECUTE( dsp32c )
 	cpustate->abufcycle[3] -= cpustate->icount;
 
 	return cycles - cpustate->icount;
-}
-
-
-
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
-
-static CPU_DISASSEMBLE( dsp32c )
-{
-	extern unsigned dasm_dsp32(char *, unsigned, UINT32);
-	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
 }
 
 

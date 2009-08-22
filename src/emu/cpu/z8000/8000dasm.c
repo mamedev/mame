@@ -86,6 +86,10 @@ CPU_DISASSEMBLE( z8000 )
 	Z8000_exec *o;
 	UINT32 flags = 0;
 
+	/* already initialized? */
+	if(z8000_exec == NULL)
+		z8000_init_tables();
+
     GET_OP(oprom, 0, new_pc - pc);
 	new_pc += 2;
 	switch (pc)

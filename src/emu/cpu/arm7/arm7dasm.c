@@ -1305,3 +1305,13 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 
 	return dasmflags | DASMFLAG_SUPPORTED;
 }
+
+CPU_DISASSEMBLE( arm7arm )
+{
+	return arm7_disasm(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24)) | 4;
+}
+
+CPU_DISASSEMBLE( arm7thumb )
+{
+	return thumb_disasm(buffer, pc, oprom[0] | (oprom[1] << 8)) | 2;
+}
