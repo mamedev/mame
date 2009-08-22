@@ -99,11 +99,11 @@ PALETTE_INIT( suprmous )
 
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 r = ((color_prom[i + 0x20] >> 6) | (color_prom[i + 0x00] << 2)) & 0x1f;
-		UINT8 g = BITSWAP8(color_prom[i + 0x20], 7, 6, 0, 1, 2, 3, 4, 5) & 0x1f;
-		UINT8 b = BITSWAP8(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7) & 0x1f;
+		UINT8 b = BITSWAP8(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7);
+		UINT8 g = BITSWAP8(color_prom[i + 0x20], 0, 1, 2, 3, 4, 5, 6, 7);
+		UINT8 r = (b>>5&7)<<2 | (g>>6&3);
 
-		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal4bit(b));
 	}
 
 	/* allocate primary colors for the background and foreground
