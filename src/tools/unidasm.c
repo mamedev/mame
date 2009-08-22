@@ -10,6 +10,52 @@
 ***************************************************************************/
 
 #include "cpuintrf.h"
+#include <ctype.h>
+
+
+enum _display_type
+{
+	_8bit,
+	_8bitx,
+	_16be,
+	_16le,
+	_24be,
+	_24le,
+	_32be,
+	_32le,
+	_40be,
+	_40le,
+	_48be,
+	_48le,
+	_56be,
+	_56le,
+	_64be,
+	_64le
+};
+typedef enum _display_type display_type;
+
+
+typedef struct _dasm_table_entry dasm_table_entry;
+struct _dasm_table_entry
+{
+	const char *			name;
+	display_type			display;
+	INT8					pcshift;
+	cpu_disassemble_func	func;
+};
+
+
+typedef struct _options options;
+struct _options
+{
+	const char *			filename;
+	offs_t					basepc;
+	UINT8					norawbytes;
+	UINT8					lower;
+	UINT8					upper;
+	const dasm_table_entry *dasm;
+};
+
 
 CPU_DISASSEMBLE( adsp21xx );
 CPU_DISASSEMBLE( alpha8201 );
@@ -127,31 +173,6 @@ CPU_DISASSEMBLE( v810 );
 CPU_DISASSEMBLE( z180 );
 CPU_DISASSEMBLE( z8000 );
 CPU_DISASSEMBLE( z80 );
-
-
-enum _display_type
-{
-	_8bit,
-	_16be,
-	_16le,
-	_24be,
-	_24le,
-	_32be,
-	_32le,
-	_64be,
-	_64le
-};
-typedef enum _display_type display_type;
-
-
-typedef struct _dasm_table_entry dasm_table_entry;
-struct _dasm_table_entry
-{
-	const char *			name;
-	display_type			display;
-	INT8					pcshift;
-	cpu_disassemble_func	func;
-};
 
 
 static const dasm_table_entry dasm_table[] =
@@ -302,18 +323,197 @@ void CLIB_DECL mame_printf_debug(const char *format, ...)
 }
 
 
+int parse_options(int argc, char *argv[], options *opts)
+{
+	int pending_base = FALSE;
+	int pending_arch = FALSE;
+	int arg;
+
+	memset(opts, 0, sizeof(*opts));
+	
+	// loop through arguments
+	for (arg = 1; arg < argc; arg++)
+	{
+		char *curarg = argv[arg];
+		
+		// is it a switch?
+		if (curarg[0] == '-')
+		{
+			if (pending_base || pending_arch)
+				goto usage;
+			
+			if (tolower(curarg[1]) == 'a')
+				pending_arch = TRUE;
+			else if (tolower(curarg[1]) == 'b')
+				pending_base = TRUE;
+			else if (tolower(curarg[1]) == 'l')
+				opts->lower = TRUE;
+			else if (tolower(curarg[1]) == 'n')
+				opts->norawbytes = TRUE;
+			else if (tolower(curarg[1]) == 'u')
+				opts->upper = TRUE;
+			else
+				goto usage;
+		}
+		
+		// base PC
+		else if (pending_base)
+		{
+			if (curarg[0] == '0' && curarg[1] == 'x')
+				sscanf(&curarg[2], "%x", &opts->basepc);
+			else if (curarg[0] == '$')
+				sscanf(&curarg[1], "%x", &opts->basepc);
+			else
+				sscanf(&curarg[0], "%x", &opts->basepc);
+			pending_base = FALSE;
+		}
+		
+		// architecture
+		else if (pending_arch)
+		{
+			int curarch;
+			for (curarch = 0; curarch < ARRAY_LENGTH(dasm_table); curarch++)
+				if (core_stricmp(curarg, dasm_table[curarch].name) == 0)
+					break;
+			if (curarch == ARRAY_LENGTH(dasm_table))
+				goto usage;
+			opts->dasm = &dasm_table[curarch];
+			pending_arch = FALSE;
+		}
+		
+		// filename
+		else if (opts->filename == NULL)
+			opts->filename = curarg;
+		
+		// fail
+		else
+			goto usage;
+	}
+	
+	// if no file or no architecture, fail
+	if (opts->filename == NULL || opts->dasm == NULL)
+		goto usage;
+	return 0;
+	
+usage:
+	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
+	return 1;
+};
+
+
 int main(int argc, char *argv[])
 {
-	char buffer[1024];
-	UINT8 oprom[10] = { 0x12, 0x34, 0x56, 0x78 };
-	offs_t basepc = 0;
-	int index;
-
-//const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram
-	for (index = 0; index < ARRAY_LENGTH(dasm_table); index++)
+	file_error filerr;
+	int displayendian;
+	int displaychunk;
+	UINT32 curbyte;
+	UINT32 length;
+	int maxchunks;
+	UINT32 curpc;
+	options opts;
+	int numbytes;
+	void *data;
+	char *p;
+	
+	// parse options first
+	if (parse_options(argc, argv, &opts))
+		return 1;
+	
+	// load the file
+	filerr = core_fload(opts.filename, &data, &length);
+	if (filerr != FILERR_NONE)
 	{
-		int result = (*dasm_table[index].func)(NULL, buffer, basepc, oprom, oprom);
-		printf("%10s: (%d) %s\n", dasm_table[index].name, result & DASMFLAG_LENGTHMASK, buffer);
+		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
+		return 1;
 	}
+	
+	// precompute parameters
+	displaychunk = (opts.dasm->display / 2) + 1;
+	displayendian = opts.dasm->display % 2;
+	switch (displaychunk)
+	{
+		case 1:		maxchunks = 6;	break;
+		case 2:		maxchunks = 3;	break;
+		default:	maxchunks = 1;	break;
+	}
+	
+	// run it
+	curpc = opts.basepc;
+	for (curbyte = 0; curbyte < length; curbyte += numbytes)
+	{
+		UINT8 *oprom = (UINT8 *)data + curbyte;
+		char buffer[1024];
+		UINT32 pcdelta;
+		int numchunks;
+
+		// disassemble
+		pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom) & DASMFLAG_LENGTHMASK;
+		if (opts.dasm->pcshift < 0)
+			numbytes = pcdelta << -opts.dasm->pcshift;
+		else
+			numbytes = pcdelta >> opts.dasm->pcshift;
+		
+		// round to the nearest display chunk
+		numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
+		if (numbytes == 0)
+			numbytes = displaychunk;
+		numchunks = numbytes / displaychunk;
+
+		// output the address
+		printf("%08X: ", curpc);
+		
+		// output the raw bytes
+		if (!opts.norawbytes)
+		{
+			int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
+			int chunknum, bytenum;
+			for (chunknum = 0; chunknum < firstchunks; chunknum++)
+			{
+				for (bytenum = 0; bytenum < displaychunk; bytenum++)
+					printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+				printf(" ");
+				oprom += displaychunk;
+			}
+			for ( ; chunknum < maxchunks; chunknum++)
+				printf("%*s ", displaychunk * 2, "");
+			printf(" ");
+		}
+		
+		// output the disassembly
+		if (opts.lower)
+		{
+			for (p = buffer; *p != 0; p++)
+				*p = tolower(*p);
+		} else if (opts.upper)
+		{
+			for (p = buffer; *p != 0; p++)
+				*p = toupper(*p);
+		}
+		printf("%s\n", buffer);
+		
+		// output additional raw bytes
+		if (!opts.norawbytes && numchunks > maxchunks)
+		{
+			for (numchunks -= maxchunks; numchunks > 0; numchunks -= maxchunks)
+			{
+				int firstchunks = (numchunks < maxchunks) ? numchunks : maxchunks;
+				int chunknum, bytenum;
+				printf("          ");
+				for (chunknum = 0; chunknum < firstchunks; chunknum++)
+				{
+					for (bytenum = 0; bytenum < displaychunk; bytenum++)
+						printf("%02X", oprom[displayendian ? (displaychunk - 1 - bytenum) : bytenum]);
+					printf(" ");
+					oprom += displaychunk;
+				}
+				printf("\n");
+			}
+		}
+
+		// advance
+		curpc += pcdelta;
+		curbyte += numbytes;
+	}
+
 	return 0;
 }
