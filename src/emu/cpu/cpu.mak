@@ -48,7 +48,7 @@ ifdef PTR64
 
 DRCOBJ += \
 	$(CPUOBJ)/drcbex64.o \
-	$(CPUOBJ)/x86log.o
+	$(CPUOBJ)/x86log.o $(CPUOBJ)/i386/i386dasm.o
 
 DRCDEPS += \
 	$(CPUSRC)/x86emit.h
@@ -59,7 +59,7 @@ else
 
 DRCOBJ += \
 	$(CPUOBJ)/drcbex86.o \
-	$(CPUOBJ)/x86log.o
+	$(CPUOBJ)/x86log.o $(CPUOBJ)/i386/i386dasm.o
 
 DRCDEPS += \
 	$(CPUSRC)/x86emit.h
