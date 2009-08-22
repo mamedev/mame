@@ -996,7 +996,6 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/multigam.o \
 	$(DRIVERS)/n8080.o $(AUDIO)/n8080.o $(VIDEO)/n8080.o \
 	$(DRIVERS)/nss.o $(MACHINE)/snes.o $(AUDIO)/snes.o $(VIDEO)/snes.o \
-	$(MACHINE)/snescx4.o $(MACHINE)/cx4ops.o $(MACHINE)/cx4oam.o $(MACHINE)/cx4fn.o $(MACHINE)/cx4data.o \
 	$(DRIVERS)/playch10.o $(MACHINE)/playch10.o $(VIDEO)/playch10.o \
 	$(DRIVERS)/popeye.o $(VIDEO)/popeye.o \
 	$(DRIVERS)/punchout.o $(VIDEO)/punchout.o \
@@ -1842,3 +1841,11 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
+$(MACHINE)/snes.o: 		$(MAMESRC)/machine/snesdsp1.c \
+						$(MAMESRC)/machine/snesdsp2.c \
+						$(MAMESRC)/machine/snesobc1.c \
+						$(MAMESRC)/machine/snescx4.c \
+						$(MAMESRC)/machine/cx4ops.c \
+						$(MAMESRC)/machine/cx4oam.c \
+						$(MAMESRC)/machine/cx4fn.c \
+						$(MAMESRC)/machine/cx4data.c
