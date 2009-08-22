@@ -8,10 +8,13 @@
 
     Games running on this hardware:
 
-    * Noraut Poker,      1988,  Noraut Ltd.
-    * Noraut Joker Poker 1988,  Noraut Ltd.
-    * GTI Poker          1983,  GTI Inc.
-    * Poker,             198?,  Unknown.
+    * Noraut Poker,                 1988,  Noraut Ltd.
+    * Noraut Joker Poker,           1988,  Noraut Ltd.
+    * Noraut Red Hot Joker Poker,   1988,  Noraut Ltd.
+    * Noraut Poker (NTX10A),        1988,  Noraut Ltd.
+    * Noraut Joker Poker (V3.010a), 1988,  Noraut Ltd.
+    * GTI Poker,                    1983,  GTI Inc.
+    * Noraut Poker (bootleg),       198?,  Unknown.
 
 
 *******************************************************************************
@@ -141,6 +144,20 @@
       to Noraut Poker (bootleg), since the game has payout system.
     - Some clean-ups.
 
+    [2009-08-21]
+
+    - Switched to pre-defined Xtal clock.
+    - Changed the way how graphics are banked/accessed.
+    - Fixed the graphics offset and number of tiles per bank.
+    - Added new set: Noraut Red Hot Joker Poker.
+    - Added new set: Noraut Poker (NTX10A).
+    - Added new set: Noraut Joker Poker (V3.010a).
+    - Fixed the tile size/decode for the first GFX bank.
+    - Added proper norautrh inputs, including the readout button.
+    - Added partial DIP switches to norautrh.
+    - Added more technical notes.
+
+
     Notes:
     - norautjp: at the first start-up, the game will give you a very clever
       "FU" screen. Press the following buttons *together* on different times
@@ -157,6 +174,7 @@
     - Analize the extra 8255 at 0xc0-0xc3 (full bidirectional port w/hshk)
     - Video RAM (through 3rd PPI?).
     - Find if wide chars are hardcoded or tied to a bit.
+    - Fix the little displacement between GFX banks. 
     - Proper colors (missing PROM?)
     - Lamps layout.
     - Discrete sound.
@@ -260,14 +278,14 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
     x--- ----  Start (poker)
 */
 
-	output_set_lamp_value(0, (data >> 0) & 1);		/* Change */
-	output_set_lamp_value(1, (data >> 1) & 1);		/* Hi/Lo  */
-	output_set_lamp_value(2, (data >> 2) & 1);		/* Hold 1 */
-	output_set_lamp_value(3, (data >> 3) & 1);		/* Hold 2 */
-	output_set_lamp_value(4, (data >> 4) & 1);		/* Hold 3 */
-	output_set_lamp_value(5, (data >> 5) & 1);		/* Hold 4 */
-	output_set_lamp_value(6, (data >> 6) & 1);		/* Hold 5 */
-	output_set_lamp_value(7, (data >> 7) & 1);		/* Start  */
+	output_set_lamp_value(0, (data >> 0) & 1);	/* Change */
+	output_set_lamp_value(1, (data >> 1) & 1);	/* Hi/Lo  */
+	output_set_lamp_value(2, (data >> 2) & 1);	/* Hold 1 */
+	output_set_lamp_value(3, (data >> 3) & 1);	/* Hold 2 */
+	output_set_lamp_value(4, (data >> 4) & 1);	/* Hold 3 */
+	output_set_lamp_value(5, (data >> 5) & 1);	/* Hold 4 */
+	output_set_lamp_value(6, (data >> 6) & 1);	/* Hold 5 */
+	output_set_lamp_value(7, (data >> 7) & 1);	/* Start  */
 }
 
 static WRITE8_DEVICE_HANDLER( ccounter_w )
@@ -279,17 +297,23 @@ static WRITE8_DEVICE_HANDLER( ccounter_w )
 
 static WRITE8_DEVICE_HANDLER( sndlamp_w )
 {
-	output_set_lamp_value(8, (data >> 0) & 1);		/* Start? */
-	output_set_lamp_value(9, (data >> 1) & 1);		/* Bet */
+	output_set_lamp_value(8, (data >> 0) & 1);	/* Start? */
+	output_set_lamp_value(9, (data >> 1) & 1);	/* Bet */
 
-	/* the 4 MSB are for discrete (or DAC) sound */
-	dac_data_w(devtag_get_device(device->machine, "dac"), (data & 0xf0));		/* Sound DAC? */
+	/* the 4 MSB are for discrete sound */
+	dac_data_w(devtag_get_device(device->machine, "dac"), (data & 0xf0));	/* Discrete Sound */
 }
 
 /*game waits for bit 7 (0x80) to be set.*/
 static READ8_HANDLER( test_r )
 {
 	return 0xff;
+}
+
+/*game waits for bit 4 (0x10) to be reset.*/
+static READ8_HANDLER( test2_r )
+{
+	return 0x00;
 }
 
 static WRITE8_HANDLER( vram_data_w )
@@ -345,7 +369,7 @@ static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xdd, 0xdd) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xde, 0xde) AM_READ(test_r)
 //  AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xef, 0xef) AM_READ(test_r)
+	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
 ADDRESS_MAP_END
 
 
@@ -356,16 +380,16 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( norautp )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Take")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Lo")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Change Card")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_CODE(KEYCODE_F) PORT_NAME("Change Card")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save (Half Gamble)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
@@ -404,12 +428,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( poker )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Change Card")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Lo")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("IN1")
@@ -449,26 +473,84 @@ static INPUT_PORTS_START( poker )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( norautrh )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_CODE(KEYCODE_F) PORT_NAME("Change Card")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save (Half Gamble)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* Coin C for other games */
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "25" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Type of Game" )
+	PORT_DIPSETTING(    0x10, "Jacks Plus" )
+	PORT_DIPSETTING(    0x00, "Joker Poker" )
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A=1; B=5" )
+	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
+	PORT_DIPSETTING(    0x20, "A=10; B=5" )
+	PORT_DIPSETTING(    0x80, "A=50; B=25" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Bet")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*************************
 *    Graphics Layouts    *
 *************************/
 
 static const gfx_layout charlayout =
+/*
+  Not sure if this is the correct way to decode.
+  Each tile should be 16x32 conformed by:
+  - 8 empty lines.
+  - 16x16 char.
+  - 8 empty lines.
+
+  Each tile is a regular 16x16 char centered into 16x32 tile.
+  Only alphanumeric chars are used.
+*/
 {
-	16,32,
-	RGN_FRAC(1,1),
+	16, 32,
+	RGN_FRAC(1,2),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 0*16, 1*16, 1*16, 2*16, 2*16, 3*16, 3*16, 4*16, 4*16, 5*16, 5*16, 6*16, 6*16, 7*16, 7*16,
-	  8*16, 8*16, 9*16, 9*16, 10*16,10*16,11*16,11*16,12*16,12*16,13*16,13*16,14*16,14*16,15*16,15*16 },
+	{ 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, },
 	16*16
 };
 
 static const gfx_layout charlayout32x32 =
 {
 	32,32,
-	RGN_FRAC(1,1),
+	RGN_FRAC(1,2),
 	1,
 	{ 0 },
 	{ 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,10, 11,11, 12,12, 13,13, 14,14, 15,15 },
@@ -482,9 +564,10 @@ static const gfx_layout charlayout32x32 =
 * Graphics Decode Information *
 ******************************/
 
+/* GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes? */
 static GFXDECODE_START( norautp )
-	GFXDECODE_ENTRY( "gfx", 0, charlayout,      0, 4 )
-	GFXDECODE_ENTRY( "gfx", 0, charlayout32x32, 0, 4 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 4 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 4 )
 GFXDECODE_END
 
 
@@ -511,12 +594,12 @@ static const ppi8255_interface ppi8255_intf[3] =
 		DEVCB_HANDLER(sndlamp_w)    /* Port C write */
 	},
 	{	/* (c0-c3) Group A Mode 2 (5-handshacked bidirectional port) */
-		DEVCB_NULL,				    /* Port A read */
-		DEVCB_NULL,				    /* Port B read */
-		DEVCB_NULL,				    /* Port C read */
-		DEVCB_NULL,				    /* Port A write */
-		DEVCB_NULL,				    /* Port B write */
-		DEVCB_NULL				    /* Port C write */
+		DEVCB_NULL,					/* Port A read */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read  (should has test_r tied) */
+		DEVCB_NULL,					/* Port A write (should has vram_data_w tied) */
+		DEVCB_NULL,					/* Port B write (should has vram_addr_w tied) */
+		DEVCB_NULL					/* Port C write */
 	}
 };
 
@@ -616,24 +699,162 @@ ROM_START( norautpn )
 	ROM_LOAD( "char.bin",   0x0000, 0x1000, CRC(955eac6f) SHA1(470d8bad1a5d2a0a08dd129e6393c3c3a4ef2159) )
 ROM_END
 
+/*
+Noraut Joker Poker
+
+Program:27C64 
+Marked:
+"MX10A JOKER G.L
+ N.C.R  C.C  M.S"
+
+Char:2732
+Marked:
+"N1-057-5"
+
+CPU: TMPZ84C00AP-8
+*/
 
 ROM_START( norautjp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2764-1prog.bin",   0x0000, 0x2000, CRC(5f776ce1) SHA1(673b8c67ebd5c1334187a9407b86a43150cbe67b) )
 
-	ROM_REGION( 0x800,  "gfx", 0 )
-	ROM_LOAD( "2732-1char.bin",   0x0000, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) 	/* first half 0xff filled */
-	ROM_CONTINUE(                 0x0000, 0x0800 )
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) 	/* first half 0xff filled */
+	ROM_CONTINUE(                 0x0800, 0x0800 )
 ROM_END
+
+/*
+Noraut Red Hot Joker Poker
+Red hot joker poker scrolls across screen
+and eprom has Red Hot on sticker
+Char:
+Handwritten sticker with "Club250 grapics" on it
+
+Pressing the readout button brings you to a menu with RESET / READOUT
+pressing on Readout brings you to "coins in" and "coins out" and "balance".
+
+No date info on board or found in rom
+*/
+
+ROM_START( norautrh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "norautrh.bin",  0x0000, 0x2000, CRC(f5447d1a) SHA1(75d6439481e469e82e5561146966c9c7b44f34fe) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "club250.bin",   0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
+ROM_END
+
+/*
+Unknown Noraut: "NTX10A  V6"
+None working old noraut board with daughter card upgrade
+daughter card looks like an old upgrade PCB marked:
+"Noraut LTD Game Module"
+half of which is incased in epoxy resin.
+only thing not visble on this board compared to others i have is the cpu
+with is under the epoxy not sure what else is their.
+
+D Card contains:
+Backup Battery
+
+Program Eprom:27C256
+Marked: "NTX10A  V6"
+           "C201"
+
+CPU:
+Unknown Incased in epoxy
+
+NVRAM: HY6264A
+
+PAL:
+PAL16L8ACN
+
+Charcter Eprom is mounted on main board
+CHAR Eprom:2732
+Marked: "GU27"
+
+daughter card is connected on to another card containing only pcb tracks no components
+This second board connects to main board with ribbon cable to the 40pin socket where 
+the original cpu would of been.
+
+No date info on board or found in rom.
+*/
+
+ROM_START( norautu )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2563.bin",    0x0000, 0x8000, CRC(6cbe68bd) SHA1(93201baaf03a9bba6c52c64cc26e8e445aa6454e) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "club250.bin", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
+ROM_END
+
+
+/*NORAUT V3.010a:
+Board upgraded with daughter card.
+daughter card looks modern and is marked
+"memory expansion module"
+"Unique Ireland"
+
+D Card contains:
+Backup Battery
+
+Program Eprom:27C512
+Marked:
+"G45P A V3.010a GU27
+ Euro 27C512 20MAR02"
+
+
+PAL:PAL16l8ANC
+Marked VER.2
+
+CPU:
+Zilog
+Z8400APS
+Z80 CPU
+
+NVRAM: 6116
+
+Two jumpers on card , game will not boot if these are removed or placed on other pins
+cabinet beeps and shows grapics on screen. Removing while game is on cause game to freeze.
+Unknown what their for.
+
+Charcter Eprom is mounted on main board
+CHAR Eprom:2716
+Marked "GU27"
+
+No date info found in rom,  program eprom sticker "Euro 27C512 20MAR02"
+This version contains a hidden menu with lots of differnt options
+to access this menu you must hold the HI and LOW button and press the readout/test switch
+the screen will go blank then you release the 3 buttons and the menu appears.
+
+Pressing the readout button brings you to a menu with RESET / READOUT
+pressing on Readout brings you to "coins in" and "coins out" and "balance".
+
+The daughter card connects direct to main pcb through 40 pins into original cpu socket
+and 12 pins to one side of original program eprom.
+*/
+
+ROM_START( norautv3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "g45pa.bin", 0x0000, 0x10000, CRC(f966f4d2) SHA1(99c21ceb59664f32fd1269351fa976370d486f2e) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(              0x0000, 0x0800, 0xff )
+	ROM_LOAD( "gu27.bin",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    INIT  ROT    COMPANY        FULLNAME                 FLAGS */
-GAME( 1988, norautp,  0,       norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1988, norautjp, norautp, norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",     GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1983, gtipoker, 0,       gtipoker, norautp, 0,    ROT0, "GTI Inc",     "GTI Poker",              GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT  ROT    COMPANY        FULLNAME                       FLAGS */
+GAME( 1988, norautp,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1988, norautjp, norautp, norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1988, norautrh, 0,       norautp,  norautrh, 0,    ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1988, norautu,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1988, norautv3, 0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1983, gtipoker, 0,       gtipoker, norautp,  0,    ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAME( 198?, norautpn, norautp, norautp,  poker,   0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 198?, norautpn, norautp, norautp,  poker,    0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
