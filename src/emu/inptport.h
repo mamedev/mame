@@ -255,6 +255,7 @@ enum
 	IPT_POKER_HOLD4,
 	IPT_POKER_HOLD5,
 	IPT_POKER_CANCEL,
+	IPT_POKER_BET,
 
 	/* slot-specific inputs */
 	IPT_SLOT_STOP1,

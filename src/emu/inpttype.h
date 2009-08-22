@@ -113,6 +113,7 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_HOLD4,         "Hold 4",                 SEQ_DEF_1(KEYCODE_V) )
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_HOLD5,         "Hold 5",                 SEQ_DEF_1(KEYCODE_B) )
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_CANCEL,        "Cancel",                 SEQ_DEF_1(KEYCODE_N) )
+	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, POKER_BET,           "Bet",                    SEQ_DEF_1(KEYCODE_1) )
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, SLOT_STOP1,          "Stop Reel 1",            SEQ_DEF_1(KEYCODE_X) )
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, SLOT_STOP2,          "Stop Reel 2",            SEQ_DEF_1(KEYCODE_C) )
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, SLOT_STOP3,          "Stop Reel 3",            SEQ_DEF_1(KEYCODE_V) )
