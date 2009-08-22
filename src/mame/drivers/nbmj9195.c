@@ -2931,13 +2931,13 @@ static MACHINE_DRIVER_START( NBMJDRV1 )
 	MDRV_CPU_IO_MAP(sailorws_io_map)
 	MDRV_CPU_VBLANK_INT("screen", ctc0_trg1)				/* vblank is connect to ctc triggfer */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MDRV_CPU_IO_MAP(sailorws_sound_io_map)
 
 	MDRV_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "maincpu" */, ctc_intf_main)
-	MDRV_Z80CTC_ADD("audio_ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf_audio)
+	MDRV_Z80CTC_ADD("audio_ctc", 8000000 /* same as "audiocpu" */, ctc_intf_audio)
 
 	MDRV_MACHINE_RESET(sailorws)
 

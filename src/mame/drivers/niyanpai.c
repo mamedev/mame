@@ -783,12 +783,12 @@ static MACHINE_DRIVER_START( niyanpai )
 	MDRV_CPU_PROGRAM_MAP(niyanpai_map)
 	MDRV_CPU_VBLANK_INT("screen", niyanpai_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map)
 	MDRV_CPU_IO_MAP(niyanpai_sound_io_map)
 
-	MDRV_Z80CTC_ADD("ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", 8000000 /* same as "audiocpu" */, ctc_intf)
 
 	MDRV_MACHINE_RESET(niyanpai)
 	MDRV_NVRAM_HANDLER(generic_0fill)
