@@ -1172,7 +1172,6 @@ $(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
 							$(CPUSRC)/minx/minxfunc.h
 
 
-
 #-------------------------------------------------
 # Nintendo/SGI RSP (R3000-based + vector processing)
 #-------------------------------------------------
@@ -1282,6 +1281,21 @@ endif
 
 $(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
 								$(CPUSRC)/ssp1610/ssp1601.h
+
+
+
+#-------------------------------------------------
+# Atmel 8-bit AVR
+#-------------------------------------------------
+
+ifneq ($(filter AVR8,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/avr8
+CPUOBJS += $(CPUOBJ)/avr8/avr8.o
+DASMOBJS += $(CPUOBJ)/avr8/avr8dasm.o
+endif
+
+$(CPUOBJ)/avr8/avr8.o: 	$(CPUSRC)/avr8/avr8.c \
+			$(CPUSRC)/avr8/avr8.h
 
 
 
@@ -1572,3 +1586,18 @@ $(CPUOBJ)/z8000/z8000.o:	$(CPUSRC)/z8000/z8000.c \
 							$(CPUSRC)/z8000/z8000dab.h \
 							$(CPUSRC)/z8000/z8000ops.c \
 							$(CPUSRC)/z8000/z8000tbl.c
+
+
+
+#-------------------------------------------------
+# Argonaut SuperFX
+#-------------------------------------------------
+
+ifneq ($(filter SUPERFX,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/superfx
+CPUOBJS += $(CPUOBJ)/superfx/superfx.o
+DASMOBJS += $(CPUOBJ)/superfx/sfx_dasm.o
+endif
+
+$(CPUOBJ)/superfx/superfx.o:$(CPUSRC)/superfx/superfx.c \
+							$(CPUSRC)/superfx/superfx.h

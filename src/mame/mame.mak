@@ -114,6 +114,7 @@ CPUS += SSEM
 CPUS += AVR8
 CPUS += TMS0980
 CPUS += I4004
+CPUS += SUPERFX
 
 
 #-------------------------------------------------
