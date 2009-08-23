@@ -838,7 +838,8 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			add_list(info, &step_list, node);
 
 		/* and register save state */
-		state_save_register_device_item_array(device, node->node, node->output);
+		if (node->node != NODE_SPECIAL)
+			state_save_register_device_item_array(device, node->node, node->output);
 	}
 
 	/* if no outputs, give an error */
