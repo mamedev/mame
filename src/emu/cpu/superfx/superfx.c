@@ -110,6 +110,15 @@ INLINE UINT8 superfx_pipe(superfx_state *cpustate);
 
 /*****************************************************************************/
 
+#define SUPERFX_SFR_OV_SET		((cpustate->sfr & SUPERFX_SFR_OV) ? 1 : 0)
+#define SUPERFX_SFR_OV_CLEAR	((cpustate->sfr & SUPERFX_SFR_OV) ? 0 : 1)
+#define SUPERFX_SFR_S_SET		((cpustate->sfr & SUPERFX_SFR_S) ? 1 : 0)
+#define SUPERFX_SFR_S_CLEAR		((cpustate->sfr & SUPERFX_SFR_S) ? 0 : 1)
+#define SUPERFX_SFR_CY_SET		((cpustate->sfr & SUPERFX_SFR_CY) ? 1 : 0)
+#define SUPERFX_SFR_CY_CLEAR	((cpustate->sfr & SUPERFX_SFR_CY) ? 0 : 1)
+#define SUPERFX_SFR_Z_SET		((cpustate->sfr & SUPERFX_SFR_Z) ? 1 : 0)
+#define SUPERFX_SFR_Z_CLEAR		((cpustate->sfr & SUPERFX_SFR_Z) ? 0 : 1)
+
 static void superfx_regs_reset(superfx_state *cpustate)
 {
 	cpustate->sfr &= ~(SUPERFX_SFR_B | SUPERFX_SFR_ALT3);
@@ -733,27 +742,98 @@ static CPU_EXECUTE( superfx )
 				superfx_regs_reset(cpustate);
 				break;
 			case 0x05: // BRA
+				superfx_gpr_write(cpustate, 15, cpustate->r[15] + (INT8)superfx_pipe(cpustate));
 				break;
 			case 0x06: // BLT
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if((SUPERFX_SFR_S_SET ^ SUPERFX_SFR_OV_SET) == 0)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x07: // BGE
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if((SUPERFX_SFR_S_SET ^ SUPERFX_SFR_OV_SET) == 1)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x08: // BNE
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_Z_SET == 0)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x09: // BEQ
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_Z_SET == 1)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0a: // BPL
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_S_SET == 0)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0b: // BMI
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_S_SET == 1)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0c: // BCC
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_CY_SET == 0)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0d: // BCS
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_CY_SET == 1)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0e: // BVC
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_OV_SET == 0)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 			case 0x0f: // BVS
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				if(SUPERFX_SFR_OV_SET == 1)
+				{
+					superfx_gpr_write(cpustate, 15, cpustate->r[15] + e);
+				}
 				break;
+			}
 
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:	// TO
