@@ -3228,13 +3228,18 @@
  *     DISCRETE_CUSTOMx(name of node,
  *                      input 0 node or static value, ...)
  *
- *     discrete_custom_info = {reset, step, contextsize, custom}
- *                             reset  = address called to reset a node after creation or system reset
- *                             step   = address called to execute one time delta of output update
- *                             contextsize = size of context to create
+ *     discrete_custom_info = {discrete_module, custom}
+ *                             discrete_module  = discrete module definition
  *                             custom = address of specific initialization data
  *
- * EXAMPLES: see Donkey Kong
+ * In most case, you should be able to use
+ * 
+ *     discrete_custom_info = {DISCRETE_CUSTOM_MODULE(basename, context type), custom}
+ * 
+ * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define 
+ * the step/reset procedures.
+ * 
+ * EXAMPLES: see Donkey Kong, Mario Bros.
  *
  ***********************************************************************
  =======================================================================
@@ -3329,13 +3334,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(disc_info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)				(1.0 - exp(node->info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(disc_info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)			(exp(node->info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3349,19 +3354,14 @@
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
 
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const discrete_info *disc_info, node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const discrete_info *disc_info, node_description *node)
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
 
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (disc_info, node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (disc_info, node)
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
 
-#if 0
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const device_config *device, node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const device_config *device, node_description *node)
-
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (device, node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (device, node)
-#endif
+#define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
+	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
 
 /*************************************
  *
@@ -3611,8 +3611,8 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
 };
 
 
@@ -3631,15 +3631,17 @@ struct _node_description
 	int				input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
 	const double *	input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	discrete_module module;								/* Copy of the node's module info */
-	const discrete_sound_block *block;					/* Points to the node's setup block. */
 	void *			context;							/* Contextual information specific to this node type */
-	const char *	name;								/* Text name string for identification/debug */
 	const void *	custom;								/* Custom function specific initialisation data */
+	
+	const discrete_module *module;						/* Node's module info */
+	const discrete_sound_block *block;					/* Points to the node's setup block. */
+	const discrete_info *info;							/* Points to the parent */
+
 	osd_ticks_t		run_time;
 };
 
-
+	
 /*************************************
  *
  *  Core runtime info
@@ -3649,6 +3651,13 @@ struct _node_description
  *  and possibly context info
  *
  *************************************/
+
+typedef struct _linked_list_entry	linked_list_entry;
+struct _linked_list_entry
+{
+	void *ptr;
+	linked_list_entry *next;
+};
 
 struct _discrete_info
 {
@@ -3660,10 +3669,16 @@ struct _discrete_info
 	double	neg_sample_time;
 
 	/* internal node tracking */
-	int node_count;
-	node_description **running_order;
 	node_description **indexed_node;
-	node_description *node_list;
+	
+	/* list of all nodes */
+	linked_list_entry	 *node_list;		/* node_description * */
+	
+	/* list of nodes which step */
+	linked_list_entry	 *step_list;		/* node_description * */
+
+	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
+	linked_list_entry	 *block_list;		/* discrete_sound_block * */
 
 	/* the input streams */
 	int discrete_input_streams;
@@ -3953,9 +3968,7 @@ struct _discrete_adsr
 typedef struct _discrete_custom_info discrete_custom_info;
 struct _discrete_custom_info
 {
-	void (*reset)(const discrete_info *disc_info, node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(const discrete_info *disc_info, node_description *node);	/* Called to execute one time delta of output update */
-	size_t contextsize;
+	const discrete_module module;
 	const void *custom;						/* Custom function specific initialisation data */
 };
 
@@ -4184,6 +4197,12 @@ enum
 	DSO_IMPORT,			/* import from another discrete block */
 	DSO_REPLACE,		/* replace next node */
 	DSO_DELETE,			/* delete nodes */
+	
+	/* Parallel execution */
+	
+	DSO_TASK_START,	/* start of parallel task */
+	DSO_TASK_END,	/* end of parallel task */
+	DSO_TASK_SYNC,	/* wait for all parallel tasks to finish */
 
 	/* Marks end of this enum -- must be last entry ! */
 	DSO_LAST

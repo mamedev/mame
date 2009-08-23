@@ -384,11 +384,11 @@ static DISCRETE_RESET(dst_dac_r1)
 	if (info->ladderLength < 2)
 	{
 		/* You need at least 2 resistors for a ladder */
-		discrete_log(disc_info, "dst_dac_r1_reset - Ladder length too small");
+		discrete_log(node->info, "dst_dac_r1_reset - Ladder length too small");
 	}
 	if (info->ladderLength > DISC_LADDER_MAXRES )
 	{
-		discrete_log(disc_info, "dst_dac_r1_reset - Ladder length exceeds DISC_LADDER_MAXRES");
+		discrete_log(node->info, "dst_dac_r1_reset - Ladder length exceeds DISC_LADDER_MAXRES");
 	}
 
 	/*
@@ -491,7 +491,7 @@ static DISCRETE_STEP(dst_divide)
 		if(DST_DIVIDE__DIV == 0)
 		{
 			node->output[0 ]= DBL_MAX;	/* Max out but don't break */
-			discrete_log(disc_info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_INDEX(node->node));
+			discrete_log(node->info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_INDEX(node->node));
 		}
 		else
 		{
@@ -609,7 +609,7 @@ static DISCRETE_STEP(dst_integrate)
 			i_neg = context->v_max_in / info->r1;
 			i_pos = (DST_INTEGRATE__TRG0 - OP_AMP_NORTON_VBE) / info->r2;
 			if (i_pos < 0) i_pos = 0;
-			node->output[0] += (i_pos - i_neg) / disc_info->sample_rate / info->c;
+			node->output[0] += (i_pos - i_neg) / node->info->sample_rate / info->c;
 			break;
 
 		case DISC_INTEGRATE_OP_AMP_2 | DISC_OP_AMP_IS_NORTON:
@@ -618,7 +618,7 @@ static DISCRETE_STEP(dst_integrate)
 			i_neg  = dst_trigger_function(trig0, trig1, 0, info->f0) ? context->v_max_in_d / info->r1 : 0;
 			i_pos  = dst_trigger_function(trig0, trig1, 0, info->f1) ? context->v_max_in / info->r2 : 0;
 			i_pos += dst_trigger_function(trig0, trig1, 0, info->f2) ? context->v_max_in_d / info->r3 : 0;
-			node->output[0] += (i_pos - i_neg) / disc_info->sample_rate / info->c;
+			node->output[0] += (i_pos - i_neg) / node->info->sample_rate / info->c;
 			break;
 	}
 
@@ -646,7 +646,7 @@ static DISCRETE_RESET(dst_integrate)
 		v = info->v1 * info->r3 / (info->r2 + info->r3);	/* vRef */
 		v = info->v1 - v;	/* actual charging voltage */
 		i = v / info->r1;
-		context->change = i / disc_info->sample_rate / info->c;
+		context->change = i / node->info->sample_rate / info->c;
 	}
 	node->output[0] = 0;
 }
@@ -1227,7 +1227,7 @@ static DISCRETE_RESET(dst_mixer)
 	context->r_node_bit_flag = 0;
 	for (bit = 0; bit < 8; bit++)
 	{
-		r_node = discrete_find_node(disc_info, info->r_node[bit]);
+		r_node = discrete_find_node(node->info, info->r_node[bit]);
 		if (r_node != NULL)
 		{
 			context->r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
@@ -1354,7 +1354,7 @@ static DISCRETE_STEP(dst_multiplex)
 		else
 		{
 			/* Bad address.  We will leave the output alone. */
-			discrete_log(disc_info, "NODE_%02d - Address = %d. Out of bounds\n", node->node-NODE_00, addr);
+			discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", node->node-NODE_00, addr);
 		}
 	}
 	else
@@ -1439,7 +1439,7 @@ static DISCRETE_STEP(dst_oneshot)
 
 		if (do_count)
 		{
-			context->countdown -= disc_info->sample_time;
+			context->countdown -= node->info->sample_time;
 			if(context->countdown <= 0.0)
 			{
 				node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
@@ -1514,7 +1514,7 @@ static DISCRETE_RESET(dst_ramp)
 	struct dss_ramp_context *context = (struct dss_ramp_context *)node->context;
 
 	node->output[0]  = DST_RAMP__CLAMP;
-	context->step    = DST_RAMP__GRAD / disc_info->sample_rate;
+	context->step    = DST_RAMP__GRAD / node->info->sample_rate;
 	context->dir     = ((DST_RAMP__END - DST_RAMP__START) == abs(DST_RAMP__END - DST_RAMP__START));
 	context->last_en = 0;
 }
@@ -1560,7 +1560,7 @@ static DISCRETE_STEP(dst_samphold)
 				if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
 				break;
 			default:
-				discrete_log(disc_info, "dst_samphold_step - Invalid clocktype passed");
+				discrete_log(node->info, "dst_samphold_step - Invalid clocktype passed");
 				break;
 		}
 	}
@@ -1762,7 +1762,7 @@ static DISCRETE_STEP(dst_transform)
 				top = (int)number1 ^ (int)top;
 				break;
 			default:
-				discrete_log(disc_info, "dst_transform_step - Invalid function type/variable passed");
+				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed");
 				node->output[0] = 0;
 				break;
 		}
@@ -1869,7 +1869,7 @@ static DISCRETE_RESET(dst_op_amp)
 		}
 		else
 			/* linear charge */
-			context->exponent = disc_info->sample_rate * info->c;
+			context->exponent = node->info->sample_rate * info->c;
 	}
 
 	if (info->r3 > 0)

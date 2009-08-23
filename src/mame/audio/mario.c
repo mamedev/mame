@@ -192,7 +192,7 @@ static DISCRETE_STEP( mario_custom_run )
 
 	double	t1	= 0.5 / LS624_F(MARIO_CUSTOM_C1, MARIO_CUSTOM_IN1, RUN_VCO_VOLTAGE);
 	double	t2	= 0.5 / LS624_F(MARIO_CUSTOM_C2, MARIO_CUSTOM_IN2, RUN_VCO_VOLTAGE);
-	double  sample_t = disc_info->sample_time;
+	double  sample_t = node->info->sample_time;
 	double  vn, t;
 
 	//if (MARIO_CUSTOM_VOUT)
@@ -258,9 +258,7 @@ static DISCRETE_RESET( mario_custom_run )
 
 static const discrete_custom_info mario_custom_run_info =
 {
-	DISCRETE_RESET_NAME( mario_custom_run ),
-	DISCRETE_STEP_NAME( mario_custom_run ),
-	sizeof(struct mario_custom_run_context),
+	DISCRETE_CUSTOM_MODULE( mario_custom_run, struct mario_custom_run_context),
 	NULL
 };
 

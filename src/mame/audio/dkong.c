@@ -343,9 +343,7 @@ static DISCRETE_RESET( dkong_custom_mixer )
 
 static const discrete_custom_info dkong_custom_mixer_info =
 {
-	DISCRETE_RESET_NAME( dkong_custom_mixer ),
-	DISCRETE_STEP_NAME( dkong_custom_mixer ),
-	sizeof(struct dkong_custom_mixer_context),
+	DISCRETE_CUSTOM_MODULE( dkong_custom_mixer, struct dkong_custom_mixer_context),
 	NULL
 };
 #endif

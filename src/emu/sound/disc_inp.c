@@ -15,6 +15,8 @@
  *
  ************************************************************************/
 
+#define EXPERIMENTAL_STREAM_PARALLEL (0)
+
 #define DSS_INPUT__GAIN		(*(node->input[0]))
 #define DSS_INPUT__OFFSET	(*(node->input[1]))
 #define DSS_INPUT__INIT		(*(node->input[2]))
@@ -54,7 +56,7 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
 		/* Bring the system up to now */
 		stream_update(info->discrete_stream);
 
-		if ((node->module.type >= DSS_INPUT_DATA) && (node->module.type <= DSS_INPUT_PULSE))
+		if ((node->module->type >= DSS_INPUT_DATA) && (node->module->type <= DSS_INPUT_PULSE))
 		{
 			data = *node_data;
 		}
@@ -65,7 +67,7 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
     return data;
 }
 
-#if 0
+#if EXPERIMENTAL_STREAM_PARALLEL
 static STREAM_BACKGROUND_CALLBACK( disc_cb )
 {
 	node_description *node = (node_description *) ptr;
@@ -86,7 +88,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 		UINT8 last_data  = *node_data;
 		UINT8 new_data    = 0;
 
-		switch (node->module.type)
+		switch (node->module->type)
 		{
 			case DSS_INPUT_DATA:
 				new_data = data;
@@ -102,7 +104,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 		if (last_data != new_data)
 		{
-#if 1
+#if !EXPERIMENTAL_STREAM_PARALLEL
 			/* Bring the system up to now */
 			stream_update(info->discrete_stream);
 
@@ -172,12 +174,12 @@ static DISCRETE_RESET(dss_adjustment)
 
 	if (node->custom)
 	{
-		context->port = input_port_by_tag(disc_info->device->machine->portconfig, (const char *)node->custom);
+		context->port = input_port_by_tag(node->info->device->machine->portconfig, (const char *)node->custom);
 		if (context->port == NULL)
 			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
 	}
 	else
-		context->port = input_port_by_index(disc_info->device->machine->portconfig, DSS_ADJUSTMENT__PORT);
+		context->port = input_port_by_index(node->info->device->machine->portconfig, DSS_ADJUSTMENT__PORT);
 
 	context->lastpval = 0x7fffffff;
 	context->pmin     = DSS_ADJUSTMENT__PMIN;
@@ -233,7 +235,7 @@ static DISCRETE_RESET(dss_input)
 {
 	UINT8 *node_data = (UINT8 *)node->context;
 
-	switch (node->module.type)
+	switch (node->module->type)
 	{
 		case DSS_INPUT_DATA:
 			*node_data = DSS_INPUT__INIT;
@@ -280,13 +282,19 @@ static DISCRETE_STEP(dss_input_stream)
 	stream_sample_t **ptr = (stream_sample_t **)node->context;
 	stream_sample_t *data = *ptr;
 
-	node->output[0] = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
+	if (data)
+	{
+		node->output[0] = (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET;
+		(*ptr)++;
+	}
+	else
+		node->output[0] = 0;
 }
 
 static DISCRETE_RESET(dss_input_stream)
 {
 	int istream = DSS_INPUT_STREAM__STREAM;
 	/* we will use the node's context pointer to point to the input stream data */
-	assert(istream < disc_info->discrete_input_streams);
-	node->context = (discrete_info *) &disc_info->input_stream_data[istream];
+	assert(istream < node->info->discrete_input_streams);
+	node->context = (discrete_info *) &node->info->input_stream_data[istream];
 }
