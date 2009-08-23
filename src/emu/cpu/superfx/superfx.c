@@ -47,6 +47,7 @@ struct _superfx_state
 	UINT8  sreg_idx;// Source Register (To), index
 	UINT16 *dreg;	// Destination Register (To)
 	UINT8  dreg_idx;// Destination Register (To), index
+	UINT8  r15_modified;
 
 	UINT8  irq;		// IRQ Pending
 
@@ -70,23 +71,10 @@ INLINE superfx_state *get_safe_token(const device_config *device)
     return (superfx_state *)device->token;
 }
 
-static UINT32 min(UINT32 a, UINT32 b)
-{
-	if(a <= b)
-	{
-		return a;
-	}
-	else
-	{
-		return b;
-	}
-}
-
 /*****************************************************************************/
 
 static void superfx_regs_reset(superfx_state *cpustate);
 static void superfx_update_speed(superfx_state *cpustate);
-static void superfx_add_clocks(superfx_state *cpustate, INT32 clocks);
 static void superfx_cache_flush(superfx_state *cpustate);
 static UINT8 superfx_cache_mmio_read(superfx_state *cpustate, UINT16 addr);
 static void superfx_cache_mmio_write(superfx_state *cpustate, UINT32 addr, UINT8 data);
@@ -107,6 +95,7 @@ static void superfx_gpr_write(superfx_state *cpustate, UINT8 r, UINT16 data);
 INLINE UINT8 superfx_op_read(superfx_state *cpustate, UINT16 addr);
 INLINE UINT8 superfx_peekpipe(superfx_state *cpustate);
 INLINE UINT8 superfx_pipe(superfx_state *cpustate);
+static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks);
 
 /*****************************************************************************/
 
@@ -126,6 +115,7 @@ static void superfx_regs_reset(superfx_state *cpustate)
 	cpustate->sreg = &cpustate->r[0];
 	cpustate->dreg = &cpustate->r[0];
 	cpustate->dreg_idx = 0;
+	cpustate->sreg_idx = 0;
 }
 
 static void superfx_update_speed(superfx_state *cpustate)
@@ -135,28 +125,6 @@ static void superfx_update_speed(superfx_state *cpustate)
 	if(cpustate->clsr)
 	{
 		cpustate->cfgr &= ~SUPERFX_CFGR_MS0; // Cannot use high-speed multiplication in 21MHz mode
-	}
-}
-
-static void superfx_add_clocks(superfx_state *cpustate, INT32 clocks)
-{
-	if(cpustate->romcl)
-	{
-		cpustate->romcl -= min(clocks, cpustate->romcl);
-		if(cpustate->romcl == 0)
-		{
-			cpustate->sfr &= ~SUPERFX_SFR_R;
-			cpustate->romdr = superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]);
-		}
-	}
-
-	if(cpustate->ramcl)
-	{
-		cpustate->ramcl -= min(clocks, cpustate->ramcl);
-		if(cpustate->ramcl == 0)
-		{
-			superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
-		}
 	}
 }
 
@@ -205,12 +173,14 @@ static void superfx_memory_reset(superfx_state *cpustate)
 
 static UINT8 superfx_bus_read(superfx_state *cpustate, UINT32 addr)
 {
-	// TODO: Hook up to the same memory map as the main 65C816 CPU.  See src/chip/superfx/bus/bus.cpp in the bsnes source code.
-	return 0;
+	printf( "superfx_bus_read: %08x\n", addr );
+	return memory_read_byte(cpustate->program, addr);
 }
 
 static void superfx_bus_write(superfx_state *cpustate, UINT32 addr, UINT8 data)
 {
+	memory_write_byte(cpustate->program, addr, data);
+	printf( "superfx_bus_write: %08x = %02x\n", addr, data );
 	// TODO: Hook up to the same memory map as the main 65C816 CPU.  See src/chip/superfx/bus/bus.cpp in the bsnes source code.
 }
 
@@ -257,11 +227,12 @@ static void superfx_pixelcache_flush(superfx_state *cpustate, INT32 line)
 		}
 		if(cpustate->pixelcache[line].bitpend != 0xff)
 		{
-			superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+			superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
 			data &= cpustate->pixelcache[line].bitpend;
+			printf( "superfx_pixelcache_flush: calling superfx_bus_read\n" );
 			data |= superfx_bus_read(cpustate, addr + byte) & ~cpustate->pixelcache[line].bitpend;
 		}
-		superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+		superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
 		superfx_bus_write(cpustate, addr + byte, data);
 	}
 
@@ -362,7 +333,8 @@ static UINT8 superfx_rpix(superfx_state *cpustate, UINT16 x, UINT16 y)
 	for(n = 0; n < bpp; n++)
 	{
 		UINT8 byte = ((n >> 1) << 4) + (n & 1);  // = [n]{ 0, 1, 16, 17, 32, 33, 48, 49 };
-		superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+		superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
+		printf( "superfx_rpix: calling superfx_bus_read\n" );
 		data |= ((superfx_bus_read(cpustate, addr + byte) >> x) & 1) << n;
 	}
 
@@ -386,7 +358,7 @@ static UINT8 superfx_rambuffer_sync(superfx_state *cpustate)
 {
 	if(cpustate->ramcl)
 	{
-		superfx_add_clocks(cpustate, cpustate->ramcl);
+		superfx_add_clocks_internal(cpustate, cpustate->ramcl);
 	}
 	return 0;
 }
@@ -394,6 +366,7 @@ static UINT8 superfx_rambuffer_sync(superfx_state *cpustate)
 static UINT8 superfx_rambuffer_read(superfx_state *cpustate, UINT16 addr)
 {
 	superfx_rambuffer_sync(cpustate);
+	printf( "superfx_rambuffer_read: calling superfx_bus_read\n" );
 	return superfx_bus_read(cpustate, 0x700000 + (cpustate->rambr << 16) + addr);
 }
 
@@ -409,7 +382,7 @@ static void superfx_rombuffer_sync(superfx_state *cpustate)
 {
 	if(cpustate->romcl)
 	{
-		superfx_add_clocks(cpustate, cpustate->romcl);
+		superfx_add_clocks_internal(cpustate, cpustate->romcl);
 	}
 }
 
@@ -432,6 +405,10 @@ static void superfx_gpr_write(superfx_state *cpustate, UINT8 r, UINT16 data)
 	{
 		superfx_rombuffer_update(cpustate);
 	}
+	else if(r == 15)
+	{
+		cpustate->r15_modified = 1;
+	}
 }
 
 INLINE UINT8 superfx_op_read(superfx_state *cpustate, UINT16 addr)
@@ -446,14 +423,15 @@ INLINE UINT8 superfx_op_read(superfx_state *cpustate, UINT16 addr)
 			UINT32 n = 0;
 			for(n = 0; n < 16; n++)
 			{
-				superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+				superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
+				printf( "superfx_op_read: caching superfx_bus_read value\n" );
 				cpustate->cache.buffer[dp++] = superfx_bus_read(cpustate, sp++);
 			}
 			cpustate->cache.valid[offset >> 4] = 1;
 		}
 		else
 		{
-			superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+			superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
 		}
 		return cpustate->cache.buffer[offset];
 	}
@@ -462,14 +440,16 @@ INLINE UINT8 superfx_op_read(superfx_state *cpustate, UINT16 addr)
 	{
 		//$[00-5f]:[0000-ffff] ROM
 		superfx_rombuffer_sync(cpustate);
-		superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+		superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
+		printf( "superfx_op_read: reading from rom, calling superfx_bus_read\n" );
 		return superfx_bus_read(cpustate, (cpustate->pbr << 16) + addr);
 	}
 	else
 	{
 		//$[60-7f]:[0000-ffff] RAM
 		superfx_rambuffer_sync(cpustate);
-		superfx_add_clocks(cpustate, cpustate->memory_access_speed);
+		superfx_add_clocks_internal(cpustate, cpustate->memory_access_speed);
+		printf( "superfx_op_read: reading from ram, calling superfx_bus_read\n" );
 		return superfx_bus_read(cpustate, (cpustate->pbr << 16) + addr);
 	}
 }
@@ -478,6 +458,7 @@ INLINE UINT8 superfx_peekpipe(superfx_state *cpustate)
 {
 	UINT8 result = cpustate->pipeline;
 	cpustate->pipeline = superfx_op_read(cpustate, cpustate->r[15]);
+	cpustate->r15_modified = 0;
 	return result;
 }
 
@@ -485,6 +466,7 @@ INLINE UINT8 superfx_pipe(superfx_state *cpustate)
 {
 	UINT8 result = cpustate->pipeline;
 	cpustate->pipeline = superfx_op_read(cpustate, ++cpustate->r[15]);
+	cpustate->r15_modified = 0;
 	return result;
 }
 
@@ -495,6 +477,8 @@ UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr)
 	superfx_state *cpustate = get_safe_token(cpu);
 
 	addr &= 0xffff;
+
+	printf( "superfx_mmio_read: %08x\n", addr );
 
 	if(addr >= 0x3100 && addr <= 0x32ff)
 	{
@@ -544,6 +528,8 @@ UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr)
 void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
+
+	printf( "superfx_mmio_write: %08x = %02x\n", addr, data );
 
 	addr &= 0xffff;
 
@@ -618,6 +604,36 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 	}
 }
 
+static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks)
+{
+	if(cpustate->romcl)
+	{
+		cpustate->romcl -= MIN(clocks, cpustate->romcl);
+		if(cpustate->romcl == 0)
+		{
+			cpustate->sfr &= ~SUPERFX_SFR_R;
+			printf( "superfx_op_read: reading from rom, calling superfx_bus_read\n" );
+			cpustate->romdr = superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]);
+		}
+	}
+
+	if(cpustate->ramcl)
+	{
+		cpustate->ramcl -= MIN(clocks, cpustate->ramcl);
+		if(cpustate->ramcl == 0)
+		{
+			superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
+		}
+	}
+}
+
+void superfx_add_clocks(const device_config *cpu, INT32 clocks)
+{
+	superfx_state *cpustate = get_safe_token(cpu);
+
+	superfx_add_clocks_internal(cpustate, clocks);
+}
+
 /*****************************************************************************/
 
 static CPU_INIT( superfx )
@@ -645,6 +661,7 @@ static CPU_INIT( superfx )
 	cpustate->clsr = 0;
 	cpustate->pipeline = 0x01; // nop
 	cpustate->ramaddr = 0;
+	cpustate->r15_modified = 0;
 
 	superfx_regs_reset(cpustate);
 	superfx_memory_reset(cpustate);
@@ -703,19 +720,28 @@ static CPU_EXECUTE( superfx )
 
 	if(!(cpustate->sfr & SUPERFX_SFR_G))
 	{
-		--cpustate->icount;
+		superfx_add_clocks_internal(cpustate, 6);
+		cpustate->icount = MIN(cpustate->icount, 0);
 	}
 
 	while (cpustate->icount > 0 && (cpustate->sfr & SUPERFX_SFR_G))
 	{
-		debugger_instruction_hook(device, cpustate->r[15]);
+		if(!(cpustate->sfr & SUPERFX_SFR_G))
+		{
+			superfx_add_clocks_internal(cpustate, 6);
+			cpustate->icount = MIN(cpustate->icount, 0);
+			break;
+		}
 
-        op = superfx_pipe(cpustate);
+		debugger_instruction_hook(device, (cpustate->pbr << 16) | cpustate->r[15]);
 
+        op = superfx_peekpipe(cpustate);
+
+		printf( "Executing op at %06x: %02x\n", (cpustate->pbr << 16) | cpustate->r[15], op );
 		switch(op)
 		{
 			case 0x00: // STOP
-				if(cpustate->cfgr & SUPERFX_CFGR_IRQ)
+				if(!(cpustate->cfgr & SUPERFX_CFGR_IRQ))
 				{
 					cpustate->sfr |= SUPERFX_SFR_IRQ;
 					cpustate->irq = 1;
@@ -1076,7 +1102,7 @@ static CPU_EXECUTE( superfx )
 				superfx_regs_reset(cpustate);
 				if(!(cpustate->cfgr & SUPERFX_CFGR_MS0))
 				{
-					superfx_add_clocks(cpustate, 2);
+					superfx_add_clocks_internal(cpustate, 2);
 				}
 				break;
 
@@ -1163,7 +1189,7 @@ static CPU_EXECUTE( superfx )
 				cpustate->sfr |= (result & 0x8000) ? SUPERFX_SFR_CY : 0;
 				superfx_dreg_sfr_sz_update(cpustate);
 				superfx_regs_reset(cpustate);
-				superfx_add_clocks(cpustate, 4 + ((cpustate->cfgr & SUPERFX_CFGR_MS0) ? 4 : 0));
+				superfx_add_clocks_internal(cpustate, 4 + ((cpustate->cfgr & SUPERFX_CFGR_MS0) ? 4 : 0));
 				break;
 			}
 
@@ -1328,6 +1354,11 @@ static CPU_EXECUTE( superfx )
 			}
 		}
 
+		if(!cpustate->r15_modified)
+		{
+			cpustate->r[15]++;
+		}
+
         --cpustate->icount;
     }
 
@@ -1355,7 +1386,43 @@ static CPU_SET_INFO( superfx )
         /* --- the following bits of info are set as 64-bit signed integers --- */
         case CPUINFO_INT_PC:
         case CPUINFO_INT_REGISTER + SUPERFX_PC:        	cpustate->r[15] = info->i;      break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_DREG:		info->i = cpustate->dreg_idx;	break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SREG:		info->i = cpustate->sreg_idx;	break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R0:         cpustate->r[0] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R1:         cpustate->r[1] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R2:         cpustate->r[2] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R3:         cpustate->r[3] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R4:         cpustate->r[4] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R5:         cpustate->r[5] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R6:         cpustate->r[6] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R7:         cpustate->r[7] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R8:         cpustate->r[8] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R9:         cpustate->r[9] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R10:        cpustate->r[10] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R11:        cpustate->r[11] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R12:        cpustate->r[12] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R13:        cpustate->r[13] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R14:        cpustate->r[14] = info->i;		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R15:        cpustate->r[15] = info->i;		break;
         case CPUINFO_INT_REGISTER + SUPERFX_SFR:      	cpustate->sfr = info->i;       	break;
+        case CPUINFO_INT_REGISTER + SUPERFX_PBR:       	cpustate->pbr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMBR:		cpustate->rombr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMBR:		cpustate->rambr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CBR:		cpustate->cbr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SCBR:		cpustate->scbr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SCMR:		cpustate->scmr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_COLR:		cpustate->colr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_POR:		cpustate->por = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_BRAMR:		cpustate->bramr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_VCR:		cpustate->vcr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CFGR:		cpustate->cfgr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CLSR:		cpustate->clsr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMCL:		cpustate->romcl = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMDR:		cpustate->romdr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMCL:		cpustate->ramcl = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMAR:		cpustate->ramar = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMDR:		cpustate->ramdr = info->i;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMADDR:	cpustate->ramaddr = info->i;	break;
     }
 }
 
@@ -1378,7 +1445,7 @@ CPU_GET_INFO( superfx )
         case CPUINFO_INT_MAX_CYCLES:            	info->i = 1;                    					break;
 
         case CPUINFO_INT_DATABUS_WIDTH_PROGRAM: 	info->i = 8;                						break;
-        case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 	info->i = 16;               						break;
+        case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 	info->i = 32;               						break;
         case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 	info->i = 0;                						break;
         case CPUINFO_INT_DATABUS_WIDTH_DATA:    	info->i = 0;                						break;
         case CPUINFO_INT_ADDRBUS_WIDTH_DATA:    	info->i = 0;                						break;
@@ -1388,8 +1455,44 @@ CPU_GET_INFO( superfx )
         case CPUINFO_INT_ADDRBUS_SHIFT_IO:      	info->i = 0;                						break;
 
         case CPUINFO_INT_PC:    /* intentional fallthrough */
-        case CPUINFO_INT_REGISTER + SUPERFX_PC: 	info->i = cpustate->r[15];    						break;
-        case CPUINFO_INT_REGISTER + SUPERFX_SFR:	info->i = cpustate->sfr;   							break;
+        case CPUINFO_INT_REGISTER + SUPERFX_PC: 		info->i = (cpustate->pbr << 16) | cpustate->r[15]; 	break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_DREG:		info->i = cpustate->dreg_idx;	break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SREG:		info->i = cpustate->sreg_idx;	break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R0:         info->i = cpustate->r[0];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R1:         info->i = cpustate->r[1];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R2:         info->i = cpustate->r[2];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R3:         info->i = cpustate->r[3];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R4:         info->i = cpustate->r[4];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R5:         info->i = cpustate->r[5];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R6:         info->i = cpustate->r[6];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R7:         info->i = cpustate->r[7];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R8:         info->i = cpustate->r[8];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R9:         info->i = cpustate->r[9];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R10:        info->i = cpustate->r[10];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R11:        info->i = cpustate->r[11];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R12:        info->i = cpustate->r[12];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R13:        info->i = cpustate->r[13];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R14:        info->i = cpustate->r[14];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_R15:        info->i = cpustate->r[15];		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_SFR:		info->i = cpustate->sfr;   		break;
+        case CPUINFO_INT_REGISTER + SUPERFX_PBR:       	info->i = cpustate->sfr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMBR:		info->i = cpustate->rombr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMBR:		info->i = cpustate->rambr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CBR:		info->i = cpustate->cbr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SCBR:		info->i = cpustate->scbr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_SCMR:		info->i = cpustate->scmr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_COLR:		info->i = cpustate->colr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_POR:		info->i = cpustate->por;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_BRAMR:		info->i = cpustate->bramr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_VCR:		info->i = cpustate->vcr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CFGR:		info->i = cpustate->cfgr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_CLSR:		info->i = cpustate->clsr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMCL:		info->i = cpustate->romcl;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_ROMDR:		info->i = cpustate->romdr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMCL:		info->i = cpustate->ramcl;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMAR:		info->i = cpustate->ramar;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMDR:		info->i = cpustate->ramdr;		break;
+    	case CPUINFO_INT_REGISTER + SUPERFX_RAMADDR:	info->i = cpustate->ramaddr;	break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
         case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(superfx);        		break;
@@ -1410,7 +1513,43 @@ CPU_GET_INFO( superfx )
 
         case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");							break;
 
-        case CPUINFO_STR_REGISTER + SUPERFX_PC:         sprintf(info->s, "PC: %04X", cpustate->r[15]);	break;
-        case CPUINFO_STR_REGISTER + SUPERFX_SFR:       	sprintf(info->s, "SFR: %04X", cpustate->sfr);	break;
+        case CPUINFO_STR_REGISTER + SUPERFX_PC:         sprintf(info->s, "PC:      %06X", (cpustate->pbr << 16) | cpustate->r[15]); break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_DREG:		sprintf(info->s, "DREG:    R%d",  cpustate->dreg_idx);	break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_SREG:		sprintf(info->s, "SREG:    R%d",  cpustate->sreg_idx);	break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R0:         sprintf(info->s, "R0:      %04X", cpustate->r[0]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R1:         sprintf(info->s, "R1:      %04X", cpustate->r[1]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R2:         sprintf(info->s, "R2:      %04X", cpustate->r[2]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R3:         sprintf(info->s, "R3:      %04X", cpustate->r[3]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R4:         sprintf(info->s, "R4:      %04X", cpustate->r[4]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R5:         sprintf(info->s, "R5:      %04X", cpustate->r[5]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R6:         sprintf(info->s, "R6:      %04X", cpustate->r[6]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R7:         sprintf(info->s, "R7:      %04X", cpustate->r[7]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R8:         sprintf(info->s, "R8:      %04X", cpustate->r[8]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R9:         sprintf(info->s, "R9:      %04X", cpustate->r[9]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R10:        sprintf(info->s, "R10:     %04X", cpustate->r[10]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R11:        sprintf(info->s, "R11:     %04X", cpustate->r[11]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R12:        sprintf(info->s, "R12:     %04X", cpustate->r[12]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R13:        sprintf(info->s, "R13:     %04X", cpustate->r[13]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R14:        sprintf(info->s, "R14:     %04X", cpustate->r[14]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_R15:        sprintf(info->s, "R15:     %04X", cpustate->r[15]);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_SFR:       	sprintf(info->s, "SFR:     %04X", cpustate->sfr);		break;
+        case CPUINFO_STR_REGISTER + SUPERFX_PBR:       	sprintf(info->s, "PBR:     %02X", cpustate->sfr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_ROMBR:		sprintf(info->s, "ROMBR:   %02X", cpustate->rombr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_RAMBR:		sprintf(info->s, "RAMBR:   %02X", cpustate->rambr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_CBR:		sprintf(info->s, "CBR:     %04X", cpustate->cbr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_SCBR:		sprintf(info->s, "SCBR:    %02X", cpustate->scbr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_SCMR:		sprintf(info->s, "SCMR:    %02X", cpustate->scmr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_COLR:		sprintf(info->s, "COLR     %02X", cpustate->colr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_POR:		sprintf(info->s, "POR:     %02X", cpustate->por);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_BRAMR:		sprintf(info->s, "BRAMR:   %02X", cpustate->bramr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_VCR:		sprintf(info->s, "VCR:     %02X", cpustate->vcr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_CFGR:		sprintf(info->s, "CFGR:    %02X", cpustate->cfgr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_CLSR:		sprintf(info->s, "CLSR:    %02X", cpustate->clsr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_ROMCL:		sprintf(info->s, "ROMCL:   %08X", cpustate->romcl);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_ROMDR:		sprintf(info->s, "ROMDR:   %02X", cpustate->romdr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_RAMCL:		sprintf(info->s, "RAMCL:   %08X", cpustate->ramcl);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_RAMAR:		sprintf(info->s, "RAMAR:   %04X", cpustate->ramar);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_RAMDR:		sprintf(info->s, "RAMDR:   %02X", cpustate->ramdr);		break;
+    	case CPUINFO_STR_REGISTER + SUPERFX_RAMADDR:	sprintf(info->s, "RAMADDR: %04X", cpustate->ramaddr);	break;
     }
 }

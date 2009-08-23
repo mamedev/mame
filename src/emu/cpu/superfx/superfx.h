@@ -5,6 +5,27 @@ enum
 {
 	SUPERFX_PC = 1,
 
+	SUPERFX_DREG,
+	SUPERFX_SREG,
+
+	SUPERFX_R0,
+	SUPERFX_R1,
+	SUPERFX_R2,
+	SUPERFX_R3,
+	SUPERFX_R4,
+	SUPERFX_R5,
+	SUPERFX_R6,
+	SUPERFX_R7,
+	SUPERFX_R8,
+	SUPERFX_R9,
+	SUPERFX_R10,
+	SUPERFX_R11,
+	SUPERFX_R12,
+	SUPERFX_R13,
+	SUPERFX_R14,
+	SUPERFX_R15,
+
+    SUPERFX_PBR,
     SUPERFX_SFR,
     SUPERFX_ROMBR,
     SUPERFX_RAMBR,
@@ -69,5 +90,6 @@ extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, 
 
 UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr);
 void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data);
+void superfx_add_clocks(const device_config *cpu, INT32 clocks);
 
 #endif /* __SUPERFX_H__ */
