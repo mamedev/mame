@@ -157,6 +157,12 @@
     - Added partial DIP switches to norautrh.
     - Added more technical notes.
 
+    [2009-08-23]
+
+    - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
+      This is due to the phisical keyboard limitation when needs to enter
+      4 simultaneous inputs.
+
 
     Notes:
     - norautjp: at the first start-up, the game will give you a very clever
