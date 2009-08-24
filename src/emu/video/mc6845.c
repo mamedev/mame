@@ -436,7 +436,7 @@ INLINE int is_display_enabled(mc6845_t *mc6845)
 
 static void update_upd_adr_timer(mc6845_t *mc6845)
 {
-	if (!is_display_enabled(mc6845) && mc6845->upd_adr_timer)
+	if (!is_display_enabled(mc6845) && supports_transparent[mc6845->device_type])
 		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
 }
 
@@ -466,7 +466,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 				if (next_y == mc6845->vert_pix_total)
 					next_y = -1;
 			}
-			if (mc6845->upd_adr_timer) timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
+			if (supports_transparent[mc6845->device_type]) timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
 		}
 
 		/* we are in a blanking region, get the location of the next display start */
@@ -490,7 +490,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		else
 			duration = attotime_never;
 
-		if (mc6845->de_changed_timer) timer_adjust_oneshot(mc6845->de_changed_timer, duration, 0);
+		timer_adjust_oneshot(mc6845->de_changed_timer, duration, 0);
 	}
 }
 
@@ -724,7 +724,7 @@ void mc6845_assert_light_pen_input(const device_config *device)
 		}
 
 		/* set the timer that will latch the display address into the light pen registers */
-		if (mc6845->light_pen_latch_timer) timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->screen, y, x), 0);
+		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->screen, y, x), 0);
 	}
 }
 
