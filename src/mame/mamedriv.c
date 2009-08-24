@@ -3026,7 +3026,8 @@ V-V                           TP-027
 	DRIVER( shangtou )	/* 2002.02 Shanghai Sangokuhaitougi */
 	DRIVER( xiistag )	/* 2002.07 XII Stag (V2.01J) */
 	DRIVER( sianniv )	/* 2003.10 Space Invaders Anniversary (V2.02J) */
-	DRIVER( kollon )	/* 2003.11 Kollon */
+	DRIVER( kollon )	/* 2003.11 Kollon (V2.04J) */
+	DRIVER( kollonc )	/* 2003.11 Kollon (V2.04JC, Compact Flash version) */
 	DRIVER( zooo )		/* 2004.05 Zooo */
 
 	/* Namco System 11 */
