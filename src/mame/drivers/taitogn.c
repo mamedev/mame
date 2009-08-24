@@ -1178,7 +1178,7 @@ ROM_START(kollonc)
 	ROM_DEFAULT_BIOS( "v2" )
 	
 	DISK_REGION( "card" )
-	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060))
+	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060)) /* Original Taito Compact Flash version */
 ROM_END
 
 ROM_START(shikigam)
@@ -1232,7 +1232,7 @@ ROM_START(otenamhf)
 	ROM_DEFAULT_BIOS( "v2" )
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562))
+	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562)) /* Original Taito Compact Flash version */
 ROM_END
 
 
