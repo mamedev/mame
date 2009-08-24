@@ -4264,7 +4264,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 16 */
 						/* 17 */
 						/* 18 */
-						/* 19 */
+	DRIVER( mt_gfoot )	/* 19 */
 	DRIVER( mt_lastb )	/* 20 */
 	DRIVER( mt_wcsoc )	/* 21 */
 	DRIVER( mt_tetri )	/* 22 */
