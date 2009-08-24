@@ -34,6 +34,7 @@
  *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
  *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
  *    - Simplified DAA, renamed MEMPTR (3.8) to WZ, added TODO [hap]
+ *    - Fixed IM2 interrupt cycles [eke]
  *   Changes in 3.8 [Miodrag Milanovic]:
  *    - Added MEMPTR register (according to informations provided
  *      by Vladimir Kladov
@@ -3296,8 +3297,8 @@ static void take_interrupt(z80_state *z80)
 		PUSH(z80, pc);
 		RM16(z80, irq_vector, &z80->pc);
 		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", z80->device->tag, irq_vector, z80->PCD));
-		/* CALL opcode timing */
-		z80->icount -= z80->cc_op[0xcd];
+		/* CALL opcode timing + 'interrupt latency' cycles */
+		z80->icount -= z80->cc_op[0xcd] + z80->cc_ex[0xff];
 	}
 	else
 	/* Interrupt mode 1. RST 38h */
