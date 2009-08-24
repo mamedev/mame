@@ -48,6 +48,10 @@ Ports:
   8002 Sound Control (According to Manual)
   8003 D0=SelfTest LED
 
+
+The cabinet has backdrop artwork, a lightbulb for explosions,
+and two large (paddles pretending to be) guns.
+
 */
 
 #include "driver.h"
@@ -89,23 +93,51 @@ static VIDEO_UPDATE( ramtek )
 }
 
 
-static const int ControllerTable[32] = {
-    0  , 1  , 3  , 2  , 6  , 7  , 5  , 4  ,
-    12 , 13 , 15 , 14 , 10 , 11 , 9  , 8  ,
-    24 , 25 , 27 , 26 , 30 , 31 , 29 , 28 ,
-    20 , 21 , 23 , 22 , 18 , 19 , 17 , 16
+/* grenade trajectory per gun position is inconsistent and sloppy in the game:
+     0,     1,     3,     2,     6,     7,     5,     4     - gun position
+    90.00, 90.00, 90.00, 90.00, 86.42, 86.42, 86.42, 86.42  - grenade trajectory (angle, est)
+     18.0,  18.0,  18.0,  18.0,  27.2,  27.2,  27.2,  31.2  - crosses with y=28 (x, est)
+
+    12,    13,    15,    14,    10,    11,     9,     8,
+    84.39, 84.39, 84.39, 80.87, 79.00, 80.87, 79.00, 79.00
+     41.9,  48.9,  56.8,  75.8,  87.2,  88.8, 101.6, 107.6
+
+    24,    25,    27,    26,    30,    31,    29,    28,
+    79.00, 79.00, 75.59, 75.59, 75.59, 73.72, 73.72, 73.72
+    114.1, 121.5, 138.8, 146.0, 152.7, 162.6, 167.6, 172.7
+
+    20,    21,    23,    22,    18,    19,    17,    16
+    73.72, 70.08, 70.08, 70.08, 67.97, 67.97, 64.34, 64.34
+    181.6, 199.9, 205.4, 211.9, 223.5, 232.4, 254.0, 254.0
+*/
+static const UINT8 lut_cross[0x20] = {
+     19,    20,    21,    23,    25,    27,    29,    37,
+     45,    53,    66,    82,    88,    95,   105,   111,
+    118,   130,   142,   149,   158,   165,   170,   177,
+    191,   203,   209,   218,   228,   243,   249,   255,
 };
+static const UINT8 lut_pos[0x20] = {
+    0x1f,  0x1e,  0x1c,  0x1d,  0x19,  0x18,  0x1a,  0x1b,
+    0x13,  0x12,  0x10,  0x11,  0x15,  0x14,  0x16,  0x17,
+    0x07,  0x06,  0x04,  0x05,  0x01,  0x00,  0x02,  0x03,
+    0x0b,  0x0a,  0x08,  0x09,  0x0d,  0x0c,  0x0e,  0x0f
+};
+
+static UINT8 lut_gun1[0x100];
+static UINT8 lut_gun2[0x100];
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-    int port_data = input_port_read(space->machine, "8004");
-    return (port_data & 0xe0) | (~ControllerTable[port_data & 0x1f] & 0x1f);
+    UINT8 port_data = input_port_read(space->machine, "8004");
+    UINT8 gun_pos = input_port_read(space->machine, "GUN1");
+    return (port_data & 0xe0) | lut_gun1[gun_pos];
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-    int port_data = input_port_read(space->machine, "8005");
-    return (port_data & 0xe0) | (~ControllerTable[port_data & 0x1f] & 0x1f);
+    UINT8 port_data = input_port_read(space->machine, "8005");
+    UINT8 gun_pos = input_port_read(space->machine, "GUN2");
+    return (port_data & 0xe0) | lut_gun2[gun_pos];
 }
 
 static WRITE8_HANDLER( m79amb_8002_w )
@@ -118,7 +150,7 @@ static WRITE8_HANDLER( m79amb_8002_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_BASE(&ramtek_videoram)
-	AM_RANGE(0x6000, 0x63ff) AM_RAM		/* ?? */
+	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE("discrete", m79amb_8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(SMH_RAM) AM_BASE(&mask)
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
@@ -161,16 +193,23 @@ static INPUT_PORTS_START( m79amb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("8004")
-	PORT_BIT( 0x1f, 0x10, IPT_PADDLE ) PORT_MINMAX(0,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED ) // gun 1 here
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("8005")
-	PORT_BIT( 0x1f, 0x10, IPT_PADDLE ) PORT_MINMAX(0,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED ) // gun 2 here
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// fake ports for the guns
+	PORT_START("GUN1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_CROSSHAIR(X, (1.0-(19.0/256.0)), 19.0/256.0, 30.0/224.0) PORT_MINMAX(19,255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("GUN2")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_CROSSHAIR(X, (1.0-(22.0/256.0)), 0.0, 30.0/224.0) PORT_MINMAX(0,234) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -182,11 +221,30 @@ static INTERRUPT_GEN( m79amb_interrupt )
 static DRIVER_INIT( m79amb )
 {
 	UINT8 *rom = memory_region(machine, "maincpu");
-	int i;
+	int i,j;
 
 	/* PROM data is active low */
  	for (i = 0;i < 0x2000;i++)
 		rom[i] = ~rom[i];
+
+	/* gun positions */
+	for (i=0;i<0x100;i++) {
+		/* gun 1, start at left 18 */
+		for (j=0;j<0x20;j++) {
+			if (i<=lut_cross[j]) {
+				lut_gun1[i]=lut_pos[j];
+				break;
+			}
+		}
+
+		/* gun 2, start at right 235 */
+		for (j=0;j<0x20;j++) {
+			if (i>=(253-lut_cross[j])) {
+				lut_gun2[i]=lut_pos[j];
+				break;
+			}
+		}
+	}
 }
 
 static MACHINE_DRIVER_START( m79amb )
