@@ -15,6 +15,7 @@ READ16_HANDLER( midtunit_cmos_r );
 READ16_HANDLER( midtunit_input_r );
 
 DRIVER_INIT( mktunit );
+DRIVER_INIT( mkturbo );
 DRIVER_INIT( jdreddp );
 DRIVER_INIT( nbajam );
 DRIVER_INIT( nbajamte );

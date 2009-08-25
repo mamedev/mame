@@ -174,6 +174,21 @@ static WRITE16_HANDLER( mk_prot_w )
 
 /*************************************
  *
+ *  MK Turbo Ninja protection
+ *
+ *************************************/
+
+static READ16_HANDLER( mkturbo_prot_r )
+{
+	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
+	 * A startup protection check expects to read back two different values in succession */
+	return mame_rand(space->machine);
+}
+
+
+
+/*************************************
+ *
  *  Mortal Kombat 2 protection
  *
  *************************************/
@@ -453,6 +468,15 @@ DRIVER_INIT( mktunit )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
 	memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
 }
+
+DRIVER_INIT( mkturbo )
+{
+	/* protection */
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfffff400, 0xfffff40f, 0, 0, mkturbo_prot_r);
+
+	DRIVER_INIT_CALL(mktunit);
+}
+
 
 static void init_nbajam_common(running_machine *machine, int te_protection)
 {
