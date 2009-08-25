@@ -21,6 +21,10 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 
 UINT16 *kaneko16_mcu_ram;
 
+static int global_offset=0;
+
+int unk[2];
+
 /***************************************************************************
                                 Gals Panic (set 2)
                                 Gals Panic (set 3)
@@ -269,7 +273,6 @@ FFFE : probably polled by MCU, needs to be kept alive (cleared by main cpu - IT2
 00207FE0 : base of 'stack' used when transfering tables out of MCU
 */
 
-static void calc3_mcu_run(running_machine *machine);
 
 static int calc3_mcu_status, calc3_mcu_command_offset;
 
@@ -280,10 +283,12 @@ void calc3_mcu_init(void)
 	calc3_mcu_command_offset = 0;
 }
 
+void calc3_mcu_run(running_machine *machine);
+
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
-	calc3_mcu_run(space->machine);
+	//calc3_mcu_run(space->machine);
 }
 
 #define CALC3_MCU_COM_W(_n_)				\
@@ -291,13 +296,13 @@ WRITE16_HANDLER( calc3_mcu_com##_n_##_w )	\
 {											\
 	logerror("calc3w %d %04x %04x\n",_n_, data,mem_mask); \
 	calc3_mcu_status |= (1 << _n_);			\
-	calc3_mcu_run(space->machine);					\
 }
 
 CALC3_MCU_COM_W(0)
 CALC3_MCU_COM_W(1)
 CALC3_MCU_COM_W(2)
 CALC3_MCU_COM_W(3)
+
 
 /***************************************************************************
                                 Shogun Warriors
@@ -356,7 +361,7 @@ where games specify the same decryption key the table used is the same, I don't 
 Status
 
 Blocks marked ** are decrypted and verified
-              ~~ means I have the data to study
+              .. means I have the data to study
 
 (Shogun Warriors)
 
@@ -409,28 +414,29 @@ Blocks marked ** are decrypted and verified
 ** Block 15 Found Base 250f - Mode? 02 Unknown 3f Key 24 Length 03b8                                           | shift 3 places + table, contains GAME OVER, CONTINUE
 ** Block 16 Found Base 28cd - Mode? 01 Unknown 03 Key 80 Length 018a
 ** Block 17 Found Base 2a5d - Mode? 01 Unknown 1f Key 15 Length 018a
--- Block 18 Found Base 2bed - Mode? 01 Unknown 44 Key 00 Length 0184
+** Block 18 Found Base 2bed - Mode? 01 Unknown 44 Key 00 Length 0184                                           | 4 place shift
 ** Block 19 Found Base 2d77 - Mode? 01 Unknown 03 Key 19 Length 0184                                           | just a table
-   Block 1a Found Base 2f01 - Inline Encryption (size 21) - Mode? 02 Unknown 3f Key (unused?) 61 Length 0a24
-   Block 1b Found Base 394c - Mode? 01 Unknown 5f Key 22 Length 0e02
-   Block 1c Found Base 4754 - Mode? 01 Unknown 1f Key 3f Length 0e02
-   Block 1d Found Base 555c - Mode? 01 Unknown 03 Key bf Length 0e02
-   Block 1e Found Base 6364 - Mode? 01 Unknown 01 Key 24 Length 0e02
+** Block 1a Found Base 2f01 - Inline Encryption (size 21) - Mode? 02 Unknown 3f Key (unused?) 61 Length 0a24
+** Block 1b Found Base 394c - Mode? 01 Unknown 5f Key 22 Length 0e02
+** Block 1c Found Base 4754 - Mode? 01 Unknown 1f Key 3f Length 0e02
+** Block 1d Found Base 555c - Mode? 01 Unknown 03 Key bf Length 0e02
+** Block 1e Found Base 6364 - Mode? 01 Unknown 01 Key 24 Length 0e02
 ** Block 1f Found Base 716c - Mode? 02 Unknown 1f Key 39 Length 02ac                                           | 1 place shift + table
-   Block 20 Found Base 741e - Mode? 03 Unknown 03 Key af Length 01a4
-   Block 21 Found Base 75c8 - Inline Encryption (size 3d) - Mode? 03 Unknown 2f Key (unused?) 7d Length 01fa
+** Block 20 Found Base 741e - Mode? 03 Unknown 03 Key af Length 01a4
+** Block 21 Found Base 75c8 - Inline Encryption (size 3d) - Mode? 03 Unknown 2f Key (unused?) 7d Length 01fa
 ** Block 22 Found Base 7805 - Mode? 03 Unknown 1f Key 17 Length 010c                                           | 1 place shift + table
 ** Block 23 Found Base 7917 - Mode? 03 Unknown 03 Key 89 Length 018c                                           | just a table
-~~ Block 24 Found Base 7aa9 - Inline Encryption (size 03) - Mode? 03 Unknown 5f Key (unused?) 43 Length 0214
-   Block 25 Found Base 7cc6 - Inline Encryption (size 1d) - Mode? 03 Unknown 02 Key (unused?) 5d Length 0178
-   Block 26 Found Base 7e61 - Mode? 03 Unknown 03 Key 05 Length 04e2
-   Block 27 Found Base 8349 - Mode? 03 Unknown 3f Key a7 Length 00fa
-   Block 28 Found Base 8449 - Inline Encryption (size 23) - Mode? 03 Unknown 1f Key (unused?) 63 Length 015a
-   Block 29 Found Base 85cc - Mode? 03 Unknown 03 Key 15 Length 00d6
-   Block 2a Found Base 86a8 - Mode? 03 Unknown 3f Key a1 Length 00aa
-   Block 2b Found Base 8758 - Mode? 03 Unknown 2f Key 04 Length 01a2
-   Block 2c Found Base 8900 - Mode? 03 Unknown 2f Key 04 Length 04cc
-   Block 2d Found Base 8dd2 - Mode? 03 Unknown 03 Key 15 Length 0486
+** Block 24 Found Base 7aa9 - Inline Encryption (size 03) - Mode? 03 Unknown 5f Key (unused?) 43 Length 0214
+** Block 25 Found Base 7cc6 - Inline Encryption (size 1d) - Mode? 03 Unknown 02 Key (unused?) 5d Length 0178
+** Block 26 Found Base 7e61 - Mode? 03 Unknown 03 Key 05 Length 04e2
+** Block 27 Found Base 8349 - Mode? 03 Unknown 3f Key a7 Length 00fa
+** Block 28 Found Base 8449 - Inline Encryption (size 23) - Mode? 03 Unknown 1f Key (unused?) 63 Length 015a
+** Block 29 Found Base 85cc - Mode? 03 Unknown 03 Key 15 Length 00d6
+** Block 2a Found Base 86a8 - Mode? 03 Unknown 3f Key a1 Length 00aa
+** Block 2b Found Base 8758 - Mode? 03 Unknown 2f Key 04 Length 01a2
+** Block 2c Found Base 8900 - Mode? 03 Unknown 2f Key 04 Length 04cc
+** Block 2d Found Base 8dd2 - Mode? 03 Unknown 03 Key 15 Length 0486
+
 
 */
 
@@ -454,14 +460,6 @@ static UINT8 calc3_key01[64] = {
 	0xda,0x89,0x08,0x77,0xb1,0x81,0x6b,0x2d,0xb6,0xbc,0x99,0xc9,0x35,0x0a,0x0f,0x01
 };
 
-/* ok - shogwarr */
-static UINT8 calc3_key15[64] = {
-	0x0C,0xEB,0x30,0x25,0xA8,0xED,0xE3,0x23,0xAC,0x2B,0x8D,0x34,0x88,0x9F,0x55,0xB5,
-	0xBF,0x15,0xE3,0x7C,0x54,0xD4,0x72,0xA9,0x7E,0x80,0x27,0x9F,0xA3,0x3F,0xA1,0x4D,
-	0x84,0x1B,0xD1,0xB2,0xB5,0xA7,0x0C,0xA0,0x51,0xE6,0x5E,0xC0,0xEB,0x68,0x22,0xD6,
-	0xC8,0xB6,0xCF,0x46,0x4B,0xF0,0x15,0xD7,0xB0,0xB5,0x29,0xB8,0xFD,0x43,0x5C,0xC0
-};
-
 
 /* ok - brapboys initial transfer */
 static UINT8 calc3_key04[64] = {
@@ -470,6 +468,21 @@ static UINT8 calc3_key04[64] = {
 	0x9c,0x8e,0x45,0xe8,0x5b,0xe1,0xdd,0xaf,0x99,0xa8,0x47,0x79,0x67,0x00,0x38,0xf4,
 	0x43,0xbe,0x47,0x32,0x8f,0x0e,0xfd,0x64,0x42,0x59,0x2b,0xe5,0xde,0x6d,0x80,0x7a,
  };
+ 
+ static UINT8 calc3_key05[64] = {
+    0x5e,0xd8,0xa6,0xd7,0x00,0x94,0x23,0x66,0xaf,0xea,0xbe,0x45,0x38,0x90,0x8e,0x8d,
+	0x5b,0x14,0x2c,0xda,0x55,0x7e,0x9d,0x08,0x2d,0x31,0xfd,0x3a,0xbe,0x13,0xeb,0x21,
+	0x87,0xee,0xb7,0x7b,0x34,0x15,0x4d,0xd9,0xeb,0x4a,0xde,0xa6,0x57,0xdf,0x53,0x65,
+	0x75,0x1c,0x72,0x3a,0x20,0xe1,0xcd,0xac,0x5d,0x8c,0x6d,0xa9,0x66,0x1d,0x41,0xca,
+};
+
+/* ok - shogwarr */
+static UINT8 calc3_key15[64] = {
+	0x0C,0xEB,0x30,0x25,0xA8,0xED,0xE3,0x23,0xAC,0x2B,0x8D,0x34,0x88,0x9F,0x55,0xB5,
+	0xBF,0x15,0xE3,0x7C,0x54,0xD4,0x72,0xA9,0x7E,0x80,0x27,0x9F,0xA3,0x3F,0xA1,0x4D,
+	0x84,0x1B,0xD1,0xB2,0xB5,0xA7,0x0C,0xA0,0x51,0xE6,0x5E,0xC0,0xEB,0x68,0x22,0xD6,
+	0xC8,0xB6,0xCF,0x46,0x4B,0xF0,0x15,0xD7,0xB0,0xB5,0x29,0xB8,0xFD,0x43,0x5C,0xC0
+};
 
   static UINT8 calc3_key17[64] = {
     0x1b,0x48,0xa4,0xdd,0x2e,0x7a,0xe3,0xd1,0x6d,0x9e,0x49,0x31,0xdb,0x13,0xe6,0x00,
@@ -483,6 +496,13 @@ static UINT8 calc3_key04[64] = {
 	0x50,0x17,0x9f,0x77,0xf8,0xcb,0xb0,0xc4,0xed,0x16,0x96,0xca,0xba,0xec,0x22,0xca,
 	0x8f,0x28,0xd3,0x12,0xc6,0x2e,0xc4,0xc3,0x36,0xcf,0x59,0xd8,0x3a,0x6c,0xa7,0x64,
 	0x7f,0x5f,0xa6,0x1b,0x90,0x96,0x19,0x14,0x22,0x81,0x38,0xcd,0x20,0x2f,0x22,0x70,
+};
+
+  static UINT8 calc3_key22[64] = {
+    0xfe,0xf7,0xc7,0x85,0xe4,0xd3,0x93,0xd0,0x36,0x61,0xc8,0x4d,0x0c,0x3e,0x2a,0x1c,
+	0x32,0x1a,0xbf,0x1a,0xb0,0x60,0xb5,0xa8,0x1a,0x19,0x16,0xaf,0x96,0x0d,0x2d,0xe0,
+	0xb1,0x2c,0xb6,0x41,0xe1,0x2d,0xc8,0xe5,0xd9,0x75,0x82,0xfa,0x90,0x3a,0x77,0x09,
+	0x0e,0xe8,0xda,0x7a,0xfb,0xc4,0x68,0x57,0xe8,0xcf,0x18,0x51,0x5b,0xed,0x83,0x08,
 };
 
   static UINT8 calc3_key24[64] = {
@@ -506,6 +526,13 @@ static UINT8 calc3_key31[64] = {
 	0x26,0xf3,0x44,0x94,0xdb,0x15,0x76,0xcc,0x28,0x33,0x2d,0x4b,0x79,0xdb,0x06,0xbc
 };
 
+static UINT8 calc3_key3f[64] = {
+	0x27,0xb4,0xc1,0xba,0x5f,0xd4,0x47,0x04,0x1f,0xfe,0x42,0xa5,0xce,0xb5,0x23,0xbe,
+	0x42,0xcc,0x59,0x71,0x51,0x13,0x41,0xa4,0x18,0x35,0xcf,0x02,0x0d,0xe1,0xfb,0x43,
+	0xc5,0x28,0xed,0xae,0x84,0x27,0xe8,0xdc,0x89,0xe5,0xf6,0xbe,0x16,0x7e,0x57,0xe1,
+	0x41,0x82,0xa9,0xf1,0x7c,0x98,0xd7,0x7c,0xe5,0x67,0xc2,0xf9,0x4d,0xb6,0xb0,0x09,
+};
+
  static UINT8 calc3_key80[64] = {
     0x33,0x8e,0x6f,0x22,0xac,0x01,0x9f,0x7a,0xc7,0xca,0x23,0xc4,0xa4,0x9c,0x07,0xf8,
 	0x98,0xc1,0x17,0x4a,0xb2,0xbc,0xcc,0xf4,0x0e,0x2e,0xf6,0x35,0xdd,0xf6,0x29,0x9a,
@@ -520,20 +547,72 @@ static UINT8 calc3_key31[64] = {
 	0x67,0x47,0xee,0xa2,0x35,0xb3,0xff,0x76,0x57,0x4f,0x30,0x66,0xf8,0xe9,0xe0,0x5b,
 };
 
+ static UINT8 calc3_keya1[64] = {
+    0x0f,0x35,0xa3,0x7c,0xf1,0x75,0xea,0x27,0x36,0x4d,0x4b,0x1a,0x3b,0x24,0xef,0x9d,
+	0x4e,0x39,0x7e,0x7b,0x3d,0x42,0x0d,0xc2,0x9f,0x53,0xc7,0xc4,0xdf,0x02,0x5d,0x61,
+	0x0c,0xc9,0x2d,0x89,0x63,0xab,0x34,0xfc,0x97,0x1b,0xb5,0x54,0xe6,0x19,0xa5,0x46,
+	0xdc,0x9e,0xdc,0x25,0xe4,0x3a,0xfc,0xa7,0x93,0xfc,0x1f,0xec,0xb3,0x92,0x43,0xbc,
+};
+
+ static UINT8 calc3_keya7[64] = {
+    0x5d,0xdd,0xd4,0xbe,0xc0,0xff,0xe1,0x1b,0x3a,0xd6,0x61,0xc8,0x90,0x02,0x23,0x08,
+	0xfa,0x7a,0xfa,0x1d,0xab,0x2b,0xa0,0x0b,0x24,0xe1,0x6b,0x9e,0x38,0x6b,0xb2,0xae,
+	0xdd,0xfa,0xfc,0xa2,0xb8,0xcb,0xed,0x33,0x66,0x06,0xef,0x72,0x8b,0xe5,0xa3,0x0d,
+	0x9b,0x18,0x05,0xce,0x6a,0x69,0x61,0x64,0x74,0x9c,0xf9,0x66,0xec,0x99,0x72,0x95,
+};
+
+ static UINT8 calc3_keyaf[64] = {
+    0x2c,0xf3,0x0d,0x50,0x30,0x77,0xc2,0x25,0x91,0x83,0x5f,0xac,0xf4,0x56,0x96,0xc8,
+	0x70,0x86,0x16,0x5a,0x1b,0xa1,0x7d,0x08,0x53,0x15,0xfd,0x3c,0xcb,0x4d,0xd0,0x70,
+	0x5c,0x1d,0x5c,0xaa,0x87,0x60,0x24,0x42,0xcc,0xe0,0x75,0xeb,0xae,0x75,0xcc,0xf1,
+	0x81,0x71,0x09,0xc0,0xf8,0x3c,0x55,0xa6,0x71,0x3c,0xd2,0xda,0xfe,0xf8,0x07,0xbc,
+};
+
 static UINT8 calc3_keybc[64] = {
     0xb8,0x8a,0xa5,0x8f,0x58,0x30,0xb0,0x38,0xa6,0x53,0x84,0x33,0xd4,0xd7,0xbd,0x26,
 	0x45,0x35,0xb7,0xf6,0x1a,0x20,0x7b,0x8d,0x7e,0x68,0x69,0xdb,0xb1,0x1e,0xa5,0x1a,
 	0xd5,0xf9,0x42,0x57,0x7a,0xf8,0x30,0x2e,0xea,0x49,0xe5,0xd5,0x34,0x6a,0xcd,0x5b,
 	0xfa,0x8e,0x71,0x32,0xfa,0x42,0x69,0xec,0x5d,0x50,0x02,0x42,0xc2,0xe4,0xae,0x5a,
  };
+ 
+ static UINT8 calc3_keybf[64] = {
+	0x9a,0x8e,0xcf,0x66,0xe0,0xd8,0xd4,0x2a,0x0f,0x4d,0xad,0x64,0x8c,0x6d,0xcb,0x37,
+	0x2e,0x0e,0x9f,0xc4,0xca,0xff,0x85,0xf1,0x7f,0xec,0x71,0x69,0xc2,0x81,0x5c,0xe4,
+	0x28,0xd2,0x6b,0xa9,0xf6,0xfb,0xe4,0x51,0x68,0x03,0xd0,0xcd,0xc3,0x07,0x6f,0xab,
+	0x1c,0x94,0x5f,0x94,0xe6,0x54,0x8b,0x1a,0x3c,0xed,0xd4,0xb0,0xf3,0x26,0x81,0xfa,
+};
 
 // global so we can use them in the filename when we save out the data (debug..)
 static UINT8 calc3_decryption_key_byte;
 static UINT8 calc3_unknown;
+static UINT8 calc3_shift;
 static UINT8 calc3_mode;
 static UINT8 calc3_blocksize_offset;
 static UINT16 calc3_dataend;
 static UINT16 calc3_database;
+
+UINT32 calc3_writeaddress;
+UINT32 calc3_writeaddress_current;
+UINT16 calc3_dsw_addr;
+UINT16 calc3_eeprom_addr;
+UINT16 calc3_poll_addr;
+UINT16 cakc3_checkumaddress;
+
+static UINT8 shift_bits(UINT8 dat, int bits)
+{
+	bits &=0x7;
+
+	if (bits==0) return BITSWAP8(dat, 7,6,5,4,3,2,1,0);
+	if (bits==1) return BITSWAP8(dat, 6,5,4,3,2,1,0,7);
+	if (bits==2) return BITSWAP8(dat, 5,4,3,2,1,0,7,6);
+	if (bits==3) return BITSWAP8(dat, 4,3,2,1,0,7,6,5);
+	if (bits==4) return BITSWAP8(dat, 3,2,1,0,7,6,5,4);
+	if (bits==5) return BITSWAP8(dat, 2,1,0,7,6,5,4,3);
+	if (bits==6) return BITSWAP8(dat, 1,0,7,6,5,4,3,2);
+	if (bits==7) return BITSWAP8(dat, 0,7,6,5,4,3,2,1);
+	
+	return dat;
+}
 
 // endian safe? you're having a laugh
 int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
@@ -541,6 +620,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 	UINT8* rom = memory_region(machine,"cpu1");
 	UINT8 numregions;
 	UINT16 length;
+	int local_counter=0;
 	int x;
 	int offset = 0;
 	int isbrap = ( !strcmp(machine->gamedrv->name,"brapboysj") || !strcmp(machine->gamedrv->name,"brapboys"));
@@ -563,7 +643,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		length = rom[offset+0] | (rom[offset+1]<<8);
 		offset+=length+2;
 	}
-
+	
 	// we're at the start of the block, get the info about it
 	{
 		UINT16 inline_table_base = 0;
@@ -572,6 +652,8 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		calc3_blocksize_offset =    rom[offset+0]; // location of the 'block length'
 		calc3_mode =                rom[offset+1];
 		calc3_unknown =             rom[offset+2];
+		calc3_shift = (calc3_unknown &0xf0)>>4;
+		calc3_unknown &= 0x0f;
 		calc3_decryption_key_byte = rom[offset+3];
 
 
@@ -586,16 +668,17 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		offset+= calc3_blocksize_offset+1;
 		length = rom[offset+0] | (rom[offset+1]<<8);
 		offset+=2;
+		
+		global_offset=offset;
 
 		if (inline_table_size)
 		{
-			printf("Block %02x Found Base %04x - Inline Encryption (size %02x) - Mode? %02x Unknown %02x Key (unused?) %02x Length %04x\n", tabnum, calc3_database, inline_table_size, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);
+			printf("Block %02x Found Base %04x - Inline Encryption (size %02x) - Mode? %02x Shift %01x Unk %01x Key (unused?) %02x Length %04x\n", tabnum, calc3_database, inline_table_size, calc3_shift, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);
 		}
 		else
 		{
-			printf("Block %02x Found Base %04x - Mode? %02x Unknown %02x Key %02x Length %04x\n", tabnum, calc3_database, calc3_mode, calc3_unknown, calc3_decryption_key_byte, length);
+			printf("Block %02x Found Base %04x - Mode? %02x Shift %01x Unk %01x Key %02x Length %04x\n", tabnum, calc3_database, calc3_mode, calc3_shift, calc3_unknown, calc3_decryption_key_byte, length);
 		}
-
 
 		// copy + decrypt the table to the specified memory area
 		if (dstram)
@@ -607,67 +690,70 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				// shogwarr does this with 'mode' as 0x08, which probably has some special meaning
 				//printf("CALC3: requested 0 length table!\n");
 				// -- seems to be 'reset stack' to default for the protection table writes
+				
+				// except this will break shogun going into game, must be specific conditions for 
+				// this, or it can remember addresses and restore those
+				//calc3_writeaddress_current = calc3_writeaddress;
+				return 0;
 			}
 
 			if (inline_table_size)
 			{
+			// these should be derived from the inline table somehow, probably just a +/- swap like the normal stuff.. maybe
+				UINT8 extra[]  = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a,0x72,0xba,0x48,0x76,0x66,0x4a,0x7c,0x5c,0x82,0x0a,0x86,0x82,0x02,0xe6 };
+				UINT8 extra2[] = { 0x2f,0x04,0xd1,0x69,0xad,0xeb,0x10,0x95,0xb0,0x2f,0x0a,0x83,0x7d,0x4e,0x2a,0x07,0x89,0x52,0xca,0x41,0xf1,0x4f,0xaf,0x1c,0x01,0xe9,0x89,0xd2,0xaf,0xcd };
+			
+			
 				for (i=0;i<length;i++)
 				{
 					UINT8 dat=0;
-
-					if (tabnum==0x11 && isbrap )
+					int extrasign = -1;
+					
+					
+					if (
+					    (tabnum==0x11 && isbrap) ||
+  					    (tabnum==0x1a && isbrap) ||
+					    (tabnum==0x21 && isbrap) ||
+					    (tabnum==0x24 && isbrap) ||
+					    (tabnum==0x28 && isbrap)
+						/*(tabnum==0x40 && !isbrap)*/
+						)
+							extrasign = 0;
+					
+					if ((tabnum==0x25 && isbrap))
+						extrasign = 1;
+						
+						
+					
+					if (extrasign !=-1)
 					{
-
-						// typed data.. to verify results, out decrypt works!
-						unsigned char rawData[252+2] = {
-							0x00,0x00,  0x42, 0x79, 0x00, 0x20, 0x08, 0x2E, 0x10, 0x39, 0x00, 0x20, 0x00, 0xC2,
-							0x02, 0x40, 0x00, 0x30, 0xE4, 0x48, 0x33, 0xFB, 0x00, 0x3C, 0x00, 0x10,
-							0x22, 0x42, 0x30, 0x3B, 0x00, 0x32, 0x43, 0xEE, 0x00, 0x0A, 0x41, 0xF9,
-							0x00, 0x20, 0x08, 0x30, 0x4A, 0x50, 0x67, 0x00, 0x00, 0x04, 0x4E, 0x75,
-							0x11, 0x40, 0x00, 0x02, 0x11, 0x7C, 0x00, 0xFC, 0x00, 0x03, 0x31, 0x49,
-							0x00, 0x04, 0x30, 0xBC, 0x00, 0x01, 0x42, 0x6E, 0xFF, 0xB0, 0x41, 0xFA,
-							0x00, 0x16, 0x2C, 0x88, 0x4E, 0x75, 0x00, 0x16, 0x00, 0x00, 0x00, 0x17,
-							0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00, 0x19, 0x00, 0x01, 0x33, 0xC0,
-							0x00, 0x2C, 0x00, 0x00, 0x30, 0x3C, 0x00, 0x14, 0x51, 0xC8, 0xFF, 0xFE,
-							0x33, 0xC0, 0x00, 0x2D, 0x00, 0x00, 0x42, 0x79, 0x00, 0x20, 0x08, 0x2E,
-							0x41, 0xF9, 0x00, 0x10, 0x78, 0xB6, 0x70, 0x07, 0x0C, 0x10, 0x00, 0x03,
-							0x66, 0x00, 0x00, 0x0E, 0x53, 0x68, 0x00, 0x0E, 0x66, 0x00, 0x00, 0x06,
-							0x10, 0xBC, 0x00, 0x04, 0x41, 0xE8, 0x00, 0x12, 0x51, 0xC8, 0xFF, 0xE6,
-							0x32, 0x39, 0x00, 0x10, 0x22, 0x46, 0x02, 0x41, 0xFF, 0xFC, 0x10, 0x39,
-							0x00, 0x20, 0x00, 0xC2, 0x02, 0x40, 0x00, 0x01, 0x82, 0x40, 0xE3, 0x48,
-							0x82, 0x40, 0x33, 0xC1, 0x00, 0x90, 0x00, 0x00, 0x33, 0xFB, 0x00, 0x2A,
-							0x00, 0x10, 0x20, 0x26, 0xE5, 0x48, 0x23, 0xFB, 0x00, 0x24, 0x00, 0x10,
-							0x20, 0x22, 0x33, 0xFB, 0x00, 0x20, 0x00, 0x90, 0x00, 0x02, 0x32, 0x39,
-							0x00, 0x10, 0x22, 0x48, 0x82, 0x7B, 0x00, 0x14, 0x33, 0xC1, 0x00, 0x80,
-							0x00, 0x08, 0x4E, 0x75, 0xFF, 0xFF, 0x00, 0x3F, 0xE8, 0xC0, 0x42, 0x00,
-							0x03, 0xC0, 0x00, 0x00, 0x57, 0x00, 0x7E, 0x00, 0xFC, 0x00, 0x03, 0x03
-						};
-
-						if ( ((i / 19)&1)==0)
+						if ( ((i / inline_table_size)&1)==0)
 						{
 							if (((i%inline_table_size)&1)==1)
 							{
 								UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 								dat = rom[offset+i];
-								//printf("%02x, ",inlinet);
 								dat -= inlinet;
-
-								dat = BITSWAP8(dat, 4,3,2,1,0,7,6,5);
-								if (dat != rawData[i]) printf("ERROR %d x %02x %02x\n", (i / 19)&1, dat, rawData[i]);
+								dat = shift_bits(dat, calc3_shift);
 							}
 							else
 							{
-								UINT8 extra[] = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c/*,0x74,0xd6,0x6a,0x24,0x12,0x1a */};
+								
 								UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 								dat = rom[offset+i];
-								dat -= inlinet;
-								dat -= extra[(i%inline_table_size)>>1];
-								dat = BITSWAP8(dat, 2,1,0,7,6,5,4,3);
-
-								if (dat != rawData[i]) printf("ERROR %d y %02x %02x\n", (i / 19)&1, dat, rawData[i]);
-
-								//dat = rawData[i];
-
+								
+								if (extrasign==0)
+								{
+									dat -= inlinet;
+									dat -= extra[(i%inline_table_size)>>1];
+								}
+								else
+								{
+									dat += inlinet;
+									dat += extra[(i%inline_table_size)>>1];							
+								}
+								
+								dat = shift_bits(dat, 8-calc3_shift);
 							}
 						}
 						else
@@ -677,25 +763,26 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 								UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 								dat = rom[offset+i];
 								dat -= inlinet;
-
-								dat = BITSWAP8(dat, 4,3,2,1,0,7,6,5);
-								if (dat != rawData[i]) printf("ERROR %d x %02x %02x\n", (i / 19)&1, dat, rawData[i]);
+								dat = shift_bits(dat, calc3_shift);			
 							}
 							else
 							{
-								// shhould probably use the inline table somehow?
-
-								UINT8 extra[] = { 0x2f, 0x04, 0xd1, 0x69, 0xad, 0xeb, 0x10, 0x95,0xb0 };;
 								dat = rom[offset+i];
-
-								dat -= extra[(i%inline_table_size)>>1];
-								dat = BITSWAP8(dat, 2,1,0,7,6,5,4,3);
-
-								if (dat != rawData[i]) printf("ERROR %d y %02x %02x\n", (i / 19)&1, dat, rawData[i]);
+								
+								if (extrasign==0)
+								{
+									dat -= extra2[(i%inline_table_size)>>1];
+								}
+								else
+								{
+									dat += extra2[(i%inline_table_size)>>1];
+								}
+								dat = shift_bits(dat, 8-calc3_shift);
 							}
-						}
+						}				
 					}
-					else if (tabnum==0x40) // fjbuster / shogun warriors japanese character select (what enables this extra?)
+					// the above rule doesn't work for this case... hmm ..
+					else if (tabnum==0x40 && !isbrap) // fjbuster / shogun warriors japanese character select (what enables this extra?)
 					{
 						UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 						dat = rom[offset+i];
@@ -706,17 +793,23 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						// is relative to the start of the original table, and has a size of 0x11 (17) bytes which loop.
 						if (((i%inline_table_size)&1)==0)
 						{
-							// thie gets mapped over half the inline table?!..  (inline length is 0x22, this changes odd bytes)
-							// what specifies the additional overlay here?
-							UINT8 extra[0x11] = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a };
 							dat -= extra[(i%inline_table_size)>>1];
-
 						}
-
-
+					}
+					else
+					{
+						if (i==1)
+							printf("unhandled inline case\n");
+					
 					}
 
-					dstram[(dstoffset+i)^1] = dat;
+					if(local_counter>1)
+
+						dstram[(dstoffset+i)^1] = dat;
+					else
+						unk[local_counter]=dat;
+					
+					++local_counter;
 				}
 			}
 			else
@@ -729,16 +822,22 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				// each key seems to relate directly to a 0x40 byte decryption table, only these ones handled so far
 				if (calc3_decryption_key_byte == 0x01) key = calc3_key01;
 				if (calc3_decryption_key_byte == 0x04) key = calc3_key04;
+				if (calc3_decryption_key_byte == 0x05) key = calc3_key05;				
 				if (calc3_decryption_key_byte == 0x15) key = calc3_key15;
 				if (calc3_decryption_key_byte == 0x17) key = calc3_key17;
 				if (calc3_decryption_key_byte == 0x19) key = calc3_key19;
+				if (calc3_decryption_key_byte == 0x22) key = calc3_key22;
 				if (calc3_decryption_key_byte == 0x24) key = calc3_key24;
 				if (calc3_decryption_key_byte == 0x31) key = calc3_key31;
 				if (calc3_decryption_key_byte == 0x39) key = calc3_key39;
+				if (calc3_decryption_key_byte == 0x3f) key = calc3_key3f;				
 				if (calc3_decryption_key_byte == 0x80) key = calc3_key80;
 				if (calc3_decryption_key_byte == 0x89) key = calc3_key89;
+				if (calc3_decryption_key_byte == 0xa1) key = calc3_keya1;
+				if (calc3_decryption_key_byte == 0xa7) key = calc3_keya7;
+				if (calc3_decryption_key_byte == 0xaf) key = calc3_keyaf;
 				if (calc3_decryption_key_byte == 0xbc) key = calc3_keybc;
-
+				if (calc3_decryption_key_byte == 0xbf) key = calc3_keybf;
 
 				for (i=0;i<length;i++)
 				{
@@ -746,133 +845,74 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 
 					UINT8 dat = rom[offset+i];
 
-					if (tabnum==0x12 && isbrap)
-					{
-						dat = BITSWAP8(dat, 4,3,2,1,0,7,6,5);
-					}
-					else if (tabnum==0x13 && isbrap)
+					if ((tabnum==0x10 && isbrap) ||
+					    (tabnum==0x13 && isbrap) ||
+					    (tabnum==0x14 && isbrap) ||
+					    (tabnum==0x15 && isbrap) ||
+					    (tabnum==0x16 && isbrap) ||
+					    (tabnum==0x18 && isbrap) ||
+					    (tabnum==0x19 && isbrap) ||
+					    (tabnum==0x1b && isbrap) ||
+					    (tabnum==0x1c && isbrap) ||
+					    (tabnum==0x1d && isbrap) ||
+					    (tabnum==0x1f && isbrap) ||
+					    (tabnum==0x20 && isbrap) ||
+					    (tabnum==0x22 && isbrap) ||
+					    (tabnum==0x23 && isbrap) ||
+					    (tabnum==0x26 && isbrap) ||
+					    (tabnum==0x27 && isbrap) ||
+					    (tabnum==0x2a && isbrap) ||
+						(tabnum==0x41 && !isbrap))
 					{
 						dat -= key[i&0x3f];
 
-						if ((i&1)==0) dat = BITSWAP8(dat, 5,4,3,2,1,0,7,6);
-						else          dat = BITSWAP8(dat, 1,0,7,6,5,4,3,2);
+						if ((i&1)==0) dat = shift_bits(dat, 8-calc3_shift);
+						else          dat = shift_bits(dat, calc3_shift);
 
 					}
-					else if (tabnum==0x14 && isbrap)
+					else if ((tabnum==0x17 && isbrap) ||
+					         (tabnum==0x29 && isbrap) ||
+							 (tabnum==0x2b && isbrap) ||
+							 (tabnum==0x2c && isbrap) ||
+							 (tabnum==0x2d && isbrap))
 					{
-						dat -= key[i&0x3f];
-					}
-					else if (tabnum==0x15 && isbrap)
-					{
-						dat -= key[i&0x3f];
-
-						if ((i&1)==0) dat = BITSWAP8(dat, 2,1,0,7,6,5,4,3);
-						else          dat = BITSWAP8(dat, 4,3,2,1,0,7,6,5);
-
-						//error 264 35 36  (typo, ignore)
-					}
-					else if (tabnum==0x16 && isbrap)
-					{
-						dat -= key[i&0x3f];
-						// error 1 02 should be 00 (the usual)
-					}
-					else if (tabnum==0x17 && isbrap)
-					{
-						// note we've seen this key (0x15) before, but again, here we have to add sometimes.. obviously a bit to control this..
 						if ((i&1)==0) dat += key[i&0x3f];
 						else dat -= key[i&0x3f];
 
-						if ((i&1)==0) dat = BITSWAP8(dat, 0,7,6,5,4,3,2,1);
-						else          dat = BITSWAP8(dat, 6,5,4,3,2,1,0,7);
-
-						//error 1 02 should be 00 (the usual)
-						//error 390 02 should be 00 (typo, ignore)
-						//error 391 c6 should be 2c (typo, ignore)
-						//error 392 03 should be 60 (typo, ignore)
-						//error 393 60 should be 36 (typo, ignore)
+						if ((i&1)==0) dat = shift_bits(dat, 8-calc3_shift);
+						else          dat = shift_bits(dat, calc3_shift);
 					}
-					else if (tabnum==0x19 && isbrap)
+					else if ((tabnum==0x1e && isbrap) ||
+					         (tabnum==0x80 && !isbrap))
 					{
-						dat -= key[i&0x3f];
-						// first 2 bytes were 00 in the returned data..
-						//if (i==1) dat=0x00;
+						// note we've already seen this table, but like many others, it's + instead of - on some bytes..
+						if ((i&1)==1) dat += key[i&0x3f];
+						else dat -= key[i&0x3f];
+						
+						if ((i&1)==0) dat = shift_bits(dat, 8-calc3_shift);
+						else          dat = shift_bits(dat, calc3_shift);				
 					}
-					else if (tabnum==0x1f && isbrap)
+					else if (tabnum==0x12 && isbrap)
 					{
-						dat -= key[i&0x3f];
-
-						if ((i&1)==0) dat = BITSWAP8(dat, 0,7,6,5,4,3,2,1);
-						else          dat = BITSWAP8(dat, 6,5,4,3,2,1,0,7);
-					}
-					else if (tabnum==0x22 && isbrap)
-					{
-
-						#if 0
-						{
-							UINT8 test;
-							UINT8 xxx;
-
-							if ((i&1)==1) xxx = BITSWAP8(rawData[i], 0,7,6,5,4,3,2,1);
-							else          xxx = BITSWAP8(rawData[i], 6,5,4,3,2,1,0,7);
-
-							test= dat-xxx;
-
-							printf("%02x,%02x,%02x  ",dat, rawData[i], test);
-
-							if ((i%0x40)==0x3f)
-								printf("\n");
-
-							//if (dat!=rawData[i]) printf("error %d %02x should be %02x\n",i, dat, rawData[i]);
-						}
-						#endif
-						{
-							dat -= key[i&0x3f];
-
-							if ((i&1)==0) dat = BITSWAP8(dat, 0,7,6,5,4,3,2,1);
-							else          dat = BITSWAP8(dat, 6,5,4,3,2,1,0,7);
-							// first 2 bytes were 00 in the returned data..
-							//if (i==1) dat=0x00;
-						}
-
-
-					}
-					else if (tabnum==0x23 && isbrap)
-					{
-						dat -= key[i&0x3f];
-						// error 1 18 should be 00 (usual byte 1 'issue)
-						// error 384 98 should be 38 (typo, ignore)
-
-					}
-					else if (tabnum==0x80 && !isbrap) // shogwarr table 80 (irq code)
-					{
-						if ((i&1)==0)
-						{
-							dat -= key[i&0x3f];
-							dat = BITSWAP8(dat,2,1,0,7,6,5,4,3);
-						}
-						else
-						{
-							// note + , not -  (!!)
-							dat += key[i&0x3f];
-							dat = BITSWAP8(dat,4,3,2,1,0,7,6,5);
-						}
-					}
-					else if (tabnum==0x41 && !isbrap) // shogwarr table 41  -- note fjbuster uses table 40, which looks like (almost) the same data but with better encryption...
-					{
-						// simple shifts...  different direction for each alternating byte..
-						dat -= key[i&0x3f];
-
-						if ((i&1)==1) dat = BITSWAP8(dat,0,7,6,5,4,3,2,1);
-						else dat = BITSWAP8(dat,6,5,4,3,2,1,0,7);
+						// this one doesn't alternate the shifts...  'unknown' is 8
+						dat = BITSWAP8(dat, 4,3,2,1,0,7,6,5);
 					}
 					else
 					{
+						if (i==1) printf("unhandled non-inline case!\n");
 						// plain table case
 						dat -= key[i&0x3f];
 					}
 
+					if(local_counter>1)
 
-					dstram[(dstoffset+i)^1] = dat;
+						dstram[(dstoffset+i)^1] = dat;
+					else
+						unk[local_counter]=dat;
+					
+					++local_counter;
+
+					//dstram[(dstoffset+i)^1] = dat;
 				}
 			}
 		}
@@ -885,6 +925,8 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 	return length;
 
 }
+
+
 
 DRIVER_INIT(calc3_scantables)
 {
@@ -959,14 +1001,10 @@ DRIVER_INIT(calc3_scantables)
 	}
 }
 
-UINT32 calc3_writeaddress;
-UINT16 calc3_dsw_addr;
-UINT16 calc3_eeprom_addr;
-UINT16 calc3_poll_addr;
-UINT16 cakc3_checkumaddress;
+
 
 extern UINT16 calc3_mcu_crc;
-extern UINT16* kaneko16_calc3_fakeram;
+
 // from brap boys, might be polluted with shogun warriors values tho as was running shogun code at the time
 static UINT16 kaneko16_eeprom_data[0x40] =
 {
@@ -980,7 +1018,7 @@ static UINT16 kaneko16_eeprom_data[0x40] =
 	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0x003B, 0xFFFF, 0xFFFF, 0xFFFF
 };
 
-static void calc3_mcu_run(running_machine *machine)
+void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
 	int i;
@@ -1013,6 +1051,9 @@ static void calc3_mcu_run(running_machine *machine)
 			cakc3_checkumaddress =     kaneko16_mcu_ram[(0>>1) + 5];
 			calc3_writeaddress =      (kaneko16_mcu_ram[(0>>1) + 6] << 16) |
 			                          (kaneko16_mcu_ram[(0>>1) + 7]);
+									  
+			// set our current write / stack pointer to the address specified
+			calc3_writeaddress_current = calc3_writeaddress;
 
 			printf("Calc 3 Init Command - %04x DSW addr\n",  calc3_dsw_addr);
 			printf("Calc 3 Init Command - %04x Eeprom Address\n",  calc3_eeprom_addr);
@@ -1021,7 +1062,7 @@ static void calc3_mcu_run(running_machine *machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  cakc3_checkumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3_writeaddress);
 
-			kaneko16_mcu_ram[calc3_dsw_addr/2] = ~input_port_read(machine, "DSW1");	// DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+			kaneko16_mcu_ram[calc3_dsw_addr/2] =( ~input_port_read(machine, "DSW1"))&0xff;	// DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 			kaneko16_mcu_ram[cakc3_checkumaddress / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
 
 			for (i=0;i<0x40;i++)
@@ -1046,71 +1087,30 @@ static void calc3_mcu_run(running_machine *machine)
 				int param1 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 1 + (2*i)];
 				int param2 = kaneko16_mcu_ram[(calc3_mcu_command_offset>>1) + 2 + (2*i)];
 				UINT8  commandtabl = (param1&0xff00) >> 8;
-				UINT16 commandaddr = (param1&0x00ff) | (param2&0xff00);
-				UINT8  commandunk =  (param2&0x00ff); // brap boys sets.. seems to cause further writebasck address displacement??
-
-				UINT32 fakeoffs;
+				UINT16 commandaddr =param2;// (param1&0x00ff) | (param2&0xff00);
+				UINT8  commandunk =  (param1&0x00ff); // brap boys sets.. seems to cause further writebasck address displacement?? (when tested on hw it looked like a simple +, but that doesn't work for brapboys...)
 
 				printf("transfer %d table %02x writeback address %04x unknown %02x\n", i, commandtabl, commandaddr, commandunk);
 
-				// the data SHOULD be written somewhere to main ram, probably related to the calc3_writeaddress set in command 0xff
-				// but I'm not sure how, for now write it back to a FAKE region instead
-				fakeoffs = 0x1e00*commandtabl;
-				fakeoffs+=0xf00000;
-
-				// HACK HACK HACK, I don't know what commandunk does, but Brap Boys polls a table of addresses and doesn't do anything
-				// more unless they change.  The usual writeback address doesn't touch this table, so I think this unknown value must
-				// cause an additional displacement to cause the writeback address to populate that table.. maybe
-				if (commandunk == 0x30)
 				{
 					int length;
-					commandaddr -= 0x60;
-					length = calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_mcu_ram, (calc3_writeaddress&0xffff)-2);
+					
+					length = calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_mcu_ram, (calc3_writeaddress_current&0xffff)-2);
+				
+					if (length)
+					{
+						int write=commandaddr;
+						printf("writing back address %08x to %08x %08x\n", calc3_writeaddress_current, commandaddr,write);
+						kaneko16_mcu_ram[(write>>1)+0] =unk[1];// (calc3_writeaddress_current>>16)&0xffff;
+						kaneko16_mcu_ram[(write>>1)+1] =unk[0];// (calc3_writeaddress_current&0xffff);
+						write=commandaddr+(char)commandunk;
+						kaneko16_mcu_ram[(write>>1)+0] = (calc3_writeaddress_current>>16)&0xffff;
+						kaneko16_mcu_ram[(write>>1)+1] = (calc3_writeaddress_current&0xffff);
+						calc3_writeaddress_current += ((length+3)&(~1));
+					}
 
-					printf("writing back address %08x to %08x\n", calc3_writeaddress, commandaddr);
-					kaneko16_mcu_ram[(commandaddr>>1)+0] = (calc3_writeaddress>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (calc3_writeaddress&0xffff);
-					calc3_writeaddress += length;
-
-				}
-				else if (commandunk == 0xa0)
-				{
-					int length;
-					commandaddr -= 0x6d;
-					length = calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_mcu_ram, (calc3_writeaddress&0xffff)-2);
-
-					printf("writing back address %08x to %08x\n", calc3_writeaddress, commandaddr);
-					kaneko16_mcu_ram[(commandaddr>>1)+0] = (calc3_writeaddress>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (calc3_writeaddress&0xffff);
-					calc3_writeaddress += length;
-				}
-				else if (commandunk == 0x98)
-				{
-					int length;
-					commandaddr -= (0x6d+0xd);
-					length = calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_mcu_ram, (calc3_writeaddress&0xffff)-2);
-
-					printf("writing back address %08x to %08x\n", calc3_writeaddress, commandaddr);
-					kaneko16_mcu_ram[(commandaddr>>1)+0] = (calc3_writeaddress>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (calc3_writeaddress&0xffff);
-					calc3_writeaddress += length;
-				}
-
-
-				else
-				{
-					calc3_decompress_table(machine, commandtabl, (UINT8*)kaneko16_calc3_fakeram, fakeoffs&0xfffff);
-
-					// write back WHERE we wrote the data to the address specified so that the code can jump to it etc.
-					fakeoffs+=2;// the first 2 bytes don't seem to be the offset it expects to jump to..
-
-					printf("writing back fake address %08x to %08x\n", fakeoffs, commandaddr);
-					kaneko16_mcu_ram[(commandaddr>>1)+0] = (fakeoffs>>16)&0xffff;
-					kaneko16_mcu_ram[(commandaddr>>1)+1] = (fakeoffs&0xffff);
 				}
 			}
-
-
 		}
 	}
 }

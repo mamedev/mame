@@ -80,7 +80,6 @@ Dip locations verified from manual for:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-UINT16* kaneko16_calc3_fakeram;
 static UINT16* kaneko16_mainram;
 
 /***************************************************************************
@@ -98,6 +97,8 @@ MACHINE_RESET( kaneko16 )
 	kaneko16_sprite_xoffs = 0;
 	kaneko16_sprite_yoffs = 0;
 
+	kaneko16_sprite_fliptype = 0;
+	
 /*
     Sx = Sprites with priority x, x = tiles with priority x,
     Sprites - Tiles Order (bottom -> top):
@@ -231,9 +232,11 @@ static MACHINE_RESET( shogwarr )
 
 	kaneko16_sprite_xoffs = 0xa00;
 
-	kaneko16_sprite_yoffs = 0x200;
+	kaneko16_sprite_yoffs = -0x40;
 
-
+	kaneko16_sprite_type = 0;
+	kaneko16_sprite_fliptype = 1;
+	
 	kaneko16_priority.sprite[0] = 2;	// below all
 	kaneko16_priority.sprite[1] = 3;	// above tile[0], below the others
 	kaneko16_priority.sprite[2] = 5;	// above all
@@ -801,6 +804,13 @@ static WRITE16_HANDLER( shogwarr_oki_bank_w )
 	}
 }
 
+extern void calc3_mcu_run(running_machine *machine);
+
+static WRITE16_HANDLER( calc3_run )
+{
+//	calc3_mcu_run(space->machine);
+}
+
 static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&kaneko16_mainram)		// Work RAM
@@ -808,6 +818,7 @@ static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(calc3_mcu_com0_w)
 	AM_RANGE(0x290000, 0x290001) AM_WRITE(calc3_mcu_com1_w)
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(calc3_mcu_com2_w)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(calc3_run) // guess, might be irqack
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(calc3_mcu_com3_w)
 	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)	// Samples
@@ -827,8 +838,6 @@ static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb80006, 0xb80007) AM_READ_PORT("UNK")
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP							// ? (bit 0)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(shogwarr_oki_bank_w)	// Samples Bankswitching
-
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM AM_BASE(&kaneko16_calc3_fakeram) // I copy protection data tables here because I don't know where they really go.  NOT ON PCB
 ADDRESS_MAP_END
 
 
@@ -1983,6 +1992,7 @@ MACHINE_DRIVER_END
 
     other: busy loop
 */
+
 #define SHOGWARR_INTERRUPTS_NUM	3
 static INTERRUPT_GEN( shogwarr_interrupt )
 {
@@ -1992,7 +2002,10 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
 
 		// the code for this interupt is provided by the MCU..
-		case 0:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 4, HOLD_LINE);
+		
+				calc3_mcu_run(device->machine);
+		break;
 		/*case 0:
         {
             // hack, clear this ram address to get into test mode (interrupt would clear it)
@@ -2020,7 +2033,7 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(40, 296-1, 0, 240-1)
+	MDRV_SCREEN_VISIBLE_AREA(40, 296-1, 16, 240-1)
 
 	MDRV_GFXDECODE(1x4bit_1x4bit)
 	MDRV_PALETTE_LENGTH(2048)
@@ -3470,16 +3483,15 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "rb-040.u33",  0x000000, 0x020000, CRC(757c6e19) SHA1(0f1c37b1b1eb6b230c593e4648c4302f413a61f5) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-020.u2",  0x000000, 0x080000, CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) )
-	ROM_LOAD( "rb-025.u80", 0x080000, 0x040000, CRC(36cd6b90) SHA1(45c50f2652726ded67c9c24185a71a6367e09270) ) // Correct size for this set
-//  ROM_LOAD( "rb-026.u5",  0x100000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // Not in World set
-
-	ROM_LOAD( "rb-021.u76", 0x200000, 0x080000, CRC(b7e2d362) SHA1(7e98e5b3d1ee972fc4cf9bebd33a3ca96a77357c) )
-	ROM_LOAD( "rb-022.u77", 0x280000, 0x080000, CRC(8d40c97a) SHA1(353b0a4a508f2fff8eeed680b1f685c7fdc29a7d) ) // right pos. (text)
-	ROM_LOAD( "rb-023.u78", 0x300000, 0x080000, CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) )
-	ROM_LOAD( "rb-024.u79", 0x380000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) )
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
+	/* prety sure all these are at least half size */
+	ROM_LOAD( "rb-020.u2",  0x080000, 0x080000, BAD_DUMP CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) ) // too small?
+	ROM_LOAD( "rb-021.u76", 0x180000, 0x080000, BAD_DUMP CRC(b7e2d362) SHA1(7e98e5b3d1ee972fc4cf9bebd33a3ca96a77357c) ) // too small?
+	ROM_LOAD( "rb-022.u77", 0x280000, 0x080000, BAD_DUMP CRC(8d40c97a) SHA1(353b0a4a508f2fff8eeed680b1f685c7fdc29a7d) ) // too small?
+	ROM_LOAD( "rb-023.u78", 0x380000, 0x080000, BAD_DUMP CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) ) // too small?
+	ROM_LOAD( "rb-024.u79", 0x400000, 0x080000, BAD_DUMP CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) ) // right?        title logo
+	ROM_LOAD( "rb-025.u80", 0x500000, 0x040000, CRC(36cd6b90) SHA1(45c50f2652726ded67c9c24185a71a6367e09270) ) // odd size..  guy on title screen, select screen  might be correct
+	//ROM_LOAD( "rb-026.u5",  0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // not on this set?
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
@@ -3506,17 +3518,17 @@ ROM_START( brapboysj ) /* The Japanese version has an extra rom??? and used a ro
  	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
 	ROM_LOAD( "rb-006.u33",  0x000000, 0x020000, CRC(f1d76b20) SHA1(c571b5f28e529589ee2d7697ef5d4b60ccb66e7a) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-020.u2",  0x000000, 0x080000, CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) )
-	ROM_LOAD( "rb-025.u4",  0x080000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) )
-	ROM_LOAD( "rb-026.u5",  0x100000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) )
-
-	ROM_LOAD( "rb-021.u76", 0x200000, 0x080000, CRC(b7e2d362) SHA1(7e98e5b3d1ee972fc4cf9bebd33a3ca96a77357c) )
-	ROM_LOAD( "rb-022.u77", 0x280000, 0x080000, CRC(8d40c97a) SHA1(353b0a4a508f2fff8eeed680b1f685c7fdc29a7d) ) // right pos. (text)
-	ROM_LOAD( "rb-023.u78", 0x300000, 0x080000, CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) )
-	ROM_LOAD( "rb-024.u79", 0x380000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) )
-
+	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Sprites */
+	/* prety sure all these are at least half size */
+	ROM_LOAD( "rb-020.u2",  0x080000, 0x080000, BAD_DUMP CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) ) // too small?
+	ROM_LOAD( "rb-021.u76", 0x180000, 0x080000, BAD_DUMP CRC(b7e2d362) SHA1(7e98e5b3d1ee972fc4cf9bebd33a3ca96a77357c) ) // too small?
+	ROM_LOAD( "rb-022.u77", 0x280000, 0x080000, BAD_DUMP CRC(8d40c97a) SHA1(353b0a4a508f2fff8eeed680b1f685c7fdc29a7d) ) // too small?
+	ROM_LOAD( "rb-023.u78", 0x380000, 0x080000, BAD_DUMP CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) ) // too small?
+	ROM_LOAD( "rb-024.u79", 0x400000, 0x080000, BAD_DUMP CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) ) // right?        title logo
+	ROM_LOAD( "rb-025.u4",  0x500000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) )  // special title screen
+	ROM_LOAD( "rb-026.u5",  0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) )  // logs that bounce past
+	
+	
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )

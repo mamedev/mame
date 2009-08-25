@@ -49,6 +49,7 @@ UINT16* galsnew_bg_pixram;
 UINT16* galsnew_fg_pixram;
 
 int kaneko16_sprite_type;
+int kaneko16_sprite_fliptype;
 static int kaneko16_keep_sprites = 0; // default disabled for games not using it
 UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
 UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
@@ -579,14 +580,19 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 		else
 			code = s->code;		// .. or latch this value
 
+	
 		if (flags & USE_LATCHED_COLOR)
 		{
 			s->color		=	color;
 			s->priority		=	priority;
 			s->xoffs		=	xoffs;
 			s->yoffs		=	yoffs;
-			s->flipx		=	flipx;
-			s->flipy		=	flipy;
+			
+			if (kaneko16_sprite_fliptype==0)
+			{
+				s->flipx		=	flipx;
+				s->flipy		=	flipy;	
+			}
 		}
 		else
 		{
@@ -594,10 +600,21 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 			priority	=	s->priority;
 			xoffs		=	s->xoffs;
 			yoffs		=	s->yoffs;
+			
+			if (kaneko16_sprite_fliptype==0)
+			{
+				flipx = s->flipx;
+				flipy = s->flipy;
+			}		
+		}
+	
+		// brap boys explicitly doesn't want the flip to be latched, maybe there is a different bit to enable that behavior?
+		if (kaneko16_sprite_fliptype==1)
+		{
 			flipx		=	s->flipx;
 			flipy		=	s->flipy;
 		}
-
+		
 		if (flags & USE_LATCHED_XY)
 		{
 			s->x += x;

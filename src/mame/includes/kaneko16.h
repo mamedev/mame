@@ -63,6 +63,7 @@ WRITE16_HANDLER( kaneko16_layers_1_regs_w );
 /* Sprites: */
 
 extern int kaneko16_sprite_type;
+extern int kaneko16_sprite_fliptype;
 extern UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
 extern UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
 extern UINT16 *kaneko16_sprites_regs;
