@@ -38,6 +38,7 @@
 #include "inptport.h"
 #include "wavwrite.h"
 #include "discrete.h"
+#include "eminline.h"
 
 
 /*************************************
@@ -65,11 +66,10 @@
 
 static void init_nodes(discrete_info *info, linked_list_entry *block_list, const device_config *device);
 static void find_input_nodes(discrete_info *info);
-static void setup_output_nodes(const device_config *device, discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
 static node_description *discrete_find_node(const discrete_info *info, int node);
 static DEVICE_RESET( discrete );
-
+static STREAM_UPDATE( discrete_stream_update );
 
 
 /*************************************
@@ -95,7 +95,79 @@ static void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const discrete_info *disc_in
 	}
 }
 
+typedef struct _task_info task_info;
 
+struct _task_info
+{
+	discrete_task_context *context;
+	int samples;
+};
+
+INLINE void step_nodes_in_list(linked_list_entry **list)
+{
+	linked_list_entry *entry;
+	for (entry = *list; entry != NULL; entry = entry->next)
+	{
+		node_description *node = (node_description *) entry->ptr;
+
+		/* Now step the node */
+		if (DISCRETE_PROFILING)
+			node->run_time -= osd_profiling_ticks();
+
+		(*node->module->step)(node);
+		//bigselect(info->device, node);
+
+		if (DISCRETE_PROFILING)
+			node->run_time += osd_profiling_ticks();
+	}
+}
+
+static void *task_callback(void *param, int threadid)
+{
+	task_info *ti = (task_info *) param;
+	int samples;
+
+	/* set up task buffer */
+	ti->context->ptr = &ti->context->node_buf[0];
+	samples = ti->samples;
+	while (samples-- > 0) 
+	{
+		step_nodes_in_list(&ti->context->list);
+	}
+	/* reset ptr */
+	ti->context->ptr = &ti->context->node_buf[0];
+
+	free(param);
+	return NULL;
+}
+
+static DISCRETE_STEP( dso_task )
+{
+	discrete_task_context *ctx =  (discrete_task_context *) node->context;
+	*(ctx->ptr++) = (double) *(node->input[0]);
+}
+
+static DISCRETE_RESET( dso_task )
+{
+	/* nothing to do - just avoid being stepped */
+}
+
+static DISCRETE_STEP( dso_output )
+{
+	stream_sample_t **output = (stream_sample_t **) &node->context;
+	double val;
+	
+	/* Add gain to the output and put into the buffers */
+	/* Clipping will be handled by the main sound system */
+	val = (*node->input[0]) * (*node->input[1]);
+	**output = val;
+	(*output)++;
+}
+
+static DISCRETE_RESET( dso_output )
+{
+	/* nothing to do - just avoid being stepped */
+}
 
 /*************************************
  *
@@ -119,13 +191,18 @@ static void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const discrete_info *disc_in
 
 static const discrete_module module_list[] =
 {
-	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,0                                      ,NULL                  ,NULL                 },
+	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,sizeof(0)                              ,dso_output_reset      ,dso_output_step      },
 	{ DSO_CSVLOG      ,"DSO_CSVLOG"      , 0 ,0                                      ,NULL                  ,NULL                 },
 	{ DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,0                                      ,NULL                  ,NULL                 },
 	{ DSO_IMPORT      ,"DSO_IMPORT"      , 0 ,0                                      ,NULL                  ,NULL                 },
 
+	/* parallel modules */
+	{ DSO_TASK_START  ,"DSO_TASK_START"  , 0 ,0                                      ,NULL                  ,NULL                 },
+	{ DSO_TASK_END    ,"DSO_TASK_END"    , 0 ,0                                      ,dso_task_reset        ,dso_task_step        },
+	{ DSO_TASK_SYNC   ,"DSO_TASK_SYNC"   , 0 ,0                                      ,NULL                  ,NULL                 },
+	
 	/* nop */
-	{ DSS_NOP         ,"DSS_NOP"         , 0 ,0                                      ,NULL                  ,NULL                },
+	{ DSS_NOP         ,"DSS_NOP"         , 0 ,0                                      ,NULL                  ,NULL                 },
 
 	/* from disc_inp.c */
 	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
@@ -298,11 +375,8 @@ static void discrete_build_list(discrete_info *info, discrete_sound_block *intf,
 		}
 		else if (intf[node_count].type == DSO_DELETE)
 		{
-			int p,deleted;
 			linked_list_entry *entry, *last;
 
-			p = 0;
-			deleted = 0;
 			last = NULL;
 			for (entry = info->block_list; entry != NULL; last = entry, entry = entry->next)
 			{
@@ -419,8 +493,13 @@ static DEVICE_START( discrete )
 	find_input_nodes(info);
 
 	/* then set up the output nodes */
-	setup_output_nodes(device, info);
+	/* initialize the stream(s) */
+	info->discrete_stream = stream_create(device, info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
 
+	/* allocate a queue */
+	
+	info->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
+	
 	setup_disc_logs(info);
 }
 
@@ -437,6 +516,8 @@ static DEVICE_STOP( discrete )
 	discrete_info *info = get_safe_token(device);
 	int log_num;
 
+	osd_work_queue_free(info->queue);
+	
 	if (DISCRETE_PROFILING)
 	{
 		int count = 0;
@@ -646,50 +727,39 @@ INLINE void discrete_stream_update_wave(discrete_info *info)
 	}
 }
 
-INLINE void discrete_stream_update_nodes(discrete_info *info, stream_sample_t **outputs)
+INLINE void discrete_stream_update_nodes(discrete_info *info)
 {
-	int outputnum;
-	double val;
-	linked_list_entry	*entry;
+	linked_list_entry *entry;
 
 	if (DISCRETE_PROFILING)
 		info->total_samples++;
 
+	/* update task nodes */
+	for (entry = info->task_list; entry != 0; entry = entry->next)
+	{
+		discrete_task_context *task = (discrete_task_context *) entry->ptr;
+		**task->dest = *task->ptr++;
+	}
+
 	/* loop over all nodes */
-	for (entry = info->step_list; entry != NULL; entry = entry->next)
-	{
-		node_description *node = (node_description *) entry->ptr;
-
-		/* Now step the node */
-		if (DISCRETE_PROFILING)
-			node->run_time -= osd_profiling_ticks();
-
-		(*node->module->step)(node);
-		//bigselect(info->device, node);
-
-		if (DISCRETE_PROFILING)
-			node->run_time += osd_profiling_ticks();
-
-	}
-
-	/* Add gain to the output and put into the buffers */
-	/* Clipping will be handled by the main sound system */
-	for (outputnum = 0; outputnum < info->discrete_outputs; outputnum++)
-	{
-		val = (*info->output_node[outputnum]->input[0]) * (*info->output_node[outputnum]->input[1]);
-		*(outputs[outputnum]++) = val;
-	}
+	step_nodes_in_list(&info->step_list);
 }
 
 static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
-	stream_sample_t *outptr[DISCRETE_MAX_OUTPUTS];
+	linked_list_entry *entry;
 	int samplenum, nodenum, outputnum;
+	//int j; int left; int run;
 
+	if (samples == 0)
+		return;
+	
 	/* Setup any output streams */
 	for (outputnum = 0; outputnum < info->discrete_outputs; outputnum++)
-		outptr[outputnum] = outputs[outputnum];
+	{
+		info->output_node[outputnum]->context = (void *) outputs[outputnum];
+	}
 	
 	/* Setup any input streams */
 	for (nodenum = 0; nodenum < info->discrete_input_streams; nodenum++)
@@ -697,20 +767,32 @@ static STREAM_UPDATE( discrete_stream_update )
 		info->input_stream_data[nodenum] = inputs[nodenum];
 	}
 
-	if ((info->num_csvlogs > 0) || (info->num_wavelogs > 0))
+	for (entry = info->task_list; entry != 0; entry = entry->next)
+	{
+		task_info *ti = malloc(sizeof(task_info));
+		discrete_task_context *task = (discrete_task_context *) entry->ptr;
+
+		/* Fire task */
+		ti->context = task;
+		ti->samples = samples;
+		osd_work_item_queue(info->queue, task_callback, (void *) ti, WORK_ITEM_FLAG_AUTO_RELEASE);
+	}
+
+	/* and wait for them */
+	osd_work_queue_wait(info->queue, osd_ticks_per_second()*10);
+
+	if ((info->num_csvlogs == 0) && (info->num_wavelogs == 0))
 	{
 		/* Now we must do samples iterations of the node list, one output for each step */
 		for (samplenum = 0; samplenum < samples; samplenum++)
-		{
-			discrete_stream_update_nodes(info, outptr);
-		}
+			discrete_stream_update_nodes(info);
 	}
 	else
 	{
 		/* Now we must do samples iterations of the node list, one output for each step */
 		for (samplenum = 0; samplenum < samples; samplenum++)
 		{
-			discrete_stream_update_nodes(info, outptr);
+			discrete_stream_update_nodes(info);
 			discrete_stream_update_csv(info);
 			discrete_stream_update_wave(info);
 
@@ -732,18 +814,38 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 {
 	linked_list_entry	**step_list = &info->step_list;
 	linked_list_entry	**node_list = &info->node_list;
+	linked_list_entry	**task_list = &info->task_list;
+	linked_list_entry	**cur_task_node = NULL;
 	linked_list_entry	*entry;
-
+	discrete_task_context *task;
+	
 	/* start with no outputs or input streams */
+
 	info->discrete_outputs = 0;
 	info->discrete_input_streams = 0;
-
+	
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
 	{
 		discrete_sound_block *block = (discrete_sound_block *) entry->ptr;
 		node_description *node = auto_alloc_clear(info->device->machine, node_description);
 		int inputnum, modulenum;
+
+		/* find the requested module */
+		for (modulenum = 0; module_list[modulenum].type != DSS_NULL; modulenum++)
+			if (module_list[modulenum].type == block->type)
+				break;
+		if (module_list[modulenum].type != block->type)
+			fatalerror("init_nodes() - Unable to find discrete module type %d for NODE_%02d", block->type, NODE_INDEX(block->node));
+
+		/* static inits */
+		node->context = NULL;
+		node->info = info;
+		node->node = block->node;
+		node->module = &module_list[modulenum];
+		node->output[0] = 0.0;
+		node->block = block;
+		node->custom = block->custom;
 
 		/* keep track of special nodes */
 		if (block->node == NODE_SPECIAL)
@@ -771,6 +873,23 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					info->wavelog_node[info->num_wavelogs++] = node;
 					break;
 
+				/* Task processing */
+				case DSO_TASK_START:
+					if (cur_task_node != NULL)
+						fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
+					task = auto_alloc_clear(info->device->machine, discrete_task_context);
+					add_list(info, &task_list, task);
+					cur_task_node = &task->list;
+					break;
+
+				case DSO_TASK_END:
+					if (cur_task_node == NULL)
+						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
+					node->context = task;
+					task->dest = (double **) &node->input[0];
+					task = NULL;
+					break;
+
 				default:
 					fatalerror("init_nodes() - Failed, trying to create unknown special discrete node.");
 			}
@@ -784,28 +903,11 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			info->indexed_node[NODE_INDEX(block->node)] = node;
 		}
 
-		/* find the requested module */
-		for (modulenum = 0; module_list[modulenum].type != DSS_NULL; modulenum++)
-			if (module_list[modulenum].type == block->type)
-				break;
-		if (module_list[modulenum].type != block->type)
-			fatalerror("init_nodes() - Unable to find discrete module type %d for NODE_%02d", block->type, NODE_INDEX(block->node));
-
-		/* static inits */
-		node->info = info;
-		node->node = block->node;
-		node->module = &module_list[modulenum];
-		node->output[0] = 0.0;
-		node->block = block;
-
 		node->active_inputs = block->active_inputs;
 		for (inputnum = 0; inputnum < DISCRETE_MAX_INPUTS; inputnum++)
 		{
 			node->input[inputnum] = &(block->initial[inputnum]);
 		}
-
-		node->context = NULL;
-		node->custom = block->custom;
 
 		/* setup module if custom */
 		if (block->type == DST_CUSTOM)
@@ -835,7 +937,18 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* our running order just follows the order specified */
 		/* does the node step ? */
 		if (node->module->step != NULL)
-			add_list(info, &step_list, node);
+		{
+			/* do we belong to a task? */
+			if (cur_task_node == NULL)
+				add_list(info, &step_list, node);
+			else
+				add_list(info, &cur_task_node, node);
+		}
+
+		if (block->type == DSO_TASK_END)
+		{
+			cur_task_node = NULL;
+		}
 
 		/* and register save state */
 		if (node->node != NODE_SPECIAL)
@@ -897,21 +1010,6 @@ static void find_input_nodes(discrete_info *info)
 		}
 	}
 }
-
-
-
-/*************************************
- *
- *  Set up the output nodes
- *
- *************************************/
-
-static void setup_output_nodes(const device_config *device, discrete_info *info)
-{
-	/* initialize the stream(s) */
-	info->discrete_stream = stream_create(device, info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
-}
-
 
 
 /*************************************

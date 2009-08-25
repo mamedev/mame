@@ -15,7 +15,6 @@
  *
  ************************************************************************/
 
-#define EXPERIMENTAL_STREAM_PARALLEL (0)
 
 #define DSS_INPUT__GAIN		(*(node->input[0]))
 #define DSS_INPUT__OFFSET	(*(node->input[1]))
@@ -67,14 +66,6 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
     return data;
 }
 
-#if EXPERIMENTAL_STREAM_PARALLEL
-static STREAM_BACKGROUND_CALLBACK( disc_cb )
-{
-	node_description *node = (node_description *) ptr;
-
-	node->output[0] = param * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
-}
-#endif
 
 WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
@@ -104,7 +95,6 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 		if (last_data != new_data)
 		{
-#if !EXPERIMENTAL_STREAM_PARALLEL
 			/* Bring the system up to now */
 			stream_update(info->discrete_stream);
 
@@ -112,12 +102,6 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 			/* Update the node output here so we don't have to do it each step */
 			node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
-#else
-			*node_data = new_data;
-			/* Bring the system up to now */
-			stream_update_background(info->discrete_stream, disc_cb, (void *) node, *node_data);
-
-#endif
 		}
 	}
 	else

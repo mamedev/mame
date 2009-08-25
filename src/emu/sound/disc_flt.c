@@ -1070,6 +1070,8 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 	int i,j ;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0, rs = 0;
+	double vd;
+	double rt;
 
 	if (DST_RCFILTER_SW__ENABLE)
 	{
@@ -1086,18 +1088,43 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 			context->vCap[1] += (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->exp1;
 			node->output[0] = context->vCap[1] + (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->factor;
 			break;
-		default:
+		case 3:
+			rs = 2 * DST_RCFILTER_SW__R;
+			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
+			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
+
 			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
 			{
+				node->output[0] = vd + rt  * (context->vCap[0] + context->vCap[1]);
+				context->vCap[0] += (node->output[0] - context->vCap[0]) * context->exp[0];
+				context->vCap[1] += (node->output[0] - context->vCap[1]) * context->exp[1];
+			}
+			break;
+		default:
+			rs = 0;
+			
+			for (i = 0; i < 4; i++)
+			{
+				if (( bits & (1 << i)) != 0)
+				{
+					rs += DST_RCFILTER_SW__R;
+				}
+			}
+
+			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
+			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
+
+			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
+			{
+				us = 0;
 				for (i = 0; i < 4; i++)
 				{
 					if (( bits & (1 << i)) != 0)
 					{
 						us += context->vCap[i];
-						rs += DST_RCFILTER_SW__R;
 					}
 				}
-				node->output[0] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
+				node->output[0] = vd + rt  * us;
 				for (i = 0; i < 4; i++)
 				{
 					if (( bits & (1 << i)) != 0)

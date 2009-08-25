@@ -3659,6 +3659,17 @@ struct _linked_list_entry
 	linked_list_entry *next;
 };
 
+typedef struct _discrete_task_context discrete_task_context;
+struct _discrete_task_context
+{
+	linked_list_entry *list;
+
+	double *ptr;
+	double node_buf[2048];
+	double **dest;
+	volatile INT32 active;
+};
+
 struct _discrete_info
 {
 	const device_config *device;
@@ -3679,6 +3690,9 @@ struct _discrete_info
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */
+	
+	/* tasks */
+	linked_list_entry	 *task_list;		/* discrete_task_context * */
 
 	/* the input streams */
 	int discrete_input_streams;
@@ -3705,6 +3719,10 @@ struct _discrete_info
 	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
 
+	/* parallel tasks */
+	
+	osd_work_queue *queue;
+	
 	/* profiling */
 	int total_samples;
 };
@@ -4190,6 +4208,11 @@ enum
 	DSO_CSVLOG,			/* Dump nodes as csv file */
 	DSO_WAVELOG,		/* Dump nodes as wav file */
 
+	/* Parallel execution */
+	DSO_TASK_START,	/* start of parallel task */
+	DSO_TASK_END,	/* end of parallel task */
+	DSO_TASK_SYNC,	/* wait for all parallel tasks to finish */
+
 	/* Output Node -- this must be the last entry in this enum! */
 	DSO_OUTPUT,			/* The final output node */
 
@@ -4198,12 +4221,6 @@ enum
 	DSO_REPLACE,		/* replace next node */
 	DSO_DELETE,			/* delete nodes */
 	
-	/* Parallel execution */
-	
-	DSO_TASK_START,	/* start of parallel task */
-	DSO_TASK_END,	/* end of parallel task */
-	DSO_TASK_SYNC,	/* wait for all parallel tasks to finish */
-
 	/* Marks end of this enum -- must be last entry ! */
 	DSO_LAST
 };
@@ -4375,19 +4392,24 @@ enum
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
 
 /* logging */
-#define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
-#define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
-#define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                        { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "DISCRETE_CSVLOG3" },
-#define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                  { NODE_SPECIAL, DSO_CSVLOG   , 4, { NODE1,NODE2,NODE3,NODE4 }, { NODE1,NODE2,NODE3,NODE4 }, NULL, "DISCRETE_CSVLOG4" },
-#define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)            { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
-#define DISCRETE_WAVELOG1(NODE1,GAIN1)                             { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
-#define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
+#define DISCRETE_CSVLOG1(NODE1)                                         { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "DISCRETE_CSVLOG1" },
+#define DISCRETE_CSVLOG2(NODE1,NODE2)                                   { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "DISCRETE_CSVLOG2" },
+#define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                             { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "DISCRETE_CSVLOG3" },
+#define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                       { NODE_SPECIAL, DSO_CSVLOG   , 4, { NODE1,NODE2,NODE3,NODE4 }, { NODE1,NODE2,NODE3,NODE4 }, NULL, "DISCRETE_CSVLOG4" },
+#define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)                 { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
+#define DISCRETE_WAVELOG1(NODE1,GAIN1)                                  { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
+#define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                      { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
 
 /* import */
-#define DISCRETE_IMPORT(INFO)                                      { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
-#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                        { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
-#define DISCRETE_REPLACE					                       { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
+#define DISCRETE_IMPORT(INFO)                                           { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },
+#define DISCRETE_DELETE(NODE_FROM, NODE_TO)                             { NODE_SPECIAL, DSO_DELETE   , 2, { NODE_FROM, NODE_TO }, { NODE_FROM, NODE_TO }, NULL, "DISCRETE_DELETE" },
+#define DISCRETE_REPLACE					                            { NODE_SPECIAL, DSO_REPLACE  , 0, { 0 }, { 0 }, NULL, "DISCRETE_REPLACE" },
 
+/* parallel tasks */
+
+#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_END(BUF_NODE)                                     { NODE_SPECIAL, DSO_TASK_END , 1, { BUF_NODE }, { BUF_NODE }, NULL, "DISCRETE_TASK_END" },
+//#define DISCRETE_TASK_SYNC()				                            { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
