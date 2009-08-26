@@ -3667,11 +3667,11 @@ static DRIVER_INIT( brapboys )
 
 		OKI 1:
 		Address space 0x00000-0x2ffff is fixed
-		Address space 0x30000-0x3ffff is banked (16 banks)
+		Address space 0x30000-0x3ffff is banked (13 banks)
 
 		OKI 2:
 		Address space 0x00000-0x1ffff is fixed
-		Address space 0x20000-0x3ffff is banked (16 banks)
+		Address space 0x20000-0x3ffff is banked (15 banks)
 
 		The current sound device implementation can't handle
 		the banking dynamically so we have to expand all the bank
@@ -3682,18 +3682,23 @@ static DRIVER_INIT( brapboys )
 	UINT8 *dst1 = memory_region(machine, "oki1");
 	UINT8 *dst2 = memory_region(machine, "oki2");
 
-	for (bank = 0; bank < 16; ++bank)
+	/* OKI 1 */
+	for (bank = 0; bank < 13; ++bank)
 	{
 		UINT8 *dst;
 		UINT8 *srcn;
 
-		/* OKI 1 */
 		dst = dst1 + 0x40000 * bank;
 		srcn = src + 0x30000 + (0x10000 * bank);
 		memcpy(dst, src, 0x30000);
 		memcpy(dst + 0x30000, srcn, 0x10000);
+	}
 
-		/* OKI 2 */
+	/* OKI 2 */
+	for (bank = 0; bank < 15; ++bank)
+	{
+		UINT8 *dst;
+		UINT8 *srcn;
 		dst = dst2 + 0x40000 * bank;
 		srcn = src + 0x120000 + (0x20000 * bank);
 		memcpy(dst, src + 0x100000, 0x20000);
