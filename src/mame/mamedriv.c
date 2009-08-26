@@ -8740,6 +8740,7 @@ Other Sun games
 	DRIVER( spitboss )	/* (c) 1988 Merit */
 	DRIVER( pitbosss )	/* (c) 1990 Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
+	DRIVER( pitbossma )	/* (c) 1994 Merit */
 	DRIVER( pbst30 )	/* (c) 1994 Merit */
 	DRIVER( pbst30b )	/* (c) 1993 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
