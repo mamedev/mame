@@ -794,13 +794,13 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-/* Untested */
+/* Works for B-Rap Boys - untested with Shogun Warriors */
 static WRITE16_HANDLER( shogwarr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x10000 * ((data >> 0) & 0x3) );
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x10000 * ((data >> 4) & 0x3) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x40000 * ((data >> 4) & 0xf));
+		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * (data & 0xf));
 	}
 }
 
@@ -3499,15 +3499,21 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* Samples */
-	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_REGION( 0x300000, "samples", 0 )
+	/* OKI 1 */
 	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
 	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	ROM_REGION( 0x200000, "oki2", 0 )	/* Samples */
-	/* Upper 128kB of M6295 address region is bank-switched? */
-	ROM_LOAD( "rb-001.u44",   0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
-	ROM_LOAD( "rb-002.u45",   0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
+	/* OKI 2 */
+	ROM_LOAD( "rb-001.u44",  0x100000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",  0x200000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
+
+	/* Sound data is copied here during driver init */
+	ROM_REGION( 0x400000*16, "oki1", 0 )
+	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
+
+	ROM_REGION( 0x400000*16, "oki2", 0 )
+	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
 ROM_END
 
 ROM_START( brapboysj ) /* The Japanese version has an extra rom??? and used a rom sub board */
@@ -3535,15 +3541,21 @@ ROM_START( brapboysj ) /* The Japanese version has an extra rom??? and used a ro
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* Samples */
-	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_REGION( 0x300000, "samples", 0 )
+	/* OKI 1 */
 	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
 	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	ROM_REGION( 0x200000, "oki2", 0 )	/* Samples */
-	/* Upper 128kB of M6295 address region is bank-switched? */
-	ROM_LOAD( "rb-001.u44",   0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
-	ROM_LOAD( "rb-002.u45",   0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
+	/* OKI 2 */
+	ROM_LOAD( "rb-001.u44",  0x100000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",  0x200000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
+
+	/* Sound data is copied here during driver init */
+	ROM_REGION( 0x400000*16, "oki1", 0 )
+	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
+
+	ROM_REGION( 0x400000*16, "oki2", 0 )
+	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
 ROM_END
 
 /**********************************************************************
@@ -3648,6 +3660,50 @@ DRIVER_INIT( calc3 )
     //  MCU is a 78K series III type CPU
 }
 
+static DRIVER_INIT( brapboys )
+{
+	/*
+		Expand the OKI sample data
+
+		OKI 1:
+		Address space 0x00000-0x2ffff is fixed
+		Address space 0x30000-0x3ffff is banked (16 banks)
+
+		OKI 2:
+		Address space 0x00000-0x1ffff is fixed
+		Address space 0x20000-0x3ffff is banked (16 banks)
+
+		The current sound device implementation can't handle
+		the banking dynamically so we have to expand all the bank
+		combinations here and use use okim6295_set_bank_base().
+	*/
+	int bank;
+	UINT8 *src = memory_region(machine, "samples");
+	UINT8 *dst1 = memory_region(machine, "oki1");
+	UINT8 *dst2 = memory_region(machine, "oki2");
+
+	for (bank = 0; bank < 16; ++bank)
+	{
+		UINT8 *dst;
+		UINT8 *srcn;
+
+		/* OKI 1 */
+		dst = dst1 + 0x40000 * bank;
+		srcn = src + 0x30000 + (0x10000 * bank);
+		memcpy(dst, src, 0x30000);
+		memcpy(dst + 0x30000, srcn, 0x10000);
+
+		/* OKI 2 */
+		dst = dst2 + 0x40000 * bank;
+		srcn = src + 0x120000 + (0x20000 * bank);
+		memcpy(dst, src + 0x100000, 0x20000);
+		memcpy(dst + 0x20000, srcn, 0x20000);
+	}
+
+	DRIVER_INIT_CALL(calc3);
+}
+
+
 /***************************************************************************
 
 
@@ -3677,8 +3733,8 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    gtmr2, ROT0,  "Kaneko", "Gre
 
 /* Non-working games (mainly due to protection) */
 
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, calc3,   ROT0,  "Kaneko", "Shogun Warriors",         GAME_NOT_WORKING )
-GAME( 1992, shogwarre,shogwarr, shogwarr, shogwarr, calc3,   ROT0,  "Kaneko", "Shogun Warriors (Euro)",  GAME_NOT_WORKING )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, calc3,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NOT_WORKING )
-GAME( 1992, brapboys, 0,        shogwarr, shogwarr, calc3,          ROT0,  "Kaneko", "B.Rap Boys (World)",      GAME_NOT_WORKING )
-GAME( 1992, brapboysj,brapboys, shogwarr, shogwarr, calc3,          ROT0,  "Kaneko", "B.Rap Boys Special (Japan)",      GAME_NOT_WORKING )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, calc3,    ROT0,  "Kaneko", "Shogun Warriors",            GAME_NOT_WORKING )
+GAME( 1992, shogwarre,shogwarr, shogwarr, shogwarr, calc3,    ROT0,  "Kaneko", "Shogun Warriors (Euro)",     GAME_NOT_WORKING )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, calc3,    ROT0,  "Kaneko", "Fujiyama Buster (Japan)",    GAME_NOT_WORKING )
+GAME( 1992, brapboys, 0,        shogwarr, shogwarr, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)",         GAME_NOT_WORKING )
+GAME( 1992, brapboysj,brapboys, shogwarr, shogwarr, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", GAME_NOT_WORKING )
