@@ -10,7 +10,7 @@
       Other: 2 Z80APIO (I/O and interrupt controllers)
              1 8255 (I/O)
 
-  CRT 252: addon board for CRT 250, stores question roms
+  CRT 256: addon board for CRT 250, stores question roms (aka Memory Expansion board)
 
   CRT 258: addon board for CRT 250, contains UART and Microtouch touch screen controller
 
@@ -34,7 +34,7 @@
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   Pit Boss Megastar (c)1994
-  *Pit Boss Supertouch 30 (c)1993/4
+  Pit Boss Supertouch 30 (c)1993/4
 
   CRT 260:
   *Megatouch Video (c)1994?
@@ -694,58 +694,65 @@ static INPUT_PORTS_START(pitbossm)
 	PORT_INCLUDE(meritm_crt250)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )				/* Unused */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Solitaire Timer Mode" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:1" )				/* Unused */
+	PORT_DIPNAME( 0x02, 0x02, "Solitaire Timer Mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia" )
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Coin Limit" )
+	PORT_DIPNAME( 0x08, 0x00, "Coin Limit" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "No Coin Limit" )
-	PORT_DIPSETTING(    0x08, "4 Coin Limit" )				/* With Lockout coil */
-	PORT_DIPNAME( 0x10, 0x10, "Run 21 and Trivia Whiz 2000: Coins to start" )
+	PORT_DIPSETTING(    0x08, "4 Coin Limit" )	/* With Lockout coil */
+	PORT_DIPNAME( 0x10, 0x10, "Run 21 and Trivia Whiz 2000: Coins to start" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "2 Coins" )
 	PORT_DIPSETTING(    0x10, "1 Coin" )
-	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" )
-	PORT_DIPSETTING(    0x00, "4 Coins" )
-	PORT_DIPSETTING(    0x20, "2 Coins" )
-	PORT_DIPNAME( 0x40, 0x00, "Sync Adjustment (Set by factory)" )		/* Sync Adjustment (Set by factory) */
+	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "2 Coins" )
+	PORT_DIPSETTING(    0x20, "1 Coins" )
+	PORT_DIPNAME( 0x40, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:7")	/* Sync Adjustment (Set by factory) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Sync Adjustment (Set by factory)" )		/* Sync Adjustment (Set by factory) */
+	PORT_DIPNAME( 0x80, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:8")	/* Sync Adjustment (Set by factory) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(pitbossa)
+	PORT_INCLUDE(pitbossm)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "4 Coins" )
+	PORT_DIPSETTING(    0x20, "2 Coins" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(pbst30)
 	PORT_INCLUDE(meritm_crt260)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) /* Screen Flip? when set to on, touch screen coordinates are mirrored */
+	PORT_DIPNAME( 0x01, 0x00, "Invert Touch Screen Coordinates" ) PORT_DIPLOCATION("SW1:1") /* In case you installed the touch screen upside down??? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Enable casino games" )
+	PORT_DIPNAME( 0x02, 0x02, "Enable casino games" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Sexy Trivia Catagory" )
+	PORT_DIPNAME( 0x04, 0x04, "Sexy Trivia Catagory" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) /* Likely Coin limit */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4") /* Likely Coin limit */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1098,33 +1105,10 @@ ROM_END
 /*
     Pit Boss Megastar - Merit Industries Inc. 1994
 
-    Games are: Great Solitaire, Run 21 and Trivia Whiz 2000.
-    -------------------------------------------------------
-    Some of the pinouts probably flash lighted buttons as
-    most Merit games have this feature.
-    -------------------------------------------------------
-
-    EPROMS U5, U6 and U7 are 27C2001's
-    EPROMS U9 through 15 are 27C512's
-
-    One 8 bank dip switch.
-
-    Two YAMAHA V9938 Video Processors.
-
-    21.47727 MHz Crystal tied into pin 63 on both the V9938's
-
-    CPU Z80B
-
-    Audio YM2149F
-    Two Z80A-PIO
-
-    One Goldstar GM76C88L-15 (6264) SRAM
-    Eight V53C464AP80 (41464) RAMS
-
-    One PALCE16V8H-25PC/4
-    One GAL22V10B
-
-    chaneman Sept.23 2004
+ Runs on standard Merit CRT-250 PCB with the following additions:
+  CRT-256 Memory Expansion board
+  CRT-254 Module (to connect the DS1204 to main board via connector J2)
+  CRT-243 Video Billboard board (Optional) with optional Video Billboard Keyboard
 
 From the "PIT BOSS MEGASTAR CHIP SET UPGRADE KIT" Program No. 9243-XX PM8938 Owner's Manual:
 
@@ -1174,7 +1158,7 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
 ROM_END
 
-ROM_START( pitbossma ) /* Seems to be unprotected */
+ROM_START( pitbossma ) /* Unprotected or patched??  The manual shows a DS1204 key for this set */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9243-00-01_u9-r0",  0x00000, 0x10000, CRC(55e14fb1) SHA1(ec29764d1b63360f64b82452e0db8054b99fcca0) )
 	ROM_LOAD( "9243-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Could also be labeled 9234-00-01 U10-R0 */
@@ -1536,7 +1520,7 @@ ROM_END
 
 ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO1 C1998 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "9255-80-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
+	ROM_LOAD( "9255-60-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
 	ROM_LOAD( "qs9255-08_u36-r0",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000 )
 	ROM_LOAD( "qs9255-08_u37-r0",   0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) ) /* Location U37 */
@@ -1673,7 +1657,7 @@ GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, pbst30b, ROT
 
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossm, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
 GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", GAME_IMPERFECT_GRAPHICS )
