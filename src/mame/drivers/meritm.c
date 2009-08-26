@@ -1558,7 +1558,7 @@ static DRIVER_INIT(pitbossm)
 		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
 
 	static const UINT8 pitbossm_ds1204_nvram[16] =
-		{ 0x3e, 0x9a, 0x3c, 0x3f, 0x1d, 0x51, 0x72, 0xc9, 0x28, 0x2c, 0x1d, 0x2d, 0x0e, 0x56, 0x41, 0x00 }; /* Wrong Key.... FIX ME! */
+		{ 0x16, 0x90, 0xa0, 0x52, 0xd8, 0x6c, 0x12, 0xaf, 0x36, 0x22, 0x61, 0x35, 0x0d, 0x58, 0x0c, 0x00 };
 
 	ds1204_init(machine, pitbossm_ds1204_key, pitbossm_ds1204_nvram);
 
@@ -1672,7 +1672,7 @@ GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, pbst30,  ROT
 GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
-GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossm, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
