@@ -20,7 +20,6 @@
 #include "machine/snesdsp1.c"
 #include "machine/snesdsp2.c"
 #include "machine/snesobc1.c"
-#include "machine/snescx4.c"
 
 /* -- Globals -- */
 UINT8  *snes_ram = NULL;		/* 65816 ram */
@@ -1398,8 +1397,6 @@ READ8_HANDLER( snes_r_bank1 )
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			value = (address < 0x7000) ? DSP1_getDr() : DSP1_getSr();
-		else if (snes_has_addon_chip == HAS_CX4)
-			value = CX4_read(address - 0x6000);
 		else
 			value = 0xff;											/* Reserved */
 	}
@@ -1585,8 +1582,6 @@ WRITE8_HANDLER( snes_w_bank1 )
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			DSP1_setDr(data);
-		else if (snes_has_addon_chip == HAS_CX4)
-			CX4_write(space->machine, address - 0x6000, data);
 		else
 			logerror( "Attempt to write to reserved address: %X\n", offset );
 	}
