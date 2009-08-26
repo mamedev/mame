@@ -86,7 +86,7 @@ CPU_GET_INFO( superfx );
 #define CPU_SUPERFX CPU_GET_INFO_NAME( superfx )
 
 CPU_DISASSEMBLE( superfx );
-extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1);
+extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt);
 
 UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr);
 void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data);

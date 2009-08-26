@@ -476,7 +476,10 @@ UINT8 superfx_mmio_read(const device_config *cpu, UINT32 addr)
 
 	addr &= 0xffff;
 
-	printf( "superfx_mmio_read: %08x\n", addr );
+	if(addr != 0x3030)
+	{
+		printf( "superfx_mmio_read: %08x\n", addr );
+	}
 
 	if(addr >= 0x3100 && addr <= 0x32ff)
 	{
@@ -745,7 +748,7 @@ static CPU_EXECUTE( superfx )
 					cpustate->irq = 1;
 				}
 				cpustate->sfr &= ~SUPERFX_SFR_G;
-				cpustate->pipeline = 0x01;
+				//cpustate->pipeline = 0x01;
 				superfx_regs_reset(cpustate);
 				break;
 			case 0x01: // NOP
@@ -1037,15 +1040,17 @@ static CPU_EXECUTE( superfx )
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;
 					case SUPERFX_SFR_ALT3: // CMP
-						r -= (op & 0xf) - ((cpustate->sfr & SUPERFX_SFR_CY) ? 0 : 1);
+						printf( "R%d = %04x\n", cpustate->sreg_idx, (UINT16)r);
+						r -= cpustate->r[op & 0xf];
+						printf( "R%d - R%d = %04x\n", cpustate->sreg_idx, op & 0xf, (UINT16)r);
 						cpustate->sfr |= ((*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (*(cpustate->sreg) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
-				break;
 				cpustate->sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				cpustate->sfr |= (r >= 0x10000) ? SUPERFX_SFR_CY : 0;
 				cpustate->sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
 				superfx_regs_reset(cpustate);
+				break;
 			}
 
 			case 0x70: // MERGE
@@ -1192,7 +1197,7 @@ static CPU_EXECUTE( superfx )
 			}
 
 			case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf: // IBT / LMS / SMS / LML
+			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf: // IBT / LMS / SMS / LMS
 				switch(cpustate->sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // IBT
@@ -1206,7 +1211,7 @@ static CPU_EXECUTE( superfx )
 						superfx_regs_reset(cpustate);
 						break;
 					case SUPERFX_SFR_ALT1: // LMS
-					case SUPERFX_SFR_ALT3: // LML
+					case SUPERFX_SFR_ALT3: // LMS
 					{
 						UINT16 data;
 						cpustate->ramaddr = superfx_pipe(cpustate) << 1;
@@ -1367,10 +1372,14 @@ static CPU_EXECUTE( superfx )
 
 CPU_DISASSEMBLE( superfx )
 {
-    UINT8     op = *(UINT8 *)(opram + 0);
-    UINT8 param0 = *(UINT8 *)(opram + 1);
-    UINT8 param1 = *(UINT8 *)(opram + 2);
-    return superfx_dasm_one(buffer, pc, op, param0, param1);
+	superfx_state *cpustate = get_safe_token(device);
+
+    UINT8      op = *(UINT8 *)(opram + 0);
+    UINT8  param0 = *(UINT8 *)(opram + 1);
+    UINT8  param1 = *(UINT8 *)(opram + 2);
+	UINT16    alt = cpustate->sfr & SUPERFX_SFR_ALT;
+
+    return superfx_dasm_one(buffer, pc, op, param0, param1, alt);
 }
 
 /*****************************************************************************/

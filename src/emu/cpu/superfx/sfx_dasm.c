@@ -1,4 +1,5 @@
 #include "cpuintrf.h"
+#include "superfx.h"
 #include <stdarg.h>
 
 static char *output;
@@ -12,7 +13,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
     va_end(vl);
 }
 
-offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1)
+offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt)
 {
 	UINT8 bytes_consumed = 1;
     output = buffer;
@@ -91,7 +92,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35:
 		case 0x36: case 0x37: case 0x38: case 0x39: case 0x3a: case 0x3b:	// STW_IR / STB_IR
-			print("STW/B   (R%d)", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("STW     (R%d)", op & 0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("STB     (R%d)", op & 0xf);
+					break;
+			}
 			break;
 
 		case 0x3c: // LOOP
@@ -109,11 +120,31 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
 		case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:	// LDW_IR / LDB_IR
-			print("LDW/B    (R%d)", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("LDW     (R%d)", op & 0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("LDB     (R%d)", op & 0xf);
+					break;
+			}
 			break;
 
 		case 0x4c: // PLOT / RPIX
-			print("PLOT/RPIX");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("PLOT");
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("RPIX");
+					break;
+			}
 			break;
 
 		case 0x4d: // SWAP
@@ -121,7 +152,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x4e: // COLOR / CMODE
-			print("COLOR/CMODE");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("COLOR");
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("CMODE");
+					break;
+			}
 			break;
 
 		case 0x4f: // NOT
@@ -130,12 +171,40 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: // ADD / ADC / ADDI / ADCI
-			print("ADD     R%d ; ADC/ADDI/ADCI", op &0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("ADD     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("ADC     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("ADDI    R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("ADCI    R%d", op &0xf);
+					break;
+			}
 			break;
 
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f: // SUB / SBC / SUBI / CMP
-			print("SUB     R%d ; SBC/SUBI/CMP", op &0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("SUB     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("SBC     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("SUBI    R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("CMP     R%d", op &0xf);
+					break;
+			}
 			break;
 
 		case 0x70: // MERGE
@@ -144,12 +213,40 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 
 				   case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // AND / BIC / ANDI / BICI
-			print("AND     R%d ; BIC/ANDI/BICI", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("AND     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("BIC     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("ANDI    R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("BICI    R%d", op &0xf);
+					break;
+			}
 			break;
 
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f: // MULT / UMULT / MULTI / UMULTI
-			print("MULT    R%d ; UMULT/MULTI/UMULTI", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("MULT    R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("UMULT   R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("MULTI   R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("UMULTI  R%d", op &0xf);
+					break;
+			}
 			break;
 
 		case 0x90: // SBK
@@ -165,7 +262,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x96: // ASR / DIV2
-			print("ASR/DIV2");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("ASR");
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("DIV2");
+					break;
+			}
 			break;
 
 		case 0x97: // ROR
@@ -173,7 +280,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: // JMP / LJMP
-			print("(L)JMP  R%d", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("JMP     R%d", op & 0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("LJMP    R%d", op & 0xf);
+					break;
+			}
 			break;
 
 		case 0x9e: // LOB
@@ -181,12 +298,34 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x9f: // FMULT / LMULT
-			print("FMULT/LMULT");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT2:
+					print("FMULT   R%d", op & 0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("LMULT   R%d", op & 0xf);
+					break;
+			}
 			break;
 
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf: // IBT / LMS / SMS / LML
-			print("IBT     R%d,0x%02x ; SMS/LMS", op & 0xf, param0);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("IBT     R%d,0x%02x", op & 0xf, param0);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("SMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("LMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
+					break;
+			}
 			bytes_consumed = 2;
 			break;
 
@@ -201,7 +340,21 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 
 				   case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: // OR / XOR / ORI / XORI
-			print("OR      R%d ; XOR/ORI/XORI", op & 0xf);
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("OR      R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("XOR     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("ORI     R%d", op &0xf);
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("XORI    R%d", op &0xf);
+					break;
+			}
 			break;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
@@ -210,7 +363,19 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0xdf: // GETC / RAMB / ROMB
-			print("GETC/RAMB/ROMB");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+				case SUPERFX_SFR_ALT1:
+					print("GETC");
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("RAMB");
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("ROMB");
+					break;
+			}
 			break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
@@ -219,13 +384,39 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0xef: // GETB / GETBH / GETBL / GETBS
-			print("GETB/GETBH/GETBL/GETBS");
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("GETB");
+					break;
+				case SUPERFX_SFR_ALT1:
+					print("GETBH");
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("GETBL");
+					break;
+				case SUPERFX_SFR_ALT3:
+					print("GETBS");
+					break;
+			}
 			break;
 
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: // IWT / LM / SM / LM
-			print("IWT     R%d,#%02x%02x ; SM/LM", op & 0xf, param1, param0);
-			bytes_consumed = 3;
+			switch(alt)
+			{
+				case SUPERFX_SFR_ALT0:
+					print("IWT     R%d,#%02x%02x", op & 0xf, param1, param0);
+					bytes_consumed = 3;
+					break;
+				case SUPERFX_SFR_ALT2:
+					print("SM      R%d", op & 0xf);
+					break;
+				case SUPERFX_SFR_ALT1:
+				case SUPERFX_SFR_ALT3:
+					print("LM      R%d", op & 0xf);
+					break;
+			}
 			break;
 	}
 
