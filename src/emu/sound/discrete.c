@@ -817,7 +817,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	linked_list_entry	**task_list = &info->task_list;
 	linked_list_entry	**cur_task_node = NULL;
 	linked_list_entry	*entry;
-	discrete_task_context *task;
+	discrete_task_context *task = NULL;
 	
 	/* start with no outputs or input streams */
 
