@@ -20,8 +20,11 @@
 *******************************************************************************
 
 
-    Hardware Notes:
+    HARDWARE NOTES:
     ---------------
+
+
+    Hardware Layout (norautp):
 
     1x Z80
     3x PPI 8255
@@ -32,6 +35,7 @@
     1x 555 + unknown yellow resonator, near the edge connector.
     1x 555 + resnet, near the battery.
 
+    1x 10 DIP switches bank.
     2x 3pins jumpers (between the Z80 and ROM)
 
        JP1 (ABC);  JP2 (DEF)
@@ -39,11 +43,78 @@
     PCB silksceened:  AB+DE=512  BC+DE=256
                       (CUT BC)   EF=64/128
 
-
-    1x 10 DIP switches bank.
-
-
     PCB silksceened:  SMART-BOARD 131191 ISS.E (Made in USA)
+
+    -------------------------------------------------------------
+
+
+    Hardware Layout (norautjp):
+
+    - CPU:             1x TMPZ84C00AP-8
+    - RAM:             2x HM6116LP-4 CMOS Static Ram
+    - I/O:             3x D8255AC-2 Peripeheral Interface Adapter
+    - Prg ROMs:        1x 2764 Eprom
+    - Gfx ROMs:        1x 2732 Eprom
+    - Sound:           Discrete
+    - Battery:         1x 3.6v Ni-cd 65Mah
+    - Crystal:         1x 18.432Mhz
+    - Resistor Array:  4x 9 Pin SIP 472G
+
+
+    PCB Layout (norautjp):                                                       Edge Connector 36x2
+     ______________________________________________________________________________________________
+    |  _____                  _________    _________    _____         .........    _________       |
+    | |D5555|                |74LS174N |  |74LS153N |  |D5555|        .........   |ULN2003A |      |
+    | |_____|                |_________|  |_________|  |_____|    Resistor Array  |_________|      |
+    |                                                               ___                            |
+    |                                                              |VR1|                           |
+    |              DIP SW x4                                       |___|                           |
+    |  ________     _______                                                                        |
+    | |Battery |   |1|2|3|4|  _________    _________    _________    _________     _________       |
+    | |  3.6v  |   |_|_|_|_| |74LS157N |  |74LS153N |  |74LS161AP|  |74LS86AN |   |ULN2003A |      |
+    | |________|             |_________|  |_________|  |_________|  |_________|   |_________|      |
+    |                                                                                              |
+    |                                                                                              |
+    |                                                                                              | 36
+    |  _________              _________                 _________    _________     _________       |___
+    | |HD74LS04P|            |74LS166AP|               |74LS161AN|  |74LS153N |   |ULN2003A |       ___|
+    | |_________|            |_________|               |_________|  |_________|   |_________|       ___|
+    |                                                                                               ___|
+    |                                   DIP SW x 8                               ________________   ___|
+    |               _____________    _______________    _________    _________  |                |  ___|
+    |              |             |  |1|2|3|4|5|6|7|8|  |74LS161AN|  |74LS157N | |    D8255AC-2   |  ___|
+    |              |    2732     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
+    |              |_____________|                                                                  ___|
+    |                                                                                               ___|
+    |                                                                            ________________   ___|
+    |                                                                           |                |  ___|
+    |  _____________        _____________                                       |    D8255AC-2   |  ___|
+    | |             |      |             |                                      |________________|  ___|
+    | |    6116     |      |    6116     |                                                          ___|
+    | |_____________|      |_____________|              _________    _________                      ___|
+    |                                                  |74LS161AN|  |74LS157N |                     ___|
+    |                                                  |_________|  |_________|                     ___|
+    |                                                                                               ___|
+    |  ______________       ________________                                                        ___|
+    | |              |     |                |           _________    _________                      ___|
+    | |     2764     |     |    D8255AC-2   |          |74LS161AN|  |74LS157N |     .........       ___|
+    | |______________|     |________________|          |_________|  |_________|     .........       ___|
+    |                                                                              Resistor Array   ___|
+    |                                                                                               |
+    |                                                                                               | 1
+    |                      _________                    _________    _________    _________         |
+    |                     | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |        |
+    |                     |_________|                  |_________|  |_________|  |_________|        |
+    |                                                                                               |
+    |                                             XTAL                                              |
+    |                                            .----.                                             |
+    |  ____________________     __________      _________    _________    _________    _________    |
+    | |                    |   |PALce16v8H|    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |   |
+    | |   TMPZ84C00AP-8    |   |__________|    |_________|  |_________|  |_________|  |_________|   |
+    | |____________________|                                                                        |
+    |                                                                                               |
+    |_______________________________________________________________________________________________|
+
 
 
 *******************************************************************************
@@ -94,6 +165,61 @@
 *******************************************************************************
 
 
+  Noraut Poker discrete audio circuitry
+  -------------------------------------
+
+  3x ULN2003A (Darlington transistor array)
+  1x D5555C   (CMOS timer)
+  1x KN2222A  (Epitaxial planar general purpose NPN transistor)
+  1x VR/POT
+
+  .------.                              .------------.               .-------. 
+  |      |                              |   D5555C   |               |KN2222A|
+  |      |                             4|            |3     R3       |       |      -->
+  |   PC7|------------------------------|RST      OUT|-----ZZZZ------|B     E|>----ZZZZZ-----> Audio Out.
+  |   PC6|---------.                   6|            |8              |   C   |      VR1
+  |   PC5|-----.    |2-in         .-----|THR      VCC|-----------.   '---+---'          .----> Audio Out.
+  |   PC4|--.  |  .-+------.      |    5|            |7          |       |              |
+  |      |  |  |  |ULN2003A|      |  .--|CVOLT   DISC|--.        |       |              |
+  |      |  |  |  '-+------'      |  |  |            |  |        +-------'            --+--
+  |      |  |  |    |2-out   C1   |  |  |    GND     |  |        |                     GND
+  | 8255 |  |  |    '--------||---+  |  '-----+------'  |        |                      -
+  |  AP  |  |  '--.               |  |        |1        |        |                      '
+  |      |  |     |3-in           |  |        |         |        |
+  '------'  |  .--+-----.         |  |   C5   |         |        |
+            |  |ULN2003A|         |  '---||---+         |        |    +5V
+            |  '--+-----'         |           |         |        |    -+-
+            |     |3-out     C2   |      C4   |         |    C6  |     |
+            |     '----------||---+------||---+-------. | .--||--+-----'
+            |2-in                 |           |       | | |      |
+          .-+------.              |         --+--      '-'       |
+          |ULN2003A|              |          GND        |        |
+          '-+------'              |           -         |        |
+            |2-out           C3   |     R1    '         |   R2   |
+            '----------------||---+----ZZZZ-------------+--ZZZZ--'
+
+  VR1 = 100 ohms
+
+  R1 = 120 K ; Tolerance +/- 5%
+  R2 = 2.2 K ; Tolerance +/- 5%
+  R3 = 1 K   ; Tolerance +/- 5%
+
+  C1 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
+  C2 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C3 = 473J = 47000 pF  =  47 nF = 0.047 uF ; Tolerance +/- 5%
+  C4 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+
+  C5 = 103  = 10000 pF  =  10 nF = 0.01 uF
+  C6 = 104  = 100000 pF = 100 nF = 0.1 uF
+
+  C1, C2, C3 & C4 are polyester film / mylar capacitors.
+  C5 & C6 are ceramic capacitors.
+  All Capacitors are non-polarised.
+
+
+*******************************************************************************
+
+
     *** Game Notes ***
 
     Nothing, yet...
@@ -108,9 +234,9 @@
     0x0000 - 0x1FFF    ; ROM space.
     0x6000 - 0x63FF    ; NVRAM.
 
-    0x60 - 0x63        ; PPI 8255 0 - DIP Switches.
-    0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs.
-    0xC0 - 0xC3        ; PPI 8255 2 - Video RAM.
+    0x60 - 0x63        ; PPI 8255 0 - DIP Switches, lamps & counters.
+    0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
+    0xC0 - 0xC3        ; PPI 8255 2 - Video RAM access.
 
 
 *******************************************************************************
@@ -157,11 +283,17 @@
     - Added partial DIP switches to norautrh.
     - Added more technical notes.
 
-    [2009-08-23]
+    [2009-08-23/26]
 
     - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
       This is due to the phisical keyboard limitation when needs to enter
       4 simultaneous inputs.
+    - Executed a trojan on 2 noraut systems to confirm the way 16x32 tiles are decoded.
+    - Fixed the x-offset for 32x32 tiles lines.
+    - Fixed the screen aspect and visible area.
+    - Confirmed correct colors. No bipolar PROM involved.
+    - Added Noraut Joker Poker hardware and PCB layouts.
+    - Documented the discrete audio circuitery. Added a full diagram.
 
 
     Notes:
@@ -177,11 +309,9 @@
 
     TODO:
 
-    - Analize the extra 8255 at 0xc0-0xc3 (full bidirectional port w/hshk)
+    - Analize the extra 8255 at 0xc0-0xc3 (full bidirectional port w/hshk lines)
     - Video RAM (through 3rd PPI?).
     - Find if wide chars are hardcoded or tied to a bit.
-    - Fix the little displacement between GFX banks. 
-    - Proper colors (missing PROM?)
     - Lamps layout.
     - Discrete sound.
 
@@ -220,7 +350,7 @@ static VIDEO_UPDATE( norautp )
 
 	for(y = 0; y < 8; y++)
 	{
-		/*Double width*/
+		/* Double width, displaced 8 pixels in X */
 		if(y == 2 || (y >= 4 && y < 6))
 		{
 			for(x = 0; x < 16; x++)
@@ -228,7 +358,7 @@ static VIDEO_UPDATE( norautp )
 				int tile = np_vram[count] & 0x3f;
 				int colour = (np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[1], tile, colour, 0, 0, x * 32, y * 32);
+				drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -271,7 +401,8 @@ static PALETTE_INIT( norautp )
 
 static WRITE8_DEVICE_HANDLER( lamps_w )
 {
-/*  LAMPS:
+/*  PPI0 (60h-63h); PortB out
+    Lamps:
 
     7654 3210
     ---- ---x  Change Card / (Save?)
@@ -283,7 +414,6 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
     -x-- ----  Hold 5
     x--- ----  Start (poker)
 */
-
 	output_set_lamp_value(0, (data >> 0) & 1);	/* Change */
 	output_set_lamp_value(1, (data >> 1) & 1);	/* Hi/Lo  */
 	output_set_lamp_value(2, (data >> 2) & 1);	/* Hold 1 */
@@ -296,6 +426,16 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 
 static WRITE8_DEVICE_HANDLER( ccounter_w )
 {
+/*  PPI0 (60h-63h); PortC out
+    Coin Counters:
+
+    7654 3210
+    ---- -xxx  unknown
+    ---- x---  Payout
+    ---x ----  Coin 2
+    --x- ----  Coin 3
+    xx-- ----  unknown
+*/
 	coin_counter_w(0, data & 0x20);	/* Coin1 */
 	coin_counter_w(1, data & 0x10);	/* Coin2 */
 	coin_counter_w(2, data & 0x08);	/* Payout */
@@ -303,6 +443,15 @@ static WRITE8_DEVICE_HANDLER( ccounter_w )
 
 static WRITE8_DEVICE_HANDLER( sndlamp_w )
 {
+/*  PPI1 (a0h-a3h); PortC out
+    Sound & Lamps:
+
+    7654 3210
+    ---- ---x  Start Lamp?
+    ---- --x-  Bet Lamp
+    ---- xx--  unknown
+    xxxx ----  Discrete Sound Lines
+*/
 	output_set_lamp_value(8, (data >> 0) & 1);	/* Start? */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* Bet */
 
@@ -360,6 +509,9 @@ ADDRESS_MAP_END
   c2 --> R  ; status?
   c3 --> W  ; alternate 00 & 01 (in case of PPI, setting resetting bit 0 of handshaked port)
 
+  The strange issue is that some sets just configure the PPI to mixed mode2 and mode0 input.
+  it means that port A should be bidirectional and port B just as input. (port C as hshk regs).
+  So... it doesn't match the addressing through c1.
 */
 
 static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -533,14 +685,8 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 /*
-  Not sure if this is the correct way to decode.
-  Each tile should be 16x32 conformed by:
-  - 8 empty lines.
-  - 16x16 char.
-  - 8 empty lines.
-
-  Each tile is a regular 16x16 char centered into 16x32 tile.
-  Only alphanumeric chars are used.
+  Trojanned 2 Narout Poker PCBs to see how the hardware decodes
+  the 16x32 tiles. The following GFX layout is 100% accurate.
 */
 {
 	16, 32,
@@ -635,7 +781,7 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(2*16, 31*16-1, 0*16, 16*16-1)
+	MDRV_SCREEN_VISIBLE_AREA(3*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
 
 	MDRV_GFXDECODE(norautp)
 
