@@ -381,8 +381,10 @@ static void superfx_rambuffer_write(superfx_state *cpustate, UINT16 addr, UINT8 
 
 static void superfx_rombuffer_sync(superfx_state *cpustate)
 {
+	//printf( "superfx_rombuffer_sync\n" );
 	if(cpustate->romcl)
 	{
+		printf( "calling add_clocks_internal\n" );
 		superfx_add_clocks_internal(cpustate, cpustate->romcl);
 	}
 }
@@ -397,7 +399,7 @@ static void superfx_rombuffer_update(superfx_state *cpustate)
 static UINT8 superfx_rombuffer_read(superfx_state *cpustate)
 {
 	superfx_rombuffer_sync(cpustate);
-	//printf( "superfx_rombuffer_read: %02x\n", cpustate->romdr);
+	printf( "superfx_rombuffer_read: %02x\n", cpustate->romdr);
 	return cpustate->romdr;
 }
 
@@ -613,12 +615,13 @@ static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks)
 	//printf( "superfx_add_clocks: %d\n", clocks);
 	if(cpustate->romcl)
 	{
-		//printf( "ROM is accessing\n" );
+		printf( "ROM is accessing\n" );
+		printf( "romcl = %d, -= MIN(%d, %d) (= %d)\n", cpustate->romcl, clocks, cpustate->romcl, MIN(clocks, cpustate->romcl));
 		cpustate->romcl -= MIN(clocks, cpustate->romcl);
 		if(cpustate->romcl == 0)
 		{
 			cpustate->sfr &= ~SUPERFX_SFR_R;
-			//printf( "superfx_op_read: reading from rom, calling superfx_bus_read\n" );
+			printf( "superfx_op_read: reading from rom, calling superfx_bus_read: %08x\n", (cpustate->rombr << 16) + cpustate->r[14] );
 			cpustate->romdr = superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]);
 		}
 	}
@@ -628,6 +631,7 @@ static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks)
 		cpustate->ramcl -= MIN(clocks, cpustate->ramcl);
 		if(cpustate->ramcl == 0)
 		{
+			printf( "Writing %02x to %08x\n", cpustate->ramdr, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar );
 			superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
 		}
 	}
@@ -794,14 +798,17 @@ static CPU_EXECUTE( superfx )
 				UINT16 carry = *(cpustate->sreg) & 8000;
 				superfx_gpr_write(cpustate, cpustate->dreg_idx, (*(cpustate->sreg) << 1) | (SUPERFX_SFR_CY_SET ? 1 : 0));
 				cpustate->sfr &= ~(SUPERFX_SFR_CY | SUPERFX_SFR_S | SUPERFX_SFR_Z);
-				cpustate->sfr |= carry;
+				cpustate->sfr |= carry ? SUPERFX_SFR_CY : 0;
 				superfx_dreg_sfr_sz_update(cpustate);
 				superfx_regs_reset(cpustate);
 				break;
 			}
 			case 0x05: // BRA
-				superfx_gpr_write(cpustate, 15, cpustate->r[15] + (INT8)superfx_pipe(cpustate) + 1 );
+			{
+				INT32 e = (INT8)superfx_pipe(cpustate);
+				superfx_gpr_write(cpustate, 15, cpustate->r[15] + e + 1);
 				break;
+			}
 			case 0x06: // BLT
 			{
 				INT32 e = (INT8)superfx_pipe(cpustate);
@@ -940,7 +947,7 @@ static CPU_EXECUTE( superfx )
 				cpustate->sfr |= (cpustate->r[12] == 0) ? SUPERFX_SFR_Z : 0;
 				if(!(cpustate->sfr & SUPERFX_SFR_Z))
 				{
-					superfx_gpr_write(cpustate, 15, cpustate->r[13]);
+					superfx_gpr_write(cpustate, 15, cpustate->r[13] - 1);
 				}
 				superfx_regs_reset(cpustate);
 				break;
@@ -1260,6 +1267,7 @@ static CPU_EXECUTE( superfx )
 				if(!(cpustate->sfr & SUPERFX_SFR_B))
 				{
 					cpustate->sreg = &(cpustate->r[op & 0xf]);
+					cpustate->sreg_idx = op & 0xf;
 				}
 				else
 				{
@@ -1300,7 +1308,7 @@ static CPU_EXECUTE( superfx )
 
 			case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde:            // INC
-				cpustate->r[op & 0xf]++;
+				superfx_gpr_write(cpustate, op & 0xf, cpustate->r[op & 0xf] + 1);
 				cpustate->sfr &= ~(SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				cpustate->sfr |= (cpustate->r[op & 0xf] & 0x8000) ? SUPERFX_SFR_S : 0;
 				cpustate->sfr |= (cpustate->r[op & 0xf] == 0) ? SUPERFX_SFR_Z : 0;
