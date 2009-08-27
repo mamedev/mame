@@ -16,6 +16,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
+#include "machine/eeprom.h"
 
 
 #define CALC3_VERBOSE_OUTPUT 0
@@ -954,9 +955,41 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				// hack, set it to a known address instead of trying to restore to anywhere specific.. 
 				// might break at some point tho, eg if it doesn't write command 06 often enough because it trys to use another one like 07...
 				// need to understand the meaning of this (test hw?)
-				if (calc3_mode==0x06) calc3_writeaddress_current = 0x202000;
-				// also calls empty table with Mode? 07
-				// maybe they reset to different points?
+				
+				// !dstram is used because we don't want to process these during our initial table scan, only when the game asks!
+				
+				if (calc3_mode==0x06)
+				{
+					calc3_writeaddress_current = 0x202000;
+				}
+				else if (calc3_mode==0x07)
+				{
+					// also calls empty table with Mode? 07
+					// maybe they reset to different points?			
+				}
+				else if (calc3_mode==0x08 && !dstram)
+				{
+					//printf("save to eeprom\n");
+
+					{
+						UINT32 length, size;
+						UINT8 *dat;
+
+						dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+					
+						for (i=0;i<0x80;i++)
+						{
+							dat[i] = memory_read_byte(space, calc3_eeprom_addr+0x200000+i);
+						}		
+						
+					}
+
+				}
+				else if (!dstram)
+				{
+					printf("unknown blank table command\n");
+				}
+				
 				return 0;
 			}
 
@@ -1291,19 +1324,6 @@ DRIVER_INIT(calc3_scantables)
 
 extern UINT16 calc3_mcu_crc;
 
-// from brap boys, might be polluted with shogun warriors values tho as was running shogun code at the time
-static UINT16 kaneko16_eeprom_data[0x40] =
-{
-	0x0001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,	0x0000, 0x0000,
-	0x0000, 0x0003, 0x0002, 0x1020, 0x0002, 0x6010, 0x0101, 0x0101,
-	0x0101, 0x0001,	0x0003, 0x0008, 0x4B41, 0x4E45, 0x4B4F, 0x2020,
-	0x4265, 0x2052, 0x6170, 0x2042, 0x6F79, 0x7300,	0x3030, 0x302E,
-	0x3038, 0x7FFF, 0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-	0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0xFFFF, 0xFFFF,
-	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,	0x003B, 0xFFFF, 0xFFFF, 0xFFFF
-};
-
 void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
@@ -1353,15 +1373,30 @@ void calc3_mcu_run(running_machine *machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  cakc3_checkumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3_writeaddress);
 #endif
-			memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	//		memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 			
 			kaneko16_mcu_ram[cakc3_checkumaddress / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
 
+			/*
 			for (i=0;i<0x40;i++)
 			{
 				kaneko16_mcu_ram[(calc3_eeprom_addr / 2)+i] = kaneko16_eeprom_data[i];//((eepromData[i]&0xff00)>>8) |  ((eepromData[i]&0x00ff)<<8);
 			}
+			*/
 
+			{
+				UINT32 length, size;
+				UINT8 *dat;
+
+				dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
+			
+				for (i=0;i<0x80;i++)
+				{
+					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, dat[i]);
+				}		
+				
+			}
+			
 		}
 		/* otherwise the command number is the number of transfer operations to perform */
 		else
