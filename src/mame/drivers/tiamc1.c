@@ -6,19 +6,19 @@
   special thanks to Shiru for his standalone emulator and documentation
 
   Games supported:
+      * Billiard
       * Konek-Gorbunok
+      * Snezhnaja Koroleva
       * S.O.S.
 
   Other games known to exist on this hardware (interchangeable by the ROM swap):
       * Avtogonki
-      * Billiard
       * Istrebitel'
       * Kot-Rybolov
       * Kotigoroshko
       * Ostrov Drakona
       * Ostrov Sokrovisch
       * Perehvatchik
-      * Snezhnaja Koroleva
       * Zvezdnyj Rycar'
 
  ***************************************************************
@@ -312,6 +312,24 @@ ROM_START( koroleva )
 
 ROM_END
 
+ROM_START( bilyard )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "04.1g", 0x00000, 0x2000, CRC(a44f913d) SHA1(f01a0e931fb0f719bc7b3f1ca7802dd747c8a56f) )
+	ROM_LOAD( "05.2g", 0x02000, 0x2000, CRC(6e41219f) SHA1(b09a16c9bd48b503ec0f2c636f021199d7ac7924) )
+	ROM_FILL( 0x04000, 0x2000, 0x00 ) /* 06.3g is unpopulated */
+	ROM_FILL( 0x06000, 0x2000, 0x00 ) /* 07.4g is unpopulated */
+	ROM_FILL( 0x08000, 0x2000, 0x00 ) /* 08.5g is unpopulated */
+	ROM_FILL( 0x0a000, 0x2000, 0x00 ) /* 09.6g is unpopulated */
+	ROM_LOAD( "10.7g", 0x0c000, 0x2000, CRC(173adb85) SHA1(53f27b45e61365907e8996c283ae70ca5b498129) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "00.2a", 0x00000, 0x2000, CRC(6f72e043) SHA1(a60f66326ff0a55e2624231efcbceff700d9ceee) )
+	ROM_LOAD( "01.3a", 0x02000, 0x2000, CRC(daddbbb5) SHA1(1460aebcbb57180e05930845703ff6325d85702a) )
+	ROM_LOAD( "02.5a", 0x04000, 0x2000, CRC(3d744d33) SHA1(f1375098e81986715d0497b09df0c6622bd75b9a) )
+	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(8bfc0b15) SHA1(221efdce516274d3b1d9009d11dc9ed6cd67ef12) )
+ROM_END
+
 GAME( 1988, konek, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1988, sosterm, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1988, koroleva, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, bilyard, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Billiard", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
