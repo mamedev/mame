@@ -1627,27 +1627,34 @@ static INPUT_PORTS_START( brapboys )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE(0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x04, 0x04, "Switch Test" )
+	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPNAME( 0x04, 0x04, "Switch Test" )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coin Type" )
-	PORT_DIPSETTING(    0x10, "Local Coin" )
-	PORT_DIPSETTING(    0x00, "Common Coin" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Players ) )
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW1:4" )
+	PORT_DIPNAME( 0x10, 0x10, "Coin Slots" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Seprate Coins" )
+	PORT_DIPSETTING(    0x00, "Shared Coins" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Players ) )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )	
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard) )	
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard) )
+
+/*****************************************************
+Difficulty    Lives      Bonus Players    Play Level
+  Easy          3      every 1000 / 2000   Level 2
+  Normal        2      every 2000 / 3000   Level 3
+  Hard          2      every 3000 / 4000   Level 4
+  Very Hard     1       --- NONE ---       Level 6
+******************************************************/
+
 INPUT_PORTS_END
 
 
