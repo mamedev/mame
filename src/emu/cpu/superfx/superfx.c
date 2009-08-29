@@ -245,6 +245,8 @@ static void superfx_plot(superfx_state *cpustate, UINT8 x, UINT8 y)
 	UINT8 color = cpustate->colr;
 	UINT16 offset = (y << 5) + (x >> 3);
 
+	printf( "plot: %02x at %d, %d\n", color, x, y );
+
 	if((cpustate->por & SUPERFX_POR_DITHER) && ((cpustate->scmr & SUPERFX_SCMR_MD) != 3))
 	{
 		if((x ^ y) & 1)
@@ -767,7 +769,7 @@ static CPU_EXECUTE( superfx )
 
         op = superfx_peekpipe(cpustate);
 
-		//printf( "Executing op at %06x: %02x\n", (cpustate->pbr << 16) | cpustate->r[15], op );
+		printf( "Executing op at %06x: %02x\n", (cpustate->pbr << 16) | cpustate->r[15], op );
 		switch(op)
 		{
 			case 0x00: // STOP
@@ -1046,17 +1048,18 @@ static CPU_EXECUTE( superfx )
 						break;
 					case SUPERFX_SFR_ALT2: // ADDI
 						r += op & 0xf;
-						cpustate->sfr |= ~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000;
+						cpustate->sfr |= (~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 					case SUPERFX_SFR_ALT3: // ADCI
 						r += (op & 0xf) + ((cpustate->sfr & SUPERFX_SFR_CY) ? 1 : 0);
-						cpustate->sfr |= ~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000;
+						cpustate->sfr |= (~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
 				cpustate->sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				cpustate->sfr |= (r >= 0x10000) ? SUPERFX_SFR_CY : 0;
 				cpustate->sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
 				superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
+				superfx_regs_reset(cpustate);
 				break;
 			}
 
@@ -1083,9 +1086,7 @@ static CPU_EXECUTE( superfx )
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;
 					case SUPERFX_SFR_ALT3: // CMP
-						//printf( "R%d = %04x\n", cpustate->sreg_idx, (UINT16)r);
 						r -= cpustate->r[op & 0xf];
-						//printf( "R%d - R%d = %04x\n", cpustate->sreg_idx, op & 0xf, (UINT16)r);
 						cpustate->sfr |= ((*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (*(cpustate->sreg) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
@@ -1243,7 +1244,6 @@ static CPU_EXECUTE( superfx )
 			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf: // IBT / LMS / SMS / LMS
 				switch(cpustate->sfr & SUPERFX_SFR_ALT)
 				{
-
 					case SUPERFX_SFR_ALT0: // IBT
 						superfx_gpr_write(cpustate, op & 0xf, (INT8)superfx_pipe(cpustate));
 						superfx_regs_reset(cpustate);
@@ -1257,7 +1257,7 @@ static CPU_EXECUTE( superfx )
 					case SUPERFX_SFR_ALT1: // LMS
 					case SUPERFX_SFR_ALT3: // LMS
 					{
-						UINT16 data;
+						UINT16 data = 0;
 						cpustate->ramaddr = superfx_pipe(cpustate) << 1;
 						data  = superfx_rambuffer_read(cpustate, cpustate->ramaddr ^ 0) << 0;
 						data |= superfx_rambuffer_read(cpustate, cpustate->ramaddr ^ 1) << 8;
