@@ -327,6 +327,8 @@ int parse_options(int argc, char *argv[], options *opts)
 {
 	int pending_base = FALSE;
 	int pending_arch = FALSE;
+	int curarch;
+	int numrows;
 	int arg;
 
 	memset(opts, 0, sizeof(*opts));
@@ -371,7 +373,6 @@ int parse_options(int argc, char *argv[], options *opts)
 		// architecture
 		else if (pending_arch)
 		{
-			int curarch;
 			for (curarch = 0; curarch < ARRAY_LENGTH(dasm_table); curarch++)
 				if (core_stricmp(curarg, dasm_table[curarch].name) == 0)
 					break;
@@ -397,6 +398,19 @@ int parse_options(int argc, char *argv[], options *opts)
 	
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
+	printf("\n");
+	printf("Supported architectures:");
+	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
+	for (curarch = 0; curarch < numrows * 7; curarch++)
+	{
+		int row = curarch / 7;
+		int col = curarch % 7;
+		int index = col * numrows + row;
+		if (col == 0)
+			printf("\n  ");
+		printf("%-11s", (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
+	}
+	printf("\n");
 	return 1;
 };
 
