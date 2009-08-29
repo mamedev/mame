@@ -1,165 +1,210 @@
 /******************************************************************************
 
-     - NORAUT POKER -
-    ------------------
+   - NORAUT POKER -
+  ------------------
 
-    Driver by Roberto Fresca & Angelo Salese.
-
-
-    Games running on this hardware:
-
-    * Noraut Poker,                 1988,  Noraut Ltd.
-    * Noraut Joker Poker,           1988,  Noraut Ltd.
-    * Noraut Red Hot Joker Poker,   1988,  Noraut Ltd.
-    * Noraut Poker (NTX10A),        1988,  Noraut Ltd.
-    * Noraut Joker Poker (V3.010a), 1988,  Noraut Ltd.
-    * GTI Poker,                    1983,  GTI Inc.
-    * Noraut Poker (bootleg),       198?,  Unknown.
+  Driver by Roberto Fresca & Angelo Salese.
 
 
-*******************************************************************************
+  Games running on this hardware:
 
-
-    HARDWARE NOTES:
-    ---------------
-
-
-    Hardware Layout (norautp):
-
-    1x Z80
-    3x PPI 8255
-    2x 6116 SRAM
-    1x 3.6 Vcc Battery.
-    1x 18.432 MHz. Xtal.
-
-    1x 555 + unknown yellow resonator, near the edge connector.
-    1x 555 + resnet, near the battery.
-
-    1x 10 DIP switches bank.
-    2x 3pins jumpers (between the Z80 and ROM)
-
-       JP1 (ABC);  JP2 (DEF)
-
-    PCB silksceened:  AB+DE=512  BC+DE=256
-                      (CUT BC)   EF=64/128
-
-    PCB silksceened:  SMART-BOARD 131191 ISS.E (Made in USA)
-
-    -------------------------------------------------------------
-
-
-    Hardware Layout (norautjp):
-
-    - CPU:             1x TMPZ84C00AP-8
-    - RAM:             2x HM6116LP-4 CMOS Static Ram
-    - I/O:             3x D8255AC-2 Peripeheral Interface Adapter
-    - Prg ROMs:        1x 2764 Eprom
-    - Gfx ROMs:        1x 2732 Eprom
-    - Sound:           Discrete
-    - Battery:         1x 3.6v Ni-cd 65Mah
-    - Crystal:         1x 18.432Mhz
-    - Resistor Array:  4x 9 Pin SIP 472G
-
-
-    PCB Layout (norautjp):                                                       Edge Connector 36x2
-     ______________________________________________________________________________________________
-    |  _____                  _________    _________    _____         .........    _________       |
-    | |D5555|                |74LS174N |  |74LS153N |  |D5555|        .........   |ULN2003A |      |
-    | |_____|                |_________|  |_________|  |_____|    Resistor Array  |_________|      |
-    |                                                               ___                            |
-    |                                                              |VR1|                           |
-    |              DIP SW x4                                       |___|                           |
-    |  ________     _______                                                                        |
-    | |Battery |   |1|2|3|4|  _________    _________    _________    _________     _________       |
-    | |  3.6v  |   |_|_|_|_| |74LS157N |  |74LS153N |  |74LS161AP|  |74LS86AN |   |ULN2003A |      |
-    | |________|             |_________|  |_________|  |_________|  |_________|   |_________|      |
-    |                                                                                              |
-    |                                                                                              |
-    |                                                                                              | 36
-    |  _________              _________                 _________    _________     _________       |___
-    | |HD74LS04P|            |74LS166AP|               |74LS161AN|  |74LS153N |   |ULN2003A |       ___|
-    | |_________|            |_________|               |_________|  |_________|   |_________|       ___|
-    |                                                                                               ___|
-    |                                   DIP SW x 8                               ________________   ___|
-    |               _____________    _______________    _________    _________  |                |  ___|
-    |              |             |  |1|2|3|4|5|6|7|8|  |74LS161AN|  |74LS157N | |    D8255AC-2   |  ___|
-    |              |    2732     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
-    |              |_____________|                                                                  ___|
-    |                                                                                               ___|
-    |                                                                            ________________   ___|
-    |                                                                           |                |  ___|
-    |  _____________        _____________                                       |    D8255AC-2   |  ___|
-    | |             |      |             |                                      |________________|  ___|
-    | |    6116     |      |    6116     |                                                          ___|
-    | |_____________|      |_____________|              _________    _________                      ___|
-    |                                                  |74LS161AN|  |74LS157N |                     ___|
-    |                                                  |_________|  |_________|                     ___|
-    |                                                                                               ___|
-    |  ______________       ________________                                                        ___|
-    | |              |     |                |           _________    _________                      ___|
-    | |     2764     |     |    D8255AC-2   |          |74LS161AN|  |74LS157N |     .........       ___|
-    | |______________|     |________________|          |_________|  |_________|     .........       ___|
-    |                                                                              Resistor Array   ___|
-    |                                                                                               |
-    |                                                                                               | 1
-    |                      _________                    _________    _________    _________         |
-    |                     | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |        |
-    |                     |_________|                  |_________|  |_________|  |_________|        |
-    |                                                                                               |
-    |                                             XTAL                                              |
-    |                                            .----.                                             |
-    |  ____________________     __________      _________    _________    _________    _________    |
-    | |                    |   |PALce16v8H|    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |   |
-    | |   TMPZ84C00AP-8    |   |__________|    |_________|  |_________|  |_________|  |_________|   |
-    | |____________________|                                                                        |
-    |                                                                                               |
-    |_______________________________________________________________________________________________|
-
+   * Noraut Poker,                 1988,  Noraut Ltd.
+   * Noraut Joker Poker,           1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker,   1988,  Noraut Ltd.
+   * Noraut Poker (NTX10A),        1988,  Noraut Ltd.
+   * Noraut Joker Poker (V3.010a), 1988,  Noraut Ltd.
+   * GTI Poker,                    1983,  GTI Inc.
+   * Noraut Poker (bootleg),       198?,  Unknown.
 
 
 *******************************************************************************
 
 
-    Noraut Edge Connector (pinouts)
-    --------------------------------
-    Component     PN   Solder Side
-    --------------------------------
-    GND           01   GND
-    5v DC         02   5v DC
-                  03
-    12v DC        04   12v DC
-                  05
-                  06
-                  07
-    0v            08   Readout Switch
-    0v            09   Low level hopper
-    0v            10   50p in
-    0v            11   pound in
-    0v            12   Bet switch
-    0v            13   Deal switch
-    0v            14   Hold 1 switch
-    0v            15   Half Gamble switch
-    0v            16   Change Card switch
-    Refil         17   Coin count/sense from hopper
-    Low Switch    18   High swicth
-    Hold 3 Switch 19   Hold 2 switch
-    Hold 5 Switch 20   Hold 4 switch
-    10p coin      21   Deflect
-                  22   50p in meter
-                  23   Hopper Motor Drive (low volt switch line NOT 24v)
-                  24
-                  25   spk+
-                  26   Panel lamps clock
-    Monitor sync  27   Hold 1 lamp
-    Bet lamp      28   Deal lamp
-    Change lamp   29   Hold 4 lamp
-    Hold 5 lamp   30   Panel lights reset
-    High lamp     31   Half Gamble lamp
-    Hold 2 lamp   32   Low lamp
-    10p Meter out 33   Meter refil
-    Video Green   34   Hold 3 lamp
-    Video Blue    35   10p in Meter
-    Video Red     36   Spark Detect (Not on all boards)
+  HARDWARE NOTES:
+  ---------------
+
+  Hardware Layout (norautp):
+
+  1x Z80
+  3x PPI 8255
+  2x 6116 SRAM
+  1x 3.6 Vcc Battery.
+  1x 18.432 MHz. Xtal.
+
+  1x 555 + unknown yellow resonator, near the edge connector.
+  1x 555 + resnet, near the battery.
+
+  1x 10 DIP switches bank.
+  2x 3pins jumpers (between the Z80 and ROM)
+
+     JP1 (ABC);  JP2 (DEF)
+
+  PCB silksceened:  AB+DE=512  BC+DE=256
+                    (CUT BC)   EF=64/128
+
+  PCB silksceened:  SMART-BOARD 131191 ISS.E (Made in USA)
+
+  -------------------------------------------------------------
+
+
+  Hardware Layout (norautjp):
+
+  - CPU:             1x TMPZ84C00AP-8
+  - RAM:             2x HM6116LP-4 CMOS Static Ram
+  - I/O:             3x D8255AC-2 Peripeheral Interface Adapter
+  - Prg ROMs:        1x 2764 Eprom
+  - Gfx ROMs:        1x 2732 Eprom
+  - Sound:           Discrete
+  - Battery:         1x 3.6v Ni-cd 65Mah
+  - Crystal:         1x 18.432Mhz
+  - Resistor Array:  4x 9 Pin SIP 472G
+
+
+  PCB Layout (norautjp):                                                       Edge Connector 36x2
+   ______________________________________________________________________________________________
+  |  _____                  _________    _________    _____         .........    _________       |
+  | |D5555|                |74LS174N |  |74LS153N |  |D5555|        .........   |ULN2003A |      |
+  | |_____|                |_________|  |_________|  |_____|    Resistor Array  |_________|      |
+  |                                                               ___                            |
+  |                                                              |VR1|                           |
+  |              DIP SW x4                                       |___|                           |
+  |  ________     _______                                                                        |
+  | |Battery |   |1|2|3|4|  _________    _________    _________    _________     _________       |
+  | |  3.6v  |   |_|_|_|_| |74LS157N |  |74LS153N |  |74LS161AP|  |74LS86AN |   |ULN2003A |      |
+  | |________|             |_________|  |_________|  |_________|  |_________|   |_________|      |
+  |                                                                                              |
+  |                                                                                              |
+  |                                                                                              | 36
+  |  _________              _________                 _________    _________     _________       |___
+  | |HD74LS04P|            |74LS166AP|               |74LS161AN|  |74LS153N |   |ULN2003A |       ___|
+  | |_________|            |_________|               |_________|  |_________|   |_________|       ___|
+  |                                                                                               ___|
+  |                                   DIP SW x 8                               ________________   ___|
+  |               _____________    _______________    _________    _________  |                |  ___|
+  |              |             |  |1|2|3|4|5|6|7|8|  |74LS161AN|  |74LS157N | |    D8255AC-2   |  ___|
+  |              |    2732     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
+  |              |_____________|                                                                  ___|
+  |                                                                                               ___|
+  |                                                                            ________________   ___|
+  |                                                                           |                |  ___|
+  |  _____________        _____________                                       |    D8255AC-2   |  ___|
+  | |             |      |             |                                      |________________|  ___|
+  | |    6116     |      |    6116     |                                                          ___|
+  | |_____________|      |_____________|              _________    _________                      ___|
+  |                                                  |74LS161AN|  |74LS157N |                     ___|
+  |                                                  |_________|  |_________|                     ___|
+  |                                                                                               ___|
+  |  ______________       ________________                                                        ___|
+  | |              |     |                |           _________    _________                      ___|
+  | |     2764     |     |    D8255AC-2   |          |74LS161AN|  |74LS157N |     .........       ___|
+  | |______________|     |________________|          |_________|  |_________|     .........       ___|
+  |                                                                              Resistor Array   ___|
+  |                                                                                               |
+  |                                                                                               | 1
+  |                      _________                    _________    _________    _________         |
+  |                     | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |        |
+  |                     |_________|                  |_________|  |_________|  |_________|        |
+  |                                                                                               |
+  |                                             XTAL                                              |
+  |                                            .----.                                             |
+  |  ____________________     __________      _________    _________    _________    _________    |
+  | |                    |   |PALce16v8H|    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |   |
+  | |   TMPZ84C00AP-8    |   |__________|    |_________|  |_________|  |_________|  |_________|   |
+  | |____________________|                                                                        |
+  |                                                                                               |
+  |_______________________________________________________________________________________________|
+
+
+
+*******************************************************************************
+
+
+  Noraut Edge Connector (pinouts)
+  --------------------------------
+  Component     PN   Solder Side
+  --------------------------------
+  GND           01   GND
+  5v DC         02   5v DC
+                03
+  12v DC        04   12v DC
+                05
+                06
+                07
+  0v            08   Readout Switch
+  0v            09   Low level hopper
+  0v            10   50p in
+  0v            11   pound in
+  0v            12   Bet switch
+  0v            13   Deal switch
+  0v            14   Hold 1 switch
+  0v            15   Half Gamble switch
+  0v            16   Change Card switch
+  Refil         17   Coin count/sense from hopper
+  Low Switch    18   High swicth
+  Hold 3 Switch 19   Hold 2 switch
+  Hold 5 Switch 20   Hold 4 switch
+  10p coin      21   Deflect
+                22   50p in meter
+                23   Hopper Motor Drive (low volt switch line NOT 24v)
+                24
+                25   spk+
+                26   Panel lamps clock
+  Monitor sync  27   Hold 1 lamp
+  Bet lamp      28   Deal lamp
+  Change lamp   29   Hold 4 lamp
+  Hold 5 lamp   30   Panel lights reset
+  High lamp     31   Half Gamble lamp
+  Hold 2 lamp   32   Low lamp
+  10p Meter out 33   Meter refil
+  Video Green   34   Hold 3 lamp
+  Video Blue    35   10p in Meter
+  Video Red     36   Spark Detect (Not on all boards)
+
+*******************************************************************************
+
+  Control Panel
+  -------------
+
+  There are 2 control panel schemes:
+
+  * The default one (11 button-lamps) for systems without CANCEL button.
+
+  .--------------------------------------------------------------------------.
+  |                                              .-------. .------. .------. |
+  | .------. .------. .------. .------. .------. |  BET  | | HALF | |  HI  | |
+  | |      | |      | |      | |      | |      | |COLLECT| |GAMBLE| |      | |
+  | | HOLD | | HOLD | | HOLD | | HOLD | | HOLD | '-------' '------' '------' |
+  | |CANCEL| |CANCEL| |CANCEL| |CANCEL| |CANCEL| .-------. .------. .------. |
+  | |      | |      | |      | |      | |      | | DEAL  | |CHANGE| |  LO  | |
+  | '------' '------' '------' '------' '------' | DRAW  | | CARD | |      | |
+  |                                              '-------' '------' '------' |
+  '--------------------------------------------------------------------------'
+
+   HOLD buttons              = red.
+   BET, DEAL, HI & LO        = yellow.
+   HALF GAMBLE & CHANGE CARD = orange. 
+
+
+  * The alternate one (12 button-lamps) for systems with CANCEL button.
+
+  .-------------------------------------------------------------.
+  | .------. .------. .------. .------. .------.   .----------. | 
+  | | HOLD | | HOLD | | HOLD | | HOLD | | HOLD |   |   HIGH   | |
+  | '------' '------' '------' '------' '------'   '----------' |
+  | .------. .------. .------. .------. .------.   .----------. |
+  | |CANCEL| |STAND | | SAVE | | DEAL | | BET  |   |   LOW    | |
+  | '------' '------' '------' '------' '------'   '----------' |
+  '-------------------------------------------------------------'
+
+   HOLD & CANCEL buttons     = yellow (1).
+   STAND & DEAL buttons      = orange (1).
+   SAVE (HALF GAMBLE) button = blued-green (1).
+   BET button                = red (1).
+   HIGH & LOW buttons        = yellow.
+
+   (1) Circular-shaped buttons.
+
+  Some lamps are wired in different way in this scheme.
 
 
 *******************************************************************************
@@ -177,7 +222,7 @@
   |      |                              |   D5555C   |               |KN2222A|
   |      |                             4|            |3     R3       |       |      -->
   |   PC7|------------------------------|RST      OUT|-----ZZZZ------|B     E|>----ZZZZZ-----> Audio Out.
-  |   PC6|---------.                   6|            |8              |   C   |      VR1
+  |   PC6|----------.                  6|            |8              |   C   |      VR1
   |   PC5|-----.    |2-in         .-----|THR      VCC|-----------.   '---+---'          .----> Audio Out.
   |   PC4|--.  |  .-+------.      |    5|            |7          |       |              |
   |      |  |  |  |ULN2003A|      |  .--|CVOLT   DISC|--.        |       |              |
@@ -212,108 +257,241 @@
   C5 = 103  = 10000 pF  =  10 nF = 0.01 uF
   C6 = 104  = 100000 pF = 100 nF = 0.1 uF
 
-  C1, C2, C3 & C4 are polyester film / mylar capacitors.
-  C5 & C6 are ceramic capacitors.
-  All Capacitors are non-polarised.
+  - C1, C2, C3 & C4 are polyester film / mylar capacitors.
+  - C5 & C6 are ceramic capacitors.
+  - All Capacitors are non-polarised.
 
 
 *******************************************************************************
 
 
-    *** Game Notes ***
+  Narout System Ports Map
+  -----------------------
 
-    Nothing, yet...
+  (*) Confirmed lines.
+
+
+  PPI-0 (60h-63h); PortA IN.
+  DIP Switches bank:
+
+  7654 3210
+  ---- ---x  * DIP switch 8
+  ---- --x-  * DIP switch 7
+  ---- -x--  * DIP switch 6
+  ---- x---  * DIP switch 5
+  ---x ----  * DIP switch 4
+  --x- ----  * DIP switch 3
+  -x-- ----  * DIP switch 2
+  x--- ----  * DIP switch 1
+
+
+  PPI-0 (60h-63h); PortB OUT.
+  Lamps:
+
+  7654 3210
+  ---- ---x  * CHANGE CARD lamp.
+  ---- --x-  * SAVE / HALF GAMBLE lamp.
+  ---- -x--  * HOLD 1 lamp.
+  ---- x---  * HOLD 2 lamp.
+  ---x ----  * HOLD 3 lamp.
+  --x- ----  * HOLD 4 lamp.
+  -x-- ----  * HOLD 5 lamp.
+  x--- ----  * CANCEL lamp.
+
+
+  PPI-0 (60h-63h); PortC OUT.
+  Lamps & Coin Counters:
+
+  7654 3210
+  ---- ---x  * HI lamp.
+  ---- --x-  * LO lamp.
+  ---- -x--  unknown.
+  ---- x---  * Payout pulse.
+  ---x ----  * Coin 2 counter.
+  --x- ----  * Coin 1 counter.
+  -x-- ----  unknown.
+  x--- ----  unknown (always activated).
+
+
+-----------------------------------------------------------
+
+  PPI-1 (a0h-a3h); PortA IN.
+  Regular Inputs:
+
+  7654 3210
+  ---- ---x  * DEAL / DRAW button.
+  ---- --x-  * BET / CHANGE CARD button.
+  ---- -x--  * COIN 1 mech.
+  ---- x---  * COIN 2 mech.
+  ---x ----  * READOUT button.
+  --x- ----  * HI button.
+  -x-- ----  * LO button.
+  x--- ----  * PAYOUT button.
+
+
+  PPI-1 (a0h-a3h); PortB IN.
+  Regular Inputs:
+
+  7654 3210
+  ---- ---x  * STAND / TAKE button.
+  ---- --x-  * SAVE / HALF GAMBLE button.
+  ---- -x--  * HOLD 1 button.
+  ---- x---  * HOLD 2 button.
+  ---x ----  * HOLD 3 button.
+  --x- ----  * HOLD 4 button.
+  -x-- ----  * HOLD 5 button.
+  x--- ----  * CANCEL button.
+
+
+  PPI-1 (a0h-a3h); PortC OUT.
+  Sound & Lamps:
+
+  7654 3210
+  ---- ---x  * DEAL / DRAW Lamp.
+  ---- --x-  * BET / COLLECT Lamp.
+  ---- -x--  unknown (always activated after initalize).
+  ---- x---  unknown.
+  xxxx ----  * Discrete Sound Lines.
+
+
+-----------------------------------------------------------
+
+  PPI-2 (a0h-a3h); PortA IN/OUT
+  VRAM Handlers:
+
+  7654 3210
+  xxxx xxxx  VRAM DATA.
+
+
+  PPI-2 (a0h-a3h); PortB IN? (should be OUT)
+  VRAM Handlers:
+
+  7654 3210
+  xxxx xxxx  VRAM ADDRESSING.
+
+
+  PPI-2 (a0h-a3h); PortC (PortA handshake lines)
+  VRAM Handlers:
+
+  7654 3210
+  xxxx xxxx  HANDSHAKE LINES.
 
 
 *******************************************************************************
 
-    --------------------
-    ***  Memory Map  ***
-    --------------------
 
-    0x0000 - 0x1FFF    ; ROM space.
-    0x6000 - 0x63FF    ; NVRAM.
+  *** Game Notes ***
 
-    0x60 - 0x63        ; PPI 8255 0 - DIP Switches, lamps & counters.
-    0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
-    0xC0 - 0xC3        ; PPI 8255 2 - Video RAM access.
+
+  - norautjp:
+  
+	At the first start-up, the game will give you a very clever
+    "FU" screen. Press the following buttons *together* on different times
+    to get rid of it (and actually initialize the machine):
+
+    * start + bet buttons (1+2);
+    * Hold 3 + Hold 2 + Save (Half Gamble) + Change Card (C+X+F+D)
+
+    Also notice that you actually need to map the last four buttons on the
+    same button / on a joypad since MAME's steady key doesn't seem to work on
+    my end...
+
+
+*******************************************************************************
+
+  --------------------
+  ***  Memory Map  ***
+  --------------------
+
+  0x0000 - 0x1FFF    ; ROM space.
+  0x6000 - 0x63FF    ; NVRAM.
+
+  0x60 - 0x63        ; PPI 8255 0 - DIP Switches, lamps & counters.
+  0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
+  0xC0 - 0xC3        ; PPI 8255 2 - Video RAM access.
 
 
 *******************************************************************************
 
 
-    DRIVER UPDATES:
+  DRIVER UPDATES:
 
 
-    [2009-01-27]
+  [2009-01-27]
 
-    - Initial release.
-    - Defined ROM, RAM.
-    - Added 2x PPI 8255 for regular I/O.
-    - Added complete inputs and hooked DIP switches.
-    - Added video RAM support.
-    - Added NVRAM.
-    - Added lamps support.
-    - Added coin counters.
-    - Identified the sound writes.
-    - Added hardware description.
-    - Added pinout scheme.
-    - Added technical notes.
-
-    [2009-01-28]
-
-    - Merged GTI Poker (gtipoker.c) with this driver.
-    - Added new memory map and machine driver for gtipoker.
-    - Hooked 2x PPI 8255 to gtipoker.
-    - Hooked the video RAM access ports to gtipoker.
-    - Changed norautpn description from Noraut Poker (No Payout),
-      to Noraut Poker (bootleg), since the game has payout system.
-    - Some clean-ups.
-
-    [2009-08-21]
-
-    - Switched to pre-defined Xtal clock.
-    - Changed the way how graphics are banked/accessed.
-    - Fixed the graphics offset and number of tiles per bank.
-    - Added new set: Noraut Red Hot Joker Poker.
-    - Added new set: Noraut Poker (NTX10A).
-    - Added new set: Noraut Joker Poker (V3.010a).
-    - Fixed the tile size/decode for the first GFX bank.
-    - Added proper norautrh inputs, including the readout button.
-    - Added partial DIP switches to norautrh.
-    - Added more technical notes.
-
-    [2009-08-23/26]
-
-    - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
-      This is due to the phisical keyboard limitation when needs to enter
-      4 simultaneous inputs.
-    - Executed a trojan on 2 noraut systems to confirm the way 16x32 tiles are decoded.
-    - Fixed the x-offset for 32x32 tiles lines.
-    - Fixed the screen aspect and visible area.
-    - Confirmed correct colors. No bipolar PROM involved.
-    - Added Noraut Joker Poker hardware and PCB layouts.
-    - Documented the discrete audio circuitery. Added a full diagram.
+  - Initial release.
+  - Defined ROM, RAM.
+  - Added 2x PPI 8255 for regular I/O.
+  - Added complete inputs and hooked DIP switches.
+  - Added video RAM support.
+  - Added NVRAM.
+  - Added lamps support.
+  - Added coin counters.
+  - Identified the sound writes.
+  - Added hardware description.
+  - Added pinout scheme.
+  - Added technical notes.
 
 
-    Notes:
-    - norautjp: at the first start-up, the game will give you a very clever
-      "FU" screen. Press the following buttons *together* on different times
-      to get rid of it (and actually initialize the machine):
-      * start + bet buttons (1+2);
-      * Hold 3 + Hold 2 + Save (Half Gamble) + Change Card (C+X+F+D)
-      Also notice that you actually need to map the last four buttons on the
-      same button / on a joypad since MAME's steady key doesn't seem to work on
-      my end...
+  [2009-01-28]
+
+  - Merged GTI Poker (gtipoker.c) with this driver.
+  - Added new memory map and machine driver for gtipoker.
+  - Hooked 2x PPI 8255 to gtipoker.
+  - Hooked the video RAM access ports to gtipoker.
+  - Changed norautpn description from Noraut Poker (No Payout),
+    to Noraut Poker (bootleg), since the game has payout system.
+  - Some clean-ups.
 
 
-    TODO:
+  [2009-08-21]
 
-    - Analize the extra 8255 at 0xc0-0xc3 (full bidirectional port w/hshk lines)
-    - Video RAM (through 3rd PPI?).
-    - Find if wide chars are hardcoded or tied to a bit.
-    - Lamps layout.
-    - Discrete sound.
+  - Switched to pre-defined Xtal clock.
+  - Changed the way how graphics are banked/accessed.
+  - Fixed the graphics offset and number of tiles per bank.
+  - Added new set: Noraut Red Hot Joker Poker.
+  - Added new set: Noraut Poker (NTX10A).
+  - Added new set: Noraut Joker Poker (V3.010a).
+  - Fixed the tile size/decode for the first GFX bank.
+  - Added proper norautrh inputs, including the readout button.
+  - Added partial DIP switches to norautrh.
+  - Added more technical notes.
+
+
+  [2009-08-23/26]
+
+  - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
+    This is due to the phisical keyboard limitation when needs to enter
+    4 simultaneous inputs.
+  - Executed a trojan on 2 noraut systems to confirm the way 16x32 tiles are decoded.
+  - Fixed the x-offset for 32x32 tiles lines.
+  - Fixed the screen aspect and visible area.
+  - Confirmed correct colors. No bipolar PROM involved.
+  - Added Noraut Joker Poker hardware and PCB layouts.
+  - Documented the discrete audio circuitery. Added a full diagram.
+
+
+  [2009-08-29]
+
+  - Fixed the coin counters.
+  - Documented all the output ports.
+  - Added a scheme with descriptions for every existent port.
+  - Added full lamps support to naroutp, naroutjp, naroutrh and naroutpn.
+  - Created lamps layouts for 11 and 12-lamps scheme.
+  - Rerouted some inputs to mantain the inputs layout.
+  - Renamed some inputs to match the text with the real cab buttons.
+  - Removed the imperfect colors flag from the existent sets.
+  - Added 2 different control panel layouts to the source.
+  - Updated technical notes.
+
+
+  TODO:
+
+  - Analize the third 8255 at 0xc0-0xc3 (full bidirectional port w/hshk lines)
+  - Video RAM (through 3rd PPI?).
+  - Find if wide chars are hardcoded or tied to a bit.
+  - Discrete sound.
+  - Save support.
 
 
 *******************************************************************************/
@@ -325,6 +503,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/dac.h"
+
+#include "noraut11.lh"
+#include "noraut12.lh"
 
 static UINT16 *np_vram;
 static UINT16 np_addr;
@@ -399,73 +580,81 @@ static PALETTE_INIT( norautp )
 *      R/W Handlers      *
 *************************/
 
-static WRITE8_DEVICE_HANDLER( lamps_w )
+static WRITE8_DEVICE_HANDLER( mainlamps_w )
 {
-/*  PPI0 (60h-63h); PortB out
+/*  PPI-0 (60h-63h); PortB OUT.
     Lamps:
 
     7654 3210
-    ---- ---x  Change Card / (Save?)
-    ---- --x-  Hi/Lo
-    ---- -x--  Hold 1
-    ---- x---  Hold 2
-    ---x ----  Hold 3
-    --x- ----  Hold 4
-    -x-- ----  Hold 5
-    x--- ----  Start (poker)
+    ---- ---x  * CHANGE CARD lamp.
+    ---- --x-  * SAVE / HALF GAMBLE lamp.
+    ---- -x--  * HOLD 1 lamp.
+    ---- x---  * HOLD 2 lamp.
+    ---x ----  * HOLD 3 lamp.
+    --x- ----  * HOLD 4 lamp.
+    -x-- ----  * HOLD 5 lamp.
+    x--- ----  * CANCEL lamp.
 */
-	output_set_lamp_value(0, (data >> 0) & 1);	/* Change */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* Hi/Lo  */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* Hold 1 */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* Hold 2 */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* Hold 3 */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* Hold 4 */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* Hold 5 */
-	output_set_lamp_value(7, (data >> 7) & 1);	/* Start  */
+	output_set_lamp_value(0, (data >> 0) & 1);	/* CHANGE CARD lamp */
+	output_set_lamp_value(1, (data >> 1) & 1);	/* SAVE / HALF GAMBLE lamp */
+	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD 1 lamp */
+	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD 2 lamp */
+	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD 3 lamp */
+	output_set_lamp_value(5, (data >> 5) & 1);	/* HOLD 4 lamp */
+	output_set_lamp_value(6, (data >> 6) & 1);	/* HOLD 5 lamp */
+	output_set_lamp_value(7, (data >> 7) & 1);	/* CANCEL lamp */
 }
 
-static WRITE8_DEVICE_HANDLER( ccounter_w )
+static WRITE8_DEVICE_HANDLER( soundlamps_w )
 {
-/*  PPI0 (60h-63h); PortC out
-    Coin Counters:
-
-    7654 3210
-    ---- -xxx  unknown
-    ---- x---  Payout
-    ---x ----  Coin 2
-    --x- ----  Coin 3
-    xx-- ----  unknown
-*/
-	coin_counter_w(0, data & 0x20);	/* Coin1 */
-	coin_counter_w(1, data & 0x10);	/* Coin2 */
-	coin_counter_w(2, data & 0x08);	/* Payout */
-}
-
-static WRITE8_DEVICE_HANDLER( sndlamp_w )
-{
-/*  PPI1 (a0h-a3h); PortC out
+/*  PPI-1 (a0h-a3h); PortC OUT.
     Sound & Lamps:
 
     7654 3210
-    ---- ---x  Start Lamp?
-    ---- --x-  Bet Lamp
-    ---- xx--  unknown
-    xxxx ----  Discrete Sound Lines
+    ---- ---x  * DEAL / DRAW Lamp.
+    ---- --x-  * BET / COLLECT Lamp.
+    ---- -x--  unknown (always activated after initalize).
+    ---- x---  unknown.
+    xxxx ----  * Discrete Sound Lines.
 */
-	output_set_lamp_value(8, (data >> 0) & 1);	/* Start? */
-	output_set_lamp_value(9, (data >> 1) & 1);	/* Bet */
+	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
+	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
 	dac_data_w(devtag_get_device(device->machine, "dac"), (data & 0xf0));	/* Discrete Sound */
 }
 
-/*game waits for bit 7 (0x80) to be set.*/
+static WRITE8_DEVICE_HANDLER( counterlamps_w )
+{
+/*  PPI-0 (60h-63h); PortC OUT.
+    Lamps & Coin Counters:
+
+    7654 3210
+    ---- ---x  * HI lamp.
+    ---- --x-  * LO lamp.
+    ---- -x--  unknown.
+    ---- x---  * Payout pulse.
+    ---x ----  * Coin 2 counter.
+    --x- ----  * Coin 1 counter.
+    -x-- ----  unknown.
+    x--- ----  unknown (always activated).
+*/
+	output_set_lamp_value(10, (data >> 0) & 1);	/* HI lamp */
+	output_set_lamp_value(11, (data >> 1) & 1);	/* LO lamp */
+
+	coin_counter_w(0, data & 0x10);	/* Coin1/3 counter */
+	coin_counter_w(1, data & 0x20);	/* Coin2 counter */
+	coin_counter_w(2, data & 0x08);	/* Payout pulse */
+}
+
+
+/* game waits for bit 7 (0x80) to be set.*/
 static READ8_HANDLER( test_r )
 {
 	return 0xff;
 }
 
-/*game waits for bit 4 (0x10) to be reset.*/
+/* game waits for bit 4 (0x10) to be reset.*/
 static READ8_HANDLER( test2_r )
 {
 	return 0x00;
@@ -537,8 +726,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( norautp )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Take")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Collect")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
@@ -548,7 +737,7 @@ static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_CODE(KEYCODE_F) PORT_NAME("Change Card")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save (Half Gamble)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Half Gamble / Save")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -583,7 +772,54 @@ static INPUT_PORTS_START( norautp )
 	PORT_DIPSETTING(    0x00, "10 Pence" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( poker )
+static INPUT_PORTS_START( norautrh )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Stand / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save / Half Gamble")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* Coin C for other games */
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "25" )
+	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )		PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, "Random" )
+	PORT_DIPSETTING(    0x00, "Always" )
+	PORT_DIPNAME( 0x10, 0x10, "Type of Game" )		PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "Jacks Plus" )
+	PORT_DIPSETTING(    0x00, "Joker Poker" )
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPSETTING(    0x00, "A=1; B=5" )
+	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
+	PORT_DIPSETTING(    0x20, "A=10; B=5" )
+	PORT_DIPSETTING(    0x80, "A=50; B=25" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Bet")			PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( naroutpn )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
@@ -595,8 +831,8 @@ static INPUT_PORTS_START( poker )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Stand (Take)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save (Half Gamble)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Stand / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save / Half Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -628,53 +864,6 @@ static INPUT_PORTS_START( poker )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( norautrh )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_CODE(KEYCODE_F) PORT_NAME("Change Card")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("Save (Half Gamble)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* Coin C for other games */
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )			PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, "25" )
-	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )		PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x08, "Random" )
-	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x10, 0x10, "Type of Game" )		PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x10, "Jacks Plus" )
-	PORT_DIPSETTING(    0x00, "Joker Poker" )
-	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
-	PORT_DIPSETTING(    0x00, "A=1; B=5" )
-	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
-	PORT_DIPSETTING(    0x20, "A=10; B=5" )
-	PORT_DIPSETTING(    0x80, "A=50; B=25" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Bet")			PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -730,28 +919,28 @@ GFXDECODE_END
 static const ppi8255_interface ppi8255_intf[3] =
 {
 	{	/* (60-63) Mode 0 - Port A set as input */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_HANDLER(lamps_w),	    /* Port B write */
-		DEVCB_HANDLER(ccounter_w)   /* Port C write */
+		DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_HANDLER(mainlamps_w),		/* Port B write */
+		DEVCB_HANDLER(counterlamps_w)	/* Port C write */
 	},
 	{	/* (a0-a3) Mode 0 - Ports A & B set as input */
-		DEVCB_INPUT_PORT("IN0"),    /* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_NULL,				    /* Port C read */
-		DEVCB_NULL,				    /* Port A write */
-		DEVCB_NULL,				    /* Port B write */
-		DEVCB_HANDLER(sndlamp_w)    /* Port C write */
+		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_HANDLER(soundlamps_w)		/* Port C write */
 	},
 	{	/* (c0-c3) Group A Mode 2 (5-handshacked bidirectional port) */
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read  (should has test_r tied) */
-		DEVCB_NULL,					/* Port A write (should has vram_data_w tied) */
-		DEVCB_NULL,					/* Port B write (should has vram_addr_w tied) */
-		DEVCB_NULL					/* Port C write */
+		DEVCB_NULL,						/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read  (should has test_r tied) */
+		DEVCB_NULL,						/* Port A write (should has vram_data_w tied) */
+		DEVCB_NULL,						/* Port B write (should has vram_addr_w tied) */
+		DEVCB_NULL						/* Port C write */
 	}
 };
 
@@ -1004,13 +1193,13 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT  ROT    COMPANY        FULLNAME                       FLAGS */
-GAME( 1988, norautp,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1988, norautjp, norautp, norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1988, norautrh, 0,       norautp,  norautrh, 0,    ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1988, norautu,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1988, norautv3, 0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1983, gtipoker, 0,       gtipoker, norautp,  0,    ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT  ROT    COMPANY        FULLNAME                       FLAGS                              LAYOUT */
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND,                     layout_noraut11 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND,                     layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, 0,    ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND,                     layout_noraut12 )
+GAME(  1988, norautu,  0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  1988, norautv3, 0,       norautp,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       gtipoker, norautp,  0,    ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAME( 198?, norautpn, norautp, norautp,  poker,    0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAMEL( 198?, norautpn, norautp, norautp,  naroutpn, 0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND,                     layout_noraut12 )
