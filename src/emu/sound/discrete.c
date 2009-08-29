@@ -169,6 +169,39 @@ static DISCRETE_RESET( dso_output )
 	/* nothing to do - just avoid being stepped */
 }
 
+
+/*************************************
+ *
+ *  Add an entry to a list
+ *
+ *************************************/
+
+static void linked_list_add(discrete_info *info, linked_list_entry ***list_tail_ptr, void *ptr)
+{
+	**list_tail_ptr = auto_alloc(info->device->machine, linked_list_entry);
+	(**list_tail_ptr)->ptr = ptr;
+	(**list_tail_ptr)->next = NULL;
+	*list_tail_ptr = &((**list_tail_ptr)->next);
+}
+
+/*************************************
+ *
+ *  Count entries in a list
+ *
+ *************************************/
+
+static int linked_list_count(linked_list_entry *list)
+{
+	int cnt = 0;
+	linked_list_entry *entry;
+	
+	for (entry = list; entry != NULL; entry = entry->next)
+		cnt++;
+	
+	return cnt;
+}
+
+
 /*************************************
  *
  *  Included simulation objects
@@ -191,7 +224,7 @@ static DISCRETE_RESET( dso_output )
 
 static const discrete_module module_list[] =
 {
-	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,sizeof(0)                              ,dso_output_reset      ,dso_output_step      },
+	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,0                                      ,dso_output_reset      ,dso_output_step      },
 	{ DSO_CSVLOG      ,"DSO_CSVLOG"      , 0 ,0                                      ,NULL                  ,NULL                 },
 	{ DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,0                                      ,NULL                  ,NULL                 },
 	{ DSO_IMPORT      ,"DSO_IMPORT"      , 0 ,0                                      ,NULL                  ,NULL                 },
@@ -207,11 +240,11 @@ static const discrete_module module_list[] =
 	/* from disc_inp.c */
 	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
 	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,dss_constant_reset    ,NULL                 },
-	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
-	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
-	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
-	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
-	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,0                                      ,dss_input_stream_reset,dss_input_stream_step},
+	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,dss_input_pulse_step },
+	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step},
 
 	/* from disc_wav.c */
 	/* Generic modules */
@@ -306,20 +339,6 @@ static const discrete_module module_list[] =
 
 /*************************************
  *
- *  Add an entry to a list
- *
- *************************************/
-
-static void add_list(discrete_info *info, linked_list_entry ***list, void *ptr)
-{
-	**list = auto_alloc(info->device->machine, linked_list_entry);
-	(**list)->ptr = ptr;
-	(**list)->next = NULL;
-	*list = &((**list)->next);
-}
-
-/*************************************
- *
  *  Find a given node
  *
  *************************************/
@@ -396,7 +415,7 @@ static void discrete_build_list(discrete_info *info, discrete_sound_block *intf,
 		else
 		{
 			discrete_log(info, "discrete_build_list() - adding node %d (*current %p)\n", node_count, *current);
-			add_list(info, current, &intf[node_count]);
+			linked_list_add(info, current, &intf[node_count]);
 		}
 
 		node_count++;
@@ -482,6 +501,8 @@ static DEVICE_START( discrete )
 	/* Start with empty lists */
 	info->node_list = NULL;
 	info->step_list = NULL;
+	info->output_list = NULL;
+	info->input_list = NULL;
 
 	/* allocate memory to hold pointers to nodes by index */
 	info->indexed_node = auto_alloc_array_clear(device->machine, node_description *, DISCRETE_MAX_NODES);
@@ -494,7 +515,7 @@ static DEVICE_START( discrete )
 
 	/* then set up the output nodes */
 	/* initialize the stream(s) */
-	info->discrete_stream = stream_create(device, info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
+	info->discrete_stream = stream_create(device,linked_list_count(info->input_list), linked_list_count(info->output_list), info->sample_rate, info, discrete_stream_update);
 
 	/* allocate a queue */
 	
@@ -749,22 +770,22 @@ static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
 	linked_list_entry *entry;
-	int samplenum, nodenum, outputnum;
-	//int j; int left; int run;
+	int samplenum, outputnum;
 
 	if (samples == 0)
 		return;
 	
 	/* Setup any output streams */
-	for (outputnum = 0; outputnum < info->discrete_outputs; outputnum++)
+	for (entry = info->output_list, outputnum = 0; entry != NULL; entry = entry->next, outputnum++)
 	{
-		info->output_node[outputnum]->context = (void *) outputs[outputnum];
+		((node_description *) entry->ptr)->context = (void *) outputs[outputnum];
 	}
 	
 	/* Setup any input streams */
-	for (nodenum = 0; nodenum < info->discrete_input_streams; nodenum++)
+	for (entry = info->input_list; entry != NULL; entry = entry->next)
 	{
-		info->input_stream_data[nodenum] = inputs[nodenum];
+		struct dss_input_context *context = (struct dss_input_context *) ((node_description *) entry->ptr)->context;
+		context->ptr = (void *) inputs[context->stream_in_number];
 	}
 
 	for (entry = info->task_list; entry != 0; entry = entry->next)
@@ -812,17 +833,15 @@ static STREAM_UPDATE( discrete_stream_update )
 
 static void init_nodes(discrete_info *info, linked_list_entry *block_list, const device_config *device)
 {
-	linked_list_entry	**step_list = &info->step_list;
-	linked_list_entry	**node_list = &info->node_list;
-	linked_list_entry	**task_list = &info->task_list;
 	linked_list_entry	**cur_task_node = NULL;
 	linked_list_entry	*entry;
 	discrete_task_context *task = NULL;
-	
-	/* start with no outputs or input streams */
-
-	info->discrete_outputs = 0;
-	info->discrete_input_streams = 0;
+	/* list tail pointers */
+	linked_list_entry	**step_list = &info->step_list;
+	linked_list_entry	**node_list = &info->node_list;
+	linked_list_entry	**task_list = &info->task_list;
+	linked_list_entry	**output_list = &info->output_list;
+	linked_list_entry	**input_list = &info->input_list;
 	
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
@@ -854,9 +873,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			{
 				/* Output Node */
 				case DSO_OUTPUT:
-					if (info->discrete_outputs == DISCRETE_MAX_OUTPUTS)
-						fatalerror("init_nodes() - There can not be more then %d output nodes", DISCRETE_MAX_OUTPUTS);
-					info->output_node[info->discrete_outputs++] = node;
+					linked_list_add(info, &output_list, node);
 					break;
 
 				/* CSVlog Node for debugging */
@@ -878,7 +895,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					if (cur_task_node != NULL)
 						fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
 					task = auto_alloc_clear(info->device->machine, discrete_task_context);
-					add_list(info, &task_list, task);
+					linked_list_add(info, &task_list, task);
 					cur_task_node = &task->list;
 					break;
 
@@ -924,15 +941,11 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* if we are an stream input node, track that */
 		if (block->type == DSS_INPUT_STREAM)
 		{
-			if (info->discrete_input_streams == DISCRETE_MAX_OUTPUTS)
-				fatalerror("init_nodes() - There can not be more then %d input stream nodes", DISCRETE_MAX_OUTPUTS);
-
-			node->context = NULL;
-			info->discrete_input_streams++;
+			linked_list_add(info, &input_list, node);
 		}
 
 		/* add to node list */
-		add_list(info, &node_list, node);
+		linked_list_add(info, &node_list, node);
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
@@ -940,9 +953,9 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		{
 			/* do we belong to a task? */
 			if (cur_task_node == NULL)
-				add_list(info, &step_list, node);
+				linked_list_add(info, &step_list, node);
 			else
-				add_list(info, &cur_task_node, node);
+				linked_list_add(info, &cur_task_node, node);
 		}
 
 		if (block->type == DSO_TASK_END)
@@ -956,7 +969,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	}
 
 	/* if no outputs, give an error */
-	if (info->discrete_outputs == 0)
+	if (linked_list_count(info->output_list) == 0)
 		fatalerror("init_nodes() - Couldn't find an output node");
 }
 

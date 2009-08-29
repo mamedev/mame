@@ -31,6 +31,18 @@ struct dss_adjustment_context
 	double		scale;
 };
 
+struct dss_input_context
+{
+	stream_sample_t *ptr;			/* current in ptr for stream */
+	UINT8		data;				/* data written */
+	double 		gain;				/* node gain */
+	double		offset;				/* node offset */
+	UINT8		is_stream;
+	UINT8		is_buffered;
+	UINT32		stream_in_number;
+	UINT32		stream_out_number;
+};
+
 INLINE discrete_info *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
@@ -50,14 +62,14 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
 	/* Read the node input value if allowed */
 	if (node)
 	{
-		UINT8 *node_data = (UINT8 *)node->context;
+		struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 		/* Bring the system up to now */
 		stream_update(info->discrete_stream);
 
 		if ((node->module->type >= DSS_INPUT_DATA) && (node->module->type <= DSS_INPUT_PULSE))
 		{
-			data = *node_data;
+			data = context->data;
 		}
 	}
 	else
@@ -75,8 +87,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 	/* Update the node input value if it's a proper input node */
 	if (node)
 	{
-		UINT8 *node_data = (UINT8 *)node->context;
-		UINT8 last_data  = *node_data;
+		struct dss_input_context *context = (struct dss_input_context *)node->context;
 		UINT8 new_data    = 0;
 
 		switch (node->module->type)
@@ -93,15 +104,15 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 				break;
 		}
 
-		if (last_data != new_data)
+		if (context->data != new_data)
 		{
 			/* Bring the system up to now */
 			stream_update(info->discrete_stream);
 
-			*node_data = new_data;
+			context->data = new_data;
 
 			/* Update the node output here so we don't have to do it each step */
-			node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
+			node->output[0] = new_data * context->gain + context->offset;
 		}
 	}
 	else
@@ -217,33 +228,38 @@ static DISCRETE_RESET(dss_constant)
  ************************************************************************/
 static DISCRETE_RESET(dss_input)
 {
-	UINT8 *node_data = (UINT8 *)node->context;
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
+
+	context->is_buffered = FALSE;
+	context->is_stream = FALSE;
+	context->gain = DSS_INPUT__GAIN;
+	context->offset = DSS_INPUT__OFFSET;
 
 	switch (node->module->type)
 	{
 		case DSS_INPUT_DATA:
-			*node_data = DSS_INPUT__INIT;
+			context->data = DSS_INPUT__INIT;
 			break;
 		case DSS_INPUT_LOGIC:
 		case DSS_INPUT_PULSE:
-			*node_data = (DSS_INPUT__INIT == 0) ? 0 : 1;
+			context->data = (DSS_INPUT__INIT == 0) ? 0 : 1;
 			break;
 		case DSS_INPUT_NOT:
-			*node_data = (DSS_INPUT__INIT == 0) ? 1 : 0;
+			context->data = (DSS_INPUT__INIT == 0) ? 1 : 0;
 			break;
 	}
-	node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
+	node->output[0] = context->data * context->gain + context->offset;
 }
 
 static DISCRETE_STEP(dss_input_pulse)
 {
-	UINT8 *node_data = (UINT8 *)node->context;
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 	/* Set a valid output */
-	node->output[0] = *node_data;
+	node->output[0] = context->data;
 	/* Reset the input to default for the next cycle */
 	/* node order is now important */
-	*node_data = DSS_INPUT__INIT;
+	context->data = DSS_INPUT__INIT;
 }
 
 
@@ -263,13 +279,12 @@ static DISCRETE_STEP(dss_input_pulse)
 static DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
-	stream_sample_t **ptr = (stream_sample_t **)node->context;
-	stream_sample_t *data = *ptr;
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
-	if (data)
+	if (context->ptr)
 	{
-		node->output[0] = (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET;
-		(*ptr)++;
+		node->output[0] = (*context->ptr) * context->gain + context->offset;
+		context->ptr++;
 	}
 	else
 		node->output[0] = 0;
@@ -277,8 +292,13 @@ static DISCRETE_STEP(dss_input_stream)
 
 static DISCRETE_RESET(dss_input_stream)
 {
-	int istream = DSS_INPUT_STREAM__STREAM;
-	/* we will use the node's context pointer to point to the input stream data */
-	assert(istream < node->info->discrete_input_streams);
-	node->context = (discrete_info *) &node->info->input_stream_data[istream];
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
+
+	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
+	context->is_buffered = FALSE;
+	context->is_stream = TRUE;
+	context->stream_in_number = DSS_INPUT_STREAM__STREAM;
+	context->gain = DSS_INPUT_STREAM__GAIN;
+	context->offset = DSS_INPUT_STREAM__OFFSET;
+	context->ptr = NULL;
 }

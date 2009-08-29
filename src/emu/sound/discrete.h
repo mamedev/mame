@@ -438,8 +438,12 @@
  * Note: The discrete system is floating point based.  So when routing a stream
  *       set it's gain to 100% and then use DISCRETE_INPUTX_STREAM to adjust
  *       it if needed.
+ *       If you need to access a stream from a discrete task, the stream node
+ *       must be part of that task. If a given stream is used in two tasks or
+ *       a task and the main task, you must declare two stream nodes acccessing the
+ *       same stream input NUM.
  *
- * EXAMPLES: see
+ * EXAMPLES: see scramble, frogger
  *
  ***********************************************************************
  =======================================================================
@@ -3371,10 +3375,9 @@
 
 #define DISCRETE_MAX_NODES				300
 #define DISCRETE_MAX_INPUTS				10
-#define DISCRETE_MAX_OUTPUTS			16
 #define DISCRETE_MAX_WAVELOGS			10
 #define DISCRETE_MAX_CSVLOGS			10
-#define DISCRETE_MAX_NODE_OUTPUTS		 8
+#define DISCRETE_MAX_OUTPUTS			 8
 
 
 /*************************************
@@ -3625,7 +3628,7 @@ struct _discrete_module
 struct _node_description
 {
 	int				node;								/* The node's index number in the node list */
-	double			output[DISCRETE_MAX_NODE_OUTPUTS];	/* The node's last output value */
+	double			output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
 	int				active_inputs;						/* Number of active inputs on this node type */
 	int				input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
@@ -3667,7 +3670,6 @@ struct _discrete_task_context
 	double *ptr;
 	double node_buf[2048];
 	double **dest;
-	volatile INT32 active;
 };
 
 struct _discrete_info
@@ -3695,12 +3697,10 @@ struct _discrete_info
 	linked_list_entry	 *task_list;		/* discrete_task_context * */
 
 	/* the input streams */
-	int discrete_input_streams;
-	stream_sample_t *input_stream_data[DISCRETE_MAX_OUTPUTS];
+	linked_list_entry 	 *input_list;
 
 	/* output node tracking */
-	int discrete_outputs;
-	node_description *output_node[DISCRETE_MAX_OUTPUTS];
+	linked_list_entry 	 *output_list;
 
 	/* the output stream */
 	sound_stream *discrete_stream;
@@ -4024,10 +4024,10 @@ struct _discrete_inverter_osc_desc
  *
  *************************************/
 
-#define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+#define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
 	NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, NODE_ ## 0 ## _x ## _04, \
 	NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
-#define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+#define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
 	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
 	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
 
@@ -4066,15 +4066,15 @@ enum {
 
 /* Some Pre-defined nodes for convenience */
 
-#define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_NODE_OUTPUTS)
+#define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
 #define NODE_SUB(_x, _y) (NODE(_x) + (_y))
 
-#if DISCRETE_MAX_NODE_OUTPUTS == 8
+#if DISCRETE_MAX_OUTPUTS == 8
 #define NODE_CHILD_NODE_NUM(_x)		((int)(_x) & 7)
 #define NODE_DEFAULT_NODE(_x)		((int)(_x) & ~7)
 #define NODE_INDEX(_x)				(((int)(_x) - NODE_START)>>3)
 #else
-#error "DISCRETE_MAX_NODE_OUTPUTS != 8"
+#error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
