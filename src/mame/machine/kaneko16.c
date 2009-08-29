@@ -1430,11 +1430,14 @@ void calc3_mcu_run(running_machine *machine)
 #if CALC3_VERBOSE_OUTPUT						
 						printf("writing back address %08x to %08x %08x\n", calc3_writeaddress_current, commandaddr,write);
 #endif						
-						kaneko16_mcu_ram[(write>>1)+0] =data_header[1];// (calc3_writeaddress_current>>16)&0xffff;
-						kaneko16_mcu_ram[(write>>1)+1] =data_header[0];// (calc3_writeaddress_current&0xffff);
+
+						//memory_write_byte(space,write+0x200001, data_header[0]); // maybe not.. check first boss brapboysj
+						memory_write_byte(space,write+0x200001, data_header[1]);
+
 						write=commandaddr+(char)commandunk;
-						kaneko16_mcu_ram[(write>>1)+0] = (calc3_writeaddress_current>>16)&0xffff;
-						kaneko16_mcu_ram[(write>>1)+1] = (calc3_writeaddress_current&0xffff);
+						memory_write_word(space,write+0x200000, (calc3_writeaddress_current>>16)&0xffff);
+						memory_write_word(space,write+0x200002,  (calc3_writeaddress_current&0xffff));
+						
 						calc3_writeaddress_current += ((length+3)&(~1));
 					}
 
