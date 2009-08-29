@@ -44,7 +44,7 @@ Known Games on this Platform
 120x  - 2001  - Knights of Valor 2 Plus (9 Dragons?)
 130x  - 2001  - DoDonpachi II
 
-0450x - 2002  - Demon Front
+0450x - 2002  - Demon Front (also known to be produced / sold in a single PCB version)
 
 ---
 
