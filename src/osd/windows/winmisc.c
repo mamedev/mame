@@ -41,16 +41,6 @@ void osd_free_executable(void *ptr, size_t size)
 
 
 //============================================================
-//  osd_is_bad_read_ptr
-//============================================================
-
-int osd_is_bad_read_ptr(const void *ptr, size_t size)
-{
-	return IsBadReadPtr(ptr, size);
-}
-
-
-//============================================================
 //  osd_break_into_debugger
 //============================================================
 

@@ -758,28 +758,6 @@ void osd_free_executable(void *ptr, size_t size);
 
 
 /*-----------------------------------------------------------------------------
-    osd_is_bad_read_ptr: attempt to determine if the given pointer will
-        generate an access violation if accessed for read
-
-    Parameters:
-
-        ptr - the pointer to examine
-
-        size - the number of bytes to reference
-
-    Return value:
-
-        TRUE if an access to the referenced memory will generate an access
-        violation on a read; FALSE otherwise.
-
-    Notes:
-
-        This function will eventually be deprecated.
------------------------------------------------------------------------------*/
-int osd_is_bad_read_ptr(const void *ptr, size_t size);
-
-
-/*-----------------------------------------------------------------------------
     osd_break_into_debugger: break into the hosting system's debugger if one
         is attached
 
