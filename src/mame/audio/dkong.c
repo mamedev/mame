@@ -284,14 +284,14 @@ static const discrete_op_amp_filt_info dkong_sallen_key_info =
  *                                        Gnd         Gnd
  *
  ************************************************************************/
-#define DKONG_CUSTOM_IN1		(*(node->input[0]))
-#define DKONG_CUSTOM_IN2		(*(node->input[1]))
-#define DKONG_CUSTOM_R1			(*(node->input[2]))
-#define DKONG_CUSTOM_R2			(*(node->input[3]))
-#define DKONG_CUSTOM_R3			(*(node->input[4]))
-#define DKONG_CUSTOM_R4			(*(node->input[5]))
-#define DKONG_CUSTOM_C			(*(node->input[6]))
-#define DKONG_CUSTOM_V			(*(node->input[7]))
+#define DKONG_CUSTOM_IN1		DISCRETE_INPUT(0)
+#define DKONG_CUSTOM_IN2		DISCRETE_INPUT(1)
+#define DKONG_CUSTOM_R1			DISCRETE_INPUT(2)
+#define DKONG_CUSTOM_R2			DISCRETE_INPUT(3)
+#define DKONG_CUSTOM_R3			DISCRETE_INPUT(4)
+#define DKONG_CUSTOM_R4			DISCRETE_INPUT(5)
+#define DKONG_CUSTOM_C			DISCRETE_INPUT(6)
+#define DKONG_CUSTOM_V			DISCRETE_INPUT(7)
 
 struct dkong_custom_mixer_context
 {

@@ -3367,6 +3367,8 @@
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
 
+#define DISCRETE_INPUT(_num)	(*(node->input[_num]))
+
 /*************************************
  *
  *  Core constants
@@ -4085,6 +4087,7 @@ enum {
 #define NODE_START	NODE_00
 #define NODE_END	NODE_SPECIAL
 
+#define IS_VALUE_A_NODE(val)	(((val) > NODE_START) && ((val) <= NODE_END))
 
 
 /*************************************
@@ -4414,9 +4417,6 @@ enum
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
 
-
-
-#define IS_VALUE_A_NODE(val)	(((val) > NODE_START) && ((val) <= NODE_END))
 
 /*************************************
  *

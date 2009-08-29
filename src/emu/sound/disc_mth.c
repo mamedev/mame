@@ -180,11 +180,11 @@ struct dst_tvca_op_amp_context
  * input[4]    - Channel3 input value
  *
  ************************************************************************/
-#define DST_ADDER__ENABLE	(*(node->input[0]))
-#define DST_ADDER__IN0		(*(node->input[1]))
-#define DST_ADDER__IN1		(*(node->input[2]))
-#define DST_ADDER__IN2		(*(node->input[3]))
-#define DST_ADDER__IN3		(*(node->input[4]))
+#define DST_ADDER__ENABLE	DISCRETE_INPUT(0)
+#define DST_ADDER__IN0		DISCRETE_INPUT(1)
+#define DST_ADDER__IN1		DISCRETE_INPUT(2)
+#define DST_ADDER__IN2		DISCRETE_INPUT(3)
+#define DST_ADDER__IN3		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_adder)
 {
@@ -209,7 +209,7 @@ static DISCRETE_STEP(dst_adder)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_COMP_ADDER__SELECT	(*(node->input[0]))
+#define DST_COMP_ADDER__SELECT	DISCRETE_INPUT(0)
 
 static DISCRETE_STEP(dst_comp_adder)
 {
@@ -267,11 +267,11 @@ static DISCRETE_RESET(dst_comp_adder)
  * input[4]    - Clamp output when disabled
  *
  ************************************************************************/
-#define DST_CLAMP__ENABLE	(*(node->input[0]))
-#define DST_CLAMP__IN		(*(node->input[1]))
-#define DST_CLAMP__MIN		(*(node->input[2]))
-#define DST_CLAMP__MAX		(*(node->input[3]))
-#define DST_CLAMP__CLAMP	(*(node->input[4]))
+#define DST_CLAMP__ENABLE	DISCRETE_INPUT(0)
+#define DST_CLAMP__IN		DISCRETE_INPUT(1)
+#define DST_CLAMP__MIN		DISCRETE_INPUT(2)
+#define DST_CLAMP__MAX		DISCRETE_INPUT(3)
+#define DST_CLAMP__CLAMP	DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_clamp)
 {
@@ -300,9 +300,9 @@ static DISCRETE_STEP(dst_clamp)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_DAC_R1__ENABLE		(*(node->input[0]))
-#define DST_DAC_R1__DATA		(*(node->input[1]))
-#define DST_DAC_R1__VON			(*(node->input[2]))
+#define DST_DAC_R1__ENABLE		DISCRETE_INPUT(0)
+#define DST_DAC_R1__DATA		DISCRETE_INPUT(1)
+#define DST_DAC_R1__VON			DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_dac_r1)
 {
@@ -426,7 +426,7 @@ static DISCRETE_RESET(dst_dac_r1)
  * Dec 2004, D Renaud.
  ************************************************************************/
 #define DST_DIODE_MIX_INP_OFFSET	0
-#define DST_DIODE_MIX__INP(addr)	(*(node->input[DST_DIODE_MIX_INP_OFFSET + addr]))
+#define DST_DIODE_MIX__INP(addr)	DISCRETE_INPUT(DST_DIODE_MIX_INP_OFFSET + addr)
 
 static DISCRETE_STEP(dst_diode_mix)
 {
@@ -480,9 +480,9 @@ static DISCRETE_RESET(dst_diode_mix)
  * input[2]    - Divisor
  *
  ************************************************************************/
-#define DST_DIVIDE__ENABLE	(*(node->input[0]))
-#define DST_DIVIDE__IN		(*(node->input[1]))
-#define DST_DIVIDE__DIV		(*(node->input[2]))
+#define DST_DIVIDE__ENABLE	DISCRETE_INPUT(0)
+#define DST_DIVIDE__IN		DISCRETE_INPUT(1)
+#define DST_DIVIDE__DIV		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_divide)
 {
@@ -515,10 +515,10 @@ static DISCRETE_STEP(dst_divide)
  * input[3]    - Final addition offset
  *
  ************************************************************************/
-#define DST_GAIN__ENABLE	(*(node->input[0]))
-#define DST_GAIN__IN		(*(node->input[1]))
-#define DST_GAIN__GAIN		(*(node->input[2]))
-#define DST_GAIN__OFFSET	(*(node->input[3]))
+#define DST_GAIN__ENABLE	DISCRETE_INPUT(0)
+#define DST_GAIN__IN		DISCRETE_INPUT(1)
+#define DST_GAIN__GAIN		DISCRETE_INPUT(2)
+#define DST_GAIN__OFFSET	DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_gain)
 {
@@ -545,8 +545,8 @@ static DISCRETE_STEP(dst_gain)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_INTEGRATE__TRG0	(*(node->input[0]))
-#define DST_INTEGRATE__TRG1	(*(node->input[1]))
+#define DST_INTEGRATE__TRG0	DISCRETE_INPUT(0)
+#define DST_INTEGRATE__TRG1	DISCRETE_INPUT(1)
 
 static int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 {
@@ -660,8 +660,8 @@ static DISCRETE_RESET(dst_integrate)
  * input[1]    - input[0] value
  *
  ************************************************************************/
-#define DST_LOGIC_INV__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_INV__IN		(*(node->input[1]))
+#define DST_LOGIC_INV__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_INV__IN		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_logic_inv)
 {
@@ -684,10 +684,10 @@ static DISCRETE_STEP(dst_logic_inv)
  * input[2]    - To bit
  *
  ************************************************************************/
-#define DST_BITS_DECODE__IN		(*(node->input[0]))
-#define DST_BITS_DECODE__FROM	(*(node->input[1]))
-#define DST_BITS_DECODE__TO		(*(node->input[2]))
-#define DST_BITS_DECODE__VOUT	(*(node->input[3]))
+#define DST_BITS_DECODE__IN		DISCRETE_INPUT(0)
+#define DST_BITS_DECODE__FROM	DISCRETE_INPUT(1)
+#define DST_BITS_DECODE__TO		DISCRETE_INPUT(2)
+#define DST_BITS_DECODE__VOUT	DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_bits_decode)
 {
@@ -724,11 +724,11 @@ static DISCRETE_RESET(dst_bits_decode)
  * input[4]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_AND__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_AND__IN0		(*(node->input[1]))
-#define DST_LOGIC_AND__IN1		(*(node->input[2]))
-#define DST_LOGIC_AND__IN2		(*(node->input[3]))
-#define DST_LOGIC_AND__IN3		(*(node->input[4]))
+#define DST_LOGIC_AND__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(3)
+#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_and)
 {
@@ -753,11 +753,11 @@ static DISCRETE_STEP(dst_logic_and)
  * input[4]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NAND__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_NAND__IN0		(*(node->input[1]))
-#define DST_LOGIC_NAND__IN1		(*(node->input[2]))
-#define DST_LOGIC_NAND__IN2		(*(node->input[3]))
-#define DST_LOGIC_NAND__IN3		(*(node->input[4]))
+#define DST_LOGIC_NAND__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(3)
+#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_nand)
 {
@@ -782,11 +782,11 @@ static DISCRETE_STEP(dst_logic_nand)
  * input[4]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_OR__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_OR__IN0		(*(node->input[1]))
-#define DST_LOGIC_OR__IN1		(*(node->input[2]))
-#define DST_LOGIC_OR__IN2		(*(node->input[3]))
-#define DST_LOGIC_OR__IN3		(*(node->input[4]))
+#define DST_LOGIC_OR__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(3)
+#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_or)
 {
@@ -811,11 +811,11 @@ static DISCRETE_STEP(dst_logic_or)
  * input[4]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NOR__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_NOR__IN0		(*(node->input[1]))
-#define DST_LOGIC_NOR__IN1		(*(node->input[2]))
-#define DST_LOGIC_NOR__IN2		(*(node->input[3]))
-#define DST_LOGIC_NOR__IN3		(*(node->input[4]))
+#define DST_LOGIC_NOR__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(3)
+#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_nor)
 {
@@ -838,9 +838,9 @@ static DISCRETE_STEP(dst_logic_nor)
  * input[2]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XOR__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_XOR__IN0		(*(node->input[1]))
-#define DST_LOGIC_XOR__IN1		(*(node->input[2]))
+#define DST_LOGIC_XOR__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_logic_xor)
 {
@@ -863,9 +863,9 @@ static DISCRETE_STEP(dst_logic_xor)
  * input[2]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XNOR__ENABLE	(*(node->input[0]))
-#define DST_LOGIC_XNOR__IN0		(*(node->input[1]))
-#define DST_LOGIC_XNOR__IN1		(*(node->input[2]))
+#define DST_LOGIC_XNOR__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(1)
+#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_logic_nxor)
 {
@@ -891,11 +891,11 @@ static DISCRETE_STEP(dst_logic_nxor)
  * input[4]    - data
  *
  ************************************************************************/
-#define DST_LOGIC_DFF__ENABLE	 (*(node->input[0]))
-#define DST_LOGIC_DFF__RESET	!(*(node->input[1]))
-#define DST_LOGIC_DFF__SET		!(*(node->input[2]))
-#define DST_LOGIC_DFF__CLOCK	 (*(node->input[3]))
-#define DST_LOGIC_DFF__DATA 	 (*(node->input[4]))
+#define DST_LOGIC_DFF__ENABLE	 DISCRETE_INPUT(0)
+#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(1)
+#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(2)
+#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(3)
+#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_dff)
 {
@@ -940,12 +940,12 @@ static DISCRETE_RESET(dst_logic_ff)
  * input[5]    - K
  *
  ************************************************************************/
-#define DST_LOGIC_JKFF__ENABLE	 (*(node->input[0]))
-#define DST_LOGIC_JKFF__RESET	!(*(node->input[1]))
-#define DST_LOGIC_JKFF__SET		!(*(node->input[2]))
-#define DST_LOGIC_JKFF__CLOCK	 (*(node->input[3]))
-#define DST_LOGIC_JKFF__J 		 (*(node->input[4]))
-#define DST_LOGIC_JKFF__K	 	 (*(node->input[5]))
+#define DST_LOGIC_JKFF__ENABLE	 DISCRETE_INPUT(0)
+#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(1)
+#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(2)
+#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(3)
+#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(4)
+#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dst_logic_jkff)
 {
@@ -1001,9 +1001,9 @@ static DISCRETE_STEP(dst_logic_jkff)
  *
  * Feb 2007, D Renaud.
  ************************************************************************/
-#define DST_LOOKUP_TABLE__ENABLE	(*(node->input[0]))
-#define DST_LOOKUP_TABLE__IN		(*(node->input[1]))
-#define DST_LOOKUP_TABLE__SIZE		(*(node->input[2]))
+#define DST_LOOKUP_TABLE__ENABLE	DISCRETE_INPUT(0)
+#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(1)
+#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_lookup_table)
 {
@@ -1068,8 +1068,8 @@ static DISCRETE_STEP(dst_lookup_table)
  * The voltage is then modified by an inverting amp formula.
  * v = vRef + (rF/rI) * (vRef - (i * r))
  */
-#define DST_MIXER__ENABLE		(*(node->input[0]))
-#define DST_MIXER__IN(bit)		(*(node->input[bit + 1]))
+#define DST_MIXER__ENABLE		DISCRETE_INPUT(0)
+#define DST_MIXER__IN(bit)		DISCRETE_INPUT(bit + 1)
 
 static DISCRETE_STEP(dst_mixer)
 {
@@ -1334,9 +1334,9 @@ static DISCRETE_RESET(dst_mixer)
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_MULTIPLEX__ENABLE		(*(node->input[0]))
-#define DST_MULTIPLEX__ADDR			(*(node->input[1]))
-#define DST_MULTIPLEX__INP(addr)	(*(node->input[2 + addr]))
+#define DST_MULTIPLEX__ENABLE		DISCRETE_INPUT(0)
+#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(1)
+#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(2 + addr)
 
 static DISCRETE_STEP(dst_multiplex)
 {
@@ -1385,11 +1385,11 @@ static DISCRETE_RESET(dst_multiplex)
  *
  * Complete re-write Jan 2004, D Renaud.
  ************************************************************************/
-#define DST_ONESHOT__RESET	(*(node->input[0]))
-#define DST_ONESHOT__TRIG	(*(node->input[1]))
-#define DST_ONESHOT__AMP	(*(node->input[2]))
-#define DST_ONESHOT__WIDTH	(*(node->input[3]))
-#define DST_ONESHOT__TYPE	(int)(*(node->input[4]))
+#define DST_ONESHOT__RESET	DISCRETE_INPUT(0)
+#define DST_ONESHOT__TRIG	DISCRETE_INPUT(1)
+#define DST_ONESHOT__AMP	DISCRETE_INPUT(2)
+#define DST_ONESHOT__WIDTH	DISCRETE_INPUT(3)
+#define DST_ONESHOT__TYPE	(int)DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_oneshot)
 {
@@ -1475,12 +1475,12 @@ static DISCRETE_RESET(dst_oneshot)
  * input[5]    - Clamp value when disabled
  *
  ************************************************************************/
-#define DST_RAMP__ENABLE	(*(node->input[0]))
-#define DST_RAMP__DIR		(*(node->input[1]))
-#define DST_RAMP__GRAD		(*(node->input[2]))
-#define DST_RAMP__START		(*(node->input[3]))
-#define DST_RAMP__END		(*(node->input[4]))
-#define DST_RAMP__CLAMP		(*(node->input[5]))
+#define DST_RAMP__ENABLE	DISCRETE_INPUT(0)
+#define DST_RAMP__DIR		DISCRETE_INPUT(1)
+#define DST_RAMP__GRAD		DISCRETE_INPUT(2)
+#define DST_RAMP__START		DISCRETE_INPUT(3)
+#define DST_RAMP__END		DISCRETE_INPUT(4)
+#define DST_RAMP__CLAMP		DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dst_ramp)
 {
@@ -1530,10 +1530,10 @@ static DISCRETE_RESET(dst_ramp)
  * input[3]    - clock type
  *
  ************************************************************************/
-#define DST_SAMPHOLD__ENABLE	(*(node->input[0]))
-#define DST_SAMPHOLD__IN0		(*(node->input[1]))
-#define DST_SAMPHOLD__CLOCK		(*(node->input[2]))
-#define DST_SAMPHOLD__TYPE		(*(node->input[3]))
+#define DST_SAMPHOLD__ENABLE	DISCRETE_INPUT(0)
+#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(1)
+#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(2)
+#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_samphold)
 {
@@ -1594,10 +1594,10 @@ static DISCRETE_RESET(dst_samphold)
  * input[3]    - input[1]
  *
  ************************************************************************/
-#define DSS_SWITCH__ENABLE	(*(node->input[0]))
-#define DSS_SWITCH__SWITCH	(*(node->input[1]))
-#define DSS_SWITCH__IN0		(*(node->input[2]))
-#define DSS_SWITCH__IN1		(*(node->input[3]))
+#define DSS_SWITCH__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SWITCH__SWITCH	DISCRETE_INPUT(1)
+#define DSS_SWITCH__IN0		DISCRETE_INPUT(2)
+#define DSS_SWITCH__IN1		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_switch)
 {
@@ -1621,10 +1621,10 @@ static DISCRETE_STEP(dst_switch)
  * input[3]    - Threshold for enable
  *
  ************************************************************************/
-#define DSS_ASWITCH__ENABLE		(*(node->input[0]))
-#define DSS_ASWITCH__CTRL		(*(node->input[1]))
-#define DSS_ASWITCH__IN			(*(node->input[2]))
-#define DSS_ASWITCH__THRESHOLD	(*(node->input[3]))
+#define DSS_ASWITCH__ENABLE		DISCRETE_INPUT(0)
+#define DSS_ASWITCH__CTRL		DISCRETE_INPUT(1)
+#define DSS_ASWITCH__IN			DISCRETE_INPUT(2)
+#define DSS_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
 
 
 static DISCRETE_STEP(dst_aswitch)
@@ -1651,11 +1651,11 @@ static DISCRETE_STEP(dst_aswitch)
  * input[5]    - Channel4 input value
  *
  ************************************************************************/
-#define DST_TRANSFORM__IN0		(*(node->input[0]))
-#define DST_TRANSFORM__IN1		(*(node->input[1]))
-#define DST_TRANSFORM__IN2		(*(node->input[2]))
-#define DST_TRANSFORM__IN3		(*(node->input[3]))
-#define DST_TRANSFORM__IN4		(*(node->input[4]))
+#define DST_TRANSFORM__IN0		DISCRETE_INPUT(0)
+#define DST_TRANSFORM__IN1		DISCRETE_INPUT(1)
+#define DST_TRANSFORM__IN2		DISCRETE_INPUT(2)
+#define DST_TRANSFORM__IN3		DISCRETE_INPUT(3)
+#define DST_TRANSFORM__IN4		DISCRETE_INPUT(4)
 
 #define MAX_TRANS_STACK	16
 
@@ -1783,9 +1783,9 @@ static DISCRETE_STEP(dst_transform)
  *
  * Mar 2007, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP__ENABLE	(*(node->input[0]))
-#define DST_OP_AMP__INP0	(*(node->input[1]))
-#define DST_OP_AMP__INP1	(*(node->input[2]))
+#define DST_OP_AMP__ENABLE	DISCRETE_INPUT(0)
+#define DST_OP_AMP__INP0	DISCRETE_INPUT(1)
+#define DST_OP_AMP__INP1	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_op_amp)
 {
@@ -1889,7 +1889,7 @@ static DISCRETE_RESET(dst_op_amp)
  *
  * Mar 2007, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP_1SHT__TRIGGER	(*(node->input[0]))
+#define DST_OP_AMP_1SHT__TRIGGER	DISCRETE_INPUT(0)
 
 static DISCRETE_STEP(dst_op_amp_1sht)
 {
@@ -1960,11 +1960,11 @@ static DISCRETE_RESET(dst_op_amp_1sht)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_TVCA_OP_AMP__TRG0	(*(node->input[0]))
-#define DST_TVCA_OP_AMP__TRG1	(*(node->input[1]))
-#define DST_TVCA_OP_AMP__TRG2	(*(node->input[2]))
-#define DST_TVCA_OP_AMP__INP0	(*(node->input[3]))
-#define DST_TVCA_OP_AMP__INP1	(*(node->input[4]))
+#define DST_TVCA_OP_AMP__TRG0	DISCRETE_INPUT(0)
+#define DST_TVCA_OP_AMP__TRG1	DISCRETE_INPUT(1)
+#define DST_TVCA_OP_AMP__TRG2	DISCRETE_INPUT(2)
+#define DST_TVCA_OP_AMP__INP0	DISCRETE_INPUT(3)
+#define DST_TVCA_OP_AMP__INP1	DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_tvca_op_amp)
 {

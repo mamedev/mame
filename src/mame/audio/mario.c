@@ -169,13 +169,13 @@
  *            -||-
  *             C2
  ************************************************************************/
-#define MARIO_CUSTOM_VOUT		(*(node->input[0]))
-#define MARIO_CUSTOM_IN1		(*(node->input[1]))
-#define MARIO_CUSTOM_IN2		(*(node->input[2]))
-#define MARIO_CUSTOM_C1			(*(node->input[3]))
-#define MARIO_CUSTOM_C2			(*(node->input[4]))
-#define MARIO_CUSTOM_R1			(*(node->input[5]))
-#define MARIO_CUSTOM_C3			(*(node->input[6]))
+#define MARIO_CUSTOM_VOUT		DISCRETE_INPUT(0)
+#define MARIO_CUSTOM_IN1		DISCRETE_INPUT(1)
+#define MARIO_CUSTOM_IN2		DISCRETE_INPUT(2)
+#define MARIO_CUSTOM_C1			DISCRETE_INPUT(3)
+#define MARIO_CUSTOM_C2			DISCRETE_INPUT(4)
+#define MARIO_CUSTOM_R1			DISCRETE_INPUT(5)
+#define MARIO_CUSTOM_C3			DISCRETE_INPUT(6)
 
 struct mario_custom_run_context
 {

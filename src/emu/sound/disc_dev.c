@@ -141,11 +141,11 @@ struct dsd_ls624_context
  *
  * Jan 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_ASTBL__RESET	(! *(node->input[0]))
-#define DSD_555_ASTBL__R1		(*(node->input[1]))
-#define DSD_555_ASTBL__R2		(*(node->input[2]))
-#define DSD_555_ASTBL__C		(*(node->input[3]))
-#define DSD_555_ASTBL__CTRLV	(*(node->input[4]))
+#define DSD_555_ASTBL__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_ASTBL__R1		DISCRETE_INPUT(1)
+#define DSD_555_ASTBL__R2		DISCRETE_INPUT(2)
+#define DSD_555_ASTBL__C		DISCRETE_INPUT(3)
+#define DSD_555_ASTBL__CTRLV	DISCRETE_INPUT(4)
 
 /* bit mask of the above RC inputs */
 #define DSD_555_ASTBL_RC_MASK	0x0e
@@ -450,10 +450,10 @@ static DISCRETE_RESET(dsd_555_astbl)
  *
  * Oct 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_MSTBL__RESET	(! *(node->input[0]))
-#define DSD_555_MSTBL__TRIGGER	(*(node->input[1]))
-#define DSD_555_MSTBL__R		(*(node->input[2]))
-#define DSD_555_MSTBL__C		(*(node->input[3]))
+#define DSD_555_MSTBL__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_MSTBL__TRIGGER	DISCRETE_INPUT(1)
+#define DSD_555_MSTBL__R		DISCRETE_INPUT(2)
+#define DSD_555_MSTBL__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dsd_555_mstbl)
 {
@@ -590,13 +590,13 @@ static DISCRETE_RESET(dsd_555_mstbl)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSD_555_CC__RESET	(! *(node->input[0]))
-#define DSD_555_CC__VIN		(*(node->input[1]))
-#define DSD_555_CC__R		(*(node->input[2]))
-#define DSD_555_CC__C		(*(node->input[3]))
-#define DSD_555_CC__RBIAS	(*(node->input[4]))
-#define DSD_555_CC__RGND	(*(node->input[5]))
-#define DSD_555_CC__RDIS	(*(node->input[6]))
+#define DSD_555_CC__RESET	(! DISCRETE_INPUT(0))
+#define DSD_555_CC__VIN		DISCRETE_INPUT(1)
+#define DSD_555_CC__R		DISCRETE_INPUT(2)
+#define DSD_555_CC__C		DISCRETE_INPUT(3)
+#define DSD_555_CC__RBIAS	DISCRETE_INPUT(4)
+#define DSD_555_CC__RGND	DISCRETE_INPUT(5)
+#define DSD_555_CC__RDIS	DISCRETE_INPUT(6)
 
 /* bit mask of the above RC inputs not including DSD_555_CC__R */
 #define DSD_555_CC_RC_MASK	0x78
@@ -1155,9 +1155,9 @@ static DISCRETE_RESET(dsd_555_cc)
  *
  * Apr 2006, D Renaud.
  ************************************************************************/
-#define DSD_555_VCO1__RESET	(*(node->input[0]))	/* reset active low */
-#define DSD_555_VCO1__VIN1	(*(node->input[1]))
-#define DSD_555_VCO1__VIN2	(*(node->input[2]))
+#define DSD_555_VCO1__RESET	DISCRETE_INPUT(0)	/* reset active low */
+#define DSD_555_VCO1__VIN1	DISCRETE_INPUT(1)
+#define DSD_555_VCO1__VIN2	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dsd_555_vco1)
 {
@@ -1385,10 +1385,10 @@ static DISCRETE_RESET(dsd_555_vco1)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSD_566__ENABLE	(*(node->input[0]))
-#define DSD_566__VMOD	(*(node->input[1]))
-#define DSD_566__R		(*(node->input[2]))
-#define DSD_566__C		(*(node->input[3]))
+#define DSD_566__ENABLE	DISCRETE_INPUT(0)
+#define DSD_566__VMOD	DISCRETE_INPUT(1)
+#define DSD_566__R		DISCRETE_INPUT(2)
+#define DSD_566__C		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dsd_566)
 {
@@ -1575,11 +1575,11 @@ static DISCRETE_RESET(dsd_566)
  *
  * Dec 2007, Couriersud
  ************************************************************************/
-#define DSD_LS624__ENABLE	(*(node->input[0]))
-#define DSD_LS624__VMOD		(*(node->input[1]))
-#define DSD_LS624__VRNG		(*(node->input[2]))
-#define DSD_LS624__C		(*(node->input[3]))
-#define DSD_LS624__OUTTYPE	(*(node->input[4]))
+#define DSD_LS624__ENABLE	DISCRETE_INPUT(0)
+#define DSD_LS624__VMOD		DISCRETE_INPUT(1)
+#define DSD_LS624__VRNG		DISCRETE_INPUT(2)
+#define DSD_LS624__C		DISCRETE_INPUT(3)
+#define DSD_LS624__OUTTYPE	DISCRETE_INPUT(4)
 
 /*
  * The datasheet mentions a 600 ohm discharge. It also gives

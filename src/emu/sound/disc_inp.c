@@ -16,9 +16,9 @@
  ************************************************************************/
 
 
-#define DSS_INPUT__GAIN		(*(node->input[0]))
-#define DSS_INPUT__OFFSET	(*(node->input[1]))
-#define DSS_INPUT__INIT		(*(node->input[2]))
+#define DSS_INPUT__GAIN		DISCRETE_INPUT(0)
+#define DSS_INPUT__OFFSET	DISCRETE_INPUT(1)
+#define DSS_INPUT__INIT		DISCRETE_INPUT(2)
 
 
 struct dss_adjustment_context
@@ -134,12 +134,12 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
  * input[6]    -
  *
  ************************************************************************/
-#define DSS_ADJUSTMENT__MIN		(*(node->input[0]))
-#define DSS_ADJUSTMENT__MAX		(*(node->input[1]))
-#define DSS_ADJUSTMENT__LOG		(*(node->input[2]))
-#define DSS_ADJUSTMENT__PORT	(*(node->input[3]))
-#define DSS_ADJUSTMENT__PMIN	(*(node->input[4]))
-#define DSS_ADJUSTMENT__PMAX	(*(node->input[5]))
+#define DSS_ADJUSTMENT__MIN		DISCRETE_INPUT(0)
+#define DSS_ADJUSTMENT__MAX		DISCRETE_INPUT(1)
+#define DSS_ADJUSTMENT__LOG		DISCRETE_INPUT(2)
+#define DSS_ADJUSTMENT__PORT	DISCRETE_INPUT(3)
+#define DSS_ADJUSTMENT__PMIN	DISCRETE_INPUT(4)
+#define DSS_ADJUSTMENT__PMAX	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_adjustment)
 {
@@ -208,7 +208,7 @@ static DISCRETE_RESET(dss_adjustment)
  * input[0]    - Constant value
  *
  ************************************************************************/
-#define DSS_CONSTANT__INIT	(*(node->input[0]))
+#define DSS_CONSTANT__INIT	DISCRETE_INPUT(0)
 
 static DISCRETE_RESET(dss_constant)
 {
@@ -272,9 +272,9 @@ static DISCRETE_STEP(dss_input_pulse)
  * input[2]    - Offset value
  *
  ************************************************************************/
-#define DSS_INPUT_STREAM__STREAM	(*(node->input[0]))
-#define DSS_INPUT_STREAM__GAIN		(*(node->input[1]))
-#define DSS_INPUT_STREAM__OFFSET	(*(node->input[2]))
+#define DSS_INPUT_STREAM__STREAM	DISCRETE_INPUT(0)
+#define DSS_INPUT_STREAM__GAIN		DISCRETE_INPUT(1)
+#define DSS_INPUT_STREAM__OFFSET	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dss_input_stream)
 {

@@ -144,7 +144,7 @@ static void *task_callback(void *param, int threadid)
 static DISCRETE_STEP( dso_task )
 {
 	discrete_task_context *ctx =  (discrete_task_context *) node->context;
-	*(ctx->ptr++) = (double) *(node->input[0]);
+	*(ctx->ptr++) = (double) DISCRETE_INPUT(0);
 }
 
 static DISCRETE_RESET( dso_task )
@@ -159,7 +159,7 @@ static DISCRETE_STEP( dso_output )
 	
 	/* Add gain to the output and put into the buffers */
 	/* Clipping will be handled by the main sound system */
-	val = (*node->input[0]) * (*node->input[1]);
+	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
 	**output = val;
 	(*output)++;
 }

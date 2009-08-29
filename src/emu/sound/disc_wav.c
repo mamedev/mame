@@ -170,13 +170,13 @@ struct dss_trianglewave_context
  *
  * Jan 2004, D Renaud.
  ************************************************************************/
-#define DSS_COUNTER__ENABLE		(*(node->input[0]))
-#define DSS_COUNTER__RESET		(*(node->input[1]))
-#define DSS_COUNTER__CLOCK		(*(node->input[2]))
-#define DSS_COUNTER__MAX		(*(node->input[3]))
-#define DSS_COUNTER__DIR		(*(node->input[4]))
-#define DSS_COUNTER__INIT		(*(node->input[5]))
-#define DSS_COUNTER__CLOCK_TYPE	(*(node->input[6]))
+#define DSS_COUNTER__ENABLE		DISCRETE_INPUT(0)
+#define DSS_COUNTER__RESET		DISCRETE_INPUT(1)
+#define DSS_COUNTER__CLOCK		DISCRETE_INPUT(2)
+#define DSS_COUNTER__MAX		DISCRETE_INPUT(3)
+#define DSS_COUNTER__DIR		DISCRETE_INPUT(4)
+#define DSS_COUNTER__INIT		DISCRETE_INPUT(5)
+#define DSS_COUNTER__CLOCK_TYPE	DISCRETE_INPUT(6)
 #define DSS_7492__CLOCK_TYPE	 DSS_COUNTER__MAX
 
 static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
@@ -318,12 +318,12 @@ static DISCRETE_RESET(dss_counter)
  * also passed dss_lfsr_context structure
  *
  ************************************************************************/
-#define DSS_LFSR_NOISE__ENABLE	(*(node->input[0]))
-#define DSS_LFSR_NOISE__RESET	(*(node->input[1]))
-#define DSS_LFSR_NOISE__CLOCK	(*(node->input[2]))
-#define DSS_LFSR_NOISE__AMP		(*(node->input[3]))
-#define DSS_LFSR_NOISE__FEED	(*(node->input[4]))
-#define DSS_LFSR_NOISE__BIAS	(*(node->input[5]))
+#define DSS_LFSR_NOISE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_LFSR_NOISE__RESET	DISCRETE_INPUT(1)
+#define DSS_LFSR_NOISE__CLOCK	DISCRETE_INPUT(2)
+#define DSS_LFSR_NOISE__AMP		DISCRETE_INPUT(3)
+#define DSS_LFSR_NOISE__FEED	DISCRETE_INPUT(4)
+#define DSS_LFSR_NOISE__BIAS	DISCRETE_INPUT(5)
 
 INLINE int dss_lfsr_function(const discrete_info *disc_info, int myfunc, int in0, int in1, int bitmask)
 {
@@ -539,10 +539,10 @@ static DISCRETE_RESET(dss_lfsr)
  * input3    - DC Bias value
  *
  ************************************************************************/
-#define DSS_NOISE__ENABLE	(*(node->input[0]))
-#define DSS_NOISE__FREQ		(*(node->input[1]))
-#define DSS_NOISE__AMP		(*(node->input[2]))
-#define DSS_NOISE__BIAS		(*(node->input[3]))
+#define DSS_NOISE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_NOISE__FREQ		DISCRETE_INPUT(1)
+#define DSS_NOISE__AMP		DISCRETE_INPUT(2)
+#define DSS_NOISE__BIAS		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dss_noise)
 {
@@ -603,12 +603,12 @@ static DISCRETE_RESET(dss_noise)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
- #define DSS_NOTE__ENABLE		(*(node->input[0]))
- #define DSS_NOTE__CLOCK		(*(node->input[1]))
- #define DSS_NOTE__DATA			(*(node->input[2]))
- #define DSS_NOTE__MAX1			(*(node->input[3]))
- #define DSS_NOTE__MAX2			(*(node->input[4]))
- #define DSS_NOTE__CLOCK_TYPE	(*(node->input[5]))
+ #define DSS_NOTE__ENABLE		DISCRETE_INPUT(0)
+ #define DSS_NOTE__CLOCK		DISCRETE_INPUT(1)
+ #define DSS_NOTE__DATA			DISCRETE_INPUT(2)
+ #define DSS_NOTE__MAX1			DISCRETE_INPUT(3)
+ #define DSS_NOTE__MAX2			DISCRETE_INPUT(4)
+ #define DSS_NOTE__CLOCK_TYPE	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_note)
 {
@@ -730,9 +730,9 @@ static DISCRETE_RESET(dss_note)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSS_OP_AMP_OSC__ENABLE	(*(node->input[0]))
-#define DSS_OP_AMP_OSC__VMOD1	(*(node->input[1]))
-#define DSS_OP_AMP_OSC__VMOD2	(*(node->input[2]))
+#define DSS_OP_AMP_OSC__ENABLE	DISCRETE_INPUT(0)
+#define DSS_OP_AMP_OSC__VMOD1	DISCRETE_INPUT(1)
+#define DSS_OP_AMP_OSC__VMOD2	DISCRETE_INPUT(2)
 
 /* The inputs on a norton op-amp are (info->vP - OP_AMP_NORTON_VBE) */
 /* which is the same as the output high voltage.  We will define them */
@@ -1048,12 +1048,12 @@ static DISCRETE_RESET(dss_op_amp_osc)
  * input5    - Initial Phase
  *
  ************************************************************************/
-#define DSS_SAWTOOTHWAVE__ENABLE	(*(node->input[0]))
-#define DSS_SAWTOOTHWAVE__FREQ		(*(node->input[1]))
-#define DSS_SAWTOOTHWAVE__AMP		(*(node->input[2]))
-#define DSS_SAWTOOTHWAVE__BIAS		(*(node->input[3]))
-#define DSS_SAWTOOTHWAVE__GRAD		(*(node->input[4]))
-#define DSS_SAWTOOTHWAVE__PHASE		(*(node->input[5]))
+#define DSS_SAWTOOTHWAVE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SAWTOOTHWAVE__FREQ		DISCRETE_INPUT(1)
+#define DSS_SAWTOOTHWAVE__AMP		DISCRETE_INPUT(2)
+#define DSS_SAWTOOTHWAVE__BIAS		DISCRETE_INPUT(3)
+#define DSS_SAWTOOTHWAVE__GRAD		DISCRETE_INPUT(4)
+#define DSS_SAWTOOTHWAVE__PHASE		DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_sawtoothwave)
 {
@@ -1111,9 +1111,9 @@ static DISCRETE_RESET(dss_sawtoothwave)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSS_SCHMITT_OSC__ENABLE	(int)(*(node->input[0]))
-#define DSS_SCHMITT_OSC__VIN	(*(node->input[1]))
-#define DSS_SCHMITT_OSC__AMP	(*(node->input[2]))
+#define DSS_SCHMITT_OSC__ENABLE	(int)DISCRETE_INPUT(0)
+#define DSS_SCHMITT_OSC__VIN	DISCRETE_INPUT(1)
+#define DSS_SCHMITT_OSC__AMP	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dss_schmitt_osc)
 {
@@ -1228,11 +1228,11 @@ static DISCRETE_RESET(dss_schmitt_osc)
  * input4    - Starting phase
  *
  ************************************************************************/
-#define DSS_SINEWAVE__ENABLE	(*(node->input[0]))
-#define DSS_SINEWAVE__FREQ		(*(node->input[1]))
-#define DSS_SINEWAVE__AMPL		(*(node->input[2]))
-#define DSS_SINEWAVE__BIAS		(*(node->input[3]))
-#define DSS_SINEWAVE__PHASE		(*(node->input[4]))
+#define DSS_SINEWAVE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SINEWAVE__FREQ		DISCRETE_INPUT(1)
+#define DSS_SINEWAVE__AMPL		DISCRETE_INPUT(2)
+#define DSS_SINEWAVE__BIAS		DISCRETE_INPUT(3)
+#define DSS_SINEWAVE__PHASE		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dss_sinewave)
 {
@@ -1286,12 +1286,12 @@ static DISCRETE_RESET(dss_sinewave)
  * input5    - Start Phase
  *
  ************************************************************************/
-#define DSS_SQUAREWAVE__ENABLE	(*(node->input[0]))
-#define DSS_SQUAREWAVE__FREQ	(*(node->input[1]))
-#define DSS_SQUAREWAVE__AMP		(*(node->input[2]))
-#define DSS_SQUAREWAVE__DUTY	(*(node->input[3]))
-#define DSS_SQUAREWAVE__BIAS	(*(node->input[4]))
-#define DSS_SQUAREWAVE__PHASE	(*(node->input[5]))
+#define DSS_SQUAREWAVE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SQUAREWAVE__FREQ	DISCRETE_INPUT(1)
+#define DSS_SQUAREWAVE__AMP		DISCRETE_INPUT(2)
+#define DSS_SQUAREWAVE__DUTY	DISCRETE_INPUT(3)
+#define DSS_SQUAREWAVE__BIAS	DISCRETE_INPUT(4)
+#define DSS_SQUAREWAVE__PHASE	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_squarewave)
 {
@@ -1352,12 +1352,12 @@ static DISCRETE_RESET(dss_squarewave)
  * input5    - Start Phase
  *
  ************************************************************************/
-#define DSS_SQUAREWFIX__ENABLE	(*(node->input[0]))
-#define DSS_SQUAREWFIX__FREQ	(*(node->input[1]))
-#define DSS_SQUAREWFIX__AMP		(*(node->input[2]))
-#define DSS_SQUAREWFIX__DUTY	(*(node->input[3]))
-#define DSS_SQUAREWFIX__BIAS	(*(node->input[4]))
-#define DSS_SQUAREWFIX__PHASE	(*(node->input[5]))
+#define DSS_SQUAREWFIX__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SQUAREWFIX__FREQ	DISCRETE_INPUT(1)
+#define DSS_SQUAREWFIX__AMP		DISCRETE_INPUT(2)
+#define DSS_SQUAREWFIX__DUTY	DISCRETE_INPUT(3)
+#define DSS_SQUAREWFIX__BIAS	DISCRETE_INPUT(4)
+#define DSS_SQUAREWFIX__PHASE	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_squarewfix)
 {
@@ -1430,12 +1430,12 @@ static DISCRETE_RESET(dss_squarewfix)
  * input5    - Initial Time Shift
  *
  ************************************************************************/
-#define DSS_SQUAREWAVE2__ENABLE	(*(node->input[0]))
-#define DSS_SQUAREWAVE2__AMP	(*(node->input[1]))
-#define DSS_SQUAREWAVE2__T_OFF	(*(node->input[2]))
-#define DSS_SQUAREWAVE2__T_ON	(*(node->input[3]))
-#define DSS_SQUAREWAVE2__BIAS	(*(node->input[4]))
-#define DSS_SQUAREWAVE2__SHIFT	(*(node->input[5]))
+#define DSS_SQUAREWAVE2__ENABLE	DISCRETE_INPUT(0)
+#define DSS_SQUAREWAVE2__AMP	DISCRETE_INPUT(1)
+#define DSS_SQUAREWAVE2__T_OFF	DISCRETE_INPUT(2)
+#define DSS_SQUAREWAVE2__T_ON	DISCRETE_INPUT(3)
+#define DSS_SQUAREWAVE2__BIAS	DISCRETE_INPUT(4)
+#define DSS_SQUAREWAVE2__SHIFT	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dss_squarewave2)
 {
@@ -1501,12 +1501,12 @@ static DISCRETE_RESET(dss_squarewave2)
  * input4    - Desc
  *
  ************************************************************************/
-#define DSS_INVERTER_OSC__ENABLE	(*(node->input[0]))
-#define DSS_INVERTER_OSC__MOD		(*(node->input[1]))
-#define DSS_INVERTER_OSC__RC		(*(node->input[2]))
-#define DSS_INVERTER_OSC__RP		(*(node->input[3]))
-#define DSS_INVERTER_OSC__C			(*(node->input[4]))
-#define DSS_INVERTER_OSC__R2		(*(node->input[5]))
+#define DSS_INVERTER_OSC__ENABLE	DISCRETE_INPUT(0)
+#define DSS_INVERTER_OSC__MOD		DISCRETE_INPUT(1)
+#define DSS_INVERTER_OSC__RC		DISCRETE_INPUT(2)
+#define DSS_INVERTER_OSC__RP		DISCRETE_INPUT(3)
+#define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
+#define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
 INLINE double dss_inverter_tftab(node_description *node, double x)
 {
@@ -1678,11 +1678,11 @@ static DISCRETE_RESET(dss_inverter_osc)
  * input4    - Initial Phase
  *
  ************************************************************************/
-#define DSS_TRIANGLEWAVE__ENABLE	(*(node->input[0]))
-#define DSS_TRIANGLEWAVE__FREQ		(*(node->input[1]))
-#define DSS_TRIANGLEWAVE__AMP		(*(node->input[2]))
-#define DSS_TRIANGLEWAVE__BIAS		(*(node->input[3]))
-#define DSS_TRIANGLEWAVE__PHASE		(*(node->input[4]))
+#define DSS_TRIANGLEWAVE__ENABLE	DISCRETE_INPUT(0)
+#define DSS_TRIANGLEWAVE__FREQ		DISCRETE_INPUT(1)
+#define DSS_TRIANGLEWAVE__AMP		DISCRETE_INPUT(2)
+#define DSS_TRIANGLEWAVE__BIAS		DISCRETE_INPUT(3)
+#define DSS_TRIANGLEWAVE__PHASE		DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dss_trianglewave)
 {
@@ -1735,7 +1735,7 @@ static DISCRETE_RESET(dss_trianglewave)
  * input2    - gain scaling factor
  *
  ************************************************************************/
-#define DSS_ADSR__ENABLE	(*(node->input[0]))
+#define DSS_ADSR__ENABLE	DISCRETE_INPUT(0)
 
 static DISCRETE_STEP(dss_adsrenv)
 {
