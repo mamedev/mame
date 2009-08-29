@@ -248,7 +248,7 @@ static MACHINE_RESET( shogwarr )
 	kaneko16_sprite_type = 0;
 	kaneko16_sprite_fliptype = 1;
 	
-	kaneko16_priority.sprite[0] = 2;	// below all
+	kaneko16_priority.sprite[0] = 1;	// below all
 	kaneko16_priority.sprite[1] = 3;	// above tile[0], below the others
 	kaneko16_priority.sprite[2] = 5;	// above all
 	kaneko16_priority.sprite[3] = 7;	// ""
