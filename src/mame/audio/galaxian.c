@@ -317,7 +317,7 @@ static DISCRETE_SOUND_START(galaxian)
 	    /************************************************/
 		/* HIT                                          */
 		/************************************************/
-	
+
 	    /* NOISE */
 	    /* since only a sample of the LFSR is latched @V2 we let the lfsr
 	     * run at a lower speed
@@ -325,7 +325,7 @@ static DISCRETE_SOUND_START(galaxian)
 	    DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
 		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
 		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,1,NODE_151,NODE_150)
-	
+
 	
 		/* Not 100% correct - switching causes high impedance input for node_157
 	     * this is not emulated */

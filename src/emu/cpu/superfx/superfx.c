@@ -619,19 +619,19 @@ static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks)
 {
 	//printf( "superfx_add_clocks: %d\n", clocks);
 	/*
-	if(cpustate->romcl)
-	{
-		printf( "ROM is accessing\n" );
-		printf( "romcl = %d, -= MIN(%d, %d) (= %d)\n", cpustate->romcl, clocks, cpustate->romcl, MIN(clocks, cpustate->romcl));
-		cpustate->romcl -= MIN(clocks, cpustate->romcl);
-		if(cpustate->romcl == 0)
-		{
-			cpustate->sfr &= ~SUPERFX_SFR_R;
-			printf( "superfx_op_read: reading from rom, calling superfx_bus_read: %08x\n", (cpustate->rombr << 16) + cpustate->r[14] );
-			cpustate->romdr = superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]);
-		}
-	}
-	*/
+    if(cpustate->romcl)
+    {
+        printf( "ROM is accessing\n" );
+        printf( "romcl = %d, -= MIN(%d, %d) (= %d)\n", cpustate->romcl, clocks, cpustate->romcl, MIN(clocks, cpustate->romcl));
+        cpustate->romcl -= MIN(clocks, cpustate->romcl);
+        if(cpustate->romcl == 0)
+        {
+            cpustate->sfr &= ~SUPERFX_SFR_R;
+            printf( "superfx_op_read: reading from rom, calling superfx_bus_read: %08x\n", (cpustate->rombr << 16) + cpustate->r[14] );
+            cpustate->romdr = superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]);
+        }
+    }
+    */
 
 	if(cpustate->ramcl)
 	{

@@ -1210,8 +1210,8 @@ VIDEO_UPDATE( taitof2_driftout )
 	UINT16 pen;
 
 	/* send palette, workaround for bug http://www.mametesters.org/view.php?id=3356 (just for this game)
-	 driftout writes twice per frame to the palette, this causes glitches on some setups due to
-	 VIDEO_UPDATE not being synced to renderer update when multithreading is on. */
+     driftout writes twice per frame to the palette, this causes glitches on some setups due to
+     VIDEO_UPDATE not being synced to renderer update when multithreading is on. */
 	for (pen=0;pen<4096;pen++)
 		palette_set_color_rgb(screen->machine, pen, pal5bit(paletteram_buffer[pen] >> 10), pal5bit(paletteram_buffer[pen] >> 5), pal5bit(paletteram_buffer[pen] >> 0));
 

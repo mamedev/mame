@@ -632,7 +632,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		switch( data & 0xff )
 		{
 			case 0x07:		// 7 resets the eeprom
-				for (i = 0; i < 5; i++) 
+				for (i = 0; i < 5; i++)
 					eepromdev_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
 				break;
 
@@ -1448,7 +1448,7 @@ ROM_START( galgbios )
 
 	ROM_REGION( 0x200000, "blitter", 0 )
 	ROM_COPY( "maincpu", 0, 0, 0x200000 )
-	
+
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// RAM, filled by the 68000 and fed to the OKI
 
@@ -1461,9 +1461,9 @@ Galaxy Games StarPak 2
 
 NAMCO 307 Cartridge, has surface mount Flash chips in it:
 
-.u1	am29f800BB
-.u2	am29f800BB
-.u4	pic 12c508
+.u1 am29f800BB
+.u2 am29f800BB
+.u4 pic 12c508
 
 Board silkscreened  237-0209-00
                     REV.-C

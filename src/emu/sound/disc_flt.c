@@ -686,7 +686,7 @@ static DISCRETE_STEP(dst_rcdisc3)
 				else
 					diff = diff - (diff * context->exponent0);
 			}
-		} 
+		}
 		else
 		{
 			if( diff < 0 )
@@ -1102,7 +1102,7 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 			break;
 		default:
 			rs = 0;
-			
+
 			for (i = 0; i < 4; i++)
 			{
 				if (( bits & (1 << i)) != 0)

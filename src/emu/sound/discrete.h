@@ -2272,7 +2272,7 @@
  *  IN1 >------------------------'  |/
  *
  *          --------------------------------------------------
- * 
+ *
  *     DISC_OP_AMP_FILTER_IS_HIGH_PASS_1
  *          First Order High Pass Filter
  *
@@ -2529,7 +2529,7 @@
  *                      diode junction voltage)
  *
  * The polarity of the diode junction voltage determines the polarity of the diode.
- * 
+ *
  *  Example config line
  *
  *     DISCRETE_RCDISC3(NODE_11,NODE_10,10,100,220,CAP_U(1), 0.5)
@@ -3237,12 +3237,12 @@
  *                             custom = address of specific initialization data
  *
  * In most case, you should be able to use
- * 
+ *
  *     discrete_custom_info = {DISCRETE_CUSTOM_MODULE(basename, context type), custom}
- * 
- * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define 
+ *
+ * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define
  * the step/reset procedures.
- * 
+ *
  * EXAMPLES: see Donkey Kong, Mario Bros.
  *
  ***********************************************************************
@@ -3638,7 +3638,7 @@ struct _node_description
 
 	void *			context;							/* Contextual information specific to this node type */
 	const void *	custom;								/* Custom function specific initialisation data */
-	
+
 	const discrete_module *module;						/* Node's module info */
 	const discrete_sound_block *block;					/* Points to the node's setup block. */
 	const discrete_info *info;							/* Points to the parent */
@@ -3646,7 +3646,7 @@ struct _node_description
 	osd_ticks_t		run_time;
 };
 
-	
+
 /*************************************
  *
  *  Core runtime info
@@ -3686,16 +3686,16 @@ struct _discrete_info
 
 	/* internal node tracking */
 	node_description **indexed_node;
-	
+
 	/* list of all nodes */
 	linked_list_entry	 *node_list;		/* node_description * */
-	
+
 	/* list of nodes which step */
 	linked_list_entry	 *step_list;		/* node_description * */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */
-	
+
 	/* tasks */
 	linked_list_entry	 *task_list;		/* discrete_task_context * */
 
@@ -3723,9 +3723,9 @@ struct _discrete_info
 	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
 
 	/* parallel tasks */
-	
+
 	osd_work_queue *queue;
-	
+
 	/* profiling */
 	int total_samples;
 };
@@ -4224,7 +4224,7 @@ enum
 	DSO_IMPORT,			/* import from another discrete block */
 	DSO_REPLACE,		/* replace next node */
 	DSO_DELETE,			/* delete nodes */
-	
+
 	/* Marks end of this enum -- must be last entry ! */
 	DSO_LAST
 };
@@ -4417,7 +4417,7 @@ enum
 #define DISCRETE_TASK_END3(BNODE1,BNODE2,BNODE3)                        { NODE_SPECIAL, DSO_TASK_END , 3, { BNODE1,BNODE2,BNODE3 }, { BNODE1,BNODE2,BNODE3 }, NULL, "DISCRETE_TASK_END3" },
 #define DISCRETE_TASK_END4(BNODE1,BNODE2,BNODE3,BNODE4)                 { NODE_SPECIAL, DSO_TASK_END , 4, { BNODE1,BNODE2,BNODE3,BNODE4 }, { BNODE1,BNODE2,BNODE3,BNODE4 }, NULL, "DISCRETE_TASK_END4" },
 #define DISCRETE_TASK_END5(BNODE1,BNODE2,BNODE3,BNODE4,BNODE5)          { NODE_SPECIAL, DSO_TASK_END , 5, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, NULL, "DISCRETE_TASK_END5" },
-//#define DISCRETE_TASK_SYNC()				                            { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
+//#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },

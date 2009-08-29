@@ -272,7 +272,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ssem",       _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
 	{ "ssp1601",    _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },
 	{ "t11",        _16le,  0, CPU_DISASSEMBLE_NAME(t11) },
-//	{ "t90",        _8bit,  0, CPU_DISASSEMBLE_NAME(t90) },
+//  { "t90",        _8bit,  0, CPU_DISASSEMBLE_NAME(t90) },
 	{ "tlcs900",    _8bit,  0, CPU_DISASSEMBLE_NAME(tlcs900) },
 	{ "tms0980",    _16be,  0, CPU_DISASSEMBLE_NAME(tms0980) },
 	{ "tms1000",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms1000) },
@@ -293,7 +293,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "v70",        _8bit,  0, CPU_DISASSEMBLE_NAME(v70) },
 	{ "v810",       _16le,  0, CPU_DISASSEMBLE_NAME(v810) },
 	{ "z180",       _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
-//	{ "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
+//  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
 	{ "z80",		_8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
 };
 
@@ -306,7 +306,7 @@ void CLIB_DECL fatalerror(const char *text, ...)
 	va_start(arg, text);
 	vfprintf(stderr, text, arg);
 	va_end(arg);
-	
+
 	exit(1);
 }
 
@@ -332,18 +332,18 @@ int parse_options(int argc, char *argv[], options *opts)
 	int arg;
 
 	memset(opts, 0, sizeof(*opts));
-	
+
 	// loop through arguments
 	for (arg = 1; arg < argc; arg++)
 	{
 		char *curarg = argv[arg];
-		
+
 		// is it a switch?
 		if (curarg[0] == '-')
 		{
 			if (pending_base || pending_arch)
 				goto usage;
-			
+
 			if (tolower(curarg[1]) == 'a')
 				pending_arch = TRUE;
 			else if (tolower(curarg[1]) == 'b')
@@ -357,7 +357,7 @@ int parse_options(int argc, char *argv[], options *opts)
 			else
 				goto usage;
 		}
-		
+
 		// base PC
 		else if (pending_base)
 		{
@@ -369,7 +369,7 @@ int parse_options(int argc, char *argv[], options *opts)
 				sscanf(&curarg[0], "%x", &opts->basepc);
 			pending_base = FALSE;
 		}
-		
+
 		// architecture
 		else if (pending_arch)
 		{
@@ -381,21 +381,21 @@ int parse_options(int argc, char *argv[], options *opts)
 			opts->dasm = &dasm_table[curarch];
 			pending_arch = FALSE;
 		}
-		
+
 		// filename
 		else if (opts->filename == NULL)
 			opts->filename = curarg;
-		
+
 		// fail
 		else
 			goto usage;
 	}
-	
+
 	// if no file or no architecture, fail
 	if (opts->filename == NULL || opts->dasm == NULL)
 		goto usage;
 	return 0;
-	
+
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] [-norawbytes] [-upper] [-lower]\n", argv[0]);
 	printf("\n");
@@ -428,11 +428,11 @@ int main(int argc, char *argv[])
 	int numbytes;
 	void *data;
 	char *p;
-	
+
 	// parse options first
 	if (parse_options(argc, argv, &opts))
 		return 1;
-	
+
 	// load the file
 	filerr = core_fload(opts.filename, &data, &length);
 	if (filerr != FILERR_NONE)
@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
 		return 1;
 	}
-	
+
 	// precompute parameters
 	displaychunk = (opts.dasm->display / 2) + 1;
 	displayendian = opts.dasm->display % 2;
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
 		case 2:		maxchunks = 3;	break;
 		default:	maxchunks = 1;	break;
 	}
-	
+
 	// run it
 	curpc = opts.basepc;
 	for (curbyte = 0; curbyte < length; curbyte += numbytes)
@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
 			numbytes = pcdelta << -opts.dasm->pcshift;
 		else
 			numbytes = pcdelta >> opts.dasm->pcshift;
-		
+
 		// round to the nearest display chunk
 		numbytes = ((numbytes + displaychunk - 1) / displaychunk) * displaychunk;
 		if (numbytes == 0)
@@ -475,7 +475,7 @@ int main(int argc, char *argv[])
 
 		// output the address
 		printf("%08X: ", curpc);
-		
+
 		// output the raw bytes
 		if (!opts.norawbytes)
 		{
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
 				printf("%*s ", displaychunk * 2, "");
 			printf(" ");
 		}
-		
+
 		// output the disassembly
 		if (opts.lower)
 		{
@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
 				*p = toupper(*p);
 		}
 		printf("%s\n", buffer);
-		
+
 		// output additional raw bytes
 		if (!opts.norawbytes && numchunks > maxchunks)
 		{

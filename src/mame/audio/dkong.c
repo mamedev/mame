@@ -391,7 +391,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_RCINTEGRATE(NODE_22,NODE_20,DK_R5, RES_2_PARALLEL(DK_R4+DK_R3,DK_R6),0,DK_C19,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0,1,NODE_22,DK_R3/R_SERIES(DK_R3,DK_R4))
 	DISCRETE_TASK_END(DS_OUT_SOUND0)
-	
+
 	/************************************************/
 	/* Jump                                         */
 	/************************************************/
@@ -637,7 +637,7 @@ static DISCRETE_SOUND_START(radarscp)
 	DISCRETE_INPUT_NOT(DS_SOUND6_INV)
 	DISCRETE_INPUT_NOT(DS_SOUND7_INV)
 	DISCRETE_INPUT_NOT(DS_DISCHARGE_INV)
-	
+
 	/* Must be in task if tasks added */
 	DISCRETE_INPUTX_STREAM(DS_DAC, 0, 1.0, 0)
 	//DISCRETE_INPUT_DATA(DS_DAC)
@@ -1262,7 +1262,7 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_CPU_IO_MAP(dkong_sound_io_map)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD("discdac", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dkong2b_dac)
 	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)

@@ -580,18 +580,18 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 		else
 			code = s->code;		// .. or latch this value
 
-	
+
 		if (flags & USE_LATCHED_COLOR)
 		{
 			s->color		=	color;
 			s->priority		=	priority;
 			s->xoffs		=	xoffs;
 			s->yoffs		=	yoffs;
-			
+
 			if (kaneko16_sprite_fliptype==0)
 			{
 				s->flipx		=	flipx;
-				s->flipy		=	flipy;	
+				s->flipy		=	flipy;
 			}
 		}
 		else
@@ -600,21 +600,21 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 			priority	=	s->priority;
 			xoffs		=	s->xoffs;
 			yoffs		=	s->yoffs;
-			
+
 			if (kaneko16_sprite_fliptype==0)
 			{
 				flipx = s->flipx;
 				flipy = s->flipy;
-			}		
+			}
 		}
-	
+
 		// brap boys explicitly doesn't want the flip to be latched, maybe there is a different bit to enable that behavior?
 		if (kaneko16_sprite_fliptype==1)
 		{
 			flipx		=	s->flipx;
 			flipy		=	s->flipy;
 		}
-		
+
 		if (flags & USE_LATCHED_XY)
 		{
 			s->x += x;

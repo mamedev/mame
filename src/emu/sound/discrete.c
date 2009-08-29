@@ -132,7 +132,7 @@ static void *task_callback(void *param, int threadid)
 		ti->context->ptr[i] = &ti->context->node_buf[i][0];
 	
 	samples = ti->samples;
-	while (samples-- > 0) 
+	while (samples-- > 0)
 	{
 		step_nodes_in_list(&ti->context->list);
 	}
@@ -162,7 +162,7 @@ static DISCRETE_STEP( dso_output )
 {
 	stream_sample_t **output = (stream_sample_t **) &node->context;
 	double val;
-	
+
 	/* Add gain to the output and put into the buffers */
 	/* Clipping will be handled by the main sound system */
 	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
@@ -200,10 +200,10 @@ static int linked_list_count(linked_list_entry *list)
 {
 	int cnt = 0;
 	linked_list_entry *entry;
-	
+
 	for (entry = list; entry != NULL; entry = entry->next)
 		cnt++;
-	
+
 	return cnt;
 }
 
@@ -239,7 +239,7 @@ static const discrete_module module_list[] =
 	{ DSO_TASK_START  ,"DSO_TASK_START"  , 0 ,0                                      ,NULL                  ,NULL                 },
 	{ DSO_TASK_END    ,"DSO_TASK_END"    , 0 ,0                                      ,dso_task_reset        ,dso_task_step        },
 	{ DSO_TASK_SYNC   ,"DSO_TASK_SYNC"   , 0 ,0                                      ,NULL                  ,NULL                 },
-	
+
 	/* nop */
 	{ DSS_NOP         ,"DSS_NOP"         , 0 ,0                                      ,NULL                  ,NULL                 },
 
@@ -376,7 +376,7 @@ static void discrete_build_list(discrete_info *info, discrete_sound_block *intf,
 		else if (intf[node_count].type == DSO_REPLACE)
 		{
 			linked_list_entry *entry;
-			
+
 			node_count++;
 			if (intf[node_count].type == DSS_NULL)
 				fatalerror("discrete_build_list: DISCRETE_REPLACE at end of node_list");
@@ -384,7 +384,7 @@ static void discrete_build_list(discrete_info *info, discrete_sound_block *intf,
 			for (entry = info->block_list; entry != NULL; entry = entry->next)
 			{
 				discrete_sound_block *block = (discrete_sound_block *) entry->ptr;
-				
+
 				if (block->type != NODE_SPECIAL )
 					if (block->node == intf[node_count].node)
 					{
@@ -438,12 +438,12 @@ static void discrete_sanity_check(discrete_info *info)
 {
 	linked_list_entry *entry;
 	int node_count = 0;
-	
+
 	discrete_log(info, "discrete_start() - Doing node list sanity check");
 	for (entry = info->block_list; entry != NULL; entry = entry->next)
 	{
 		discrete_sound_block *block = (discrete_sound_block *) entry->ptr;
-		
+
 		/* make sure we don't have too many nodes overall */
 		if (node_count > DISCRETE_MAX_NODES)
 			fatalerror("discrete_start() - Upper limit of %d nodes exceeded, have you terminated the interface block?", DISCRETE_MAX_NODES);
@@ -503,7 +503,7 @@ static DEVICE_START( discrete )
 
 	/* first pass through the nodes: sanity check, fill in the indexed_nodes, and make a total count */
 	discrete_sanity_check(info);
-	
+
 	/* Start with empty lists */
 	info->node_list = NULL;
 	info->step_list = NULL;
@@ -524,9 +524,9 @@ static DEVICE_START( discrete )
 	info->discrete_stream = stream_create(device,linked_list_count(info->input_list), linked_list_count(info->output_list), info->sample_rate, info, discrete_stream_update);
 
 	/* allocate a queue */
-	
+
 	info->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
-	
+
 	setup_disc_logs(info);
 }
 
@@ -544,11 +544,11 @@ static DEVICE_STOP( discrete )
 	int log_num;
 
 	osd_work_queue_free(info->queue);
-	
+
 	if (DISCRETE_PROFILING)
 	{
 		int count = 0;
-		linked_list_entry *entry;		
+		linked_list_entry *entry;
 		osd_ticks_t total = 0;
 		osd_ticks_t tresh;
 
@@ -783,13 +783,13 @@ static STREAM_UPDATE( discrete_stream_update )
 
 	if (samples == 0)
 		return;
-	
+
 	/* Setup any output streams */
 	for (entry = info->output_list, outputnum = 0; entry != NULL; entry = entry->next, outputnum++)
 	{
 		((node_description *) entry->ptr)->context = (void *) outputs[outputnum];
 	}
-	
+
 	/* Setup any input streams */
 	for (entry = info->input_list; entry != NULL; entry = entry->next)
 	{
@@ -851,7 +851,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	linked_list_entry	**task_list = &info->task_list;
 	linked_list_entry	**output_list = &info->output_list;
 	linked_list_entry	**input_list = &info->input_list;
-	
+
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
 	{

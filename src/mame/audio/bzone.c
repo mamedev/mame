@@ -327,9 +327,9 @@ DEVICE_GET_INFO( bzone_sound )
 #define BZ_R8			RES_K(100)
 #define BZ_R9			RES_K(22)
 
-//#define RT			(1.0/BZ_R5 + 1.0/BZ_R6 * 1.0/BZ_R7)
+//#define RT            (1.0/BZ_R5 + 1.0/BZ_R6 * 1.0/BZ_R7)
 
-#define BZ_R10			RES_K(100)	
+#define BZ_R10			RES_K(100)
 #define BZ_R11			RES_K(250)
 #define BZ_R12			RES_K(33)
 #define BZ_R13			RES_K(10)
@@ -385,7 +385,7 @@ static const discrete_lfsr_desc bzone_lfsr =
 	15		          	/* Output bit */
 };
 
-static const discrete_op_amp_filt_info bzone_explo_0 = 
+static const discrete_op_amp_filt_info bzone_explo_0 =
 {
 		BZ_R18 + BZ_R19, 0, 0, 0, 		/* r1, r2, r3, r4 */
 		BZ_R33,							/* rF */
@@ -394,7 +394,7 @@ static const discrete_op_amp_filt_info bzone_explo_0 =
 		22, 0							/* vP, vN */
 };
 
-static const discrete_op_amp_filt_info bzone_explo_1 = 
+static const discrete_op_amp_filt_info bzone_explo_1 =
 {
 		BZ_R18, 0, 0, 0, 				/* r1, r2, r3, r4 */
 		BZ_R33,							/* rF */
@@ -403,7 +403,7 @@ static const discrete_op_amp_filt_info bzone_explo_1 =
 		22, 0							/* vP, vN */
 };
 
-static const discrete_op_amp_filt_info bzone_shell_0 = 
+static const discrete_op_amp_filt_info bzone_shell_0 =
 {
 		BZ_R13 + BZ_R12, 0, 0, 0, 		/* r1, r2, r3, r4 */
 		BZ_R32,							/* rF */
@@ -412,7 +412,7 @@ static const discrete_op_amp_filt_info bzone_shell_0 =
 		22, 0							/* vP, vN */
 };
 
-static const discrete_op_amp_filt_info bzone_shell_1 = 
+static const discrete_op_amp_filt_info bzone_shell_1 =
 {
 		BZ_R13, 0, 0, 0, 				/* r1, r2, r3, r4 */
 		BZ_R32,							/* rF */
@@ -432,7 +432,7 @@ static const discrete_555_desc bzone_vco_desc =
 static const discrete_mixer_desc bzone_eng_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{BZ_R20, BZ_R21, BZ_R34, BZ_R35},	
+	{BZ_R20, BZ_R21, BZ_R34, BZ_R35},
 	{0, 0, 0, 0},
 	{0, 0, 0, 0},
 	0, 0,
@@ -444,7 +444,7 @@ static const discrete_mixer_desc bzone_eng_mixer_desc =
 static const discrete_mixer_desc bzone_final_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{BZ_R28, BZ_R25, BZ_R26, BZ_R27},	
+	{BZ_R28, BZ_R25, BZ_R26, BZ_R27},
 	{0, 0, 0, 0},
 	{0, 0, 0, 0},
 	0, BZ_R29,
@@ -467,14 +467,14 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_INPUT_DATA(BZ_INPUT)
 
 	/* decode the bits */
-	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 5.7)// TTL_OUT)		/* QA-QD 74393 */
+	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 5.7)// TTL_OUT)       /* QA-QD 74393 */
 	DISCRETE_ADJUSTMENT_TAG(NODE_11, 0, RES_K(250), DISC_LINADJ, "R11")
 
-	
+
 	/************************************************/
 	/* NOISE                                        */
 	/************************************************/
-	
+
 	/* 12Khz clock is divided by two by B4 74LS109 */
 	DISCRETE_LFSR_NOISE(NODE_30, 1, 1, BZ_NOISE_CLOCK / 2, 1.0, 0, 0.5, &bzone_lfsr)
 
@@ -486,7 +486,7 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_LOGIC_NAND4(NODE_33,1,NODE_SUB(32,0),NODE_SUB(32,1),NODE_SUB(32,2),NODE_SUB(32,3))
 	/* divide by 2 */
 	DISCRETE_COUNTER(NODE_34, 1, 0, NODE_33, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
-	
+
 	/************************************************/
 	/* Explosion                                    */
 	/************************************************/
@@ -494,15 +494,15 @@ static DISCRETE_SOUND_START(bzone)
 	/* FIXME: +0.7 for diode */
 	DISCRETE_RCDISC5(NODE_40, NODE_34, BZ_INP_EXPLO, BZ_R17 + BZ_R16, BZ_C14)
 	DISCRETE_MULTIPLY(NODE_41, 1, BZ_R16 / (BZ_R17 + BZ_R16), NODE_40)
-	
+
 	/* one of two filter configurations active */
 	DISCRETE_LOGIC_INVERT(NODE_42, 1, BZ_INP_EXPLOLS)
-	DISCRETE_OP_AMP_FILTER(NODE_43, BZ_INP_EXPLOLS,  0, NODE_41, 
+	DISCRETE_OP_AMP_FILTER(NODE_43, BZ_INP_EXPLOLS,  0, NODE_41,
 			DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_explo_1)
-	DISCRETE_OP_AMP_FILTER(NODE_44, NODE_42,  0, NODE_41, 
+	DISCRETE_OP_AMP_FILTER(NODE_44, NODE_42,  0, NODE_41,
 		DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_explo_0)
 	DISCRETE_ADDER2(NODE_45, 1, NODE_43, NODE_44)
-		
+
 	/************************************************/
 	/* Shell                                        */
 	/************************************************/
@@ -512,22 +512,22 @@ static DISCRETE_SOUND_START(bzone)
 
 	/* one of two filter configurations active */
 	DISCRETE_LOGIC_INVERT(NODE_52, 1, BZ_INP_SHELLLS)
-	DISCRETE_OP_AMP_FILTER(NODE_53, BZ_INP_SHELLLS,  0, NODE_51, 
+	DISCRETE_OP_AMP_FILTER(NODE_53, BZ_INP_SHELLLS,  0, NODE_51,
 			DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_shell_1)
-	DISCRETE_OP_AMP_FILTER(NODE_54, NODE_52,  0, NODE_51, 
+	DISCRETE_OP_AMP_FILTER(NODE_54, NODE_52,  0, NODE_51,
 		DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_shell_0)
 	DISCRETE_ADDER2(NODE_55, 1, NODE_53, NODE_54)
 
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/
-	
-	
+
+
 	DISCRETE_TRANSFORM2(NODE_60, BZ_INP_ENGREV, 0.0, "01=")
 	// FIXME: from R5 .. R7
 	DISCRETE_MULTIPLEX2(NODE_61, 1, NODE_60, 2.5, 4.2)
 	DISCRETE_RCDISC3(NODE_62, 1, NODE_61, BZ_R8, BZ_R9, BZ_C13, -0.5)
-	
+
 	/* R11 taken from adjuster port */
 	DISCRETE_555_ASTABLE_CV(NODE_63, 1, BZ_R10, NODE_11, BZ_C11, NODE_62, &bzone_vco_desc)
 
@@ -535,13 +535,13 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_COUNTER(NODE_65, BZ_INP_MOTEN, 0, NODE_63, 11, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
 	DISCRETE_TRANSFORM2(NODE_66, NODE_65, 3, "01>") /* QD */
 	DISCRETE_TRANSFORM2(NODE_67, NODE_65, 11, "01=") /* Ripple */
-	
+
 	DISCRETE_COUNTER(NODE_68, BZ_INP_MOTEN, 0, NODE_63, 9, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
 	DISCRETE_TRANSFORM2(NODE_69, NODE_68, 1, "01>") /* QD */
 	DISCRETE_TRANSFORM2(NODE_70, NODE_68, 9, "01=") /* Ripple */
-	
+
 	DISCRETE_MIXER4(NODE_75, 1, NODE_66, NODE_67, NODE_69, NODE_70, &bzone_eng_mixer_desc)
-	
+
 	/************************************************/
 	/* FINAL MIX                                    */
 	/************************************************/
@@ -574,7 +574,7 @@ WRITE8_DEVICE_HANDLER( bzone_sounds_w )
 MACHINE_DRIVER_START( bzone_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD("pokey",  POKEY, BZONE_MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(bzone_pokey_interface)
 	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)

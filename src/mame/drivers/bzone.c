@@ -582,7 +582,7 @@ static MACHINE_DRIVER_START( bzone )
 	MDRV_IMPORT_FROM(bzone_audio)
 #else
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD("pokey",  POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(bzone_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -218,7 +218,7 @@
   1x KN2222A  (Epitaxial planar general purpose NPN transistor)
   1x VR/POT
 
-  .------.                              .------------.               .-------. 
+  .------.                              .------------.               .-------.
   |      |                              |   D5555C   |               |KN2222A|
   |      |                             4|            |3     R3       |       |      -->
   |   PC7|------------------------------|RST      OUT|-----ZZZZ------|B     E|>----ZZZZZ-----> Audio Out.
@@ -1043,7 +1043,7 @@ ROM_END
 /*
 Noraut Joker Poker
 
-Program:27C64 
+Program:27C64
 Marked:
 "MX10A JOKER G.L
  N.C.R  C.C  M.S"
@@ -1119,7 +1119,7 @@ CHAR Eprom:2732
 Marked: "GU27"
 
 daughter card is connected on to another card containing only pcb tracks no components
-This second board connects to main board with ribbon cable to the 40pin socket where 
+This second board connects to main board with ribbon cable to the 40pin socket where
 the original cpu would of been.
 
 No date info on board or found in rom.

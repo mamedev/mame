@@ -53,7 +53,7 @@ static emu_timer *scanline_timer;
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-	
+
 	/* update the DACs */
 	if (!(leland_dac_control & 0x01))
 		leland_dac_update(0, leland_video_ram[(last_scanline) * 256 + 160]);

@@ -1172,11 +1172,11 @@ ROM_START(kollon)
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
 ROM_END
- 
+
 ROM_START(kollonc)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
-	
+
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060)) /* Original Taito Compact Flash version */
 ROM_END

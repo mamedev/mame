@@ -1136,7 +1136,7 @@ static CPU_EXPORT_STATE( i808x )
 		case I8085_SID:
 			{
 			int sid = devcb_call_read_line(&cpustate->in_sid_func);
-			
+
 			cpustate->ietemp = ((cpustate->IM & IM_SID) != 0);
 			cpustate->ietemp = (sid != 0);
 			}
