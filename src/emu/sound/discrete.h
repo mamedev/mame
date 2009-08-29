@@ -3669,9 +3669,10 @@ struct _discrete_task_context
 {
 	linked_list_entry *list;
 
-	double *ptr;
-	double node_buf[2048];
-	double **dest;
+	int numbuffered;
+	double *ptr[5];
+	double node_buf[5][2048];
+	double **dest[5];
 };
 
 struct _discrete_info
@@ -4411,7 +4412,11 @@ enum
 /* parallel tasks */
 
 #define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
-#define DISCRETE_TASK_END(BUF_NODE)                                     { NODE_SPECIAL, DSO_TASK_END , 1, { BUF_NODE }, { BUF_NODE }, NULL, "DISCRETE_TASK_END" },
+#define DISCRETE_TASK_END(BNODE1)                                       { NODE_SPECIAL, DSO_TASK_END , 1, { BNODE1 }, { BNODE1 }, NULL, "DISCRETE_TASK_END" },
+#define DISCRETE_TASK_END2(BNODE1,BNODE2)                               { NODE_SPECIAL, DSO_TASK_END , 2, { BNODE1,BNODE2 }, { BNODE1,BNODE2 }, NULL, "DISCRETE_TASK_END2" },
+#define DISCRETE_TASK_END3(BNODE1,BNODE2,BNODE3)                        { NODE_SPECIAL, DSO_TASK_END , 3, { BNODE1,BNODE2,BNODE3 }, { BNODE1,BNODE2,BNODE3 }, NULL, "DISCRETE_TASK_END3" },
+#define DISCRETE_TASK_END4(BNODE1,BNODE2,BNODE3,BNODE4)                 { NODE_SPECIAL, DSO_TASK_END , 4, { BNODE1,BNODE2,BNODE3,BNODE4 }, { BNODE1,BNODE2,BNODE3,BNODE4 }, NULL, "DISCRETE_TASK_END4" },
+#define DISCRETE_TASK_END5(BNODE1,BNODE2,BNODE3,BNODE4,BNODE5)          { NODE_SPECIAL, DSO_TASK_END , 5, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, NULL, "DISCRETE_TASK_END5" },
 //#define DISCRETE_TASK_SYNC()				                            { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */

@@ -125,17 +125,20 @@ INLINE void step_nodes_in_list(linked_list_entry **list)
 static void *task_callback(void *param, int threadid)
 {
 	task_info *ti = (task_info *) param;
-	int samples;
+	int samples, i;
 
-	/* set up task buffer */
-	ti->context->ptr = &ti->context->node_buf[0];
+	/* set up task buffers */
+	for (i = 0; i < ti->context->numbuffered; i++)
+		ti->context->ptr[i] = &ti->context->node_buf[i][0];
+	
 	samples = ti->samples;
 	while (samples-- > 0) 
 	{
 		step_nodes_in_list(&ti->context->list);
 	}
 	/* reset ptr */
-	ti->context->ptr = &ti->context->node_buf[0];
+	for (i = 0; i < ti->context->numbuffered; i++)
+		ti->context->ptr[i] = &ti->context->node_buf[i][0];
 
 	free(param);
 	return NULL;
@@ -144,7 +147,10 @@ static void *task_callback(void *param, int threadid)
 static DISCRETE_STEP( dso_task )
 {
 	discrete_task_context *ctx =  (discrete_task_context *) node->context;
-	*(ctx->ptr++) = (double) DISCRETE_INPUT(0);
+	int i;
+	
+	for (i = 0; i < ctx->numbuffered; i++)
+		*(ctx->ptr[i]++) = (double) DISCRETE_INPUT(i);
 }
 
 static DISCRETE_RESET( dso_task )
@@ -759,7 +765,10 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
 		discrete_task_context *task = (discrete_task_context *) entry->ptr;
-		**task->dest = *task->ptr++;
+		int i;
+		
+		for (i = 0; i < task->numbuffered; i++)
+			**task->dest[i] = *task->ptr[i]++;
 	}
 
 	/* loop over all nodes */
@@ -865,6 +874,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		node->output[0] = 0.0;
 		node->block = block;
 		node->custom = block->custom;
+		node->active_inputs = block->active_inputs;
 
 		/* keep track of special nodes */
 		if (block->node == NODE_SPECIAL)
@@ -902,8 +912,13 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 				case DSO_TASK_END:
 					if (cur_task_node == NULL)
 						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
+					task->numbuffered = node->active_inputs;
+					{
+						int i;
+						for (i = 0; i < task->numbuffered; i++)
+							task->dest[i] = (double **) &node->input[i];
+					}
 					node->context = task;
-					task->dest = (double **) &node->input[0];
 					task = NULL;
 					break;
 
@@ -920,7 +935,6 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			info->indexed_node[NODE_INDEX(block->node)] = node;
 		}
 
-		node->active_inputs = block->active_inputs;
 		for (inputnum = 0; inputnum < DISCRETE_MAX_INPUTS; inputnum++)
 		{
 			node->input[inputnum] = &(block->initial[inputnum]);
