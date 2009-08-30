@@ -90,7 +90,7 @@ static UINT8 superfx_rambuffer_read(superfx_state *cpustate, UINT16 addr);
 static void superfx_rambuffer_write(superfx_state *cpustate, UINT16 addr, UINT8 val);
 static void superfx_rombuffer_sync(superfx_state *cpustate);
 static void superfx_rombuffer_update(superfx_state *cpustate);
-static UINT8 superfx_rombuffer_read(superfx_state *cpustate);
+//static UINT8 superfx_rombuffer_read(superfx_state *cpustate);
 static void superfx_gpr_write(superfx_state *cpustate, UINT8 r, UINT16 data);
 INLINE UINT8 superfx_op_read(superfx_state *cpustate, UINT16 addr);
 INLINE UINT8 superfx_peekpipe(superfx_state *cpustate);
@@ -174,15 +174,12 @@ static void superfx_memory_reset(superfx_state *cpustate)
 
 static UINT8 superfx_bus_read(superfx_state *cpustate, UINT32 addr)
 {
-	//printf( "superfx_bus_read: %08x\n", addr );
 	return memory_read_byte(cpustate->program, addr);
 }
 
 static void superfx_bus_write(superfx_state *cpustate, UINT32 addr, UINT8 data)
 {
 	memory_write_byte(cpustate->program, addr, data);
-	//printf( "superfx_bus_write: %08x = %02x\n", addr, data );
-	// TODO: Hook up to the same memory map as the main 65C816 CPU.  See src/chip/superfx/bus/bus.cpp in the bsnes source code.
 }
 
 static void superfx_pixelcache_flush(superfx_state *cpustate, INT32 line)
@@ -245,7 +242,7 @@ static void superfx_plot(superfx_state *cpustate, UINT8 x, UINT8 y)
 	UINT8 color = cpustate->colr;
 	UINT16 offset = (y << 5) + (x >> 3);
 
-	printf( "plot: %02x at %d, %d\n", color, x, y );
+	//printf( "plot: %02x at %d, %d\n", color, x, y );
 
 	if((cpustate->por & SUPERFX_POR_DITHER) && ((cpustate->scmr & SUPERFX_SCMR_MD) != 3))
 	{
@@ -311,6 +308,7 @@ static UINT8 superfx_rpix(superfx_state *cpustate, UINT16 x, UINT16 y)
 	UINT8 data = 0x00;
 	UINT32 n = 0;
 
+	//printf( "superfx_rpix: %d, %d\n", x, y );
 	superfx_pixelcache_flush(cpustate, 1);
 	superfx_pixelcache_flush(cpustate, 0);
 
@@ -346,6 +344,7 @@ static UINT8 superfx_rpix(superfx_state *cpustate, UINT16 x, UINT16 y)
 
 static UINT8 superfx_color(superfx_state *cpustate, UINT8 source)
 {
+	//printf("superfx_color\n" );
 	if(cpustate->por & SUPERFX_POR_HIGHNIBBLE)
 	{
 		return (cpustate->colr & 0xf0) | (source >> 4);
@@ -359,10 +358,10 @@ static UINT8 superfx_color(superfx_state *cpustate, UINT8 source)
 
 static UINT8 superfx_rambuffer_sync(superfx_state *cpustate)
 {
-	if(cpustate->ramcl)
-	{
-		superfx_add_clocks_internal(cpustate, cpustate->ramcl);
-	}
+	//if(cpustate->ramcl)
+	//{
+	//	superfx_add_clocks_internal(cpustate, cpustate->ramcl);
+	//}
 	return 0;
 }
 
@@ -375,7 +374,7 @@ static UINT8 superfx_rambuffer_read(superfx_state *cpustate, UINT16 addr)
 
 static void superfx_rambuffer_write(superfx_state *cpustate, UINT16 addr, UINT8 data)
 {
-	superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
+	superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + addr, data);
 	//superfx_rambuffer_sync(cpustate);
 	//cpustate->ramcl = cpustate->memory_access_speed;
 	//cpustate->ramar = addr;
@@ -385,26 +384,26 @@ static void superfx_rambuffer_write(superfx_state *cpustate, UINT16 addr, UINT8 
 static void superfx_rombuffer_sync(superfx_state *cpustate)
 {
 	//printf( "superfx_rombuffer_sync\n" );
-	if(cpustate->romcl)
-	{
-		printf( "calling add_clocks_internal\n" );
-		superfx_add_clocks_internal(cpustate, cpustate->romcl);
-	}
+	//if(cpustate->romcl)
+	///{
+	//	printf( "calling add_clocks_internal\n" );
+	//	superfx_add_clocks_internal(cpustate, cpustate->romcl);
+	//}
 }
 
 static void superfx_rombuffer_update(superfx_state *cpustate)
 {
-	cpustate->sfr |= SUPERFX_SFR_R;
+	//cpustate->sfr |= SUPERFX_SFR_R;
 	//printf( "superfx_rombuffer_update: setting romcl\n" );
-	cpustate->romcl = cpustate->memory_access_speed;
+	//cpustate->romcl = cpustate->memory_access_speed;
 }
 
-static UINT8 superfx_rombuffer_read(superfx_state *cpustate)
-{
-	superfx_rombuffer_sync(cpustate);
-	printf( "superfx_rombuffer_read: %02x\n", cpustate->romdr);
-	return cpustate->romdr;
-}
+//static UINT8 superfx_rombuffer_read(superfx_state *cpustate)
+//{
+	//superfx_rombuffer_sync(cpustate);
+	//printf( "superfx_rombuffer_read: %02x\n", cpustate->romdr);
+	//return cpustate->romdr;
+//}
 
 static void superfx_gpr_write(superfx_state *cpustate, UINT8 r, UINT16 data)
 {
@@ -565,6 +564,7 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 		if(addr == 0x301f)
 		{
 			cpustate->sfr |= SUPERFX_SFR_G;
+			//printf( "new PC: %04x\n", cpustate->r[15] );
 		}
 		return;
 	}
@@ -634,15 +634,15 @@ static void superfx_add_clocks_internal(superfx_state *cpustate, INT32 clocks)
     }
     */
 
-	if(cpustate->ramcl)
-	{
-		cpustate->ramcl -= MIN(clocks, cpustate->ramcl);
-		if(cpustate->ramcl == 0)
-		{
-			printf( "Writing %02x to %08x\n", cpustate->ramdr, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar );
-			superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
-		}
-	}
+	///if(cpustate->ramcl)
+	//{
+	//	cpustate->ramcl -= MIN(clocks, cpustate->ramcl);
+	//	if(cpustate->ramcl == 0)
+	//	{
+	//		printf( "Writing %02x to %08x\n", cpustate->ramdr, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar );
+	//		superfx_bus_write(cpustate, 0x700000 + (cpustate->rambr << 16) + cpustate->ramar, cpustate->ramdr);
+	//	}
+	//}
 }
 
 static void superfx_timing_reset(superfx_state *cpustate)
@@ -770,7 +770,7 @@ static CPU_EXECUTE( superfx )
 
         op = superfx_peekpipe(cpustate);
 
-		printf( "Executing op at %06x: %02x\n", (cpustate->pbr << 16) | cpustate->r[15], op );
+		//printf( "Executing op at %06x: %02x\n", (cpustate->pbr << 16) | cpustate->r[15], op );
 		switch(op)
 		{
 			case 0x00: // STOP
@@ -979,8 +979,8 @@ static CPU_EXECUTE( superfx )
 				{ // LDW_IR
 					UINT16 data = 0;
 					cpustate->ramaddr = cpustate->r[op & 0xf];
-					data  = superfx_rambuffer_read(cpustate, (cpustate->ramaddr ^ 0) << 0);
-					data |= superfx_rambuffer_read(cpustate, (cpustate->ramaddr ^ 1) << 8);
+					data  = superfx_rambuffer_read(cpustate, (cpustate->ramaddr ^ 0)) << 0;
+					data |= superfx_rambuffer_read(cpustate, (cpustate->ramaddr ^ 1)) << 8;
 					superfx_gpr_write(cpustate, cpustate->dreg_idx, data);
 					superfx_regs_reset(cpustate);
 				}
@@ -1077,7 +1077,7 @@ static CPU_EXECUTE( superfx )
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;
 					case SUPERFX_SFR_ALT1: // SBC
-						r -= cpustate->r[op & 0xf] - ((cpustate->sfr & SUPERFX_SFR_CY) ? 0 : 1);
+						r = r - cpustate->r[op & 0xf] - ((cpustate->sfr & SUPERFX_SFR_CY) ? 0 : 1);
 						cpustate->sfr |= ((*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (*(cpustate->sreg) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;
@@ -1092,7 +1092,7 @@ static CPU_EXECUTE( superfx )
 						break;
 				}
 				cpustate->sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
-				cpustate->sfr |= (r >= 0x10000) ? SUPERFX_SFR_CY : 0;
+				cpustate->sfr |= (r >= 0x0) ? SUPERFX_SFR_CY : 0;
 				cpustate->sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
 				superfx_regs_reset(cpustate);
 				break;
@@ -1327,7 +1327,7 @@ static CPU_EXECUTE( superfx )
 				{
 					case SUPERFX_SFR_ALT0: // GETC
 					case SUPERFX_SFR_ALT1: // GETC
-						cpustate->colr = superfx_color(cpustate, superfx_rombuffer_read(cpustate));
+						cpustate->colr = superfx_color(cpustate, superfx_bus_read(cpustate, (cpustate->rombr << 16) + cpustate->r[14]));
 						superfx_regs_reset(cpustate);
 						break;
 					case SUPERFX_SFR_ALT2: // RAMB

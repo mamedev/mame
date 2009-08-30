@@ -302,11 +302,11 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("FMULT   R%d", op & 0xf);
+					print("FMULT");
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LMULT   R%d", op & 0xf);
+					print("LMULT");
 					break;
 			}
 			break;
