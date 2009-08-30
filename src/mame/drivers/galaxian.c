@@ -221,6 +221,8 @@ TO DO :
   - kingbalj : full Dip Switches and Inputs
   - frogg    : fix read/writes at/to unmapped/wrong memory
   - scprpng  : fix read/writes at/to unmapped/wrong memory
+  - scorpion : check whether konami filters are used 
+  - explorer : check whether konami filters are used 
 
 ***************************************************************************/
 
@@ -743,8 +745,8 @@ static READ8_HANDLER( scorpion_ay8910_r )
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
 	if (offset & 0x08) result &= ay8910_r(devtag_get_device(space->machine, "8910.2"), 0);
-	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, "8910.0"), 0);
-	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, "8910.1"), 0);
+	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, "8910.1"), 0);
+	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, "8910.0"), 0);
 	return result;
 }
 
@@ -754,10 +756,10 @@ static WRITE8_HANDLER( scorpion_ay8910_w )
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
 	if (offset & 0x04) ay8910_address_w(devtag_get_device(space->machine, "8910.2"), 0, data);
 	if (offset & 0x08) ay8910_data_w(devtag_get_device(space->machine, "8910.2"), 0, data);
-	if (offset & 0x10) ay8910_address_w(devtag_get_device(space->machine, "8910.0"), 0, data);
-	if (offset & 0x20) ay8910_data_w(devtag_get_device(space->machine, "8910.0"), 0, data);
-	if (offset & 0x40) ay8910_address_w(devtag_get_device(space->machine, "8910.1"), 0, data);
-	if (offset & 0x80) ay8910_data_w(devtag_get_device(space->machine, "8910.1"), 0, data);
+	if (offset & 0x10) ay8910_address_w(devtag_get_device(space->machine, "8910.1"), 0, data);
+	if (offset & 0x20) ay8910_data_w(devtag_get_device(space->machine, "8910.1"), 0, data);
+	if (offset & 0x40) ay8910_address_w(devtag_get_device(space->machine, "8910.0"), 0, data);
+	if (offset & 0x80) ay8910_data_w(devtag_get_device(space->machine, "8910.0"), 0, data);
 }
 
 
@@ -1618,7 +1620,7 @@ static const ay8910_interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(konami_sound_timer_r),
+	DEVCB_HANDLER(explorer_sound_latch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1628,7 +1630,7 @@ static const ay8910_interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(explorer_sound_latch_r),
+	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
