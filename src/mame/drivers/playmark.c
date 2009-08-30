@@ -155,11 +155,11 @@ static READ8_HANDLER( playmark_snd_command_r )
 
 	if ((playmark_oki_control & 0x38) == 0x30) {
 		data = playmark_snd_command;
-//      logerror("PortB reading %02x from the 68K\n",data);
+//      logerror("PC$%03x PortB reading %02x from the 68K\n",cpu_get_previouspc(space->cpu),data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
 		data = (okim6295_r(devtag_get_device(space->machine, "oki"),0) & 0x0f);
-//      logerror("PortB reading %02x from the OKI status port\n",data);
+//      logerror("PC$%03x PortB reading %02x from the OKI status port\n",cpu_get_previouspc(space->cpu),data);
 	}
 
 	return data;
@@ -198,6 +198,8 @@ static WRITE8_HANDLER( playmark_oki_w )
 
 static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 {
+//	const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+
     /*  This port controls communications to and from the 68K, and the OKI
         device.
 
@@ -215,7 +217,7 @@ static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 
 	if ((data & 0x38) == 0x18)
 	{
-//      logerror("Writing %02x to OKI1, PortC=%02x, Code=%02x\n",playmark_oki_command,playmark_oki_control,playmark_snd_command);
+//      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(space->cpu),playmark_oki_command,playmark_oki_control,playmark_snd_command);
 		okim6295_w(device, 0, playmark_oki_command);
 	}
 }
@@ -392,12 +394,11 @@ static INPUT_PORTS_START( bigtwin )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+//	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
+	PORT_DIPSETTING(	0x30, DEF_STR( Medium ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
