@@ -4752,7 +4752,8 @@ static void stv_vdp2_draw_NBG3(running_machine *machine, bitmap_t *bitmap, const
 static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int iRP)
 {
 	rectangle roz_clip_rect, mycliprect;
-	int planesizex = 0, planesizey = 0, planerenderedsizex, planerenderedsizey;
+	int planesizex = 0, planesizey = 0;
+	int planerenderedsizex, planerenderedsizey;
 	UINT8 colour_calculation_enabled;
 	UINT8 window_control;
 	UINT8 fade_control;
