@@ -546,7 +546,7 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 
 	if(addr >= 0x3100 && addr <= 0x32ff)
 	{
-		return superfx_cache_mmio_write(cpustate, addr - 0x3100, data);
+		superfx_cache_mmio_write(cpustate, addr - 0x3100, data);
 	}
 
 	if(addr >= 0x3000 && addr <= 0x301f)
