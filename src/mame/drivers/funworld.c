@@ -2732,8 +2732,8 @@ ROM_START( royalcdp )
 	ROM_LOAD( "u11_tms27c256.bin",0x0000, 0x8000, CRC(d6834c3a) SHA1(4b071b9826c086439b9763393b23c671261b3788) )
 	ROM_LOAD( "u4_nmc27c256.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* not present in the set */
-	ROM_LOAD( "n82s147.bin",      0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147a.bin",     0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 
 	ROM_REGION( 0x0200, "plds", 0 )	/* correct PAL dump */
 	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
@@ -2765,7 +2765,7 @@ ROM_END
 
 ROM_START( magicrd2 )	/* Impera */
 	ROM_REGION( 0x18000, "maincpu", 0 )
-    ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) ) /* only last 16kbyte visible? */
+	ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "magicard.01",  0x8000, 0x10000, CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -2781,7 +2781,7 @@ ROM_END
 
 ROM_START( magicd2a )	/* for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
+	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 //    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -2798,7 +2798,7 @@ ROM_END
 ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 //    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
-    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
+	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr1b.bin",  0x0000, 0x8000, CRC(ce2629a7) SHA1(84767ed5da8dcee44a210255537e10372bcc264b) )
@@ -2877,7 +2877,7 @@ ROM_START( jokercrd )
     Seems to be a Big Deal clone.
 */
 	ROM_REGION( 0x18000, "maincpu", 0 )
-    ROM_LOAD( "ic41.bin",   0x8000,  0x8000, CRC(d36188b3) SHA1(3fb848fabbbde9fbb70875b3dfef62bfb3a8cbcb) ) /* only last 16kbyte visible? */
+	ROM_LOAD( "ic41.bin",   0x8000,  0x8000, CRC(d36188b3) SHA1(3fb848fabbbde9fbb70875b3dfef62bfb3a8cbcb) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "ic37.bin",   0x10000, 0x8000, CRC(8e0d70c4) SHA1(018f92631acbe98e5826a41698f0e07b4b46cd71) ) /* 1st and 2nd half identical */
 	ROM_COPY( "maincpu",	0x10000, 0xc000, 0x4000 ) /* rgn, srcoffset, offset, length */
 
@@ -3204,7 +3204,7 @@ GAME( 1996, bottl10b, bottle10, cuoreuno, cuoreuno, 0,        ROT0, "C.M.C.",   
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
 GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
 GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, 0,        ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1993, royalcdp, royalcrd, cuoreuno, royalcrd, 0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1993, royalcdp, royalcrd, cuoreuno, royalcrd, 0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_NOT_WORKING )
 GAME( 1991, lluck3x3, royalcrd, cuoreuno, royalcrd, 0,        ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
 GAME( 1991, lluck4x1, royalcrd, royalcrd, royalcrd, 0,        ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
 GAME( 1996, magicrd2, 0,        magicrd2, magicrd2, 0,        ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
