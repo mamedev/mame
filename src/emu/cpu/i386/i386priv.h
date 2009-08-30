@@ -691,27 +691,32 @@ INLINE UINT32 XOR32(i386_state *cpustate,UINT32 dst, UINT32 src)
 	return res;
 }
 
-INLINE UINT8 SUB8(i386_state *cpustate,UINT8 dst, UINT8 src)
+#define SUB8(cpu, dst, src) SBB8(cpu, dst, src, 0)
+INLINE UINT8 SBB8(i386_state *cpustate,UINT8 dst, UINT8 src, UINT8 b)
 {
-	UINT16 res = (UINT16)dst - (UINT16)src;
+	UINT16 res = (UINT16)dst - (UINT16)src - (UINT8)b;
 	SetCF8(res);
 	SetOF_Sub8(res,src,dst);
 	SetAF(res,src,dst);
 	SetSZPF8(res);
 	return (UINT8)res;
 }
-INLINE UINT16 SUB16(i386_state *cpustate,UINT16 dst, UINT16 src)
+
+#define SUB16(cpu, dst, src) SBB16(cpu, dst, src, 0)
+INLINE UINT16 SBB16(i386_state *cpustate,UINT16 dst, UINT16 src, UINT16 b)
 {
-	UINT32 res = (UINT32)dst - (UINT32)src;
+	UINT32 res = (UINT32)dst - (UINT32)src - (UINT32)b;
 	SetCF16(res);
 	SetOF_Sub16(res,src,dst);
 	SetAF(res,src,dst);
 	SetSZPF16(res);
 	return (UINT16)res;
 }
-INLINE UINT32 SUB32(i386_state *cpustate,UINT32 dst, UINT32 src)
+
+#define SUB32(cpu, dst, src) SBB32(cpu, dst, src, 0)
+INLINE UINT32 SBB32(i386_state *cpustate,UINT32 dst, UINT32 src, UINT32 b)
 {
-	UINT64 res = (UINT64)dst - (UINT64)src;
+	UINT64 res = (UINT64)dst - (UINT64)src - (UINT64) b;
 	SetCF32(res);
 	SetOF_Sub32(res,src,dst);
 	SetAF(res,src,dst);
@@ -719,27 +724,32 @@ INLINE UINT32 SUB32(i386_state *cpustate,UINT32 dst, UINT32 src)
 	return (UINT32)res;
 }
 
-INLINE UINT8 ADD8(i386_state *cpustate,UINT8 dst, UINT8 src)
+#define ADD8(cpu, dst, src) ADC8(cpu, dst, src, 0)
+INLINE UINT8 ADC8(i386_state *cpustate,UINT8 dst, UINT8 src, UINT8 c)
 {
-	UINT16 res = (UINT16)dst + (UINT16)src;
+	UINT16 res = (UINT16)dst + (UINT16)src + (UINT16)c;
 	SetCF8(res);
 	SetOF_Add8(res,src,dst);
 	SetAF(res,src,dst);
 	SetSZPF8(res);
 	return (UINT8)res;
 }
-INLINE UINT16 ADD16(i386_state *cpustate,UINT16 dst, UINT16 src)
+
+#define ADD16(cpu, dst, src) ADC16(cpu, dst, src, 0)
+INLINE UINT16 ADC16(i386_state *cpustate,UINT16 dst, UINT16 src, UINT8 c)
 {
-	UINT32 res = (UINT32)dst + (UINT32)src;
+	UINT32 res = (UINT32)dst + (UINT32)src + (UINT32)c;
 	SetCF16(res);
 	SetOF_Add16(res,src,dst);
 	SetAF(res,src,dst);
 	SetSZPF16(res);
 	return (UINT16)res;
 }
-INLINE UINT32 ADD32(i386_state *cpustate,UINT32 dst, UINT32 src)
+
+#define ADD32(cpu, dst, src) ADC32(cpu, dst, src, 0)
+INLINE UINT32 ADC32(i386_state *cpustate,UINT32 dst, UINT32 src, UINT32 c)
 {
-	UINT64 res = (UINT64)dst + (UINT64)src;
+	UINT64 res = (UINT64)dst + (UINT64)src + (UINT64) c;
 	SetCF32(res);
 	SetOF_Add32(res,src,dst);
 	SetAF(res,src,dst);

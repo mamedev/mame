@@ -121,16 +121,14 @@ static void I386OP(adc_rm8_r8)(i386_state *cpustate)		// Opcode 0x10
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
-		src = ADD8(cpustate,src, cpustate->CF);
-		dst = ADD8(cpustate,dst, src);
+		dst = ADC8(cpustate, dst, src, cpustate->CF);
 		STORE_RM8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = LOAD_REG8(modrm);
 		dst = READ8(cpustate,ea);
-		src = ADD8(cpustate,src, cpustate->CF);
-		dst = ADD8(cpustate,dst, src);
+		dst = ADC8(cpustate, dst, src, cpustate->CF);
 		WRITE8(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -143,16 +141,14 @@ static void I386OP(adc_r8_rm8)(i386_state *cpustate)		// Opcode 0x12
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
-		src = ADD8(cpustate,src, cpustate->CF);
-		dst = ADD8(cpustate,dst, src);
+		dst = ADC8(cpustate, dst, src, cpustate->CF);
 		STORE_REG8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = READ8(cpustate,ea);
 		dst = LOAD_REG8(modrm);
-		src = ADD8(cpustate,src, cpustate->CF);
-		dst = ADD8(cpustate,dst, src);
+		dst = ADC8(cpustate, dst, src, cpustate->CF);
 		STORE_REG8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -163,8 +159,7 @@ static void I386OP(adc_al_i8)(i386_state *cpustate)		// Opcode 0x14
 	UINT8 src, dst;
 	src = FETCH(cpustate);
 	dst = REG8(AL);
-	src = ADD8(cpustate,src, cpustate->CF);
-	dst = ADD8(cpustate,dst, src);
+	dst = ADC8(cpustate, dst, src, cpustate->CF);
 	REG8(AL) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -1141,16 +1136,16 @@ static void I386OP(sbb_rm8_r8)(i386_state *cpustate)		// Opcode 0x18
 	UINT8 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_REG8(modrm) + cpustate->CF;
+		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
-		dst = SUB8(cpustate,dst, src);
+		dst = SBB8(cpustate, dst, src, cpustate->CF);
 		STORE_RM8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = LOAD_REG8(modrm) + cpustate->CF;
+		src = LOAD_REG8(modrm);
 		dst = READ8(cpustate,ea);
-		dst = SUB8(cpustate,dst, src);
+		dst = SBB8(cpustate, dst, src, cpustate->CF);
 		WRITE8(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -1161,16 +1156,16 @@ static void I386OP(sbb_r8_rm8)(i386_state *cpustate)		// Opcode 0x1a
 	UINT8 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_RM8(modrm) + cpustate->CF;
+		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
-		dst = SUB8(cpustate,dst, src);
+		dst = SBB8(cpustate, dst, src, cpustate->CF);
 		STORE_REG8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = READ8(cpustate,ea) + cpustate->CF;
+		src = READ8(cpustate,ea);
 		dst = LOAD_REG8(modrm);
-		dst = SUB8(cpustate,dst, src);
+		dst = SBB8(cpustate, dst, src, cpustate->CF);
 		STORE_REG8(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -1179,9 +1174,9 @@ static void I386OP(sbb_r8_rm8)(i386_state *cpustate)		// Opcode 0x1a
 static void I386OP(sbb_al_i8)(i386_state *cpustate)			// Opcode 0x1c
 {
 	UINT8 src, dst;
-	src = FETCH(cpustate) + cpustate->CF;
+	src = FETCH(cpustate);
 	dst = REG8(AL);
-	dst = SUB8(cpustate,dst, src);
+	dst = SBB8(cpustate, dst, src, cpustate->CF);
 	REG8(EAX) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -1707,16 +1702,14 @@ static void I386OP(group80_8)(i386_state *cpustate)			// Opcode 0x80
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM8(modrm);
 				src = FETCH(cpustate);
-				src = ADD8(cpustate,src, cpustate->CF);
-				dst = ADD8(cpustate,dst, src);
+				dst = ADC8(cpustate, dst, src, cpustate->CF);
 				STORE_RM8(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ8(cpustate,ea);
 				src = FETCH(cpustate);
-				src = ADD8(cpustate,src, cpustate->CF);
-				dst = ADD8(cpustate,dst, src);
+				dst = ADC8(cpustate, dst, src, cpustate->CF);
 				WRITE8(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -1724,15 +1717,15 @@ static void I386OP(group80_8)(i386_state *cpustate)			// Opcode 0x80
 		case 3:		// SBB Rm8, i8
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM8(modrm);
-				src = FETCH(cpustate) + cpustate->CF;
-				dst = SUB8(cpustate,dst, src);
+				src = FETCH(cpustate);
+				dst = SBB8(cpustate, dst, src, cpustate->CF);
 				STORE_RM8(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ8(cpustate,ea);
-				src = FETCH(cpustate) + cpustate->CF;
-				dst = SUB8(cpustate,dst, src);
+				src = FETCH(cpustate);
+				dst = SBB8(cpustate, dst, src, cpustate->CF);
 				WRITE8(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}

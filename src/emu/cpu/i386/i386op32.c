@@ -122,16 +122,14 @@ static void I386OP(adc_rm32_r32)(i386_state *cpustate)		// Opcode 0x11
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
-		src = ADD32(cpustate,src, cpustate->CF);
-		dst = ADD32(cpustate,dst, src);
+		dst = ADC32(cpustate, dst, src, cpustate->CF);
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
-		src = ADD32(cpustate,src, cpustate->CF);
-		dst = ADD32(cpustate,dst, src);
+		dst = ADC32(cpustate, dst, src, cpustate->CF);
 		WRITE32(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -144,16 +142,14 @@ static void I386OP(adc_r32_rm32)(i386_state *cpustate)		// Opcode 0x13
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
-		src = ADD32(cpustate,src, cpustate->CF);
-		dst = ADD32(cpustate,dst, src);
+		dst = ADC32(cpustate, dst, src, cpustate->CF);
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
-		src = ADD32(cpustate,src, cpustate->CF);
-		dst = ADD32(cpustate,dst, src);
+		dst = ADC32(cpustate, dst, src, cpustate->CF);
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -164,8 +160,7 @@ static void I386OP(adc_eax_i32)(i386_state *cpustate)		// Opcode 0x15
 	UINT32 src, dst;
 	src = FETCH32(cpustate);
 	dst = REG32(EAX);
-	src = ADD32(cpustate,src, cpustate->CF);
-	dst = ADD32(cpustate,dst, src);
+	dst = ADC32(cpustate, dst, src, cpustate->CF);
 	REG32(EAX) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -1596,16 +1591,16 @@ static void I386OP(sbb_rm32_r32)(i386_state *cpustate)		// Opcode 0x19
 	UINT32 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_REG32(modrm) + cpustate->CF;
+		src = LOAD_REG32(modrm);
 		dst = LOAD_RM32(modrm);
-		dst = SUB32(cpustate,dst, src);
+		dst = SBB32(cpustate, dst, src, cpustate->CF);
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = LOAD_REG32(modrm) + cpustate->CF;
+		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
-		dst = SUB32(cpustate,dst, src);
+		dst = SBB32(cpustate, dst, src, cpustate->CF);
 		WRITE32(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -1616,16 +1611,16 @@ static void I386OP(sbb_r32_rm32)(i386_state *cpustate)		// Opcode 0x1b
 	UINT32 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_RM32(modrm) + cpustate->CF;
+		src = LOAD_RM32(modrm);
 		dst = LOAD_REG32(modrm);
-		dst = SUB32(cpustate,dst, src);
+		dst = SBB32(cpustate, dst, src, cpustate->CF);
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = READ32(cpustate,ea) + cpustate->CF;
+		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
-		dst = SUB32(cpustate,dst, src);
+		dst = SBB32(cpustate, dst, src, cpustate->CF);
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -1634,9 +1629,9 @@ static void I386OP(sbb_r32_rm32)(i386_state *cpustate)		// Opcode 0x1b
 static void I386OP(sbb_eax_i32)(i386_state *cpustate)		// Opcode 0x1d
 {
 	UINT32 src, dst;
-	src = FETCH32(cpustate) + cpustate->CF;
+	src = FETCH32(cpustate);
 	dst = REG32(EAX);
-	dst = SUB32(cpustate,dst, src);
+	dst = SBB32(cpustate, dst, src, cpustate->CF);
 	REG32(EAX) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -2059,16 +2054,14 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
 				src = FETCH32(cpustate);
-				src = ADD32(cpustate,src, cpustate->CF);
-				dst = ADD32(cpustate,dst, src);
+				dst = ADC32(cpustate, dst, src, cpustate->CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
-				src = ADD32(cpustate,src, cpustate->CF);
-				dst = ADD32(cpustate,dst, src);
+				dst = ADC32(cpustate, dst, src, cpustate->CF);
 				WRITE32(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2076,15 +2069,15 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 		case 3:		// SBB Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = FETCH32(cpustate) + cpustate->CF;
-				dst = SUB32(cpustate,dst, src);
+				src = FETCH32(cpustate);
+				dst = SBB32(cpustate, dst, src, cpustate->CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ32(cpustate,ea);
-				src = FETCH32(cpustate) + cpustate->CF;
-				dst = SUB32(cpustate,dst, src);
+				src = FETCH32(cpustate);
+				dst = SBB32(cpustate, dst, src, cpustate->CF);
 				WRITE32(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2198,16 +2191,14 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
-				src = ADD32(cpustate,src, cpustate->CF);
-				dst = ADD32(cpustate,dst, src);
+				dst = ADC32(cpustate, dst, src, cpustate->CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
-				src = ADD32(cpustate,src, cpustate->CF);
-				dst = ADD32(cpustate,dst, src);
+				dst = ADC32(cpustate, dst, src, cpustate->CF);
 				WRITE32(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2215,15 +2206,15 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 		case 3:		// SBB Rm32, i32
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM32(modrm);
-				src = ((UINT32)(INT32)(INT8)FETCH(cpustate)) + cpustate->CF;
-				dst = SUB32(cpustate,dst, src);
+				src = ((UINT32)(INT32)(INT8)FETCH(cpustate));
+				dst = SBB32(cpustate, dst, src, cpustate->CF);
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ32(cpustate,ea);
-				src = ((UINT32)(INT32)(INT8)FETCH(cpustate)) + cpustate->CF;
-				dst = SUB32(cpustate,dst, src);
+				src = ((UINT32)(INT32)(INT8)FETCH(cpustate));
+				dst = SBB32(cpustate, dst, src, cpustate->CF);
 				WRITE32(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}

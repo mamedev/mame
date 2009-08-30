@@ -120,16 +120,14 @@ static void I386OP(adc_rm16_r16)(i386_state *cpustate)		// Opcode 0x11
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG16(modrm);
 		dst = LOAD_RM16(modrm);
-		src = ADD16(cpustate,src, cpustate->CF);
-		dst = ADD16(cpustate,dst, src);
+		dst = ADC16(cpustate, dst, src, cpustate->CF);
 		STORE_RM16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = LOAD_REG16(modrm);
 		dst = READ16(cpustate,ea);
-		src = ADD16(cpustate,src, cpustate->CF);
-		dst = ADD16(cpustate,dst, src);
+		dst = ADC16(cpustate, dst, src, cpustate->CF);
 		WRITE16(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -142,16 +140,14 @@ static void I386OP(adc_r16_rm16)(i386_state *cpustate)		// Opcode 0x13
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM16(modrm);
 		dst = LOAD_REG16(modrm);
-		src = ADD16(cpustate,src, cpustate->CF);
-		dst = ADD16(cpustate,dst, src);
+		dst = ADC16(cpustate, dst, src, cpustate->CF);
 		STORE_REG16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		src = READ16(cpustate,ea);
 		dst = LOAD_REG16(modrm);
-		src = ADD16(cpustate,src, cpustate->CF);
-		dst = ADD16(cpustate,dst, src);
+		dst = ADC16(cpustate, dst, src, cpustate->CF);
 		STORE_REG16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -162,8 +158,7 @@ static void I386OP(adc_ax_i16)(i386_state *cpustate)		// Opcode 0x15
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
 	dst = REG16(AX);
-	src = ADD16(cpustate,src, cpustate->CF);
-	dst = ADD16(cpustate,dst, src);
+	dst = ADC16(cpustate, dst, src, cpustate->CF);
 	REG16(AX) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -1729,16 +1724,16 @@ static void I386OP(sbb_rm16_r16)(i386_state *cpustate)		// Opcode 0x19
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_REG16(modrm) + cpustate->CF;
+		src = LOAD_REG16(modrm);
 		dst = LOAD_RM16(modrm);
-		dst = SUB16(cpustate,dst, src);
+		dst = SBB16(cpustate, dst, src, cpustate->CF);
 		STORE_RM16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = LOAD_REG16(modrm) + cpustate->CF;
+		src = LOAD_REG16(modrm);
 		dst = READ16(cpustate,ea);
-		dst = SUB16(cpustate,dst, src);
+		dst = SBB16(cpustate, dst, src, cpustate->CF);
 		WRITE16(cpustate,ea, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 	}
@@ -1749,16 +1744,16 @@ static void I386OP(sbb_r16_rm16)(i386_state *cpustate)		// Opcode 0x1b
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
-		src = LOAD_RM16(modrm) + cpustate->CF;
+		src = LOAD_RM16(modrm);
 		dst = LOAD_REG16(modrm);
-		dst = SUB16(cpustate,dst, src);
+		dst = SBB16(cpustate, dst, src, cpustate->CF);
 		STORE_REG16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		src = READ16(cpustate,ea) + cpustate->CF;
+		src = READ16(cpustate,ea);
 		dst = LOAD_REG16(modrm);
-		dst = SUB16(cpustate,dst, src);
+		dst = SBB16(cpustate, dst, src, cpustate->CF);
 		STORE_REG16(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_MEM_REG);
 	}
@@ -1767,9 +1762,9 @@ static void I386OP(sbb_r16_rm16)(i386_state *cpustate)		// Opcode 0x1b
 static void I386OP(sbb_ax_i16)(i386_state *cpustate)		// Opcode 0x1d
 {
 	UINT16 src, dst;
-	src = FETCH16(cpustate) + cpustate->CF;
+	src = FETCH16(cpustate);
 	dst = REG16(AX);
-	dst = SUB16(cpustate,dst, src);
+	dst = SBB16(cpustate, dst, src, cpustate->CF);
 	REG16(AX) = dst;
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
@@ -2210,16 +2205,14 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
-				src = ADD16(cpustate,src, cpustate->CF);
-				dst = ADD16(cpustate,dst, src);
+				dst = ADC16(cpustate, dst, src, cpustate->CF);
 				STORE_RM16(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ16(cpustate,ea);
 				src = FETCH16(cpustate);
-				src = ADD16(cpustate,src, cpustate->CF);
-				dst = ADD16(cpustate,dst, src);
+				dst = ADC16(cpustate, dst, src, cpustate->CF);
 				WRITE16(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2227,15 +2220,15 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 		case 3:		// SBB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
-				src = FETCH16(cpustate) + cpustate->CF;
-				dst = SUB16(cpustate,dst, src);
+				src = FETCH16(cpustate);
+				dst = SBB16(cpustate, dst, src, cpustate->CF);
 				STORE_RM16(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ16(cpustate,ea);
-				src = FETCH16(cpustate) + cpustate->CF;
-				dst = SUB16(cpustate,dst, src);
+				src = FETCH16(cpustate);
+				dst = SBB16(cpustate, dst, src, cpustate->CF);
 				WRITE16(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2349,16 +2342,14 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
-				src = ADD16(cpustate,src, cpustate->CF);
-				dst = ADD16(cpustate,dst, src);
+				dst = ADC16(cpustate, dst, src, cpustate->CF);
 				STORE_RM16(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ16(cpustate,ea);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
-				src = ADD16(cpustate,src, cpustate->CF);
-				dst = ADD16(cpustate,dst, src);
+				dst = ADC16(cpustate, dst, src, cpustate->CF);
 				WRITE16(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
@@ -2366,15 +2357,15 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 		case 3:		// SBB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
-				src = ((UINT16)(INT16)(INT8)FETCH(cpustate)) + cpustate->CF;
-				dst = SUB16(cpustate,dst, src);
+				src = ((UINT16)(INT16)(INT8)FETCH(cpustate));
+				dst = SBB16(cpustate, dst, src, cpustate->CF);
 				STORE_RM16(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
 				ea = GetEA(cpustate,modrm);
 				dst = READ16(cpustate,ea);
-				src = ((UINT16)(INT16)(INT8)FETCH(cpustate)) + cpustate->CF;
-				dst = SUB16(cpustate,dst, src);
+				src = ((UINT16)(INT16)(INT8)FETCH(cpustate));
+				dst = SBB16(cpustate, dst, src, cpustate->CF);
 				WRITE16(cpustate,ea, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
