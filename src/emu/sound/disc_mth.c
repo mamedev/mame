@@ -1641,14 +1641,13 @@ static DISCRETE_STEP(dst_aswitch)
 
 /************************************************************************
  *
- * DST_TRANSFORM - Programmable math module with enable function
+ * DST_TRANSFORM - Programmable math module
  *
- * input[0]    - Enable input value
- * input[1]    - Channel0 input value
- * input[2]    - Channel1 input value
- * input[3]    - Channel2 input value
- * input[4]    - Channel3 input value
- * input[5]    - Channel4 input value
+ * input[0]    - Channel0 input value
+ * input[1]    - Channel1 input value
+ * input[2]    - Channel2 input value
+ * input[3]    - Channel3 input value
+ * input[4]    - Channel4 input value
  *
  ************************************************************************/
 #define DST_TRANSFORM__IN0		DISCRETE_INPUT(0)
@@ -1681,7 +1680,6 @@ static DISCRETE_STEP(dst_transform)
 	int		trans_stack_ptr = 0;
 
 	const char *fPTR = (const char *)node->custom;
-	node->output[0]  = 0;
 
 	top = HUGE_VAL;
 
@@ -1762,8 +1760,9 @@ static DISCRETE_STEP(dst_transform)
 				top = (int)number1 ^ (int)top;
 				break;
 			default:
-				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed");
-				node->output[0] = 0;
+				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed: %s",(const char *)node->custom);
+				/* these is enough to fatalerror */
+				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)node->custom);
 				break;
 		}
 	}
