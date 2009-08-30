@@ -286,6 +286,7 @@ const game_driver * const drivers[] =
 	DRIVER( suprheli )	/* bootleg */
 	DRIVER( stratgyx )	/* GX306 (c) 1981 Konami */
 	DRIVER( stratgys )	/* GX306 (c) 1981 Stern */
+	DRIVER( strongx )	/* bootleg */
 	DRIVER( armorcar )	/* (c) 1981 Stern */
 	DRIVER( armorcar2 )	/* (c) 1981 Stern */
 	DRIVER( moonwar )	/* (c) 1981 Stern */
@@ -4779,6 +4780,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kchamp )	/* (c) 1984 Data East USA (US) */
 	DRIVER( karatedo )	/* (c) 1984 Data East Corporation (Japan) */
 	DRIVER( kchampvs )	/* (c) 1984 Data East USA (US) */
+	DRIVER( kchampa )   /* (c) 1984 Data East USA (US) */
 	DRIVER( karatevs )	/* (c) 1984 Data East Corporation (Japan) */
 	DRIVER( compgolf )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( compgolfo )	/* (c) 1985 Data East Corporation (Japan) */
