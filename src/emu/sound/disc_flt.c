@@ -661,7 +661,7 @@ static DISCRETE_RESET(dst_rcdisc2)
 #define DST_RCDISC3__R1		DISCRETE_INPUT(2)
 #define DST_RCDISC3__R2		DISCRETE_INPUT(3)
 #define DST_RCDISC3__C		DISCRETE_INPUT(4)
-#define DST_RCDISC3__DJV	DISCRETE_INPUT(6)
+#define DST_RCDISC3__DJV	DISCRETE_INPUT(5)
 
 static DISCRETE_STEP(dst_rcdisc3)
 {
@@ -676,28 +676,32 @@ static DISCRETE_STEP(dst_rcdisc3)
 		diff = DST_RCDISC3__IN - node->output[0];
 		if (context->v_diode > 0)
 		{
-			if( diff > 0 )
+			if (diff > 0)
 			{
-				diff = diff - (diff * context->exponent0);
-			} else if( diff < 0)
+				diff = diff * context->exponent0;
+			} 
+			else if (diff < -context->v_diode)
 			{
-				if(diff < -context->v_diode)
-					diff = diff - (diff * context->exponent1);
-				else
-					diff = diff - (diff * context->exponent0);
+				diff = diff * context->exponent1;
+			}
+			else
+			{
+				diff = diff * context->exponent0;
 			}
 		}
 		else
 		{
-			if( diff < 0 )
+			if (diff < 0)
 			{
-				diff = diff - (diff * context->exponent0);
-			} else if( diff > 0)
+				diff = diff * context->exponent0;
+			} 
+			else if (diff > -context->v_diode)
 			{
-				if(diff > -context->v_diode)
-					diff = diff - (diff * context->exponent1);
-				else
-					diff = diff - (diff * context->exponent0);
+				diff = diff * context->exponent1;
+			}
+			else
+			{
+				diff = diff * context->exponent0;
 			}
 		}
 		node->output[0] += diff;
