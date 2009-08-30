@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE(&speedbal_background_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE(&speedbal_foreground_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf600, 0xfeff) AM_RAM
+	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
@@ -237,6 +237,8 @@ static MACHINE_DRIVER_START( speedbal )
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
+	
+	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
