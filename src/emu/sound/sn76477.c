@@ -1999,7 +1999,7 @@ static STREAM_UPDATE( SN76477_update )
 	{
 		recursing = 1;
 
-		sound_global_enable(1);
+		sound_global_enable(device->machine, 1);
 		SN76477_test_enable_w(sn, !sn->enable);
 	}
 

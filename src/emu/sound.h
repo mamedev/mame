@@ -156,10 +156,10 @@ DEVICE_GET_INFO( sound );
 
 
 /* global sound controls */
-void sound_mute(int mute);
-void sound_set_attenuation(int attenuation);
-int sound_get_attenuation(void);
-void sound_global_enable(int enable);
+void sound_mute(running_machine *machine, int mute);
+void sound_set_attenuation(running_machine *machine, int attenuation);
+int sound_get_attenuation(running_machine *machine);
+void sound_global_enable(running_machine *machine, int enable);
 
 /* user gain controls on speaker inputs for mixing */
 int sound_get_user_gain_count(running_machine *machine);

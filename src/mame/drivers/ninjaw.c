@@ -1006,7 +1006,7 @@ static MACHINE_START( ninjaw )
 static MACHINE_RESET( ninjaw )
 {
   /**** mixer control enable ****/
-  sound_global_enable( 1 );	/* mixer enabled */
+  sound_global_enable( machine, 1 );	/* mixer enabled */
 }
 
 

@@ -52,7 +52,7 @@ WRITE8_HANDLER( invadpt2_sh_port_1_w )
 
     c8080bw_screen_red_w(data & 0x04);
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(space->machine, data & 0x20);
 
 	port_1_last_extra = data;
 
@@ -145,7 +145,7 @@ WRITE8_HANDLER( lrescue_sh_port_1_w )
 	if (rising_bits & 0x08) sample_start(samples, 1, 0, 0);		/* Alien Hit */
 	if (rising_bits & 0x10) sample_start(samples, 2, 5, 0);		/* Bonus Ship (not confirmed) */
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(space->machine, data & 0x20);
 
 	c8080bw_screen_red_w(data & 0x04);
 
@@ -204,7 +204,7 @@ WRITE8_HANDLER( ballbomb_sh_port_1_w )
 	if (rising_bits & 0x08) sample_start(samples, 1, 7, 0);		/* Hit a Bomb */
 	if (rising_bits & 0x10) sample_start(samples, 3, 8, 0);		/* Bonus Base at 1500 points */
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(space->machine, data & 0x20);
 
 	c8080bw_screen_red_w(data & 0x04);
 
@@ -281,7 +281,7 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 	if (rising_bits & 0x04) sample_start(samples, 2, 3, 0);		/* Move */
 	if (rising_bits & 0x08) sample_start(samples, 3, 2, 0);		/* Hit */
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(space->machine, data & 0x20);
 
 	c8080bw_screen_red_w(data & 0x01);
 
@@ -881,7 +881,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 	discrete_sound_w(discrete, SCHASER_MUSIC_BIT, data & 0x01);
 
 	discrete_sound_w(discrete, SCHASER_SND_EN, data & 0x02);
-	sound_global_enable(data & 0x02);
+	sound_global_enable(space->machine, data & 0x02);
 
 	coin_lockout_global_w(data & 0x04);
 
@@ -1090,7 +1090,7 @@ WRITE8_HANDLER( schasrcv_sh_port_2_w )
 
 	speaker_level_w(speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
 
-	sound_global_enable(data & 0x10);
+	sound_global_enable(space->machine, data & 0x10);
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 }
@@ -1112,7 +1112,7 @@ WRITE8_HANDLER( yosakdon_sh_port_1_w )
 	if (rising_bits & 0x08) sample_start(samples, 1, 2, 0);			/* Man dead */
 	if (rising_bits & 0x10) sample_start(samples, 5, 8, 0);			/* Bonus Man? */
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(space->machine, data & 0x20);
 
 	port_1_last_extra = data;
 }

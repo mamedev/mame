@@ -38,7 +38,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 	UINT8 diff = data ^ jamma_if_control_latch;
 	jamma_if_control_latch = data;
 
-	sound_global_enable( (data >> 7) & 1 );
+	sound_global_enable( space->machine, (data >> 7) & 1 );
 
 	if ( diff & 0x40 )
 	{

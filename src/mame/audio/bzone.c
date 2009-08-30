@@ -64,7 +64,7 @@ WRITE8_HANDLER( bzone_sounds_w )
 	stream_update(channel);
     latch = data;
 
-    sound_global_enable(latch & 0x20);
+    sound_global_enable(space->machine, latch & 0x20);
 }
 
 static STREAM_UPDATE( bzone_sound_update )
@@ -567,7 +567,7 @@ WRITE8_DEVICE_HANDLER( bzone_sounds_w )
 	discrete_sound_w(device, BZ_INPUT, data);
 
 	output_set_value("startled", (data >> 6) & 1);
-    sound_global_enable(data & 0x20);
+    sound_global_enable(device->machine, data & 0x20);
 }
 
 

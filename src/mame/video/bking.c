@@ -186,7 +186,7 @@ WRITE8_HANDLER( bking_cont3_w )
 
 	palette_bank = (data >> 1) & 0x03;
 
-	sound_global_enable(~data & 0x08);
+	sound_global_enable(space->machine, ~data & 0x08);
 }
 
 

@@ -167,7 +167,7 @@ static WRITE8_HANDLER( port_sound_w )
 	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */
-	sound_global_enable((data & 0x02) ? TRUE : FALSE);
+	sound_global_enable(space->machine, (data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
 	crbaloon_audio_set_music_enable(discrete, 0, (data & 0x04) ? TRUE : FALSE);

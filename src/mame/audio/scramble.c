@@ -84,7 +84,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 	TTL7474_update(device->machine, 2);
 
 	/* bit 4 is sound disable */
-	sound_global_enable(~data & 0x10);
+	sound_global_enable(device->machine, ~data & 0x10);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )

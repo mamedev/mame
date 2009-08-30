@@ -267,7 +267,7 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 	if (bits_gone_hi & 0x04) sample_start(samples, 2, SND_BASEHIT, 0);
 	if (bits_gone_hi & 0x08) sample_start(samples, 3, SND_INVADERHIT, 0);
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(device->machine, data & 0x20);
 	screen_red = data & 0x04;
 }
 
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
 
-	sound_global_enable(data & 0x02);
+	sound_global_enable(space->machine, data & 0x02);
 
 	if (bits_gone_hi & 0x04) sample_start(samples, 3, SND_INVADERHIT, 0);
 

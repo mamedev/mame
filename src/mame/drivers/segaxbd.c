@@ -567,7 +567,7 @@ static WRITE16_HANDLER( iochip_0_w )
                 D7: Amplifier mute control (1= sounding, 0= muted)
                 D6-D0: CN D pin A17-A23 (output level 1= high, 0= low)
             */
-			sound_global_enable(data & 0x80);
+			sound_global_enable(space->machine, data & 0x80);
 			return;
 	}
 
@@ -653,7 +653,7 @@ static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 	coin_counter_w(0, (data >> 4) & 0x01);
 	output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
 	output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
-	sound_global_enable((data >> 7) & 0x01);
+	sound_global_enable(space->machine, (data >> 7) & 0x01);
 }
 
 

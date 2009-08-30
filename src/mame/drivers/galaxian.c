@@ -373,7 +373,7 @@ static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
 		cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
-	sound_global_enable(~data & 0x10);
+	sound_global_enable(device->machine, ~data & 0x10);
 }
 
 

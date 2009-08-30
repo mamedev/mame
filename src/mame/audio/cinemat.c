@@ -1482,7 +1482,7 @@ static WRITE8_DEVICE_HANDLER( sound_portb_w )
 
 	/* bit 2 controls the global mute */
 	if ((data & 4) != (last_portb_write & 4))
-		sound_global_enable(!(data & 4));
+		sound_global_enable(device->machine, !(data & 4));
 
 	/* remember the last value written */
 	last_portb_write = data;

@@ -274,7 +274,7 @@ WRITE8_HANDLER( astrob_sound_w )
 			if ((data & 0x10) && sample_playing(samples, 4)) sample_stop(samples, 4);
 
 			/* MUTE */
-			sound_global_enable(!(data & 0x20));
+			sound_global_enable(space->machine, !(data & 0x20));
 
 			/* REFILL: channel 5 */
 			if (!(data & 0x40) && !sample_playing(samples, 5)) sample_start(samples, 5, 9, FALSE);

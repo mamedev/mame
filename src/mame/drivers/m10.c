@@ -239,7 +239,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 		state->flip = ~data & 0x10;
 
 	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		sound_global_enable(~data & 0x80);
+		sound_global_enable(space->machine, ~data & 0x80);
 
 	/* sound command in lower 4 bytes */
 	switch (data & 0x07)
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( m11_ctrl_w )
 		state->flip = ~data & 0x10;
 
 	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		sound_global_enable(~data & 0x80);
+		sound_global_enable(space->machine, ~data & 0x80);
 }
 
 /*
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( m15_ctrl_w )
 	if (input_port_read(space->machine, "CAB") & 0x01)
 		state->flip = ~data & 0x04;
 	if (!(input_port_read(space->machine, "CAB") & 0x02))
-		sound_global_enable(~data & 0x08);
+		sound_global_enable(space->machine, ~data & 0x08);
 }
 
 

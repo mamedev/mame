@@ -1203,7 +1203,7 @@ static MACHINE_RESET( darius )
 	}
 	memory_set_bankptr(machine, 1, RAM);
 
-	sound_global_enable( 1 );	/* mixer enabled */
+	sound_global_enable( machine, 1 );	/* mixer enabled */
 
 	for( i = 0; i < DARIUS_VOL_MAX; i++ ){
 		darius_vol[i] = 0x00;	/* min volume */

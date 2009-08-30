@@ -669,7 +669,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		debugger_refresh_display(device->machine);
 
 		/* wait for the debugger; during this time, disable sound output */
-		sound_mute(TRUE);
+		sound_mute(device->machine, TRUE);
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* flush any pending updates before waiting again */
@@ -694,7 +694,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			if (mame_is_scheduled_event_pending(device->machine))
 				global->execution_state = EXECUTION_STATE_RUNNING;
 		}
-		sound_mute(FALSE);
+		sound_mute(device->machine, FALSE);
 
 		/* remember the last visible CPU in the debugger */
 		global->visiblecpu = device;

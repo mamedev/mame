@@ -464,7 +464,7 @@ static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevda
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	/* bit 0 = MUTE (inverted sense on System 2) */
-	sound_global_enable(~(data ^ mute_xor) & 1);
+	sound_global_enable(device->machine, ~(data ^ mute_xor) & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 

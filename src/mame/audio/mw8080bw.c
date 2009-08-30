@@ -1058,7 +1058,7 @@ WRITE8_DEVICE_HANDLER( checkmat_audio_w )
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	sound_global_enable((data >> 3) & 0x01);
+	sound_global_enable(device->machine, (data >> 3) & 0x01);
 
 	discrete_sound_w(device, CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
 	discrete_sound_w(device, CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
@@ -1653,7 +1653,7 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	sound_global_enable((data >> 3) & 0x01);
+	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
 	if (rising_bits & 0x10) sample_start(samples1, 0, 0, 0);
@@ -1749,7 +1749,7 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	sound_global_enable((data >> 3) & 0x01);
+	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
 	if (rising_bits & 0x10) sample_start(samples0, 0, 0, 0);
@@ -2052,7 +2052,7 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 
 	discrete_sound_w(device, CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
 
-	sound_global_enable((data >> 3) & 0x01);
+	sound_global_enable(device->machine, (data >> 3) & 0x01);
 
 	discrete_sound_w(device, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
@@ -2109,7 +2109,7 @@ WRITE8_HANDLER( shuffle_audio_1_w )
 
 	/* if (data & 0x02)  enable SHUFFLE ROLLOVER sound */
 
-	sound_global_enable((data >> 2) & 0x01);
+	sound_global_enable(space->machine, (data >> 2) & 0x01);
 
 	/* set SHUFFLE ROLLING sound((data >> 3) & 0x07)  0, if not rolling,
                                                       faster rolling = higher number */
@@ -2198,7 +2198,7 @@ WRITE8_HANDLER( dogpatch_audio_w )
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	sound_global_enable((data >> 3) & 0x01);
+	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT SHOOT sound */
 
@@ -2742,7 +2742,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w )
 {
-	sound_global_enable((data >> 0) & 0x01);
+	sound_global_enable(device->machine, (data >> 0) & 0x01);
 
 	/* D1 is marked as 'OPTIONAL SWITCH VIDEO FOR COCKTAIL',
        but it is never set by the software */
@@ -2830,7 +2830,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 	/* if (data & 0x02)  enable ENEMY SHOT sound */
 
-	sound_global_enable((data >> 2) & 0x01);
+	sound_global_enable(space->machine, (data >> 2) & 0x01);
 
 	coin_counter_w(0, (data >> 3) & 0x01);
 
@@ -2956,7 +2956,7 @@ WRITE8_DEVICE_HANDLER( bowler_audio_1_w )
 
 	coin_counter_w(0, (data >> 1) & 0x01);
 
-	sound_global_enable((data >> 2) & 0x01);
+	sound_global_enable(device->machine, (data >> 2) & 0x01);
 
 	discrete_sound_w(device, BOWLER_FOWL_EN, (data >> 3) & 0x01);
 
@@ -3693,7 +3693,7 @@ WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(device->machine, data & 0x20);
 
 	/* D6 and D7 are not connected */
 }
@@ -4075,7 +4075,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
-	sound_global_enable(data & 0x20);
+	sound_global_enable(device->machine, data & 0x20);
 
 	/* D6 and D7 are not connected */
 }

@@ -304,7 +304,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
-	sound_global_enable(data & 0x01);
+	sound_global_enable(device->machine, data & 0x01);
 }
 
 

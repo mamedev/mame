@@ -106,7 +106,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
 	/* D7 - sound enable bit */
-	sound_global_enable(data & 0x80);
+	sound_global_enable(space->machine, data & 0x80);
 
 	port_1_last = data;
 }
@@ -237,7 +237,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D6 - explosion */
 
 	/* D7 - sound enable bit */
-	sound_global_enable(data & 0x80);
+	sound_global_enable(space->machine, data & 0x80);
 }
 
 

@@ -413,7 +413,7 @@ WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w )
 	sample_set_volume(samples, 11, (data & 0x40) ? 0 : 1.0);
 
 	/* /GAME START */
-	sound_global_enable(!(data & 0x80));
+	sound_global_enable(device->machine, !(data & 0x80));
 }
 
 
@@ -568,7 +568,7 @@ WRITE8_DEVICE_HANDLER( buckrog_sound_b_w )
 	if ((diff & 0x40) && !(data & 0x40) &&  sample_playing(samples, 5)) sample_stop(samples, 5);
 
 	/* GAME ON */
-	sound_global_enable(data & 0x80);
+	sound_global_enable(device->machine, data & 0x80);
 }
 
 

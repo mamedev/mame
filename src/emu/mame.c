@@ -335,7 +335,7 @@ int mame_execute(core_options *options)
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings(machine);
 			nvram_load(machine);
-			sound_mute(FALSE);
+			sound_mute(machine, FALSE);
 
 			/* display the startup screens */
 			ui_display_startup_screens(machine, firstrun, !settingsloaded);
@@ -377,7 +377,7 @@ int mame_execute(core_options *options)
 			end_resource_tracking();
 
 			/* save the NVRAM and configuration */
-			sound_mute(TRUE);
+			sound_mute(machine, TRUE);
 			nvram_save(machine);
 			config_save_settings(machine);
 		}

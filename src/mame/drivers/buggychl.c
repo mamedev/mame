@@ -127,7 +127,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static WRITE8_HANDLER( sound_enable_w )
 {
-	sound_global_enable(data & 1);
+	sound_global_enable(space->machine, data & 1);
 }
 
 

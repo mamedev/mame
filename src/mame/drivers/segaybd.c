@@ -332,7 +332,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x0e/2:
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
-			sound_global_enable(data & 0x80);
+			sound_global_enable(space->machine, data & 0x80);
 			break;
 
 		/* CNT register */

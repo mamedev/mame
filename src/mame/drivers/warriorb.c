@@ -710,7 +710,7 @@ static MACHINE_RESET( taito_dualscreen )
 	banknum = -1;
 
 	/**** mixer control enable ****/
-	sound_global_enable( 1 );	/* mixer enabled */
+	sound_global_enable( machine, 1 );	/* mixer enabled */
 }
 
 

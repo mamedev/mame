@@ -1576,10 +1576,10 @@ static slider_state *slider_init(running_machine *machine)
 static INT32 slider_volume(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		sound_set_attenuation(newval);
+		sound_set_attenuation(machine, newval);
 	if (string != NULL)
-		astring_printf(string, "%3ddB", sound_get_attenuation());
-	return sound_get_attenuation();
+		astring_printf(string, "%3ddB", sound_get_attenuation(machine));
+	return sound_get_attenuation(machine);
 }
 
 

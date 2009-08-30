@@ -80,26 +80,24 @@ struct _speaker_info
 #endif
 };
 
+struct _sound_private
+{
+	emu_timer *update_timer;
 
+	int totalsnd;
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+	UINT32 finalmix_leftover;
+	INT16 *finalmix;
+	INT32 *leftmix;
+	INT32 *rightmix;
 
-static emu_timer *sound_update_timer;
+	int muted;
+	int attenuation;
+	int enabled;
+	int nosound_mode;
 
-static int totalsnd;
-
-static INT16 *finalmix;
-static UINT32 finalmix_leftover;
-static INT32 *leftmix, *rightmix;
-
-static int sound_muted;
-static int sound_attenuation;
-static int global_sound_enabled;
-static int nosound_mode;
-
-static wav_file *wavfile;
+	wav_file *wavfile;
+};
 
 
 
@@ -191,24 +189,27 @@ INLINE speaker_info *index_to_input(running_machine *machine, int index, int *in
 
 void sound_init(running_machine *machine)
 {
+	sound_private *global;
 	const char *filename;
 
+	machine->sound_data = global = auto_alloc_clear(machine, sound_private);
+
 	/* handle -nosound */
-	nosound_mode = !options_get_bool(mame_options(), OPTION_SOUND);
-	if (nosound_mode)
+	global->nosound_mode = !options_get_bool(mame_options(), OPTION_SOUND);
+	if (global->nosound_mode)
 		machine->sample_rate = 11025;
 
 	/* count the speakers */
 	VPRINTF(("total speakers = %d\n", speaker_output_count(machine->config)));
 
 	/* allocate memory for mix buffers */
-	leftmix = auto_alloc_array(machine, INT32, machine->sample_rate);
-	rightmix = auto_alloc_array(machine, INT32, machine->sample_rate);
-	finalmix = auto_alloc_array(machine, INT16, machine->sample_rate);
+	global->leftmix = auto_alloc_array(machine, INT32, machine->sample_rate);
+	global->rightmix = auto_alloc_array(machine, INT32, machine->sample_rate);
+	global->finalmix = auto_alloc_array(machine, INT16, machine->sample_rate);
 
 	/* allocate a global timer for sound timing */
-	sound_update_timer = timer_alloc(machine, sound_update, NULL);
-	timer_adjust_periodic(sound_update_timer, STREAMS_UPDATE_FREQUENCY, 0, STREAMS_UPDATE_FREQUENCY);
+	global->update_timer = timer_alloc(machine, sound_update, NULL);
+	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_FREQUENCY, 0, STREAMS_UPDATE_FREQUENCY);
 
 	/* finally, do all the routing */
 	VPRINTF(("route_sound\n"));
@@ -217,12 +218,12 @@ void sound_init(running_machine *machine)
 	/* open the output WAV file if specified */
 	filename = options_get_string(mame_options(), OPTION_WAVWRITE);
 	if (filename[0] != 0)
-		wavfile = wav_open(filename, machine->sample_rate, 2);
+		global->wavfile = wav_open(filename, machine->sample_rate, 2);
 
 	/* enable sound by default */
-	global_sound_enabled = TRUE;
-	sound_muted = FALSE;
-	sound_set_attenuation(options_get_int(mame_options(), OPTION_VOLUME));
+	global->enabled = TRUE;
+	global->muted = FALSE;
+	sound_set_attenuation(machine, options_get_int(mame_options(), OPTION_VOLUME));
 
 	/* register callbacks */
 	config_register(machine, "mixer", sound_load, sound_save);
@@ -238,12 +239,15 @@ void sound_init(running_machine *machine)
 
 static void sound_exit(running_machine *machine)
 {
+	sound_private *global = machine->sound_data;
+
 	/* close any open WAV file */
-	if (wavfile != NULL)
-		wav_close(wavfile);
+	if (global->wavfile != NULL)
+		wav_close(global->wavfile);
+	global->wavfile = NULL;
 
 	/* reset variables */
-	totalsnd = 0;
+	global->totalsnd = 0;
 }
 
 
@@ -541,25 +545,29 @@ static void sound_reset(running_machine *machine)
 
 static void sound_pause(running_machine *machine, int pause)
 {
+	sound_private *global = machine->sound_data;
+
 	if (pause)
-		sound_muted |= 0x02;
+		global->muted |= 0x02;
 	else
-		sound_muted &= ~0x02;
-	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
+		global->muted &= ~0x02;
+	osd_set_mastervolume(global->muted ? -32 : global->attenuation);
 }
 
 
 /*-------------------------------------------------
-    sound_pause - pause sound output
+    sound_mute - mute sound output
 -------------------------------------------------*/
 
-void sound_mute(int mute)
+void sound_mute(running_machine *machine, int mute)
 {
+	sound_private *global = machine->sound_data;
+
 	if (mute)
-		sound_muted |= 0x01;
+		global->muted |= 0x01;
 	else
-		sound_muted &= ~0x01;
-	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
+		global->muted &= ~0x01;
+	osd_set_mastervolume(global->muted ? -32 : global->attenuation);
 }
 
 
@@ -567,10 +575,11 @@ void sound_mute(int mute)
     sound_set_attenuation - set the global volume
 -------------------------------------------------*/
 
-void sound_set_attenuation(int attenuation)
+void sound_set_attenuation(running_machine *machine, int attenuation)
 {
-	sound_attenuation = attenuation;
-	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
+	sound_private *global = machine->sound_data;
+	global->attenuation = attenuation;
+	osd_set_mastervolume(global->muted ? -32 : global->attenuation);
 }
 
 
@@ -579,9 +588,10 @@ void sound_set_attenuation(int attenuation)
     volume
 -------------------------------------------------*/
 
-int sound_get_attenuation(void)
+int sound_get_attenuation(running_machine *machine)
 {
-	return sound_attenuation;
+	sound_private *global = machine->sound_data;
+	return global->attenuation;
 }
 
 
@@ -590,9 +600,10 @@ int sound_get_attenuation(void)
     globally
 -------------------------------------------------*/
 
-void sound_global_enable(int enable)
+void sound_global_enable(running_machine *machine, int enable)
 {
-	global_sound_enabled = enable;
+	sound_private *global = machine->sound_data;
+	global->enabled = enable;
 }
 
 
@@ -684,10 +695,17 @@ static TIMER_CALLBACK( sound_update )
 	const device_config *curspeak;
 	int samples_this_update = 0;
 	int sample;
+	sound_private *global = machine->sound_data;
+	INT16 *finalmix;
+	INT32 *leftmix, *rightmix;
 
 	VPRINTF(("sound_update\n"));
 
 	profiler_mark_start(PROFILER_SOUND);
+
+	leftmix = global->leftmix;
+	rightmix = global->rightmix;
+	finalmix = global->finalmix;
 
 	/* force all the speaker streams to generate the proper number of samples */
 	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
@@ -729,7 +747,7 @@ static TIMER_CALLBACK( sound_update )
 #endif
 
 			/* mix if sound is enabled */
-			if (global_sound_enabled && !nosound_mode)
+			if (global->enabled && !global->nosound_mode)
 			{
 				/* if the speaker is centered, send to both left and right */
 				if (spk->speaker->x == 0)
@@ -755,7 +773,7 @@ static TIMER_CALLBACK( sound_update )
 	/* now downmix the final result */
 	finalmix_step = video_get_speed_factor();
 	finalmix_offset = 0;
-	for (sample = finalmix_leftover; sample < samples_this_update * 100; sample += finalmix_step)
+	for (sample = global->finalmix_leftover; sample < samples_this_update * 100; sample += finalmix_step)
 	{
 		int sampindex = sample / 100;
 		INT32 samp;
@@ -776,15 +794,15 @@ static TIMER_CALLBACK( sound_update )
 			samp = 32767;
 		finalmix[finalmix_offset++] = samp;
 	}
-	finalmix_leftover = sample - samples_this_update * 100;
+	global->finalmix_leftover = sample - samples_this_update * 100;
 
 	/* play the result */
 	if (finalmix_offset > 0)
 	{
 		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
 		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
-		if (wavfile != NULL)
-			wav_add_data_16(wavfile, finalmix, finalmix_offset);
+		if (global->wavfile != NULL)
+			wav_add_data_16(global->wavfile, finalmix, finalmix_offset);
 	}
 
 	/* update the streamer */
