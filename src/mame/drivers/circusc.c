@@ -112,46 +112,25 @@ static WRITE8_HANDLER( circusc_coin_counter_w )
 	coin_counter_w(offset,data);
 }
 
-static WRITE8_HANDLER(circusc_sound_w)
+static WRITE8_HANDLER(circusc_sound_latch_w)
 {
-	const device_config *device;
-	//int c;
-
-	switch (offset & 7)
-	{
-		/* CS2 */
-		case 0:
-			sn_latch = data;
-			break;
-
-		/* CS3 */
-		case 1:
-			device = devtag_get_device(space->machine, "sn1");
-			sn76496_w(device, 0, sn_latch);
-			break;
-
-		/* CS4 */
-		case 2:
-			device = devtag_get_device(space->machine, "sn2");
-			sn76496_w(device, 0, sn_latch);
-			break;
-
-		/* CS5 */
-		case 3:
-			device = devtag_get_device(space->machine, "fltdisc");
-			discrete_sound_w(device, NODE_03, data);
-			break;
-
-		/* CS6 */
-		case 4:
-			device = devtag_get_device(space->machine, "fltdisc");
-			discrete_sound_w(device, NODE_05, (offset & 0x20) >> 5);
-			discrete_sound_w(device, NODE_06, (offset & 0x18) >> 3);
-			discrete_sound_w(device, NODE_07, (offset & 0x40) >> 6);
-			break;
-	}
+	sn_latch = data;
 }
 
+static WRITE8_DEVICE_HANDLER(circusc_sound_sn_w)
+{
+	sn76496_w(device, 0, sn_latch);
+}
+
+
+
+static WRITE8_DEVICE_HANDLER(circusc_sound_cs6_w)
+{
+	offset += 4; /* offset is relativ to A004 !! */
+	discrete_sound_w(device, NODE_05, (offset & 0x20) >> 5);
+	discrete_sound_w(device, NODE_06, (offset & 0x18) >> 3);
+	discrete_sound_w(device, NODE_07, (offset & 0x40) >> 6);
+}
 
 
 static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -182,9 +161,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)		/* CS0 */
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)	/* CS1 */
-	AM_RANGE(0xa000, 0xa07f) AM_MIRROR(0x1f80) AM_WRITE(circusc_sound_w)	/* CS2 - CS6 */
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)			/* CS0 */
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)		/* CS1 */
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_WRITE(circusc_sound_latch_w)	/* CS2 */
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_DEVWRITE("sn1", circusc_sound_sn_w)	/* CS3 */
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_DEVWRITE("sn2", circusc_sound_sn_w)	/* CS4 */
+	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)	/* CS5 */
+	AM_RANGE(0xa004, 0xa004) AM_MIRROR(0x1ff8) AM_DEVWRITE("fltdisc", circusc_sound_cs6_w)	/* CS6 */
 ADDRESS_MAP_END
 
 
@@ -324,7 +307,7 @@ static DISCRETE_SOUND_START( circusc )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
-	DISCRETE_INPUTX_DATA(NODE_03, 255, 0, 0) //DAC
+	DISCRETE_INPUTX_STREAM(NODE_03, 1, 2.0, 0) // DAC 0..32767, multiply by 2
 
 	DISCRETE_INPUT_DATA(NODE_05)
 	DISCRETE_INPUT_DATA(NODE_06)
@@ -377,6 +360,9 @@ static MACHINE_DRIVER_START( circusc )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 14318180/8)
 	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2)
 
 	MDRV_SOUND_ADD("fltdisc", DISCRETE, 0)
 
