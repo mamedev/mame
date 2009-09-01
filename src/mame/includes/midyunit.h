@@ -26,6 +26,7 @@ DRIVER_INIT( hiimpact );
 DRIVER_INIT( shimpact );
 DRIVER_INIT( strkforc );
 DRIVER_INIT( mkyunit );
+DRIVER_INIT( mkyturbo );
 DRIVER_INIT( mkyawdim );
 DRIVER_INIT( term2 );
 DRIVER_INIT( term2la2 );

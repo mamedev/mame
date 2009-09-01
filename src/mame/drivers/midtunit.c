@@ -711,7 +711,7 @@ ROM_START( mkr4 )
 ROM_END
 
 
-ROM_START( mkturbo )
+ROM_START( mktturbo )
 	ROM_REGION( 0x50000, "adpcm", 0 ) 	/* sound CPU */
 	ROM_LOAD( "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
@@ -721,7 +721,7 @@ ROM_START( mkturbo )
 	ROM_LOAD( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
 	ROM_RELOAD(              0xc0000, 0x40000 )
 
-	/* A 'KOMBO BOARD' daughtercard holding a GAL16V8A-2SP, 27C040 EPROM and a 9.8304MHz XTAL plugs into the UG12 socket */
+	/* A 'NIBBLE BOARD' daughtercard holding a GAL16V8A-2SP, 27C040 EPROM and a 9.8304MHz XTAL plugs into the UG12 socket */
 	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "kombo-rom-uj-12.bin", 0x00000, 0x80000, CRC(7a441f2d) SHA1(3b731bcbd73721ea0cc20157ec5181d25922523c) )
 	ROM_LOAD16_BYTE( "kombo-rom-ug-12.bin", 0x00001, 0x80000, CRC(45bed5a1) SHA1(dba2c21878925afdcaf61520c18ebefd5e9617db) )
@@ -1312,7 +1312,7 @@ ROM_END
 
 GAME( 1992, mk,       0,       tunit_adpcm, mk,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 5.0 T-Unit 03/19/93)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkr4,     mk,      tunit_adpcm, mk,       mktunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 T-Unit 02/11/93)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkturbo,  mk,      tunit_adpcm, mk,       mkturbo,  ROT0, "Midway",   "Mortal Kombat Turbo Ninja (rev 3.1 T-Unit 03/19/93, hack)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mktturbo,  mk,     tunit_adpcm, mk,       mkturbo,  ROT0, "hack",     "Mortal Kombat (Turbo Ninja T-Unit 03/19/93, hack)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, mk2,      0,       tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.1)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2r32,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.2 (European))", GAME_SUPPORTS_SAVE )

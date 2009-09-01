@@ -463,6 +463,27 @@ DRIVER_INIT( mkyawdim )
 }
 
 
+/*************************************
+ *
+ *  MK Turbo Ninja protection
+ *
+ *************************************/
+
+static READ16_HANDLER( mkturbo_prot_r )
+{
+	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
+     * A startup protection check expects to read back two different values in succession */
+	return mame_rand(space->machine);
+}
+
+DRIVER_INIT( mkyturbo )
+{
+	/* protection */
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfffff400, 0xfffff40f, 0, 0, mkturbo_prot_r);
+
+	DRIVER_INIT_CALL(mkyunit);
+}
+
 /********************** Terminator 2 **********************/
 
 static void term2_init_common(running_machine *machine, write16_space_func hack_w)
