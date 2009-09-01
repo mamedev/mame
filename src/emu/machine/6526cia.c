@@ -701,12 +701,23 @@ READ8_DEVICE_HANDLER( cia_r )
 		case CIA_TOD1:
 		case CIA_TOD2:
 		case CIA_TOD3:
-			if (offset == CIA_TOD2)
+			if (device->type == CIA8520)
 			{
-				cia->tod_latch = cia->tod;
-				cia->tod_latched = TRUE;
+				if (offset == CIA_TOD2)
+				{
+					cia->tod_latch = cia->tod;
+					cia->tod_latched = TRUE;
+				}
 			}
-			else if (offset == CIA_TOD0)
+			else
+			{
+				if (offset == CIA_TOD3)
+				{
+					cia->tod_latch = cia->tod;
+					cia->tod_latched = TRUE;
+				}
+			}
+			if (offset == CIA_TOD0)
 				cia->tod_latched = FALSE;
 
 			if (cia->tod_latched)
@@ -806,20 +817,28 @@ WRITE8_DEVICE_HANDLER( cia_w )
 		case CIA_TOD0:
 		case CIA_TOD1:
 		case CIA_TOD2:
+		case CIA_TOD3:
 			shift = 8 * ((offset - CIA_TOD0));
 
 			/* alarm setting mode? */
 			if (cia->timer[1].mode & 0x80)
 				cia->alarm = (cia->alarm & ~(0xff << shift)) | (data << shift);
-
 			/* counter setting mode */
 			else
-			{
 				cia->tod = (cia->tod & ~(0xff << shift)) | (data << shift);
 
-				/* only enable the TOD once the LSB is written */
-				cia->tod_running = (shift == 0);
+			if (device->type == CIA8520)
+			{
+				if (offset == CIA_TOD2)
+					cia->tod_running = FALSE;
 			}
+			else
+			{
+				if (offset == CIA_TOD3)
+					cia->tod_running = FALSE;
+			}
+			if (offset == CIA_TOD0)
+				cia->tod_running = TRUE;
 			break;
 
 		/* serial data ready */
@@ -917,3 +936,4 @@ DEVICE_GET_INFO(cia8520)
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
+
