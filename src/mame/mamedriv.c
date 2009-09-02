@@ -6715,6 +6715,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Williams/Midway TMS games */
 	DRIVER( narc )		/* (c) 1988 Williams */
 	DRIVER( narc3 )		/* (c) 1988 Williams */
+	DRIVER( narc2 )		/* (c) 1988 Williams */
 	DRIVER( trog )		/* (c) 1990 Midway */
 	DRIVER( trog4 )		/* (c) 1990 Midway */
 	DRIVER( trog3 )		/* (c) 1990 Midway */
