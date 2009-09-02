@@ -3349,10 +3349,9 @@ ROUTINES:
 
 ***************************************************************************/
 
-// sound banking for music still seems to be wrong see http://www.youtube.com/watch?v=lz4gY9d7uxw
-// (sound is missing on the VS. screen)
-// the 'green garbage' on the VS logo shown in the video doesn't happen on the real PCB, it appears to be an encoding artifact
-// on the videos uploaded by this poster
+
+// the 'green garbage' on the VS logo shown in the video ( http://www.youtube.com/watch?v=lz4gY9d7uxw ) doesn't happen on the real PCB,
+// it appears to be an encoding artifact on the videos uploaded by this poster
 
 ROM_START( shogwarr )
  	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
@@ -3871,8 +3870,6 @@ static void expand_brapboys_music(running_machine* machine)
 		memcpy(dst, src + 0x100000, 0x20000);
 		memcpy(dst + 0x20000, srcn, 0x20000);
 	}
-
-	DRIVER_INIT_CALL(calc3);
 }
 
 static DRIVER_INIT( shogwarr )
