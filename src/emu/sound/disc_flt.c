@@ -107,6 +107,8 @@ struct dst_rcfilter_sw_context
 	double  exp0; 	/* fast case bit 0 */
 	double  exp1; 	/* fast case bit 1 */
 	double  factor; /* fast case */
+	double  f1[16];
+	double  f2[16];
 };
 
 struct dst_rcintegrate_context
@@ -1063,19 +1065,24 @@ static DISCRETE_RESET(dst_rcfilter)
 #define DST_RCFILTER_SW__R			DISCRETE_INPUT(3)
 #define DST_RCFILTER_SW__C(x)		DISCRETE_INPUT(4+x)
 
-#define CD4066_ON_RES  270
-#define DST_RCFILTER_SW_ITERATIONS	(10)
+/* 74HC4066 : 15
+ * 74VHC4066 : 15
+ * UTC4066 : 270 @ 5VCC, 80 @ 15VCC
+ * CD4066BC : 270 (Fairchild)
+ * 
+ * The choice below makes scramble sound about "right". For future error reports,
+ * we need the exact type of switch and at which voltage (5, 12?) it is operated.
+ */
+#define CD4066_ON_RES (40)
 
 // FIXME: This needs optimization !
 static DISCRETE_STEP(dst_rcfilter_sw)
 {
 	struct dst_rcfilter_sw_context *context = (struct dst_rcfilter_sw_context *)node->context;
 
-	int i,j ;
+	int i;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
-	double us = 0, rs = 0;
-	double vd;
-	double rt;
+	double us = 0;
 
 	if (DST_RCFILTER_SW__ENABLE)
 	{
@@ -1092,50 +1099,17 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 			context->vCap[1] += (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->exp1;
 			node->output[0] = context->vCap[1] + (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->factor;
 			break;
-		case 3:
-			rs = 2 * DST_RCFILTER_SW__R;
-			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
-			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
-
-			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
-			{
-				node->output[0] = vd + rt  * (context->vCap[0] + context->vCap[1]);
-				context->vCap[0] += (node->output[0] - context->vCap[0]) * context->exp[0];
-				context->vCap[1] += (node->output[0] - context->vCap[1]) * context->exp[1];
-			}
-			break;
 		default:
-			rs = 0;
-
 			for (i = 0; i < 4; i++)
 			{
 				if (( bits & (1 << i)) != 0)
-				{
-					rs += DST_RCFILTER_SW__R;
-				}
+					us += context->vCap[i];
 			}
-
-			vd = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN;
-			rt = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
-
-			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
+			node->output[0] = context->f1[bits] * DST_RCFILTER_SW__VIN + context->f2[bits]  * us;
+			for (i = 0; i < 4; i++)
 			{
-				us = 0;
-				for (i = 0; i < 4; i++)
-				{
-					if (( bits & (1 << i)) != 0)
-					{
-						us += context->vCap[i];
-					}
-				}
-				node->output[0] = vd + rt  * us;
-				for (i = 0; i < 4; i++)
-				{
-					if (( bits & (1 << i)) != 0)
-					{
-						context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
-					}
-				}
+				if (( bits & (1 << i)) != 0)
+					context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
 			}
 		}
 	}
@@ -1149,17 +1123,33 @@ static DISCRETE_RESET(dst_rcfilter_sw)
 {
 	struct dst_rcfilter_sw_context *context = (struct dst_rcfilter_sw_context *)node->context;
 
-	int i;
+	int i, bits;
 
 	for (i = 0; i < 4; i++)
 	{
 		context->vCap[i] = 0;
-		context->exp[i] = RC_CHARGE_EXP(((double) DST_RCFILTER_SW_ITERATIONS) * CD4066_ON_RES * DST_RCFILTER_SW__C(i));
+		context->exp[i] = RC_CHARGE_EXP( CD4066_ON_RES * DST_RCFILTER_SW__C(i));
 	}
+
+	for (bits=0; bits < 15; bits++)
+	{
+		double rs = 0;
+		
+		for (i = 0; i < 4; i++)
+		{
+			if (( bits & (1 << i)) != 0)
+				rs += DST_RCFILTER_SW__R;
+		}
+		context->f1[bits] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES);
+		context->f2[bits] = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
+	}
+
+	
 	/* fast cases */
 	context->exp0 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
 	context->exp1 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
 	context->factor = RES_VOLTAGE_DIVIDER(DST_RCFILTER_SW__R, CD4066_ON_RES);
+	
 	node->output[0] = 0;
 }
 
