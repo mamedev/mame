@@ -106,19 +106,31 @@ struct _task_info
 INLINE void step_nodes_in_list(linked_list_entry **list)
 {
 	linked_list_entry *entry;
-	for (entry = *list; entry != NULL; entry = entry->next)
+
+	if (DISCRETE_PROFILING)
 	{
-		node_description *node = (node_description *) entry->ptr;
-
-		/* Now step the node */
-		if (DISCRETE_PROFILING)
-			node->run_time -= osd_profiling_ticks();
-
-		(*node->module->step)(node);
-		//bigselect(info->device, node);
-
-		if (DISCRETE_PROFILING)
-			node->run_time += osd_profiling_ticks();
+		osd_ticks_t last = osd_profiling_ticks();
+		
+		for (entry = *list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+	
+			node->run_time -= last;
+			(*node->module->step)(node);
+			last = osd_profiling_ticks();
+			node->run_time += last;
+		}
+	}
+	else
+	{
+		for (entry = *list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+	
+			/* Now step the node */
+			(*node->module->step)(node);
+			//bigselect(info->device, node);
+		}
 	}
 }
 
@@ -538,6 +550,20 @@ static DEVICE_START( discrete )
  *
  *************************************/
 
+static osd_ticks_t task_run_time(linked_list_entry *list)
+{
+	linked_list_entry *entry;
+	osd_ticks_t total = 0;
+	
+	for (entry = list; entry != NULL; entry = entry->next)
+	{
+		node_description *node = (node_description *) entry->ptr;
+
+		total += node->run_time;
+	}
+	return total;
+}
+
 static DEVICE_STOP( discrete )
 {
 	discrete_info *info = get_safe_token(device);
@@ -551,9 +577,10 @@ static DEVICE_STOP( discrete )
 		linked_list_entry *entry;
 		osd_ticks_t total = 0;
 		osd_ticks_t tresh;
+		double tt;
 
 		/* calculate total time */
-		for (entry = info->step_list; entry != NULL; entry = entry->next)
+		for (entry = info->node_list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
 
@@ -564,13 +591,26 @@ static DEVICE_STOP( discrete )
 		/* print statistics */
 		printf("Total Samples: %d\n", info->total_samples);
 		tresh = total / count;
-		for (entry = info->step_list; entry != NULL; entry = entry->next)
+		for (entry = info->node_list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
 
 			if (node->run_time > tresh)
-				printf("%3d: %20s %8.2f %10d\n", NODE_INDEX(node->node), node->module->name, (float) node->run_time / (float) total * 100.0, ((int) node->run_time) / info->total_samples);
+				printf("%3d: %20s %8.2f %10.2f\n", NODE_INDEX(node->node), node->module->name, (float) node->run_time / (float) total * 100.0, ((float) node->run_time) / (float) info->total_samples);
 		}
+
+		/* Task information */
+		for (entry = info->task_list; entry != 0; entry = entry->next)
+		{
+			discrete_task_context *task = (discrete_task_context *) entry->ptr;
+			tt =  task_run_time(task->list);
+
+			printf("Task: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
+		}
+		tt =  task_run_time(info->step_list);
+
+		printf("Main: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
+
 	}
 
 	/* close any csv files */
@@ -767,7 +807,7 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 		discrete_task_context *task = (discrete_task_context *) entry->ptr;
 		int i;
 		
-		for (i = 0; i < task->numbuffered; i++)
+		for (i = task->numbuffered - 1; i >= 0 ; i--)
 			**task->dest[i] = *task->ptr[i]++;
 	}
 
@@ -915,8 +955,11 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					task->numbuffered = node->active_inputs;
 					{
 						int i;
-						for (i = 0; i < task->numbuffered; i++)
+						for (i = 0; i < task->numbuffered; i++) 
+						{
+							task->node_buf[i] = auto_alloc_array(info->device->machine, double, 2048);
 							task->dest[i] = (double **) &node->input[i];
+						}
 					}
 					node->context = task;
 					task = NULL;

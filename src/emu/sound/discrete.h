@@ -3380,6 +3380,7 @@
 #define DISCRETE_MAX_WAVELOGS			10
 #define DISCRETE_MAX_CSVLOGS			10
 #define DISCRETE_MAX_OUTPUTS			 8
+#define DISCRETE_MAX_TASK_OUTPUTS		 5
 
 
 /*************************************
@@ -3670,9 +3671,10 @@ struct _discrete_task_context
 	linked_list_entry *list;
 
 	int numbuffered;
-	double *ptr[5];
-	double node_buf[5][2048];
-	double **dest[5];
+	double *ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	double *node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	double **dest[DISCRETE_MAX_TASK_OUTPUTS];
+		
 };
 
 struct _discrete_info
