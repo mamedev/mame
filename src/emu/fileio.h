@@ -99,6 +99,9 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 /* close an open file */
 void mame_fclose(mame_file *file);
 
+/* close an open file, and open the next entry in the original searchpath*/
+file_error mame_fclose_and_open_next(mame_file **file, const char *filename, UINT32 openflags);
+
 /* enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression */
 file_error mame_fcompress(mame_file *file, int compress);
 

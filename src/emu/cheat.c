@@ -93,6 +93,9 @@
     CONSTANTS
 ***************************************************************************/
 
+/* turn this on to enable removing duplicate cheats; not sure if we should */
+#define REMOVE_DUPLICATE_CHEATS	0
+
 #define CHEAT_VERSION			1
 
 #define DEFAULT_TEMP_VARIABLES	10
@@ -959,76 +962,99 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 
 static cheat_entry *cheat_list_load(running_machine *machine, const char *filename)
 {
-	xml_data_node *rootnode, *mamecheatnode, *cheatnode;
+	xml_data_node *rootnode = NULL;
 	cheat_entry *cheatlist = NULL;
-	cheat_entry **cheattailptr;
-	xml_parse_options options;
-	xml_parse_error error;
-	mame_file *cheatfile;
+	cheat_entry **cheattailptr = &cheatlist;
+	mame_file *cheatfile = NULL;
 	file_error filerr;
 	astring *fname;
-	int version;
 
 	/* open the file with the proper name */
 	fname = astring_assemble_2(astring_alloc(), filename, ".xml");
 	filerr = mame_fopen(SEARCHPATH_CHEAT, astring_c(fname), OPEN_FLAG_READ, &cheatfile);
-	astring_free(fname);
-
-	/* if that failed, return nothing */
-	if (filerr != FILERR_NONE)
-		return NULL;
-
-	/* read the XML file into internal data structures */
-	memset(&options, 0, sizeof(options));
-	options.error = &error;
-	rootnode = xml_file_read(mame_core_file(cheatfile), &options);
-	mame_fclose(cheatfile);
-
-	/* if unable to parse the file, just bail */
-	if (rootnode == NULL)
+	
+	/* loop over all instrances of the files found in our search paths */
+	while (filerr == FILERR_NONE)
 	{
-		mame_printf_error("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
-		return NULL;
-	}
+		xml_data_node *mamecheatnode, *cheatnode;
+		xml_parse_options options;
+		xml_parse_error error;
+		cheat_entry *scannode;
+		int version;
 
-	/* find the layout node */
-	mamecheatnode = xml_get_sibling(rootnode->child, "mamecheat");
-	if (mamecheatnode == NULL)
-	{
-		mame_printf_error("%s.xml: missing mamecheatnode node", filename);
-		goto error;
-	}
+		mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile));
+		
+		/* read the XML file into internal data structures */
+		memset(&options, 0, sizeof(options));
+		options.error = &error;
+		rootnode = xml_file_read(mame_core_file(cheatfile), &options);
 
-	/* validate the config data version */
-	version = xml_get_attribute_int(mamecheatnode, "version", 0);
-	if (version != CHEAT_VERSION)
-	{
-		mame_printf_error("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
-		goto error;
-	}
-
-	/* parse all the elements */
-	cheatlist = NULL;
-	cheattailptr = &cheatlist;
-	for (cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
-	{
-		/* load this entry */
-		cheat_entry *curcheat = cheat_entry_load(machine, filename, cheatnode);
-		if (curcheat == NULL)
+		/* if unable to parse the file, just bail */
+		if (rootnode == NULL)
+		{
+			mame_printf_error("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
 			goto error;
+		}
 
-		/* add to the end of the list */
-		*cheattailptr = curcheat;
-		cheattailptr = &curcheat->next;
+		/* find the layout node */
+		mamecheatnode = xml_get_sibling(rootnode->child, "mamecheat");
+		if (mamecheatnode == NULL)
+		{
+			mame_printf_error("%s.xml: missing mamecheatnode node", filename);
+			goto error;
+		}
+
+		/* validate the config data version */
+		version = xml_get_attribute_int(mamecheatnode, "version", 0);
+		if (version != CHEAT_VERSION)
+		{
+			mame_printf_error("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
+			goto error;
+		}
+
+		/* parse all the elements */
+		for (cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
+		{
+			/* load this entry */
+			cheat_entry *curcheat = cheat_entry_load(machine, filename, cheatnode);
+			if (curcheat == NULL)
+				goto error;
+			
+			/* make sure we're not a duplicate */
+			scannode = NULL;
+			if (REMOVE_DUPLICATE_CHEATS)
+				for (scannode = cheatlist; scannode != NULL; scannode = scannode->next)
+					if (astring_cmp(scannode->description, curcheat->description) == 0)
+					{
+						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", astring_c(curcheat->description), mame_file_full_name(cheatfile));
+						break;
+					}
+
+			/* add to the end of the list */
+			if (scannode == NULL)
+			{
+				*cheattailptr = curcheat;
+				cheattailptr = &curcheat->next;
+			}
+		}
+
+		/* free the file and loop for the next one */
+		xml_file_free(rootnode);
+		
+		/* open the next file in sequence */
+		filerr = mame_fclose_and_open_next(&cheatfile, astring_c(fname), OPEN_FLAG_READ);
 	}
 
-	/* free the file and exit */
-	xml_file_free(rootnode);
+	/* release memory and return the cheat list */
+	astring_free(fname);
 	return cheatlist;
 
 error:
 	cheat_list_free(cheatlist);
 	xml_file_free(rootnode);
+	if (cheatfile != NULL)
+		mame_fclose(cheatfile);
+	astring_free(fname);
 	return NULL;
 }
 

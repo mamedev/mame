@@ -38,6 +38,15 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _path_iterator path_iterator;
+struct _path_iterator
+{
+	const char *	base;
+	const char *	cur;
+	int				index;
+};
+
+
 /* typedef struct _mame_file mame_file -- declared in fileio.h */
 struct _mame_file
 {
@@ -46,20 +55,12 @@ struct _mame_file
 #endif
 	astring *		filename;						/* full filename */
 	core_file *		file;							/* core file pointer */
+	path_iterator 	iterator;						/* iterator for paths */
 	UINT32			openflags;						/* flags we used for the open */
 	char			hash[HASH_BUF_SIZE];			/* hash data for the file */
 	zip_file *		zipfile;						/* ZIP file pointer */
 	UINT8 *			zipdata;						/* ZIP file data */
 	UINT64			ziplength;						/* ZIP file length */
-};
-
-
-typedef struct _path_iterator path_iterator;
-struct _path_iterator
-{
-	const char *	base;
-	const char *	cur;
-	int				index;
 };
 
 
@@ -82,7 +83,7 @@ struct _mame_path
 static void fileio_exit(running_machine *machine);
 
 /* file open/close */
-static file_error fopen_internal(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
+static file_error fopen_internal(core_options *opts, path_iterator *iterator, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
 static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file);
 
 /* path iteration */
@@ -134,7 +135,9 @@ static void fileio_exit(running_machine *machine)
 
 file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
 {
-	return fopen_internal(mame_options(), searchpath, filename, 0, openflags, file);
+	path_iterator iterator;
+	path_iterator_init(&iterator, mame_options(), searchpath);
+	return fopen_internal(mame_options(), &iterator, filename, 0, openflags, file);
 }
 
 
@@ -145,6 +148,8 @@ file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openf
 
 file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
 {
+	path_iterator iterator;
+	path_iterator_init(&iterator, mame_options(), searchpath);
 	return mame_fopen_crc_options(mame_options(), searchpath, filename, crc, openflags, file);
 }
 
@@ -156,7 +161,9 @@ file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 c
 
 file_error mame_fopen_options(core_options *opts, const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
 {
-	return fopen_internal(opts, searchpath, filename, 0, openflags, file);
+	path_iterator iterator;
+	path_iterator_init(&iterator, opts, searchpath);
+	return fopen_internal(opts, &iterator, filename, 0, openflags, file);
 }
 
 
@@ -167,7 +174,9 @@ file_error mame_fopen_options(core_options *opts, const char *searchpath, const 
 
 file_error mame_fopen_crc_options(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
 {
-	return fopen_internal(opts, searchpath, filename, crc, openflags | OPEN_FLAG_HAS_CRC, file);
+	path_iterator iterator;
+	path_iterator_init(&iterator, opts, searchpath);
+	return fopen_internal(opts, &iterator, filename, crc, openflags | OPEN_FLAG_HAS_CRC, file);
 }
 
 
@@ -212,10 +221,9 @@ error:
     fopen_internal - open a file
 -------------------------------------------------*/
 
-static file_error fopen_internal(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
+static file_error fopen_internal(core_options *opts, path_iterator *iterator, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
 {
 	file_error filerr = FILERR_NOT_FOUND;
-	path_iterator iterator;
 
 	/* can either have a hash or open for write, but not both */
 	if ((openflags & OPEN_FLAG_HAS_CRC) && (openflags & OPEN_FLAG_WRITE))
@@ -233,16 +241,9 @@ static file_error fopen_internal(core_options *opts, const char *searchpath, con
 	(*file)->debug_cookie = DEBUG_COOKIE;
 #endif
 
-	/* if the path is absolute, null out the search path */
-	if (searchpath != NULL && osd_is_absolute_path(searchpath))
-		searchpath = NULL;
-
-	/* determine the maximum length of a composed filename, plus some extra space for .zip extensions */
-	path_iterator_init(&iterator, opts, searchpath);
-
 	/* loop over paths */
 	(*file)->filename = astring_alloc();
-	while (path_iterator_get_next(&iterator, (*file)->filename))
+	while (path_iterator_get_next(iterator, (*file)->filename))
 	{
 		/* compute the full pathname */
 		if (astring_len((*file)->filename) > 0)
@@ -262,9 +263,13 @@ static file_error fopen_internal(core_options *opts, const char *searchpath, con
 				break;
 		}
 	}
+	
+	/* if we succeeded, save the iterator */
+	if (filerr == FILERR_NONE)
+		(*file)->iterator = *iterator;
 
 	/* handle errors and return */
-	if (filerr != FILERR_NONE)
+	else
 	{
 		mame_fclose(*file);
 		*file = NULL;
@@ -385,6 +390,21 @@ void mame_fclose(mame_file *file)
 	if (file->filename != NULL)
 		astring_free(file->filename);
 	free(file);
+}
+
+
+/*-------------------------------------------------
+    mame_fclose_and_open_next - close an open 
+    file, and open the next entry in the original 
+    searchpath
+-------------------------------------------------*/
+
+file_error mame_fclose_and_open_next(mame_file **file, const char *filename, UINT32 openflags)
+{
+	path_iterator iterator = (*file)->iterator;
+	mame_fclose(*file);
+	*file = NULL;
+	return fopen_internal(mame_options(), &iterator, filename, 0, openflags, file);
 }
 
 
@@ -803,7 +823,7 @@ static void path_iterator_init(path_iterator *iterator, core_options *opts, cons
 {
 	/* reset the structure */
 	memset(iterator, 0, sizeof(*iterator));
-	iterator->base = (searchpath != NULL) ? options_get_string(opts, searchpath) : "";
+	iterator->base = (searchpath != NULL && !osd_is_absolute_path(searchpath)) ? options_get_string(opts, searchpath) : "";
 	iterator->cur = iterator->base;
 }
 
