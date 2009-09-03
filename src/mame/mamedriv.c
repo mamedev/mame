@@ -8983,6 +8983,7 @@ Other Sun games
 	DRIVER( bsuerteu )	/* 1991, Unknown */
 
 	/* Cal Omega */
+	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg080 )	/* (c) 1981 Cal Omega Inc. */
