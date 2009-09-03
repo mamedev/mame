@@ -157,7 +157,7 @@ WRITE8_HANDLER( espial_flipscreen_w )
 {
 	flipscreen = data;
 
-	tilemap_set_flip(0, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(bg_tilemap, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
 
