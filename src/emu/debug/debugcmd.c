@@ -41,6 +41,26 @@ struct _global_entry
 	UINT32		size;
 };
 
+typedef struct _cheat_map cheat_map;
+struct _cheat_map
+{
+	UINT64		offset;
+	UINT64		first_value;
+	UINT64		previous_value;
+	UINT8		state:1;
+	UINT8		undo:7;
+};
+
+typedef struct _cheat_system cheat_system;
+struct _cheat_system
+{
+	char			cpu;
+	UINT64			length;
+	UINT8			width;
+	cheat_map *		cheatmap;
+	UINT8			undo;
+	UINT8			signed_cheat;
+};
 
 
 /***************************************************************************
@@ -48,6 +68,7 @@ struct _global_entry
 ***************************************************************************/
 
 static global_entry global_array[MAX_GLOBALS];
+static cheat_system cheat;
 
 
 
@@ -96,6 +117,10 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 static void execute_hotspot(running_machine *machine, int ref, int params, const char **param);
 static void execute_save(running_machine *machine, int ref, int params, const char **param);
 static void execute_dump(running_machine *machine, int ref, int params, const char **param);
+static void execute_cheatinit(running_machine *machine, int ref, int params, const char **param);
+static void execute_cheatnext(running_machine *machine, int ref, int params, const char **param);
+static void execute_cheatlist(running_machine *machine, int ref, int params, const char **param);
+static void execute_cheatundo(running_machine *machine, int ref, int params, const char **param);
 static void execute_dasm(running_machine *machine, int ref, int params, const char **param);
 static void execute_find(running_machine *machine, int ref, int params, const char **param);
 static void execute_trace(running_machine *machine, int ref, int params, const char **param);
@@ -109,6 +134,54 @@ static void execute_memdump(running_machine *machine, int ref, int params, const
 static void execute_symlist(running_machine *machine, int ref, int params, const char **param);
 static void execute_softreset(running_machine *machine, int ref, int params, const char **param);
 static void execute_hardreset(running_machine *machine, int ref, int params, const char **param);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cheat_address_is_valid - return TRUE if the
+    given address is valid for cheating
+-------------------------------------------------*/
+
+INLINE int cheat_address_is_valid(const address_space *space, offs_t address)
+{
+	return debug_cpu_translate(space, TRANSLATE_READ, &address) && (memory_get_write_ptr(space, address) != NULL);
+}
+
+
+/*-------------------------------------------------
+    cheat_sign_extend - sign-extend a value to
+    the current cheat width, if signed
+-------------------------------------------------*/
+
+INLINE UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
+{
+	if (cheatsys->signed_cheat)
+	{
+		switch (cheatsys->width)
+		{
+			case 1:	value = (INT8)value;	break;
+			case 2:	value = (INT16)value;	break;
+			case 4:	value = (INT32)value;	break;
+		}
+	}
+	return value;
+}
+
+
+/*-------------------------------------------------
+    cheat_read_extended - read a value from memory
+    in the given address space, sign-extending
+    if necessary
+-------------------------------------------------*/
+
+INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, const address_space *space, offs_t address)
+{
+	return cheat_sign_extend(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE));
+}
 
 
 
@@ -215,6 +288,23 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
 	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
 
+	debug_console_register_command(machine, "cheatinit", CMDFLAG_NONE, 0, 0, 4, execute_cheatinit);
+	debug_console_register_command(machine, "ci",        CMDFLAG_NONE, 0, 0, 4, execute_cheatinit);
+
+	debug_console_register_command(machine, "cheatrange",CMDFLAG_NONE, 1, 2, 2, execute_cheatinit);
+	debug_console_register_command(machine, "cr",        CMDFLAG_NONE, 1, 2, 2, execute_cheatinit);
+
+	debug_console_register_command(machine, "cheatnext", CMDFLAG_NONE, 0, 1, 2, execute_cheatnext);
+	debug_console_register_command(machine, "cn",        CMDFLAG_NONE, 0, 1, 2, execute_cheatnext);
+	debug_console_register_command(machine, "cheatnextf",CMDFLAG_NONE, 1, 1, 2, execute_cheatnext);
+	debug_console_register_command(machine, "cnf",       CMDFLAG_NONE, 1, 1, 2, execute_cheatnext);
+
+	debug_console_register_command(machine, "cheatlist", CMDFLAG_NONE, 0, 0, 1, execute_cheatlist);
+	debug_console_register_command(machine, "cl",        CMDFLAG_NONE, 0, 0, 1, execute_cheatlist);
+
+	debug_console_register_command(machine, "cheatundo", CMDFLAG_NONE, 0, 0, 0, execute_cheatundo);
+	debug_console_register_command(machine, "cu",        CMDFLAG_NONE, 0, 0, 0, execute_cheatundo);
+
 	debug_console_register_command(machine, "f",         CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
 	debug_console_register_command(machine, "find",      CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
 	debug_console_register_command(machine, "fd",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
@@ -273,6 +363,9 @@ static void debug_command_exit(running_machine *machine)
 	/* turn off all traces */
 	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 		debug_cpu_trace(cpu, NULL, 0, NULL);
+
+	if (cheat.length)
+		free(cheat.cheatmap);
 }
 
 
@@ -1652,6 +1745,403 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 	/* close the file */
 	fclose(f);
 	debug_console_printf(machine, "Data dumped successfully\n");
+}
+
+
+/*-------------------------------------------------
+   execute_cheatinit - initialize the cheat system
+-------------------------------------------------*/
+
+static void execute_cheatinit(running_machine *machine, int ref, int params, const char *param[])
+{
+	UINT64 offset, endoffset, length = 0, real_length = 0;
+	const address_space *space;
+	UINT32 active_cheat = 0;
+	UINT64 curaddr;
+
+	/* validate parameters */
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ADDRESS_SPACE_PROGRAM, &space))
+		return;
+
+	if (ref == 0)
+	{
+		if (params > 0)
+		{
+			if (!strcmp(param[0], "sb"))
+			{
+				cheat.width = 1;
+				cheat.signed_cheat = TRUE;
+			}
+			else if (!strcmp(param[0], "sw"))
+			{
+				cheat.width = 2;
+				cheat.signed_cheat = TRUE;
+			}
+			else if (!strcmp(param[0], "sd"))
+			{
+				cheat.width = 4;
+				cheat.signed_cheat = TRUE;
+			}
+			else if (!strcmp(param[0], "sq"))
+			{
+				cheat.width = 8;
+				cheat.signed_cheat = TRUE;
+			}
+			else if (!strcmp(param[0], "ub"))
+			{
+				cheat.width = 1;
+				cheat.signed_cheat = FALSE;
+			}
+			else if (!strcmp(param[0], "uw"))
+			{
+				cheat.width = 2;
+				cheat.signed_cheat = FALSE;
+			}
+			else if (!strcmp(param[0], "ud"))
+			{
+				cheat.width = 4;
+				cheat.signed_cheat = FALSE;
+			}
+			else if (!strcmp(param[0], "uq"))
+			{
+				cheat.width = 8;
+				cheat.signed_cheat = FALSE;
+			}
+			else
+			{
+				debug_console_printf(machine, "Invalid type: expected ub, uw, ud, uq, sb, sw, sd or sq\n");
+				return;
+			}
+		}
+		else
+		{
+			cheat.width = 1;
+			cheat.signed_cheat = FALSE;
+		}
+	}
+
+	if (params > 1)
+	{
+		if (!debug_command_parameter_number(machine, param[(ref == 0) ? 1 : 0], &offset))
+			return;
+		if (!debug_command_parameter_number(machine, param[(ref == 0) ? 2 : 1], &length))
+			return;				
+	}
+	else
+	{
+		/* initialize entire memory  */
+		offset = 0;
+		length = space->bytemask + 1;
+	}
+
+	endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;
+	offset = memory_address_to_byte(space, offset) & space->bytemask;
+
+	/* counts the writable bytes in the area */
+	for (curaddr = offset; curaddr <= endoffset; curaddr += cheat.width)
+		if (cheat_address_is_valid(space, curaddr))
+			real_length++;
+
+	if (real_length == 0)
+	{
+		debug_console_printf(machine, "No writable bytes found in this area\n");
+		return;
+	}
+		
+	if (ref == 0)
+	{
+		/* initialize new cheat system */
+		if (cheat.cheatmap != NULL)
+			free(cheat.cheatmap);
+		cheat.cheatmap = malloc(real_length * sizeof(cheat_map));
+		if (cheat.cheatmap == NULL)
+		{
+			debug_console_printf(machine, "Unable of allocate the necessary memory\n");
+			return;
+		}
+
+		cheat.length = real_length;
+		cheat.undo = 0;
+		cheat.cpu = (params > 3) ? *param[3] : '0';
+	}
+	else
+	{
+		/* add range to cheat system */
+		cheat_map * cheatmap_bak = cheat.cheatmap;
+
+		if (cheat.cpu == 0)
+		{
+			debug_console_printf(machine, "Use cheatinit before cheatrange\n");
+			return;
+		}
+
+		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+			return;
+
+		cheat.cheatmap = realloc(cheat.cheatmap, (cheat.length + real_length) * sizeof(cheat_map));
+		if (cheat.cheatmap == NULL)
+		{
+			cheat.cheatmap = cheatmap_bak;
+			debug_console_printf(machine, "Unable of allocate the necessary memory\n");
+			return;
+		}
+
+		active_cheat = cheat.length;
+		cheat.length += real_length;
+	}
+
+	/* initialize cheatmap in the selected space */
+	for (curaddr = offset; curaddr <= endoffset; curaddr += cheat.width)
+		if (cheat_address_is_valid(space, curaddr))
+		{
+			cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&cheat, space, curaddr);
+			cheat.cheatmap[active_cheat].first_value = cheat.cheatmap[active_cheat].previous_value;
+			cheat.cheatmap[active_cheat].offset = curaddr;
+			cheat.cheatmap[active_cheat].state = 1;
+			cheat.cheatmap[active_cheat].undo = 0;
+			active_cheat++;
+		}
+
+	debug_console_printf(machine, "%u cheat initialized\n", active_cheat);
+}
+
+
+/*-------------------------------------------------
+    execute_cheatnext - execute the search
+-------------------------------------------------*/
+
+static void execute_cheatnext(running_machine *machine, int ref, int params, const char *param[])
+{
+	const address_space *space;
+	UINT64 cheatindex;
+	UINT32 active_cheat = 0;
+	UINT8 condition;
+	UINT64 comp_value;
+	
+	enum 
+	{
+		CHEAT_ALL = 0,
+		CHEAT_EQUAL,
+		CHEAT_NOTEQUAL,
+		CHEAT_EQUALTO,
+		CHEAT_NOTEQUALTO,
+		CHEAT_DECREASE,
+		CHEAT_INCREASE,
+		CHEAT_DECREASEOF,
+		CHEAT_INCREASEOF,
+		CHEAT_SMALLEROF,
+		CHEAT_GREATEROF
+	};
+
+	if (cheat.cpu == 0)
+	{
+		debug_console_printf(machine, "Use cheatinit before cheatnext\n");
+		return;
+	}
+
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+		return;
+
+	if (params > 1 && !debug_command_parameter_number(machine, param[1], &comp_value))
+		return;
+	comp_value = cheat_sign_extend(&cheat, comp_value);
+
+	/* decode contidion */
+	if (!strcmp(param[0], "all"))
+		condition = CHEAT_ALL;
+	else if (!strcmp(param[0], "equal") || !strcmp(param[0], "eq"))
+		condition = (params > 1) ? CHEAT_EQUALTO : CHEAT_EQUAL;
+	else if (!strcmp(param[0], "notequal") || !strcmp(param[0], "ne"))
+		condition = (params > 1) ? CHEAT_NOTEQUALTO : CHEAT_NOTEQUAL;
+	else if (!strcmp(param[0], "decrease") || !strcmp(param[0], "de") || !strcmp(param[0], "-"))
+		condition = (params > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
+	else if (!strcmp(param[0], "increase") || !strcmp(param[0], "in") || !strcmp(param[0], "+"))
+		condition = (params > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
+	else if (!strcmp(param[0], "smallerof") || !strcmp(param[0], "lt") || !strcmp(param[0], "<"))
+		condition = CHEAT_SMALLEROF;
+	else if (!strcmp(param[0], "greaterof") || !strcmp(param[0], "gt") || !strcmp(param[0], ">"))
+		condition = CHEAT_GREATEROF;	
+	else
+	{
+		debug_console_printf(machine, "Invalid condition type\n");
+		return;
+	}
+
+	cheat.undo++;
+
+	/* execute the search */
+	for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+		if (cheat.cheatmap[cheatindex].state == 1)
+		{
+			UINT64 cheat_value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset);
+			UINT64 comp_byte = (ref == 0) ? cheat.cheatmap[cheatindex].previous_value : cheat.cheatmap[cheatindex].first_value;
+			UINT8 disable_byte = FALSE;
+			
+			switch (condition)
+			{
+				case CHEAT_ALL:
+					break;
+
+				case CHEAT_EQUAL:
+					disable_byte = (cheat_value != comp_byte);
+					break;
+
+				case CHEAT_NOTEQUAL:
+					disable_byte = (cheat_value == comp_byte);
+					break;
+
+				case CHEAT_EQUALTO:
+					disable_byte = (cheat_value != comp_value);
+					break;
+
+				case CHEAT_NOTEQUALTO:
+					disable_byte = (cheat_value == comp_value);
+					break;
+
+				case CHEAT_DECREASE:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value >= (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value >= (UINT64)comp_byte);
+					break;
+
+				case CHEAT_INCREASE:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value <= (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_byte);
+					break;
+
+				case CHEAT_DECREASEOF:
+					disable_byte = (cheat_value != comp_byte - comp_value);
+					break;
+
+				case CHEAT_INCREASEOF:
+					disable_byte = (cheat_value != comp_byte + comp_value);
+					break;
+
+				case CHEAT_SMALLEROF:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value >= (INT64)comp_value);
+					else
+						disable_byte = ((UINT64)cheat_value >= (UINT64)comp_value);
+					break;
+
+				case CHEAT_GREATEROF:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value <= (INT64)comp_value);
+					else
+						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_value);
+					break;
+			}
+
+			if (disable_byte)
+			{
+				cheat.cheatmap[cheatindex].state = 0;
+				cheat.cheatmap[cheatindex].undo = cheat.undo;
+			}
+			else
+				active_cheat++;
+
+			/* update previous value */
+			cheat.cheatmap[cheatindex].previous_value = cheat_value;
+		}
+
+	if (active_cheat <= 5)
+		execute_cheatlist(machine, 0, 0, NULL);
+
+	debug_console_printf(machine, "%u cheats found\n", active_cheat);
+}
+
+
+/*-------------------------------------------------
+    execute_cheatlist - show a list of active cheat
+-------------------------------------------------*/
+
+static void execute_cheatlist(running_machine *machine, int ref, int params, const char *param[])
+{
+	char spaceletter, sizeletter;
+	const address_space *space;
+	UINT32 active_cheat = 0;
+	UINT64 cheatindex;
+	UINT64 sizemask;
+	FILE *f = NULL;
+
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+		return;
+		
+	if (params > 0)
+		f = fopen(param[0], "w");
+	
+	switch (space->spacenum)
+	{
+		default:
+		case ADDRESS_SPACE_PROGRAM:	spaceletter = 'p';	break;
+		case ADDRESS_SPACE_DATA:	spaceletter = 'd';	break;
+		case ADDRESS_SPACE_IO:		spaceletter = 'i';	break;
+	}
+	
+	switch (cheat.width)
+	{
+		default:
+		case 1:						sizeletter = 'b';	sizemask = 0xff;					break;
+		case 2:						sizeletter = 'w';	sizemask = 0xffff;					break;
+		case 4:						sizeletter = 'd';	sizemask = 0xffffffff;				break;
+		case 8:						sizeletter = 'q';	sizemask = U64(0xffffffffffffffff);	break;
+	}
+
+	/* write the cheat list */
+	for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+	{
+		if (cheat.cheatmap[cheatindex].state == 1)
+		{
+			UINT64 value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset) & sizemask;
+			offs_t address = memory_byte_to_address(space, cheat.cheatmap[cheatindex].offset);
+			
+			if (params > 0)
+			{
+				active_cheat++;
+				fprintf(f, "  <cheat desc=\"Possibility %d : %0*X (%0*" I64FMT "X)\">\n", active_cheat, space->logaddrchars, address, cheat.width * 2, value);
+				fprintf(f, "    <script state=\"run\">\n");  
+				fprintf(f, "      <action>maincpu.%c%c@%0*X=%0*" I64FMT "X</action>\n", spaceletter, sizeletter, space->logaddrchars, address, cheat.width * 2, cheat.cheatmap[cheatindex].first_value & sizemask);
+				fprintf(f, "    </script>\n"); 
+				fprintf(f, "  </cheat>\n\n");
+			}
+			else
+				debug_console_printf(machine, "Address=%0*X Start=%0*" I64FMT "X Current=%0*" I64FMT "X\n", space->logaddrchars, address, cheat.width * 2, cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2, value);
+		}
+	}
+	if (params > 0)
+		fclose(f);
+}
+
+
+/*-------------------------------------------------
+    execute_cheatundo - undo the last search
+-------------------------------------------------*/
+
+static void execute_cheatundo(running_machine *machine, int ref, int params, const char *param[])
+{
+	UINT64 cheatindex;
+	UINT32 undo_count = 0;
+
+	if (cheat.undo > 0)
+	{
+		for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+		{
+			if (cheat.cheatmap[cheatindex].undo == cheat.undo)
+			{
+				cheat.cheatmap[cheatindex].state = 1;
+				cheat.cheatmap[cheatindex].undo = 0;
+				undo_count++;
+			}
+		}		
+
+		cheat.undo--;
+		debug_console_printf(machine, "%u cheat reactivated\n", undo_count);
+	}
+	else
+		debug_console_printf(machine, "Maximum undo reached\n");
 }
 
 

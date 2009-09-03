@@ -336,6 +336,9 @@ UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_tr
 /* return a qword from the the specified memory space */
 UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_translation);
 
+/* return 1,2,4 or 8 bytes from the specified memory space */
+UINT64 debug_read_memory(const address_space *space, offs_t address, int size, int apply_translation);
+
 /* write a byte to the specified memory space */
 void debug_write_byte(const address_space *space, offs_t address, UINT8 data, int apply_translation);
 
@@ -347,6 +350,9 @@ void debug_write_dword(const address_space *space, offs_t address, UINT32 data, 
 
 /* write a qword to the specified memory space */
 void debug_write_qword(const address_space *space, offs_t address, UINT64 data, int apply_translation);
+
+/* write 1,2,4 or 8 bytes to the specified memory space */
+void debug_write_memory(const address_space *space, offs_t address, UINT64 data, int size, int apply_translation);
 
 /* read 1,2,4 or 8 bytes at the given offset from opcode space */
 UINT64 debug_read_opcode(const address_space *space, offs_t offset, int size, int arg);
