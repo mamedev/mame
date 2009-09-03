@@ -375,9 +375,9 @@
   PortA handshake lines & PC0-PC2 (noraut11 = OUT; noraut12 = IN):
 
   7654 3210
-  ---- ---x  unknown (noraut11).
-  ---- --x-  unknown (noraut11).
-  ---- -x--  unknown (noraut11).
+  ---- ---x  * N/C (noraut11).
+  ---- --x-  * N/C (noraut11).
+  ---- -x--  * N/C (noraut11).
   ---- ---x  * N/C (noraut12).
   ---- --x-  * READOUT SWITCH (noraut12).
   ---- -x--  * LOW LEVEL HOPPER (noraut12).
@@ -504,10 +504,19 @@
   - Updated technical notes.
 
 
+  [2009-09-03]
+
+  - Routed the whole video RAM access through PPI-2.
+    (bypassed the handshake lines for now).
+  - Merged back the noraut machine drivers after the 3rd PPI connection.
+  - Added Low Level Hopper manual input.
+  - Added a new machine driver for extended hardware.
+    It has 2 jumpers that cut the a14 and a15 addressing lines.
+
+
   TODO:
 
-  - Analize the third 8255 at 0xc0-0xc3 (full bidirectional port w/hshk lines)
-  - Video RAM (through 3rd PPI?).
+  - Analize PPI-2 at 0xc0-0xc3. OBF handshake line (PC7) doesn't seems to work properly.
   - Find if wide chars are hardcoded or tied to a bit.
   - Discrete sound.
   - Save support.
@@ -669,44 +678,45 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 
 
 /* Game waits for bit 7 (0x80) to be set.
-   This should be the /OBF line (PC7) from PPI-2 (handshaked).
-   PC0-PC2 are set as input.
+   This should be the /OBF line (PC7) from PPI-2 (handshake).
+   PC0-PC2 could be set as input or output.
 */
-UINT8 ppi2_portc;
-UINT8 hndshk = 0xf8;	/* simulating the handshake lines */
 
-static READ8_HANDLER( ppi2_portc_r )
+static READ8_DEVICE_HANDLER( ppi2_portc_r )
 {
-	ppi2_portc = (hndshk | (input_port_read(space->machine, "IN2") & 0x07));
+	UINT8 ppi2_pcmix = 0;
+	UINT8 hndshk = 0x80;	/* simulating the handshake lines (bits 3-7) */
+	ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
+//	popmessage("portc read: %02x", ppi2_pcmix);
 
-	return ppi2_portc;
+	return ppi2_pcmix;
 }
 
-static READ8_HANDLER( hndshk_r )
+static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
 {
-	return hndshk;
+	/* PC0-PC2 don't seems to be connected to any output */
+//	popmessage("portc write: %02x", data);
 }
 
-static WRITE8_HANDLER( ppi2_portc_w )
+static READ8_DEVICE_HANDLER( vram_data_r )
 {
-	/* PC0-PC2 don't seems to be connected */
-	popmessage("written : %02X", data);
+	return np_vram[np_addr];
+}
+
+static WRITE8_DEVICE_HANDLER( vram_data_w )
+{
+	np_vram[np_addr] = data & 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( vram_addr_w )
+{
+	np_addr = data;
 }
 
 /* game waits for bit 4 (0x10) to be reset.*/
 static READ8_HANDLER( test2_r )
 {
 	return 0x00;
-}
-
-static WRITE8_HANDLER( vram_data_w )
-{
-	np_vram[np_addr] = data & 0xff;
-}
-
-static WRITE8_HANDLER( vram_addr_w )
-{
-	np_addr = data;
 }
 
 
@@ -719,35 +729,34 @@ static ADDRESS_MAP_START( norautp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( noraut11_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(vram_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(vram_addr_w)
-	AM_RANGE(0xc2, 0xc2) AM_READWRITE(hndshk_r, ppi2_portc_w)
-//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( noraut12_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(vram_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(vram_addr_w)
-	AM_RANGE(0xc2, 0xc2) AM_READ(ppi2_portc_r)
-//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /*
   Video RAM R/W:
 
-  c0 --> W  ; data (in case of PPI, port data)
+  c0 --> W  ; data
   c1 --> W  ; addressing
-  c2 --> R  ; status?
-  c3 --> W  ; alternate 00 & 01 (PC0 line on PPI-2 (noraut11)
+  c2 --> R  ; status
+  c3 --> W  ; alternate 00 & 01 (control?)
 
 */
+
+static ADDRESS_MAP_START( norautxp_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xcfff) AM_ROM	/* need to be checked */
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* need to be checked */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+//	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+//	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -758,10 +767,7 @@ static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xdc, 0xdc) AM_WRITE(vram_data_w)
-	AM_RANGE(0xdd, 0xdd) AM_WRITE(vram_addr_w)
-	AM_RANGE(0xde, 0xde) AM_READ(ppi2_portc_r)
-//  AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
 ADDRESS_MAP_END
 
@@ -794,8 +800,8 @@ static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("IN2-3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_CODE(KEYCODE_9) PORT_NAME("Readout")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
 
 
 	PORT_START("DSW1")
@@ -847,6 +853,11 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* Coin C for other games */
 
+	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
@@ -897,9 +908,9 @@ static INPUT_PORTS_START( norautpn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 
 	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN2-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
 	PORT_START("DSW1")
@@ -998,12 +1009,12 @@ static const ppi8255_interface ppi8255_intf[3] =
 	},
 	{	/* (c0-c3) Group A Mode 2 (5-handshacked bidirectional port)
 			       Group B Mode 0, output;  (see below for lines PC0-PC2) */
-		DEVCB_NULL,						/* Port A read */
+		DEVCB_HANDLER(vram_data_r),		/* Port A read */
 		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read  (should has test_r tied) */
-		DEVCB_NULL,						/* Port A write (should has vram_data_w tied) */
-		DEVCB_NULL,						/* Port B write (should has vram_addr_w tied) */
-		DEVCB_NULL						/* Port C write */
+		DEVCB_HANDLER(ppi2_portc_r),	/* Port C read */
+		DEVCB_HANDLER(vram_data_w),		/* Port A write (vram_data_w tied) */
+		DEVCB_HANDLER(vram_addr_w),		/* Port B write (vram_addr_w tied) */
+		DEVCB_HANDLER(ppi2_portc_w)		/* Port C write */
 	}
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 		It means that port A should be bidirectional and port B just as output.
@@ -1021,7 +1032,7 @@ static MACHINE_DRIVER_START( norautp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(norautp_map)
-//	MDRV_CPU_IO_MAP(noraut12_portmap)
+	MDRV_CPU_IO_MAP(norautp_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1052,19 +1063,12 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( noraut11 )
+static MACHINE_DRIVER_START( norautxp )
 	MDRV_IMPORT_FROM(norautp)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(noraut11_portmap)
-
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( noraut12 )
-	MDRV_IMPORT_FROM(norautp)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(noraut12_portmap)
+	MDRV_CPU_PROGRAM_MAP(norautxp_map)
+	MDRV_CPU_IO_MAP(norautxp_portmap)
 
 MACHINE_DRIVER_END
 
@@ -1210,7 +1214,8 @@ No date info on board or found in rom.
 
 ROM_START( norautu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2563.bin",    0x0000, 0x8000, CRC(6cbe68bd) SHA1(93201baaf03a9bba6c52c64cc26e8e445aa6454e) )
+	ROM_LOAD( "2563.bin",	0x0000, 0x8000, CRC(6cbe68bd) SHA1(93201baaf03a9bba6c52c64cc26e8e445aa6454e) )
+	ROM_RELOAD(				0x8000, 0x8000 )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "club250.bin", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
@@ -1272,17 +1277,51 @@ ROM_START( norautv3 )
 ROM_END
 
 
+/**************************
+*       Driver Init       *
+**************************/
+
+/* These are to patch the check for OBF handshake line,
+   that seems to be wrong. Otherwise will enter in an infinite loop.
+
+  110D: DB C2      in   a,($C2)  ; read from PPI-2, portC. (OBF should be set, but isn't)
+  110F: 07         rlca          ; rotate left.
+  1110: 30 FB      jr   nc,$110D
+
+*/
+static DRIVER_INIT( norautrh )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x1110] = 0x00;
+	ROM[0x1111] = 0x00;
+}
+
+static DRIVER_INIT( norautpn )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x0827] = 0x00;
+	ROM[0x0828] = 0x00;
+}
+
+static DRIVER_INIT( gtipoker )
+{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0cc6] = 0x00;
+//	ROM[0x0cc7] = 0x00;
+}
+
+
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT   MACHINE    INPUT     INIT  ROT    COMPANY        FULLNAME                       FLAGS                              LAYOUT */
-GAMEL( 1988, norautp,  0,       noraut12,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND,                     layout_noraut11 )
-GAMEL( 1988, norautjp, norautp, noraut12,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND,                     layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       noraut11,  norautrh, 0,    ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND,                     layout_noraut12 )
-GAME(  1988, norautu,  0,       noraut12,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  1988, norautv3, 0,       noraut12,  norautp,  0,    ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  1983, gtipoker, 0,       gtipoker,  norautpn, 0,    ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                       FLAGS                              LAYOUT */
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker",                 GAME_NO_SOUND,                     layout_noraut11 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker",           GAME_NO_SOUND,                     layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   GAME_NO_SOUND,                     layout_noraut12 )
+GAME(  1988, norautu,  0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",     "GTI Poker",                    GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAMEL( 198?, norautpn, norautp, noraut11,  norautpn, 0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND,                     layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",    "Noraut Poker (bootleg)",       GAME_NO_SOUND,                     layout_noraut12 )
