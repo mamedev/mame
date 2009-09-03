@@ -4,8 +4,6 @@
 
 *************************************************************************/
 
-#define BZONE_DISCRETE		(1)
-
 #define BZONE_MASTER_CLOCK (XTAL_12_096MHz)
 #define BZONE_CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -16,17 +14,10 @@ extern UINT8 rb_input_select;
 
 /*----------- defined in audio/bzone.c -----------*/
 
-#if BZONE_DISCRETE
 
 WRITE8_DEVICE_HANDLER( bzone_sounds_w );
 
 MACHINE_DRIVER_EXTERN( bzone_audio );
-#else
-WRITE8_HANDLER( bzone_sounds_w );
-
-DEVICE_GET_INFO( bzone_sound );
-#define SOUND_BZONE DEVICE_GET_INFO_NAME(bzone_sound)
-#endif
 
 /*----------- defined in audio/redbaron.c -----------*/
 
