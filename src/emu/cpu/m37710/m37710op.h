@@ -77,7 +77,7 @@ INLINE uint m37710i_read_16_direct(m37710i_cpu_struct *cpustate, uint address)
 {
 	address = ADDRESS_37710(address);
 	if (address & 1)
-		return m37710_read_8(address) | m37710_read_8(address+1)<<8;
+		return m37710_read_8(address) | m37710_read_8((address)+1)<<8;
 	else
 		return m37710_read_16(address);
 }
@@ -2253,7 +2253,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);							\
 			DST    = EA_##MODE(cpustate);											\
 			REG_IM = read_8_##MODE(DST);									\
-			REG_IM2 = read_8_NORM(REG_PC);	\
+			REG_IM2 = read_8_NORM(REG_PB | REG_PC);	\
 			REG_PC++;			\
 			write_8_##MODE(DST, REG_IM & ~REG_IM2);
 #else
@@ -2261,7 +2261,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);							\
 			DST    = EA_##MODE(cpustate);											\
 			REG_IM = read_16_##MODE(DST);									\
-			REG_IM2 = read_16_NORM(REG_PC);	\
+			REG_IM2 = read_16_NORM(REG_PB | REG_PC);	\
 			REG_PC+=2;			\
 			write_16_##MODE(DST, REG_IM & ~REG_IM2);
 #endif
@@ -2273,7 +2273,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);							\
 			DST    = EA_##MODE(cpustate);											\
 			REG_IM = read_8_##MODE(DST);									\
-			REG_IM2 = read_8_NORM(REG_PC);	\
+			REG_IM2 = read_8_NORM(REG_PB | REG_PC);	\
 			REG_PC++;			\
 			write_8_##MODE(DST, REG_IM | REG_IM2);
 #else
@@ -2281,7 +2281,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);							\
 			DST    = EA_##MODE(cpustate);											\
 			REG_IM = read_16_##MODE(DST);									\
-			REG_IM2 = read_16_NORM(REG_PC);	\
+			REG_IM2 = read_16_NORM(REG_PB | REG_PC);	\
 			REG_PC+=2;			\
 			write_16_##MODE(DST, REG_IM | REG_IM2);
 #endif
