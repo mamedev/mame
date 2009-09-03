@@ -38,9 +38,9 @@ enum
 enum
 {
 	// user-defined priorities
-	TWIN16_BG_LAYER1		= 0x01,
+	TWIN16_BG_LAYER1			= 0x01,
 	TWIN16_SPRITE_PRI_L1		= 0x02,
-	TWIN16_BG_LAYER2		= 0x04,
+	TWIN16_BG_LAYER2			= 0x04,
 	TWIN16_SPRITE_PRI_L2		= 0x08,
 	TWIN16_SPRITE_OCCUPIED		= 0x10, // sprite on screen pixel
 	TWIN16_SPRITE_CAST_SHADOW	= 0x20
@@ -496,6 +496,8 @@ VIDEO_START( twin16 )
 {
 	text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(text_tilemap, 0);
+
+	palette_set_shadow_factor(machine,0.4); // screenshots estimate
 
 	memset(twin16_sprite_buffer,0xff,0x800*sizeof(UINT16));
 	twin16_sprite_busy = 0;
