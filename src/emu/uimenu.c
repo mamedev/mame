@@ -2493,6 +2493,9 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 	if (event != NULL && event->itemref != NULL)
 	{
 		int changed = FALSE;
+		
+		/* clear cheat comment on any movement or keypress */
+		popmessage(NULL);
 
 		/* handle reset all + reset all cheats for reload all option */
 		if ((FPTR)event->itemref < 3 && event->iptkey == IPT_UI_SELECT)
@@ -2505,6 +2508,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 				changed |= cheat_select_default_state(machine, curcheat);
 			}
 		}
+		
 
 		/* handle individual cheats */
 		else if ((FPTR)event->itemref > 2)
@@ -2530,6 +2534,14 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 				case IPT_UI_RIGHT:
 					changed = cheat_select_next_state(machine, event->itemref);
 					break;
+					
+				/* bring up display comment if one exists */
+				case IPT_UI_DISPLAY_COMMENT:
+				case IPT_UI_UP:
+				case IPT_UI_DOWN:
+					if (cheat_get_comment(event->itemref) != NULL)
+						popmessage("Cheat Comment:\n%s", astring_c(cheat_get_comment(event->itemref)));
+					break;		
 			}
 		}
 		

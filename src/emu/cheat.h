@@ -53,5 +53,8 @@ int cheat_select_previous_state(running_machine *machine, void *entry);
 /* select the next menu state */
 int cheat_select_next_state(running_machine *machine, void *entry);
 
+/* return the displayable comment of the current cheat */
+astring *cheat_get_comment(void *entry);
+
 
 #endif	/* __CHEAT_H__ */

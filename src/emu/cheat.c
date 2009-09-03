@@ -812,6 +812,18 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 }
 
 
+/*-------------------------------------------------
+    cheat_get_comment - called by the UI system
+    to help render displayable comments
+-------------------------------------------------*/
+
+astring *cheat_get_comment(void *entry)
+{
+	cheat_entry *cheat = (cheat_entry *)entry;
+	return cheat->comment;
+}
+
+
 
 /***************************************************************************
     CHEAT EXECUTION

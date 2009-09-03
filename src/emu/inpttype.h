@@ -595,6 +595,7 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_PAGE_DOWN,        "UI Page Down",           SEQ_DEF_1(KEYCODE_PGDN) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_SELECT,           "UI Select",              SEQ_DEF_3(KEYCODE_ENTER, SEQCODE_OR, INDEXED(JOYCODE_BUTTON1, 0)) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_CANCEL,           "UI Cancel",              SEQ_DEF_1(KEYCODE_ESC) )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DISPLAY_COMMENT,  "UI Display Comment",     SEQ_DEF_1(KEYCODE_SPACE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_CLEAR,            "UI Clear",               SEQ_DEF_1(KEYCODE_DEL) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ZOOM_IN,          "UI Zoom In",             SEQ_DEF_1(KEYCODE_EQUALS) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ZOOM_OUT,         "UI Zoom Out",            SEQ_DEF_1(KEYCODE_MINUS) )
