@@ -2494,8 +2494,8 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 	{
 		int changed = FALSE;
 
-		/* handle reset all */
-		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
+		/* handle reset all + reset all cheats for reload all option */
+		if ((FPTR)event->itemref < 3 && event->iptkey == IPT_UI_SELECT)
 		{
 			void *curcheat;
 			for (curcheat = cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL);
@@ -2507,7 +2507,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 		}
 
 		/* handle individual cheats */
-		else if ((FPTR)event->itemref > 1)
+		else if ((FPTR)event->itemref > 2)
 		{
 			switch (event->iptkey)
 			{
@@ -2531,6 +2531,17 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 					changed = cheat_select_next_state(machine, event->itemref);
 					break;
 			}
+		}
+		
+		/* handle reload all  */
+		if ((FPTR)event->itemref == 2 && event->iptkey == IPT_UI_SELECT)
+		{
+			/* re-init cheat engine and thus reload cheats/cheats have already been turned off by here */
+			cheat_reload(machine);
+	
+			/* display the reloaded cheats */ 
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
+			popmessage("All cheats reloaded");
 		}
 
 		/* if things changed, update */
@@ -2563,6 +2574,9 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
 
 	/* add a reset all option */
 	ui_menu_item_append(menu, "Reset All", NULL, 0, (void *)1);
+	
+	/* add a reload all cheats option */
+	ui_menu_item_append(menu, "Reload All", NULL, 0, (void *)2);
 }
 
 

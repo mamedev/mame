@@ -77,6 +77,7 @@
 #include "xmlfile.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "cheat.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
@@ -377,6 +378,31 @@ void cheat_init(running_machine *machine)
 	/* allocate memory */
 	cheatinfo = auto_alloc_clear(machine, cheat_private);
 	machine->cheat_data = cheatinfo;
+	
+	/* load the cheats */
+	cheat_reload(machine);
+
+	/* we rely on the debugger expression callbacks; if the debugger isn't
+       enabled, we must jumpstart them manually */
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+		debug_cpu_init(machine);
+}
+
+
+/*-------------------------------------------------
+    cheat_reload - re-initialize the cheat engine,
+    and reload the cheat file(s)
+-------------------------------------------------*/
+
+void cheat_reload(running_machine *machine)
+{
+	cheat_private *cheatinfo = machine->cheat_data;
+
+	/* free everything */
+	cheat_exit(machine);
+	
+	/* reset our memory */
+	memset(cheatinfo, 0, sizeof(*cheatinfo));
 
 	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
        and MAME will load gamename.xml */
@@ -394,11 +420,6 @@ void cheat_init(running_machine *machine)
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
 		cheat_list_save("output", cheatinfo->cheatlist);
-
-	/* we rely on the debugger expression callbacks; if the debugger isn't
-       enabled, we must jumpstart them manually */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		debug_cpu_init(machine);
 }
 
 

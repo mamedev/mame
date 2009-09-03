@@ -28,6 +28,9 @@
 /* initialize the cheat system, loading any cheat files */
 void cheat_init(running_machine *machine);
 
+/* re-initialize the cheat system, reloading any cheat files */
+void cheat_reload(running_machine *machine);
+
 
 
 /* ----- cheat UI helpers ----- */
