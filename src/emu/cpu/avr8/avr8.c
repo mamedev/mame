@@ -128,6 +128,7 @@ INLINE void PUSH(avr8_state *cpustate, UINT8 val)
     UINT16 sp = SPREG;
     WRITE_IO_8(cpustate, sp, val);
     sp--;
+    //printf( "PUSH %02x, new SP = %04x\n", val, sp );
     WRITE_IO_8(cpustate, AVR8_IO_SPH, (sp >> 8) & 0x00ff);
     WRITE_IO_8(cpustate, AVR8_IO_SPL, sp & 0x00ff);
 }
@@ -138,7 +139,21 @@ INLINE UINT8 POP(avr8_state *cpustate)
     sp++;
     WRITE_IO_8(cpustate, AVR8_IO_SPH, (sp >> 8) & 0x00ff);
     WRITE_IO_8(cpustate, AVR8_IO_SPL, sp & 0x00ff);
+    //printf( "POP %02x, new SP = %04x\n", READ_IO_8(cpustate, sp), sp );
     return READ_IO_8(cpustate, sp);
+}
+
+static void avr8_set_irq_line(avr8_state *cpustate, UINT16 vector, int state)
+{
+    //printf( "OMFG SETTING IRQ LINE\n" );
+    // Horrible hack, not accurate
+    if(state)
+    {
+        SREG_W(AVR8_SREG_I, 0);
+        PUSH(cpustate, (cpustate->pc >> 8) & 0x00ff);
+        PUSH(cpustate, cpustate->pc & 0x00ff);
+        cpustate->pc = vector;
+    }
 }
 
 /*****************************************************************************/
@@ -176,6 +191,8 @@ static CPU_EXECUTE( avr8 )
     UINT8 rr = 0;
     UINT8 res = 0;
     UINT16 pd = 0;
+    INT16 sd = 0;
+    INT32 opcycles = 1;
     //UINT16 pr = 0;
     avr8_state *cpustate = get_safe_token(device);
 
@@ -195,20 +212,22 @@ static CPU_EXECUTE( avr8 )
                 switch(op & 0x0f00)
                 {
                     case 0x0000:    // NOP
-                        //output += sprintf( output, "NOP" );
-                        unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0100:    // MOVW Rd+1:Rd,Rr+1:Rd
-                        //output += sprintf( output, "MOVW    R%d:R%d, R%d:R%d", RD4(op)+1, RD4(op), RR4(op)+1, RR4(op) );
-                        unimplemented_opcode(cpustate, op);
+                        WRITE_IO_8(cpustate, (RD4(op) << 1)+1, READ_IO_8(cpustate, (RR4(op) << 1)+1));
+                        WRITE_IO_8(cpustate, RD4(op) << 1, READ_IO_8(cpustate, RR4(op) << 1));
                         break;
                     case 0x0200:    // MULS Rd,Rr
                         //output += sprintf( output, "MULS    R%d, R%d", 16+RD4(op), 16+RR4(op) );
                         unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0300:    // MULSU Rd,Rr
-                        //output += sprintf( output, "MULSU   R%d, R%d", 16+RD4(op), 16+RR4(op) );
-                        unimplemented_opcode(cpustate, op);
+                        sd = (INT8)READ_IO_8(cpustate, 16+RD4(op)) * (UINT8)READ_IO_8(cpustate, 16+RR4(op));
+                        WRITE_IO_8(cpustate, 1, (sd >> 8) & 0x00ff);
+                        WRITE_IO_8(cpustate, 0, sd & 0x00ff);
+                        SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
+                        SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
+                        opcycles = 2;
                         break;
                     case 0x0400:
                     case 0x0500:
@@ -228,8 +247,16 @@ static CPU_EXECUTE( avr8 )
                     case 0x0900:
                     case 0x0a00:
                     case 0x0b00:    // SBC Rd,Rr
-                        //output += sprintf( output, "SBC     R%d, R%d", RD5(op), RR5(op) );
-                        unimplemented_opcode(cpustate, op);
+                        rd = READ_IO_8(cpustate, RD5(op));
+                        rr = READ_IO_8(cpustate, RR5(op));
+                        res = rd - (rr + SREG_R(AVR8_SREG_C));
+                        WRITE_IO_8(cpustate, RD5(op), res);
+                        SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
+                        SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
+                        SREG_W(AVR8_SREG_N, BIT(res,7));
+                        SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
+                        SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                        SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                         break;
                     case 0x0c00:
                     case 0x0d00:
@@ -267,8 +294,16 @@ static CPU_EXECUTE( avr8 )
                         SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                         break;
                     case 0x0800:    // SUB Rd,Rr
-                        //output += sprintf( output, "SUB     R%d, R%d", RD5(op), RR5(op) );
-                        unimplemented_opcode(cpustate, op);
+                        rd = READ_IO_8(cpustate, RD5(op));
+                        rr = READ_IO_8(cpustate, RR5(op));
+                        res = rd - rr;
+                        WRITE_IO_8(cpustate, RD5(op), res);
+                        SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
+                        SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
+                        SREG_W(AVR8_SREG_N, BIT(res,7));
+                        SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
+                        SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                        SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                         break;
                     case 0x0c00:    // ADC Rd,Rr
                         rd = READ_IO_8(cpustate, RD5(op));
@@ -361,16 +396,16 @@ static CPU_EXECUTE( avr8 )
                         unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0008:    // LDD Rd,Y+q
-                        //output += sprintf( output, "LD(D)   R%d, Y+%02x", RD5(op), QCONST6(op) );
-                        unimplemented_opcode(cpustate, op);
+                        WRITE_IO_8(cpustate, RD5(op), YREG + QCONST6(op));
+                        opcycles = 2;
                         break;
                     case 0x0200:    // STD Z+q,Rr
                         //output += sprintf( output, "ST(D)   Z+%02x, R%d", QCONST6(op), RD5(op) );
                         unimplemented_opcode(cpustate, op);
                         break;
-                    case 0x0208:    // STD Z+q,Rr
-                        //output += sprintf( output, "ST(D)   Y+%02x, R%d", QCONST6(op), RD5(op) );
-                        unimplemented_opcode(cpustate, op);
+                    case 0x0208:    // STD Y+q,Rr
+                        WRITE_IO_8(cpustate, YREG + QCONST6(op), READ_IO_8(cpustate, RD5(op)));
+                        opcycles = 2;
                         break;
                 }
                 break;
@@ -386,6 +421,7 @@ static CPU_EXECUTE( avr8 )
                                 cpustate->pc++;
                                 op |= READ_PRG_16(cpustate, cpustate->pc);
                                 WRITE_IO_8(cpustate, RD5(op >> 16), READ_IO_8(cpustate, op & 0x0000ffff));
+                                opcycles = 2;
                                 break;
                             case 0x0001:    // LD Rd,Z+
                                 unimplemented_opcode(cpustate, op);
@@ -396,6 +432,7 @@ static CPU_EXECUTE( avr8 )
                                 break;
                             case 0x0004:    // LPM Rd,Z
                                 WRITE_IO_8(cpustate, RD5(op), READ_PRG_8(cpustate, ZREG));
+                                opcycles = 3;
                                 break;
                             case 0x0005:    // LPM Rd,Z+
                                 pd = ZREG;
@@ -403,6 +440,7 @@ static CPU_EXECUTE( avr8 )
                                 pd++;
                                 WRITE_IO_8(cpustate, 31, (pd >> 8) & 0x00ff);
                                 WRITE_IO_8(cpustate, 30, pd & 0x00ff);
+                                opcycles = 3;
                                 break;
                             case 0x0006:    // ELPM Rd,Z
                                 //output += sprintf( output, "ELPM    R%d, Z", RD5(op) );
@@ -425,16 +463,20 @@ static CPU_EXECUTE( avr8 )
                                 unimplemented_opcode(cpustate, op);
                                 break;
                             case 0x000d:    // LD Rd,X+
-                                //output += sprintf( output, "LD      R%d, X+", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                pd = XREG;
+                                WRITE_IO_8(cpustate, RD5(op), READ_IO_8(cpustate, pd));
+                                pd++;
+                                WRITE_IO_8(cpustate, 27, (pd >> 8) & 0x00ff);
+                                WRITE_IO_8(cpustate, 26, pd & 0x00ff);
+                                opcycles = 2;
                                 break;
                             case 0x000e:    // LD Rd,-X
                                 //output += sprintf( output, "LD      R%d,-X", RD5(op) );
                                 unimplemented_opcode(cpustate, op);
                                 break;
                             case 0x000f:    // POP Rd
-                                //output += sprintf( output, "POP     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                WRITE_IO_8(cpustate, RD5(op), POP(cpustate));
+                                opcycles = 2;
                                 break;
                             default:
                                 unimplemented_opcode(cpustate, op);
@@ -451,6 +493,7 @@ static CPU_EXECUTE( avr8 )
                                 cpustate->pc++;
                                 op |= READ_PRG_16(cpustate, cpustate->pc);
                                 WRITE_IO_8(cpustate, op & 0x0000ffff, READ_IO_8(cpustate, RD5(op >> 16)));
+                                opcycles = 2;
                                 break;
                             case 0x0001:    // ST Z+,Rd
                                 //output += sprintf( output, "ST       Z+, R%d", RD5(op) );
@@ -471,6 +514,7 @@ static CPU_EXECUTE( avr8 )
                             case 0x000c:    // ST X,Rd
                                 rd = READ_IO_8(cpustate, RD5(op));
                                 WRITE_IO_8(cpustate, XREG, rd);
+                                opcycles = 2;
                                 break;
                             case 0x000d:    // ST X+,Rd
                                 pd = XREG;
@@ -478,14 +522,15 @@ static CPU_EXECUTE( avr8 )
                                 pd++;
                                 WRITE_IO_8(cpustate, 27, (pd >> 8) & 0x00ff);
                                 WRITE_IO_8(cpustate, 26, pd & 0x00ff);
+                                opcycles = 2;
                                 break;
                             case 0x000e:    // ST -X,Rd
                                 //output += sprintf( output, "ST      -X , R%d", RD5(op) );
                                 unimplemented_opcode(cpustate, op);
                                 break;
                             case 0x000f:    // PUSH Rd
-                                //output += sprintf( output, "PUSH    R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                PUSH(cpustate, READ_IO_8(cpustate, RD5(op)));
+                                opcycles = 2;
                                 break;
                             default:
                                 unimplemented_opcode(cpustate, op);
@@ -497,12 +542,23 @@ static CPU_EXECUTE( avr8 )
                         switch(op & 0x000f)
                         {
                             case 0x0000:    // COM Rd
-                                //output += sprintf( output, "COM     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                rd = ~rd;
+                                SREG_W(AVR8_SREG_C, 1);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_V, 0);
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) | SREG_R(AVR8_SREG_V));
                                 break;
                             case 0x0001:    // NEG Rd
-                                //output += sprintf( output, "NEG     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = 0 - rd;
+                                SREG_W(AVR8_SREG_C, (res == 0) ? 0 : 1);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_V, (res == 0x80) ? 1 : 0);
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) | SREG_R(AVR8_SREG_V));
+                                SREG_W(AVR8_SREG_H, BIT(res,3) | BIT(rd,3));
                                 break;
                             case 0x0002:    // SWAP Rd
                                 //output += sprintf( output, "SWAP    R%d", RD5(op) );
@@ -522,8 +578,13 @@ static CPU_EXECUTE( avr8 )
                                 unimplemented_opcode(cpustate, op);
                                 break;
                             case 0x0006:    // LSR Rd
-                                //output += sprintf( output, "LSR     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = rd >> 1;
+                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
+                                SREG_W(AVR8_SREG_N, 0);
+                                SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 break;
                             case 0x0007:    // ROR Rd
                                 //output += sprintf( output, "ROR     R%d", RD5(op) );
@@ -559,21 +620,26 @@ static CPU_EXECUTE( avr8 )
                                 {
                                     case 0x0000:    // IJMP
                                         cpustate->pc = ZREG - 1;
+                                        opcycles = 2;
                                         break;
                                     case 0x0010:    // EIJMP
                                         //output += sprintf( output, "EIJMP" );
                                         unimplemented_opcode(cpustate, op);
                                         break;
                                     default:
-                                        unimplemented_opcode(cpustate, op);
                                         //output += sprintf( output, "Undefined (%04x)", op );
                                         unimplemented_opcode(cpustate, op);
                                         break;
                                 }
                                 break;
                             case 0x000a:    // DEC Rd
-                                //output += sprintf( output, "DEC     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = rd - 1;
+                                SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                WRITE_IO_8(cpustate, RD5(op), res);
                                 break;
                             case 0x000c:
                             case 0x000d:    // JMP k
@@ -603,12 +669,24 @@ static CPU_EXECUTE( avr8 )
                         switch(op & 0x000f)
                         {
                             case 0x0000:    // COM Rd
-                                //output += sprintf( output, "COM     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                rd = ~rd;
+                                SREG_W(AVR8_SREG_C, 1);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_V, 0);
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) | SREG_R(AVR8_SREG_V));
                                 break;
                             case 0x0001:    // NEG Rd
-                                //output += sprintf( output, "NEG     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = 0 - rd;
+                                WRITE_IO_8(cpustate, RD5(op), res);
+                                SREG_W(AVR8_SREG_C, (res == 0) ? 0 : 1);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_V, (res == 0x80) ? 1 : 0);
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) | SREG_R(AVR8_SREG_V));
+                                SREG_W(AVR8_SREG_H, BIT(res,3) | BIT(rd,3));
                                 break;
                             case 0x0002:    // SWAP Rd
                                 //output += sprintf( output, "SWAP    R%d", RD5(op) );
@@ -628,8 +706,13 @@ static CPU_EXECUTE( avr8 )
                                 unimplemented_opcode(cpustate, op);
                                 break;
                             case 0x0006:    // LSR Rd
-                                //output += sprintf( output, "LSR     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = rd >> 1;
+                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
+                                SREG_W(AVR8_SREG_N, 0);
+                                SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 break;
                             case 0x0007:    // ROR Rd
                                 //output += sprintf( output, "ROR     R%d", RD5(op) );
@@ -642,10 +725,14 @@ static CPU_EXECUTE( avr8 )
                                         cpustate->pc = POP(cpustate);
                                         cpustate->pc |= POP(cpustate) << 8;
                                         cpustate->pc--;
+                                        opcycles = 4;
                                         break;
                                     case 0x0010:    // RETI
-                                        //output += sprintf( output, "RETI" );
-                                        unimplemented_opcode(cpustate, op);
+                                        cpustate->pc = POP(cpustate);
+                                        cpustate->pc |= POP(cpustate) << 8;
+                                        cpustate->pc--;
+                                        SREG_W(AVR8_SREG_I, 1);
+                                        opcycles = 4;
                                         break;
                                     case 0x0080:    // SLEEP
                                         //output += sprintf( output, "SLEEP" );
@@ -661,6 +748,7 @@ static CPU_EXECUTE( avr8 )
                                         break;
                                     case 0x00c0:    // LPM
                                         WRITE_IO_8(cpustate, 0, READ_PRG_8(cpustate, ZREG));
+                                        opcycles = 3;
                                         break;
                                     case 0x00d0:    // ELPM
                                         //output += sprintf( output, "ELPM" );
@@ -698,8 +786,13 @@ static CPU_EXECUTE( avr8 )
                                 }
                                 break;
                             case 0x000a:    // DEC Rd
-                                //output += sprintf( output, "DEC     R%d", RD5(op) );
-                                unimplemented_opcode(cpustate, op);
+                                rd = READ_IO_8(cpustate, RD5(op));
+                                res = rd - 1;
+                                SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
+                                SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
+                                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                                WRITE_IO_8(cpustate, RD5(op), res);
                                 break;
                             case 0x000c:
                             case 0x000d:    // JMP k
@@ -727,47 +820,56 @@ static CPU_EXECUTE( avr8 )
                         break;
                     case 0x0700:    // SBIW Rd+1:Rd,K
                         //output += sprintf( output, "SBIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op) );
+                        unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0800:    // CBI A,b
                         //output += sprintf( output, "CBI     0x%02x, %d", ACONST5(op), RR3(op) );
+                        WRITE_IO_8(cpustate, ACONST5(op), READ_IO_8(cpustate, ACONST5(op)) &~ (1 << RR3(op)));
+                        opcycles = 2;
                         break;
                     case 0x0900:    // SBIC A,b
                         //output += sprintf( output, "SBIC    0x%02x, %d", ACONST5(op), RR3(op) );
+                        unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0a00:    // SBI A,b
                         //output += sprintf( output, "SBI     0x%02x, %d", ACONST5(op), RR3(op) );
+                        WRITE_IO_8(cpustate, ACONST5(op), READ_IO_8(cpustate, ACONST5(op)) | (1 << RR3(op)));
+                        opcycles = 2;
                         break;
                     case 0x0b00:    // SBIS A,b
                         //output += sprintf( output, "SBIS    0x%02x, %d", ACONST5(op), RR3(op) );
+                        unimplemented_opcode(cpustate, op);
                         break;
                     case 0x0c00:
                     case 0x0d00:
                     case 0x0e00:
                     case 0x0f00:    // MUL Rd,Rr
                         //output += sprintf( output, "MUL     R%d, R%d", RD5(op), RR5(op) );
+                        unimplemented_opcode(cpustate, op);
                         break;
                 }
                 break;
             case 0xb000:
-                unimplemented_opcode(cpustate, op);
                 if(op & 0x0800) // OUT A,Rr
                 {
-                    //output += sprintf( output, "OUT     0x%02x, R%d", ACONST6(op), RD5(op) );
+                    WRITE_IO_8(cpustate, 0x20 + ACONST6(op), READ_IO_8(cpustate, RD5(op)));
                 }
                 else            // IN Rd,A
                 {
-                    //output += sprintf( output, "IN      R%d, 0x%02x", RD5(op), ACONST6(op) );
+                    WRITE_IO_8(cpustate, RD5(op), READ_IO_8(cpustate, 0x20 + ACONST6(op)));
                 }
                 break;
             case 0xc000:    // RJMP k
                 offs = (INT32)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
                 cpustate->pc += offs;
+                opcycles = 2;
                 break;
             case 0xd000:    // RCALL k
                 offs = (INT32)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
                 PUSH(cpustate, ((cpustate->pc + 1) >> 8) & 0x00ff);
                 PUSH(cpustate, (cpustate->pc + 1) & 0x00ff);
                 cpustate->pc += offs;
+                opcycles = 3;
                 break;
             case 0xe000:    // LDI Rd,K
                 rd = KCONST8(op);
@@ -785,6 +887,7 @@ static CPU_EXECUTE( avr8 )
                                 offs |= 0xffffff80;
                             }
                             cpustate->pc += offs;
+                            opcycles = 2;
                         }
                         break;
                     case 0x0400: // BRSH through BRID
@@ -796,28 +899,54 @@ static CPU_EXECUTE( avr8 )
                                 offs |= 0xffffff80;
                             }
                             cpustate->pc += offs;
+                            opcycles = 2;
                         }
                         break;
                     case 0x0800:
-                        unimplemented_opcode(cpustate, op);
                         if(op & 0x0200) // BST Rd, b
                         {
-                            //output += sprintf( output, "BST     R%d, %d", RD5(op), RR3(op) );
+                            SREG_W(AVR8_SREG_T, (BIT(READ_IO_8(cpustate, RD5(op)),RR3(op))) ? 1 : 0);
                         }
                         else            // BLD Rd, b
                         {
-                            //output += sprintf( output, "BLD     R%d, %d", RD5(op), RR3(op) );
+                            if(SREG_R(AVR8_SREG_T))
+                            {
+                                WRITE_IO_8(cpustate, RD5(op), READ_IO_8(cpustate, RD5(op)) | (1 << RR3(op)));
+                            }
+                            else
+                            {
+                                WRITE_IO_8(cpustate, RD5(op), READ_IO_8(cpustate, RD5(op)) &~ (1 << RR3(op)));
+                            }
                         }
                         break;
                     case 0x0c00:
-                        unimplemented_opcode(cpustate, op);
                         if(op & 0x0200) // SBRS Rd, b
                         {
-                            //output += sprintf( output, "SBRS    R%d, %d", RD5(op), RR3(op) );
+                            if(BIT(READ_IO_8(cpustate, RD5(op)),RR3(op)))
+                            {
+                                op = (UINT32)READ_PRG_16(cpustate, cpustate->pc++);
+                                opcycles = 2;
+                                if((op & 0xfe0c) == 0x940c ||
+                                   (op & 0xfe0f) == 0xfe0f)
+                                {
+                                    cpustate->pc++;
+                                    opcycles = 3;
+                                }
+                            }
                         }
                         else            // SBRC Rd, b
                         {
-                            //output += sprintf( output, "SBRC    R%d, %d", RD5(op), RR3(op) );
+                            if(!BIT(READ_IO_8(cpustate, RD5(op)),RR3(op)))
+                            {
+                                op = (UINT32)READ_PRG_16(cpustate, cpustate->pc++);
+                                opcycles = 2;
+                                if((op & 0xfe0c) == 0x940c ||
+                                   (op & 0xfc0f) == 0x9000)
+                                {
+                                    cpustate->pc++;
+                                    opcycles = 3;
+                                }
+                            }
                         }
                         break;
                 }
@@ -826,7 +955,7 @@ static CPU_EXECUTE( avr8 )
 
         cpustate->pc++;
 
-        --cpustate->icount;
+        cpustate->icount -= opcycles;
     }
 
     return cycles - cpustate->icount;
@@ -840,6 +969,35 @@ static CPU_SET_INFO( avr8 )
 
     switch (state)
     {
+
+        /* interrupt lines/exceptions */
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_RESET:          avr8_set_irq_line(cpustate, AVR8_INT_RESET, info->i);       break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_INT0:           avr8_set_irq_line(cpustate, AVR8_INT_INT0, info->i);        break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_INT1:           avr8_set_irq_line(cpustate, AVR8_INT_INT1, info->i);        break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_PCINT0:         avr8_set_irq_line(cpustate, AVR8_INT_PCINT0, info->i);      break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_PCINT1:         avr8_set_irq_line(cpustate, AVR8_INT_PCINT1, info->i);      break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_PCINT2:         avr8_set_irq_line(cpustate, AVR8_INT_PCINT2, info->i);      break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_WDT:            avr8_set_irq_line(cpustate, AVR8_INT_WDT, info->i);         break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T2COMPA:        avr8_set_irq_line(cpustate, AVR8_INT_T2COMPA, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T2COMPB:        avr8_set_irq_line(cpustate, AVR8_INT_T2COMPB, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T2OVF:          avr8_set_irq_line(cpustate, AVR8_INT_T2OVF, info->i);       break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T1CAPT:         avr8_set_irq_line(cpustate, AVR8_INT_T1CAPT, info->i);      break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T1COMPA:        avr8_set_irq_line(cpustate, AVR8_INT_T1COMPA, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T1COMPB:        avr8_set_irq_line(cpustate, AVR8_INT_T1COMPB, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T1OVF:          avr8_set_irq_line(cpustate, AVR8_INT_T1OVF, info->i);       break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T0COMPA:        avr8_set_irq_line(cpustate, AVR8_INT_T0COMPA, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T0COMPB:        avr8_set_irq_line(cpustate, AVR8_INT_T0COMPB, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_T0OVF:          avr8_set_irq_line(cpustate, AVR8_INT_T0OVF, info->i);       break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_SPI_STC:        avr8_set_irq_line(cpustate, AVR8_INT_SPI_STC, info->i);     break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_USART_RX:       avr8_set_irq_line(cpustate, AVR8_INT_USART_RX, info->i);    break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_USART_UDRE:     avr8_set_irq_line(cpustate, AVR8_INT_USART_UDRE, info->i);  break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_USART_TX:       avr8_set_irq_line(cpustate, AVR8_INT_USART_TX, info->i);    break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_ADC:            avr8_set_irq_line(cpustate, AVR8_INT_ADC, info->i);         break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_EE_RDY:         avr8_set_irq_line(cpustate, AVR8_INT_EE_RDY, info->i);      break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_ANALOG_COMP:    avr8_set_irq_line(cpustate, AVR8_INT_ANALOG_COMP, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_TWI:            avr8_set_irq_line(cpustate, AVR8_INT_TWI, info->i);         break;
+        case CPUINFO_INT_INPUT_STATE + AVR8_INT_SPM_RDY:        avr8_set_irq_line(cpustate, AVR8_INT_SPM_RDY, info->i);     break;
+
         /* --- the following bits of info are set as 64-bit signed integers --- */
         case CPUINFO_INT_PC:    /* intentional fallthrough */
         case CPUINFO_INT_REGISTER + AVR8_PC:            cpustate->pc = info->i;                         break;
@@ -966,5 +1124,6 @@ CPU_GET_INFO( avr8 )
         case CPUINFO_STR_REGISTER + AVR8_X:             sprintf(info->s, "X: %04x", XREG ); break;
         case CPUINFO_STR_REGISTER + AVR8_Y:             sprintf(info->s, "Y: %04x", YREG ); break;
         case CPUINFO_STR_REGISTER + AVR8_Z:             sprintf(info->s, "Z: %04x", ZREG ); break;
+        case CPUINFO_STR_REGISTER + AVR8_SP:            sprintf(info->s, "SP: %04x", SPREG ); break;
     }
 }

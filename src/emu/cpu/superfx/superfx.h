@@ -1,6 +1,8 @@
 #ifndef __SUPERFX_H__
 #define __SUPERFX_H__
 
+#include "devcb.h"
+
 enum
 {
 	SUPERFX_PC = 1,
@@ -81,6 +83,13 @@ enum
 
 #define SUPERFX_CFGR_IRQ	0x80	// IRQ
 #define SUPERFX_CFGR_MS0	0x20	// MS0
+
+typedef struct _superfx_config superfx_config;
+struct _superfx_config
+{
+	devcb_write_line	out_irq_func;			/* IRQ changed callback */
+};
+#define SUPERFX_CONFIG(name) const superfx_config (name) =
 
 CPU_GET_INFO( superfx );
 #define CPU_SUPERFX CPU_GET_INFO_NAME( superfx )

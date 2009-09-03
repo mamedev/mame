@@ -38,7 +38,7 @@ CPU_DISASSEMBLE( avr8 )
                     output += sprintf( output, "NOP" );
                     break;
                 case 0x0100:
-                    output += sprintf( output, "MOVW    R%d:R%d, R%d:R%d", RD4(op)+1, RD4(op), RR4(op)+1, RR4(op) );
+                    output += sprintf( output, "MOVW    R%d:R%d, R%d:R%d", (RD4(op) << 1)+1, RD4(op) << 1, (RR4(op) << 1)+1, RR4(op) << 1 );
                     break;
                 case 0x0200:
                     output += sprintf( output, "MULS    R%d, R%d", 16+RD4(op), 16+RR4(op) );

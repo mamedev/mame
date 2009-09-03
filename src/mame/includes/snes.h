@@ -1,6 +1,7 @@
 #ifndef _SNES_H_
 #define _SNES_H_
 
+#include "devcb.h"
 #include "streams.h"
 
 /*
@@ -365,13 +366,12 @@ HAS_SDD1,
 HAS_OBC1,
 HAS_RTC,
 HAS_Z80GB,
-HAS_C4,
+HAS_CX4,
 HAS_ST010,
 HAS_ST011,
 HAS_ST018,
 HAS_SPC7110,
 HAS_SPC7110_RTC,
-HAS_CX4,
 HAS_UNK
 };
 
@@ -399,6 +399,17 @@ extern WRITE8_HANDLER( snes_w_bank4 );
 extern WRITE8_HANDLER( snes_w_bank5 );
 extern WRITE8_HANDLER( snes_w_bank6 );
 extern WRITE8_HANDLER( snes_w_bank7 );
+
+extern READ8_HANDLER( superfx_r_bank1 );
+extern READ8_HANDLER( superfx_r_bank2 );
+extern READ8_HANDLER( superfx_r_bank3 );
+extern READ8_HANDLER( superfx_r_bank4 );
+extern WRITE8_HANDLER( superfx_w_bank1 );
+extern WRITE8_HANDLER( superfx_w_bank2 );
+extern WRITE8_HANDLER( superfx_w_bank3 );
+extern WRITE8_HANDLER( superfx_w_bank4 );
+
+WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
 extern UINT8 snes_has_addon_chip;
 
