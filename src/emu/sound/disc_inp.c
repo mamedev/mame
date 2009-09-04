@@ -93,6 +93,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 		switch (node->module->type)
 		{
 			case DSS_INPUT_DATA:
+			case DSS_INPUT_BUFFER:
 				new_data = data;
 				break;
 			case DSS_INPUT_LOGIC:
@@ -106,13 +107,23 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 		if (context->data != new_data)
 		{
-			/* Bring the system up to now */
-			stream_update(info->discrete_stream);
+			if (context->is_buffered)
+			{
+				/* Bring the system up to now */
+				stream_update(info->buffer_stream);
 
-			context->data = new_data;
+				context->data = new_data;
+			}
+			else
+			{
+				/* Bring the system up to now */
+				stream_update(info->discrete_stream);
 
-			/* Update the node output here so we don't have to do it each step */
-			node->output[0] = new_data * context->gain + context->offset;
+				context->data = new_data;
+
+				/* Update the node output here so we don't have to do it each step */
+				node->output[0] = new_data * context->gain + context->offset;
+			}
 		}
 	}
 	else
@@ -295,10 +306,23 @@ static DISCRETE_RESET(dss_input_stream)
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
-	context->is_buffered = FALSE;
+	
 	context->is_stream = TRUE;
+	/* Stream out number is set during start */
 	context->stream_in_number = DSS_INPUT_STREAM__STREAM;
 	context->gain = DSS_INPUT_STREAM__GAIN;
 	context->offset = DSS_INPUT_STREAM__OFFSET;
 	context->ptr = NULL;
+	//context->data = 0;
+	
+	if (node->block->type == DSS_INPUT_BUFFER)
+	{
+		context->is_buffered = TRUE;
+		stream_set_input(node->info->discrete_stream, context->stream_in_number, 
+			node->info->buffer_stream, context->stream_out_number, 1.0);
+	}
+	else
+	{
+		context->is_buffered = FALSE;
+	}
 }

@@ -3703,12 +3703,17 @@ struct _discrete_info
 
 	/* the input streams */
 	linked_list_entry 	 *input_list;
+	int					  buffer_count;		/* number of stream buffered nodes */
 
 	/* output node tracking */
 	linked_list_entry 	 *output_list;
 
 	/* the output stream */
 	sound_stream *discrete_stream;
+
+	/* the buffer stream */
+
+	sound_stream *buffer_stream;
 
 	/* debugging statics */
 	FILE *disclogfile;
@@ -4119,6 +4124,7 @@ enum
 	DSS_INPUT_NOT,		/* Input node */
 	DSS_INPUT_PULSE,	/* Input node, single pulsed version */
 	DSS_INPUT_STREAM,	/* Stream Input */
+	DSS_INPUT_BUFFER,	/* Buffer Input node, for high freq inputs like DAC */
 
 	/* from disc_wav.c */
 	/* generic modules */
@@ -4258,8 +4264,11 @@ enum
 #define DISCRETE_INPUT_NOT(NODE)                                        { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,0 }, NULL, "DISCRETE_INPUT_NOT" },
 #define DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)                      { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { GAIN,OFFSET,INIT }, NULL, "DISCRETE_INPUTX_NOT" },
 #define DISCRETE_INPUT_PULSE(NODE,INIT)                                 { NODE, DSS_INPUT_PULSE , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,INIT }, NULL, "DISCRETE_INPUT_PULSE" },
+
 #define DISCRETE_INPUT_STREAM(NODE, NUM)                                { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,1,0 }, NULL, "DISCRETE_INPUT_STREAM" },
 #define DISCRETE_INPUTX_STREAM(NODE, NUM, GAIN,OFFSET)                  { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,GAIN,OFFSET }, NULL, "DISCRETE_INPUTX_STREAM" },
+
+#define DISCRETE_INPUT_BUFFER(NODE, NUM)	                            { NODE, DSS_INPUT_BUFFER, 3, { NUM,NODE_NC,NODE_NC }, { NUM,1,0 }, NULL, "DISCRETE_INPUT_BUFFER" },
 
 /* from disc_wav.c */
 /* generic modules */

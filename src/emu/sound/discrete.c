@@ -70,6 +70,7 @@ static void setup_disc_logs(discrete_info *info);
 static node_description *discrete_find_node(const discrete_info *info, int node);
 static DEVICE_RESET( discrete );
 static STREAM_UPDATE( discrete_stream_update );
+static STREAM_UPDATE( buffer_stream_update );
 
 
 /*************************************
@@ -263,6 +264,7 @@ static const discrete_module module_list[] =
 	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 },
 	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,dss_input_pulse_step },
 	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step},
+	{ DSS_INPUT_BUFFER,"DSS_INPUT_BUFFER", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step},
 
 	/* from disc_wav.c */
 	/* Generic modules */
@@ -531,10 +533,11 @@ static DEVICE_START( discrete )
 	/* now go back and find pointers to all input nodes */
 	find_input_nodes(info);
 
-	/* then set up the output nodes */
 	/* initialize the stream(s) */
 	info->discrete_stream = stream_create(device,linked_list_count(info->input_list), linked_list_count(info->output_list), info->sample_rate, info, discrete_stream_update);
-
+	if (info->buffer_count > 0)
+		info->buffer_stream = stream_create(device, 0, info->buffer_count, info->sample_rate, info, buffer_stream_update);
+	
 	/* allocate a queue */
 
 	info->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
@@ -815,6 +818,35 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 	step_nodes_in_list(&info->step_list);
 }
 
+static STREAM_UPDATE( buffer_stream_update )
+{
+	discrete_info *info = (discrete_info *)param;
+	linked_list_entry *entry;
+
+	if (samples == 0)
+		return;
+
+	/* process buffered inputs */
+	for (entry = info->input_list; entry != NULL; entry = entry->next)
+	{
+		node_description *node = (node_description *) entry->ptr;
+
+		if (node->block->type == DSS_INPUT_BUFFER)
+		{
+			struct dss_input_context *context = (struct dss_input_context *)node->context;
+			stream_sample_t *ptr = outputs[context->stream_out_number];
+			int data = context->data;
+			int samplenum = samples;
+
+			while (samplenum--)
+			  *(ptr++) = data;
+			//for (samplenum = 0; samplenum < samples; samplenum++)
+			//	outputs[context->stream_out_number][samplenum] = data;
+		}
+	}
+}
+
+
 static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
@@ -891,6 +923,9 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	linked_list_entry	**task_list = &info->task_list;
 	linked_list_entry	**output_list = &info->output_list;
 	linked_list_entry	**input_list = &info->input_list;
+	
+	/* stream buffered node counter */
+	info->buffer_count = 0;
 
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
@@ -998,6 +1033,12 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* if we are an stream input node, track that */
 		if (block->type == DSS_INPUT_STREAM)
 		{
+			linked_list_add(info, &input_list, node);
+		}
+		else if (block->type == DSS_INPUT_BUFFER)
+		{
+			struct dss_input_context *context = (struct dss_input_context *)node->context;
+			context->stream_out_number = info->buffer_count++;
 			linked_list_add(info, &input_list, node);
 		}
 
