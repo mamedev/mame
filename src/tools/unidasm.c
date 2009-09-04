@@ -173,6 +173,7 @@ CPU_DISASSEMBLE( v810 );
 CPU_DISASSEMBLE( z180 );
 CPU_DISASSEMBLE( z8000 );
 CPU_DISASSEMBLE( z80 );
+CPU_DISASSEMBLE( z8 );
 
 
 static const dasm_table_entry dasm_table[] =
@@ -295,6 +296,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "z180",       _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
 //  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
 	{ "z80",		_8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
+	{ "z8",			_8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
 };
 
 
