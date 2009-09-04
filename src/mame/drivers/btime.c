@@ -2097,7 +2097,7 @@ static DRIVER_INIT( wtennis )
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(10));
 	memory_set_bankptr(machine, 10, memory_region(machine, "audiocpu") + 0xe200);
-	audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
+	audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
 static DRIVER_INIT( sdtennis )
