@@ -1354,8 +1354,6 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 	}
 
-	logerror("Unsupported MMIO write: offset %08x = %02x\n", offset, data);
-
 	snes_ram[offset] = data;
 }
 
@@ -1520,7 +1518,12 @@ READ8_HANDLER( snes_r_bank3 )
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_cart.mode & 5)							/* Mode 20 & 22 */
+	if (snes_has_addon_chip == HAS_SUPERFX)
+	{
+		//printf( "snes_r_bank3: %08x\n", offset );
+		return snes_ram[0x400000 + offset];
+	}
+	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
 	{
 		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20)) //FIXME: check this
 			value =  snes_ram[0x200000 + ((offset & ~0x8000) | 0x8000)];							/* Reserved */
@@ -1669,7 +1672,9 @@ WRITE8_HANDLER( snes_w_bank1 )
 		snes_w_io(space, address, data);
 	else if (address < 0x8000)
 	{
-		if (snes_has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_SUPERFX)
+			snes_ram[0x700000 + (address & 0x1fff)] = data;
+		else if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if ((snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			DSP2_write(data);
@@ -2478,5 +2483,6 @@ WRITE8_HANDLER( superfx_w_bank2 )
 
 WRITE8_HANDLER( superfx_w_bank3 )
 {
+	//printf( "superfx_w_bank3: %08x = %02x\n", 0x600000 + offset, data );
 	snes_ram[0x600000 + offset] = data;
 }

@@ -530,6 +530,8 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 
 	addr &= 0xffff;
 
+	//printf( "superfx_mmio_write: %08x = %02x\n", addr, data );
+
 	if(addr >= 0x3100 && addr <= 0x32ff)
 	{
 		return superfx_cache_mmio_write(cpustate, addr - 0x3100, data);
@@ -573,11 +575,11 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 			break;
 
 		case 0x3033:
-			cpustate->bramr = data;
+			cpustate->bramr = data & 1;
 			break;
 
 		case 0x3034:
-			cpustate->pbr = data;
+			cpustate->pbr = data & 0x7f;
 			superfx_cache_flush(cpustate);
 			break;
 
@@ -591,7 +593,7 @@ void superfx_mmio_write(const device_config *cpu, UINT32 addr, UINT8 data)
 			break;
 
 		case 0x3039:
-			cpustate->clsr = data;
+			cpustate->clsr = data & 1;
 			superfx_update_speed(cpustate);
 			break;
 
@@ -1169,7 +1171,7 @@ static CPU_EXECUTE( superfx )
 				{ // DIV2
 					cpustate->sfr &= ~SUPERFX_SFR_CY;
 					cpustate->sfr |= (*(cpustate->sreg) & 1) ? SUPERFX_SFR_CY : 0;
-					superfx_gpr_write(cpustate, cpustate->dreg_idx, ((INT16)(*(cpustate->sreg)) >> 1) + ((*(cpustate->sreg) + 1) >> 16));
+					superfx_gpr_write(cpustate, cpustate->dreg_idx, ((INT16)(*(cpustate->sreg)) >> 1) + ((UINT32)(*(cpustate->sreg) + 1) >> 16));
 					superfx_dreg_sfr_sz_update(cpustate);
 					superfx_regs_reset(cpustate);
 				}
@@ -1194,7 +1196,7 @@ static CPU_EXECUTE( superfx )
 				}
 				else
 				{ // LJMP
-					cpustate->pbr = cpustate->r[op & 0xf];
+					cpustate->pbr = cpustate->r[op & 0xf] & 0x7f;
 					superfx_gpr_write(cpustate, 15, *(cpustate->sreg));
 					cpustate->cbr = cpustate->r[15] & 0xfff0;
 					superfx_cache_flush(cpustate);
@@ -1319,12 +1321,12 @@ static CPU_EXECUTE( superfx )
 						break;
 					case SUPERFX_SFR_ALT2: // RAMB
 						superfx_rambuffer_sync(cpustate);
-						cpustate->rambr = *(cpustate->sreg);
+						cpustate->rambr = ((*(cpustate->sreg)) & 1) ? 1 : 0;
 						superfx_regs_reset(cpustate);
 						break;
 					case SUPERFX_SFR_ALT3: // ROMB
 						superfx_rombuffer_sync(cpustate);
-						cpustate->rombr = *(cpustate->sreg);
+						cpustate->rombr = *(cpustate->sreg) & 0x7f;
 						superfx_regs_reset(cpustate);
 						break;
 				}
