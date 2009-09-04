@@ -80,6 +80,7 @@ WRITE32_HANDLER( psikyo_vram_1_w );
 VIDEO_START( psikyo );
 VIDEO_EOF( psikyo );
 VIDEO_UPDATE( psikyo );
+VIDEO_START( sngkace );
 
 extern void psikyo_switch_banks( int tmap, int bank );
 
@@ -1205,7 +1206,7 @@ static MACHINE_DRIVER_START( sngkace )
 	MDRV_GFXDECODE(psikyo)
 	MDRV_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
+	MDRV_VIDEO_START(sngkace)
 	MDRV_VIDEO_EOF(psikyo)
 	MDRV_VIDEO_UPDATE(psikyo)
 
@@ -1431,8 +1432,6 @@ static DRIVER_INIT( sngkace )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
 
 	psikyo_ka302c_banking = 0; // SH201B doesn't have any gfx banking
-	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
-	psikyo_switch_banks(1, 1); // They share "gfx2" to save memory on other boards
 
 	/* Enable other regions */
 #if 0

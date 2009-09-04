@@ -243,6 +243,14 @@ VIDEO_START( psikyo )
 		tilemap_set_scroll_cols(tilemap_1_size3,1);
 }
 
+VIDEO_START( sngkace )
+{
+	VIDEO_START_CALL( psikyo );
+
+	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
+	psikyo_switch_banks(1, 1); // They share "gfx2" to save memory on other boards
+}
+
 
 
 /***************************************************************************
