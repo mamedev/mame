@@ -2,6 +2,7 @@
     68681 DUART
 
     Written by Mariusz Wojcieszek
+    Updated by Jonathan Gevaryahu AKA Lord Nightmare
 */
 
 #include "driver.h"
@@ -38,7 +39,7 @@ static const char *const duart68681_reg_write_names[0x10] =
 #define STATUS_FIFO_FULL			0x02
 #define STATUS_RECEIVER_READY		0x01
 
-#define MODE_RX_INT_SELECT_BIT		6
+#define MODE_RX_INT_SELECT_BIT		0x40
 
 #define RX_FIFO_SIZE				3
 
@@ -109,10 +110,127 @@ INLINE duart68681_state *get_safe_token(const device_config *device)
 
 static void duart68681_update_interrupts(duart68681_state *duart68681)
 {
+	/* update SR state and update interrupt ISR state for the following bits:
+	SRn: bits 7-4: handled elsewhere.
+	SRn: bit 3 (TxEMTn) (we can assume since we're not actually emulating the delay/timing of sending bits, that as long as TxRDYn is set, TxEMTn is also set since the transmit byte has 'already happened', therefore TxEMTn is always 1 assuming tx is enabled on channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined)
+	SRn: bit 2 (TxRDYn) (we COULD assume since we're not emulating delay and timing output, that as long as tx is enabled on channel n, TxRDY is 1 for channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined; however, tx_ready is already nicely handled for us elsewhere, so we can use that instead for now, though we may need to retool that code as well)
+	SRn: bit 1 (FFULLn) (this bit we actually emulate; if the recieve fifo for channel n is full, this bit is 1, otherwise it is 0. the recieve fifo should be three words long.)
+	SRn: bit 0 (RxRDYn) (this bit we also emulate; the bit is always asserted if the recieve fifo is not empty)
+	ISR: bit 7: Input Port change; this should be handled elsewhere, on the input port handler
+	ISR: bit 6: Delta Break B; this should be handled elsewhere, on the data recieve handler
+	ISR: bit 5: RxRDYB/FFULLB: this is handled here; depending on whether MSR1B bit 6 is 0 or 1, this bit holds the state of SRB bit 0 or bit 1 respectively
+	ISR: bit 4: TxRDYB: this is handled here; it mirrors SRB bit 2
+	ISR: bit 3: Counter ready; this should be handled by the timer generator
+	ISR: bit 2: Delta Break A; this should be handled elsewhere, on the data recieve handler
+	ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
+	ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
+	*/
+	UINT8 ch = 0;
+	//logerror("DEBUG: 68681 int check: upon func call, SRA is %02X, SRB is %02X, ISR is %02X\n", duart68681->channel[0].SR, duart68681->channel[1].SR, duart68681->ISR);
+	for (ch = 0; ch < 2; ch++)
+	{
+		//if ( duart68681->channel[ch].rx_enabled )
+		//{
+			if ( duart68681->channel[ch].rx_fifo_num > 0 )
+			{
+				duart68681->channel[ch].SR |= STATUS_RECEIVER_READY;
+			}
+			else
+			{
+				duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
+			}
+			if ( duart68681->channel[ch].rx_fifo_num == RX_FIFO_SIZE )
+			{
+				duart68681->channel[ch].SR |= STATUS_FIFO_FULL;
+			}
+			else
+			{
+				duart68681->channel[ch].SR &= ~STATUS_FIFO_FULL;
+			}
+		//}
+		//else
+		//{
+		//duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
+		//duart68681->channel[ch].SR &= ~STATUS_FIFO_FULL;
+		//}
+		// Handle the TxEMT and TxRDY bits based on mode
+		switch( duart68681->channel[ch].MR2&0xC0) // what mode are we in?
+			{
+			case 0x00: // normal mode 
+				if ( duart68681->channel[ch].tx_enabled )
+				{
+					duart68681->channel[ch].SR |= STATUS_TRANSMITTER_EMPTY;
+				}
+				else
+				{
+					duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
+				}
+			break;
+			case 0x40: // automatic echo mode
+				duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
+				duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+			break;
+			case 0x80: // local loopback mode
+				if ( duart68681->channel[ch].tx_enabled )
+				{
+					duart68681->channel[ch].SR |= STATUS_TRANSMITTER_EMPTY;
+				}
+				else
+				{
+					duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
+				}
+			break;
+			case 0xC0: // remote loopback mode
+				// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
+				duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
+				duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+			break;
+			}
+		// now handle the ISR bits
+		if ( duart68681->channel[ch].SR & STATUS_TRANSMITTER_READY )
+		{
+			if (ch == 0)
+				duart68681->ISR |= INT_TXRDYA;
+			else
+				duart68681->ISR |= INT_TXRDYB;
+		}
+		else
+		{
+			if (ch == 0)
+				duart68681->ISR &= ~INT_TXRDYA;
+			else
+				duart68681->ISR &= ~INT_TXRDYB;
+		}
+		//logerror("DEBUG: 68681 int check: before reciever test, SR%c is %02X, ISR is %02X\n", (ch+0x41), duart68681->channel[ch].SR, duart68681->ISR);
+		if ( duart68681->channel[ch].MR1 & MODE_RX_INT_SELECT_BIT )
+		{
+			if ( duart68681->channel[ch].SR & STATUS_FIFO_FULL )
+			{
+				duart68681->ISR |= ((ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB);
+			}
+			else
+			{
+				duart68681->ISR &= ((ch == 0) ? ~INT_RXRDY_FFULLA : ~INT_RXRDY_FFULLB);
+			}
+		}
+		else
+		{
+			if ( duart68681->channel[ch].SR & STATUS_RECEIVER_READY )
+			{
+				duart68681->ISR |= ((ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB);
+			}
+			else
+			{
+				duart68681->ISR &= ((ch == 0) ? ~INT_RXRDY_FFULLA : ~INT_RXRDY_FFULLB);
+			}
+		}
+		//logerror("DEBUG: 68681 int check: after reciever test, SR%c is %02X, ISR is %02X\n", (ch+0x41), duart68681->channel[ch].SR, duart68681->ISR);
+	}
 	if ( (duart68681->ISR & duart68681->IMR) != 0 )
 	{
 		if ( duart68681->duart_config->irq_handler )
 		{
+			LOG(( "68681: Interrupt line active (IMR & ISR = %02X)\n", (duart68681->ISR & duart68681->IMR) ));
 			duart68681->duart_config->irq_handler( duart68681->device, duart68681->IVR );
 		}
 	}
@@ -138,6 +256,7 @@ static void duart68681_write_MR(duart68681_state *duart68681, int ch, UINT8 data
 	{
 		duart68681->channel[ch].MR2 = data;
 	}
+	duart68681_update_interrupts(duart68681);
 };
 
 static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 data, UINT8 ACR)
@@ -171,7 +290,7 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 	if ( BIT(data,1) )
 	{
 		duart68681->channel[ch].rx_enabled = 0;
-		duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
+		duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY; // datasheet explicitly says disabling rx does not affect the reciever ready line, which just indicates if the fifo has anything in it at all.
 	}
 
 	if ( BIT(data,2) )
@@ -179,12 +298,14 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 		duart68681->channel[ch].tx_enabled = 1;
 		duart68681->channel[ch].tx_ready = 1;
 		duart68681->channel[ch].SR |= STATUS_TRANSMITTER_READY;
+		duart68681->channel[ch].SR |= STATUS_TRANSMITTER_EMPTY;
 	}
 	if ( BIT(data,3) )
 	{
 		duart68681->channel[ch].tx_enabled = 0;
 		duart68681->channel[ch].tx_ready = 0;
 		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
 	}
 
 	switch( (data >> 4) & 0x07 )
@@ -197,6 +318,7 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 		case 2: /* Reset channel A receiver (disable receiver and flush fifo) */
 			duart68681->channel[ch].rx_enabled = 0;
 			duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
+			duart68681->channel[ch].SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
 			duart68681->channel[ch].rx_fifo_read_ptr = 0;
 			duart68681->channel[ch].rx_fifo_write_ptr = 0;
 			duart68681->channel[ch].rx_fifo_num = 0;
@@ -218,12 +340,13 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 			{
 				duart68681->ISR &= ~INT_DELTA_BREAK_B;
 			}
-			duart68681_update_interrupts(duart68681);
 			break;
+		/* TODO: case 6 and case 7 are start break and stop break respectively, which start or stop holding the TxDA or TxDB line low (space) after whatever data is in the buffer finishes transmitting (following the stop bit?), or after two bit-times if no data is being transmitted  */
 		default:
 			LOG(( "68681: Unhandled command (%x) in CR%d\n", (data >> 4) & 0x07, ch ));
 			break;
 	}
+	duart68681_update_interrupts(duart68681);
 };
 
 static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
@@ -243,31 +366,6 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 	}
 
 	duart68681->channel[ch].rx_fifo_num--;
-
-	if ( duart68681->channel[ch].rx_fifo_num > 0 )
-	{
-		duart68681->channel[ch].SR |= STATUS_RECEIVER_READY;
-		if ( ch == 0 )
-		{
-			duart68681->ISR |= INT_RXRDY_FFULLA;
-		}
-		else
-		{
-			duart68681->ISR |= INT_RXRDY_FFULLB;
-		}
-	}
-	else
-	{
-		duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
-		if ( ch == 0 )
-		{
-			duart68681->ISR &= ~INT_RXRDY_FFULLA;
-		}
-		else
-		{
-			duart68681->ISR &= ~INT_RXRDY_FFULLB;
-		}
-	}
 	duart68681_update_interrupts(duart68681);
 
 	return r;
@@ -312,6 +410,24 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 
 	period = ATTOTIME_IN_HZ(duart68681->channel[ch].baud_rate / 10 );
 	timer_adjust_oneshot(duart68681->channel[ch].tx_timer, period, ch);
+
+	// if local loopback is on, write the transmitted data as if a byte had been recieved
+	if ((duart68681->channel[ch].MR2&0xC0) == 0x80)
+	{
+		if ( duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE )
+		{
+			LOG(( "68681: FIFO overflow\n" ));
+			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
+			return;
+		}
+		duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++] = data;
+		if ( duart68681->channel[ch].rx_fifo_write_ptr == RX_FIFO_SIZE )
+		{
+			duart68681->channel[ch].rx_fifo_write_ptr = 0;
+		}
+		duart68681->channel[ch].rx_fifo_num++;
+		duart68681_update_interrupts(duart68681);
+	}
 };
 
 READ8_DEVICE_HANDLER(duart68681_r)
@@ -397,6 +513,19 @@ READ8_DEVICE_HANDLER(duart68681_r)
 		case 0x0e: /* Start counter command */
 			switch( (duart68681->ACR >> 4) & 0x07 )
 			{
+				/* TODO: implement modes 0,1,2,4,5 */
+				case 0x03: /* Counter, CLK/16 */
+					{
+						attotime rate = ATTOTIME_IN_HZ(2*device->clock/(2*16*16*duart68681->CTR.w.l));
+						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
+					}
+					break;
+				case 0x06: /* Timer, CLK/1 */
+					{
+						attotime rate = ATTOTIME_IN_HZ(2*device->clock/(2*16*duart68681->CTR.w.l));
+						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
+					}
+					break;
 				case 0x07: /* Timer, CLK/16 */
 					{
 						//double hz;
@@ -410,6 +539,8 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			break;
 		case 0x0f: /* Stop counter command */
 			duart68681->ISR &= ~INT_COUNTER_READY;
+			if (((duart68681->ACR >>4)& 0x07) < 4) // if in counter mode...
+			timer_adjust_oneshot(duart68681->duart_timer, attotime_never, 0); // shut down timer
 			duart68681_update_interrupts(duart68681);
 			break;
 		default:
@@ -446,11 +577,17 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 			duart68681->ACR = data;
 			//       bits 6-4: Counter/Timer Mode And Clock Source Select
 			//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
-			if (((data >> 4) & 0x07) != 0x07)
+			switch ((data >> 4) & 0x07)
+			{
+				case 0: case 1: case 2: case 4: case 5: // TODO: handle these cases!
 				logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag, (data >> 4) & 0x07);
-
+				break;
+				case 3: case 6: case 7:
+				break;
+			}
 			duart68681_write_CSR(duart68681, 0, duart68681->channel[0].CSR, data);
 			duart68681_write_CSR(duart68681, 1, duart68681->channel[1].CSR, data);
+			duart68681_update_interrupts(duart68681); // need to add ACR checking for IP delta ints
 			break;
 		case 0x05: /* IMR */
 			duart68681->IMR = data;
@@ -504,6 +641,7 @@ void duart68681_rx_data( const device_config* device, int ch, UINT8 data )
 		if ( duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE )
 		{
 			LOG(( "68681: FIFO overflow\n" ));
+			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
 			return;
 		}
 		duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++] = data;
@@ -512,20 +650,6 @@ void duart68681_rx_data( const device_config* device, int ch, UINT8 data )
 			duart68681->channel[ch].rx_fifo_write_ptr = 0;
 		}
 		duart68681->channel[ch].rx_fifo_num++;
-
-		duart68681->channel[ch].SR |= STATUS_RECEIVER_READY;
-		if ( BIT(duart68681->channel[ch].MR1,MODE_RX_INT_SELECT_BIT) == 0 )
-		{
-			duart68681->ISR |= (ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB;
-		}
-		if ( duart68681->channel[ch].rx_fifo_num == RX_FIFO_SIZE )
-		{
-			duart68681->channel[ch].SR |= STATUS_FIFO_FULL;
-			if ( BIT(duart68681->channel[ch].MR1,MODE_RX_INT_SELECT_BIT) == 1 )
-			{
-				duart68681->ISR |= (ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB;
-			}
-		}
 		duart68681_update_interrupts(duart68681);
 	}
 };
@@ -594,7 +718,16 @@ static DEVICE_RESET(duart68681)
 	memset(duart68681, 0, sizeof(duart68681_state));
 	duart68681->duart_config = (const duart68681_config *)device->static_config;
 	duart68681->device = device;
-	duart68681->IVR = 0x0f;
+	duart68681->IVR = 0x0f;  /* Interrupt Vector Register */
+	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
+	duart68681->channel[0].SR = 0;
+	duart68681->channel[1].SR = 0;
+	duart68681->IMR = 0;  /* Interrupt Mask Register */
+	duart68681->ISR = 0;  /* Interrupt Status Register */
+	duart68681->OPCR = 0; /* Output Port Conf. Register */
+	duart68681->OPR = 0;  /* Output Port Register */
+	if (duart68681->duart_config->output_port_write)
+	duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
 
 	// allocate timers
 	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
