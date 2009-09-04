@@ -876,7 +876,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
-    printf( "schaser_sh_port_2_w: %02x\n", data );
+    //printf( "schaser_sh_port_2_w: %02x\n", data );
 
 	discrete_sound_w(discrete, SCHASER_MUSIC_BIT, data & 0x01);
 

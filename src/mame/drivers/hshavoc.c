@@ -300,6 +300,7 @@ static DRIVER_INIT(hshavoc)
 
 	}
 
+/* Uncommented until actively worked on
 	{
 		FILE*FP;
 
@@ -308,7 +309,7 @@ static DRIVER_INIT(hshavoc)
 		fwrite(src, rom_size/2, 2, FP);
 		fclose(FP);
 	}
-
+*/
 
 
 	DRIVER_INIT_CALL(genesis);

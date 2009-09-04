@@ -104,7 +104,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 			if(data != old_data)
 			{
 				old_data = data;
-				printf("port80 = %02X\n",data);
+				logerror("port80 = %02X\n",data);
 				//logerror("port80 = %02X\n",data);
 			}
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		//address |= (data & 0x08) ? 0x8000 : 0;
 
-//      printf("add = %X\n",address);
+//      logerror("add = %X\n",address);
 
 		memory_set_bankptr(space->machine, 1, &rom[address]);
 	}
@@ -166,7 +166,7 @@ static WRITE8_HANDLER( w2 )
 {
 /*  static int old = -1;
     if(data!=old)
-        printf("w2 = %02X\n",old=data);
+        logerror("w2 = %02X\n",old=data);
 */
 }
 
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( w3 )
 {
 /*  static int old = -1;
     if(data!=old)
-        printf("w3 = %02X\n",old=data);
+        logerror("w3 = %02X\n",old=data);
 */
 }
 
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 			cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
 		}
 //      else
-//          printf("%x \n", cpu_get_previouspc(space->cpu));
+//          logerror("%x \n", cpu_get_previouspc(space->cpu));
 
 	}
 

@@ -174,9 +174,9 @@ static WRITE16_HANDLER( blit_copy_w )
 	int x,y,x_size,y_size;
 	UINT32 src;
 
-	printf("blit copy %04x %04x %04x %04x %04x\n", blit_romaddr[0], blit_attr1_ram[0], blit_dst_ram_loword[0], blit_attr2_ram[0], blit_dst_ram_hiword[0] );
-	printf("blit vregs %04x %04x %04x %04x\n",blit_vregs[0/2],blit_vregs[2/2],blit_vregs[4/2],blit_vregs[6/2]);
-	printf("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",blit_transpen[0/2],blit_transpen[2/2],blit_transpen[4/2],blit_transpen[6/2],
+	logerror("blit copy %04x %04x %04x %04x %04x\n", blit_romaddr[0], blit_attr1_ram[0], blit_dst_ram_loword[0], blit_attr2_ram[0], blit_dst_ram_hiword[0] );
+	logerror("blit vregs %04x %04x %04x %04x\n",blit_vregs[0/2],blit_vregs[2/2],blit_vregs[4/2],blit_vregs[6/2]);
+	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",blit_transpen[0/2],blit_transpen[2/2],blit_transpen[4/2],blit_transpen[6/2],
 	                                                               blit_transpen[8/2],blit_transpen[10/2],blit_transpen[12/2],blit_transpen[14/2]);
 
 	blit_dst_xpos = (blit_dst_ram_loword[0] & 0x00ff)*2;

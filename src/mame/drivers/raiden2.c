@@ -2002,6 +2002,7 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
+/* Uncommented until actively worked on
 	{
 		FILE *fp;
 		fp=fopen("rdx_v33.dmp", "w+b");
@@ -2011,6 +2012,7 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 			fclose(fp);
 		}
 	}
+*/
 }
 
 static WRITE16_HANDLER( mcu_prog_offs_w )
