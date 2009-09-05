@@ -1023,7 +1023,7 @@ static CPU_EXECUTE( superfx )
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: // ADD / ADC / ADDI / ADCI
 			{
 				INT32 r = *(cpustate->sreg);
-				cpustate->sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_CY | SUPERFX_SFR_Z);
+				cpustate->sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				switch(cpustate->sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // ADD
@@ -1043,6 +1043,7 @@ static CPU_EXECUTE( superfx )
 						cpustate->sfr |= (~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
+				cpustate->sfr &= ~SUPERFX_SFR_CY;
 				cpustate->sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				cpustate->sfr |= (r >= 0x10000) ? SUPERFX_SFR_CY : 0;
 				cpustate->sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
@@ -1055,7 +1056,7 @@ static CPU_EXECUTE( superfx )
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f: // SUB / SBC / SUBI / CMP
 			{
 				INT32 r = 0;
-				cpustate->sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_CY | SUPERFX_SFR_Z);
+				cpustate->sfr &= ~(SUPERFX_SFR_OV | SUPERFX_SFR_S | SUPERFX_SFR_Z);
 				switch(cpustate->sfr & SUPERFX_SFR_ALT)
 				{
 					case SUPERFX_SFR_ALT0: // SUB
@@ -1078,6 +1079,7 @@ static CPU_EXECUTE( superfx )
 						cpustate->sfr |= ((*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (*(cpustate->sreg) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
+				cpustate->sfr &= ~SUPERFX_SFR_CY;
 				cpustate->sfr |= (r & 0x8000) ? SUPERFX_SFR_S : 0;
 				cpustate->sfr |= (r >= 0x0) ? SUPERFX_SFR_CY : 0;
 				cpustate->sfr |= ((UINT16)r == 0) ? SUPERFX_SFR_Z : 0;
@@ -1400,6 +1402,10 @@ static CPU_EXECUTE( superfx )
 		{
 			cpustate->r[15]++;
 		}
+
+		//printf( " r0:%04x  r1:%04x  r2:%04x  r3:%04x  r4:%04x  r5:%04x  r6:%04x  r7:%04x\n",  cpustate->r[0],  cpustate->r[1],  cpustate->r[2],  cpustate->r[3],  cpustate->r[4],  cpustate->r[5],  cpustate->r[6],  cpustate->r[7] );
+		//printf( " r8:%04x  r9:%04x r10:%04x r11:%04x r12:%04x r13:%04x r14:%04x r15:%04x\n",  cpustate->r[8],  cpustate->r[9], cpustate->r[10], cpustate->r[11], cpustate->r[12], cpustate->r[13], cpustate->r[14], cpustate->r[15] );
+		//printf( "sfr:%04x\n", cpustate->sfr );
 
         --cpustate->icount;
     }
