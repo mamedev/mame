@@ -1,4 +1,4 @@
-static UINT8 sdd1_read(running_machine* machine, UINT32 addr);
+static UINT8 sdd1_read(running_machine* machine, UINT16 addr);
 
 typedef struct //Input Manager
 {
@@ -411,7 +411,7 @@ static void SDD1_OL_prepareDecomp(SDD1_OL* this, UINT32 first_byte, UINT16 out_l
 static void SDD1_OL_launch(SDD1_OL* this)
 {
 	UINT8 i;
-	UINT8 register1, register2;
+	UINT8 register1 = 0, register2 = 0;
 
 	switch(this->bitplanesInfo)
 	{
@@ -540,26 +540,37 @@ static void sdd1_init(running_machine* machine)
 	snes_sdd1.sdd1emu = SDD1emu_ctor(machine);
 }
 
-static UINT8 sdd1_mmio_read(running_machine* machine, UINT16 addr)
+static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
 {
 	addr &= 0xffff;
+
+	//printf("SDD1::mmio_read(%04x)\n", addr);
+
+	if((addr & 0x4380) == 0x4300)
+	{
+		return snes_r_io(space, addr & 0x7f);
+	}
 
 	switch(addr)
 	{
 		case 0x4804:
 			return (snes_sdd1.mmc[0] >> 20) & 7;
+			break;
 		case 0x4805:
 			return (snes_sdd1.mmc[1] >> 20) & 7;
+			break;
 		case 0x4806:
 			return (snes_sdd1.mmc[2] >> 20) & 7;
+			break;
 		case 0x4807:
 			return (snes_sdd1.mmc[3] >> 20) & 7;
+			break;
 	}
 
 	return 0xff;
 }
 
-static void sdd1_mmio_write(running_machine* machine, UINT16 addr, UINT8 data)
+static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)
 {
 	addr &= 0xffff;
 
@@ -570,19 +581,24 @@ static void sdd1_mmio_write(running_machine* machine, UINT16 addr, UINT8 data)
 		{
 			case 2:
 				snes_sdd1.dma[channel].addr = (snes_sdd1.dma[channel].addr & 0xffff00) + (data <<  0);
+				//printf( "dma[%d].addr = %06x\n", channel, snes_sdd1.dma[channel].addr );
 				break;
 			case 3:
 				snes_sdd1.dma[channel].addr = (snes_sdd1.dma[channel].addr & 0xff00ff) + (data <<  8);
+				//printf( "dma[%d].addr = %06x\n", channel, snes_sdd1.dma[channel].addr );
 				break;
 			case 4:
 				snes_sdd1.dma[channel].addr = (snes_sdd1.dma[channel].addr & 0x00ffff) + (data << 16);
+				//printf( "dma[%d].addr = %06x\n", channel, snes_sdd1.dma[channel].addr );
 				break;
 
 			case 5:
-				snes_sdd1.dma[channel].addr = (snes_sdd1.dma[channel].addr &   0xff00) + (data <<  0);
+				snes_sdd1.dma[channel].size = (snes_sdd1.dma[channel].size &   0xff00) + (data <<  0);
+				//printf( "dma[%d].size = %04x\n", channel, snes_sdd1.dma[channel].size );
 				break;
 			case 6:
-				snes_sdd1.dma[channel].addr = (snes_sdd1.dma[channel].addr &   0x00ff) + (data <<  8);
+				snes_sdd1.dma[channel].size = (snes_sdd1.dma[channel].size &   0x00ff) + (data <<  8);
+				//printf( "dma[%d].size = %04x\n", channel, snes_sdd1.dma[channel].size );
 				break;
 		}
 		snes_ram[addr] = data;
@@ -613,8 +629,9 @@ static void sdd1_mmio_write(running_machine* machine, UINT16 addr, UINT8 data)
 	}
 }
 
-static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
+static UINT8 sdd1_read(running_machine* machine, UINT16 addr)
 {
+	//printf( "sdd1.read(%06x)\n", addr );
 	if(snes_sdd1.sdd1_enable & snes_sdd1.xfer_enable)
 	{
 		// at least one channel has S-DD1 decompression enabled...
@@ -659,7 +676,8 @@ static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
 		} // channel loop
 	} // S-DD1 decompressor enabled
 
-	return memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff));
+	//printf( "returning a generic memory read from %06x\n", 0xc00000 + snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff) );
+	return snes_ram[0xc00000 + snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff)];
 }
 
 static void sdd1_reset(running_machine *machine)
