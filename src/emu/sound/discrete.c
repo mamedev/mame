@@ -56,7 +56,21 @@
  *
  *************************************/
 
-#define DISCRETE_PROFILING			(0)
+#define DISCRETE_PROFILING			(1)
+
+/*************************************
+ *
+ *  Structures
+ *
+ *************************************/
+
+typedef struct _task_info task_info;
+struct _task_info
+{
+	discrete_task_context *context;
+	int samples;
+};
+
 
 /*************************************
  *
@@ -96,137 +110,13 @@ static void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const discrete_info *disc_in
 	}
 }
 
-typedef struct _task_info task_info;
-
-struct _task_info
-{
-	discrete_task_context *context;
-	int samples;
-};
-
-INLINE void step_nodes_in_list(linked_list_entry **list)
-{
-	linked_list_entry *entry;
-
-	if (DISCRETE_PROFILING)
-	{
-		osd_ticks_t last = osd_profiling_ticks();
-		
-		for (entry = *list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-	
-			node->run_time -= last;
-			(*node->module->step)(node);
-			last = osd_profiling_ticks();
-			node->run_time += last;
-		}
-	}
-	else
-	{
-		for (entry = *list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-	
-			/* Now step the node */
-			(*node->module->step)(node);
-			//bigselect(info->device, node);
-		}
-	}
-}
-
-static void *task_callback(void *param, int threadid)
-{
-	task_info *ti = (task_info *) param;
-	int samples, i;
-
-	/* set up task buffers */
-	for (i = 0; i < ti->context->numbuffered; i++)
-		ti->context->ptr[i] = &ti->context->node_buf[i][0];
-	
-	samples = ti->samples;
-	while (samples-- > 0)
-	{
-		step_nodes_in_list(&ti->context->list);
-	}
-	/* reset ptr */
-	for (i = 0; i < ti->context->numbuffered; i++)
-		ti->context->ptr[i] = &ti->context->node_buf[i][0];
-
-	free(param);
-	return NULL;
-}
-
-static DISCRETE_STEP( dso_task )
-{
-	discrete_task_context *ctx =  (discrete_task_context *) node->context;
-	int i;
-	
-	for (i = 0; i < ctx->numbuffered; i++)
-		*(ctx->ptr[i]++) = (double) DISCRETE_INPUT(i);
-}
-
-static DISCRETE_RESET( dso_task )
-{
-	/* nothing to do - just avoid being stepped */
-}
-
-static DISCRETE_STEP( dso_output )
-{
-	stream_sample_t **output = (stream_sample_t **) &node->context;
-	double val;
-
-	/* Add gain to the output and put into the buffers */
-	/* Clipping will be handled by the main sound system */
-	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
-	**output = val;
-	(*output)++;
-}
-
-static DISCRETE_RESET( dso_output )
-{
-	/* nothing to do - just avoid being stepped */
-}
-
-
-/*************************************
- *
- *  Add an entry to a list
- *
- *************************************/
-
-static void linked_list_add(discrete_info *info, linked_list_entry ***list_tail_ptr, void *ptr)
-{
-	**list_tail_ptr = auto_alloc(info->device->machine, linked_list_entry);
-	(**list_tail_ptr)->ptr = ptr;
-	(**list_tail_ptr)->next = NULL;
-	*list_tail_ptr = &((**list_tail_ptr)->next);
-}
-
-/*************************************
- *
- *  Count entries in a list
- *
- *************************************/
-
-static int linked_list_count(linked_list_entry *list)
-{
-	int cnt = 0;
-	linked_list_entry *entry;
-
-	for (entry = list; entry != NULL; entry = entry->next)
-		cnt++;
-
-	return cnt;
-}
-
-
 /*************************************
  *
  *  Included simulation objects
  *
  *************************************/
 
+#include "disc_sys.c"		/* discrete core modules and support functions */
 #include "disc_wav.c"		/* Wave sources   - SINE/SQUARE/NOISE/etc */
 #include "disc_mth.c"		/* Math Devices   - ADD/GAIN/etc */
 #include "disc_inp.c"		/* Input Devices  - INPUT/CONST/etc */
@@ -356,6 +246,67 @@ static const discrete_module module_list[] =
 	/* must be the last one */
 	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 }
 };
+
+INLINE void step_nodes_in_list(linked_list_entry **list)
+{
+	linked_list_entry *entry;
+
+	if (DISCRETE_PROFILING)
+	{
+		osd_ticks_t last = osd_profiling_ticks();
+		
+		for (entry = *list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+	
+			node->run_time -= last;
+			(*node->module->step)(node);
+			last = osd_profiling_ticks();
+			node->run_time += last;
+		}
+	}
+	else
+	{
+		for (entry = *list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+	
+			/* Now step the node */
+			(*node->module->step)(node);
+		}
+	}
+}
+
+/*************************************
+ *
+ *  Add an entry to a list
+ *
+ *************************************/
+
+static void linked_list_add(discrete_info *info, linked_list_entry ***list_tail_ptr, void *ptr)
+{
+	**list_tail_ptr = auto_alloc(info->device->machine, linked_list_entry);
+	(**list_tail_ptr)->ptr = ptr;
+	(**list_tail_ptr)->next = NULL;
+	*list_tail_ptr = &((**list_tail_ptr)->next);
+}
+
+/*************************************
+ *
+ *  Count entries in a list
+ *
+ *************************************/
+
+static int linked_list_count(linked_list_entry *list)
+{
+	int cnt = 0;
+	linked_list_entry *entry;
+
+	for (entry = list; entry != NULL; entry = entry->next)
+		cnt++;
+
+	return cnt;
+}
 
 /*************************************
  *
@@ -504,6 +455,7 @@ static DEVICE_START( discrete )
 	info->neg_sample_time = - info->sample_time;
 
 	info->total_samples = 0;
+	info->total_stream_updates = 0;
 
 	/* create the logfile */
 	sprintf(name, "discrete%s.log", device->tag);
@@ -553,10 +505,10 @@ static DEVICE_START( discrete )
  *
  *************************************/
 
-static osd_ticks_t task_run_time(linked_list_entry *list)
+static UINT64 list_run_time(linked_list_entry *list)
 {
 	linked_list_entry *entry;
-	osd_ticks_t total = 0;
+	UINT64 total = 0;
 	
 	for (entry = list; entry != NULL; entry = entry->next)
 	{
@@ -565,6 +517,44 @@ static osd_ticks_t task_run_time(linked_list_entry *list)
 		total += node->run_time;
 	}
 	return total;
+}
+
+static void display_profiling(discrete_info *info)
+{
+	int count;
+	UINT64 total;
+	UINT64 tresh;
+	double tt;
+	linked_list_entry *entry;
+
+	/* calculate total time */
+	total = list_run_time(info->node_list);
+	count = linked_list_count(info->node_list);
+	/* print statistics */
+	printf("Total Samples  : %16" I64FMT "d\n", info->total_samples);
+	tresh = total / count;
+	printf("Treshold (mean): %16" I64FMT "d\n", tresh / info->total_samples );
+	for (entry = info->node_list; entry != NULL; entry = entry->next)
+	{
+		node_description *node = (node_description *) entry->ptr;
+
+		if (node->run_time > tresh)
+			printf("%3d: %20s %8.2f %10.2f\n", NODE_INDEX(node->node), node->module->name, (float) node->run_time / (float) total * 100.0, ((float) node->run_time) / (float) info->total_samples);
+	}
+
+	/* Task information */
+	for (entry = info->task_list; entry != 0; entry = entry->next)
+	{
+		discrete_task_context *task = (discrete_task_context *) entry->ptr;
+		tt =  list_run_time(task->list);
+
+		printf("Task: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
+	}
+	tt =  list_run_time(info->step_list);
+
+	printf("Main: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
+	
+	printf("Average samples/stream_update: %8.2f\n", (double) info->total_samples / (double) info->total_stream_updates);
 }
 
 static DEVICE_STOP( discrete )
@@ -576,44 +566,7 @@ static DEVICE_STOP( discrete )
 
 	if (DISCRETE_PROFILING)
 	{
-		int count = 0;
-		linked_list_entry *entry;
-		osd_ticks_t total = 0;
-		osd_ticks_t tresh;
-		double tt;
-
-		/* calculate total time */
-		for (entry = info->node_list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-
-			/* Now step the node */
-			total += node->run_time;
-			count++;
-		}
-		/* print statistics */
-		printf("Total Samples: %d\n", info->total_samples);
-		tresh = total / count;
-		for (entry = info->node_list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-
-			if (node->run_time > tresh)
-				printf("%3d: %20s %8.2f %10.2f\n", NODE_INDEX(node->node), node->module->name, (float) node->run_time / (float) total * 100.0, ((float) node->run_time) / (float) info->total_samples);
-		}
-
-		/* Task information */
-		for (entry = info->task_list; entry != 0; entry = entry->next)
-		{
-			discrete_task_context *task = (discrete_task_context *) entry->ptr;
-			tt =  task_run_time(task->list);
-
-			printf("Task: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
-		}
-		tt =  task_run_time(info->step_list);
-
-		printf("Main: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
-
+		display_profiling(info);
 	}
 
 	/* close any csv files */
@@ -665,91 +618,33 @@ static DEVICE_RESET( discrete )
 	}
 }
 
-/* This was a try which unfortunately did not provide
- * any improvement. Left here for reference
- */
-#if 0
-INLINE void bigselect(const device_config *device, node_description *node)
-{
-	switch (node->module.type)
-	{
-	case  DSS_ADJUSTMENT  :		dss_adjustment_step(device, node); break;
-	case  DSS_INPUT_PULSE :		dss_input_pulse_step(device, node); break;
-	case  DSS_INPUT_STREAM:		dss_input_stream_step(device, node); break;
-	case  DSS_COUNTER     :		dss_counter_step(device, node); break;
-	case  DSS_LFSR_NOISE  :		dss_lfsr_step(device, node); break;
-	case  DSS_NOISE       :		dss_noise_step(device, node); break;
-	case  DSS_NOTE        :		dss_note_step(device, node); break;
-	case  DSS_SAWTOOTHWAVE:		dss_sawtoothwave_step(device, node); break;
-	case  DSS_SINEWAVE    :		dss_sinewave_step(device, node); break;
-	case  DSS_SQUAREWAVE  :		dss_squarewave_step(device, node); break;
-	case  DSS_SQUAREWFIX  :		dss_squarewfix_step(device, node); break;
-	case  DSS_SQUAREWAVE2 :		dss_squarewave2_step(device, node); break;
-	case  DSS_TRIANGLEWAVE:		dss_trianglewave_step(device, node); break;
-	case  DSS_INVERTER_OSC :	dss_inverter_osc_step(device, node); break;
-	case  DSS_OP_AMP_OSC  :		dss_op_amp_osc_step(device, node); break;
-	case  DSS_SCHMITT_OSC :		dss_schmitt_osc_step(device, node); break;
-	case  DSS_ADSR        :		dss_adsrenv_step(device, node); break;
-	case  DST_ADDER       :		dst_adder_step(device, node); break;
-	case  DST_CLAMP       :		dst_clamp_step(device, node); break;
-	case  DST_DIVIDE      :		dst_divide_step(device, node); break;
-	case  DST_GAIN        :		dst_gain_step(device, node); break;
-	case  DST_LOGIC_INV   :		dst_logic_inv_step(device, node); break;
-	case  DST_LOGIC_AND   :		dst_logic_and_step(device, node); break;
-	case  DST_LOGIC_NAND  :		dst_logic_nand_step(device, node); break;
-	case  DST_LOGIC_OR    :		dst_logic_or_step(device, node); break;
-	case  DST_LOGIC_NOR   :		dst_logic_nor_step(device, node); break;
-	case  DST_LOGIC_XOR   :		dst_logic_xor_step(device, node); break;
-	case  DST_LOGIC_NXOR  :		dst_logic_nxor_step(device, node); break;
-	case  DST_LOGIC_DFF   :		dst_logic_dff_step(device, node); break;
-	case  DST_LOGIC_JKFF  :		dst_logic_jkff_step(device, node); break;
-	case  DST_LOOKUP_TABLE:		dst_lookup_table_step(device, node); break;
-	case  DST_MULTIPLEX   :		dst_multiplex_step(device, node); break;
-	case  DST_ONESHOT     :		dst_oneshot_step(device, node); break;
-	case  DST_RAMP        :		dst_ramp_step(device, node); break;
-	case  DST_SAMPHOLD    :		dst_samphold_step(device, node); break;
-	case  DST_SWITCH      :		dst_switch_step(device, node); break;
-	case  DST_ASWITCH     :		dst_aswitch_step(device, node); break;
-	case  DST_TRANSFORM   :		dst_transform_step(device, node); break;
-	case  DST_COMP_ADDER  :		dst_comp_adder_step(device, node); break;
-	case  DST_DAC_R1      :		dst_dac_r1_step(device, node); break;
-	case  DST_DIODE_MIX   :		dst_diode_mix_step(device, node); break;
-	case  DST_INTEGRATE   :		dst_integrate_step(device, node); break;
-	case  DST_MIXER       :		dst_mixer_step(device, node); break;
-	case  DST_OP_AMP      :		dst_op_amp_step(device, node); break;
-	case  DST_OP_AMP_1SHT :		dst_op_amp_1sht_step(device, node); break;
-	case  DST_TVCA_OP_AMP :		dst_tvca_op_amp_step(device, node); break;
-	case  DST_FILTER1     :		dst_filter1_step(device, node); break;
-	case  DST_FILTER2     :		dst_filter2_step(device, node); break;
-	case  DST_SALLEN_KEY  :		dst_sallen_key_step(device, node); break;
-	case  DST_CRFILTER    :		dst_crfilter_step(device, node); break;
-	case  DST_OP_AMP_FILT :		dst_op_amp_filt_step(device, node); break;
-	case  DST_RCDISC      :		dst_rcdisc_step(device, node); break;
-	case  DST_RCDISC2     :		dst_rcdisc2_step(device, node); break;
-	case  DST_RCDISC3     :		dst_rcdisc3_step(device, node); break;
-	case  DST_RCDISC4     :		dst_rcdisc4_step(device, node); break;
-	case  DST_RCDISC5     :		dst_rcdisc5_step(device, node); break;
-	case  DST_RCINTEGRATE :		dst_rcintegrate_step(device, node); break;
-	case  DST_RCDISC_MOD  :		dst_rcdisc_mod_step(device, node); break;
-	case  DST_RCFILTER    :		dst_rcfilter_step(device, node); break;
-	case  DST_RCFILTER_SW :		dst_rcfilter_sw_step(device, node); break;
-	case  DST_RCFILTERN   :		dst_filter1_step(device, node); break;
-	case  DST_RCDISCN     :		dst_rcdiscN_step(device, node); break;
-	case  DST_RCDISC2N    :		dst_rcdisc2N_step(device, node); break;
-	case  DSD_555_ASTBL   :		dsd_555_astbl_step(device, node); break;
-	case  DSD_555_MSTBL   :		dsd_555_mstbl_step(device, node); break;
-	case  DSD_555_CC      :		dsd_555_cc_step(device, node); break;
-	case  DSD_555_VCO1    :		dsd_555_vco1_step(device, node); break;
-	case  DSD_566         :		dsd_566_step(device, node); break;
-	case  DSD_LS624       :		dsd_ls624_step(device, node); break;
-	}
-}
-#endif
 /*************************************
  *
  *  Stream update functions
  *
  *************************************/
+
+static void *task_callback(void *param, int threadid)
+{
+	task_info *ti = (task_info *) param;
+	int samples, i;
+
+	/* set up task buffers */
+	for (i = 0; i < ti->context->numbuffered; i++)
+		ti->context->ptr[i] = &ti->context->node_buf[i][0];
+	
+	samples = ti->samples;
+	while (samples-- > 0)
+	{
+		step_nodes_in_list(&ti->context->list);
+	}
+	/* reset ptr */
+	for (i = 0; i < ti->context->numbuffered; i++)
+		ti->context->ptr[i] = &ti->context->node_buf[i][0];
+
+	free(param);
+	return NULL;
+}
 
 INLINE void discrete_stream_update_csv(discrete_info *info)
 {
@@ -840,8 +735,6 @@ static STREAM_UPDATE( buffer_stream_update )
 
 			while (samplenum--)
 			  *(ptr++) = data;
-			//for (samplenum = 0; samplenum < samples; samplenum++)
-			//	outputs[context->stream_out_number][samplenum] = data;
 		}
 	}
 }
@@ -869,6 +762,7 @@ static STREAM_UPDATE( discrete_stream_update )
 		context->ptr = (void *) inputs[context->stream_in_number];
 	}
 
+	/* Queue tasks */
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
 		task_info *ti = malloc(sizeof(task_info));
@@ -900,6 +794,9 @@ static STREAM_UPDATE( discrete_stream_update )
 
 		}
 	}
+	
+	if (DISCRETE_PROFILING)
+		info->total_stream_updates++;
 
 }
 
@@ -950,6 +847,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		node->block = block;
 		node->custom = block->custom;
 		node->active_inputs = block->active_inputs;
+		node->run_time = 0;
 
 		/* keep track of special nodes */
 		if (block->node == NODE_SPECIAL)

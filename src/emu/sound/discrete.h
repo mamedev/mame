@@ -3734,7 +3734,8 @@ struct _discrete_info
 	osd_work_queue *queue;
 
 	/* profiling */
-	int total_samples;
+	UINT64 total_samples;
+	UINT64 total_stream_updates;
 };
 
 

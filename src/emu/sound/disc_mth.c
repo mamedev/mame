@@ -1761,7 +1761,7 @@ static DISCRETE_STEP(dst_transform)
 				break;
 			default:
 				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed: %s",(const char *)node->custom);
-				/* these is enough to fatalerror */
+				/* that is enough to fatalerror */
 				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)node->custom);
 				break;
 		}
