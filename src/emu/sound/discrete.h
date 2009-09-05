@@ -3357,12 +3357,20 @@
 
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
+#define DISCRETE_START_NAME( _func ) _func ## _start
+#define DISCRETE_STOP_NAME( _func )  _func ## _stop
 
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
+#define DISCRETE_FUNC(_func) void _func (node_description *node)
+
+#define DISCRETE_STEP(_func) DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
+#define DISCRETE_RESET(_func) DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
+#define DISCRETE_START(_func) DISCRETE_FUNC(DISCRETE_START_NAME(_func))
+#define DISCRETE_STOP(_func) DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
 
 #define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
 #define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
+#define DISCRETE_START_CALL(_func) DISCRETE_START_NAME(_func) (node)
+#define DISCRETE_STOP_CALL(_func) DISCRETE_STOP_NAME(_func) (node)
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
@@ -3377,10 +3385,8 @@
 
 #define DISCRETE_MAX_NODES				300
 #define DISCRETE_MAX_INPUTS				10
-#define DISCRETE_MAX_WAVELOGS			10
-#define DISCRETE_MAX_CSVLOGS			10
 #define DISCRETE_MAX_OUTPUTS			 8
-#define DISCRETE_MAX_TASK_OUTPUTS		 5
+#define DISCRETE_MAX_TASK_OUTPUTS		 8
 
 
 /*************************************
@@ -3617,8 +3623,10 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
+	DISCRETE_FUNC((*reset));	            /* Called to reset a node after creation or system reset */
+	DISCRETE_FUNC((*step));					/* Called to execute one time delta of output update */
+	DISCRETE_FUNC((*start));				/* Called to execute at device start */
+	DISCRETE_FUNC((*stop));					/* Called to execute at device stop */
 };
 
 
@@ -3712,25 +3720,12 @@ struct _discrete_info
 	sound_stream *discrete_stream;
 
 	/* the buffer stream */
-
 	sound_stream *buffer_stream;
 
-	/* debugging statics */
+	/* debugging statistics */
 	FILE *disclogfile;
 
-	/* csvlog tracking */
-	int num_csvlogs;
-	FILE *disc_csv_file[DISCRETE_MAX_CSVLOGS];
-	node_description *csvlog_node[DISCRETE_MAX_CSVLOGS];
-	INT64 sample_num;
-
-	/* wavelog tracking */
-	int num_wavelogs;
-	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
-	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
-
 	/* parallel tasks */
-
 	osd_work_queue *queue;
 
 	/* profiling */
