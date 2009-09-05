@@ -8954,6 +8954,8 @@ Other Sun games
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
 	DRIVER( witchcdd )	/* 1991, Unknown */
+	DRIVER( witchcde )	/* 1994, Unknown */
+	DRIVER( witchcdf )	/* (c) 1991 PlayMan */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
