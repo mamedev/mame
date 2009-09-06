@@ -6,20 +6,14 @@
 	</led7seg>
 	</element>
 	<element name="play" defstate="0">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
 		<text string="PLAY" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 	<element name="pass" defstate="0">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
 		<text string="PASS" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
@@ -113,6 +107,72 @@
 	<element name="4" defstate="0">
 		<text string="4" state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="20p" defstate="0">
+		<text string="20p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="20p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="50p" defstate="0">
+		<text string="50p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="50p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="100p" defstate="0">
+		<text string="100p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="100p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="200p" defstate="0">
+		<text string="200p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="200p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="500p" defstate="0">
+		<text string="500p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="500p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="1000p" defstate="0">
+		<text string="1000p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="1000p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
@@ -549,6 +609,30 @@
 			<bounds x="56" y="48" width="7" height="7"/>
 		</backdrop>
 
+		<backdrop name="lamp71" element="20p" state="0">
+			<bounds x="64" y="48" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp79" element="50p" state="0">
+			<bounds x="64" y="40" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp87" element="100p" state="0">
+			<bounds x="64" y="32" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp95" element="200p" state="0">
+			<bounds x="64" y="24" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp103" element="500p" state="0">
+			<bounds x="64" y="16" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp111" element="1000p" state="0">
+			<bounds x="64" y="8" width="7" height="7"/>
+		</backdrop>
+
 		<backdrop name="lamp119" element="timeout" state="0">
 			<bounds x="30" y="56" width="28" height="14"/>
 		</backdrop>
@@ -563,11 +647,11 @@
 			<bounds x="30" y="56" width="28" height="14"/>
 		</backdrop>
 
-		<backdrop name="lamp27" element="play" state="0">
-			<bounds x="0" y="72" width="28" height="14"/>
+		<backdrop name="lamp122" element="play" state="0">
+			<bounds x="0" y="140" width="28" height="14"/>
 		</backdrop>
-		<backdrop name="lamp26" element="pass" state="0">
-			<bounds x="20" y="72" width="28" height="14"/>
+		<backdrop name="lamp121" element="pass" state="0">
+			<bounds x="40" y="140" width="28" height="14"/>
 		</backdrop>
 		<backdrop name="lamp24" element="select" state="0">
 			<bounds x="0" y="90" width="28" height="14"/>
