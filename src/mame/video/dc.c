@@ -34,6 +34,7 @@ static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
 static UINT32 debug_dip_status;
+static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y);
 
 UINT64 *dc_framebuffer_ram; // '32-bit access area'
 UINT64 *dc_texture_ram; // '64-bit access area'
@@ -46,8 +47,11 @@ static emu_timer *endofrender_timer_tsp;
 static emu_timer *endofrender_timer_video;
 
 static int scanline;
-static bitmap_t *fakeframebuffer_bitmap;
-static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
+
+// the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
+//  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
+static bitmap_t *fake_accumulationbuffer_bitmap;
+static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
@@ -1003,10 +1007,9 @@ WRITE64_HANDLER( pvr_ta_w )
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
-	#if DEBUG_PVRTA
-	UINT32 sizera,offsetra,v;
-	#endif
+	UINT32 sizera,offsetra;
 	int a;
+	int sanitycount;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1050,42 +1053,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("Start Render Received:\n");
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
 		mame_printf_verbose("  ISP/TSP Parameters at %08x\n",pvrta_regs[PARAM_BASE]);
-		if (pvrta_regs[FPU_PARAM_CFG] & 0x200000)
-			sizera=6;
-		else
-			sizera=5;
-		offsetra=pvrta_regs[REGION_BASE];
-		for (;;)
-		{
-			v=memory_read_dword(space,0x05000000+offsetra);
-			mame_printf_verbose("Tile X:%d Y:%d\n  ", (v >> 2) & 0x3f, (v >> 8) & 0x3f);
-			offsetra = offsetra+4;
-			v=memory_read_dword(space,0x05000000+offsetra);
-			if (!(v & 0x80000000))
-				mame_printf_verbose("OLP %d ",v & 0xFFFFFC);
-			offsetra = offsetra+4;
-			v=memory_read_dword(space,0x05000000+offsetra);
-			if (!(v & 0x80000000))
-				mame_printf_verbose("OMVLP %d ",v & 0xFFFFFC);
-			offsetra = offsetra+4;
-			v=memory_read_dword(space,0x05000000+offsetra);
-			if (!(v & 0x80000000))
-				mame_printf_verbose("TLP %d ",v & 0xFFFFFC);
-			offsetra = offsetra+4;
-			v=memory_read_dword(space,0x05000000+offsetra);
-			if (!(v & 0x80000000))
-				mame_printf_verbose("TMVLP %d ",v & 0xFFFFFC);
-			if (sizera == 6)
-			{
-				offsetra = offsetra+4;
-				v=memory_read_dword(space,0x05000000+offsetra);
-				if (!(v & 0x80000000))
-					mame_printf_verbose("PTLP %d ",v & 0xFFFFFC);
-			}
-			mame_printf_verbose("\n");
-			if (v & 0x80000000)
-				break;
-		}
+
 		#endif
 		// select buffer to draw using PARAM_BASE
 		for (a=0;a < NUM_BUFFERS;a++)
@@ -1107,11 +1075,68 @@ WRITE64_HANDLER( pvr_ta_w )
 				clip.min_y = 0;
 				clip.max_y = 1023;
 
-				// we've got a request to draw, so, draw to the fake fraembuffer!
-				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);
+				// we've got a request to draw, so, draw to the accumulation buffer!
+				// this should really be done for each tile!
+				render_to_accumulation_buffer(space->machine,fake_accumulationbuffer_bitmap,&clip);
 
 				timer_adjust_oneshot(endofrender_timer_isp, ATTOTIME_IN_USEC(4000) , 0); // hack, make sure render takes some amount of time
 
+				/* copy the tiles to the framebuffer (really the rendering should be in this loop too) */
+				if (pvrta_regs[FPU_PARAM_CFG] & 0x200000)
+					sizera=6;
+				else
+					sizera=5;
+				offsetra=pvrta_regs[REGION_BASE];
+				
+				//printf("base is %08x\n", offsetra);
+				
+				// sanity
+				sanitycount = 0;
+				for (;;)
+				{
+					UINT32 st[6];
+
+					st[0]=memory_read_dword(space,(0x05000000+offsetra));
+					st[1]=memory_read_dword(space,(0x05000004+offsetra)); // Opaque List Pointer
+					st[2]=memory_read_dword(space,(0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
+					st[3]=memory_read_dword(space,(0x0500000c+offsetra)); // Translucent List Pointer
+					st[4]=memory_read_dword(space,(0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
+				
+					if (sizera == 6)
+					{
+						st[5] = memory_read_dword(space,(0x05000014+offsetra)); // Punch Through List Pointer
+						offsetra+=0x18;
+					}
+					else
+					{
+						st[5] = 0;
+						offsetra+=0x14;
+					}
+						
+					{
+						int x = ((st[0]&0x000000fc)>>2)*32;
+						int y = ((st[0]&0x00003f00)>>8)*32;
+						//printf("tiledata %08x %d %d - %08x %08x %08x %08x %08x\n",st[0],x,y,st[1],st[2],st[3],st[4],st[5]);
+						
+						// should render to the accumulation buffer here using pointers we filled in when processing the data
+						// sent to the TA.  HOWEVER, we don't process the TA data and create the real format object lists, so
+						// instead just use these co-ordinates to copy data from our fake full-screnen accumnulation buffer into
+						// the framebuffer
+						
+						pvr_accumulationbuffer_to_framebuffer(space, x,y);
+					}
+						
+					if (st[0] & 0x80000000)
+						break;
+					
+					// prevent infinite loop if asked to process invalid data
+					if(sanitycount>2000)
+						break;
+				}
+				
+				
+				
+				
 				break;
 			}
 		}
@@ -1854,7 +1879,7 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 	render_tri_sorted(bitmap, ti, v+i0, v+i1, v+i2);
 }
 
-static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int cs,rs,ns;
@@ -1875,27 +1900,8 @@ static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const recta
 	c=pvrta_regs[ISP_BACKGND_T];
 	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	bitmap_fill(bitmap,cliprect,c);
-#if 0
-	stride=pvrta_regs[FB_W_LINESTRIDE] << 3;
-	c=pvrta_regs[ISP_BACKGND_T];
-	a=(c & 0xfffff8) >> 1;
-	cs=(c >> 24) & 7;
-	cs=cs+3; // cs*2+3
-	c=memory_read_dword(space,0x05000000+a+3*4+(cs-1)*4);
-	dx=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+cs*4+0));
-	dy=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+2*cs*4+4));
-	for (y=0;y < dy;y++)
-	{
-		addrp=state_ta.grab[rs].fbwsof1+y*stride;
-		for (x=0;x < dx;x++)
-		{
-			bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
-			*bmpaddr16=((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3);
-			addrp+=2;
-		}
-	}
-#endif
 
+	
 	ns=state_ta.grab[rs].strips_size;
 	if(ns)
 		memset(wbuffer, 0x00, sizeof(wbuffer));
@@ -1922,8 +1928,85 @@ static void testdrawscreen(running_machine *machine,bitmap_t *bitmap,const recta
 	state_ta.grab[rs].busy=0;
 }
 
-#if 0
-static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
+// copies the accumulation buffer into the framebuffer, converting to the specified format
+// not accurate, ignores field stuff and just uses SOF1 for now
+// also ignores scale effects (can scale accumulation buffer to half size with filtering etc.)
+// also can specify dither etc.
+// basically, just a crude implementation!
+
+/*
+
+0x0 0555 KRGB 16 bit (default) Bit 15 is the value of fb_kval 7.
+0x1 565 RGB 16 bit
+0x2 4444 ARGB 16 bit
+0x3 1555 ARGB 16 bit The alpha value is determined by comparison with the value of fb_alpha_threshold.
+0x4 888 RGB 24 bit packed
+0x5 0888 KRGB 32 bit K is the value of fk_kval.
+0x6 8888 ARGB 32 bit
+0x7 Setting prohibited.
+
+*/
+
+static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y)
+{
+	// the accumulation buffer is always 8888
+	//
+	// the standard format for the framebuffer appears to be 565
+	// yes, this means colour data is lost in the conversion
+
+	UINT32 wc = pvrta_regs[FB_W_CTRL];
+	UINT32 stride = pvrta_regs[FB_W_LINESTRIDE];
+	UINT32 writeoffs = pvrta_regs[FB_W_SOF1];
+	
+	UINT32* src;
+	
+	
+	UINT8 packmode = wc & 0x7;
+	
+	switch (packmode)
+	{
+		case 0x01: //565 RGB 16 bit
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+	
+				
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data is 8888 format
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000fc00) >> 10)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 11);
+									
+					memory_write_word(space,realwriteoffs+xcnt*2, newdat);				
+				}
+			}
+		}
+		break;
+		
+	
+		case 0x00:
+
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+		default:
+		
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x\n",x,y,packmode);
+	}
+
+
+}
+
+
+static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,dy,xi;
 	UINT32 addrp;
@@ -1934,22 +2017,29 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 	// only for rgb565 framebuffer
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
 	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
+	
+	dy*=2; // probably depends on interlace mode, fields etc...
+	
+	
 	for (y=0;y < dy;y++)
 	{
 		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 		for (x=0;x < xi;x++)
 		{
 			fbaddr=BITMAP_ADDR32(bitmap,y,x);
-			c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
+			c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+			
 			b = (c & 0x001f) << 3;
 			g = (c & 0x07e0) >> 3;
 			r = (c & 0xf800) >> 8;
-			*fbaddr = b | (g<<8) | (r<<16);
+			
+			if (y<cliprect->max_y)				
+				*fbaddr = b | (g<<8) | (r<<16);
 			addrp+=2;
 		}
 	}
 }
-#endif
+
 
 #if DEBUG_PALRAM
 static void debug_paletteram(running_machine *machine)
@@ -2130,7 +2220,7 @@ VIDEO_START(dc)
 	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
 	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
 
-	fakeframebuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
+	fake_accumulationbuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
 
 }
 
@@ -2150,8 +2240,8 @@ VIDEO_UPDATE(dc)
     ******************/
 
 //  static int useframebuffer=1;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	int y,x;
+//	const rectangle *visarea = video_screen_get_visible_area(screen);
+//	int y,x;
 	//printf("videoupdate\n");
 
 #if DEBUG_PALRAM
@@ -2159,16 +2249,20 @@ VIDEO_UPDATE(dc)
 #endif
 
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
+#if 0
 	for (y = visarea->min_y ; y <= visarea->max_y ; y++)
 	{
 		for (x = visarea->min_x ; x <= visarea->max_x ; x++)
 		{
-			UINT32* src = BITMAP_ADDR32(fakeframebuffer_bitmap, y, x);
+			UINT32* src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y, x);
 			UINT32* dst = BITMAP_ADDR32(bitmap, y, x);
 			dst[0] = src[0];
 		}
 	}
+#endif
 
+	pvr_drawframebuffer(bitmap,cliprect);
+	
 	// update this here so we only do string lookup once per frame
 	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
 
