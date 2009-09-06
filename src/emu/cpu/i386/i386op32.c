@@ -1021,8 +1021,8 @@ static void I386OP(lodsd)(i386_state *cpustate)				// Opcode 0xad
 static void I386OP(loop32)(i386_state *cpustate)			// Opcode 0xe2
 {
 	INT8 disp = FETCH(cpustate);
-	REG32(ECX)--;
-	if( REG32(ECX) != 0 ) {
+	INT32 reg = (cpustate->address_size)?--REG32(ECX):--REG16(CX);
+	if( reg != 0 ) {
 		cpustate->eip += disp;
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
@@ -1032,8 +1032,8 @@ static void I386OP(loop32)(i386_state *cpustate)			// Opcode 0xe2
 static void I386OP(loopne32)(i386_state *cpustate)			// Opcode 0xe0
 {
 	INT8 disp = FETCH(cpustate);
-	REG32(ECX)--;
-	if( REG32(ECX) != 0 && cpustate->ZF == 0 ) {
+	INT32 reg = (cpustate->address_size)?--REG32(ECX):--REG16(CX);
+	if( reg != 0 && cpustate->ZF == 0 ) {
 		cpustate->eip += disp;
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
@@ -1043,8 +1043,8 @@ static void I386OP(loopne32)(i386_state *cpustate)			// Opcode 0xe0
 static void I386OP(loopz32)(i386_state *cpustate)			// Opcode 0xe1
 {
 	INT8 disp = FETCH(cpustate);
-	REG32(ECX)--;
-	if( REG32(ECX) != 0 && cpustate->ZF != 0 ) {
+	INT32 reg = (cpustate->address_size)?--REG32(ECX):--REG16(CX);
+	if( reg != 0 && cpustate->ZF != 0 ) {
 		cpustate->eip += disp;
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
