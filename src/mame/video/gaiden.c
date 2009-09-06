@@ -86,6 +86,21 @@ VIDEO_START( gaiden )
 	tilemap_set_transparent_pen(text_layer, 0);
 }
 
+VIDEO_START( mastninj )
+{
+	/* set up tile layers */
+	background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
+	foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
+	text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+
+//	tilemap_set_transparent_pen(background, 15);
+	tilemap_set_transparent_pen(foreground, 15);
+	tilemap_set_transparent_pen(text_layer, 15);
+	
+	tilemap_set_scrolldx(background, -248, 248);
+	tilemap_set_scrolldx(foreground, -252, 252);
+}
+
 VIDEO_START( raiga )
 {
 	int width = video_screen_get_width(machine->primary_screen);

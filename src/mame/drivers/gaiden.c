@@ -139,6 +139,7 @@ extern int raiga_alpha;
 VIDEO_START( gaiden );
 VIDEO_START( raiga );
 VIDEO_START( drgnbowl );
+VIDEO_START( mastninj );
 
 VIDEO_UPDATE( gaiden );
 VIDEO_UPDATE( raiga );
@@ -774,6 +775,35 @@ static GFXDECODE_START( raiga )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 16 + 128 ) /* sprites 8x8 (only colors 0x00-x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
+static const gfx_layout mastninj_tile2layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 24,16,8,0 },
+	{ 0,1,2,3,4,5,6,7, 256,257,258,259,260,261,262,263 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 512+0*32, 512+1*32, 512+2*32, 512+3*32, 512+4*32, 512+5*32, 512+6*32, 512+7*32},
+	32*32
+};
+
+static const gfx_layout mastninj_spritelayout =
+{
+	8,8,	/* tile size */
+	RGN_FRAC(1,4),	/* number of tiles */
+	4,	/* 4 bits per pixel */
+	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8	/* offset to next tile */
+};
+
+static GFXDECODE_START( mastninj )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )	/* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout,      0x100, 16 )	/* sprites 8x8 */
+GFXDECODE_END
+
 static const gfx_layout drgnbowl_tile2layout =
 {
 	16,16,
@@ -912,6 +942,134 @@ static MACHINE_DRIVER_START( drgnbowl )
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+/*
+Master Ninja
+
+CPUs
+
+QTY 	Type 				position 			function
+1x 		MC68000P10 			68000 main PCB 		main
+1x 		Z8400HB1 			ic36 main PCB 		sound
+2x 		YM2203C 			ic31,ic32 main PCB 	sound
+2x 		Y3014B 				c16,ic17 main PCB 	sound
+2x 		LM324N 				ic2,ic6 main PCB 	sound
+1x 		TDA2002 			ic1 main PCB 		sound
+
+Oscillators
+1x 		oscillator 20.000 (xl2 main PCB)
+1x 		blu resonator 400K (xl1 main PCB)
+
+ROMs
+
+QTY 	Type 				position 			status
+6x 		AM27C512 			1-6 main PCB 		dumped
+32x 	AM27C512 			8-39 ROMs PCB 		dumped
+
+RAMs
+
+QTY 	Type 				position
+4x 		HY6264LP-10 		ic25,ic28,ic61,ic62 main PCB
+3x 		HY6116ALP-10 		ic33,ic123,ic124 main PCB
+1x 		HM6148P 			ic80 main PCB
+1x 		MCM2018AN45 		ic81 main PCB
+4x 		HM6148P 			ic63-66 ROMs PCB
+1x 		HY6116ALP-10 		ic85 ROMs PCB
+
+PLDs
+
+QTY 	Type 				position 			status
+2x 		TIBPAL16L8 			ic15,ic54 main PCB 	read protected
+1x 		GAL16L8 			ic42 ROMs PCB 		read protected
+
+Others
+
+1x 		JAMMA edge connector
+1x 		trimmer (volume)
+2x 		8x2 switches DIP
+*/
+
+static ADDRESS_MAP_START( mastninj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
+//	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
+//	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mastninj_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x060000, 0x063fff) AM_RAM
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE(&gaiden_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE(&gaiden_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+//	AM_RANGE(0x078800, 0x079fff) AM_RAM
+	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
+//	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
+//	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
+	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
+	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
+	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
+	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
+//	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
+//	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+ADDRESS_MAP_END
+
+static MACHINE_DRIVER_START( mastninj )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz? */
+	MDRV_CPU_PROGRAM_MAP(mastninj_map)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ?? MHz */
+	MDRV_CPU_PROGRAM_MAP(mastninj_sound_map)
+								/* IRQs are triggered by the YM2203 */
+
+	MDRV_MACHINE_RESET(raiga)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(mastninj)
+	MDRV_PALETTE_LENGTH(4096)
+
+	MDRV_VIDEO_START(mastninj)
+	MDRV_VIDEO_UPDATE(gaiden)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(0, "mono", 0.15)
+	MDRV_SOUND_ROUTE(1, "mono", 0.15)
+	MDRV_SOUND_ROUTE(2, "mono", 0.15)
+	MDRV_SOUND_ROUTE(3, "mono", 0.60)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 4000000) /* ?? MHz */
+	MDRV_SOUND_ROUTE(0, "mono", 0.15)
+	MDRV_SOUND_ROUTE(1, "mono", 0.15)
+	MDRV_SOUND_ROUTE(2, "mono", 0.15)
+	MDRV_SOUND_ROUTE(3, "mono", 0.60)
+
+	/* no OKI on the bootleg */
+//	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+//	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -1128,6 +1286,62 @@ ROM_START( ryukendna )
 	ROM_LOAD( "4.4a",     0x0000, 0x20000, CRC(b0e0faf9) SHA1(2275d2ef5eee356ccf80b9e9644d16fc30a4d107) ) /* samples */
 ROM_END
 
+ROM_START( mastninj )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "3.ic27",    0x00000, 0x10000, CRC(41fedeb3) SHA1(7e95f8e5b0c38b578eedbce9afbd10dbb14cdddf) )
+	ROM_LOAD16_BYTE( "1.ic30",    0x00001, 0x10000, CRC(93b1e3dd) SHA1(325b2f0ef5d92f4d760086de6cb23494d1e6c6e6) )
+	ROM_LOAD16_BYTE( "4.ic26",    0x20000, 0x10000, CRC(d375c5f6) SHA1(925e84d79f35595a344a417125d74dc46ebec310) ) // 1ST AND 2ND HALF IDENTICAL (but correct?)
+	ROM_LOAD16_BYTE( "2.ic29",    0x20001, 0x10000, CRC(6b53b8b1) SHA1(68bffc992fecae5e113592a9481c0cee80925135) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5.ic35",       0x000000, 0x10000, CRC(ba528424) SHA1(5ab93059e26483a756d80b8c18d9669d2a3416de) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "6.ic120",      0x000000, 0x10000, CRC(847cc552) SHA1(e5e2ed19efcedb52885f9f91a1690c88a6b6261d) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "8.ic13",       0x000000, 0x10000, CRC(e3987e0f) SHA1(8805443e56575fc455d21703bd2f9ebef434e262) )
+	ROM_LOAD32_BYTE( "10.ic11",      0x000001, 0x10000, CRC(5e8afc68) SHA1(ecef113a947b9bda6abbef5f75557cd201e355b3) )
+	ROM_LOAD32_BYTE( "12.ic9",       0x000002, 0x10000, CRC(2713e9f1) SHA1(87614a79596216d2b710925167f3130d4c2e07c9) )
+	ROM_LOAD32_BYTE( "14.ic7",       0x000003, 0x10000, CRC(ca59280f) SHA1(d5a1d85f75ea667812708758915f43f01c8c9830) )
+	ROM_LOAD32_BYTE( "20.ic27",      0x040000, 0x10000, CRC(72e5c1c2) SHA1(0e744407c52a61ed657557978cdfe455fe5e931e) )
+	ROM_LOAD32_BYTE( "22.ic25",      0x040001, 0x10000, CRC(55affaf8) SHA1(c121a904ba44dc53c8a10b8d56c4c25ab879d8be) )
+	ROM_LOAD32_BYTE( "24.ic23",      0x040002, 0x10000, CRC(bd76fd53) SHA1(bc2ad054b63573f16c99f82c680f0f6de2ee4683) )
+	ROM_LOAD32_BYTE( "26.ic21",      0x040003, 0x10000, CRC(f3bfcfd6) SHA1(7d73a2ae00825979b3d09502f52d78f61f3ea1a9) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD32_BYTE( "9.ic12",       0x000000, 0x10000, CRC(ae043a2e) SHA1(3513b21d4ee7f869c9ebda68707845d030b0ecad) )
+	ROM_LOAD32_BYTE( "11.ic10",      0x000001, 0x10000, CRC(e197fd97) SHA1(1e92139ae6a1c15de629039757c21e32cacc42d6) )
+	ROM_LOAD32_BYTE( "13.ic8",       0x000002, 0x10000, CRC(0871971c) SHA1(ede9bb5d6d968fc532217b4eb1cd4c0d7ea9a4a1) )
+	ROM_LOAD32_BYTE( "15.ic6",       0x000003, 0x10000, CRC(6850aea3) SHA1(670820ba2df040ded8739907bfdde4ac97373200) )
+	ROM_LOAD32_BYTE( "21.ic26",      0x040000, 0x10000, CRC(dd162ce7) SHA1(70ec5a722ea31434be2a4b3104f9c54a48b8ec05) )
+	ROM_LOAD32_BYTE( "23.ic24",      0x040001, 0x10000, CRC(edd65385) SHA1(3b5c0115ae1972bfe696a22edd2da9e6fb9739f4) )
+	ROM_LOAD32_BYTE( "25.ic22",      0x040002, 0x10000, CRC(ca691635) SHA1(177f94a17cfaf67c764c2a2dff48475039207fae) )
+	ROM_LOAD32_BYTE( "27.ic20",      0x040003, 0x10000, CRC(2ae70f42) SHA1(aad89dbd0309a5e3a786aa028995b56859d5b5ff) )
+
+	ROM_REGION( 0x100000, "gfx4", 0) /* these will need a further descramble to be in the same format as gaiden, although the sprites on the bootleg look different anyway */
+	ROM_LOAD( "36.ic50",           0x000000, 0x10000, CRC(3c117e62) SHA1(dee45d6bbe053996e0b3faaba0293a273faf1ffa) )
+	ROM_LOAD( "37.ic49",           0x010000, 0x10000, CRC(f6d6422d) SHA1(933487b09d3bcff9714fb2469b3d751b38459cfd) )
+	ROM_LOAD( "38.ic48",           0x020000, 0x10000, CRC(642f06e7) SHA1(5b30b5029884b7eddcad201224a639f94ee27823) )
+	ROM_LOAD( "39.ic47",           0x030000, 0x10000, CRC(51f00702) SHA1(c2a7819beb37ebf613cb2d65476dcee39f72a781) )
+	ROM_LOAD( "32.ic34",           0x040000, 0x10000, CRC(940f3dbb) SHA1(4e2f224ed2ec1b8da992bd375d3ab1cf6fbfdd1f) )
+	ROM_LOAD( "33.ic33",           0x050000, 0x10000, CRC(f6baccb0) SHA1(2244d16127efe67fcf59a59e50eabc54e3081dd1) )
+	ROM_LOAD( "34.ic32",           0x060000, 0x10000, CRC(bb46ef1b) SHA1(4c8f9e06fa4d7f14206f6180a999b3f32681785a) )
+	ROM_LOAD( "35.ic31",           0x070000, 0x10000, CRC(c0b6ba3e) SHA1(8849cf5c7777e4b5e52c695bcb6038b3bad4e04c) )
+	ROM_LOAD( "28.ic19",           0x080000, 0x10000, CRC(012da98d) SHA1(413e1f02e2e3267fb4b893b14f627105789aa1c9) )
+	ROM_LOAD( "29.ic18",           0x090000, 0x10000, CRC(fa32da96) SHA1(5e240f6f91813bdafacf1d29ea65704f2c4f2ae6) )
+	ROM_LOAD( "30.ic17",           0x0a0000, 0x10000, CRC(910fccdb) SHA1(99523b53ae0dbf82783ab5a731df3c02984c72fe) )
+	ROM_LOAD( "31.ic16",           0x0b0000, 0x10000, CRC(d16b593b) SHA1(2895b2eba0f3ad5e209fe8c550dd8cc3c3e08742) )
+	ROM_LOAD( "16.ic5",            0x0c0000, 0x10000, CRC(216eeef5) SHA1(5167af8cef220a5092add2bf578e8323360132a5) )
+	ROM_LOAD( "17.ic4",            0x0d0000, 0x10000, CRC(f72f8bfd) SHA1(ccf0aab11987e76c927a73f12e5cd4bb125c1258) )
+	ROM_LOAD( "18.ic3",            0x0e0000, 0x10000, CRC(6de96087) SHA1(0b9028320cb622dad07cf8bde015428eba7f8a5e) )
+	ROM_LOAD( "19.ic2",            0x0f0000, 0x10000, CRC(c12c367b) SHA1(9835292f335f1353f7b9bd0bb85124942822646f) )
+
+	ROM_REGION( 0x080000, "misc", 0 )
+	ROM_LOAD( "gal16v8.ic42.bad.dump",    0x000, 0x117, BAD_DUMP CRC(61d6a8d7) SHA1(d3a6331b1fccd374e4f080740094d3832ff98ad9) )
+	ROM_LOAD( "tibpal16l8.ic15.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "tibpal16l8.ic54.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+ROM_END
 
 
 ROM_START( tknight )
@@ -1391,12 +1605,61 @@ static DRIVER_INIT( drgnbowl )
 	free(buffer);
 }
 
+static void descramble_mastninj_gfx(UINT8* src)
+{
+	UINT8 *buffer;
+	int len = 0x80000;
+
+	/*  rearrange gfx */
+	buffer = alloc_array_or_die(UINT8, len);
+	{
+		int i;
+		for (i = 0;i < len; i++)
+		{
+			buffer[i] = src[BITSWAP24(i,
+			23,22,21,20,
+			19,18,17,16,
+			15,5,14,13,12,
+			11,10,9,8,
+			7,6,4,
+			3,2,1,0)];
+		}
+		memcpy(src,buffer,len);
+		free(buffer);
+	}
+	
+	buffer = alloc_array_or_die(UINT8, len);
+	{
+		int i;
+		for (i = 0;i < len; i++)
+		{
+			buffer[i] = src[BITSWAP24(i,
+			23,22,21,20,
+			19,18,17,16,
+			15,6,14,13,12,
+			11,10,9,8,
+			7,5,4,
+			3,2,1,0)];
+		}
+		memcpy(src,buffer,len);
+		free(buffer);
+	}
+}
+
+DRIVER_INIT(mastninj)
+{
+	// rearrange the graphic roms into a format that MAME can decode
+	descramble_mastninj_gfx(memory_region(machine,"gfx2"));
+	descramble_mastninj_gfx(memory_region(machine,"gfx3"));
+	DRIVER_INIT_CALL(shadoww);
+}
 
 GAME( 1988, shadoww,  0,        shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 1)", 0 )
 GAME( 1988, shadowwa, shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 2)", 0 )
 GAME( 1988, gaiden,   shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Gaiden (US)", 0 )
 GAME( 1989, ryukendn, shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 1)", 0 )
 GAME( 1989, ryukendna,shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 2)", 0 )
+GAME( 1989, mastninj, shadoww,  mastninj,shadoww,  mastninj, ROT0, "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING ) // sprites need fixing, sound and yscroll too.
 GAME( 1989, wildfang, 0,        shadoww, wildfang, wildfang, ROT0, "Tecmo", "Wild Fang / Tecmo Knight", 0 )
 GAME( 1989, tknight,  wildfang, shadoww, tknight,  wildfang, ROT0, "Tecmo", "Tecmo Knight", 0 )
 GAME( 1991, stratof,  0,        raiga,	 raiga,    raiga,    ROT0, "Tecmo", "Raiga - Strato Fighter (US)", GAME_IMPERFECT_GRAPHICS )
