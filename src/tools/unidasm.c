@@ -346,15 +346,15 @@ int parse_options(int argc, char *argv[], options *opts)
 			if (pending_base || pending_arch)
 				goto usage;
 
-			if (tolower(curarg[1]) == 'a')
+			if (tolower((UINT8)curarg[1]) == 'a')
 				pending_arch = TRUE;
-			else if (tolower(curarg[1]) == 'b')
+			else if (tolower((UINT8)curarg[1]) == 'b')
 				pending_base = TRUE;
-			else if (tolower(curarg[1]) == 'l')
+			else if (tolower((UINT8)curarg[1]) == 'l')
 				opts->lower = TRUE;
-			else if (tolower(curarg[1]) == 'n')
+			else if (tolower((UINT8)curarg[1]) == 'n')
 				opts->norawbytes = TRUE;
-			else if (tolower(curarg[1]) == 'u')
+			else if (tolower((UINT8)curarg[1]) == 'u')
 				opts->upper = TRUE;
 			else
 				goto usage;
@@ -499,11 +499,11 @@ int main(int argc, char *argv[])
 		if (opts.lower)
 		{
 			for (p = buffer; *p != 0; p++)
-				*p = tolower(*p);
+				*p = tolower((UINT8)*p);
 		} else if (opts.upper)
 		{
 			for (p = buffer; *p != 0; p++)
-				*p = toupper(*p);
+				*p = toupper((UINT8)*p);
 		}
 		printf("%s\n", buffer);
 
