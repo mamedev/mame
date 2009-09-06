@@ -1,9 +1,36 @@
-/* Chihiro Skeleton
- -- split from Naomi.c
+/*
 
- Chihiro uses
+Chihiro is an Xbox based arcade motherboard from SEGA
+A Chihiro system consists of network board, media board, base board & Xbox board
 
-custom XBOX motherboard + bios
+The whole system is divided into 2 parts and each part has two boards.
+The upper part contains a media board with a TSOP48 where there is an xbox .xbe loader
+(this is the dashboard you see when you power the Chihiro) and for a network board (100% the same
+as the one in the Triforce v3, same firmware also)
+
+The bottom section consists of an Xbox board with 128MB of RAM and with a different MCPX than
+a retail one and a base board that handles JVS and Video.
+
+Network Board Dump : Ver1305.bin
+Media Board dump   : FPR21042_M29W160ET.bin
+Base Board Dumps   : ic10_g24lc64.bin ic11_24lc024.bin pc20_g24lc64.bin
+Xbox Board Dump    : Not dumped
+
+FPR21042_M29W160ET.bin :
+As in Triforce, it consists of two versions in the same flash, the first MB of the flash has
+an older version as backup, and the second MB has the current version, versions included are:
+SegaBoot Ver.2.00.0 Build:Feb  7 2003 12:28:30
+SegaBoot Ver.2.13.0 Build:Mar  3 2005 17:03:15
+
+ic10_g24lc64.bin: This dump contains the firmware of the Base Board, serial number and REGION of the whole system
+Region is located at Offset 0x00001F10 , 01 means JAP, 02 Means USA, 03 Means EXPORT, if you
+want to change the region of your Chihiro Board, just change this byte.
+pc20_g24lc64.bin: it seems a backup of the base board without region or serial, older version maybe?
+ic11_24lc024.bin: this is the mysterious one, as the previous 2, its on the Base Board, and just contains some
+strings the interesting thing is that it contains the string SBJE and if you go to the system info menu
+on the Chihiro and you press service button 16 times in a row, a message will be displayed: GAME ID SBJE
+
+Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 */
 
