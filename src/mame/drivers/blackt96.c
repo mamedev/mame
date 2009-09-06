@@ -42,6 +42,9 @@ Notes:
 2008-07
 Added Dip Locations based on Service Mode
 
+
+Is this based on some Seta / Taito HW design, the sprite-tilemaps look familiar
+
 */
 
 #include "driver.h"
@@ -57,109 +60,74 @@ static VIDEO_START( blackt96 )
 static UINT16* blackt96_tilemapram;
 static UINT16* blackt96_tilemapram2;
 
+static void draw_strip(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int stripnum, int xbase, int ybase, int bg)
+{
+	const gfx_element *gfxspr = machine->gfx[1];
+	const gfx_element *gfxbg = machine->gfx[0];
+
+	int base = stripnum;
+	int count = 0;
+	int y;
+	
+	for (y=0;y<32;y++)
+	{
+		UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x3fff);
+		UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+		UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
+
+		if (tile&0x2000)
+		{
+			if (bg) drawgfx_transpen(bitmap,cliprect,gfxbg,tile&0x1fff,colour>>4,flipx,0,xbase,ybase+y*16,0);
+		}
+		else
+		{
+			if (!bg) drawgfx_transpen(bitmap,cliprect,gfxspr,tile&0x1fff,colour,flipx,0,xbase,ybase+y*16,0);
+		}
+		
+		count++;
+	}
+		
+}
+
+static void draw_main(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bg)
+{
+
+	int x;
+	
+
+	for (x=(0x1000/2)-2;x>=0;x-=2)
+	{
+		int xx;
+		int yy;
+		int s = 0;
+
+		xx=  ((blackt96_tilemapram2[x+0]&0x001f)<<4) | (blackt96_tilemapram2[x+1]&0xf000)>>12;
+		yy = ((blackt96_tilemapram2[x+1]&0x1ff));
+		
+		if (xx&0x100) xx-=0x200;
+		yy = 0x1ff-yy;
+		if (yy&0x100) yy-=0x200;
+		
+		s = x*2;
+		s &=0xfff;
+		s += (x&7)*0x800;
+
+
+		draw_strip(machine,bitmap,cliprect,s,xx,yy,bg);
+	}
+
+}
+
 static VIDEO_UPDATE( blackt96 )
 {
-	int y,x;
-	int count = 0;
-	int base;
+	int count;
+	int x,y;
 	const gfx_element *gfx = screen->machine->gfx[2];
-	const gfx_element *gfxbg = screen->machine->gfx[0];
-	const gfx_element *gfxspr = screen->machine->gfx[1];
+		
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	count = 0;
-	for (x=0;x<64;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (0x2000/2)+1]);
-			drawgfx_opaque(bitmap,cliprect,gfxbg,tile,6,0,0,x*16,y*16);
-			count++;
-		}
-	}
-
-	/* the sprite are arranged in tilemaps.. I don't know how this works yet */
-	count = 0;
-	base = 0x1000;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
-	count = 0;
-	base = 0x1800;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
-	count = 0;
-	base = 0x3000;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
-	count = 0;
-	base = 0x3800;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
-	base = 0x4000;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
-	base = 0x4800;
-	for (x=0;x<32;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
-			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
-
-			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
-			count++;
-		}
-	}
+	draw_main(screen->machine,bitmap,cliprect,1);
+	draw_main(screen->machine,bitmap,cliprect,0);
 
 	/* Text Layer */
 	count = 0;
@@ -168,14 +136,10 @@ static VIDEO_UPDATE( blackt96 )
 		for (y=0;y<32;y++)
 		{
 			UINT16 tile = (blackt96_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
-
 	}
-
-
-
 
 	return 0;
 }
@@ -203,7 +167,7 @@ static ADDRESS_MAP_START( blackt96_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&blackt96_tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&blackt96_tilemapram2)// sprite list?
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&blackt96_tilemapram2)// sprite list + sprite tilemaps
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
@@ -443,7 +407,7 @@ static const gfx_layout blackt962_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 24, 8, 16 },
+	{ 0,24,8, 16 },
 	{ 519, 515, 518, 514,  517,513,  516,512, 7,3,6,2,5,1,4,0 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	32*32
@@ -463,7 +427,7 @@ static const gfx_layout blackt963_layout =
 };
 
 static GFXDECODE_START( blackt96 )
-	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,   0x0, 0x10  )
+	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,    0x0, 0x10  )
 	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,   0x0, 0x80  )
 	GFXDECODE_ENTRY( "gfx3", 0, blackt963_layout,   0x0, 0x80  )
 GFXDECODE_END
@@ -486,9 +450,9 @@ static MACHINE_DRIVER_START( blackt96 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 64*8)
+	MDRV_SCREEN_SIZE(256, 256)
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 8*32-1, 2*8, 8*30-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 208-1)
 
 	MDRV_PALETTE_LENGTH(0x800)
 
