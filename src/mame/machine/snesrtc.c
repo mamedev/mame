@@ -159,9 +159,9 @@ static void srtc_mmio_write(running_machine *machine, UINT16 addr, UINT8 data)
 				if(snes_rtc.rtc_index == 12)
 				{
 					// Day of week is automatically calculated and written
-					UINT8 day   = snes_rtc.rtc_ram[6] + snes_rtc.rtc_ram[7] * 10;
-					UINT8 month = snes_rtc.rtc_ram[8];
-					UINT8 year  = snes_rtc.rtc_ram[9] + snes_rtc.rtc_ram[10] * 10 + snes_rtc.rtc_ram[11] * 100;
+					UINT32 day   = snes_rtc.rtc_ram[6] + snes_rtc.rtc_ram[7] * 10;
+					UINT32 month = snes_rtc.rtc_ram[8];
+					UINT32 year  = snes_rtc.rtc_ram[9] + snes_rtc.rtc_ram[10] * 10 + snes_rtc.rtc_ram[11] * 100;
 					year += 1000;
 
 					snes_rtc.rtc_ram[snes_rtc.rtc_index++] = srtc_weekday(year, month, day);

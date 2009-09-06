@@ -1,4 +1,4 @@
-static UINT8 sdd1_read(running_machine* machine, UINT16 addr);
+static UINT8 sdd1_read(running_machine* machine, UINT32 addr);
 
 typedef struct //Input Manager
 {
@@ -629,7 +629,7 @@ static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)
 	}
 }
 
-static UINT8 sdd1_read(running_machine* machine, UINT16 addr)
+static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
 {
 	//printf( "sdd1.read(%06x)\n", addr );
 	if(snes_sdd1.sdd1_enable & snes_sdd1.xfer_enable)
