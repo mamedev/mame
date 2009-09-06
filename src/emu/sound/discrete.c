@@ -508,7 +508,7 @@ static DEVICE_START( discrete )
 	{
 		node_description *node = (node_description *) entry->ptr;
 		
-		if (*node->module->start)
+		if (node->module->start)
 			(*node->module->start)(node);
 	}
 	
@@ -592,7 +592,7 @@ static DEVICE_STOP( discrete )
 	{
 		node_description *node = (node_description *) entry->ptr;
 		
-		if (*node->module->stop)
+		if (node->module->stop)
 			(*node->module->stop)(node);
 	}
 
