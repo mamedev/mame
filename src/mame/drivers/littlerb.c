@@ -141,6 +141,8 @@ static void littlerb_recalc_address(void)
 
 static READ16_HANDLER( littlerb_vdp_r )
 {
+	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
+
 	switch (offset)
 	{
 		case 0:
@@ -159,8 +161,45 @@ static READ16_HANDLER( littlerb_vdp_r )
 	return -1;
 }
 
+int type2_writes = 0;
+UINT32 lasttype2pc = 0;
 static WRITE16_HANDLER( littlerb_vdp_w )
 {
+	
+	if (offset!=2)
+	{
+		if (type2_writes)
+		{
+			if (type2_writes>2)
+			{
+				logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
+			}
+			
+			logerror("~%06x previously wrote %08x data bytes\n", lasttype2pc, type2_writes*2);
+			type2_writes = 0;
+		}
+	
+		logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+	}
+	else
+	{
+		if (mem_mask==0xffff)
+		{
+			if (type2_writes==0)
+			{
+				logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+			}
+			
+			type2_writes++;
+			lasttype2pc = cpu_get_pc(space->cpu);
+		}
+		else
+		{
+			logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		}
+	}
+
+
 	switch (offset)
 	{
 		case 0:
@@ -359,10 +398,16 @@ static VIDEO_UPDATE(littlerb)
 	return 0;
 }
 
+static INTERRUPT_GEN( littlerb )
+{
+	logerror("IRQ\n");
+	cpu_set_input_line(device, 4, HOLD_LINE);
+}
+
 static MACHINE_DRIVER_START( littlerb )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(littlerb_main)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", littlerb)
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
