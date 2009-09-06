@@ -335,8 +335,8 @@ static DISCRETE_RESET( dkong_custom_mixer )
 	context->r_total[0] = RES_2_PARALLEL(context->r_in[0] + DKONG_CUSTOM_R4, NE555_CV_R);
 	context->r_total[1] = RES_2_PARALLEL((context->r_in[1] + DKONG_CUSTOM_R4), NE555_CV_R);
 	/* precalculate charging exponents */
-	context->exp[0] = RC_CHARGE_EXP(context->r_total[0] * DKONG_CUSTOM_C);
-	context->exp[1] = RC_CHARGE_EXP(context->r_total[1] * DKONG_CUSTOM_C);
+	context->exp[0] = RC_CHARGE_EXP(node, context->r_total[0] * DKONG_CUSTOM_C);
+	context->exp[1] = RC_CHARGE_EXP(node, context->r_total[1] * DKONG_CUSTOM_C);
 
 	node->output[0] = 0;
 }

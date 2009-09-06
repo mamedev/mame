@@ -115,7 +115,7 @@ static void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const discrete_info *disc_in
  *
  *************************************/
 
-INLINE int node_module_index(node_description *node)
+INLINE int node_module_index(const node_description *node)
 {
 	linked_list_entry *entry;
 	int index = 0;
@@ -132,7 +132,7 @@ INLINE int node_module_index(node_description *node)
 	return -1;
 }
 
-INLINE void linked_list_add(discrete_info *info, linked_list_entry ***list_tail_ptr, void *ptr)
+INLINE void linked_list_add(const discrete_info *info, linked_list_entry ***list_tail_ptr, const void *ptr)
 {
 	**list_tail_ptr = auto_alloc(info->device->machine, linked_list_entry);
 	(**list_tail_ptr)->ptr = ptr;
@@ -140,10 +140,10 @@ INLINE void linked_list_add(discrete_info *info, linked_list_entry ***list_tail_
 	*list_tail_ptr = &((**list_tail_ptr)->next);
 }
 
-INLINE int linked_list_count(linked_list_entry *list)
+INLINE int linked_list_count(const linked_list_entry *list)
 {
 	int cnt = 0;
-	linked_list_entry *entry;
+	const linked_list_entry *entry;
 
 	for (entry = list; entry != NULL; entry = entry->next)
 		cnt++;
@@ -287,15 +287,15 @@ static const discrete_module module_list[] =
 	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 }
 };
 
-INLINE void step_nodes_in_list(linked_list_entry **list)
+INLINE void step_nodes_in_list(const linked_list_entry *list)
 {
-	linked_list_entry *entry;
+	const linked_list_entry *entry;
 
 	if (DISCRETE_PROFILING)
 	{
 		osd_ticks_t last = osd_profiling_ticks();
 		
-		for (entry = *list; entry != NULL; entry = entry->next)
+		for (entry = list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
 	
@@ -307,7 +307,7 @@ INLINE void step_nodes_in_list(linked_list_entry **list)
 	}
 	else
 	{
-		for (entry = *list; entry != NULL; entry = entry->next)
+		for (entry = list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
 	
@@ -335,7 +335,7 @@ static node_description *discrete_find_node(const discrete_info *info, int node)
  *
  *************************************/
 
-static void discrete_build_list(discrete_info *info, discrete_sound_block *intf, linked_list_entry ***current)
+static void discrete_build_list(discrete_info *info, const discrete_sound_block *intf, linked_list_entry ***current)
 {
 	int node_count = 0;
 
@@ -408,7 +408,7 @@ static void discrete_build_list(discrete_info *info, discrete_sound_block *intf,
  *
  *************************************/
 
-static void discrete_sanity_check(discrete_info *info)
+static void discrete_sanity_check(const discrete_info *info)
 {
 	linked_list_entry *entry;
 	int node_count = 0;
@@ -522,9 +522,9 @@ static DEVICE_START( discrete )
  *
  *************************************/
 
-static UINT64 list_run_time(linked_list_entry *list)
+static UINT64 list_run_time(const linked_list_entry *list)
 {
-	linked_list_entry *entry;
+	const linked_list_entry *entry;
 	UINT64 total = 0;
 	
 	for (entry = list; entry != NULL; entry = entry->next)
@@ -536,7 +536,7 @@ static UINT64 list_run_time(linked_list_entry *list)
 	return total;
 }
 
-static void display_profiling(discrete_info *info)
+static void display_profiling(const discrete_info *info)
 {
 	int count;
 	UINT64 total;
@@ -653,7 +653,7 @@ static void *task_callback(void *param, int threadid)
 	samples = ti->samples;
 	while (samples-- > 0)
 	{
-		step_nodes_in_list(&ti->context->list);
+		step_nodes_in_list(ti->context->list);
 	}
 	/* reset ptr */
 	for (i = 0; i < ti->context->numbuffered; i++)
@@ -681,7 +681,7 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 	}
 
 	/* loop over all nodes */
-	step_nodes_in_list(&info->step_list);
+	step_nodes_in_list(info->step_list);
 }
 
 static STREAM_UPDATE( buffer_stream_update )
@@ -770,7 +770,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	{
 		discrete_sound_block *block = (discrete_sound_block *) entry->ptr;
 		node_description *node = auto_alloc_clear(info->device->machine, node_description);
-		int inputnum, modulenum;
+		int modulenum;
 
 		/* find the requested module */
 		for (modulenum = 0; module_list[modulenum].type != DSS_NULL; modulenum++)
@@ -782,7 +782,6 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* static inits */
 		node->context = NULL;
 		node->info = info;
-		//node->node = block->node;
 		node->module = &module_list[modulenum];
 		node->output[0] = 0.0;
 		node->block = block;
@@ -832,19 +831,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					if (task_node_list_ptr == NULL)
 						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
 					task = auto_alloc_clear(info->device->machine, discrete_task_context);
-#if 1
 					task->numbuffered = 0;
-#else
-					task->numbuffered = node->active_inputs;
-					{
-						int i;
-						for (i = 0; i < task->numbuffered; i++) 
-						{
-							task->node_buf[i] = auto_alloc_array(info->device->machine, double, 2048);
-							task->dest[i] = (double **) &node->input[i];
-						}
-					}
-#endif
 					task->list = task_node_list;
 					linked_list_add(info, &task_list_ptr, task);
 					node->context = task;
@@ -863,11 +850,6 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			if (info->indexed_node[NODE_INDEX(block->node)])
 				fatalerror("init_nodes() - Duplicate entries for NODE_%02d", NODE_INDEX(block->node));
 			info->indexed_node[NODE_INDEX(block->node)] = node;
-		}
-
-		for (inputnum = 0; inputnum < DISCRETE_MAX_INPUTS; inputnum++)
-		{
-			node->input[inputnum] = &(block->initial[inputnum]);
 		}
 
 		/* if we are an stream input node, track that */
@@ -920,7 +902,7 @@ static void find_input_nodes(discrete_info *info)
 {
 	int inputnum;
 	linked_list_entry *entry;
-
+	
 	/* loop over all nodes */
 	for (entry = info->node_list; entry != NULL; entry = entry->next)
 	{
@@ -954,7 +936,16 @@ static void find_input_nodes(discrete_info *info)
 					/* also report it in the error log so it is not missed */
 					logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_BLOCKINDEX(node), inputnum);
 				}
+				else
+				{
+					node->input[inputnum] = &(block->initial[inputnum]);
+				}
 			}
+		}
+		for (inputnum = node->active_inputs; inputnum < DISCRETE_MAX_INPUTS; inputnum++)
+		{
+			//FIXME: Check that no nodes follow !
+			node->input[inputnum] = &(block->initial[inputnum]);
 		}
 	}
 }

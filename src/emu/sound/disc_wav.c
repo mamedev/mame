@@ -1207,7 +1207,7 @@ static DISCRETE_RESET(dss_schmitt_osc)
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	context->rc = rSource * info->c;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP(node, context->rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
 	context->v_cap = 0;
@@ -1508,7 +1508,7 @@ static DISCRETE_RESET(dss_squarewave2)
 #define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
 #define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
-INLINE double dss_inverter_tftab(node_description *node, double x)
+INLINE double dss_inverter_tftab(const node_description *node, double x)
 {
 	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
 	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
@@ -1520,7 +1520,7 @@ INLINE double dss_inverter_tftab(node_description *node, double x)
 		return info->vB;
 }
 
-INLINE double dss_inverter_tf(node_description *node, double x)
+INLINE double dss_inverter_tf(const node_description *node, double x)
 {
 	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
 	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;

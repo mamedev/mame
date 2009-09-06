@@ -3338,13 +3338,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)				(1.0 - exp(node->info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(_node, rc)				(1.0 - exp((_node)->info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)			(exp(node->info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(_node, rc)			(exp((_node)->info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
@@ -3668,14 +3668,14 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	void *ptr;
+	const void *ptr;
 	linked_list_entry *next;
 };
 
 typedef struct _discrete_task_context discrete_task_context;
 struct _discrete_task_context
 {
-	linked_list_entry *list;
+	const linked_list_entry *list;
 
 	int 				numbuffered;
 	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];

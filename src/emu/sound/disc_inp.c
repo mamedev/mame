@@ -327,7 +327,7 @@ static DISCRETE_START(dss_input_stream)
 	if (node->block->type == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
-		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, node, buffer_stream_update);
+		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);
 
 		stream_set_input(node->info->discrete_stream, context->stream_in_number, 
 			context->buffer_stream, 0, 1.0);

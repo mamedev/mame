@@ -40,8 +40,8 @@ static DISCRETE_START( dso_task )
 {
 	discrete_task_context *task =  (discrete_task_context *) node->context;
 	int inputnum;
-	linked_list_entry *node_entry;
-	linked_list_entry *step_entry;
+	const linked_list_entry *node_entry;
+	const linked_list_entry *step_entry;
 
 	/* Determine, which nodes in the task are referenced in the main task
 	 * and add them to the list of nodes to be buffered for further processing
