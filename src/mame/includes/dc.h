@@ -13,6 +13,8 @@ READ64_HANDLER( dc_sysctrl_r );
 WRITE64_HANDLER( dc_sysctrl_w );
 READ64_HANDLER( dc_maple_r );
 WRITE64_HANDLER( dc_maple_w );
+READ64_HANDLER( naomi_maple_r );
+WRITE64_HANDLER( naomi_maple_w );
 READ64_HANDLER( dc_gdrom_r );
 WRITE64_HANDLER( dc_gdrom_w );
 READ64_HANDLER( dc_g1_ctrl_r );

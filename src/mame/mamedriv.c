@@ -4339,7 +4339,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( naomi2 )
 
 	DRIVER( hod2bios )	/* 1998.11 The House of the Dead 2 */
+	DRIVER( hotd2 )		/* 1998.11 The House of the Dead 2 */
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
+	DRIVER( smlg99 )        /* 1999.?? Super Major League '99 */
 	DRIVER( pstone )	/* 1999.02 Power Stone */
 						/* 1999.02 Crazy Taxi */
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
@@ -4416,7 +4418,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
-						/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
+	DRIVER( gunsur2 )	/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
 						/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
@@ -4510,12 +4512,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
+	DRIVER( vf4cart )     	/* 2001.08.02 Virtua Fighter 4 (cartridge) */
+	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 (GD-ROM) */
 	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
 	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
+	DRIVER( clubkrte )	/* 2002.?? Club Kart: European Session */
 						/* 2002.06 WCCF SERIE A 2001-2002 */
 						/* 2002.07 Soul Surfer */
 	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
@@ -4548,19 +4552,20 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
-						/* 2003.08 Dolphin Blue */
-						/* 2003.12 Guilty Gear Isuka */
+	DRIVER( dolphin  )	/* 2003.08 Dolphin Blue */
+	DRIVER( ggisuka )	/* 2003.12 Guilty Gear Isuka */
 						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
-						/* 2004.03 The Rumble Fish */
+	DRIVER( rumblef ) 	/* 2004.03 The Rumble Fish */
 	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
-						/* 2004.07 The King of Fighters Neo Wave */
+	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 						/* 2004.09 Dirty Pig Skin Football */
 						/* 2004.09 Faster than Speed */
+	DRIVER( kov7sprt )	/* 2004.?? Knights of Valour - The Seven Sprits */
 						/* 2005.03 Net Select Keiba Victory Furlong */
 						/* 2005.03 The Rumble Fish 2 */
-						/* 2005.07 NeoGeo Battle Colloseum */
+	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 						/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */

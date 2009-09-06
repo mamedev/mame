@@ -182,6 +182,8 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
 #define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
+#define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
+
 /*************************************
  *
  *  Prototypes
@@ -225,6 +227,9 @@ struct _naomibd_state
 
 	UINT32				*prot_translate;
 	int				prot_reverse_bytes;
+	#if NAOMIBD_PRINTF_PROTECTION
+	int				prot_pio_count;
+	#endif
 };
 
 // maps protection offsets to real addresses
@@ -254,6 +259,39 @@ static naomibd_config_table naomibd_translate_tbl[] =
 			0xad8c, 0, 0xf0000, 0x923d, 0, 0x100000, 0x4a65, 0, 0x110000, 0x9958, 0, 0x120000, 0x8216, 0, 0x130000,
 			0xaa91, 0, 0x140000, 0xd007, 0, 0x150000, 0xead, 0, 0x160000, 0x492, 0, 0x170000,
 			0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pjustic", 0, { 0x923d, 0, 0, 0x3e41, 0, 0x10000, 0xb7af, 0, 0x20000, 
+			  0x9651, 0, 0x30000, 0xad8c, 0, 0x40000, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "hmgeo",   0, { 0x6cc8, 0, 0x000000, 0x7b92, 0, 0x010000, 0x69bc, 0, 0x020000,
+			  0x6d16, 0, 0x030000, 0x6134, 0, 0x040000, 0x1340, 0, 0x050000,
+			  0x7716, 0, 0x060000, 0x2e1a, 0, 0x070000, 0x3030, 0, 0x080000,
+			  0x0870, 0, 0x090000, 0x2856, 0, 0x0a0000, 0x4224, 0, 0x0b0000,
+			  0x6df0, 0, 0x0c0000, 0x0dd8, 0, 0x0d0000, 0x576c, 0, 0x0e0000,
+			  0x0534, 0, 0x0f0000, 0x0904, 0, 0x100000, 0x2f14, 0, 0x110000,
+			  0x1792, 0, 0x120000, 0x6866, 0, 0x130000, 0x06fa, 0, 0x140000,
+			  0x2842, 0, 0x150000, 0x7cc8, 0, 0x160000, 0xffffffff, 0xffffffff, 0xffffffff } },  
+	{ "wwfroyal",0, { 0xaaaa, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "gwing2",  0, { -1, 0x85ddc0, 0, 0xd567, 0, 0x10000, 0xe329, 0, 0x30000, 0xc112, 0, 0x50000,
+			  0xabcd, 0, 0x70000, 0xef01, 0, 0x90000, 0x1234, 0, 0xb0000, 0x5678, 0, 0xd0000,
+			  0x5555, 0, 0xf0000, 0x6666, 0, 0x110000, 0xa901, 0, 0x130000, 0xa802, 0, 0x150000, 
+			  0x3232, 0, 0x170000, 0x8989, 0, 0x190000, 0x6655, 0, 0x1a0000,
+			  0x3944, 0, 0x1c0000, 0x655a, 0, 0x1d0000, 0xf513, 0, 0x1e0000,
+			  0xb957, 0, 0, 0x37ca, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+/*	{ "pstone2", 0, { 0x4a65, 0, 0x000000, 0x0ead, 0, 0x010000, 0x0492, 0, 0x020000, 0x414a, 0, 0x030000,
+			  0xad8c, 0, 0x040000, 0x923d, 0, 0x050000, 0x4a65, 0, 0x060000, 0x9958, 0, 0x070000,
+			  0x8216, 0, 0x080000, 0xaa91, 0, 0x090000, 0xd007, 0, 0x0a0000, 0x71ee, 0, 0x0b0000,
+			  0x3e41, 0, 0x0c0000, 0xb7af, 0, 0x0d0000, 0x9651, 0, 0x0e0000, 0x0492, 0, 0x0f0000,
+			  0x414a, 0, 0x100000, 0xaf99, 0, 0x110000, 0x5182, 0, 0x120000, 0x08aa, 0, 0x130000,
+			  0x69d0, 0, 0x140000, 0x9d71, 0, 0x150000, 0xd319, 0, 0x160000, 0xcc09, 0, 0x170000,
+			  0x5ec4, 0, 0x180000, 0x7103, 0, 0x190000, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+*/
+	{ "toyfight", 0,{ 0x0615, 0, 0x0000, 0x1999, 0, 0x1000, 0x7510, 0, 0x2000, 0x5736, 0, 0x3000,
+		          0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "ggx",      0,{ -1, 0x200000, 0x100000, -1, 0x210004, 0x110000, -1, 0x220008, 0x120000, -1, 0x228000, 0x130000,
+		          0x3af9, 0, 0x000000, 0x2288, 0, 0x010000, 0xe5e6, 0, 0x020000, 0xebb0, 0, 0x030000,
+			  0x0228, 0, 0x040000, 0x872c, 0, 0x050000, 0xbba0, 0, 0x060000, 0x772f, 0, 0x070000,
+			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
+			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
+		          0xffffffff, 0xffffffff, 0xffffffff } }, 
 };
 
 /***************************************************************************
@@ -378,9 +416,17 @@ READ64_DEVICE_HANDLER( naomibd_r )
 
 				if (v->prot_translate == NULL)
 				{
-					logerror("naomibd: reading protection data, but none was supplied\n");
+					#if NAOMIBD_PRINTF_PROTECTION
+					v->prot_pio_count += 2;
+					printf("naomibd: reading protection data, but none was supplied (now %x bytes)\n", v->prot_pio_count);
+					#endif
 					return 0;
 				}
+
+				#if NAOMIBD_PRINTF_PROTECTION
+				v->prot_pio_count += 2;
+				printf("naomibd: PIO read count %x\n", v->prot_pio_count);
+				#endif
 
 			 	if (v->prot_reverse_bytes)
 				{
@@ -393,10 +439,12 @@ READ64_DEVICE_HANDLER( naomibd_r )
 
 				v->prot_offset++;
 			}
+			#if NAOMIBD_PRINTF_PROTECTION
 			else
 			{
-				logerror("Bad protection offset read %x\n", v->rom_offset);
+				printf("Bad protection offset read %x\n", v->rom_offset);
 			}
+			#endif
 		}
 		else
 		{
@@ -564,6 +612,10 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				v->rom_offset &= 0xffff0000;
 				v->rom_offset |= ((data >> 32) & 0xffff);
 			}
+
+			#if NAOMIBD_PRINTF_PROTECTION
+			printf("PIO: offset to %x\n", v->rom_offset);
+			#endif
 		}
 		break;
 		case 1:
@@ -593,7 +645,11 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 					case 0x1fffc:	// decryption key
 						v->prot_key = data;
 
-//                      printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset, v->prot_key, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
+						#if NAOMIBD_PRINTF_PROTECTION
+						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
+
+						v->prot_pio_count = 0;
+						#endif
 
 						// translate address if necessary
 						if (v->prot_translate != NULL)
@@ -606,7 +662,9 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 								{
 									if (v->prot_translate[i] == v->prot_key)
 									{
-										mame_printf_verbose("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
+										#if NAOMIBD_PRINTF_PROTECTION
+										printf("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
+										#endif
 										v->prot_offset = v->prot_translate[i+2]/2;
 										break;
 									}
@@ -619,7 +677,9 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 								{
 									if (v->prot_translate[i+1] == (v->prot_offset*2))
 									{
-										mame_printf_verbose("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
+										#if NAOMIBD_PRINTF_PROTECTION
+										printf("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
+										#endif
 										v->prot_offset = v->prot_translate[i+2]/2;
 										break;
 									}
@@ -630,14 +690,18 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 								}
 							}
 						}
+						#if NAOMIBD_PRINTF_PROTECTION
 						else
 						{
-							logerror("naomibd: protection not handled for this game\n");
+							printf("naomibd: protection not handled for this game\n");
 						}
+						#endif
 						break;
 
 					default:
-						mame_printf_verbose("naomibd: unknown protection write %x @ %x\n", (UINT32)data, offset);
+						#if NAOMIBD_PRINTF_PROTECTION
+						printf("naomibd: unknown protection write %x @ %x\n", (UINT32)data, offset);
+						#endif
 						break;
 				}
 			}
@@ -908,6 +972,9 @@ static DEVICE_START( naomibd )
 
 	/* find the protection address translation for this game */
 	v->prot_translate = (UINT32 *)0;
+	#if NAOMIBD_PRINTF_PROTECTION
+	v->prot_pio_count = 0;
+	#endif
 	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
 	{
 		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
@@ -1030,11 +1097,13 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(naomibd_config);				break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_DMAOFFSET:
-//          printf("DMA source %x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
+			#if NAOMIBD_PRINTF_PROTECTION
+		        printf("DMA source %08x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
+			#endif
 
 			// if the flag is cleared that lets the protection chip go,
-			// we need to handle this specially.
-			if (!(get_safe_token(device)->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE))
+			// we need to handle this specially.  but not on DIMM boards.
+			if (!(get_safe_token(device)->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE) && (get_safe_token(device)->type == ROM_BOARD))
 			{
 				if (!strcmp(device->machine->gamedrv->name, "qmegamis"))
 				{
@@ -1089,7 +1158,7 @@ DEVICE_GET_INFO( naomibd )
 			}
 			break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Naomi/Atomiswave plug-in board");			break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.1");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
