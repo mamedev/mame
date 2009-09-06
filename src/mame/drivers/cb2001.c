@@ -175,9 +175,31 @@ static const gfx_layout cb2001_layout32 =
 };
 
 static GFXDECODE_START( cb2001 )
-	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 2  )
+	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 32  )
+	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
+
+static PALETTE_INIT(cb2001)
+{
+	int i;
+	for (i = 0; i < 0x200; i++)
+	{
+		int r,g,b;
+
+		UINT8*proms = memory_region(machine, "proms");
+		UINT16 dat;
+		
+		dat = (proms[0x000+i] << 8) | proms[0x200+i];
+			
+		
+		b = ((dat >> 1) & 0x1f)<<3;
+		r = ((dat >> 6 )& 0x1f)<<3;
+		g = ((dat >> 11 ) & 0x1f)<<3;
+		
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
 static MACHINE_DRIVER_START( cb2001 )
@@ -188,7 +210,9 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_GFXDECODE(cb2001)
-
+	
+	MDRV_PALETTE_INIT( cb2001 )
+	
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -210,10 +234,9 @@ ROM_START( cb2001 )
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "c0111.12a", 0x000000, 0x80000, CRC(342b760e) SHA1(bc168bec384ccacd73543f604e3ab5b2b8f4f441) )
 
-	ROM_REGION( 0x200, "user1", 0 ) // ?
-	ROM_LOAD( "am27s29.9b", 0x000, 0x200, CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
-	ROM_REGION( 0x200, "user2", 0 ) // ?
-	ROM_LOAD( "am27s29.11b", 0x000, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
+	ROM_REGION( 0x400, "proms", 0 ) // ?
+	ROM_LOAD( "am27s29.9b",  0x000, 0x200, CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
+	ROM_LOAD( "am27s29.11b", 0x200, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
 ROM_END
 
 ROM_START( scherrym )
@@ -223,11 +246,9 @@ ROM_START( scherrym )
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB
 
-	// assumed to be the same
-	ROM_REGION( 0x200, "user1", 0 ) // ?
-	ROM_LOAD( "am27s29.9b", 0x000, 0x200, CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
-	ROM_REGION( 0x200, "user2", 0 ) // ?
-	ROM_LOAD( "am27s29.11b", 0x000, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
+	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
 GAME( 2001, cb2001,    0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Cherry Bonus 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
