@@ -193,8 +193,8 @@ static const discrete_module module_list[] =
 	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 },
 	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 },
 	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,dss_input_pulse_step ,NULL                  ,NULL                 },
-	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,NULL                  ,NULL                 },
-	{ DSS_INPUT_BUFFER,"DSS_INPUT_BUFFER", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,NULL                  ,NULL                 },
+	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 },
+	{ DSS_INPUT_BUFFER,"DSS_INPUT_BUFFER", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 },
 
 	/* from disc_wav.c */
 	/* Generic modules */
@@ -497,8 +497,6 @@ static DEVICE_START( discrete )
 
 	/* initialize the stream(s) */
 	info->discrete_stream = stream_create(device,linked_list_count(info->input_list), linked_list_count(info->output_list), info->sample_rate, info, discrete_stream_update);
-	if (info->buffer_count > 0)
-		info->buffer_stream = stream_create(device, 0, info->buffer_count, info->sample_rate, info, buffer_stream_update);
 	
 	/* allocate a queue */
 
@@ -688,28 +686,14 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 
 static STREAM_UPDATE( buffer_stream_update )
 {
-	discrete_info *info = (discrete_info *)param;
-	linked_list_entry *entry;
+	node_description *node = (node_description *) param;
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	stream_sample_t *ptr = outputs[0];
+	int data = context->data;
+	int samplenum = samples;
 
-	if (samples == 0)
-		return;
-
-	/* process buffered inputs */
-	for (entry = info->input_list; entry != NULL; entry = entry->next)
-	{
-		node_description *node = (node_description *) entry->ptr;
-
-		if (node->block->type == DSS_INPUT_BUFFER)
-		{
-			struct dss_input_context *context = (struct dss_input_context *)node->context;
-			stream_sample_t *ptr = outputs[context->stream_out_number];
-			int data = context->data;
-			int samplenum = samples;
-
-			while (samplenum--)
-			  *(ptr++) = data;
-		}
-	}
+	while (samplenum-- > 0)
+	  *(ptr++) = data;
 }
 
 
@@ -770,19 +754,17 @@ static STREAM_UPDATE( discrete_stream_update )
 
 static void init_nodes(discrete_info *info, linked_list_entry *block_list, const device_config *device)
 {
-	linked_list_entry	**cur_task_node = NULL;
+	linked_list_entry	**task_node_list_ptr = NULL;
 	linked_list_entry	*entry;
+	linked_list_entry	*task_node_list = NULL;
 	discrete_task_context *task = NULL;
 	/* list tail pointers */
-	linked_list_entry	**step_list = &info->step_list;
-	linked_list_entry	**node_list = &info->node_list;
-	linked_list_entry	**task_list = &info->task_list;
-	linked_list_entry	**output_list = &info->output_list;
-	linked_list_entry	**input_list = &info->input_list;
+	linked_list_entry	**step_list_ptr = &info->step_list;
+	linked_list_entry	**node_list_ptr = &info->node_list;
+	linked_list_entry	**task_list_ptr = &info->task_list;
+	linked_list_entry	**output_list_ptr = &info->output_list;
+	linked_list_entry	**input_list_ptr = &info->input_list;
 	
-	/* stream buffered node counter */
-	info->buffer_count = 0;
-
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
 	{
@@ -808,6 +790,18 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		node->active_inputs = block->active_inputs;
 		node->run_time = 0;
 
+		/* setup module if custom */
+		if (block->type == DST_CUSTOM)
+		{
+			const discrete_custom_info *custom = (const discrete_custom_info *)node->custom;
+			node->module = &custom->module;
+			node->custom = custom->custom;
+		}
+
+		/* allocate memory if necessary */
+		if (node->module->contextsize)
+			node->context = auto_alloc_array_clear(device->machine, UINT8, node->module->contextsize);
+
 		/* keep track of special nodes */
 		if (block->node == NODE_SPECIAL)
 		{
@@ -815,7 +809,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			{
 				/* Output Node */
 				case DSO_OUTPUT:
-					linked_list_add(info, &output_list, node);
+					linked_list_add(info, &output_list_ptr, node);
 					break;
 
 				/* CSVlog Node for debugging */
@@ -828,16 +822,16 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 
 				/* Task processing */
 				case DSO_TASK_START:
-					if (cur_task_node != NULL)
+					if (task_node_list_ptr != NULL)
 						fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
-					task = auto_alloc_clear(info->device->machine, discrete_task_context);
-					linked_list_add(info, &task_list, task);
-					cur_task_node = &task->list;
+					task_node_list = NULL;
+					task_node_list_ptr = &task_node_list;
 					break;
 
 				case DSO_TASK_END:
-					if (cur_task_node == NULL)
+					if (task_node_list_ptr == NULL)
 						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
+					task = auto_alloc_clear(info->device->machine, discrete_task_context);
 					task->numbuffered = node->active_inputs;
 					{
 						int i;
@@ -847,8 +841,11 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 							task->dest[i] = (double **) &node->input[i];
 						}
 					}
+					task->list = task_node_list;
+					linked_list_add(info, &task_list_ptr, task);
 					node->context = task;
 					task = NULL;
+					task_node_list = NULL;
 					break;
 
 				default:
@@ -869,47 +866,33 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			node->input[inputnum] = &(block->initial[inputnum]);
 		}
 
-		/* setup module if custom */
-		if (block->type == DST_CUSTOM)
-		{
-			const discrete_custom_info *custom = (const discrete_custom_info *)node->custom;
-			node->module = &custom->module;
-			node->custom = custom->custom;
-		}
-
-		/* allocate memory if necessary */
-		if (node->module->contextsize)
-			node->context = auto_alloc_array_clear(device->machine, UINT8, node->module->contextsize);
-
 		/* if we are an stream input node, track that */
 		if (block->type == DSS_INPUT_STREAM)
 		{
-			linked_list_add(info, &input_list, node);
+			linked_list_add(info, &input_list_ptr, node);
 		}
 		else if (block->type == DSS_INPUT_BUFFER)
 		{
-			struct dss_input_context *context = (struct dss_input_context *)node->context;
-			context->stream_out_number = info->buffer_count++;
-			linked_list_add(info, &input_list, node);
+			linked_list_add(info, &input_list_ptr, node);
 		}
 
 		/* add to node list */
-		linked_list_add(info, &node_list, node);
+		linked_list_add(info, &node_list_ptr, node);
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
 		if (node->module->step != NULL)
 		{
 			/* do we belong to a task? */
-			if (cur_task_node == NULL)
-				linked_list_add(info, &step_list, node);
+			if (task_node_list_ptr == NULL)
+				linked_list_add(info, &step_list_ptr, node);
 			else
-				linked_list_add(info, &cur_task_node, node);
+				linked_list_add(info, &task_node_list_ptr, node);
 		}
 
 		if (block->type == DSO_TASK_END)
 		{
-			cur_task_node = NULL;
+			task_node_list_ptr = NULL;
 		}
 
 		/* and register save state */

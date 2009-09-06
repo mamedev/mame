@@ -40,7 +40,8 @@ struct dss_input_context
 	UINT8		is_stream;
 	UINT8		is_buffered;
 	UINT32		stream_in_number;
-	UINT32		stream_out_number;
+	/* the buffer stream */
+	sound_stream *buffer_stream;
 };
 
 INLINE discrete_info *get_safe_token(const device_config *device)
@@ -110,7 +111,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 			if (context->is_buffered)
 			{
 				/* Bring the system up to now */
-				stream_update(info->buffer_stream);
+				stream_update(context->buffer_stream);
 
 				context->data = new_data;
 			}
@@ -305,6 +306,14 @@ static DISCRETE_RESET(dss_input_stream)
 {
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
+	context->ptr = NULL;
+	//context->data = 0;
+}
+
+static DISCRETE_START(dss_input_stream)
+{
+	struct dss_input_context *context = (struct dss_input_context *)node->context;
+
 	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
 	
 	context->is_stream = TRUE;
@@ -318,11 +327,14 @@ static DISCRETE_RESET(dss_input_stream)
 	if (node->block->type == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
+		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, node, buffer_stream_update);
+
 		stream_set_input(node->info->discrete_stream, context->stream_in_number, 
-			node->info->buffer_stream, context->stream_out_number, 1.0);
+			context->buffer_stream, 0, 1.0);
 	}
 	else
 	{
 		context->is_buffered = FALSE;
+		context->buffer_stream = NULL;
 	}
 }

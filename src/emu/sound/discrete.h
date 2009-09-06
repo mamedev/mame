@@ -3711,16 +3711,12 @@ struct _discrete_info
 
 	/* the input streams */
 	linked_list_entry 	 *input_list;
-	int					  buffer_count;		/* number of stream buffered nodes */
 
 	/* output node tracking */
 	linked_list_entry 	 *output_list;
 
 	/* the output stream */
 	sound_stream *discrete_stream;
-
-	/* the buffer stream */
-	sound_stream *buffer_stream;
 
 	/* debugging statistics */
 	FILE *disclogfile;
