@@ -335,6 +335,25 @@ static ADDRESS_MAP_START( vandyke_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vandykeb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
+	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
+	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
+	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSW2")
+	AM_RANGE(0x08000e, 0x08000f) AM_READ(NMK004_r)
+	AM_RANGE(0x080016, 0x080017) AM_WRITENOP	/* IRQ enable? */
+	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
+	AM_RANGE(0x080010, 0x08001d) AM_WRITE(vandykeb_scroll_w) /* 10, 12, 1a, 1c */
+	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP	/* just in case... */
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( manybloc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
@@ -1186,6 +1205,13 @@ static INPUT_PORTS_START( vandyke )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vandykeb )
+	PORT_INCLUDE( vandyke )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Tested on boot */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blkheart )
@@ -3771,7 +3797,7 @@ static MACHINE_DRIVER_START( vandykeb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(vandyke_map)
+	MDRV_CPU_PROGRAM_MAP(vandykeb_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
@@ -5129,16 +5155,16 @@ ROM_START( vandykeb )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "4.bin",		0x000000, 0x040000, CRC(4ba4138d) SHA1(56f9c9422085eaf74ddec8977663a33c122b7e8b) )	/* 16x16 tiles */
-	ROM_LOAD( "5.bin",		0x000000, 0x040000, CRC(9a1ac697) SHA1(a8200b10606edf4578c7e2f53a0046bb1209a041) )	/* 16x16 tiles */
+	ROM_LOAD( "5.bin",		0x040000, 0x040000, CRC(9a1ac697) SHA1(a8200b10606edf4578c7e2f53a0046bb1209a041) )	/* 16x16 tiles */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "13.bin",	0x000000, 0x040000, CRC(bb561871) SHA1(33dcaf956112181eed531320d3ececb90b17a599) )	/* Sprites */
-	ROM_LOAD16_BYTE( "12.bin",	0x080000, 0x040000, CRC(cdef9b17) SHA1(ec024a21685b87c82dc574cd050118d856a3cf57) )	/* Sprites */
 	ROM_LOAD16_BYTE( "17.bin",	0x000001, 0x040000, CRC(346e3b66) SHA1(34df7167ed4048e1f236e7d8fa6dcdffb0965c71) )	/* Sprites */
+	ROM_LOAD16_BYTE( "12.bin",	0x080000, 0x040000, CRC(cdef9b17) SHA1(ec024a21685b87c82dc574cd050118d856a3cf57) )	/* Sprites */
 	ROM_LOAD16_BYTE( "16.bin",	0x080001, 0x040000, CRC(beda678c) SHA1(3dfb8763241a97b9d65113c6eb99b52ec5245cd6) )	/* Sprites */
 	ROM_LOAD16_BYTE( "11.bin",	0x100000, 0x020000, CRC(823185d9) SHA1(eaf0f3ab0921d894eb1d09d5b2e9d5b785928804) )	/* Sprites */
-	ROM_LOAD16_BYTE( "10.bin",	0x140000, 0x020000, CRC(388b1abc) SHA1(9d1c43070130672a5e1a41807d796c944b0676ae) )	/* Sprites */
 	ROM_LOAD16_BYTE( "15.bin",	0x100001, 0x020000, CRC(149f3247) SHA1(5f515cb10468da048c89b543807280bd3e39e45a) )	/* Sprites */
+	ROM_LOAD16_BYTE( "10.bin",	0x140000, 0x020000, CRC(388b1abc) SHA1(9d1c43070130672a5e1a41807d796c944b0676ae) )	/* Sprites */
 	ROM_LOAD16_BYTE( "14.bin",	0x140001, 0x020000, CRC(32eeba37) SHA1(0d0218e864ed647bd33bbe379f0ef76ccefbd06c) )	/* Sprites */
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -7100,7 +7126,7 @@ GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",    
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykeb,   vandyke, vandykeb, vandyke, vandykeb, ROT270, "[UPL] (bootleg)",              "Vandyke (bootleg with PIC16c57)",  GAME_NOT_WORKING )
+GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "[UPL] (bootleg)",              "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
 
 GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )
 GAME( 1991, blkheartj,blkheart, blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart (Japan)", GAME_IMPERFECT_SOUND )

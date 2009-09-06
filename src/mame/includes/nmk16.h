@@ -28,6 +28,7 @@ WRITE16_HANDLER( bioship_bank_w );
 WRITE16_HANDLER( mustang_scroll_w );
 WRITE16_HANDLER( bioshipbg_scroll_w );
 WRITE16_HANDLER( vandyke_scroll_w );
+WRITE16_HANDLER( vandykeb_scroll_w );
 WRITE16_HANDLER( manybloc_scroll_w );
 
 VIDEO_START( macross );

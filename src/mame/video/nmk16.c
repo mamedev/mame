@@ -329,6 +329,16 @@ WRITE16_HANDLER( vandyke_scroll_w )
 	tilemap_set_scrolly(bg_tilemap0,0,scroll[2] * 256 + (scroll[3] >> 8));
 }
 
+WRITE16_HANDLER( vandykeb_scroll_w )
+{
+	static UINT16 scroll[8];
+
+	COMBINE_DATA(&scroll[offset]);
+
+	tilemap_set_scrollx(bg_tilemap0,0,scroll[6] * 256 + (scroll[5] >> 8));
+	tilemap_set_scrolly(bg_tilemap0,0,scroll[1] * 256 + (scroll[0] >> 8));
+}
+
 WRITE16_HANDLER( manybloc_scroll_w )
 {
 	COMBINE_DATA(&gunnail_scrollram[offset]);
