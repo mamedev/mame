@@ -196,7 +196,7 @@ static INPUT_PORTS_START( pokechmp )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
+/* this makes no sense at all!  it seems impossible to get the colours to align up in the korean flag ingame and everything else is slightly broken too */
 static const gfx_layout pokechmp_charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -209,15 +209,16 @@ static const gfx_layout pokechmp_charlayout =
 };
 
 
+/* should be ok.. */
 static const gfx_layout pokechmp_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,8),   /* 1024 sprites */
-	4,
-	{ RGN_FRAC(1,8),RGN_FRAC(5,8), RGN_FRAC(3,8),RGN_FRAC(7,8) },
-	{ 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0, 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every char takes 8 consecutive bytes */
+16,16,  /* 16*16 sprites */
+RGN_FRAC(1,8),   /* 1024 sprites */
+4,
+{RGN_FRAC(1,8),RGN_FRAC(3,8),RGN_FRAC(5,8),RGN_FRAC(7,8)},
+{ 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0, 7, 6, 5, 4, 3, 2, 1, 0 },
+{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+32*8    /* every char takes 8 consecutive bytes */
 };
 
 
@@ -290,11 +291,11 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_08_27c020.bin",	   0xc0000, 0x40000, CRC(e9db54d6) SHA1(ac3b7c06d0f61847bf9bc6147f2f88d712f2b4b3) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	/* the first half of all these roms is identical... for rom 3 both halves match, is the first half unused? 4bpp gfx? */
-	ROM_LOAD( "pokechamp_01_27c512.bin",	   0x00000, 0x10000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) )
-	ROM_LOAD( "pokechamp_02_27c512.bin",	   0x10000, 0x10000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) )
-	ROM_LOAD( "pokechamp_03_27c512.bin",	   0x20000, 0x10000, CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5) )
-	ROM_LOAD( "pokechamp_04_27c512.bin",	   0x30000, 0x10000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) )
+	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	ROM_LOAD( "pokechamp_02_27c512.bin",	   0x00000, 0x10000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) )
+	ROM_LOAD( "pokechamp_01_27c512.bin",	   0x10000, 0x10000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) )
+	ROM_LOAD( "pokechamp_04_27c512.bin",	   0x20000, 0x10000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) )
+	ROM_LOAD( "pokechamp_03_27c512.bin",	   0x30000, 0x10000, CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "pokechamp_10_27c040.bin",	   0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )

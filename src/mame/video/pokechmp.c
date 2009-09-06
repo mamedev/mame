@@ -58,7 +58,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
-					(spriteram[offs+1] & 0x70) >> 4,
+					(spriteram[offs+1] & 0xf0) >> 4,
 					flipx,flipy,
 					sx,sy,0);
 		}

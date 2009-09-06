@@ -86,7 +86,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -100,7 +100,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -114,7 +114,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -128,7 +128,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -141,7 +141,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -154,7 +154,7 @@ static VIDEO_UPDATE( blackt96 )
 		{
 			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
 			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
-			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 			drawgfx_transpen(bitmap,cliprect,gfxspr,tile,colour,flipx,0,x*16,y*16,0);
 			count++;
@@ -443,7 +443,7 @@ static const gfx_layout blackt962_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,16,8, 24 },
+	{ 0, 24, 8, 16 },
 	{ 519, 515, 518, 514,  517,513,  516,512, 7,3,6,2,5,1,4,0 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	32*32
