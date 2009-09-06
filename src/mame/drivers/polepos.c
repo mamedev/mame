@@ -206,7 +206,12 @@ Notes:
   This seems to be a genuine error on Atari's part, since they replaced it with
   136014-231 which matches Namco's PP1-27. The bad bit should cause a tiny gfx
   glitch, though it's difficult to notice.
+  
+- topracra: Use Service1 to start game
 
+Todo:
+
+- topracra: Gear is not updated in artwork
 
 ***************************************************************************/
 
@@ -347,7 +352,8 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
+static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
+static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine, (const char *)param) & 0x0f; }
 static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
@@ -553,7 +559,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -582,7 +588,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -633,7 +639,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, "Practice Rank" )
@@ -662,7 +668,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -685,6 +691,12 @@ static INPUT_PORTS_START( topracra )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0L")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(low_port_r, "IN0")
+
+	PORT_START("IN0H")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "IN0")
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -711,7 +723,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -740,7 +752,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -792,7 +804,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Game_Time ) )
@@ -818,7 +830,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x00, DEF_STR( High ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
