@@ -32,7 +32,7 @@ VIDEO_START( mlc )
 }
 
 #ifdef UNUSED_FUNCTION
-static void blitRaster(bitmap_t *bitmap, int rasterMode)
+static void blitRaster(running_machine *machine, bitmap_t *bitmap, int rasterMode)
 {
 	int x,y;
 	for (y=0; y<256; y++) //todo
@@ -41,7 +41,7 @@ static void blitRaster(bitmap_t *bitmap, int rasterMode)
 		UINT32* dst=BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 xptr=(mlc_raster_table[0][y]<<13);
 
-		if (input_code_pressed(KEYCODE_X))
+		if (input_code_pressed(machine, KEYCODE_X))
 			xptr=0;
 
 		for (x=0; x<320; x++)
@@ -49,7 +49,7 @@ static void blitRaster(bitmap_t *bitmap, int rasterMode)
 			if (src[x])
 				dst[x]=src[(xptr>>16)&0x1ff];
 
-			//if (input_code_pressed(KEYCODE_X))
+			//if (input_code_pressed(machine, KEYCODE_X))
 			//  xptr+=0x10000;
 			//else if(rasterHackTest[0][y]<0)
 				xptr+=0x10000 - ((mlc_raster_table[2][y]&0x3ff)<<5);
@@ -499,7 +499,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 
 //      if (lastRasterMode!=0 && rasterDirty)
 //      {
-//          blitRaster(bitmap, rasterMode);
+//          blitRaster(machine, bitmap, rasterMode);
 //          bitmap_fill(temp_bitmap,cliprect,0);
 //          rasterDirty=0;
 //      }

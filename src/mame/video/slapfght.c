@@ -132,10 +132,10 @@ WRITE8_HANDLER( slapfight_palette_bank_w )
 	slapfight_palette_bank = offset;
 }
 
-#ifdef MAME_DEBUG
-static void slapfght_log_vram(void)
+static void slapfght_log_vram(running_machine *machine)
 {
-	if ( input_code_pressed_once(KEYCODE_B) )
+#ifdef MAME_DEBUG
+	if ( input_code_pressed_once(machine, KEYCODE_B) )
 	{
 		int i;
 		for (i=0; i<0x800; i++)
@@ -143,8 +143,8 @@ static void slapfght_log_vram(void)
 			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, videoram[i],colorram[i],spriteram[i]);
 		}
 	}
-}
 #endif
+}
 
 /***************************************************************************
 
@@ -199,9 +199,7 @@ VIDEO_UPDATE( perfrman )
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect,0x80);
 
-#ifdef MAME_DEBUG
-	slapfght_log_vram();
-#endif
+	slapfght_log_vram(screen->machine);
 	return 0;
 }
 
@@ -245,8 +243,6 @@ VIDEO_UPDATE( slapfight )
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 
-#ifdef MAME_DEBUG
-	slapfght_log_vram();
-#endif
+	slapfght_log_vram(screen->machine);
 	return 0;
 }

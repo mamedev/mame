@@ -161,11 +161,11 @@ static VIDEO_UPDATE( livequiz )
 	int layers_ctrl = -1;
 
 #if MIDAS_DEBUG
-	if ( input_code_pressed(KEYCODE_Z) )
+	if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (input_code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for tmap
-		if (input_code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1 << 0;	// for tmap
+		if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif

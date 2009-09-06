@@ -1491,23 +1491,23 @@ VIDEO_UPDATE( cave )
 #ifdef MAME_DEBUG
 {
 	static int rasflag, old_rasflag;
-	if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) || input_code_pressed(KEYCODE_C) ||
-    	 input_code_pressed(KEYCODE_V) || input_code_pressed(KEYCODE_B) )
+	if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) || input_code_pressed(screen->machine, KEYCODE_C) ||
+    	 input_code_pressed(screen->machine, KEYCODE_V) || input_code_pressed(screen->machine, KEYCODE_B) )
 	{
 		int msk = 0, val = 0;
 
-		if (input_code_pressed(KEYCODE_X))	val = 1;	// priority 0 only
-		if (input_code_pressed(KEYCODE_C))	val = 2;	// ""       1
-		if (input_code_pressed(KEYCODE_V))	val = 4;	// ""       2
-		if (input_code_pressed(KEYCODE_B))	val = 8;	// ""       3
+		if (input_code_pressed(screen->machine, KEYCODE_X))	val = 1;	// priority 0 only
+		if (input_code_pressed(screen->machine, KEYCODE_C))	val = 2;	// ""       1
+		if (input_code_pressed(screen->machine, KEYCODE_V))	val = 4;	// ""       2
+		if (input_code_pressed(screen->machine, KEYCODE_B))	val = 8;	// ""       3
 
-		if (input_code_pressed(KEYCODE_Z))	val = 1|2|4|8;	// All of the above priorities
+		if (input_code_pressed(screen->machine, KEYCODE_Z))	val = 1|2|4|8;	// All of the above priorities
 
-		if (input_code_pressed(KEYCODE_Q))	msk |= val <<  0;	// for layer 0
-		if (input_code_pressed(KEYCODE_W))	msk |= val <<  4;	// for layer 1
-		if (input_code_pressed(KEYCODE_E))	msk |= val <<  8;	// for layer 2
-		if (input_code_pressed(KEYCODE_R))	msk |= val << 12;	// for layer 3
-		if (input_code_pressed(KEYCODE_A))	msk |= val << 16;	// for sprites
+		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= val <<  0;	// for layer 0
+		if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= val <<  4;	// for layer 1
+		if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= val <<  8;	// for layer 2
+		if (input_code_pressed(screen->machine, KEYCODE_R))	msk |= val << 12;	// for layer 3
+		if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= val << 16;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 
 #if 1

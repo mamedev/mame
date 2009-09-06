@@ -1332,7 +1332,7 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 static void tgp_scan(void)
 {
 #if 0
-	if (input_code_pressed_once(KEYCODE_F))
+	if (input_code_pressed_once(machine, KEYCODE_F))
         {
 			FILE *fp;
 			fp=fopen("tgp-ram.bin", "w+b");
@@ -1465,35 +1465,35 @@ VIDEO_UPDATE(model1)
 		double delta;
 		delta = 1;
 
-		if(input_code_pressed(KEYCODE_F)) {
+		if(input_code_pressed(screen->machine, KEYCODE_F)) {
 			mod = 1;
 			vxx -= delta;
 		}
-		if(input_code_pressed(KEYCODE_G)) {
+		if(input_code_pressed(screen->machine, KEYCODE_G)) {
 			mod = 1;
 			vxx += delta;
 		}
-		if(input_code_pressed(KEYCODE_H)) {
+		if(input_code_pressed(screen->machine, KEYCODE_H)) {
 			mod = 1;
 			vyy -= delta;
 		}
-		if(input_code_pressed(KEYCODE_J)) {
+		if(input_code_pressed(screen->machine, KEYCODE_J)) {
 			mod = 1;
 			vyy += delta;
 		}
-		if(input_code_pressed(KEYCODE_K)) {
+		if(input_code_pressed(screen->machine, KEYCODE_K)) {
 			mod = 1;
 			vzz -= delta;
 		}
-		if(input_code_pressed(KEYCODE_L)) {
+		if(input_code_pressed(screen->machine, KEYCODE_L)) {
 			mod = 1;
 			vzz += delta;
 		}
-		if(input_code_pressed(KEYCODE_U)) {
+		if(input_code_pressed(screen->machine, KEYCODE_U)) {
 			mod = 1;
 			ayy -= 0.05;
 		}
-		if(input_code_pressed(KEYCODE_I)) {
+		if(input_code_pressed(screen->machine, KEYCODE_I)) {
 			mod = 1;
 			ayy += 0.05;
 		}

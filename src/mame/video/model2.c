@@ -1031,7 +1031,7 @@ static void model2_3d_frame_end( bitmap_t *bitmap, const rectangle *cliprect )
 		return;
 
 #if DEBUG
-	if (input_code_pressed(KEYCODE_Q))
+	if (input_code_pressed(machine, KEYCODE_Q))
 	{
 		UINT32	i;
 

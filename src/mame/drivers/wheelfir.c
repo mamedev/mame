@@ -292,10 +292,10 @@ static VIDEO_UPDATE(wheelfir)
     int x,y;
     static int base = 0;
 
-    if ( input_code_pressed_once(KEYCODE_E) )
+    if ( input_code_pressed_once(screen->machine, KEYCODE_E) )
         base += 512*512;
 
-    if ( input_code_pressed_once(KEYCODE_Q) )
+    if ( input_code_pressed_once(screen->machine, KEYCODE_Q) )
         base -= 512*512;
 
     if (base<0x000000) base = 0x000000;
@@ -306,7 +306,7 @@ static VIDEO_UPDATE(wheelfir)
     copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
     bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(screen),0);
 
-    if ( input_code_pressed(KEYCODE_R) )
+    if ( input_code_pressed(screen->machine, KEYCODE_R) )
     {
         const UINT8 *gfx = memory_region(machine, "gfx1");
         for (y=0;y<128;y++)

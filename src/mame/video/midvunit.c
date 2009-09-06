@@ -378,7 +378,7 @@ static void process_dma_queue(running_machine *machine)
 
 WRITE32_HANDLER( midvunit_dma_queue_w )
 {
-	if (LOG_DMA && input_code_pressed(KEYCODE_L))
+	if (LOG_DMA && input_code_pressed(space->machine, KEYCODE_L))
 		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(space->cpu), dma_data_index, data);
 	if (dma_data_index < 16)
 		dma_data[dma_data_index++] = data;
@@ -396,7 +396,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 {
 	if (offset)
 	{
-		if (LOG_DMA && input_code_pressed(KEYCODE_L))
+		if (LOG_DMA && input_code_pressed(space->machine, KEYCODE_L))
 			logerror("%06X:trigger\n", cpu_get_pc(space->cpu));
 		process_dma_queue(space->machine);
 		dma_data_index = 0;
@@ -418,7 +418,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 	if ((page_control ^ data) & 1)
 	{
 		video_changed = TRUE;
-		if (LOG_DMA && input_code_pressed(KEYCODE_L))
+		if (LOG_DMA && input_code_pressed(space->machine, KEYCODE_L))
 			logerror("##########################################################\n");
 		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
 	}

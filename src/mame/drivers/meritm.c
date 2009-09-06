@@ -369,12 +369,12 @@ static VIDEO_START( meritm )
 
 static VIDEO_UPDATE( meritm )
 {
-	if(input_code_pressed_once(KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		layer0_enabled^=1;
 		popmessage("Layer 0 %sabled",layer0_enabled ? "en" : "dis");
 	}
-	if(input_code_pressed_once(KEYCODE_W))
+	if(input_code_pressed_once(screen->machine, KEYCODE_W))
 	{
 		layer1_enabled^=1;
 		popmessage("Layer 1 %sabled",layer1_enabled ? "en" : "dis");

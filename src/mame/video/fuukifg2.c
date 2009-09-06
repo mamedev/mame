@@ -223,7 +223,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(KEYCODE_X))
+if (input_code_pressed(screen->machine, KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);

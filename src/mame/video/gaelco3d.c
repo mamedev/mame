@@ -456,26 +456,26 @@ VIDEO_UPDATE( gaelco3d )
 {
 	int x, y, ret;
 
-	if (DISPLAY_TEXTURE && (input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X)))
+	if (DISPLAY_TEXTURE && (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X)))
 	{
 		static int xv = 0, yv = 0x1000;
 		UINT8 *base = gaelco3d_texture;
 		int length = gaelco3d_texture_size;
 
-		if (input_code_pressed(KEYCODE_X))
+		if (input_code_pressed(screen->machine, KEYCODE_X))
 		{
 			base = gaelco3d_texmask;
 			length = gaelco3d_texmask_size;
 		}
 
-		if (input_code_pressed(KEYCODE_LEFT) && xv >= 4)
+		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && xv >= 4)
 			xv -= 4;
-		if (input_code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
+		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && xv < 4096 - 4)
 			xv += 4;
 
-		if (input_code_pressed(KEYCODE_UP) && yv >= 4)
+		if (input_code_pressed(screen->machine, KEYCODE_UP) && yv >= 4)
 			yv -= 4;
-		if (input_code_pressed(KEYCODE_DOWN) && yv < 0x40000)
+		if (input_code_pressed(screen->machine, KEYCODE_DOWN) && yv < 0x40000)
 			yv += 4;
 
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)

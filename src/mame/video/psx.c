@@ -420,10 +420,10 @@ static void DebugMeshEnd( void )
 
 static void DebugCheckKeys( running_machine *machine )
 {
-	if( input_code_pressed_once( KEYCODE_M ) )
+	if( input_code_pressed_once( machine, KEYCODE_M ) )
 		m_debug.b_mesh = !m_debug.b_mesh;
 
-	if( input_code_pressed_once( KEYCODE_V ) )
+	if( input_code_pressed_once( machine, KEYCODE_V ) )
 		m_debug.b_texture = !m_debug.b_texture;
 
 	if( m_debug.b_mesh || m_debug.b_texture )
@@ -435,7 +435,7 @@ static void DebugCheckKeys( running_machine *machine )
 	else
 		video_screen_set_visarea(machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
 
-	if( input_code_pressed_once( KEYCODE_I ) )
+	if( input_code_pressed_once( machine, KEYCODE_I ) )
 	{
 		if( m_debug.b_texture )
 		{
@@ -463,7 +463,7 @@ static void DebugCheckKeys( running_machine *machine )
 	}
 
 #if 0
-	if( input_code_pressed_once( KEYCODE_D ) )
+	if( input_code_pressed_once( machine, KEYCODE_D ) )
 	{
 		FILE *f;
 		int n_x;
@@ -473,7 +473,7 @@ static void DebugCheckKeys( running_machine *machine )
 				fprintf( f, "%04u,%04u = %04x\n", n_y, n_x, m_p_p_vram[ n_y ][ n_x ] );
 		fclose( f );
 	}
-	if( input_code_pressed_once( KEYCODE_S ) )
+	if( input_code_pressed_once( machine, KEYCODE_S ) )
 	{
 		FILE *f;
 		popmessage( "saving..." );
@@ -482,7 +482,7 @@ static void DebugCheckKeys( running_machine *machine )
 			fwrite( m_p_p_vram[ n_y ], 1024 * 2, 1, f );
 		fclose( f );
 	}
-	if( input_code_pressed_once( KEYCODE_L ) )
+	if( input_code_pressed_once( machine, KEYCODE_L ) )
 	{
 		FILE *f;
 		popmessage( "loading..." );

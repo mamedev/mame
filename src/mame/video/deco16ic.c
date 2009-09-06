@@ -800,11 +800,11 @@ void deco16_pf34_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2
 
 /*****************************************************************************************/
 
-void deco16_print_debug_info(bitmap_t *bitmap)
+void deco16_print_debug_info(running_machine *machine, bitmap_t *bitmap)
 {
 	char buf[64*5];
 
-	if (input_code_pressed(KEYCODE_O))
+	if (input_code_pressed(machine, KEYCODE_O))
 		return;
 
 	if (deco16_pf12_control) {

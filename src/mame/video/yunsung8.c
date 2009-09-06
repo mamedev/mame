@@ -189,11 +189,11 @@ VIDEO_UPDATE( yunsung8 )
 	int layers_ctrl = (~yunsung8_layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(KEYCODE_Z))
+if (input_code_pressed(screen->machine, KEYCODE_Z))
 {
 	int msk = 0;
-	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

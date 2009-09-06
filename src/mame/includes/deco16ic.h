@@ -57,4 +57,4 @@ WRITE16_HANDLER( deco16_priority_w );
 
 READ16_HANDLER( deco16_71_r );
 
-void deco16_print_debug_info(bitmap_t *bitmap);
+void deco16_print_debug_info(running_machine *machine, bitmap_t *bitmap);

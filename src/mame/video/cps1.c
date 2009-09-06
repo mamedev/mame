@@ -2469,7 +2469,7 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 	int yoffs = 16-cps2_port(CPS2_OBJ_YOFFS);
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(KEYCODE_Z) && input_code_pressed(KEYCODE_R))
+	if (input_code_pressed(machine, KEYCODE_Z) && input_code_pressed(machine, KEYCODE_R))
 	{
 		return;
 	}
@@ -2795,7 +2795,7 @@ if (	(cps2_port(CPS2_OBJ_BASE) != 0x7080 && cps2_port(CPS2_OBJ_BASE) != 0x7000) 
 			cps2_port(CPS2_OBJ_UK1),
 			cps2_port(CPS2_OBJ_UK2));
 
-if (0 && input_code_pressed(KEYCODE_Z))
+if (0 && input_code_pressed(screen->machine, KEYCODE_Z))
 	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
 #endif
 

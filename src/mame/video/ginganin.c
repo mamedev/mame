@@ -250,15 +250,15 @@ VIDEO_UPDATE( ginganin )
 	layers_ctrl1 = layers_ctrl;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(KEYCODE_Z))
+if (input_code_pressed(screen->machine, KEYCODE_Z))
 {
 	int msk = 0;
 	static int posx,posy;
 
-	if (input_code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
-	if (input_code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
-	if (input_code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
-	if (input_code_pressed(KEYCODE_A))	{ msk |= 0xfff8;}
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) { msk |= 0xfff1;}
+	if (input_code_pressed(screen->machine, KEYCODE_W)) { msk |= 0xfff2;}
+	if (input_code_pressed(screen->machine, KEYCODE_E)) { msk |= 0xfff4;}
+	if (input_code_pressed(screen->machine, KEYCODE_A))	{ msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -268,11 +268,11 @@ if (input_code_pressed(KEYCODE_Z))
 	tilemap_set_scrolly(fg_tilemap, 0, posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",posx%(BG_NX*16),posy%(BG_NY*16),posx%(FG_NX*16),posy%(FG_NY*16));
 
-	if (input_code_pressed(KEYCODE_L))	{ posx +=8; SETSCROLL }
-	if (input_code_pressed(KEYCODE_J))	{ posx -=8; SETSCROLL }
-	if (input_code_pressed(KEYCODE_K))	{ posy +=8; SETSCROLL }
-	if (input_code_pressed(KEYCODE_I))	{ posy -=8; SETSCROLL }
-	if (input_code_pressed(KEYCODE_H))	{ posx = posy = 0;	SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_L))	{ posx +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_J))	{ posx -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_K))	{ posy +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_I))	{ posy -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_H))	{ posx = posy = 0;	SETSCROLL }
 
 }
 #endif

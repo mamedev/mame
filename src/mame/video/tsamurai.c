@@ -260,8 +260,8 @@ VIDEO_UPDATE( vsgongf )
 {
 	#ifdef MAME_DEBUG
 	static int k;
-	if( input_code_pressed( KEYCODE_Q ) ){
-		while( input_code_pressed( KEYCODE_Q ) ){
+	if( input_code_pressed( screen->machine, KEYCODE_Q ) ){
+		while( input_code_pressed( screen->machine, KEYCODE_Q ) ){
 			k++;
 			vsgongf_color = k;
 			tilemap_mark_all_tiles_dirty( foreground );

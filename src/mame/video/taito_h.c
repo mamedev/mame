@@ -396,15 +396,13 @@ static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 
 
-#ifdef MAME_DEBUG
-
-static void taitoh_log_vram(void)
+static void taitoh_log_vram(running_machine *machine)
 {
+#ifdef MAME_DEBUG
 	// null function: the necessary pointers are now internal to taitoic.c
 	// Recreate it there if wanted (add prototype to taitoic.h)
-}
-
 #endif
+}
 
 
 /**************************************************************************/
@@ -413,9 +411,7 @@ VIDEO_UPDATE( syvalion )
 {
 	TC0080VCO_tilemap_update(screen->machine);
 
-#ifdef MAME_DEBUG
-	taitoh_log_vram();
-#endif
+	taitoh_log_vram(screen->machine);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -431,20 +427,18 @@ VIDEO_UPDATE( recordbr )
 {
 	TC0080VCO_tilemap_update(screen->machine);
 
-#ifdef MAME_DEBUG
-	taitoh_log_vram();
-#endif
+	taitoh_log_vram(screen->machine);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if ( !input_code_pressed(KEYCODE_A) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	if ( !input_code_pressed(KEYCODE_S) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
 		recordbr_draw_sprites(screen->machine,bitmap,cliprect,0);
-	if ( !input_code_pressed(KEYCODE_D) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	if ( !input_code_pressed(KEYCODE_F) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
 		recordbr_draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
@@ -462,20 +456,18 @@ VIDEO_UPDATE( dleague )
 {
 	TC0080VCO_tilemap_update(screen->machine);
 
-#ifdef MAME_DEBUG
-	taitoh_log_vram();
-#endif
+	taitoh_log_vram(screen->machine);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if ( !input_code_pressed(KEYCODE_A) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	if ( !input_code_pressed(KEYCODE_S) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
 		dleague_draw_sprites(screen->machine,bitmap,cliprect,0);
-	if ( !input_code_pressed(KEYCODE_D) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	if ( !input_code_pressed(KEYCODE_F) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
 		dleague_draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);

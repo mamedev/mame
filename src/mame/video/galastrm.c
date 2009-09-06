@@ -493,17 +493,17 @@ VIDEO_UPDATE( galastrm )
 #if 0
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
 	{
-		if (!input_code_pressed(KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		if (!input_code_pressed(KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,4);
-		if (!input_code_pressed(KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		if (!input_code_pressed(KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,4);
+		if (!input_code_pressed(screen->machine, KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
+		if (!input_code_pressed(screen->machine, KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,4);
+		if (!input_code_pressed(screen->machine, KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
+		if (!input_code_pressed(screen->machine, KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,4);
 	}
 	else
 	{
-		if (!input_code_pressed(KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
-		if (!input_code_pressed(KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,2);
-		if (!input_code_pressed(KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
-		if (!input_code_pressed(KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,8);
+		if (!input_code_pressed(screen->machine, KEYCODE_Z)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[0],0,1);
+		if (!input_code_pressed(screen->machine, KEYCODE_X)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[1],0,2);
+		if (!input_code_pressed(screen->machine, KEYCODE_C)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[2],0,4);
+		if (!input_code_pressed(screen->machine, KEYCODE_V)) TC0480SCP_tilemap_draw(screen->machine,tmpbitmaps,&clip,layer[3],0,8);
 	}
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
@@ -532,8 +532,8 @@ VIDEO_UPDATE( galastrm )
 	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 
-	if (!input_code_pressed(KEYCODE_B)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
-	if (!input_code_pressed(KEYCODE_M)) TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
+	if (!input_code_pressed(screen->machine, KEYCODE_B)) TC0480SCP_tilemap_draw(screen->machine,bitmap,cliprect,layer[4],0,0);
+	if (!input_code_pressed(screen->machine, KEYCODE_M)) TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);
 
 
 #else

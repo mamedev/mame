@@ -124,10 +124,10 @@ static READ8_HANDLER( mermaid_data_r )
 {
 	static UINT8 res;
 
-	if(input_code_pressed_once(KEYCODE_Z))
+	if(input_code_pressed_once(space->machine, KEYCODE_Z))
 		test_mcu++;
 
-	if(input_code_pressed_once(KEYCODE_X))
+	if(input_code_pressed_once(space->machine, KEYCODE_X))
 		test_mcu--;
 
 	if(mcu_ram.access_ram_r)

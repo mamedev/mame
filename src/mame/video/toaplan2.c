@@ -1029,31 +1029,31 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 		vid_controllers = 2;
 	}
 
-	if ( input_code_pressed_once(KEYCODE_W) )
+	if ( input_code_pressed_once(machine, KEYCODE_W) )
 	{
 		display_tx += 1;
 		display_tx &= 1;
 		if (toaplan2_txvideoram16 != 0)
 			tilemap_set_enable(tx_tilemap, display_tx);
 	}
-	if ( input_code_pressed_once(KEYCODE_L) )
+	if ( input_code_pressed_once(machine, KEYCODE_L) )
 	{
 		display_sp[0] += 1;
 		display_sp[0] &= 1;
 	}
-	if ( input_code_pressed_once(KEYCODE_K) )
+	if ( input_code_pressed_once(machine, KEYCODE_K) )
 	{
 		display_top[0] += 1;
 		display_top[0] &= 1;
 		tilemap_set_enable(top_tilemap[0], display_top[0]);
 	}
-	if ( input_code_pressed_once(KEYCODE_J) )
+	if ( input_code_pressed_once(machine, KEYCODE_J) )
 	{
 		display_fg[0] += 1;
 		display_fg[0] &= 1;
 		tilemap_set_enable(fg_tilemap[0], display_fg[0]);
 	}
-	if ( input_code_pressed_once(KEYCODE_H) )
+	if ( input_code_pressed_once(machine, KEYCODE_H) )
 	{
 		display_bg[0] += 1;
 		display_bg[0] &= 1;
@@ -1061,24 +1061,24 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 	}
 	if (vid_controllers == 2)
 	{
-		if ( input_code_pressed_once(KEYCODE_O) )
+		if ( input_code_pressed_once(machine, KEYCODE_O) )
 		{
 			display_sp[1] += 1;
 			display_sp[1] &= 1;
 		}
-		if ( input_code_pressed_once(KEYCODE_I) )
+		if ( input_code_pressed_once(machine, KEYCODE_I) )
 		{
 			display_top[1] += 1;
 			display_top[1] &= 1;
 			tilemap_set_enable(top_tilemap[1], display_top[1]);
 		}
-		if ( input_code_pressed_once(KEYCODE_U) )
+		if ( input_code_pressed_once(machine, KEYCODE_U) )
 		{
 			display_fg[1] += 1;
 			display_fg[1] &= 1;
 			tilemap_set_enable(fg_tilemap[1], display_fg[1]);
 		}
-		if ( input_code_pressed_once(KEYCODE_Y) )
+		if ( input_code_pressed_once(machine, KEYCODE_Y) )
 		{
 			display_bg[1] += 1;
 			display_bg[1] &= 1;
@@ -1150,9 +1150,9 @@ WRITE16_HANDLER( pipibibi_spriteram16_w )
 
 
 
-#ifdef MAME_DEBUG
-static void toaplan2_log_vram(void)
+static void toaplan2_log_vram(running_machine *machine)
 {
+#ifdef MAME_DEBUG
 	offs_t sprite_voffs, tile_voffs;
 	int vid_controllers = 1;
 
@@ -1162,7 +1162,7 @@ static void toaplan2_log_vram(void)
 		vid_controllers = 2;
 	}
 
-	if ( input_code_pressed_once(KEYCODE_M) )
+	if ( input_code_pressed_once(machine, KEYCODE_M) )
 	{
 		UINT16 *source_now0  = (UINT16 *)(spriteram16_now[0]);
 		UINT16 *source_new0  = (UINT16 *)(spriteram16_new[0]);
@@ -1213,7 +1213,7 @@ static void toaplan2_log_vram(void)
 			}
 		}
 	}
-	if ( input_code_pressed_once(KEYCODE_N) )
+	if ( input_code_pressed_once(machine, KEYCODE_N) )
 	{
 		int tchar[2], tattr[2];
 		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
@@ -1238,7 +1238,7 @@ static void toaplan2_log_vram(void)
 			}
 		}
 	}
-	if ( input_code_pressed_once(KEYCODE_B) )
+	if ( input_code_pressed_once(machine, KEYCODE_B) )
 	{
 		int tchar[2], tattr[2];
 		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
@@ -1263,7 +1263,7 @@ static void toaplan2_log_vram(void)
 			}
 		}
 	}
-	if ( input_code_pressed_once(KEYCODE_V) )
+	if ( input_code_pressed_once(machine, KEYCODE_V) )
 	{
 		int tchar[2], tattr[2];
 		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
@@ -1289,10 +1289,10 @@ static void toaplan2_log_vram(void)
 		}
 	}
 
-	if ( input_code_pressed_once(KEYCODE_C) )
+	if ( input_code_pressed_once(machine, KEYCODE_C) )
 		logerror("Mark here\n");
 
-	if ( input_code_pressed_once(KEYCODE_E) )
+	if ( input_code_pressed_once(machine, KEYCODE_E) )
 	{
 		displog += 1;
 		displog &= 1;
@@ -1306,8 +1306,8 @@ static void toaplan2_log_vram(void)
 			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", bg_scrollx[1],bg_scrolly[1],fg_scrollx[1],fg_scrolly[1],top_scrollx[1],top_scrolly[1],sprite_scrollx[1], sprite_scrolly[1]);
 		}
 	}
-}
 #endif
+}
 
 
 
@@ -1493,10 +1493,7 @@ VIDEO_UPDATE( toaplan2_0 )
 {
 	int priority;
 
-
-#ifdef MAME_DEBUG
-	toaplan2_log_vram();
-#endif
+	toaplan2_log_vram(screen->machine);
 
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
@@ -1518,10 +1515,7 @@ VIDEO_UPDATE( dogyuun_1 )
 {
 	int priority;
 
-
-#ifdef MAME_DEBUG
-	toaplan2_log_vram();
-#endif
+	toaplan2_log_vram(screen->machine);
 
 	mark_sprite_priority(0);
 	mark_sprite_priority(1);
@@ -1553,10 +1547,7 @@ VIDEO_UPDATE( batsugun_1 )
 {
 	int priority;
 
-
-#ifdef MAME_DEBUG
-	toaplan2_log_vram();
-#endif
+	toaplan2_log_vram(screen->machine);
 
 	mark_sprite_priority(0);
 	mark_sprite_priority(1);
@@ -1601,9 +1592,7 @@ VIDEO_UPDATE( batrider_0 )
 	rectangle clip;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-#ifdef MAME_DEBUG
-	toaplan2_log_vram();
-#endif
+	toaplan2_log_vram(screen->machine);
 
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
@@ -1648,10 +1637,7 @@ VIDEO_UPDATE( mahoudai_0 )
 {
 	int priority;
 
-
-#ifdef MAME_DEBUG
-	toaplan2_log_vram();
-#endif
+	toaplan2_log_vram(screen->machine);
 
 	mark_sprite_priority(0);
 	mark_tile_priority(0);

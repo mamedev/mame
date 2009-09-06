@@ -166,31 +166,31 @@ VIDEO_UPDATE( test_vcu )
 
 	bitmap_fill(tmpbitmaps[0],NULL,color_base);
 
-	if (input_code_pressed_once(KEYCODE_1))	/* plane 1 */
+	if (input_code_pressed_once(screen->machine, KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
 
-	if (input_code_pressed_once(KEYCODE_2))	/* plane 2 */
+	if (input_code_pressed_once(screen->machine, KEYCODE_2))	/* plane 2 */
 		planes_enabled[1] ^= 1;
 
-	if (input_code_pressed_once(KEYCODE_3))	/* plane 3 */
+	if (input_code_pressed_once(screen->machine, KEYCODE_3))	/* plane 3 */
 		planes_enabled[2] ^= 1;
 
-	if (input_code_pressed_once(KEYCODE_4))	/* plane 4 */
+	if (input_code_pressed_once(screen->machine, KEYCODE_4))	/* plane 4 */
 		planes_enabled[3] ^= 1;
 
-	if (input_code_pressed_once(KEYCODE_I))	/* show/hide debug info */
+	if (input_code_pressed_once(screen->machine, KEYCODE_I))	/* show/hide debug info */
 		dbg_info = !dbg_info;
 
-	if (input_code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
+	if (input_code_pressed_once(screen->machine, KEYCODE_G))	/* enable gfx area handling */
 		dbg_gfx_e = !dbg_gfx_e;
 
-	if (input_code_pressed_once(KEYCODE_C))	/* enable color area handling */
+	if (input_code_pressed_once(screen->machine, KEYCODE_C))	/* enable color area handling */
 		dbg_clr_e = !dbg_clr_e;
 
-	if (input_code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
+	if (input_code_pressed_once(screen->machine, KEYCODE_V))	/* draw only when vbank==dbg_vbank */
 		dbg_vbank ^= 1;
 
-	if (input_code_pressed_once(KEYCODE_L))	/* showlookup ram */
+	if (input_code_pressed_once(screen->machine, KEYCODE_L))	/* showlookup ram */
 		dbg_lookup = (dbg_lookup+1)%5;//0,1,2,3, 4-off
 
 

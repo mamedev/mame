@@ -584,13 +584,13 @@ extern const char joystick_map_4way_diagonal[];
 void input_init(running_machine *machine);
 
 /* enable or disable a device class */
-void input_device_class_enable(input_device_class devclass, UINT8 enable);
+void input_device_class_enable(running_machine *machine, input_device_class devclass, UINT8 enable);
 
 /* is a device class enabled? */
-UINT8 input_device_class_enabled(input_device_class devclass);
+UINT8 input_device_class_enabled(running_machine *machine, input_device_class devclass);
 
 /* configure default joystick maps */
-int input_device_set_joystick_map(int devindex, const char *mapstring);
+int input_device_set_joystick_map(running_machine *machine, int devindex, const char *mapstring);
 
 
 /* ----- OSD configuration and access ----- */
@@ -606,38 +606,38 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 /* ----- state queries ----- */
 
 /* return the value of a particular input code */
-INT32 input_code_value(input_code code);
+INT32 input_code_value(running_machine *machine, input_code code);
 
 /* return TRUE if the given input code has been pressed */
-INT32 input_code_pressed(input_code code);
+INT32 input_code_pressed(running_machine *machine, input_code code);
 
 /* same as above, but returns TRUE only on the first call after an off->on transition */
-INT32 input_code_pressed_once(input_code code);
+INT32 input_code_pressed_once(running_machine *machine, input_code code);
 
 /* translates an input_item_id to an input_code */
-input_code input_code_from_input_item_id(input_item_id itemid);
+input_code input_code_from_input_item_id(running_machine *machine, input_item_id itemid);
 
 /* poll for any switch input, optionally resetting internal memory */
-input_code input_code_poll_switches(int reset);
+input_code input_code_poll_switches(running_machine *machine, int reset);
 
 /* poll for any keyboard switch input, optionally resetting internal memory */
-input_code input_code_poll_keyboard_switches(int reset);
+input_code input_code_poll_keyboard_switches(running_machine *machine, int reset);
 
 /* poll for any axis input, optionally resetting internal memory */
-input_code input_code_poll_axes(int reset);
+input_code input_code_poll_axes(running_machine *machine, int reset);
 
 
 
 /* ----- strings and tokenization ----- */
 
 /* generate the friendly name of an input code, returning the length (buffer can be NULL) */
-astring *input_code_name(astring *buffer, input_code code);
+astring *input_code_name(running_machine *machine, astring *buffer, input_code code);
 
 /* convert an input code to a token, returning the length (buffer can be NULL) */
-astring *input_code_to_token(astring *buffer, input_code code);
+astring *input_code_to_token(running_machine *machine, astring *buffer, input_code code);
 
 /* convert a token back to an input code */
-input_code input_code_from_token(const char *_token);
+input_code input_code_from_token(running_machine *machine, const char *_token);
 
 
 #endif	/* __INPUT_H__ */

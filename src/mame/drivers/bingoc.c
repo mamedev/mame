@@ -61,13 +61,13 @@ static READ8_HANDLER( sound_test_r )
 {
 	static UINT8 x;
 
-	if(input_code_pressed_once(KEYCODE_Z))
+	if(input_code_pressed_once(space->machine, KEYCODE_Z))
 		x++;
 
-	if(input_code_pressed_once(KEYCODE_X))
+	if(input_code_pressed_once(space->machine, KEYCODE_X))
 		x--;
 
-	if(input_code_pressed_once(KEYCODE_A))
+	if(input_code_pressed_once(space->machine, KEYCODE_A))
 		return 0xff;
 
 	popmessage("%02x",x);

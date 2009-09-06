@@ -872,7 +872,7 @@ static void cischeat_draw_sprites(running_machine *machine, bitmap_t *bitmap , c
 
 		/* dimension of a tile after zoom */
 #ifdef MAME_DEBUG
-		if ( input_code_pressed(KEYCODE_Z) && input_code_pressed(KEYCODE_M) )
+		if ( input_code_pressed(machine, KEYCODE_Z) && input_code_pressed(machine, KEYCODE_M) )
 		{
 			xdim	=	16 << 16;
 			ydim	=	16 << 16;
@@ -938,7 +938,7 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		}
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(KEYCODE_X))
+if (input_code_pressed(machine, KEYCODE_X))
 {	/* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
@@ -1028,7 +1028,7 @@ static void bigrun_draw_sprites(running_machine *machine, bitmap_t *bitmap , con
 
 		/* dimension of a tile after zoom */
 #ifdef MAME_DEBUG
-		if ( input_code_pressed(KEYCODE_Z) && input_code_pressed(KEYCODE_M) )
+		if ( input_code_pressed(machine, KEYCODE_Z) && input_code_pressed(machine, KEYCODE_M) )
 		{
 			xdim	=	16 << 16;
 			ydim	=	16 << 16;
@@ -1092,7 +1092,7 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		}
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(KEYCODE_X))
+if (input_code_pressed(machine, KEYCODE_X))
 {	/* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
@@ -1113,25 +1113,25 @@ if (input_code_pressed(KEYCODE_X))
 
 #define CISCHEAT_LAYERSCTRL \
 debugsprites = 0; \
-if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) ) \
+if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) ) \
 { \
 	int msk = 0; \
-	if (input_code_pressed(KEYCODE_Q))	{ msk |= 0x01;} \
-	if (input_code_pressed(KEYCODE_W))	{ msk |= 0x02;} \
-	if (input_code_pressed(KEYCODE_E))	{ msk |= 0x04;} \
-	if (input_code_pressed(KEYCODE_A))	{ msk |= 0x08; debugsprites = 1;} \
-	if (input_code_pressed(KEYCODE_S))	{ msk |= 0x08; debugsprites = 2;} \
-	if (input_code_pressed(KEYCODE_D))	{ msk |= 0x08; debugsprites = 3;} \
-	if (input_code_pressed(KEYCODE_F))	{ msk |= 0x08; debugsprites = 4;} \
-	if (input_code_pressed(KEYCODE_R))	{ msk |= 0x10;} \
-	if (input_code_pressed(KEYCODE_T))	{ msk |= 0x20;} \
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	{ msk |= 0x01;} \
+	if (input_code_pressed(screen->machine, KEYCODE_W))	{ msk |= 0x02;} \
+	if (input_code_pressed(screen->machine, KEYCODE_E))	{ msk |= 0x04;} \
+	if (input_code_pressed(screen->machine, KEYCODE_A))	{ msk |= 0x08; debugsprites = 1;} \
+	if (input_code_pressed(screen->machine, KEYCODE_S))	{ msk |= 0x08; debugsprites = 2;} \
+	if (input_code_pressed(screen->machine, KEYCODE_D))	{ msk |= 0x08; debugsprites = 3;} \
+	if (input_code_pressed(screen->machine, KEYCODE_F))	{ msk |= 0x08; debugsprites = 4;} \
+	if (input_code_pressed(screen->machine, KEYCODE_R))	{ msk |= 0x10;} \
+	if (input_code_pressed(screen->machine, KEYCODE_T))	{ msk |= 0x20;} \
  \
 	if (msk != 0) megasys1_active_layers &= msk; \
 } \
 \
 { \
 	static int show_unknown; \
-	if ( input_code_pressed(KEYCODE_Z) && input_code_pressed_once(KEYCODE_U) ) \
+	if ( input_code_pressed(screen->machine, KEYCODE_Z) && input_code_pressed_once(screen->machine, KEYCODE_U) ) \
 		show_unknown ^= 1; \
 	if (show_unknown) \
 		popmessage("0:%04X 2:%04X 4:%04X 6:%04X c:%04X", \
@@ -1327,16 +1327,16 @@ VIDEO_UPDATE( scudhamm )
 
 #ifdef MAME_DEBUG
 debugsprites = 0;
-if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
+if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(KEYCODE_Q))	{ msk |= 0x1;}
-	if (input_code_pressed(KEYCODE_W))	{ msk |= 0x2;}
-	if (input_code_pressed(KEYCODE_E))	{ msk |= 0x4;}
-	if (input_code_pressed(KEYCODE_A))	{ msk |= 0x8; debugsprites = 1;}
-	if (input_code_pressed(KEYCODE_S))	{ msk |= 0x8; debugsprites = 2;}
-	if (input_code_pressed(KEYCODE_D))	{ msk |= 0x8; debugsprites = 3;}
-	if (input_code_pressed(KEYCODE_F))	{ msk |= 0x8; debugsprites = 4;}
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	{ msk |= 0x1;}
+	if (input_code_pressed(screen->machine, KEYCODE_W))	{ msk |= 0x2;}
+	if (input_code_pressed(screen->machine, KEYCODE_E))	{ msk |= 0x4;}
+	if (input_code_pressed(screen->machine, KEYCODE_A))	{ msk |= 0x8; debugsprites = 1;}
+	if (input_code_pressed(screen->machine, KEYCODE_S))	{ msk |= 0x8; debugsprites = 2;}
+	if (input_code_pressed(screen->machine, KEYCODE_D))	{ msk |= 0x8; debugsprites = 3;}
+	if (input_code_pressed(screen->machine, KEYCODE_F))	{ msk |= 0x8; debugsprites = 4;}
 
 	if (msk != 0) megasys1_active_layers &= msk;
 #if 1

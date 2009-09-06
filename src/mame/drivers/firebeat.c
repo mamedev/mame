@@ -508,7 +508,7 @@ static VIDEO_UPDATE(firebeat)
 	if (tick >= 5)
 	{
 		tick = 0;
-		if (input_code_pressed(KEYCODE_0))
+		if (input_code_pressed(screen->machine, KEYCODE_0))
 		{
 			layer++;
 			if (layer > 2)
@@ -518,7 +518,7 @@ static VIDEO_UPDATE(firebeat)
 		}
 
 		/*
-        if (input_code_pressed_once(KEYCODE_9))
+        if (input_code_pressed_once(screen->machine, KEYCODE_9))
         {
             FILE *file = fopen("vram0.bin", "wb");
             int i;

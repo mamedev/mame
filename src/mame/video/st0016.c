@@ -594,7 +594,7 @@ VIDEO_UPDATE( st0016 )
 {
 
 #ifdef MAME_DEBUG
-	if(input_code_pressed_once(KEYCODE_Z))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Z))
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");

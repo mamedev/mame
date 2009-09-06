@@ -379,7 +379,7 @@ READ16_HANDLER( hdc68k_wheel_r )
 	UINT16 new_wheel = input_port_read(space->machine, "12BADC0") << 4;
 
 	/* hack to display the wheel position */
-	if (input_code_pressed(KEYCODE_LSHIFT))
+	if (input_code_pressed(space->machine, KEYCODE_LSHIFT))
 		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
@@ -888,7 +888,7 @@ WRITE16_HANDLER( hd68k_adsp_buffer_w )
 
 static TIMER_CALLBACK( deferred_adsp_bank_switch )
 {
-	if (LOG_COMMANDS && m68k_adsp_buffer_bank != param && input_code_pressed(KEYCODE_L))
+	if (LOG_COMMANDS && m68k_adsp_buffer_bank != param && input_code_pressed(machine, KEYCODE_L))
 	{
 		static FILE *commands;
 		if (!commands) commands = fopen("commands.log", "w");

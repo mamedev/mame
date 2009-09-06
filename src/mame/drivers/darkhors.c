@@ -160,12 +160,12 @@ static VIDEO_UPDATE( darkhors )
 	int layers_ctrl = -1;
 
 #if DARKHORS_DEBUG
-	if (input_code_pressed(KEYCODE_Z))
+	if (input_code_pressed(screen->machine, KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(KEYCODE_W))	mask |= 2;
-		if (input_code_pressed(KEYCODE_A))	mask |= 4;
+		if (input_code_pressed(screen->machine, KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(screen->machine, KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(screen->machine, KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif

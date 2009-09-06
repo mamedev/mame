@@ -225,19 +225,19 @@ VIDEO_UPDATE( mcatadv )
 	for (i=0; i<=3; i++)
 	{
 	#ifdef MAME_DEBUG
-			if (!input_code_pressed(KEYCODE_Q))
+			if (!input_code_pressed(screen->machine, KEYCODE_Q))
 	#endif
 			mcatadv_draw_tilemap_part(mcatadv_scroll,  mcatadv_videoram1, i, mcatadv_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
-			if (!input_code_pressed(KEYCODE_W))
+			if (!input_code_pressed(screen->machine, KEYCODE_W))
 	#endif
 				mcatadv_draw_tilemap_part(mcatadv_scroll2, mcatadv_videoram2, i, mcatadv_tilemap2, bitmap, cliprect);
 	}
 
 	profiler_mark_start(PROFILER_USER1);
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(KEYCODE_E))
+	if (!input_code_pressed(screen->machine, KEYCODE_E))
 #endif
 		draw_sprites (screen->machine, bitmap, cliprect);
 	profiler_mark_end();

@@ -253,31 +253,31 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
-/*
-    if (input_code_pressed(KEYCODE_M)) b = 0;
-    if (input_code_pressed(KEYCODE_Q)) b += 0x060 * 280 * 1;
-    if (input_code_pressed(KEYCODE_W)) b += 0x060 * 280 * 2;
-    if (input_code_pressed(KEYCODE_E)) b += 0x060 * 280 * 3;
-    if (input_code_pressed(KEYCODE_R)) b += 0x060 * 280 * 4;
-    if (input_code_pressed(KEYCODE_T)) b += 0x060 * 280 * 5;
-    if (input_code_pressed(KEYCODE_Y)) b += 0x060 * 280 * 6;
-    if (input_code_pressed(KEYCODE_U)) b += 0x060 * 280 * 7;
-    if (input_code_pressed(KEYCODE_I)) b += 0x060 * 280 * 8;
-    if (input_code_pressed(KEYCODE_A)) b += 0x060 * 280 * 9;
-    if (input_code_pressed(KEYCODE_S)) b += 0x060 * 280 * 10;
-    if (input_code_pressed(KEYCODE_D)) b += 0x060 * 280 * 11;
-    if (input_code_pressed(KEYCODE_F)) b += 0x060 * 280 * 12;
-    if (input_code_pressed(KEYCODE_G)) b += 0x060 * 280 * 13;
-    if (input_code_pressed(KEYCODE_H)) b += 0x060 * 280 * 14;
-    if (input_code_pressed(KEYCODE_J)) b += 0x060 * 280 * 15;
-    if (input_code_pressed(KEYCODE_K)) b += 0x060 * 280 * 16;
-    if (input_code_pressed(KEYCODE_Z)) b += 0x060 * 280 * 17;
-    if (input_code_pressed(KEYCODE_X)) b += 0x060 * 280 * 18;
-    if (input_code_pressed(KEYCODE_C)) b += 0x060 * 280 * 19;
-    if (input_code_pressed(KEYCODE_V)) b += 0x060 * 280 * 20;
-    if (input_code_pressed(KEYCODE_B)) b += 0x060 * 280 * 21;
-    if (input_code_pressed(KEYCODE_N)) b += 0x060 * 280 * 22;
-*/
+#if 0
+	if (input_code_pressed(screen->machine, KEYCODE_M)) b = 0;
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) b += 0x060 * 280 * 1;
+	if (input_code_pressed(screen->machine, KEYCODE_W)) b += 0x060 * 280 * 2;
+	if (input_code_pressed(screen->machine, KEYCODE_E)) b += 0x060 * 280 * 3;
+	if (input_code_pressed(screen->machine, KEYCODE_R)) b += 0x060 * 280 * 4;
+	if (input_code_pressed(screen->machine, KEYCODE_T)) b += 0x060 * 280 * 5;
+	if (input_code_pressed(screen->machine, KEYCODE_Y)) b += 0x060 * 280 * 6;
+	if (input_code_pressed(screen->machine, KEYCODE_U)) b += 0x060 * 280 * 7;
+	if (input_code_pressed(screen->machine, KEYCODE_I)) b += 0x060 * 280 * 8;
+	if (input_code_pressed(screen->machine, KEYCODE_A)) b += 0x060 * 280 * 9;
+	if (input_code_pressed(screen->machine, KEYCODE_S)) b += 0x060 * 280 * 10;
+	if (input_code_pressed(screen->machine, KEYCODE_D)) b += 0x060 * 280 * 11;
+	if (input_code_pressed(screen->machine, KEYCODE_F)) b += 0x060 * 280 * 12;
+	if (input_code_pressed(screen->machine, KEYCODE_G)) b += 0x060 * 280 * 13;
+	if (input_code_pressed(screen->machine, KEYCODE_H)) b += 0x060 * 280 * 14;
+	if (input_code_pressed(screen->machine, KEYCODE_J)) b += 0x060 * 280 * 15;
+	if (input_code_pressed(screen->machine, KEYCODE_K)) b += 0x060 * 280 * 16;
+	if (input_code_pressed(screen->machine, KEYCODE_Z)) b += 0x060 * 280 * 17;
+	if (input_code_pressed(screen->machine, KEYCODE_X)) b += 0x060 * 280 * 18;
+	if (input_code_pressed(screen->machine, KEYCODE_C)) b += 0x060 * 280 * 19;
+	if (input_code_pressed(screen->machine, KEYCODE_V)) b += 0x060 * 280 * 20;
+	if (input_code_pressed(screen->machine, KEYCODE_B)) b += 0x060 * 280 * 21;
+	if (input_code_pressed(screen->machine, KEYCODE_N)) b += 0x060 * 280 * 22;
+#endif
 	for (y = 0;y < 280;y++)
 	{
 		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
@@ -290,7 +290,7 @@ static VIDEO_UPDATE(adp)
 			b++;
 		}
 	}
-if (!input_code_pressed(KEYCODE_O))
+if (!input_code_pressed(screen->machine, KEYCODE_O))
 	if ((HD63484_reg[0x06/2] & 0x0300) == 0x0300)
 	{
 		int sy = (HD63484_reg[0x94/2] & 0x0fff) - (HD63484_reg[0x88/2] >> 8);

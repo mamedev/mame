@@ -278,7 +278,7 @@ static void menu_input_specific(running_machine *machine, ui_menu *menu, void *p
 static void menu_input_specific_populate(running_machine *machine, ui_menu *menu, input_menu_state *menustate);
 static void menu_input_common(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static int CLIB_DECL menu_input_compare_items(const void *i1, const void *i2);
-static void menu_input_populate_and_sort(ui_menu *menu, input_item_data *itemlist, input_menu_state *menustate);
+static void menu_input_populate_and_sort(running_machine *machine, ui_menu *menu, input_item_data *itemlist, input_menu_state *menustate);
 static void menu_settings_dip_switches(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_settings_driver_config(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_settings_categories(running_machine *machine, ui_menu *menu, void *parameter, void *state);
@@ -1629,7 +1629,7 @@ static void menu_input_general_populate(running_machine *machine, ui_menu *menu,
 		}
 
 	/* sort and populate the menu in a standard fashion */
-	menu_input_populate_and_sort(menu, itemlist, menustate);
+	menu_input_populate_and_sort(machine, menu, itemlist, menustate);
 	astring_free(tempstring);
 }
 
@@ -1709,7 +1709,7 @@ static void menu_input_specific_populate(running_machine *machine, ui_menu *menu
 		}
 
 	/* sort and populate the menu in a standard fashion */
-	menu_input_populate_and_sort(menu, itemlist, menustate);
+	menu_input_populate_and_sort(machine, menu, itemlist, menustate);
 	astring_free(tempstring);
 }
 
@@ -1758,7 +1758,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 		}
 
 		/* poll again; if finished, update the sequence */
-		if (input_seq_poll(&newseq))
+		if (input_seq_poll(machine, &newseq))
 		{
 			menustate->pollingitem = NULL;
 			menustate->record_next = TRUE;
@@ -1778,7 +1778,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 				menustate->pollingitem = item;
 				menustate->last_sortorder = item->sortorder;
 				menustate->starting_seq = item->seq;
-				input_seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
+				input_seq_poll_start(machine, (item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
 				invalidate = TRUE;
 				break;
 
@@ -1854,7 +1854,7 @@ static int menu_input_compare_items(const void *i1, const void *i2)
     menu from them
 -------------------------------------------------*/
 
-static void menu_input_populate_and_sort(ui_menu *menu, input_item_data *itemlist, input_menu_state *menustate)
+static void menu_input_populate_and_sort(running_machine *machine, ui_menu *menu, input_item_data *itemlist, input_menu_state *menustate)
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { 0 };
 	input_item_data **itemarray, *item;
@@ -1900,7 +1900,7 @@ static void menu_input_populate_and_sort(ui_menu *menu, input_item_data *itemlis
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
-			input_seq_name(subtext, &item->seq);
+			input_seq_name(machine, subtext, &item->seq);
 			flags |= input_seq_cmp(&item->seq, item->defseq) ? MENU_FLAG_INVERT : 0;
 		}
 
@@ -2225,12 +2225,12 @@ static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter
 
 			/* left decrements */
 			case IPT_UI_LEFT:
-				newval -= input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				newval -= input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 
 			/* right increments */
 			case IPT_UI_RIGHT:
-				newval += input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				newval += input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 		}
 
@@ -2742,11 +2742,11 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 
 				/* decrease value */
 				case IPT_UI_LEFT:
-					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
+					if (input_code_pressed(machine, KEYCODE_LALT) || input_code_pressed(machine, KEYCODE_RALT))
 						increment = -1;
-					else if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
+					else if (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT))
 						increment = (slider->incval > 10) ? -(slider->incval / 10) : -1;
-					else if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
+					else if (input_code_pressed(machine, KEYCODE_LCONTROL) || input_code_pressed(machine, KEYCODE_RCONTROL))
 						increment = -slider->incval * 10;
 					else
 						increment = -slider->incval;
@@ -2754,11 +2754,11 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 
 				/* increase value */
 				case IPT_UI_RIGHT:
-					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
+					if (input_code_pressed(machine, KEYCODE_LALT) || input_code_pressed(machine, KEYCODE_RALT))
 						increment = 1;
-					else if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
+					else if (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT))
 						increment = (slider->incval > 10) ? (slider->incval / 10) : 1;
-					else if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
+					else if (input_code_pressed(machine, KEYCODE_LCONTROL) || input_code_pressed(machine, KEYCODE_RCONTROL))
 						increment = slider->incval * 10;
 					else
 						increment = slider->incval;
@@ -3121,12 +3121,12 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 
 			/* left decrements */
 			case IPT_UI_LEFT:
-				newval -= input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				newval -= input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 
 			/* right increments */
 			case IPT_UI_RIGHT:
-				newval += input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				newval += input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 		}
 

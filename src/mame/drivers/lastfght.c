@@ -95,11 +95,11 @@ static VIDEO_UPDATE( lastfght )
 	UINT8 *gfxdata = memory_region( screen->machine, "gfx1" );
 	UINT8 data;
 
-	if ( input_code_pressed_once(KEYCODE_ENTER) )	view_roms ^= 1;
+	if ( input_code_pressed_once(screen->machine, KEYCODE_ENTER) )	view_roms ^= 1;
 	if ( view_roms )
 	{
-		if ( input_code_pressed_once(KEYCODE_PGDN) )	base += 512 * 256;
-		if ( input_code_pressed_once(KEYCODE_PGUP) )	base -= 512 * 256;
+		if ( input_code_pressed_once(screen->machine, KEYCODE_PGDN) )	base += 512 * 256;
+		if ( input_code_pressed_once(screen->machine, KEYCODE_PGUP) )	base -= 512 * 256;
 		base %= memory_region_length( screen->machine, "gfx1" );
 
 		count = base;

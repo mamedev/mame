@@ -1152,12 +1152,12 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 }
 
 
-#ifdef MAME_DEBUG
-static void butasan_log_vram(void)
+static void butasan_log_vram(running_machine *machine)
 {
+#ifdef MAME_DEBUG
 	int offs;
 
-	if (input_code_pressed(KEYCODE_M))
+	if (input_code_pressed(machine, KEYCODE_M))
 	{
 		int i;
 		logerror("\nSprite RAM\n");
@@ -1201,8 +1201,8 @@ static void butasan_log_vram(void)
 			}
 		}
 	}
-}
 #endif
+}
 
 VIDEO_UPDATE( argus )
 {
@@ -1245,8 +1245,6 @@ VIDEO_UPDATE( butasan )
 	butasan_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 
-#ifdef MAME_DEBUG
-	butasan_log_vram();
-#endif
+	butasan_log_vram(screen->machine);
 	return 0;
 }

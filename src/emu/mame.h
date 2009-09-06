@@ -135,6 +135,7 @@ typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
 typedef struct _romload_private romload_private;
 typedef struct _sound_private sound_private;
+typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
@@ -186,6 +187,7 @@ struct _running_machine
 	devices_private *		devices_data;		/* internal data from devices.c */
 	romload_private *		romload_data;		/* internal data from romload.c */
 	sound_private *			sound_data;			/* internal data from sound.c */
+	input_private *			input_data;			/* internal data from input.c */
 	input_port_private *	input_port_data;	/* internal data from inptport.c */
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 	cheat_private *			cheat_data;			/* internal data from cheat.c */

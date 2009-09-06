@@ -1074,7 +1074,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 
 	/* use this for debugging the video controller values */
 #if 0
-	if (input_code_pressed(KEYCODE_8))
+	if (input_code_pressed(machine, KEYCODE_8))
 	{
 		static FILE *out;
 		if (!out) out = fopen("scroll.log", "w");

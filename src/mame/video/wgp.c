@@ -653,25 +653,25 @@ VIDEO_UPDATE( wgp )
 #endif
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (KEYCODE_V))
+	if (input_code_pressed_once (screen->machine, KEYCODE_V))
 	{
 		dislayer[0] ^= 1;
 		popmessage("piv0: %01x",dislayer[0]);
 	}
 
-	if (input_code_pressed_once (KEYCODE_B))
+	if (input_code_pressed_once (screen->machine, KEYCODE_B))
 	{
 		dislayer[1] ^= 1;
 		popmessage("piv1: %01x",dislayer[1]);
 	}
 
-	if (input_code_pressed_once (KEYCODE_N))
+	if (input_code_pressed_once (screen->machine, KEYCODE_N))
 	{
 		dislayer[2] ^= 1;
 		popmessage("piv2: %01x",dislayer[2]);
 	}
 
-	if (input_code_pressed_once (KEYCODE_M))
+	if (input_code_pressed_once (screen->machine, KEYCODE_M))
 	{
 		dislayer[3] ^= 1;
 		popmessage("TC0100SCN top bg layer: %01x",dislayer[3]);

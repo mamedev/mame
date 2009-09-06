@@ -361,13 +361,13 @@ VIDEO_UPDATE( taitoair )
 	bitmap_fill(bitmap, cliprect, 0x41);
 
 #ifdef MAME_DEBUG
-	if ( !input_code_pressed(KEYCODE_A) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
-	if ( !input_code_pressed(KEYCODE_S) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_S) )
 		draw_sprites(screen->machine,bitmap,cliprect,0);
-	if ( !input_code_pressed(KEYCODE_D) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	if ( !input_code_pressed(KEYCODE_F) )
+	if ( !input_code_pressed(screen->machine, KEYCODE_F) )
 		draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);

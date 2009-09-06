@@ -162,13 +162,13 @@ static VIDEO_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	if(input_code_pressed_once(KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		++xixi;
 		printf("%x\n",xixi);
 	}
 
-	if(input_code_pressed_once(KEYCODE_W))
+	if(input_code_pressed_once(screen->machine, KEYCODE_W))
 	{
 		--xixi;
 		printf("%x\n",xixi);
@@ -259,7 +259,7 @@ static VIDEO_UPDATE(srmp6)
 
 	memcpy(sprram_old, sprram, 0x80000);
 
-	if(input_code_pressed_once(KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
 		fwrite(tileram,1,0x100000*16,p);

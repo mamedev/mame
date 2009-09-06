@@ -524,14 +524,14 @@ void btoads_scanline_update(const device_config *screen, bitmap_t *bitmap, int s
 #if BT_DEBUG
 	popmessage("screen_control = %02X", screen_control & 0x7f);
 
-	if (input_code_pressed(KEYCODE_X))
+	if (input_code_pressed(screen->machine, KEYCODE_X))
 	{
 		static int count = 0;
 		char name[10];
 		FILE *f;
 		int i;
 
-		while (input_code_pressed(KEYCODE_X)) ;
+		while (input_code_pressed(screen->machine, KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", count++);
 		f = fopen(name, "w");

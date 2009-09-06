@@ -199,9 +199,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (input_code_pressed_once(x)){nycaptor_mask|=y;tilemap_mark_all_tiles_dirty( bg_tilemap );}
+#define mKEY_MASK(x,y) if (input_code_pressed_once(machine, x)){nycaptor_mask|=y;tilemap_mark_all_tiles_dirty( bg_tilemap );}
 
-static void nycaptor_setmask(void)
+static void nycaptor_setmask(running_machine *machine)
 {
   mKEY_MASK(KEYCODE_Q,1); /* bg */
   mKEY_MASK(KEYCODE_W,2);
@@ -217,15 +217,15 @@ static void nycaptor_setmask(void)
   mKEY_MASK(KEYCODE_J,0x400);
   mKEY_MASK(KEYCODE_K,0x800);
 
-  if (input_code_pressed_once(KEYCODE_Z)){nycaptor_mask=0;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* disable */
-  if (input_code_pressed_once(KEYCODE_X)){nycaptor_mask|=0x1000;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* no layers */
+  if (input_code_pressed_once(machine, KEYCODE_Z)){nycaptor_mask=0;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* disable */
+  if (input_code_pressed_once(machine, KEYCODE_X)){nycaptor_mask|=0x1000;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* no layers */
 }
 #endif
 
 VIDEO_UPDATE( nycaptor )
 {
 #if NYCAPTOR_DEBUG
-  nycaptor_setmask();
+  nycaptor_setmask(screen->machine);
   if(nycaptor_mask&0x1000)
   {
      	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);

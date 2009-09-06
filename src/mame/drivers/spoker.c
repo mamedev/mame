@@ -84,7 +84,7 @@ static int nmi_enable, hopper;
 static CUSTOM_INPUT( hopper_r )
 {
 	if (hopper) return !(video_screen_get_frame_number(field->port->machine->primary_screen)%10);
-	return input_code_pressed(KEYCODE_H);
+	return input_code_pressed(field->port->machine, KEYCODE_H);
 }
 
 static UINT8 out[3];

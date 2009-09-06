@@ -60,28 +60,28 @@ static VIDEO_UPDATE( itgambl3 )
 	const UINT8 *blit_ram = memory_region(screen->machine,"gfx1");
 	static int test_x = 256,test_y = 256,start_offs;
 
-	if(input_code_pressed(KEYCODE_Z))
+	if(input_code_pressed(screen->machine, KEYCODE_Z))
 		test_x++;
 
-	if(input_code_pressed(KEYCODE_X))
+	if(input_code_pressed(screen->machine, KEYCODE_X))
 		test_x--;
 
-	if(input_code_pressed(KEYCODE_A))
+	if(input_code_pressed(screen->machine, KEYCODE_A))
 		test_y++;
 
-	if(input_code_pressed(KEYCODE_S))
+	if(input_code_pressed(screen->machine, KEYCODE_S))
 		test_y--;
 
-	if(input_code_pressed(KEYCODE_Q))
+	if(input_code_pressed(screen->machine, KEYCODE_Q))
 		start_offs+=0x200;
 
-	if(input_code_pressed(KEYCODE_W))
+	if(input_code_pressed(screen->machine, KEYCODE_W))
 		start_offs-=0x200;
 
-	if(input_code_pressed(KEYCODE_E))
+	if(input_code_pressed(screen->machine, KEYCODE_E))
 		start_offs++;
 
-	if(input_code_pressed(KEYCODE_R))
+	if(input_code_pressed(screen->machine, KEYCODE_R))
 		start_offs--;
 
 	popmessage("%d %d %04x",test_x,test_y,start_offs);

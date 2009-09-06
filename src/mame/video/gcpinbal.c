@@ -281,19 +281,19 @@ VIDEO_UPDATE( gcpinbal )
 #endif
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (KEYCODE_V))
+	if (input_code_pressed_once (screen->machine, KEYCODE_V))
 	{
 		dislayer[0] ^= 1;
 		popmessage("bg0: %01x",dislayer[0]);
 	}
 
-	if (input_code_pressed_once (KEYCODE_B))
+	if (input_code_pressed_once (screen->machine, KEYCODE_B))
 	{
 		dislayer[1] ^= 1;
 		popmessage("bg1: %01x",dislayer[1]);
 	}
 
-	if (input_code_pressed_once (KEYCODE_N))
+	if (input_code_pressed_once (screen->machine, KEYCODE_N))
 	{
 		dislayer[2] ^= 1;
 		popmessage("fg: %01x",dislayer[2]);

@@ -954,8 +954,8 @@ static void update_tilemap_zoom(const device_config *screen, struct layer_info *
 	/* configure the layer */
 	opaque = 0;
 //opaque = (system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
-//if (input_code_pressed(KEYCODE_Z) && bgnum == 0) opaque = 1;
-//if (input_code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
+//if (input_code_pressed(screen->machine, KEYCODE_Z) && bgnum == 0) opaque = 1;
+//if (input_code_pressed(screen->machine, KEYCODE_X) && bgnum == 1) opaque = 1;
 
 	/* determine if we're flipped */
 	flip = ((system32_videoram[0x1ff00/2] >> 9) ^ (system32_videoram[0x1ff00/2] >> bgnum)) & 1;
@@ -1108,8 +1108,8 @@ static void update_tilemap_rowscroll(const device_config *screen, struct layer_i
 	/* configure the layer */
 	opaque = 0;
 //opaque = (system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
-//if (input_code_pressed(KEYCODE_C) && bgnum == 2) opaque = 1;
-//if (input_code_pressed(KEYCODE_V) && bgnum == 3) opaque = 1;
+//if (input_code_pressed(screen->machine, KEYCODE_C) && bgnum == 2) opaque = 1;
+//if (input_code_pressed(screen->machine, KEYCODE_V) && bgnum == 3) opaque = 1;
 
 	/* determine if we're flipped */
 	flip = ((system32_videoram[0x1ff00/2] >> 9) ^ (system32_videoram[0x1ff00/2] >> bgnum)) & 1;
@@ -2466,12 +2466,12 @@ VIDEO_UPDATE( system32 )
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (input_code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (input_code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (input_code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (input_code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (input_code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (input_code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) enablemask = 0x01;
+	if (input_code_pressed(screen->machine, KEYCODE_W)) enablemask = 0x02;
+	if (input_code_pressed(screen->machine, KEYCODE_E)) enablemask = 0x04;
+	if (input_code_pressed(screen->machine, KEYCODE_R)) enablemask = 0x08;
+	if (input_code_pressed(screen->machine, KEYCODE_T)) enablemask = 0x10;
+	if (input_code_pressed(screen->machine, KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2479,7 +2479,7 @@ VIDEO_UPDATE( system32 )
 	mix_all_layers(0, 0, bitmap, cliprect, enablemask);
 	profiler_mark_end();
 
-	if (LOG_SPRITES && input_code_pressed(KEYCODE_L))
+	if (LOG_SPRITES && input_code_pressed(screen->machine, KEYCODE_L))
 	{
 		const rectangle *visarea = video_screen_get_visible_area(screen);
 		FILE *f = fopen("sprite.txt", "w");
@@ -2557,13 +2557,13 @@ VIDEO_UPDATE( system32 )
 {
 	int showclip = -1;
 
-//  if (input_code_pressed(KEYCODE_V))
+//  if (input_code_pressed(screen->machine, KEYCODE_V))
 //      showclip = 0;
-//  if (input_code_pressed(KEYCODE_B))
+//  if (input_code_pressed(screen->machine, KEYCODE_B))
 //      showclip = 1;
-//  if (input_code_pressed(KEYCODE_N))
+//  if (input_code_pressed(screen->machine, KEYCODE_N))
 //      showclip = 2;
-//  if (input_code_pressed(KEYCODE_M))
+//  if (input_code_pressed(screen->machine, KEYCODE_M))
 //      showclip = 3;
 //  if (showclip != -1)
 for (showclip = 0; showclip < 4; showclip++)
@@ -2646,12 +2646,12 @@ VIDEO_UPDATE( multi32 )
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (input_code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (input_code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (input_code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (input_code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (input_code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (input_code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) enablemask = 0x01;
+	if (input_code_pressed(screen->machine, KEYCODE_W)) enablemask = 0x02;
+	if (input_code_pressed(screen->machine, KEYCODE_E)) enablemask = 0x04;
+	if (input_code_pressed(screen->machine, KEYCODE_R)) enablemask = 0x08;
+	if (input_code_pressed(screen->machine, KEYCODE_T)) enablemask = 0x10;
+	if (input_code_pressed(screen->machine, KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2661,10 +2661,10 @@ VIDEO_UPDATE( multi32 )
 
 if (PRINTF_MIXER_DATA)
 {
-	if (!input_code_pressed(KEYCODE_M)) print_mixer_data(0);
+	if (!input_code_pressed(screen->machine, KEYCODE_M)) print_mixer_data(0);
 	else print_mixer_data(1);
 }
-	if (LOG_SPRITES && input_code_pressed(KEYCODE_L))
+	if (LOG_SPRITES && input_code_pressed(screen->machine, KEYCODE_L))
 	{
 		const rectangle *visarea = video_screen_get_visible_area(screen);
 		FILE *f = fopen("sprite.txt", "w");

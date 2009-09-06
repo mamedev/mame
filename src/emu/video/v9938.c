@@ -1394,10 +1394,10 @@ I do not know the behaviour of FV when IE0=0. That is the part that I still
 have to test.
 */
 
-static void v9938_interrupt_start_vblank (void)
+static void v9938_interrupt_start_vblank (running_machine *machine)
 	{
 #if 0
-	if (input_code_pressed (KEYCODE_D) )
+	if (input_code_pressed (machine, KEYCODE_D) )
 		{
 		FILE *fp;
 		int i;
@@ -1492,7 +1492,7 @@ int v9938_interrupt (running_machine *machine, int which)
 	/* check for start of vblank */
 	if ((pal && (vdp->scanline == 310)) ||
 		(!pal && (vdp->scanline == 259)))
-		v9938_interrupt_start_vblank ();
+		v9938_interrupt_start_vblank (machine);
 
 	/* render the current line */
 	if ((vdp->scanline >= scanline_start) && (vdp->scanline < (212 + 28 + scanline_start)))

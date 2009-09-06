@@ -455,7 +455,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 if (LOG_DMA)
 {
-	if (input_code_pressed(KEYCODE_L))
+	if (input_code_pressed(space->machine, KEYCODE_L))
 	{
 		logerror("----\n");
 		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",

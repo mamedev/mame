@@ -99,18 +99,18 @@ VIDEO_UPDATE(funybubl)
 
 	draw_sprites(screen->machine,bitmap,cliprect);
 
-/*
-    if ( input_code_pressed_once(KEYCODE_W) )
-    {
-        FILE *fp;
+#if 0
+	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
+	{
+		FILE *fp;
 
-        fp=fopen("funnybubsprites", "w+b");
-        if (fp)
-        {
-            fwrite(&funybubl_banked_videoram[0x1000], 0x1000, 1, fp);
-            fclose(fp);
-        }
-    }
-*/
+		fp=fopen("funnybubsprites", "w+b");
+		if (fp)
+		{
+			fwrite(&funybubl_banked_videoram[0x1000], 0x1000, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
 	return 0;
 }

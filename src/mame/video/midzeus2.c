@@ -107,7 +107,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset, UINT32
 static void zeus_pointer_write(UINT8 which, UINT32 value);
 static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int numwords);
 static void zeus_draw_model(running_machine *machine, UINT32 baseaddr, UINT16 count, int logit);
-static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
+static void zeus_draw_quad(running_machine *machine, const UINT32 *databuffer, UINT32 texoffs, int logit);
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 static void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
@@ -361,11 +361,11 @@ VIDEO_UPDATE( midzeus2 )
 
 	poly_wait(poly, "VIDEO_UPDATE");
 
-if (input_code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
-if (input_code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
+if (input_code_pressed(screen->machine, KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
+if (input_code_pressed(screen->machine, KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
 
 	/* normal update case */
-	if (!input_code_pressed(KEYCODE_W))
+	if (!input_code_pressed(screen->machine, KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0x38]);
 		int xoffs = video_screen_get_visible_area(screen)->min_x;
@@ -384,10 +384,10 @@ if (input_code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", 
 		static int width = 256;
 		const UINT64 *base;
 
-		if (input_code_pressed(KEYCODE_DOWN)) yoffs += input_code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(KEYCODE_UP)) yoffs -= input_code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(KEYCODE_LEFT) && width > 4) { width >>= 1; while (input_code_pressed(KEYCODE_LEFT)) ; }
-		if (input_code_pressed(KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(KEYCODE_RIGHT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (input_code_pressed(screen->machine, KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && width > 4) { width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);
@@ -584,7 +584,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset, UINT32
 				UINT32 temp = zeusbase[0x38];
 				zeusbase[0x38] = oldval;
 				video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-				log_fifo = input_code_pressed(KEYCODE_L);
+				log_fifo = input_code_pressed(machine, KEYCODE_L);
 				zeusbase[0x38] = temp;
 			}
 			break;
@@ -1010,7 +1010,7 @@ static void zeus_draw_model(running_machine *machine, UINT32 baseaddr, UINT16 co
 						break;
 
 					case 0x38:	/* crusnexo/thegrid */
-						zeus_draw_quad(databuffer, texoffs, logit);
+						zeus_draw_quad(machine, databuffer, texoffs, logit);
 						break;
 
 					default:
@@ -1039,7 +1039,7 @@ static void zeus_draw_model(running_machine *machine, UINT32 baseaddr, UINT16 co
  *
  *************************************/
 
-static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
+static void zeus_draw_quad(running_machine *machine, const UINT32 *databuffer, UINT32 texoffs, int logit)
 {
 	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
@@ -1057,15 +1057,15 @@ static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
 	if (logit)
 		logerror("quad\n");
 
-if (input_code_pressed(KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
-if (input_code_pressed(KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
-if (input_code_pressed(KEYCODE_R) && (texoffs & 0xffff) == 0x11d) return;
-if (input_code_pressed(KEYCODE_T) && (texoffs & 0xffff) == 0x05d) return;
-if (input_code_pressed(KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
-//if (input_code_pressed(KEYCODE_U) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(KEYCODE_I) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(KEYCODE_O) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(KEYCODE_L) && (texoffs & 0x100)) return;
+if (input_code_pressed(machine, KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
+if (input_code_pressed(machine, KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
+if (input_code_pressed(machine, KEYCODE_R) && (texoffs & 0xffff) == 0x11d) return;
+if (input_code_pressed(machine, KEYCODE_T) && (texoffs & 0xffff) == 0x05d) return;
+if (input_code_pressed(machine, KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
+//if (input_code_pressed(machine, KEYCODE_U) && (texoffs & 0xffff) == 0x119) return;
+//if (input_code_pressed(machine, KEYCODE_I) && (texoffs & 0xffff) == 0x119) return;
+//if (input_code_pressed(machine, KEYCODE_O) && (texoffs & 0xffff) == 0x119) return;
+//if (input_code_pressed(machine, KEYCODE_L) && (texoffs & 0x100)) return;
 
 	callback = render_poly_8bit;
 

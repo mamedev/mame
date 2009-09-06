@@ -207,7 +207,7 @@ WRITE16_HANDLER( namcos2_68k_roz_ram_w )
 {
 	COMBINE_DATA(&namcos2_68k_roz_ram[offset]);
 	tilemap_mark_tile_dirty(tilemap_roz,offset);
-//      if( input_code_pressed(KEYCODE_Q) )
+//      if( input_code_pressed(space->machine, KEYCODE_Q) )
 //      {
 //          debugger_break(space->machine);
 //      }

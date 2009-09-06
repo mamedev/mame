@@ -1053,20 +1053,20 @@ WRITE8_HANDLER( tenkai_priority_w )
 	hanamai_priority = BITSWAP8(data, 3,2,1,0, 4,7,5,6);
 }
 
-static int debug_mask(void)
+static int debug_mask(running_machine *machine)
 {
 #ifdef MAME_DEBUG
 	int msk = 0;
-	if (input_code_pressed(KEYCODE_Z))
+	if (input_code_pressed(machine, KEYCODE_Z))
 	{
-		if (input_code_pressed(KEYCODE_Q))	msk |= 0x01;	// layer 0
-		if (input_code_pressed(KEYCODE_W))	msk |= 0x02;	// layer 1
-		if (input_code_pressed(KEYCODE_E))	msk |= 0x04;	// layer 2
-		if (input_code_pressed(KEYCODE_R))	msk |= 0x08;	// layer 3
-		if (input_code_pressed(KEYCODE_A))	msk |= 0x10;	// layer 4
-		if (input_code_pressed(KEYCODE_S))	msk |= 0x20;	// layer 5
-		if (input_code_pressed(KEYCODE_D))	msk |= 0x40;	// layer 6
-		if (input_code_pressed(KEYCODE_F))	msk |= 0x80;	// layer 7
+		if (input_code_pressed(machine, KEYCODE_Q))	msk |= 0x01;	// layer 0
+		if (input_code_pressed(machine, KEYCODE_W))	msk |= 0x02;	// layer 1
+		if (input_code_pressed(machine, KEYCODE_E))	msk |= 0x04;	// layer 2
+		if (input_code_pressed(machine, KEYCODE_R))	msk |= 0x08;	// layer 3
+		if (input_code_pressed(machine, KEYCODE_A))	msk |= 0x10;	// layer 4
+		if (input_code_pressed(machine, KEYCODE_S))	msk |= 0x20;	// layer 5
+		if (input_code_pressed(machine, KEYCODE_D))	msk |= 0x40;	// layer 6
+		if (input_code_pressed(machine, KEYCODE_F))	msk |= 0x80;	// layer 7
 		if (msk != 0)	return msk;
 	}
 #endif
@@ -1083,18 +1083,18 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 {
 #ifdef MAME_DEBUG
 	static int toggle;
-	if (input_code_pressed_once(KEYCODE_T))	toggle = 1-toggle;
+	if (input_code_pressed_once(machine, KEYCODE_T))	toggle = 1-toggle;
 	if (toggle)	{
 		UINT8 *RAM	=	memory_region( machine, "gfx1" );
 		size_t size		=	memory_region_length( machine, "gfx1" );
 		static int i = 0, c = 0, r = 0;
 
-		if (input_code_pressed_once(KEYCODE_I))	c = (c-1) & 0x1f;
-		if (input_code_pressed_once(KEYCODE_O))	c = (c+1) & 0x1f;
-		if (input_code_pressed_once(KEYCODE_R))	{ r = (r+1) & 0x7;	i = size/8 * r; }
-		if (input_code_pressed(KEYCODE_M) | input_code_pressed_once(KEYCODE_K))	{
+		if (input_code_pressed_once(machine, KEYCODE_I))	c = (c-1) & 0x1f;
+		if (input_code_pressed_once(machine, KEYCODE_O))	c = (c+1) & 0x1f;
+		if (input_code_pressed_once(machine, KEYCODE_R))	{ r = (r+1) & 0x7;	i = size/8 * r; }
+		if (input_code_pressed(machine, KEYCODE_M) | input_code_pressed_once(machine, KEYCODE_K))	{
 			while( i < size && RAM[i] ) i++;		while( i < size && !RAM[i] ) i++;	}
-		if (input_code_pressed(KEYCODE_N) | input_code_pressed_once(KEYCODE_J))	{
+		if (input_code_pressed(machine, KEYCODE_N) | input_code_pressed_once(machine, KEYCODE_J))	{
 			if (i >= 2) i-=2;	while( i > 0 && RAM[i] ) i--;	i++;	}
 
 		dynax_blit_palettes = (c & 0xf) * 0x111;
@@ -1124,7 +1124,7 @@ VIDEO_UPDATE( hanamai )
 	int lay[4];
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
-	layers_ctrl &= debug_mask();
+	layers_ctrl &= debug_mask(screen->machine);
 
 	bitmap_fill(bitmap, cliprect,
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
@@ -1158,7 +1158,7 @@ VIDEO_UPDATE( hnoridur )
 	int pri;
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
-	layers_ctrl &= debug_mask();
+	layers_ctrl &= debug_mask(screen->machine);
 
 	bitmap_fill(bitmap, cliprect,
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256);
@@ -1191,7 +1191,7 @@ VIDEO_UPDATE( sprtmtch )
 	int layers_ctrl = ~dynax_layer_enable;
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
-	layers_ctrl &= debug_mask();
+	layers_ctrl &= debug_mask(screen->machine);
 
 	bitmap_fill(bitmap, cliprect,
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
@@ -1210,7 +1210,7 @@ VIDEO_UPDATE( jantouki )
 	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
-	layers_ctrl &= debug_mask();
+	layers_ctrl &= debug_mask(screen->machine);
 
 	bitmap_fill(bitmap, cliprect,
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
@@ -1239,7 +1239,7 @@ VIDEO_UPDATE( mjdialq2 )
 	int layers_ctrl = ~dynax_layer_enable;
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
-	layers_ctrl &= debug_mask();
+	layers_ctrl &= debug_mask(screen->machine);
 
 	bitmap_fill(bitmap, cliprect,
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);

@@ -192,15 +192,15 @@ VIDEO_UPDATE( system18 )
 	vdppri = (vdp_mixing & 1) ? (1 << vdplayer) : 0;
 
 #if DEBUG_VDP
-	if (input_code_pressed(KEYCODE_Q)) vdplayer = 0;
-	if (input_code_pressed(KEYCODE_W)) vdplayer = 1;
-	if (input_code_pressed(KEYCODE_E)) vdplayer = 2;
-	if (input_code_pressed(KEYCODE_R)) vdplayer = 3;
-	if (input_code_pressed(KEYCODE_A)) vdppri = 0x00;
-	if (input_code_pressed(KEYCODE_S)) vdppri = 0x01;
-	if (input_code_pressed(KEYCODE_D)) vdppri = 0x02;
-	if (input_code_pressed(KEYCODE_F)) vdppri = 0x04;
-	if (input_code_pressed(KEYCODE_G)) vdppri = 0x08;
+	if (input_code_pressed(screen->machine, KEYCODE_Q)) vdplayer = 0;
+	if (input_code_pressed(screen->machine, KEYCODE_W)) vdplayer = 1;
+	if (input_code_pressed(screen->machine, KEYCODE_E)) vdplayer = 2;
+	if (input_code_pressed(screen->machine, KEYCODE_R)) vdplayer = 3;
+	if (input_code_pressed(screen->machine, KEYCODE_A)) vdppri = 0x00;
+	if (input_code_pressed(screen->machine, KEYCODE_S)) vdppri = 0x01;
+	if (input_code_pressed(screen->machine, KEYCODE_D)) vdppri = 0x02;
+	if (input_code_pressed(screen->machine, KEYCODE_F)) vdppri = 0x04;
+	if (input_code_pressed(screen->machine, KEYCODE_G)) vdppri = 0x08;
 #endif
 
 	/* if no drawing is happening, fill with black and get out */
@@ -241,12 +241,12 @@ VIDEO_UPDATE( system18 )
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 
 #if DEBUG_VDP
-	if (vdp_enable && input_code_pressed(KEYCODE_V))
+	if (vdp_enable && input_code_pressed(screen->machine, KEYCODE_V))
 	{
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		update_system18_vdp(bitmap, cliprect);
 	}
-	if (vdp_enable && input_code_pressed(KEYCODE_B))
+	if (vdp_enable && input_code_pressed(screen->machine, KEYCODE_B))
 	{
 		FILE *f = fopen("vdp.bin", "w");
 		fwrite(tempbitmap->base, 1, tempbitmap->rowpixels * (tempbitmap->bpp / 8) * tempbitmap->height, f);

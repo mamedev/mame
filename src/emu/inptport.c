@@ -449,7 +449,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 static void frame_update_callback(running_machine *machine);
 static void frame_update(running_machine *machine);
 static void frame_update_digital_joysticks(running_machine *machine);
-static void frame_update_analog_field(analog_field_state *analog);
+static void frame_update_analog_field(running_machine *machine, analog_field_state *analog);
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down);
 
 /* port configuration helpers */
@@ -478,7 +478,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 
 /* settings save */
 static void save_config_callback(running_machine *machine, int config_type, xml_data_node *parentnode);
-static void save_sequence(xml_data_node *parentnode, int type, int porttype, const input_seq *seq);
+static void save_sequence(running_machine *machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq);
 static int save_this_input_field_type(int type);
 static void save_default_inputs(running_machine *machine, xml_data_node *parentnode);
 static void save_game_inputs(running_machine *machine, xml_data_node *parentnode);
@@ -1174,7 +1174,7 @@ void input_type_set_seq(running_machine *machine, int type, int player, input_se
 
 int input_type_pressed(running_machine *machine, int type, int player)
 {
-	return input_seq_pressed(input_type_seq(machine, type, player, SEQ_TYPE_STANDARD));
+	return input_seq_pressed(machine, input_type_seq(machine, type, player, SEQ_TYPE_STANDARD));
 }
 
 
@@ -1646,7 +1646,7 @@ static void init_port_state(running_machine *machine)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 				if (field->state->joystick != NULL && field->way == 4)
 				{
-					input_device_set_joystick_map(-1, (field->flags & FIELD_FLAG_ROTATED) ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
+					input_device_set_joystick_map(machine, -1, (field->flags & FIELD_FLAG_ROTATED) ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
 					break;
 				}
 }
@@ -1695,7 +1695,7 @@ static void init_autoselect_devices(const input_port_config *portlist, int type1
 		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	/* only scan the list if we haven't already enabled this class of control */
-	if (!input_device_class_enabled(autoenable))
+	if (!input_device_class_enabled(portlist->machine, autoenable))
 		for (port = portlist; port != NULL; port = port->next)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
@@ -1705,7 +1705,7 @@ static void init_autoselect_devices(const input_port_config *portlist, int type1
 					(type3 != 0 && field->type == type3))
 				{
 					mame_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-					input_device_class_enable(autoenable, TRUE);
+					input_device_class_enable(portlist->machine, autoenable, TRUE);
 					break;
 				}
 }
@@ -1988,7 +1988,7 @@ profiler_mark_start(PROFILER_INPUT);
 
 				/* handle analog inputs */
 				else if (field->state->analog != NULL)
-					frame_update_analog_field(field->state->analog);
+					frame_update_analog_field(machine, field->state->analog);
 
 				/* handle non-analog types, but only when the UI isn't visible */
 				else if (!ui_visible && frame_get_digital_field_state(field, field == mouse_field))
@@ -2050,13 +2050,13 @@ static void frame_update_digital_joysticks(running_machine *machine)
 				joystick->current = 0;
 
 				/* read all the associated ports */
-				if (joystick->field[JOYDIR_UP] != NULL && input_seq_pressed(input_field_seq(joystick->field[JOYDIR_UP], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_UP] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_UP], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_UP_BIT;
-				if (joystick->field[JOYDIR_DOWN] != NULL && input_seq_pressed(input_field_seq(joystick->field[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_DOWN] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_DOWN_BIT;
-				if (joystick->field[JOYDIR_LEFT] != NULL && input_seq_pressed(input_field_seq(joystick->field[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_LEFT] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_LEFT_BIT;
-				if (joystick->field[JOYDIR_RIGHT] != NULL && input_seq_pressed(input_field_seq(joystick->field[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_RIGHT] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_RIGHT_BIT;
 
 				/* lock out opposing directions (left + right or up + down) */
@@ -2117,7 +2117,7 @@ static void frame_update_digital_joysticks(running_machine *machine)
     internals of a single analog field
 -------------------------------------------------*/
 
-static void frame_update_analog_field(analog_field_state *analog)
+static void frame_update_analog_field(running_machine *machine, analog_field_state *analog)
 {
 	input_item_class itemclass;
 	int keypressed = FALSE;
@@ -2129,7 +2129,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 	analog->previous = analog->accum = apply_analog_min_max(analog, analog->accum);
 
 	/* get the new raw analog value and its type */
-	rawvalue = input_seq_axis_value(input_field_seq(analog->field, SEQ_TYPE_STANDARD), &itemclass);
+	rawvalue = input_seq_axis_value(machine, input_field_seq(analog->field, SEQ_TYPE_STANDARD), &itemclass);
 
 	/* if we got an absolute input, it overrides everything else */
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
@@ -2187,7 +2187,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 
 	/* if the decrement code sequence is pressed, add the key delta to */
 	/* the accumulated delta; also note that the last input was a digital one */
-	if (input_seq_pressed(input_field_seq(analog->field, SEQ_TYPE_DECREMENT)))
+	if (input_seq_pressed(machine, input_field_seq(analog->field, SEQ_TYPE_DECREMENT)))
 	{
 		keypressed = TRUE;
 		if (analog->delta != 0)
@@ -2199,7 +2199,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 	}
 
 	/* same for the increment code sequence */
-	if (input_seq_pressed(input_field_seq(analog->field, SEQ_TYPE_INCREMENT)))
+	if (input_seq_pressed(machine, input_field_seq(analog->field, SEQ_TYPE_INCREMENT)))
 	{
 		keypressed = TRUE;
 		if (analog->delta)
@@ -2263,7 +2263,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down)
 {
-	int curstate = mouse_down || input_seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
+	int curstate = mouse_down || input_seq_pressed(field->port->machine, input_field_seq(field, SEQ_TYPE_STANDARD));
 	int changed = FALSE;
 
 	/* if the state changed, look for switch down/switch up */
@@ -3403,7 +3403,7 @@ static void load_config_callback(running_machine *machine, int config_type, xml_
 			{
 				if (strcmp(seqnode->value, "NONE") == 0)
 					input_seq_set_0(&newseq[seqtype]);
-				else if (input_seq_from_tokens(seqnode->value, &tempseq) != 0)
+				else if (input_seq_from_tokens(machine, seqnode->value, &tempseq) != 0)
 					newseq[seqtype] = tempseq;
 			}
 		}
@@ -3459,8 +3459,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		count = 0;
 		for (remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != NULL; remapnode = xml_get_sibling(remapnode->next, "remap"))
 		{
-			input_code origcode = input_code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
-			input_code newcode = input_code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
+			input_code origcode = input_code_from_token(machine, xml_get_attribute_string(remapnode, "origcode", ""));
+			input_code newcode = input_code_from_token(machine, xml_get_attribute_string(remapnode, "newcode", ""));
 			if (origcode != INPUT_CODE_INVALID && newcode != INPUT_CODE_INVALID)
 			{
 				oldtable[count] = origcode;
@@ -3609,7 +3609,7 @@ static void save_config_callback(running_machine *machine, int config_type, xml_
     sequence
 -------------------------------------------------*/
 
-static void save_sequence(xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
+static void save_sequence(running_machine *machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
 {
 	astring *seqstring = astring_alloc();
 	xml_data_node *seqnode;
@@ -3618,7 +3618,7 @@ static void save_sequence(xml_data_node *parentnode, int type, int porttype, con
 	if (input_seq_get_1(seq) == SEQCODE_END)
 		astring_cpyc(seqstring, "NONE");
 	else
-		input_seq_to_tokens(seqstring, seq);
+		input_seq_to_tokens(machine, seqstring, seq);
 
 	/* add the new node */
 	seqnode = xml_add_child(parentnode, "newseq", astring_c(seqstring));
@@ -3684,7 +3684,7 @@ static void save_default_inputs(running_machine *machine, xml_data_node *parentn
 					/* add only the sequences that have changed from the defaults */
 					for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
 						if (input_seq_cmp(&typestate->seq[seqtype], &typestate->typedesc.seq[seqtype]) != 0)
-							save_sequence(portnode, seqtype, typestate->typedesc.type, &typestate->seq[seqtype]);
+							save_sequence(machine, portnode, seqtype, typestate->typedesc.type, &typestate->seq[seqtype]);
 				}
 			}
 		}
@@ -3745,7 +3745,7 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 						/* add sequences if changed */
 						for (seqtype = 0; seqtype < ARRAY_LENGTH(field->state->seq); seqtype++)
 							if (input_seq_cmp(&field->state->seq[seqtype], &field->seq[seqtype]) != 0)
-								save_sequence(portnode, seqtype, field->type, &field->state->seq[seqtype]);
+								save_sequence(machine, portnode, seqtype, field->type, &field->state->seq[seqtype]);
 
 						/* write out non-analog changes */
 						if (field->state->analog == NULL)

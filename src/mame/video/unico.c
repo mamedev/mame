@@ -346,13 +346,13 @@ VIDEO_UPDATE( unico )
 	tilemap_set_scrollx(tilemap_2, 0, *unico_scrollx_2);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
+if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -385,13 +385,13 @@ VIDEO_UPDATE( zeropnt2 )
 	tilemap_set_scrolly(tilemap_2, 0, unico_scroll32[1] >> 16);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
+if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

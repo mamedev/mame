@@ -133,7 +133,7 @@ INLINE void input_seq_backspace(input_seq *seq)
     sequence of switch inputs is "pressed"
 -------------------------------------------------*/
 
-int input_seq_pressed(const input_seq *seq)
+int input_seq_pressed(running_machine *machine, const input_seq *seq)
 {
 	int result = FALSE;
 	int invert = FALSE;
@@ -167,11 +167,11 @@ int input_seq_pressed(const input_seq *seq)
 		{
 			/* if this is the first in the sequence, result is set equal */
 			if (first)
-				result = input_code_pressed(code) ^ invert;
+				result = input_code_pressed(machine, code) ^ invert;
 
 			/* further values are ANDed */
 			else if (result)
-				result &= input_code_pressed(code) ^ invert;
+				result &= input_code_pressed(machine, code) ^ invert;
 
 			/* no longer first, and clear the invert flag */
 			first = invert = FALSE;
@@ -188,7 +188,7 @@ int input_seq_pressed(const input_seq *seq)
     axis defined in an input sequence
 -------------------------------------------------*/
 
-INT32 input_seq_axis_value(const input_seq *seq, input_item_class *itemclass_ptr)
+INT32 input_seq_axis_value(running_machine *machine, const input_seq *seq, input_item_class *itemclass_ptr)
 {
 	input_item_class itemclasszero = ITEM_CLASS_ABSOLUTE;
 	input_item_class itemclass = ITEM_CLASS_INVALID;
@@ -227,13 +227,13 @@ INT32 input_seq_axis_value(const input_seq *seq, input_item_class *itemclass_ptr
 			{
 				/* AND against previous digital codes */
 				if (enable)
-					enable &= input_code_pressed(code) ^ invert;
+					enable &= input_code_pressed(machine, code) ^ invert;
 			}
 
 			/* non-switch codes are analog values */
 			else
 			{
-				INT32 value = input_code_value(code);
+				INT32 value = input_code_value(machine, code);
 
 				/* if we got a 0 value, don't do anything except remember the first type */
 				if (value == 0)
@@ -279,7 +279,7 @@ INT32 input_seq_axis_value(const input_seq *seq, input_item_class *itemclass_ptr
     new sequence of the given itemclass
 -------------------------------------------------*/
 
-void input_seq_poll_start(input_item_class itemclass, const input_seq *startseq)
+void input_seq_poll_start(running_machine *machine, input_item_class itemclass, const input_seq *startseq)
 {
 	input_code dummycode;
 
@@ -300,9 +300,9 @@ void input_seq_poll_start(input_item_class itemclass, const input_seq *startseq)
 		input_seq_append(&record_seq, SEQCODE_OR);
 
 	/* flush out any goobers */
-	dummycode = (record_class == ITEM_CLASS_SWITCH) ? input_code_poll_switches(TRUE) : input_code_poll_axes(TRUE);
+	dummycode = (record_class == ITEM_CLASS_SWITCH) ? input_code_poll_switches(machine, TRUE) : input_code_poll_axes(machine, TRUE);
 	while (dummycode != INPUT_CODE_INVALID)
-		dummycode = (record_class == ITEM_CLASS_SWITCH) ? input_code_poll_switches(FALSE) : input_code_poll_axes(FALSE);
+		dummycode = (record_class == ITEM_CLASS_SWITCH) ? input_code_poll_switches(machine, FALSE) : input_code_poll_axes(machine, FALSE);
 }
 
 
@@ -310,7 +310,7 @@ void input_seq_poll_start(input_item_class itemclass, const input_seq *startseq)
     input_seq_poll - continue polling
 -------------------------------------------------*/
 
-int input_seq_poll(input_seq *finalseq)
+int input_seq_poll(running_machine *machine, input_seq *finalseq)
 {
 	input_code lastcode = input_seq_get_last(&record_seq);
 	int has_or = FALSE;
@@ -319,7 +319,7 @@ int input_seq_poll(input_seq *finalseq)
 	/* switch case: see if we have a new code to process */
 	if (record_class == ITEM_CLASS_SWITCH)
 	{
-		newcode = input_code_poll_switches(FALSE);
+		newcode = input_code_poll_switches(machine, FALSE);
 		if (newcode != INPUT_CODE_INVALID)
 		{
 			/* if code is duplicate, toggle the NOT state on the code */
@@ -345,7 +345,7 @@ int input_seq_poll(input_seq *finalseq)
 			lastcode = input_seq_get_last_but_one(&record_seq);
 			has_or = TRUE;
 		}
-		newcode = input_code_poll_axes(FALSE);
+		newcode = input_code_poll_axes(machine, FALSE);
 
 		/* if the last code doesn't match absolute/relative of this code, ignore the new one */
 		if ((INPUT_CODE_ITEMCLASS(lastcode) == ITEM_CLASS_ABSOLUTE && INPUT_CODE_ITEMCLASS(newcode) != ITEM_CLASS_ABSOLUTE) ||
@@ -407,7 +407,7 @@ int input_seq_poll(input_seq *finalseq)
     of a sequence
 -------------------------------------------------*/
 
-astring *input_seq_name(astring *string, const input_seq *seq)
+astring *input_seq_name(running_machine *machine, astring *string, const input_seq *seq)
 {
 	astring *codestr = astring_alloc();
 	int codenum, copycodenum;
@@ -419,7 +419,7 @@ astring *input_seq_name(astring *string, const input_seq *seq)
 		input_code code = seq->code[codenum];
 
 		/* if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs */
-		if (!INPUT_CODE_IS_INTERNAL(code) && astring_len(input_code_name(codestr, code)) == 0)
+		if (!INPUT_CODE_IS_INTERNAL(code) && astring_len(input_code_name(machine, codestr, code)) == 0)
 		{
 			while (copycodenum > 0 && INPUT_CODE_IS_INTERNAL(seqcopy.code[copycodenum - 1]))
 				copycodenum--;
@@ -456,7 +456,7 @@ astring *input_seq_name(astring *string, const input_seq *seq)
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-			astring_cat(string, input_code_name(codestr, code));
+			astring_cat(string, input_code_name(machine, codestr, code));
 	}
 
 	astring_free(codestr);
@@ -469,7 +469,7 @@ astring *input_seq_name(astring *string, const input_seq *seq)
     form of a sequence
 -------------------------------------------------*/
 
-astring *input_seq_to_tokens(astring *string, const input_seq *seq)
+astring *input_seq_to_tokens(running_machine *machine, astring *string, const input_seq *seq)
 {
 	astring *codestr = astring_alloc();
 	int codenum;
@@ -496,7 +496,7 @@ astring *input_seq_to_tokens(astring *string, const input_seq *seq)
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-			astring_cat(string, input_code_to_token(codestr, code));
+			astring_cat(string, input_code_to_token(machine, codestr, code));
 	}
 
 	astring_free(codestr);
@@ -509,7 +509,7 @@ astring *input_seq_to_tokens(astring *string, const input_seq *seq)
     form of a sequence
 -------------------------------------------------*/
 
-int input_seq_from_tokens(const char *string, input_seq *seq)
+int input_seq_from_tokens(running_machine *machine, const char *string, input_seq *seq)
 {
 	char *strcopy = alloc_array_or_die(char, strlen(string) + 1);
 	char *str = strcopy;
@@ -551,7 +551,7 @@ int input_seq_from_tokens(const char *string, input_seq *seq)
 		else if (strcmp(str, "DEFAULT") == 0)
 			code = SEQCODE_DEFAULT;
 		else
-			code = input_code_from_token(str);
+			code = input_code_from_token(machine, str);
 
 		/* translate and add to the sequence */
 		input_seq_append(seq, code);

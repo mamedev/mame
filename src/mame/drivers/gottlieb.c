@@ -614,7 +614,7 @@ static void audio_handle_zero_crossing(attotime zerotime, int logit)
 
 static void laserdisc_audio_process(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
-	int logit = LOG_AUDIO_DECODE && input_code_pressed(KEYCODE_L);
+	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine, KEYCODE_L);
 	attotime time_per_sample = ATTOTIME_IN_HZ(samplerate);
 	attotime curtime = laserdisc_last_time;
 	int cursamp;

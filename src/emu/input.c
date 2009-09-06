@@ -115,6 +115,20 @@ struct _code_string_table
 };
 
 
+struct _input_private
+{
+	/* array of devices for each class */
+	input_device_list 	device_list[DEVICE_CLASS_MAXIMUM];
+	input_code			code_pressed_memory[MAX_PRESSED_SWITCHES];
+
+	/* device configuration */
+	UINT8				steadykey_enabled;
+	UINT8				lightgun_reload_button;
+	const char *		joystick_map_default;
+	INT32				joystick_deadzone;
+	INT32 				joystick_saturation;
+};
+
 
 /***************************************************************************
     TOKEN/STRING TABLES
@@ -392,17 +406,6 @@ static const code_string_table itemid_token_table[] =
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* array of devices for each class */
-static input_device_list 	device_list[DEVICE_CLASS_MAXIMUM];
-static input_code			code_pressed_memory[MAX_PRESSED_SWITCHES];
-
-/* device configuration */
-static UINT8				steadykey_enabled;
-static UINT8				lightgun_reload_button;
-static const char *			joystick_map_default;
-static INT32				joystick_deadzone;
-static INT32 				joystick_saturation;
-
 /* standard joystick mappings */
 const char			joystick_map_8way[] = "7778...4445";
 const char			joystick_map_4way_sticky[] = "s8.4s8.44s8.4445";
@@ -415,15 +418,15 @@ const char			joystick_map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.
 ***************************************************************************/
 
 static void input_frame(running_machine *machine);
-static input_device_item *input_code_item(input_code code);
-static INT32 convert_absolute_value(input_code code, input_device_item *item);
+static input_device_item *input_code_item(running_machine *machine, input_code code);
+static INT32 convert_absolute_value(running_machine *machine, input_code code, input_device_item *item);
 static INT32 convert_relative_value(input_code code, input_device_item *item);
-static INT32 convert_switch_value(input_code code, input_device_item *item);
-static INT32 apply_deadzone_and_saturation(input_code code, INT32 result);
+static INT32 convert_switch_value(running_machine *machine, input_code code, input_device_item *item);
+static INT32 apply_deadzone_and_saturation(running_machine *machine, input_code code, INT32 result);
 static int joystick_map_parse(const char *mapstring, joystick_map *map);
 static void joystick_map_print(const char *header, const char *origstring, const joystick_map *map);
-static void input_code_reset_axes(void);
-static int input_code_check_axis(input_device_item *item, input_code code);
+static void input_code_reset_axes(running_machine *machine);
+static int input_code_check_axis(running_machine *machine, input_device_item *item, input_code code);
 
 
 
@@ -436,12 +439,14 @@ static int input_code_check_axis(input_device_item *item, input_code code);
     a pointer to the associated device
 -------------------------------------------------*/
 
-INLINE input_device *input_code_device(input_code code)
+INLINE input_device *input_code_device(running_machine *machine, input_code code)
 {
 	/* if the class is valid... */
 	input_device_class devclass = INPUT_CODE_DEVCLASS(code);
 	if (devclass > DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM)
 	{
+		input_device_list *device_list = machine->input_data->device_list;
+
 		/* ...and the index is valid for that class, return a pointer to the device */
 		int devindex = INPUT_CODE_DEVINDEX(code);
 		if (devindex < device_list[devclass].count)
@@ -462,7 +467,7 @@ INLINE input_code device_item_to_code(input_device *device, input_item_id itemid
 {
 	int devindex = device->devindex;
 
-	assert(devindex < device_list[device->devclass].count);
+	assert(devindex < device->machine->input_data->device_list[device->devclass].count);
 	assert(itemid < ITEM_ID_ABSOLUTE_MAXIMUM);
 	assert(device->item[itemid] != NULL);
 
@@ -496,8 +501,10 @@ INLINE input_item_class input_item_standard_class(input_device_class devclass, i
     of an input item
 -------------------------------------------------*/
 
-INLINE void input_item_update_value(input_device_item *item)
+INLINE void input_item_update_value(running_machine *machine, input_device_item *item)
 {
+	input_device_list *device_list = machine->input_data->device_list;
+
 	item->current = (*item->getstate)(device_list[item->devclass].list[item->devindex].internal, item->internal);
 }
 
@@ -507,9 +514,11 @@ INLINE void input_item_update_value(input_device_item *item)
     of memory for pressed switches
 -------------------------------------------------*/
 
-INLINE void code_pressed_memory_reset(void)
+INLINE void code_pressed_memory_reset(running_machine *machine)
 {
+	input_code *code_pressed_memory = machine->input_data->code_pressed_memory;
 	int memnum;
+
 	for (memnum = 0; memnum < MAX_PRESSED_SWITCHES; memnum++)
 		code_pressed_memory[memnum] = INPUT_CODE_INVALID;
 }
@@ -561,12 +570,18 @@ INLINE const char *code_to_string(const code_string_table *table, UINT32 code)
 void input_init(running_machine *machine)
 {
 	joystick_map map;
+	input_private *state;
+	input_device_list *device_list;
+
+	/* allocate private memory */
+	machine->input_data = state = auto_alloc_clear(machine, input_private);
+	device_list = state->device_list;
 
 	/* reset the device lists */
 	memset(device_list, 0, sizeof(device_list));
 
 	/* reset code memory */
-	code_pressed_memory_reset();
+	code_pressed_memory_reset(machine);
 
 	/* request a per-frame callback for bookkeeping */
 	add_frame_callback(machine, input_frame);
@@ -584,19 +599,19 @@ void input_init(running_machine *machine)
 	device_list[DEVICE_CLASS_JOYSTICK].multi = TRUE;
 
 	/* read other input options */
-	steadykey_enabled = options_get_bool(mame_options(), OPTION_STEADYKEY);
-	lightgun_reload_button = options_get_bool(mame_options(), OPTION_OFFSCREEN_RELOAD);
-	joystick_deadzone = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
-	joystick_saturation = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
+	state->steadykey_enabled = options_get_bool(mame_options(), OPTION_STEADYKEY);
+	state->lightgun_reload_button = options_get_bool(mame_options(), OPTION_OFFSCREEN_RELOAD);
+	state->joystick_deadzone = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
+	state->joystick_saturation = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
 
 	/* get the default joystick map */
-	joystick_map_default = options_get_string(mame_options(), OPTION_JOYSTICK_MAP);
-	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		joystick_map_default = joystick_map_8way;
-	if (!joystick_map_parse(joystick_map_default, &map))
-		mame_printf_error("Invalid joystick map: %s\n", joystick_map_default);
-	else if (joystick_map_default != joystick_map_8way)
-		joystick_map_print("Input: Default joystick map", joystick_map_default, &map);
+	state->joystick_map_default = options_get_string(mame_options(), OPTION_JOYSTICK_MAP);
+	if (state->joystick_map_default[0] == 0 || strcmp(state->joystick_map_default, "auto") == 0)
+		state->joystick_map_default = joystick_map_8way;
+	if (!joystick_map_parse(state->joystick_map_default, &map))
+		mame_printf_error("Invalid joystick map: %s\n", state->joystick_map_default);
+	else if (state->joystick_map_default != joystick_map_8way)
+		joystick_map_print("Input: Default joystick map", state->joystick_map_default, &map);
 }
 
 
@@ -605,8 +620,10 @@ void input_init(running_machine *machine)
     a device class
 -------------------------------------------------*/
 
-void input_device_class_enable(input_device_class devclass, UINT8 enable)
+void input_device_class_enable(running_machine *machine, input_device_class devclass, UINT8 enable)
 {
+	input_device_list *device_list = machine->input_data->device_list;
+
 	assert(devclass > DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 	device_list[devclass].enabled = enable;
 }
@@ -617,8 +634,10 @@ void input_device_class_enable(input_device_class devclass, UINT8 enable)
     enabled?
 -------------------------------------------------*/
 
-UINT8 input_device_class_enabled(input_device_class devclass)
+UINT8 input_device_class_enabled(running_machine *machine, input_device_class devclass)
 {
+	input_device_list *device_list = machine->input_data->device_list;
+
 	assert(devclass > DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 	return device_list[devclass].enabled;
 }
@@ -629,8 +648,9 @@ UINT8 input_device_class_enabled(input_device_class devclass)
     joystick map for a device
 -------------------------------------------------*/
 
-int input_device_set_joystick_map(int devindex, const char *mapstring)
+int input_device_set_joystick_map(running_machine *machine, int devindex, const char *mapstring)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	int startindex = devindex;
 	int stopindex = devindex;
 	joystick_map map;
@@ -666,9 +686,12 @@ int input_device_set_joystick_map(int devindex, const char *mapstring)
 
 static void input_frame(running_machine *machine)
 {
+	input_private *state = machine->input_data;
+
 	/* if steadykey is enabled, do processing here */
-	if (steadykey_enabled)
+	if (state->steadykey_enabled)
 	{
+		input_device_list *device_list = state->device_list;
 		int devnum;
 
 		/* iterate over keyboards */
@@ -684,7 +707,7 @@ static void input_frame(running_machine *machine)
 				input_device_item *item = device->item[itemid];
 				if (item != NULL && item->itemclass == ITEM_CLASS_SWITCH)
 				{
-					input_item_update_value(item);
+					input_item_update_value(machine, item);
 					if ((item->current ^ item->oldkey) & 1)
 					{
 						changed = TRUE;
@@ -723,7 +746,8 @@ static void input_frame(running_machine *machine)
 
 input_device *input_device_add(running_machine *machine, input_device_class devclass, const char *name, void *internal)
 {
-	input_device_list *devlist = &device_list[devclass];
+	input_private *state = machine->input_data;
+	input_device_list *devlist = &state->device_list[devclass];
 	input_device *device;
 
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call input_device_add at init time!");
@@ -745,7 +769,7 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 	/* default to 8-way map for joysticks */
 	if (devclass == DEVICE_CLASS_JOYSTICK)
 	{
-		joystick_map_parse(joystick_map_default, &device->joymap);
+		joystick_map_parse(state->joystick_map_default, &device->joymap);
 		device->lastmap = JOYSTICK_MAP_NEUTRAL;
 	}
 
@@ -821,8 +845,9 @@ void input_device_item_add(input_device *device, const char *name, void *interna
     given input code
 -------------------------------------------------*/
 
-INT32 input_code_value(input_code code)
+INT32 input_code_value(running_machine *machine, input_code code)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	input_device_class devclass = INPUT_CODE_DEVCLASS(code);
 	int startindex = INPUT_CODE_DEVINDEX(code);
 	int stopindex = startindex;
@@ -852,18 +877,18 @@ INT32 input_code_value(input_code code)
 	for (curindex = startindex; curindex <= stopindex; curindex++)
 	{
 		/* lookup the item for the appropriate index */
-		input_device_item *item = input_code_item(INPUT_CODE_SET_DEVINDEX(code, curindex));
+		input_device_item *item = input_code_item(machine, INPUT_CODE_SET_DEVINDEX(code, curindex));
 		if (item == NULL)
 			continue;
 
 		/* update the value of this item */
-		input_item_update_value(item);
+		input_item_update_value(machine, item);
 
 		/* process items according to their native type */
 		switch (item->itemclass)
 		{
 			case ITEM_CLASS_ABSOLUTE:
-				result = convert_absolute_value(code, item);
+				result = convert_absolute_value(machine, code, item);
 				break;
 
 			case ITEM_CLASS_RELATIVE:
@@ -871,7 +896,7 @@ INT32 input_code_value(input_code code)
 				break;
 
 			case ITEM_CLASS_SWITCH:
-				result |= convert_switch_value(code, item);
+				result |= convert_switch_value(machine, code, item);
 				break;
 
 			default:
@@ -890,9 +915,9 @@ exit:
     given input code has been pressed
 -------------------------------------------------*/
 
-int input_code_pressed(input_code code)
+int input_code_pressed(running_machine *machine, input_code code)
 {
-	return (input_code_value(code) != 0);
+	return (input_code_value(machine, code) != 0);
 }
 
 
@@ -902,9 +927,10 @@ int input_code_pressed(input_code code)
     on since the last call
 -------------------------------------------------*/
 
-int input_code_pressed_once(input_code code)
+int input_code_pressed_once(running_machine *machine, input_code code)
 {
-	int curvalue = input_code_pressed(code);
+	input_code *code_pressed_memory = machine->input_data->code_pressed_memory;
+	int curvalue = input_code_pressed(machine, code);
 	int memnum, empty = -1;
 
 	/* look for the code in the memory */
@@ -943,8 +969,9 @@ int input_code_pressed_once(input_code code)
     an input_item_id to an input_code
 -------------------------------------------------*/
 
-input_code input_code_from_input_item_id(input_item_id itemid)
+input_code input_code_from_input_item_id(running_machine *machine, input_item_id itemid)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	input_device_class devclass;
 
 	/* iterate over device classes and devices */
@@ -969,15 +996,16 @@ input_code input_code_from_input_item_id(input_item_id itemid)
     input_code_poll_switches - poll for any input
 -------------------------------------------------*/
 
-input_code input_code_poll_switches(int reset)
+input_code input_code_poll_switches(running_machine *machine, int reset)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	input_device_class devclass;
 
 	/* if resetting memory, do it now */
 	if (reset)
 	{
-		code_pressed_memory_reset();
-		input_code_reset_axes();
+		code_pressed_memory_reset(machine);
+		input_code_reset_axes(machine);
 	}
 
 	/* iterate over device classes and devices */
@@ -1003,14 +1031,14 @@ input_code input_code_poll_switches(int reset)
 					/* if the item is natively a switch, poll it */
 					if (item->itemclass == ITEM_CLASS_SWITCH)
 					{
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 						else
 						    continue;
 					}
 
 					/* skip if there is not enough axis movement */
-					if (!input_code_check_axis(item, code))
+					if (!input_code_check_axis(machine, item, code))
 						continue;
 
 					/* otherwise, poll axes digitally */
@@ -1020,10 +1048,10 @@ input_code input_code_poll_switches(int reset)
 					if (devclass == DEVICE_CLASS_JOYSTICK && INPUT_CODE_ITEMID(code) == ITEM_ID_XAXIS)
 					{
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_LEFT);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_RIGHT);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 					}
 
@@ -1031,10 +1059,10 @@ input_code input_code_poll_switches(int reset)
 					else if (devclass == DEVICE_CLASS_JOYSTICK && INPUT_CODE_ITEMID(code) == ITEM_ID_YAXIS)
 					{
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_UP);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_DOWN);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 					}
 
@@ -1042,10 +1070,10 @@ input_code input_code_poll_switches(int reset)
 					else
 					{
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_POS);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 						code = INPUT_CODE_SET_MODIFIER(code, ITEM_MODIFIER_NEG);
-						if (input_code_pressed_once(code))
+						if (input_code_pressed_once(machine, code))
 							return code;
 					}
 				}
@@ -1063,14 +1091,14 @@ input_code input_code_poll_switches(int reset)
     any keyboard-specific input
 -------------------------------------------------*/
 
-input_code input_code_poll_keyboard_switches(int reset)
+input_code input_code_poll_keyboard_switches(running_machine *machine, int reset)
 {
-	input_device_list *devlist = &device_list[DEVICE_CLASS_KEYBOARD];
+	input_device_list *devlist = &machine->input_data->device_list[DEVICE_CLASS_KEYBOARD];
 	int devnum;
 
 	/* if resetting memory, do it now */
 	if (reset)
-		code_pressed_memory_reset();
+		code_pressed_memory_reset(machine);
 
 	/* iterate over devices within each class */
 	for (devnum = 0; devnum < devlist->count; devnum++)
@@ -1085,7 +1113,7 @@ input_code input_code_poll_keyboard_switches(int reset)
 			if (item != NULL && item->itemclass == ITEM_CLASS_SWITCH)
 			{
 				input_code code = device_item_to_code(device, itemid);
-				if (input_code_pressed_once(code))
+				if (input_code_pressed_once(machine, code))
 					return code;
 			}
 		}
@@ -1101,12 +1129,12 @@ input_code input_code_poll_keyboard_switches(int reset)
     move far enough
 -------------------------------------------------*/
 
-static int input_code_check_axis(input_device_item *item, input_code code)
+static int input_code_check_axis(running_machine *machine, input_device_item *item, input_code code)
 {
 	INT32 curval, diff;
 
 	/* poll the current value */
-	curval = input_code_value(code);
+	curval = input_code_value(machine, code);
 
 	/* if we've already reported this one, don't bother */
 	if (item->memory == INVALID_AXIS_VALUE)
@@ -1146,8 +1174,9 @@ static int input_code_check_axis(input_device_item *item, input_code code)
     input_code_reset_axes - reset axes memory
 -------------------------------------------------*/
 
-static void input_code_reset_axes(void)
+static void input_code_reset_axes(running_machine *machine)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	input_device_class devclass;
 
 	/* iterate over device classes and devices */
@@ -1175,7 +1204,7 @@ static void input_code_reset_axes(void)
 						continue;
 
 					/* poll the current value and reset the memory */
-					item->memory = input_code_value(code);
+					item->memory = input_code_value(machine, code);
 				}
 			}
 		}
@@ -1187,13 +1216,14 @@ static void input_code_reset_axes(void)
     input_code_poll_axes - poll for any input
 -------------------------------------------------*/
 
-input_code input_code_poll_axes(int reset)
+input_code input_code_poll_axes(running_machine *machine, int reset)
 {
+	input_device_list *device_list = machine->input_data->device_list;
 	input_device_class devclass;
 
 	/* if resetting memory, do it now */
 	if (reset)
-		input_code_reset_axes();
+		input_code_reset_axes(machine);
 
 	/* iterate over device classes and devices */
 	for (devclass = DEVICE_CLASS_FIRST_VALID; devclass < DEVICE_CLASS_MAXIMUM; devclass++)
@@ -1220,7 +1250,7 @@ input_code input_code_poll_axes(int reset)
 						continue;
 
 					/* check if there is enough axis movement */
-					if (input_code_check_axis(item, code))
+					if (input_code_check_axis(machine, item, code))
 						return code;
 				}
 			}
@@ -1242,9 +1272,10 @@ input_code input_code_poll_axes(int reset)
     a friendly name
 -------------------------------------------------*/
 
-astring *input_code_name(astring *string, input_code code)
+astring *input_code_name(running_machine *machine, astring *string, input_code code)
 {
-	input_device_item *item = input_code_item(code);
+	input_device_list *device_list = machine->input_data->device_list;
+	input_device_item *item = input_code_item(machine, code);
 	const char *devclass;
 	const char *devcode;
 	const char *modifier;
@@ -1301,9 +1332,9 @@ astring *input_code_name(astring *string, input_code code)
     a given code
 -------------------------------------------------*/
 
-astring *input_code_to_token(astring *string, input_code code)
+astring *input_code_to_token(running_machine *machine, astring *string, input_code code)
 {
-	input_device_item *item = input_code_item(code);
+	input_device_item *item = input_code_item(machine, code);
 	const char *devclass;
 	const char *devcode;
 	const char *itemclass;
@@ -1353,7 +1384,7 @@ astring *input_code_to_token(astring *string, input_code code)
     code from a token
 -------------------------------------------------*/
 
-input_code input_code_from_token(const char *_token)
+input_code input_code_from_token(running_machine *machine, const char *_token)
 {
 	UINT32 devclass, itemid, devindex, modifier, standard;
 	UINT32 itemclass = ITEM_CLASS_INVALID;
@@ -1402,6 +1433,7 @@ input_code input_code_from_token(const char *_token)
 	else
 	{
 		input_device *device;
+		input_device_list *device_list = machine->input_data->device_list;
 
 		/* if this is an invalid device, we have nothing to look up */
 		if (devindex >= device_list[devclass].count)
@@ -1473,9 +1505,9 @@ exit:
     from the code
 -------------------------------------------------*/
 
-static input_device_item *input_code_item(input_code code)
+static input_device_item *input_code_item(running_machine *machine, input_code code)
 {
-	input_device *device = input_code_device(code);
+	input_device *device = input_code_device(machine, code);
 	input_item_id itemid;
 
 	/* if no device, we fail */
@@ -1497,8 +1529,10 @@ static input_device_item *input_code_item(input_code code)
     value into the class specified by code
 -------------------------------------------------*/
 
-static INT32 convert_absolute_value(input_code code, input_device_item *item)
+static INT32 convert_absolute_value(running_machine *machine, input_code code, input_device_item *item)
 {
+	input_private *state = machine->input_data;
+
 	/* make sure values are valid */
 	assert(item->current >= INPUT_ABSOLUTE_MIN && item->current <= INPUT_ABSOLUTE_MAX);
 
@@ -1510,16 +1544,16 @@ static INT32 convert_absolute_value(input_code code, input_device_item *item)
 	else if (INPUT_CODE_ITEMCLASS(code) == ITEM_CLASS_ABSOLUTE)
 	{
 		input_item_modifier modifier = INPUT_CODE_MODIFIER(code);
-		INT32 result = apply_deadzone_and_saturation(code, item->current);
+		INT32 result = apply_deadzone_and_saturation(machine, code, item->current);
 
 		/* if we're doing a lightgun reload hack, override the value */
-		if (lightgun_reload_button && item->devclass == DEVICE_CLASS_LIGHTGUN)
+		if (state->lightgun_reload_button && item->devclass == DEVICE_CLASS_LIGHTGUN)
 		{
-			input_device_item *button2_item = device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
+			input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
 			if (button2_item != NULL)
 			{
 				/* if it is pressed, return (min,max) */
-				input_item_update_value(button2_item);
+				input_item_update_value(machine, button2_item);
 				if (button2_item->current)
 					result = (INPUT_CODE_ITEMID(code) == ITEM_ID_XAXIS) ? INPUT_ABSOLUTE_MIN : INPUT_ABSOLUTE_MAX;
 			}
@@ -1544,7 +1578,7 @@ static INT32 convert_absolute_value(input_code code, input_device_item *item)
 		/* left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert */
 		if (modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN && item->devclass == DEVICE_CLASS_JOYSTICK)
 		{
-			input_device *device = &device_list[item->devclass].list[item->devindex];
+			input_device *device = &state->device_list[item->devclass].list[item->devindex];
 			input_device_item *xaxis_item = device->item[ITEM_ID_XAXIS];
 			input_device_item *yaxis_item = device->item[ITEM_ID_YAXIS];
 			if (xaxis_item != NULL && yaxis_item != NULL)
@@ -1554,7 +1588,7 @@ static INT32 convert_absolute_value(input_code code, input_device_item *item)
 
 				/* determine which item we didn't update, and update it */
 				assert(item == xaxis_item || item == yaxis_item);
-				input_item_update_value((item == xaxis_item) ? yaxis_item : xaxis_item);
+				input_item_update_value(machine, (item == xaxis_item) ? yaxis_item : xaxis_item);
 
 				/* now map the X and Y axes to a 9x9 grid */
 				xaxisval = ((xaxis_item->current - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
@@ -1574,9 +1608,9 @@ static INT32 convert_absolute_value(input_code code, input_device_item *item)
 
 		/* positive/negative: TRUE if past the deadzone in either direction */
 		if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
-			return (apply_deadzone_and_saturation(code, item->current) > 0);
+			return (apply_deadzone_and_saturation(machine, code, item->current) > 0);
 		else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)
-			return (apply_deadzone_and_saturation(code, item->current) < 0);
+			return (apply_deadzone_and_saturation(machine, code, item->current) < 0);
 	}
 
 	return 0;
@@ -1619,21 +1653,23 @@ static INT32 convert_relative_value(input_code code, input_device_item *item)
     value into the class specified by code
 -------------------------------------------------*/
 
-static INT32 convert_switch_value(input_code code, input_device_item *item)
+static INT32 convert_switch_value(running_machine *machine, input_code code, input_device_item *item)
 {
+	input_private *state = machine->input_data;
+
 	/* only a switch is supported */
 	if (INPUT_CODE_ITEMCLASS(code) == ITEM_CLASS_SWITCH)
 	{
 		/* if we're doing a lightgun reload hack, button 1 and 2 operate differently */
-		if (lightgun_reload_button && item->devclass == DEVICE_CLASS_LIGHTGUN)
+		if (state->lightgun_reload_button && item->devclass == DEVICE_CLASS_LIGHTGUN)
 		{
 			/* button 1 is pressed if either button 1 or 2 are active */
 			if (INPUT_CODE_ITEMID(code) == ITEM_ID_BUTTON1)
 			{
-				input_device_item *button2_item = device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
+				input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
 				if (button2_item != NULL)
 				{
-					input_item_update_value(button2_item);
+					input_item_update_value(machine, button2_item);
 					return item->current | button2_item->current;
 				}
 			}
@@ -1644,7 +1680,7 @@ static INT32 convert_switch_value(input_code code, input_device_item *item)
 		}
 
 		/* steadykey for keyboards */
-		if (steadykey_enabled && item->devclass == DEVICE_CLASS_KEYBOARD)
+		if (state->steadykey_enabled && item->devclass == DEVICE_CLASS_KEYBOARD)
 			return item->steadykey;
 
 		/* everything else is just the current value as-is */
@@ -1661,8 +1697,9 @@ static INT32 convert_switch_value(input_code code, input_device_item *item)
     absolute value
 -------------------------------------------------*/
 
-static INT32 apply_deadzone_and_saturation(input_code code, INT32 result)
+static INT32 apply_deadzone_and_saturation(running_machine *machine, input_code code, INT32 result)
 {
+	input_private *state = machine->input_data;
 	int negative = FALSE;
 
 	/* ignore if not a joystick */
@@ -1677,16 +1714,16 @@ static INT32 apply_deadzone_and_saturation(input_code code, INT32 result)
 	}
 
 	/* if in the deadzone, return 0 */
-	if (result < joystick_deadzone)
+	if (result < state->joystick_deadzone)
 		result = 0;
 
 	/* if saturated, return the max */
-	else if (result > joystick_saturation)
+	else if (result > state->joystick_saturation)
 		result = INPUT_ABSOLUTE_MAX;
 
 	/* otherwise, scale */
 	else
-		result = (INT64)(result - joystick_deadzone) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(joystick_saturation - joystick_deadzone);
+		result = (INT64)(result - state->joystick_deadzone) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(state->joystick_saturation - state->joystick_deadzone);
 
 	/* apply sign and return */
 	return negative ? -result : result;

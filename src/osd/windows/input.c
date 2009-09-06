@@ -538,8 +538,8 @@ void wininput_poll(running_machine *machine)
 		winwindow_process_events_periodic(machine);
 
 		// track if mouse/lightgun is enabled, for mouse hiding purposes
-		mouse_enabled = input_device_class_enabled(DEVICE_CLASS_MOUSE);
-		lightgun_enabled = input_device_class_enabled(DEVICE_CLASS_LIGHTGUN);
+		mouse_enabled = input_device_class_enabled(machine, DEVICE_CLASS_MOUSE);
+		lightgun_enabled = input_device_class_enabled(machine, DEVICE_CLASS_LIGHTGUN);
 	}
 
 	// poll all of the devices

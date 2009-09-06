@@ -688,12 +688,12 @@ VIDEO_UPDATE( hyprduel )
 	flip_screen_set(screen->machine, screenctrl & 1);
 
 #if 0
-if (input_code_pressed(KEYCODE_Z))
+if (input_code_pressed(screen->machine, KEYCODE_Z))
 {	int msk = 0;
-	if (input_code_pressed(KEYCODE_Q))	msk |= 0x01;
-	if (input_code_pressed(KEYCODE_W))	msk |= 0x02;
-	if (input_code_pressed(KEYCODE_E))	msk |= 0x04;
-	if (input_code_pressed(KEYCODE_A))	msk |= 0x08;
+	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 0x01;
+	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 0x02;
+	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 0x04;
+	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 0x08;
 	if (msk != 0)
 	{	bitmap_fill(bitmap,cliprect,0);
 		layers_ctrl &= msk;	}

@@ -388,19 +388,19 @@ static VIDEO_START( bballoon )
 static int b=0;
 static VIDEO_UPDATE( bballoon )
 {
-	if(input_code_pressed_once(KEYCODE_Q))
+	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
 		irq_en ^= 1;
 		printf("en = %d\n",irq_en);
 	}
 
-	if(input_code_pressed(KEYCODE_W))
+	if(input_code_pressed(screen->machine, KEYCODE_W))
 	{
 
 		printf("b = %d\n",++b);
 	}
 
-	if(input_code_pressed(KEYCODE_E))
+	if(input_code_pressed(screen->machine, KEYCODE_E))
 	{
 
 		printf("b = %d\n",--b);

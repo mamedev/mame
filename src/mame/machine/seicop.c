@@ -1271,8 +1271,8 @@ READ16_HANDLER( heatbrl_mcu_r )
         *********************************************************************/
 
 		case (0x180/2):	{ return xy_check; } /*hit protection*/
-		case (0x182/2):	{ if(input_code_pressed(KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
-		case (0x184/2):	{ if(input_code_pressed(KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x182/2):	{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x184/2):	{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
 
 	    case (0x1b0/2): return (0xffff); /* bit 15 is branched on a few times in the $1938 area */
 		case (0x1b4/2):	return (0xffff); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */

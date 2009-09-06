@@ -1307,7 +1307,7 @@ popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%0
 	K007121_ctrlram[0][0x00],K007121_ctrlram[0][0x01],K007121_ctrlram[0][0x02],K007121_ctrlram[0][0x03],K007121_ctrlram[0][0x04],K007121_ctrlram[0][0x05],K007121_ctrlram[0][0x06],K007121_ctrlram[0][0x07],
 	K007121_ctrlram[1][0x00],K007121_ctrlram[1][0x01],K007121_ctrlram[1][0x02],K007121_ctrlram[1][0x03],K007121_ctrlram[1][0x04],K007121_ctrlram[1][0x05],K007121_ctrlram[1][0x06],K007121_ctrlram[1][0x07]);
 
-if (input_code_pressed(KEYCODE_D))
+if (input_code_pressed(gfx->machine, KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen(chip?"SPRITE1.DMP":"SPRITE0.DMP", "w+b");
@@ -1646,7 +1646,7 @@ void K007342_tilemap_update(void)
 	{
 		static int current_layer = 0;
 
-		if (input_code_pressed_once(KEYCODE_Z)) current_layer = !current_layer;
+		if (input_code_pressed_once(machine, KEYCODE_Z)) current_layer = !current_layer;
 		tilemap_set_enable(K007342_tilemap[current_layer], 1);
 		tilemap_set_enable(K007342_tilemap[!current_layer], 0);
 
@@ -1855,8 +1855,8 @@ void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect)
 	{
 		static int current_sprite = 0;
 
-		if (input_code_pressed_once(KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
-		if (input_code_pressed_once(KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
+		if (input_code_pressed_once(machine, KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
+		if (input_code_pressed_once(machine, KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
 
 		popmessage("%02x:%02x %02x %02x %02x %02x %02x %02x %02x", current_sprite,
 			K007420_ram[(current_sprite*8)+0], K007420_ram[(current_sprite*8)+1],
@@ -2414,7 +2414,7 @@ if ((K052109_scrollctrl & 0x03) == 0x01 ||
 		(K052109_scrollctrl & 0xc0) != 0)
 	popmessage("scrollcontrol = %02x",K052109_scrollctrl);
 
-if (input_code_pressed(KEYCODE_F))
+if (input_code_pressed(machine, KEYCODE_F))
 {
 	FILE *fp;
 	fp=fopen("TILE.DMP", "w+b");
@@ -2872,7 +2872,7 @@ void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 		}
 	}
 #if 0
-if (input_code_pressed(KEYCODE_D))
+if (input_code_pressed(machine, KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -3440,7 +3440,7 @@ void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,c
 		}
 	}
 #if 0
-if (input_code_pressed(KEYCODE_D))
+if (input_code_pressed(machine, KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -3677,7 +3677,7 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 		}
 	}
 #if 0
-if (input_code_pressed(KEYCODE_D))
+if (input_code_pressed(machine, KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -5013,7 +5013,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *
 	}
 
 #if 0
-if (input_code_pressed(KEYCODE_D))
+if (input_code_pressed(machine, KEYCODE_D))
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x",
 			ctrl[0x00],
 			ctrl[0x01],
@@ -7844,32 +7844,32 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	if(chip && ++kk == 3) {
 		int kx=0, kkc = 0;
 		kk = 0;
-		if(input_code_pressed(KEYCODE_Y)) {
+		if(input_code_pressed(machine, KEYCODE_Y)) {
 			kx = 1;
 			kc--;
 			if(kc<-1)
 				kc = 511;
 		}
-		if(input_code_pressed(KEYCODE_U)) {
+		if(input_code_pressed(machine, KEYCODE_U)) {
 			kx = 1;
 			kc++;
 			if(kc==512)
 				kc = -1;
 		}
 
-		if(input_code_pressed(KEYCODE_T)) {
+		if(input_code_pressed(machine, KEYCODE_T)) {
 			kkc = 1;
 			kyy--;
 		}
-		if(input_code_pressed(KEYCODE_V)) {
+		if(input_code_pressed(machine, KEYCODE_V)) {
 			kkc = 1;
 			kyy++;
 		}
-		if(input_code_pressed(KEYCODE_F)) {
+		if(input_code_pressed(machine, KEYCODE_F)) {
 			kkc = 1;
 			kxx--;
 		}
-		if(input_code_pressed(KEYCODE_G)) {
+		if(input_code_pressed(machine, KEYCODE_G)) {
 			kkc = 1;
 			kxx++;
 		}

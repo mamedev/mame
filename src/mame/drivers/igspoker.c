@@ -284,7 +284,7 @@ static WRITE8_HANDLER( custom_io_w )
 static CUSTOM_INPUT( hopper_r )
 {
 	if (hopper) return !(video_screen_get_frame_number(field->port->machine->primary_screen)%10);
-	return input_code_pressed(KEYCODE_H);
+	return input_code_pressed(field->port->machine, KEYCODE_H);
 }
 
 static READ8_HANDLER( exp_rom_r )

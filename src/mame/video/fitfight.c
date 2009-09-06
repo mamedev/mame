@@ -116,13 +116,13 @@ VIDEO_UPDATE(fitfight)
 	if (vblank > 0)
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	else {
-//      if (input_code_pressed(KEYCODE_Q))
+//      if (input_code_pressed(screen->machine, KEYCODE_Q))
 //          scrollbak = ((fof_a00000[0]&0xff00) >> 5) - ((fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(KEYCODE_W))
+//      else if (input_code_pressed(screen->machine, KEYCODE_W))
 //          scrollbak = ((fof_a00000[0]&0xff00) >> 5) + ((fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(KEYCODE_E))
+//      else if (input_code_pressed(screen->machine, KEYCODE_E))
 //          scrollbak = ((fof_a00000[0]&0xff00) >> 5) - ((fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(KEYCODE_R))
+//      else if (input_code_pressed(screen->machine, KEYCODE_R))
 //          scrollbak = ((fof_a00000[0]&0xff00) >> 5) + ((fof_700000[0] & 0x0038) >> 3);
 //      else
 			scrollbak = ((fof_a00000[0]&0xff00) >> 5);
@@ -132,19 +132,19 @@ VIDEO_UPDATE(fitfight)
 
 		draw_sprites(screen->machine,bitmap,cliprect,0);
 
-//      if (input_code_pressed(KEYCODE_A))
+//      if (input_code_pressed(screen->machine, KEYCODE_A))
 //          scrollmid = ((fof_900000[0]&0xff00) >> 5) - ((fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(KEYCODE_S))
+//      else if (input_code_pressed(screen->machine, KEYCODE_S))
 //          scrollmid = ((fof_900000[0]&0xff00) >> 5) + ((fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(KEYCODE_D))
+//      else if (input_code_pressed(screen->machine, KEYCODE_D))
 //          scrollmid = ((fof_900000[0]&0xff00) >> 5) - ((fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(KEYCODE_F))
+//      else if (input_code_pressed(screen->machine, KEYCODE_F))
 //          scrollmid = ((fof_900000[0]&0xff00) >> 5) + ((fof_700000[0] & 0x01c0) >> 6);
 //      else
 			scrollmid = ((fof_900000[0]&0xff00) >> 5);
 		tilemap_set_scrollx(fof_mid_tilemap,0, scrollmid );
 		tilemap_set_scrolly(fof_mid_tilemap,0, fof_900000[0]&0xff);
-//      if (!input_code_pressed(KEYCODE_F))
+//      if (!input_code_pressed(screen->machine, KEYCODE_F))
 			tilemap_draw(bitmap,cliprect,fof_mid_tilemap,0,0);
 
 		draw_sprites(screen->machine,bitmap,cliprect,1);

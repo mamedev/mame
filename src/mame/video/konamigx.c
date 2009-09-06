@@ -493,7 +493,7 @@ VIDEO_UPDATE(konamigx)
 	{
 		const pen_t *paldata = screen->machine->pens;
 
-		if ( input_code_pressed(KEYCODE_W) )
+		if ( input_code_pressed(screen->machine, KEYCODE_W) )
 		{
 			int y,x;
 

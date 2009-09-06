@@ -404,14 +404,14 @@ static void wardner_sprite_priority_hack(void)
 
 
 
-#ifdef MAME_DEBUG
-static void twincobr_log_vram(void)
+static void twincobr_log_vram(running_machine *machine)
 {
-	if ( input_code_pressed(KEYCODE_M) )
+#ifdef MAME_DEBUG
+	if ( input_code_pressed(machine, KEYCODE_M) )
 	{
 		offs_t tile_voffs;
 		int tcode[4];
-		while (input_code_pressed(KEYCODE_M)) ;
+		while (input_code_pressed(machine, KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
 		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",bgscrollx,bgscrolly,fgscrollx,fgscrolly,txscrollx,txscrolly);
 		for ( tile_voffs = 0; tile_voffs < (twincobr_txvideoram_size/2); tile_voffs++ )
@@ -439,8 +439,8 @@ static void twincobr_log_vram(void)
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff);
 		}
 	}
-}
 #endif
+}
 
 
 /***************************************************************************
@@ -486,9 +486,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( toaplan0 )
 {
-#ifdef MAME_DEBUG
-	twincobr_log_vram();
-#endif
+	twincobr_log_vram(screen->machine);
 
 	if (wardner_sprite_hack) wardner_sprite_priority_hack();
 

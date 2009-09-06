@@ -346,10 +346,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 #if 0
-if (input_code_pressed(KEYCODE_A) && (pri & 8)) color = rand();
-if (input_code_pressed(KEYCODE_S) && (pri & 4)) color = rand();
-if (input_code_pressed(KEYCODE_D) && (pri & 2)) color = rand();
-if (input_code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
+if (input_code_pressed(machine, KEYCODE_A) && (pri & 8)) color = rand();
+if (input_code_pressed(machine, KEYCODE_S) && (pri & 4)) color = rand();
+if (input_code_pressed(machine, KEYCODE_D) && (pri & 2)) color = rand();
+if (input_code_pressed(machine, KEYCODE_F) && (pri & 1)) color = rand();
 #endif
 
 		/* TODO: priority handling is completely wrong, but better than nothing */
