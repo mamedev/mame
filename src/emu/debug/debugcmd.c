@@ -1916,7 +1916,7 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 	UINT64 cheatindex;
 	UINT32 active_cheat = 0;
 	UINT8 condition;
-	UINT64 comp_value;
+	UINT64 comp_value = 0;
 	
 	enum 
 	{
