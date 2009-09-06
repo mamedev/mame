@@ -500,7 +500,8 @@ int main(int argc, char *argv[])
 		{
 			for (p = buffer; *p != 0; p++)
 				*p = tolower((UINT8)*p);
-		} else if (opts.upper)
+		}
+		else if (opts.upper)
 		{
 			for (p = buffer; *p != 0; p++)
 				*p = toupper((UINT8)*p);
@@ -528,7 +529,6 @@ int main(int argc, char *argv[])
 
 		// advance
 		curpc += pcdelta;
-		curbyte += numbytes;
 	}
 
 	return 0;
