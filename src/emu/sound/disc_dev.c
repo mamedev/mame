@@ -548,7 +548,7 @@ static DISCRETE_RESET(dsd_555_mstbl)
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
 	{
-		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", NODE_BLOCKINDEX(node));
 		context->output_type = DISC_555_OUT_SQW;
 	}
 
@@ -1522,7 +1522,7 @@ static DISCRETE_RESET(dsd_566)
 	context->error = 0;
 	if (info->v_neg >= info->v_pos)
 	{
-		logerror("[v_neg >= v_pos] - NODE_%d DISABLED!\n", node->node - NODE_00);
+		logerror("[v_neg >= v_pos] - NODE_%d DISABLED!\n", NODE_BLOCKINDEX(node));
 		context->error = 1;
 		return;
 	}

@@ -556,7 +556,7 @@ static void display_profiling(discrete_info *info)
 		node_description *node = (node_description *) entry->ptr;
 
 		if (node->run_time > tresh)
-			printf("%3d: %20s %8.2f %10.2f\n", NODE_INDEX(node->node), node->module->name, (float) node->run_time / (float) total * 100.0, ((float) node->run_time) / (float) info->total_samples);
+			printf("%3d: %20s %8.2f %10.2f\n", NODE_BLOCKINDEX(node), node->module->name, (float) node->run_time / (float) total * 100.0, ((float) node->run_time) / (float) info->total_samples);
 	}
 
 	/* Task information */
@@ -782,7 +782,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* static inits */
 		node->context = NULL;
 		node->info = info;
-		node->node = block->node;
+		//node->node = block->node;
 		node->module = &module_list[modulenum];
 		node->output[0] = 0.0;
 		node->block = block;
@@ -900,8 +900,8 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		}
 
 		/* and register save state */
-		if (node->node != NODE_SPECIAL)
-			state_save_register_device_item_array(device, node->node, node->output);
+		if (node->block->node != NODE_SPECIAL)
+			state_save_register_device_item_array(device, node->block->node, node->output);
 	}
 
 	/* if no outputs, give an error */
@@ -937,10 +937,10 @@ static void find_input_nodes(discrete_info *info)
 			{
 				node_description *node_ref = info->indexed_node[NODE_INDEX(inputnode)];
 				if (!node_ref)
-					fatalerror("discrete_start - NODE_%02d referenced a non existent node NODE_%02d", NODE_INDEX(node->node), NODE_INDEX(inputnode));
+					fatalerror("discrete_start - NODE_%02d referenced a non existent node NODE_%02d", NODE_BLOCKINDEX(node), NODE_INDEX(inputnode));
 
 				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module->num_output)
-					fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
+					fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_BLOCKINDEX(node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
 				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
 				node->input_is_node |= 1 << inputnum;			/* Bit flag if input is node */
@@ -950,9 +950,9 @@ static void find_input_nodes(discrete_info *info)
 				/* warn if trying to use a node for an input that can only be static */
 				if IS_VALUE_A_NODE(block->initial[inputnum])
 				{
-					discrete_log(info, "Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_INDEX(node->node), inputnum);
+					discrete_log(info, "Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_BLOCKINDEX(node), inputnum);
 					/* also report it in the error log so it is not missed */
-					logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_INDEX(node->node), inputnum);
+					logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_BLOCKINDEX(node), inputnum);
 				}
 			}
 		}

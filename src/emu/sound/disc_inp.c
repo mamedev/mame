@@ -183,7 +183,7 @@ static DISCRETE_RESET(dss_adjustment)
 	{
 		context->port = input_port_by_tag(node->info->device->machine->portconfig, (const char *)node->custom);
 		if (context->port == NULL)
-			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
+			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
 	}
 	else
 		context->port = input_port_by_index(node->info->device->machine->portconfig, DSS_ADJUSTMENT__PORT);

@@ -500,7 +500,7 @@ static DISCRETE_RESET(dss_lfsr)
 	context->out_lfsr_reg = (lfsr_desc->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((lfsr_desc->clock_type < DISC_CLK_ON_F_EDGE) || (lfsr_desc->clock_type > DISC_CLK_IS_FREQ))
-		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", NODE_INDEX(node->node));
+		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", NODE_BLOCKINDEX(node));
 
 	context->last = (DSS_COUNTER__CLOCK != 0);
 	if (lfsr_desc->clock_type == DISC_CLK_IS_FREQ) context->t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
@@ -1569,7 +1569,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			vG2 = dss_inverter_tf(node,vG3);
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
 	}
 	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
 	{
@@ -1628,7 +1628,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			diff = diff - diff * exp(-node->info->sample_time/(context->c * rMix));
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
 	}
 	context->v_cap   += diff;
 	context->v_g2_old = vG2;

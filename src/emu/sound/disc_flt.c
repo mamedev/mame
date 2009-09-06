@@ -786,17 +786,17 @@ static DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  context->type == 1))
 	{
-		discrete_log(node->info, "Invalid component values in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid component values in NODE_%d.\n", NODE_BLOCKINDEX(node));
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		discrete_log(node->info, "vP must be >= 3V in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "vP must be >= 3V in NODE_%d.\n", NODE_BLOCKINDEX(node));
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		discrete_log(node->info, "Invalid circuit type in NODE_%d.\n", node->node - NODE_00);
+		discrete_log(node->info, "Invalid circuit type in NODE_%d.\n", NODE_BLOCKINDEX(node));
 		return;
 	}
 

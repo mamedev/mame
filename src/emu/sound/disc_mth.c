@@ -491,7 +491,7 @@ static DISCRETE_STEP(dst_divide)
 		if(DST_DIVIDE__DIV == 0)
 		{
 			node->output[0 ]= DBL_MAX;	/* Max out but don't break */
-			discrete_log(node->info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_INDEX(node->node));
+			discrete_log(node->info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_BLOCKINDEX(node));
 		}
 		else
 		{
@@ -1354,7 +1354,7 @@ static DISCRETE_STEP(dst_multiplex)
 		else
 		{
 			/* Bad address.  We will leave the output alone. */
-			discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", node->node-NODE_00, addr);
+			discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
 		}
 	}
 	else

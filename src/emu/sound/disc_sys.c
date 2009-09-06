@@ -66,17 +66,17 @@ static DISCRETE_START( dso_task )
 						int i;
 						found = 0;
 						for (i = 0; i < task->numbuffered; i++)
-							if (task->nodes[i] == inputnode)
+							if (task->nodes[i]->block->node == inputnode)
 								found = 1;
 						if (!found)
 						{
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							discrete_log(node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_INDEX(snode->node));
+							discrete_log(node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_BLOCKINDEX(snode));
 							task->node_buf[task->numbuffered] = auto_alloc_array(node->info->device->machine, double, 2048);
 							task->dest[task->numbuffered] = (double **) &snode->input[inputnum];
-							task->nodes[task->numbuffered] = inputnode;
+							task->nodes[task->numbuffered] = discrete_find_node(node->info, inputnode);
 							task->numbuffered++;
 						}
 					}

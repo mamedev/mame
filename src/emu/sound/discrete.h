@@ -3638,7 +3638,6 @@ struct _discrete_module
 
 struct _node_description
 {
-	int				node;								/* The node's index number in the node list */
 	double			output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
 	int				active_inputs;						/* Number of active inputs on this node type */
@@ -3678,11 +3677,11 @@ struct _discrete_task_context
 {
 	linked_list_entry *list;
 
-	int 		numbuffered;
-	double 		*ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	double 		*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	int			nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 		**dest[DISCRETE_MAX_TASK_OUTPUTS];
+	int 				numbuffered;
+	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				**dest[DISCRETE_MAX_TASK_OUTPUTS];
 		
 };
 
@@ -4079,6 +4078,8 @@ enum {
 #else
 #error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
+
+#define NODE_BLOCKINDEX(_node)	NODE_INDEX((_node)->block->node)
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
 
