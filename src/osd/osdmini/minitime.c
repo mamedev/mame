@@ -34,10 +34,10 @@ osd_ticks_t osd_ticks_per_second(void)
 
 
 //============================================================
-//  osd_profiling_ticks
+//  get_profile_ticks
 //============================================================
 
-osd_ticks_t osd_profiling_ticks(void)
+osd_ticks_t get_profile_ticks(void)
 {
 	// on x86 platforms, we should return the value of RDTSC here
 	// generically, we fall back to clock(), which hopefully is

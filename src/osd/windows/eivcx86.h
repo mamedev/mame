@@ -460,4 +460,45 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 }
 #endif
 
+
+
+/***************************************************************************
+    INLINE TIMING FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_profile_ticks - return a tick counter
+    from the processor that can be used for
+    profiling. It does not need to run at any
+    particular rate.
+-------------------------------------------------*/
+
+#define get_profile_ticks _get_profile_ticks
+
+#ifdef PTR64
+
+INLINE osd_ticks_t _get_profile_ticks(void)
+{
+	return __rdtsc();
+}
+
+#else
+
+INLINE osd_ticks_t _get_profile_ticks(void)
+{
+	INT64 result;
+	INT64 *presult = &result;
+
+	__asm {
+		__asm _emit 0Fh __asm _emit 031h	// rdtsc
+		mov ebx, presult
+		mov [ebx],eax
+		mov [ebx+4],edx
+	}
+
+	return result;
+}
+
+#endif
+
 #endif /* __EIVCX86__ */

@@ -421,7 +421,7 @@ void poly_wait(poly_manager *poly, const char *debug_reason)
 
 	/* remember the start time if we're logging */
 	if (LOG_WAITS)
-		time = osd_profiling_ticks();
+		time = get_profile_ticks();
 
 	/* wait for all pending work items to complete */
 	if (poly->queue != NULL)
@@ -438,7 +438,7 @@ void poly_wait(poly_manager *poly, const char *debug_reason)
 	/* log any long waits */
 	if (LOG_WAITS)
 	{
-		time = osd_profiling_ticks() - time;
+		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)
 			logerror("Poly:Waited %d cycles for %s\n", (int)time, debug_reason);
 	}

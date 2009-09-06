@@ -48,7 +48,7 @@ profiler_state global_profiler;
 void _profiler_mark_start(int type)
 {
 	profiler_data *data = &global_profiler.data[global_profiler.dataindex];
-	osd_ticks_t curticks = osd_profiling_ticks();
+	osd_ticks_t curticks = get_profile_ticks();
 	profiler_filo_entry *entry;
 	int index;
 
@@ -85,7 +85,7 @@ void _profiler_mark_start(int type)
 void _profiler_mark_end(void)
 {
 	profiler_data *data = &global_profiler.data[global_profiler.dataindex];
-	osd_ticks_t curticks = osd_profiling_ticks();
+	osd_ticks_t curticks = get_profile_ticks();
 
 	/* we're ending an existing bucket, update the time */
 	if (global_profiler.filoindex > 0)

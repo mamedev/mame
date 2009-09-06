@@ -77,56 +77,6 @@ osd_ticks_t osd_ticks_per_second(void)
 
 
 //============================================================
-//  osd_profiling_ticks
-//============================================================
-
-#ifdef _MSC_VER
-
-#ifdef PTR64
-
-osd_ticks_t osd_profiling_ticks(void)
-{
-	return __rdtsc();
-}
-
-#else
-
-osd_ticks_t osd_profiling_ticks(void)
-{
-	INT64 result;
-	INT64 *presult = &result;
-
-	__asm {
-		__asm _emit 0Fh __asm _emit 031h	// rdtsc
-		mov ebx, presult
-		mov [ebx],eax
-		mov [ebx+4],edx
-	}
-
-	return result;
-}
-
-#endif
-
-#else
-
-osd_ticks_t osd_profiling_ticks(void)
-{
-	INT64 result;
-
-	// use RDTSC
-	__asm__ __volatile__ (
-		"rdtsc"
-		: "=A" (result)
-	);
-
-	return result;
-}
-
-#endif
-
-
-//============================================================
 //  osd_sleep
 //============================================================
 

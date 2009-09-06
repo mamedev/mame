@@ -1648,12 +1648,12 @@ int mame_validitychecks(const game_driver *curdriver)
 
 	init_resource_tracking();
 	begin_resource_tracking();
-	osd_profiling_ticks();
+	get_profile_ticks();
 
 	/* prepare by pre-scanning all the drivers and adding their info to hash tables */
-	prep -= osd_profiling_ticks();
+	prep -= get_profile_ticks();
 	quark_tables_create(&tables);
-	prep += osd_profiling_ticks();
+	prep += get_profile_ticks();
 
 	/* iterate over all drivers */
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
@@ -1670,49 +1670,49 @@ int mame_validitychecks(const game_driver *curdriver)
 		memset(&rgninfo, 0, sizeof(rgninfo));
 
 		/* expand the machine driver */
-		expansion -= osd_profiling_ticks();
+		expansion -= get_profile_ticks();
 		config = machine_config_alloc(driver->machine_config);
-		expansion += osd_profiling_ticks();
+		expansion += get_profile_ticks();
 
 		/* validate the driver entry */
-		driver_checks -= osd_profiling_ticks();
+		driver_checks -= get_profile_ticks();
 		error = validate_driver(drivnum, config, &tables) || error;
-		driver_checks += osd_profiling_ticks();
+		driver_checks += get_profile_ticks();
 
 		/* validate the ROM information */
-		rom_checks -= osd_profiling_ticks();
+		rom_checks -= get_profile_ticks();
 		error = validate_roms(drivnum, config, &rgninfo) || error;
-		rom_checks += osd_profiling_ticks();
+		rom_checks += get_profile_ticks();
 
 		/* validate input ports */
-		input_checks -= osd_profiling_ticks();
+		input_checks -= get_profile_ticks();
 		error = validate_inputs(drivnum, config, tables.defstr, &portlist) || error;
-		input_checks += osd_profiling_ticks();
+		input_checks += get_profile_ticks();
 
 		/* validate the CPU information */
-		cpu_checks -= osd_profiling_ticks();
+		cpu_checks -= get_profile_ticks();
 		error = validate_cpu(drivnum, config) || error;
-		cpu_checks += osd_profiling_ticks();
+		cpu_checks += get_profile_ticks();
 
 		/* validate the display */
-		display_checks -= osd_profiling_ticks();
+		display_checks -= get_profile_ticks();
 		error = validate_display(drivnum, config) || error;
-		display_checks += osd_profiling_ticks();
+		display_checks += get_profile_ticks();
 
 		/* validate the graphics decoding */
-		gfx_checks -= osd_profiling_ticks();
+		gfx_checks -= get_profile_ticks();
 		error = validate_gfx(drivnum, config, &rgninfo) || error;
-		gfx_checks += osd_profiling_ticks();
+		gfx_checks += get_profile_ticks();
 
 		/* validate sounds and speakers */
-		sound_checks -= osd_profiling_ticks();
+		sound_checks -= get_profile_ticks();
 		error = validate_sound(drivnum, config) || error;
-		sound_checks += osd_profiling_ticks();
+		sound_checks += get_profile_ticks();
 
 		/* validate devices */
-		device_checks -= osd_profiling_ticks();
+		device_checks -= get_profile_ticks();
 		error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
-		device_checks += osd_profiling_ticks();
+		device_checks += get_profile_ticks();
 
 		for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo.entries); rgnnum++)
 			if (rgninfo.entries[rgnnum].tag != NULL)
@@ -1723,10 +1723,10 @@ int mame_validitychecks(const game_driver *curdriver)
 	}
 
 #ifdef MESS
-	mess_checks -= osd_profiling_ticks();
+	mess_checks -= get_profile_ticks();
 	if (mess_validitychecks())
 		error = TRUE;
-	mess_checks += osd_profiling_ticks();
+	mess_checks += get_profile_ticks();
 #endif /* MESS */
 
 #if (REPORT_TIMES)

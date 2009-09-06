@@ -44,8 +44,8 @@
 
 #if KEEP_STATISTICS
 #define add_to_stat(v,x)		do { interlocked_add((v), (x)); } while (0)
-#define begin_timing(v)			do { (v) -= osd_profiling_ticks(); } while (0)
-#define end_timing(v)			do { (v) += osd_profiling_ticks(); } while (0)
+#define begin_timing(v)			do { (v) -= get_profile_ticks(); } while (0)
+#define end_timing(v)			do { (v) += get_profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)		do { } while (0)
 #define begin_timing(v)			do { } while (0)

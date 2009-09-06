@@ -293,7 +293,7 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 
 	if (DISCRETE_PROFILING)
 	{
-		osd_ticks_t last = osd_profiling_ticks();
+		osd_ticks_t last = get_profile_ticks();
 		
 		for (entry = list; entry != NULL; entry = entry->next)
 		{
@@ -301,7 +301,7 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 	
 			node->run_time -= last;
 			(*node->module->step)(node);
-			last = osd_profiling_ticks();
+			last = get_profile_ticks();
 			node->run_time += last;
 		}
 	}

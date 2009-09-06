@@ -430,4 +430,24 @@ INLINE INT32 atomic_decrement32(INT32 volatile *ptr)
 }
 #endif
 
+
+
+/***************************************************************************
+    INLINE TIMING FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_profile_ticks - return a tick counter
+    from the processor that can be used for
+    profiling. It does not need to run at any
+    particular rate.
+-------------------------------------------------*/
+
+#ifndef get_profile_ticks
+INLINE INT64 get_profile_ticks(void)
+{
+	return osd_ticks();
+}
+#endif
+
 #endif /* __EMINLINE__ */

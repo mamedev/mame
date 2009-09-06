@@ -644,4 +644,28 @@ _atomic_decrement32(INT32 volatile *ptr)
 	return result - 1;
 }
 
+
+
+/***************************************************************************
+    INLINE TIMING FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_profile_ticks - return a tick counter
+    from the processor that can be used for
+    profiling. It does not need to run at any
+    particular rate.
+-------------------------------------------------*/
+
+#define get_profile_ticks _get_profile_ticks
+INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
+{
+    UINT64 result;
+    __asm__ __volatile__ (
+            "rdtsc"
+            : "=A" (result)
+    );
+    return (INT64) (result & U64(0x7fffffffffffffff));
+}
+
 #endif /* __EIGCCX86__ */
