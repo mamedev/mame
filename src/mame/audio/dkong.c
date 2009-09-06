@@ -384,7 +384,7 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	DISCRETE_RCINTEGRATE(NODE_22,NODE_20,DK_R5, RES_2_PARALLEL(DK_R4+DK_R3,DK_R6),0,DK_C19,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0,1,NODE_22,DK_R3/R_SERIES(DK_R3,DK_R4))
-	DISCRETE_TASK_END(DS_OUT_SOUND0)
+	DISCRETE_TASK_END()
 
 	/************************************************/
 	/* Jump                                         */
@@ -418,7 +418,7 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	DISCRETE_RCINTEGRATE(NODE_39,NODE_38,DK_R27, RES_2_PARALLEL(DK_R28,DK_R26+DK_R25),0,DK_C16,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1,1,NODE_39,DK_R25/(DK_R26+DK_R25))
-	DISCRETE_TASK_END(DS_OUT_SOUND1)
+	DISCRETE_TASK_END()
 
 	/************************************************/
 	/* Walk                                         */
@@ -444,7 +444,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/* Filter and divide - omitted C22 */
 	DISCRETE_CRFILTER(NODE_61, 1, NODE_60, DK_R15+DK_R16, DK_C23)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND2, 1, NODE_61, DK_R15/(DK_R15+DK_R16))
-	DISCRETE_TASK_END(DS_OUT_SOUND2)
+	DISCRETE_TASK_END()
 
 	/************************************************/
 	/* DAC                                          */
@@ -474,7 +474,7 @@ static DISCRETE_SOUND_START(dkong2b)
 #else
 	DISCRETE_MULTIPLY(DS_OUT_DAC, 1, NODE_73, DS_ADJ_DAC)
 #endif
-	DISCRETE_TASK_END(DS_OUT_DAC)
+	DISCRETE_TASK_END()
 
 	/************************************************/
 	/* Amplifier                                    */
@@ -493,6 +493,9 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
 #else
 	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3.41)
+	/* Test */
+	//DISCRETE_CSVLOG2(NODE_296, NODE_288)
+	//DISCRETE_WAVELOG1(NODE_296, 32767.0/5.0 * 3.41)
 #endif
 
 DISCRETE_SOUND_END

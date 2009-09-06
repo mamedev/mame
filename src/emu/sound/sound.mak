@@ -78,6 +78,7 @@ endif
 $(SOUNDOBJ)/discrete.o:	$(SOUNDSRC)/discrete.c \
 						$(SOUNDSRC)/discrete.h \
 						$(SOUNDSRC)/disc_dev.c \
+						$(SOUNDSRC)/disc_sys.c \
 						$(SOUNDSRC)/disc_flt.c \
 						$(SOUNDSRC)/disc_inp.c \
 						$(SOUNDSRC)/disc_mth.c \

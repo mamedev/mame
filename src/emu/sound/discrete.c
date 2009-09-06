@@ -180,7 +180,7 @@ static const discrete_module module_list[] =
 
 	/* parallel modules */
 	{ DSO_TASK_START  ,"DSO_TASK_START"  , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
-	{ DSO_TASK_END    ,"DSO_TASK_END"    , 0 ,0                                      ,dso_task_reset        ,dso_task_step        ,NULL                  ,NULL                 },
+	{ DSO_TASK_END    ,"DSO_TASK_END"    , 0 ,0                                      ,dso_task_reset        ,dso_task_step        ,dso_task_start        ,NULL                 },
 	{ DSO_TASK_SYNC   ,"DSO_TASK_SYNC"   , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
 
 	/* nop */
@@ -832,6 +832,9 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					if (task_node_list_ptr == NULL)
 						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
 					task = auto_alloc_clear(info->device->machine, discrete_task_context);
+#if 1
+					task->numbuffered = 0;
+#else
 					task->numbuffered = node->active_inputs;
 					{
 						int i;
@@ -841,6 +844,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 							task->dest[i] = (double **) &node->input[i];
 						}
 					}
+#endif
 					task->list = task_node_list;
 					linked_list_add(info, &task_list_ptr, task);
 					node->context = task;
@@ -904,7 +908,6 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	if (linked_list_count(info->output_list) == 0)
 		fatalerror("init_nodes() - Couldn't find an output node");
 }
-
 
 
 /*************************************

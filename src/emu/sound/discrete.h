@@ -3678,10 +3678,11 @@ struct _discrete_task_context
 {
 	linked_list_entry *list;
 
-	int numbuffered;
-	double *ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	double *node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	double **dest[DISCRETE_MAX_TASK_OUTPUTS];
+	int 		numbuffered;
+	double 		*ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	double 		*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	int			nodes[DISCRETE_MAX_TASK_OUTPUTS];
+	double 		**dest[DISCRETE_MAX_TASK_OUTPUTS];
 		
 };
 
@@ -4414,12 +4415,8 @@ enum
 
 /* parallel tasks */
 
-#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
-#define DISCRETE_TASK_END(BNODE1)                                       { NODE_SPECIAL, DSO_TASK_END , 1, { BNODE1 }, { BNODE1 }, NULL, "DISCRETE_TASK_END" },
-#define DISCRETE_TASK_END2(BNODE1,BNODE2)                               { NODE_SPECIAL, DSO_TASK_END , 2, { BNODE1,BNODE2 }, { BNODE1,BNODE2 }, NULL, "DISCRETE_TASK_END2" },
-#define DISCRETE_TASK_END3(BNODE1,BNODE2,BNODE3)                        { NODE_SPECIAL, DSO_TASK_END , 3, { BNODE1,BNODE2,BNODE3 }, { BNODE1,BNODE2,BNODE3 }, NULL, "DISCRETE_TASK_END3" },
-#define DISCRETE_TASK_END4(BNODE1,BNODE2,BNODE3,BNODE4)                 { NODE_SPECIAL, DSO_TASK_END , 4, { BNODE1,BNODE2,BNODE3,BNODE4 }, { BNODE1,BNODE2,BNODE3,BNODE4 }, NULL, "DISCRETE_TASK_END4" },
-#define DISCRETE_TASK_END5(BNODE1,BNODE2,BNODE3,BNODE4,BNODE5)          { NODE_SPECIAL, DSO_TASK_END , 5, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, { BNODE1,BNODE2,BNODE3,BNODE4,BNODE5 }, NULL, "DISCRETE_TASK_END5" },
+#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START,0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_END()                                             { NODE_SPECIAL, DSO_TASK_END , 1, { 0 }, { 0 }, NULL, "DISCRETE_TASK_END" },
 //#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */

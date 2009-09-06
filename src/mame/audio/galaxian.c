@@ -308,7 +308,7 @@ static DISCRETE_SOUND_START(galaxian)
 	    DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)		/* QA-QD 74393 */
 
     /* End of this task */
-    DISCRETE_TASK_END5(NODE_120, NODE_SUB(133,0),NODE_SUB(133,1),NODE_SUB(133,2),NODE_SUB(133,3))
+    DISCRETE_TASK_END()
     
     /* Group Hit and Fire */
 
@@ -355,7 +355,7 @@ static DISCRETE_SOUND_START(galaxian)
 		DISCRETE_RCDISC5(NODE_182, NODE_181, NODE_171, (GAL_R41), GAL_C25)
 
 	/* End of task */
-	DISCRETE_TASK_END2(NODE_157, NODE_182)
+	DISCRETE_TASK_END()
 
 	/************************************************/
 	/* FINAL MIX                                    */
