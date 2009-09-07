@@ -104,8 +104,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x01:		mnemonic("DEC"); arg_IR(B0); bytes(2);					break;
 			case 0x02:		mnemonic("ADD"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x03:		mnemonic("ADD"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x04:		mnemonic("ADD"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x05:		mnemonic("ADD"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x04:		mnemonic("ADD"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x05:		mnemonic("ADD"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x06:		mnemonic("ADD"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x07:		mnemonic("ADD"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x08:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -121,8 +121,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x11:		mnemonic("RLC"); arg_IR(B0); bytes(2);					break;
 			case 0x12:		mnemonic("ADC"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x13:		mnemonic("ADC"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x14:		mnemonic("ADC"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x15:		mnemonic("ADC"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x14:		mnemonic("ADC"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x15:		mnemonic("ADC"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x16:		mnemonic("ADC"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x17:		mnemonic("ADC"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x18:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -138,8 +138,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x21:		mnemonic("INC"); arg_IR(B0); bytes(2);					break;
 			case 0x22:		mnemonic("SUB"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x23:		mnemonic("SUB"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x24:		mnemonic("SUB"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x25:		mnemonic("SUB"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x24:		mnemonic("SUB"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x25:		mnemonic("SUB"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x26:		mnemonic("SUB"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x27:		mnemonic("SUB"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x28:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -155,8 +155,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x31:		mnemonic("SRP"); arg_IM(*oprom++);						break;
 			case 0x32:		mnemonic("SBC"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x33:		mnemonic("SBC"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x34:		mnemonic("SBC"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x35:		mnemonic("SBC"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x34:		mnemonic("SBC"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x35:		mnemonic("SBC"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x36:		mnemonic("SBC"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x37:		mnemonic("SBC"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x38:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -172,8 +172,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x41:		mnemonic("DA"); arg_IR(B0); bytes(2);					break;
 			case 0x42:		mnemonic("OR"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x43:		mnemonic("OR"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x44:		mnemonic("OR"); arg_R(B0); arg_R(B1); bytes(3);			break;
-			case 0x45:		mnemonic("OR"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x44:		mnemonic("OR"); arg_R(B1); arg_R(B0); bytes(3);			break;
+			case 0x45:		mnemonic("OR"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x46:		mnemonic("OR"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x47:		mnemonic("OR"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x48:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -189,8 +189,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x51:		mnemonic("POP"); arg_IR(B0); bytes(2);					break;
 			case 0x52:		mnemonic("AND"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x53:		mnemonic("AND"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x54:		mnemonic("AND"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x55:		mnemonic("AND"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x54:		mnemonic("AND"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x55:		mnemonic("AND"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x56:		mnemonic("AND"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x57:		mnemonic("AND"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x58:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -206,8 +206,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x61:		mnemonic("COM"); arg_IR(B0); bytes(2);					break;
 			case 0x62:		mnemonic("TCM"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x63:		mnemonic("TCM"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x64:		mnemonic("TCM"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0x65:		mnemonic("TCM"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x64:		mnemonic("TCM"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0x65:		mnemonic("TCM"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x66:		mnemonic("TCM"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x67:		mnemonic("TCM"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x68:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -223,8 +223,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0x71:		mnemonic("PUSH"); arg_IR(B0); bytes(2);					break;
 			case 0x72:		mnemonic("TM"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0x73:		mnemonic("TM"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0x74:		mnemonic("TM"); arg_R(B0); arg_R(B1); bytes(3);			break;
-			case 0x75:		mnemonic("TM"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0x74:		mnemonic("TM"); arg_R(B1); arg_R(B0); bytes(3);			break;
+			case 0x75:		mnemonic("TM"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0x76:		mnemonic("TM"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0x77:		mnemonic("TM"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0x78:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -274,8 +274,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0xa1:		mnemonic("INCW"); arg_IR(B0); bytes(2);					break;
 			case 0xa2:		mnemonic("CP"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0xa3:		mnemonic("CP"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0xa4:		mnemonic("CP"); arg_R(B0); arg_R(B1); bytes(3);			break;
-			case 0xa5:		mnemonic("CP"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0xa4:		mnemonic("CP"); arg_R(B1); arg_R(B0); bytes(3);			break;
+			case 0xa5:		mnemonic("CP"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0xa6:		mnemonic("CP"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0xa7:		mnemonic("CP"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0xa8:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -288,11 +288,11 @@ CPU_DISASSEMBLE( z8 )
 			case 0xaf:		mnemonic("RET"); step_out;								break;
 
 			case 0xb0:		mnemonic("CLR"); arg_R(B0); bytes(2);					break;
-			case 0xb1:		mnemonic("XOR"); arg_IR(B0); bytes(2);					break;
+			case 0xb1:		mnemonic("CLR"); arg_IR(B0); bytes(2);					break;
 			case 0xb2:		mnemonic("XOR"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
 			case 0xb3:		mnemonic("XOR"); arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0xb4:		mnemonic("XOR"); arg_R(B0); arg_R(B1); bytes(3);		break;
-			case 0xb5:		mnemonic("XOR"); arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0xb4:		mnemonic("XOR"); arg_R(B1); arg_R(B0); bytes(3);		break;
+			case 0xb5:		mnemonic("XOR"); arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0xb6:		mnemonic("XOR"); arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0xb7:		mnemonic("XOR"); arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0xb8:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
@@ -342,8 +342,8 @@ CPU_DISASSEMBLE( z8 )
 			case 0xe1:		mnemonic("RR"); arg_IR(B0); bytes(2);					break;
 			case 0xe2:		illegal;												break;
 			case 0xe3:		mnemonic("LD");	arg_r(B0H); arg_Ir(B0L); bytes(2);		break;
-			case 0xe4:		mnemonic("LD");	arg_R(B0); arg_R(B1); bytes(3);			break;
-			case 0xe5:		mnemonic("LD");	arg_R(B0); arg_IR(B1); bytes(3);		break;
+			case 0xe4:		mnemonic("LD");	arg_R(B1); arg_R(B0); bytes(3);			break;
+			case 0xe5:		mnemonic("LD");	arg_R(B1); arg_IR(B0); bytes(3);		break;
 			case 0xe6:		mnemonic("LD");	arg_R(B0); arg_IM(B1); bytes(3);		break;
 			case 0xe7:		mnemonic("LD");	arg_IR(B0); arg_IM(B1); bytes(3);		break;
 			case 0xe8:		mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);		break;
