@@ -2748,7 +2748,7 @@ static void sharcop_idle(SHARC_REGS *cpustate)
 static void sharcop_unimplemented(SHARC_REGS *cpustate)
 {
 	char dasm[1000];
-	CPU_DISASSEMBLE_NAME(sharc)(NULL, dasm, cpustate->pc, NULL, NULL);
+	CPU_DISASSEMBLE_NAME(sharc)(NULL, dasm, cpustate->pc, NULL, NULL, 0);
 	mame_printf_debug("SHARC: %08X: %s\n", cpustate->pc, dasm);
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X", (UINT16)(cpustate->opcode >> 32), (UINT32)(cpustate->opcode), cpustate->pc);
 }

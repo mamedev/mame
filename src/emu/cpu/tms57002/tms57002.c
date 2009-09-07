@@ -1104,7 +1104,7 @@ static void tms57002_decode_error(tms57002_t *s, UINT32 opcode)
 	opr[1] = opcode >> 8;
 	opr[2] = opcode >> 16;
 
-	CPU_DISASSEMBLE_NAME(tms57002)(0, buf, s->pc, opr, opr);
+	CPU_DISASSEMBLE_NAME(tms57002)(0, buf, s->pc, opr, opr, 0);
 	popmessage("tms57002: %s - Contact Mamedev", buf);
 }
 

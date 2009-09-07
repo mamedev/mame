@@ -582,7 +582,7 @@ CPU_GET_INFO( mc68hc11 )
 		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(hc11);					break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hc11);			break;
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = hc11_disasm;		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hc11);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

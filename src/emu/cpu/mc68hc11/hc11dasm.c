@@ -1283,7 +1283,7 @@ static UINT32 decode_opcode(UINT32 pc, const M68HC11_OPCODE *op_table)
 	return flags;
 }
 
-offs_t hc11_disasm(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( hc11 )
 {
 	UINT32 flags = 0;
 	UINT8 opcode;
