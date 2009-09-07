@@ -399,6 +399,7 @@ enum
 	INPUT_TOKEN_KEYDELTA,
 	INPUT_TOKEN_CENTERDELTA,
 	INPUT_TOKEN_CROSSHAIR,
+	INPUT_TOKEN_CROSSHAIR_MAPPER,
 	INPUT_TOKEN_FULL_TURN_COUNT,
 	INPUT_TOKEN_POSITIONS,
 	INPUT_TOKEN_WRAPS,
@@ -569,6 +570,9 @@ typedef UINT32 (*input_field_custom_func)(const input_field_config *field, void 
 /* input port changed callback function */
 typedef void (*input_field_changed_func)(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval);
 
+/* crosshair mapping function */
+typedef float (*input_field_crossmap_func)(const input_field_config *field, float linear_value);
+
 
 /* this type is used to encode input port definitions */
 typedef union _input_port_token input_port_token;
@@ -578,6 +582,7 @@ union _input_port_token
 	const input_port_token *	tokenptr;
 	input_field_custom_func 	customptr;
 	input_field_changed_func 	changedptr;
+	input_field_crossmap_func 	crossmapptr;
 };
 
 
@@ -647,6 +652,7 @@ struct _input_field_config
 	float						crossscale;		/* crosshair scale */
 	float						crossoffset;	/* crosshair offset */
 	float						crossaltaxis;	/* crosshair alternate axis value */
+	input_field_crossmap_func 	crossmapper;	/* crosshair mapping function */
 	UINT16						full_turn_count;/* number of optical counts for 1 full turn of the original control */
 	const input_port_value *	remap_table;	/* pointer to an array that remaps the port value */
 
@@ -725,6 +731,9 @@ struct _inp_header
 
 /* macro for port changed callback functions (PORT_CHANGED) */
 #define INPUT_CHANGED(name)	void name(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval)
+
+/* macro for port changed callback functions (PORT_CROSSHAIR_MAPPER) */
+#define CROSSHAIR_MAPPER(name)	float name(const input_field_config *field, float linear_value)
 
 /* macro for wrapping a default string */
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
@@ -847,6 +856,10 @@ struct _inp_header
 #define PORT_CROSSHAIR(axis, scale, offset, altaxis) \
 	TOKEN_UINT32_PACK3(INPUT_TOKEN_CROSSHAIR, 8, CROSSHAIR_AXIS_##axis, 4, (INT32)((altaxis) * 65536.0f), 20), \
 	TOKEN_UINT64_PACK2((INT32)((scale) * 65536.0f), 32, (INT32)((offset) * 65536.0f), 32),
+
+#define PORT_CROSSHAIR_MAPPER(_callback) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_CROSSHAIR_MAPPER, 8), \
+	TOKEN_PTR(crossmapptr, _callback),
 
 /* how many optical counts for 1 full turn of the control */
 #define PORT_FULL_TURN_COUNT(_count) \

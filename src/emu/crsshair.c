@@ -332,9 +332,13 @@ void crosshair_set_user_settings(running_machine *machine, UINT8 player, crossha
 static void animate(const device_config *device, void *param, int vblank_state)
 {
 	int player;
+	
+	/* only animate once per frame, when vblank_state is 1 */
+	if (!vblank_state)
+		return;
 
 	/* increment animation counter */
-	global.animation_counter += 0x04;
+	global.animation_counter += 0x08;
 
 	/* compute a fade factor from the current animation value */
 	if (global.animation_counter < 0x80)
@@ -362,11 +366,10 @@ static void animate(const device_config *device, void *param, int vblank_state)
 			else
 			{
 				/* see if the player has been motionless for time specified */
-				/* note that the animate() routine is called twice per frame */
 				/* slightly confusing formula, but the effect is: */
 				/* auto_time = 0 makes the crosshair barely visible while moved */
 				/* every increment in auto_time is about .2s at 60Hz */
-				if (global.time[player] > global.auto_time * 24 + 4)
+				if (global.time[player] > global.auto_time * 12 + 2)
 					/* time exceeded so turn crosshair invisible */
 					global.visible[player] = FALSE;
 

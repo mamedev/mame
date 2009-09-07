@@ -1320,6 +1320,10 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 					else
 						value *= field->crossscale;
 					value += field->crossoffset;
+					
+					/* apply custom mapping if necessary */
+					if (field->crossmapper != NULL)
+						value = (*field->crossmapper)(field, value);
 
 					/* handle X axis */
 					if (field->crossaxis == CROSSHAIR_AXIS_X)
@@ -2711,6 +2715,17 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				curfield->crossaltaxis *= 1.0f / 65536.0f;
 				curfield->crossscale *= 1.0f / 65536.0f;
 				curfield->crossoffset *= 1.0f / 65536.0f;
+				break;
+
+			/* crosshair mapper callback */
+			case INPUT_TOKEN_CROSSHAIR_MAPPER:
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_CROSSHAIR_MAPPER encountered with no active field\n");
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
+				curfield->crossmapper = TOKEN_GET_PTR(ipt, crossmapptr);
 				break;
 
 			/* analog decrement sequence */
