@@ -361,6 +361,25 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	}
 }
 
+/*-------------------------------------------------
+    cia_get_timer - get the count
+    for a given CIA timer
+-------------------------------------------------*/
+
+static UINT16 cia_get_timer(cia_timer *timer)
+{
+	UINT16 count;
+
+	if (is_timer_active(timer->timer))
+	{
+		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock));
+		count = timer->count - MIN(timer->count, current_count);
+	}
+	else
+		count = timer->count;
+
+	return count;
+}
 
 /*-------------------------------------------------
     cia_timer_bump
@@ -684,16 +703,14 @@ READ8_DEVICE_HANDLER( cia_r )
 		case CIA_TALO:
 		case CIA_TBLO:
 			timer = &cia->timer[(offset >> 1) & 1];
-			cia_timer_update(timer, -1);
-			data = timer->count >> 0;
+			data = cia_get_timer(timer) >> 0;
 			break;
 
 		/* timer A/B high byte */
 		case CIA_TAHI:
 		case CIA_TBHI:
 			timer = &cia->timer[(offset >> 1) & 1];
-			cia_timer_update(timer, -1);
-			data = timer->count >> 8;
+			data = cia_get_timer(timer) >> 8;
 			break;
 
 		/* TOD counter */
@@ -745,6 +762,7 @@ READ8_DEVICE_HANDLER( cia_r )
 			data = timer->mode;
 			break;
 	}
+
 	return data;
 }
 
