@@ -183,13 +183,13 @@
 
    HOLD buttons              = red.
    BET, DEAL, HI & LO        = yellow.
-   HALF GAMBLE & CHANGE CARD = orange. 
+   HALF GAMBLE & CHANGE CARD = orange.
 
 
   * The alternate one (12 button-lamps) for systems with CANCEL button.
 
   .-------------------------------------------------------------.
-  | .------. .------. .------. .------. .------.   .----------. | 
+  | .------. .------. .------. .------. .------.   .----------. |
   | | HOLD | | HOLD | | HOLD | | HOLD | | HOLD |   |   HIGH   | |
   | '------' '------' '------' '------' '------'   '----------' |
   | .------. .------. .------. .------. .------.   .----------. |
@@ -391,8 +391,8 @@
 
 
   - norautjp:
-  
-	At the first start-up, the game will give you a very clever
+
+    At the first start-up, the game will give you a very clever
     "FU" screen. Press the following buttons *together* on different times
     to get rid of it (and actually initialize the machine):
 
@@ -687,7 +687,7 @@ static READ8_DEVICE_HANDLER( ppi2_portc_r )
 	UINT8 ppi2_pcmix = 0;
 	UINT8 hndshk = 0x80;	/* simulating the handshake lines (bits 3-7) */
 	ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
-//	popmessage("portc read: %02x", ppi2_pcmix);
+//  popmessage("portc read: %02x", ppi2_pcmix);
 
 	return ppi2_pcmix;
 }
@@ -695,7 +695,7 @@ static READ8_DEVICE_HANDLER( ppi2_portc_r )
 static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
 {
 	/* PC0-PC2 don't seems to be connected to any output */
-//	popmessage("portc write: %02x", data);
+//  popmessage("portc write: %02x", data);
 }
 
 static READ8_DEVICE_HANDLER( vram_data_r )
@@ -753,9 +753,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-//	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-//	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1008,7 +1008,7 @@ static const ppi8255_interface ppi8255_intf[3] =
 		DEVCB_HANDLER(soundlamps_w)		/* Port C write */
 	},
 	{	/* (c0-c3) Group A Mode 2 (5-handshacked bidirectional port)
-			       Group B Mode 0, output;  (see below for lines PC0-PC2) */
+                   Group B Mode 0, output;  (see below for lines PC0-PC2) */
 		DEVCB_HANDLER(vram_data_r),		/* Port A read */
 		DEVCB_NULL,						/* Port B read */
 		DEVCB_HANDLER(ppi2_portc_r),	/* Port C read */
@@ -1017,9 +1017,9 @@ static const ppi8255_interface ppi8255_intf[3] =
 		DEVCB_HANDLER(ppi2_portc_w)		/* Port C write */
 	}
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
-		It means that port A should be bidirectional and port B just as output.
-		Port C as hshk regs, and P0-P2 as output (noraut11) or input (noraut12).
-	*/
+        It means that port A should be bidirectional and port B just as output.
+        Port C as hshk regs, and P0-P2 as output (noraut11) or input (noraut12).
+    */
 };
 
 
@@ -1305,9 +1305,9 @@ static DRIVER_INIT( norautpn )
 
 static DRIVER_INIT( gtipoker )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0cc6] = 0x00;
-//	ROM[0x0cc7] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0cc6] = 0x00;
+//  ROM[0x0cc7] = 0x00;
 }
 
 

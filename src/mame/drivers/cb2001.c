@@ -188,14 +188,14 @@ static PALETTE_INIT(cb2001)
 
 		UINT8*proms = memory_region(machine, "proms");
 		UINT16 dat;
-		
+
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
-			
-		
+
+
 		b = ((dat >> 1) & 0x1f)<<3;
 		r = ((dat >> 6 )& 0x1f)<<3;
 		g = ((dat >> 11 ) & 0x1f)<<3;
-		
+
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
@@ -210,9 +210,9 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_GFXDECODE(cb2001)
-	
+
 	MDRV_PALETTE_INIT( cb2001 )
-	
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

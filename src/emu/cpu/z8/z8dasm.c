@@ -9,27 +9,27 @@
 static const char* REGISTER_NAME[256] =
 {
 	"P0", "P1", "P2", "P3", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 	"SIO", "TMR", "T1", "PRE1", "T0", "PRE0", "P2M", "P3M", "P01M", "IPR", "IRQ", "IMR", "FLAGS", "RP", "SPH", "SPL"
 };
 
 static const char* CONDITION_CODE[16] =
 {
-	"F", "LT", "LE", "ULE", "OV", "MI", "Z", "C", 
-	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC" 
+	"F", "LT", "LE", "ULE", "OV", "MI", "Z", "C",
+	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
 };
 
 /***************************************************************************
@@ -90,7 +90,7 @@ CPU_DISASSEMBLE( z8 )
 
 	switch (pc)
 	{
-	case 0x0000: 
+	case 0x0000:
 	case 0x0002:
 	case 0x0004:
 	case 0x0006:
@@ -235,7 +235,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0x7d:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0x7e:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0x7f:		illegal; /* mnemonic("HALT"); */						break;
-			
+
 			case 0x80:		mnemonic("DECW"); arg_RR(*oprom++);						break;
 			case 0x81:		mnemonic("DECW"); arg_IR(B0); bytes(2);					break;
 			case 0x82:		mnemonic("LDE"); arg_r(B0H); arg_Irr(B0L); bytes(2);	break;
@@ -252,7 +252,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0x8d:		mnemonic("JP"); arg_DA; bytes(3);						break;
 			case 0x8e:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0x8f:		mnemonic("DI");											break;
-			
+
 			case 0x90:		mnemonic("RL"); arg_R(B0); bytes(2);					break;
 			case 0x91:		mnemonic("RL"); arg_IR(B0); bytes(2);					break;
 			case 0x92:		mnemonic("LDE"); arg_r(B0L); arg_Irr(B0H); bytes(2);	break;
@@ -269,7 +269,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0x9d:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0x9e:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0x9f:		mnemonic("EI");											break;
-			
+
 			case 0xa0:		mnemonic("INCW"); arg_RR(B0); bytes(2);					break;
 			case 0xa1:		mnemonic("INCW"); arg_IR(B0); bytes(2);					break;
 			case 0xa2:		mnemonic("CP"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
@@ -286,7 +286,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0xad:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0xae:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0xaf:		mnemonic("RET"); step_out;								break;
-			
+
 			case 0xb0:		mnemonic("CLR"); arg_R(B0); bytes(2);					break;
 			case 0xb1:		mnemonic("XOR"); arg_IR(B0); bytes(2);					break;
 			case 0xb2:		mnemonic("XOR"); arg_r(B0H); arg_r(B0L); bytes(2);		break;
@@ -303,7 +303,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0xbd:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0xbe:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0xbf:		mnemonic("IRET"); step_out;								break;
-			
+
 			case 0xc0:		mnemonic("RRC"); arg_R(B0); bytes(2);					break;
 			case 0xc1:		mnemonic("RRC"); arg_IR(B0); bytes(2);					break;
 			case 0xc2:		mnemonic("LDC"); arg_r(B0H); arg_Irr(B0L); bytes(2);	break;
@@ -320,7 +320,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0xcd:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0xce:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0xcf:		mnemonic("RCF");										break;
-			
+
 			case 0xd0:		mnemonic("SRA"); arg_R(B0); bytes(2);					break;
 			case 0xd1:		mnemonic("SRA"); arg_IR(B0); bytes(2);					break;
 			case 0xd2:		mnemonic("LDC"); arg_Irr(B0L); arg_r(B0H); bytes(2);	break;
@@ -337,7 +337,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0xdd:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0xde:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0xdf:		mnemonic("SCF");										break;
-			
+
 			case 0xe0:		mnemonic("RR"); arg_R(B0); bytes(2);					break;
 			case 0xe1:		mnemonic("RR"); arg_IR(B0); bytes(2);					break;
 			case 0xe2:		illegal;												break;
@@ -354,7 +354,7 @@ CPU_DISASSEMBLE( z8 )
 			case 0xed:		mnemonic("JP"); arg_cc; arg_DA; bytes(3);				break;
 			case 0xee:		mnemonic("INC"); arg_r(OPH);							break;
 			case 0xef:		mnemonic("CCF");										break;
-			
+
 			case 0xf0:		mnemonic("SWAP"); arg_R(B0); bytes(2);					break;
 			case 0xf1:		mnemonic("SWAP"); arg_IR(B0); bytes(2);					break;
 			case 0xf2:		illegal;												break;

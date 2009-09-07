@@ -681,7 +681,7 @@ static DISCRETE_STEP(dst_rcdisc3)
 			if (diff > 0)
 			{
 				diff = diff * context->exponent0;
-			} 
+			}
 			else if (diff < -context->v_diode)
 			{
 				diff = diff * context->exponent1;
@@ -696,7 +696,7 @@ static DISCRETE_STEP(dst_rcdisc3)
 			if (diff < 0)
 			{
 				diff = diff * context->exponent0;
-			} 
+			}
 			else if (diff > -context->v_diode)
 			{
 				diff = diff * context->exponent1;
@@ -1069,7 +1069,7 @@ static DISCRETE_RESET(dst_rcfilter)
  * 74VHC4066 : 15
  * UTC4066 : 270 @ 5VCC, 80 @ 15VCC
  * CD4066BC : 270 (Fairchild)
- * 
+ *
  * The choice below makes scramble sound about "right". For future error reports,
  * we need the exact type of switch and at which voltage (5, 12?) it is operated.
  */
@@ -1134,7 +1134,7 @@ static DISCRETE_RESET(dst_rcfilter_sw)
 	for (bits=0; bits < 15; bits++)
 	{
 		double rs = 0;
-		
+
 		for (i = 0; i < 4; i++)
 		{
 			if (( bits & (1 << i)) != 0)
@@ -1144,12 +1144,12 @@ static DISCRETE_RESET(dst_rcfilter_sw)
 		context->f2[bits] = DST_RCFILTER_SW__R / (CD4066_ON_RES + rs);
 	}
 
-	
+
 	/* fast cases */
 	context->exp0 = RC_CHARGE_EXP(node, (CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
 	context->exp1 = RC_CHARGE_EXP(node, (CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
 	context->factor = RES_VOLTAGE_DIVIDER(DST_RCFILTER_SW__R, CD4066_ON_RES);
-	
+
 	node->output[0] = 0;
 }
 

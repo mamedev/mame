@@ -1083,7 +1083,7 @@ static const help_item static_help_list[] =
 		"  cheatrange <address>,<length>\n"
 		"\n"
 		"The cheatrange command adds the selected memory area to the cheat search.\n"
-		"Before using cheatrange it is necessary to initialize the cheat search with cheatinit.\n" 
+		"Before using cheatrange it is necessary to initialize the cheat search with cheatinit.\n"
 		"\n"
 		"Examples:\n"
 		"\n"

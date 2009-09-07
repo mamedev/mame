@@ -221,8 +221,8 @@ TO DO :
   - kingbalj : full Dip Switches and Inputs
   - frogg    : fix read/writes at/to unmapped/wrong memory
   - scprpng  : fix read/writes at/to unmapped/wrong memory
-  - scorpion : check whether konami filters are used 
-  - explorer : check whether konami filters are used 
+  - scorpion : check whether konami filters are used
+  - explorer : check whether konami filters are used
 
 ***************************************************************************/
 

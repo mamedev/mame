@@ -148,7 +148,7 @@ static void load_from_memory(z8_state *cpustate, const address_space *space)
 
 	UINT16 address = register_pair_read(cpustate, src);
 	UINT8 data = memory_decrypted_read_byte(cpustate->program, address);
-	
+
 	register_write(cpustate, dst, data);
 }
 
@@ -173,9 +173,9 @@ static void load_from_memory_autoinc(z8_state *cpustate, const address_space *sp
 
 	UINT16 address = register_pair_read(cpustate, src);
 	UINT8 data = memory_decrypted_read_byte(cpustate->program, address);
-	
+
 	register_write(cpustate, real_dst, data);
-	
+
 	register_write(cpustate, dst, real_dst + 1);
 	register_pair_write(cpustate, src, address + 1);
 }
@@ -191,7 +191,7 @@ static void load_to_memory_autoinc(z8_state *cpustate, const address_space *spac
 	UINT8 data = register_read(cpustate, real_src);
 
 	memory_write_byte(cpustate->program, address, data);
-	
+
 	register_pair_write(cpustate, dst, address + 1);
 	register_write(cpustate, src, real_src + 1);
 }
@@ -208,7 +208,7 @@ INSTRUCTION( ldei_Ir2_Irr1 )	{ load_to_memory_autoinc(cpustate, cpustate->data);
 static void pop(z8_state *cpustate, UINT8 dst)
 {
 	/* dst <- @SP
-	   SP <- SP + 1 */
+       SP <- SP + 1 */
 	register_write(cpustate, dst, stack_pop_byte(cpustate));
 }
 
@@ -218,7 +218,7 @@ INSTRUCTION( pop_IR1 )			{ mode_IR1(pop) }
 static void push(z8_state *cpustate, UINT8 src)
 {
 	/* SP <- SP - 1
-	   @SP <- src */
+       @SP <- src */
 	stack_push_byte(cpustate, read(src));
 }
 
@@ -495,7 +495,7 @@ INSTRUCTION( call_DA )			{ UINT16 dst = (fetch(cpustate) << 8) | fetch(cpustate)
 
 INSTRUCTION( djnz_r1_RA )
 {
-	INT8 ra = (INT8)fetch(cpustate); 
+	INT8 ra = (INT8)fetch(cpustate);
 
 	/* r <- r - 1 */
 	int r = get_working_register(cpustate, opcode >> 4);
@@ -513,13 +513,13 @@ INSTRUCTION( djnz_r1_RA )
 INSTRUCTION( iret )
 {
 	/* FLAGS <- @SP
-	   SP <- SP + 1 */
+       SP <- SP + 1 */
 	register_write(cpustate, Z8_REGISTER_FLAGS, stack_pop_byte(cpustate));
 
 	/* PC <- @SP
-	   SP <- SP + 2 */
+       SP <- SP + 2 */
 	cpustate->pc = stack_pop_word(cpustate);
-	
+
 	/* IMR (7) <- 1 */
 	cpustate->r[Z8_REGISTER_IMR] |= Z8_IMR_ENABLE;
 }
@@ -527,7 +527,7 @@ INSTRUCTION( iret )
 INSTRUCTION( ret )
 {
 	/* PC <- @SP
-	   SP <- SP + 2 */
+       SP <- SP + 2 */
 	cpustate->pc = stack_pop_word(cpustate);
 }
 
@@ -562,14 +562,14 @@ static int check_condition_code(z8_state *cpustate, int cc)
 	case CC_NZ:		truth = !flag(Z); break;
 	case CC_NC:		truth = !flag(C); break;
 	}
-	
+
 	return truth;
 }
 
 INSTRUCTION( jp_cc_DA )
 {
-	UINT16 dst = (fetch(cpustate) << 8) | fetch(cpustate); 
-	
+	UINT16 dst = (fetch(cpustate) << 8) | fetch(cpustate);
+
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(cpustate, opcode >> 4))
 	{
@@ -581,7 +581,7 @@ INSTRUCTION( jp_cc_DA )
 INSTRUCTION( jr_cc_RA )
 {
 	INT8 ra = (INT8)fetch(cpustate);
-	UINT16 dst = cpustate->pc + ra; 
+	UINT16 dst = cpustate->pc + ra;
 
 	/* if cc is true, then PC <- dst */
 	if (check_condition_code(cpustate, opcode >> 4))
@@ -599,7 +599,7 @@ static void test_complement_under_mask(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* NOT(dst) AND src */
 	UINT8 data = (register_read(cpustate, dst) ^ 0xff) & src;
-	
+
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
 	set_flag_v(0);
@@ -616,7 +616,7 @@ static void test_under_mask(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* dst AND src */
 	UINT8 data = register_read(cpustate, dst) & src;
-	
+
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
 	set_flag_v(0);
@@ -727,7 +727,7 @@ static void swap(z8_state *cpustate, UINT8 dst)
 
 	set_flag_z(data == 0);
 	set_flag_s(data & 0x80);
-//	set_flag_v(0); undefined
+//  set_flag_v(0); undefined
 }
 
 INSTRUCTION( swap_R1 )			{ mode_R1(swap) }

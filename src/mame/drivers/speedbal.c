@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( speedbal )
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
-	
+
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */

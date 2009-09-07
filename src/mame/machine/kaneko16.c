@@ -133,7 +133,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		shogwarr_calc_w(space,offset,data,mem_mask);
 		return;
 	}
-	
+
 	switch (offset)
 	{
 		// p is position, s is size
@@ -206,7 +206,7 @@ READ16_HANDLER(bloodwar_calc_r)
 	{
 		return shogwarr_calc_r(space,offset,mem_mask);
 	}
-	
+
 	x_coll = calc_compute_x();
 	y_coll = calc_compute_y();
 
@@ -263,8 +263,8 @@ READ16_HANDLER(bloodwar_calc_r)
 }
 
 /*
-	B Rap Boys  
-	Shogun Warriors
+    B Rap Boys
+    Shogun Warriors
 
 */
 
@@ -272,21 +272,21 @@ READ16_HANDLER(bloodwar_calc_r)
 static struct {
 	int x1p, y1p, z1p, x1s, y1s, z1s;
 	int x2p, y2p, z2p, x2s, y2s, z2s;
-	
+
 	int x1po, y1po, z1po, x1so, y1so, z1so;
 	int x2po, y2po, z2po, x2so, y2so, z2so;
 
 	int x12, y12, z12, x21, y21, z21;
-	
+
 	int x_coll, y_coll, z_coll;
-	
+
 	int x1tox2, y1toy2, z1toz2;
 
 	UINT16 mult_a, mult_b;
-	
+
 	UINT16 flags;
 	UINT16 mode;
-	
+
 } shogwarr_hit;
 
 
@@ -295,32 +295,32 @@ static struct {
 static int shogwarr_calc_compute(int x1, int w1, int x2, int w2)
 {
 	int dist;
-	
+
 	if(x2>=x1 && x2+w2<=(x1+w1))
 	{
 		//x2 inside x1
-		dist=w2;	
+		dist=w2;
 	}
 	else
 	{
 		if(x1>=x2 && x1+w1<=(x2+w2))
 		{
 			//x1 inside x2
-			dist=w1;	
+			dist=w1;
 		}
 		else
 		{
 			if(x2<x1)
 			{
-				//swap 
+				//swap
 				int tmp=x1;
 				x1=x2;
 				x2=tmp;
 				tmp=w1;
 				w1=w2;
 				w2=tmp;
-			}	
-			dist=x1+w1-x2;		
+			}
+			dist=x1+w1-x2;
 		}
 	}
 	return dist;
@@ -337,42 +337,42 @@ static void shogwarr_calc_org(int mode, int x0, int s0,  int* x1, int* s1)
 		case 2: *x1=x0-s0; *s1=s0; break;
 		case 3:	*x1=x0-s0; *s1=2*s0; break;
 	}
-	//x1 is the left most coord, s1 = width 
+	//x1 is the left most coord, s1 = width
 }
 
 static void shogwarr_recalc_collisions(void)
 {
 	//calculate positions and sizes
-	
+
 	int mode=shogwarr_hit.mode;
-	
+
 	shogwarr_hit.flags=0;
-	
+
 	shogwarr_calc_org(mode&3, shogwarr_hit.x1po, shogwarr_hit.x1so, &shogwarr_hit.x1p, &shogwarr_hit.x1s);
 	mode>>=2;
 	shogwarr_calc_org(mode&3, shogwarr_hit.y1po, shogwarr_hit.y1so, &shogwarr_hit.y1p, &shogwarr_hit.y1s);
 	mode>>=2;
 	shogwarr_calc_org(mode&3, shogwarr_hit.z1po, shogwarr_hit.z1so, &shogwarr_hit.z1p, &shogwarr_hit.z1s);
-	
+
 	mode>>=4;
-	
+
 	shogwarr_calc_org(mode&3, shogwarr_hit.x2po, shogwarr_hit.x2so, &shogwarr_hit.x2p, &shogwarr_hit.x2s);
 	mode>>=2;
 	shogwarr_calc_org(mode&3, shogwarr_hit.y2po, shogwarr_hit.y2so, &shogwarr_hit.y2p, &shogwarr_hit.y2s);
 	mode>>=2;
 	shogwarr_calc_org(mode&3, shogwarr_hit.z2po, shogwarr_hit.z2so, &shogwarr_hit.z2p, &shogwarr_hit.z2s);
-	
+
 
 	shogwarr_hit.x1tox2=abs(shogwarr_hit.x2po-shogwarr_hit.x1po);
 	shogwarr_hit.y1toy2=abs(shogwarr_hit.y2po-shogwarr_hit.y1po);
 	shogwarr_hit.z1toz2=abs(shogwarr_hit.z2po-shogwarr_hit.z1po);
-	
-	
+
+
 	shogwarr_hit.x_coll = shogwarr_calc_compute(shogwarr_hit.x1p, shogwarr_hit.x1s, shogwarr_hit.x2p, shogwarr_hit.x2s);
 	shogwarr_hit.y_coll = shogwarr_calc_compute(shogwarr_hit.y1p, shogwarr_hit.y1s, shogwarr_hit.y2p, shogwarr_hit.y2s);
 	shogwarr_hit.z_coll = shogwarr_calc_compute(shogwarr_hit.z1p, shogwarr_hit.z1s, shogwarr_hit.z2p, shogwarr_hit.z2s);
-	
-	
+
+
 	// 4th nibble: Y Absolute Collision -> possible values = 9,8,4,3,2
 	if      (shogwarr_hit.y1p >  shogwarr_hit.y2p)	shogwarr_hit.flags |= 0x2000;
 	else if (shogwarr_hit.y1p == shogwarr_hit.y2p)	shogwarr_hit.flags |= 0x4000;
@@ -391,7 +391,7 @@ static void shogwarr_recalc_collisions(void)
 	else if (shogwarr_hit.z1p <  shogwarr_hit.z2p)	shogwarr_hit.flags |= 0x0080;
 	if (shogwarr_hit.z_coll<0) shogwarr_hit.flags |= 0x0010;
 
-	// 1st nibble: XYZ Overlap Collision 
+	// 1st nibble: XYZ Overlap Collision
 	if ((shogwarr_hit.x_coll>=0)&&(shogwarr_hit.y_coll>=0)&&(shogwarr_hit.z_coll>=0)) shogwarr_hit.flags |= 0x0008;
 	if ((shogwarr_hit.x_coll>=0)&&(shogwarr_hit.z_coll>=0)) shogwarr_hit.flags |= 0x0004;
 	if ((shogwarr_hit.y_coll>=0)&&(shogwarr_hit.z_coll>=0)) shogwarr_hit.flags |= 0x0002;
@@ -407,66 +407,66 @@ WRITE16_HANDLER(shogwarr_calc_w)
 		// p is position, s is size
 		case 0x00:
 		case 0x28:
-					
+
 					shogwarr_hit.x1po = data; break;
-					
+
 		case 0x04:
 		case 0x2c:
 					shogwarr_hit.x1so = data; break;
-					
-		case 0x08: 
+
+		case 0x08:
 		case 0x30:
 					shogwarr_hit.y1po = data; break;
-					
-		case 0x0c: 
+
+		case 0x0c:
 		case 0x34:
 					shogwarr_hit.y1so = data; break;
 
-		case 0x10: 
+		case 0x10:
 		case 0x58:
 					shogwarr_hit.x2po = data; break;
-					
-		case 0x14: 
+
+		case 0x14:
 		case 0x5c:
 					shogwarr_hit.x2so = data; break;
-					
-		case 0x18: 
+
+		case 0x18:
 		case 0x60:
 					shogwarr_hit.y2po = data; break;
-					
-		case 0x1c: 
+
+		case 0x1c:
 		case 0x64:
 					shogwarr_hit.y2so = data; break;
-		
+
 		case 0x38:
 		case 0x50:
 					shogwarr_hit.z1po = data; break;
-		case 0x3c: 
+		case 0x3c:
 		case 0x54:
 					shogwarr_hit.z1so = data; break;
-		
-		case 0x20: 
+
+		case 0x20:
 		case 0x68:
 					shogwarr_hit.z2po = data; break;
-					
-		case 0x24: 
+
+		case 0x24:
 		case 0x6c:
 					shogwarr_hit.z2so = data; break;
-					
+
 		case 0x70:
 					shogwarr_hit.mode=data;break;
-					
+
 		default:
 			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x [ %06x] = %06x\n",cpu_get_pc(space->cpu),offset<<1, idx, data);
 	}
-	
+
 	shogwarr_recalc_collisions();
 }
 
 
 READ16_HANDLER(shogwarr_calc_r)
 {
-	
+
 	int idx=offset*4;
 
 	switch (idx)
@@ -478,11 +478,11 @@ READ16_HANDLER(shogwarr_calc_r)
 		case 0x04: // Y distance
 		case 0x14:
 			return shogwarr_hit.y_coll;
-			
+
 		case 0x18: // Z distance
 			return shogwarr_hit.z_coll;
 
-		case 0x08: 
+		case 0x08:
 		case 0x1c:
 
 			return shogwarr_hit.flags;
@@ -503,7 +503,7 @@ READ16_HANDLER(shogwarr_calc_r)
 		case 0x64: return shogwarr_hit.y2so;
 		case 0x68: return shogwarr_hit.z2po;
 		case 0x6c: return shogwarr_hit.z2so;
-		
+
 		case 0x80: return shogwarr_hit.x1tox2;
 		case 0x84: return shogwarr_hit.y1toy2;
 		case 0x88: return shogwarr_hit.z1toz2;
@@ -616,7 +616,7 @@ OFFSET 1 - a 'mode' register of some sort, usually 0,1,2 or 3 for used data, sho
 
 OFFSET 2 - unknown, might be some kind of 'step' register
          - 4 bits are 'shift' used in the decryption
-		 - the other 4 bits probably control if the odd/even bytes are inverted, and if an alt shift is applied every other byte
+         - the other 4 bits probably control if the odd/even bytes are inverted, and if an alt shift is applied every other byte
 
 OFFSET 3 - decryption key - specifies which decryption table to use (ignored for inline tables, see offset 0), key 00 is blank
 
@@ -638,11 +638,11 @@ UINT16 calc3_mcu_crc;
 
 /* decryption tables */
 
-/* this should probably be derived from the final block at the end of the MCU rom somehow ... 
+/* this should probably be derived from the final block at the end of the MCU rom somehow ...
     (see 'finalblock' debug output when verbose = 1)
    for now just putting it in a bit table, only used keys are filled in as nothing else was
    extracted when getting the tables, unknown values are filled in as -1
-   
+
    key 0 means no decryption, this could be done in logic rather than expecting the first
    part of the table to be 0
 */
@@ -1705,7 +1705,7 @@ static UINT8 shift_bits(UINT8 dat, int bits)
 	if (bits==5) return BITSWAP8(dat, 2,1,0,7,6,5,4,3);
 	if (bits==6) return BITSWAP8(dat, 1,0,7,6,5,4,3,2);
 	if (bits==7) return BITSWAP8(dat, 0,7,6,5,4,3,2,1);
-	
+
 	return dat;
 }
 
@@ -1713,7 +1713,7 @@ static UINT8 shift_bits(UINT8 dat, int bits)
 int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 
-	
+
 
 
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -1742,7 +1742,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		length = rom[offset+0] | (rom[offset+1]<<8);
 		offset+=length+2;
 	}
-	
+
 	// we're at the start of the block, get the info about it
 	{
 		UINT16 inline_table_base = 0;
@@ -1755,7 +1755,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		calc3_subtracttype = (calc3_alternateswaps &0x03);
 		calc3_alternateswaps &= 0x0c;
 		calc3_alternateswaps >>=2;
-		
+
 		calc3_decryption_key_byte = rom[offset+3];
 
 
@@ -1770,7 +1770,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 		offset+= calc3_blocksize_offset+1;
 		length = rom[offset+0] | (rom[offset+1]<<8);
 		offset+=2;
-		
+
 #if CALC3_VERBOSE_OUTPUT
 		if (inline_table_size)
 		{
@@ -1791,16 +1791,16 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				// shogwarr does this with 'mode' as 0x08, which probably has some special meaning
 				//printf("CALC3: requested 0 length table!\n");
 				// -- seems to be 'reset stack' to default for the protection table writes
-				
-				// except this will break shogun going into game, must be specific conditions for 
+
+				// except this will break shogun going into game, must be specific conditions for
 				// this, or it can remember addresses and restore those
-				
-				// hack, set it to a known address instead of trying to restore to anywhere specific.. 
+
+				// hack, set it to a known address instead of trying to restore to anywhere specific..
 				// might break at some point tho, eg if it doesn't write command 06 often enough because it trys to use another one like 07...
 				// need to understand the meaning of this (test hw?)
-				
+
 				// !dstram is used because we don't want to process these during our initial table scan, only when the game asks!
-				
+
 				if (calc3_mode==0x06)
 				{
 					calc3_writeaddress_current = 0x202000; // this is reasoanble for brapboys, not sure about shogun, needs emulating properly!
@@ -1809,7 +1809,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				else if (calc3_mode==0x07)
 				{
 					// also calls empty table with Mode? 07
-					// maybe they reset to different points?			
+					// maybe they reset to different points?
 				}
 				else if (calc3_mode==0x08 && !dstram)
 				{
@@ -1820,12 +1820,12 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						UINT8 *dat;
 
 						dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
-					
+
 						for (i=0;i<0x80;i++)
 						{
 							dat[i] = memory_read_byte(space, calc3_eeprom_addr+0x200000+i);
-						}		
-						
+						}
+
 					}
 
 				}
@@ -1833,7 +1833,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 				{
 					printf("unknown blank table command\n");
 				}
-				
+
 				return 0;
 			}
 
@@ -1842,19 +1842,19 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 			// these should be derived from the inline table somehow, probably just a +/- swap like the normal stuff.. maybe
 				UINT8 extra[]  = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a,0x72,0xba,0x48,0x76,0x66,0x4a,0x7c,0x5c,0x82,0x0a,0x86,0x82,0x02,0xe6 };
 				UINT8 extra2[] = { 0x2f,0x04,0xd1,0x69,0xad,0xeb,0x10,0x95,0xb0,0x2f,0x0a,0x83,0x7d,0x4e,0x2a,0x07,0x89,0x52,0xca,0x41,0xf1,0x4f,0xaf,0x1c,0x01,0xe9,0x89,0xd2,0xaf,0xcd };
-			
-			
+
+
 				for (i=0;i<length;i++)
 				{
-					UINT8 dat=0;					
-					
-							
+					UINT8 dat=0;
+
+
 					/* special case for Shogun Warriors table 0x40 */
 					if (calc3_subtracttype==3 && calc3_alternateswaps ==0)
 					{
 						UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 						dat = rom[offset+i];
-						
+
 						dat -= inlinet;
 
 						if (((i%inline_table_size)&1)==0)
@@ -1875,10 +1875,10 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 							}
 							else
 							{
-								
+
 								UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 								dat = rom[offset+i];
-								
+
 								if (calc3_subtracttype!=0x02)
 								{
 									dat -= inlinet;
@@ -1887,9 +1887,9 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 								else
 								{
 									dat += inlinet;
-									dat += extra[(i%inline_table_size)>>1];							
+									dat += extra[(i%inline_table_size)>>1];
 								}
-								
+
 								dat = shift_bits(dat, 8-calc3_shift);
 							}
 						}
@@ -1900,12 +1900,12 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 								UINT8 inlinet = rom[inline_table_base + (i%inline_table_size)];
 								dat = rom[offset+i];
 								dat -= inlinet;
-								dat = shift_bits(dat, calc3_shift);			
+								dat = shift_bits(dat, calc3_shift);
 							}
 							else
 							{
 								dat = rom[offset+i];
-								
+
 								if (calc3_subtracttype!=0x02)
 								{
 									dat -= extra2[(i%inline_table_size)>>1];
@@ -1916,7 +1916,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 								}
 								dat = shift_bits(dat, 8-calc3_shift);
 							}
-						}				
+						}
 					}
 
 					if(local_counter>1)
@@ -1925,7 +1925,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						{
 							memory_write_byte(space, dstoffset+i, dat);
 						}
-						
+
 						// debug, used to output tables at the start
 						if (dstram)
 						{
@@ -1934,31 +1934,31 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 					}
 					else
 						data_header[local_counter]=dat;
-					
+
 					++local_counter;
 				}
 			}
 			else
 			{
 				INT16* key = calc3_keydata+(calc3_decryption_key_byte*0x40);
-				
+
 				if (key[0] == -1)
 				{
 					fatalerror("attempting to use invalid decryption data\n");
 				}
-	
+
 				for (i=0;i<length;i++)
 				{
 					UINT8 dat = rom[offset+i];
 					UINT8 keydat = (UINT8)key[i&0x3f];
-					
-					{						
+
+					{
 						if (calc3_subtracttype==0)
 						{
 							//dat = dat;
 						}
 						else if (calc3_subtracttype==1)
-						{						
+						{
 							if ((i&1)==1) dat += keydat;
 							else dat -= keydat;
 						}
@@ -1970,8 +1970,8 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 						else if (calc3_subtracttype==3)
 						{
 							dat -= keydat;
-						}						
-						
+						}
+
 						if (calc3_alternateswaps == 0)
 						{
 							if ((i&1)==0) dat = shift_bits(dat, 8-calc3_shift);
@@ -1992,14 +1992,14 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 							else          dat = shift_bits(dat, calc3_shift);
 						}
 					}
-	
+
 					if(local_counter>1)
 					{
 						if (space)
 						{
 							memory_write_byte(space, dstoffset+i, dat);
 						}
-						
+
 						// debug, used to output tables at the start
 						if (dstram)
 						{
@@ -2008,7 +2008,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 					}
 					else
 						data_header[local_counter]=dat;
-					
+
 					++local_counter;
 
 					//dstram[(dstoffset+i)^1] = dat;
@@ -2085,7 +2085,7 @@ DRIVER_INIT(calc3_scantables)
 	// to that extra block of data
 
 	// dump out the 0x1000 sized block at the end
-#if CALC3_VERBOSE_OUTPUT	
+#if CALC3_VERBOSE_OUTPUT
 	{
 		FILE *fp;
 		char filename[256];
@@ -2117,7 +2117,7 @@ void calc3_mcu_run(running_machine *machine)
 
 	if (calc3_dsw_addr) memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
-	
+
 	//calc3_mcu_status = 0;
 
 	mcu_command = kaneko16_mcu_ram[calc3_mcu_command_offset/2 + 0];
@@ -2145,7 +2145,7 @@ void calc3_mcu_run(running_machine *machine)
 			cakc3_checkumaddress =     kaneko16_mcu_ram[(0>>1) + 5];
 			calc3_writeaddress =      (kaneko16_mcu_ram[(0>>1) + 6] << 16) |
 			                          (kaneko16_mcu_ram[(0>>1) + 7]);
-									  
+
 			// set our current write / stack pointer to the address specified
 			calc3_writeaddress_current = calc3_writeaddress;
 #if CALC3_VERBOSE_OUTPUT
@@ -2156,30 +2156,30 @@ void calc3_mcu_run(running_machine *machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  cakc3_checkumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3_writeaddress);
 #endif
-	//		memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
-			
+	//      memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+
 			kaneko16_mcu_ram[cakc3_checkumaddress / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
 
 			/*
-			for (i=0;i<0x40;i++)
-			{
-				kaneko16_mcu_ram[(calc3_eeprom_addr / 2)+i] = kaneko16_eeprom_data[i];//((eepromData[i]&0xff00)>>8) |  ((eepromData[i]&0x00ff)<<8);
-			}
-			*/
+            for (i=0;i<0x40;i++)
+            {
+                kaneko16_mcu_ram[(calc3_eeprom_addr / 2)+i] = kaneko16_eeprom_data[i];//((eepromData[i]&0xff00)>>8) |  ((eepromData[i]&0x00ff)<<8);
+            }
+            */
 
 			{
 				UINT32 length, size;
 				UINT8 *dat;
 
 				dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
-			
+
 				for (i=0;i<0x80;i++)
 				{
 					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, dat[i]);
-				}		
-				
+				}
+
 			}
-			
+
 		}
 		/* otherwise the command number is the number of transfer operations to perform */
 		else
@@ -2204,15 +2204,15 @@ void calc3_mcu_run(running_machine *machine)
 #endif
 				{
 					int length;
-					
+
 					length = calc3_decompress_table(machine, commandtabl, 0, calc3_writeaddress_current-2);
-				
+
 					if (length)
 					{
 						int write=commandaddr;
-#if CALC3_VERBOSE_OUTPUT						
+#if CALC3_VERBOSE_OUTPUT
 						printf("writing back address %08x to %08x %08x\n", calc3_writeaddress_current, commandaddr,write);
-#endif						
+#endif
 
 						memory_write_byte(space,write+0x200000, data_header[0]);
 						memory_write_byte(space,write+0x200001, data_header[1]);
@@ -2220,7 +2220,7 @@ void calc3_mcu_run(running_machine *machine)
 						write=commandaddr+(char)commandunk;
 						memory_write_word(space,write+0x200000, (calc3_writeaddress_current>>16)&0xffff);
 						memory_write_word(space,write+0x200002,  (calc3_writeaddress_current&0xffff));
-						
+
 						calc3_writeaddress_current += ((length+3)&(~1));
 					}
 

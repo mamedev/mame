@@ -206,7 +206,7 @@ Notes:
   This seems to be a genuine error on Atari's part, since they replaced it with
   136014-231 which matches Namco's PP1-27. The bad bit should cause a tiny gfx
   glitch, though it's difficult to notice.
-  
+
 - topracra: Use Service1 to start game
 
 Todo:

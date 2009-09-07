@@ -315,7 +315,7 @@ static DISCRETE_START(dss_input_stream)
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
-	
+
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */
 	context->stream_in_number = DSS_INPUT_STREAM__STREAM;
@@ -323,13 +323,13 @@ static DISCRETE_START(dss_input_stream)
 	context->offset = DSS_INPUT_STREAM__OFFSET;
 	context->ptr = NULL;
 	//context->data = 0;
-	
+
 	if (node->block->type == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
 		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);
 
-		stream_set_input(node->info->discrete_stream, context->stream_in_number, 
+		stream_set_input(node->info->discrete_stream, context->stream_in_number,
 			context->buffer_stream, 0, 1.0);
 	}
 	else

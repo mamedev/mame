@@ -3377,11 +3377,11 @@ ROM_START( shogwarr )
 	ROM_REGION( 0x300000, "samples", 0 )
 	ROM_LOAD( "fb001e.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
 	ROM_LOAD( "fb000e.u42",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
-		
+
 	/* Sound data is copied here during driver init */
 	ROM_REGION( 0x400000*16, "oki1", 0 )
 	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
-	
+
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
 	ROM_LOAD( "fb-003.u44",   0x100000, 0x100000, CRC(0aea4ac5) SHA1(8f3b30e505b0ba51c140a0a2c071680d4fa05db9) )
@@ -3436,11 +3436,11 @@ ROM_START( shogwarre )
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
-	
+
 	ROM_REGION( 0x300000, "samples", 0 )
 	ROM_LOAD( "fb001e.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
 	ROM_LOAD( "fb000e.u42",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
-	
+
 	/* Sound data is copied here during driver init */
 	ROM_REGION( 0x400000*16, "oki1", 0 )
 	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
@@ -3509,11 +3509,11 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
-	
+
 	ROM_REGION( 0x300000, "samples", 0 )
 	ROM_LOAD( "fb000j.u43",    0x000000, 0x080000, CRC(a7522555) SHA1(ea88d90dda20bc309f98a1924c41551e7708e6af) )
 	ROM_LOAD( "fb001j_u.101",  0x080000, 0x080000, CRC(07d4e8e2) SHA1(0de911f452ddeb54b0b435b9c1cf5d5881175d44) )
-	
+
 	/* Sound data is copied here during driver init */
 	ROM_REGION( 0x400000*16, "oki1", 0 )
 	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
@@ -3849,13 +3849,13 @@ static void expand_shogwarr_samples(running_machine* machine)
 static void expand_brapboys_music(running_machine* machine)
 {
 	/*
-	    Expand the OKI sample data
-		
+        Expand the OKI sample data
+
         OKI 2:
         Address space 0x00000-0x1ffff is fixed
         Address space 0x20000-0x3ffff is banked (15 banks)
-	*/
-		
+    */
+
 	int bank;
 	UINT8 *src = memory_region(machine, "samples");
 	UINT8 *dst2 = memory_region(machine, "oki2");

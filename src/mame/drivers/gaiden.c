@@ -949,45 +949,45 @@ Master Ninja
 
 CPUs
 
-QTY 	Type 				position 			function
-1x 		MC68000P10 			68000 main PCB 		main
-1x 		Z8400HB1 			ic36 main PCB 		sound
-2x 		YM2203C 			ic31,ic32 main PCB 	sound
-2x 		Y3014B 				c16,ic17 main PCB 	sound
-2x 		LM324N 				ic2,ic6 main PCB 	sound
-1x 		TDA2002 			ic1 main PCB 		sound
+QTY     Type                position            function
+1x      MC68000P10          68000 main PCB      main
+1x      Z8400HB1            ic36 main PCB       sound
+2x      YM2203C             ic31,ic32 main PCB  sound
+2x      Y3014B              c16,ic17 main PCB   sound
+2x      LM324N              ic2,ic6 main PCB    sound
+1x      TDA2002             ic1 main PCB        sound
 
 Oscillators
-1x 		oscillator 20.000 (xl2 main PCB)
-1x 		blu resonator 400K (xl1 main PCB)
+1x      oscillator 20.000 (xl2 main PCB)
+1x      blu resonator 400K (xl1 main PCB)
 
 ROMs
 
-QTY 	Type 				position 			status
-6x 		AM27C512 			1-6 main PCB 		dumped
-32x 	AM27C512 			8-39 ROMs PCB 		dumped
+QTY     Type                position            status
+6x      AM27C512            1-6 main PCB        dumped
+32x     AM27C512            8-39 ROMs PCB       dumped
 
 RAMs
 
-QTY 	Type 				position
-4x 		HY6264LP-10 		ic25,ic28,ic61,ic62 main PCB
-3x 		HY6116ALP-10 		ic33,ic123,ic124 main PCB
-1x 		HM6148P 			ic80 main PCB
-1x 		MCM2018AN45 		ic81 main PCB
-4x 		HM6148P 			ic63-66 ROMs PCB
-1x 		HY6116ALP-10 		ic85 ROMs PCB
+QTY     Type                position
+4x      HY6264LP-10         ic25,ic28,ic61,ic62 main PCB
+3x      HY6116ALP-10        ic33,ic123,ic124 main PCB
+1x      HM6148P             ic80 main PCB
+1x      MCM2018AN45         ic81 main PCB
+4x      HM6148P             ic63-66 ROMs PCB
+1x      HY6116ALP-10        ic85 ROMs PCB
 
 PLDs
 
-QTY 	Type 				position 			status
-2x 		TIBPAL16L8 			ic15,ic54 main PCB 	read protected
-1x 		GAL16L8 			ic42 ROMs PCB 		read protected
+QTY     Type                position            status
+2x      TIBPAL16L8          ic15,ic54 main PCB  read protected
+1x      GAL16L8             ic42 ROMs PCB       read protected
 
 Others
 
-1x 		JAMMA edge connector
-1x 		trimmer (volume)
-2x 		8x2 switches DIP
+1x      JAMMA edge connector
+1x      trimmer (volume)
+2x      8x2 switches DIP
 */
 
 static ADDRESS_MAP_START( mastninj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -995,8 +995,8 @@ static ADDRESS_MAP_START( mastninj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
-//	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+//  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
+//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1007,20 +1007,20 @@ static ADDRESS_MAP_START( mastninj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-//	AM_RANGE(0x078800, 0x079fff) AM_RAM
+//  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-//	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-//	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
+//  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
+//  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
 	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
-//	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
-//	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+//  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
+//  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( mastninj )
@@ -1067,9 +1067,9 @@ static MACHINE_DRIVER_START( mastninj )
 	MDRV_SOUND_ROUTE(3, "mono", 0.60)
 
 	/* no OKI on the bootleg */
-//	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-//	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+//  MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+//  MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -1627,7 +1627,7 @@ static void descramble_mastninj_gfx(UINT8* src)
 		memcpy(src,buffer,len);
 		free(buffer);
 	}
-	
+
 	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;

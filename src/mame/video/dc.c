@@ -1087,9 +1087,9 @@ WRITE64_HANDLER( pvr_ta_w )
 				else
 					sizera=5;
 				offsetra=pvrta_regs[REGION_BASE];
-				
+
 				//printf("base is %08x\n", offsetra);
-				
+
 				// sanity
 				sanitycount = 0;
 				for (;;)
@@ -1101,7 +1101,7 @@ WRITE64_HANDLER( pvr_ta_w )
 					st[2]=memory_read_dword(space,(0x05000008+offsetra)); // Opaque Modifier Volume List Pointer
 					st[3]=memory_read_dword(space,(0x0500000c+offsetra)); // Translucent List Pointer
 					st[4]=memory_read_dword(space,(0x05000010+offsetra)); // Translucent Modifier Volume List Pointer
-				
+
 					if (sizera == 6)
 					{
 						st[5] = memory_read_dword(space,(0x05000014+offsetra)); // Punch Through List Pointer
@@ -1112,31 +1112,31 @@ WRITE64_HANDLER( pvr_ta_w )
 						st[5] = 0;
 						offsetra+=0x14;
 					}
-						
+
 					{
 						int x = ((st[0]&0x000000fc)>>2)*32;
 						int y = ((st[0]&0x00003f00)>>8)*32;
 						//printf("tiledata %08x %d %d - %08x %08x %08x %08x %08x\n",st[0],x,y,st[1],st[2],st[3],st[4],st[5]);
-						
+
 						// should render to the accumulation buffer here using pointers we filled in when processing the data
 						// sent to the TA.  HOWEVER, we don't process the TA data and create the real format object lists, so
 						// instead just use these co-ordinates to copy data from our fake full-screnen accumnulation buffer into
 						// the framebuffer
-						
+
 						pvr_accumulationbuffer_to_framebuffer(space, x,y);
 					}
-						
+
 					if (st[0] & 0x80000000)
 						break;
-					
+
 					// prevent infinite loop if asked to process invalid data
 					if(sanitycount>2000)
 						break;
 				}
-				
-				
-				
-				
+
+
+
+
 				break;
 			}
 		}
@@ -1901,7 +1901,7 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	bitmap_fill(bitmap,cliprect,c);
 
-	
+
 	ns=state_ta.grab[rs].strips_size;
 	if(ns)
 		memset(wbuffer, 0x00, sizeof(wbuffer));
@@ -1957,12 +1957,12 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 	UINT32 wc = pvrta_regs[FB_W_CTRL];
 	UINT32 stride = pvrta_regs[FB_W_LINESTRIDE];
 	UINT32 writeoffs = pvrta_regs[FB_W_SOF1];
-	
+
 	UINT32* src;
-	
-	
+
+
 	UINT8 packmode = wc & 0x7;
-	
+
 	switch (packmode)
 	{
 		case 0x01: //565 RGB 16 bit
@@ -1972,8 +1972,8 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 			{
 				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
 				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
-	
-				
+
+
 				for (xcnt=0;xcnt<32;xcnt++)
 				{
 					// data is 8888 format
@@ -1981,14 +1981,14 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
 									((((data & 0x00f80000) >> 19)) << 11);
-									
-					memory_write_word(space,realwriteoffs+xcnt*2, newdat);				
+
+					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
 				}
 			}
 		}
 		break;
-		
-	
+
+
 		case 0x00:
 
 		case 0x02:
@@ -1998,7 +1998,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 		case 0x06:
 		case 0x07:
 		default:
-		
+
 			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x\n",x,y,packmode);
 	}
 
@@ -2017,10 +2017,10 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 	// only for rgb565 framebuffer
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
 	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
-	
+
 	dy*=2; // probably depends on interlace mode, fields etc...
-	
-	
+
+
 	for (y=0;y < dy;y++)
 	{
 		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
@@ -2028,12 +2028,12 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 		{
 			fbaddr=BITMAP_ADDR32(bitmap,y,x);
 			c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
-			
+
 			b = (c & 0x001f) << 3;
 			g = (c & 0x07e0) >> 3;
 			r = (c & 0xf800) >> 8;
-			
-			if (y<cliprect->max_y)				
+
+			if (y<cliprect->max_y)
 				*fbaddr = b | (g<<8) | (r<<16);
 			addrp+=2;
 		}
@@ -2240,8 +2240,8 @@ VIDEO_UPDATE(dc)
     ******************/
 
 //  static int useframebuffer=1;
-//	const rectangle *visarea = video_screen_get_visible_area(screen);
-//	int y,x;
+//  const rectangle *visarea = video_screen_get_visible_area(screen);
+//  int y,x;
 	//printf("videoupdate\n");
 
 #if DEBUG_PALRAM
@@ -2262,7 +2262,7 @@ VIDEO_UPDATE(dc)
 #endif
 
 	pvr_drawframebuffer(bitmap,cliprect);
-	
+
 	// update this here so we only do string lookup once per frame
 	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
 

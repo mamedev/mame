@@ -1531,7 +1531,7 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 
 
 /*-------------------------------------------------
-    debug_read_memory - return 1,2,4 or 8 bytes 
+    debug_read_memory - return 1,2,4 or 8 bytes
     from the specified memory space
 -------------------------------------------------*/
 
@@ -1746,7 +1746,7 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 
 
 /*-------------------------------------------------
-    debug_write_memory - write 1,2,4 or 8 bytes 
+    debug_write_memory - write 1,2,4 or 8 bytes
     to the specified memory space
 -------------------------------------------------*/
 

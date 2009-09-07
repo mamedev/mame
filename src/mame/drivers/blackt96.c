@@ -68,7 +68,7 @@ static void draw_strip(running_machine *machine, bitmap_t *bitmap, const rectang
 	int base = stripnum;
 	int count = 0;
 	int y;
-	
+
 	for (y=0;y<32;y++)
 	{
 		UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x3fff);
@@ -83,17 +83,17 @@ static void draw_strip(running_machine *machine, bitmap_t *bitmap, const rectang
 		{
 			if (!bg) drawgfx_transpen(bitmap,cliprect,gfxspr,tile&0x1fff,colour,flipx,0,xbase,ybase+y*16,0);
 		}
-		
+
 		count++;
 	}
-		
+
 }
 
 static void draw_main(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bg)
 {
 
 	int x;
-	
+
 
 	for (x=(0x1000/2)-2;x>=0;x-=2)
 	{
@@ -103,11 +103,11 @@ static void draw_main(running_machine *machine, bitmap_t *bitmap, const rectangl
 
 		xx=  ((blackt96_tilemapram2[x+0]&0x001f)<<4) | (blackt96_tilemapram2[x+1]&0xf000)>>12;
 		yy = ((blackt96_tilemapram2[x+1]&0x1ff));
-		
+
 		if (xx&0x100) xx-=0x200;
 		yy = 0x1ff-yy;
 		if (yy&0x100) yy-=0x200;
-		
+
 		s = x*2;
 		s &=0xfff;
 		s += (x&7)*0x800;
@@ -123,7 +123,7 @@ static VIDEO_UPDATE( blackt96 )
 	int count;
 	int x,y;
 	const gfx_element *gfx = screen->machine->gfx[2];
-		
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	draw_main(screen->machine,bitmap,cliprect,1);

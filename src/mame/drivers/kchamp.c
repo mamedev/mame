@@ -713,7 +713,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 
 	for (A = 0;A < 0x10000;A++)
 		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);
-	
+
 	return decrypted;
 }
 
@@ -723,7 +723,7 @@ static DRIVER_INIT( kchampvs )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypted = decrypt_code(machine);
 	int A;
-	
+
 	/*
         Note that the first 4 opcodes that the program
         executes aren't encrypted for some obscure reason.

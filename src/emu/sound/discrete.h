@@ -3682,7 +3682,7 @@ struct _discrete_task_context
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				**dest[DISCRETE_MAX_TASK_OUTPUTS];
-		
+
 };
 
 struct _discrete_info

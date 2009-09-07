@@ -516,7 +516,7 @@ static INPUT_PORTS_START( bradley )
 
 	PORT_START("AN2")	/* analog 2 = shell firing range hack removed, now uses Z */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
-	
+
 	BZONEADJ
 INPUT_PORTS_END
 

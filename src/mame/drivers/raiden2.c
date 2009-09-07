@@ -2003,15 +2003,15 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
 /* Uncommented until actively worked on
-	{
-		FILE *fp;
-		fp=fopen("rdx_v33.dmp", "w+b");
-		if (fp)
-		{
-			fwrite(mcu_prog, 0x400, 2, fp);
-			fclose(fp);
-		}
-	}
+    {
+        FILE *fp;
+        fp=fopen("rdx_v33.dmp", "w+b");
+        if (fp)
+        {
+            fwrite(mcu_prog, 0x400, 2, fp);
+            fclose(fp);
+        }
+    }
 */
 }
 

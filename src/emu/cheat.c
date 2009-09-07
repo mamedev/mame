@@ -381,7 +381,7 @@ void cheat_init(running_machine *machine)
 	/* allocate memory */
 	cheatinfo = auto_alloc_clear(machine, cheat_private);
 	machine->cheat_data = cheatinfo;
-	
+
 	/* load the cheats */
 	cheat_reload(machine);
 
@@ -403,7 +403,7 @@ void cheat_reload(running_machine *machine)
 
 	/* free everything */
 	cheat_exit(machine);
-	
+
 	/* reset our memory */
 	memset(cheatinfo, 0, sizeof(*cheatinfo));
 
@@ -972,7 +972,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 	/* open the file with the proper name */
 	fname = astring_assemble_2(astring_alloc(), filename, ".xml");
 	filerr = mame_fopen(SEARCHPATH_CHEAT, astring_c(fname), OPEN_FLAG_READ, &cheatfile);
-	
+
 	/* loop over all instrances of the files found in our search paths */
 	while (filerr == FILERR_NONE)
 	{
@@ -983,7 +983,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 		int version;
 
 		mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile));
-		
+
 		/* read the XML file into internal data structures */
 		memset(&options, 0, sizeof(options));
 		options.error = &error;
@@ -1019,7 +1019,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 			cheat_entry *curcheat = cheat_entry_load(machine, filename, cheatnode);
 			if (curcheat == NULL)
 				goto error;
-			
+
 			/* make sure we're not a duplicate */
 			scannode = NULL;
 			if (REMOVE_DUPLICATE_CHEATS)
@@ -1040,7 +1040,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 
 		/* free the file and loop for the next one */
 		xml_file_free(rootnode);
-		
+
 		/* open the next file in sequence */
 		filerr = mame_fclose_and_open_next(&cheatfile, astring_c(fname), OPEN_FLAG_READ);
 	}

@@ -287,7 +287,7 @@ INLINE void PUSH_STACK(pic16c5x_state *cpustate, UINT16 data)
 INLINE UINT8 GET_REGFILE(pic16c5x_state *cpustate, offs_t addr)	/* Read from internal memory */
 {
 	UINT8 data;
-	
+
 	if (addr == 0) {						/* Indirect addressing  */
 		addr = (cpustate->FSR & cpustate->picRAMmask);
 	}

@@ -87,39 +87,39 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 	copd2_table_4[copd2_offs/8] = cop_43c;
 
 /* Uncommented until actively worked on
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_2, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_3, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table_4, 0x200/8, 1, fp);
-			fclose(fp);
-		}
-	}
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_2, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_3, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table_4, 0x200/8, 1, fp);
+            fclose(fp);
+        }
+    }
 */
 
 }
@@ -130,17 +130,17 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 	logerror("mcu_data %04x\n", data);
 
 /* Uncommented until actively worked on
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"copdat_%s.data", machine->gamedrv->name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(copd2_table, 0x200, 1, fp);
-			fclose(fp);
-		}
-	}
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"copdat_%s.data", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(copd2_table, 0x200, 1, fp);
+            fclose(fp);
+        }
+    }
 */
 }
 

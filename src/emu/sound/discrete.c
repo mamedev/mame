@@ -294,11 +294,11 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 	if (DISCRETE_PROFILING)
 	{
 		osd_ticks_t last = get_profile_ticks();
-		
+
 		for (entry = list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
-	
+
 			node->run_time -= last;
 			(*node->module->step)(node);
 			last = get_profile_ticks();
@@ -310,7 +310,7 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 		for (entry = list; entry != NULL; entry = entry->next)
 		{
 			node_description *node = (node_description *) entry->ptr;
-	
+
 			/* Now step the node */
 			(*node->module->step)(node);
 		}
@@ -497,21 +497,21 @@ static DEVICE_START( discrete )
 
 	/* initialize the stream(s) */
 	info->discrete_stream = stream_create(device,linked_list_count(info->input_list), linked_list_count(info->output_list), info->sample_rate, info, discrete_stream_update);
-	
+
 	/* allocate a queue */
 
 	info->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* Process nodes which have a start func */
-	
+
 	for (entry = info->node_list; entry != NULL; entry = entry->next)
 	{
 		node_description *node = (node_description *) entry->ptr;
-		
+
 		if (node->module->start)
 			(*node->module->start)(node);
 	}
-	
+
 }
 
 
@@ -526,7 +526,7 @@ static UINT64 list_run_time(const linked_list_entry *list)
 {
 	const linked_list_entry *entry;
 	UINT64 total = 0;
-	
+
 	for (entry = list; entry != NULL; entry = entry->next)
 	{
 		node_description *node = (node_description *) entry->ptr;
@@ -570,7 +570,7 @@ static void display_profiling(const discrete_info *info)
 	tt =  list_run_time(info->step_list);
 
 	printf("Main: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
-	
+
 	printf("Average samples/stream_update: %8.2f\n", (double) info->total_samples / (double) info->total_stream_updates);
 }
 
@@ -578,20 +578,20 @@ static DEVICE_STOP( discrete )
 {
 	discrete_info *info = get_safe_token(device);
 	linked_list_entry *entry;
-	
+
 	osd_work_queue_free(info->queue);
 
 	if (DISCRETE_PROFILING)
 	{
 		display_profiling(info);
 	}
-	
+
 	/* Process nodes which have a stop func */
-	
+
 	for (entry = info->node_list; entry != NULL; entry = entry->next)
 	{
 		node_description *node = (node_description *) entry->ptr;
-		
+
 		if (node->module->stop)
 			(*node->module->stop)(node);
 	}
@@ -649,7 +649,7 @@ static void *task_callback(void *param, int threadid)
 	/* set up task buffers */
 	for (i = 0; i < ti->context->numbuffered; i++)
 		ti->context->ptr[i] = &ti->context->node_buf[i][0];
-	
+
 	samples = ti->samples;
 	while (samples-- > 0)
 	{
@@ -675,7 +675,7 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 	{
 		discrete_task_context *task = (discrete_task_context *) entry->ptr;
 		int i;
-		
+
 		for (i = task->numbuffered - 1; i >= 0 ; i--)
 			**task->dest[i] = *task->ptr[i]++;
 	}
@@ -737,7 +737,7 @@ static STREAM_UPDATE( discrete_stream_update )
 	/* Now we must do samples iterations of the node list, one output for each step */
 	for (samplenum = 0; samplenum < samples; samplenum++)
 		discrete_stream_update_nodes(info);
-	
+
 	if (DISCRETE_PROFILING)
 		info->total_stream_updates++;
 
@@ -764,7 +764,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	linked_list_entry	**task_list_ptr = &info->task_list;
 	linked_list_entry	**output_list_ptr = &info->output_list;
 	linked_list_entry	**input_list_ptr = &info->input_list;
-	
+
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
 	{
@@ -902,7 +902,7 @@ static void find_input_nodes(discrete_info *info)
 {
 	int inputnum;
 	linked_list_entry *entry;
-	
+
 	/* loop over all nodes */
 	for (entry = info->node_list; entry != NULL; entry = entry->next)
 	{

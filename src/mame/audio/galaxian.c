@@ -270,11 +270,11 @@ static DISCRETE_SOUND_START(galaxian)
 
 	/* Group Background and pitch */
 	DISCRETE_TASK_START()
-	
+
 		/************************************************/
 		/* Background                                   */
 		/************************************************/
-	
+
 		DISCRETE_DAC_R1(NODE_100, 1, GAL_INP_BG_DAC, TTL_OUT, &galaxian_bck_dac)
 		DISCRETE_555_CC(NODE_105, 1, NODE_100, GAL_R21, GAL_C15, 0, 0, 0, &galaxian_bck_vco)
 		// Next is mult/add opamp circuit
@@ -285,31 +285,31 @@ static DISCRETE_SOUND_START(galaxian)
 		DISCRETE_555_ASTABLE_CV(NODE_115, GAL_INP_FS1, GAL_R22, GAL_R23, GAL_C17, NODE_111, &galaxian_555_vco_desc)
 		DISCRETE_555_ASTABLE_CV(NODE_116, GAL_INP_FS2, GAL_R25, GAL_R26, GAL_C18, NODE_111, &galaxian_555_vco_desc)
 		DISCRETE_555_ASTABLE_CV(NODE_117, GAL_INP_FS3, GAL_R28, GAL_R29, GAL_C19, NODE_111, &galaxian_555_vco_desc)
-	
+
 		DISCRETE_MIXER3(NODE_120, 1, NODE_115, NODE_116, NODE_117, &galaxian_bck_mixer_desc)
-		
+
 		/************************************************/
 		/* PITCH                                        */
 		/************************************************/
-	
+
 		/* two cascaded LS164 which are reset to pitch latch value,
-	     * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
-	     *
-	     * One possibility to implement this is
-	     * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
-	     * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
-	     * but there is a native choice:
-	     */
+         * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
+         *
+         * One possibility to implement this is
+         * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+         * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+         * but there is a native choice:
+         */
 	    DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
-	
+
 	    /* from the 74393 (counter 2 above) only QA, QC, QD are used.
-	     * We decode three here and use SUB_NODE(133,x) below to access.
-	     */
+         * We decode three here and use SUB_NODE(133,x) below to access.
+         */
 	    DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)		/* QA-QD 74393 */
 
     /* End of this task */
     DISCRETE_TASK_END()
-    
+
     /* Group Hit and Fire */
 
     DISCRETE_TASK_START()
@@ -320,22 +320,22 @@ static DISCRETE_SOUND_START(galaxian)
 
 	    /* NOISE */
 	    /* since only a sample of the LFSR is latched @V2 we let the lfsr
-	     * run at a lower speed
-	     */
+         * run at a lower speed
+         */
 	    DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
 		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
 		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,1,NODE_151,NODE_150)
 
-	
+
 		/* Not 100% correct - switching causes high impedance input for node_157
-	     * this is not emulated */
+         * this is not emulated */
 		DISCRETE_RCDISC5(NODE_155, NODE_152, GAL_INP_HIT, (GAL_R35 + GAL_R36), GAL_C21)
 		DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
-		
+
 		/************************************************/
 		/* FIRE                                         */
 		/************************************************/
-		
+
 		DISCRETE_LOGIC_INVERT(NODE_170, 1, GAL_INP_FIRE)
 		DISCRETE_MULTIPLY(NODE_171, 1, TTL_OUT, GAL_INP_FIRE)
 		DISCRETE_MULTIPLY(NODE_172, 1, TTL_OUT, NODE_170) // inverted
@@ -348,9 +348,9 @@ static DISCRETE_SOUND_START(galaxian)
 		//DISCRETE_MULTIPLY(NODE_176, 1, 1.0/GAL_R48, NODE_173)
 		//DISCRETE_ADDER2(NODE_177, 1, NODE_175, NODE_176)
 		DISCRETE_MULTIPLY(NODE_178, 1, RES_2_PARALLEL(GAL_R46, GAL_R48), NODE_177)
-	
+
 		DISCRETE_555_ASTABLE_CV(NODE_181, 1, GAL_R44, GAL_R45, GAL_C27, NODE_178, &galaxian_555_fire_vco_desc)
-	
+
 		/* 555 toggles discharge on rc discharge module */
 		DISCRETE_RCDISC5(NODE_182, NODE_181, NODE_171, (GAL_R41), GAL_C25)
 

@@ -332,7 +332,7 @@ void crosshair_set_user_settings(running_machine *machine, UINT8 player, crossha
 static void animate(const device_config *device, void *param, int vblank_state)
 {
 	int player;
-	
+
 	/* only animate once per frame, when vblank_state is 1 */
 	if (!vblank_state)
 		return;

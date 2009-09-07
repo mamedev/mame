@@ -165,7 +165,7 @@ int type2_writes = 0;
 UINT32 lasttype2pc = 0;
 static WRITE16_HANDLER( littlerb_vdp_w )
 {
-	
+
 	if (offset!=2)
 	{
 		if (type2_writes)
@@ -174,11 +174,11 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			{
 				logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
 			}
-			
+
 			logerror("~%06x previously wrote %08x data bytes\n", lasttype2pc, type2_writes*2);
 			type2_writes = 0;
 		}
-	
+
 		logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	}
 	else
@@ -189,7 +189,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			{
 				logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 			}
-			
+
 			type2_writes++;
 			lasttype2pc = cpu_get_pc(space->cpu);
 		}

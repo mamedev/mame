@@ -1825,7 +1825,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		if (!debug_command_parameter_number(machine, param[(ref == 0) ? 1 : 0], &offset))
 			return;
 		if (!debug_command_parameter_number(machine, param[(ref == 0) ? 2 : 1], &length))
-			return;				
+			return;
 	}
 	else
 	{
@@ -1847,7 +1847,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		debug_console_printf(machine, "No writable bytes found in this area\n");
 		return;
 	}
-		
+
 	if (ref == 0)
 	{
 		/* initialize new cheat system */
@@ -1917,8 +1917,8 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 	UINT32 active_cheat = 0;
 	UINT8 condition;
 	UINT64 comp_value = 0;
-	
-	enum 
+
+	enum
 	{
 		CHEAT_ALL = 0,
 		CHEAT_EQUAL,
@@ -1960,7 +1960,7 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 	else if (!strcmp(param[0], "smallerof") || !strcmp(param[0], "lt") || !strcmp(param[0], "<"))
 		condition = CHEAT_SMALLEROF;
 	else if (!strcmp(param[0], "greaterof") || !strcmp(param[0], "gt") || !strcmp(param[0], ">"))
-		condition = CHEAT_GREATEROF;	
+		condition = CHEAT_GREATEROF;
 	else
 	{
 		debug_console_printf(machine, "Invalid condition type\n");
@@ -1976,7 +1976,7 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 			UINT64 cheat_value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset);
 			UINT64 comp_byte = (ref == 0) ? cheat.cheatmap[cheatindex].previous_value : cheat.cheatmap[cheatindex].first_value;
 			UINT8 disable_byte = FALSE;
-			
+
 			switch (condition)
 			{
 				case CHEAT_ALL:
@@ -2069,10 +2069,10 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 
 	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
 		return;
-		
+
 	if (params > 0)
 		f = fopen(param[0], "w");
-	
+
 	switch (space->spacenum)
 	{
 		default:
@@ -2080,7 +2080,7 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 		case ADDRESS_SPACE_DATA:	spaceletter = 'd';	break;
 		case ADDRESS_SPACE_IO:		spaceletter = 'i';	break;
 	}
-	
+
 	switch (cheat.width)
 	{
 		default:
@@ -2097,14 +2097,14 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 		{
 			UINT64 value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset) & sizemask;
 			offs_t address = memory_byte_to_address(space, cheat.cheatmap[cheatindex].offset);
-			
+
 			if (params > 0)
 			{
 				active_cheat++;
 				fprintf(f, "  <cheat desc=\"Possibility %d : %0*X (%0*" I64FMT "X)\">\n", active_cheat, space->logaddrchars, address, cheat.width * 2, value);
-				fprintf(f, "    <script state=\"run\">\n");  
+				fprintf(f, "    <script state=\"run\">\n");
 				fprintf(f, "      <action>maincpu.%c%c@%0*X=%0*" I64FMT "X</action>\n", spaceletter, sizeletter, space->logaddrchars, address, cheat.width * 2, cheat.cheatmap[cheatindex].first_value & sizemask);
-				fprintf(f, "    </script>\n"); 
+				fprintf(f, "    </script>\n");
 				fprintf(f, "  </cheat>\n\n");
 			}
 			else
@@ -2135,7 +2135,7 @@ static void execute_cheatundo(running_machine *machine, int ref, int params, con
 				cheat.cheatmap[cheatindex].undo = 0;
 				undo_count++;
 			}
-		}		
+		}
 
 		cheat.undo--;
 		debug_console_printf(machine, "%u cheat reactivated\n", undo_count);

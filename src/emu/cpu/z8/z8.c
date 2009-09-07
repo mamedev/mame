@@ -9,15 +9,15 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- strobed I/O
-	- interrupts
-	- expose register file to disassembler
-	- decimal adjust instruction
-	- timer Tin/Tout modes
-	- serial
-	- instruction pipeline
+    - strobed I/O
+    - interrupts
+    - expose register file to disassembler
+    - decimal adjust instruction
+    - timer Tin/Tout modes
+    - serial
+    - instruction pipeline
 
 */
 
@@ -241,7 +241,7 @@ INLINE z8_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert((cpu_get_type(device) == CPU_Z8601) || 
+	assert((cpu_get_type(device) == CPU_Z8601) ||
 		(cpu_get_type(device) == CPU_UB8830D) ||
 		(cpu_get_type(device) == CPU_Z8611));
 	return (z8_state *)device->token;
@@ -341,7 +341,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 	case Z8_REGISTER_IPR:
 		/* write only */
 		break;
-	
+
 	default:
 		data = cpustate->r[offset];
 		break;
@@ -382,7 +382,7 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 
 	case Z8_REGISTER_P3:
 		cpustate->output[offset] = data;
-		
+
 		// TODO: special port 3 modes
 		if (!(P3M & 0x7c))
 		{
@@ -394,10 +394,10 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 
 	case Z8_REGISTER_SIO:
 		break;
-	
+
 	case Z8_REGISTER_TMR:
 		if (data & Z8_TMR_LOAD_T0)
-		{	
+		{
 			cpustate->t0 = T0;
 			timer_adjust_periodic(cpustate->t0_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
 		}
@@ -405,7 +405,7 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 		timer_enable(cpustate->t0_timer, data & Z8_TMR_ENABLE_T0);
 
 		if (data & Z8_TMR_LOAD_T1)
-		{	
+		{
 			cpustate->t1 = T1;
 			timer_adjust_periodic(cpustate->t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
 		}
@@ -597,53 +597,53 @@ struct _z8_opcode_map
 
 static const z8_opcode_map Z8601_OPCODE_MAP[] =
 {
-	{ dec_R1, 6, 5 },	{ dec_IR1, 6, 5 },	{ add_r1_r2, 10, 5 },	{ add_r1_Ir2, 10, 5 },	{ add_R2_R1, 10, 5 },	{ add_IR2_R1, 10, 5 },	{ add_R1_IM, 10, 5 },	{ add_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ dec_R1, 6, 5 },	{ dec_IR1, 6, 5 },	{ add_r1_r2, 10, 5 },	{ add_r1_Ir2, 10, 5 },	{ add_R2_R1, 10, 5 },	{ add_IR2_R1, 10, 5 },	{ add_R1_IM, 10, 5 },	{ add_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ rlc_R1, 6, 5 },	{ rlc_IR1, 6, 5 },	{ adc_r1_r2, 6, 5 },	{ adc_r1_Ir2, 6, 5 },	{ adc_R2_R1, 10, 5 },	{ adc_IR2_R1, 10, 5 },	{ adc_R1_IM, 10, 5 },	{ adc_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ rlc_R1, 6, 5 },	{ rlc_IR1, 6, 5 },	{ adc_r1_r2, 6, 5 },	{ adc_r1_Ir2, 6, 5 },	{ adc_R2_R1, 10, 5 },	{ adc_IR2_R1, 10, 5 },	{ adc_R1_IM, 10, 5 },	{ adc_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ inc_R1, 6, 5 },	{ inc_IR1, 6, 5 },	{ sub_r1_r2, 6, 5 },	{ sub_r1_Ir2, 6, 5 },	{ sub_R2_R1, 10, 5 },	{ sub_IR2_R1, 10, 5 },	{ sub_R1_IM, 10, 5 },	{ sub_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ inc_R1, 6, 5 },	{ inc_IR1, 6, 5 },	{ sub_r1_r2, 6, 5 },	{ sub_r1_Ir2, 6, 5 },	{ sub_R2_R1, 10, 5 },	{ sub_IR2_R1, 10, 5 },	{ sub_R1_IM, 10, 5 },	{ sub_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ jp_IRR1, 8, 0 },	{ srp_IM, 6, 1 },	{ sbc_r1_r2, 6, 5 },	{ sbc_r1_Ir2, 6, 5 },	{ sbc_R2_R1, 10, 5 },	{ sbc_IR2_R1, 10, 5 },	{ sbc_R1_IM, 10, 5 },	{ sbc_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ jp_IRR1, 8, 0 },	{ srp_IM, 6, 1 },	{ sbc_r1_r2, 6, 5 },	{ sbc_r1_Ir2, 6, 5 },	{ sbc_R2_R1, 10, 5 },	{ sbc_IR2_R1, 10, 5 },	{ sbc_R1_IM, 10, 5 },	{ sbc_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ da_R1, 8, 5 },	{ da_IR1, 8, 5 },	{ or_r1_r2, 6, 5 },		{ or_r1_Ir2, 6, 5 },	{ or_R2_R1, 10, 5 },	{ or_IR2_R1, 10, 5 },	{ or_R1_IM, 10, 5 },	{ or_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ da_R1, 8, 5 },	{ da_IR1, 8, 5 },	{ or_r1_r2, 6, 5 },		{ or_r1_Ir2, 6, 5 },	{ or_R2_R1, 10, 5 },	{ or_IR2_R1, 10, 5 },	{ or_R1_IM, 10, 5 },	{ or_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ pop_R1, 10, 5 },	{ pop_IR1, 10, 5 },	{ and_r1_r2, 6, 5 },	{ and_r1_Ir2, 6, 5 },	{ and_R2_R1, 10, 5 },	{ and_IR2_R1, 10, 5 },	{ and_R1_IM, 10, 5 },	{ and_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ pop_R1, 10, 5 },	{ pop_IR1, 10, 5 },	{ and_r1_r2, 6, 5 },	{ and_r1_Ir2, 6, 5 },	{ and_R2_R1, 10, 5 },	{ and_IR2_R1, 10, 5 },	{ and_R1_IM, 10, 5 },	{ and_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ com_R1, 6, 5 },	{ com_IR1, 6, 5 },	{ tcm_r1_r2, 6, 5 },	{ tcm_r1_Ir2, 6, 5 },	{ tcm_R2_R1, 10, 5 },	{ tcm_IR2_R1, 10, 5 },	{ tcm_R1_IM, 10, 5 },	{ tcm_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ com_R1, 6, 5 },	{ com_IR1, 6, 5 },	{ tcm_r1_r2, 6, 5 },	{ tcm_r1_Ir2, 6, 5 },	{ tcm_R2_R1, 10, 5 },	{ tcm_IR2_R1, 10, 5 },	{ tcm_R1_IM, 10, 5 },	{ tcm_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ push_R2, 10, 1 },	{ push_IR2, 12, 1 },{ tm_r1_r2, 6, 5 },		{ tm_r1_Ir2, 6, 5 },	{ tm_R2_R1, 10, 5 },	{ tm_IR2_R1, 10, 5 },	{ tm_R1_IM, 10, 5 },	{ tm_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 }, 
+	{ push_R2, 10, 1 },	{ push_IR2, 12, 1 },{ tm_r1_r2, 6, 5 },		{ tm_r1_Ir2, 6, 5 },	{ tm_R2_R1, 10, 5 },	{ tm_IR2_R1, 10, 5 },	{ tm_R1_IM, 10, 5 },	{ tm_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
 
-	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 },	{ ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ di, 6, 1 }, 
+	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 },	{ ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ di, 6, 1 },
 
-	{ rl_R1, 6, 5 },	{ rl_IR1, 6, 5 },	{ lde_r2_Irr1, 12, 0 },	{ ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },	
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ei, 6, 1 }, 
+	{ rl_R1, 6, 5 },	{ rl_IR1, 6, 5 },	{ lde_r2_Irr1, 12, 0 },	{ ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ei, 6, 1 },
 
-	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },		{ cp_r1_Ir2, 6, 5 },	{ cp_R2_R1, 10, 5 },	{ cp_IR2_R1, 10, 5 },	{ cp_R1_IM, 10, 5 },	{ cp_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ret, 14, 0 }, 
+	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },		{ cp_r1_Ir2, 6, 5 },	{ cp_R2_R1, 10, 5 },	{ cp_IR2_R1, 10, 5 },	{ cp_R1_IM, 10, 5 },	{ cp_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ret, 14, 0 },
 
-	{ clr_R1, 6, 5 },	{ clr_IR1, 6, 5 },	{ xor_r1_r2, 6, 5 },	{ xor_r1_Ir2, 6, 5 },	{ xor_R2_R1, 10, 5 },	{ xor_IR2_R1, 10, 5 },	{ xor_R1_IM, 10, 5 },	{ xor_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ iret, 16, 0 }, 
+	{ clr_R1, 6, 5 },	{ clr_IR1, 6, 5 },	{ xor_r1_r2, 6, 5 },	{ xor_r1_Ir2, 6, 5 },	{ xor_R2_R1, 10, 5 },	{ xor_IR2_R1, 10, 5 },	{ xor_R1_IM, 10, 5 },	{ xor_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ iret, 16, 0 },
 
-	{ rrc_R1, 6, 5 },	{ rrc_IR1, 6, 5 },	{ ldc_r1_Irr2, 12, 0 },	{ ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ ld_r1_x_R2, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ rcf, 6, 5 }, 
+	{ rrc_R1, 6, 5 },	{ rrc_IR1, 6, 5 },	{ ldc_r1_Irr2, 12, 0 },	{ ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ ld_r1_x_R2, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ rcf, 6, 5 },
 
-	{ sra_R1, 6, 5 },	{ sra_IR1, 6, 5 },	{ ldc_r2_Irr1, 12, 0 },	{ ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },	{ illegal, 0, 0 },		{ call_DA, 20, 0 },		{ ld_r2_x_R1, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ scf, 6, 5 }, 
+	{ sra_R1, 6, 5 },	{ sra_IR1, 6, 5 },	{ ldc_r2_Irr1, 12, 0 },	{ ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },	{ illegal, 0, 0 },		{ call_DA, 20, 0 },		{ ld_r2_x_R1, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ scf, 6, 5 },
 
-	{ rr_R1, 6, 5 },	{ rr_IR1, 6, 5 },	{ illegal, 0, 0 },		{ ld_r1_Ir2, 6, 5 },	{ ld_R2_R1, 10, 5 },	{ ld_IR2_R1, 10, 5 },	{ ld_R1_IM, 10, 5 },	{ ld_IR1_IM, 10, 5 }, 
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ccf, 6, 5 }, 
+	{ rr_R1, 6, 5 },	{ rr_IR1, 6, 5 },	{ illegal, 0, 0 },		{ ld_r1_Ir2, 6, 5 },	{ ld_R2_R1, 10, 5 },	{ ld_IR2_R1, 10, 5 },	{ ld_R1_IM, 10, 5 },	{ ld_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ccf, 6, 5 },
 
 	{ swap_R1, 8, 5 },	{ swap_IR1, 8, 5 },	{ illegal, 0, 0 },		{ ld_Ir1_r2, 6, 5 },	{ illegal, 0, 0 },		{ ld_R2_IR1, 10, 5 },	{ illegal, 0, 0 },		{ illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ nop, 6, 0 }, 
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ nop, 6, 0 },
 };
 
 /***************************************************************************
@@ -728,17 +728,17 @@ static CPU_EXECUTE( z8 )
 		int cycles;
 
 		debugger_instruction_hook(device, cpustate->pc);
-		
+
 		/* TODO: sample interrupts */
 		cpustate->input[3] = memory_read_byte_8be(cpustate->io, 3);
-				
+
 		/* fetch opcode */
 		opcode = fetch(cpustate);
 		cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
 		/* execute instruction */
 		(*(Z8601_OPCODE_MAP[opcode].function))(cpustate, opcode, &cycles);
-		
+
 		cpustate->icount -= cycles;
 	}
 	while (cpustate->icount > 0);
@@ -793,7 +793,7 @@ static CPU_IMPORT_STATE( z8 )
 			cpustate->r[Z8_REGISTER_SPH] = cpustate->fake_sp >> 8;
 			cpustate->r[Z8_REGISTER_SPL] = cpustate->fake_sp & 0xff;
 			break;
-	
+
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
 			cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry->index - Z8_R0)] = cpustate->fake_r[entry->index - Z8_R0];
 			break;

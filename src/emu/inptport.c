@@ -1320,7 +1320,7 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 					else
 						value *= field->crossscale;
 					value += field->crossoffset;
-					
+
 					/* apply custom mapping if necessary */
 					if (field->crossmapper != NULL)
 						value = (*field->crossmapper)(field, value);

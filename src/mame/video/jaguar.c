@@ -656,15 +656,15 @@ static TIMER_CALLBACK( jaguar_pit )
 	if (gpu_regs[PIT0])
 	{
 		sample_period = ATTOTIME_IN_NSEC(cpu_get_clock(cputag_get_cpu(machine,"gpu")) / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
-//		timer_set(machine, sample_period, NULL, 0, jaguar_pit);
+//      timer_set(machine, sample_period, NULL, 0, jaguar_pit);
 	}
 }
 #endif
-	
+
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
 	UINT32 reg_store = gpu_regs[offset];
-//	attotime sample_period;
+//  attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
@@ -825,7 +825,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 				{
 					UINT8 r = pen_table[(scanline[x]&0xff)|256];
 					UINT8 g = pen_table[(scanline[x]>>8)|512];
-					UINT8 b = pen_table[scanline[x+1]&0xff];					
+					UINT8 b = pen_table[scanline[x+1]&0xff];
 					dest[hdb++] = MAKE_RGB(r, g, b);
 				}
 		}

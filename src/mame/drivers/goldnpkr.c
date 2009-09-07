@@ -1531,7 +1531,7 @@ static INPUT_PORTS_START( witchcdd )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	/* even when the following one is forced to OFF,
-	turned ON behaves like "Jacks and Better" */
+    turned ON behaves like "Jacks and Better" */
 	PORT_DIPNAME( 0x10, 0x10, "SW 1 (always to OFF)")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1618,16 +1618,16 @@ static INPUT_PORTS_START( witchcde )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 /*  DIP Switches (as shown in the epoxy block)
-    
+
     Schalter      1   2   3   4   5   6   7   8
-	--------------------------------------------
+    --------------------------------------------
     Bet >  10    OFF OFF
     Bet >  20    ON  OFF
     Bet >  50    OFF ON
     Bet > 100    ON  ON
     --------------------------------------------
     Jolli-Witch          OFF
-	Witch-Card           ON
+    Witch-Card           ON
     --------------------------------------------
      6 Taster                ON
     12 Taster                OFF
@@ -1635,8 +1635,8 @@ static INPUT_PORTS_START( witchcde )
     Hohes Paar                   ON
     2 Paar                       OFF
     --------------------------------------------
-	1 DM - 1 PKT                     OFF OFF
-	1 DM - 10 PKT                    OFF ON
+    1 DM - 1 PKT                     OFF OFF
+    1 DM - 10 PKT                    OFF ON
     --------------------------------------------
     RF                                       ON
     RF NO                                    OFF
@@ -2635,7 +2635,7 @@ ROM_END
     TV GAME ELEKTRONIK 1994
            PROVA
     CASINOVERSION WC3050
-*/	
+*/
 	ROM_START( witchcdd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12a.bin",	0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
@@ -2658,7 +2658,7 @@ ROM_END
 
     Code jumps into a zero-filled zone.
     Addressing seems to be scrambled in some way
-	maybe through a PLD.
+    maybe through a PLD.
 */
 ROM_START( witchcde )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* inside epoxy block with the CPU */

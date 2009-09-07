@@ -13,7 +13,7 @@
  * DSO_TASK              - Task node
  *
  * Task and list routines
- * 
+ *
  ************************************************************************/
 
 struct dso_csvlog_context
@@ -44,8 +44,8 @@ static DISCRETE_START( dso_task )
 	const linked_list_entry *step_entry;
 
 	/* Determine, which nodes in the task are referenced in the main task
-	 * and add them to the list of nodes to be buffered for further processing
-	 */
+     * and add them to the list of nodes to be buffered for further processing
+     */
 	for (node_entry = task->list; node_entry != NULL; node_entry = node_entry->next)
 	{
 		node_description *node = (node_description *) node_entry->ptr;
@@ -54,7 +54,7 @@ static DISCRETE_START( dso_task )
 		for (step_entry = node->info->step_list; step_entry != NULL; step_entry = step_entry->next)
 		{
 			node_description *snode = (node_description *) step_entry->ptr;
-			
+
 			/* loop over all active inputs */
 			for (inputnum = 0; inputnum < snode->active_inputs; inputnum++)
 			{
@@ -90,7 +90,7 @@ static DISCRETE_STEP( dso_task )
 {
 	discrete_task_context *task =  (discrete_task_context *) node->context;
 	int i;
-	
+
 	for (i = 0; i < task->numbuffered; i++)
 		*(task->ptr[i]++) = **task->dest[i]; //DISCRETE_INPUT(i);
 }
@@ -143,7 +143,7 @@ static DISCRETE_START( dso_csvlog )
 static DISCRETE_STOP( dso_csvlog )
 {
 	struct dso_csvlog_context *context = (struct dso_csvlog_context *) node->context;
-	
+
 	/* close any csv files */
 	if (context->csv_file)
 		fclose(context->csv_file);
@@ -179,7 +179,7 @@ static DISCRETE_STOP( dso_wavelog )
 
 	/* close any wave files */
 	if (context->wav_file)
-		wav_close(context->wav_file);	
+		wav_close(context->wav_file);
 }
 
 static DISCRETE_STEP( dso_wavelog )

@@ -301,14 +301,14 @@ static DRIVER_INIT(hshavoc)
 	}
 
 /* Uncommented until actively worked on
-	{
-		FILE*FP;
+    {
+        FILE*FP;
 
-		FP=fopen("hshavoc.dump","wb");
+        FP=fopen("hshavoc.dump","wb");
 
-		fwrite(src, rom_size/2, 2, FP);
-		fclose(FP);
-	}
+        fwrite(src, rom_size/2, 2, FP);
+        fclose(FP);
+    }
 */
 
 

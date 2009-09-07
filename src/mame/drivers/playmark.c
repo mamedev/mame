@@ -198,7 +198,7 @@ static WRITE8_HANDLER( playmark_oki_w )
 
 static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 {
-//	const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+//  const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
     /*  This port controls communications to and from the 68K, and the OKI
         device.
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( bigtwin )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
-//	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
+//  PORT_DIPSETTING(    0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
 	PORT_DIPSETTING(	0x30, DEF_STR( Medium ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )

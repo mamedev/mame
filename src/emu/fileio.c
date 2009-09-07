@@ -263,7 +263,7 @@ static file_error fopen_internal(core_options *opts, path_iterator *iterator, co
 				break;
 		}
 	}
-	
+
 	/* if we succeeded, save the iterator */
 	if (filerr == FILERR_NONE)
 		(*file)->iterator = *iterator;
@@ -394,8 +394,8 @@ void mame_fclose(mame_file *file)
 
 
 /*-------------------------------------------------
-    mame_fclose_and_open_next - close an open 
-    file, and open the next entry in the original 
+    mame_fclose_and_open_next - close an open
+    file, and open the next entry in the original
     searchpath
 -------------------------------------------------*/
 
