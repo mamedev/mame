@@ -1433,10 +1433,10 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	else
 	{
 		input_device *device;
-		input_device_list *device_list = machine->input_data->device_list;
+		input_device_list *device_list = (machine != NULL) ? machine->input_data->device_list : NULL;
 
 		/* if this is an invalid device, we have nothing to look up */
-		if (devindex >= device_list[devclass].count)
+		if (!device_list || devindex >= device_list[devclass].count)
 			goto exit;
 		device = &device_list[devclass].list[devindex];
 
