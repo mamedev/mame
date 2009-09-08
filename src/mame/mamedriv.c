@@ -6938,6 +6938,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( phtetris )
 	DRIVER( phpython )
 
+	/* Photon IK2 hardware */
+	DRIVER( kok )
+	DRIVER( black )
+	DRIVER( brod )
+
 	/* Valadon Automation games */
 	DRIVER( bagman )	/* (c) 1982 */
 	DRIVER( bagnard )	/* (c) 1982 */
