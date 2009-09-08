@@ -144,7 +144,7 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 		return;
 
 	/* might not have any data */
-	if (!parentnode)
+	if (parentnode == NULL)
 		return;
 
 	/* iterate over coins nodes */
@@ -157,7 +157,7 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 
 	/* get the single tickets node */
 	ticketnode = xml_get_sibling(parentnode->child, "tickets");
-	if (ticketnode)
+	if (ticketnode != NULL)
 		dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
 }
 
@@ -180,7 +180,7 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
 		if (coin_count[i] != 0)
 		{
 			xml_data_node *coinnode = xml_add_child(parentnode, "coins", NULL);
-			if (coinnode)
+			if (coinnode != NULL)
 			{
 				xml_set_attribute_int(coinnode, "index", i);
 				xml_set_attribute_int(coinnode, "number", coin_count[i]);
@@ -191,7 +191,7 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
 	if (dispensed_tickets != 0)
 	{
 		xml_data_node *tickets = xml_add_child(parentnode, "tickets", NULL);
-		if (tickets)
+		if (tickets != NULL)
 			xml_set_attribute_int(tickets, "number", dispensed_tickets);
 	}
 }
@@ -201,14 +201,14 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
     coin_counter_w - sets input for coin counter
 -------------------------------------------------*/
 
-void coin_counter_w(int num,int on)
+void coin_counter_w(int num, int on)
 {
-	if (num >= COIN_COUNTERS) return;
+	if (num >= COIN_COUNTERS)
+		return;
+
 	/* Count it only if the data has changed from 0 to non-zero */
 	if (on && (lastcoin[num] == 0))
-	{
 		coin_count[num]++;
-	}
 	lastcoin[num] = on;
 }
 
@@ -219,8 +219,8 @@ void coin_counter_w(int num,int on)
 
 void coin_lockout_w(int num,int on)
 {
-	if (num >= COIN_COUNTERS) return;
-
+	if (num >= COIN_COUNTERS)
+		return;
 	coinlockedout[num] = on;
 }
 
@@ -235,9 +235,7 @@ void coin_lockout_global_w(int on)
 	int i;
 
 	for (i = 0; i < COIN_COUNTERS; i++)
-	{
-		coin_lockout_w(i,on);
-	}
+		coin_lockout_w(i, on);
 }
 
 
@@ -253,13 +251,13 @@ void coin_lockout_global_w(int on)
 
 INLINE void *nvram_select(void)
 {
-	if (generic_nvram)
+	if (generic_nvram != NULL)
 		return generic_nvram;
-	if (generic_nvram16)
+	if (generic_nvram16 != NULL)
 		return generic_nvram16;
-	if (generic_nvram32)
+	if (generic_nvram32 != NULL)
 		return generic_nvram32;
-	if (generic_nvram64)
+	if (generic_nvram64 != NULL)
 		return generic_nvram64;
 	fatalerror("generic nvram handler called without nvram in the memory map");
 	return 0;
@@ -293,12 +291,14 @@ void nvram_load(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	const device_config *device;
 
+	/* read data from general NVRAM handler first */
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
 		(*machine->config->nvram_handler)(machine, nvram_file, 0);
 	}
 
+	/* find all devices with NVRAM handlers, and read from them next */
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
@@ -324,12 +324,14 @@ void nvram_save(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	const device_config *device;
 
+	/* write data from general NVRAM handler first */
 	if (machine->config->nvram_handler != NULL)
 	{
 		nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		(*machine->config->nvram_handler)(machine, nvram_file, 1);
 	}
 
+	/* find all devices with NVRAM handlers, and write them next */
 	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
@@ -752,7 +754,7 @@ INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input
 -------------------------------------------------*/
 
 WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return 0xff; }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 /*-------------------------------------------------
@@ -760,7 +762,7 @@ READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return 0xff;
 -------------------------------------------------*/
 
 WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return 0xffff; }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 /*-------------------------------------------------
@@ -768,7 +770,7 @@ READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return 0x
 -------------------------------------------------*/
 
 WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return 0xffffffff; }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return space->unmap; }
 
 
 
