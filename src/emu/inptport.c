@@ -1699,22 +1699,19 @@ static void init_autoselect_devices(const input_port_config *portlist, int type1
 		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	/* only scan the list if we haven't already enabled this class of control */
-	if (portlist)
-	{
-		if (!input_device_class_enabled(portlist->machine, autoenable))
-			for (port = portlist; port != NULL; port = port->next)
-				for (field = port->fieldlist; field != NULL; field = field->next)
+	if (portlist != NULL && !input_device_class_enabled(portlist->machine, autoenable))
+		for (port = portlist; port != NULL; port = port->next)
+			for (field = port->fieldlist; field != NULL; field = field->next)
 
-					/* if this port type is in use, apply the autoselect criteria */
-					if ((type1 != 0 && field->type == type1) ||
-						(type2 != 0 && field->type == type2) ||
-						(type3 != 0 && field->type == type3))
-					{
-						mame_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-						input_device_class_enable(portlist->machine, autoenable, TRUE);
-						break;
-					}
-	}
+				/* if this port type is in use, apply the autoselect criteria */
+				if ((type1 != 0 && field->type == type1) ||
+					(type2 != 0 && field->type == type2) ||
+					(type3 != 0 && field->type == type3))
+				{
+					mame_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
+					input_device_class_enable(portlist->machine, autoenable, TRUE);
+					break;
+				}
 }
 
 

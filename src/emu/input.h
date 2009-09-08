@@ -640,4 +640,11 @@ astring *input_code_to_token(running_machine *machine, astring *buffer, input_co
 input_code input_code_from_token(running_machine *machine, const char *_token);
 
 
+
+/* ----- debugging utilities ----- */
+
+/* return TRUE if the given input code has been pressed */
+INT32 debug_global_input_code_pressed(input_code code);
+
+
 #endif	/* __INPUT_H__ */

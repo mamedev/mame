@@ -21,7 +21,7 @@
             - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
             - calls setjmp to prepare for deep error handling
             - begins resource tracking (level 1)
-            - calls create_machine [mame.c] to initialize the Machine structure
+            - calls create_machine [mame.c] to initialize the running_machine structure
             - calls init_machine() [mame.c]
 
             init_machine() [mame.c]
@@ -180,7 +180,7 @@ struct _mame_private
 ***************************************************************************/
 
 /* the active machine */
-static running_machine *Machine;
+static running_machine *global_machine;
 
 /* the current options */
 static core_options *mame_opts;
@@ -303,7 +303,7 @@ int mame_execute(core_options *options)
 		mame->current_phase = MAME_PHASE_PREINIT;
 
 		/* looooong term: remove this */
-		Machine = machine;
+		global_machine = machine;
 
 		init_resource_tracking();
 
@@ -548,6 +548,17 @@ void mame_frame_update(running_machine *machine)
 	/* call all registered frame callbacks */
 	for (cb = machine->mame_data->frame_callback_list; cb; cb = cb->next)
 		(*cb->func.frame)(machine);
+}
+
+
+/*-------------------------------------------------
+    mame_is_valid_machine - return true if the 
+    given machine is valid
+-------------------------------------------------*/
+
+int mame_is_valid_machine(running_machine *machine)
+{
+	return (machine != NULL && machine == global_machine);
 }
 
 
@@ -1145,8 +1156,7 @@ static void fatalerror_common(running_machine *machine, int exitcode, const char
 
 void CLIB_DECL fatalerror(const char *text, ...)
 {
-	extern running_machine *Machine;
-	running_machine *machine = Machine;
+	running_machine *machine = global_machine;
 	va_list arg;
 
 	/* dump to the buffer; assume no one writes >2k lines this way */
@@ -1204,8 +1214,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 void CLIB_DECL logerror(const char *format, ...)
 {
-	extern running_machine *Machine;
-	running_machine *machine = Machine;
+	running_machine *machine = global_machine;
 
 	/* currently, we need a machine to do this */
 	if (machine != NULL)
@@ -1452,7 +1461,7 @@ error:
 
 static void destroy_machine(running_machine *machine)
 {
-	assert(machine == Machine);
+	assert(machine == global_machine);
 
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
@@ -1463,7 +1472,7 @@ static void destroy_machine(running_machine *machine)
 	if (machine->basename != NULL)
 		free((void *)machine->basename);
 	free(machine);
-	Machine = NULL;
+	global_machine = NULL;
 }
 
 

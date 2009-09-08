@@ -130,6 +130,7 @@ struct _input_private
 };
 
 
+
 /***************************************************************************
     TOKEN/STRING TABLES
 ***************************************************************************/
@@ -406,6 +407,9 @@ static const code_string_table itemid_token_table[] =
     GLOBAL VARIABLES
 ***************************************************************************/
 
+/* stashed copy of the most recently initialized machine for the debugging hack */
+static running_machine *stashed_machine;
+
 /* standard joystick mappings */
 const char			joystick_map_8way[] = "7778...4445";
 const char			joystick_map_4way_sticky[] = "s8.4s8.44s8.4445";
@@ -572,13 +576,13 @@ void input_init(running_machine *machine)
 	joystick_map map;
 	input_private *state;
 	input_device_list *device_list;
+	
+	/* remember this machine */
+	stashed_machine = machine;
 
 	/* allocate private memory */
 	machine->input_data = state = auto_alloc_clear(machine, input_private);
 	device_list = state->device_list;
-
-	/* reset the device lists */
-	memset(device_list, 0, sizeof(device_list));
 
 	/* reset code memory */
 	code_pressed_memory_reset(machine);
@@ -940,7 +944,7 @@ int input_code_pressed_once(running_machine *machine, input_code code)
 		if (code_pressed_memory[memnum] == code)
 		{
 			/* if no longer pressed, clear entry */
-			if (!curvalue)
+			if (curvalue == 0)
 				code_pressed_memory[memnum] = INPUT_CODE_INVALID;
 
 			/* always return 0 */
@@ -953,7 +957,7 @@ int input_code_pressed_once(running_machine *machine, input_code code)
 	}
 
 	/* if we get here, we were not previously pressed; if still not pressed, return 0 */
-	if (!curvalue)
+	if (curvalue == 0)
 		return 0;
 
 	/* otherwise, add ourself to the memory and return 1 */
@@ -1428,15 +1432,15 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	/* if we're a standard code, default the itemclass based on it */
 	if (standard)
 		itemclass = input_item_standard_class((input_device_class)devclass, (input_item_id)itemid);
-
+	
 	/* otherwise, keep parsing */
 	else
 	{
-		input_device *device;
 		input_device_list *device_list = (machine != NULL) ? machine->input_data->device_list : NULL;
+		input_device *device;
 
 		/* if this is an invalid device, we have nothing to look up */
-		if (!device_list || devindex >= device_list[devclass].count)
+		if (device_list == NULL || devindex >= device_list[devclass].count)
 			goto exit;
 		device = &device_list[devclass].list[devindex];
 
@@ -1492,6 +1496,24 @@ exit:
 		if (token[curtok] != NULL)
 			astring_free(token[curtok]);
 	return code;
+}
+
+
+
+/***************************************************************************
+    DEBUGGIN UTILITIES
+***************************************************************************/
+
+/*-------------------------------------------------
+    debug_global_input_code_pressed - return TRUE 
+    if the given input code has been pressed
+-------------------------------------------------*/
+
+INT32 debug_global_input_code_pressed(input_code code)
+{
+	if (!mame_is_valid_machine(stashed_machine))
+		return 0;
+	return input_code_pressed(stashed_machine, code);
 }
 
 

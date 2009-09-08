@@ -270,6 +270,9 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 /* handle update tasks for a frame boundary */
 void mame_frame_update(running_machine *machine);
 
+/* return true if the given machine is valid */
+int mame_is_valid_machine(running_machine *machine);
+
 
 
 /* ----- global system states ----- */
