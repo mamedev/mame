@@ -978,7 +978,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	astring_printf(string, "%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
-	for (device = machine->cpu[0]; device != NULL; device = scandevice)
+	for (device = machine->firstcpu; device != NULL; device = scandevice)
 	{
 		/* count how many identical CPUs we have */
 		count = 1;
@@ -1454,13 +1454,13 @@ static slider_state *slider_init(running_machine *machine)
 	/* add CPU overclocking (cheat only) */
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
 	{
-		for (item = 0; item < ARRAY_LENGTH(machine->cpu); item++)
-			if (machine->cpu[item] != NULL)
-			{
-				astring_printf(string, "Overclock CPU %s", machine->cpu[item]->tag);
-				*tailptr = slider_alloc(machine, astring_c(string), 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
-				tailptr = &(*tailptr)->next;
-			}
+		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
+		{
+			void *param = (void *)device;
+			astring_printf(string, "Overclock CPU %s", device->tag);
+			*tailptr = slider_alloc(machine, astring_c(string), 10, 1000, 2000, 1, slider_overclock, param);
+			tailptr = &(*tailptr)->next;
+		}
 	}
 
 	/* add screen parameters */
@@ -1628,12 +1628,12 @@ static INT32 slider_adjuster(running_machine *machine, void *arg, astring *strin
 
 static INT32 slider_overclock(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	int which = (FPTR)arg;
+	const device_config *cpu = (const device_config *)arg;
 	if (newval != SLIDER_NOCHANGE)
-		cpu_set_clockscale(machine->cpu[which], (float)newval * 0.001f);
+		cpu_set_clockscale(cpu, (float)newval * 0.001f);
 	if (string != NULL)
-		astring_printf(string, "%3.0f%%", floor(cpu_get_clockscale(machine->cpu[which]) * 100.0f + 0.5f));
-	return floor(cpu_get_clockscale(machine->cpu[which]) * 1000.0f + 0.5f);
+		astring_printf(string, "%3.0f%%", floor(cpu_get_clockscale(cpu) * 100.0f + 0.5f));
+	return floor(cpu_get_clockscale(cpu) * 1000.0f + 0.5f);
 }
 
 

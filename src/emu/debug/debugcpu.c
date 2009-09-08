@@ -183,7 +183,7 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* loop over CPUs and build up their info */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_class_header *classheader = cpu_get_class_header(cpu);
 		cpu_debug_data *info;
@@ -249,7 +249,7 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* first CPU is visible by default */
-	global->visiblecpu = machine->cpu[0];
+	global->visiblecpu = machine->firstcpu;
 
 	/* add callback for breaking on VBLANK */
 	if (machine->primary_screen != NULL)
@@ -269,7 +269,7 @@ void debug_cpu_flush_traces(running_machine *machine)
 {
 	const device_config *cpu;
 
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
@@ -1014,7 +1014,7 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 	const device_config *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 		for (pbp = NULL, bp = info->bplist; bp != NULL; pbp = bp, bp = bp->next)
@@ -1055,7 +1055,7 @@ int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 	const device_config *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 		for (bp = info->bplist; bp != NULL; bp = bp->next)
@@ -1123,7 +1123,7 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 	int spacenum;
 
 	/* loop over CPUs and find the requested watchpoint */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
@@ -1166,7 +1166,7 @@ int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 	int spacenum;
 
 	/* loop over CPUs and address spaces and find the requested watchpoint */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
@@ -1934,7 +1934,7 @@ static void debug_cpu_exit(running_machine *machine)
 	int spacenum;
 
 	/* loop over all watchpoints and breakpoints to free their memory */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
@@ -1989,7 +1989,7 @@ static void reset_transient_flags(running_machine *machine)
 	const device_config *cpu;
 
 	/* loop over CPUs and reset the transient flags */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		cpu_get_debug_data(cpu)->flags &= ~DEBUG_FLAG_TRANSIENT;
 }
 
@@ -2445,11 +2445,11 @@ static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc)
 
 static const device_config *expression_cpu_index(running_machine *machine, const char *tag)
 {
-	int index;
+	const device_config *cpu;
 
-	for (index = 0; index < ARRAY_LENGTH(machine->cpu); index++)
-		if (machine->cpu[index] != NULL && mame_stricmp(machine->cpu[index]->tag, tag) == 0)
-			return machine->cpu[index];
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+		if (mame_stricmp(cpu->tag, tag) == 0)
+			return cpu;
 
 	return NULL;
 }

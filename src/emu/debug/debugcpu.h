@@ -71,6 +71,7 @@ typedef int (*debug_instruction_hook_func)(const device_config *device, offs_t c
 
 typedef struct _debug_cpu_breakpoint debug_cpu_breakpoint;
 typedef struct _debug_cpu_watchpoint debug_cpu_watchpoint;
+typedef struct _debug_cpu_comment_group debug_cpu_comment_group;
 
 
 typedef struct _debug_trace_info debug_trace_info;
@@ -126,6 +127,7 @@ struct _cpu_debug_data
 	cpu_disassemble_func 	dasm_override;				/* pointer to provided override function */
 	debug_instruction_hook_func instrhook;				/* per-instruction callback hook */
 	debug_cpu_watchpoint *	wplist[ADDRESS_SPACES];		/* watchpoint lists for each address space */
+	debug_cpu_comment_group *comments;					/* disassembly comments */
 };
 
 

@@ -1046,7 +1046,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		registers_subview_item *subview;
 
@@ -1187,7 +1187,7 @@ static void registers_view_recompute(debug_view *view)
 
 	/* if no CPU, reset to the first one */
 	if (regdata->device == NULL)
-		regdata->device = view->machine->cpu[0];
+		regdata->device = view->machine->firstcpu;
 	table = cpu_get_state_table(regdata->device);
 
 	/* reset the view parameters */
@@ -1512,7 +1512,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 		if (space != NULL)
@@ -1569,7 +1569,7 @@ static int disasm_view_alloc(debug_view *view)
 	debug_view_expression_alloc(&dasmdata->expression);
 
 	/* count the number of comments */
-	for (cpu = view->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = view->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		total_comments += debug_comment_get_count(cpu);
 
 	/* initialize */
@@ -2433,7 +2433,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	int itemnum;
 
 	/* first add all the CPUs' address spaces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space *space = cpu_get_address_space(cpu, spacenum);

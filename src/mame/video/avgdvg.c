@@ -1276,7 +1276,7 @@ WRITE16_HANDLER( avgdvg_reset_word_w )
 
 MACHINE_RESET( avgdvg )
 {
-	avgdvg_reset_w (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
+	avgdvg_reset_w (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
 }
 
 

@@ -325,7 +325,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
 
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine->cpu[0]);
+	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
 
 	/* set a new timer to go off at the same scan line next frame */
 	timer_adjust_oneshot(timer, video_screen_get_frame_period(screen), 0);
@@ -858,7 +858,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 	/* set up the states and signal the sound interrupt to the main CPU */
 	atarigen_sound_to_cpu = param;
 	atarigen_sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen(machine->cpu[0]);
+	atarigen_sound_int_gen(cputag_get_cpu(machine, "maincpu"));
 }
 
 
@@ -1238,7 +1238,7 @@ static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 
 		/* scanline IRQ ack here */
 		case 0x1e:
 			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+			atarigen_scanline_int_ack_w(cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */
@@ -1468,6 +1468,8 @@ int atarigen_get_hblank(const device_config *screen)
 
 void atarigen_halt_until_hblank_0(const device_config *screen)
 {
+	const device_config *cpu = cputag_get_cpu(screen->machine, "maincpu");
+	
 	/* halt the CPU until the next HBLANK */
 	int hpos = video_screen_get_hpos(screen);
 	int width = video_screen_get_width(screen);
@@ -1480,8 +1482,8 @@ void atarigen_halt_until_hblank_0(const device_config *screen)
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)width;
-	timer_set(screen->machine, double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
-	cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+	timer_set(screen->machine, double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), (void *)cpu, 0, unhalt_cpu);
+	cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1569,7 +1571,8 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 static TIMER_CALLBACK( unhalt_cpu )
 {
-	cpu_set_input_line(machine->cpu[param], INPUT_LINE_HALT, CLEAR_LINE);
+	const device_config *cpu = (const device_config *)ptr;
+	cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

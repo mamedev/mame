@@ -47,7 +47,7 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 		tmp68301_irq_vector[level]	=	IVNR & 0x00e0;
 		tmp68301_irq_vector[level]	+=	4+i;
 
-		cpu_set_input_line(machine->cpu[0],level,HOLD_LINE);
+		cpu_set_input_line(machine->firstcpu,level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)	// N/1
@@ -90,7 +90,7 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0])), (1 << scale) * max);
+			duration = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->firstcpu)), (1 << scale) * max);
 		}
 		break;
 	}
@@ -115,7 +115,7 @@ MACHINE_RESET( tmp68301 )
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;
 
-	cpu_set_irq_callback(machine->cpu[0], tmp68301_irq_callback);
+	cpu_set_irq_callback(machine->firstcpu, tmp68301_irq_callback);
 }
 
 /* Update the IRQ state based on all possible causes */
@@ -145,7 +145,7 @@ static void update_irq_state(running_machine *machine)
 
 			tmp68301_IE[i] = 0;		// Interrupts are edge triggerred
 
-			cpu_set_input_line(machine->cpu[0],level,HOLD_LINE);
+			cpu_set_input_line(machine->firstcpu,level,HOLD_LINE);
 		}
 	}
 }

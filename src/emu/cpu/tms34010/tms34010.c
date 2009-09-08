@@ -1139,7 +1139,7 @@ VIDEO_UPDATE( tms340x0 )
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = screen->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_type type = cpu_get_type(cpu);
 		if (type == CPU_TMS34010 || type == CPU_TMS34020)

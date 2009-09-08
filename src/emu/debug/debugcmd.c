@@ -335,7 +335,7 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_init_func debug_init;
 		debug_init = (cpu_debug_init_func)device_get_info_fct(cpu, CPUINFO_FCT_DEBUG_INIT);
@@ -361,7 +361,7 @@ static void debug_command_exit(running_machine *machine)
 	const device_config *cpu;
 
 	/* turn off all traces */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		debug_cpu_trace(cpu, NULL, 0, NULL);
 
 	if (cheat.length)
@@ -510,14 +510,14 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 		return FALSE;
 	}
 
+	/* if we got a valid one, return */
+	*result = device_list_find_by_index(machine->config->devicelist, CPU, cpunum);
+	if (*result != NULL)
+		return TRUE;
+
 	/* if out of range, complain */
-	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
-	{
-		debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
-		return FALSE;
-	}
-	*result = machine->cpu[cpunum];
-	return TRUE;
+	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
+	return FALSE;
 }
 
 
@@ -957,7 +957,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 	debug_cpu_ignore_cpu(cpu, 0);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	for (scancpu = machine->cpu[0]; scancpu != NULL; scancpu = scancpu->typenext)
+	for (scancpu = machine->firstcpu; scancpu != NULL; scancpu = cpu_next(scancpu))
 		if (scancpu != cpu)
 			debug_cpu_ignore_cpu(scancpu, 1);
 	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag);
@@ -980,7 +980,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1012,7 +1012,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
 			/* make sure this isn't the last live CPU */
-			for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+			for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 				if (cpu != cpuwhich[paramnum] && (cpu_get_debug_data(cpu)->flags & DEBUG_FLAG_OBSERVING) != 0)
 					break;
 			if (cpu == NULL)
@@ -1044,7 +1044,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 	if (params == 0)
 	{
 		/* loop over all CPUs */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1196,7 +1196,7 @@ static void execute_bpclear(running_machine *machine, int ref, int params, const
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			debug_cpu_breakpoint *bp;
@@ -1234,7 +1234,7 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			debug_cpu_breakpoint *bp;
@@ -1273,7 +1273,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 
@@ -1370,7 +1370,7 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			int spacenum;
@@ -1413,7 +1413,7 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 	{
 		const device_config *cpu;
 
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 			int spacenum;
@@ -1457,7 +1457,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 	char buffer[256];
 
 	/* loop over all CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 		int spacenum;
@@ -1509,7 +1509,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 		int cleared = FALSE;
 
 		/* loop over CPUs and find live spots */
-		for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(cpu);
 

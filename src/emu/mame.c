@@ -240,7 +240,7 @@ INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
 	const device_config *cpu;
 
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		cpu_eat_cycles(cpu, 1000000000);
 }
 
@@ -1399,7 +1399,6 @@ static int parse_ini_file(core_options *options, const char *name)
 static running_machine *create_machine(const game_driver *driver)
 {
 	running_machine *machine;
-	int cpunum;
 
 	/* allocate memory for the machine */
 	machine = (running_machine *)malloc(sizeof(*machine));
@@ -1428,9 +1427,7 @@ static running_machine *create_machine(const game_driver *driver)
 	}
 
 	/* find devices */
-	machine->cpu[0] = cpu_first(machine->config);
-	for (cpunum = 1; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum - 1] != NULL; cpunum++)
-		machine->cpu[cpunum] = machine->cpu[cpunum - 1]->typenext;
+	machine->firstcpu = cpu_first(machine->config);
 	machine->primary_screen = video_screen_first(machine->config);
 
 	/* attach this machine to all the devices in the configuration */

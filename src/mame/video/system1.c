@@ -497,8 +497,8 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 	/* iterate over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *fgbase = BITMAP_ADDR16(fgpixmap, y, 0);
-		UINT16 *sprbase = BITMAP_ADDR16(sprite_bitmap, y, 0);
+		UINT16 *fgbase = BITMAP_ADDR16(fgpixmap, y & 0xff, 0);
+		UINT16 *sprbase = BITMAP_ADDR16(sprite_bitmap, y & 0xff, 0);
 		UINT16 *dstbase = BITMAP_ADDR16(bitmap, y, 0);
 		int bgy = (y + bgyscroll) & 0x1ff;
 		int bgxscroll = bgrowscroll[y / 8];

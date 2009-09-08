@@ -54,28 +54,21 @@
 typedef struct _debug_comment debug_comment;
 struct _debug_comment
 {
-	UINT8 is_valid;
-	UINT32 address;
-	char text[DEBUG_COMMENT_MAX_LINE_LENGTH];
-	rgb_t color;
-	UINT32 crc;
+	UINT8 			is_valid;
+	UINT32 			address;
+	char 			text[DEBUG_COMMENT_MAX_LINE_LENGTH];
+	rgb_t 			color;
+	UINT32 			crc;
 };
 
-typedef struct _comment_group comment_group;
-struct _comment_group
+
+/* in debugcpu.h -- typedef struct _debug_cpu_comment_group debug_cpu_comment_group; */
+struct _debug_cpu_comment_group
 {
-	int comment_count;
-	UINT32 change_count;
-	debug_comment *comment_info[DEBUG_COMMENT_MAX_NUM];
+	int 			comment_count;
+	UINT32 			change_count;
+	debug_comment *	comment_info[DEBUG_COMMENT_MAX_NUM];
 };
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static comment_group *debug_comments;
 
 
 
@@ -90,9 +83,7 @@ static void debug_comment_free(running_machine *machine);
 
 
 /***************************************************************************
-
-    Initialization
-
+    INITIALIZATION
 ***************************************************************************/
 
 /*-------------------------------------------------------------------------
@@ -102,22 +93,18 @@ static void debug_comment_free(running_machine *machine);
 
 int debug_comment_init(running_machine *machine)
 {
-	int numcpu;
-
-	for (numcpu = 0; numcpu < ARRAY_LENGTH(machine->cpu); numcpu++)
-		if (machine->cpu[numcpu] == NULL)
-			break;
-	if (numcpu > 0)
+	const device_config *cpu;
+	
+	/* allocate memory for the comments */
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
-		/* allocate enough comment groups for the total # of cpu's */
-		debug_comments = auto_alloc_array_clear(machine, comment_group, numcpu);
-
-		/* automatically load em up */
-		debug_comment_load(machine);
-
-		add_exit_callback(machine, debug_comment_exit);
+		cpu_debug_data *cpudata = cpu_get_debug_data(cpu);
+		cpudata->comments = auto_alloc(machine, debug_cpu_comment_group);
 	}
 
+	/* automatically load em up */
+	debug_comment_load(machine);
+	add_exit_callback(machine, debug_comment_exit);
 	return 1;
 }
 
@@ -130,10 +117,10 @@ int debug_comment_init(running_machine *machine)
 
 int debug_comment_add(const device_config *device, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc)
 {
-	int cpu_num = cpu_get_index(device);
-	int i = 0;
-	int insert_point = debug_comments[cpu_num].comment_count;
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
+	int insert_point = comments->comment_count;
 	int match = 0;
+	int i = 0;
 
 	/* Create a new item to insert into the list */
 	debug_comment *insert_me = alloc_or_die(debug_comment);
@@ -144,15 +131,15 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	strcpy(insert_me->text, comment);
 
 	/* Find the insert point */
-	for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
+	for (i = 0; i < comments->comment_count; i++)
 	{
-		if (insert_me->address < debug_comments[cpu_num].comment_info[i]->address)
+		if (insert_me->address < comments->comment_info[i]->address)
 		{
 			insert_point = i;
 			break;
 		}
-		else if (insert_me->address == debug_comments[cpu_num].comment_info[i]->address &&
-				 insert_me->crc == debug_comments[cpu_num].comment_info[i]->crc)
+		else if (insert_me->address == comments->comment_info[i]->address &&
+				 insert_me->crc == comments->comment_info[i]->crc)
 		{
 			insert_point = i;
 			match = 1;
@@ -163,9 +150,9 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	/* Got an exact match?  Just replace */
 	if (match == 1)
 	{
-		free(debug_comments[cpu_num].comment_info[insert_point]);
-		debug_comments[cpu_num].comment_info[insert_point] = insert_me;
-		debug_comments[cpu_num].change_count++;
+		free(comments->comment_info[insert_point]);
+		comments->comment_info[insert_point] = insert_me;
+		comments->change_count++;
 
 		/* force an update of disassembly views */
 		debug_view_update_type(device->machine, DVT_DISASSEMBLY);
@@ -174,13 +161,13 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 
 	/* Otherwise insert */
 	/* First, shift the list down */
-	for (i = debug_comments[cpu_num].comment_count; i >= insert_point; i--)
-		debug_comments[cpu_num].comment_info[i] = debug_comments[cpu_num].comment_info[i-1];
+	for (i = comments->comment_count; i >= insert_point; i--)
+		comments->comment_info[i] = comments->comment_info[i-1];
 
 	/* do the insertion */
-	debug_comments[cpu_num].comment_info[insert_point] = insert_me;
-	debug_comments[cpu_num].comment_count++;
-	debug_comments[cpu_num].change_count++;
+	comments->comment_info[insert_point] = insert_me;
+	comments->comment_count++;
+	comments->change_count++;
 
 	/* force an update of disassembly views */
 	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
@@ -197,35 +184,27 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 
 int debug_comment_remove(const device_config *device, offs_t addr, UINT32 c_crc)
 {
-	int cpu_num = cpu_get_index(device);
-	int i;
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int remove_index = -1;
+	int i;
 
-	for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
-	{
-		if (debug_comments[cpu_num].comment_info[i]->address == addr)	/* got an address match */
-		{
-			if (debug_comments[cpu_num].comment_info[i]->crc == c_crc)
-			{
+	for (i = 0; i < comments->comment_count; i++)
+		if (comments->comment_info[i]->address == addr)	/* got an address match */
+			if (comments->comment_info[i]->crc == c_crc)
 				remove_index = i;
-			}
-		}
-	}
 
 	/* The comment doesn't exist? */
 	if (remove_index == -1)
 		return 0;
 
 	/* Okay, it's there, now remove it */
-	free(debug_comments[cpu_num].comment_info[remove_index]);
+	free(comments->comment_info[remove_index]);
 
-	for (i = remove_index; i < debug_comments[cpu_num].comment_count-1; i++)
-	{
-		debug_comments[cpu_num].comment_info[i] = debug_comments[cpu_num].comment_info[i+1];
-	}
+	for (i = remove_index; i < comments->comment_count-1; i++)
+		comments->comment_info[i] = comments->comment_info[i+1];
 
-	debug_comments[cpu_num].comment_count--;
-	debug_comments[cpu_num].change_count++;
+	comments->comment_count--;
+	comments->change_count++;
 
 	/* force an update of disassembly views */
 	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
@@ -242,21 +221,17 @@ int debug_comment_remove(const device_config *device, offs_t addr, UINT32 c_crc)
 
 const char *debug_comment_get_text(const device_config *device, offs_t addr, UINT32 c_crc)
 {
-	int cpu_num = cpu_get_index(device);
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int i;
 
 	/* inefficient - should use bsearch - but will be a little tricky with multiple comments per addr */
-	for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
-	{
-		if (debug_comments[cpu_num].comment_info[i]->address == addr)	/* got an address match */
+	for (i = 0; i < comments->comment_count; i++)
+		if (comments->comment_info[i]->address == addr)	/* got an address match */
 		{
 			/* now check the bank information to be sure */
-			if (debug_comments[cpu_num].comment_info[i]->crc == c_crc)
-			{
-				return debug_comments[cpu_num].comment_info[i]->text;
-			}
+			if (comments->comment_info[i]->crc == c_crc)
+				return comments->comment_info[i]->text;
 		}
-	}
 
 	return 0x00;
 }
@@ -269,7 +244,8 @@ const char *debug_comment_get_text(const device_config *device, offs_t addr, UIN
 
 int debug_comment_get_count(const device_config *device)
 {
-	return debug_comments[cpu_get_index(device)].comment_count;
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
+	return comments->comment_count;
 }
 
 
@@ -280,7 +256,8 @@ int debug_comment_get_count(const device_config *device)
 
 UINT32 debug_comment_get_change_count(const device_config *device)
 {
-	return debug_comments[cpu_get_index(device)].change_count;
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
+	return comments->change_count;
 }
 
 /*-------------------------------------------------------------------------
@@ -290,12 +267,14 @@ UINT32 debug_comment_get_change_count(const device_config *device)
 
 UINT32 debug_comment_all_change_count(running_machine *machine)
 {
-	int i ;
+	const device_config *cpu;
 	UINT32 retVal = 0;
-
-	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
-		if (machine->cpu[i] != NULL)
-			retVal += debug_comments[i].change_count ;
+	
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	{
+		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
+		retVal += comments->change_count;
+	}
 
 	return retVal;
 }
@@ -342,41 +321,35 @@ UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t addres
 
 void debug_comment_dump(const device_config *device, offs_t addr)
 {
-	int cpu_num = cpu_get_index(device);
+	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int i;
 	int ff = 0;
 
 	if (addr == -1)
 	{
-		for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
-		{
-			if (debug_comments[cpu_num].comment_info[i]->is_valid)
-			{
-				logerror("%d : %s (%d %d)\n", i, debug_comments[cpu_num].comment_info[i]->text,
-												 debug_comments[cpu_num].comment_info[i]->address,
-												 debug_comments[cpu_num].comment_info[i]->crc);
-			}
-		}
+		for (i = 0; i < comments->comment_count; i++)
+			if (comments->comment_info[i]->is_valid)
+				logerror("%d : %s (%d %d)\n", i, comments->comment_info[i]->text,
+												 comments->comment_info[i]->address,
+												 comments->comment_info[i]->crc);
 	}
 	else
 	{
 		UINT32 c_crc = debug_comment_get_opcode_crc32(device, addr);
 
-		for (i = 0; i < debug_comments[cpu_num].comment_count; i++)
-		{
-			if (debug_comments[cpu_num].comment_info[i]->address == addr)	/* got an address match */
+		for (i = 0; i < comments->comment_count; i++)
+			if (comments->comment_info[i]->address == addr)	/* got an address match */
 			{
 				/* now check the bank information to be sure */
-				if (debug_comments[cpu_num].comment_info[i]->crc == c_crc)
+				if (comments->comment_info[i]->crc == c_crc)
 				{
 					logerror("%d : %s (%d %d)\n", addr,
-												  debug_comments[cpu_num].comment_info[addr]->text,
-												  debug_comments[cpu_num].comment_info[addr]->address,
-												  debug_comments[cpu_num].comment_info[addr]->crc);
+												  comments->comment_info[addr]->text,
+												  comments->comment_info[addr]->address,
+												  comments->comment_info[addr]->crc);
 					ff = 1;
 				}
 			}
-		}
 
 		if (!ff) logerror("No comment exists for address : 0x%x\n", addr);
 	}
@@ -389,49 +362,51 @@ void debug_comment_dump(const device_config *device, offs_t addr)
 
 int debug_comment_save(running_machine *machine)
 {
-	int i, j;
+	int j;
 	char crc_buf[20];
 	xml_data_node *root = xml_file_create();
 	xml_data_node *commentnode, *systemnode;
 	int total_comments = 0;
+	const device_config *cpu;
 
 	/* if we don't have a root, bail */
-	if (!root)
+	if (root == NULL)
 		return 0;
 
 	/* create a comment node */
 	commentnode = xml_add_child(root, "mamecommentfile", NULL);
-	if (!commentnode)
+	if (commentnode == NULL)
 		goto error;
 	xml_set_attribute_int(commentnode, "version", COMMENT_VERSION);
 
 	/* create a system node */
 	systemnode = xml_add_child(commentnode, "system", NULL);
-	if (!systemnode)
+	if (systemnode == NULL)
 		goto error;
 	xml_set_attribute(systemnode, "name", machine->gamedrv->name);
 
 	/* for each cpu */
-	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
-		if (machine->cpu[i] != NULL)
-		{
-			xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
-			if (!curnode)
-				goto error;
-			xml_set_attribute_int(curnode, "num", i);
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	{
+		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
 
-			for (j = 0; j < debug_comments[i].comment_count; j++)
-			{
-				xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(debug_comments[i].comment_info[j]->text));
-				if (!datanode)
-					goto error;
-				xml_set_attribute_int(datanode, "address", debug_comments[i].comment_info[j]->address);
-				xml_set_attribute_int(datanode, "color", debug_comments[i].comment_info[j]->color);
-				sprintf(crc_buf, "%08X", debug_comments[i].comment_info[j]->crc);
-				xml_set_attribute(datanode, "crc", crc_buf);
-				total_comments++;
-			}
+		xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
+		if (curnode == NULL)
+			goto error;
+		xml_set_attribute(curnode, "tag", cpu->tag);
+
+		for (j = 0; j < comments->comment_count; j++)
+		{
+			xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(comments->comment_info[j]->text));
+			if (datanode == NULL)
+				goto error;
+			xml_set_attribute_int(datanode, "address", comments->comment_info[j]->address);
+			xml_set_attribute_int(datanode, "color", comments->comment_info[j]->color);
+			sprintf(crc_buf, "%08X", comments->comment_info[j]->crc);
+			xml_set_attribute(datanode, "crc", crc_buf);
+			total_comments++;
 		}
+	}
 
 	/* flush the file */
 	if (total_comments > 0)
@@ -484,19 +459,19 @@ int debug_comment_load(running_machine *machine)
 
 static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 {
-	int i, j;
+	int j;
 	xml_data_node *root, *commentnode, *systemnode, *cpunode, *datanode;
 	const char *name;
 	int version;
 
 	/* read the file */
 	root = xml_file_read(mame_core_file(fp), NULL);
-	if (!root)
+	if (root == NULL)
 		goto error;
 
 	/* find the config node */
 	commentnode = xml_get_sibling(root->child, "mamecommentfile");
-	if (!commentnode)
+	if (commentnode == NULL)
 		goto error;
 
 	/* validate the config data version */
@@ -510,29 +485,30 @@ static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 	if (strcmp(name, machine->gamedrv->name) != 0)
 		goto error;
 
-	i = 0;
-
 	for (cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 	{
-		j = 0;
-
-		for (datanode = xml_get_sibling(cpunode->child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
+		const device_config *cpu = cputag_get_cpu(machine, xml_get_attribute_string(cpunode, "tag", ""));
+		if (cpu != NULL)
 		{
-			/* Malloc the comment */
-			debug_comments[i].comment_info[j] = (debug_comment*) malloc(sizeof(debug_comment));
+			debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
+			j = 0;
 
-			debug_comments[i].comment_info[j]->address = xml_get_attribute_int(datanode, "address", 0);
-			debug_comments[i].comment_info[j]->color = xml_get_attribute_int(datanode, "color", 0);
-			sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &debug_comments[i].comment_info[j]->crc);
-			strcpy(debug_comments[i].comment_info[j]->text, datanode->value);
-			debug_comments[i].comment_info[j]->is_valid = 1;
+			for (datanode = xml_get_sibling(cpunode->child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
+			{
+				/* Malloc the comment */
+				comments->comment_info[j] = (debug_comment*) malloc(sizeof(debug_comment));
 
-			j++;
+				comments->comment_info[j]->address = xml_get_attribute_int(datanode, "address", 0);
+				comments->comment_info[j]->color = xml_get_attribute_int(datanode, "color", 0);
+				sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &comments->comment_info[j]->crc);
+				strcpy(comments->comment_info[j]->text, datanode->value);
+				comments->comment_info[j]->is_valid = 1;
+
+				j++;
+			}
+
+			comments->comment_count = j;
 		}
-
-		debug_comments[i].comment_count = j;
-
-		i++;
 	}
 
 	/* free the parser */
@@ -564,16 +540,19 @@ static void debug_comment_exit(running_machine *machine)
 
 static void debug_comment_free(running_machine *machine)
 {
-	int i, j;
-
-	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
-		if (machine->cpu[i] != NULL)
+	const device_config *cpu;
+	
+	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	{
+		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
+		if (comments != NULL)
 		{
-			for (j = 0; j < debug_comments[i].comment_count; j++)
-			{
-				free(debug_comments[i].comment_info[j]);
-			}
+			int j;
+			
+			for (j = 0; j < comments->comment_count; j++)
+				free(comments->comment_info[j]);
 
-			debug_comments[i].comment_count = 0;
+			comments->comment_count = 0;
 		}
+	}
 }

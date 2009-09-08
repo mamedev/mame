@@ -705,7 +705,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(SCSP->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(SCSP->device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -1208,7 +1208,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-		cpu_set_input_line(space->machine->cpu[2],dma_transfer_end,HOLD_LINE);
+		cpu_set_input_line(device_list_find_by_index(space->machine->config->devicelist, CPU, 2),dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1312,7 +1312,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), SCSP);
+			dma_scsp(cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM), SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1320,7 +1320,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpu_set_input_line_and_vector(device->machine->cpu[0], 9, HOLD_LINE , 0x46);
+				cpu_set_input_line_and_vector(device->machine->firstcpu, 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;
