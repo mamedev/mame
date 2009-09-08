@@ -412,7 +412,7 @@ INSTRUCTION( sub_IR1_IM )		{ mode_IR1_IM(subtract) }
     LOGICAL INSTRUCTIONS
 ***************************************************************************/
 
-static void and(z8_state *cpustate, UINT8 dst, UINT8 src)
+static void _and(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* dst <- dst AND src */
 	UINT8 data = register_read(cpustate, dst) & src;
@@ -423,12 +423,12 @@ static void and(z8_state *cpustate, UINT8 dst, UINT8 src)
 	set_flag_v(0);
 }
 
-INSTRUCTION( and_r1_r2 )		{ mode_r1_r2(and) }
-INSTRUCTION( and_r1_Ir2 )		{ mode_r1_Ir2(and) }
-INSTRUCTION( and_R2_R1 )		{ mode_R2_R1(and) }
-INSTRUCTION( and_IR2_R1 )		{ mode_IR2_R1(and) }
-INSTRUCTION( and_R1_IM )		{ mode_R1_IM(and) }
-INSTRUCTION( and_IR1_IM )		{ mode_IR1_IM(and) }
+INSTRUCTION( and_r1_r2 )		{ mode_r1_r2(_and) }
+INSTRUCTION( and_r1_Ir2 )		{ mode_r1_Ir2(_and) }
+INSTRUCTION( and_R2_R1 )		{ mode_R2_R1(_and) }
+INSTRUCTION( and_IR2_R1 )		{ mode_IR2_R1(_and) }
+INSTRUCTION( and_R1_IM )		{ mode_R1_IM(_and) }
+INSTRUCTION( and_IR1_IM )		{ mode_IR1_IM(_and) }
 
 static void complement(z8_state *cpustate, UINT8 dst)
 {
@@ -444,7 +444,7 @@ static void complement(z8_state *cpustate, UINT8 dst)
 INSTRUCTION( com_R1 )			{ mode_R1(complement) }
 INSTRUCTION( com_IR1 )			{ mode_IR1(complement) }
 
-static void or(z8_state *cpustate, UINT8 dst, UINT8 src)
+static void _or(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* dst <- dst OR src */
 	UINT8 data = register_read(cpustate, dst) | src;
@@ -455,14 +455,14 @@ static void or(z8_state *cpustate, UINT8 dst, UINT8 src)
 	set_flag_v(0);
 }
 
-INSTRUCTION( or_r1_r2 )			{ mode_r1_r2(or) }
-INSTRUCTION( or_r1_Ir2 )		{ mode_r1_Ir2(or) }
-INSTRUCTION( or_R2_R1 )			{ mode_R2_R1(or) }
-INSTRUCTION( or_IR2_R1 )		{ mode_IR2_R1(or) }
-INSTRUCTION( or_R1_IM )			{ mode_R1_IM(or) }
-INSTRUCTION( or_IR1_IM )		{ mode_IR1_IM(or) }
+INSTRUCTION( or_r1_r2 )			{ mode_r1_r2(_or) }
+INSTRUCTION( or_r1_Ir2 )		{ mode_r1_Ir2(_or) }
+INSTRUCTION( or_R2_R1 )			{ mode_R2_R1(_or) }
+INSTRUCTION( or_IR2_R1 )		{ mode_IR2_R1(_or) }
+INSTRUCTION( or_R1_IM )			{ mode_R1_IM(_or) }
+INSTRUCTION( or_IR1_IM )		{ mode_IR1_IM(_or) }
 
-static void xor(z8_state *cpustate, UINT8 dst, UINT8 src)
+static void _xor(z8_state *cpustate, UINT8 dst, UINT8 src)
 {
 	/* dst <- dst XOR src */
 	UINT8 data = register_read(cpustate, dst) ^ src;
@@ -473,12 +473,12 @@ static void xor(z8_state *cpustate, UINT8 dst, UINT8 src)
 	set_flag_v(0);
 }
 
-INSTRUCTION( xor_r1_r2 )		{ mode_r1_r2(xor) }
-INSTRUCTION( xor_r1_Ir2 )		{ mode_r1_Ir2(xor) }
-INSTRUCTION( xor_R2_R1 )		{ mode_R2_R1(xor) }
-INSTRUCTION( xor_IR2_R1 )		{ mode_IR2_R1(xor) }
-INSTRUCTION( xor_R1_IM )		{ mode_R1_IM(xor) }
-INSTRUCTION( xor_IR1_IM )		{ mode_IR1_IM(xor) }
+INSTRUCTION( xor_r1_r2 )		{ mode_r1_r2(_xor) }
+INSTRUCTION( xor_r1_Ir2 )		{ mode_r1_Ir2(_xor) }
+INSTRUCTION( xor_R2_R1 )		{ mode_R2_R1(_xor) }
+INSTRUCTION( xor_IR2_R1 )		{ mode_IR2_R1(_xor) }
+INSTRUCTION( xor_R1_IM )		{ mode_R1_IM(_xor) }
+INSTRUCTION( xor_IR1_IM )		{ mode_IR1_IM(_xor) }
 
 /***************************************************************************
     PROGRAM CONTROL INSTRUCTIONS

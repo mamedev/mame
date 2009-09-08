@@ -716,13 +716,13 @@ static STREAM_UPDATE( discrete_stream_update )
 	for (entry = info->input_list; entry != NULL; entry = entry->next)
 	{
 		struct dss_input_context *context = (struct dss_input_context *) ((node_description *) entry->ptr)->context;
-		context->ptr = (void *) inputs[context->stream_in_number];
+		context->ptr = (stream_sample_t *) inputs[context->stream_in_number];
 	}
 
 	/* Queue tasks */
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
-		task_info *ti = malloc(sizeof(task_info));
+		task_info *ti = (task_info *)malloc(sizeof(task_info));
 		discrete_task_context *task = (discrete_task_context *) entry->ptr;
 
 		/* Fire task */

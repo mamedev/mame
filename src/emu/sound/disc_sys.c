@@ -25,7 +25,7 @@ struct dso_csvlog_context
 
 struct dso_wavelog_context
 {
-	wav_file *wav_file;
+	wav_file *wavfile;
 	char name[32];
 };
 
@@ -170,7 +170,7 @@ static DISCRETE_START( dso_wavelog )
 
 	log_num = node_module_index(node);
 	sprintf(context->name, "discrete%s_%d.wav", node->info->device->tag, log_num);
-	context->wav_file = wav_open(context->name, node->info->sample_rate, node->active_inputs/2);
+	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs/2);
 }
 
 static DISCRETE_STOP( dso_wavelog )
@@ -178,8 +178,8 @@ static DISCRETE_STOP( dso_wavelog )
 	struct dso_wavelog_context *context = (struct dso_wavelog_context *) node->context;
 
 	/* close any wave files */
-	if (context->wav_file)
-		wav_close(context->wav_file);
+	if (context->wavfile)
+		wav_close(context->wavfile);
 }
 
 static DISCRETE_STEP( dso_wavelog )
@@ -196,7 +196,7 @@ static DISCRETE_STEP( dso_wavelog )
 	if (node->active_inputs == 2)
 	{
 		/* DISCRETE_WAVELOG1 */
-		wav_add_data_16(context->wav_file, &wave_data_l, 1);
+		wav_add_data_16(context->wavfile, &wave_data_l, 1);
 	}
 	else
 	{
@@ -205,6 +205,6 @@ static DISCRETE_STEP( dso_wavelog )
 		val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 		wave_data_r = (INT16)val;
 
-		wav_add_data_16lr(context->wav_file, &wave_data_l, &wave_data_r, 1);
+		wav_add_data_16lr(context->wavfile, &wave_data_l, &wave_data_r, 1);
 	}
 }

@@ -1853,7 +1853,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		/* initialize new cheat system */
 		if (cheat.cheatmap != NULL)
 			free(cheat.cheatmap);
-		cheat.cheatmap = malloc(real_length * sizeof(cheat_map));
+		cheat.cheatmap = (cheat_map *)malloc(real_length * sizeof(cheat_map));
 		if (cheat.cheatmap == NULL)
 		{
 			debug_console_printf(machine, "Unable of allocate the necessary memory\n");
@@ -1878,7 +1878,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
 			return;
 
-		cheat.cheatmap = realloc(cheat.cheatmap, (cheat.length + real_length) * sizeof(cheat_map));
+		cheat.cheatmap = (cheat_map *)realloc(cheat.cheatmap, (cheat.length + real_length) * sizeof(cheat_map));
 		if (cheat.cheatmap == NULL)
 		{
 			cheat.cheatmap = cheatmap_bak;

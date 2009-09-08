@@ -14,30 +14,30 @@ static SDD1_IM* SDD1_IM_ctor(running_machine* machine)
 	return newclass;
 }
 
-static void SDD1_IM_prepareDecomp(SDD1_IM* this, UINT32 in_buf)
+static void SDD1_IM_prepareDecomp(SDD1_IM* thisptr, UINT32 in_buf)
 {
-	this->byte_ptr = in_buf;
-	this->bit_count = 4;
+	thisptr->byte_ptr = in_buf;
+	thisptr->bit_count = 4;
 }
 
-static UINT8 SDD1_IM_getCodeword(SDD1_IM* this, const UINT8 code_len)
+static UINT8 SDD1_IM_getCodeword(SDD1_IM* thisptr, const UINT8 code_len)
 {
 	UINT8 codeword;
 
-	codeword = sdd1_read(this->machine, this->byte_ptr) << this->bit_count;
+	codeword = sdd1_read(thisptr->machine, thisptr->byte_ptr) << thisptr->bit_count;
 
-	++this->bit_count;
+	++thisptr->bit_count;
 
 	if (codeword & 0x80)
 	{
-		codeword |= sdd1_read(this->machine, this->byte_ptr + 1) >> (9 - this->bit_count);
-		this->bit_count += code_len;
+		codeword |= sdd1_read(thisptr->machine, thisptr->byte_ptr + 1) >> (9 - thisptr->bit_count);
+		thisptr->bit_count += code_len;
 	}
 
-	if (this->bit_count & 0x08)
+	if (thisptr->bit_count & 0x08)
 	{
-		this->byte_ptr++;
-		this->bit_count &= 0x07;
+		thisptr->byte_ptr++;
+		thisptr->bit_count &= 0x07;
 	}
 
 	return codeword;
@@ -57,7 +57,7 @@ static SDD1_GCD* SDD1_GCD_ctor(running_machine* machine, SDD1_IM* associatedIM)
 	return newclass;
 }
 
-static void SDD1_GCD_getRunCount(SDD1_GCD* this, UINT8 code_num, UINT8* MPScount, UINT8* LPSind)
+static void SDD1_GCD_getRunCount(SDD1_GCD* thisptr, UINT8 code_num, UINT8* MPScount, UINT8* LPSind)
 {
 	const UINT8 run_count[] =
 	{
@@ -95,7 +95,7 @@ static void SDD1_GCD_getRunCount(SDD1_GCD* this, UINT8 code_num, UINT8* MPScount
 		0x70, 0x30, 0x50, 0x10, 0x60, 0x20, 0x40, 0x00,
 	};
 
-	UINT8 codeword = SDD1_IM_getCodeword(this->IM, code_num);
+	UINT8 codeword = SDD1_IM_getCodeword(thisptr->IM, code_num);
 
 	if (codeword & 0x80)
 	{
@@ -126,33 +126,33 @@ static SDD1_BG* SDD1_BG_ctor(running_machine* machine, SDD1_GCD* associatedGCD, 
 	return newclass;
 }
 
-static void SDD1_BG_prepareDecomp(SDD1_BG* this)
+static void SDD1_BG_prepareDecomp(SDD1_BG* thisptr)
 {
-	this->MPScount = 0;
-	this->LPSind = 0;
+	thisptr->MPScount = 0;
+	thisptr->LPSind = 0;
 }
 
-static UINT8 SDD1_BG_getBit(SDD1_BG* this, UINT8* endOfRun)
+static UINT8 SDD1_BG_getBit(SDD1_BG* thisptr, UINT8* endOfRun)
 {
 	UINT8 bit;
 
-	if (!(this->MPScount || this->LPSind))
+	if (!(thisptr->MPScount || thisptr->LPSind))
 	{
-		SDD1_GCD_getRunCount(this->GCD, this->code_num, &(this->MPScount), &(this->LPSind));
+		SDD1_GCD_getRunCount(thisptr->GCD, thisptr->code_num, &(thisptr->MPScount), &(thisptr->LPSind));
 	}
 
-	if (this->MPScount)
+	if (thisptr->MPScount)
 	{
 		bit = 0;
-		this->MPScount--;
+		thisptr->MPScount--;
 	}
 	else
 	{
 		bit = 1;
-		this->LPSind = 0;
+		thisptr->LPSind = 0;
 	}
 
-	if (this->MPScount || this->LPSind)
+	if (thisptr->MPScount || thisptr->LPSind)
 	{
 		(*endOfRun) = 0;
 	}
@@ -241,27 +241,27 @@ static SDD1_PEM* SDD1_PEM_ctor(running_machine* machine,
 	return newclass;
 }
 
-static void SDD1_PEM_prepareDecomp(SDD1_PEM* this)
+static void SDD1_PEM_prepareDecomp(SDD1_PEM* thisptr)
 {
 	UINT8 i;
 	for(i = 0; i < 32; i++)
 	{
-		this->contextInfo[i].status = 0;
-		this->contextInfo[i].MPS = 0;
+		thisptr->contextInfo[i].status = 0;
+		thisptr->contextInfo[i].MPS = 0;
 	}
 }
 
-static UINT8 SDD1_PEM_getBit(SDD1_PEM* this, UINT8 context)
+static UINT8 SDD1_PEM_getBit(SDD1_PEM* thisptr, UINT8 context)
 {
 	UINT8 endOfRun;
 	UINT8 bit;
 
-	SDD1_PEM_ContextInfo *pContInfo = &(this->contextInfo)[context];
+	SDD1_PEM_ContextInfo *pContInfo = &(thisptr->contextInfo)[context];
 	UINT8 currStatus = pContInfo->status;
 	SDD1_PEM_state* pState = &(SDD1_PEM_evolution_table[currStatus]);
 	UINT8 currentMPS = pContInfo->MPS;
 
-	bit = SDD1_BG_getBit(this->BG[pState->code_num], &endOfRun);
+	bit = SDD1_BG_getBit(thisptr->BG[pState->code_num], &endOfRun);
 
 	if (endOfRun)
 	{
@@ -301,64 +301,64 @@ static SDD1_CM* SDD1_CM_ctor(running_machine* machine, SDD1_PEM* associatedPEM)
 	return newclass;
 }
 
-static void SDD1_CM_prepareDecomp(SDD1_CM* this, UINT32 first_byte)
+static void SDD1_CM_prepareDecomp(SDD1_CM* thisptr, UINT32 first_byte)
 {
 	INT32 i = 0;
-	this->bitplanesInfo = sdd1_read(this->machine, first_byte) & 0xc0;
-	this->contextBitsInfo = sdd1_read(this->machine, first_byte) & 0x30;
-	this->bit_number = 0;
+	thisptr->bitplanesInfo = sdd1_read(thisptr->machine, first_byte) & 0xc0;
+	thisptr->contextBitsInfo = sdd1_read(thisptr->machine, first_byte) & 0x30;
+	thisptr->bit_number = 0;
 	for (i = 0; i < 8; i++)
 	{
-		this->prevBitplaneBits[i] = 0;
+		thisptr->prevBitplaneBits[i] = 0;
 	}
-	switch(this->bitplanesInfo)
+	switch(thisptr->bitplanesInfo)
 	{
 		case 0x00:
-			this->currBitplane = 1;
+			thisptr->currBitplane = 1;
 			break;
 		case 0x40:
-			this->currBitplane = 7;
+			thisptr->currBitplane = 7;
 			break;
 		case 0x80:
-			this->currBitplane = 3;
+			thisptr->currBitplane = 3;
 			break;
 	}
 }
 
-static UINT8 SDD1_CM_getBit(SDD1_CM* this)
+static UINT8 SDD1_CM_getBit(SDD1_CM* thisptr)
 {
 	UINT8 currContext;
 	UINT16 *context_bits;
 	UINT8 bit = 0;
 
-	switch (this->bitplanesInfo)
+	switch (thisptr->bitplanesInfo)
 	{
 		case 0x00:
-			this->currBitplane ^= 0x01;
+			thisptr->currBitplane ^= 0x01;
 			break;
 		case 0x40:
-			this->currBitplane ^= 0x01;
-			if (!(this->bit_number & 0x7f))
+			thisptr->currBitplane ^= 0x01;
+			if (!(thisptr->bit_number & 0x7f))
 			{
-				this->currBitplane = ((this->currBitplane + 2) & 0x07);
+				thisptr->currBitplane = ((thisptr->currBitplane + 2) & 0x07);
 			}
 			break;
 		case 0x80:
-			this->currBitplane ^= 0x01;
-			if (!(this->bit_number & 0x7f))
+			thisptr->currBitplane ^= 0x01;
+			if (!(thisptr->bit_number & 0x7f))
 			{
-				this->currBitplane ^= 0x02;
+				thisptr->currBitplane ^= 0x02;
 			}
 			break;
 		case 0xc0:
-			this->currBitplane = this->bit_number & 0x07;
+			thisptr->currBitplane = thisptr->bit_number & 0x07;
 			break;
 	}
 
-	context_bits = &(this->prevBitplaneBits)[this->currBitplane];
+	context_bits = &(thisptr->prevBitplaneBits)[thisptr->currBitplane];
 
-	currContext = (this->currBitplane & 0x01) << 4;
-	switch (this->contextBitsInfo)
+	currContext = (thisptr->currBitplane & 0x01) << 4;
+	switch (thisptr->contextBitsInfo)
 	{
 		case 0x00:
 			currContext |= ((*context_bits & 0x01c0) >> 5) | (*context_bits & 0x0001);
@@ -374,12 +374,12 @@ static UINT8 SDD1_CM_getBit(SDD1_CM* this)
 			break;
 	}
 
-	bit = SDD1_PEM_getBit(this->PEM, currContext);
+	bit = SDD1_PEM_getBit(thisptr->PEM, currContext);
 
 	*context_bits <<= 1;
 	*context_bits |= bit;
 
-	this->bit_number++;
+	thisptr->bit_number++;
 
 	return bit;
 }
@@ -401,19 +401,19 @@ static SDD1_OL* SDD1_OL_ctor(running_machine* machine, SDD1_CM* associatedCM)
 	return newclass;
 }
 
-static void SDD1_OL_prepareDecomp(SDD1_OL* this, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf)
+static void SDD1_OL_prepareDecomp(SDD1_OL* thisptr, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf)
 {
-	this->bitplanesInfo = sdd1_read(this->machine, first_byte) & 0xc0;
-	this->length = out_len;
-	this->buffer = out_buf;
+	thisptr->bitplanesInfo = sdd1_read(thisptr->machine, first_byte) & 0xc0;
+	thisptr->length = out_len;
+	thisptr->buffer = out_buf;
 }
 
-static void SDD1_OL_launch(SDD1_OL* this)
+static void SDD1_OL_launch(SDD1_OL* thisptr)
 {
 	UINT8 i;
 	UINT8 register1 = 0, register2 = 0;
 
-	switch(this->bitplanesInfo)
+	switch(thisptr->bitplanesInfo)
 	{
 		case 0x00:
 		case 0x40:
@@ -423,38 +423,38 @@ static void SDD1_OL_launch(SDD1_OL* this)
 			{	// if length == 0, we output 2^16 bytes
 				if(!i)
 				{
-					*(this->buffer++) = register2;
+					*(thisptr->buffer++) = register2;
 					i = ~i;
 				}
 				else
 				{
 					for(register1 = register2 = 0, i = 0x80; i; i >>= 1)
 					{
-						if(SDD1_CM_getBit(this->CM))
+						if(SDD1_CM_getBit(thisptr->CM))
 						{
 							register1 |= i;
 						}
-						if(SDD1_CM_getBit(this->CM))
+						if(SDD1_CM_getBit(thisptr->CM))
 						{
 							register2 |= i;
 						}
 					}
-					*(this->buffer++) = register1;
+					*(thisptr->buffer++) = register1;
 				}
-			} while(--(this->length));
+			} while(--(thisptr->length));
 			break;
 		case 0xc0:
 			do
 			{
 				for(register1 = 0, i = 0x01; i; i <<= 1)
 				{
-					if(SDD1_CM_getBit(this->CM))
+					if(SDD1_CM_getBit(thisptr->CM))
 					{
 						register1 |= i;
 					}
 				}
-				*(this->buffer++) = register1;
-			} while(--(this->length));
+				*(thisptr->buffer++) = register1;
+			} while(--(thisptr->length));
 			break;
 	}
 }
@@ -493,22 +493,22 @@ static SDD1emu* SDD1emu_ctor(running_machine *machine)
 	return newclass;
 }
 
-static void SDD1emu_decompress(SDD1emu* this, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf)
+static void SDD1emu_decompress(SDD1emu* thisptr, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf)
 {
-	SDD1_IM_prepareDecomp(this->IM, in_buf);
-	SDD1_BG_prepareDecomp(this->BG0);
-	SDD1_BG_prepareDecomp(this->BG1);
-	SDD1_BG_prepareDecomp(this->BG2);
-	SDD1_BG_prepareDecomp(this->BG3);
-	SDD1_BG_prepareDecomp(this->BG4);
-	SDD1_BG_prepareDecomp(this->BG5);
-	SDD1_BG_prepareDecomp(this->BG6);
-	SDD1_BG_prepareDecomp(this->BG7);
-	SDD1_PEM_prepareDecomp(this->PEM);
-	SDD1_CM_prepareDecomp(this->CM, in_buf);
-	SDD1_OL_prepareDecomp(this->OL, in_buf, out_len, out_buf);
+	SDD1_IM_prepareDecomp(thisptr->IM, in_buf);
+	SDD1_BG_prepareDecomp(thisptr->BG0);
+	SDD1_BG_prepareDecomp(thisptr->BG1);
+	SDD1_BG_prepareDecomp(thisptr->BG2);
+	SDD1_BG_prepareDecomp(thisptr->BG3);
+	SDD1_BG_prepareDecomp(thisptr->BG4);
+	SDD1_BG_prepareDecomp(thisptr->BG5);
+	SDD1_BG_prepareDecomp(thisptr->BG6);
+	SDD1_BG_prepareDecomp(thisptr->BG7);
+	SDD1_PEM_prepareDecomp(thisptr->PEM);
+	SDD1_CM_prepareDecomp(thisptr->CM, in_buf);
+	SDD1_OL_prepareDecomp(thisptr->OL, in_buf, out_len, out_buf);
 
-	SDD1_OL_launch(this->OL);
+	SDD1_OL_launch(thisptr->OL);
 }
 
 typedef struct

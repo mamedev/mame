@@ -71,7 +71,6 @@ enum
 
 /* maxima */
 #define MAX_GFX_ELEMENTS		32
-#define MAX_MEMORY_REGIONS		32
 
 
 /* MESS vs. MAME abstractions */
