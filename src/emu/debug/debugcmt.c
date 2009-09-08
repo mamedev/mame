@@ -99,7 +99,7 @@ int debug_comment_init(running_machine *machine)
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *cpudata = cpu_get_debug_data(cpu);
-		cpudata->comments = auto_alloc(machine, debug_cpu_comment_group);
+		cpudata->comments = auto_alloc_clear(machine, debug_cpu_comment_group);
 	}
 
 	/* automatically load em up */
