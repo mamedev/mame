@@ -2048,7 +2048,7 @@ recompute:
 	if (view->recompute)
 	{
 		/* recompute the view */
-		if (dasmdata->last_change_count != debug_comment_all_change_count(space->machine))
+		if (dasmdata->byteaddress != NULL && dasmdata->last_change_count != debug_comment_all_change_count(space->machine))
 		{
 			/* smoosh us against the left column, but not the top row */
 			view->topleft.x = 0;
