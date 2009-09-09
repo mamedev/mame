@@ -58,6 +58,8 @@ static struct
 // add-on chip emulators
 #include "machine/snesdsp1.c"
 #include "machine/snesdsp2.c"
+#include "machine/snesdsp3.c"
+#include "machine/snesdsp4.c"
 #include "machine/snesobc1.c"
 #include "machine/snesrtc.c"
 #include "machine/snessdd1.c"
@@ -1475,6 +1477,8 @@ READ8_HANDLER( snes_r_bank1 )
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
+	else if ((snes_has_addon_chip == HAS_DSP3) && (offset >= 0x200000))
+		value = DSP3_read(address);
 	else
 		value = snes_ram[offset];
 
@@ -1514,6 +1518,10 @@ READ8_HANDLER( snes_r_bank2 )
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
+	else if (snes_has_addon_chip == HAS_DSP3)
+		value = DSP3_read(address);
+	else if (snes_has_addon_chip == HAS_DSP4)
+		value = (address < 0xc000) ? DSP4_read() : 0x80;
 	else
 		value = snes_ram[0x300000 + offset];
 
@@ -1637,6 +1645,10 @@ READ8_HANDLER( snes_r_bank6 )
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
+	else if ((snes_has_addon_chip == HAS_DSP3) && (offset >= 0x200000))
+		value = DSP3_read(address);
+	else if ((snes_has_addon_chip == HAS_DSP4) && (offset >= 0x300000))
+		value = (address < 0xc000) ? DSP4_read() : 0x80;
 	else
 		value = snes_ram[0x800000 + offset];
 
@@ -1699,6 +1711,8 @@ WRITE8_HANDLER( snes_w_bank1 )
 		DSP1_setDr(data);
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
 		DSP2_write(data);
+	else if ((snes_has_addon_chip == HAS_DSP3) && (offset >= 0x200000))
+		DSP3_write(address, data);
 	else
 		logerror( "Attempt to write to ROM address: %X\n", offset );
 }
@@ -1733,6 +1747,10 @@ WRITE8_HANDLER( snes_w_bank2 )
 		DSP1_setDr(data);
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (address < 0xc000))
 		DSP2_write(data);
+	else if (snes_has_addon_chip == HAS_DSP3)
+		DSP3_write(address, data);
+	else if ((snes_has_addon_chip == HAS_DSP4) && (address < 0xc000))
+		DSP4_write(data);
 	else
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x300000);
 }
@@ -1837,6 +1855,10 @@ WRITE8_HANDLER( snes_w_bank6 )
 		DSP1_setDr(data);
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
 		DSP2_write(data);
+	else if ((snes_has_addon_chip == HAS_DSP3) && (offset >= 0x200000))
+		DSP3_write(address, data);
+	else if ((snes_has_addon_chip == HAS_DSP4) && (offset >= 0x300000) && (address < 0xc000))
+		DSP4_write(data);
 	else if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
 		logerror( "snes_w_bank6 hit (ROM) in Super FX mode, please fix me\n" );
 	else
@@ -1955,6 +1977,14 @@ static void snes_init_ram(running_machine *machine)
 	{
 		case HAS_DSP2:
 			DSP2_reset();
+			break;
+
+		case HAS_DSP3:
+			InitDSP3();
+			break;
+
+		case HAS_DSP4:
+			InitDSP4();
 			break;
 
 		case HAS_OBC1:
