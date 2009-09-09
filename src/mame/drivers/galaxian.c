@@ -1897,7 +1897,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( checkmaj )
-	MDRV_IMPORT_FROM(galaxian)
+	MDRV_IMPORT_FROM(galaxian_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(galaxian_map_base)  /* no discrete sound */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 1620000)
@@ -1908,7 +1912,7 @@ static MACHINE_DRIVER_START( checkmaj )
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1620000)
 	MDRV_SOUND_CONFIG(checkmaj_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_DRIVER_END
 
 
