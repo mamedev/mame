@@ -45,7 +45,7 @@ DISCRETE_SOUND_START( norautp )
 	DISCRETE_INPUT_DATA (NORAUTP_FREQ_DATA)
 
 	/************************************************
-     * Mixer
+     * Tone Generator
      ************************************************/
 	DISCRETE_COMP_ADDER(NODE_20, NORAUTP_FREQ_DATA, &desc_norautp_caps)
 	DISCRETE_555_ASTABLE(NODE_21,
