@@ -38,6 +38,8 @@
  *     the W register.                                                      *
  *   - 'tris' instruction no longer modifies Port-C on PIC models that      *
  *     do not have Port-C implemented.                                      *
+ *  TLP (07-Sep-2009) Ver 1.14                                              *
+ *   - Edge sense control for the T0 count input was incorrectly reversed   *
  *                                                                          *
  *                                                                          *
  *  **** Notes: ****                                                        *
@@ -160,8 +162,8 @@ INLINE void update_internalram_ptr(pic16c5x_state *cpustate)
 
 #define ADDR	(cpustate->opcode.b.l & 0x1f)
 
-#define POSITIVE_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) > 0) ? 1 : 0)
-#define NEGATIVE_EDGE_T0  (( (int)(cpustate->old_T0 - T0_in) > 0) ? 1 : 0)
+#define  RISING_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) > 0) ? 1 : 0)
+#define FALLING_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) < 0) ? 1 : 0)
 
 
 /********  The following is the Status Flag register definition.  *********/
@@ -882,7 +884,7 @@ static void pic16c5x_update_timer(pic16c5x_state *cpustate, int counts)
 static CPU_EXECUTE( pic16c5x )
 {
 	pic16c5x_state *cpustate = get_safe_token(device);
-	int T0_in;
+	UINT8 T0_in;
 
 	update_internalram_ptr(cpustate);
 
@@ -919,13 +921,14 @@ static CPU_EXECUTE( pic16c5x )
 
 			if (T0CS) {						/* Count mode */
 				T0_in = S_T0_IN;
-				if (T0SE) {					/* Count rising edge */
-					if (POSITIVE_EDGE_T0) {
+				if (T0_in) T0_in = 1;
+				if (T0SE) {					/* Count falling edge T0 input */
+					if (FALLING_EDGE_T0) {
 						pic16c5x_update_timer(cpustate, 1);
 					}
 				}
-				else {						/* Count falling edge */
-					if (NEGATIVE_EDGE_T0) {
+				else {						/* Count rising edge T0 input */
+					if (RISING_EDGE_T0) {
 						pic16c5x_update_timer(cpustate, 1);
 					}
 				}
@@ -1052,7 +1055,7 @@ static CPU_GET_INFO( pic16c5x )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PIC16C5x");					break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Microchip");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.13");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.14");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Tony La Porta");		break;
 
