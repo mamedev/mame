@@ -1641,7 +1641,8 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				}															\
 				tmp16 = tmp1 | (tmp2 << 4) | (tmp3 << 8) | (tmp4 << 12);	\
 				FLAG_V = VFLAG_SUB_16(SRC, REGISTER_A, tmp16);				\
-				FLAG_N = FLAG_Z = REGISTER_A = MAKE_UINT_16(tmp16);			\
+				FLAG_Z = REGISTER_A = MAKE_UINT_16(tmp16);					\
+				FLAG_N = NFLAG_16(REGISTER_A);								\
 			}
 #endif
 
