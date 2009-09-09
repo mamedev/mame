@@ -1912,7 +1912,7 @@ static MACHINE_DRIVER_START( checkmaj )
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1620000)
 	MDRV_SOUND_CONFIG(checkmaj_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
 MACHINE_DRIVER_END
 
 
