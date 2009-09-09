@@ -214,6 +214,12 @@
     The program has 2 hidden menues that allow change parameters without knowledge of the players.
 
 
+     * Jolly Card (Evona Electronic)
+
+    This set has some hidden features.
+    In the service 2 screen, press service 1 to enter to a message edit mode.
+
+
     * Jolly Card (croatian sets) and Jolly Card Professional 2.0
 
     These games don't operate with regular coins/tokens. Only remote credits are allowed.
@@ -1018,6 +1024,13 @@
     - Added new sets: Bottle 10 (italian, set 1 & 2).
     - Updated technical notes.
 
+    [2009/09/09]
+    - Discovered and documented new features in Jolly Card (Evona Electronics).
+    - Removed the commented hack for joly980 driver init since is not needed anymore.
+    - Fixed a bug introduced with the massive input change, that didn't allow initialize
+      all sets that need the normal procedure to do it.
+    - Updated technical notes.
+
 
     *** TO DO ***
 
@@ -1025,7 +1038,8 @@
     - Figure out the remaining PIA connections for almost all games.
     - Fix Saloon and move it to its own driver.
     - Fix the imperfect sound in Magic Card II.
-    - Reverse-engineering the boot code of Jolly Card Professional 2.0 to get the proper codes to boot.
+    - Reverse-engineering the boot code of Jolly Card Professional 2.0,
+      and Royal Card Professional 2.0 to get the proper codes to boot.
     - Analyze the unknown writes to $2000/$4000 in some games.
     - Check for the reads to the ay8910 output ports in some games.
     - Figure out the MCU in monglfir and soccernw.
@@ -1185,7 +1199,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funworld )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start) / Gamble (Play)")
@@ -1202,7 +1216,7 @@ static INPUT_PORTS_START( funworld )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1246,7 +1260,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdcr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Navijanje (Remote)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Navijanje (Remote)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Djelenje (Start) / Gamble (Play)")
@@ -1263,7 +1277,7 @@ static INPUT_PORTS_START( jolycdcr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1307,7 +1321,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdit )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1 / Alta (High)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Doppio (Double) / Autohold")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
@@ -1324,7 +1338,7 @@ static INPUT_PORTS_START( jolycdit )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1367,7 +1381,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdib )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Autohold / Accredito (Take)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Doppio (Double)")
@@ -1384,7 +1398,7 @@ static INPUT_PORTS_START( jolycdib )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test3") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1428,7 +1442,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolyc980 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Navijanje (Remote)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Navijanje (Remote)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Djelenje (Start) / Gamble (Play)")
@@ -1445,7 +1459,7 @@ static INPUT_PORTS_START( jolyc980 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1486,7 +1500,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigdeal )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
@@ -1503,7 +1517,7 @@ static INPUT_PORTS_START( bigdeal )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1548,7 +1562,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( magicrd2 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
@@ -1565,7 +1579,7 @@ static INPUT_PORTS_START( magicrd2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1609,7 +1623,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( royalcrd )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1 / Hoch (High)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen/Gamble (Cancel/Play)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start)")
@@ -1626,7 +1640,7 @@ static INPUT_PORTS_START( royalcrd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1687,7 +1701,7 @@ static INPUT_PORTS_START( cuoreuno )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1747,7 +1761,7 @@ static INPUT_PORTS_START( pool10 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1789,7 +1803,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolyjkra )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	PORT_NAME("Remote")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start) / Gamble (Play)")
@@ -1806,7 +1820,7 @@ static INPUT_PORTS_START( jolyjkra )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2984,28 +2998,6 @@ static DRIVER_INIT( tabblue )
 	}
 }
 
-static DRIVER_INIT( jolyc980 )
-{
-/************************************************************************************************
-
-   The game need the vector $07F0/$07F1 pointing to $801C to proper boot.
-
-   Vector $07F0/$07F1 is copied to $0006/$0007 (multipurpose)
-   and then accessed through indirect JMP ($0006).
-
-   This is a temporary patch to allow boot the game since vector $07F0/$07F1 is normally empty,
-   pointing to $0000 and therefore jumping to $C210 constantly where starts producing unexpected
-   things, like stack overflow.
-
-*************************************************************************************************/
-
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-
-//  ROM[0xc1fc] = 0x4c;
-//  ROM[0xc1fd] = 0x1c;
-//  ROM[0xc1fe] = 0x80;
-}
-
 static DRIVER_INIT( magicd2a )
 /*****************************************************************
 
@@ -3179,7 +3171,7 @@ static DRIVER_INIT( saloon )
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                                          FLAGS  */
 GAME( 1985, jollycrd, 0,        funworld, funworld, 0,        ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0 )
 GAME( 1985, jolyc3x3, jollycrd, funworld, funworld, 0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0 )
-GAME( 2000, jolyc980, jollycrd, jolyc980, jolyc980, jolyc980, ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
+GAME( 2000, jolyc980, jollycrd, jolyc980, jolyc980, 0,        ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
 GAME( 1998, jolycdev, jollycrd, funworld, funworld, 0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0 )
 GAME( 1985, jolyccra, jollycrd, cuoreuno, jolycdcr, 0,        ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0 )
 GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, 0,        ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0 )
