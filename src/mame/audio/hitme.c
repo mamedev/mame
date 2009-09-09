@@ -10,7 +10,7 @@
 
 static const discrete_555_desc desc_hitme_555 =
 {
-	DISC_555_OUT_SQW | DISC_555_OUT_DC,
+	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
 	5,				// B+ voltage of 555
 	DEFAULT_555_VALUES
 };
@@ -75,6 +75,6 @@ DISCRETE_SOUND_START(hitme)
 	/* The output of the 555 timer is fed through a simple CR filter in the amp stage. */
 	DISCRETE_CRFILTER(HITME_FINAL_SND,1,NODE_24,1e3,50e-6)
 
-	/* We scale the final output of 3.3 to 16-bit range and output it at full volume */
-	DISCRETE_OUTPUT(HITME_FINAL_SND,32000.0/3.3)
+	/* We scale the final output of 3.8 to 16-bit range and output it at full volume */
+	DISCRETE_OUTPUT(HITME_FINAL_SND,32000.0/3.8)
 DISCRETE_SOUND_END

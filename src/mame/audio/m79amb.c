@@ -30,6 +30,7 @@
 #define M79AMB_WHISTLE_A_SND			NODE_16
 #define M79AMB_WHISTLE_B_SND			NODE_17
 
+/* Parts List - Resistors */
 #define M79AMB_R2		RES_K(5.6)
 #define M79AMB_R6		220
 #define M79AMB_R9		RES_K(4.7)
@@ -80,6 +81,7 @@
 #define M79AMB_R84		RES_K(50)
 #define M79AMB_R86		470
 
+/* Parts List - Capacitors */
 #define M79AMB_C2		CAP_U(39)
 #define M79AMB_C3		CAP_U(22)
 #define M79AMB_C6		CAP_U(0.1)

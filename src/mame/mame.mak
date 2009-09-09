@@ -1568,7 +1568,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
-	$(DRIVERS)/norautp.o \
+	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \
