@@ -114,7 +114,7 @@ VIDEO_UPDATE( spectrum )
     int x, y, b, scrx, scry;
     unsigned short ink, pap;
     unsigned char *attr, *scr;
-	int full_refresh = 1;
+//	int full_refresh = 1;
 
     scr=spectrum_video_ram;
 
