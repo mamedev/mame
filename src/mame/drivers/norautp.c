@@ -250,10 +250,10 @@
   R2 = 2.2 K ; Tolerance +/- 5%
   R3 = 1 K   ; Tolerance +/- 5%
 
-  C1 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
-  C2 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
-  C3 = 473J = 47000 pF  =  47 nF = 0.047 uF ; Tolerance +/- 5%
-  C4 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C1 = 223J = 22000 pF  =   22 nF = 0.022 uF  ; Tolerance +/- 5%
+  C2 = 103J = 10000 pF  =   10 nF = 0.01 uF   ; Tolerance +/- 5%
+  C3 = 472J =  4700 pF  =  4.7 nF = 0.0047 uF ; Tolerance +/- 5%
+  C4 = 103J = 10000 pF  =   10 nF = 0.01 uF   ; Tolerance +/- 5%
 
   C5 = 103  = 10000 pF  =  10 nF = 0.01 uF
   C6 = 104  = 100000 pF = 100 nF = 0.1 uF

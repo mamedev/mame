@@ -1284,7 +1284,7 @@
  *
  * EXAMPLES: galaxian, dkong, mario
  *
-# ***********************************************************************
+ ***********************************************************************
  *
  * DISCRETE_LOGIC_INVERT - Logic invertor
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)

@@ -17,7 +17,7 @@
 /* Parts List - Capacitors */
 #define NORAUTP_C1		CAP_U(.022)
 #define NORAUTP_C2		CAP_U(.01)
-#define NORAUTP_C3		CAP_U(.047)
+#define NORAUTP_C3		CAP_U(.0047)
 #define NORAUTP_C4		CAP_U(.01)
 
 
