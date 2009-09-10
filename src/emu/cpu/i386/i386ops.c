@@ -887,6 +887,34 @@ static void I386OP(out_al_dx)(i386_state *cpustate)			// Opcode 0xee
 	CYCLES(cpustate,CYCLES_OUT);
 }
 
+
+static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
+{
+	UINT16 src, dst;
+	UINT8 modrm = FETCH(cpustate);
+	UINT8 flag = 0;
+  
+     if( modrm >= 0xc0 ) {
+       	src = LOAD_REG16(modrm);
+       	dst = LOAD_RM16(modrm);
+		if( (dst&0x3) < (src&0x3) ) {
+			dst = (dst&0xfffc) | (src&0x3);
+			flag = 1;
+			STORE_RM16(modrm, dst);
+		}
+	} else {
+       	UINT32 ea = GetEA(cpustate, modrm);
+       	src = LOAD_REG16(modrm);
+       	dst = READ16(cpustate, ea);
+		if( (dst&0x3) < (src&0x3) ) {
+			dst = (dst&0xfffc) | (src&0x3);
+			flag = 1;
+			WRITE16(cpustate, ea, dst);
+		}
+    }
+	SetZF(flag);
+}
+
 static void I386OP(push_i8)(i386_state *cpustate)			// Opcode 0x6a
 {
 	UINT8 value = FETCH(cpustate);
@@ -2170,18 +2198,20 @@ static void I386OP(hlt)(i386_state *cpustate)				// Opcode 0xf4
 static void I386OP(decimal_adjust)(i386_state *cpustate, int direction)
 {
 	UINT8 tmpAL = REG8(AL);
+	UINT8 tmpCF = cpustate->CF;
 
 	if (cpustate->AF || ((REG8(AL) & 0xf) > 9))
 	{
-		REG8(AL) = REG8(AL) + (direction * 0x06);
+		UINT16 t= (UINT16)REG8(AL) + (direction * 0x06);
+		REG8(AL) = (UINT8)t&0xff;
 		cpustate->AF = 1;
-		if (REG8(AL) & 0x100)
+		if (t & 0x100)
 			cpustate->CF = 1;
 		if (direction > 0)
 			tmpAL = REG8(AL);
 	}
 
-	if (cpustate->CF || (tmpAL > 0x9f))
+	if (tmpCF || (tmpAL > 0x99))
 	{
 		REG8(AL) += (direction * 0x60);
 		cpustate->CF = 1;
@@ -2204,7 +2234,7 @@ static void I386OP(das)(i386_state *cpustate)				// Opcode 0x2f
 
 static void I386OP(aaa)(i386_state *cpustate)				// Opcode 0x37
 {
-	if( (REG8(AL) & 0x0f) || cpustate->AF != 0 ) {
+	if( ( (REG8(AL) & 0x0f) > 9) || (cpustate->AF != 0) ) {
 		REG16(AX) = REG16(AX) + 6;
 		REG8(AH) = REG8(AH) + 1;
 		cpustate->AF = 1;

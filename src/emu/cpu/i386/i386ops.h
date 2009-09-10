@@ -119,7 +119,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0x60,		OP_I386,					I386OP(pusha),					I386OP(pushad),				},
 	{ 0x61,		OP_I386,					I386OP(popa),					I386OP(popad),				},
 	{ 0x62,		OP_I386,					I386OP(bound_r16_m16_m16),		I386OP(bound_r32_m32_m32),	},
-	{ 0x63,		OP_I386,					I386OP(unimplemented),			I386OP(unimplemented),		},
+	{ 0x63,		OP_I386,					I386OP(arpl),					I386OP(arpl),				},
 	{ 0x64,		OP_I386,					I386OP(segment_FS),				I386OP(segment_FS),			},
 	{ 0x65,		OP_I386,					I386OP(segment_GS),				I386OP(segment_GS),			},
 	{ 0x66,		OP_I386,					I386OP(operand_size),			I386OP(operand_size),		},

@@ -1637,12 +1637,12 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: sprintf(s, "fadd    st(0),st(%d)", op2 & 0x7); break;
-					case 1: sprintf(s, "fcom    st(0),st(%d)", op2 & 0x7); break;
-					case 2: sprintf(s, "fsub    st(0),st(%d)", op2 & 0x7); break;
-					case 3: sprintf(s, "fdiv    st(0),st(%d)", op2 & 0x7); break;
-					case 4: sprintf(s, "fmul    st(0),st(%d)", op2 & 0x7); break;
-					case 5: sprintf(s, "fcomp   st(0),st(%d)", op2 & 0x7); break;
-					case 6: sprintf(s, "fsubr   st(0),st(%d)", op2 & 0x7); break;
+					case 1: sprintf(s, "fmul    st(0),st(%d)", op2 & 0x7); break;
+					case 2: sprintf(s, "fcom    st(0),st(%d)", op2 & 0x7); break;
+					case 3: sprintf(s, "fcomp   st(0),st(%d)", op2 & 0x7); break;
+					case 4: sprintf(s, "fsub    st(0),st(%d)", op2 & 0x7); break;
+					case 5: sprintf(s, "fsubr   st(0),st(%d)", op2 & 0x7); break;
+					case 6: sprintf(s, "fdiv    st(0),st(%d)", op2 & 0x7); break;
 					case 7: sprintf(s, "fdivr   st(0),st(%d)", op2 & 0x7); break;
 				}
 			}
@@ -1747,6 +1747,8 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 
 					case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 						sprintf(s, "fcmovu  st(0),st(%d)", op2 & 0x7); break;
+					case 0x29:
+						sprintf(s, "fucompp"); break;
 
 					default: sprintf(s, "??? (FPU)"); break;
 
