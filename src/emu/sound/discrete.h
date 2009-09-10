@@ -3154,6 +3154,9 @@
  *                 |       |
  *               v_neg   v_neg
  *
+ * Note: There is usually a 0.001uF cap between pins 5 & 6.
+ *       This is for circuit stability and can be ignored for simulation purposes.
+ *
  *  Declaration syntax
  *
  *     DISCRETE_566(name of node,
