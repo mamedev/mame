@@ -56,7 +56,7 @@
  *
  *************************************/
 
-#define DISCRETE_PROFILING			(1)
+#define DISCRETE_PROFILING			(0)
 
 /*************************************
  *
