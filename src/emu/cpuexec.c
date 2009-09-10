@@ -422,7 +422,10 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 	/* if we have an executing CPU, output data */
 	if (executingcpu != NULL)
-		sprintf(global->statebuf, "'%s' (%08X)", executingcpu->tag, cpu_get_pc(executingcpu));
+	{
+		const address_space *space = cpu_get_address_space(executingcpu, ADDRESS_SPACE_PROGRAM);
+		sprintf(global->statebuf, "'%s' (%s)", executingcpu->tag, core_i64_hex_format(cpu_get_pc(executingcpu), space->logaddrchars));
+	}
 	else
 		strcpy(global->statebuf, "(no context)");
 
