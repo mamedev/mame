@@ -448,7 +448,7 @@ static void cheat_exit(running_machine *machine)
 
 
 /*-------------------------------------------------
-    cheat_get_global_enable - return the global 
+    cheat_get_global_enable - return the global
     enabled state of the cheat engine
 -------------------------------------------------*/
 
@@ -460,7 +460,7 @@ int cheat_get_global_enable(running_machine *machine)
 
 
 /*-------------------------------------------------
-    cheat_set_global_enable - globally enable or 
+    cheat_set_global_enable - globally enable or
     disable the cheat engine
 -------------------------------------------------*/
 
@@ -468,7 +468,7 @@ void cheat_set_global_enable(running_machine *machine, int enable)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
 	cheat_entry *cheat;
-	
+
 	/* if we're enabled currently and we don't want to be, turn things off */
 	if (!cheatinfo->disabled && !enable)
 	{
@@ -479,7 +479,7 @@ void cheat_set_global_enable(running_machine *machine, int enable)
 		popmessage("Cheats Disabled");
 		cheatinfo->disabled = TRUE;
 	}
-	
+
 	/* if we're disabled currently and we want to be enabled, turn things on */
 	else if (cheatinfo->disabled && enable)
 	{
@@ -648,7 +648,7 @@ int cheat_activate(running_machine *machine, void *entry)
 	cheat_private *cheatinfo = machine->cheat_data;
 	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
-	
+
 	/* if cheats have been toggled off no point in even trying to do anything */
 	if (cheatinfo->disabled)
 		return changed;

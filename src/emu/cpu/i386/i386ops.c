@@ -893,7 +893,7 @@ static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 flag = 0;
-  
+
      if( modrm >= 0xc0 ) {
        	src = LOAD_REG16(modrm);
        	dst = LOAD_RM16(modrm);

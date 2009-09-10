@@ -379,7 +379,7 @@ static TIMER_CALLBACK( tx_timer_callback )
 
 	// send the byte unless we're in loopback mode;
 	// in loopback mode do NOT 'actually' send the byte: the TXn pin is held high when loopback mode is on.
-	if ((duart68681->duart_config->tx_callback) && ((duart68681->channel[ch].MR2&0xC0) != 0x80)) 
+	if ((duart68681->duart_config->tx_callback) && ((duart68681->channel[ch].MR2&0xC0) != 0x80))
 		duart68681->duart_config->tx_callback(device, ch, duart68681->channel[ch].tx_data);
 
 	duart68681->channel[ch].tx_ready = 1;

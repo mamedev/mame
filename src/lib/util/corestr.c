@@ -132,7 +132,7 @@ char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
 	char *bufbase = &buffer[index++ % 16][0];
 	char *bufptr = bufbase;
 	INT8 curdigit;
-	
+
 	for (curdigit = 15; curdigit >= 0; curdigit--)
 	{
 		int nibble = (value >> (curdigit * 4)) & 0xf;
@@ -145,6 +145,6 @@ char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
 	if (bufptr == bufbase)
 		*bufptr++ = '0';
 	*bufptr = 0;
-	
+
 	return bufbase;
 }

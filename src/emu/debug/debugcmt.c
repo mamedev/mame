@@ -94,7 +94,7 @@ static void debug_comment_free(running_machine *machine);
 int debug_comment_init(running_machine *machine)
 {
 	const device_config *cpu;
-	
+
 	/* allocate memory for the comments */
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
@@ -269,7 +269,7 @@ UINT32 debug_comment_all_change_count(running_machine *machine)
 {
 	const device_config *cpu;
 	UINT32 retVal = 0;
-	
+
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
@@ -541,14 +541,14 @@ static void debug_comment_exit(running_machine *machine)
 static void debug_comment_free(running_machine *machine)
 {
 	const device_config *cpu;
-	
+
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;
 		if (comments != NULL)
 		{
 			int j;
-			
+
 			for (j = 0; j < comments->comment_count; j++)
 				free(comments->comment_info[j]);
 

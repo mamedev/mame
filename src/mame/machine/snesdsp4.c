@@ -2,10 +2,10 @@
 
     DSP-4 emulator code
 
-    Copyright (c) 2004-2009 Dreamer Nom, John Weidman, Kris Bleakley, 
+    Copyright (c) 2004-2009 Dreamer Nom, John Weidman, Kris Bleakley,
     Nach, z80 gaiden, and Jonas Quinn
 
-    This code is released by ZSNES Team under GNU General Public License 
+    This code is released by ZSNES Team under GNU General Public License
     version 2 as published by the Free Software Foundation.
     The implementation below is released under the MAME license for use
     in MAME, MESS and derivatives by permission of the authors.
@@ -30,17 +30,17 @@ Fixed-point math reminder:
 struct DSP4_t DSP4;
 struct DSP4_vars_t DSP4_vars;
 
-INLINE UINT16 READ_WORD(UINT8 *addr) 
+INLINE UINT16 READ_WORD(UINT8 *addr)
 {
 	return (addr[0]) + (addr[1] << 8);
 }
 
-INLINE UINT32 READ_DWORD(UINT8 *addr) 
+INLINE UINT32 READ_DWORD(UINT8 *addr)
 {
 	return (addr[0]) + (addr[1] << 8) + (addr[2] << 16) + (addr[3] << 24);
 }
 
-INLINE void WRITE_WORD(UINT8 *addr, UINT16 data) 
+INLINE void WRITE_WORD(UINT8 *addr, UINT16 data)
 {
 	addr[0] = data;
 	addr[1] = data >> 8;

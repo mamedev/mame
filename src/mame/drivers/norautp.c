@@ -665,7 +665,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
 	discrete_sound_w(discrete, NORAUTP_SND_EN, (data >> 7) & 0x01);
 	discrete_sound_w(discrete, NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
 
-//	popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
+//  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }
 
 static WRITE8_DEVICE_HANDLER( counterlamps_w )

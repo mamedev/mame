@@ -544,7 +544,7 @@ void mame_frame_update(running_machine *machine)
 
 
 /*-------------------------------------------------
-    mame_is_valid_machine - return true if the 
+    mame_is_valid_machine - return true if the
     given machine is valid
 -------------------------------------------------*/
 

@@ -1015,7 +1015,7 @@ WRITE64_HANDLER( pvr_ta_w )
 	dat = (UINT32)(data >> shift);
 	old = pvrta_regs[reg];
 
-	// Dreamcast BIOS attempts to set PVRID to zero and then dies 
+	// Dreamcast BIOS attempts to set PVRID to zero and then dies
 	// if it succeeds.  Don't allow.
 	if ((reg != PVRID) && (reg != REVISION))
 	{

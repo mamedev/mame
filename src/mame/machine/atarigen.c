@@ -1469,7 +1469,7 @@ int atarigen_get_hblank(const device_config *screen)
 void atarigen_halt_until_hblank_0(const device_config *screen)
 {
 	const device_config *cpu = cputag_get_cpu(screen->machine, "maincpu");
-	
+
 	/* halt the CPU until the next HBLANK */
 	int hpos = video_screen_get_hpos(screen);
 	int width = video_screen_get_width(screen);

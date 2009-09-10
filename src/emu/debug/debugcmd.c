@@ -1471,7 +1471,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 				for (wp = cpuinfo->wplist[spacenum]; wp != NULL; wp = wp->next)
 				{
 					int buflen;
-					buflen = sprintf(buffer, "%c%4X @ %s-%s %s", wp->enabled ? ' ' : 'D', wp->index, 
+					buflen = sprintf(buffer, "%c%4X @ %s-%s %s", wp->enabled ? ' ' : 'D', wp->index,
 							core_i64_hex_format(memory_byte_to_address(space, wp->address), space->addrchars),
 							core_i64_hex_format(memory_byte_to_address_end(space, wp->address + wp->length) - 1, space->addrchars),
 							types[wp->type & 3]);

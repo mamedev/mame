@@ -576,7 +576,7 @@ void input_init(running_machine *machine)
 	joystick_map map;
 	input_private *state;
 	input_device_list *device_list;
-	
+
 	/* remember this machine */
 	stashed_machine = machine;
 
@@ -1432,7 +1432,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 	/* if we're a standard code, default the itemclass based on it */
 	if (standard)
 		itemclass = input_item_standard_class((input_device_class)devclass, (input_item_id)itemid);
-	
+
 	/* otherwise, keep parsing */
 	else
 	{
@@ -1505,7 +1505,7 @@ exit:
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_global_input_code_pressed - return TRUE 
+    debug_global_input_code_pressed - return TRUE
     if the given input code has been pressed
 -------------------------------------------------*/
 

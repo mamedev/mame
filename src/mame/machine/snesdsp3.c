@@ -2,10 +2,10 @@
 
     DSP-3 emulator code
 
-    Copyright (c) 2003-2009 John Weidman, Kris Bleakley, Lancer, Nach, 
+    Copyright (c) 2003-2009 John Weidman, Kris Bleakley, Lancer, Nach,
     z80 gaiden, and Jonas Quinn
 
-    This code is released by ZSNES Team under GNU General Public License 
+    This code is released by ZSNES Team under GNU General Public License
     version 2 as published by the Free Software Foundation.
     The implementation below is released under the MAME license for use
     in MAME, MESS and derivatives by permission of the authors.

@@ -1,9 +1,9 @@
 /*
-	Photon IK2 system
+    Photon IK2 system
 
-	Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek
 
-	Russian arcade system based on ZX Spectrum home computer.
+    Russian arcade system based on ZX Spectrum home computer.
 
 */
 
@@ -27,7 +27,7 @@ static UINT8 nmi_enable = 0;
 
 /*************************************
  *
- *  Video (copied from MESS apart from support 
+ *  Video (copied from MESS apart from support
  *  for changing border color mid-frame)
  *
  *************************************/
@@ -54,11 +54,11 @@ static UINT8 nmi_enable = 0;
 static const rgb_t spectrum_palette[16] = {
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0x00, 0x00, 0xbf),
-	MAKE_RGB(0xbf, 0x00, 0x00), 
+	MAKE_RGB(0xbf, 0x00, 0x00),
 	MAKE_RGB(0xbf, 0x00, 0xbf),
-	MAKE_RGB(0x00, 0xbf, 0x00), 
+	MAKE_RGB(0x00, 0xbf, 0x00),
 	MAKE_RGB(0x00, 0xbf, 0xbf),
-	MAKE_RGB(0xbf, 0xbf, 0x00), 
+	MAKE_RGB(0xbf, 0xbf, 0x00),
 	MAKE_RGB(0xbf, 0xbf, 0xbf),
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0x00, 0x00, 0xff),
@@ -114,7 +114,7 @@ VIDEO_UPDATE( spectrum )
     int x, y, b, scrx, scry;
     unsigned short ink, pap;
     unsigned char *attr, *scr;
-//	int full_refresh = 1;
+//  int full_refresh = 1;
 
     scr=spectrum_video_ram;
 

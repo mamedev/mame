@@ -1239,7 +1239,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* handle a toggle cheats request */
 	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 		cheat_set_global_enable(machine, !cheat_get_global_enable(machine));
-		
+
 	/* toggle movie recording */
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
 	{
