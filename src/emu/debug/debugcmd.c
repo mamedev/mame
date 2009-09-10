@@ -1927,6 +1927,8 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		CHEAT_NOTEQUALTO,
 		CHEAT_DECREASE,
 		CHEAT_INCREASE,
+		CHEAT_DECREASE_OR_EQUAL,
+		CHEAT_INCREASE_OR_EQUAL,
 		CHEAT_DECREASEOF,
 		CHEAT_INCREASEOF,
 		CHEAT_SMALLEROF,
@@ -1957,6 +1959,10 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		condition = (params > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
 	else if (!strcmp(param[0], "increase") || !strcmp(param[0], "in") || !strcmp(param[0], "+"))
 		condition = (params > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
+	else if (!strcmp(param[0], "decreaseorequal") || !strcmp(param[0], "deeq"))
+		condition = CHEAT_DECREASE_OR_EQUAL;
+	else if (!strcmp(param[0], "increaseorequal") || !strcmp(param[0], "ineq"))
+		condition = CHEAT_INCREASE_OR_EQUAL;
 	else if (!strcmp(param[0], "smallerof") || !strcmp(param[0], "lt") || !strcmp(param[0], "<"))
 		condition = CHEAT_SMALLEROF;
 	else if (!strcmp(param[0], "greaterof") || !strcmp(param[0], "gt") || !strcmp(param[0], ">"))
@@ -2010,6 +2016,20 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 						disable_byte = ((INT64)cheat_value <= (INT64)comp_byte);
 					else
 						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_byte);
+					break;
+
+				case CHEAT_DECREASE_OR_EQUAL:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value > (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value > (UINT64)comp_byte);
+					break;
+
+				case CHEAT_INCREASE_OR_EQUAL:
+					if (cheat.signed_cheat)
+						disable_byte = ((INT64)cheat_value < (INT64)comp_byte);
+					else
+						disable_byte = ((UINT64)cheat_value < (UINT64)comp_byte);
 					break;
 
 				case CHEAT_DECREASEOF:
