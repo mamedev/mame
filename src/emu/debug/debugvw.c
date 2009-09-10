@@ -1781,48 +1781,14 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 static void disasm_view_generate_bytes(const address_space *space, offs_t pcbyte, int numbytes, int minbytes, char *string, int maxchars, int encrypted)
 {
 	int byte, offset = 0;
-	UINT64 val;
 
-	switch (minbytes)
-	{
-		case 1:
-			if (maxchars >= 2)
-				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(space, pcbyte, 1, FALSE));
-			for (byte = 1; byte < numbytes && offset + 3 < maxchars; byte++)
-				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(space, pcbyte + byte, 1, encrypted));
-			break;
+	/* output the first value */
+	if (maxchars >= 2 * minbytes)
+		offset = sprintf(string, "%s", core_i64_hex_format(debug_read_opcode(space, pcbyte, minbytes, FALSE), minbytes * 2));
 
-		case 2:
-			if (maxchars >= 4)
-				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(space, pcbyte, 2, FALSE));
-			for (byte = 2; byte < numbytes && offset + 5 < maxchars; byte += 2)
-				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(space, pcbyte + byte, 2, encrypted));
-			break;
-
-		case 4:
-			if (maxchars >= 8)
-				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(space, pcbyte, 4, FALSE));
-			for (byte = 4; byte < numbytes && offset + 9 < maxchars; byte += 4)
-				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(space, pcbyte + byte, 4, encrypted));
-			break;
-
-		case 8:
-			if (maxchars >= 16)
-			{
-				val = debug_read_opcode(space, pcbyte, 8, FALSE);
-				offset = sprintf(string, "%08X%08X", (UINT32)(val >> 32), (UINT32)val);
-			}
-			for (byte = 8; byte < numbytes && offset + 17 < maxchars; byte += 8)
-			{
-				val = debug_read_opcode(space, pcbyte + byte, 8, encrypted);
-				offset += sprintf(&string[offset], " %08X%08X", (UINT32)(val >> 32), (UINT32)val);
-			}
-			break;
-
-		default:
-			fatalerror("disasm_view_generate_bytes: unknown size = %d", minbytes);
-			break;
-	}
+	/* output subsequent values */
+	for (byte = minbytes; byte < numbytes && offset + 1 + 2 * minbytes < maxchars; byte += minbytes)
+		offset += sprintf(&string[offset], " %s", core_i64_hex_format(debug_read_opcode(space, pcbyte + byte, minbytes, encrypted), minbytes * 2));
 
 	/* if we ran out of room, indicate more */
 	string[maxchars - 1] = 0;
@@ -1904,7 +1870,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 
 		/* convert back and set the address of this instruction */
 		dasmdata->byteaddress[instr] = pcbyte;
-		sprintf(&destbuf[0], " %0*X  ", space->logaddrchars, memory_byte_to_address(space, pcbyte));
+		sprintf(&destbuf[0], " %s  ", core_i64_hex_format(memory_byte_to_address(space, pcbyte), space->logaddrchars));
 
 		/* make sure we can translate the address, and then disassemble the result */
 		physpcbyte = pcbyte;

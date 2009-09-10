@@ -119,3 +119,32 @@ char *core_strdup(const char *str)
 	}
 	return cpy;
 }
+
+
+/*-------------------------------------------------
+    core_i64_format - i64 format printf helper
+-------------------------------------------------*/
+
+char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
+{
+	static char buffer[16][64];
+	static int index;
+	char *bufbase = &buffer[index++ % 16][0];
+	char *bufptr = bufbase;
+	INT8 curdigit;
+	
+	for (curdigit = 15; curdigit >= 0; curdigit--)
+	{
+		int nibble = (value >> (curdigit * 4)) & 0xf;
+		if (nibble != 0 || curdigit < mindigits)
+		{
+			mindigits = curdigit;
+			*bufptr++ = "0123456789ABCDEF"[nibble];
+		}
+	}
+	if (bufptr == bufbase)
+		*bufptr++ = '0';
+	*bufptr = 0;
+	
+	return bufbase;
+}
