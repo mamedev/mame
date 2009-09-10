@@ -17,6 +17,10 @@
    * Noraut Poker (bootleg),       198?,  Unknown.
 
 
+  Special thanks to Alan Griffin, that kindly helped providing good references
+  that allowed me to improve the system emulation.
+
+
 *******************************************************************************
 
 
@@ -250,8 +254,8 @@
   R2 = 2.2 K ; Tolerance +/- 5%
   R3 = 1 K   ; Tolerance +/- 5%
 
-  C1 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
-  C2 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C1 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
+  C2 = 223J = 22000 pF  =  22 nF = 0.022 uF ; Tolerance +/- 5%
   C3 = 473J = 47000 pF  =  47 nF = 0.047 uF ; Tolerance +/- 5%
   C4 = 103J = 10000 pF  =  10 nF = 0.01 uF  ; Tolerance +/- 5%
 
@@ -512,6 +516,12 @@
   - Added Low Level Hopper manual input.
   - Added a new machine driver for extended hardware.
     It has 2 jumpers that cut the a14 and a15 addressing lines.
+
+
+  [2009-09-09]
+
+  - Added accurate discrete sound system emulation.
+  - Fixed the discrete sound system diagram, based on real sound references.
 
 
   TODO:
