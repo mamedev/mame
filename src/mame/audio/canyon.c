@@ -172,7 +172,7 @@ DISCRETE_SOUND_START(canyon)
 	/* Output is binary weighted with 4 bits of     */
 	/* crash volume.                                */
 	/************************************************/
-	DISCRETE_LOGIC_OR(NODE_60, 1, CANYON_ATTRACT1_EN, CANYON_ATTRACT2_EN)
+	DISCRETE_LOGIC_OR(NODE_60, CANYON_ATTRACT1_EN, CANYON_ATTRACT2_EN)
 	DISCRETE_LFSR_NOISE(CANYON_NOISE, NODE_60, NODE_60, 15750.0/4, 1.0, 0, 0, &canyon_lfsr)
 
 	DISCRETE_MULTIPLY(NODE_61, CANYON_NOISE, CANYON_EXPLODE_DATA)

@@ -699,166 +699,112 @@ static DISCRETE_RESET(dst_bits_decode)
  *
  * DST_LOGIC_AND - Logic AND gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_AND__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_and)
 {
-	if(DST_LOGIC_AND__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NAND - Logic NAND gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NAND__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_nand)
 {
-	if(DST_LOGIC_NAND__ENABLE)
-	{
-		node->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_OR  - Logic OR  gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_OR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_or)
 {
-	if(DST_LOGIC_OR__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NOR - Logic NOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
- * input[3]    - input[2] value
- * input[4]    - input[3] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
+ * input[2]    - input[2] value
+ * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(2)
-#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(3)
-#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(4)
+#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(2)
+#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_nor)
 {
-	if(DST_LOGIC_NOR__ENABLE)
-	{
-		node->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_XOR - Logic XOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_logic_xor)
 {
-	if(DST_LOGIC_XOR__ENABLE)
-	{
-		node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
 }
 
 /************************************************************************
  *
  * DST_LOGIC_NXOR - Logic NXOR gate implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - input[1] value
+ * input[0]    - input[0] value
+ * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XNOR__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(1)
-#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(2)
+#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(0)
+#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_logic_nxor)
 {
-	if(DST_LOGIC_XNOR__ENABLE)
-	{
-		node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
 }
 
 
@@ -866,18 +812,16 @@ static DISCRETE_STEP(dst_logic_nxor)
  *
  * DST_LOGIC_DFF - Standard D-type flip-flop implementation
  *
- * input[0]    - enable
- * input[1]    - /Reset
- * input[2]    - /Set
- * input[3]    - clock
- * input[4]    - data
+ * input[0]    - /Reset
+ * input[1]    - /Set
+ * input[2]    - clock
+ * input[3]    - data
  *
  ************************************************************************/
-#define DST_LOGIC_DFF__ENABLE	 DISCRETE_INPUT(0)
-#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(1)
-#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(2)
-#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(3)
-#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(4)
+#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(0)
+#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(1)
+#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(2)
+#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_logic_dff)
 {
@@ -885,19 +829,12 @@ static DISCRETE_STEP(dst_logic_dff)
 
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
-	if (DST_LOGIC_DFF__ENABLE)
-	{
-		if (DST_LOGIC_DFF__RESET)
-			node->output[0] = 0;
-		else if (DST_LOGIC_DFF__SET)
-			node->output[0] = 1;
-		else if (!context->last_clk && clk)	/* low to high */
-			node->output[0] = DST_LOGIC_DFF__DATA;
-	}
-	else
-	{
+	if (DST_LOGIC_DFF__RESET)
 		node->output[0] = 0;
-	}
+	else if (DST_LOGIC_DFF__SET)
+		node->output[0] = 1;
+	else if (!context->last_clk && clk)	/* low to high */
+		node->output[0] = DST_LOGIC_DFF__DATA;
 	context->last_clk = clk;
 }
 
@@ -914,20 +851,18 @@ static DISCRETE_RESET(dst_logic_ff)
  *
  * DST_LOGIC_JKFF - Standard JK-type flip-flop implementation
  *
- * input[0]    - enable
- * input[1]    - /Reset
- * input[2]    - /Set
- * input[3]    - clock
- * input[4]    - J
- * input[5]    - K
+ * input[0]    - /Reset
+ * input[1]    - /Set
+ * input[2]    - clock
+ * input[3]    - J
+ * input[4]    - K
  *
  ************************************************************************/
-#define DST_LOGIC_JKFF__ENABLE	 DISCRETE_INPUT(0)
-#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(1)
-#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(2)
-#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(3)
-#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(4)
-#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(5)
+#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(0)
+#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(1)
+#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(2)
+#define DST_LOGIC_JKFF__J 		 DISCRETE_INPUT(3)
+#define DST_LOGIC_JKFF__K	 	 DISCRETE_INPUT(4)
 
 static DISCRETE_STEP(dst_logic_jkff)
 {
@@ -937,35 +872,28 @@ static DISCRETE_STEP(dst_logic_jkff)
 	int j   = (int)DST_LOGIC_JKFF__J;
 	int k   = (int)DST_LOGIC_JKFF__K;
 
-	if (DST_LOGIC_JKFF__ENABLE)
-	{
-		if (DST_LOGIC_JKFF__RESET)
-			node->output[0] = 0;
-		else if (DST_LOGIC_JKFF__SET)
-			node->output[0] = 1;
-		else if (context->last_clk && !clk)	/* high to low */
-		{
-			if (!j)
-			{
-				/* J=0, K=0 - Hold */
-				if (k)
-					/* J=0, K=1 - Reset */
-					node->output[0] = 0;
-			}
-			else
-			{
-				if (!k)
-					/* J=1, K=0 - Set */
-					node->output[0] = 1;
-				else
-					/* J=1, K=1 - Toggle */
-					node->output[0] = !(int)node->output[0];
-			}
-		}
-	}
-	else
-	{
+	if (DST_LOGIC_JKFF__RESET)
 		node->output[0] = 0;
+	else if (DST_LOGIC_JKFF__SET)
+		node->output[0] = 1;
+	else if (context->last_clk && !clk)	/* high to low */
+	{
+		if (!j)
+		{
+			/* J=0, K=0 - Hold */
+			if (k)
+				/* J=0, K=1 - Reset */
+				node->output[0] = 0;
+		}
+		else
+		{
+			if (!k)
+				/* J=1, K=0 - Set */
+				node->output[0] = 1;
+			else
+				/* J=1, K=1 - Toggle */
+				node->output[0] = !(int)node->output[0];
+		}
 	}
 	context->last_clk = clk;
 }

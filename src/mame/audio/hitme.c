@@ -64,7 +64,7 @@ DISCRETE_SOUND_START(hitme)
 
 	/* This flipflop represents the latch at 1L. It is clocked when OUT1 is written and latches
      * the value from the processor. When the downcounter above rolls over, it clears the latch. */
-	DISCRETE_LOGIC_DFLIPFLOP(NODE_22,1,NODE_21,1,HITME_OUT1,HITME_ENABLE_VAL)
+	DISCRETE_LOGIC_DFLIPFLOP(NODE_22,NODE_21,1,HITME_OUT1,HITME_ENABLE_VAL)
 
 	/* The output of the latch goes through a series of various capacitors in parallel. */
 	DISCRETE_COMP_ADDER(NODE_23,NODE_22,&desc_hitme_adder)

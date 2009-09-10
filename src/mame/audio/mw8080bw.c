@@ -289,10 +289,10 @@ static DISCRETE_SOUND_START(tornbase)
 	DISCRETE_SQUAREWFIX(TORNBASE_SQUAREW_120, 1, 120, 1.0, 50.0, 1.0/2, 0)	/* pin V */
 
 	/* 7403 O/C NAND gate at G6.  3 of the 4 gates used with their outputs tied together */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_240_SND, 1, TORNBASE_SQUAREW_240, TORNBASE_TONE_240_EN)	/* pins 4,5,6 */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_960_SND, 1, TORNBASE_SQUAREW_960, TORNBASE_TONE_960_EN)	/* pins 2,1,3 */
-	DISCRETE_LOGIC_NAND(TORNBASE_TONE_120_SND, 1, TORNBASE_SQUAREW_120, TORNBASE_TONE_120_EN)	/* pins 13,12,11 */
-	DISCRETE_LOGIC_AND3(TORNBASE_TONE_SND,     1, TORNBASE_TONE_240_SND, TORNBASE_TONE_960_SND, TORNBASE_TONE_120_SND)
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_240_SND, TORNBASE_SQUAREW_240, TORNBASE_TONE_240_EN)	/* pins 4,5,6 */
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_960_SND, TORNBASE_SQUAREW_960, TORNBASE_TONE_960_EN)	/* pins 2,1,3 */
+	DISCRETE_LOGIC_NAND(TORNBASE_TONE_120_SND, TORNBASE_SQUAREW_120, TORNBASE_TONE_120_EN)	/* pins 13,12,11 */
+	DISCRETE_LOGIC_AND3(TORNBASE_TONE_SND,     TORNBASE_TONE_240_SND, TORNBASE_TONE_960_SND, TORNBASE_TONE_120_SND)
 
 	/* 47K resistor (R601) and 0.047uF capacitor (C601)
        There is also a 50K pot acting as a volume control, but we output at
@@ -485,7 +485,6 @@ static DISCRETE_SOUND_START(maze)
 					CAP_U(100),					/* C204 */
 					&maze_555_F2)
 	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_AUDIO_ENABLE,/* IC F1, pin 5 */
-					1,							/* ENAB */
 					MAZE_COIN,					/* RESET */
 					1,							/* SET */
 					MAZE_GAME_OVER,				/* CLK */
@@ -494,14 +493,12 @@ static DISCRETE_SOUND_START(maze)
 	DISCRETE_LOGIC_INVERT(MAZE_TONE_ENABLE,		/* IC F1, pin 6 */
 					MAZE_AUDIO_ENABLE)			/* IN0 */
 	DISCRETE_LOGIC_AND3(NODE_21,
-					1,							/* ENAB */
 					MAZE_JOYSTICK_IN_USE,		/* INP0 */
 					MAZE_TONE_ENABLE,			/* INP1 */
 					MAZE_TONE_TIMING)			/* INP2 */
 
 	/* The following circuits use the control info to generate a tone. */
 	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_PLAYER_SEL,	/* IC C1, pin 3 */
-					1,							/* ENAB */
 					1,							/* RESET */
 					1,							/* SET */
 					MAZE_TONE_TIMING,			/* CLK */
@@ -2691,7 +2688,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					CAP_U(1),					/* C713 */
 					&spcenctr_555_bonus)
 	DISCRETE_LOGIC_AND3(NODE_82,				/* IC C-D, pin 6 */
-					1,							/* ENAB */
 					NODE_80,					/* INP0 */
 					NODE_81,					/* INP1 */
 					SPCENCTR_BONUS_EN)			/* INP2 */
@@ -3524,7 +3520,6 @@ static const discrete_mixer_desc invaders_mixer =
 					1.0/2,												/* BIAS */                                  \
 					0)													/* PHASE */                                 \
 	DISCRETE_LOGIC_AND3(INVADERS_NODE(42, _board),						/* IC F3, pin 12 */                         \
-					1,													/* ENAB */                                  \
 					INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),/* INP0 */                                 \
 					INVADERS_NODE(41, _board),							/* INP1 */                                  \
 					INVADERS_NODE(40, _board) )							/* INP2 */                                  \

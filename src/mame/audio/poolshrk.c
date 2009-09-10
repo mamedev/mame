@@ -131,7 +131,7 @@ DISCRETE_SOUND_START(poolshrk)
 	/* not at TC, so the click is counted once.     */
 	/* This should also happen on the original PCB. */
 	/************************************************/
-	DISCRETE_LOGIC_OR(NODE_40 ,1 ,POOLSHRK_CLICK_EN , NODE_39)	// gate K9, pin 11
+	DISCRETE_LOGIC_OR(NODE_40, POOLSHRK_CLICK_EN , NODE_39)	// gate K9, pin 11
 	DISCRETE_COUNTER(NODE_41,				// Counter J9 (9316 is a 74161)
 	                 NODE_42,				// Clock enabled by F8, pin 1
 	                 NODE_40,				// Reset/triggered by K9, pin 11
