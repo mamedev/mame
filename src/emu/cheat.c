@@ -203,8 +203,9 @@ struct _cheat_private
 	UINT64				framecount;						/* frame count */
 	astring *			output[UI_TARGET_FONT_ROWS*2];	/* array of output strings */
 	UINT8				justify[UI_TARGET_FONT_ROWS*2];	/* justification for each string */
-	UINT8				numlines;						/* nnumber of lines available for output */
+	UINT8				numlines;						/* number of lines available for output */
 	INT8				lastline;						/* last line used for output */
+	UINT8				disabled;						/* true if the cheat engine is disabled */
 };
 
 
@@ -446,6 +447,52 @@ static void cheat_exit(running_machine *machine)
 }
 
 
+/*-------------------------------------------------
+    cheat_get_global_enable - return the global 
+    enabled state of the cheat engine
+-------------------------------------------------*/
+
+int cheat_get_global_enable(running_machine *machine)
+{
+	cheat_private *cheatinfo = machine->cheat_data;
+	return !cheatinfo->disabled;
+}
+
+
+/*-------------------------------------------------
+    cheat_set_global_enable - globally enable or 
+    disable the cheat engine
+-------------------------------------------------*/
+
+void cheat_set_global_enable(running_machine *machine, int enable)
+{
+	cheat_private *cheatinfo = machine->cheat_data;
+	cheat_entry *cheat;
+	
+	/* if we're enabled currently and we don't want to be, turn things off */
+	if (!cheatinfo->disabled && !enable)
+	{
+		/* iterate over running cheats and execute any OFF Scripts */
+		for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
+			if (cheat->state == SCRIPT_STATE_RUN)
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
+		popmessage("Cheats Disabled");
+		cheatinfo->disabled = TRUE;
+	}
+	
+	/* if we're disabled currently and we want to be enabled, turn things on */
+	else if (cheatinfo->disabled && enable)
+	{
+		/* iterate over running cheats and execute any ON Scripts */
+		cheatinfo->disabled = FALSE;
+		for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
+			if (cheat->state == SCRIPT_STATE_RUN)
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+		popmessage("Cheats Enabled");
+	}
+}
+
+
 
 /***************************************************************************
     CHEAT UI
@@ -601,6 +648,10 @@ int cheat_activate(running_machine *machine, void *entry)
 	cheat_private *cheatinfo = machine->cheat_data;
 	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
+	
+	/* if cheats have been toggled off no point in even trying to do anything */
+	if (cheatinfo->disabled)
+		return changed;
 
 	/* if we have no parameter and no run or off script, but we do have an on script, it's a oneshot cheat */
 	if (is_oneshot_cheat(cheat))
@@ -872,8 +923,8 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 {
 	script_entry *entry;
 
-	/* if no script, bail */
-	if (cheat->script[state] == NULL)
+	/* if cheat engine has been temporarily disabled or no script, bail */
+	if (cheatinfo->disabled || cheat->script[state] == NULL)
 		return;
 
 	/* iterate over entries */

@@ -31,6 +31,12 @@ void cheat_init(running_machine *machine);
 /* re-initialize the cheat system, reloading any cheat files */
 void cheat_reload(running_machine *machine);
 
+/* return the global enabled state of the cheat engine */
+int cheat_get_global_enable(running_machine *machine);
+
+/* globally enable or disable the cheat engine */
+void cheat_set_global_enable(running_machine *machine, int enable);
+
 
 
 /* ----- cheat UI helpers ----- */
