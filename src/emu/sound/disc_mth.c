@@ -509,28 +509,18 @@ static DISCRETE_STEP(dst_divide)
  *
  * DST_GAIN - This is a programmable gain module with enable function
  *
- * input[0]    - Enable input value
- * input[1]    - Channel0 input value
- * input[2]    - Gain value
- * input[3]    - Final addition offset
+ * input[0]    - Channel0 input value
+ * input[1]    - Gain value
+ * input[2]    - Final addition offset
  *
  ************************************************************************/
-#define DST_GAIN__ENABLE	DISCRETE_INPUT(0)
-#define DST_GAIN__IN		DISCRETE_INPUT(1)
-#define DST_GAIN__GAIN		DISCRETE_INPUT(2)
-#define DST_GAIN__OFFSET	DISCRETE_INPUT(3)
+#define DST_GAIN__IN		DISCRETE_INPUT(0)
+#define DST_GAIN__GAIN		DISCRETE_INPUT(1)
+#define DST_GAIN__OFFSET	DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_gain)
 {
-	if(DST_GAIN__ENABLE)
-	{
-		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN;
-		node->output[0] += DST_GAIN__OFFSET;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN + DST_GAIN__OFFSET;
 }
 
 

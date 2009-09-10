@@ -217,7 +217,7 @@ static DISCRETE_SOUND_START(bzone)
 
 	/* FIXME: +0.7 for diode */
 	DISCRETE_RCDISC5(NODE_40, NODE_34, BZ_INP_EXPLO, BZ_R17 + BZ_R16, BZ_C14)
-	DISCRETE_MULTIPLY(NODE_41, 1, BZ_R16 / (BZ_R17 + BZ_R16), NODE_40)
+	DISCRETE_MULTIPLY(NODE_41, BZ_R16 / (BZ_R17 + BZ_R16), NODE_40)
 
 	/* one of two filter configurations active */
 	DISCRETE_LOGIC_INVERT(NODE_42, 1, BZ_INP_EXPLOLS)
@@ -232,7 +232,7 @@ static DISCRETE_SOUND_START(bzone)
 	/************************************************/
 	/* FIXME: +0.7 for diode */
 	DISCRETE_RCDISC5(NODE_50, NODE_31, BZ_INP_SHELL, BZ_R14 + BZ_R15, BZ_C9)
-	DISCRETE_MULTIPLY(NODE_51, 1, BZ_R15 / (BZ_R14 + BZ_R15), NODE_50)
+	DISCRETE_MULTIPLY(NODE_51, BZ_R15 / (BZ_R14 + BZ_R15), NODE_50)
 
 	/* one of two filter configurations active */
 	DISCRETE_LOGIC_INVERT(NODE_52, 1, BZ_INP_SHELLLS)

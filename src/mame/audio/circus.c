@@ -130,14 +130,14 @@ DISCRETE_SOUND_START(crash)
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
 	/************************************************/
-	DISCRETE_MULTADD(CRASH_MUSIC_SND, 1, CRASH_MUSIC_BIT, CRASH_R63, 0.5)
+	DISCRETE_MULTADD(CRASH_MUSIC_SND, CRASH_MUSIC_BIT, CRASH_R63, 0.5)
 
 	/************************************************/
 	/* Beeper - oneshot gates tone                  */
 	/************************************************/
 	DISCRETE_555_MSTABLE(NODE_30, 1, CRASH_BEEPER_EN, RES_K(22), CAP_U(.47), &crash_beeper_555m)
 	DISCRETE_555_ASTABLE(NODE_31, NODE_30, RES_K(4.7), RES_K(4.7), CAP_U(.1), &crash_beeper_555a)
-	DISCRETE_MULTIPLY(CRASH_BEEPER_SND, 1, NODE_31, CRASH_R39)
+	DISCRETE_MULTIPLY(CRASH_BEEPER_SND, NODE_31, CRASH_R39)
 
 	/************************************************/
 	/* Final mix with gain                          */

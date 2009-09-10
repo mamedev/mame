@@ -226,7 +226,7 @@
  * DISCRETE_INVERT(NODE,IN0)
  * DISCRETE_LOOKUP_TABLE(NODE,ENAB,ADDR,SIZE,TABLE)
  * DISCRETE_MULTIPLY(NODE,ENAB,IN0,IN1)
- * DISCRETE_MULTADD(NODE,ENAB,INP0,INP1,INP2)
+ * DISCRETE_MULTADD(NODE,INP0,INP1,INP2)
  * DISCRETE_ONESHOT(NODE,TRIG,AMPL,WIDTH,TYPE)
  * DISCRETE_ONESHOTR(NODE,RESET,TRIG,AMPL,WIDTH,TYPE)
  * DISCRETE_ONOFF(NODE,ENAB,INP0)
@@ -1444,8 +1444,6 @@
  *
  *                        .------------.
  *                        |            |
- *    ENAB       -0------>|            |
- *                        |            |
  *    INPUT0     -1------>|     \|/    |
  *                        |     -+-    |---->   Netlist node
  *    INPUT1     -2------>|     /|\    |
@@ -1457,12 +1455,10 @@
  *  Declaration syntax
  *
  *     DISCRETE_MULTIPLY  (name of node,
- *                         enable node or static value,
  *                         input0 node or static value,
  *                         input1 node or static value)
  *
  *     DISCRETE_MULTADD   (name of node,
- *                         enable node or static value,
  *                         input0 node or static value,
  *                         input1 node or static value,
  *                         input2 node or static value)
@@ -4296,8 +4292,8 @@ enum
 #define DISCRETE_ADDER4(NODE,ENAB,INP0,INP1,INP2,INP3)                  { NODE, DST_ADDER       , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_ADDER4" },
 #define DISCRETE_CLAMP(NODE,ENAB,INP0,MIN,MAX,CLAMP)                    { NODE, DST_CLAMP       , 5, { ENAB,INP0,MIN,MAX,CLAMP }, { ENAB,INP0,MIN,MAX,CLAMP }, NULL, "DISCRETE_CLAMP" },
 #define DISCRETE_DIVIDE(NODE,ENAB,INP0,INP1)                            { NODE, DST_DIVIDE      , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_DIVIDE" },
-#define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
-#define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 4, { NODE_NC,INP0,NODE_NC,NODE_NC }, { 1,INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
+#define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
+#define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
 #define DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)                           { NODE, DST_LOGIC_INV   , 2, { ENAB,INP0 }, { ENAB,INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
 
 #define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 3, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N, VOUT }, NULL, "DISCRETE_BIT_DECODE" },
@@ -4323,11 +4319,11 @@ enum
 #define DISCRETE_MULTIPLEX2(NODE,ENAB,ADDR,INP0,INP1)                   { NODE, DST_MULTIPLEX   , 4, { ENAB,ADDR,INP0,INP1 }, { ENAB,ADDR,INP0,INP1 }, NULL, "DISCRETE_MULTIPLEX2" },
 #define DISCRETE_MULTIPLEX4(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3)         { NODE, DST_MULTIPLEX   , 6, { ENAB,ADDR,INP0,INP1,INP2,INP3 }, { ENAB,ADDR,INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_MULTIPLEX4" },
 #define DISCRETE_MULTIPLEX8(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7) { NODE, DST_MULTIPLEX, 10, { ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, { ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, NULL, "DISCRETE_MULTIPLEX8" },
-#define DISCRETE_MULTIPLY(NODE,ENAB,INP0,INP1)                          { NODE, DST_GAIN        , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,0 }, NULL, "DISCRETE_MULTIPLY" },
-#define DISCRETE_MULTADD(NODE,ENAB,INP0,INP1,INP2)                      { NODE, DST_GAIN        , 4, { ENAB,INP0,INP1,INP2 }, { ENAB,INP0,INP1,INP2 }, NULL, "DISCRETE_MULTADD" },
+#define DISCRETE_MULTIPLY(NODE,INP0,INP1)                               { NODE, DST_GAIN        , 3, { INP0,INP1,NODE_NC }, { INP0,INP1,0 }, NULL, "DISCRETE_MULTIPLY" },
+#define DISCRETE_MULTADD(NODE,INP0,INP1,INP2)                           { NODE, DST_GAIN        , 3, { INP0,INP1,INP2 }, { INP0,INP1,INP2 }, NULL, "DISCRETE_MULTADD" },
 #define DISCRETE_ONESHOT(NODE,TRIG,AMPL,WIDTH,TYPE)                     { NODE, DST_ONESHOT     , 5, { NODE_NC,TRIG,AMPL,WIDTH,NODE_NC }, { 0,TRIG,AMPL,WIDTH,TYPE }, NULL, "DISCRETE_ONESHOT" },
 #define DISCRETE_ONESHOTR(NODE,RESET,TRIG,AMPL,WIDTH,TYPE)              { NODE, DST_ONESHOT     , 5, { RESET,TRIG,AMPL,WIDTH,NODE_NC }, { RESET,TRIG,AMPL,WIDTH,TYPE }, NULL, "One Shot Resetable" },
-#define DISCRETE_ONOFF(NODE,ENAB,INP0)                                  { NODE, DST_GAIN        , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,0,1,0 }, NULL, "DISCRETE_ONOFF" },
+#define DISCRETE_ONOFF(NODE,ENAB,INP0)                                  { NODE, DST_GAIN        , 3, { ENAB,INP0,NODE_NC }, { 0,1,0 }, NULL, "DISCRETE_ONOFF" },
 #define DISCRETE_RAMP(NODE,ENAB,RAMP,GRAD,START,END,CLAMP)              { NODE, DST_RAMP        , 6, { ENAB,RAMP,GRAD,START,END,CLAMP }, { ENAB,RAMP,GRAD,START,END,CLAMP }, NULL, "DISCRETE_RAMP" },
 #define DISCRETE_SAMPLHOLD(NODE,ENAB,INP0,CLOCK,CLKTYPE)                { NODE, DST_SAMPHOLD    , 4, { ENAB,INP0,CLOCK,NODE_NC }, { ENAB,INP0,CLOCK,CLKTYPE }, NULL, "DISCRETE_SAMPLHOLD" },
 #define DISCRETE_SWITCH(NODE,ENAB,SWITCH,INP0,INP1)                     { NODE, DST_SWITCH      , 4, { ENAB,SWITCH,INP0,INP1 }, { ENAB,SWITCH,INP0,INP1 }, NULL, "DISCRETE_SWITCH" },

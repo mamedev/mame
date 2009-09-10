@@ -355,7 +355,7 @@ static DISCRETE_SOUND_START(headon)
     DISCRETE_COUNTER(NODE_27, 1, 0, NODE_25, 3, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE) //divide by 4
     DISCRETE_COUNTER(NODE_28, 1, 0, NODE_25, 2, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE) //divide by 3
 	DISCRETE_TRANSFORM5(NODE_29,NODE_26,NODE_27,NODE_28,1,2,"13>24=+0+")
-	DISCRETE_MULTIPLY(HEADON_PLAYER_CAR_OUT, 1, NODE_29, 12 / 3)
+	DISCRETE_MULTIPLY(HEADON_PLAYER_CAR_OUT, NODE_29, 12 / 3)
 
 	/************************************************
      * CAR Sound generation Computer Car
@@ -374,13 +374,13 @@ static DISCRETE_SOUND_START(headon)
     DISCRETE_COUNTER(NODE_37, 1, 0, NODE_35, 3, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE) //divide by 4
     DISCRETE_COUNTER(NODE_38, 1, 0, NODE_35, 2, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE) //divide by 3
 	DISCRETE_TRANSFORM5(NODE_39,NODE_36,NODE_37,NODE_38,1,2,"13>24=+0+")
-	DISCRETE_MULTIPLY(HEADON_COMP_CAR_OUT, 1, NODE_39, 12 / 3)
+	DISCRETE_MULTIPLY(HEADON_COMP_CAR_OUT, NODE_39, 12 / 3)
 
 	/************************************************
      * Screech #1
      ************************************************/
 
-	DISCRETE_MULTIPLY(NODE_50,1,HEADON_SCREECH1_EN,12)
+	DISCRETE_MULTIPLY(NODE_50,HEADON_SCREECH1_EN,12)
 	DISCRETE_LFSR_NOISE(NODE_51, 1, 1, MM5837_CLOCK_12V, 12.0, 0, 6.0, &mm5837_lfsr)
 	DISCRETE_INVERTER_OSC(HEADON_SCREECH1_OUT,NODE_50,NODE_51,RES_K(10),RES_K(100),CAP_N(47),RES_K(10),&headon_inverter_osc_1)
 
@@ -388,7 +388,7 @@ static DISCRETE_SOUND_START(headon)
      * Screech #2
      ************************************************/
 
-	DISCRETE_MULTIPLY(NODE_60,1,HEADON_SCREECH2_EN,12)
+	DISCRETE_MULTIPLY(NODE_60,HEADON_SCREECH2_EN,12)
 	DISCRETE_INVERTER_OSC(HEADON_SCREECH2_OUT,NODE_60,NODE_51,RES_K(10),RES_K(100),CAP_N(57),RES_K(10),&headon_inverter_osc_1)
 
 	/************************************************
@@ -396,7 +396,7 @@ static DISCRETE_SOUND_START(headon)
      ************************************************/
 
 	DISCRETE_LOGIC_INVERT(NODE_70, 1, HEADON_BONUS_EN)
-	DISCRETE_MULTIPLY(NODE_71,1,NODE_70,12)
+	DISCRETE_MULTIPLY(NODE_71,NODE_70,12)
 	DISCRETE_INVERTER_OSC(NODE_73,NODE_71,0,RES_K(22),RES_M(1),CAP_N(470),RES_M(10),&headon_inverter_osc_2)
 
 	/* FIXME: the following is a bit of a hack
@@ -411,7 +411,7 @@ static DISCRETE_SOUND_START(headon)
      */
 	DISCRETE_TRANSFORM3(NODE_74,NODE_73,200000,165000,"102*-")
 	DISCRETE_555_ASTABLE(NODE_75, 1, NODE_74, RES_K(100), CAP_N(10), &headon_555_bonus)
-	DISCRETE_MULTIPLY(HEADON_BONUS_OUT,1,NODE_75,HEADON_BONUS_EN)
+	DISCRETE_MULTIPLY(HEADON_BONUS_OUT,NODE_75,HEADON_BONUS_EN)
 
 	/************************************************
      * Crash
@@ -421,7 +421,7 @@ static DISCRETE_SOUND_START(headon)
 	DISCRETE_LOGIC_INVERT(NODE_80, 1, HEADON_CRASH_EN)
 	DISCRETE_555_MSTABLE(NODE_81, 1, NODE_80, RES_K(470), CAP_U(1), &headon_555_crash)
 	// Mix with noise
-	DISCRETE_MULTIPLY(NODE_84, 1, NODE_81, NODE_51)
+	DISCRETE_MULTIPLY(NODE_84, NODE_81, NODE_51)
 	// Taken from simulation
 	// Center frequency is 500 Hz
 	// roughly 6db per octave
@@ -430,7 +430,7 @@ static DISCRETE_SOUND_START(headon)
 
 	DISCRETE_555_MSTABLE(NODE_86, 1, NODE_80, RES_K(470), CAP_U(2.2), &headon_555_crash)
 	// Mix with noise
-	DISCRETE_MULTIPLY(NODE_87, 1, NODE_86, NODE_51)
+	DISCRETE_MULTIPLY(NODE_87, NODE_86, NODE_51)
 	// Sallen Key filter ...
 	// http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
 	// f = w / 2 / pi  = 1 / ( 2 * pi * 15k*sqrt(470n*47n)) = 71 Hz

@@ -101,7 +101,7 @@ DISCRETE_SOUND_START(subs)
 	/************************************************/
 	/* Launch is just amplitude contolled noise     */
 	/************************************************/
-	DISCRETE_MULTIPLY(SUBS_LAUNCH_SND, 1, SUBS_NOISE, SUBS_LAUNCH_DATA)
+	DISCRETE_MULTIPLY(SUBS_LAUNCH_SND, SUBS_NOISE, SUBS_LAUNCH_DATA)
 
 	/************************************************/
 	/* Crash resamples the noise at 8V and then     */
@@ -110,7 +110,8 @@ DISCRETE_SOUND_START(subs)
 	/************************************************/
 	DISCRETE_SQUAREWFIX(NODE_20, 1, 15750.0/2/8, 1.0, 50, 1.0/2, 0)	/* Resample freq. */
 	DISCRETE_SAMPLHOLD(NODE_21, 1, SUBS_NOISE, NODE_20, DISC_SAMPHOLD_REDGE)
-	DISCRETE_MULTIPLY(SUBS_CRASH_SND, SUBS_CRASH_EN, NODE_21, SUBS_CRASH_DATA)
+	DISCRETE_MULTIPLY(NODE_22, NODE_21, SUBS_CRASH_DATA)
+	DISCRETE_ONOFF(SUBS_CRASH_SND, SUBS_CRASH_EN, NODE_22)
 
 	/************************************************/
 	/* Explode filters the crash sound.             */
