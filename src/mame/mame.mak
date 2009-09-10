@@ -213,6 +213,7 @@ SOUNDS += WAVE
 #SOUNDS += SID8580
 SOUNDS += SP0256
 SOUNDS += DIGITALKER
+SOUNDS += CDP1863
 
 
 #-------------------------------------------------
