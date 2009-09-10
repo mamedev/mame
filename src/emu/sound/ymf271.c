@@ -1644,6 +1644,7 @@ static void init_tables(running_machine *machine)
 			case 1: plfo[3] = PLFO_MAX - ftri_wave; break;
 			case 2: plfo[3] = 0 - ftri_wave; break;
 			case 3: plfo[3] = 0 - (PLFO_MAX - ftri_wave); break;
+			default: plfo[3]=0; assert(0); break;
 		}
 
 		for (j=0; j < 4; j++)
