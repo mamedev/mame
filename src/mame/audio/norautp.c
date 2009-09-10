@@ -15,7 +15,7 @@
 #define NORAUTP_R2		RES_K(2.2)
 
 /* Parts List - Capacitors */
-#define NORAUTP_C1		CAP_U(.009)		/* The real value is .01, but using .009 the tone for this line is accurate */
+#define NORAUTP_C1		CAP_U(.01)
 #define NORAUTP_C2		CAP_U(.022)
 #define NORAUTP_C3		CAP_U(.047)
 #define NORAUTP_C4		CAP_U(.01)
