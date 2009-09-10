@@ -505,12 +505,10 @@ static DISCRETE_SOUND_START(maze)
 					1,							/* J */
 					1)							/* K */
 	DISCRETE_MULTIPLEX2(NODE_31,				/* IC D1 */
-					1,							/* ENAB */
 					MAZE_PLAYER_SEL,			/* ADDR */
 					MAZE_P1_DATA,				/* INP0 */
 					MAZE_P2_DATA)				/* INP1 */
 	DISCRETE_LOOKUP_TABLE(NODE_32,				/* IC E1 */
-					1,							/* ENAB */
 					NODE_31,					/* ADDR */
 					16,							/* SIZE */
 					&maze_74147_table)

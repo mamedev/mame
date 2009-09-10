@@ -903,17 +903,15 @@ static DISCRETE_STEP(dst_logic_jkff)
  *
  * DST_LOOKUP_TABLE  - Return value from lookup table
  *
- * input[0]    - Enable input value
- * input[1]    - Input 1
- * input[2]    - Table size
+ * input[0]    - Input 1
+ * input[1]    - Table size
  *
  * Also passed address of the lookup table
  *
  * Feb 2007, D Renaud.
  ************************************************************************/
-#define DST_LOOKUP_TABLE__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(1)
-#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(2)
+#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(0)
+#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_lookup_table)
 {
@@ -921,7 +919,7 @@ static DISCRETE_STEP(dst_lookup_table)
 
 	int	addr = DST_LOOKUP_TABLE__IN;
 
-	if (!DST_LOOKUP_TABLE__ENABLE || addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
+	if (addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
 		node->output[0] = 0;
 	else
 		node->output[0] = table[addr];
@@ -1236,17 +1234,15 @@ static DISCRETE_RESET(dst_mixer)
  *
  * DST_MULTIPLEX - 1 of x multiplexer/switch
  *
- * input[0]    - Enable input value
- * input[1]    - switch position
- * input[2]    - input[0]
- * input[3]    - input[1]
+ * input[0]    - switch position
+ * input[1]    - input[0]
+ * input[2]    - input[1]
  * .....
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_MULTIPLEX__ENABLE		DISCRETE_INPUT(0)
-#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(1)
-#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(2 + addr)
+#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(0)
+#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(1 + addr)
 
 static DISCRETE_STEP(dst_multiplex)
 {
@@ -1254,22 +1250,15 @@ static DISCRETE_STEP(dst_multiplex)
 
 	int addr;
 
-	if(DST_MULTIPLEX__ENABLE)
+	addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
+	if ((addr >= 0) && (addr < context->size))
 	{
-		addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
-		if ((addr >= 0) && (addr < context->size))
-		{
-			node->output[0] = DST_MULTIPLEX__INP(addr);
-		}
-		else
-		{
-			/* Bad address.  We will leave the output alone. */
-			discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
-		}
+		node->output[0] = DST_MULTIPLEX__INP(addr);
 	}
 	else
 	{
-		node->output[0] = 0;
+		/* Bad address.  We will leave the output alone. */
+		discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
 	}
 }
 
@@ -1434,49 +1423,40 @@ static DISCRETE_RESET(dst_ramp)
  *
  * DST_SAMPHOLD - Sample & Hold Implementation
  *
- * input[0]    - Enable
- * input[1]    - input[0] value
- * input[2]    - clock node
- * input[3]    - clock type
+ * input[0]    - input[0] value
+ * input[1]    - clock node
+ * input[2]    - clock type
  *
  ************************************************************************/
-#define DST_SAMPHOLD__ENABLE	DISCRETE_INPUT(0)
-#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(1)
-#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(2)
-#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(3)
+#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(0)
+#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(1)
+#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_samphold)
 {
 	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
 
-	if(DST_SAMPHOLD__ENABLE)
+	switch(context->clocktype)
 	{
-		switch(context->clocktype)
-		{
-			case DISC_SAMPHOLD_REDGE:
-				/* Clock the whole time the input is rising */
-				if (DST_SAMPHOLD__CLOCK > context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_FEDGE:
-				/* Clock the whole time the input is falling */
-				if(DST_SAMPHOLD__CLOCK < context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_HLATCH:
-				/* Output follows input if clock != 0 */
-				if( DST_SAMPHOLD__CLOCK) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			case DISC_SAMPHOLD_LLATCH:
-				/* Output follows input if clock == 0 */
-				if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
-				break;
-			default:
-				discrete_log(node->info, "dst_samphold_step - Invalid clocktype passed");
-				break;
-		}
-	}
-	else
-	{
-		node->output[0] = 0;
+		case DISC_SAMPHOLD_REDGE:
+			/* Clock the whole time the input is rising */
+			if (DST_SAMPHOLD__CLOCK > context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_FEDGE:
+			/* Clock the whole time the input is falling */
+			if(DST_SAMPHOLD__CLOCK < context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_HLATCH:
+			/* Output follows input if clock != 0 */
+			if( DST_SAMPHOLD__CLOCK) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		case DISC_SAMPHOLD_LLATCH:
+			/* Output follows input if clock == 0 */
+			if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
+			break;
+		default:
+			discrete_log(node->info, "dst_samphold_step - Invalid clocktype passed");
+			break;
 	}
 	/* Save the last value */
 	context->last_input = DST_SAMPHOLD__CLOCK;
