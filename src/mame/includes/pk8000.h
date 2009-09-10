@@ -1,3 +1,5 @@
+/*----------- defined in video/pk8000.c -----------*/
+
 READ8_HANDLER(pk8000_video_color_r);
 WRITE8_HANDLER(pk8000_video_color_w);
 READ8_HANDLER(pk8000_text_start_r);
@@ -17,5 +19,3 @@ extern UINT8 pk8000_video_enable;
 PALETTE_INIT( pk8000 );
 
 UINT32 pk8000_video_update(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *videomem);
-
-

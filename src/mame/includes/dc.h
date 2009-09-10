@@ -40,7 +40,7 @@ INPUT_CHANGED( dc_coin_slots_callback );
 
 extern UINT32 dc_sysctrl_regs[0x200/4];
 extern UINT32 dc_coin_counts[2];
-extern UINT32 pvrctrl_regs[0x100/4];
+extern UINT8 maple0x86data1[0x80];
 
 /*--------- Ch2-DMA Control Registers ----------*/
 #define SB_C2DSTAT	((0x005f6800-0x005f6800)/4)
@@ -203,6 +203,7 @@ extern UINT32 pvrctrl_regs[0x100/4];
 
 /*----------- defined in video/dc.c -----------*/
 
+extern UINT32 pvrctrl_regs[0x100/4];
 extern UINT64 *dc_texture_ram;
 extern UINT64 *dc_framebuffer_ram;
 

@@ -168,46 +168,16 @@ Cisco Heat.
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "megasys1.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-/* Variables only used here: */
+#include "megasys1.h"
+#include "includes/cischeat.h"
 
 static UINT16 *rom_1, *rom_2, *rom_3;
 static UINT16 *sharedram1, *sharedram2;
 
-/* Variables defined in video: */
-
-extern UINT16 *cischeat_roadram[2];
-extern UINT16 *f1gpstr2_ioready;
-
-/* Functions defined in video: */
-
-READ16_HANDLER( bigrun_vregs_r );
-READ16_HANDLER( cischeat_vregs_r );
-READ16_HANDLER( f1gpstar_vregs_r );
-READ16_HANDLER( f1gpstr2_vregs_r );
-READ16_HANDLER( wildplt_vregs_r );
-
-WRITE16_HANDLER( bigrun_vregs_w );
-WRITE16_HANDLER( cischeat_vregs_w );
-WRITE16_HANDLER( f1gpstar_vregs_w );
-WRITE16_HANDLER( f1gpstr2_vregs_w );
-WRITE16_HANDLER( scudhamm_vregs_w );
-
-CUSTOM_INPUT( cischeat_shift_r );
-
-VIDEO_START( bigrun );
-VIDEO_START( cischeat );
-VIDEO_START( f1gpstar );
-
-VIDEO_UPDATE( bigrun );
-VIDEO_UPDATE( cischeat );
-VIDEO_UPDATE( f1gpstar );
-VIDEO_UPDATE( scudhamm );
 
 
 /**************************************************************************

@@ -165,7 +165,7 @@ static INPUT_PORTS_START( photon )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN( pk8000_interrupt )
+static INTERRUPT_GEN( pk8000_interrupt )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }

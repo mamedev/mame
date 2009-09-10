@@ -372,7 +372,7 @@ static char * ALU( UINT32 alu)
 	return buf;
 }
 
-unsigned dasm_mb86233(char *buffer, UINT32 opcode )
+static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 {
 	char *p = buffer;
 	UINT32	grp = ( opcode >> 26 ) & 0x3f;

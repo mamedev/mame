@@ -29,11 +29,11 @@
 #include "video/resnet.h"
 #include "video/segaic16.h"
 
-int system16_bootleg_spritebank_type = -1;
-int system16_bootleg_back_tilemap_yscroll = 0;
-int system16_bootleg_fore_tilemap_yscroll = 0;
-int system16_bootleg_text_tilemap_yscroll = 0;
-int system16_bootleg_sprite_xoffs = 0;
+static int system16_bootleg_spritebank_type = -1;
+static int system16_bootleg_back_tilemap_yscroll = 0;
+static int system16_bootleg_fore_tilemap_yscroll = 0;
+static int system16_bootleg_text_tilemap_yscroll = 0;
+static int system16_bootleg_sprite_xoffs = 0;
 
 /* A config table for per-game offsets and bank types */
 struct system15_bootleg_config
@@ -85,7 +85,7 @@ static const struct system15_bootleg_config config_table[] =
 
 
 
-void setup_system16_bootleg_video(running_machine* machine)
+static void setup_system16_bootleg_video(running_machine* machine)
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct system15_bootleg_config *k = &config_table[0];
@@ -108,7 +108,7 @@ void setup_system16_bootleg_video(running_machine* machine)
 	if (!found) fatalerror("system16 bootleg not in system15_bootleg_config config_table[]!\n");
 }
 
-void setup_system16_bootleg_spritebanking(running_machine* machine)
+static void setup_system16_bootleg_spritebanking(running_machine* machine)
 {
 
 	if (system16_bootleg_spritebank_type == 1)
@@ -171,9 +171,7 @@ int sys16_tile_bank0;
 int sys16_refreshenable;
 
 int sys16_bg_scrollx, sys16_bg_scrolly;
-int sys16_bg2_scrollx, sys16_bg2_scrolly;
 int sys16_fg_scrollx, sys16_fg_scrolly;
-int sys16_fg2_scrollx, sys16_fg2_scrolly;
 
 int sys16_bg_page[4];
 int sys16_bg2_page[4];
@@ -311,7 +309,7 @@ static const int resistances_normal[6] = {3900, 2000, 1000, 1000/2, 1000/4, 0};
 static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 static double weights[2][3][6];
 
-#if 0
+#ifdef UNUSED_CODE
 WRITE16_HANDLER( sys16_paletteram_w )
 {
 	UINT16 newword;

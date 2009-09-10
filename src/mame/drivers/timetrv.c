@@ -28,12 +28,12 @@ CPU is an Intel 80188
 
 static UINT8 *led_vram_lo,*led_vram_hi;
 
-VIDEO_START( timetrv )
+static VIDEO_START( timetrv )
 {
 
 }
 
-VIDEO_UPDATE( timetrv )
+static VIDEO_UPDATE( timetrv )
 {
 	popmessage("%s%s",led_vram_lo,led_vram_hi);
 	return 0;

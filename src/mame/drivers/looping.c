@@ -87,7 +87,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #define VBEND				(16)
 #define VBSTART				(224+16)
 
-UINT8 *cop_io;
+static UINT8 *cop_io;
 
 /*************************************
  *

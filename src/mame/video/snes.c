@@ -124,8 +124,6 @@ struct SCANLINE
 static struct SCANLINE scanlines[2];
 struct SNES_PPU_STRUCT snes_ppu;
 
-extern UINT16 snes_htmult;
-
 enum
 {
 	SNES_COLOR_DEPTH_2BPP = 0,

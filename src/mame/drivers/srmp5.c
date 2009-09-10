@@ -42,7 +42,6 @@ This is not a bug (real machine behaves the same).
 #include "st0016.h"
 
 #define DEBUG_CHAR
-extern UINT8 *st0016_charram;
 static UINT32 databank;
 static UINT32 srmp5_vidregs[0x120 / 4];
 static UINT16 *tileram, *palram;

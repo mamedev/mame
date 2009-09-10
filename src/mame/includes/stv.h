@@ -3,7 +3,6 @@
 extern UINT32 *stv_workram_h;
 extern UINT32 *stv_workram_l;
 
-extern int stv_vblank,stv_hblank;
 extern int stv_enable_slave_sh2;
 
 extern int minit_boost,sinit_boost;
@@ -79,6 +78,7 @@ READ32_HANDLER ( stv_vdp1_framebuffer0_r );
 
 extern UINT32* stv_vdp2_regs;
 extern UINT32* stv_vdp2_vram;
+extern int stv_vblank,stv_hblank;
 extern UINT32* stv_vdp2_cram;
 
 UINT8 stv_get_vblank(running_machine *machine);

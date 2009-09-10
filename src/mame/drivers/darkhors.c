@@ -73,8 +73,6 @@ To do:
 
 ***************************************************************************/
 
-extern UINT8 *st0016_charram;
-
 static VIDEO_START( darkhors );
 static VIDEO_UPDATE( darkhors );
 
@@ -331,7 +329,7 @@ ADDRESS_MAP_END
 static UINT32* jclub2_tileram;
 static int jclub2_gfx_index;
 
-WRITE32_HANDLER( jclub2_tileram_w )
+static WRITE32_HANDLER( jclub2_tileram_w )
 {
 	COMBINE_DATA(&jclub2_tileram[offset]);
 	gfx_element_mark_dirty(space->machine->gfx[jclub2_gfx_index], offset/(256/4));
@@ -672,7 +670,7 @@ MACHINE_DRIVER_END
 
 
 
-VIDEO_START(jclub2)
+static VIDEO_START(jclub2)
 {
  	/* find first empty slot to decode gfx */
 	for (jclub2_gfx_index = 0; jclub2_gfx_index < MAX_GFX_ELEMENTS; jclub2_gfx_index++)
@@ -687,7 +685,7 @@ VIDEO_START(jclub2)
 
 }
 
-VIDEO_UPDATE(jclub2)
+static VIDEO_UPDATE(jclub2)
 {
 	return 0;
 }
@@ -738,12 +736,12 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-VIDEO_START(jclub2o)
+static VIDEO_START(jclub2o)
 {
 
 }
 
-VIDEO_UPDATE(jclub2o)
+static VIDEO_UPDATE(jclub2o)
 {
 	return 0;
 }

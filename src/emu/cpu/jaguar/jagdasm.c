@@ -76,7 +76,7 @@ INLINE char *signed_16bit(INT16 val)
 	return temp;
 }
 
-unsigned dasmjag(int variant, char *buffer, unsigned pc, const UINT8 *oprom)
+static unsigned dasmjag(int variant, char *buffer, unsigned pc, const UINT8 *oprom)
 {
 	UINT32 flags = 0;
 	int op = ROPCODE(0);

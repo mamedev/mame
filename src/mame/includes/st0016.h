@@ -32,7 +32,7 @@ WRITE8_HANDLER	(st0016_rom_bank_w);
 
 /*----------- defined in video/st0016.c -----------*/
 
-extern UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;
+extern UINT8 *st0016_charram;
 
 extern UINT8 *macs_ram1,*macs_ram2;
 

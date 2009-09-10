@@ -32,9 +32,15 @@ extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following
 void bloodwar_mcu_run(running_machine *machine);
 void bonkadv_mcu_run(running_machine *machine);
 void gtmr_mcu_run(running_machine *machine);
+void calc3_mcu_run(running_machine *machine);
+
 void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
+
 DRIVER_INIT( decrypt_toybox_rom );
 DRIVER_INIT( decrypt_toybox_rom_alt );
+DRIVER_INIT( calc3_scantables );
+
+
 
 /*----------- defined in drivers/kaneko16.c -----------*/
 

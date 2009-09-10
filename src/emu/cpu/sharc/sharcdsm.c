@@ -1152,7 +1152,7 @@ static void build_dasm_table(void)
 	}
 }
 
-UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode)
+static UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode)
 {
 	#define DEFAULT_DASM_WIDTH	(64)
 

@@ -37,8 +37,8 @@ UINT16 *kaneko16_mcu_ram;
     - see notes about this "calculator" implementation in drivers\galpanic.c
     - bonkadv only uses Random Number, XY Overlap Collision bit and register '0x02'
 */
-READ16_HANDLER(shogwarr_calc_r);
-WRITE16_HANDLER(shogwarr_calc_w);
+static READ16_HANDLER(shogwarr_calc_r);
+static WRITE16_HANDLER(shogwarr_calc_w);
 
 static struct {
 	UINT16 x1p, y1p, x1s, y1s;
@@ -399,7 +399,7 @@ static void shogwarr_recalc_collisions(void)
 }
 
 
-WRITE16_HANDLER(shogwarr_calc_w)
+static WRITE16_HANDLER(shogwarr_calc_w)
 {
 	int idx=offset*4;
 	switch (idx)
@@ -464,7 +464,7 @@ WRITE16_HANDLER(shogwarr_calc_w)
 }
 
 
-READ16_HANDLER(shogwarr_calc_r)
+static READ16_HANDLER(shogwarr_calc_r)
 {
 
 	int idx=offset*4;
@@ -558,8 +558,6 @@ void calc3_mcu_init(void)
 	calc3_mcu_command_offset = 0;
 }
 
-void calc3_mcu_run(running_machine *machine);
-
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
@@ -634,7 +632,7 @@ where games specify the same decryption key the table used is the same, I don't 
 */
 
 
-UINT16 calc3_mcu_crc;
+static UINT16 calc3_mcu_crc;
 
 /* decryption tables */
 
@@ -647,7 +645,7 @@ UINT16 calc3_mcu_crc;
    part of the table to be 0
 */
 
-static INT16 calc3_keydata[0x40*0x100] = {
+static const INT16 calc3_keydata[0x40*0x100] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -1686,12 +1684,12 @@ static UINT16 calc3_database;
 
 static int data_header[2];
 
-UINT32 calc3_writeaddress;
-UINT32 calc3_writeaddress_current;
-UINT16 calc3_dsw_addr = 0x00;
-UINT16 calc3_eeprom_addr;
-UINT16 calc3_poll_addr;
-UINT16 cakc3_checkumaddress;
+static UINT32 calc3_writeaddress;
+static UINT32 calc3_writeaddress_current;
+static UINT16 calc3_dsw_addr = 0x00;
+static UINT16 calc3_eeprom_addr;
+static UINT16 calc3_poll_addr;
+static UINT16 cakc3_checkumaddress;
 
 static UINT8 shift_bits(UINT8 dat, int bits)
 {
@@ -1710,7 +1708,7 @@ static UINT8 shift_bits(UINT8 dat, int bits)
 }
 
 // endian safe? you're having a laugh
-int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
+static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 
 
@@ -1940,7 +1938,7 @@ int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* dstram, 
 			}
 			else
 			{
-				INT16* key = calc3_keydata+(calc3_decryption_key_byte*0x40);
+				const INT16* key = calc3_keydata+(calc3_decryption_key_byte*0x40);
 
 				if (key[0] == -1)
 				{
@@ -2104,8 +2102,6 @@ DRIVER_INIT(calc3_scantables)
 }
 
 
-
-extern UINT16 calc3_mcu_crc;
 
 void calc3_mcu_run(running_machine *machine)
 {

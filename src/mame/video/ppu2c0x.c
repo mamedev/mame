@@ -125,8 +125,8 @@ static TIMER_CALLBACK( nmi_callback );
 void (*ppu_latch)( const device_config *device, offs_t offset );
 
 /* palette handlers */
-WRITE8_HANDLER( ppu2c0x_palette_write );
-READ8_HANDLER( ppu2c0x_palette_read );
+static WRITE8_HANDLER( ppu2c0x_palette_write );
+static READ8_HANDLER( ppu2c0x_palette_read );
 /* name and attribute table functions */
 WRITE8_HANDLER( ppu2c0x_name_write );
 READ8_HANDLER( ppu2c0x_name_read );
@@ -980,7 +980,7 @@ static DEVICE_RESET( ppu2c0x )
 *
 *************************************/
 
-WRITE8_HANDLER( ppu2c0x_palette_write )
+static WRITE8_HANDLER( ppu2c0x_palette_write )
 {
 	ppu2c0x_chip *this_ppu = get_token(space->cpu);
 	const ppu2c0x_interface *intf = get_interface(space->cpu);
@@ -1011,7 +1011,7 @@ WRITE8_HANDLER( ppu2c0x_palette_write )
 	}
 }
 
-READ8_HANDLER( ppu2c0x_palette_read )
+static READ8_HANDLER( ppu2c0x_palette_read )
 {
 	ppu2c0x_chip *this_ppu = get_token(space->cpu);
 	{

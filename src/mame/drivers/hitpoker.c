@@ -52,14 +52,14 @@ static UINT8 hitpoker_pic_data;
 
 #define CRTC_CLOCK XTAL_3_579545MHz
 
-VIDEO_START(hitpoker)
+static VIDEO_START(hitpoker)
 {
 	videoram = auto_alloc_array(machine, UINT8, 0x35ff);
 	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	colorram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
-VIDEO_UPDATE(hitpoker)
+static VIDEO_UPDATE(hitpoker)
 {
 	int count = 0;
 	int y,x;
@@ -488,7 +488,7 @@ static MACHINE_DRIVER_START( hitpoker )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-DRIVER_INIT(hitpoker)
+static DRIVER_INIT(hitpoker)
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 

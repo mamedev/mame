@@ -217,7 +217,7 @@ void tms5110_set_variant(tms5110_state *tms, int variant)
 }
 
 
-void register_for_save_states(tms5110_state *tms)
+static void register_for_save_states(tms5110_state *tms)
 {
 	state_save_register_device_item_array(tms->device, 0, tms->fifo);
 	state_save_register_device_item(tms->device, 0, tms->fifo_head);

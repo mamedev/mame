@@ -30,7 +30,7 @@ enum e_addressing {
 };
 
 
-static const char *s_mnemonic[] = {
+static const char *const s_mnemonic[] = {
 	"a10aac", "a6aac", "a8aac", "ac1ac", "acacc", "acnaa", "alec", "alem", "amaac", "branch", "call", "ccla",
 	"cla", "clo", "comc", "comx", "comx8", "cpaiz", "ctmdyn", "dan", "dman", "dmea", "dnaa",
 	"dyn", "ia", "imac", "iyc", "kne", "knez", "ldp", "ldx", "ldx", "mnea", "mnez",

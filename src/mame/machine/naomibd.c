@@ -225,7 +225,7 @@ struct _naomibd_state
 	UINT32				prot_offset, prot_key;
 	UINT32				aw_offset, aw_file_base, aw_file_offset;
 
-	UINT32				*prot_translate;
+	const UINT32				*prot_translate;
 	int				prot_reverse_bytes;
 	#if NAOMIBD_PRINTF_PROTECTION
 	int				prot_pio_count;
@@ -235,7 +235,7 @@ struct _naomibd_state
 // maps protection offsets to real addresses
 // format of array: encryption key, address written, address to switch out with.  if key is -1 it's ignored and address written is the match.
 // if key is not -1, it's used for the match instead of the address written.
-static naomibd_config_table naomibd_translate_tbl[] =
+static const naomibd_config_table naomibd_translate_tbl[] =
 {
 	{ "doa2", 0, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
 		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x118a3a, 0x120000,

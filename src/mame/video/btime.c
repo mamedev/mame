@@ -19,7 +19,7 @@ UINT8 *lnc_charbank;
 UINT8 *bnj_backgroundram;
 UINT8 *zoar_scrollram;
 UINT8 *deco_charram;
-UINT8 *progolf_fg_fb;
+//UINT8 *progolf_fg_fb;
 size_t bnj_backgroundram_size;
 
 static UINT8 btime_palette = 0;

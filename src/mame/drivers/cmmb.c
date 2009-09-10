@@ -30,12 +30,12 @@ CYC1399
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 
-VIDEO_START( cmmb )
+static VIDEO_START( cmmb )
 {
 
 }
 
-VIDEO_UPDATE( cmmb )
+static VIDEO_UPDATE( cmmb )
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x00000;

@@ -1019,7 +1019,6 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
-extern UINT64 *naomi_ram64;
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -1052,9 +1051,6 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 /*
 * Non-volatile memories
 */
-
-extern UINT8 maple0x86data1[0x80];
-
 
 // some default eeprom settings
 static const struct
@@ -1375,7 +1371,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	return reg;
 }
 
-READ64_HANDLER( aw_modem_r )
+static READ64_HANDLER( aw_modem_r )
 {
 	int reg;
 	UINT64 shift;
@@ -1402,7 +1398,7 @@ READ64_HANDLER( aw_modem_r )
 	return 0;
 }
 
-WRITE64_HANDLER( aw_modem_w )
+static WRITE64_HANDLER( aw_modem_w )
 {
 	int reg;
 	UINT64 shift;

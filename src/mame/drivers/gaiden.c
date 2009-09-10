@@ -1646,7 +1646,7 @@ static void descramble_mastninj_gfx(UINT8* src)
 	}
 }
 
-DRIVER_INIT(mastninj)
+static DRIVER_INIT(mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
 	descramble_mastninj_gfx(memory_region(machine,"gfx2"));

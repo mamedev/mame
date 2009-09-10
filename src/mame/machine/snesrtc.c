@@ -13,9 +13,9 @@ typedef struct
 	INT8 rtc_index;
 } _snes_rtc_t;
 
-_snes_rtc_t snes_rtc;
+static _snes_rtc_t snes_rtc;
 
-const UINT8 srtc_months[12] =
+static const UINT8 srtc_months[12] =
 {
 	31, 28, 31,
 	30, 31, 30,

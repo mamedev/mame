@@ -6,7 +6,7 @@
     CONSTANTS
 ***************************************************************************/
 
-static const char* REGISTER_NAME[256] =
+static const char *const REGISTER_NAME[256] =
 {
 	"P0", "P1", "P2", "P3", "", "", "", "", "", "", "", "", "", "", "", "",
 	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -26,7 +26,7 @@ static const char* REGISTER_NAME[256] =
 	"SIO", "TMR", "T1", "PRE1", "T0", "PRE0", "P2M", "P3M", "P01M", "IPR", "IRQ", "IMR", "FLAGS", "RP", "SPH", "SPL"
 };
 
-static const char* CONDITION_CODE[16] =
+static const char *const CONDITION_CODE[16] =
 {
 	"F", "LT", "LE", "ULE", "OV", "MI", "Z", "C",
 	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"

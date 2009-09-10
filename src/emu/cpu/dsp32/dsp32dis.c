@@ -196,7 +196,7 @@ static const char *dasm_PI(UINT16 bits, char *buffer)
 }
 
 
-unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
+static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 {
 	UINT32 flags = 0;
 

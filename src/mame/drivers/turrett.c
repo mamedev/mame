@@ -65,12 +65,12 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 #define R3041_CLOCK		25000000
 
 
-VIDEO_START(turrett)
+static VIDEO_START(turrett)
 {
 
 }
 
-VIDEO_UPDATE(turrett)
+static VIDEO_UPDATE(turrett)
 {
 	return 0;
 }

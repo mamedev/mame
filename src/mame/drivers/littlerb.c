@@ -161,8 +161,8 @@ static READ16_HANDLER( littlerb_vdp_r )
 	return -1;
 }
 
-int type2_writes = 0;
-UINT32 lasttype2pc = 0;
+static int type2_writes = 0;
+static UINT32 lasttype2pc = 0;
 static WRITE16_HANDLER( littlerb_vdp_w )
 {
 

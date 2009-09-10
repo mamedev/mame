@@ -46,7 +46,7 @@ static VIDEO_START ( skeetsht )
 
 }
 
-void skeetsht_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void skeetsht_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	const rgb_t *const pens = tlc34076_get_pens();
 	UINT16 *vram = &tms_vram[(params->rowaddr << 8) & 0x3ff00];

@@ -82,12 +82,12 @@ mm74c920J/mmc6551j-9    x2
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 
-VIDEO_START( vpoker )
+static VIDEO_START( vpoker )
 {
 	videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
-VIDEO_UPDATE( vpoker )
+static VIDEO_UPDATE( vpoker )
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0000;

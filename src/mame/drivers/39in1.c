@@ -220,7 +220,7 @@ static void pxa255_dma_irq_check(running_machine* machine)
 	pxa255_set_irq_line(machine, PXA255_INT_DMA, set_intr);
 }
 
-void pxa255_dma_load_descriptor_and_start(running_machine* machine, int channel)
+static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int channel)
 {
 	attotime period;
 

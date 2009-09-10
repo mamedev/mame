@@ -421,7 +421,6 @@ static INTERRUPT_GEN(st0016_int)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE );
 }
 
-extern UINT8 *st0016_charram;
 static const st0016_interface st0016_config =
 {
 	&st0016_charram

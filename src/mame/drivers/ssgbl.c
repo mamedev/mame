@@ -18,12 +18,12 @@ ROM_START( ssgbl )
 ROM_END
 
 
-READ16_HANDLER( sunsetbl_r )
+static READ16_HANDLER( sunsetbl_r )
 {
 	return mame_rand(space->machine);
 }
 
-READ16_HANDLER( sunsetbl2_r )
+static READ16_HANDLER( sunsetbl2_r )
 {
 	return 0x0000;//mame_rand(space->machine);
 }

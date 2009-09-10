@@ -6,7 +6,8 @@
 #include "driver.h"
 #include "st0016.h"
 
-UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;
+UINT8 *st0016_charram;
+static UINT8 *st0016_spriteram,*st0016_paletteram;
 
 UINT8 *macs_ram1,*macs_ram2;
 

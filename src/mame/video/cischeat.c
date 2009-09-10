@@ -55,6 +55,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 #include "driver.h"
 #include "megasys1.h"
+#include "includes/cischeat.h"
 
 /* Variables only used here: */
 
@@ -1312,12 +1313,6 @@ VIDEO_UPDATE( f1gpstar )
 /**************************************************************************
                                 Scud Hammer
 **************************************************************************/
-
-extern UINT16 scudhamm_motor_command;
-
-	READ16_HANDLER( scudhamm_motor_pos_r );
-	READ16_HANDLER( scudhamm_motor_status_r );
-	READ16_HANDLER( scudhamm_analog_r );
 
 VIDEO_UPDATE( scudhamm )
 {

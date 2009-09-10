@@ -403,15 +403,14 @@ extern WRITE8_HANDLER( snes_w_bank7 );
 extern READ8_HANDLER( superfx_r_bank1 );
 extern READ8_HANDLER( superfx_r_bank2 );
 extern READ8_HANDLER( superfx_r_bank3 );
-extern READ8_HANDLER( superfx_r_bank4 );
 extern WRITE8_HANDLER( superfx_w_bank1 );
 extern WRITE8_HANDLER( superfx_w_bank2 );
 extern WRITE8_HANDLER( superfx_w_bank3 );
-extern WRITE8_HANDLER( superfx_w_bank4 );
 
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
 extern UINT8 snes_has_addon_chip;
+extern UINT16 snes_htmult;
 
 extern void snes_gdma( const address_space *space, UINT8 channels );
 extern void snes_hdma_init(void);

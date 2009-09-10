@@ -373,7 +373,7 @@ static void disasm_parallel_storestore(const char *opstring1, const char *opstri
 
 
 
-unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
+static unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
 {
 	UINT32 flags = 0;
 

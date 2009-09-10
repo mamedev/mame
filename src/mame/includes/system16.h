@@ -48,40 +48,6 @@ VIDEO_START( yboard );
 VIDEO_UPDATE( yboard );
 
 
-
-/******************** OLD STUFF *******************/
-
-#define SYS16_SPR_FLIPX						0x01
-#define SYS16_SPR_VISIBLE					0x04
-#define SYS16_SPR_DRAW_TO_LEFT				0x08
-#define SYS16_SPR_SPECIAL					0x10
-#define SYS16_SPR_SHADOW					0x20 /* all pixels */
-#define SYS16_SPR_PARTIAL_SHADOW			0x40 /* pen #10 */
-#define SYS16_SPR_DRAW_TO_TOP				0x80
-
-struct sys16_sprite_attributes {
-	int priority, flags;
-	int gfx, color;
-	UINT8 pitch;
-	int zoomx, zoomy;
-	int x,y, screen_height;	/* in screen coordinates */
-	int shadow_pen;
-};
-
-extern int (*sys16_spritesystem)(
-	struct sys16_sprite_attributes *sprite,
-	const UINT16 *source,
-	int bJustGetColor );
-
-/*----------- defined in video/sys16spr.c -----------*/
-
-extern int sys16_sprite_shinobi( struct sys16_sprite_attributes *sprite, const UINT16 *source, int bJustGetColor );
-extern int sys16_sprite_passshot( struct sys16_sprite_attributes *sprite, const UINT16 *source, int bJustGetColor );
-extern int sys16_sprite_quartet2( struct sys16_sprite_attributes *sprite, const UINT16 *source, int bJustGetColor );
-
-#define NumOfShadowColors 32
-#define ShadowColorsMultiplier 2
-
 /*----------- defined in machine/s16fd.c -----------*/
 
 void *fd1094_get_decrypted_base(void);
@@ -110,34 +76,7 @@ struct _sys16_patch
 
 extern void sys16_patch_code( running_machine *machine, const sys16_patch *patch, int count );
 
-#define SYS16_MWA16_PALETTERAM	sys16_paletteram_w
-#define SYS16_MRA16_PALETTERAM	SMH_RAM
-
-#define SYS16_MRA16_WORKINGRAM	SMH_RAM
-#define SYS16_MWA16_WORKINGRAM	SMH_RAM
-
-#define SYS16_MRA16_WORKINGRAM2	SMH_RAM
-#define SYS16_MWA16_WORKINGRAM2	SMH_RAM
-
 extern MACHINE_RESET( sys16_onetime );
-
-#define SYS16_MRA16_SPRITERAM		SMH_RAM
-#define SYS16_MWA16_SPRITERAM		SMH_RAM
-
-#define SYS16_MRA16_EXTRAM		SMH_RAM
-#define SYS16_MWA16_EXTRAM		SMH_RAM
-
-#define SYS16_MRA16_EXTRAM2		SMH_RAM
-#define SYS16_MWA16_EXTRAM2		SMH_RAM
-
-#define SYS16_MRA16_EXTRAM3		SMH_RAM
-#define SYS16_MWA16_EXTRAM3		SMH_RAM
-
-#define SYS16_MRA16_EXTRAM4		SMH_RAM
-#define SYS16_MWA16_EXTRAM4		SMH_RAM
-
-#define SYS16_MRA16_ROADRAM		SMH_RAM
-#define SYS16_MWA16_ROADRAM		SMH_RAM
 
 GFXDECODE_EXTERN( sys16 );
 
@@ -160,7 +99,6 @@ extern UINT16* system16a_bootleg_bg1_tileram;
 /* video hardware */
 extern WRITE16_HANDLER( sys16_tileram_w );
 extern WRITE16_HANDLER( sys16_textram_w );
-extern WRITE16_HANDLER( sys16_paletteram_w );
 
 /* "normal" video hardware */
 extern VIDEO_START( system16 );
@@ -205,9 +143,7 @@ extern int sys16_bg_page[4];
 extern int sys16_fg_scrollx, sys16_fg_scrolly;
 extern int sys16_fg_page[4];
 
-extern int sys16_bg2_scrollx, sys16_bg2_scrolly;
 extern int sys16_bg2_page[4];
-extern int sys16_fg2_scrollx, sys16_fg2_scrolly;
 extern int sys16_fg2_page[4];
 
 extern int sys18_bg2_active;

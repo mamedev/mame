@@ -69,7 +69,7 @@ static VIDEO_UPDATE(mlanding)
 }
 
 /* Return the number of pixels processed for timing purposes? */
-int start_dma(void)
+static int start_dma(void)
 {
 	/* Traverse the DMA RAM list */
 	int offs;

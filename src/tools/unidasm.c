@@ -326,7 +326,7 @@ void CLIB_DECL mame_printf_debug(const char *format, ...)
 }
 
 
-int parse_options(int argc, char *argv[], options *opts)
+static int parse_options(int argc, char *argv[], options *opts)
 {
 	int pending_base = FALSE;
 	int pending_arch = FALSE;

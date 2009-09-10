@@ -232,7 +232,7 @@ static UINT32 dasm_cop1(UINT32 pc, UINT32 op, char *buffer)
 	return flags;
 }
 
-unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
+static unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 {
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;

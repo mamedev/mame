@@ -172,7 +172,7 @@ typedef struct
 	UINT8 nextIfLPS;
 } SDD1_PEM_state;
 
-SDD1_PEM_state SDD1_PEM_evolution_table[33] =
+static const SDD1_PEM_state SDD1_PEM_evolution_table[33] =
 {
 	{ 0,25,25},
 	{ 0, 2, 1},
@@ -258,7 +258,7 @@ static UINT8 SDD1_PEM_getBit(SDD1_PEM* thisptr, UINT8 context)
 
 	SDD1_PEM_ContextInfo *pContInfo = &(thisptr->contextInfo)[context];
 	UINT8 currStatus = pContInfo->status;
-	SDD1_PEM_state* pState = &(SDD1_PEM_evolution_table[currStatus]);
+	const SDD1_PEM_state* pState = &(SDD1_PEM_evolution_table[currStatus]);
 	UINT8 currentMPS = pContInfo->MPS;
 
 	bit = SDD1_BG_getBit(thisptr->BG[pState->code_num], &endOfRun);
@@ -533,7 +533,7 @@ typedef struct
 	} buffer;
 } _snes_sdd1_t;
 
-_snes_sdd1_t snes_sdd1;
+static _snes_sdd1_t snes_sdd1;
 
 static void sdd1_init(running_machine* machine)
 {

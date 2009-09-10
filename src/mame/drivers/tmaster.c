@@ -541,7 +541,7 @@ static const eeprom_interface galgames_eeprom_interface =
 #define GALGAMES_EEPROM_CART3 "eeprom_cart3"
 #define GALGAMES_EEPROM_CART4 "eeprom_cart4"
 
-const char *galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
+static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
 
 static READ16_HANDLER( galgames_eeprom_r )
 {
@@ -939,7 +939,7 @@ static MACHINE_RESET( galgames )
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
-UINT8 *galgames_eeprom_data = NULL;
+static UINT8 *galgames_eeprom_data = NULL;
 
 static MACHINE_DRIVER_START( galgames )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)

@@ -97,6 +97,8 @@
 #include "sound/rf5c68.h"
 #include "video/segaic16.h"
 
+#define ShadowColorsMultiplier 2
+
 /***************************************************************************/
 
 static UINT16 coinctrl;

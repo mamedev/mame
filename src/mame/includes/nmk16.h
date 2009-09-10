@@ -7,8 +7,8 @@ extern UINT16 *nmk_bgvideoram3;
 
 extern UINT16 *nmk_fgvideoram,*nmk_txvideoram;
 extern UINT16 *gunnail_scrollram, *gunnail_scrollramy;
-extern UINT16 *nmk_bgvideoram0, *afega_scroll_0;
-extern UINT16 *nmk_txvideoram, *afega_scroll_1;
+extern UINT16 *afega_scroll_0;
+extern UINT16 *afega_scroll_1;
 
 
 WRITE16_HANDLER( nmk_bgvideoram0_w );
@@ -20,7 +20,6 @@ WRITE16_HANDLER( nmk_fgvideoram_w );
 WRITE16_HANDLER( nmk_txvideoram_w );
 WRITE16_HANDLER( nmk_scroll_w );
 WRITE16_HANDLER( nmk_scroll_2_w );
-WRITE16_HANDLER( nmk_scroll_3_w );
 WRITE16_HANDLER( nmk_flipscreen_w );
 WRITE16_HANDLER( nmk_tilebank_w );
 WRITE16_HANDLER( bioship_scroll_w );
