@@ -648,8 +648,8 @@ static DISCRETE_SOUND_START(radarscp)
 	/* SIGNALS                                      */
 	/************************************************/
 
-	DISCRETE_LOGIC_INVERT(DS_SOUND6,1,DS_SOUND6_INV)
-	DISCRETE_LOGIC_INVERT(DS_SOUND7,1,DS_SOUND7_INV)
+	DISCRETE_LOGIC_INVERT(DS_SOUND6,DS_SOUND6_INV)
+	DISCRETE_LOGIC_INVERT(DS_SOUND7,DS_SOUND7_INV)
 
 	/************************************************/
 	/* Noise                                      */
@@ -876,8 +876,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	/* SIGNALS                                      */
 	/************************************************/
 
-	DISCRETE_LOGIC_INVERT(DS_SOUND7,1,DS_SOUND7_INV)
-	DISCRETE_LOGIC_INVERT(DS_SOUND9,1,DS_SOUND9_INV)
+	DISCRETE_LOGIC_INVERT(DS_SOUND7,DS_SOUND7_INV)
+	DISCRETE_LOGIC_INVERT(DS_SOUND9,DS_SOUND9_INV)
 
 	/************************************************/
 	/* SOUND1                                       */
@@ -885,7 +885,7 @@ static DISCRETE_SOUND_START(dkongjr)
 
 	DISCRETE_LS123(NODE_10, DS_SOUND1_INV, JR_R9, JR_C15)
 	DISCRETE_TRANSFORM2(NODE_11,NODE_104,TTL_HIGH,"0!1*")
-	DISCRETE_LOGIC_INVERT(NODE_12,1,NODE_10)
+	DISCRETE_LOGIC_INVERT(NODE_12,NODE_10)
 	DISCRETE_MIXER2(NODE_13, 1, NODE_10, NODE_11, &dkongjr_s1_mixer_desc)
 	DISCRETE_74LS624( NODE_14, 1, NODE_13, 0.98*DK_SUP_V, JR_C22, DISC_LS624_OUT_ENERGY)
 	DISCRETE_RCDISC_MODULATED(NODE_15, NODE_12, NODE_14, 120, JR_R27, RES_K(0.001), JR_R28, JR_C28, DK_SUP_V)

@@ -395,7 +395,7 @@ static DISCRETE_SOUND_START(headon)
      * Bonus
      ************************************************/
 
-	DISCRETE_LOGIC_INVERT(NODE_70, 1, HEADON_BONUS_EN)
+	DISCRETE_LOGIC_INVERT(NODE_70, HEADON_BONUS_EN)
 	DISCRETE_MULTIPLY(NODE_71,NODE_70,12)
 	DISCRETE_INVERTER_OSC(NODE_73,NODE_71,0,RES_K(22),RES_M(1),CAP_N(470),RES_M(10),&headon_inverter_osc_2)
 
@@ -418,7 +418,7 @@ static DISCRETE_SOUND_START(headon)
      * FIXME: Just a prototype several filter missing
      ************************************************/
 
-	DISCRETE_LOGIC_INVERT(NODE_80, 1, HEADON_CRASH_EN)
+	DISCRETE_LOGIC_INVERT(NODE_80, HEADON_CRASH_EN)
 	DISCRETE_555_MSTABLE(NODE_81, 1, NODE_80, RES_K(470), CAP_U(1), &headon_555_crash)
 	// Mix with noise
 	DISCRETE_MULTIPLY(NODE_84, NODE_81, NODE_51)

@@ -477,7 +477,6 @@ static DISCRETE_SOUND_START(maze)
 	/* After the 30s has expired, there is no sound until the next coin is inserted. */
 	/* There is also sound for the first 30s after power up even without a coin. */
 	DISCRETE_LOGIC_INVERT(NODE_20,				/* IC E2, pin 8 */
-					1,							/* ENAB */
 					MAZE_JOYSTICK_IN_USE)		/* IN0 */
 	DISCRETE_555_MSTABLE(MAZE_GAME_OVER,		/* IC F2, pin 3 */
 					1,							/* RESET */
@@ -493,7 +492,6 @@ static DISCRETE_SOUND_START(maze)
 					1,							/* J */
 					0)							/* K */
 	DISCRETE_LOGIC_INVERT(MAZE_TONE_ENABLE,		/* IC F1, pin 6 */
-					1,							/* ENAB */
 					MAZE_AUDIO_ENABLE)			/* IN0 */
 	DISCRETE_LOGIC_AND3(NODE_21,
 					1,							/* ENAB */
@@ -3804,7 +3802,7 @@ static DISCRETE_SOUND_START(blueshrk)
 	/* so we will cheat and add a pulse 1 sample wide to trigger it */
 	DISCRETE_ONESHOT(NODE_30, BLUESHRK_HIT_EN, 1, /* 1 sample wide */ 0, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_LOW)
 	DISCRETE_555_MSTABLE(NODE_31, BLUESHRK_HIT_EN, NODE_30, RES_K(47), CAP_U(2.2), &blueshrk_555_H1A)
-	DISCRETE_LOGIC_INVERT(NODE_32, 1, BLUESHRK_HIT_EN)
+	DISCRETE_LOGIC_INVERT(NODE_32, BLUESHRK_HIT_EN)
 	DISCRETE_COUNTER(NODE_33, 1, /*RST*/ NODE_32, /*CLK*/ NODE_31, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_SWITCH(NODE_34, 1, NODE_33, CAP_U(0.015) + CAP_U(0.01), CAP_U(0.022))
 	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND, BLUESHRK_HIT_EN, RES_K(22), RES_K(39), NODE_34, &blueshrk_555_H1B)

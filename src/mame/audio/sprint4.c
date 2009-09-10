@@ -143,7 +143,7 @@ static const discrete_mixer_desc sprint4_mixer =
 /* setup the attract input and it's inverse */
 #define SPRINT4_ATTRACT                                                 \
 	DISCRETE_INPUT_NOT(SPRINT4_ATTRACT_EN)                              \
-	DISCRETE_LOGIC_INVERT(SPRINT4_ATTRACT_INV, 1, SPRINT4_ATTRACT_EN)
+	DISCRETE_LOGIC_INVERT(SPRINT4_ATTRACT_INV, SPRINT4_ATTRACT_EN)
 
 
 /* port tags used for the discrete adjusters */

@@ -215,7 +215,7 @@ DISCRETE_SOUND_START( madalien )
 		NODE_50,						// IC 1F pin 5 in
 		&madalien_555_1f)
 	// convert reset to active high for module use
-	DISCRETE_LOGIC_INVERT(NODE_53, 1, MADALIEN_8910_PORTB_45)
+	DISCRETE_LOGIC_INVERT(NODE_53, MADALIEN_8910_PORTB_45)
 	DISCRETE_COUNTER(NODE_54, 1,
 		NODE_53,						// pin 7 in
 		NODE_52,						// pin 1 in
@@ -242,7 +242,7 @@ DISCRETE_SOUND_START( madalien )
 		NODE_64,						// IC 1C pin 5 in
 		&madalien_555_1c)
 	// convert reset to active high for module use
-	DISCRETE_LOGIC_INVERT(NODE_66, 1, MADALIEN_8910_PORTB_6)
+	DISCRETE_LOGIC_INVERT(NODE_66, MADALIEN_8910_PORTB_6)
 	DISCRETE_COUNTER(NODE_67, 1,
 		NODE_66,						// pin 7 in
 		NODE_65,						// pin 1 in

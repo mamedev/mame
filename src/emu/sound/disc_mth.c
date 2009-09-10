@@ -650,19 +650,11 @@ static DISCRETE_RESET(dst_integrate)
  * input[1]    - input[0] value
  *
  ************************************************************************/
-#define DST_LOGIC_INV__ENABLE	DISCRETE_INPUT(0)
-#define DST_LOGIC_INV__IN		DISCRETE_INPUT(1)
+#define DST_LOGIC_INV__IN		DISCRETE_INPUT(0)
 
 static DISCRETE_STEP(dst_logic_inv)
 {
-	if(DST_LOGIC_INV__ENABLE)
-	{
-		node->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
-	}
-	else
-	{
-		node->output[0] = 0.0;
-	}
+	node->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
 }
 
 /************************************************************************

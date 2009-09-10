@@ -258,7 +258,7 @@
  * DISCRETE_BIT_DECODE(NODE,INP,BIT_N,VOUT)
  * DISCRETE_BITS_DECODE(NODE,INP,BIT_FROM,BIT_TO,VOUT)
  *
- * DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)
+ * DISCRETE_LOGIC_INVERT(NODE,INP0)
  * DISCRETE_LOGIC_AND(NODE,ENAB,INP0,INP1)
  * DISCRETE_LOGIC_AND3(NODE,ENAB,INP0,INP1,INP2)
  * DISCRETE_LOGIC_AND4(NODE,ENAB,INP0,INP1,INP2,INP3)
@@ -1286,7 +1286,7 @@
  *
  ***********************************************************************
  *
- * DISCRETE_LOGIC_INVERT - Logic invertor
+ * DISCRETE_LOGIC_INVERT - Logic invertor (no enable node)
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)
  * DISCRETE_LOGIC_NAND - Logic NAND gate (3 & 4 input also available)
  * DISCRETE_LOGIC_OR   - Logic OR gate (3 & 4 input also available)
@@ -4294,7 +4294,7 @@ enum
 #define DISCRETE_DIVIDE(NODE,ENAB,INP0,INP1)                            { NODE, DST_DIVIDE      , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_DIVIDE" },
 #define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
-#define DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)                           { NODE, DST_LOGIC_INV   , 2, { ENAB,INP0 }, { ENAB,INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
+#define DISCRETE_LOGIC_INVERT(NODE,INP0)                                { NODE, DST_LOGIC_INV   , 1, { INP0 }, { INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
 
 #define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 3, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N, VOUT }, NULL, "DISCRETE_BIT_DECODE" },
 #define DISCRETE_BITS_DECODE(NODE, INP, BIT_FROM, BIT_TO, VOUT)         { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_FROM,BIT_TO, VOUT }, NULL, "DISCRETE_BITS_DECODE" },

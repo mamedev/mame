@@ -336,7 +336,7 @@ static DISCRETE_SOUND_START(galaxian)
 		/* FIRE                                         */
 		/************************************************/
 
-		DISCRETE_LOGIC_INVERT(NODE_170, 1, GAL_INP_FIRE)
+		DISCRETE_LOGIC_INVERT(NODE_170, GAL_INP_FIRE)
 		DISCRETE_MULTIPLY(NODE_171, TTL_OUT, GAL_INP_FIRE)
 		DISCRETE_MULTIPLY(NODE_172, TTL_OUT, NODE_170) // inverted
 		DISCRETE_RCFILTER(NODE_173, 1, NODE_172, GAL_R47, GAL_C28)
