@@ -411,7 +411,7 @@ static DISCRETE_RESET(dst_dac_r1)
 	if (info->cFilter)
 	{
 		/* Setup filter constants */
-		context->exponent = RC_CHARGE_EXP(node, context->r_total * info->cFilter);
+		context->exponent = RC_CHARGE_EXP(context->r_total * info->cFilter);
 	}
 }
 
@@ -1138,7 +1138,7 @@ static DISCRETE_STEP(dst_mixer)
 							/* Re-calculate exponent if resistor is a node and has changed value */
 							if (*context->r_node[bit] != context->r_last[bit])
 							{
-								context->exponent_rc[bit] =  RC_CHARGE_EXP(node, rTemp2 * info->c[bit]);
+								context->exponent_rc[bit] =  RC_CHARGE_EXP(rTemp2 * info->c[bit]);
 								context->r_last[bit] = *context->r_node[bit];
 							}
 						}
@@ -1194,7 +1194,7 @@ static DISCRETE_STEP(dst_mixer)
 			if (r_node_bit_flag != 0)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
-				context->exponent_c_f =  RC_CHARGE_EXP(node, r_total * info->cF);
+				context->exponent_c_f =  RC_CHARGE_EXP(r_total * info->cF);
 			}
 			context->v_cap_f += (v - v_ref - context->v_cap_f) * context->exponent_c_f;
 			v = context->v_cap_f;
@@ -1288,7 +1288,7 @@ static DISCRETE_RESET(dst_mixer)
 					break;
 			}
 			/* Setup filter constants */
-			context->exponent_rc[bit] = RC_CHARGE_EXP(node, rTemp * info->c[bit]);
+			context->exponent_rc[bit] = RC_CHARGE_EXP(rTemp * info->c[bit]);
 		}
 	}
 
@@ -1303,7 +1303,7 @@ static DISCRETE_RESET(dst_mixer)
 	if (info->cF != 0)
 	{
 		/* Setup filter constants */
-		context->exponent_c_f = RC_CHARGE_EXP(node, ((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total)) * info->cF);
+		context->exponent_c_f = RC_CHARGE_EXP(((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total)) * info->cF);
 	}
 
 	context->v_cap_amp      = 0;
@@ -1313,7 +1313,7 @@ static DISCRETE_RESET(dst_mixer)
 		/* Setup filter constants */
 		/* We will use 100k ohms as an average final stage impedance. */
 		/* Your amp/speaker system will have more effect on incorrect filtering then any value used here. */
-		context->exponent_c_amp = RC_CHARGE_EXP(node, RES_K(100) * info->cAmp);
+		context->exponent_c_amp = RC_CHARGE_EXP(RES_K(100) * info->cAmp);
 	}
 
 	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
@@ -1864,7 +1864,7 @@ static DISCRETE_RESET(dst_op_amp)
 		if (context->has_r4)
 		{
 			/* exponential charge */
-			context->exponent = RC_CHARGE_EXP(node, info->r4 * info->c);
+			context->exponent = RC_CHARGE_EXP(info->r4 * info->c);
 		}
 		else
 			/* linear charge */
@@ -1935,9 +1935,9 @@ static DISCRETE_RESET(dst_op_amp_1sht)
 	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
 	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
 
-	context->exponent1c = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r3, info->r4) * info->c1);
-	context->exponent1d = RC_CHARGE_EXP(node, info->r4 * info->c1);
-	context->exponent2  = RC_CHARGE_EXP(node, info->r2 * info->c2);
+	context->exponent1c = RC_CHARGE_EXP(RES_2_PARALLEL(info->r3, info->r4) * info->c1);
+	context->exponent1d = RC_CHARGE_EXP(info->r4 * info->c1);
+	context->exponent2  = RC_CHARGE_EXP(info->r2 * info->c2);
 	context->i_fixed  = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
 	context->v_cap1   = context->v_cap2 = 0;
 	context->v_max    = info->vP - OP_AMP_NORTON_VBE;
@@ -2062,23 +2062,23 @@ static DISCRETE_RESET(dst_tvca_op_amp)
 	context->v_cap1 = 0;
 	/* Charge rate thru r5 */
 	/* There can be a different charge rates depending on function F3. */
-	context->exponent_c[0] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r5, info->r6) * info->c1);
-	context->exponent_c[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r5, context->r67) * info->c1);
+	context->exponent_c[0] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, info->r6) * info->c1);
+	context->exponent_c[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, context->r67) * info->c1);
 	/* Discharge rate thru r6 + r7 */
-	context->exponent_d[1] = RC_CHARGE_EXP(node, context->r67 * info->c1);
+	context->exponent_d[1] = RC_CHARGE_EXP(context->r67 * info->c1);
 	/* Discharge rate thru r6 */
 	if (info->r6 != 0)
 	{
-		context->exponent_d[0] = RC_CHARGE_EXP(node, info->r6 * info->c1);
+		context->exponent_d[0] = RC_CHARGE_EXP(info->r6 * info->c1);
 	}
 	context->v_cap2       = 0;
 	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r8, info->r9);
-	context->exponent2[0] = RC_CHARGE_EXP(node, info->r9 * info->c2);
-	context->exponent2[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r8, info->r9) * info->c2);
+	context->exponent2[0] = RC_CHARGE_EXP(info->r9 * info->c2);
+	context->exponent2[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r8, info->r9) * info->c2);
 	context->v_cap3  = 0;
 	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r10, info->r11);
-	context->exponent3[0] = RC_CHARGE_EXP(node, info->r11 * info->c3);
-	context->exponent3[1] = RC_CHARGE_EXP(node, RES_2_PARALLEL(info->r10, info->r11) * info->c3);
+	context->exponent3[0] = RC_CHARGE_EXP(info->r11 * info->c3);
+	context->exponent3[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r10, info->r11) * info->c3);
 
 	DISCRETE_STEP_CALL(dst_tvca_op_amp);
 }

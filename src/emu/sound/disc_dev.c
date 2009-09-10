@@ -255,9 +255,9 @@ static DISCRETE_STEP(dsd_555_astbl)
 			context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
 			context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
 			context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-			context->exp_bleed  = RC_CHARGE_EXP(node, context->t_rc_bleed);
-			context->exp_charge = RC_CHARGE_EXP(node, context->t_rc_charge);
-			context->exp_discharge = RC_CHARGE_EXP(node, context->t_rc_discharge);
+			context->exp_bleed  = RC_CHARGE_EXP(context->t_rc_bleed);
+			context->exp_charge = RC_CHARGE_EXP(context->t_rc_charge);
+			context->exp_discharge = RC_CHARGE_EXP(context->t_rc_discharge);
 			context->last_r1 = DSD_555_ASTBL__R1;
 			context->last_r2 = DSD_555_ASTBL__R2;
 			context->last_c  = DSD_555_ASTBL__C;
@@ -418,11 +418,11 @@ static DISCRETE_RESET(dsd_555_astbl)
 	else
 	{
 		context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
-		context->exp_bleed   = RC_CHARGE_EXP(node, context->t_rc_bleed);
+		context->exp_bleed   = RC_CHARGE_EXP(context->t_rc_bleed);
 		context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
-		context->exp_charge  = RC_CHARGE_EXP(node, context->t_rc_charge);
+		context->exp_charge  = RC_CHARGE_EXP(context->t_rc_charge);
 		context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-		context->exp_discharge  = RC_CHARGE_EXP(node, context->t_rc_discharge);
+		context->exp_discharge  = RC_CHARGE_EXP(context->t_rc_discharge);
 	}
 
 	context->output_is_ac = info->options & DISC_555_OUT_AC;
@@ -506,7 +506,7 @@ static DISCRETE_STEP(dsd_555_mstbl)
 			else
 			{
 				/* Charging */
-				v_cap_next = v_cap + ((info->v_pos - v_cap) * RC_CHARGE_EXP(node, DSD_555_MSTBL__R * DSD_555_MSTBL__C));
+				v_cap_next = v_cap + ((info->v_pos - v_cap) * RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C));
 
 				/* Has it charged past upper limit? */
 				/* If trigger is still enabled, then we keep charging,
@@ -994,15 +994,15 @@ static DISCRETE_RESET(dsd_555_cc)
 				break;
 		}
 
-		context->exp_bleed  = RC_CHARGE_EXP(node, DSD_555_CC_T_RC_BLEED);
+		context->exp_bleed  = RC_CHARGE_EXP(DSD_555_CC_T_RC_BLEED);
 		context->t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
-		context->exp_discharge_01  = RC_CHARGE_EXP(node, context->t_rc_discharge_01);
+		context->exp_discharge_01  = RC_CHARGE_EXP(context->t_rc_discharge_01);
 		context->t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
-		context->exp_discharge_no_i  = RC_CHARGE_EXP(node, context->t_rc_discharge_no_i);
+		context->exp_discharge_no_i  = RC_CHARGE_EXP(context->t_rc_discharge_no_i);
 		context->t_rc_charge = DSD_555_CC_T_RC_CHARGE;
-		context->exp_charge  = RC_CHARGE_EXP(node, context->t_rc_charge);
+		context->exp_charge  = RC_CHARGE_EXP(context->t_rc_charge);
 		context->t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
-		context->exp_discharge  = RC_CHARGE_EXP(node, context->t_rc_discharge);
+		context->exp_discharge  = RC_CHARGE_EXP(context->t_rc_discharge);
 	}
 
 	/* Step to set the output */

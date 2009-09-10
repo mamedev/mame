@@ -3341,16 +3341,16 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(_node, rc)				(1.0 - exp((_node)->info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)						(1.0 - exp((node)->info->neg_sample_time / (rc)))
 /* calculate charge exponent using given sample time */
-#define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
-#define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
+#define RC_CHARGE_EXP_DT(rc, dt)				(1.0 - exp(-(dt) / (rc)))
+#define RC_CHARGE_NEG_EXP_DT(rc, dt)			(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(_node, rc)			(exp((_node)->info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)					(exp((node)->info->neg_sample_time / (rc)))
 /* calculate discharge exponent using given sample time */
-#define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
-#define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
+#define RC_DISCHARGE_EXP_DT(rc, dt)				(exp(-(dt) / (rc)))
+#define RC_DISCHARGE_NEG_EXP_DT(rc, dt)			(exp((dt) / (rc)))
 
 /*************************************
  *
@@ -3358,27 +3358,27 @@
  *
  *************************************/
 
-#define DISCRETE_STEP_NAME( _func )  _func ## _step
-#define DISCRETE_RESET_NAME( _func ) _func ## _reset
-#define DISCRETE_START_NAME( _func ) _func ## _start
-#define DISCRETE_STOP_NAME( _func )  _func ## _stop
+#define DISCRETE_STEP_NAME( _func )  			_func ## _step
+#define DISCRETE_RESET_NAME( _func )			_func ## _reset
+#define DISCRETE_START_NAME( _func ) 			_func ## _start
+#define DISCRETE_STOP_NAME( _func )  			_func ## _stop
 
-#define DISCRETE_FUNC(_func) void _func (node_description *node)
+#define DISCRETE_FUNC(_func) 					void _func (node_description *node)
 
-#define DISCRETE_STEP(_func) DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
-#define DISCRETE_RESET(_func) DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
-#define DISCRETE_START(_func) DISCRETE_FUNC(DISCRETE_START_NAME(_func))
-#define DISCRETE_STOP(_func) DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
+#define DISCRETE_STEP(_func)			 		DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
+#define DISCRETE_RESET(_func) 					DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
+#define DISCRETE_START(_func) 					DISCRETE_FUNC(DISCRETE_START_NAME(_func))
+#define DISCRETE_STOP(_func) 					DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
 
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
-#define DISCRETE_START_CALL(_func) DISCRETE_START_NAME(_func) (node)
-#define DISCRETE_STOP_CALL(_func) DISCRETE_STOP_NAME(_func) (node)
+#define DISCRETE_STEP_CALL(_func) 				DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func) 				DISCRETE_RESET_NAME(_func) (node)
+#define DISCRETE_START_CALL(_func) 				DISCRETE_START_NAME(_func) (node)
+#define DISCRETE_STOP_CALL(_func) 				DISCRETE_STOP_NAME(_func) (node)
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
 
-#define DISCRETE_INPUT(_num)	(*(node->input[_num]))
+#define DISCRETE_INPUT(_num)					(*(node->input[_num]))
 
 /*************************************
  *
@@ -3386,10 +3386,10 @@
  *
  *************************************/
 
-#define DISCRETE_MAX_NODES				300
-#define DISCRETE_MAX_INPUTS				10
-#define DISCRETE_MAX_OUTPUTS			 8
-#define DISCRETE_MAX_TASK_OUTPUTS		 8
+#define DISCRETE_MAX_NODES					300
+#define DISCRETE_MAX_INPUTS					10
+#define DISCRETE_MAX_OUTPUTS			 	8
+#define DISCRETE_MAX_TASK_OUTPUTS			8
 
 
 /*************************************
@@ -3398,73 +3398,73 @@
  *
  *************************************/
 
-#define DEFAULT_TTL_V_LOGIC_1	3.4
+#define DEFAULT_TTL_V_LOGIC_1				3.4
 
-#define DISC_LOGADJ				1.0
-#define DISC_LINADJ				0.0
+#define DISC_LOGADJ							1.0
+#define DISC_LINADJ							0.0
 
 /* DISCRETE_COMP_ADDER types */
-#define DISC_COMP_P_CAPACITOR			0x00
-#define DISC_COMP_P_RESISTOR			0x01
+#define DISC_COMP_P_CAPACITOR				0x00
+#define DISC_COMP_P_RESISTOR				0x01
 
 /* clk types */
-#define DISC_CLK_MASK			0x03
-#define DISC_CLK_ON_F_EDGE		0x00
-#define DISC_CLK_ON_R_EDGE		0x01
-#define DISC_CLK_BY_COUNT		0x02
-#define DISC_CLK_IS_FREQ		0x03
+#define DISC_CLK_MASK						0x03
+#define DISC_CLK_ON_F_EDGE					0x00
+#define DISC_CLK_ON_R_EDGE					0x01
+#define DISC_CLK_BY_COUNT					0x02
+#define DISC_CLK_IS_FREQ					0x03
 
-#define DISC_COUNT_DOWN			0
-#define DISC_COUNT_UP			1
+#define DISC_COUNT_DOWN						0
+#define DISC_COUNT_UP						1
+	
+#define DISC_COUNTER_IS_7492				0x08
 
-#define DISC_COUNTER_IS_7492	0x08
-
-#define DISC_OUT_MASK			0x30
-#define DISC_OUT_DEFAULT		0x00
-#define DISC_OUT_IS_ENERGY		0x10
-#define DISC_OUT_HAS_XTIME		0x20
+#define DISC_OUT_MASK						0x30
+#define DISC_OUT_DEFAULT					0x00
+#define DISC_OUT_IS_ENERGY					0x10
+#define DISC_OUT_HAS_XTIME					0x20
 
 /* Function possibilities for the LFSR feedback nodes */
 /* 2 inputs, one output                               */
-#define DISC_LFSR_XOR					0
-#define DISC_LFSR_OR					1
-#define DISC_LFSR_AND					2
-#define DISC_LFSR_XNOR					3
-#define DISC_LFSR_NOR					4
-#define DISC_LFSR_NAND					5
-#define DISC_LFSR_IN0					6
-#define DISC_LFSR_IN1					7
-#define DISC_LFSR_NOT_IN0				8
-#define DISC_LFSR_NOT_IN1				9
-#define DISC_LFSR_REPLACE				10
-#define DISC_LFSR_XOR_INV_IN0           11
-#define DISC_LFSR_XOR_INV_IN1           12
+#define DISC_LFSR_XOR						0
+#define DISC_LFSR_OR						1
+#define DISC_LFSR_AND						2
+#define DISC_LFSR_XNOR						3
+#define DISC_LFSR_NOR						4
+#define DISC_LFSR_NAND						5
+#define DISC_LFSR_IN0						6
+#define DISC_LFSR_IN1						7
+#define DISC_LFSR_NOT_IN0					8
+#define DISC_LFSR_NOT_IN1					9
+#define DISC_LFSR_REPLACE					10
+#define DISC_LFSR_XOR_INV_IN0           	11
+#define DISC_LFSR_XOR_INV_IN1           	12
 
 /* LFSR Flag Bits */
-#define DISC_LFSR_FLAG_OUT_INVERT		0x01
-#define DISC_LFSR_FLAG_RESET_TYPE_L		0x00
-#define DISC_LFSR_FLAG_RESET_TYPE_H		0x02
-#define DISC_LFSR_FLAG_OUTPUT_F0		0x04
-#define DISC_LFSR_FLAG_OUTPUT_SR_SN1	0x08
+#define DISC_LFSR_FLAG_OUT_INVERT			0x01
+#define DISC_LFSR_FLAG_RESET_TYPE_L			0x00
+#define DISC_LFSR_FLAG_RESET_TYPE_H			0x02
+#define DISC_LFSR_FLAG_OUTPUT_F0			0x04
+#define DISC_LFSR_FLAG_OUTPUT_SR_SN1		0x08
 
 /* Sample & Hold supported clock types */
-#define DISC_SAMPHOLD_REDGE				0
-#define DISC_SAMPHOLD_FEDGE				1
-#define DISC_SAMPHOLD_HLATCH			2
-#define DISC_SAMPHOLD_LLATCH			3
+#define DISC_SAMPHOLD_REDGE					0
+#define DISC_SAMPHOLD_FEDGE					1
+#define DISC_SAMPHOLD_HLATCH				2
+#define DISC_SAMPHOLD_LLATCH				3
 
 /* Maximum number of resistors in ladder chain */
-#define DISC_LADDER_MAXRES				8
+#define DISC_LADDER_MAXRES					8
 
 /* Filter types */
-#define DISC_FILTER_LOWPASS				0
-#define DISC_FILTER_HIGHPASS			1
-#define DISC_FILTER_BANDPASS			2
+#define DISC_FILTER_LOWPASS					0
+#define DISC_FILTER_HIGHPASS				1
+#define DISC_FILTER_BANDPASS				2
 
 /* Mixer types */
-#define DISC_MIXER_IS_RESISTOR			0
-#define DISC_MIXER_IS_OP_AMP			1
-#define DISC_MIXER_IS_OP_AMP_WITH_RI 	2	// Used only internally.  Use DISC_MIXER_IS_OP_AMP
+#define DISC_MIXER_IS_RESISTOR				0
+#define DISC_MIXER_IS_OP_AMP				1
+#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	// Used only internally.  Use DISC_MIXER_IS_OP_AMP
 
 /* Triggered Op Amp Functions */
 enum
@@ -3482,16 +3482,16 @@ enum
 
 
 /* Common Op Amp Flags and values */
-#define DISC_OP_AMP_IS_NORTON	0x01
-#define OP_AMP_NORTON_VBE		0.5		// This is the norton junction voltage. Used only internally.
-#define OP_AMP_VP_RAIL_OFFSET	1.5		// This is how close an op-amp can get to the vP rail. Used only internally.
+#define DISC_OP_AMP_IS_NORTON				0x01
+#define OP_AMP_NORTON_VBE					0.5		// This is the norton junction voltage. Used only internally.
+#define OP_AMP_VP_RAIL_OFFSET				1.5		// This is how close an op-amp can get to the vP rail. Used only internally.
 
 /* Integrate options */
-#define DISC_INTEGRATE_OP_AMP_1	0x00
-#define DISC_INTEGRATE_OP_AMP_2	0x10
+#define DISC_INTEGRATE_OP_AMP_1				0x00
+#define DISC_INTEGRATE_OP_AMP_2				0x10
 
 /* op amp 1 shot types */
-#define DISC_OP_AMP_1SHT_1	0x00
+#define DISC_OP_AMP_1SHT_1					0x00
 
 /* Op Amp Filter Options */
 #define DISC_OP_AMP_FILTER_IS_LOW_PASS_1	0x00
@@ -3520,35 +3520,35 @@ enum
 #define DISC_OP_AMP_OSCILLATOR_TYPE_MASK	(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
 /* Schmitt Oscillator Options */
-#define DISC_SCHMITT_OSC_IN_IS_LOGIC	0x00
-#define DISC_SCHMITT_OSC_IN_IS_VOLTAGE	0x01
+#define DISC_SCHMITT_OSC_IN_IS_LOGIC		0x00
+#define DISC_SCHMITT_OSC_IN_IS_VOLTAGE		0x01
 
-#define DISC_SCHMITT_OSC_ENAB_IS_AND	0x00
-#define DISC_SCHMITT_OSC_ENAB_IS_NAND	0x02
-#define DISC_SCHMITT_OSC_ENAB_IS_OR		0x04
-#define DISC_SCHMITT_OSC_ENAB_IS_NOR	0x06
+#define DISC_SCHMITT_OSC_ENAB_IS_AND		0x00
+#define DISC_SCHMITT_OSC_ENAB_IS_NAND		0x02
+#define DISC_SCHMITT_OSC_ENAB_IS_OR			0x04
+#define DISC_SCHMITT_OSC_ENAB_IS_NOR		0x06
 
-#define DISC_SCHMITT_OSC_ENAB_MASK		0x06	/* Bits that define output enable type.
-                                                 * Used only internally in module. */
+#define DISC_SCHMITT_OSC_ENAB_MASK			0x06	/* Bits that define output enable type.
+													 * Used only internally in module. */
 
 /* 555 Common output flags */
-#define DISC_555_OUT_DC					0x00
-#define DISC_555_OUT_AC					0x10
+#define DISC_555_OUT_DC						0x00
+#define DISC_555_OUT_AC						0x10
 
-#define DISC_555_TRIGGER_IS_LOGIC		0x00
-#define DISC_555_TRIGGER_IS_VOLTAGE		0x40
-#define DISC_555_TRIGGER_DISCHARGES_CAP	0x80
+#define DISC_555_TRIGGER_IS_LOGIC			0x00
+#define DISC_555_TRIGGER_IS_VOLTAGE			0x40
+#define DISC_555_TRIGGER_DISCHARGES_CAP		0x80
 
-#define DISC_555_OUT_SQW				0x00	/* Squarewave */
-#define DISC_555_OUT_CAP				0x01	/* Cap charge waveform */
-#define DISC_555_OUT_COUNT_F			0x02	/* Falling count */
-#define DISC_555_OUT_COUNT_R			0x03	/* Rising count */
-#define DISC_555_OUT_ENERGY				0x04
-#define DISC_555_OUT_LOGIC_X			0x05
-#define DISC_555_OUT_COUNT_F_X			0x06
-#define DISC_555_OUT_COUNT_R_X			0x07
+#define DISC_555_OUT_SQW					0x00	/* Squarewave */
+#define DISC_555_OUT_CAP					0x01	/* Cap charge waveform */
+#define DISC_555_OUT_COUNT_F				0x02	/* Falling count */
+#define DISC_555_OUT_COUNT_R				0x03	/* Rising count */
+#define DISC_555_OUT_ENERGY					0x04
+#define DISC_555_OUT_LOGIC_X				0x05
+#define DISC_555_OUT_COUNT_F_X				0x06
+#define DISC_555_OUT_COUNT_R_X				0x07
 
-#define DISC_555_OUT_MASK				0x07	/* Bits that define output type.
+#define DISC_555_OUT_MASK					0x07	/* Bits that define output type.
                                                  * Used only internally in module. */
 
 #define DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE		0x80
@@ -3556,40 +3556,40 @@ enum
 #define DISCRETE_555_CC_TO_CAP						0x80
 
 /* 566 output flags */
-#define DISC_566_OUT_DC					0x00
-#define DISC_566_OUT_AC					0x01
+#define DISC_566_OUT_DC						0x00
+#define DISC_566_OUT_AC						0x01
+	
+#define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
+#define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
+#define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
 
-#define DISC_566_OUT_SQUARE				0x00	/* Squarewave */
-#define DISC_566_OUT_TRIANGLE			0x10	/* Triangle waveform */
-#define DISC_566_OUT_LOGIC				0x20	/* 0/1 logic output */
-
-#define DISC_566_OUT_MASK				0x30	/* Bits that define output type.
-                                                 * Used only internally in module. */
+#define DISC_566_OUT_MASK					0x30	/* Bits that define output type.
+                                                     * Used only internally in module. */
 #define DEFAULT_566_CHARGE	-1
 
 /* LS624 output flags */
-#define DISC_LS624_OUT_ENERGY			0x01
-#define DISC_LS624_OUT_LOGIC			0x02
-#define DISC_LS624_OUT_COUNT_F			0x03
-#define DISC_LS624_OUT_COUNT_R			0x04
+#define DISC_LS624_OUT_ENERGY				0x01
+#define DISC_LS624_OUT_LOGIC				0x02
+#define DISC_LS624_OUT_COUNT_F				0x03
+#define DISC_LS624_OUT_COUNT_R				0x04
 
 /* Oneshot types */
-#define DISC_ONESHOT_FEDGE				0x00
-#define DISC_ONESHOT_REDGE				0x01
+#define DISC_ONESHOT_FEDGE					0x00
+#define DISC_ONESHOT_REDGE					0x01
 
-#define DISC_ONESHOT_NORETRIG			0x00
-#define DISC_ONESHOT_RETRIG				0x02
+#define DISC_ONESHOT_NORETRIG				0x00
+#define DISC_ONESHOT_RETRIG					0x02
 
-#define DISC_OUT_ACTIVE_LOW				0x04
-#define DISC_OUT_ACTIVE_HIGH			0x00
+#define DISC_OUT_ACTIVE_LOW					0x04
+#define DISC_OUT_ACTIVE_HIGH				0x00
 
-#define DISC_CD4066_THRESHOLD           2.75
+#define DISC_CD4066_THRESHOLD           	2.75
 
 /* Integrate */
 
-#define DISC_RC_INTEGRATE_TYPE1						0x00
-#define DISC_RC_INTEGRATE_TYPE2						0x01
-#define DISC_RC_INTEGRATE_TYPE3						0x02
+#define DISC_RC_INTEGRATE_TYPE1				0x00
+#define DISC_RC_INTEGRATE_TYPE2				0x01
+#define DISC_RC_INTEGRATE_TYPE3				0x02
 
 /*************************************
  *
@@ -3641,20 +3641,20 @@ struct _discrete_module
 
 struct _node_description
 {
-	double			output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
+	double				output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
-	int				active_inputs;						/* Number of active inputs on this node type */
-	int				input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
-	const double *	input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
+	int					active_inputs;						/* Number of active inputs on this node type */
+	int					input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
+	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	void *			context;							/* Contextual information specific to this node type */
-	const void *	custom;								/* Custom function specific initialisation data */
+	void *				context;							/* Contextual information specific to this node type */
+	const void *		custom;								/* Custom function specific initialisation data */
 
-	const discrete_module *module;						/* Node's module info */
-	const discrete_sound_block *block;					/* Points to the node's setup block. */
-	const discrete_info *info;							/* Points to the parent */
+	const discrete_module *module;							/* Node's module info */
+	const discrete_sound_block *block;						/* Points to the node's setup block. */
+	const discrete_info *info;								/* Points to the parent */
 
-	osd_ticks_t		run_time;
+	osd_ticks_t			run_time;
 };
 
 
@@ -3671,8 +3671,8 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	const void *ptr;
-	linked_list_entry *next;
+	const void 			*ptr;
+	linked_list_entry 	*next;
 };
 
 typedef struct _discrete_task_context discrete_task_context;
@@ -3693,9 +3693,9 @@ struct _discrete_info
 	const device_config *device;
 
 	/* emulation info */
-	int		sample_rate;
-	double	sample_time;
-	double	neg_sample_time;
+	int					sample_rate;
+	double				sample_time;
+	double				neg_sample_time;
 
 	/* internal node tracking */
 	node_description **indexed_node;
@@ -3719,17 +3719,17 @@ struct _discrete_info
 	linked_list_entry 	 *output_list;
 
 	/* the output stream */
-	sound_stream *discrete_stream;
+	sound_stream 		*discrete_stream;
 
 	/* debugging statistics */
-	FILE *disclogfile;
+	FILE 				*disclogfile;
 
 	/* parallel tasks */
-	osd_work_queue *queue;
+	osd_work_queue 		*queue;
 
 	/* profiling */
-	UINT64 total_samples;
-	UINT64 total_stream_updates;
+	UINT64 				total_samples;
+	UINT64 				total_stream_updates;
 };
 
 
@@ -4424,7 +4424,7 @@ enum
 //#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 
 /* output */
-#define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
+#define DISCRETE_OUTPUT(OPNODE,GAIN)            	                   { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "DISCRETE_OUTPUT" },
 
 
 /*************************************
