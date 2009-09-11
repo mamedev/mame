@@ -2234,6 +2234,7 @@ const game_driver * const drivers[] =
 	DRIVER( kingdmgp )	/* (c) 1994 Raizing/8ing (hack?) */
 	DRIVER( bgaregga )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggahk )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgareggatw )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgaregganv )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggat2 )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggacn )	/* (c) 1996 Raizing/8ing */
