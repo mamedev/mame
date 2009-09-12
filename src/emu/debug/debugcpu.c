@@ -1779,14 +1779,12 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 	/* shortcut if we have a custom routine */
 	if (info->readop != NULL)
 	{
-		UINT64 result;
-
 		/* return early if we got the result directly */
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
-		if ((*info->readop)(space->cpu, address, size, &result))
+		if ((*info->readop)(space->cpu, address, size, &result2))
 		{
 			memory_set_debugger_access(space, global->debugger_access = FALSE);
-			return result;
+			return result2;
 		}
 	}
 
