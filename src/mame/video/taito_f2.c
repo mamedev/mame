@@ -73,8 +73,6 @@ static UINT8 f2_tilepri[6]; // todo - move into taitoic.c
 static UINT8 f2_spritepri[6]; // todo - move into taitoic.c
 static UINT8 f2_spriteblendmode; // todo - move into taitoic.c
 
-static UINT16 *paletteram_buffer;
-
 enum
 {
 	FOOTCHMP = 1
@@ -297,15 +295,6 @@ VIDEO_START( taitof2_driftout )
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 16;
 	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
-
-	paletteram_buffer = auto_alloc_array(machine, UINT16, 4096);
-	memset(paletteram_buffer, 0, 4096*sizeof(UINT16));
-	state_save_register_global_pointer(machine, paletteram_buffer, 4096);
-}
-
-WRITE16_HANDLER( taitof2_palette_w )
-{
-	COMBINE_DATA(&paletteram_buffer[offset]);
 }
 
 
@@ -1203,19 +1192,6 @@ VIDEO_UPDATE( taitof2_pri_roz )
 
 	draw_sprites(screen->machine, bitmap,cliprect,NULL,1);
 	return 0;
-}
-
-VIDEO_UPDATE( taitof2_driftout )
-{
-	UINT16 pen;
-
-	/* send palette, workaround for bug http://www.mametesters.org/view.php?id=3356 (just for this game)
-     driftout writes twice per frame to the palette, this causes glitches on some setups due to
-     VIDEO_UPDATE not being synced to renderer update when multithreading is on. */
-	for (pen=0;pen<4096;pen++)
-		palette_set_color_rgb(screen->machine, pen, pal5bit(paletteram_buffer[pen] >> 10), pal5bit(paletteram_buffer[pen] >> 5), pal5bit(paletteram_buffer[pen] >> 0));
-
-	return VIDEO_UPDATE_CALL( taitof2_pri_roz );
 }
 
 

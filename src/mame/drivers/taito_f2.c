@@ -1132,7 +1132,7 @@ static ADDRESS_MAP_START( driftout_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(TC0430GRW_word_r, TC0430GRW_word_w)	/* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_WRITE(TC0430GRW_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(taitof2_palette_w)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -3609,7 +3609,7 @@ static MACHINE_DRIVER_START( driftout )
 	/* video hardware */
 	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_driftout)
-	MDRV_VIDEO_UPDATE(taitof2_driftout)
+	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
 MACHINE_DRIVER_END
 
 
