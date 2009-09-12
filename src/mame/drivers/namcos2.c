@@ -5040,7 +5040,7 @@ GAME( 1988, ordyne,    0,        default,  default,  ordyne,   ROT180, "Namco", 
 GAME( 1988, ordynej,   ordyne,   default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
 GAME( 1988, mirninja,  0,        default,  default,  mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
 GAME( 1988, phelios,   0,        default2, default,  phelios , ROT90,  "Namco", "Phelios (Japan)" , 0)
-GAME( 1989, dirtfoxj,  0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , GAME_NOT_WORKING ) // IRQ issues
+GAME( 1989, dirtfoxj,  0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , 0 )
 GAME( 1989, fourtrax,  0,        finallap, fourtrax, fourtrax, ROT0,   "Namco", "Four Trax", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, valkyrie,  0,        default3, default,  valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
 GAME( 1989, finehour,  0,        default2, default,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)
