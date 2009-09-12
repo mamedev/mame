@@ -1703,6 +1703,33 @@ ROM_START( uccops )
 	ROM_LOAD( "uc_w42.rom", 0x000000, 0x080000, CRC(d17d3fd6) SHA1(b02da0d01c41c7bf50cd35d6c75bacc3e3e0b85a) )
 ROM_END
 
+ROM_START( uccopsu )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uc_h0.rom",   0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "uc_l0.rom",   0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "uc_h1-g.rom", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
+	ROM_LOAD16_BYTE( "uc_l1-g.rom", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
+
+	ROM_REGION( 0x100000, "soundcpu", 0 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
+	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x000001, 0x010000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
+	ROM_LOAD16_BYTE( "uc_sl0.rom", 0x000000, 0x010000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
+	ROM_LOAD( "uc_w38m.rom", 0x000000, 0x080000, CRC(130a40e5) SHA1(f70bad2fe126bb0e451a3fa6100a610928e9a502) )
+	ROM_LOAD( "uc_w39m.rom", 0x080000, 0x080000, CRC(e42ca144) SHA1(ea83b1027d403e874fda6e68097814f8b9ce25d6) )
+	ROM_LOAD( "uc_w40m.rom", 0x100000, 0x080000, CRC(c2961648) SHA1(b5d28638e72ab50d598e284f31bf389956ae12c6) )
+	ROM_LOAD( "uc_w41m.rom", 0x180000, 0x080000, CRC(f5334b80) SHA1(6fa70ceba4f67fb0562be7b24b28bda0ffc13ef5) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "uc_k16m.rom", 0x000000, 0x100000, CRC(4a225f09) SHA1(f4d27813241fd9b020e4df8b03c852c8ecb92586) )
+	ROM_LOAD( "uc_k17m.rom", 0x100000, 0x100000, CRC(e4ed9a54) SHA1(55befbd2e156c765c5e79a3176cf4336d2111293) )
+	ROM_LOAD( "uc_k18m.rom", 0x200000, 0x100000, CRC(a626eb12) SHA1(826c4796c2e63f777490b43f84ffa37a6b749ca2) )
+	ROM_LOAD( "uc_k19m.rom", 0x300000, 0x100000, CRC(5df46549) SHA1(87b0b799b50bf2b6ee916d9f8dfc1ee7666ce800) )
+
+	ROM_REGION( 0x80000, "irem", 0 )
+	ROM_LOAD( "uc_w42.rom", 0x000000, 0x080000, CRC(d17d3fd6) SHA1(b02da0d01c41c7bf50cd35d6c75bacc3e3e0b85a) )
+ROM_END
+
 
 /*
 Undercover Cops Alpha Renewal Version
@@ -2168,6 +2195,7 @@ GAME( 1991, crossbld, bmaster,  bmaster,       bmaster,  bmaster,  ROT0,   "Irem
 GAME( 1991, lethalth, 0,        lethalth,      lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 )
 GAME( 1991, thndblst, lethalth, lethalth,      lethalth, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", 0 )
 GAME( 1992, uccops,   0,        uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (World)", 0 )
+GAME( 1992, uccopsu,  uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (US)", 0 )
 GAME( 1992, uccopsar, uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Alpha Renewal Version)", 0 )
 GAME( 1992, uccopsj,  uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
 GAME( 1992, mysticri, 0,        mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )

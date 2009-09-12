@@ -1523,6 +1523,7 @@ const game_driver * const drivers[] =
 	DRIVER( lethalth )	/* (c) 1991 Irem (World) */
 	DRIVER( thndblst )	/* (c) 1991 Irem (Japan) */
 	DRIVER( uccops )	/* (c) 1992 Irem (World) */
+	DRIVER( uccopsu )	/* (c) 1992 Irem (US) */
 	DRIVER( uccopsar )	/* (c) 1992 Irem (World) */
 	DRIVER( uccopsj )	/* (c) 1992 Irem (Japan) */
 	DRIVER( mysticri )	/* (c) 1992 Irem (World) */
@@ -5371,7 +5372,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssridersb )	/* bootleg */
 	DRIVER( xmen )		/* GX065 (c) 1992 (US) */
 	DRIVER( xmenj )		/* GX065 (c) 1992 (Japan) */
-	DRIVER( xmen2p )	/* GX065 (c) 1992 (World) */
+	DRIVER( xmen2pe )	/* GX065 (c) 1992 (World) */
+	DRIVER( xmen2pa )	/* GX065 (c) 1992 (Asia) */
 	DRIVER( xmen2pj )	/* GX065 (c) 1992 (Japan) */
 	DRIVER( xmen6p )	/* GX065 (c) 1992 */
 	DRIVER( xmen6pu )	/* GX065 (c) 1992 */
