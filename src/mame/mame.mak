@@ -214,6 +214,7 @@ SOUNDS += WAVE
 SOUNDS += SP0256
 SOUNDS += DIGITALKER
 SOUNDS += CDP1863
+SOUNDS += CDP1864
 
 
 #-------------------------------------------------
