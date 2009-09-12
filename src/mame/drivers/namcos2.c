@@ -5031,19 +5031,19 @@ GAMEL(1987, finallapd, finallap, finallap, finallap, finallap, ROT0,   "Namco", 
 GAMEL(1987, finallapc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
 GAMEL(1987, finallapjc,finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
 GAMEL(1987, finallapjb,finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev B)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
-GAME( 1988, assault,   0,        default2, assault,  assault , ROT90,  "Namco", "Assault" , 0)		/* adjusted */
-GAME( 1988, assaultj,  assault,  default2, assault,  assaultj, ROT90,  "Namco", "Assault (Japan)" , 0)	/* adjusted */
-GAME( 1988, assaultp,  assault,  default2, assault,  assaultp, ROT90,  "Namco", "Assault Plus (Japan)" , 0)	/* adjusted */
+GAME( 1988, assault,   0,        default2, assault,  assault , ROT90,  "Namco", "Assault" , 0)
+GAME( 1988, assaultj,  assault,  default2, assault,  assaultj, ROT90,  "Namco", "Assault (Japan)" , 0)
+GAME( 1988, assaultp,  assault,  default2, assault,  assaultp, ROT90,  "Namco", "Assault Plus (Japan)" , 0)
 GAME( 1988, metlhawk,  0,        metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk", 0)
 GAME( 1988, metlhawkj, metlhawk, metlhawk, metlhawk, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan)", 0)
 GAME( 1988, ordyne,    0,        default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
 GAME( 1988, ordynej,   ordyne,   default,  default,  ordyne,   ROT180, "Namco", "Ordyne (Japan)", 0 )
 GAME( 1988, mirninja,  0,        default,  default,  mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", 0 )
-GAME( 1988, phelios,   0,        default2, default,  phelios , ROT90,  "Namco", "Phelios (Japan)" , 0)	/* adjusted */
-GAME( 1989, dirtfoxj,  0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , 0)	/* adjusted */
+GAME( 1988, phelios,   0,        default2, default,  phelios , ROT90,  "Namco", "Phelios (Japan)" , 0)
+GAME( 1989, dirtfoxj,  0,        default2, dirtfox,  dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)" , GAME_NOT_WORKING ) // IRQ issues
 GAME( 1989, fourtrax,  0,        finallap, fourtrax, fourtrax, ROT0,   "Namco", "Four Trax", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, valkyrie,  0,        default3, default,  valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
-GAME( 1989, finehour,  0,        default2, default,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)		/* adjusted */
+GAME( 1989, finehour,  0,        default2, default,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)
 GAME( 1989, burnforc,  0,        default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan new version)", 0 )
 GAME( 1989, burnforco, burnforc, default3, default,  burnforc, ROT0,   "Namco", "Burning Force (Japan old version)", 0 )
 GAME( 1989, marvland,  0,        default,  default,  marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )

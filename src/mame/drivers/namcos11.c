@@ -1644,7 +1644,7 @@ GAME( 1994, tekkenc,   tekken,   coh100, tekken,   namcos11, ROT0, "Namco", "Tek
 GAME( 1995, tekken2,   0,        coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 Ver.B (TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, tekken2a,  tekken2,  coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 Ver.B (TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, tekken2b,  tekken2,  coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 (TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, souledge,  0,        coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge Ver. II (SO4/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, souledge,  0,        coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge Ver. II (SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledgea, souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge Ver. II (SO3/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledge1, souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge (SO3/VER.A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledge1j,souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge (Japan, SO1/VER.A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
