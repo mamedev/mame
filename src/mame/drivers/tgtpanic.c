@@ -1,0 +1,160 @@
+/***************************************************************************
+
+    Konami Target Panic (cabinet test PCB)
+
+    driver by Phil Bennett
+
+    TODO: Colors
+
+***************************************************************************/
+
+#include "driver.h"
+#include "cpu/z80/z80.h"
+
+static UINT8 *ram;
+static UINT8 color;
+
+
+/*************************************
+ *
+ *  Video hardware
+ *
+ *************************************/
+
+static VIDEO_UPDATE( tgtpanic )
+{
+	/* TODO */
+	static const UINT32 colors[4] = 
+	{
+		0xff000000,
+		0xffff0000,
+		0xff0000ff,
+		0xffffffff
+	};
+
+	UINT32 offs;
+	UINT32 x, y;
+
+	for (offs = 0; offs < 0x2000; ++offs)
+	{
+		UINT8 val = ram[offs];
+
+		y = (offs & 0x7f) << 1;
+		x = (offs >> 7) << 2;
+
+		/* I'm guessing the hardware doubles lines */
+		*BITMAP_ADDR32(bitmap, y + 0, x + 0) = colors[val & 3];
+		*BITMAP_ADDR32(bitmap, y + 1, x + 0) = colors[val & 3];
+		val >>= 2;
+		*BITMAP_ADDR32(bitmap, y + 0, x + 1) = colors[val & 3];
+		*BITMAP_ADDR32(bitmap, y + 1, x + 1) = colors[val & 3];
+		val >>= 2;
+		*BITMAP_ADDR32(bitmap, y + 0, x + 2) = colors[val & 3];
+		*BITMAP_ADDR32(bitmap, y + 1, x + 2) = colors[val & 3];
+		val >>= 2;
+		*BITMAP_ADDR32(bitmap, y + 0, x + 3) = colors[val & 3];
+		*BITMAP_ADDR32(bitmap, y + 1, x + 3) = colors[val & 3];
+	}
+
+	return 0;
+}
+
+static WRITE8_HANDLER( color_w )
+{
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	color = data;
+}
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( prg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(&ram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Inputs
+ *
+ *************************************/
+
+static INPUT_PORTS_START( tgtpanic )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( tgtpanic )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("cpu", Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(prg_map)
+	MDRV_CPU_IO_MAP(io_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(tgtpanic)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60) /* Unverified */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* Unverified */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
+MACHINE_DRIVER_END
+
+
+ /*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
+
+ROM_START( tgtpanic )
+	ROM_REGION( 0x10000, "cpu", 0 )
+	ROM_LOAD( "601_ja_a01.13e", 0x0000, 0x8000, CRC(ece71952) SHA1(0f9cbd8adac2b1950bc608d51f0f122399c8f00f) )
+ROM_END
+
+
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
+
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )

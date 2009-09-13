@@ -5294,6 +5294,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( lethaleneab )	/* GX191 (c) 1992 */
 	DRIVER( lethaleneae )	/* GX191 (c) 1992 */
 	DRIVER( lethalenj )	/* GX191 (c) 1992 */
+	DRIVER( tgtpanic )	/* GX601 (c) 1996 */
 
 	/* Konami "Nemesis hardware" games */
 	DRIVER( nemesis )	/* GX456 (c) 1985 */

@@ -833,6 +833,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/simpsons.o $(MACHINE)/simpsons.o $(VIDEO)/simpsons.o \
 	$(DRIVERS)/spy.o $(VIDEO)/spy.o \
 	$(DRIVERS)/surpratk.o $(VIDEO)/surpratk.o \
+	$(DRIVERS)/tgtpanic.o \
 	$(DRIVERS)/thunderx.o $(VIDEO)/thunderx.o \
 	$(DRIVERS)/timeplt.o $(AUDIO)/timeplt.o $(VIDEO)/timeplt.o \
 	$(DRIVERS)/tmnt.o $(VIDEO)/tmnt.o \

@@ -2159,6 +2159,7 @@ src/mame/drivers/tehkanwc.c svneol=native#text/plain
 src/mame/drivers/tempest.c svneol=native#text/plain
 src/mame/drivers/terracre.c svneol=native#text/plain
 src/mame/drivers/tetrisp2.c svneol=native#text/plain
+src/mame/drivers/tgtpanic.c svneol=native#text/plain
 src/mame/drivers/thayers.c svneol=native#text/plain
 src/mame/drivers/thedeep.c svneol=native#text/plain
 src/mame/drivers/thepit.c svneol=native#text/plain
