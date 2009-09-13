@@ -1271,6 +1271,7 @@ src/mame/drivers/aleck64.c svneol=native#text/plain
 src/mame/drivers/alg.c svneol=native#text/plain
 src/mame/drivers/aliens.c svneol=native#text/plain
 src/mame/drivers/alpha68k.c svneol=native#text/plain
+src/mame/drivers/amaticmg.c svneol=native#text/plain
 src/mame/drivers/ambush.c svneol=native#text/plain
 src/mame/drivers/ampoker2.c svneol=native#text/plain
 src/mame/drivers/amspdwy.c svneol=native#text/plain

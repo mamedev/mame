@@ -1470,6 +1470,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
+	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
