@@ -887,9 +887,9 @@ CPU  - 317-0092  |--------------------------------------------------------------
  *
  *************************************/
 
-#define MASTER_CLOCK_10MHz		(10000000)
-#define MASTER_CLOCK_8MHz		(8000000)
-#define MASTER_CLOCK_25MHz		(25174800)
+#define MASTER_CLOCK_10MHz		XTAL_10MHz
+#define MASTER_CLOCK_8MHz		XTAL_8MHz
+#define MASTER_CLOCK_25MHz		XTAL_25_1748MHz
 
 #define ROM_BOARD_171_5358_SMALL (0)	/* 171-5358 with smaller ROMs */
 #define ROM_BOARD_171_5358		(1)		/* 171-5358 */
@@ -3266,7 +3266,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atomicp )
+static MACHINE_DRIVER_START( atomicp ) /* 10MHz CPU Clock verified */
 	MDRV_IMPORT_FROM(system16b)
 
 	/* basic machine hardware */
@@ -3274,7 +3274,7 @@ static MACHINE_DRIVER_START( atomicp )
 	MDRV_MACHINE_RESET(atomicp)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ym", YM2413, 5000000) /* 20MHz OSC divided by 4 */
+	MDRV_SOUND_REPLACE("ym", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_DEVICE_REMOVE("upd")
