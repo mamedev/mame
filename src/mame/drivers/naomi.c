@@ -729,8 +729,17 @@ SW1             - 2-position Dip Switch
 VGA             - 15 pin VGA out connector @ 31.5kHz
 SER             - 9 pin Serial connector  \
 VOL             - Volume pot              / These are on a small daughterboard that plugs into the main PCB via a multi-wire cable.
-CN3             - Unknown 10 pin connector labelled 'CN3'
+CN3             - Speaker output & Extension serial connector
 3V_BATT         - Panasonic ML2020 3 Volt Coin Battery
+
+CN3 Pinout
+Pin     Function    I/O    Pin   Function  I/O
+----------------------------------------------
+ 1    Stereo L (+)  Out  |  2      TXD     Out
+ 3    Stereo L (-)  Out  |  4      RXD      In
+ 5    Stereo R (+)  Out  |  6      GND      -
+ 7    Stereo R (-)  Out  |  8      +5V     Out
+ 9      No Connection    | 10  No Connection
 
 The bottom of the PCB contains nothing significant except some connectors. One for the game cart, one for special controls
 or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
@@ -982,6 +991,35 @@ Notes:
                            Game                                   Sega Part#
                            ---------------------------------------------------
                            Extreme Hunting 2 Tournament Edition   317-0445-COM
+
+AW-NET Network Board
+--------------------
+
+Sammy
+AM3AJG-01
+LAN PCB
+2003
+SAMLAN Rev: D
+|-----------------------------------|
+| RJ45                              |
+|PULSE                              |
+|        25Mz                       |
+|                                   |
+|      RTL8139CL+*           CN*    |
+|                  315-6310*        |
+|                                   |
+|       L46R                        |
+|-----------------------------------|
+Notes:
+      *          - Denotes those parts are on the other side of the PCB
+      RJ45       - RJ45 network connector
+      PULSE      - Pulse H0011 10/100 LAN Magnetics Module (SOIC16)
+      L46R       - 93C46 compatible 128x8 EEPROM (SOIC8)
+      RTL8139CL+ - Realtek RTL8139CL+ 3.3 volt Single Chip Fast Ethernet Controller with Power Management (QFP120)
+      315-6310   - Sega 315-6310 Custom IC (QFP100)
+      CN         - This connector plugs into the main board
+
+
 
 Gun Sub Board
 -------------
