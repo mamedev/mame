@@ -729,7 +729,7 @@ SW1             - 2-position Dip Switch
 VGA             - 15 pin VGA out connector @ 31.5kHz
 SER             - 9 pin Serial connector  \
 VOL             - Volume pot              / These are on a small daughterboard that plugs into the main PCB via a multi-wire cable.
-CN3             - Speaker output & Extension serial connector
+CN3             - 10 pin Speaker output & Extension serial connector
 3V_BATT         - Panasonic ML2020 3 Volt Coin Battery
 
 CN3 Pinout
