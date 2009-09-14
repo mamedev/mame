@@ -790,7 +790,6 @@ case 0x75: /*      LD (HL),L */
   break;
 case 0x76: /*      HALT */
 	cpustate->w.enable |= HALTED;
-	cpustate->w.haltIFstatus = cpustate->w.IF & cpustate->w.IE;
 	cpustate->w.PC--;
   break;
 case 0x77: /*      LD (HL),A */

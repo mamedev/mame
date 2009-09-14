@@ -77,7 +77,6 @@ typedef struct {
 	int gb_speed_change_pending;
 	int enable;
 	int doHALTbug;
-	int haltIFstatus;
 	UINT8	features;
 	const lr35902_cpu_core *config;
 } lr35902_16BitRegs;
@@ -272,10 +271,7 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 					if ( cpustate->w.features & LR35902_FEATURE_HALT_BUG ) {
 						if ( ! cpustate->w.enable & IME ) {
 							/* Old cpu core (dmg/mgb/sgb) */
-							/* check if the HALT bug should be performed */
-							if ( cpustate->w.haltIFstatus ) {
-								cpustate->w.doHALTbug = 1;
-							}
+							cpustate->w.doHALTbug = 1;
 						}
 					} else {
 						/* New cpu core (cgb/agb/ags) */
