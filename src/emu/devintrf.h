@@ -367,6 +367,9 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 /* retrieve a device configuration based on a tag */
 const device_config *device_list_find_by_tag(const device_config *listhead, const char *tag);
 
+/* retrieve a child device configuration based on a tag */
+const device_config *device_find_child_by_tag(const device_config *owner, const char *tag);
+
 /* return the index of a device based on its type and tag; DEVICE_TYPE_WILDCARD is allowed */
 int device_list_index(const device_config *listhead, device_type type, const char *tag);
 

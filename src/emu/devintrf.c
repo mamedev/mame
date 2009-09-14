@@ -361,6 +361,27 @@ const device_config *device_list_find_by_tag(const device_config *listhead, cons
 
 
 /*-------------------------------------------------
+    device_find_child_by_tag - retrieve a child 
+	device configuration based on a tag
+-------------------------------------------------*/
+
+const device_config *device_find_child_by_tag(const device_config *owner, const char *tag)
+{
+	astring *tempstring;
+	const device_config *child;
+	
+	assert(owner != NULL);
+	assert(tag != NULL);
+
+	tempstring = astring_alloc();
+	child = device_list_find_by_tag(owner->machine->config->devicelist, device_build_tag(tempstring, owner, tag));
+	astring_free(tempstring);
+
+	return child;
+}
+
+
+/*-------------------------------------------------
     device_list_index - return the index of a
     device based on its type and tag;
     DEVICE_TYPE_WILDCARD is allowed
