@@ -1016,31 +1016,62 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 {
 	UINT32 repeated_eip = cpustate->eip;
 	UINT32 repeated_pc = cpustate->pc;
-	UINT8 opcode = FETCH(cpustate);
+	UINT8 opcode; // = FETCH(cpustate);
 	UINT32 eas, ead;
 	UINT32 count;
 	INT32 cycle_base = 0, cycle_adjustment = 0;
+	UINT8 prefix_flag=1;
 	UINT8 *flag = NULL;
 
-	if( cpustate->segment_prefix ) {
-		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->sreg[CS].d ? REG32(ESI) : REG16(SI) );
-	} else {
-		eas = i386_translate(cpustate, DS, cpustate->sreg[CS].d ? REG32(ESI) : REG16(SI) );
-	}
-	ead = i386_translate(cpustate, ES, cpustate->sreg[CS].d ? REG32(EDI) : REG16(DI) );
 
-	if( opcode == 0x66 ) {
+	do {
+	repeated_eip = cpustate->eip;
+	repeated_pc = cpustate->pc;
+	opcode = FETCH(cpustate);
+	switch(opcode) {
+		case 0x26:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=ES;
+		break;
+		case 0x2e:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=CS;
+		break;
+		case 0x36:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=SS;
+		break;
+		case 0x3e:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=DS;
+		break;
+		case 0x64:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=FS;
+		break;
+		case 0x65:
+	    cpustate->segment_override=1;
+		cpustate->segment_prefix=GS;
+		break;
+		case 0x66:
 		cpustate->operand_size ^= 1;
-		repeated_eip = cpustate->eip;
-		repeated_pc = cpustate->pc;
-		opcode = FETCH(cpustate);
-	}
-	if( opcode == 0x67 ) {
+		break;
+		case 0x67:
 		cpustate->address_size ^= 1;
-		repeated_eip = cpustate->eip;
-		repeated_pc = cpustate->pc;
-		opcode = FETCH(cpustate);
+		break;
+        default:
+		prefix_flag=0;
+      }
+	} while (prefix_flag);
+
+
+	if( cpustate->segment_prefix ) {
+		// FIXME: the following does not work if both address override and segment override are used
+		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->sreg[cpustate->segment_prefix].d ? REG32(ESI) : REG16(SI) );
+	} else {
+		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
 	}
+	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
 
 	switch(opcode)
 	{
@@ -1107,7 +1138,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 			break;
 	}
 
-	if( cpustate->sreg[CS].d ) {
+	if( cpustate->address_size ) {
 		if( REG32(ECX) == 0 )
 			return;
 	} else {
@@ -1124,7 +1155,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 		I386OP(decode_opcode)(cpustate);
 		CYCLES_NUM(cycle_adjustment);
 
-		if (cpustate->sreg[CS].d)
+		if (cpustate->address_size)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
