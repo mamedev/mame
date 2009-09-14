@@ -8,7 +8,6 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
-- emulate sound properly;
 - sprite offsets?
 - score / credits display should stay above the sprites?
 
@@ -380,7 +379,7 @@ static MACHINE_DRIVER_START( mirax )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4) /* unverified */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -484,5 +483,5 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",       GAME_IMPERFECT_SOUND )
-GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         0 )
+GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", 0 )
