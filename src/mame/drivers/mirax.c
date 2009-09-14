@@ -374,13 +374,13 @@ static INTERRUPT_GEN( mirax_vblank_irq )
 }
 
 static MACHINE_DRIVER_START( mirax )
-	MDRV_CPU_ADD("maincpu", Z80, 12000000/2) // ceramic potted module, encrypted z80
+	MDRV_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
 	MDRV_CPU_VBLANK_INT("screen",mirax_vblank_irq)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/2) // audio cpu ?
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4) /* unverified */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -399,9 +399,9 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SOUND_START(mirax)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/6 /* guess */)
+	MDRV_SOUND_ADD("ay1", AY8910, 12000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/6 /* guess */)
+	MDRV_SOUND_ADD("ay2", AY8910, 12000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -413,6 +413,36 @@ ROM_START( mirax )
 	ROM_LOAD( "mxp5-42.rom",   0x0000, 0x4000, CRC(716410a0) SHA1(55171376e1e164b1d5e728789da6e04a3a33c172) )
 	ROM_LOAD( "mxr5-4v.rom",   0x4000, 0x4000, CRC(c9484fc3) SHA1(101c5e4b9d49d2424ad80970eb3bdb87949a9966) )
 	ROM_LOAD( "mxs5-4v.rom",   0x8000, 0x4000, CRC(e0085f91) SHA1(cf143b94048e1ebb5c899b94b500e193dfd42e18) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "mxr2-4v.rom",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "mxe3-4v.rom",   0x0000, 0x4000, CRC(0cede01f) SHA1(c723dd8ee9dc06c94a7fe5d5b5bccc42e2181af1) )
+	ROM_LOAD( "mxh3-4v.rom",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
+	ROM_LOAD( "mxk3-4v.rom",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "mxe2-4v.rom",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
+	ROM_LOAD( "mxf2-4v.rom",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
+	ROM_LOAD( "mxh2-4v.rom",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
+	ROM_LOAD( "mxf3-4v.rom",   0x00000, 0x4000, CRC(14b1ca85) SHA1(775a4c81a81b78490d45095af31e24c16886f0a2) )
+	ROM_LOAD( "mxi3-4v.rom",   0x08000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
+	ROM_LOAD( "mxl3-4v.rom",   0x10000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
+
+	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
+	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
+	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
+	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP )
+ROM_END
+
+ROM_START( miraxa )
+	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00 ) // put decrypted code there
+
+	ROM_REGION( 0xc000, "data_code", 0 ) // encrypted code for the main cpu
+	ROM_LOAD( "mx_p5_43v.p5",   0x0000, 0x4000, CRC(87664903) SHA1(ccc11ecf0658e7af0db3229f60a16b1a44bd12bc) )
+	ROM_LOAD( "mx_r5_43v.r5",   0x4000, 0x4000, CRC(1ba4cd8e) SHA1(8fd22d3a4bca7c989382aaf7b08ac381a3566493) )
+	ROM_LOAD( "mx_s5_43v.s5",   0x8000, 0x4000, CRC(c58cc151) SHA1(0846e22f4da6d85c6dc29ff1472bc84b419b2289) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mxr2-4v.rom",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
@@ -454,4 +484,5 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,		mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax", GAME_IMPERFECT_SOUND )
+GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",       GAME_IMPERFECT_SOUND )
+GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", GAME_IMPERFECT_SOUND )

@@ -8922,6 +8922,7 @@ Other Sun games
 	DRIVER( rbmk )		/* (c) 1995 GMS */
 	DRIVER( go2000 )	/* (c) 2000 SA */
 	DRIVER( mirax )		/* (c) 1985 Current Technologies */
+	DRIVER( miraxa )	/* (c) 1985 Current Technologies */
 
 	DRIVER( victor5 )	/* (c) 1990 Subsino */
 	DRIVER( victor21 )	/* (c) 1990 Subsino */
