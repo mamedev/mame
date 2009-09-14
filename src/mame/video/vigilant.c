@@ -276,6 +276,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
+VIDEO_UPDATE( kikcubic )
+{
+	int offs;
+
+	for (offs = 0; offs<videoram_size; offs+=2 )
+	{
+		int sy = 8 * ((offs/2) / 64);
+		int sx = 8 * ((offs/2) % 64);
+		int attributes = videoram[offs+1];
+		int color = (attributes & 0xF0) >> 4;
+		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
+
+		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
+				tile_number,
+				color,
+				0,0,
+				sx,sy);
+	}
+
+	draw_sprites(screen->machine,bitmap,cliprect);
+	return 0;
+}
+
 VIDEO_UPDATE( vigilant )
 {
 	int i;
@@ -312,29 +335,5 @@ VIDEO_UPDATE( vigilant )
 		draw_sprites(screen->machine,bitmap,&bottomvisiblearea);
 		draw_foreground(screen->machine,bitmap,cliprect,1,0); // priority tiles
 	}
-	return 0;
-}
-
-VIDEO_UPDATE( kikcubic )
-{
-	int offs;
-
-
-	for (offs = 0; offs<videoram_size; offs+=2 )
-	{
-		int sy = 8 * ((offs/2) / 64);
-		int sx = 8 * ((offs/2) % 64);
-		int attributes = videoram[offs+1];
-		int color = (attributes & 0xF0) >> 4;
-		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
-
-		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-				tile_number,
-				color,
-				0,0,
-				sx,sy);
-	}
-
-	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
