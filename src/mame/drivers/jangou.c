@@ -1023,6 +1023,25 @@ ROM_START( fruitbun )
 	ROM_LOAD( "tbp18s30n.4f", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46) ) //verified on real hardware
 ROM_END
 
+ROM_START( cntrygrla )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "5bunny.7l", 0x00000, 0x02000, CRC(ef07e029) SHA1(4be1bea9acaa37c615e937c3d0e0b8454aff2a8c) )
+	ROM_LOAD( "5bunny.7k", 0x02000, 0x02000, CRC(cdf822b0) SHA1(a3cae79713cf7ff94a98705b7cba621730dbac1f) )
+
+	/* same non-sense like Country Girl... */
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "5bunny.7h", 0x00000, 0x0800, CRC(18da8863) SHA1(2151bc67173507dc35edc2426c2ef97d7937d01c) )
+	ROM_LOAD( "5bunny.7j", 0x00800, 0x0800, CRC(06666bbf) SHA1(3d8eb4ea2d4fc6f3f327e710e19bcb68d8466d80) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  ) //5bunny.m5
+	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  ) //5bunny.l5
+	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  ) //5bunny.k5
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "tbp18s30n.4f", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46) ) //verified on real hardware
+ROM_END
+
 ROM_START( luckygrl )
 	ROM_REGION( 0x10000, "cpu0", 0 ) //encrypted z80 cpu
 	ROM_LOAD( "5.9c", 0x00000, 0x01000, CRC(79b34eb2) SHA1(4b4916e09bfd6573fd2c7a7254fa4419164e0c4d) )
@@ -1098,7 +1117,8 @@ static DRIVER_INIT (luckygrl)
 GAME( 1983, jangou,     0,        jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
 GAME( 1983, macha,      0,        jangou,   macha,     0,        ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", GAME_NO_COCKTAIL )
 GAME( 1984, jngolady,   0,        jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, cntrygrl,   0,        cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrl,   0,        cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan set 1)",  GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrla,  cntrygrl, cntrygrl, cntrygrl,  0,        ROT0, "Nichibutsu",   "Country Girl (Japan set 2)",  GAME_NO_COCKTAIL )
 GAME( 1984, fruitbun,   cntrygrl, cntrygrl, cntrygrl,  0,        ROT0, "Nichibutsu",   "Fruits & Bunny (World?)",  GAME_NO_COCKTAIL )
 /* The following might not run there... */
 GAME( 1984?,luckygrl,   0,        cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing",         "Lucky Girl? (Wing)", GAME_NOT_WORKING )
