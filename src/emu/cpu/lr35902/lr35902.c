@@ -266,7 +266,6 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 				if (cpustate->w.enable & HALTED)
 				{
 					cpustate->w.enable &= ~HALTED;
-					cpustate->w.IF &= ~(1 << irqline);
 					cpustate->w.PC++;
 					if ( cpustate->w.features & LR35902_FEATURE_HALT_BUG ) {
 						if ( ! cpustate->w.enable & IME ) {
