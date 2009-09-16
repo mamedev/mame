@@ -108,6 +108,7 @@ struct _z80dma_t
 	UINT16 count;
 
 	UINT8 rdy;
+	UINT8 irq_en;
 
 	UINT8 is_read;
 	UINT8 cur_cycle;
@@ -151,7 +152,12 @@ static void z80dma_do_read(const device_config *device)
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			break;
-
+		case TM_SEARCH:
+			fatalerror("z80dma_do_operation: unhandled search mode!\n");
+			break;
+		case TM_SEARCH_TRANSFER:
+			fatalerror("z80dma_do_operation: unhandled search & transfer mode !\n");
+			break;
 		default:
 			fatalerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
@@ -189,6 +195,14 @@ static int z80dma_do_write(const device_config *device)
 			}
 			cntx->count--;
 			done = (cntx->count == 0xFFFF);
+			break;
+
+		case TM_SEARCH:
+			fatalerror("z80dma_do_operation: unhandled search mode!\n");
+			break;
+
+		case TM_SEARCH_TRANSFER:
+			fatalerror("z80dma_do_operation: unhandled search & transfer mode !\n");
 			break;
 
 		default:
@@ -340,11 +354,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 			WR6(cntx) = data;
 			switch (data)
 			{
-				case 0x88:	/* Reinitialize status byte */
 				case 0xA3:	/* Reset and disable interrupts */
-				case 0xAB:	/* Enable interrupts */
-				case 0xAF:	/* Disable interrupts */
-				case 0xB3:	/* Force ready */
 				case 0xB7:	/* Enable after rti */
 				case 0xBF:	/* Read status byte */
 					fatalerror("Unimplemented WR6 command %02x", data);
@@ -366,6 +376,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					cntx->addressA = PORTA_ADDRESS(cntx);
 					cntx->addressB = PORTB_ADDRESS(cntx);
 					cntx->count = BLOCKLEN(cntx);
+					cntx->status &= ~0x30;
 					LOG(("Load A: %x B: %x N: %x\n", cntx->addressA, cntx->addressB, cntx->count));
 					break;
 				case 0x83:	/* Disable dma */
@@ -382,13 +393,27 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0xD3:	/* Continue */
 					cntx->count = 0;
 					cntx->dma_enabled = 1;
-					//FIXME: "mach" & "endb" flags should be zeroed here
+					//"match not found" & "end of block" status flags zeroed here
+					cntx->status &= ~0x30;
 					break;
 				case 0xc7:	/* Reset Port A Timing */
 					PORTA_TIMING(cntx) = 0;
 					break;
 				case 0xcb:	/* Reset Port B Timing */
 					PORTB_TIMING(cntx) = 0;
+					break;
+				case 0xB3:	/* Force ready */
+					cntx->rdy = (WR5(cntx) & 0x8)>>3;
+					break;
+				case 0xAB:	/* Enable interrupts */
+					cntx->irq_en = 1;
+					break;
+				case 0xAF:	/* Disable interrupts */
+					cntx->irq_en = 0;
+					break;
+				case 0x8B:	/* Reinitialize status byte */
+					/* FIXME: docs says these two is 1, but behaviour makes me think it's a 0, investigate */
+					cntx->status &= ~0x30;
 					break;
 				default:
 					fatalerror("Unknown WR6 command %02x", data);
@@ -508,6 +533,7 @@ static DEVICE_RESET( z80dma )
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
 	z80dma->read_num_follow = z80dma->read_cur_follow = 0;
+	z80dma->irq_en = 0;
 	z80dma_update_status(device);
 }
 
