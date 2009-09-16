@@ -97,6 +97,9 @@ struct _z80dma_t
 	UINT8 	num_follow;
 	UINT8	cur_follow;
 	UINT8 	regs_follow[4];
+	UINT8	read_num_follow;
+	UINT8	read_cur_follow;
+	UINT8 	read_regs_follow[7];
 	UINT8	status;
 	UINT8	dma_enabled;
 
@@ -268,8 +271,16 @@ static void z80dma_update_status(const device_config *device)
 
 READ8_DEVICE_HANDLER( z80dma_r )
 {
-	fatalerror("z80dma_read: not implemented");
-	return 0;
+	z80dma_t *cntx = get_safe_token(device);
+	UINT8 res;
+
+	res = cntx->read_regs_follow[cntx->read_cur_follow];
+	cntx->read_cur_follow++;
+
+	if(cntx->read_cur_follow >= cntx->read_num_follow)
+		cntx->read_cur_follow = 0;
+
+	return res;
 }
 
 
@@ -331,7 +342,6 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 			{
 				case 0x88:	/* Reinitialize status byte */
 				case 0xA3:	/* Reset and disable interrupts */
-				case 0xA7:	/* Initiate read sequence */
 				case 0xAB:	/* Enable interrupts */
 				case 0xAF:	/* Disable interrupts */
 				case 0xB3:	/* Force ready */
@@ -339,6 +349,16 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0xBF:	/* Read status byte */
 				case 0xD3:	/* Continue */
 					fatalerror("Unimplemented WR6 command %02x", data);
+					break;
+				case 0xA7:	/* Initiate read sequence */
+					cntx->read_cur_follow = cntx->read_num_follow = 0;
+					if(READ_MASK(cntx) & 0x01) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->status; }
+					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->count & 0xff; } //byte counter (low)
+					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->count >> 8) & 0xff; } //byte counter (high)
+					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->addressA & 0xff; } //port A address (low)
+					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->addressA >> 8) & 0xff; } //port A address (high)
+					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->addressB & 0xff; } //port B address (low)
+					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->addressB >> 8) & 0xff; } //port B address (high)
 					break;
 				case 0xC3:	/* Reset */
 					LOG(("Reset\n"));
@@ -402,7 +422,7 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
 }
 
 
-WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
+WRITE8_DEVICE_HANDLER( z80dma_rdy_w )
 {
 	z80dma_t *z80dma = get_safe_token(device);
 	int param;
@@ -477,6 +497,7 @@ static DEVICE_RESET( z80dma )
 	z80dma->rdy = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
+	z80dma->read_num_follow = z80dma->read_cur_follow = 0;
 	z80dma_update_status(device);
 }
 
