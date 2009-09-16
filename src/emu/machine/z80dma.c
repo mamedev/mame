@@ -362,12 +362,12 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0xA7:	/* Initiate read sequence */
 					cntx->read_cur_follow = cntx->read_num_follow = 0;
 					if(READ_MASK(cntx) & 0x01) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->status; }
-					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, BLOCKLEN_L(cntx)); } //byte counter (low)
-					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, BLOCKLEN_H(cntx)); } //byte counter (high)
-					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_L(cntx)); } //port A address (low)
-					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_H(cntx)); } //port A address (high)
-					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTB_ADDRESS_L(cntx)); } //port B address (low)
-					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_H(cntx)); } //port B address (high)
+					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = BLOCKLEN_L(cntx); } //byte counter (low)
+					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = BLOCKLEN_H(cntx); } //byte counter (high)
+					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_L(cntx); } //port A address (low)
+					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_H(cntx); } //port A address (high)
+					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTB_ADDRESS_L(cntx); } //port B address (low)
+					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = PORTA_ADDRESS_H(cntx); } //port B address (high)
 					break;
 				case 0xC3:	/* Reset */
 					LOG(("Reset\n"));
@@ -414,6 +414,9 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0x8B:	/* Reinitialize status byte */
 					/* FIXME: docs says these two is 1, but behaviour makes me think it's a 0, investigate */
 					cntx->status &= ~0x30;
+					break;
+				case 0xFB:
+					LOG(("Z80DMA undocumented command triggered!\n"));
 					break;
 				default:
 					fatalerror("Unknown WR6 command %02x", data);
