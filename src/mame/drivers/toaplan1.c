@@ -1629,8 +1629,8 @@ ROM_START( hellfire )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
 	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "3w.bpr",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire1 )
@@ -1654,8 +1654,8 @@ ROM_START( hellfire1 )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
 	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "3w.bpr",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire2 )/* Original version, by rom numbers (IE: 01 & 02) */
@@ -1679,8 +1679,8 @@ ROM_START( hellfire2 )/* Original version, by rom numbers (IE: 01 & 02) */
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
 	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "3w.bpr",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire3 )
@@ -1704,8 +1704,8 @@ ROM_START( hellfire3 )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
 	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "3w.bpr",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "6b.bpr",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( zerowing )
