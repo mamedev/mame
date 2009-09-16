@@ -520,6 +520,12 @@ ifdef MAP
 	@echo Deleting $(FULLNAME).map...
 	$(RM) $(FULLNAME).map
 endif
+ifdef MSVC_BUILD
+	@echo Deleting Visual Studio specific files...
+	$(RM) *.pdb
+	$(RM) *.lib
+	$(RM) *.exp
+endif
 
 
 
