@@ -582,7 +582,7 @@ static MACHINE_DRIVER_START( chinagat )
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1065000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified, clock frequency estimated with recording
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( saiyugb1 )
