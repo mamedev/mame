@@ -5325,6 +5325,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( darkadv )	/* GX687 (c) 1987 */
 	DRIVER( majuu )		/* GX687 (c) 1987 (Japan) */
 	DRIVER( vulcan )	/* GX785 (c) 1988 */
+	DRIVER( vulcana )	/* GX785 (c) 1988 */
 	DRIVER( gradius2 )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( gradius2a )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( gradius2b )	/* GX785 (c) 1988 (Japan) */
