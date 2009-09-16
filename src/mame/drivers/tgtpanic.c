@@ -4,7 +4,8 @@
 
     driver by Phil Bennett
 
-    TODO: Colors
+    TODO: Determine correct clock frequencies, fix 'stuck' inputs in
+    test mode
 
 ***************************************************************************/
 
@@ -23,17 +24,14 @@ static UINT8 color;
 
 static VIDEO_UPDATE( tgtpanic )
 {
-	/* TODO */
-	static const UINT32 colors[4] = 
-	{
-		0xff000000,
-		0xffff0000,
-		0xff0000ff,
-		0xffffffff
-	};
-
+	UINT32 colors[4];
 	UINT32 offs;
 	UINT32 x, y;
+
+	colors[0] = 0;
+	colors[1] = 0xffffffff;
+	colors[2] = MAKE_RGB(pal1bit(color >> 2), pal1bit(color >> 1), pal1bit(color >> 0));
+	colors[3] = MAKE_RGB(pal1bit(color >> 6), pal1bit(color >> 5), pal1bit(color >> 4));
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
@@ -125,7 +123,7 @@ static MACHINE_DRIVER_START( tgtpanic )
 	MDRV_CPU_ADD("cpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(prg_map)
 	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 20) /* Unverified */
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(tgtpanic)
@@ -157,4 +155,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND )
