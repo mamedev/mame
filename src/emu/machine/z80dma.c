@@ -347,18 +347,17 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0xB3:	/* Force ready */
 				case 0xB7:	/* Enable after rti */
 				case 0xBF:	/* Read status byte */
-				case 0xD3:	/* Continue */
 					fatalerror("Unimplemented WR6 command %02x", data);
 					break;
 				case 0xA7:	/* Initiate read sequence */
 					cntx->read_cur_follow = cntx->read_num_follow = 0;
 					if(READ_MASK(cntx) & 0x01) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->status; }
-					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->count & 0xff; } //byte counter (low)
-					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->count >> 8) & 0xff; } //byte counter (high)
-					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->addressA & 0xff; } //port A address (low)
-					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->addressA >> 8) & 0xff; } //port A address (high)
-					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = cntx->addressB & 0xff; } //port B address (low)
-					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = (cntx->addressB >> 8) & 0xff; } //port B address (high)
+					if(READ_MASK(cntx) & 0x02) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, BLOCKLEN_L(cntx)); } //byte counter (low)
+					if(READ_MASK(cntx) & 0x04) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, BLOCKLEN_H(cntx)); } //byte counter (high)
+					if(READ_MASK(cntx) & 0x08) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_L(cntx)); } //port A address (low)
+					if(READ_MASK(cntx) & 0x10) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_H(cntx)); } //port A address (high)
+					if(READ_MASK(cntx) & 0x20) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTB_ADDRESS_L(cntx)); } //port B address (low)
+					if(READ_MASK(cntx) & 0x40) { cntx->read_regs_follow[cntx->read_num_follow++] = GET_REGNUM(cntx, PORTA_ADDRESS_H(cntx)); } //port B address (high)
 					break;
 				case 0xC3:	/* Reset */
 					LOG(("Reset\n"));
@@ -379,6 +378,17 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					break;
 				case 0xBB:
 					cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, READ_MASK(cntx));
+					break;
+				case 0xD3:	/* Continue */
+					cntx->count = 0;
+					cntx->dma_enabled = 1;
+					//FIXME: "mach" & "endb" flags should be zeroed here
+					break;
+				case 0xc7:	/* Reset Port A Timing */
+					PORTA_TIMING(cntx) = 0;
+					break;
+				case 0xcb:	/* Reset Port B Timing */
+					PORTB_TIMING(cntx) = 0;
 					break;
 				default:
 					fatalerror("Unknown WR6 command %02x", data);
