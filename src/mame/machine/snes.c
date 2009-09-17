@@ -61,6 +61,7 @@ static struct
 #include "machine/snesdsp3.c"
 #include "machine/snesdsp4.c"
 #include "machine/snesobc1.c"
+#include "machine/snescx4.c"
 #include "machine/snesrtc.c"
 #include "machine/snessdd1.c"
 
@@ -1467,6 +1468,8 @@ READ8_HANDLER( snes_r_bank1 )
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			value = (address < 0x7000) ? DSP1_getDr() : DSP1_getSr();
+		else if (snes_has_addon_chip == HAS_CX4)
+			value = CX4_read(address - 0x6000);
 		else
 		{
 			logerror( "snes_r_bank1: Unmapped external chip read: %04x\n", address );
@@ -1704,6 +1707,8 @@ WRITE8_HANDLER( snes_w_bank1 )
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			DSP1_setDr(data);
+		else if (snes_has_addon_chip == HAS_CX4)
+			CX4_write(space->machine, address - 0x6000, data);
 		else
 			logerror( "snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data );
 	}
@@ -1912,9 +1917,6 @@ static void snes_init_ram(running_machine *machine)
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, j;
 
-	/* Init DSP1 */
-	DSP1_reset(machine);
-
 	/* Init VRAM */
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
 
@@ -1975,12 +1977,16 @@ static void snes_init_ram(running_machine *machine)
 
 	switch (snes_has_addon_chip)
 	{
+		case HAS_DSP1:
+			DSP1_reset(machine);
+			break;
+
 		case HAS_DSP2:
 			DSP2_reset();
 			break;
 
 		case HAS_DSP3:
-			InitDSP3();
+			InitDSP3(machine);
 			break;
 
 		case HAS_DSP4:
