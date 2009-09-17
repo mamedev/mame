@@ -1022,7 +1022,7 @@ UINT8 DSP3_read( UINT16 dsp3_address )
 void InitDSP3( running_machine *machine )
 {
 	UINT32 i;
-	UINT8 *dspin = memory_region(machine, "user6");
+	UINT8 *dspin = memory_region(machine, "addons");
 
 	DSP3_Reset();
 

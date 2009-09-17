@@ -321,7 +321,7 @@ static void DSP1_setDr(UINT8 iDr)
 static void DSP1_reset(running_machine *machine)
 {
 	UINT32 i;
-	UINT8 *dspin = memory_region(machine, "user6");
+	UINT8 *dspin = memory_region(machine, "addons");
 
 	mSr = DRC|RQM;
 	mSrLowByteAccess = FALSE;
