@@ -447,7 +447,7 @@ MACHINE_DRIVER_END
 #define NSS_BIOS \
 	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */ \
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
-	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */\
+	ROM_REGION(0x1000,           "user6", 0)		/* add-on chip ROMs (DSP1 could be needed if we dump smk). the second 0x800 host DSP3 ROM in MESS */\
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))\
 	ROM_REGION(0x10000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
