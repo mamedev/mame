@@ -478,7 +478,7 @@ static void DSP1_memoryDump(INT16 *input, INT16 *output)
 
 static void DSP1_memorySize(INT16 *input, INT16 *output)
 {
-   INT16 *Size = &output[0];
+   INT16* Size = &output[0];
 
    *Size = 0x0100;
 }
@@ -491,7 +491,7 @@ static void DSP1_multiply(INT16 *input, INT16 *output)
 {
    INT16 Multiplicand = input[0];
    INT16 Multiplier = input[1];
-   INT16 *Product = &output[0];
+   INT16* Product = &output[0];
 
    *Product = Multiplicand * Multiplier >> 15;
 }
@@ -1419,7 +1419,7 @@ static INT16 DSP1_sin(INT16 Angle)
 
    if (Angle < 0) {
       if (Angle == -32768) return 0;
-      return -sin((double)-Angle);
+      return -DSP1_sin(-Angle);
    }
    S = DSP1_SinTable[Angle >> 8] + (DSP1_MulTable[Angle & 0xff] * DSP1_SinTable[0x40 + (Angle >> 8)] >> 15);
    if (S > 32767) S = 32767;
