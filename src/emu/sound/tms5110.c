@@ -12,6 +12,7 @@
      Todo:
         - implement CS
         - implement missing commands
+        - TMS5110_CMD_TEST_TALK is only partially implemented
 
      TMS5100:
 
@@ -119,6 +120,7 @@ struct _tms5110_state
 	UINT8 speaking_now;
 	UINT8 speak_delay_frames;
 	UINT8 talk_status;
+	UINT8 ignore_next_cmd;
 
 	/* Rom interface */
 	UINT32 address;
@@ -229,6 +231,7 @@ static void register_for_save_states(tms5110_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->speaking_now);
 	state_save_register_device_item(tms->device, 0, tms->speak_delay_frames);
 	state_save_register_device_item(tms->device, 0, tms->talk_status);
+	state_save_register_device_item(tms->device, 0, tms->ignore_next_cmd);
 
 	state_save_register_device_item(tms->device, 0, tms->old_energy);
 	state_save_register_device_item(tms->device, 0, tms->old_pitch);
@@ -669,6 +672,11 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 		tms->PDC = data & 0x1;
 		if (tms->PDC == 0) /* toggling 1->0 processes command on CTL_pins */
 		{
+			if (tms->ignore_next_cmd) 
+			{
+				tms->ignore_next_cmd = FALSE;
+				return;
+			}
 			/* the only real commands we handle now are SPEAK and RESET */
 			if (tms->next_is_address)
 			{
@@ -709,6 +717,13 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 					tms->next_is_address = TRUE;
 					break;
 
+				case TMS5110_CMD_TEST_TALK:
+					/* FIXME: status on CTL1 can only be read after this command
+					 * to properly do radarscope, we need a separate m58817 status read.
+					 */
+					tms->ignore_next_cmd = TRUE;
+					break;
+					
 				default:
 					logerror("tms5110.c: unknown command: 0x%02x\n", tms->CTL_pins);
 					break;
