@@ -437,7 +437,7 @@
                                     SET_CPSR(GET_CPSR | HandleALUNZFlags(GET_REGISTER(cpustate, rd) & GET_REGISTER(cpustate, rs)));
                                     R15 += 2;
                                     break;
-                                case 0x9: /* NEG Rd, Rs - todo: check me */
+                                case 0x9: /* NEG Rd, Rs */
                                     rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
                                     rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
                                     rrs = GET_REGISTER(cpustate, rs);

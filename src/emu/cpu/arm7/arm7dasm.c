@@ -845,6 +845,11 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 								pBuf += sprintf( pBuf, "TST R%d, R%d", rd, rs );
 								break;
+							case 0x9: /* NEG Rd, Rs */
+								rs = ( opcode & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
+								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
+								pBuf += sprintf( pBuf, "NEG R%d, R%d", rd, rs );
+								break;
 							case 0xa: /* CMP Rd, Rs */
 								rs = ( opcode & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
