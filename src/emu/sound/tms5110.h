@@ -26,9 +26,12 @@ struct _tms5110_interface
 };
 
 WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
+READ8_DEVICE_HANDLER( tms5110_ctl_r );
 WRITE8_DEVICE_HANDLER( tms5110_pdc_w );
 
-READ8_DEVICE_HANDLER( tms5110_status_r );
+/* m58817 status line */
+READ8_DEVICE_HANDLER( m58817_status_r );
+
 int tms5110_ready_r(const device_config *device);
 
 void tms5110_set_frequency(const device_config *device, int frequency);

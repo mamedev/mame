@@ -32,6 +32,9 @@
         PROM OUT | 13           16 |  NC
         VSS      | 14           15 |  M0
                  +-----------------+
+		
+		T11: Sync for serial data out
+
 
     M58817
 
@@ -85,6 +88,12 @@
 #define TMS5110_IS_CD2802	TMS5110_IS_5110
 #define TMS5110_IS_M58817	TMS5110_IS_5110
 
+/* States for CTL */
+
+#define CTL_STATE_INPUT 		(0)
+#define CTL_STATE_OUTPUT 		(1)
+#define CTL_STATE_NEXT_OUTPUT 	(2)
+
 struct tms5100_coeffs
 {
 	int				subtype;
@@ -120,7 +129,7 @@ struct _tms5110_state
 	UINT8 speaking_now;
 	UINT8 speak_delay_frames;
 	UINT8 talk_status;
-	UINT8 ignore_next_cmd;
+	UINT8 state;
 
 	/* Rom interface */
 	UINT32 address;
@@ -231,7 +240,7 @@ static void register_for_save_states(tms5110_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->speaking_now);
 	state_save_register_device_item(tms->device, 0, tms->speak_delay_frames);
 	state_save_register_device_item(tms->device, 0, tms->talk_status);
-	state_save_register_device_item(tms->device, 0, tms->ignore_next_cmd);
+	state_save_register_device_item(tms->device, 0, tms->state);
 
 	state_save_register_device_item(tms->device, 0, tms->old_energy);
 	state_save_register_device_item(tms->device, 0, tms->old_pitch);
@@ -399,7 +408,7 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 			/* if the old frame was a stop frame, exit and do not process any more frames */
 			if (tms->old_energy == COEFF_ENERGY_SENTINEL)
 			{
-				/*if (DEBUG_5110) logerror("processing frame: stop frame\n");*/
+				if (DEBUG_5110) logerror("processing frame: stop frame\n");
 				tms->target_energy = tms->current_energy = 0;
 				tms->speaking_now = tms->talk_status = 0;
 				tms->interp_count = tms->sample_count = tms->pitch_count = 0;
@@ -672,9 +681,17 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 		tms->PDC = data & 0x1;
 		if (tms->PDC == 0) /* toggling 1->0 processes command on CTL_pins */
 		{
-			if (tms->ignore_next_cmd) 
+			/* first pdc toggles output, next toggles input */
+			switch (tms->state)
 			{
-				tms->ignore_next_cmd = FALSE;
+			case CTL_STATE_INPUT:
+				/* continue */
+				break;
+			case CTL_STATE_NEXT_OUTPUT:
+				tms->state = CTL_STATE_OUTPUT;
+				return;
+			case CTL_STATE_OUTPUT:
+				tms->state = CTL_STATE_INPUT;
 				return;
 			}
 			/* the only real commands we handle now are SPEAK and RESET */
@@ -718,10 +735,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
-					/* FIXME: status on CTL1 can only be read after this command
-					 * to properly do radarscope, we need a separate m58817 status read.
-					 */
-					tms->ignore_next_cmd = TRUE;
+					tms->state = CTL_STATE_NEXT_OUTPUT;
 					break;
 					
 				default:
@@ -945,6 +959,8 @@ static DEVICE_START( tms5110 )
 	    tms->M0_callback = speech_rom_read_bit;
 	    tms->set_load_address = speech_rom_set_addr;
 	}
+	
+	tms->state = CTL_STATE_INPUT; /* most probably not defined */
 
 	register_for_save_states(tms);
 }
@@ -1060,7 +1076,7 @@ WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
 
 /******************************************************************************
 
-     tms5110_status_r -- read status from the sound chip
+     tms5110_ctl_r -- read status from the sound chip
 
         bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
                 Talk Status goes active at the initiation of a SPEAK command.
@@ -1068,10 +1084,30 @@ WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
                 immediately(?????? not TMS5110) by a RESET command.
         TMS5110 datasheets mention this is only available as a result of executing
                 TEST TALK command.
+                
+                FIXME: data read not implemented, CTL1 only available after TALK command
 
 ******************************************************************************/
 
-READ8_DEVICE_HANDLER( tms5110_status_r )
+READ8_DEVICE_HANDLER( tms5110_ctl_r )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+    if (tms->state == CTL_STATE_OUTPUT)
+    {
+		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", tms->talk_status);
+    	return (tms->talk_status << 0); /*CTL1 = still talking ? */
+    }
+    else
+    {
+		//if (DEBUG_5110) logerror("Status read (not in output mode)\n");
+    	return (0);
+    }
+}
+
+READ8_DEVICE_HANDLER( m58817_status_r )
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -1079,6 +1115,8 @@ READ8_DEVICE_HANDLER( tms5110_status_r )
     stream_update(tms->stream);
     return (tms->talk_status << 0); /*CTL1 = still talking ? */
 }
+
+WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
 
 
 

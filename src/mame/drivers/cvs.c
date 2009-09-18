@@ -251,10 +251,11 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 }
 
 
-static void cvs_dac_cpu_interrupt(running_machine *machine)
+static void cvs_slave_cpu_interrupt(running_machine *machine, const char *cpu, int state)
 {
-	cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 0, 0x03);
-	cputag_set_input_line(machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, cpu), 0, 0x03);
+	//cputag_set_input_line(machine, cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, cpu, 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -326,6 +327,7 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 {
 	UINT8 dac_value;
 
+	//LOG(("4BIT: %02x %02x\n", offset, data));
 	cvs_4_bit_dac_data[offset] = data >> 7;
 
 	/* merge into D0-D3 */
@@ -346,88 +348,53 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
  *
  *************************************/
 
-/* temporary code begin */
-static void speech_execute_command(const device_config *tms, UINT8 command)
-{
-	/* reset */
-	if (command == 0x3f)
-	{
-		tms5110_ctl_w(tms, 0, TMS5110_CMD_RESET);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		tms5110_pdc_w(tms, 0,0);
-		tms5110_pdc_w(tms, 0,1);
-		tms5110_pdc_w(tms, 0,0);
-
-		speech_rom_bit_address = 0;
-	}
-	/* start */
-	else
-	{
-		tms5110_ctl_w(tms, 0, TMS5110_CMD_SPEAK);
-
-		tms5110_pdc_w(tms, 0, 0);
-		tms5110_pdc_w(tms, 0, 1);
-		tms5110_pdc_w(tms, 0, 0);
-
-		speech_rom_bit_address = command * 0x80 * 8;
-	}
-}
-/* temporary code end */
-
 
 static WRITE8_HANDLER( cvs_speech_rom_address_lo_w )
 {
 	/* assuming that d0-d2 are cleared here */
 	speech_rom_bit_address = (speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Address = %04x\n", cpu_get_pc(space->cpu), speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(space->cpu), data, speech_rom_bit_address >> 3));
 }
 
 static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 {
 	speech_rom_bit_address = (speech_rom_bit_address & 0x07ff) | (data << 11);
-}
-
-
-static void cvs_set_speech_command_w(const address_space *space, UINT8 data)
-{
-	soundlatch2_w(space, 0, data & 0x7f);
-	if (~data & 0x40) LOG(("%04x : CVS: Speech Command W = %04x\n", cpu_get_pc(space->cpu), data & 0x7f));
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(space->cpu), data, speech_rom_bit_address >> 3));
 }
 
 
 static READ8_HANDLER( cvs_speech_command_r )
 {
-	/* bit 7 is TMS status (active LO) */
-	return (~tms5110_status_r(devtag_get_device(space->machine, "tms"), 0) << 7) | soundlatch2_r(space, 0);
+	/* FIXME: this was by observation on board ???
+	 * 			-bit 7 is TMS status (active LO) */
+	return ((tms5110_ctl_r(devtag_get_device(space->machine, "tms"), 0) ^ 1) << 7) 
+		| (soundlatch2_r(space, 0) & 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( cvs_tms5110_ctl_w )
 {
 	UINT8 ctl;
-
+	/*
+	 * offset 0: CS ?
+	 */
 	cvs_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	ctl = 0 |								/* CTL1 */
 		  (cvs_tms5110_ctl_data[1] << 1) |	/* CTL2 */
-		  0 |								/* CTL4 */
-		  (cvs_tms5110_ctl_data[0] << 3);	/* CTL8 */
+		  (cvs_tms5110_ctl_data[2] << 2) |	/* CTL4 */
+		  (cvs_tms5110_ctl_data[1] << 3);	/* CTL8 */
 
-	//tms5110_ctl_w(device, ctl);
+	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
+	tms5110_ctl_w(device, 0, ctl);
 }
 
 
 static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 {
-	//tms5110_pdc_w(device, ~data >> 7);
+	UINT8 out = ((~data) >> 7) & 1;
+	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
+	tms5110_pdc_w(device, 0, out);
 }
 
 
@@ -464,21 +431,11 @@ static const tms5110_interface tms5100_interface =
 
 static WRITE8_HANDLER( audio_command_w )
 {
+	LOG(("data %02x\n", data));
     /* cause interrupt on audio CPU if bit 7 set */
-	if (data & 0x80)
-	{
-	   	soundlatch_w(space, 0, data);
-		cvs_dac_cpu_interrupt(space->machine);
-
-		LOG(("%04x : CVS: Audio command = %02x\n", cpu_get_pc(space->cpu), data));
-	}
-
-	cvs_set_speech_command_w(space, data);
-
-	/* temporary code begin */
-	if ((data & 0x40) == 0)
-		speech_execute_command(devtag_get_device(space->machine, "tms"), data & 0x03f);
-	/* temporary code end */
+	soundlatch2_w(space, 0, data);
+	soundlatch_w(space, 0, data);
+	cvs_slave_cpu_interrupt(space->machine, "audiocpu", data & 0x80 ? 1 : 0);
 }
 
 
@@ -502,6 +459,9 @@ MACHINE_START( cvs )
 		gfx_element_set_source(machine->gfx[1], cvs_character_ram);
 
 	start_393hz_timer(machine);
+	
+	soundlatch_setclearedvalue(machine, 0xff);
+	soundlatch2_clear_w(NULL, 0, 0);
 
 	/* register state save */
 	state_save_register_global_pointer(machine, cvs_color_ram, 0x400);
@@ -580,7 +540,7 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
 	AM_RANGE(0x1d40, 0x1d40) AM_WRITE(cvs_speech_rom_address_hi_w)
     AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
-	AM_RANGE(0x1ddd, 0x1dde) AM_DEVWRITE("tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
+	AM_RANGE(0x1ddc, 0x1dde) AM_DEVWRITE("tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
 	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE("tms", cvs_tms5110_pdc_w)
 ADDRESS_MAP_END
 

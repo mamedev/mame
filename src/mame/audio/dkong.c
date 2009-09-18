@@ -1287,7 +1287,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
 	MDRV_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
 	MDRV_LATCH8_DEVREAD(7, "ls259.6h", latch8_r, 3)
-	MDRV_LATCH8_DEVREAD(6, "tms", tms5110_status_r, 0)
+	MDRV_LATCH8_DEVREAD(6, "tms", m58817_status_r, 0)
 
 	MDRV_SOUND_ADD("tms", M58817, XTAL_640kHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
