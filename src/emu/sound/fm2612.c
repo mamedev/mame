@@ -6,7 +6,7 @@
 ** Copyright Jarek Burczynski (bujar at mame dot net)
 ** Copyright Tatsuyuki Satoh , MultiArcadeMachineEmulator development
 **
-** Version 1.5 (Genesis Plus GX ym2612.c rev. 325)
+** Version 1.5 (Genesis Plus GX ym2612.c rev. 346)
 **
 */
 
@@ -707,6 +707,9 @@ typedef struct
 	UINT32	lfo_cnt;
 	UINT32	lfo_inc;
 	UINT32	lfo_freq[8];	/* LFO FREQ table */
+
+	UINT32	LFO_AM;		/* runtime LFO calculations helper */
+	INT32	LFO_PM;		/* runtime LFO calculations helper */
 } FM_OPN;
 
 
@@ -716,9 +719,6 @@ static INT32	m2,c1,c2;		/* Phase Modulation input for operators 2,3,4 */
 static INT32	mem;			/* one sample delay memory */
 
 static INT32	out_fm[8];		/* outputs of working channels */
-
-static UINT32	LFO_AM;			/* runtime LFO calculations helper */
-static INT32	LFO_PM;			/* runtime LFO calculations helper */
 
 /* log output level */
 #define LOG_ERR  3      /* ERROR       */
@@ -918,7 +918,8 @@ INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
 
 	if ((OPN->ST.mode ^ v) & 0xC0)
 	{
-		OPN->P_CH[2].SLOT[SLOT1].Incr=-1; /* recalculate phase (from Gens) */
+		/* phase increment need to be recalculated */
+		OPN->P_CH[2].SLOT[SLOT1].Incr=-1;
 
 		/* CSM mode disabled and CSM key ON active*/
 		if (((v & 0xC0) != 0x80) && OPN->SL3.key_csm)
@@ -1262,12 +1263,12 @@ INLINE void advance_lfo(FM_OPN *OPN)
 		/* triangle */
 		/* AM: 0 to 126 step +2, 126 to 0 step -2 */
 		if (pos<64)
-			LFO_AM = pos * 2;
+			OPN->LFO_AM = pos * 2;
 		else
-			LFO_AM = 126 - ((pos&63) * 2);
+			OPN->LFO_AM = 126 - ((pos&63) * 2);
 
 		/* PM works with 4 times slower clock */
-		LFO_PM = pos >> 2;
+		OPN->LFO_PM = pos >> 2;
 	}
 	/* when LFO is disabled, current level is held (fix Spider-Man & Venom : Separation Anxiety) */
 }
@@ -1490,7 +1491,7 @@ static void update_ssg_eg_channel(FM_SLOT *SLOT)
 INLINE void update_phase_lfo_slot(FM_OPN *OPN, FM_SLOT *SLOT, INT32 pms, UINT32 block_fnum)
 {
 	UINT32 fnum_lfo   = ((block_fnum & 0x7f0) >> 4) * 32 * 8;
-	INT32  lfo_fn_table_index_offset = lfo_pm_table[ fnum_lfo + pms + LFO_PM ];
+	INT32  lfo_fn_table_index_offset = lfo_pm_table[ fnum_lfo + pms + OPN->LFO_PM ];
 
 	block_fnum = block_fnum*2 + lfo_fn_table_index_offset;
 
@@ -1522,7 +1523,7 @@ INLINE void update_phase_lfo_channel(FM_OPN *OPN, FM_CH *CH)
 	UINT32 block_fnum = CH->block_fnum;
 
 	UINT32 fnum_lfo  = ((block_fnum & 0x7f0) >> 4) * 32 * 8;
-	INT32  lfo_fn_table_index_offset = lfo_pm_table[ fnum_lfo + CH->pms + LFO_PM ];
+	INT32  lfo_fn_table_index_offset = lfo_pm_table[ fnum_lfo + CH->pms + OPN->LFO_PM ];
 
 	block_fnum = block_fnum*2 + lfo_fn_table_index_offset;
 
@@ -1567,7 +1568,7 @@ INLINE void chan_calc(FM_OPN *OPN, FM_CH *CH, int chnum)
 {
 	unsigned int eg_out;
 
-	UINT32 AM = LFO_AM >> CH->ams;
+	UINT32 AM = OPN->LFO_AM >> CH->ams;
 
 
 	m2 = c1 = c2 = mem = 0;
@@ -2002,8 +2003,8 @@ static void OPNWriteMode(FM_OPN *OPN, int r, int v)
 			{
 			        /* restart LFO */
 			        OPN->lfo_cnt  = 0;
-			        LFO_AM  = 0;
-			        LFO_PM  = 0;
+			        OPN->LFO_AM  = 0;
+			        OPN->LFO_PM  = 0;
 			}
 
 			OPN->lfo_inc = OPN->lfo_freq[v&7];
@@ -2315,6 +2316,14 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		out_fm[4] = 0;
 		out_fm[5] = 0;
 
+		/* update SSG-EG output */
+		update_ssg_eg_channel(&cch[0]->SLOT[SLOT1]);
+		update_ssg_eg_channel(&cch[1]->SLOT[SLOT1]);
+		update_ssg_eg_channel(&cch[2]->SLOT[SLOT1]);
+		update_ssg_eg_channel(&cch[3]->SLOT[SLOT1]);
+		update_ssg_eg_channel(&cch[4]->SLOT[SLOT1]);
+		update_ssg_eg_channel(&cch[5]->SLOT[SLOT1]);
+
 		/* calculate FM */
 		chan_calc(OPN, cch[0], 0 );
 		chan_calc(OPN, cch[1], 1 );
@@ -2325,14 +2334,6 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 			*cch[5]->connect4 += dacout;
 		else
 			chan_calc(OPN, cch[5], 5 );
-
-		/* update SSG-EG envelope type */
-		update_ssg_eg_channel(&cch[0]->SLOT[SLOT1]);
-		update_ssg_eg_channel(&cch[1]->SLOT[SLOT1]);
-		update_ssg_eg_channel(&cch[2]->SLOT[SLOT1]);
-		update_ssg_eg_channel(&cch[3]->SLOT[SLOT1]);
-		update_ssg_eg_channel(&cch[4]->SLOT[SLOT1]);
-		update_ssg_eg_channel(&cch[5]->SLOT[SLOT1]);
 
 		/* advance LFO */
 		advance_lfo(OPN);
@@ -2506,8 +2507,8 @@ void ym2612_reset_chip(void *chip)
 	OPN->eg_cnt   = 0;
 	OPN->ST.status = 0;
 	OPN->ST.mode = 0;
-	LFO_AM  = 0;
-	LFO_PM  = 0;
+	OPN->LFO_AM  = 0;
+	OPN->LFO_PM  = 0;
 	OPN->lfo_cnt  = 0;
 
 	OPNWriteMode(OPN,0x27,0x30);
