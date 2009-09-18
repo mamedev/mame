@@ -260,7 +260,8 @@ static void execute_one(dsp56k_core* cpustate)
 
 		/* ADD : 011m mKKK 0rru Fuuu : A-22 */
 		/* SUB : 011m mKKK 0rru Fuuu : A-202 */
-		if ((op & 0xe080) == 0x6000)
+		/* Note: 0x0094 check allows command to drop through to MOVE and TFR */
+		if (((op & 0xe080) == 0x6000) && ((op & 0x0094) != 0x0010))
 		{
 			size = dsp56k_op_addsub_2(cpustate, op_byte, &d_register, &cycle_count);
 		}
@@ -274,9 +275,20 @@ static void execute_one(dsp56k_core* cpustate)
 		{
 			size = dsp56k_op_macr_1(cpustate, op_byte, &d_register, &cycle_count);
 		}
+		/* TFR : 011m mKKK 0rr1 F0DD : A-212 */
+		else if ((op & 0xe094) == 0x6010)
+		{
+			size = dsp56k_op_tfr_2(cpustate, op_byte, &d_register, &cycle_count);
+		}
 		/* MOVE : 011m mKKK 0rr1 0000 : A-128 */
 		else if ((op & 0xe09f) == 0x6010)
 		{
+			/* Note: The opcode encoding : 011x xxxx 0xx1 0000 (move + double memory read)
+					 is .identical. to (tfr X0,A + two parallel reads).  This sparks the notion
+					 that these 'move' opcodes don't actually exist and are just there as
+					 documentation.  Real-world examples would need to be examined to come
+					 to a satisfactory conclusion, but as it stands, tfr will override this
+					 move operation. */
 			size = dsp56k_op_move_1(cpustate, op_byte, &d_register, &cycle_count);
 		}
 		/* MPY : 011m mKKK 1xx0 F0QQ : A-160 */
@@ -288,11 +300,6 @@ static void execute_one(dsp56k_core* cpustate)
 		else if ((op & 0xe094) == 0x6090)
 		{
 			size = dsp56k_op_mpyr_1(cpustate, op_byte, &d_register, &cycle_count);
-		}
-		/* TFR : 011m mKKK 0rr1 F0DD : A-212 */
-		else if ((op & 0xe094) == 0x6010)
-		{
-			size = dsp56k_op_tfr_2(cpustate, op_byte, &d_register, &cycle_count);
 		}
 
 		/* Now evaluate the parallel data move */
@@ -788,7 +795,6 @@ static void execute_one(dsp56k_core* cpustate)
 		size = dsp56k_op_debugcc(cpustate, op, &cycle_count);
 	}
 	/* DIV : 0001 0101 0--0 F1DD : A-76 */
-	/* WARNING : DOCS SAY THERE IS A PARALLEL MOVE HERE !!! */
 	else if ((op & 0xff94) == 0x1504)
 	{
 		size = dsp56k_op_div(cpustate, op, &cycle_count);
