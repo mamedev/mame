@@ -3,7 +3,7 @@
     cx4fn.c
 
     Code based on original work by zsKnight, anomie and Nach.
-    This implementation is based on C++ "cx4*.cpp" by byuu 
+    This implementation is based on C++ "cx4*.cpp" by byuu.
     (up to date with source v 0.49).
 
 ***************************************************************************/
@@ -25,18 +25,18 @@ void CX4_C4TransfWireFrame(void)
 
 	//Rotate X
 	cx4.tanval = -(double)cx4.C4WFX2Val * PI * 2 / 128;
-	cx4.c4y2   = cx4.c4y * CX4_cos(cx4.tanval) - cx4.c4z * CX4_sin(cx4.tanval);
-	cx4.c4z2   = cx4.c4y * CX4_sin(cx4.tanval) + cx4.c4z * CX4_cos(cx4.tanval);
+	cx4.c4y2   = cx4.c4y * cos(cx4.tanval) - cx4.c4z * sin(cx4.tanval);
+	cx4.c4z2   = cx4.c4y * sin(cx4.tanval) + cx4.c4z * cos(cx4.tanval);
 
 	//Rotate Y
 	cx4.tanval = -(double)cx4.C4WFY2Val * PI * 2 / 128;
-	cx4.c4x2   = cx4.c4x * CX4_cos(cx4.tanval)  + cx4.c4z2 * CX4_sin(cx4.tanval);
-	cx4.c4z    = cx4.c4x * -CX4_sin(cx4.tanval) + cx4.c4z2 * CX4_cos(cx4.tanval);
+	cx4.c4x2   = cx4.c4x * cos(cx4.tanval)  + cx4.c4z2 * sin(cx4.tanval);
+	cx4.c4z    = cx4.c4x * -sin(cx4.tanval) + cx4.c4z2 * cos(cx4.tanval);
 
 	//Rotate Z
 	cx4.tanval = -(double)cx4.C4WFDist * PI * 2 / 128;
-	cx4.c4x    = cx4.c4x2 * CX4_cos(cx4.tanval) - cx4.c4y2 * CX4_sin(cx4.tanval);
-	cx4.c4y    = cx4.c4x2 * CX4_sin(cx4.tanval) + cx4.c4y2 * CX4_cos(cx4.tanval);
+	cx4.c4x    = cx4.c4x2 * cos(cx4.tanval) - cx4.c4y2 * sin(cx4.tanval);
+	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
 	//Scale
 	cx4.C4WFXVal = (INT16)(cx4.c4x * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
@@ -74,18 +74,18 @@ void CX4_C4TransfWireFrame2(void)
 
 	//Rotate X
 	cx4.tanval = -(double)cx4.C4WFX2Val * PI * 2 / 128;
-	cx4.c4y2   = cx4.c4y * CX4_cos(cx4.tanval) - cx4.c4z * CX4_sin(cx4.tanval);
-	cx4.c4z2   = cx4.c4y * CX4_sin(cx4.tanval) + cx4.c4z * CX4_cos(cx4.tanval);
+	cx4.c4y2   = cx4.c4y * cos(cx4.tanval) - cx4.c4z * sin(cx4.tanval);
+	cx4.c4z2   = cx4.c4y * sin(cx4.tanval) + cx4.c4z * cos(cx4.tanval);
 
 	//Rotate Y
 	cx4.tanval = -(double)cx4.C4WFY2Val * PI * 2 / 128;
-	cx4.c4x2   = cx4.c4x * CX4_cos(cx4.tanval)  + cx4.c4z2 * CX4_sin(cx4.tanval);
-	cx4.c4z    = cx4.c4x * -CX4_sin(cx4.tanval) + cx4.c4z2 * CX4_cos(cx4.tanval);
+	cx4.c4x2   = cx4.c4x * cos(cx4.tanval)  + cx4.c4z2 * sin(cx4.tanval);
+	cx4.c4z    = cx4.c4x * -sin(cx4.tanval) + cx4.c4z2 * cos(cx4.tanval);
 
 	//Rotate Z
 	cx4.tanval = -(double)cx4.C4WFDist * PI * 2 / 128;
-	cx4.c4x    = cx4.c4x2 * CX4_cos(cx4.tanval) - cx4.c4y2 * CX4_sin(cx4.tanval);
-	cx4.c4y    = cx4.c4x2 * CX4_sin(cx4.tanval) + cx4.c4y2 * CX4_cos(cx4.tanval);
+	cx4.c4x    = cx4.c4x2 * cos(cx4.tanval) - cx4.c4y2 * sin(cx4.tanval);
+	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
 	//Scale
 	cx4.C4WFXVal = (INT16)(cx4.c4x * cx4.C4WFScale / 0x100);
