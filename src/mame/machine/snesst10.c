@@ -364,7 +364,7 @@ static void st010_op_05( void ) {
 
   //grab the target angle
   st010_op_05_do_work(dy, dx);
-  o1 = (UINT8)snes_st010.o1;
+  o1 = (UINT16)snes_st010.o1;
 
   //check for wrapping
   if(abs(o1 - rot) > 0x8000) {
