@@ -12,20 +12,15 @@ enum
 	S2650_HALT, S2650_SI, S2650_FO
 };
 
-/* fake control port   M/~IO=0 D/~C=0 E/~NE=0 */
-#define S2650_CTRL_PORT 0x100
-
-/* fake data port      M/~IO=0 D/~C=1 E/~NE=0 */
-#define S2650_DATA_PORT 0x101
-
-/* extended i/o ports  M/~IO=0 D/~C=x E/~NE=1 */
-#define S2650_EXT_PORT	0xff
-
-/* Fake Sense Line */
-#define S2650_SENSE_PORT 0x102
-
-/* Fake FO Line */
-#define S2650_FO_PORT 0x103
+/* fake I/O space ports */
+enum
+{
+	S2650_EXT_PORT		= 0x00ff,	/* M/~IO=0 D/~C=x E/~NE=1 */
+	S2650_CTRL_PORT		= 0x0100, 	/* M/~IO=0 D/~C=0 E/~NE=0 */
+	S2650_DATA_PORT 	= 0x0101,	/* M/~IO=0 D/~C=1 E/~NE=0 */
+	S2650_SENSE_PORT	= 0x0102,	/* Fake Sense Line */
+	S2650_FO_PORT		= 0x0103	/* Fake FO Line */
+};
 
 extern CPU_GET_INFO( s2650 );
 #define CPU_S2650 CPU_GET_INFO_NAME( s2650 )
