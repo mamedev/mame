@@ -175,8 +175,10 @@ INLINE void set_sp(s2650_regs *s2650c, UINT8 new_sp)
 	s2650c->psu = (s2650c->psu & ~SP) | (new_sp & SP);
 }
 
-INLINE void check_irq_line(s2650_regs *s2650c)
+INLINE int check_irq_line(s2650_regs *s2650c)
 {
+	int cycles = 0;
+	
 	if (s2650c->irq_state != CLEAR_LINE)
 	{									
 		if( (s2650c->psu & II) == 0 ) 
@@ -193,7 +195,7 @@ INLINE void check_irq_line(s2650_regs *s2650c)
 			if (vector & 0x80)		/* indirect bit set ? */	
 			{													
 				int addr = s2650c->ea;							
-				s2650c->icount -= 6;					
+				cycles += 6;					
 				/* build indirect 32K address */		
 				s2650c->ea = RDMEM(addr) << 8;			
 				if (!(++addr & PMSK)) addr -= PLEN; 	
@@ -207,6 +209,7 @@ INLINE void check_irq_line(s2650_regs *s2650c)
 			s2650c->iar  = s2650c->ea & PMSK;							
 		}														
 	}
+	return cycles;
 }
 
 /***************************************************************
@@ -511,7 +514,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
 		s2650c->page = s2650c->ea & PAGE;						\
 		s2650c->iar  = s2650c->ea & PMSK;						\
 		set_psu(s2650c, s2650c->psu & ~II);						\
-		check_irq_line(s2650c);									\
+		s2650c->icount -= check_irq_line(s2650c);				\
 	}															\
 }
 
@@ -697,7 +700,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
 {																\
 	UINT8 cpsu = ARG(s2650c); 									\
 	set_psu(s2650c, s2650c->psu & ~cpsu);						\
-	check_irq_line(s2650c);										\
+	s2650c->icount -= check_irq_line(s2650c);					\
 }
 
 /***************************************************************
@@ -711,7 +714,6 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
 	if( (cpsl & RS) && (s2650c->psl & RS) )						\
 		SWAP_REGS;												\
 	s2650c->psl = s2650c->psl & ~cpsl;							\
-	check_irq_line(s2650c);										\
 }
 
 /***************************************************************
@@ -851,7 +853,6 @@ static void set_irq_line(s2650_regs *s2650c, int irqline, int state)
 	}
 
 	s2650c->irq_state = state;
-	check_irq_line(s2650c);
 }
 
 static void s2650_set_flag(s2650_regs *s2650c, int state)
@@ -887,6 +888,10 @@ static CPU_EXECUTE( s2650 )
 	s2650_regs *s2650c = get_safe_token(device);
 
 	s2650c->icount = cycles;
+
+	/* check for external irqs */
+	s2650c->icount -= check_irq_line(s2650c);
+	
 	do
 	{
 		s2650c->ppc = s2650c->page + s2650c->iar;
