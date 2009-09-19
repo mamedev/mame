@@ -374,7 +374,7 @@ static void SPC7110Decomp_mode1(SPC7110Decomp *thisptr, UINT8 init)
 
 	while(thisptr->decomp_buffer_length < (spc7110_decomp_buffer_size >> 1))
 	{
-		UINT8 data;
+		UINT16 data;
 		UINT32 pixel;
 		for(pixel = 0; pixel < 8; pixel++)
 		{
