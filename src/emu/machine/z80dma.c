@@ -142,7 +142,7 @@ static void z80dma_do_read(const device_config *device)
 					cntx->latch = cntx->intf->memory_read(device, cntx->addressA);
 				else
 					cntx->latch = cntx->intf->portA_read(device, cntx->addressA);
-				cntx->addressA += PORTA_STEP(cntx);
+				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_STEP(cntx);
 			}
 			else
 			{
@@ -150,7 +150,8 @@ static void z80dma_do_read(const device_config *device)
 					cntx->latch = cntx->intf->memory_read(device, cntx->addressB);
 				else
 					cntx->latch = cntx->intf->portB_read(device, cntx->addressB);
-				cntx->addressB += PORTB_STEP(cntx);
+
+				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_STEP(cntx);
 			}
 			break;
 		case TM_SEARCH:
@@ -184,7 +185,8 @@ static int z80dma_do_write(const device_config *device)
 					cntx->intf->memory_write(device, cntx->addressB, cntx->latch);
 				else
 					cntx->intf->portB_write(device, cntx->addressB, cntx->latch);
-				cntx->addressB += PORTB_STEP(cntx);
+
+				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_STEP(cntx);
 			}
 			else
 			{
@@ -192,7 +194,8 @@ static int z80dma_do_write(const device_config *device)
 					cntx->intf->memory_write(device, cntx->addressA, cntx->latch);
 				else
 					cntx->intf->portB_write(device, cntx->addressA, cntx->latch);
-				cntx->addressA += PORTA_STEP(cntx);
+
+				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_STEP(cntx);
 			}
 			cntx->count--;
 			done = (cntx->count == 0xFFFF);
