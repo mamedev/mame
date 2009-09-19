@@ -6,6 +6,7 @@
 
   R. Belmont
   Anthony Kruize
+  Harmony
   Based on the original code by Lee Hammerton (aka Savoury Snax)
   Thanks to Anomie for invaluable technical information.
   Thanks to byuu for invaluable technical information.
@@ -38,6 +39,7 @@ static emu_timer *snes_hirq_timer;
 static UINT16 hblank_offset;
 UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
 UINT8 snes_has_addon_chip;
+UINT32 snes_rom_size;
 
 // full graphic variables
 static UINT16 vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
@@ -64,6 +66,8 @@ static struct
 #include "machine/snescx4.c"
 #include "machine/snesrtc.c"
 #include "machine/snessdd1.c"
+#include "machine/snes7110.c"
+#include "machine/snesst10.c"
 
 /*************************************
 
@@ -377,6 +381,14 @@ READ8_HANDLER( snes_r_io )
 		if(offset < 0x80)
 		{
 			offset += 0x4300;
+		}
+	}
+	else if(snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+	{
+		UINT16 limit = (snes_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if(offset >= 0x4800 && offset < limit)
+		{
+			return spc7110_mmio_read(space->machine, offset);
 		}
 	}
 
@@ -748,6 +760,15 @@ WRITE8_HANDLER( snes_w_io )
 		if(offset < 0x80)
 		{
 			offset += 0x4300;
+		}
+	}
+	else if(snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+	{
+		UINT16 limit = (snes_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if(offset >= 0x4800 && offset < limit)
+		{
+			spc7110_mmio_write(space->machine, (UINT32)offset, data);
+			return;
 		}
 	}
 
@@ -1470,6 +1491,10 @@ READ8_HANDLER( snes_r_bank1 )
 			value = (address < 0x7000) ? DSP1_getDr() : DSP1_getSr();
 		else if (snes_has_addon_chip == HAS_CX4)
 			value = CX4_read(address - 0x6000);
+		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+		{
+			value = snes_ram[0x306000 + (offset & 0x1fff)];
+		}
 		else
 		{
 			logerror( "snes_r_bank1: Unmapped external chip read: %04x\n", address );
@@ -1504,6 +1529,10 @@ READ8_HANDLER( snes_r_bank2 )
 			value = obc1_read (space, offset);
 		else if (snes_has_addon_chip == HAS_DSP2)
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
+		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+		{
+			value = snes_ram[0x306000 + (offset & 0x1fff)];
+		}
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
 			int mask = ((snes_cart.sram * 1024) - 1);				/* Limit SRAM size to what's actually present */
@@ -1564,6 +1593,10 @@ READ8_HANDLER( snes_r_bank4 )
 	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
 	{
 		value = snes_ram[0x600000 + offset];
+	}
+	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x80000 && address < 0x1000)
+	{
+		value = st010_read(address);
 	}
 	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
 	{
@@ -1627,6 +1660,10 @@ READ8_HANDLER( snes_r_bank6 )
 			logerror( "snes_r_bank6 hit in Super FX mode, please fix me\n" );
 		else if (snes_cart.mode != SNES_MODE_25)
 			value = memory_read_byte(space, offset);
+		else if (snes_has_addon_chip == HAS_CX4)
+		{
+			//printf( "R: CX4 hit from 0x800000\n" );
+		}
 		else							/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
@@ -1672,6 +1709,10 @@ READ8_HANDLER( snes_r_bank7 )
 	{
 		logerror( "snes_r_bank7 hit in Super FX mode, please fix me\n" );
 	}
+	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
+	{
+		value = st010_read(address);
+	}
 	else if (snes_cart.mode & 5)				/* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
@@ -1709,6 +1750,10 @@ WRITE8_HANDLER( snes_w_bank1 )
 			DSP1_setDr(data);
 		else if (snes_has_addon_chip == HAS_CX4)
 			CX4_write(space->machine, address - 0x6000, data);
+		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+		{
+			snes_ram[0x306000 + (offset & 0x1fff)] = data;
+		}
 		else
 			logerror( "snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data );
 	}
@@ -1737,6 +1782,10 @@ WRITE8_HANDLER( snes_w_bank2 )
 			obc1_write(space, offset, data);
 		else if (snes_has_addon_chip == HAS_DSP2)
 			DSP2_write(data);
+		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
+		{
+			snes_ram[0x306000 + (offset & 0x1fff)] = data;
+		}
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
 			int mask = ((snes_cart.sram * 1024) - 1);			/* Limit SRAM size to what's actually present */
@@ -1767,8 +1816,11 @@ WRITE8_HANDLER( snes_w_bank4 )
 
 	if (snes_has_addon_chip == HAS_SUPERFX && cputag_get_cpu(space->machine, "superfx") != NULL)
 	{
-		//printf( "Writing %02x to %08x\n", data, 0x600000 + offset );
 		snes_ram[0x600000 + offset] = data;
+	}
+	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x80000 && address < 0x1000)
+	{
+		st010_write(address, data);
 	}
 	else if (snes_cart.mode & 5)					/* Mode 20 & 22 */
 	{
@@ -1830,6 +1882,10 @@ WRITE8_HANDLER( snes_w_bank6 )
 		{
 			logerror( "snes_w_bank6 hit (RAM) in Super FX mode, please fix me\n" );
 		}
+		else if(snes_has_addon_chip == HAS_CX4)
+		{
+			//printf( "R: CX4 hit from 0x800000\n" );
+		}
 		if (snes_cart.mode != SNES_MODE_25)
 		{
 			if (offset < 0x300000)
@@ -1886,6 +1942,10 @@ WRITE8_HANDLER( snes_w_bank7 )
 		{
 			logerror( "snes_w_bank7 hit (RAM) in Super FX mode, please fix me\n" );
 		}
+	}
+	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
+	{
+		st010_write(address, data);
 	}
 	else if (snes_cart.mode & 5)				/* Mode 20 & 22 */
 	{
@@ -1993,8 +2053,20 @@ static void snes_init_ram(running_machine *machine)
 			InitDSP4();
 			break;
 
+		case HAS_RTC:
+			srtc_reset(machine);
+			break;
+
+		case HAS_SDD1:
+			sdd1_reset(machine);
+			break;
+
 		case HAS_OBC1:
 			obc1_init();
+			break;
+
+		case HAS_ST010:
+			st010_reset();
 			break;
 
 		default:
@@ -2059,6 +2131,8 @@ MACHINE_START( snes )
 	snes_ram[WRDIVH] = 0xff;
 
 	sdd1_init(machine);
+	spc7110_init(machine);
+	st010_init(machine);
 }
 
 MACHINE_RESET( snes )
@@ -2081,9 +2155,6 @@ MACHINE_RESET( snes )
 	snes_htmult = 1;
 	snes_ppu.interlace = 1;
 	snes_ppu.obj_interlace = 1;
-
-	srtc_reset(machine);
-	sdd1_reset(machine);
 }
 
 
@@ -2095,8 +2166,8 @@ DRIVER_INIT( snes )
 	UINT8  *rom;
 
 	rom = memory_region(machine, "user3");
-	snes_ram = auto_alloc_array(machine, UINT8, 0x1000000);
-	memset(snes_ram, 0, 0x1000000);
+	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
+	memset(snes_ram, 0, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
 	snes_cart.mode = SNES_MODE_20;
@@ -2161,8 +2232,8 @@ DRIVER_INIT( snes_hirom )
 	UINT8  *rom;
 
 	rom = memory_region(machine, "user3");
-	snes_ram = auto_alloc_array(machine, UINT8, 0x1000000);
-	memset(snes_ram, 0, 0x1000000);
+	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
+	memset(snes_ram, 0, 0x1400000);
 
 	snes_cart.mode = SNES_MODE_21;
 	snes_cart.sram_max = 0x40000;
