@@ -173,6 +173,9 @@ struct _tms5110_state
 	const UINT8 *table;
 	sound_stream *stream;
 	INT32 speech_rom_bitnum;
+	
+	emu_timer *romclk_timer;
+	UINT8 romclk_state;
 };
 
 
@@ -1116,7 +1119,33 @@ READ8_DEVICE_HANDLER( m58817_status_r )
     return (tms->talk_status << 0); /*CTL1 = still talking ? */
 }
 
-WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
+/******************************************************************************
+
+     tms5110_romclk_r -- read status of romclk
+
+******************************************************************************/
+
+static TIMER_CALLBACK( romclk_timer_cb )
+{
+	tms5110_state *tms = get_safe_token(ptr);
+	tms->romclk_state = !tms->romclk_state;
+}
+
+READ8_DEVICE_HANDLER( tms5110_romclk_r )
+{
+	tms5110_state *tms = get_safe_token(device);
+
+    /* bring up to date first */
+    stream_update(tms->stream);
+    
+    /* create and start timer if necessary */
+    if (tms->romclk_timer == NULL)
+    {
+    	tms->romclk_timer = timer_alloc(device->machine, romclk_timer_cb, (void *) device);
+    	timer_adjust_periodic(tms->romclk_timer, ATTOTIME_IN_HZ(device->clock / 40), 0, ATTOTIME_IN_HZ(device->clock / 40));
+    }
+    return tms->romclk_state;
+}
 
 
 

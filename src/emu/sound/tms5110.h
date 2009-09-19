@@ -29,6 +29,8 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
 READ8_DEVICE_HANDLER( tms5110_ctl_r );
 WRITE8_DEVICE_HANDLER( tms5110_pdc_w );
 
+READ8_DEVICE_HANDLER( tms5110_romclk_r );
+
 /* m58817 status line */
 READ8_DEVICE_HANDLER( m58817_status_r );
 
