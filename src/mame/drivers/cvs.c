@@ -80,6 +80,14 @@ Driver by
 Hardware Info
  Malcolm & Darren
 
+Additional work
+	2009 Couriersud
+
+Todo & FIXME:
+
+- the board most probably has discrete circuits. The 393Hz tone used 
+  for shots (superbike) and collisions (8ball) is just a guess.
+  
 ***************************************************************************/
 
 #include "driver.h"
@@ -122,6 +130,8 @@ static UINT8 *cvs_tms5110_ctl_data;
 static UINT8 character_banking_mode;
 static UINT16 character_ram_page_start;
 static UINT16 speech_rom_bit_address;
+
+static int dac3_state[4] = {0,0,0,0};
 
 
 
@@ -296,23 +306,30 @@ static READ8_HANDLER( cvs_input_r )
  *  Timing
  *
  *************************************/
-
+#if 0
 static READ8_HANDLER( cvs_393hz_clock_r )
 {
   	return cvs_393hz_clock ? 0x80 : 0;
 }
+#endif
 
+static READ8_DEVICE_HANDLER( tms_clock_r )
+{
+  	return tms5110_romclk_r(device, 0) ? 0x80 : 0;
+}
 
 static TIMER_CALLBACK( cvs_393hz_timer_cb )
 {
 	cvs_393hz_clock = !cvs_393hz_clock;
+	if (dac3_state[2])
+		dac_w(devtag_get_device(machine, "dac3"), 0, cvs_393hz_clock * 0xff);
 }
 
 
 static void start_393hz_timer(running_machine *machine)
 {
 	cvs_393hz_timer = timer_alloc(machine, cvs_393hz_timer_cb, NULL);
-	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(2*393), 0, ATTOTIME_IN_HZ(2*393));
+	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(30*393), 0, ATTOTIME_IN_HZ(30*393));
 }
 
 
@@ -326,8 +343,13 @@ static void start_393hz_timer(running_machine *machine)
 static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 {
 	UINT8 dac_value;
-
-	//LOG(("4BIT: %02x %02x\n", offset, data));
+	static int old_data[4] = {0,0,0,0};
+	
+	if (data != old_data[offset])
+	{
+		LOG(("4BIT: %02x %02x\n", offset, data));
+		old_data[offset] = data;
+	}
 	cvs_4_bit_dac_data[offset] = data >> 7;
 
 	/* merge into D0-D3 */
@@ -340,7 +362,15 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 	dac_data_w(device, (dac_value << 4) | dac_value);
 }
 
-
+static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
+{
+	
+	if (data != dac3_state[offset])
+	{
+		LOG(("Unknown: %02x %02x\n", offset, data));
+		dac3_state[offset] = data;
+	}
+}
 
 /*************************************
  *
@@ -368,7 +398,7 @@ static READ8_HANDLER( cvs_speech_command_r )
 	/* FIXME: this was by observation on board ???
 	 * 			-bit 7 is TMS status (active LO) */
 	return ((tms5110_ctl_r(devtag_get_device(space->machine, "tms"), 0) ^ 1) << 7) 
-		| (soundlatch2_r(space, 0) & 0x7f);
+		| (soundlatch_r(space, 0) & 0x7f);
 }
 
 
@@ -433,7 +463,7 @@ static WRITE8_HANDLER( audio_command_w )
 {
 	LOG(("data %02x\n", data));
     /* cause interrupt on audio CPU if bit 7 set */
-	soundlatch2_w(space, 0, data);
+	//soundlatch2_w(space, 0, data);
 	soundlatch_w(space, 0, data);
 	cvs_slave_cpu_interrupt(space->machine, "audiocpu", data & 0x80 ? 1 : 0);
 }
@@ -460,9 +490,6 @@ MACHINE_START( cvs )
 
 	start_393hz_timer(machine);
 	
-	soundlatch_setclearedvalue(machine, 0xff);
-	soundlatch2_clear_w(NULL, 0, 0);
-
 	/* register state save */
 	state_save_register_global_pointer(machine, cvs_color_ram, 0x400);
 	state_save_register_global_pointer(machine, cvs_palette_ram, 0x10);
@@ -518,12 +545,13 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
     AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_w)
     AM_RANGE(0x1880, 0x1883) AM_DEVWRITE("dac2", cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
-    AM_RANGE(0x1884, 0x1887) AM_WRITENOP		/* not connected to anything */
+    AM_RANGE(0x1884, 0x1887) AM_DEVWRITE("dac3", cvs_unknown_w)		/* ???? not connected to anything */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_dac_cpu_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+	/* doesn't look like it is used at all */
+    //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
 
 
@@ -546,9 +574,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+/* romclk is much more probable, 393 Hz results in timing issues */
+//	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD("tms", tms_clock_r)
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -1012,6 +1041,9 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("dac3", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("tms", TMS5100, 640000)
@@ -1601,24 +1633,24 @@ static DRIVER_INIT( raiders )
  *
  *************************************/
 
-GAME( 1981, cosmos,   0,        cvs,     cosmos,   0,        ROT90, "Century Electronics", "Cosmos", GAME_NO_COCKTAIL )
-GAME( 1981, darkwar,  0,        cvs,     darkwar,  0,        ROT90, "Century Electronics", "Dark Warrior", GAME_NO_COCKTAIL )
-GAME( 1981, spacefrt, 0,        cvs,     spacefrt, 0,        ROT90, "Century Electronics", "Space Fortress (CVS)", GAME_NO_COCKTAIL )
-GAME( 1982, 8ball,    0,        cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball", GAME_NO_COCKTAIL )
-GAME( 1982, 8ball1,   8ball,    cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", GAME_NO_COCKTAIL )
-GAME( 1982, logger,   0,        cvs,     logger,   0,        ROT90, "Century Electronics", "Logger", GAME_NO_COCKTAIL )
-GAME( 1982, dazzler,  0,        cvs,     dazzler,  0,        ROT90, "Century Electronics", "Dazzler", GAME_NO_COCKTAIL )
-GAME( 1982, wallst,   0,        cvs,     wallst,   0,        ROT90, "Century Electronics", "Wall Street", GAME_NO_COCKTAIL )
-GAME( 1982, radarzon, 0,        cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone", GAME_NO_COCKTAIL )
-GAME( 1982, radarzon1,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL )
-GAME( 1982, radarzont,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL )
-GAME( 1982, outline,  radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Outline", GAME_NO_COCKTAIL )
-GAME( 1982, goldbug,  0,        cvs,     goldbug,  0,        ROT90, "Century Electronics", "Gold Bug", GAME_NO_COCKTAIL )
-GAME( 1982, diggerc,  0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL )
-GAME( 1983, heartatk, 0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL )
-GAME( 1983, hunchbak, 0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL )
-GAME( 1983, hunchbaka,hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL )
-GAME( 1983, superbik, 0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL )
-GAME( 1983, raiders,  0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL )
-GAME( 1983, hero,     0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL )
-GAME( 1984, huncholy, 0,        cvs,     huncholy, huncholy, ROT90, "Seatongrove Ltd",     "Hunchback Olympic", GAME_NO_COCKTAIL )
+GAME( 1981, cosmos,   0,        cvs,     cosmos,   0,        ROT90, "Century Electronics", "Cosmos", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1981, darkwar,  0,        cvs,     darkwar,  0,        ROT90, "Century Electronics", "Dark Warrior", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1981, spacefrt, 0,        cvs,     spacefrt, 0,        ROT90, "Century Electronics", "Space Fortress (CVS)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1982, 8ball,    0,        cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, 8ball1,   8ball,    cvs,     8ball,    0,        ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, logger,   0,        cvs,     logger,   0,        ROT90, "Century Electronics", "Logger", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, dazzler,  0,        cvs,     dazzler,  0,        ROT90, "Century Electronics", "Dazzler", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, wallst,   0,        cvs,     wallst,   0,        ROT90, "Century Electronics", "Wall Street", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzon, 0,        cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzon1,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Radar Zone (Rev.1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, radarzont,radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, outline,  radarzon, cvs,     radarzon, 0,        ROT90, "Century Electronics", "Outline", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, goldbug,  0,        cvs,     goldbug,  0,        ROT90, "Century Electronics", "Gold Bug", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1982, diggerc,  0,        cvs,     diggerc,  0,        ROT90, "Century Electronics", "Digger (CVS)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, heartatk, 0,        cvs,     heartatk, 0,        ROT90, "Century Electronics", "Heart Attack", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hunchbak, 0,        cvs,     hunchbak, 0,        ROT90, "Century Electronics", "Hunchback (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hunchbaka,hunchbak, cvs,     hunchbak, hunchbka, ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, superbik, 0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, raiders,  0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1983, hero,     0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
+GAME( 1984, huncholy, 0,        cvs,     huncholy, huncholy, ROT90, "Seatongrove Ltd",     "Hunchback Olympic", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND)
