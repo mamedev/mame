@@ -123,86 +123,6 @@ static const UINT8 ccc[0x200] = {
 	0x84,0x84,0x84,0x84,0x84,0x84,0x84,0x84
 };
 
-static void s2650_set_sense(s2650_regs *s2650c, int state);
-
-
-#define CHECK_IRQ_LINE											\
-	if (s2650c->irq_state != CLEAR_LINE)								\
-	{															\
-		if( (s2650c->psu & II) == 0 ) 								\
-		{														\
-			int vector; 										\
-			if (s2650c->halt) 										\
-			{													\
-				s2650c->halt = 0; 									\
-				s2650c->iar = (s2650c->iar + 1) & PMSK; 					\
-			}													\
-			vector = (*s2650c->irq_callback)(s2650c->device, 0) & 0xff;		\
-			/* build effective address within first 8K page */	\
-			s2650c->ea = S2650_relative[vector] & PMSK;				\
-			if (vector & 0x80)		/* indirect bit set ? */	\
-			{													\
-				int addr = s2650c->ea;								\
-				s2650c->icount -= 6;					\
-				/* build indirect 32K address */				\
-				s2650c->ea = RDMEM(addr) << 8;						\
-				if (!(++addr & PMSK)) addr -= PLEN; 			\
-				s2650c->ea = (s2650c->ea + RDMEM(addr)) & AMSK; 			\
-			}													\
-			LOG(("S2650 interrupt to $%04x\n", s2650c->ea));\
-			s2650c->psu  = (s2650c->psu & ~SP) | ((s2650c->psu + 1) & SP) | II;	\
-			s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;					\
-			s2650c->page = s2650c->ea & PAGE;								\
-			s2650c->iar  = s2650c->ea & PMSK;								\
-		}														\
-	}
-
-/***************************************************************
- *
- * set condition code (zero,plus,minus) from result
- ***************************************************************/
-#define SET_CC(result)                                          \
-	s2650c->psl = (s2650c->psl & ~CC) | ccc[result]
-
-/***************************************************************
- *
- * set condition code (zero,plus,minus) and overflow
- ***************************************************************/
-#define SET_CC_OVF(result,value)                                \
-	s2650c->psl = (s2650c->psl & ~(OVF+CC)) |								\
-		ccc[result + (((value) & 0x80) << 1)]
-
-#define SET_CC_OVF_ADD(result,value1,value2) SET_CC_OVF(result,~((value1) ^ (value2)) & ((value1) ^ (result)))
-#define SET_CC_OVF_SUB(result,value1,value2) SET_CC_OVF(result,~((value1) ^ (value2)) & ((value1) ^ (result)))
-
-/***************************************************************
- * ROP
- * read next opcode
- ***************************************************************/
-INLINE UINT8 ROP(s2650_regs *s2650c)
-{
-	UINT8 result = memory_decrypted_read_byte(s2650c->program, s2650c->page + s2650c->iar);
-	s2650c->iar = (s2650c->iar + 1) & PMSK;
-	return result;
-}
-
-/***************************************************************
- * ARG
- * read next opcode argument
- ***************************************************************/
-INLINE UINT8 ARG(s2650_regs *s2650c)
-{
-	UINT8 result = memory_raw_read_byte(s2650c->program, s2650c->page + s2650c->iar);
-	s2650c->iar = (s2650c->iar + 1) & PMSK;
-	return result;
-}
-
-/***************************************************************
- * RDMEM
- * read memory byte from addr
- ***************************************************************/
-#define RDMEM(addr) memory_read_byte_8le(s2650c->program, addr)
-
 /***************************************************************
  * handy table to build PC relative offsets
  * from HR (holding register)
@@ -226,6 +146,97 @@ static const int S2650_relative[0x100] =
 	-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,
 	-16,-15,-14,-13,-12,-11,-10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
 };
+
+
+/***************************************************************
+ * RDMEM
+ * read memory byte from addr
+ ***************************************************************/
+#define RDMEM(addr) memory_read_byte_8le(s2650c->program, addr)
+
+static void s2650_set_sense(s2650_regs *s2650c, int state);
+
+INLINE void check_irq_line(s2650_regs *s2650c)
+{
+	if (s2650c->irq_state != CLEAR_LINE)
+	{									
+		if( (s2650c->psu & II) == 0 ) 
+		{								
+			int vector; 				
+			if (s2650c->halt) 			
+			{							
+				s2650c->halt = 0;
+				s2650c->iar = (s2650c->iar + 1) & PMSK; 			
+			}													
+			vector = (*s2650c->irq_callback)(s2650c->device, 0) & 0xff;		
+			/* build effective address within first 8K page */	
+			s2650c->ea = S2650_relative[vector] & PMSK;			
+			if (vector & 0x80)		/* indirect bit set ? */	
+			{													
+				int addr = s2650c->ea;							
+				s2650c->icount -= 6;					
+				/* build indirect 32K address */		
+				s2650c->ea = RDMEM(addr) << 8;			
+				if (!(++addr & PMSK)) addr -= PLEN; 	
+				s2650c->ea = (s2650c->ea + RDMEM(addr)) & AMSK;
+			}													
+			LOG(("S2650 interrupt to $%04x\n", s2650c->ea));
+			s2650c->psu  = (s2650c->psu & ~SP) | ((s2650c->psu + 1) & SP) | II;	
+			s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;	
+			s2650c->page = s2650c->ea & PAGE;							
+			s2650c->iar  = s2650c->ea & PMSK;							
+		}														
+	}
+}
+
+/***************************************************************
+ *
+ * set condition code (zero,plus,minus) from result
+ ***************************************************************/
+#define SET_CC(result)                                          \
+	s2650c->psl = (s2650c->psl & ~CC) | ccc[result]
+
+/***************************************************************
+ *
+ * set condition code (zero,plus,minus) and overflow
+ ***************************************************************/
+#define SET_CC_OVF(result,value)                                \
+	s2650c->psl = (s2650c->psl & ~(OVF+CC)) |								\
+		ccc[result + (((value) & 0x80) << 1)]
+
+#define SET_CC_OVF_ADD(result,value1,value2) SET_CC_OVF(result,~((value1) ^ (value2)) & ((value1) ^ (result)))
+#define SET_CC_OVF_SUB(result,value1,value2) SET_CC_OVF(result,~((value1) ^ (value2)) & ((value1) ^ (result)))
+
+INLINE void set_psu(s2650_regs *s2650c, UINT8 new)
+{
+	UINT8 old = s2650c->psu;
+
+    s2650c->psu = new;
+    if ((new ^ old) & FO)
+    	memory_write_byte_8le(s2650c->io, S2650_FO_PORT, (new & FO) ? 1 : 0);
+}
+
+/***************************************************************
+ * ROP
+ * read next opcode
+ ***************************************************************/
+INLINE UINT8 ROP(s2650_regs *s2650c)
+{
+	UINT8 result = memory_decrypted_read_byte(s2650c->program, s2650c->page + s2650c->iar);
+	s2650c->iar = (s2650c->iar + 1) & PMSK;
+	return result;
+}
+
+/***************************************************************
+ * ARG
+ * read next opcode argument
+ ***************************************************************/
+INLINE UINT8 ARG(s2650_regs *s2650c)
+{
+	UINT8 result = memory_raw_read_byte(s2650c->program, s2650c->page + s2650c->iar);
+	s2650c->iar = (s2650c->iar + 1) & PMSK;
+	return result;
+}
 
 /***************************************************************
  * _REL_EA
@@ -484,12 +495,12 @@ static const int S2650_relative[0x100] =
 {																\
 	if( cond )													\
 	{															\
-		s2650c->ea = s2650c->ras[s2650c->psu & SP];								\
+		s2650c->ea = s2650c->ras[s2650c->psu & SP];				\
 		s2650c->psu = (s2650c->psu & ~SP) | ((s2650c->psu - 1) & SP); 			\
-		s2650c->page = s2650c->ea & PAGE;									\
-		s2650c->iar  = s2650c->ea & PMSK;									\
-		s2650c->psu &= ~II;											\
-		CHECK_IRQ_LINE; 										\
+		s2650c->page = s2650c->ea & PAGE;						\
+		s2650c->iar  = s2650c->ea & PMSK;						\
+		s2650c->psu &= ~II;										\
+		check_irq_line(s2650c);									\
 	}															\
 }
 
@@ -673,9 +684,9 @@ static const int S2650_relative[0x100] =
  ***************************************************************/
 #define M_CPSU()												\
 {																\
-	UINT8 cpsu = ARG(s2650c); 										\
-	s2650c->psu = s2650c->psu & ~cpsu;										\
-	CHECK_IRQ_LINE; 											\
+	UINT8 cpsu = ARG(s2650c); 									\
+	set_psu(s2650c, s2650c->psu & ~cpsu);						\
+	check_irq_line(s2650c);										\
 }
 
 /***************************************************************
@@ -684,12 +695,12 @@ static const int S2650_relative[0x100] =
  ***************************************************************/
 #define M_CPSL()												\
 {																\
-	UINT8 cpsl = ARG(s2650c); 										\
+	UINT8 cpsl = ARG(s2650c); 									\
 	/* select other register set now ? */						\
-	if( (cpsl & RS) && (s2650c->psl & RS) )							\
+	if( (cpsl & RS) && (s2650c->psl & RS) )						\
 		SWAP_REGS;												\
-	s2650c->psl = s2650c->psl & ~cpsl;										\
-	CHECK_IRQ_LINE; 											\
+	s2650c->psl = s2650c->psl & ~cpsl;							\
+	check_irq_line(s2650c);										\
 }
 
 /***************************************************************
@@ -699,8 +710,8 @@ static const int S2650_relative[0x100] =
  ***************************************************************/
 #define M_PPSU()												\
 {																\
-	UINT8 ppsu = (ARG(s2650c) & ~PSU34) & ~SI;						\
-	s2650c->psu = s2650c->psu | ppsu;										\
+	UINT8 ppsu = (ARG(s2650c) & ~PSU34) & ~SI;					\
+	set_psu(s2650c, s2650c->psu | ppsu);						\
 }
 
 /***************************************************************
@@ -827,15 +838,15 @@ static void set_irq_line(s2650_regs *s2650c, int irqline, int state)
 	}
 
 	s2650c->irq_state = state;
-	CHECK_IRQ_LINE;
+	check_irq_line(s2650c);
 }
 
 static void s2650_set_flag(s2650_regs *s2650c, int state)
 {
     if (state)
-        s2650c->psu |= FO;
+        set_psu(s2650c, s2650c->psu |= FO);
     else
-        s2650c->psu &= ~FO;
+    	set_psu(s2650c, s2650c->psu &= ~FO);
 }
 
 static int s2650_get_flag(s2650_regs *s2650c)
@@ -846,9 +857,9 @@ static int s2650_get_flag(s2650_regs *s2650c)
 static void s2650_set_sense(s2650_regs *s2650c, int state)
 {
     if (state)
-        s2650c->psu |= SI;
+    	set_psu(s2650c, s2650c->psu |= SI);
     else
-        s2650c->psu &= ~SI;
+    	set_psu(s2650c, s2650c->psu &= ~SI);
 }
 
 static int s2650_get_sense(s2650_regs *s2650c)
@@ -1217,7 +1228,7 @@ static CPU_EXECUTE( s2650 )
 				break;
 			case 0x92:		/* LPSU */
 				s2650c->icount -= 6;
-				s2650c->psu = (R0 & ~PSU34) & ~SI;
+				set_psu(s2650c, (R0 & ~PSU34) & ~SI);
 				break;
 			case 0x93:		/* LPSL */
 				s2650c->icount -= 6;
@@ -1493,7 +1504,7 @@ static CPU_SET_INFO( s2650 )
 			break;
 
 		case CPUINFO_INT_REGISTER + S2650_PC:			s2650c->page = info->i & PAGE; s2650c->iar = info->i & PMSK; break;
-		case CPUINFO_INT_SP: 							s2650c->psu = (s2650c->psu & ~SP) | (info->i & SP); break;
+		case CPUINFO_INT_SP: 							set_psu(s2650c, (s2650c->psu & ~SP) | (info->i & SP)); break;
 		case CPUINFO_INT_REGISTER + S2650_PS:			s2650c->psl = info->i & 0xff; s2650c->psu = info->i >> 8; break;
 		case CPUINFO_INT_REGISTER + S2650_R0:			s2650c->reg[0] = info->i;						break;
 		case CPUINFO_INT_REGISTER + S2650_R1:			s2650c->reg[1] = info->i;						break;

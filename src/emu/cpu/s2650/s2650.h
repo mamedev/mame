@@ -24,6 +24,9 @@ enum
 /* Fake Sense Line */
 #define S2650_SENSE_PORT 0x102
 
+/* Fake FO Line */
+#define S2650_FO_PORT 0x103
+
 extern CPU_GET_INFO( s2650 );
 #define CPU_S2650 CPU_GET_INFO_NAME( s2650 )
 
