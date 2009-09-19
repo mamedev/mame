@@ -2130,9 +2130,19 @@ MACHINE_START( snes )
 	snes_ram[WRDIVL] = 0xff;
 	snes_ram[WRDIVH] = 0xff;
 
-	sdd1_init(machine);
-	spc7110_init(machine);
-	st010_init(machine);
+	switch(snes_has_addon_chip)
+	{
+		case HAS_SDD1:
+			sdd1_init(machine);
+			break;
+		case HAS_SPC7110:
+		case HAS_SPC7110_RTC:
+			spc7110_init(machine);
+			break;
+		case HAS_ST010:
+			st010_init(machine);
+			break;
+	}
 }
 
 MACHINE_RESET( snes )
