@@ -1708,10 +1708,18 @@ ROM_END
 
 Note:
 
-   Only the first set of a given revision is listed in Irgosoft's official hashes list.
+   Only the first set of a given revision is listed in Igrosoft's official hashes list.
 
    It is not known if the alternate sets are hacks or were intended for different regions.
    It looks like the difference are in the payout percentage / odds
+
+Most games had a revision in early 2007 to meet the standards of the "Government gambling control"
+   law of The Russian Federation No 244-03 of Dec 29, 2006
+
+From Igrosoft's web site about version types (IE: some version have "M" in them):
+
+   * Two software versions are shown, one of them corresponds to Russian legislation,
+     the other one (with the letter m) is for the countries without such restrictions.
 
 */
 
