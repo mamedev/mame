@@ -17,9 +17,18 @@ struct _tms5220_interface
 	void (*read_and_branch)(const device_config *device);		/* speech ROM read and branch callback */
 };
 
+/* Control lines - once written to will switch interface into
+ * "true" timing behaviour.
+ */ 
+
+WRITE8_DEVICE_HANDLER( tms5220_rs_w );
+WRITE8_DEVICE_HANDLER( tms5220_ws_w );
+
 WRITE8_DEVICE_HANDLER( tms5220_data_w );
 READ8_DEVICE_HANDLER( tms5220_status_r );
 int tms5220_ready_r(const device_config *device);
+
+
 double tms5220_time_to_ready(const device_config *device);
 int tms5220_int_r(const device_config *device);
 
