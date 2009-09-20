@@ -2156,7 +2156,7 @@ static NVRAM_HANDLER( shogwarr )
 static MACHINE_DRIVER_START( shogwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(shogwarr)
 	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
@@ -2164,7 +2164,7 @@ static MACHINE_DRIVER_START( shogwarr )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59)
+	MDRV_SCREEN_REFRESH_RATE(59.1854)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
@@ -2181,12 +2181,12 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3532,8 +3532,8 @@ they can lay their hands on!
 
 Main PCB No: ZO1DK-002
 ROM PCB No:  ZO1DK-EXROM
-CPU: TMP68HC000N-12
-SND: OKI M6295 x 2
+CPU: TMP68HC000N-12 @ 12.000MHz
+SND: OKI M6295 x 2 @ 2.000MHz [16/8]. Pin 7 is low.
 OSC: 16.000MHz, 12.000MHz
 DIP: 1 x 8 POSITION
 SW1 - PCB location for 2 position DIP but location is unpopulated.
@@ -3596,6 +3596,9 @@ KANEKO MUX2-CHIP (64 PIN PQFP)
 KANEKO CALC3 508 (74 PIN PQFP, NEC uPD78322 MCU, LINKED TO RB-006.U33)
 KANEKO JAPAN 9204 T (44 PIN PQFP)
 PALs (x 11, read protected, not dumped)
+
+VSync is 59.1854Hz
+HSync is 15.625kHz
 
 ROMs:
 RB-004.U61  27C010    \     Main program
