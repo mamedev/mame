@@ -416,6 +416,8 @@ static MACHINE_START( s2650 )
     state->hunchloopback = 0;
 
     state_save_register_global(machine, state->hunchloopback);
+    state_save_register_global(machine, state->prot_cnt);
+    state_save_register_global(machine, state->main_fo);
 
     if (strcmp(game_name,"herbiedk") == 0) state->protect_type = DK2650_HERBIEDK;
     else if (strcmp(game_name,"hunchbkd") == 0) state->protect_type = DK2650_HUNCHBKD;
@@ -636,7 +638,6 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
-	/* FIXME: move to AM_BASE_MEMBER */
     dkong_state *state = (dkong_state *)space->machine->driver_data;
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
@@ -647,37 +648,37 @@ static WRITE8_HANDLER( s2650_data_w )
 
 static WRITE8_HANDLER( s2650_fo_w )
 {
-	/* FIXME: move to AM_BASE_MEMBER */
     dkong_state *state = (dkong_state *)space->machine->driver_data;
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
 
     state->main_fo = data;
+    
+    if (state->main_fo)
+    	state->hunchloopback = 0xfb;
 }
 
 static READ8_HANDLER( s2650_port0_r )
 {
     dkong_state *state = (dkong_state *)space->machine->driver_data;
 #if DEBUG_PROTECTION
-    logerror("port 0 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
+    logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
 #endif
-
-    switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
-    {
-        case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
-        case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
-        case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x209b):  return state->hunchloopback; /* this at least prevents reset after super bonus */
-        case COMBINE_TYPE_PC(DK2650_SHOOTGAL, 0x0079):  return 0xff; /* FO related ? */
-        case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x00a3):  return 0x01; /* FO related */
-        //case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x007b):  return 0x01;
-    }
 
     switch (state->protect_type)
     {
-        case DK2650_HUNCHBKD:  return 0x00;
-        case DK2650_SHOOTGAL:  return 0x00;
-        case DK2650_SPCLFORC:  return state->hunchloopback; //return 0x00;
+    	case DK2650_SHOOTGAL:
+    	case DK2650_HUNCHBKD:  
+        	if (state->main_fo)
+        		return state->hunchloopback;
+        	else
+        		return state->hunchloopback--;
+        case DK2650_SPCLFORC:  
+	    	if (!state->main_fo)
+	    		return state->hunchloopback; 
+	    	else
+	    		return state->hunchloopback--; 
     }
     fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
@@ -686,13 +687,15 @@ static READ8_HANDLER( s2650_port0_r )
 static READ8_HANDLER( s2650_port1_r )
 {
     dkong_state *state = (dkong_state *)space->machine->driver_data;
+    
 #if DEBUG_PROTECTION
-    logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
+    logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
 #endif
 
     switch (state->protect_type)
     {
-        case DK2650_HUNCHBKD:  return state->hunchloopback;
+        case DK2650_HUNCHBKD:  
+        	return state->hunchloopback--;
         case DK2650_EIGHTACT:
         case DK2650_HERBIEDK:  
         	if (state->hunchloopback & 0x80)
@@ -758,22 +761,22 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x6000, 0x6bff) AM_RAM
     AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
-                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* sprite set 1 */
+                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
     AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)   /* P8257 control registers */
-    AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")      /* IN0, sound CPU intf */
-    AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)  /* IN1 */
+    AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")    /* IN0, sound CPU intf */
+    AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)/* IN1 */
 
-    AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                                 /* IN2 */
-    AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_bit0_w)       /* Sound signals */
+    AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                               /* IN2 */
+    AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_bit0_w)      		/* Sound signals */
 
-    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
+    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-    AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                         /* 2 PSL Signal */
+    AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
     AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
+    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)          		/* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
