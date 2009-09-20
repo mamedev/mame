@@ -6,10 +6,9 @@ driver by Nicola Salmoria
 thanks to Andrea Babich for the manual.
 
 TODO:
-- correctly hook up TMS5200 (there's a kludge in zaccaria_ca2_r to make it work)
 
-- there seems to be a strange kind of DAC connected to 8910 #0 port A, but it sounds
-  horrible so I'm leaving its volume at 0.
+- implement discrete filters for analog signals 1 to 5 and attenuation control
+  for signal 5 (74LS156)
 
 - The 8910 outputs go through some analog circuitry to make them sound more like
   real intruments.
@@ -89,17 +88,23 @@ static READ8_HANDLER( zaccaria_dsw_r )
 
 static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 {
-	// bits 0-2 go to a weird kind of DAC ??
+	/* bits 0-2 go to a 74LS156 with open collector outputs
+	 * one out of 8 Resitors is than used to form a resistor
+	 * divider with Analog input 5 (tromba)
+	 */
+	
 	// bits 3-4 control the analog drum emulation on 8910 #0 ch. A
 
-	if (data & 1)	/* DAC enable */
-	{
-		/* TODO: is this right? it sound awful */
-		static const int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
-		dac_signed_data_w(devtag_get_device(device->machine, "dac1"),table[(data & 0x06) >> 1]);
-	}
-	else
-		dac_signed_data_w(devtag_get_device(device->machine, "dac1"),0x80);
+	static const int table[8] = { 8200, 5600, 3300, 1500, 820, 390, 150, 47 };
+	int b0, b1, b2, ba, v;
+	b0 = data & 0x01;
+	b1 = (data & 0x02) >> 1;
+	b2 = (data & 0x04) >> 2;
+	ba = (b0<<2) | (b1<<1) | b2;
+	/* 150 below to scale to volume 100 */
+	v = (150 * table[ba]) / (4700 + table[ba]);
+	//printf("dac1w %02d %04d\n", ba, v);
+	ay8910_set_volume(devtag_get_device(device->machine, "ay2"), 1, v);
 }
 
 
@@ -162,29 +167,30 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 
 
-static int port1a,port1b;
+//static int port1a,port1b;
 
 static READ8_DEVICE_HANDLER( zaccaria_port1a_r )
 {
 	const device_config *tms = devtag_get_device(device->machine, "tms");
-	if (~port1b & 1) return tms5220_status_r(tms,0);
-	else return port1a;
+
+	return tms5220_status_r(tms,0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1a_w )
 {
-	port1a = data;
+	const device_config *tms = devtag_get_device(device->machine, "tms");
+
+	tms5220_data_w(tms,0,data);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
 	const device_config *tms = devtag_get_device(device->machine, "tms");
-	port1b = data;
 
 	// bit 0 = /RS
-
+	tms5220_rs_w(tms,0, (data >> 0) & 0x01);
 	// bit 1 = /WS
-	if (~data & 2) tms5220_data_w(tms,0,port1a);
+	tms5220_ws_w(tms,0, (data >> 1) & 0x01);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	acs = ~data & 0x08;
@@ -195,14 +201,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 
 static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
 {
-// TODO: this doesn't work, why?
-//  return !tms5220_ready_r();
-
-static int counter;
-counter = (counter+1) & 0x0f;
-
-return counter;
-
+	return !tms5220_ready_r(device);
 }
 
 static void tms5220_irq_handler(const device_config *device, int state)
@@ -235,7 +234,7 @@ static const pia6821_interface pia_1_intf =
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_LINE(zaccaria_ca2_r),		/* line CA2 in */
+	DEVCB_DEVICE_LINE("tms", zaccaria_ca2_r),		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_HANDLER(zaccaria_port1a_w),		/* port A out */
 	DEVCB_HANDLER(zaccaria_port1b_w),		/* port B out */
@@ -573,13 +572,17 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MDRV_QUANTUM_TIME(HZ(1000000))
 
 	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_1)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
+	MDRV_QUANTUM_TIME(HZ(1000000))
 
 	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_2)
+	MDRV_QUANTUM_TIME(HZ(1000000))
+
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 	MDRV_PIA6821_ADD( "pia0", pia_0_intf )
@@ -609,9 +612,6 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.0)		/* first DAC sounds awful */
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
