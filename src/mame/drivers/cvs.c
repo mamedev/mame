@@ -121,17 +121,18 @@ static UINT8 *cvs_character_ram;
 UINT8 *cvs_s2636_0_ram;
 UINT8 *cvs_s2636_1_ram;
 UINT8 *cvs_s2636_2_ram;
+static UINT8 *cvs_fo_state;
 
 static emu_timer *cvs_393hz_timer;
 static UINT8 cvs_393hz_clock;
 static UINT8 *cvs_4_bit_dac_data;
 static UINT8 *cvs_tms5110_ctl_data;
+static UINT8 *dac3_state;
 
 static UINT8 character_banking_mode;
 static UINT16 character_ram_page_start;
 static UINT16 speech_rom_bit_address;
 
-static int dac3_state[4] = {0,0,0,0};
 
 
 
@@ -150,7 +151,7 @@ UINT8 cvs_get_character_banking_mode(void)
 
 READ8_HANDLER( cvs_video_or_color_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_video_ram[offset];
 	else
 		return cvs_color_ram[offset];
@@ -158,7 +159,7 @@ READ8_HANDLER( cvs_video_or_color_ram_r )
 
 WRITE8_HANDLER( cvs_video_or_color_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		cvs_video_ram[offset] = data;
 	else
 		cvs_color_ram[offset] = data;
@@ -167,7 +168,7 @@ WRITE8_HANDLER( cvs_video_or_color_ram_w )
 
 READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_palette_ram[offset & 0x0f];
 	else
 		return cvs_bullet_ram[offset];
@@ -175,7 +176,7 @@ READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 
 WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		cvs_palette_ram[offset & 0x0f] = data;
 	else
 		cvs_bullet_ram[offset] = data;
@@ -184,7 +185,7 @@ WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 
 READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_0_ram[offset];
@@ -192,7 +193,7 @@ READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (0 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -205,7 +206,7 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_1_ram[offset];
@@ -213,7 +214,7 @@ READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (1 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -226,7 +227,7 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 		return cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_2_ram[offset];
@@ -234,7 +235,7 @@ READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
-	if (cpu_get_reg(space->cpu, S2650_FO))
+	if (*cvs_fo_state)
 	{
 		offset |= (2 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
@@ -364,13 +365,21 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 
 static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
 {
+	/* offset 2 is used in 8ball
+	 * offset 0 is used in spacefrt
+	 * offset 3 is used in darkwar
+	 * 
+	 * offset 1 is not used (no trace in disassembly
+	 */
 	
 	if (data != dac3_state[offset])
 	{
-		LOG(("Unknown: %02x %02x\n", offset, data));
+		if (offset != 2)
+			popmessage("Unknown: %02x %02x\n", offset, data);
 		dac3_state[offset] = data;
 	}
 }
+
 
 /*************************************
  *
@@ -463,7 +472,6 @@ static WRITE8_HANDLER( audio_command_w )
 {
 	LOG(("data %02x\n", data));
     /* cause interrupt on audio CPU if bit 7 set */
-	//soundlatch2_w(space, 0, data);
 	soundlatch_w(space, 0, data);
 	cvs_slave_cpu_interrupt(space->machine, "audiocpu", data & 0x80 ? 1 : 0);
 }
@@ -528,6 +536,7 @@ static ADDRESS_MAP_START( cvs_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+    AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(&cvs_fo_state)
 ADDRESS_MAP_END
 
 
@@ -545,7 +554,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
     AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_w)
     AM_RANGE(0x1880, 0x1883) AM_DEVWRITE("dac2", cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
-    AM_RANGE(0x1884, 0x1887) AM_DEVWRITE("dac3", cvs_unknown_w)		/* ???? not connected to anything */
+    AM_RANGE(0x1884, 0x1887) AM_DEVWRITE("dac3", cvs_unknown_w)	AM_BASE(&dac3_state)	/* ???? not connected to anything */
 ADDRESS_MAP_END
 
 
@@ -1039,6 +1048,9 @@ static MACHINE_DRIVER_START( cvs )
 
 	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	//MDRV_SOUND_ADD("dac1a", DAC, 0)
+	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
