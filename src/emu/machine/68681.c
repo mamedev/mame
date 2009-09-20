@@ -8,7 +8,7 @@
 #include "driver.h"
 #include "68681.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 static const char *const duart68681_reg_read_names[0x10] =
@@ -269,6 +269,29 @@ static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 dat
 	if ( BIT(ACR,7) == 0 )
 	{
 		duart68681->channel[ch].baud_rate = baud_rate_ACR_0[data & 0x0f];
+
+		if (ch == 0)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk;
+			}
+		}
+		else if (ch == 1)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk;
+			}
+		}
 	}
 	else
 	{

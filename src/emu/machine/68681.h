@@ -8,6 +8,9 @@ struct _duart68681_config
 	void (*tx_callback)(const device_config *device, int channel, UINT8 data);
 	UINT8 (*input_port_read)(const device_config *device);
 	void (*output_port_write)(const device_config *device, UINT8 data);
+
+	/* clocks for external baud rates */
+	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
 };
 
 #define DUART68681 DEVICE_GET_INFO_NAME(duart68681)
