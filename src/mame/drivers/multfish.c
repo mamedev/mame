@@ -1821,4 +1821,4 @@ GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Ke
 GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 2)",  0 )
 GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 3)",  0 )
 GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403. set 1)",  0 )
-GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, set 3)",  0 )
+GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, set 2)",  0 )
