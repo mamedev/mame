@@ -313,7 +313,7 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-#define DEBUG_PROTECTION    (1)
+#define DEBUG_PROTECTION    (0)
 #define DEBUG_DISC_SOUND    (0)
 
 #define COMBINE_TYPE_PC(_tyn, _pc) ((_tyn)<<16 | (_pc))

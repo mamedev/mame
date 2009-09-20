@@ -102,7 +102,7 @@ Todo & FIXME:
 #define CVS_SHOW_ALL_INPUTS	0
 
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
