@@ -313,7 +313,7 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-#define DEBUG_PROTECTION    (0)
+#define DEBUG_PROTECTION    (1)
 #define DEBUG_DISC_SOUND    (0)
 
 #define COMBINE_TYPE_PC(_tyn, _pc) ((_tyn)<<16 | (_pc))
@@ -636,12 +636,24 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
+	/* FIXME: move to AM_BASE_MEMBER */
     dkong_state *state = (dkong_state *)space->machine->driver_data;
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
 
     state->hunchloopback = data;
+}
+
+static WRITE8_HANDLER( s2650_fo_w )
+{
+	/* FIXME: move to AM_BASE_MEMBER */
+    dkong_state *state = (dkong_state *)space->machine->driver_data;
+#if DEBUG_PROTECTION
+    logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(space->cpu), data);
+#endif
+
+    state->main_fo = data;
 }
 
 static READ8_HANDLER( s2650_port0_r )
@@ -656,16 +668,16 @@ static READ8_HANDLER( s2650_port0_r )
         case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
         case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
         case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x209b):  return state->hunchloopback; /* this at least prevents reset after super bonus */
-        case COMBINE_TYPE_PC(DK2650_SHOOTGAL, 0x0079):  return 0xff;
-        case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x00a3):  return 0x01;
-        case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x007b):  return 0x01;
+        case COMBINE_TYPE_PC(DK2650_SHOOTGAL, 0x0079):  return 0xff; /* FO related ? */
+        case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x00a3):  return 0x01; /* FO related */
+        //case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x007b):  return 0x01;
     }
 
     switch (state->protect_type)
     {
         case DK2650_HUNCHBKD:  return 0x00;
         case DK2650_SHOOTGAL:  return 0x00;
-        case DK2650_SPCLFORC:  return 0x00;
+        case DK2650_SPCLFORC:  return state->hunchloopback; //return 0x00;
     }
     fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
@@ -678,18 +690,15 @@ static READ8_HANDLER( s2650_port1_r )
     logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
 #endif
 
-    switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
-    {
-        case COMBINE_TYPE_PC(DK2650_EIGHTACT, 0x0021):  return 0x00;
-        case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x002b):  return 0x00;
-        case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x09dc):  return 0x00;
-    }
-
     switch (state->protect_type)
     {
         case DK2650_HUNCHBKD:  return state->hunchloopback;
-        case DK2650_EIGHTACT:  return 1;
-        case DK2650_HERBIEDK:  return 1;
+        case DK2650_EIGHTACT:
+        case DK2650_HERBIEDK:  
+        	if (state->hunchloopback & 0x80)
+        		return state->prot_cnt;
+        	else
+        		return ++state->prot_cnt;
     }
     fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
@@ -839,9 +848,9 @@ static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
                                     AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
-    AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_w)
+    AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_w)
     AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
-    AM_RANGE(0x1500, 0x1500) AM_READ(dkong_in2_r)                                 /* IN2 */
+    AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ(dkong_in2_r)                                 /* IN2 */
     AM_RANGE(0x1500, 0x1507) AM_DEVWRITE("ls259.6h", latch8_bit0_w)       /* Sound signals */
     AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
     AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
@@ -867,6 +876,7 @@ static ADDRESS_MAP_START( s2650_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
     AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+    AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_WRITE(s2650_fo_w)
     AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 

@@ -112,6 +112,8 @@ struct _dkong_state
 	/* 2650 protection */
 	UINT8 protect_type;
 	UINT8 hunchloopback;
+	UINT8 prot_cnt;
+	UINT8 main_fo;
 
 	/* Save state relevant */
 	UINT8	gfx_bank, palette_bank;
