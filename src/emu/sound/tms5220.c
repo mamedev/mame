@@ -38,6 +38,10 @@
 Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lowercase.
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
+Notes:
+	Looping has the tms5220 hookep up directly to the cpu. However currently the
+	tms9900 cpu core does not support a ready line. 
+
 ***********************************************************************************************/
 
 #include "sndintrf.h"
