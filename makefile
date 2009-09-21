@@ -509,7 +509,7 @@ tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
 
-clean:
+clean: $(OSDCLEAN)
 	@echo Deleting object tree $(OBJ)...
 	$(RM) -r $(OBJ)
 	@echo Deleting $(EMULATOR)...
@@ -519,12 +519,6 @@ clean:
 ifdef MAP
 	@echo Deleting $(FULLNAME).map...
 	$(RM) $(FULLNAME).map
-endif
-ifdef MSVC_BUILD
-	@echo Deleting Visual Studio specific files...
-	$(RM) *.pdb
-	$(RM) *.lib
-	$(RM) *.exp
 endif
 
 

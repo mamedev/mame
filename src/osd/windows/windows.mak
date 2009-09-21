@@ -157,6 +157,14 @@ $(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
 	@echo Compiling $<...
 	@cl.exe /nologo /O1 -D_CRT_SECURE_NO_DEPRECATE -c $< /Fo$@
 
+OSDCLEAN = msvcclean
+
+msvcclean:
+	@echo Deleting Visual Studio specific files...
+	$(RM) *.pdb
+	$(RM) *.lib
+	$(RM) *.exp
+
 endif
 endif
 
