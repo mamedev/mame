@@ -135,8 +135,6 @@
  *
  *************************************/
 
-static UINT8 speech_val;
-static UINT8 last_speech_write;
 static UINT16 sound_reset_val;
 
 
@@ -168,7 +166,6 @@ static void scanline_update(const device_config *screen, int scanline)
 
 static MACHINE_RESET( gauntlet )
 {
-	last_speech_write = 0x80;
 	sound_reset_val = 1;
 
 	atarigen_eeprom_reset();
@@ -238,20 +235,6 @@ static READ8_HANDLER( switch_6502_r )
 }
 
 
-
-/*************************************
- *
- *  Sound TMS5220 write
- *
- *************************************/
-
-static WRITE8_HANDLER( tms5220_w )
-{
-	speech_val = data;
-}
-
-
-
 /*************************************
  *
  *  Sound control write
@@ -267,14 +250,11 @@ static WRITE8_HANDLER( sound_ctl_w )
 			break;
 
 		case 1:	/* speech write, bit D7, active low */
-			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				tms5220_data_w(tms, 0, speech_val);
-			last_speech_write = data;
+			tms5220_wsq_w(tms, data >> 7);
 			break;
 
 		case 2:	/* speech reset, bit D7, active low */
-			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				device_reset(tms);
+			tms5220_rsq_w(tms, data >> 7);
 			break;
 
 		case 3:	/* speech squeak, bit D7 */
@@ -358,7 +338,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_WRITE(tms5220_w)
+	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE("tms", tms5220_data_w)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -557,7 +537,7 @@ static MACHINE_DRIVER_START( gauntlet )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.32)
 
-	MDRV_SOUND_ADD("tms", TMS5220, ATARI_CLOCK_14MHz/2/11)	/* potentially ATARI_CLOCK_14MHz/2/9 as well */
+	MDRV_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)	/* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
