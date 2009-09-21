@@ -151,6 +151,7 @@ static void z80dma_do_read(const device_config *device)
 				else
 					cntx->latch = cntx->intf->portA_read(device, cntx->addressA);
 
+				LOG(("A src: %04x \n",cntx->addressA));
 				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
 			}
 			else
@@ -160,6 +161,7 @@ static void z80dma_do_read(const device_config *device)
 				else
 					cntx->latch = cntx->intf->portB_read(device, cntx->addressB);
 
+				LOG(("B src: %04x \n",cntx->addressB));
 				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
 			}
 			break;
@@ -192,6 +194,7 @@ static int z80dma_do_write(const device_config *device)
 				else
 					cntx->intf->portB_write(device, cntx->addressB, cntx->latch);
 
+				LOG(("B dst: %04x \n",cntx->addressB));
 				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
 			}
 			else
@@ -201,6 +204,7 @@ static int z80dma_do_write(const device_config *device)
 				else
 					cntx->intf->portA_write(device, cntx->addressA, cntx->latch);
 
+				LOG(("A dst: %04x \n",cntx->addressA));
 				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
 			}
 			cntx->count--;
@@ -418,11 +422,13 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0x83:	/* Disable dma */
 					LOG(("Disable DMA\n"));
 					cntx->dma_enabled = 0;
+					cntx->rdy = 1 ^ ((WR5(cntx) & 0x8)>>3);
 					z80dma_rdy_w(device, 0, cntx->rdy);
 					break;
 				case 0x87:	/* Enable dma */
 					LOG(("Enable DMA\n"));
 					cntx->dma_enabled = 1;
+					cntx->rdy = (WR5(cntx) & 0x8)>>3;
 					z80dma_rdy_w(device, 0, cntx->rdy);
 					break;
 				case 0xBB:
