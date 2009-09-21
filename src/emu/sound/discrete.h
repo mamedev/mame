@@ -275,6 +275,7 @@
  * DISCRETE_LOGIC_NXOR(NODE,INP0,INP1)
  * DISCRETE_LOGIC_DFLIPFLOP(NODE,RESET,SET,CLK,INP)
  * DISCRETE_LOGIC_JKFLIPFLOP(NODE,RESET,SET,CLK,J,K)
+ * DISCRETE_LOGIC_SHIFT(NODE,INP0,RESET,CLK,SIZE,OPTIONS)
  * DISCRETE_MULTIPLEX2(NODE,ADDR,INP0,INP1)
  * DISCRETE_MULTIPLEX4(NODE,ADDR,INP0,INP1,INP2,INP3)
  * DISCRETE_MULTIPLEX8(NODE,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7)
@@ -1286,7 +1287,7 @@
  *
  ***********************************************************************
  *
- * DISCRETE_LOGIC_INVERT - Logic invertor 
+ * DISCRETE_LOGIC_INVERT - Logic invertor
  * DISCRETE_LOGIC_AND  - Logic AND gate (3 & 4 input also available)
  * DISCRETE_LOGIC_NAND - Logic NAND gate (3 & 4 input also available)
  * DISCRETE_LOGIC_OR   - Logic OR gate (3 & 4 input also available)
@@ -1309,7 +1310,7 @@
  *  Declaration syntax
  *
  *     DISCRETE_LOGIC_XXXn(name of node,
- *      (X=INV/AND/etc)    
+ *      (X=INV/AND/etc)
  *      (n=Blank/2/3)      input0 node or static value,
  *                         [input1 node or static value],
  *                         [input2 node or static value],
@@ -1429,6 +1430,31 @@
  *           (x=2/4/8)       address node,
  *                           input 0 node or static value,
  *                           input 1 node or static value, ...)
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_LOGIC_SHIFT - shift register
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_LOGIC_SHIFT(name of node,
+ *                          input node,
+ *                          reset node or static value,
+ *                          clock node or static value,
+ *                          size static value,
+ *                          options static value)
+ *
+ * Options:
+ *          reset type: DISC_LOGIC_SHIFT__RESET_L
+ *                      DISC_LOGIC_SHIFT__RESET_H
+ *          shift type: DISC_LOGIC_SHIFT__LEFT
+ *                      DISC_LOGIC_SHIFT__RIGHT
+ *          clock type: DISC_CLK_ON_F_EDGE - toggle on falling edge.
+ *                      DISC_CLK_ON_R_EDGE - toggle on rising edge.
+ *                      DISC_CLK_BY_COUNT  - toggle specified number of times.
+ *                      DISC_CLK_IS_FREQ   - internally clock at this frequency.
+ *
+ * EXAMPLES: see Sky Raider
  *
  ***********************************************************************
  *
@@ -3236,7 +3262,7 @@
  * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define
  * the step/reset procedures.
  *
- * EXAMPLES: see Donkey Kong, Mario Bros.
+ * EXAMPLES: see Donkey Kong, Mario Bros., Sky Raider
  *
  ***********************************************************************
  =======================================================================
@@ -3406,7 +3432,7 @@
 
 #define DISC_COUNT_DOWN						0
 #define DISC_COUNT_UP						1
-	
+
 #define DISC_COUNTER_IS_7492				0x08
 
 #define DISC_OUT_MASK						0x30
@@ -3442,6 +3468,12 @@
 #define DISC_SAMPHOLD_FEDGE					1
 #define DISC_SAMPHOLD_HLATCH				2
 #define DISC_SAMPHOLD_LLATCH				3
+
+/* Shift options */
+#define DISC_LOGIC_SHIFT__RESET_L			0x00
+#define DISC_LOGIC_SHIFT__RESET_H			0x10
+#define DISC_LOGIC_SHIFT__LEFT				0x00
+#define DISC_LOGIC_SHIFT__RIGHT				0x20
 
 /* Maximum number of resistors in ladder chain */
 #define DISC_LADDER_MAXRES					8
@@ -3548,7 +3580,7 @@ enum
 /* 566 output flags */
 #define DISC_566_OUT_DC						0x00
 #define DISC_566_OUT_AC						0x01
-	
+
 #define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
 #define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
 #define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
@@ -4149,6 +4181,7 @@ enum
 	DST_LOGIC_NXOR,
 	DST_LOGIC_DFF,
 	DST_LOGIC_JKFF,
+	DST_LOGIC_SHIFT,
 	DST_LOOKUP_TABLE,	/* return value from lookup table */
 	DST_MULTIPLEX,		/* 1 of x multiplexer */
 	DST_ONESHOT,		/* One-shot pulse generator */
@@ -4309,6 +4342,7 @@ enum
 #define DISCRETE_LOGIC_NXOR(NODE,INP0,INP1)                             { NODE, DST_LOGIC_NXOR  , 2, { INP0,INP1 }, { INP0,INP1 }, NULL, "DISCRETE_LOGIC_NXOR" },
 #define DISCRETE_LOGIC_DFLIPFLOP(NODE,RESET,SET,CLK,INP)                { NODE, DST_LOGIC_DFF   , 4, { RESET,SET,CLK,INP }, { RESET,SET,CLK,INP }, NULL, "DISCRETE_LOGIC_DFLIPFLOP" },
 #define DISCRETE_LOGIC_JKFLIPFLOP(NODE,RESET,SET,CLK,J,K)               { NODE, DST_LOGIC_JKFF  , 5, { RESET,SET,CLK,J,K }, { RESET,SET,CLK,J,K }, NULL, "DISCRETE_LOGIC_JKFLIPFLOP" },
+#define DISCRETE_LOGIC_SHIFT(NODE,INP0,RESET,CLK,SIZE,OPTIONS)          { NODE, DST_LOGIC_SHIFT , 5, { INP0,RESET,CLK,NODE_NC,NODE_NC }, { INP0,RESET,CLK,SIZE,OPTIONS }, NULL, "DISCRETE_LOGIC_SHIFT" },
 #define DISCRETE_LOOKUP_TABLE(NODE,ADDR,SIZE,TABLE)                     { NODE, DST_LOOKUP_TABLE, 2, { ADDR,NODE_NC }, { ADDR,SIZE }, TABLE, "DISCRETE_LOOKUP_TABLE" },
 #define DISCRETE_MULTIPLEX2(NODE,ADDR,INP0,INP1)                        { NODE, DST_MULTIPLEX   , 3, { ADDR,INP0,INP1 }, { ADDR,INP0,INP1 }, NULL, "DISCRETE_MULTIPLEX2" },
 #define DISCRETE_MULTIPLEX4(NODE,ADDR,INP0,INP1,INP2,INP3)              { NODE, DST_MULTIPLEX   , 5, { ADDR,INP0,INP1,INP2,INP3 }, { ADDR,INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_MULTIPLEX4" },

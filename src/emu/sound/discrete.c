@@ -19,7 +19,7 @@
  * file. All discrete sound primatives MUST implement the following
  * API:
  *
- * dsX_NAME_step(inputs, context,float timestep)  - Perform time step
+ * dsX_NAME_step(inputs, context, float timestep)  - Perform time step
  *                                                  return output value
  * dsX_NAME_reset(context) - Reset to initial state
  *
@@ -231,6 +231,7 @@ static const discrete_module module_list[] =
 	{ DST_LOGIC_NXOR  ,"DST_LOGIC_NXOR"  , 1 ,0                                      ,NULL                  ,dst_logic_nxor_step  ,NULL                  ,NULL                 },
 	{ DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   ,NULL                  ,NULL                 },
 	{ DST_LOGIC_JKFF  ,"DST_LOGIC_JKFF"  , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  ,NULL                  ,NULL                 },
+	{ DST_LOGIC_SHIFT ,"DST_LOGIC_SHIFT" , 1 ,sizeof(struct dst_shift_context)       ,dst_logic_shift_reset ,dst_logic_shift_step ,NULL                  ,NULL                 },
 	{ DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE", 1 ,0                                      ,NULL                  ,dst_lookup_table_step,NULL                  ,NULL                 },
 	{ DST_MULTIPLEX   ,"DST_MULTIPLEX"   , 1 ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   ,NULL                  ,NULL                 },
 	{ DST_ONESHOT     ,"DST_ONESHOT"     , 1 ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     ,NULL                  ,NULL                 },

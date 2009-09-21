@@ -10,6 +10,7 @@
  ************************************************************************
  *
  * DST_ADDDER            - Multichannel adder
+ * DST_BITS_DECODE       - Decode Bits from input node
  * DST_CLAMP             - Simple signal clamping circuit
  * DST_COMP_ADDER        - Selectable parallel component circuit
  * DST_DAC_R1            - R1 Ladder DAC with cap filtering
@@ -26,6 +27,7 @@
  * DST_LOGIC_NXOR        - Logic NXOR gate 2 input
  * DST_LOGIC_DFF         - Logic D-type flip/flop
  * DST_LOGIC_JKFF        - Logic JK-type flip/flop
+ * DST_LOGIC_SHIFT       - Logic Shift Register
  * DST_LOOKUP_TABLE      - Return value from lookup table
  * DST_MIXER             - Final Mixer Stage
  * DST_MULTIPLEX         - 1 of x Multiplexer/switch
@@ -53,7 +55,6 @@ struct dst_bits_decode_context
 	int from;
 	int count;
 	int last_val;
-	int v_out;
 };
 
 struct dst_dac_r1_context
@@ -121,6 +122,17 @@ struct dst_samphold_context
 {
 	double last_input;
 	int clocktype;
+};
+
+struct dst_shift_context
+{
+	double	t_left;		/* time unused during last sample in seconds */
+	UINT32	shift_data;
+	UINT32	bit_mask;
+	UINT8	clock_type;
+	UINT8	reset_on_high;
+	UINT8	shift_r;
+	UINT8	last;
 };
 
 struct dst_size_context
@@ -681,7 +693,7 @@ static DISCRETE_STEP(dst_bits_decode)
 	{
 		context->last_val = v;
 		for (i = 0; i < context->count; i++ )
-			node->output[i] = ((v >> (i+context->from)) & 1) * context->v_out;
+			node->output[i] = ((v >> (i+context->from)) & 1) * DST_BITS_DECODE__VOUT;
 	}
 }
 
@@ -691,7 +703,6 @@ static DISCRETE_RESET(dst_bits_decode)
 
 	context->from = DST_BITS_DECODE__FROM;
 	context->count = DST_BITS_DECODE__TO - context->from + 1;
-	context->v_out = DST_BITS_DECODE__VOUT;
 
 	DISCRETE_STEP_CALL(dst_bits_decode);
 }
@@ -898,6 +909,108 @@ static DISCRETE_STEP(dst_logic_jkff)
 	context->last_clk = clk;
 }
 
+
+/************************************************************************
+ *
+ * DST_LOGIC_SHIFT - Shift Register implementation
+ *
+ ************************************************************************/
+#define DST_LOGIC_SHIFT__IN			DISCRETE_INPUT(0)
+#define DST_LOGIC_SHIFT__RESET		DISCRETE_INPUT(1)
+#define DST_LOGIC_SHIFT__CLK		DISCRETE_INPUT(2)
+#define DST_LOGIC_SHIFT__SIZE		DISCRETE_INPUT(3)
+#define DST_LOGIC_SHIFT__OPTIONS	DISCRETE_INPUT(4)
+
+static DISCRETE_STEP(dst_logic_shift)
+{
+	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+
+	double	cycles;
+	double	ds_clock;
+	int		clock = 0, inc = 0;
+
+	int input_bit = (DST_LOGIC_SHIFT__IN != 0) ? 1 : 0;
+	ds_clock = DST_LOGIC_SHIFT__CLK;
+	if (context->clock_type == DISC_CLK_IS_FREQ)
+	{
+		/* We need to keep clocking the internal clock even if in reset. */
+		cycles = (context->t_left + node->info->sample_time) * ds_clock;
+		inc    = (int)cycles;
+		context->t_left = (cycles - inc) / ds_clock;
+	}
+	else
+	{
+		clock  = (int)ds_clock;
+	}
+
+	/* If reset enabled then set output to the reset value.  No x_time in reset. */
+	if(((DST_LOGIC_SHIFT__RESET == 0) ? 0 : 1) == context->reset_on_high)
+	{
+		context->shift_data = 0;
+		node->output[0] = 0;
+		return;
+	}
+
+	/* increment clock */
+	switch (context->clock_type)
+	{
+		case DISC_CLK_ON_F_EDGE:
+		case DISC_CLK_ON_R_EDGE:
+			/* See if the clock has toggled to the proper edge */
+			clock = (clock != 0);
+			if (context->last != clock)
+			{
+				context->last = clock;
+				if (context->clock_type == clock)
+				{
+					/* Toggled */
+					inc = 1;
+				}
+			}
+			break;
+
+		case DISC_CLK_BY_COUNT:
+			/* Clock number of times specified. */
+			inc = clock;
+			break;
+	}
+
+	if (inc > 0)
+	{
+		if (context->shift_r)
+		{
+			context->shift_data >>= 1;
+			context->shift_data |= input_bit << ((int)DST_LOGIC_SHIFT__SIZE - 1);
+			inc--;
+			context->shift_data >>= inc;
+		}
+		else
+		{
+			context->shift_data <<= 1;
+			context->shift_data |= input_bit;
+			inc--;
+			context->shift_data <<= inc;
+		}
+		context->shift_data &= context->bit_mask;
+	}
+
+	node->output[0] = context->shift_data;
+}
+
+static DISCRETE_RESET(dst_logic_shift)
+{
+	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+
+	context->bit_mask = (1 << (int)DST_LOGIC_SHIFT__SIZE) - 1;
+	context->clock_type = (int)DST_LOGIC_SHIFT__OPTIONS & DISC_CLK_MASK;
+	context->reset_on_high = ((int)DST_LOGIC_SHIFT__OPTIONS & DISC_LOGIC_SHIFT__RESET_H) ? 1 : 0;
+	context->shift_r = ((int)DST_LOGIC_SHIFT__OPTIONS & DISC_LOGIC_SHIFT__RIGHT)  ? 1 : 0;
+
+	context->t_left  = 0;
+	context->last = 0;
+	context->shift_data   = 0;
+	node->output[0]  = 0;
+}
 
 /************************************************************************
  *

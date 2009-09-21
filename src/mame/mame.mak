@@ -430,7 +430,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/shuuz.o $(VIDEO)/shuuz.o \
 	$(DRIVERS)/skullxbo.o $(VIDEO)/skullxbo.o \
 	$(DRIVERS)/skydiver.o $(AUDIO)/skydiver.o $(VIDEO)/skydiver.o \
-	$(DRIVERS)/skyraid.o $(VIDEO)/skyraid.o \
+	$(DRIVERS)/skyraid.o $(AUDIO)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
 	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o $(AUDIO)/sprint4.o \
 	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \

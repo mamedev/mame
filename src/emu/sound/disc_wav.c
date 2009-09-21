@@ -407,7 +407,7 @@ static DISCRETE_STEP(dss_lfsr)
 	}
 
 	/* Reset everything if necessary */
-	if((DSS_LFSR_NOISE__RESET ? 1 : 0) == context->reset_on_high)
+	if(((DSS_LFSR_NOISE__RESET == 0) ? 0 : 1) == context->reset_on_high)
 	{
 		DISCRETE_RESET_CALL(dss_lfsr);
 		return;

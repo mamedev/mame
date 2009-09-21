@@ -6,6 +6,7 @@ Atari Sky Raider driver
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
+#include "skyraid.h"
 
 extern UINT8* skyraid_alpha_num_ram;
 extern UINT8* skyraid_pos_ram;
@@ -56,18 +57,6 @@ static READ8_HANDLER( skyraid_port_0_r )
 	return val;
 }
 
-static WRITE8_HANDLER( skyraid_sound_w )
-{
-	/* BIT0 => PLANE SWEEP */
-	/* BIT1 => MISSILE     */
-	/* BIT2 => EXPLOSION   */
-	/* BIT3 => START LAMP  */
-	/* BIT4 => PLANE ON    */
-	/* BIT5 => ATTRACT     */
-
-	set_led_status(0, !(data & 0x08));
-}
-
 
 static WRITE8_HANDLER( skyraid_range_w )
 {
@@ -97,7 +86,7 @@ static ADDRESS_MAP_START( skyraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x1401) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE(&skyraid_obj_ram)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(skyraid_sound_w)
+	AM_RANGE(0x4400, 0x4400) AM_DEVWRITE("discrete", skyraid_sound_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(skyraid_offset_w)
@@ -240,6 +229,7 @@ static MACHINE_DRIVER_START( skyraid )
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 12)
 	MDRV_CPU_PROGRAM_MAP(skyraid_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_WATCHDOG_VBLANK_INIT(4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -258,6 +248,11 @@ static MACHINE_DRIVER_START( skyraid )
 	MDRV_VIDEO_UPDATE(skyraid)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 96000)
+	MDRV_SOUND_CONFIG_DISCRETE(skyraid)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -291,4 +286,4 @@ ROM_START( skyraid )
 ROM_END
 
 
-GAME( 1978, skyraid, 0, skyraid, skyraid, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1978, skyraid, 0, skyraid, skyraid, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
