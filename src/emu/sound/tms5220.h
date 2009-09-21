@@ -39,10 +39,12 @@ double tms5220_time_to_ready(const device_config *device);
 
 void tms5220_set_frequency(const device_config *device, int frequency);
 
+DEVICE_GET_INFO( tms5220c );
 DEVICE_GET_INFO( tms5220 );
 DEVICE_GET_INFO( tmc0285 );
 DEVICE_GET_INFO( tms5200 );
 
+#define SOUND_TMS5220C DEVICE_GET_INFO_NAME( tms5220c )
 #define SOUND_TMS5220 DEVICE_GET_INFO_NAME( tms5220 )
 #define SOUND_TMC0285 DEVICE_GET_INFO_NAME( tmc0285 )
 #define SOUND_TMS5200 DEVICE_GET_INFO_NAME( tms5200 )
