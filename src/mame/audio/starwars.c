@@ -45,7 +45,7 @@ static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
 	/* d0 (out) TMS5220 Not Write       */
 	/* Note: bit 4 is always set to avoid sound self test */
 
-	return (olddata & 0xc0) | 0x10 | (!tms5220_ready_r(devtag_get_device(device->machine, "tms")) << 2);
+	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(devtag_get_device(device->machine, "tms")) << 2);
 }
 
 

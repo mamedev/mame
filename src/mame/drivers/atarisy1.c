@@ -423,7 +423,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 static READ8_DEVICE_HANDLER( via_pb_r )
 {
-	return (!tms5220_ready_r(device) << 2) | (!tms5220_int_r(device) << 3);
+	return (tms5220_readyq_r(device) << 2) | (tms5220_intq_r(device) << 3);
 }
 
 

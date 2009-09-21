@@ -492,8 +492,8 @@ static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 	{
 		const device_config *tms = devtag_get_device(device->machine, "tms");
 		newdata &= ~0x0c;
-		if (!tms5220_ready_r(tms)) newdata |= 0x04;
-		if (!tms5220_int_r(tms)) newdata |= 0x08;
+		if (tms5220_readyq_r(tms)) newdata |= 0x04;
+		if (tms5220_intq_r(tms)) newdata |= 0x08;
 	}
 	return newdata;
 }

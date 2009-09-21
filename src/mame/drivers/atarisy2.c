@@ -392,7 +392,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x01;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x02;
-	if (!has_tms5220 || tms5220_ready_r(devtag_get_device(space->machine, "tms"))) result ^= 0x04;
+	if (!has_tms5220 || !tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) result ^= 0x04;
 	if (!(input_port_read(space->machine, "1801") & 0x80)) result ^= 0x10;
 
 	return result;

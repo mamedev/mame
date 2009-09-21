@@ -231,7 +231,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x80;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x40;
-	if (tms5220_ready_r(devtag_get_device(space->machine, "tms"))) temp ^= 0x20;
+	if (!tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) temp ^= 0x20;
 	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;

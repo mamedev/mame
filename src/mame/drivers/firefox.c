@@ -301,7 +301,7 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 	/* bit 0 = TMS /write */
 
 	const device_config *tms = devtag_get_device(device->machine, "tms");
-	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (!tms5220_ready_r(tms) << 2);
+	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(tms) << 2);
 }
 
 

@@ -3,6 +3,8 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
+#include "devcb.h"
+
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
@@ -19,18 +21,21 @@ struct _tms5220_interface
 
 /* Control lines - once written to will switch interface into
  * "true" timing behaviour.
- */ 
+ */
 
-WRITE8_DEVICE_HANDLER( tms5220_rs_w );
-WRITE8_DEVICE_HANDLER( tms5220_ws_w );
+/* all lines with suffix q are active low! */
+
+WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w );
+WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w );
 
 WRITE8_DEVICE_HANDLER( tms5220_data_w );
 READ8_DEVICE_HANDLER( tms5220_status_r );
-int tms5220_ready_r(const device_config *device);
+
+READ_LINE_DEVICE_HANDLER( tms5220_readyq_r );
+READ_LINE_DEVICE_HANDLER( tms5220_intq_r );
 
 
 double tms5220_time_to_ready(const device_config *device);
-int tms5220_int_r(const device_config *device);
 
 void tms5220_set_frequency(const device_config *device, int frequency);
 

@@ -558,7 +558,7 @@ static READ8_HANDLER( tms5220_r )
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
-		return (!tms5220_ready_r(tms) << 7) | (!tms5220_int_r(tms) << 6) | status;
+		return (tms5220_readyq_r(tms) << 7) | (tms5220_intq_r(tms) << 6) | status;
 	}
 
 	return 0xff;

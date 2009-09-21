@@ -226,7 +226,7 @@ static READ8_HANDLER( jsa1_io_r )
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
-			if (tms5220 == NULL || tms5220_ready_r(tms5220)) result ^= 0x10;
+			if (tms5220 == NULL || !tms5220_readyq_r(tms5220)) result ^= 0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */

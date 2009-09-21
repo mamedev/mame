@@ -1126,6 +1126,7 @@ static DEVICE_START( tms5220 )
 	tms->io_ready = 1;
 	tms->true_timing = 0;
 	
+	tms->variant = variant_tms5220;
 	register_for_save_states(tms);
 }
 
@@ -1218,15 +1219,15 @@ TIMER_CALLBACK( io_ready_cb )
 	tms->io_ready = param;
 }
 
-WRITE8_DEVICE_HANDLER( tms5220_rs_w )
+WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
 	UINT8 new;
 	
 	tms->true_timing = 1;
-	data &= 0x01;
+	state &= 0x01;
 	
-	new = (tms->rs_ws & 0x01) | (data<<1);
+	new = (tms->rs_ws & 0x01) | (state<<1);
 	if (new != tms->rs_ws)
 	{
 		tms->rs_ws = new;
@@ -1235,7 +1236,7 @@ WRITE8_DEVICE_HANDLER( tms5220_rs_w )
 			/* illegal */
 			return;
 		}
-		if (data)
+		if (state)
 		{
 			/* low to high */
 		} 
@@ -1252,14 +1253,14 @@ WRITE8_DEVICE_HANDLER( tms5220_rs_w )
 	}
 }
 
-WRITE8_DEVICE_HANDLER( tms5220_ws_w )
+WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
 	UINT8 new;
 	
 	tms->true_timing = 1;
-	data &= 0x01;
-	new = (tms->rs_ws & 0x02) | (data<<0);
+	state &= 0x01;
+	new = (tms->rs_ws & 0x02) | (state<<0);
 	if (new != tms->rs_ws)
 	{
 		tms->rs_ws = new;
@@ -1269,7 +1270,7 @@ WRITE8_DEVICE_HANDLER( tms5220_ws_w )
 			if (new == 0) LOG(("tms5220_ws_w: illegal\n"));
 			return;
 		}
-		if (data)
+		if (state)
 		{
 			/* low to high  */
 		} 
@@ -1344,12 +1345,12 @@ READ8_DEVICE_HANDLER( tms5220_status_r )
 
 ***********************************************************************************************/
 
-int tms5220_ready_r(const device_config *device)
+READ_LINE_DEVICE_HANDLER( tms5220_readyq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
     stream_update(tms->stream);
-    return tms5220_ready_read(tms);
+    return !tms5220_ready_read(tms);
 }
 
 
@@ -1379,12 +1380,12 @@ double tms5220_time_to_ready(const device_config *device)
 
 ***********************************************************************************************/
 
-int tms5220_int_r(const device_config *device)
+READ_LINE_DEVICE_HANDLER( tms5220_intq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
     stream_update(tms->stream);
-    return tms5220_int_read(tms);
+    return !tms5220_int_read(tms);
 }
 
 

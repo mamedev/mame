@@ -188,9 +188,9 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	const device_config *tms = devtag_get_device(device->machine, "tms");
 
 	// bit 0 = /RS
-	tms5220_rs_w(tms,0, (data >> 0) & 0x01);
+	tms5220_rsq_w(tms, (data >> 0) & 0x01);
 	// bit 1 = /WS
-	tms5220_ws_w(tms,0, (data >> 1) & 0x01);
+	tms5220_wsq_w(tms, (data >> 1) & 0x01);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	acs = ~data & 0x08;
@@ -201,7 +201,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 
 static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
 {
-	return !tms5220_ready_r(device);
+	return tms5220_readyq_r(device);
 }
 
 static void tms5220_irq_handler(const device_config *device, int state)

@@ -156,7 +156,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 static READ8_HANDLER( speech_ready_r )
 {
-	return (!tms5220_ready_r(devtag_get_device(space->machine, "tms"))) << 7;
+	return (tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) << 7;
 }
 
 
