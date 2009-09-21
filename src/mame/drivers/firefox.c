@@ -304,20 +304,28 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(tms) << 2);
 }
 
+static UINT8 riot_portb_r(const device_config *device, UINT8 olddata)
+{
+	const device_config *tms = devtag_get_device(device->machine, "tms");
+	return tms5220_status_r(tms, 0);
+}
 
 static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	const device_config *tms = devtag_get_device(device->machine, "tms");
 
 	/* handle 5220 read */
-	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(device, tms5220_status_r(tms, 0), 0xff);
+	tms5220_rsq_w(tms, (newdata>>1) & 1);
 
 	/* handle 5220 write */
-	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(tms, 0, riot6532_portb_out_get(device));
+	tms5220_wsq_w(tms, newdata & 1);
 }
 
+static void riot_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	const device_config *tms = devtag_get_device(device->machine, "tms");
+	tms5220_data_w(tms, 0, newdata);
+}
 
 static void riot_irq(const device_config *device, int state)
 {
@@ -640,9 +648,9 @@ GFXDECODE_END
 static const riot6532_interface riot_intf =
 {
 	riot_porta_r,
-	NULL,
+	riot_portb_r,
 	riot_porta_w,
-	NULL,
+	riot_portb_w,
 	riot_irq
 };
 
