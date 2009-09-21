@@ -83,6 +83,11 @@
 #define PORTB_IS_SOURCE(_c)	(!PORTA_IS_SOURCE(_c))
 #define TRANSFER_MODE(_c)	(WR0(_c) & 0x03)
 
+#define MATCH_F_SET(_c)		(_c->status &= ~0x10)
+#define MATCH_F_CLEAR(_c)	(_c->status |= 0x10)
+#define EOB_F_SET(_c)		(_c->status &= ~0x20)
+#define EOB_F_CLEAR(_c)		(_c->status |= 0x20)
+
 #define TM_TRANSFER		(0x01)
 #define TM_SEARCH		(0x02)
 #define TM_SEARCH_TRANSFER	(0x03)
@@ -138,6 +143,7 @@ static void z80dma_do_read(const device_config *device)
 	mode = TRANSFER_MODE(cntx);
 	switch(mode) {
 		case TM_TRANSFER:
+		case TM_SEARCH:
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTA_MEMORY(cntx))
@@ -156,9 +162,6 @@ static void z80dma_do_read(const device_config *device)
 
 				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
 			}
-			break;
-		case TM_SEARCH:
-			fatalerror("z80dma_do_operation: unhandled search mode!\n");
 			break;
 		case TM_SEARCH_TRANSFER:
 			fatalerror("z80dma_do_operation: unhandled search & transfer mode !\n");
@@ -205,7 +208,17 @@ static int z80dma_do_write(const device_config *device)
 			break;
 
 		case TM_SEARCH:
-			fatalerror("z80dma_do_operation: unhandled search mode!\n");
+			{
+				UINT8 load_byte,match_byte;
+				load_byte = cntx->latch | MASK_BYTE(cntx);
+				match_byte = MATCH_BYTE(cntx) | MASK_BYTE(cntx);
+				//LOG(("%02x %02x\n",load_byte,match_byte));
+				if(load_byte == match_byte)
+					MATCH_F_SET(cntx);
+
+				cntx->count--;
+				done = (cntx->count == 0xFFFF); //correct?
+			}
 			break;
 
 		case TM_SEARCH_TRANSFER:
@@ -338,6 +351,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 		else if ((data & 0x83) == 0x80) // WR3
 		{
 			WR3(cntx) = data;
+			if (data & 0x08)
 				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, MASK_BYTE(cntx));
 			if (data & 0x10)
 				cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, MATCH_BYTE(cntx));
@@ -398,7 +412,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					cntx->addressA = PORTA_ADDRESS(cntx);
 					cntx->addressB = PORTB_ADDRESS(cntx);
 					cntx->count = BLOCKLEN(cntx);
-					cntx->status &= ~0x30;
+					cntx->status |= 0x30;
 					LOG(("Load A: %x B: %x N: %x\n", cntx->addressA, cntx->addressB, cntx->count));
 					break;
 				case 0x83:	/* Disable dma */
@@ -420,7 +434,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					cntx->count = 0;
 					cntx->dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
-					cntx->status &= ~0x30;
+					cntx->status |= 0x30;
 					break;
 				case 0xc7:	/* Reset Port A Timing */
 					LOG(("Reset Port A Timing\n"));
@@ -444,9 +458,8 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					cntx->irq_en = 0;
 					break;
 				case 0x8B:	/* Reinitialize status byte */
-					/* FIXME: docs says these two is 1, but behaviour makes me think it's a 0, investigate */
 					LOG(("Reinitialize status byte\n"));
-					cntx->status &= ~0x30;
+					cntx->status |= 0x30;
 					break;
 				case 0xFB:
 					LOG(("Z80DMA undocumented command triggered 0x%02X!\n",data));
