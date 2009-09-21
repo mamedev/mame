@@ -136,7 +136,7 @@
 /* banking constants */
 #define MAX_BANKS				(STATIC_BANKMAX - STATIC_BANK1) /* maximum number of banks */
 #define MAX_BANK_ENTRIES		4096					/* maximum number of possible bank values */
-#define MAX_EXPLICIT_BANKS		32						/* maximum number of explicitly-defined banks */
+#define MAX_EXPLICIT_BANKS		64						/* maximum number of explicitly-defined banks */
 
 /* address map lookup table definitions */
 #define LEVEL1_BITS				18						/* number of address bits in the level 1 table */
