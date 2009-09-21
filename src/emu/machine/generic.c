@@ -661,6 +661,7 @@ void cpu_interrupt_enable(const device_config *device, int enabled)
 	int cpunum = cpu_get_index(device);
 
 	assert_always(device != NULL, "cpu_interrupt_enable() called for invalid cpu!");
+	assert_always(cpunum < ARRAY_LENGTH(interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
 
 	/* set the new state */
 	if (cpunum < ARRAY_LENGTH(interrupt_enable))

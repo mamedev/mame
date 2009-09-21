@@ -203,7 +203,7 @@ const char mame_disclaimer[] =
 
 extern int mame_validitychecks(const game_driver *driver);
 
-static int parse_ini_file(core_options *options, const char *name);
+static int parse_ini_file(core_options *options, const char *name, int priority);
 
 static running_machine *create_machine(const game_driver *driver);
 static void destroy_machine(running_machine *machine);
@@ -1299,12 +1299,12 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 {
 	/* parse the INI file defined by the platform (e.g., "mame.ini") */
 	/* we do this twice so that the first file can change the INI path */
-	parse_ini_file(options, CONFIGNAME);
-	parse_ini_file(options, CONFIGNAME);
+	parse_ini_file(options, CONFIGNAME, OPTION_PRIORITY_MAME_INI);
+	parse_ini_file(options, CONFIGNAME, OPTION_PRIORITY_MAME_INI);
 
 	/* debug mode: parse "debug.ini" as well */
 	if (options_get_bool(options, OPTION_DEBUG))
-		parse_ini_file(options, "debug");
+		parse_ini_file(options, "debug", OPTION_PRIORITY_DEBUG_INI);
 
 	/* if we have a valid game driver, parse game-specific INI files */
 	if (driver != NULL)
@@ -1317,9 +1317,9 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 
 		/* parse "vertical.ini" or "horizont.ini" */
 		if (driver->flags & ORIENTATION_SWAP_XY)
-			parse_ini_file(options, "vertical");
+			parse_ini_file(options, "vertical", OPTION_PRIORITY_ORIENTATION_INI);
 		else
-			parse_ini_file(options, "horizont");
+			parse_ini_file(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI);
 
 		/* parse "vector.ini" for vector games */
 		config = machine_config_alloc(driver->machine_config);
@@ -1328,7 +1328,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 			const screen_config *scrconfig = (const screen_config *)device->inline_config;
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
 			{
-				parse_ini_file(options, "vector");
+				parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
 				break;
 			}
 		}
@@ -1337,19 +1337,19 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
 		astring_insc(sourcename, 0, "source" PATH_SEPARATOR);
-		if (!parse_ini_file(options, astring_c(sourcename)))
+		if (!parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI))
 		{
 			core_filename_extract_base(sourcename, driver->source_file, TRUE);
-			parse_ini_file(options, astring_c(sourcename));
+			parse_ini_file(options, astring_c(sourcename), OPTION_PRIORITY_SOURCE_INI);
 		}
 		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
 		if (gparent != NULL)
-			parse_ini_file(options, gparent->name);
+			parse_ini_file(options, gparent->name, OPTION_PRIORITY_GPARENT_INI);
 		if (parent != NULL)
-			parse_ini_file(options, parent->name);
-		parse_ini_file(options, driver->name);
+			parse_ini_file(options, parent->name, OPTION_PRIORITY_PARENT_INI);
+		parse_ini_file(options, driver->name, OPTION_PRIORITY_DRIVER_INI);
 	}
 }
 
@@ -1358,7 +1358,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
     parse_ini_file - parse a single INI file
 -------------------------------------------------*/
 
-static int parse_ini_file(core_options *options, const char *name)
+static int parse_ini_file(core_options *options, const char *name, int priority)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1377,7 +1377,7 @@ static int parse_ini_file(core_options *options, const char *name)
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(options, mame_core_file(file), OPTION_PRIORITY_INI);
+	options_parse_ini_file(options, mame_core_file(file), priority);
 	mame_fclose(file);
 	return TRUE;
 }
