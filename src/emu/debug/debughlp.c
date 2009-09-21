@@ -215,7 +215,7 @@ static const help_item static_help_list[] =
 		"  cheatnext <condition>[,<comparisonvalue>] -- continue cheat search comparing with the the last value\n"
 		"  cheatnextf <condition>[,<comparisonvalue>] -- continue cheat search comparing with the the first value\n"
 		"  cheatlist [<filename>] -- show the list of cheat search matches or save them to <filename>\n"
-		"  cheatundo [<wpnum>] -- undo the last cheat search (state only)\n"
+		"  cheatundo -- undo the last cheat search (state only)\n"
 	},
 	{
 		"do",
@@ -1047,27 +1047,13 @@ static const help_item static_help_list[] =
 	{
 		"cheatinit",
 		"\n"
-		"  cheatinit [<type>,[<address>,<length>[,<cpu>]]]\n"
+		"  cheatinit [<sign><width><swap>,[<address>,<length>[,<cpu>]]]\n"
 		"\n"
 		"The cheatinit command initializes the cheat search to the selected memory area.\n"
 		"If no parameter is specified the cheat search is initialized to all changeable memory of the main cpu.\n"
-		"Possible <type>:\n"
-		"  ub\n"
-		"   8 bit unsigned int\n"
-		"  uw\n"
-		"   16 bit unsigned int\n"
-		"  ud\n"
-		"   32 bit unsigned int\n"
-		"  uq\n"
-		"   64 bit unsigned int\n"
-		"  sb\n"
-		"   8 bit signed int\n"
-		"  sw\n"
-		"   16 bit signed int\n"
-		"  sd\n"
-		"   32 bit signed int\n"
-		"  sq\n"
-		"   64 bit signed int\n"
+		"<sign> can be s(signed) or u(unsigned)\n"
+		"<width> can be b(8 bit), w(16 bit), d(32 bit) or q(64 bit)\n"
+		"<swap> append s for swapped search\n"
 		"\n"
 		"Examples:\n"
 		"\n"
@@ -1076,6 +1062,9 @@ static const help_item static_help_list[] =
 		"\n"
 		"cheatinit sw,0x2000,0x1000,1\n"
 		"  Initialize the cheat search with width of 2 byte in signed mode from 0x2000 to 0x3000 of the second CPU.\n"
+		"\n"
+		"cheatinit uds,0x0000,0x1000\n"
+		"  Initialize the cheat search with width of 4 byte swapped from 0x0000 to 0x1000.\n"
 	},
 	{
 		"cheatrange",
@@ -1192,6 +1181,8 @@ static const help_item static_help_list[] =
 		"  Save the current matches to cheat.txt.\n"
 	},
 	{
+		"cheatundo",
+		"\n"
 		"  cheatundo\n"
 		"\n"
 		"Undo the results of the last search.\n"

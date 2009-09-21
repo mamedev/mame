@@ -60,6 +60,7 @@ struct _cheat_system
 	cheat_map *		cheatmap;
 	UINT8			undo;
 	UINT8			signed_cheat;
+	UINT8			swapped_cheat;
 };
 
 
@@ -170,17 +171,34 @@ INLINE UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
 	}
 	return value;
 }
+/*-------------------------------------------------
+    cheat_byte_swap - swap a value
+-------------------------------------------------*/
 
+INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
+{
+	if (cheatsys->swapped_cheat)
+	{
+		switch (cheatsys->width)
+		{
+			case 2:	value = ((value >> 8) & 0x00ff) | ((value << 8) & 0xff00);	break;
+			case 4:	value = ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) | ((value << 24) & 0xff000000);	break;
+			case 8:	value = ((value >> 56) & U64(0x00000000000000ff)) | ((value >> 40) & U64(0x000000000000ff00)) | ((value >> 24) & U64(0x0000000000ff0000)) | ((value >> 8) & U64(0x00000000ff000000)) |
+							((value << 8) & U64(0x000000ff00000000)) | ((value << 24) & U64(0x0000ff0000000000)) | ((value << 40) & U64(0x00ff000000000000)) | ((value << 56) & U64(0xff00000000000000));	break;
+		}
+	}
+	return value;
+}
 
 /*-------------------------------------------------
     cheat_read_extended - read a value from memory
     in the given address space, sign-extending
-    if necessary
+    and swapping if necessary
 -------------------------------------------------*/
 
 INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, const address_space *space, offs_t address)
 {
-	return cheat_sign_extend(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE));
+	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE)));
 }
 
 
@@ -1703,56 +1721,42 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 	{
 		if (params > 0)
 		{
-			if (!strcmp(param[0], "sb"))
-			{
-				cheat.width = 1;
+			char *srtpnt = (char*)param[0];
+
+			if (*srtpnt == 's')
 				cheat.signed_cheat = TRUE;
-			}
-			else if (!strcmp(param[0], "sw"))
-			{
-				cheat.width = 2;
-				cheat.signed_cheat = TRUE;
-			}
-			else if (!strcmp(param[0], "sd"))
-			{
-				cheat.width = 4;
-				cheat.signed_cheat = TRUE;
-			}
-			else if (!strcmp(param[0], "sq"))
-			{
-				cheat.width = 8;
-				cheat.signed_cheat = TRUE;
-			}
-			else if (!strcmp(param[0], "ub"))
-			{
-				cheat.width = 1;
+			else if (*srtpnt == 'u')
 				cheat.signed_cheat = FALSE;
-			}
-			else if (!strcmp(param[0], "uw"))
-			{
-				cheat.width = 2;
-				cheat.signed_cheat = FALSE;
-			}
-			else if (!strcmp(param[0], "ud"))
-			{
-				cheat.width = 4;
-				cheat.signed_cheat = FALSE;
-			}
-			else if (!strcmp(param[0], "uq"))
-			{
-				cheat.width = 8;
-				cheat.signed_cheat = FALSE;
-			}
 			else
 			{
-				debug_console_printf(machine, "Invalid type: expected ub, uw, ud, uq, sb, sw, sd or sq\n");
+				debug_console_printf(machine, "Invalid sign: expected s or u\n");
 				return;
 			}
+
+			if (*(++srtpnt) == 'b')
+				cheat.width = 1;
+			else if (*srtpnt == 'w')
+				cheat.width = 2;
+			else if (*srtpnt == 'd')
+				cheat.width = 4;
+			else if (*srtpnt == 'q')
+				cheat.width = 8;
+			else
+			{
+				debug_console_printf(machine, "Invalid width: expected b, w, d or q\n");
+				return;
+			}
+
+			if (*(++srtpnt) == 's')
+				cheat.swapped_cheat = TRUE;
+			else
+				cheat.swapped_cheat = FALSE;
 		}
 		else
 		{
 			cheat.width = 1;
 			cheat.signed_cheat = FALSE;
+			cheat.swapped_cheat = FALSE;
 		}
 	}
 
@@ -2018,12 +2022,16 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 {
 	char spaceletter, sizeletter;
 	const address_space *space;
+	const device_config *cpu;
 	UINT32 active_cheat = 0;
 	UINT64 cheatindex;
 	UINT64 sizemask;
 	FILE *f = NULL;
 
 	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+		return;
+
+	if (!debug_command_parameter_cpu(machine, &cheat.cpu, &cpu))
 		return;
 
 	if (params > 0)
@@ -2051,7 +2059,7 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
-			UINT64 value = cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset) & sizemask;
+			UINT64 value = cheat_byte_swap(&cheat, cheat_read_extended(&cheat, space, cheat.cheatmap[cheatindex].offset)) & sizemask;
 			offs_t address = memory_byte_to_address(space, cheat.cheatmap[cheatindex].offset);
 
 			if (params > 0)
@@ -2059,12 +2067,12 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 				active_cheat++;
 				fprintf(f, "  <cheat desc=\"Possibility %d : %s (%s)\">\n", active_cheat, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(value, cheat.width * 2));
 				fprintf(f, "    <script state=\"run\">\n");
-				fprintf(f, "      <action>maincpu.%c%c@%s=%s</action>\n", spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2));
+				fprintf(f, "      <action>%s.%c%c@%s=%s</action>\n", cpu->tag, spaceletter, sizeletter, core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2));
 				fprintf(f, "    </script>\n");
 				fprintf(f, "  </cheat>\n\n");
 			}
 			else
-				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat.cheatmap[cheatindex].first_value & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
+				debug_console_printf(machine, "Address=%s Start=%s Current=%s\n", core_i64_hex_format(address, space->logaddrchars), core_i64_hex_format(cheat_byte_swap(&cheat, cheat.cheatmap[cheatindex].first_value) & sizemask, cheat.width * 2), core_i64_hex_format(value, cheat.width * 2));
 		}
 	}
 	if (params > 0)
