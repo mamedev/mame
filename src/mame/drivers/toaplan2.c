@@ -3821,12 +3821,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vfive )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25+ type Toaplan mark scratched out */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
 	//MDRV_CPU_IO_MAP(V25_port)
 #endif
@@ -3837,7 +3837,7 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3852,7 +3852,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
