@@ -54,6 +54,8 @@ VIDEO_UPDATE( zaccaria );
 
 
 static int dsw;
+static int active_8910, port0a, acs;
+static int last_port0b;
 
 static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 {
@@ -108,10 +110,15 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) { cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) { cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) 
+{ 
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); 
+}
 
-static int active_8910, port0a, acs;
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) 
+{
+	cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE); 
+}
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
@@ -125,35 +132,33 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
-	static int last;
-
 
 	/* bit 1 goes to 8910 #0 BDIR pin  */
-	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
+	if ((last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last_port0b, port0a);
 	}
-	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
+	else if ((last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (last & 0x01)
+		if (last_port0b & 0x01)
 			active_8910 = 0;
 	}
 	/* bit 3 goes to 8910 #1 BDIR pin  */
-	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
+	if ((last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last >> 2, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last_port0b >> 2, port0a);
 	}
-	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
+	else if ((last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (last & 0x04)
+		if (last_port0b & 0x04)
 			active_8910 = 1;
 	}
 
-	last = data;
+	last_port0b = data;
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
@@ -163,24 +168,6 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 	pia6821_cb1_w(pia0,0, toggle & 1);
 	toggle ^= 1;
-}
-
-
-
-//static int port1a,port1b;
-
-static READ8_DEVICE_HANDLER( zaccaria_port1a_r )
-{
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-
-	return tms5220_status_r(tms,0);
-}
-
-static WRITE8_DEVICE_HANDLER( zaccaria_port1a_w )
-{
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-
-	tms5220_data_w(tms,0,data);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
@@ -204,12 +191,6 @@ static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
 	return tms5220_readyq_r(device);
 }
 
-static void tms5220_irq_handler(const device_config *device, int state)
-{
-	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
-	pia6821_cb1_w(pia1,0,state ? 0 : 1);
-}
-
 
 static const pia6821_interface pia_0_intf =
 {
@@ -230,13 +211,13 @@ static const pia6821_interface pia_0_intf =
 
 static const pia6821_interface pia_1_intf =
 {
-	DEVCB_HANDLER(zaccaria_port1a_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_DEVICE_LINE("tms", zaccaria_ca2_r),		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zaccaria_port1a_w),		/* port A out */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),		/* port A out */
 	DEVCB_HANDLER(zaccaria_port1b_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
@@ -561,7 +542,7 @@ static const ay8910_interface ay8910_config =
 
 static const tms5220_interface tms5220_config =
 {
-	tms5220_irq_handler	/* IRQ handler */
+	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w)	/* IRQ handler */
 };
 
 

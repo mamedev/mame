@@ -12,7 +12,7 @@
 typedef struct _tms5220_interface tms5220_interface;
 struct _tms5220_interface
 {
-	void (*irq)(const device_config *device, int state);		/* IRQ callback function */
+	devcb_write_line irq_func;		/* IRQ callback function */
 
 	int (*read)(const device_config *device, int count);			/* speech ROM read callback */
 	void (*load_address)(const device_config *device, int data);	/* speech ROM load address callback */

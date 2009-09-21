@@ -49,6 +49,7 @@ TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define MAX_SAMPLE_CHUNK	512
+#define FIFO_SIZE 16
 
 
 enum _tms5220_variant
@@ -74,8 +75,10 @@ typedef enum _tms5220_variant tms5220_variant;
 typedef struct _tms5220_state tms5220_state;
 struct _tms5220_state
 {
+	/* callbacks */
+	devcb_resolved_write_line	irq_func;
+	
 	/* these contain data that describes the 128-bit data FIFO */
-	#define FIFO_SIZE 16
 	UINT8 fifo[FIFO_SIZE];
 	UINT8 fifo_head;
 	UINT8 fifo_tail;
@@ -99,9 +102,6 @@ struct _tms5220_state
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
-
-	void (*irq_func)(const device_config *device, int state); /* called when the state of the IRQ pin changes */
-
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 old_energy;
@@ -1097,8 +1097,8 @@ static void check_buffer_low(tms5220_state *tms)
 
 static void set_interrupt_state(tms5220_state *tms, int state)
 {
-    if (tms->intf->irq && state != tms->irq_pin)
-    	tms->intf->irq(tms->device, state);
+    if (tms->irq_func.write && state != tms->irq_pin)
+    	devcb_call_write_line(&tms->irq_func, !state);
     tms->irq_pin = state;
 }
 
@@ -1111,13 +1111,17 @@ static void set_interrupt_state(tms5220_state *tms, int state)
 
 static DEVICE_START( tms5220 )
 {
-	static const tms5220_interface dummy = { 0 };
+	static const tms5220_interface dummy = { DEVCB_NULL };
 	tms5220_state *tms = get_safe_token(device);
 
 	/* set the interface and device */
 	tms->intf = device->static_config ? (const tms5220_interface *)device->static_config : &dummy;
 	tms->device = device;
 	tms->clock = device->clock;
+
+	/* resolve */
+	
+	devcb_resolve_write_line(&tms->irq_func, &tms->intf->irq_func, device);
 
 	/* initialize a stream */
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
@@ -1158,7 +1162,7 @@ static DEVICE_RESET( tms5220 )
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
 	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-	if (tms->intf->irq) tms->intf->irq(tms->device, 0);
+	set_interrupt_state(tms, 0);
 	tms->buffer_empty = tms->buffer_low = 1;
 
 	tms->RDB_flag = FALSE;

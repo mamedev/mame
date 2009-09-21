@@ -332,9 +332,9 @@ static WRITE8_HANDLER( looping_souint_clr )
 }
 
 
-static void looping_spcint(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( looping_spcint )
 {
-	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, state, 6);
+	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, !state, 6);
 }
 
 
@@ -576,7 +576,7 @@ GFXDECODE_END
 
 static const tms5220_interface tms5220_config =
 {
-	looping_spcint
+	DEVCB_LINE(looping_spcint)
 };
 
 static const ay8910_interface ay8910_config =
