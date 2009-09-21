@@ -1229,7 +1229,7 @@ static void ui_menu_handle_keys(ui_menu *menu, UINT32 flags)
 		mame_pause(menu->machine, !mame_is_paused(menu->machine));
 
 	/* handle a toggle cheats request */
-	if (exclusive_input_pressed(menu, IPT_UI_TOGGLE_CHEAT, 0))
+	if (ui_input_pressed_repeat(menu->machine, IPT_UI_TOGGLE_CHEAT, 0))
 		cheat_set_global_enable(menu->machine, !cheat_get_global_enable(menu->machine));
 
 	/* see if any other UI keys are pressed */
