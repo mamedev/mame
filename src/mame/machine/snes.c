@@ -524,14 +524,14 @@ READ8_HANDLER( snes_r_io )
 			}
 			return snes_ppu.ppu1_open_bus;
 		case RCGDATA:	/* Read data from CGRAM */
-				if (cgram_address & 0x01)
+				if (!(cgram_address & 0x01))
 				{
-					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[cgram_address & 0xff];
+					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[cgram_address] & 0xff;
 				}
 				else
 				{
 					snes_ppu.ppu2_open_bus &= 0x80;
-					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[cgram_address & 0x7f];
+					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[cgram_address] & 0x7f;
 				}
 
 				cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
