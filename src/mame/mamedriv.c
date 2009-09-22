@@ -1768,7 +1768,8 @@ const game_driver * const drivers[] =
 	DRIVER( perestrof )	/* (c) 1993 Promat / Fuuki */
 	DRIVER( pbillian )	/* (c) 1986 Taito */
 	DRIVER( hotsmash )	/* B18 (c) 1987 Taito */
-	DRIVER( exzisus )	/* B23 (c) 1987 Taito Corporation (Japan) */
+	DRIVER( exzisus )	/* B12 (c) 1987 Taito Corporation (Japan) */
+	DRIVER( exzisusa )	/* B23 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( minivadr )	/* D26 cabinet test board */
 	DRIVER( volfied )	/* C04 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( volfiedu )	/* C04 (c) 1989 Taito America Corporation (US) */
