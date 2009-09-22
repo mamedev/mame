@@ -149,7 +149,7 @@ static const discrete_mixer_desc skyraid_mixer =
 
 #define SKYRAID_4066_R_ON	270
 
-static struct skyraid_explosion_custom_charge_context
+struct skyraid_explosion_custom_charge_context
 {
 	double v_cap;
 	double v_charge_1_2;
@@ -258,7 +258,7 @@ static const discrete_custom_info skyraid_explosion_custom_charge =
 #define SKYRAID_MISSLE_CUSTOM_R3		DISCRETE_INPUT(3)
 #define SKYRAID_MISSLE_CUSTOM_C			DISCRETE_INPUT(4)
 
-static struct skyraid_missle_custom_charge_context
+struct skyraid_missle_custom_charge_context
 {
 	double v_charge[2];
 	double v_cap;
