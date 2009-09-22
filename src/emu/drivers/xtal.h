@@ -41,7 +41,7 @@ enum
 /*
     Name                = Frequency     Examples
     ------------------    ------------  ------------------------------------------------------------ */
-	XTAL_32_768kHz		= 327680,		/* 32.768kHz, used to drive RTC chips */
+	XTAL_32_768kHz		= 32768,		/* 32.768kHz, used to drive RTC chips */
 	XTAL_1MHz    		= 1000000,		/* Used to drive OKI M6295 chips */
 	XTAL_1_75MHz		= 1750000,		/* RCA CDP1861 */
 	XTAL_1_8432MHz		= 1843200,		/* Bondwell 12/14 */
