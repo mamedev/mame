@@ -289,7 +289,7 @@ static WRITE8_HANDLER( sound_to_main_w )
  *
  *************************************/
 
-static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( riot_porta_r )
 {
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
@@ -300,34 +300,21 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
 
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(tms) << 2);
+	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(device) << 2);
 }
 
-static UINT8 riot_portb_r(const device_config *device, UINT8 olddata)
-{
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-	return tms5220_status_r(tms, 0);
-}
-
-static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( riot_porta_w )
 {
 	const device_config *tms = devtag_get_device(device->machine, "tms");
 
 	/* handle 5220 read */
-	tms5220_rsq_w(tms, (newdata>>1) & 1);
+	tms5220_rsq_w(tms, (data>>1) & 1);
 
 	/* handle 5220 write */
-	tms5220_wsq_w(tms, newdata & 1);
+	tms5220_wsq_w(tms, data & 1);
 }
 
-static void riot_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
-{
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-	tms5220_data_w(tms, 0, newdata);
-}
-
-static void riot_irq(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( riot_irq )
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -647,11 +634,11 @@ GFXDECODE_END
 
 static const riot6532_interface riot_intf =
 {
-	riot_porta_r,
-	riot_portb_r,
-	riot_porta_w,
-	riot_portb_w,
-	riot_irq
+	DEVCB_DEVICE_HANDLER("tms", riot_porta_r),
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),
+	DEVCB_DEVICE_HANDLER("tms", riot_porta_w),
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),
+	DEVCB_LINE(riot_irq)
 };
 
 

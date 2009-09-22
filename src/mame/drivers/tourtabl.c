@@ -16,14 +16,14 @@
 #define MASTER_CLOCK	3579575
 
 
-static void tourtabl_led_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( tourtabl_led_w )
 {
-	set_led_status(0, newdata & 0x40); /* start 1 */
-	set_led_status(1, newdata & 0x20); /* start 2 */
-	set_led_status(2, newdata & 0x10); /* start 4 */
-	set_led_status(3, newdata & 0x80); /* select game */
+	set_led_status(0, data & 0x40); /* start 1 */
+	set_led_status(1, data & 0x20); /* start 2 */
+	set_led_status(2, data & 0x10); /* start 4 */
+	set_led_status(3, data & 0x80); /* select game */
 
-	coin_lockout_global_w(!(newdata & 0x80));
+	coin_lockout_global_w(!(data & 0x80));
 }
 
 
@@ -51,48 +51,28 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static UINT8 port6_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_read(device->machine, "RIOT0_SWA");
-}
-
-static UINT8 port7_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_read(device->machine, "RIOT0_SWB");
-}
-
-static UINT8 port8_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_read(device->machine, "RIOT1_SWA");
-}
-
-static UINT8 port9_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_read(device->machine, "RIOT1_SWB");
-}
-
-static void watchdog_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( watchdog_w )
 {
 	watchdog_reset(device->machine);
 }
 
 static const riot6532_interface r6532_interface_0 =
 {
-	port6_r,
-	port7_r,
-	NULL,
-	watchdog_w,
-	NULL
+	DEVCB_INPUT_PORT("RIOT0_SWA"),	/* Port 6 */
+	DEVCB_INPUT_PORT("RIOT0_SWB"),	/* Port 7 */
+	DEVCB_NULL,
+	DEVCB_HANDLER(watchdog_w),
+	DEVCB_NULL
 };
 
 
 static const riot6532_interface r6532_interface_1 =
 {
-	port8_r,
-	port9_r,
-	NULL,
-	tourtabl_led_w,
-	NULL
+	DEVCB_INPUT_PORT("RIOT1_SWA"),	/* Port 8 */
+	DEVCB_INPUT_PORT("RIOT1_SWB"),	/* Port 9 */
+	DEVCB_NULL,
+	DEVCB_HANDLER(tourtabl_led_w),
+	DEVCB_NULL
 };
 
 

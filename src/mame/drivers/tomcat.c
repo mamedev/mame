@@ -8,7 +8,7 @@
     - game has no sound, while sound hardware was developed, sound program was
       not prepared
 
-    ToDo:
+    TODO:
     - add proper timing of interrupts and framerate (currently commented out,
       as they cause test mode to hang)
     - vector quality appears to be worse than original game (compared to original
@@ -18,6 +18,7 @@
     - current implementation of 68010 <-> tms32010 is a little bit hacky, after
       tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
       and starts executing
+    - hook up tms5220 - it is currently not used at all 
 
 */
 
@@ -354,7 +355,7 @@ static NVRAM_HANDLER(tomcat)
 
 static const riot6532_interface tomcat_riot6532_intf =
 {
-	NULL,
+	DEVCB_NULL,
 /*
     PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
     PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
@@ -367,10 +368,10 @@ static const riot6532_interface tomcat_riot6532_intf =
     PA6 = /MUSRES   OUTPUT  (Reset the Yamaha)
     PA7 = MAINFLAG  INPUT
 */
-	NULL,
-	NULL,
-	NULL,	//  PB0 - PB7   OUTPUT  Speech Data
-	NULL	// connected to IRQ line of 6502
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,	//  PB0 - PB7   OUTPUT  Speech Data
+	DEVCB_NULL	// connected to IRQ line of 6502
 };
 
 static MACHINE_DRIVER_START(tomcat)

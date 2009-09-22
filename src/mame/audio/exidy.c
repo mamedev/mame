@@ -459,35 +459,46 @@ static void r6532_irq(const device_config *device, int state)
 }
 
 
-static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
 	if (has_mc3417)
-		cputag_set_input_line(device->machine, "cvsdcpu", INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(device->machine, "cvsdcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+
+	if (has_tms5220)
+	{
+		const device_config *tms = devtag_get_device(device->machine, "tms");
+		logerror("(%f)%s:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), riot6532_porta_out_get(riot));
+		tms5220_data_w(tms, 0, data);
+	}
 }
 
-
-static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static READ8_DEVICE_HANDLER( r6532_porta_r )
 {
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-	if (device != NULL)
+	if (has_tms5220)
 	{
-		if ((olddata & 0x01) && !(newdata & 0x01))
-		{
-			riot6532_porta_in_set(riot, tms5220_status_r(tms, 0), 0xff);
-			logerror("(%f)%s:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), tms5220_status_r(tms, 0));
-		}
-		if ((olddata & 0x02) && !(newdata & 0x02))
-		{
-			logerror("(%f)%s:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), riot6532_porta_out_get(riot));
-			tms5220_data_w(tms, 0, riot6532_porta_out_get(riot));
-		}
+		const device_config *tms = devtag_get_device(device->machine, "tms");
+		logerror("(%f)%s:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), tms5220_status_r(tms, 0));
+		return tms5220_status_r(tms, 0);
+	}
+	else
+		return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( r6532_portb_w )
+{
+	if (has_tms5220)
+	{
+		const device_config *tms = devtag_get_device(device->machine, "tms");
+
+		tms5220_rsq_w(tms, data & 0x01);
+		tms5220_wsq_w(tms, (data >> 1) & 0x01);
 	}
 }
 
 
-static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( r6532_portb_r )
 {
-	UINT8 newdata = olddata;
+	UINT8 newdata = riot6532_portb_in_get(device);
 	if (has_tms5220)
 	{
 		const device_config *tms = devtag_get_device(device->machine, "tms");
@@ -501,11 +512,11 @@ static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 
 static const riot6532_interface r6532_interface =
 {
-	NULL,					/* port A read handler */
-	r6532_portb_r,			/* port B read handler */
-	r6532_porta_w,			/* port A write handler */
-	r6532_portb_w,			/* port B write handler */
-	r6532_irq				/* IRQ callback */
+	DEVCB_HANDLER(r6532_porta_r),	/* port A read handler */
+	DEVCB_HANDLER(r6532_portb_r),	/* port B read handler */
+	DEVCB_HANDLER(r6532_porta_w),	/* port A write handler */
+	DEVCB_HANDLER(r6532_portb_w),	/* port B write handler */
+	DEVCB_LINE(r6532_irq)			/* IRQ callback */
 };
 
 

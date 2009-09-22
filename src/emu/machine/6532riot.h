@@ -7,24 +7,21 @@
 #ifndef __RIOT6532_H__
 #define __RIOT6532_H__
 
+#include "devcb.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*riot_read_func)(const device_config *device, UINT8 olddata);
-typedef void (*riot_write_func)(const device_config *device, UINT8 newdata, UINT8 olddata);
-typedef void (*riot_irq_func)(const device_config *device, int state);
-
 
 typedef struct _riot6532_interface riot6532_interface;
 struct _riot6532_interface
 {
-	riot_read_func		in_a_func;
-	riot_read_func		in_b_func;
-	riot_write_func		out_a_func;
-	riot_write_func		out_b_func;
-	riot_irq_func		irq_func;
+	devcb_read8			in_a_func;
+	devcb_read8			in_b_func;
+	devcb_write8		out_a_func;
+	devcb_write8		out_b_func;
+	devcb_write_line	irq_func;
 };
 
 

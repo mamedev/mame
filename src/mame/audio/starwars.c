@@ -31,7 +31,7 @@ SOUND_START( starwars )
  *
  *************************************/
 
-static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( r6532_porta_r )
 {
 	/* Configured as follows:           */
 	/* d7 (in)  Main Ready Flag         */
@@ -44,26 +44,22 @@ static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
 	/* d1 (out) TMS5220 Not Read        */
 	/* d0 (out) TMS5220 Not Write       */
 	/* Note: bit 4 is always set to avoid sound self test */
+	UINT8 olddata = riot6532_porta_in_get(device);
 
 	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(devtag_get_device(device->machine, "tms")) << 2);
 }
 
 
-static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, "tms");
-
 	/* handle 5220 read */
-	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(riot, tms5220_status_r(tms, 0), 0xff);
-
+	tms5220_rsq_w(device, (data & 2)>>1);
 	/* handle 5220 write */
-	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(tms, 0, riot6532_portb_out_get(riot));
+	tms5220_wsq_w(device, (data & 1)>>0);
 }
 
 
-static void snd_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( snd_interrupt )
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, state);
 }
@@ -71,11 +67,11 @@ static void snd_interrupt(const device_config *device, int state)
 
 const riot6532_interface starwars_riot6532_intf =
 {
-	r6532_porta_r,
-	NULL,
-	r6532_porta_w,
-	NULL,
-	snd_interrupt
+	DEVCB_HANDLER(r6532_porta_r),
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),
+	DEVCB_DEVICE_HANDLER("tms", r6532_porta_w),
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),
+	DEVCB_LINE(snd_interrupt)
 };
 
 

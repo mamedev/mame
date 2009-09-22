@@ -46,6 +46,7 @@ TODO:
 	If a command is still executing, /READY will be kept high until the command has
 	finished if the next command is written. 
 	TMS5220C: see below.
+	tomcat has a 5220 which is not hooked up at all
 
 Notes:
 	Looping has the tms5220 hookep up directly to the cpu. However currently the

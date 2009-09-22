@@ -94,32 +94,26 @@ static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
  *
  *************************************/
 
-static void snd_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( snd_interrupt )
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, state);
 }
 
 
-static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
-{
-	return input_port_read(device->machine, "SB1");
-}
-
-
-static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( r6532_portb_w )
 {
 	/* unsure if this is ever used, but the NMI is connected to the RIOT's PB7 */
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static const riot6532_interface gottlieb_riot6532_intf =
 {
-	NULL,
-	r6532_portb_r,
-	NULL,
-	r6532_portb_w,
-	snd_interrupt
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("SB1"),
+	DEVCB_NULL,
+	DEVCB_HANDLER(r6532_portb_w),
+	DEVCB_LINE(snd_interrupt)
 };
 
 

@@ -180,7 +180,7 @@ static const via6522_interface via_2_interface =
  *
  *************************************/
 
-static void r6532_irq(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 	if (state == ASSERT_LINE)
@@ -188,20 +188,20 @@ static void r6532_irq(const device_config *device, int state)
 }
 
 
-static void r6532_soundlatch_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
 	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	soundlatch_w(space, 0, newdata);
+	soundlatch_w(space, 0, data);
 }
 
 
 static const riot6532_interface r6532_interface =
 {
-	NULL,					/* port A read handler */
-	NULL,					/* port B read handler */
-	NULL,					/* port A write handler */
-	r6532_soundlatch_w,		/* port B write handler */
-	r6532_irq				/* IRQ callback */
+	DEVCB_NULL,							/* port A read handler */
+	DEVCB_NULL,							/* port B read handler */
+	DEVCB_NULL,							/* port A write handler */
+	DEVCB_HANDLER(r6532_soundlatch_w),	/* port B write handler */
+	DEVCB_LINE(r6532_irq)				/* IRQ callback */
 };
 
 

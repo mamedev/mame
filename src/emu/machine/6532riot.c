@@ -38,11 +38,11 @@ enum
 typedef struct _riot6532_port riot6532_port;
 struct _riot6532_port
 {
-	UINT8				in;
-	UINT8				out;
-	UINT8				ddr;
-	riot_read_func		in_func;
-	riot_write_func		out_func;
+	UINT8					in;
+	UINT8					out;
+	UINT8			 		ddr;
+	devcb_resolved_read8	in_func;
+	devcb_resolved_write8	out_func;
 };
 
 
@@ -54,6 +54,8 @@ struct _riot6532_state
 	int				index;
 
 	riot6532_port	port[2];
+	
+	devcb_resolved_write_line	irq_func;
 
 	UINT8			irqstate;
 	UINT8			irqenable;
@@ -96,8 +98,8 @@ INLINE void update_irqstate(const device_config *device)
 	riot6532_state *riot = get_safe_token(device);
 	int state = (riot->irqstate & riot->irqenable);
 
-	if (riot->intf->irq_func != NULL)
-		(*riot->intf->irq_func)(device, (state != 0) ? ASSERT_LINE : CLEAR_LINE);
+	if (riot->irq_func.write != NULL)
+		devcb_call_write_line(&riot->irq_func, (state != 0) ? ASSERT_LINE : CLEAR_LINE);
 	else
 		logerror("%s:6532RIOT chip #%d: no irq callback function\n", cpuexec_describe_context(device->machine), riot->index);
 }
@@ -256,10 +258,9 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 		/* if A0 == 0, we are writing to the port's output */
 		else
 		{
-			UINT8 olddata = port->out;
 			port->out = data;
-			if (port->out_func != NULL)
-				(*port->out_func)(device, data, olddata);
+			if (port->out_func.write != NULL)
+				devcb_call_write8(&port->out_func, 0, data);
 			else
 				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(device->machine), device->tag, 'A' + (offset & 1), data);
 		}
@@ -321,9 +322,9 @@ READ8_DEVICE_HANDLER( riot6532_r )
 		else
 		{
 			/* call the input callback if it exists */
-			if (port->in_func != NULL)
+			if (port->in_func.read != NULL)
 			{
-				port->in = (*port->in_func)(device, port->in);
+				port->in = devcb_call_read8(&port->in_func, 0);
 
 				/* changes to port A need to update the PA7 state */
 				if (port == &riot->port[0])
@@ -437,10 +438,13 @@ static DEVICE_START( riot6532 )
 	riot->index = device_list_index(device->machine->config->devicelist, RIOT6532, device->tag);
 
 	/* configure the ports */
-	riot->port[0].in_func = riot->intf->in_a_func;
-	riot->port[0].out_func = riot->intf->out_a_func;
-	riot->port[1].in_func = riot->intf->in_b_func;
-	riot->port[1].out_func = riot->intf->out_b_func;
+	devcb_resolve_read8(&riot->port[0].in_func, &riot->intf->in_a_func, device);
+	devcb_resolve_write8(&riot->port[0].out_func, &riot->intf->out_a_func, device);
+	devcb_resolve_read8(&riot->port[1].in_func, &riot->intf->in_b_func, device);
+	devcb_resolve_write8(&riot->port[1].out_func, &riot->intf->out_b_func, device);
+
+	/* resolve irq func */
+	devcb_resolve_write_line(&riot->irq_func, &riot->intf->irq_func, device);
 
 	/* allocate timers */
 	riot->timer = timer_alloc(device->machine, timer_end_callback, (void *)device);
