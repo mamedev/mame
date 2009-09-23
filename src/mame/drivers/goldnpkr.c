@@ -2126,7 +2126,7 @@ static DISCRETE_SOUND_START( goldnpkr )
 	DISCRETE_INPUT_NOT   (NODE_01)		/* bit 3 - enable/disable */
 	DISCRETE_INPUT_DATA  (NODE_10)		/* bits 0-2  - sound data */
 
-	DISCRETE_DAC_R1(NODE_20, NODE_01, NODE_10, 5, &dac_goldnpkr_ladder)
+	DISCRETE_DAC_R1(NODE_20, NODE_10, 5, &dac_goldnpkr_ladder)
 
 	DISCRETE_555_ASTABLE_CV(NODE_30, NODE_01, RES_K(1), RES_K(10), CAP_U(.1), NODE_20, &goldnpkr_555_vco_desc)
 	DISCRETE_OUTPUT(NODE_30, 3000)
@@ -2189,7 +2189,7 @@ static DISCRETE_SOUND_START( pottnpkr )
 	DISCRETE_INPUT_NOT   (NODE_01)		/* bit 3 - enable/disable */
 	DISCRETE_INPUT_DATA  (NODE_10)		/* bits 0-2  - sound data */
 
-	DISCRETE_DAC_R1(NODE_20, NODE_01, NODE_10, 5, &dac_pottnpkr_ladder)
+	DISCRETE_DAC_R1(NODE_20, NODE_10, 5, &dac_pottnpkr_ladder)
 
 	DISCRETE_555_ASTABLE_CV(NODE_30, NODE_01, RES_K(1), RES_K(1), CAP_U(1), NODE_20, &goldnpkr_555_vco_desc)
 	DISCRETE_OUTPUT(NODE_30, 3000)
