@@ -126,7 +126,6 @@ struct dsd_ls624_context
 	int			out_type;
 	double		k1;				/* precalculated cap part of formula */
 	double		k2;				/* precalculated ring part of formula */
-	double		k3;				/* another precalculated ring part of formula */
 };
 
 
@@ -1600,8 +1599,7 @@ static DISCRETE_RESET(dsd_566)
  #define LS624_F(_C, _VI, _VR)	pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
 		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
 */
-#define LS624_F(_VI)	pow(10, context->k1 + 0.243264328 * (_VI) \
-		          + context->k2 + context->k3 * (_VI))
+#define LS624_F(_VI)	pow(10, context->k1 + 0.243264328 * (_VI) + context->k2 * (_VI))
 
 static DISCRETE_STEP(dsd_ls624)
 {
@@ -1667,9 +1665,8 @@ static DISCRETE_RESET(dsd_ls624)
 	context->out_type = DSD_LS624__OUTTYPE;
 
 	/* precalculate some parts of the formula for speed */
-	context->k1 = -0.912029404 * log10(DSD_LS624__C);
-	context->k2 = -0.091695877 * (DSD_LS624__VRNG) - 3.207072925;
-	context->k3 = -0.014110946 * (DSD_LS624__VRNG);
+	context->k1 = -0.912029404 * log10(DSD_LS624__C) -0.091695877 * (DSD_LS624__VRNG) - 3.207072925;
+	context->k2 = -0.014110946 * (DSD_LS624__VRNG);
 
 	/* Step the output */
 	DISCRETE_STEP_CALL(dsd_ls624);
