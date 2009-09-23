@@ -5557,136 +5557,61 @@ GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "
  *
  *********************************************/
 
-typedef struct _atomiswave_key atomiswave_key;
-struct _atomiswave_key
+typedef struct _sbox_set sbox_set;
+struct _sbox_set
 {
-    int P0[16];
     int S0[32];
     int S1[16];
     int S2[16];
     int S3[8];
 };
 
-static const atomiswave_key sprtshot_key = {
+static const int permutation_table[4][16] =
+{
     {8,10,1,3,7,4,11,2,5,15,6,0,12,13,9,14},
-    {4,12,8,14,16,30,31,0,23,29,24,21,11,22,27,5,3,20,18,26,10,7,17,1,28,6,15,13,2,9,25,19},
-    {13,1,0,9,5,12,4,14,3,15,2,10,11,6,8,7},
-    {7,13,4,6,5,9,3,2,0,15,12,10,8,11,1,14},
-    {4,0,1,2,5,7,3,6}
-};
-
-static const atomiswave_key rangrmsn_key = {
     {4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-    {3,0,14,17,10,15,31,20,13,2,29,28,9,18,25,27,6,19,30,22,7,12,1,16,23,11,24,4,8,26,21,5},
-    {2,10,6,9,11,13,4,5,3,15,7,14,12,1,0,8},
-    {1,13,11,3,8,7,9,10,12,15,4,14,0,5,6,2},
-    {6,5,0,3,7,1,4,2}
-};
-
-static const atomiswave_key fotns_key = {
     {12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
-    {4,7,9,22,13,8,24,19,10,5,26,27,14,21,30,28,1,20,25,17,0,11,6,23,16,12,31,3,15,29,18,2},
-    {3,11,7,8,10,12,5,4,2,14,6,15,13,0,1,9},
-    {10,6,0,8,3,12,2,1,7,4,15,5,11,14,13,9},
-    {7,4,1,2,6,0,5,3}
+    {14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9}
 };
 
-static const atomiswave_key xtrmhunt_key = {
-    {12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
-    {4,12,8,14,16,30,31,0,23,29,24,21,11,22,27,5,3,20,18,26,10,7,17,1,28,6,15,13,2,9,25,19},
-    {13,1,0,9,5,12,4,14,3,15,2,10,11,6,8,7},
-    {7,13,4,6,5,9,3,2,0,15,12,10,8,11,1,14},
-    {4,0,1,2,5,7,3,6}
+static const sbox_set sboxes_table[4] =
+{
+    {
+        {4,12,8,14,16,30,31,0,23,29,24,21,11,22,27,5,3,20,18,26,10,7,17,1,28,6,15,13,2,9,25,19},
+        {13,1,0,9,5,12,4,14,3,15,2,10,11,6,8,7},
+        {7,13,4,6,5,9,3,2,0,15,12,10,8,11,1,14},
+        {4,0,1,2,5,7,3,6}
+    },
+    {
+        {3,0,14,17,10,15,31,20,13,2,29,28,9,18,25,27,6,19,30,22,7,12,1,16,23,11,24,4,8,26,21,5},
+        {2,10,6,9,11,13,4,5,3,15,7,14,12,1,0,8},
+        {1,13,11,3,8,7,9,10,12,15,4,14,0,5,6,2},
+        {6,5,0,3,7,1,4,2}
+    },
+    {
+        {9,15,28,7,13,24,2,23,21,1,22,16,18,8,17,31,27,6,30,12,4,20,5,19,0,25,3,29,10,14,11,26},
+        {5,2,13,11,8,6,12,1,4,3,0,10,14,15,7,9},
+        {11,6,10,0,12,1,8,14,2,9,13,3,7,4,15,5},
+        {1,5,6,2,4,7,3,0}
+    },
+    {
+        {17,3,31,2,28,10,9,29,6,25,24,8,13,1,19,15,22,0,14,20,16,7,21,4,18,26,27,5,12,23,11,30},
+        {4,8,11,15,3,14,7,12,1,0,9,5,6,13,2,10},
+        {14,0,9,11,4,1,7,5,13,6,8,12,2,3,10,15},
+        {2,1,0,5,4,6,7,3}
+    },
 };
 
-static const atomiswave_key xtrmhnt2_key = {
-    {14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
-    {11,3,7,1,31,17,16,15,24,18,23,26,4,25,20,10,12,27,29,21,5,8,30,14,19,9,0,2,13,6,22,28},
-    {7,11,10,3,15,6,14,4,9,5,8,0,1,12,2,13},
-    {11,1,8,10,9,5,15,14,12,3,0,6,4,7,13,2},
-    {4,0,1,2,5,7,3,6}
-};
-
-static const atomiswave_key dolphin_key = {
-    {8,10,1,3,7,4,11,2,5,15,6,0,12,13,9,14},
-    {11,8,6,25,2,7,23,28,5,10,21,20,1,26,17,19,14,27,22,30,15,4,9,24,31,3,16,12,0,18,29,13},
-    {13,5,9,6,4,2,11,10,12,0,8,1,3,14,15,7},
-    {1,13,11,3,8,7,9,10,12,15,4,14,0,5,6,2},
-    {3,0,5,6,2,4,1,7}
-};
-
-static const atomiswave_key demofist_key = {
-    {4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-    {9,15,28,7,13,24,2,23,21,1,22,16,18,8,17,31,27,6,30,12,4,20,5,19,0,25,3,29,10,14,11,26},
-    {5,2,13,11,8,6,12,1,4,3,0,10,14,15,7,9},
-    {11,6,10,0,12,1,8,14,2,9,13,3,7,4,15,5},
-    {1,5,6,2,4,7,3,0}
-};
-
-static const atomiswave_key rumblef_key = {
-    {4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-    {11,3,7,1,31,17,16,15,24,18,23,26,4,25,20,10,12,27,29,21,5,8,30,14,19,9,0,2,13,6,22,28},
-    {7,11,10,3,15,6,14,4,9,5,8,0,1,12,2,13},
-    {11,1,8,10,9,5,15,14,12,3,0,6,4,7,13,2},
-    {4,0,1,2,5,7,3,6}
-};
-
-static const atomiswave_key ngbc_key = {
-    {4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-    {17,25,29,27,5,11,10,21,2,8,13,0,30,3,14,16,22,1,7,15,31,18,4,20,9,19,26,24,23,28,12,6},
-    {15,3,2,11,7,14,6,12,1,13,0,8,9,4,10,5},
-    {6,12,5,7,4,8,2,3,1,14,13,11,9,10,0,15},
-    {5,1,0,3,4,6,2,7}
-};
-
-static const atomiswave_key kofnw_key = {
-    {4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-    {22,16,3,24,18,7,29,8,10,30,9,15,13,23,14,0,4,25,1,19,27,11,26,12,31,6,28,2,21,17,20,5},
-    {8,15,0,6,5,11,1,12,9,14,13,7,3,2,10,4},
-    {2,15,3,9,5,8,1,7,11,0,4,10,14,13,6,12},
-    {4,0,3,7,1,2,6,5}
-};
-
-static const atomiswave_key kov7sprt_key = {
-    {14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
-    {17,3,31,2,28,10,9,29,6,25,24,8,13,1,19,15,22,0,14,20,16,7,21,4,18,26,27,5,12,23,11,30},
-    {4,8,11,15,3,14,7,12,1,0,9,5,6,13,2,10},
-    {14,0,9,11,4,1,7,5,13,6,8,12,2,3,10,15},
-    {2,1,0,5,4,6,7,3}
-};
-
-static const atomiswave_key ggisuka_key = {
-    {12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
-    {14,6,2,4,26,20,21,10,29,23,18,31,1,28,17,15,9,30,24,16,0,13,27,11,22,12,5,7,8,3,19,25},
-    {5,9,8,1,13,4,12,6,11,7,10,2,3,14,0,15},
-    {15,5,12,14,13,1,11,10,8,7,4,2,0,3,9,6},
-    {1,5,4,7,0,2,6,3}
-};
-
-static const atomiswave_key vfurlong_key = {
-    {12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
-    {19,21,6,29,23,2,24,13,15,27,12,10,8,18,11,5,1,28,4,22,30,14,31,9,26,3,25,7,16,20,17,0},
-    {6,1,14,8,11,5,15,2,7,0,3,9,13,12,4,10},
-    {1,12,0,10,6,11,2,4,8,3,7,9,13,14,5,15},
-    {3,7,4,0,6,5,1,2}
-};
-
-static const atomiswave_key salmankt_key = {
-    {8,10,1,3,7,4,11,2,5,15,6,0,12,13,9,14},
-    {5,23,11,22,8,30,29,9,18,13,12,28,25,21,7,27,2,20,26,0,4,19,1,16,6,14,15,17,24,3,31,10},
-    {15,3,0,4,8,5,12,7,10,11,2,14,13,6,9,1},
-    {11,5,12,14,1,4,2,0,8,3,13,9,7,6,15,10},
-    {0,3,2,7,6,4,5,1}
-};
-
-static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswave_key* key)
+static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const UINT32 key)
 {
     int b0,b1,b2,b3;
     int aux;
+    const int* pbox = permutation_table[key>>18];
+    const sbox_set* ss = &sboxes_table[(key>>16)&3];
 
     aux = BITSWAP16(cipherText,
-                    key->P0[15],key->P0[14],key->P0[13],key->P0[12],key->P0[11],key->P0[10],key->P0[9],key->P0[8],
-                    key->P0[7],key->P0[6],key->P0[5],key->P0[4],key->P0[3],key->P0[2],key->P0[1],key->P0[0]);
+                    pbox[15],pbox[14],pbox[13],pbox[12],pbox[11],pbox[10],pbox[9],pbox[8],
+                    pbox[7],pbox[6],pbox[5],pbox[4],pbox[3],pbox[2],pbox[1],pbox[0]);
     aux = aux ^ BITSWAP16(address/2, 13,5,2, 14,10,9,4, 15,11,6,1, 12,8,7,3,0);
 
     b0 = aux&0x1f;
@@ -5694,13 +5619,43 @@ static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const atomiswav
     b2 = (aux>>9)&0xf;
     b3 = aux>>13;
 
-    b0 = key->S0[b0];
-    b1 = key->S1[b1];
-    b2 = key->S2[b2];
-    b3 = key->S3[b3];
+    b0 = ss->S0[b0];
+    b1 = ss->S1[b1];
+    b2 = ss->S2[b2];
+    b3 = ss->S3[b3];
 
-    return (b3<<13)|(b2<<9)|(b1<<5)|b0;
+    return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^(key&0xffff);
 }
+
+
+/*
+We are using 20 bits keys with the following subfields' structure:
+bits 0-15 is a 16-bits XOR
+bits 17-16 is a index to the sboxes table
+bits 19-18 is a index to the permutation table
+
+These subfields could be differing from the "real" ones in the following ways:
+- Every one of the index subfields could be suffering an arbitrary bitswap and XOR
+- The 16-bits-XOR subfield could suffer an arbitrary XOR which could depend on the 4 index bits (that is: a different XOR per every index combination)
+- Of course, the way in which we are mixing 3 subfields in one only key is arbitrary too.
+*/
+
+
+static const UINT32 sprtshot_key = 0x00000;
+static const UINT32 rangrmsn_key = 0x50000;
+static const UINT32 fotns_key    = 0x93627;
+static const UINT32 xtrmhunt_key = 0x80000;
+static const UINT32 xtrmhnt2_key = 0xc194f;
+static const UINT32 dolphin_key  = 0x1a1e8;
+static const UINT32 demofist_key = 0x60000;
+static const UINT32 rumblef_key  = 0x4194f;
+static const UINT32 ngbc_key     = 0x42255;
+static const UINT32 kofnw_key    = 0x6b3bf;
+static const UINT32 kov7sprt_key = 0xf0000;
+static const UINT32 ggisuka_key  = 0x8b10a;
+static const UINT32 vfurlong_key = 0xa547a;
+static const UINT32 salmankt_key = 0x34b74;
+
 
 static DRIVER_INIT( atomiswave )
 {
@@ -5727,7 +5682,7 @@ static DRIVER_INIT(DRIVER)	\
 	int rom_size = memory_region_length(machine, "user1");	\
 	for(i=0; i<rom_size/2; i++)	\
 	{	\
-		src[i] = atomiswave_decrypt(src[i], i*2, &DRIVER##_key);	\
+		src[i] = atomiswave_decrypt(src[i], i*2, DRIVER##_key);	\
 	}	\
 	DRIVER_INIT_CALL(atomiswave);	\
 }
