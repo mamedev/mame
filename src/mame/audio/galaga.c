@@ -139,7 +139,6 @@ DISCRETE_SOUND_START(bosco)
      * CHANL1 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
-					1,			/* ENAB */
 					NAMCO_54XX_2_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&bosco_54xx_dac)
@@ -153,7 +152,6 @@ DISCRETE_SOUND_START(bosco)
      * CHANL2 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_30,
-					1,			/* ENAB */
 					NAMCO_54XX_1_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&bosco_54xx_dac)
@@ -167,7 +165,6 @@ DISCRETE_SOUND_START(bosco)
      * CHANL3 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
-					1,			/* ENAB */
 					NAMCO_54XX_0_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&bosco_54xx_dac)
@@ -182,7 +179,6 @@ DISCRETE_SOUND_START(bosco)
      ************************************************/
 	/* this circuit was simulated in SPICE and an equivalent filter circuit generated */
 	DISCRETE_DAC_R1(NODE_50,
-					1,			/* ENAB */
 					NAMCO_52XX_P_DATA(NODE_04),
 					4,			/* 4V - unmeasured*/
 					&bosco_52xx_dac)
@@ -322,7 +318,6 @@ DISCRETE_SOUND_START(galaga)
      * CHANL1 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
-					1,			/* ENAB */
 					NAMCO_54XX_2_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&galaga_54xx_dac)
@@ -336,7 +331,6 @@ DISCRETE_SOUND_START(galaga)
      * CHANL2 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_30,
-					1,			/* ENAB */
 					NAMCO_54XX_1_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&galaga_54xx_dac)
@@ -350,7 +344,6 @@ DISCRETE_SOUND_START(galaga)
      * CHANL3 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
-					1,			/* ENAB */
 					NAMCO_54XX_0_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&galaga_54xx_dac)

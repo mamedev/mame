@@ -304,17 +304,15 @@ static DISCRETE_STEP(dst_clamp)
  *
  * DST_DAC_R1 - R1 Ladder DAC with cap smoothing
  *
- * input[0]    - Enable
- * input[1]    - Binary Data Input
- * input[2]    - Data On Voltage (3.4 for TTL)
+ * input[0]    - Binary Data Input
+ * input[1]    - Data On Voltage (3.4 for TTL)
  *
  * also passed discrete_dac_r1_ladder structure
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_DAC_R1__ENABLE		DISCRETE_INPUT(0)
-#define DST_DAC_R1__DATA		DISCRETE_INPUT(1)
-#define DST_DAC_R1__VON			DISCRETE_INPUT(2)
+#define DST_DAC_R1__DATA		DISCRETE_INPUT(0)
+#define DST_DAC_R1__VON			DISCRETE_INPUT(1)
 
 static DISCRETE_STEP(dst_dac_r1)
 {
@@ -329,50 +327,39 @@ static DISCRETE_STEP(dst_dac_r1)
 	data   = (int)DST_DAC_R1__DATA;
 	x_time = DST_DAC_R1__DATA - data;
 
-	if (DST_DAC_R1__ENABLE)
+	von = DST_DAC_R1__VON;
+	for (bit=0; bit < info->ladderLength; bit++)
 	{
-		von = DST_DAC_R1__VON;
-		for (bit=0; bit < info->ladderLength; bit++)
+		/* Add up currents of ON circuits per Millman. */
+
+		/* ignore if no resistor present */
+		if (info->r[bit] != 0)
 		{
-			/* Add up currents of ON circuits per Millman. */
+			i_bit   = von / info->r[bit];
+			bit_val = (data >> bit) & 0x01;
 
-			/* ignore if no resistor present */
-			if (info->r[bit] != 0)
+			if ((x_time != 0.0) && (bit_val != ((context->last_data >> bit) & 0x01)))
 			{
-				i_bit   = von / info->r[bit];
-				bit_val = (data >> bit) & 0x01;
-
-				if ((x_time != 0.0) && (bit_val != ((context->last_data >> bit) & 0x01)))
-				{
-					/* there is x_time and a change in bit,
-                     * so anti-alias the current */
-					i_bit *= bit_val ? x_time : 1.0 - x_time;
-				}
-				else
-				{
-					/* there is no x_time or a change in bit,
-                     * so 0 the current if the bit value is 0 */
-					 if (bit_val == 0)
-						 i_bit = 0;
-				}
-				i_total += i_bit;
+				/* there is x_time and a change in bit,
+                 * so anti-alias the current */
+				i_bit *= bit_val ? x_time : 1.0 - x_time;
 			}
+			else
+			{
+				/* there is no x_time or a change in bit,
+                 * so 0 the current if the bit value is 0 */
+				 if (bit_val == 0)
+					 i_bit = 0;
+			}
+			i_total += i_bit;
 		}
-
-		v = i_total * context->r_total;
-		context->last_data = data;
-
-		/* Filter if needed, else just output voltage */
-		node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
 	}
-	else
-	{
-		/*
-         * If module is disabled we will just leave the voltage where it was.
-         * We may want to set it to 0 in the future, but we will probably never
-         * disable this module.
-         */
-	}
+
+	v = i_total * context->r_total;
+	context->last_data = data;
+
+	/* Filter if needed, else just output voltage */
+	node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
 }
 
 static DISCRETE_RESET(dst_dac_r1)
@@ -1589,7 +1576,7 @@ static DISCRETE_RESET(dst_samphold)
 
 /************************************************************************
  *
- * DSS_SWITCH - Programmable 2 pole switch module with enable function
+ * DST_SWITCH - Programmable 2 pole switch module with enable function
  *
  * input[0]    - Enable input value
  * input[1]    - switch position
@@ -1597,16 +1584,16 @@ static DISCRETE_RESET(dst_samphold)
  * input[3]    - input[1]
  *
  ************************************************************************/
-#define DSS_SWITCH__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SWITCH__SWITCH	DISCRETE_INPUT(1)
-#define DSS_SWITCH__IN0		DISCRETE_INPUT(2)
-#define DSS_SWITCH__IN1		DISCRETE_INPUT(3)
+#define DST_SWITCH__ENABLE	DISCRETE_INPUT(0)
+#define DST_SWITCH__SWITCH	DISCRETE_INPUT(1)
+#define DST_SWITCH__IN0		DISCRETE_INPUT(2)
+#define DST_SWITCH__IN1		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_switch)
 {
-	if(DSS_SWITCH__ENABLE)
+	if(DST_SWITCH__ENABLE)
 	{
-		node->output[0] = DSS_SWITCH__SWITCH ? DSS_SWITCH__IN1 : DSS_SWITCH__IN0;
+		node->output[0] = DST_SWITCH__SWITCH ? DST_SWITCH__IN1 : DST_SWITCH__IN0;
 	}
 	else
 	{
@@ -1616,30 +1603,21 @@ static DISCRETE_STEP(dst_switch)
 
 /************************************************************************
  *
- * DSS_ASWITCH - Analog switch
+ * DST_ASWITCH - Analog switch
  *
- * input[0]    - Enable input value
  * input[1]    - Control
  * input[2]    - Input
  * input[3]    - Threshold for enable
  *
  ************************************************************************/
-#define DSS_ASWITCH__ENABLE		DISCRETE_INPUT(0)
-#define DSS_ASWITCH__CTRL		DISCRETE_INPUT(1)
-#define DSS_ASWITCH__IN			DISCRETE_INPUT(2)
-#define DSS_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
+#define DST_ASWITCH__CTRL		DISCRETE_INPUT(1)
+#define DST_ASWITCH__IN			DISCRETE_INPUT(2)
+#define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(3)
 
 
 static DISCRETE_STEP(dst_aswitch)
 {
-	if(DSS_SWITCH__ENABLE)
-	{
-		node->output[0] = DSS_ASWITCH__CTRL > DSS_ASWITCH__THRESHOLD ? DSS_ASWITCH__IN : 0;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = DST_ASWITCH__CTRL > DST_ASWITCH__THRESHOLD ? DST_ASWITCH__IN : 0;
 }
 
 /************************************************************************

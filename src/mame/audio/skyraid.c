@@ -353,7 +353,6 @@ DISCRETE_SOUND_START( skyraid )
 		SKYRAID_PLANE_SWEEP_EN,				/* IN0 */
 		RES_2_PARALLEL(SKYRAID_R25, SKYRAID_R24), SKYRAID_C49)
 	DISCRETE_566(NODE_31,					/* IC J6, pin 3 */
-		1,									/* ENAB */
 		NODE_30,							/* VMOD */
 		SKYRAID_R18, SKYRAID_C48, &skyraid_566_desc)
 	DISCRETE_LOGIC_SHIFT(NODE_32,			/* IC H7, J7 output */
@@ -363,7 +362,6 @@ DISCRETE_SOUND_START( skyraid )
 	/* move bits together for ease of use */
 	DISCRETE_TRANSFORM4(NODE_33, NODE_32, 1, 1 << 14, 2, "01&02/3&|")
 	DISCRETE_DAC_R1(SKYRAID_PLANE_SND,
-		1,									/* ENAB */
 		NODE_33,							/* DATA */
 		DEFAULT_TTL_V_LOGIC_1, &skyraid_plane_dac)
 	DISCRETE_BIT_DECODE(SKYRAID_JET_A_SND, NODE_32, 0, DEFAULT_TTL_V_LOGIC_1)	/* IC H7, pin 3 */
@@ -374,7 +372,6 @@ DISCRETE_SOUND_START( skyraid )
 	 ************************************************/
 	DISCRETE_CUSTOM5(NODE_40, SKYRAID_MISSILE_EN, SKYRAID_R12, SKYRAID_R14, SKYRAID_R13, SKYRAID_C44, &skyraid_missle_custom_charge)
 	DISCRETE_566(NODE_41,					/* IC K6, pin 3 */
-		1,									/* ENAB */
 		NODE_40,							/* VMOD */
 		SKYRAID_R16, SKYRAID_C45, &skyraid_566_desc)
 	DISCRETE_LOGIC_SHIFT(NODE_42,			/* IC K7, L7 output */

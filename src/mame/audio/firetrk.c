@@ -210,7 +210,7 @@ DISCRETE_SOUND_START(firetrk)
 				RES_K(260),	// R26 + R27 @ max
 				RES_K(10),	// R26 + R27 @ min
 				DISC_LOGADJ, "R27")
-	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q1
+	DISCRETE_DAC_R1(NODE_21,		// base of Q1
 			FIRETRUCK_MOTOR_DATA,	// IC F8, pins 2,5,6,9
 			DEFAULT_TTL_V_LOGIC_1,
 			&firetrk_motor_v_dac)
@@ -227,7 +227,7 @@ DISCRETE_SOUND_START(firetrk)
 			NODE_24,									// from IC A9, pin 8
 			1, 1, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_TRANSFORM3(NODE_26, NODE_23, 2, NODE_25, "01*2+")	// Mix QA and QB-D together
-	DISCRETE_DAC_R1(FIRETRUCK_MOTORSND, 1, NODE_26,
+	DISCRETE_DAC_R1(FIRETRUCK_MOTORSND, NODE_26,
 			DEFAULT_TTL_V_LOGIC_1,
 			&firetrk_motor_out_dac)
 
@@ -246,7 +246,7 @@ DISCRETE_SOUND_START(firetrk)
 	/* 0000 = 666Hz with 35% duty cycle             */
 	/* 1111 = 526Hz with 63% duty cycle             */
 	/************************************************/
-	DISCRETE_DAC_R1(NODE_40, 1,		// IC E9, pin 7
+	DISCRETE_DAC_R1(NODE_40,		// IC E9, pin 7
 			FIRETRUCK_SIREN_DATA,	// IC F8, pins 15,16,12,19
 			DEFAULT_TTL_V_LOGIC_1,
 			&firetrk_siren_cv_dac)
@@ -270,7 +270,7 @@ DISCRETE_SOUND_START(firetrk)
 
 	DISCRETE_SWITCH(NODE_50, 1, FIRETRUCK_NOISE, 0,	// Enable gate K9
 			FIRETRUCK_CRASH_DATA)		// IC K9, pins 3,6,11,8
-	DISCRETE_DAC_R1(FIRETRUCK_BANGSND, 1,	// Bang
+	DISCRETE_DAC_R1(FIRETRUCK_BANGSND,	// Bang
 			NODE_50,		// from enable gates K9
 			DEFAULT_TTL_V_LOGIC_1,
 			&firetrk_bang_dac)
@@ -413,7 +413,7 @@ DISCRETE_SOUND_START(superbug)
 				RES_K(260),	// R12 + R62 @ max
 				RES_K(10),	// R12 + R62 @ min
 				DISC_LOGADJ, "R62")
-	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q1
+	DISCRETE_DAC_R1(NODE_21,		// base of Q1
 			SUPERBUG_SPEED_DATA,	// IC B5, pins 3, 14, 6, 11
 			DEFAULT_TTL_V_LOGIC_1,
 			&superbug_motor_v_dac)
@@ -432,7 +432,7 @@ DISCRETE_SOUND_START(superbug)
 			NODE_26,									// from IC A9, pin 8
 			1, 1, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")	// Mix QA and QB-D together
-	DISCRETE_DAC_R1(SUPERBUG_MOTORSND, 1, NODE_28,
+	DISCRETE_DAC_R1(SUPERBUG_MOTORSND, NODE_28,
 			DEFAULT_TTL_V_LOGIC_1,
 			&superbug_motor_out_dac)
 
@@ -449,7 +449,7 @@ DISCRETE_SOUND_START(superbug)
 
 	DISCRETE_SWITCH(NODE_40, 1, SUPERBUG_NOISE, 0,	// Enable gate C8
 			SUPERBUG_CRASH_DATA)		// IC D8, pins 3,14,6,11
-	DISCRETE_DAC_R1(SUPERBUG_BANGSND, 1,	// Bang
+	DISCRETE_DAC_R1(SUPERBUG_BANGSND,	// Bang
 			NODE_40,		// from enable gates C8
 			DEFAULT_TTL_V_LOGIC_1,
 			&superbug_bang_dac)
@@ -597,7 +597,7 @@ DISCRETE_SOUND_START(montecar)
 				RES_K(260),	// R87 + R89 @ max
 				RES_K(10),	// R87 + R89 @ min
 				DISC_LOGADJ, "R89")
-	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q7
+	DISCRETE_DAC_R1(NODE_21,		// base of Q7
 			MONTECAR_MOTOR_DATA,	// IC H8, pins 5, 2, 9, 6
 			DEFAULT_TTL_V_LOGIC_1,
 			&montecar_motor_v_dac)
@@ -616,7 +616,7 @@ DISCRETE_SOUND_START(montecar)
 			NODE_26,									// from IC A9, pin 11
 			1, 1, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")	// Mix QA and QB-D together
-	DISCRETE_DAC_R1(MONTECAR_MOTORSND, 1, NODE_28,
+	DISCRETE_DAC_R1(MONTECAR_MOTORSND, NODE_28,
 			DEFAULT_TTL_V_LOGIC_1,
 			&montecar_motor_out_dac)
 
@@ -632,7 +632,7 @@ DISCRETE_SOUND_START(montecar)
 				RES_K(260),	// R85 + R88 @ max
 				RES_K(10),	// R85 + R88 @ min
 				DISC_LOGADJ, "R88")
-	DISCRETE_DAC_R1(NODE_41, 1,			// base of Q7
+	DISCRETE_DAC_R1(NODE_41,			// base of Q7
 			MONTECAR_DRONE_MOTOR_DATA,	// IC H8, pins 19, 16, 12, 15
 			DEFAULT_TTL_V_LOGIC_1,
 			&montecar_motor_v_dac)
@@ -651,7 +651,7 @@ DISCRETE_SOUND_START(montecar)
 			NODE_46,									// from IC A9, pin 6
 			1, 1, 0, DISC_CLK_ON_F_EDGE)
 	DISCRETE_TRANSFORM3(NODE_48, NODE_43, 2, NODE_47, "01*2+")	// Mix QA and QB-D together
-	DISCRETE_DAC_R1(MONTECAR_DRONE_MOTORSND, 1, NODE_48,
+	DISCRETE_DAC_R1(MONTECAR_DRONE_MOTORSND, NODE_48,
 			DEFAULT_TTL_V_LOGIC_1,
 			&montecar_motor_out_dac)
 
@@ -668,7 +668,7 @@ DISCRETE_SOUND_START(montecar)
 
 	DISCRETE_SWITCH(NODE_50, 1, MONTECAR_NOISE, 0,	// Enable gate A9
 			MONTECAR_CRASH_DATA)		// IC J8, pins 3,6,11,14
-	DISCRETE_DAC_R1(NODE_51, 1,	// Bang
+	DISCRETE_DAC_R1(NODE_51,	// Bang
 			NODE_50,	// from enable gates A9
 			DEFAULT_TTL_V_LOGIC_1,
 			&montecar_bang_dac)

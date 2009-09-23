@@ -229,7 +229,6 @@ DISCRETE_SOUND_START( m79amb )
 	/* (iR36 + iR35 + iR37) * R36||R35||R37 where iR35 = 0/R35 = 0 */
 	DISCRETE_TRANSFORM4(NODE_51, 12.0 / M79AMB_R36, NODE_50, M79AMB_R37, RES_3_PARALLEL(M79AMB_R36, M79AMB_R35, M79AMB_R37), "012/+3*")
 	DISCRETE_566(NODE_52,					/* IC U3, pin 4 */
-				1,							/* ENAB */
 				NODE_51,					/* IC U3, pin 5 */
 				M79AMB_R39, M79AMB_C21, &m79amb_566_desc)
 	DISCRETE_CRFILTER(NODE_53,
@@ -241,7 +240,6 @@ DISCRETE_SOUND_START( m79amb )
      * Tank, Truck, Jeep
      ************************************************/
 	DISCRETE_566(NODE_60,						/* IC U4, pin 4 */
-				1,								/* ENAB */
 				12.0 * RES_VOLTAGE_DIVIDER(M79AMB_R44, M79AMB_R45),		/* IC U5, pin 5 */
 				M79AMB_R46, M79AMB_C25, &m79amb_566_desc)
 	DISCRETE_ONOFF(NODE_61,
@@ -267,7 +265,6 @@ DISCRETE_SOUND_START( m79amb )
 	/* cap charge to B+ ratio changes voltage on pin 5 */
 	DISCRETE_TRANSFORM3(NODE_71, 12, NODE_70, RES_VOLTAGE_DIVIDER(M79AMB_R51, M79AMB_R52), "01-2*1+")
 	DISCRETE_566(NODE_72,					/* IC U5, pin 4 */
-				1,							/* ENAB */
 				NODE_71,					/* IC U5, pin 5 */
 				M79AMB_R54, M79AMB_C30, &m79amb_566_desc)
 	DISCRETE_CRFILTER(NODE_73,
@@ -287,7 +284,6 @@ DISCRETE_SOUND_START( m79amb )
 	/* cap charge to B+ ratio changes voltage on pin 5 */
 	DISCRETE_TRANSFORM3(NODE_81, 12, NODE_80, RES_VOLTAGE_DIVIDER(M79AMB_R61, M79AMB_R62), "01-2*1+")
 	DISCRETE_566(NODE_82,					/* IC U5, pin 4 */
-				1,							/* ENAB */
 				NODE_81,					/* IC U5, pin 5 */
 				M79AMB_R64, M79AMB_C34, &m79amb_566_desc)
 	DISCRETE_CRFILTER(NODE_83,

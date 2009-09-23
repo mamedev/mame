@@ -126,7 +126,7 @@ DISCRETE_SOUND_START(sprint2)
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR1")
 
-	DISCRETE_DAC_R1(NODE_21, 1,
+	DISCRETE_DAC_R1(NODE_21,
 			SPRINT2_MOTORSND1_DATA,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_v_dac)
@@ -152,7 +152,7 @@ DISCRETE_SOUND_START(sprint2)
 	/* Mix QA and QB-D together */
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")
 
-	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, 1, NODE_28,
+	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, NODE_28,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_out_dac)
 
@@ -164,7 +164,7 @@ DISCRETE_SOUND_START(sprint2)
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR2")
 
-	DISCRETE_DAC_R1(NODE_41, 1,
+	DISCRETE_DAC_R1(NODE_41,
 			SPRINT2_MOTORSND2_DATA,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_v_dac)
@@ -190,7 +190,7 @@ DISCRETE_SOUND_START(sprint2)
 	/* Mix QA and QB-D together */
 	DISCRETE_TRANSFORM3(NODE_48, NODE_43, 2, NODE_47, "01*2+")
 
-	DISCRETE_DAC_R1(SPRINT2_MOTORSND2, 1, NODE_48,
+	DISCRETE_DAC_R1(SPRINT2_MOTORSND2, NODE_48,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_out_dac)
 
@@ -205,7 +205,7 @@ DISCRETE_SOUND_START(sprint2)
 
 	DISCRETE_SWITCH(NODE_60, 1, SPRINT2_NOISE, 0, SPRINT2_CRASHSND_DATA)
 
-	DISCRETE_DAC_R1(SPRINT2_CRASHSND, 1, NODE_60, DEFAULT_TTL_V_LOGIC_1, &sprint2_crash_dac)
+	DISCRETE_DAC_R1(SPRINT2_CRASHSND, NODE_60, DEFAULT_TTL_V_LOGIC_1, &sprint2_crash_dac)
 
 	/************************************************/
 	/* Screech is noise modulating a  Schmitt VCO.  */
@@ -249,7 +249,7 @@ DISCRETE_SOUND_START(sprint1)
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR")
 
-	DISCRETE_DAC_R1(NODE_21, 1,
+	DISCRETE_DAC_R1(NODE_21,
 			SPRINT2_MOTORSND1_DATA,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_v_dac)
@@ -275,7 +275,7 @@ DISCRETE_SOUND_START(sprint1)
 	/* Mix QA and QB-D together */
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")
 
-	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, 1, NODE_28,
+	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, NODE_28,
 			DEFAULT_TTL_V_LOGIC_1,
 			&sprint2_motor_out_dac)
 
@@ -290,7 +290,7 @@ DISCRETE_SOUND_START(sprint1)
 
 	DISCRETE_SWITCH(NODE_60, 1, SPRINT2_NOISE, 0, SPRINT2_CRASHSND_DATA)
 
-	DISCRETE_DAC_R1(SPRINT2_CRASHSND, 1, NODE_60, DEFAULT_TTL_V_LOGIC_1, &sprint2_crash_dac)
+	DISCRETE_DAC_R1(SPRINT2_CRASHSND, NODE_60, DEFAULT_TTL_V_LOGIC_1, &sprint2_crash_dac)
 
 	/************************************************/
 	/* Screech is noise modulating a  Schmitt VCO.  */
@@ -376,14 +376,14 @@ DISCRETE_SOUND_START(dominos)
 	/************************************************/
 	/* Tone Sound                                   */
 	/************************************************/
-	DISCRETE_DAC_R1(NODE_20, 1, DOMINOS_FREQ_DATA, DEFAULT_TTL_V_LOGIC_1, &dominos_tone_vco_dac)
+	DISCRETE_DAC_R1(NODE_20, DOMINOS_FREQ_DATA, DEFAULT_TTL_V_LOGIC_1, &dominos_tone_vco_dac)
 	DISCRETE_555_CC(NODE_21, 1, NODE_20, DOMINOS_R23, CAP_U(.01), 0, 0, 0, &dominos_tone_vco)
 	DISCRETE_COUNTER_7492(NODE_22, 1, DOMINOS_ATTRACT_EN,	// IC D8, QB-QD
 			NODE_21, DISC_CLK_ON_F_EDGE)					// from IC D7/8, pin 3
 	DISCRETE_TRANSFORM2(NODE_23, NODE_22, 0x01, "01&")	// IC D8, pin 11-QB
 	DISCRETE_SWITCH(NODE_24, 1, NODE_23, 0,	// Enable gate C5
 			DOMINOS_AMP_DATA)		// IC C4
-	DISCRETE_DAC_R1(DOMINOS_TONE_SND, 1, NODE_24, DEFAULT_TTL_V_LOGIC_1, &dominos_tone_dac)
+	DISCRETE_DAC_R1(DOMINOS_TONE_SND, NODE_24, DEFAULT_TTL_V_LOGIC_1, &dominos_tone_dac)
 
 	/************************************************/
 	/* Topple sound is just the 4V source           */

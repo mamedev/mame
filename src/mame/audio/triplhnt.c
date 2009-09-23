@@ -134,7 +134,7 @@ DISCRETE_SOUND_START(triplhnt)
 				10000,	// R86 + R88 @ 0
 				260000,	// R86 + R88 @ max
 				DISC_LOGADJ, "BEAR")
-	DISCRETE_DAC_R1(NODE_21, 1,			// base of Q2
+	DISCRETE_DAC_R1(NODE_21,			// base of Q2
 			TRIPLHNT_BEAR_ROAR_DATA,	// IC B10, Q0-Q3
 			DEFAULT_TTL_V_LOGIC_1,		// TTL ON level
 			&triplhnt_bear_roar_v_dac)
@@ -155,7 +155,7 @@ DISCRETE_SOUND_START(triplhnt)
 			NODE_27,								// from IC B8, pin 6
 			1, 1, 0, DISC_CLK_ON_R_EDGE)			// /2 counter on rising edge
 	DISCRETE_TRANSFORM5(NODE_29, NODE_24, NODE_28, NODE_26, 2, 4, "13*24*+0+")	// Mix the mess together in binary
-	DISCRETE_DAC_R1(TRIPLHNT_BEAR_ROAR_SND, 1, NODE_29,
+	DISCRETE_DAC_R1(TRIPLHNT_BEAR_ROAR_SND, NODE_29,
 			DEFAULT_TTL_V_LOGIC_1,
 			&triplhnt_bear_roar_out_dac)
 
@@ -166,7 +166,7 @@ DISCRETE_SOUND_START(triplhnt)
 	DISCRETE_SWITCH(NODE_40, 1,	// Gate A9, pins 6, 8, 11, 3
 			TRIPLHNT_NOISE,	// noise enables the data which is then inverted
 			1, TRIPLHNT_SHOT_DATA)
-	DISCRETE_DAC_R1(TRIPLHNT_SHOT_SND, 1,
+	DISCRETE_DAC_R1(TRIPLHNT_SHOT_SND,
 			NODE_40,
 			DEFAULT_TTL_V_LOGIC_1,
 			&triplhnt_shot_dac)

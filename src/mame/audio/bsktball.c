@@ -107,7 +107,7 @@ DISCRETE_SOUND_START(bsktball)
 	/************************************************/
 	DISCRETE_LFSR_NOISE(BSKTBALL_NOISE, BSKTBALL_NOISE_EN, BSKTBALL_NOISE_EN, BSKTBALL_256H, 1, 0, .5, &bsktball_lfsr)
 	DISCRETE_SWITCH(NODE_20, 1, BSKTBALL_NOISE, 0, BSKTBALL_CROWD_DATA)	// enable data, gate D11
-	DISCRETE_DAC_R1(NODE_21, 1, NODE_20, DEFAULT_TTL_V_LOGIC_1, &bsktball_crowd_r1_ladder)
+	DISCRETE_DAC_R1(NODE_21, NODE_20, DEFAULT_TTL_V_LOGIC_1, &bsktball_crowd_r1_ladder)
 	DISCRETE_OP_AMP_FILTER(BSKTBALL_CROWD_SND, 1, NODE_21, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &bsktball_crowd_filt)
 
 	/************************************************/

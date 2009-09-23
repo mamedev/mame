@@ -118,11 +118,13 @@ static DISCRETE_SOUND_START(crbaloon)
     * Music Generator is amplitude modulated by a
     * linear ramp.
     ************************************************/
+	/* TO BE FIXED - needs proper modulation */
 	DISCRETE_NOTE(NODE_20, 1, CRBALOON_16H / 2, CRBALOON_MUSIC_DATA, 255, 7, DISC_CLK_IS_FREQ)
-	DISCRETE_DAC_R1(NODE_21, CRBALOON_MUSIC_EN, NODE_20, DEFAULT_TTL_V_LOGIC_1, &desc_crbaloon_music_dac)
+	DISCRETE_DAC_R1(NODE_21, NODE_20, DEFAULT_TTL_V_LOGIC_1, &desc_crbaloon_music_dac)
+	DISCRETE_ONOFF(NODE_22, CRBALOON_MUSIC_EN, NODE_21)
 //  DISCRETE_RAMP(NODE_21, 1, RAMP, GRAD, MIN, MAX, CLAMP)
-	DISCRETE_MULTIPLY(NODE_22, NODE_21, CRBALOON_VR3)
-	DISCRETE_CRFILTER(CRBALOON_MUSIC_SND, 1, NODE_22, RES_K(50), CAP_U(1))
+	DISCRETE_MULTIPLY(NODE_23, NODE_22, CRBALOON_VR3)
+	DISCRETE_CRFILTER(CRBALOON_MUSIC_SND, 1, NODE_23, RES_K(50), CAP_U(1))
 
 	/************************************************
     * Final mix and output.

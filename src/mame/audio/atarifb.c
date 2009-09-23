@@ -96,7 +96,7 @@ DISCRETE_SOUND_START(atarifb)
 	/************************************************/
 	DISCRETE_LFSR_NOISE(NODE_20, ATARIFB_NOISE_EN, ATARIFB_NOISE_EN, 15750.0, 1, 0, .5, &atarifb_lfsr)
 	DISCRETE_SWITCH(NODE_21, 1, NODE_20, 0, ATARIFB_CROWD_DATA)	// enable data, gate D8
-	DISCRETE_DAC_R1(NODE_22, 1, NODE_21, DEFAULT_TTL_V_LOGIC_1, &atarifb_crowd_r1_ladder)
+	DISCRETE_DAC_R1(NODE_22, NODE_21, DEFAULT_TTL_V_LOGIC_1, &atarifb_crowd_r1_ladder)
 	DISCRETE_OP_AMP_FILTER(ATARIFB_CROWD_SND, 1, NODE_22, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &atarifb_crowd_filt)
 
 	/************************************************/
@@ -186,7 +186,7 @@ DISCRETE_SOUND_START(abaseb)
 	/************************************************/
 	DISCRETE_LFSR_NOISE(NODE_20, ATARIFB_NOISE_EN, ATARIFB_NOISE_EN, 15750.0, 1, 0, .5, &atarifb_lfsr)
 	DISCRETE_SWITCH(NODE_21, 1, NODE_20, 0, ATARIFB_CROWD_DATA)	// enable data, gate D8
-	DISCRETE_DAC_R1(NODE_22, 1, NODE_21, DEFAULT_TTL_V_LOGIC_1, &abaseb_crowd_r1_ladder)
+	DISCRETE_DAC_R1(NODE_22, NODE_21, DEFAULT_TTL_V_LOGIC_1, &abaseb_crowd_r1_ladder)
 	DISCRETE_OP_AMP_FILTER(ABASEB_CROWD_SND, 1, NODE_22, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &abaseb_crowd_filt)
 
 	/************************************************/

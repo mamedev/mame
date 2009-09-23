@@ -111,7 +111,7 @@ DISCRETE_SOUND_START(asteroid)
 	/* an RC filter to perform smoothing on the     */
 	/* output                                       */
 	/************************************************/
-	DISCRETE_DAC_R1(NODE_30, 1, ASTEROID_THUMP_DATA, 3.5, &asteroid_thump_dac1) // CMOS
+	DISCRETE_DAC_R1(NODE_30, ASTEROID_THUMP_DATA, 3.5, &asteroid_thump_dac1) // CMOS
 	DISCRETE_555_CC(NODE_31, ASTEROID_THUMP_EN, NODE_30, RES_K(22), CAP_U(0.22), 0, 0, RES_K(18), &asteroid_thump_555cc)
 	DISCRETE_RCFILTER(NODE_32, 1, NODE_31, RES_K(3.3), CAP_U(0.1))
 	DISCRETE_GAIN(ASTEROID_THUMP_SND, NODE_32, 30)

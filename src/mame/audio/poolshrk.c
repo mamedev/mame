@@ -96,7 +96,7 @@ DISCRETE_SOUND_START(poolshrk)
 	                 0, DISC_CLK_IS_FREQ)	// Cleared to 0
 	DISCRETE_TRANSFORM2(NODE_31, NODE_30, 15, "01=!")	// TC output of E8, pin 15. (inverted)
 
-	DISCRETE_DAC_R1(NODE_32, 1,	// Base of Q3
+	DISCRETE_DAC_R1(NODE_32,	// Base of Q3
 			NODE_30,	// IC E8, Q0-Q3
 			3.4,		// TTL ON level = 3.4V
 			&poolshrk_score_v_dac)

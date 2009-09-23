@@ -260,7 +260,6 @@ DISCRETE_SOUND_START(polepos)
      * CHANL1 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
-					1,			/* ENAB */
 					NAMCO_54XX_2_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
@@ -278,7 +277,6 @@ DISCRETE_SOUND_START(polepos)
      * CHANL2 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_30,
-					1,			/* ENAB */
 					NAMCO_54XX_1_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
@@ -296,7 +294,6 @@ DISCRETE_SOUND_START(polepos)
      * CHANL3 sound
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
-					1,			/* ENAB */
 					NAMCO_54XX_0_DATA(NODE_01),
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
@@ -315,7 +312,6 @@ DISCRETE_SOUND_START(polepos)
      ************************************************/
 	/* this circuit was simulated in SPICE and an equivalent filter circuit generated */
 	DISCRETE_DAC_R1(NODE_50,
-					1,			/* ENAB */
 					NAMCO_52XX_P_DATA(NODE_04),
 					4,			/* 4V - unmeasured*/
 					&polepos_52xx_dac)

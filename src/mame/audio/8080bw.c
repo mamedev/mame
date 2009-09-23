@@ -256,7 +256,7 @@ DISCRETE_SOUND_START(indianbt)
 	// Convert count to 7492 output
 	DISCRETE_TRANSFORM2(NODE_21, NODE_20, 2, "01>0+")
 
-	DISCRETE_DAC_R1(NODE_22, 1, NODE_21, DEFAULT_TTL_V_LOGIC_1, &indianbt_music_dac)
+	DISCRETE_DAC_R1(NODE_22, NODE_21, DEFAULT_TTL_V_LOGIC_1, &indianbt_music_dac)
 
 /******************************************************************************
  *
@@ -478,7 +478,7 @@ DISCRETE_SOUND_START(polaris)
  *
  ******************************************************************************/
 	DISCRETE_NOTE(NODE_30, 1, 23396, POLARIS_MUSIC_DATA, 255, 3, DISC_CLK_IS_FREQ)
-	DISCRETE_DAC_R1(NODE_31, 1, NODE_30, DEFAULT_TTL_V_LOGIC_1, &polaris_music_dac)
+	DISCRETE_DAC_R1(NODE_31, NODE_30, DEFAULT_TTL_V_LOGIC_1, &polaris_music_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_32, 1, NODE_31, 0, DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON, &polaris_music_op_amp_filt_info)
 	DISCRETE_MULTIPLY(POLARIS_MUSIC, NODE_32, POLARIS_ADJ_VR3)
 

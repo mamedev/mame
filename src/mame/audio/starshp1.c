@@ -249,7 +249,6 @@ DISCRETE_SOUND_START( starshp1 )
 						5,							/* 5V to R55 */
 						&starshp1_566_a9_mix_r)
 	DISCRETE_566(		NODE_42,					/* IC A9, pin 4 */
-						1,							/* ENAB */
 						STARSHP1_MOTOR_SPEED,		/* IC A9, pin 5 */
 						RES_2_PARALLEL(STARSHP1_R54, STARSHP1_R55),
 						STARSHP1_C34,

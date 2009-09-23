@@ -169,7 +169,6 @@ static const discrete_mixer_desc sprint4_mixer =
 	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR_DATA_##_plr,                                                 \
 					-1, 0x0f, 0)	/* latch IC D8 inverts the data */                              \
 	DISCRETE_DAC_R1(SPRINT4_PLAYER_MOTOR_NODE(1, _plr),                                             \
-					1,											/* ENAB */                          \
 					SPRINT4_MOTOR_DATA_##_plr,					/* DATA */                          \
 					DEFAULT_TTL_V_LOGIC_1,						/* VDATA */                         \
 					&sprint4_motor_freq_DAC)					/* LADDER */                        \
@@ -211,7 +210,6 @@ static const discrete_mixer_desc sprint4_mixer =
 					0x08,										/* INP2 */                          \
 					"012*+")									/* join 7492 bits together */       \
 	DISCRETE_DAC_R1(SPRINT4_MOTOR_SND_##_plr,           		                                    \
-					1,											/* ENAB */                          \
 					SPRINT4_PLAYER_MOTOR_NODE(7, _plr),			/* DATA */                          \
 					DEFAULT_TTL_V_LOGIC_1,						/* VDATA */                         \
 					&sprint4_motor_out_DAC)						/* LADDER */
@@ -234,7 +232,6 @@ static const discrete_mixer_desc sprint4_mixer =
 					SPRINT4_NOISE,						/* ENAB */      \
 					SPRINT4_BANG_DATA)					/* INP0 */      \
 	DISCRETE_DAC_R1(SPRINT4_BANG_SND,                                   \
-					1,									/* ENAB */      \
 					NODE_70,							/* DATA */      \
 					DEFAULT_TTL_V_LOGIC_1,				/* VDATA */     \
 					&sprint4_bang_DAC)					/* LADDER */

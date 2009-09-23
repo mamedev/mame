@@ -233,13 +233,14 @@
  * DISCRETE_RAMP(NODE,ENAB,RAMP,GRAD,MIN,MAX,CLAMP)
  * DISCRETE_SAMPLHOLD(NODE,INP0,CLOCK,CLKTYPE)
  * DISCRETE_SWITCH(NODE,ENAB,SWITCH,INP0,INP1)
+ * DISCRETE_ASWITCH(NODE,CTRL,INP,THRESHOLD)
  * DISCRETE_TRANSFORM2(NODE,INP0,INP1,FUNCT)
  * DISCRETE_TRANSFORM3(NODE,INP0,INP1,INP2,FUNCT)
  * DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)
  * DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)
  *
  * DISCRETE_COMP_ADDER(NODE,DATA,TABLE)
- * DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)
+ * DISCRETE_DAC_R1(NODE,DATA,VDATA,LADDER)
  * DISCRETE_DIODE_MIXER2(NODE,IN0,IN1,TABLE)
  * DISCRETE_DIODE_MIXER3(NODE,IN0,IN1,IN2,TABLE)
  * DISCRETE_DIODE_MIXER4(NODE,IN0,IN1,IN2,IN3,TABLE)
@@ -302,8 +303,8 @@
  * DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
- * DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)
- * DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)
+ * DISCRETE_566(NODE,VMOD,R,C,OPTIONS)
+ * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
  * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
@@ -1653,14 +1654,13 @@
  *  Declaration syntax
  *
  *     DISCRETE_ASWITCH   (name of node,
- *                         enable node or static value,
  *                         ctrl node or static value,
  *                         input node or static value,
  *                         threshold satic value )
  *
  *  Example config line
  *
- *     DISCRETE_ASWITCH(NODE_03,1,NODE_10,NODE_90, 2.73)
+ *     DISCRETE_ASWITCH(NODE_03,NODE_10,NODE_90, 2.73)
  *
  *  Always enabled, NODE_10 switches output to be either NODE_90 or
  *  constant value 0.0. Ctrl>2.73 output=NODE_90 else output=0
@@ -1790,7 +1790,6 @@
  *  Declaration syntax
  *
  *     DISCRETE_DAC_R1(name of node,
- *                     enable node or static value,
  *                     data node (static value is useless),
  *                     vData node or static value (voltage when a bit is on ),
  *                     address of discrete_dac_r1_ladder structure)
@@ -3177,7 +3176,6 @@
  *  Declaration syntax
  *
  *     DISCRETE_566(name of node,
- *                  enable node or static value,
  *                  vMod node or static value,
  *                  R node or static value in ohms,
  *                  C node or static value in Farads,
@@ -3230,7 +3228,6 @@
  *  Declaration syntax
  *
  *     DISCRETE_74LS624(name of node,
- *                      enable node or static value,
  *                      vMod node or static value,
  *                      vRng static value,
  *                      C static value in Farads,
@@ -4359,14 +4356,14 @@ enum
 #define DISCRETE_RAMP(NODE,ENAB,RAMP,GRAD,START,END,CLAMP)              { NODE, DST_RAMP        , 6, { ENAB,RAMP,GRAD,START,END,CLAMP }, { ENAB,RAMP,GRAD,START,END,CLAMP }, NULL, "DISCRETE_RAMP" },
 #define DISCRETE_SAMPLHOLD(NODE,INP0,CLOCK,CLKTYPE)                     { NODE, DST_SAMPHOLD    , 3, { INP0,CLOCK,NODE_NC }, { INP0,CLOCK,CLKTYPE }, NULL, "DISCRETE_SAMPLHOLD" },
 #define DISCRETE_SWITCH(NODE,ENAB,SWITCH,INP0,INP1)                     { NODE, DST_SWITCH      , 4, { ENAB,SWITCH,INP0,INP1 }, { ENAB,SWITCH,INP0,INP1 }, NULL, "DISCRETE_SWITCH" },
-#define DISCRETE_ASWITCH(NODE,ENAB,CTRL,INP,THRESHOLD)                  { NODE, DST_ASWITCH     , 3, { ENAB,CTRL,INP,THRESHOLD }, { ENAB,CTRL,INP, THRESHOLD}, NULL, "Analog Switch" },
+#define DISCRETE_ASWITCH(NODE,CTRL,INP,THRESHOLD)                       { NODE, DST_ASWITCH     , 3, { CTRL,INP,THRESHOLD }, { CTRL,INP, THRESHOLD}, NULL, "Analog Switch" },
 #define DISCRETE_TRANSFORM2(NODE,INP0,INP1,FUNCT)                       { NODE, DST_TRANSFORM   , 2, { INP0,INP1 }, { INP0,INP1 }, FUNCT, "DISCRETE_TRANSFORM2" },
 #define DISCRETE_TRANSFORM3(NODE,INP0,INP1,INP2,FUNCT)                  { NODE, DST_TRANSFORM   , 3, { INP0,INP1,INP2 }, { INP0,INP1,INP2 }, FUNCT, "DISCRETE_TRANSFORM3" },
 #define DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)             { NODE, DST_TRANSFORM   , 4, { INP0,INP1,INP2,INP3 }, { INP0,INP1,INP2,INP3 }, FUNCT, "DISCRETE_TRANSFORM4" },
 #define DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)        { NODE, DST_TRANSFORM   , 5, { INP0,INP1,INP2,INP3,INP4 }, { INP0,INP1,INP2,INP3,INP4 }, FUNCT, "DISCRETE_TRANSFORM5" },
 /* Component specific */
 #define DISCRETE_COMP_ADDER(NODE,DATA,TABLE)                            { NODE, DST_COMP_ADDER  , 1, { DATA }, { DATA }, TABLE, "DISCRETE_COMP_ADDER" },
-#define DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)                    { NODE, DST_DAC_R1      , 3, { ENAB,DATA,VDATA }, { ENAB,DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
+#define DISCRETE_DAC_R1(NODE,DATA,VDATA,LADDER)                         { NODE, DST_DAC_R1      , 2, { DATA,VDATA }, { DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
 #define DISCRETE_DIODE_MIXER2(NODE,IN0,IN1,TABLE)                       { NODE, DST_DIODE_MIX   , 3, { IN0,IN1 }, { IN0,IN1 }, TABLE, "DISCRETE_DIODE_MIXER2" },
 #define DISCRETE_DIODE_MIXER3(NODE,IN0,IN1,IN2,TABLE)                   { NODE, DST_DIODE_MIX   , 4, { IN0,IN1,IN2 }, { IN0,IN1,IN2 }, TABLE, "DISCRETE_DIODE_MIXER3" },
 #define DISCRETE_DIODE_MIXER4(NODE,IN0,IN1,IN2,IN3,TABLE)               { NODE, DST_DIODE_MIX   , 5, { IN0,IN1,IN2,IN3 }, { IN0,IN1,IN2,IN3 }, TABLE, "DISCRETE_DIODE_MIXER4" },
@@ -4425,8 +4422,8 @@ enum
 #define DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)     { NODE, DSD_555_CC      , 7, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, OPTIONS, "DISCRETE_555_CC" },
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "DISCRETE_555_VCO1" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
-#define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "DISCRETE_566" },
-#define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
+#define DISCRETE_566(NODE,VMOD,R,C,OPTIONS)                             { NODE, DSD_566         , 3, { VMOD,R,C }, { VMOD,R,C }, OPTIONS, "DISCRETE_566" },
+#define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
