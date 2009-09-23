@@ -373,10 +373,8 @@ INLINE UINT8 get_rim_value(i8085_state *cpustate)
 
 	/* copy live RST5.5 and RST6.5 states */
 	result &= ~(IM_I65 | IM_I55);
-	if (cpustate->irq_state[I8085_RST65_LINE] && !(cpustate->IM & IM_M65))
-		result |= IM_I65;
-	if (cpustate->irq_state[I8085_RST55_LINE] && !(cpustate->IM & IM_M55))
-		result |= IM_I55;
+	if (cpustate->irq_state[I8085_RST65_LINE]) result |= IM_I65;
+	if (cpustate->irq_state[I8085_RST55_LINE]) result |= IM_I55;
 
 	/* fetch the SID bit if we have a callback */
 	result = (result & 0x7f) | (sid ? 0x80 : 0);
