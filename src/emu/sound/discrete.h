@@ -303,6 +303,7 @@
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)
+ * DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
  * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
@@ -3231,8 +3232,8 @@
  *     DISCRETE_74LS624(name of node,
  *                      enable node or static value,
  *                      vMod node or static value,
- *                      vRng node or static value,
- *                      C node or static value in Farads,
+ *                      vRng static value,
+ *                      C static value in Farads,
  *                      Type of output static value)
  *
  * Type of Output
@@ -3240,6 +3241,9 @@
  *      DISC_LS624_OUT_LOGIC    Logic ( 0 or 1)
  *      DISC_LS624_OUT_COUNT_F  Number of Falling edges
  *      DISC_LS624_OUT_COUNT_R  Number of Rising  edges
+ *
+ *
+ * EXAMPLES: see Donkey Kong Jr.
  *
  ***********************************************************************
  *
@@ -4422,7 +4426,7 @@ enum
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "DISCRETE_555_VCO1" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
 #define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "DISCRETE_566" },
-#define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "DISCRETE_74LS624" },
+#define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
