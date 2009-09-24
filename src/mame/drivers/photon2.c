@@ -5,6 +5,7 @@
 
     Russian arcade system based on ZX Spectrum home computer.
 
+	Each coin buys you 1-6 minutes of game time.
 */
 
 #include "driver.h"
@@ -243,13 +244,20 @@ static INPUT_PORTS_START( photon2 )
 
 	PORT_START("COIN")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_PLAYER(1) PORT_IMPULSE(1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_DIPNAME( 0x0e, 0x0e, "Time per Coin" )
+	PORT_DIPSETTING(    0x00, "1:00" )
+	PORT_DIPSETTING(    0x02, "1:30" )
+	PORT_DIPSETTING(    0x04, "2:00" )
+	PORT_DIPSETTING(    0x06, "2:30" )
+	PORT_DIPSETTING(    0x08, "3:00" )
+	PORT_DIPSETTING(    0x0a, "4:00" )
+	PORT_DIPSETTING(    0x0c, "5:00" )
+	PORT_DIPSETTING(    0x0e, "6:00" )
+	// todo: check if these are really unused..
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( black )
@@ -353,6 +361,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, 0, ROT0, "<unknown>", "Povar / Sobrat' Buran / Agroprom", 0 )
-GAME( 19??,  black, 0,      photon2, black,   0, ROT0, "<unknown>", "Czernyj Korabl", 0 )
-GAME( 19??,  brod,  0,      photon2, black,   0, ROT0, "<unknown>", "Brodjaga", 0 )
+GAME( 19??,  kok,   0,      photon2, photon2, 0, ROT0, "<unknown>", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", 0 ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black,   0, ROT0, "<unknown>", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", 0 ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black,   0, ROT0, "<unknown>", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", 0 ) // original (c)1987 BEAM software
