@@ -63,18 +63,13 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
 	/* Read the node input value if allowed */
 	if (node)
 	{
-		struct dss_input_context *context = (struct dss_input_context *)node->context;
-
 		/* Bring the system up to now */
 		stream_update(info->discrete_stream);
 
-		if ((node->module->type >= DSS_INPUT_DATA) && (node->module->type <= DSS_INPUT_PULSE))
-		{
-			data = context->data;
-		}
+		data = (UINT8) node->output[NODE_CHILD_NODE_NUM(offset)];
 	}
 	else
-		discrete_log(info, "discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
+		fatalerror("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
 
     return data;
 }
