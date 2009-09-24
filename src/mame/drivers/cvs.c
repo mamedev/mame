@@ -81,13 +81,13 @@ Hardware Info
  Malcolm & Darren
 
 Additional work
-	2009 Couriersud
+    2009 Couriersud
 
 Todo & FIXME:
 
-- the board most probably has discrete circuits. The 393Hz tone used 
+- the board most probably has discrete circuits. The 393Hz tone used
   for shots (superbike) and collisions (8ball) is just a guess.
-  
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 {
 	UINT8 dac_value;
 	static int old_data[4] = {0,0,0,0};
-	
+
 	if (data != old_data[offset])
 	{
 		LOG(("4BIT: %02x %02x\n", offset, data));
@@ -366,12 +366,12 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
 {
 	/* offset 2 is used in 8ball
-	 * offset 0 is used in spacefrt
-	 * offset 3 is used in darkwar
-	 * 
-	 * offset 1 is not used (no trace in disassembly
-	 */
-	
+     * offset 0 is used in spacefrt
+     * offset 3 is used in darkwar
+     *
+     * offset 1 is not used (no trace in disassembly
+     */
+
 	if (data != dac3_state[offset])
 	{
 		if (offset != 2)
@@ -405,8 +405,8 @@ static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 static READ8_HANDLER( cvs_speech_command_r )
 {
 	/* FIXME: this was by observation on board ???
-	 * 			-bit 7 is TMS status (active LO) */
-	return ((tms5110_ctl_r(devtag_get_device(space->machine, "tms"), 0) ^ 1) << 7) 
+     *          -bit 7 is TMS status (active LO) */
+	return ((tms5110_ctl_r(devtag_get_device(space->machine, "tms"), 0) ^ 1) << 7)
 		| (soundlatch_r(space, 0) & 0x7f);
 }
 
@@ -415,8 +415,8 @@ static WRITE8_DEVICE_HANDLER( cvs_tms5110_ctl_w )
 {
 	UINT8 ctl;
 	/*
-	 * offset 0: CS ?
-	 */
+     * offset 0: CS ?
+     */
 	cvs_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	ctl = 0 |								/* CTL1 */
@@ -497,7 +497,7 @@ MACHINE_START( cvs )
 		gfx_element_set_source(machine->gfx[1], cvs_character_ram);
 
 	start_393hz_timer(machine);
-	
+
 	/* register state save */
 	state_save_register_global_pointer(machine, cvs_color_ram, 0x400);
 	state_save_register_global_pointer(machine, cvs_palette_ram, 0x10);
@@ -584,7 +584,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 /* romclk is much more probable, 393 Hz results in timing issues */
-//	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+//  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD("tms", tms_clock_r)
 ADDRESS_MAP_END
 

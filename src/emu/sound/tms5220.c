@@ -39,101 +39,101 @@ Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lower
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
 TODO:
-	Implement a ready callback for pc interfaces
-	- this will be quite a challenge since for it to be really accurate 
-	  the whole emulation has to run in sync (lots of timers) with the
-	  cpu cores.
-	If a command is still executing, /READY will be kept high until the command has
-	finished if the next command is written. 
-	TMS5220C: see below.
-	tomcat has a 5220 which is not hooked up at all
+    Implement a ready callback for pc interfaces
+    - this will be quite a challenge since for it to be really accurate
+      the whole emulation has to run in sync (lots of timers) with the
+      cpu cores.
+    If a command is still executing, /READY will be kept high until the command has
+    finished if the next command is written.
+    TMS5220C: see below.
+    tomcat has a 5220 which is not hooked up at all
 
 Notes:
-	Looping has the tms5220 hookep up directly to the cpu. However currently the
-	tms9900 cpu core does not support a ready line. 
-	
-	Email from Lord Nightmare having a lot more detail follows:
-	
-	Yes, there is at least two more differences:
-The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I 
-think the 5220C may use a different energy table (or use one value lower 
-in the normal energy table) than the 5220 does, possibly only when 
-playing unvoiced frames, but I can't prove this without a decap; the 
-5220C's PROMOUT pin (for dumping the lpc tables as played) is 
+    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    tms9900 cpu core does not support a ready line.
+
+    Email from Lord Nightmare having a lot more detail follows:
+
+    Yes, there is at least two more differences:
+The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I
+think the 5220C may use a different energy table (or use one value lower
+in the normal energy table) than the 5220 does, possibly only when
+playing unvoiced frames, but I can't prove this without a decap; the
+5220C's PROMOUT pin (for dumping the lpc tables as played) is
 nonfunctional due to changed design or a die bug.
-In addition, the NOP commands on the FIFO interface have been changed 
+In addition, the NOP commands on the FIFO interface have been changed
 and data passed in the low bits has a meaning regarding frame length:
 commands :
 (lsb is right, msb is left; x means don't care)
-x0x0xbcc : (5220: NOP) (5220C: select frame length by cc, and b selects 
-whether every frame is preceeded by 2 bits to select the frame length 
-(instead of using the value set by cc)) (default is 00 for frame length 
+x0x0xbcc : (5220: NOP) (5220C: select frame length by cc, and b selects
+whether every frame is preceeded by 2 bits to select the frame length
+(instead of using the value set by cc)) (default is 00 for frame length
 (200 samples) and 0 for whether the preceeding 2 bits are enabled (off))
-x001xxxx: sends eight read bit commands (M0 high M1 low) to VSM and 
-reads the resulting bits serially into a temporary register, which 
-becomes readable as the next byte read from the tms52xx once ready goes 
+x001xxxx: sends eight read bit commands (M0 high M1 low) to VSM and
+reads the resulting bits serially into a temporary register, which
+becomes readable as the next byte read from the tms52xx once ready goes
 active.
 
-Note the bit order of the byte read from the TMS52xx is BACKWARDS as 
-compared to the actual data order as in the rom on the VSM chips! This 
-was IMHO a rather silly design decision of TI. (I asked Larry 
-Brantingham about this but he wasn't involved with the TMS52xx chips, 
+Note the bit order of the byte read from the TMS52xx is BACKWARDS as
+compared to the actual data order as in the rom on the VSM chips! This
+was IMHO a rather silly design decision of TI. (I asked Larry
+Brantingham about this but he wasn't involved with the TMS52xx chips,
 just the 5100)
-There's ASCII data in the TI 99/4 speech module VSMs which has the bit 
+There's ASCII data in the TI 99/4 speech module VSMs which has the bit
 order reversed on purpose because of this!
 
-x011xxxx: sends a read and branch command (M0 high, M1 high) to force 
-VSM to set its data pointer to whatever the data is at its current 
+x011xxxx: sends a read and branch command (M0 high, M1 high) to force
+VSM to set its data pointer to whatever the data is at its current
 pointer location is)
-x100aaaa: send a load address command (M0 low M1 high) to vsm with the 4 
+x100aaaa: send a load address command (M0 low M1 high) to vsm with the 4
 'a' bits
-x101xxxx: 'speak' begins speaking from current address in the data 
+x101xxxx: 'speak' begins speaking from current address in the data
 pointer of the vsms
 x110xxxx: 'speak external' begins speaking from the 16 byte fifo
-x111xxxx: resets the speech synthesis core immediately; clears the bit 
-offset counter in the fifo to the nearest byte 'forward ', but does NOT 
+x111xxxx: resets the speech synthesis core immediately; clears the bit
+offset counter in the fifo to the nearest byte 'forward ', but does NOT
 clear the fifo, annoyingly!
 
 Its also possible but inconclusive that the chirp table was changed.
-The LPC tables between the 5220 and 5220C are MOSTLY the same of not 
-completely so, but as mentioned above the energy table has some sort of 
+The LPC tables between the 5220 and 5220C are MOSTLY the same of not
+completely so, but as mentioned above the energy table has some sort of
 difference.
 
 
 As for which games used which chips, from the TMS5220 wikipedia page:
- 
+
 TMS5200 AKA TMC0285: (1981 to 1983ish when supplies ran low)
-    Arcade: Zaccaria's 'money money' and 'jack rabbit'; Bally/Midway's 
-'Discs of Tron' (all environmental cabs and a few upright cabs; the code 
-exists on all versions for the speech though, and upright cabs can be 
-upgraded to add it by hacking on a 'Squawk & Talk' pinball speech board 
+    Arcade: Zaccaria's 'money money' and 'jack rabbit'; Bally/Midway's
+'Discs of Tron' (all environmental cabs and a few upright cabs; the code
+exists on all versions for the speech though, and upright cabs can be
+upgraded to add it by hacking on a 'Squawk & Talk' pinball speech board
 (which is also TMS5200 based) with a few modded components)
     Pinball: All Bally/Midway machines which uses the 'Squawk & Talk' board.
-    Home computer: TI 99/4 PHP1500 Speech module (along with two VSM 
-serial chips); Street Electronics Corp.'s Apple II 'Echo 2' Speech 
+    Home computer: TI 99/4 PHP1500 Speech module (along with two VSM
+serial chips); Street Electronics Corp.'s Apple II 'Echo 2' Speech
 synthesizer (early cards only)
 
-TMS5220: (mostly on things made between 1982 and 1984-1985 when supplies 
+TMS5220: (mostly on things made between 1982 and 1984-1985 when supplies
 ran low)
-    Arcade: Bally/Midway's 'NFL Football'; Atari's 'Star Wars', 
-'Firefox', 'Return of the Jedi', 'Road Runner', 'The Empire Strikes 
-Back' (all verified with schematics); Venture Line's 'Looping' and 'Sky 
-Bumper' (need verify for both); Olympia's 'Portraits' (need verify); 
+    Arcade: Bally/Midway's 'NFL Football'; Atari's 'Star Wars',
+'Firefox', 'Return of the Jedi', 'Road Runner', 'The Empire Strikes
+Back' (all verified with schematics); Venture Line's 'Looping' and 'Sky
+Bumper' (need verify for both); Olympia's 'Portraits' (need verify);
 Exidy's 'Victory' and 'Victor Banana' (need verify for both)
     Pinball: Several (don't know names offhand, have not checked schematics)
-    Home computer: Street Electronics Corp.'s Apple II 'Echo 2' Speech 
-synthesizer (later cards only); Texas Instruments' 'Speak and Learn' 
+    Home computer: Street Electronics Corp.'s Apple II 'Echo 2' Speech
+synthesizer (later cards only); Texas Instruments' 'Speak and Learn'
 scanner wand unit.
 
 TMS5220C AKA TSP5220C: (on stuff made from 1984 to 1992 or so)
-    Arcade: Atari's 'Indiana Jones and the Temple of Doom', '720', 
-'Gauntlet', 'Gauntlet II', 'A.P.B.', 'Paperboy', 'RoadBlasters', 
-'Vindicators Pt II'(verify?), and 'Escape from the Planet of the Robot 
+    Arcade: Atari's 'Indiana Jones and the Temple of Doom', '720',
+'Gauntlet', 'Gauntlet II', 'A.P.B.', 'Paperboy', 'RoadBlasters',
+'Vindicators Pt II'(verify?), and 'Escape from the Planet of the Robot
 Monsters' (all verified except for vindicators pt 2)
-    Pinball: Several (less common than the tms5220? (not sure about 
+    Pinball: Several (less common than the tms5220? (not sure about
 this), mostly on later pinballs with LPC speech)
-    Home computer: Street Electronics Corp.'s 'ECHO' parallel/hobbyist 
-module (6511 based), IBM PS/2 Speech adapter (parallel port connection 
+    Home computer: Street Electronics Corp.'s 'ECHO' parallel/hobbyist
+module (6511 based), IBM PS/2 Speech adapter (parallel port connection
 device), PES Speech adapter (serial port connection)
 
 
@@ -177,7 +177,7 @@ struct _tms5220_state
 {
 	/* callbacks */
 	devcb_resolved_write_line	irq_func;
-	
+
 	/* these contain data that describes the 128-bit data FIFO */
 	UINT8 fifo[FIFO_SIZE];
 	UINT8 fifo_head;
@@ -242,20 +242,20 @@ struct _tms5220_state
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
 	/* io_ready: page 3 of the datasheet specifies that READY will be asserted until
-	 * data is available or processed by the system.
-	 */
-	
+     * data is available or processed by the system.
+     */
+
 	UINT8 io_ready;
-	
+
 	/* flag for "true" timing involving rs/ws */
-	
+
 	UINT8 true_timing;
-	
+
 	/* rsws - state, rs bit 1, ws bit 0 */
 	UINT8 rs_ws;
 	UINT8 read_latch;
 	UINT8 write_latch;
-	
+
 	/* flag for variant tmc0285/tms5200 emulation */
 	/* The TMC0285 AKA TMS5200 is an earlier variant of the TMS5220 used in
        the early releases of the Speech Module for the TI-99/4(a) computer,
@@ -1220,7 +1220,7 @@ static DEVICE_START( tms5220 )
 	tms->clock = device->clock;
 
 	/* resolve */
-	
+
 	devcb_resolve_write_line(&tms->irq_func, &tms->intf->irq_func, device);
 
 	/* initialize a stream */
@@ -1229,7 +1229,7 @@ static DEVICE_START( tms5220 )
 	/* not during reset which is called frm within a write! */
 	tms->io_ready = 1;
 	tms->true_timing = 0;
-	
+
 	tms->variant = variant_tms5220;
 	register_for_save_states(tms);
 }
@@ -1333,10 +1333,10 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
 	UINT8 new;
-	
+
 	tms->true_timing = 1;
 	state &= 0x01;
-	
+
 	new = (tms->rs_ws & 0x01) | (state<<1);
 	if (new != tms->rs_ws)
 	{
@@ -1345,11 +1345,11 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 		{
 			if (tms->variant == variant_tms5220c)
 				device_reset(device);
-			else 
+			else
 				/* illegal */
 				LOG(("tms5220_rs_w: illegal\n"));
 			return;
-		} 
+		}
 		else if ( new == 3)
 		{
 			/* high impedance */
@@ -1359,7 +1359,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 		if (state)
 		{
 			/* low to high */
-		} 
+		}
 		else
 		{
 			/* high to low - schedule ready cycle*/
@@ -1377,7 +1377,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
 	UINT8 new;
-	
+
 	tms->true_timing = 1;
 	state &= 0x01;
 	new = (tms->rs_ws & 0x02) | (state<<0);
@@ -1388,11 +1388,11 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		{
 			if (tms->variant == variant_tms5220c)
 				device_reset(device);
-			else 
+			else
 				/* illegal */
 				LOG(("tms5220_ws_w: illegal\n"));
 			return;
-		} 
+		}
 		else if ( new == 3)
 		{
 			/* high impedance */
@@ -1402,7 +1402,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		if (state)
 		{
 			/* low to high  */
-		} 
+		}
 		else
 		{
 			/* high to low - schedule ready cycle*/
@@ -1577,7 +1577,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5220c##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START 
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
 #define DEVTEMPLATE_DERIVED_NAME		"TMS5220C"
 #include "devtempl.h"
 

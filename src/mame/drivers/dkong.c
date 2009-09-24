@@ -654,7 +654,7 @@ static WRITE8_HANDLER( s2650_fo_w )
 #endif
 
     state->main_fo = data;
-    
+
     if (state->main_fo)
     	state->hunchloopback = 0xfb;
 }
@@ -669,16 +669,16 @@ static READ8_HANDLER( s2650_port0_r )
     switch (state->protect_type)
     {
     	case DK2650_SHOOTGAL:
-    	case DK2650_HUNCHBKD:  
+    	case DK2650_HUNCHBKD:
         	if (state->main_fo)
         		return state->hunchloopback;
         	else
         		return state->hunchloopback--;
-        case DK2650_SPCLFORC:  
+        case DK2650_SPCLFORC:
 	    	if (!state->main_fo)
-	    		return state->hunchloopback; 
+	    		return state->hunchloopback;
 	    	else
-	    		return state->hunchloopback--; 
+	    		return state->hunchloopback--;
     }
     fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
@@ -687,17 +687,17 @@ static READ8_HANDLER( s2650_port0_r )
 static READ8_HANDLER( s2650_port1_r )
 {
     dkong_state *state = (dkong_state *)space->machine->driver_data;
-    
+
 #if DEBUG_PROTECTION
     logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
 #endif
 
     switch (state->protect_type)
     {
-        case DK2650_HUNCHBKD:  
+        case DK2650_HUNCHBKD:
         	return state->hunchloopback--;
         case DK2650_EIGHTACT:
-        case DK2650_HERBIEDK:  
+        case DK2650_HERBIEDK:
         	if (state->hunchloopback & 0x80)
         		return state->prot_cnt;
         	else

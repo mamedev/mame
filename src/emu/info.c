@@ -521,11 +521,11 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					/* for disk entries, add the disk index */
 					else
 						fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
-						
+
 					/* add optional flag */
 					if ((!is_disk && ROM_ISOPTIONAL(rom)) || (is_disk && DISK_ISOPTIONAL(rom)))
 						fprintf(out, " optional=\"yes\"");
-						
+
 					fprintf(out, "/>\n");
 				}
 			}

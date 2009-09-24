@@ -91,10 +91,10 @@ static READ8_HANDLER( zaccaria_dsw_r )
 static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 {
 	/* bits 0-2 go to a 74LS156 with open collector outputs
-	 * one out of 8 Resitors is than used to form a resistor
-	 * divider with Analog input 5 (tromba)
-	 */
-	
+     * one out of 8 Resitors is than used to form a resistor
+     * divider with Analog input 5 (tromba)
+     */
+
 	// bits 3-4 control the analog drum emulation on 8910 #0 ch. A
 
 	static const int table[8] = { 8200, 5600, 3300, 1500, 820, 390, 150, 47 };
@@ -110,14 +110,14 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) 
-{ 
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); 
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
+{
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) 
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE); 
+	cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )

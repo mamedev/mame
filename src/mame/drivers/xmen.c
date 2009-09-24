@@ -569,7 +569,7 @@ ROM_START( xmenj )
 	ROM_REGION( 0x200000, "konami", 0 )	/* samples for the 054539 */
 	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
 ROM_END
- 
+
 ROM_START( xmen2pe )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "065-eaa04.10d",  0x00000, 0x20000, CRC(502861e7) SHA1(f96aab2d2006703065de5bd7e341f929d04f5f60) ) /* Europe 2 Player version */

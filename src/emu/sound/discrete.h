@@ -3552,7 +3552,7 @@ enum
 #define DISC_SCHMITT_OSC_ENAB_IS_NOR		0x06
 
 #define DISC_SCHMITT_OSC_ENAB_MASK			0x06	/* Bits that define output enable type.
-													 * Used only internally in module. */
+                                                     * Used only internally in module. */
 
 /* 555 Common output flags */
 #define DISC_555_OUT_DC						0x00

@@ -1583,8 +1583,8 @@ static DISCRETE_RESET(dsd_566)
  * This approach gives a bit better results compared to the first approach.
  */
 /* Original formula before optimization of static values
- #define LS624_F(_C, _VI, _VR)	pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
-		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
+ #define LS624_F(_C, _VI, _VR)  pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
+                  - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
 */
 #define LS624_F(_VI)	pow(10, context->k1 + 0.243264328 * (_VI) + context->k2 * (_VI))
 

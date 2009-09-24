@@ -681,7 +681,7 @@ INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 
     result = ((UINT64)r2<<32) | (UINT64)r1;
     return (INT64) (result & U64(0x7fffffffffffffff));
-}    
+}
 #endif
 
 #endif /* __EIGCCX86__ */

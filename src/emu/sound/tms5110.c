@@ -32,8 +32,8 @@
         PROM OUT | 13           16 |  NC
         VSS      | 14           15 |  M0
                  +-----------------+
-		
-		T11: Sync for serial data out
+
+        T11: Sync for serial data out
 
 
     M58817
@@ -173,7 +173,7 @@ struct _tms5110_state
 	const UINT8 *table;
 	sound_stream *stream;
 	INT32 speech_rom_bitnum;
-	
+
 	emu_timer *romclk_timer;
 	UINT8 romclk_state;
 };
@@ -740,7 +740,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 				case TMS5110_CMD_TEST_TALK:
 					tms->state = CTL_STATE_NEXT_OUTPUT;
 					break;
-					
+
 				default:
 					logerror("tms5110.c: unknown command: 0x%02x\n", tms->CTL_pins);
 					break;
@@ -962,7 +962,7 @@ static DEVICE_START( tms5110 )
 	    tms->M0_callback = speech_rom_read_bit;
 	    tms->set_load_address = speech_rom_set_addr;
 	}
-	
+
 	tms->state = CTL_STATE_INPUT; /* most probably not defined */
 
 	register_for_save_states(tms);
@@ -1087,7 +1087,7 @@ WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
                 immediately(?????? not TMS5110) by a RESET command.
         TMS5110 datasheets mention this is only available as a result of executing
                 TEST TALK command.
-                
+
                 FIXME: data read not implemented, CTL1 only available after TALK command
 
 ******************************************************************************/
@@ -1137,7 +1137,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_r )
 
     /* bring up to date first */
     stream_update(tms->stream);
-    
+
     /* create and start timer if necessary */
     if (tms->romclk_timer == NULL)
     {

@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	dsp56dsm.c
-	Disassembler for the portable Motorola/Freescale dsp56k emulator.
-	Written by Andrew Gardner
+    dsp56dsm.c
+    Disassembler for the portable Motorola/Freescale dsp56k emulator.
+    Written by Andrew Gardner
 
 ***************************************************************************/
 
@@ -229,7 +229,7 @@ CPU_DISASSEMBLE( dsp56k )
 	if ((op & 0xe000) == 0x6000)
 	{
 		char d_register[32] = "";
-		
+
 		/* Quote: (MOVE, MAC(R), MPY(R), ADD, SUB, TFR) */
 		UINT16 op_byte = op & 0x00ff;
 
@@ -259,11 +259,11 @@ CPU_DISASSEMBLE( dsp56k )
 		else if ((op & 0xe09f) == 0x6010)
 		{
 			/* Note: The opcode encoding : 011x xxxx 0xx1 0000 (move + double memory read)
-					 is .identical. to (tfr X0,A + two parallel reads).  This sparks the notion
-					 that these 'move' opcodes don't actually exist and are just there as
-					 documentation.  Real-world examples would need to be examined to come
-					 to a satisfactory conclusion, but as it stands, tfr will override this
-					 move operation. */
+                     is .identical. to (tfr X0,A + two parallel reads).  This sparks the notion
+                     that these 'move' opcodes don't actually exist and are just there as
+                     documentation.  Real-world examples would need to be examined to come
+                     to a satisfactory conclusion, but as it stands, tfr will override this
+                     move operation. */
 			size = dsp56k_dasm_move_1(op_byte, opcode_str, arg_str, d_register);
 		}
 		/* MPY : 011m mKKK 1xx0 F0QQ : A-160 */
@@ -356,10 +356,10 @@ CPU_DISASSEMBLE( dsp56k )
 			/* Now check it against all the other potential collisions */
 			/* This is necessary because "don't care bits" get in the way. */
 			/*
-			MOVE(M) :   0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
-			MOVE(C) :   0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
-			MOVE :      0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
-			*/
+            MOVE(M) :   0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
+            MOVE(C) :   0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
+            MOVE :      0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
+            */
 			if (((op2 & 0xfe20) != 0x0200) &&
 				((op2 & 0xf810) != 0x3800) &&
 				((op2 & 0x00ff) != 0x0011))
@@ -1426,7 +1426,7 @@ static size_t dsp56k_dasm_cmp(const UINT16 op_byte, char* opcode_str, char* arg_
 	char D[32];
 	char S1[32];
 	/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-			 in before cmp, so the same decode function can be used. */
+             in before cmp, so the same decode function can be used. */
 	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
 	sprintf(opcode_str, "cmp");
 	sprintf(arg_str, "%s,%s", S1, D);
@@ -1529,7 +1529,7 @@ static size_t dsp56k_dasm_cmpm(const UINT16 op_byte, char* opcode_str, char* arg
 	char D[32];
 	char S1[32];
 	/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-			 in before cmp, so the same decode function can be used. */
+             in before cmp, so the same decode function can be used. */
 	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
 	sprintf(opcode_str, "cmpm");
 	sprintf(arg_str, "%s,%s", S1, D);
@@ -1541,7 +1541,7 @@ static size_t dsp56k_dasm_cmpm(const UINT16 op_byte, char* opcode_str, char* arg
 static size_t dsp56k_dasm_mpy(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
 {
 	/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-	   but since it's a multiply it doesn't matter */
+       but since it's a multiply it doesn't matter */
 	char D[32];
 	char S1[32];
 	char S2[32];
@@ -1561,7 +1561,7 @@ static size_t dsp56k_dasm_mpy(const UINT16 op_byte, char* opcode_str, char* arg_
 static size_t dsp56k_dasm_mpyr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
 {
 	/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-	   but since it's a multiply it doesn't matter */
+       but since it's a multiply it doesn't matter */
 	char D[32];
 	char S1[32];
 	char S2[32];
@@ -1599,7 +1599,7 @@ static size_t dsp56k_dasm_mac(const UINT16 op_byte, char* opcode_str, char* arg_
 static size_t dsp56k_dasm_macr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
 {
 	/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-	   but since it's a multiply it doesn't matter */
+       but since it's a multiply it doesn't matter */
 	char D[32];
 	char S1[32];
 	char S2[32];
@@ -1881,8 +1881,8 @@ static size_t dsp56k_dasm_debugcc(const UINT16 op, char* opcode_str, char* arg_s
 /* DIV : 0001 0101 0--0 F1DD : A-76 */
 static size_t dsp56k_dasm_div(const UINT16 op, char* opcode_str, char* arg_str)
 {
-	/* The docs on page A-76 claim there is potential for a parallel move here, 
-	   but various other sources (including elsewhere in the family manual) disagree */
+	/* The docs on page A-76 claim there is potential for a parallel move here,
+       but various other sources (including elsewhere in the family manual) disagree */
 	char D[32];
 	char S1[32];
 	decode_DDF_table(BITS(op,0x0003), BITS(op,0x0008), S1, D);
@@ -2485,10 +2485,10 @@ static size_t dsp56k_dasm_tcc(const UINT16 op, char* opcode_str, char* arg_str)
 	sprintf(arg_str, "%s,%s  R0,R%d", S, D, Rnum);
 
 	/* Note: S == 'A' && D == 'A' is used by the assembler when "no Data ALU
-	   transfer is specified in the instruction."  The Data ALU contains the
-	   X,Y,A,B registers.  The AGU holds the R registers.  This comment means
-	   the assembler will create Tcc A,A when it wants to conditionally transfer
-	   only a R register to another R register. */
+       transfer is specified in the instruction."  The Data ALU contains the
+       X,Y,A,B registers.  The AGU holds the R registers.  This comment means
+       the assembler will create Tcc A,A when it wants to conditionally transfer
+       only a R register to another R register. */
 	return 1;
 }
 
@@ -3204,7 +3204,7 @@ static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, I
 	UINT8 abs_xx;
 	char operation[32];
 
-	if(xx < 0) 
+	if(xx < 0)
 		sprintf(operation,"-");
 	else
 		sprintf(operation,"+");

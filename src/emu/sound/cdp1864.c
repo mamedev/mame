@@ -11,14 +11,14 @@
 
     TODO:
 
-	- interlace mode
-	- PAL output, currently using RGB
-	- cpu synchronization
+    - interlace mode
+    - PAL output, currently using RGB
+    - cpu synchronization
 
-		SC1 and SC0 are used to provide CDP1864C-to-CPU synchronization for a jitter-free display.
-		During every horizontal sync the CDP1864C samples SC0 and SC1 for SC0 = 1 and SC1 = 0
-		(CDP1800 execute state). Detection of a fetch cycle causes the CDP1864C to skip cycles to
-		attain synchronization. (i.e. picture moves 8 pixels to the right)
+        SC1 and SC0 are used to provide CDP1864C-to-CPU synchronization for a jitter-free display.
+        During every horizontal sync the CDP1864C samples SC0 and SC1 for SC0 = 1 and SC1 = 0
+        (CDP1800 execute state). Detection of a fetch cycle causes the CDP1864C to skip cycles to
+        attain synchronization. (i.e. picture moves 8 pixels to the right)
 
 */
 

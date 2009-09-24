@@ -284,11 +284,11 @@ static void execute_one(dsp56k_core* cpustate)
 		else if ((op & 0xe09f) == 0x6010)
 		{
 			/* Note: The opcode encoding : 011x xxxx 0xx1 0000 (move + double memory read)
-					 is .identical. to (tfr X0,A + two parallel reads).  This sparks the notion
-					 that these 'move' opcodes don't actually exist and are just there as
-					 documentation.  Real-world examples would need to be examined to come
-					 to a satisfactory conclusion, but as it stands, tfr will override this
-					 move operation. */
+                     is .identical. to (tfr X0,A + two parallel reads).  This sparks the notion
+                     that these 'move' opcodes don't actually exist and are just there as
+                     documentation.  Real-world examples would need to be examined to come
+                     to a satisfactory conclusion, but as it stands, tfr will override this
+                     move operation. */
 			size = dsp56k_op_move_1(cpustate, op_byte, &d_register, &cycle_count);
 		}
 		/* MPY : 011m mKKK 1xx0 F0QQ : A-160 */

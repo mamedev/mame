@@ -334,21 +334,21 @@ static PALETTE_INIT( amaticmg )
 
 static ADDRESS_MAP_START( amaticmg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-//	AM_RANGE(0x0000, 0x0000) AM_RAM	// AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-//	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
-//	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_videoram_w) AM_BASE(&videoram)
-//	AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_colorram_w) AM_BASE(&colorram)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+//  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
+//  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_videoram_w) AM_BASE(&videoram)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-//	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-//	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-//	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ym", ym3812_w)
-//	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_signed_w)
-//	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_signed_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("ym", ym3812_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_signed_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_signed_w)
 
 ADDRESS_MAP_END
 
@@ -466,7 +466,7 @@ GFXDECODE_END
 
 //static const ym3812_interface ym3812_config =
 //{
-//	sound_irq
+//  sound_irq
 //};
 
 
@@ -476,16 +476,16 @@ GFXDECODE_END
 
 //static const mc6845_interface mc6845_intf =
 //{
-//	"screen",	/* screen we are acting on */
-//	8,			/* number of pixels per video memory address */
-//	NULL,		/* before pixel update callback */
-//	NULL,		/* row update callback */
-//	NULL,		/* after pixel update callback */
-//	DEVCB_NULL,	/* callback for display state changes */
-//	DEVCB_NULL,	/* callback for cursor state changes */
-//	DEVCB_NULL,	/* HSYNC callback */
-//	DEVCB_NULL,	/* VSYNC callback */
-//	NULL		/* update address callback */
+//  "screen",   /* screen we are acting on */
+//  8,          /* number of pixels per video memory address */
+//  NULL,       /* before pixel update callback */
+//  NULL,       /* row update callback */
+//  NULL,       /* after pixel update callback */
+//  DEVCB_NULL, /* callback for display state changes */
+//  DEVCB_NULL, /* callback for cursor state changes */
+//  DEVCB_NULL, /* HSYNC callback */
+//  DEVCB_NULL, /* VSYNC callback */
+//  NULL        /* update address callback */
 //};
 
 
@@ -495,30 +495,30 @@ GFXDECODE_END
 
 //static const ppi8255_interface ppi8255_intf[3] =
 //{
-//	{	/* (00-00) Mode X - Port X set as input */
-//		DEVCB_NULL,						/* Port A read */
-//		DEVCB_NULL,						/* Port B read */
-//		DEVCB_NULL,						/* Port C read */
-//		DEVCB_NULL,						/* Port A write */
-//		DEVCB_NULL,						/* Port B write */
-//		DEVCB_NULL,						/* Port C write */
-//	},
-//	{	/* (00-00) Mode X - Port X set as input */
-//		DEVCB_NULL,						/* Port A read */
-//		DEVCB_NULL,						/* Port B read */
-//		DEVCB_NULL,						/* Port C read */
-//		DEVCB_NULL,						/* Port A write */
-//		DEVCB_NULL,						/* Port B write */
-//		DEVCB_NULL,						/* Port C write */
-//	},
-//	{	/* (00-00) Mode X - Port X set as input */
-//		DEVCB_NULL,						/* Port A read */
-//		DEVCB_NULL,						/* Port B read */
-//		DEVCB_NULL,						/* Port C read */
-//		DEVCB_NULL,						/* Port A write */
-//		DEVCB_NULL,						/* Port B write */
-//		DEVCB_NULL,						/* Port C write */
-//	}
+//  {   /* (00-00) Mode X - Port X set as input */
+//      DEVCB_NULL,                     /* Port A read */
+//      DEVCB_NULL,                     /* Port B read */
+//      DEVCB_NULL,                     /* Port C read */
+//      DEVCB_NULL,                     /* Port A write */
+//      DEVCB_NULL,                     /* Port B write */
+//      DEVCB_NULL,                     /* Port C write */
+//  },
+//  {   /* (00-00) Mode X - Port X set as input */
+//      DEVCB_NULL,                     /* Port A read */
+//      DEVCB_NULL,                     /* Port B read */
+//      DEVCB_NULL,                     /* Port C read */
+//      DEVCB_NULL,                     /* Port A write */
+//      DEVCB_NULL,                     /* Port B write */
+//      DEVCB_NULL,                     /* Port C write */
+//  },
+//  {   /* (00-00) Mode X - Port X set as input */
+//      DEVCB_NULL,                     /* Port A read */
+//      DEVCB_NULL,                     /* Port B read */
+//      DEVCB_NULL,                     /* Port C read */
+//      DEVCB_NULL,                     /* Port A write */
+//      DEVCB_NULL,                     /* Port B write */
+//      DEVCB_NULL,                     /* Port C write */
+//  }
 //};
 
 /************************************
@@ -532,12 +532,12 @@ static MACHINE_DRIVER_START( amaticmg )
 	MDRV_CPU_IO_MAP(amaticmg_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-//	MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* 3x 8255 */
-//	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-//	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-//	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+//  MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+//  MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+//  MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -547,7 +547,7 @@ static MACHINE_DRIVER_START( amaticmg )
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-//	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+//  MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	MDRV_GFXDECODE(amaticmg)
 
@@ -557,14 +557,14 @@ static MACHINE_DRIVER_START( amaticmg )
 	MDRV_VIDEO_UPDATE(amaticmg)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
+//  MDRV_SPEAKER_STANDARD_MONO("mono")
 
-//	MDRV_SOUND_ADD("ym", YM3812, SND_CLOCK)
-//	MDRV_SOUND_CONFIG(ym3812_config)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MDRV_SOUND_ADD("ym", YM3812, SND_CLOCK)
+//  MDRV_SOUND_CONFIG(ym3812_config)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-//	MDRV_SOUND_ADD("dac", DAC, 0)	/* Y3014B */
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MDRV_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_DRIVER_END
 

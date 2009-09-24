@@ -3,7 +3,7 @@
     cx4oam.c
 
     Code based on original work by zsKnight, anomie and Nach.
-    This implementation is based on C++ "cx4*.cpp" by byuu 
+    This implementation is based on C++ "cx4*.cpp" by byuu
     (up to date with source v 0.49).
 
 ***************************************************************************/

@@ -5,7 +5,7 @@
 
     Russian arcade system based on ZX Spectrum home computer.
 
-	Each coin buys you 1-6 minutes of game time.
+    Each coin buys you 1-6 minutes of game time.
 */
 
 #include "driver.h"

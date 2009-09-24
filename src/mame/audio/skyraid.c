@@ -311,8 +311,8 @@ static const discrete_custom_info skyraid_missle_custom_charge =
 
 DISCRETE_SOUND_START( skyraid )
 	/************************************************
-	 * Input register mapping
-	 ************************************************/
+     * Input register mapping
+     ************************************************/
 	/* convert the PLANE_SWEEP line to voltage*/
 	DISCRETE_INPUTX_LOGIC(SKYRAID_PLANE_SWEEP_EN, DEFAULT_TTL_V_LOGIC_1 * RES_VOLTAGE_DIVIDER(SKYRAID_R25, SKYRAID_R24), 0, 0)
 	DISCRETE_INPUT_LOGIC(SKYRAID_MISSILE_EN)
@@ -322,8 +322,8 @@ DISCRETE_SOUND_START( skyraid )
 	DISCRETE_INPUT_LOGIC(SKYRAID_ATTRACT_EN)
 
 	/************************************************
-	 * Noise Generator, Explosion sound
-	 ************************************************/
+     * Noise Generator, Explosion sound
+     ************************************************/
 	/* Note: the noise reset is not emulated 100% accurate */
 	/* According to the schematics, Attract only clears the lower 8 bits. */
 	/* I may modify the noise module in the future to properly emulate this, */
@@ -346,8 +346,8 @@ DISCRETE_SOUND_START( skyraid )
 	DISCRETE_CLAMP(SKYRAID_EXPLOSION_SND, 1, NODE_23, -5, 12.0 - 1.5, 0)
 
 	/************************************************
-	 * Jet, Plane sound
-	 ************************************************/
+     * Jet, Plane sound
+     ************************************************/
 	DISCRETE_RCFILTER(NODE_30,				/* IC J6, pin 5 */
 		1,									/* ENAB */
 		SKYRAID_PLANE_SWEEP_EN,				/* IN0 */
@@ -368,8 +368,8 @@ DISCRETE_SOUND_START( skyraid )
 	DISCRETE_BIT_DECODE(SKYRAID_JET_B_SND, NODE_32, 15, DEFAULT_TTL_V_LOGIC_1)	/* IC J7, pin 13 */
 
 	/************************************************
-	 * Missle sound
-	 ************************************************/
+     * Missle sound
+     ************************************************/
 	DISCRETE_CUSTOM5(NODE_40, SKYRAID_MISSILE_EN, SKYRAID_R12, SKYRAID_R14, SKYRAID_R13, SKYRAID_C44, &skyraid_missle_custom_charge)
 	DISCRETE_566(NODE_41,					/* IC K6, pin 3 */
 		NODE_40,							/* VMOD */
@@ -382,8 +382,8 @@ DISCRETE_SOUND_START( skyraid )
 	DISCRETE_BIT_DECODE(SKYRAID_MSL_B_SND, NODE_42, 15, DEFAULT_TTL_V_LOGIC_1)	/* IC L7, pin 13 */
 
 	/************************************************
-	 * Final Mix
-	 ************************************************/
+     * Final Mix
+     ************************************************/
 	DISCRETE_LOGIC_INVERT(NODE_91, SKYRAID_ATTRACT_EN)
 	DISCRETE_MIXER6(NODE_92,
 		NODE_91,				/* ENAB */

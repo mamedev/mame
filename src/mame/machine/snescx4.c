@@ -5,7 +5,7 @@
     File to handle emulation of the SNES "CX4" add-on chip.
 
     Code based on original work by zsKnight, anomie and Nach.
-    This implementation is based on C++ "cx4*.cpp" by byuu 
+    This implementation is based on C++ "cx4*.cpp" by byuu
     (up to date with source v 0.49).
 
 ***************************************************************************/

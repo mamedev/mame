@@ -18,7 +18,7 @@
     - current implementation of 68010 <-> tms32010 is a little bit hacky, after
       tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
       and starts executing
-    - hook up tms5220 - it is currently not used at all 
+    - hook up tms5220 - it is currently not used at all
 
 */
 

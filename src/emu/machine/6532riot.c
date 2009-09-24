@@ -54,7 +54,7 @@ struct _riot6532_state
 	int				index;
 
 	riot6532_port	port[2];
-	
+
 	devcb_resolved_write_line	irq_func;
 
 	UINT8			irqstate;

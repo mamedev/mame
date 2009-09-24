@@ -703,18 +703,18 @@ INPUT_PORTS_END
   MVS carts (arcade) were released before the AES carts (home)
   The actual codepath taken depends entirely on the BIOS rom, not the roms in the cartridge, which (with
   a few exceptions) support both codepaths.
-  
+
   The initial AES releases are therefore later revisions of the game, often with bug fixes over the
   initial MVS releases.  It isn't uncommon for later production runs and bootlegs to use these newer sets,
   so all of them are supported in MAME.
-  
+
   Likewise, because the MVS carts were released first (and were produced in higher numbers and generally
   have a lower cost) it's not uncommon for AES units to operate with converted MVS carts, so, with the
   exception of the sets that specifically lock out the AES mode* these sets are all equally suitable
   for MESS.
-  
+
   * nitd, kof2001 (initial release has no AES code), and a number of the hacked bootlegs.
-  
+
 */
 
 /* dummy entry for the dummy bios driver */
@@ -1921,12 +1921,12 @@ ROM_START( samshoh ) /* AES VERSION */
 ROM_END
 
 	/* Old version looked like this; p's on eprom?
-	ROM_START( samsho )
-	ROM_REGION( 0x180000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "045-p1.bin", 0x000000, 0x080000, CRC(80aa6c97) SHA1(6e07a4aa7b4719ae487a10cee9389cb55a370a7a) )
-	ROM_LOAD16_WORD_SWAP( "045-p2.bin", 0x080000, 0x080000, CRC(71768728) SHA1(9ff0e01d3fb73ad04279d4fdf4c53c3160888179) )
-	ROM_LOAD16_WORD_SWAP( "045-p3.bin", 0x100000, 0x080000, CRC(38ee9ba9) SHA1(48190699a6be83cb6257365ae81f93fdd23abe09) )
-	*/
+    ROM_START( samsho )
+    ROM_REGION( 0x180000, "maincpu", 0 )
+    ROM_LOAD16_WORD_SWAP( "045-p1.bin", 0x000000, 0x080000, CRC(80aa6c97) SHA1(6e07a4aa7b4719ae487a10cee9389cb55a370a7a) )
+    ROM_LOAD16_WORD_SWAP( "045-p2.bin", 0x080000, 0x080000, CRC(71768728) SHA1(9ff0e01d3fb73ad04279d4fdf4c53c3160888179) )
+    ROM_LOAD16_WORD_SWAP( "045-p3.bin", 0x100000, 0x080000, CRC(38ee9ba9) SHA1(48190699a6be83cb6257365ae81f93fdd23abe09) )
+    */
 
 ROM_START( tophuntr ) /* MVS VERSION */
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -2392,7 +2392,7 @@ ROM_START( fightfeva ) /* MVS VERSION */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.rom", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) )
 	/* There was also a copy of the 060-p1.bin with the name 060-p2.bin maybe it should be loaded over the top or this
-	larger rom is an older revision... */
+    larger rom is an older revision... */
 
 	NEO_SFIX_128K( "060-s1.bin", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) )
 
@@ -2914,7 +2914,7 @@ ROM_END
 
 ROM_START( pbobblen ) /* MVS VERSION */
 	/* This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
-	Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
+    Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
 
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "d96-07.ep1", 0x000000, 0x080000, CRC(6102ca14) SHA1(328429d11de5b327a0654ae0548da4d0025a2ae6) )
@@ -5363,10 +5363,10 @@ ROM_END
 ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	/* There also exist carts where p1 label is pg1;
-	The PG1 revision has a Japanese cart label, SN 02Jxxxxx
-	The P1 revision has a US/EUR cart label, SN 02Txxxxx
-	Rom data on both is identical.
-	These carts were manufactured by Mega Enterprise, not SNK. */
+    The PG1 revision has a Japanese cart label, SN 02Jxxxxx
+    The P1 revision has a US/EUR cart label, SN 02Txxxxx
+    Rom data on both is identical.
+    These carts were manufactured by Mega Enterprise, not SNK. */
 	ROM_LOAD16_WORD_SWAP( "263-p1.bin", 0x000000, 0x100000, CRC(27e4def3) SHA1(a08785e8145981bb6b5332a3b2df7eb321253cca) )
 	ROM_LOAD16_WORD_SWAP( "263-p2.bin", 0x100000, 0x400000, CRC(fdb7aed8) SHA1(dbeaec38f44e58ffedba99e70fa1439c2bf0dfa3) )
 

@@ -361,15 +361,15 @@ const device_config *device_list_find_by_tag(const device_config *listhead, cons
 
 
 /*-------------------------------------------------
-    device_find_child_by_tag - retrieve a child 
-	device configuration based on a tag
+    device_find_child_by_tag - retrieve a child
+    device configuration based on a tag
 -------------------------------------------------*/
 
 const device_config *device_find_child_by_tag(const device_config *owner, const char *tag)
 {
 	astring *tempstring;
 	const device_config *child;
-	
+
 	assert(owner != NULL);
 	assert(tag != NULL);
 

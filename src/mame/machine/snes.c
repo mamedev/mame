@@ -674,7 +674,7 @@ READ8_HANDLER( snes_r_io )
 		case DMAP5:
 		case DMAP6:
 		case DMAP7:
-//			return (snes_ram[offset] & 0xdf) | (snes_open_bus_r(space,0) & 0x20);
+//          return (snes_ram[offset] & 0xdf) | (snes_open_bus_r(space,0) & 0x20);
 		case BBAD0: case A1T0L: case A1T0H: case A1B0: case DAS0L:
 		case DAS0H: case DSAB0: case A2A0L: case A2A0H: case NTRL0:
 	 	case BBAD1: case A1T1L: case A1T1H: case A1B1: case DAS1L:

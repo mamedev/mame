@@ -178,36 +178,36 @@ INLINE void set_sp(s2650_regs *s2650c, UINT8 new_sp)
 INLINE int check_irq_line(s2650_regs *s2650c)
 {
 	int cycles = 0;
-	
+
 	if (s2650c->irq_state != CLEAR_LINE)
-	{									
-		if( (s2650c->psu & II) == 0 ) 
-		{								
-			int vector; 				
-			if (s2650c->halt) 			
-			{							
+	{
+		if( (s2650c->psu & II) == 0 )
+		{
+			int vector;
+			if (s2650c->halt)
+			{
 				s2650c->halt = 0;
-				s2650c->iar = (s2650c->iar + 1) & PMSK; 			
-			}													
-			vector = (*s2650c->irq_callback)(s2650c->device, 0) & 0xff;		
-			/* build effective address within first 8K page */	
-			s2650c->ea = S2650_relative[vector] & PMSK;			
-			if (vector & 0x80)		/* indirect bit set ? */	
-			{													
-				int addr = s2650c->ea;							
-				cycles += 6;					
-				/* build indirect 32K address */		
-				s2650c->ea = RDMEM(addr) << 8;			
-				if (!(++addr & PMSK)) addr -= PLEN; 	
+				s2650c->iar = (s2650c->iar + 1) & PMSK;
+			}
+			vector = (*s2650c->irq_callback)(s2650c->device, 0) & 0xff;
+			/* build effective address within first 8K page */
+			s2650c->ea = S2650_relative[vector] & PMSK;
+			if (vector & 0x80)		/* indirect bit set ? */
+			{
+				int addr = s2650c->ea;
+				cycles += 6;
+				/* build indirect 32K address */
+				s2650c->ea = RDMEM(addr) << 8;
+				if (!(++addr & PMSK)) addr -= PLEN;
 				s2650c->ea = (s2650c->ea + RDMEM(addr)) & AMSK;
-			}													
+			}
 			LOG(("S2650 interrupt to $%04x\n", s2650c->ea));
 			set_sp(s2650c, get_sp(s2650c) + 1);
-			set_psu(s2650c, s2650c->psu | II);	
-			s2650c->ras[get_sp(s2650c)] = s2650c->page + s2650c->iar;	
-			s2650c->page = s2650c->ea & PAGE;							
-			s2650c->iar  = s2650c->ea & PMSK;							
-		}														
+			set_psu(s2650c, s2650c->psu | II);
+			s2650c->ras[get_sp(s2650c)] = s2650c->page + s2650c->iar;
+			s2650c->page = s2650c->ea & PAGE;
+			s2650c->iar  = s2650c->ea & PMSK;
+		}
 	}
 	return cycles;
 }
@@ -891,7 +891,7 @@ static CPU_EXECUTE( s2650 )
 
 	/* check for external irqs */
 	s2650c->icount -= check_irq_line(s2650c);
-	
+
 	do
 	{
 		s2650c->ppc = s2650c->page + s2650c->iar;

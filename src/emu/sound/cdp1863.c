@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- what happens if you connect both clocks?
+    - what happens if you connect both clocks?
 
 */
 
@@ -74,7 +74,7 @@ INLINE cdp1863_config *get_safe_config(const device_config *device)
 WRITE8_DEVICE_HANDLER( cdp1863_str_w )
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
-	
+
 	cdp1863->latch = data;
 }
 
