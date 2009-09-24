@@ -518,10 +518,14 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					/* for non-disk entries, print offset */
 					if (!is_disk)
 						fprintf(out, " offset=\"%x\"", offset);
-
 					/* for disk entries, add the disk index */
 					else
 						fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
+						
+					/* add optional flag */
+					if ((!is_disk && ROM_ISOPTIONAL(rom)) || (is_disk && DISK_ISOPTIONAL(rom)))
+						fprintf(out, " optional=\"yes\"");
+						
 					fprintf(out, "/>\n");
 				}
 			}
@@ -948,7 +952,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST rom region CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
-		"\t\t\t<!ATTLIST rom dispose (yes|no) \"no\">\n"
+		"\t\t\t<!ATTLIST rom optional (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT disk EMPTY>\n"
 		"\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
@@ -957,6 +961,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST disk region CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk index CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
+		"\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"
 		"\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT chip EMPTY>\n"
