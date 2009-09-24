@@ -6185,6 +6185,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
  	DRIVER( neogeo )
 	DRIVER( nam1975 )	/* 0001 (c) 1990 SNK */
 	DRIVER( bstars )	/* 0002 (c) 1990 SNK */
+	DRIVER( bstarsh )	/* 0002 (c) 1990 SNK */
 	DRIVER( tpgolf )	/* 0003 (c) 1990 SNK */
 	DRIVER( mahretsu )	/* 0004 (c) 1990 SNK */
 	DRIVER( maglord )	/* 0005 (c) 1990 Alpha Denshi Co. */
@@ -6240,7 +6241,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samsho )	/* 0045 (c) 1993 SNK */
 	DRIVER( samshoh )	/* 0045 (c) 1993 SNK */
 	DRIVER( tophuntr )	/* 0046 (c) 1994 SNK */
-	DRIVER( tophuntra )	/* 0046 (c) 1994 SNK */
+	DRIVER( tophuntrh )	/* 0046 (c) 1994 SNK */
 	DRIVER( fatfury2 )	/* 0047 (c) 1992 SNK */
 	DRIVER( janshin )	/* 0048 (c) 1994 Aicom */
 	DRIVER( androdun )	/* 0049 (c) 1992 Visco */
@@ -6286,7 +6287,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssideki3 )	/* 0081 (c) 1995 SNK */
 	DRIVER( doubledr )	/* 0082 (c) 1995 Technos */
 	DRIVER( pbobblen )	/* 0083 (c) 1994 Taito */
-	DRIVER( pbobblena )	/* 0083 (c) 1994 Taito */
+	DRIVER( pbobblenb )	/* bootleg */
 	DRIVER( kof95 )		/* 0084 (c) 1995 SNK */
 	DRIVER( kof95h )	/* 0084 (c) 1995 SNK */
 						/* 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only) */
@@ -6308,7 +6309,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
 						/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
 						/* 0099 Neo Pool Masters */
-						/* 0160 98 BEST 44 (c) 1997/1998 SNK */
 	DRIVER( turfmast )	/* 0200 (c) 1996 Nazca */
 	DRIVER( mslug )		/* 0201 (c) 1996 Nazca */
 	DRIVER( puzzledp )	/* 0202 (c) 1995 Taito (Visco license) */
@@ -6346,7 +6346,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( breakers )	/* 0230 (c) 1996 Visco */
 	DRIVER( miexchng )	/* 0231 (c) 1997 Face */
 	DRIVER( kof97 )		/* 0232 (c) 1997 SNK */
-	DRIVER( kof97a )	/* 0232 (c) 1997 SNK */
+	DRIVER( kof97h )	/* 0232 (c) 1997 SNK */
 	DRIVER( kof97pls )	/* bootleg of kof97 */
 	DRIVER( kog )		/* bootleg of kof97 */
 	DRIVER( magdrop3 )	/* 0233 (c) 1997 Data East Corporation */
@@ -6403,6 +6403,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ct2k3sp )	/* bootleg of kof2001 */
 	DRIVER( ct2k3sa )	/* bootleg of kof2001 */
 	DRIVER( mslug4 )	/* 0263 (c) 2002 Mega Enterprise */
+	DRIVER( mslug4h )	/* 0263 (c) 2002 Mega Enterprise */
 	DRIVER( ms4plus )	/* bootleg */
 	DRIVER( rotd )		/* 0264 (c) 2002 Evoga */
 	DRIVER( kof2002 )	/* 0265 (c) 2002 Eolith / Playmore */
