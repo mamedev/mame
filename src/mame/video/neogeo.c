@@ -334,24 +334,24 @@ if (banked)
 }
 
 		{
-			UINT8 data = 0;
+			UINT8 data;
 			int i;
 
 			UINT8 *gfx = &gfx_base[((code << 5) | (scanline & 0x07)) & addr_mask];
 			pen_t *char_pens = &pens[code_and_palette >> 12 << 4];
 
-			for (i = 0; i < 8; i++)
+			for (i = 0; i < 4; i++)
 			{
 				static const UINT32 pix_offsets[] = { 0x10, 0x18, 0x00, 0x08 };
 
-				if (i & 0x01)
-					data = data >> 4;
-				else
-					data = gfx[pix_offsets[i >> 1]];
+				data = gfx[pix_offsets[i]];
 
 				if (data & 0x0f)
 					*pixel_addr = char_pens[data & 0x0f];
+				pixel_addr++;
 
+				if (data & 0xf0)
+					*pixel_addr = char_pens[(data & 0xf0) >> 4];
 				pixel_addr++;
 			}
 		}
