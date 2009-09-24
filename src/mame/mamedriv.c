@@ -616,8 +616,10 @@ const game_driver * const drivers[] =
 	DRIVER( warpwarpr )	/* (c) 1981 [Namco] (Rock-ola license) */
 	DRIVER( warpwarpr2 )/* (c) 1981 [Namco] (Rock-ola license) */
 	DRIVER( rallyx )	/* (c) 1980 Namco */
+	DRIVER( rallyxa )	/* (c) 1980 Namco */
 	DRIVER( rallyxm )	/* (c) 1980 Midway */
 	DRIVER( nrallyx )	/* (c) 1981 Namco */
+	DRIVER( nrallyxb )	/* (c) 1981 Namco */
 	DRIVER( jungler )	/* GX327 (c) 1981 Konami */
 	DRIVER( junglers )	/* GX327 (c) 1981 Stern */
 	DRIVER( tactcian )	/* GX335 (c) 1982 Sega */
