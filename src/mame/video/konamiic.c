@@ -1962,6 +1962,8 @@ static STATE_POSTLOAD( K052109_tileflip_reset )
 }
 
 
+#define XOR(a) WORD_XOR_BE(a)
+
 void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int tmap,int bank,int *code,int *color,int *flags,int *priority))
 {
@@ -1983,11 +1985,7 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 		0,
 		4,
 		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-#endif
+		{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 		32*8
 	};
@@ -4627,13 +4625,8 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 		0,
 		4,
 		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-#endif
+		{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4,
+				XOR(8)*4, XOR(9)*4, XOR(10)*4, XOR(11)*4, XOR(12)*4, XOR(13)*4, XOR(14)*4, XOR(15)*4 },
 		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 		128*8

@@ -84,27 +84,17 @@ static UINT16 sys24_tile_mask;
 static int sys24_char_gfx_index;
 static tilemap *sys24_tile_layer[4];
 
-#ifdef LSB_FIRST
+#define XOR(a) WORD_XOR_BE(a)
+
 static const gfx_layout sys24_char_layout = {
 	8, 8,
 	SYS24_TILES,
 	4,
 	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+	{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
-#else
-static const gfx_layout sys24_char_layout = {
-	8, 8,
-	SYS24_TILES,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-#endif
 
 static TILE_GET_INFO( sys24_tile_info_0s )
 {

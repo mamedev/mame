@@ -2622,13 +2622,8 @@ INLINE void FMOVMRIFR(SH4 *sh4, UINT32 m,UINT32 n)
 		n = n & 14;
 		sh4->ea = sh4->r[m];
 		sh4->r[m] += 8;
-#ifdef LSB_FIRST
-		sh4->xf[n+1] = RL(sh4, sh4->ea );
-		sh4->xf[n] = RL(sh4, sh4->ea+4 );
-#else
-		sh4->xf[n] = RL(sh4, sh4->ea );
-		sh4->xf[n+1] = RL(sh4, sh4->ea+4 );
-#endif
+		sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(sh4, sh4->ea );
+		sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(sh4, sh4->ea+4 );
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
 			if (n & 1) {
@@ -2662,13 +2657,8 @@ INLINE void FMOVFRMR(SH4 *sh4,UINT32 m,UINT32 n)
 	if (sh4->fpu_pr) { /* PR = 1 */
 		m= m & 14;
 		sh4->ea = sh4->r[n];
-#ifdef LSB_FIRST
-		WL(sh4, sh4->ea,sh4->xf[m+1] );
-		WL(sh4, sh4->ea+4,sh4->xf[m] );
-#else
-		WL(sh4, sh4->ea,sh4->xf[m] );
-		WL(sh4, sh4->ea+4,sh4->xf[m+1] );
-#endif
+		WL(sh4, sh4->ea,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
+		WL(sh4, sh4->ea+4,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
@@ -2698,13 +2688,8 @@ INLINE void FMOVFRMDR(SH4 *sh4,UINT32 m,UINT32 n)
 		m= m & 14;
 		sh4->r[n] -= 8;
 		sh4->ea = sh4->r[n];
-#ifdef LSB_FIRST
-		WL(sh4, sh4->ea,sh4->xf[m+1] );
-		WL(sh4, sh4->ea+4,sh4->xf[m] );
-#else
-		WL(sh4, sh4->ea,sh4->xf[m] );
-		WL(sh4, sh4->ea+4,sh4->xf[m+1] );
-#endif
+		WL(sh4, sh4->ea,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
+		WL(sh4, sh4->ea+4,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
@@ -2736,13 +2721,8 @@ INLINE void FMOVFRS0(SH4 *sh4,UINT32 m,UINT32 n)
 	if (sh4->fpu_pr) { /* PR = 1 */
 		m= m & 14;
 		sh4->ea = sh4->r[0] + sh4->r[n];
-#ifdef LSB_FIRST
-		WL(sh4, sh4->ea,sh4->xf[m+1] );
-		WL(sh4, sh4->ea+4,sh4->xf[m] );
-#else
-		WL(sh4, sh4->ea,sh4->xf[m] );
-		WL(sh4, sh4->ea+4,sh4->xf[m+1] );
-#endif
+		WL(sh4, sh4->ea,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
+		WL(sh4, sh4->ea+4,sh4->xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
@@ -2771,13 +2751,8 @@ INLINE void FMOVS0FR(SH4 *sh4,UINT32 m,UINT32 n)
 	if (sh4->fpu_pr) { /* PR = 1 */
 		n= n & 14;
 		sh4->ea = sh4->r[0] + sh4->r[m];
-#ifdef LSB_FIRST
-		sh4->xf[n+1] = RL(sh4, sh4->ea );
-		sh4->xf[n] = RL(sh4, sh4->ea+4 );
-#else
-		sh4->xf[n] = RL(sh4, sh4->ea );
-		sh4->xf[n+1] = RL(sh4, sh4->ea+4 );
-#endif
+		sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(sh4, sh4->ea );
+		sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(sh4, sh4->ea+4 );
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
 			if (n & 1) {
@@ -2808,23 +2783,13 @@ INLINE void FMOVMRFR(SH4 *sh4,UINT32 m,UINT32 n)
 		if (n & 1) {
 			n= n & 14;
 			sh4->ea = sh4->r[m];
-#ifdef LSB_FIRST
-			sh4->xf[n+1] = RL(sh4, sh4->ea );
-			sh4->xf[n] = RL(sh4, sh4->ea+4 );
-#else
-			sh4->xf[n] = RL(sh4, sh4->ea );
-			sh4->xf[n+1] = RL(sh4, sh4->ea+4 );
-#endif
+			sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(sh4, sh4->ea );
+			sh4->xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(sh4, sh4->ea+4 );
 		} else {
 			n= n & 14;
 			sh4->ea = sh4->r[m];
-#ifdef LSB_FIRST
-			sh4->fr[n+1] = RL(sh4, sh4->ea );
-			sh4->fr[n] = RL(sh4, sh4->ea+4 );
-#else
-			sh4->fr[n] = RL(sh4, sh4->ea );
-			sh4->fr[n+1] = RL(sh4, sh4->ea+4 );
-#endif
+			sh4->fr[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(sh4, sh4->ea );
+			sh4->fr[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(sh4, sh4->ea+4 );
 		}
 	} else {              /* PR = 0 */
 		if (sh4->fpu_sz) { /* SZ = 1 */
@@ -3010,13 +2975,8 @@ INLINE void FCNVDS(SH4 *sh4, UINT32 n)
 {
 	if (sh4->fpu_pr) { /* PR = 1 */
 		n = n & 14;
-#ifdef LSB_FIRST
 		if (sh4->fpscr & RM)
-			sh4->fr[n] &= 0xe0000000; /* round toward zero*/
-#else
-		if (sh4->fpscr & RM)
-			sh4->fr[n | 1] &= 0xe0000000; /* round toward zero*/
-#endif
+			sh4->fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0,1)] &= 0xe0000000; /* round toward zero*/
 		*((float *)&sh4->fpul) = (float)FP_RFD(n);
 	}
 }

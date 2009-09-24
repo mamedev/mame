@@ -1559,16 +1559,9 @@ void kof2003biosdecode(running_machine *machine)
 
 		for (a=0;a<0x80000/2;a++)
 		{
-			//data xor
-			#ifdef LSB_FIRST
-			if (src[a] & 0x0004)	src[a] ^= 0x0001;
-			if (src[a] & 0x0010)	src[a] ^= 0x0002;
-			if (src[a] & 0x0020)	src[a] ^= 0x0008;
-			#else
-			if (src[a] & 0x0400)	src[a] ^= 0x0100;
-			if (src[a] & 0x1000)	src[a] ^= 0x0200;
-			if (src[a] & 0x2000)	src[a] ^= 0x0800;
-			#endif
+			if (src[a] & (0x0004 << (8*BYTE_XOR_LE(0))))	src[a] ^= 0x0001 << (8*BYTE_XOR_LE(0));
+			if (src[a] & (0x0010 << (8*BYTE_XOR_LE(0))))	src[a] ^= 0x0002 << (8*BYTE_XOR_LE(0));
+			if (src[a] & (0x0020 << (8*BYTE_XOR_LE(0))))	src[a] ^= 0x0008 << (8*BYTE_XOR_LE(0));
 			//address xor
 			addr  = a & ~0xff;
 			addr |= address[BYTE_XOR_LE(a & 0x7f)];

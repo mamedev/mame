@@ -4491,15 +4491,10 @@ static void decode_tdragonb(running_machine *machine)
 	len = memory_region_length(machine, "maincpu");
 	for (A = 0;A < len;A += 2)
 	{
-#ifdef LSB_FIRST
-		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_tdragonb[0]);
-		rom[A+1] = tmp >> 8;
-		rom[A] = tmp & 0xff;
-#else
-		UINT16 tmp = decode_word( rom[A]*256 + rom[A+1], decode_data_tdragonb[0]);
-		rom[A] = tmp >> 8;
-		rom[A+1] = tmp & 0xff;
-#endif
+		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
+		UINT16 tmp = decode_word( rom[h]*256 + rom[l], decode_data_tdragonb[0]);
+		rom[h] = tmp >> 8;
+		rom[l] = tmp & 0xff;
 	}
 
 	rom = memory_region(machine, "gfx2");

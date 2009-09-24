@@ -179,15 +179,8 @@ static const int        ENVCNT[ 0x20 ]
                                     /* Returns SUSTAIN rate         */
 
 /* Handle endianness */
-#ifndef LSB_FIRST
-#define LEtoME16( x )                                                \
-    ( ( ( ( x ) >> 8 ) & 0xFF ) | ( ( ( x ) << 8 ) & 0xFF00 ) )
-#define MEtoLE16( x )                                                \
-    ( ( ( ( x ) >> 8 ) & 0xFF ) | ( ( ( x ) << 8 ) & 0xFF00 ) )
-#else
-#define LEtoME16( x )   ( x )
-#define MEtoLE16( x )   ( x )
-#endif
+#define LEtoME16( x ) LITTLE_ENDIANIZE_INT16(x)
+#define MEtoLE16( x ) LITTLE_ENDIANIZE_INT16(x)
 
 /*========== PROCEDURES ==========*/
 

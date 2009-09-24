@@ -1299,11 +1299,7 @@ void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-#ifdef LSB_FIRST
 					*p32bytes = memory_read_qword_64le(sh4->program, s->source);
-#else
-					*p32bytes = memory_read_qword_64be(sh4->program, s->source);
-#endif
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}
@@ -1311,11 +1307,7 @@ void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-#ifdef LSB_FIRST
 					memory_write_qword_64le(sh4->program, s->destination, *p32bytes);
-#else
-					memory_write_qword_64be(sh4->program, s->destination, *p32bytes);
-#endif
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}

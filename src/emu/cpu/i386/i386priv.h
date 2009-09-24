@@ -15,57 +15,29 @@ extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 
 typedef enum { ES, CS, SS, DS, FS, GS } SREGS;
 
-#ifdef LSB_FIRST
 typedef enum
 {
-	AL = 0,
-	AH = 1,
-	CL = 4,
-	CH = 5,
-	DL = 8,
-	DH = 9,
-	BL = 12,
-	BH = 13
+	AL = NATIVE_ENDIAN_VALUE_LE_BE(0,3),
+	AH = NATIVE_ENDIAN_VALUE_LE_BE(1,2),
+	CL = NATIVE_ENDIAN_VALUE_LE_BE(4,7),
+	CH = NATIVE_ENDIAN_VALUE_LE_BE(5,6),
+	DL = NATIVE_ENDIAN_VALUE_LE_BE(8,11),
+	DH = NATIVE_ENDIAN_VALUE_LE_BE(9,10),
+	BL = NATIVE_ENDIAN_VALUE_LE_BE(12,15),
+	BH = NATIVE_ENDIAN_VALUE_LE_BE(13,14)
 } BREGS;
-#else
-typedef enum
-{
-	AL = 3,
-	AH = 2,
-	CL = 7,
-	CH = 6,
-	DL = 11,
-	DH = 10,
-	BL = 15,
-	BH = 14
-} BREGS;
-#endif
 
-#ifdef LSB_FIRST
 typedef enum
 {
-	AX = 0,
-	CX = 2,
-	DX = 4,
-	BX = 6,
-	SP = 8,
-	BP = 10,
-	SI = 12,
-	DI = 14
+	AX = NATIVE_ENDIAN_VALUE_LE_BE(0,1),
+	CX = NATIVE_ENDIAN_VALUE_LE_BE(2,3),
+	DX = NATIVE_ENDIAN_VALUE_LE_BE(4,5),
+	BX = NATIVE_ENDIAN_VALUE_LE_BE(6,7),
+	SP = NATIVE_ENDIAN_VALUE_LE_BE(8,9),
+	BP = NATIVE_ENDIAN_VALUE_LE_BE(10,11),
+	SI = NATIVE_ENDIAN_VALUE_LE_BE(12,13),
+	DI = NATIVE_ENDIAN_VALUE_LE_BE(14,15)
 } WREGS;
-#else
-typedef enum
-{
-	AX = 1,
-	CX = 3,
-	DX = 5,
-	BX = 7,
-	SP = 9,
-	BP = 11,
-	SI = 13,
-	DI = 15
-} WREGS;
-#endif
 
 typedef enum { EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI } DREGS;
 

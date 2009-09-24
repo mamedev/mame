@@ -1442,25 +1442,14 @@ static TILE_GET_INFO( TC0080VCO_get_tx_tile_info )
 
 /* Is this endian-correct ??? */
 
+#define XOR(a) WORD_XOR_BE(a)
+
 static const gfx_layout TC0080VCO_charlayout =
 {
 	8, 8,	/* 8x8 pixels */
 	256,	/* 256 chars */
-
-// can't be 4bpp as it becomes opaque in Ainferno...
-//  4,      /* 4 bits per pixel */
-//#ifdef LSB_FIRST
-//  { 0x10000*8 + 8, 0x10000*8, 8, 0 },
-//#else
-//  { 0x10000*8, 0x10000*8 + 8, 0, 8 },
-//#endif
-
 	3,		/* 3 bits per pixel */
-#ifdef LSB_FIRST
-	{ 0x10000*8, 8, 0 },
-#else
-	{ 0x10000*8 + 8, 0, 8 },
-#endif
+	{ 0x10000*8 + XOR(2)*4, XOR(0)*4, XOR(2)*4 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
 	16*8
@@ -2133,11 +2122,7 @@ static const gfx_layout TC0100SCN_charlayout =
 	8,8,	/* 8*8 characters */
 	256,	/* 256 characters */
 	2,	/* 2 bits per pixel */
-#ifdef LSB_FIRST
-	{ 8, 0 },
-#else
-	{ 0, 8 },
-#endif
+	{ XOR(0)*4, XOR(2)*4 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8	/* every sprite takes 16 consecutive bytes */
@@ -2922,11 +2907,7 @@ static const gfx_layout TC0480SCP_charlayout =
 	256,	/* 256 characters */
 	4,	/* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-#else
-	{ 3*4, 2*4, 1*4, 0*4, 7*4, 6*4, 5*4, 4*4 },
-#endif
+	{ XOR(3)*4, XOR(2)*4, XOR(1)*4, XOR(0)*4, XOR(7)*4, XOR(6)*4, XOR(5)*4, XOR(4)*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8	/* every sprite takes 32 consecutive bytes */
 };

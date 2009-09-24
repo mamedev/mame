@@ -491,19 +491,13 @@ static DRIVER_INIT( twocrude )
 
 	/* Main cpu decrypt */
 	for (i=0x00000; i<0x80000; i+=2) {
-#ifdef LSB_FIRST
-		RAM[i+1]=(RAM[i+1] & 0xcf) | ((RAM[i+1] & 0x10) << 1) | ((RAM[i+1] & 0x20) >> 1);
-		RAM[i+1]=(RAM[i+1] & 0x5f) | ((RAM[i+1] & 0x20) << 2) | ((RAM[i+1] & 0x80) >> 2);
+		int h = i+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = i+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
 
-		RAM[i]=(RAM[i] & 0xbd) | ((RAM[i] & 0x2) << 5) | ((RAM[i] & 0x40) >> 5);
-		RAM[i]=(RAM[i] & 0xf5) | ((RAM[i] & 0x2) << 2) | ((RAM[i] & 0x8) >> 2);
-#else
-		RAM[i]=(RAM[i] & 0xcf) | ((RAM[i] & 0x10) << 1) | ((RAM[i] & 0x20) >> 1);
-		RAM[i]=(RAM[i] & 0x5f) | ((RAM[i] & 0x20) << 2) | ((RAM[i] & 0x80) >> 2);
+		RAM[h]=(RAM[h] & 0xcf) | ((RAM[h] & 0x10) << 1) | ((RAM[h] & 0x20) >> 1);
+		RAM[h]=(RAM[h] & 0x5f) | ((RAM[h] & 0x20) << 2) | ((RAM[h] & 0x80) >> 2);
 
-		RAM[i+1]=(RAM[i+1] & 0xbd) | ((RAM[i+1] & 0x2) << 5) | ((RAM[i+1] & 0x40) >> 5);
-		RAM[i+1]=(RAM[i+1] & 0xf5) | ((RAM[i+1] & 0x2) << 2) | ((RAM[i+1] & 0x8) >> 2);
-#endif
+		RAM[l]=(RAM[l] & 0xbd) | ((RAM[l] & 0x2) << 5) | ((RAM[l] & 0x40) >> 5);
+		RAM[l]=(RAM[l] & 0xf5) | ((RAM[l] & 0x2) << 2) | ((RAM[l] & 0x8) >> 2);
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */

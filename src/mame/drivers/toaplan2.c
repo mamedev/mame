@@ -3267,54 +3267,30 @@ static const gfx_layout raizing_textlayout =
 	8*32
 };
 
-#ifdef LSB_FIRST
+#define XOR(a) WORD_XOR_LE(a)
+#define LOC(x) (x+XOR(0))
+
 static const gfx_layout truxton2_tx_tilelayout =
 {
 	8,8,	/* 8x8 characters */
 	1024,	/* 1024 characters */
 	4,		/* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 16, 20, 32, 36, 48, 52 },
+	{ LOC(0)*4, LOC(1)*4, LOC(4)*4, LOC(5)*4, LOC(8)*4, LOC(9)*4, LOC(12)*4, LOC(13)*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
 };
-#else
-static const gfx_layout truxton2_tx_tilelayout =
-{
-	8,8,	/* 8x8 characters */
-	1024,	/* 1024 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0+8, 4+8, 16+8, 20+8, 32+8, 36+8, 48+8, 52+8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
-};
-#endif
 
-#ifdef LSB_FIRST
 static const gfx_layout batrider_tx_tilelayout =
 {
 	8,8,	/* 8x8 characters */
 	1024,	/* 1024 characters */
 	4,		/* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
+	{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
-#else
-static const gfx_layout batrider_tx_tilelayout =
-{
-	8,8,	/* 8x8 characters */
-	1024,	/* 1024 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 8, 12, 0, 4, 24, 28, 16, 20 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-#endif
-
 
 static const gfx_layout fixeighblayout =
 {

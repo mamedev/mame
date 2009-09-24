@@ -185,6 +185,8 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 
 /*************************************************************************/
 
+#define XOR(a) BYTE_XOR_BE(a)
+
 static const gfx_layout shape_layout =
 {
 	8,8,
@@ -192,11 +194,7 @@ static const gfx_layout shape_layout =
 	1,
 	{ 0 },
 	{ 0,1,2,3,4,5,6,7 },
-#ifdef LSB_FIRST
-	{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
-#else
-	{ 8*0,8*1,8*2,8*3,8*4,8*5,8*6,8*7 },
-#endif
+	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
 	8*8
 }; /* shape_layout */
 
@@ -206,11 +204,7 @@ static const gfx_layout cg_layout_8bpp =
 	0x1000,
 	8, /* 8BPP */
 	{ 0,1,2,3,4,5,6,7 },
-#ifdef LSB_FIRST
-	{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
-#else
-	{ 8*0,8*1,8*2,8*3,8*4,8*5,8*6,8*7 },
-#endif
+	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
 	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7 },
 	64*8
 }; /* cg_layout_8bpp */
@@ -221,11 +215,7 @@ static const gfx_layout cg_layout_4bpp =
 	0x1000,
 	4, /* 4BPP */
 	{ 4,5,6,7 },
-#ifdef LSB_FIRST
-	{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
-#else
-	{ 8*0,8*1,8*2,8*3,8*4,8*5,8*6,8*7 },
-#endif
+	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
 	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7 },
 	64*8
 }; /* cg_layout_4bpp */

@@ -157,37 +157,6 @@ void a5200_handle_keypads(running_machine *machine);
 #define GTIA_PLAYER 	0x02
 #define GTIA_TRIGGER	0x04
 
-#ifdef  LSB_FIRST
-
-/* make a UINT32 from four bytes */
-#define MKD(b0,b1,b2,b3) ((b0)|((b1)<<8)|((b2)<<16)|((b3)<<24))
-
-#define BYTE0	0x000000ff
-#define BYTE1   0x0000ff00
-#define BYTE2   0x00ff0000
-#define BYTE3   0xff000000
-
-#else
-
-/* make a UINT32 from four bytes */
-#define MKD(b0,b1,b2,b3) (((b0)<<24)|((b1)<<16)|((b2)<<8)|(b3))
-
-#define BYTE0	0xff000000
-#define BYTE1   0x00ff0000
-#define BYTE2   0x0000ff00
-#define BYTE3   0x000000ff
-
-#endif
-
-/* make a qUINT16 from eight bytes */
-#define MKQ(b0,b1,b2,b3,b4,b5,b6,b7) MKD(b0,b1,b2,b3), MKD(b4,b5,b6,b7)
-
-/* make two UINT32s from 4 bytes by doubling them */
-#define MKDD(b0,b1,b2,b3) MKD(b0,b0,b1,b1), MKD(b2,b2,b3,b3)
-
-/* make a four UINT32s from 4 bytes by quadrupling them */
-#define MKQD(b0,b1,b2,b3) MKD(b0,b0,b0,b0), MKD(b1,b1,b1,b1), MKD(b2,b2,b2,b2), MKD(b3,b3,b3,b3)
-
 /*****************************************************************************
  * If your memcpy does not expand too well if you use it with constant
  * size_t field, you might want to define these macros somehow different.
