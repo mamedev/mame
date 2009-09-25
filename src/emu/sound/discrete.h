@@ -303,7 +303,7 @@
  * DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
- * DISCRETE_566(NODE,VMOD,R,C,OPTIONS)
+ * DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)
  * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
@@ -3179,11 +3179,10 @@
  *                  vMod node or static value,
  *                  R node or static value in ohms,
  *                  C node or static value in Farads,
- *                  address of discrete_566_desc structure)
- *
- *     discrete_566_desc = {options, v_pos, v_neg, v_charge}
- *       Note: v_charge can be static value, a node
- *             or use DEFAULT_566_CHARGE to connect to v_pos
+ *                  v_pos static value
+ *                  v_neg static value
+ *                  v_charge node or static value
+ *                  options)
  *
  *  Output Types:
  *     DISC_566_OUT_DC - Output is actual DC. (DEFAULT)
@@ -3588,7 +3587,6 @@ enum
 
 #define DISC_566_OUT_MASK					0x30	/* Bits that define output type.
                                                      * Used only internally in module. */
-#define DEFAULT_566_CHARGE	-1
 
 /* LS624 output flags */
 #define DISC_LS624_OUT_ENERGY				0x01
@@ -3984,16 +3982,6 @@ struct _discrete_555_vco1_desc
 	double v_pos;				/* B+ voltage of 555 */
 	double v_charge;			/* (ignored) */
 	double v_out_high;			/* High output voltage of 555 (Defaults to v_pos - 1.2V) */
-};
-
-
-typedef struct _discrete_566_desc discrete_566_desc;
-struct _discrete_566_desc
-{
-	int		options;	// bit mapped options
-	double	v_pos;		// B+ voltage of 566
-	double	v_neg;		// B- voltage of 566
-	double	v_charge;
 };
 
 
@@ -4422,7 +4410,7 @@ enum
 #define DISCRETE_555_CC(NODE,RESET,VIN,R,C,RBIAS,RGND,RDIS,OPTIONS)     { NODE, DSD_555_CC      , 7, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, { RESET,VIN,R,C,RBIAS,RGND,RDIS }, OPTIONS, "DISCRETE_555_CC" },
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "DISCRETE_555_VCO1" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
-#define DISCRETE_566(NODE,VMOD,R,C,OPTIONS)                             { NODE, DSD_566         , 3, { VMOD,R,C }, { VMOD,R,C }, OPTIONS, "DISCRETE_566" },
+#define DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)           { NODE, DSD_566         , 7, { VMOD,R,C,NODE_NC,NODE_NC,VCHARGE,NODE_NC }, { VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS }, NULL, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */

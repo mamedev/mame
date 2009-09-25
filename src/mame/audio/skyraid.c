@@ -28,7 +28,7 @@
 #define SKYRAID_R12		RES_K(1)
 #define SKYRAID_R13		RES_K(10)
 #define SKYRAID_R14		RES_K(100)
-#define SKYRAID_R16		RES_M(10)
+#define SKYRAID_R16		RES_K(10)
 #define SKYRAID_R18		RES_K(10)
 #define SKYRAID_R19		RES_K(10)
 #define SKYRAID_R20		RES_K(47)
@@ -84,14 +84,6 @@ static const discrete_op_amp_filt_info skyraid_explosion_filter =
 	SKYRAID_R85, 0, SKYRAID_R86, 0, SKYRAID_R110,	/* r1, r2, r3, r4, rF*/
 	SKYRAID_C85, SKYRAID_C86, 0,	/* c1, c2, c3 */
 	0, 12, -5,	/* vRef, vP, vN */
-};
-
-static const discrete_566_desc skyraid_566_desc =
-{
-	DISC_566_OUT_LOGIC,
-	 5,					/* v_pos */
-	-5,					/* v_neg */
-	 5					/* v_charge */
 };
 
 static const discrete_dac_r1_ladder skyraid_plane_dac =
@@ -354,7 +346,9 @@ DISCRETE_SOUND_START( skyraid )
 		RES_2_PARALLEL(SKYRAID_R25, SKYRAID_R24), SKYRAID_C49)
 	DISCRETE_566(NODE_31,					/* IC J6, pin 3 */
 		NODE_30,							/* VMOD */
-		SKYRAID_R18, SKYRAID_C48, &skyraid_566_desc)
+		SKYRAID_R18, SKYRAID_C48,
+		5, -5, 5,							/* VPOS,VNEG,VCHARGE */
+		DISC_566_OUT_LOGIC)
 	DISCRETE_LOGIC_SHIFT(NODE_32,			/* IC H7, J7 output */
 		SKYRAID_NOISE,						/* IC H7, J7 pins 1 & 2 */
 		1, NODE_31, 16,						/* RESET, CLK, SIZE */
@@ -373,7 +367,9 @@ DISCRETE_SOUND_START( skyraid )
 	DISCRETE_CUSTOM5(NODE_40, SKYRAID_MISSILE_EN, SKYRAID_R12, SKYRAID_R14, SKYRAID_R13, SKYRAID_C44, &skyraid_missle_custom_charge)
 	DISCRETE_566(NODE_41,					/* IC K6, pin 3 */
 		NODE_40,							/* VMOD */
-		SKYRAID_R16, SKYRAID_C45, &skyraid_566_desc)
+		SKYRAID_R16, SKYRAID_C45,
+		5, -5, SKYRAID_MISSLE_CHARGE_PLUS,	/* VPOS,VNEG,VCHARGE */
+		DISC_566_OUT_LOGIC)
 	DISCRETE_LOGIC_SHIFT(NODE_42,			/* IC K7, L7 output */
 		SKYRAID_NOISE,						/* IC K7, L7 pins 1 & 2 */
 		1, NODE_41, 16,						/* RESET, CLK, SIZE */
@@ -402,7 +398,7 @@ DISCRETE_SOUND_START( skyraid )
 	/* IC E10, pin 1 gain and clipping */
 	DISCRETE_GAIN(NODE_94, NODE_93, - SKYRAID_R118 / (SKYRAID_R122 + RES_5_PARALLEL(SKYRAID_R120, SKYRAID_R32, SKYRAID_R29, SKYRAID_R30, SKYRAID_R31)))
 	DISCRETE_CLAMP(NODE_95, 1, NODE_94, -5, 12.0 - 1.5, 0)
-	DISCRETE_OUTPUT(NODE_95, 32700.0/12)
+	DISCRETE_OUTPUT(NODE_95, 32700.0/8)
 DISCRETE_SOUND_END
 
 

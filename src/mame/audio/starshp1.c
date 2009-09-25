@@ -113,14 +113,6 @@ static const discrete_mixer_desc starshp1_566_a9_mix_r =
 	{0}, {0}, 0, 0, 0, 0, 0, 1
 };
 
-static const discrete_566_desc starshp1_566_a9 =
-{
-	DISC_566_OUT_TRIANGLE,
-	5,			/* B+ */
-	-10,		/* B- */
-	NODE_41		/* charge voltage */
-};
-
 static const discrete_mixer_desc starshp1_555_b10_mix_r =
 {
 	DISC_MIXER_IS_RESISTOR,
@@ -252,7 +244,8 @@ DISCRETE_SOUND_START( starshp1 )
 						STARSHP1_MOTOR_SPEED,		/* IC A9, pin 5 */
 						RES_2_PARALLEL(STARSHP1_R54, STARSHP1_R55),
 						STARSHP1_C34,
-						&starshp1_566_a9)
+						5, -10, NODE_41,			/* VPOS,VNEG,VCHARGE */
+						DISC_566_OUT_TRIANGLE)
 	DISCRETE_MULTIPLY(	STARSHP1_MOTOR_SND,
 						NODE_42,
 						STARSHP1_MOLVL_GAIN)
