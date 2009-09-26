@@ -1345,6 +1345,15 @@ CPU_GET_INFO( m68040 )
  * SCC-68070 section
  ****************************************************************************/
 
+static CPU_INIT( scc68070 )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68010);
+
+	m68k->cpu_type         = CPU_TYPE_SCC070;
+}
+
 CPU_GET_INFO( scc68070 )
 {
 	switch (state)
@@ -1353,7 +1362,7 @@ CPU_GET_INFO( scc68070 )
 		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m68000);		break; //todo
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(scc68070);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
