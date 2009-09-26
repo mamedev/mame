@@ -13,8 +13,8 @@
 /* TTL text plane stuff */
 
 static int ttl_gfx_index;
-static tilemap *ttl_tilemap;
-static UINT16 ttl_vram[0x800];
+static tilemap *ttl_tilemap, *roz_tilemap;
+static UINT16 ttl_vram[0x800], roz_vram[0x800];
 
 /* TTL text plane */
 
@@ -27,6 +27,16 @@ static TILE_GET_INFO( ttl_get_tile_info )
 	attr = ttl_vram[tile_index]>>12;	// palette in all 4 bits?
 
 	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
+}
+
+static TILE_GET_INFO( roz_get_tile_info )
+{
+	int attr, code;
+	
+	attr = (roz_vram[tile_index] >> 12) + 16;	// roz base palette is palette 16
+	code = roz_vram[tile_index] & 0x3ff;
+
+	SET_TILE_INFO(0, code, attr, 0);
 }
 
 READ32_HANDLER( polygonet_ttl_ram_r )
@@ -44,6 +54,23 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2);
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2+1);
+}
+
+READ32_HANDLER( polygonet_roz_ram_r )
+{
+	UINT32 *vram = (UINT32 *)roz_vram;
+
+	return(vram[offset]);
+}
+
+WRITE32_HANDLER( polygonet_roz_ram_w )
+{
+	UINT32 *vram = (UINT32 *)roz_vram;
+
+	COMBINE_DATA(&vram[offset]);
+
+	tilemap_mark_tile_dirty(roz_tilemap, offset*2);
+	tilemap_mark_tile_dirty(roz_tilemap, offset*2+1);
 }
 
 static TILEMAP_MAPPER( plygonet_scan )
@@ -80,12 +107,18 @@ VIDEO_START( polygonet )
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
 	state_save_register_global_array(machine, ttl_vram);
+
+	// set up the roz t-map too
+	roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan, 16, 16, 64, 32); 
+	tilemap_set_transparent_pen(roz_tilemap, 0);
 }
 
 VIDEO_UPDATE( polygonet )
 {
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	K053936_0_zoom_draw(bitmap, cliprect, roz_tilemap, 0, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 1<<0);
 	return 0;

@@ -92,6 +92,8 @@ VIDEO_UPDATE( polygonet );
 
 READ32_HANDLER( polygonet_ttl_ram_r );
 WRITE32_HANDLER( polygonet_ttl_ram_w );
+READ32_HANDLER( polygonet_roz_ram_r );
+WRITE32_HANDLER( polygonet_roz_ram_w );
 
 static int init_eeprom_count;
 
@@ -236,7 +238,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(space->cpu));
+//	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(space->cpu));
 
 	return value;
 }
@@ -245,12 +247,7 @@ static WRITE32_HANDLER( shared_ram_write )
 {
 	COMBINE_DATA(&shared_ram[offset]) ;
 
-	logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
-																             (shared_ram[offset] & 0x0000ffff),
-																              0xc000 + (offset<<1),
-																              0xc000 +((offset<<1)+1),
-																		      mem_mask,
-																		      cpu_get_pc(space->cpu));
+//	logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
@@ -272,12 +269,12 @@ static WRITE32_HANDLER( dsp_w_lines )
 	/* 0x01000000 is the reset line - 0 is high, 1 is low */
 	if ((data >> 24) & 0x01)
 	{
-		logerror("RESET CLEARED\n");
+//		logerror("RESET CLEARED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		logerror("RESET ASSERTED\n");
+//		logerror("RESET ASSERTED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
@@ -299,7 +296,7 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	if (mem_mask == 0x0000ff00)	{ hi_data = (data & 0x0000ff00) >> 8;  }
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
-	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
+//	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
 	dsp56k_host_interface_write(cputag_get_cpu(space->machine, "dsp"), hi_addr, hi_data);
 }
 
@@ -525,7 +522,8 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSVR: PSAC2 VRAM? */
+	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl) 
+	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
@@ -603,11 +601,10 @@ static const k054539_interface k054539_config =
 };
 
 /**********************************************************************************/
-
 static const gfx_layout bglayout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	1024,
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
