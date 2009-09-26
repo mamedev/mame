@@ -1655,9 +1655,38 @@ static size_t dsp56k_op_subl(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 /* SUB : .... .... 0100 FJJJ : A-202 */
 static size_t dsp56k_op_sub(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	UINT64 useVal = 0;
+	typed_pointer S = {NULL, DT_BYTE};
+	typed_pointer D = {NULL, DT_BYTE};
+
+	decode_JJJF_table(cpustate, BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S, &D);
+
+	/* Get on with it. */
+	switch(S.data_type)
+	{
+		case DT_WORD:        useVal = (UINT64)*((UINT16*)S.addr) << 16; break;
+		case DT_DOUBLE_WORD: useVal = (UINT64)*((UINT32*)S.addr);       break;
+		case DT_LONG_WORD:   useVal = (UINT64)*((UINT64*)S.addr);       break;
+	}
+
+	/* Sign-extend word for proper sub op */
+	if ((S.data_type == DT_WORD) && useVal & U64(0x0000000080000000))
+		useVal |= U64(0x000000ff00000000);
+
+	/* Operate*/
+	*((UINT64*)D.addr) -= useVal;
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
-	return 0;
+	/* TODO S, L, E, U, V, C */
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+
+	cycles += 2;		/* TODO: + mv oscillator cycles */
+	return 1;
 }
 
 /* CLR24 : .... .... 0101 F001 : A-62 */
@@ -2995,12 +3024,27 @@ static size_t dsp56k_op_jsr(dsp56k_core* cpustate, const UINT16 op, const UINT16
 	/* TODO: Verify, since it's not in the docs, but it must be true */
 	PC += 2;
 
-	SP++;
-	SSH = PC;
-	SSL = SR;
+	/* TODO: This is a hacky implementation of Long vs Fast Interrupts.  Do it right someday! */
+	if (PC < WORD(0x40))
+	{
+		/* Long interrupt gets the previous PC, not the current one */
+		SP++;
+		SSH = cpustate->ppc;
+		SSL = SR;
 
-	cpustate->ppc = PC;
-	PC = branchOffset;
+		cpustate->ppc = cpustate->ppc;
+		PC = branchOffset;
+	}
+	else
+	{
+		/* Normal operation */
+		SP++;
+		SSH = PC;
+		SSL = SR;
+
+		cpustate->ppc = PC;
+		PC = branchOffset;
+	}
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */

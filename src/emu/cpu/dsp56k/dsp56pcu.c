@@ -276,6 +276,10 @@ static void pcu_service_interrupts(dsp56k_core* cpustate)
 		// 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here)
 		if (priority >= I_bits(cpustate))
 		{
+			// TODO: Implement long interrupts & fast interrupts correctly!
+			//       Right now they are handled in the JSR & BSR ops.  SupahLame.
+			cpustate->ppc = PC;
+
 			// Are you anything but the Host Command interrupt?
 			if (interrupt_index != 22)
 			{
@@ -287,7 +291,6 @@ static void pcu_service_interrupts(dsp56k_core* cpustate)
 				// The host command input has a floating vector.
 				const UINT16 irq_vector = HV_bits(cpustate) << 1;
 
-				cpustate->ppc = PC;
 				PC = irq_vector;
 
 				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!

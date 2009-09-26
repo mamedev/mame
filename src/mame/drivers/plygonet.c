@@ -403,9 +403,10 @@ static UINT8 dsp56k_bank_num(const device_config* cpu, UINT8 bank_group)
 		const UINT16 bit1   = (portC & 0x0001) >> 0;
 		return (bits32 | bit1);
 	}
-
-	if (bank_group == INVALID_BANK_GROUP)
+	else if (bank_group == INVALID_BANK_GROUP)
+	{
 		fatalerror("Plygonet: dsp56k bank num invalid.\n");
+	}
 
 	return 0;
 }
