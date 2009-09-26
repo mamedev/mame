@@ -78,6 +78,11 @@ static TILEMAP_MAPPER( plygonet_scan )
 	return row * num_cols + (col^1);
 }
 
+TILEMAP_MAPPER( plygonet_scan_cols )
+{
+	return col * num_rows + (row^1);
+}
+
 VIDEO_START( polygonet )
 {
 	static const gfx_layout charlayout =
@@ -109,7 +114,7 @@ VIDEO_START( polygonet )
 	state_save_register_global_array(machine, ttl_vram);
 
 	// set up the roz t-map too
-	roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan, 16, 16, 64, 32); 
+	roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64); 
 	tilemap_set_transparent_pen(roz_tilemap, 0);
 }
 

@@ -607,11 +607,12 @@ static const gfx_layout bglayout =
 	1024,
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
  	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
+	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+
+	  128*8
 };
 
 static GFXDECODE_START( plygonet )
@@ -658,7 +659,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(48, 48+384-1, 0, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 
 	MDRV_PALETTE_LENGTH(32768)
 
