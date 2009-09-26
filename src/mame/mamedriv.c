@@ -5562,6 +5562,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Konami M2 games */
 	DRIVER( polystar )	/* GX623 (c)1997 */
 	DRIVER( totlvice )	/* GX639 (c)1997 */
+	DRIVER( totlvicj )	/* GX639 (c)1997 */
 	DRIVER( btltryst )	/* GX636 (c)1998 */
 	DRIVER( heatof11 )	/* GX703 (c)1998 */
 	DRIVER( evilngt )	/* GX810 (c)1998 */

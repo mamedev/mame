@@ -10,14 +10,14 @@ This hardware is 3DO-based with two IBM Power PC CPUs.
 
 There were only 5 known games on this hardware. They include....
 
-Game                                                 Year    CD Codes     Konami Part#
---------------------------------------------------------------------------------------
+Game                                                 Year    CD Codes                        Konami Part#
+-------------------------------------------------------------------------------------------------
 Battle Tryst                                         1998    636JAC02
 Evil Night                                           1998    810UBA02
 Hell Night (alt. Region title, same as Evil Night)   1998    810EAA02
 Heat Of Eleven '98                                   1998    703EAA02
-Polystars                                            1997    623JAA02     003894
-Total Vice                                           1997    639AAB01
+Tobe! Polystars                                      1997    623JAA02                        003894
+Total Vice                                           1997    639UAC01, 639JAD01, 639AAB01
 
 
 PCB Layouts
@@ -1223,7 +1223,18 @@ ROM_START( totlvice )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "639uac01", 0, SHA1(88431b8a0ce83c156c8b19efbba1af901b859404) )
+ROM_END
+
+ROM_START( totlvicj )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
+
+	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
+
+	DISK_REGION( "cdrom" ) // Need a re-image
 	DISK_IMAGE( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
@@ -1234,9 +1245,11 @@ static DRIVER_INIT( m2 )
 	cde_init(machine);
 }
 
-GAME( 1997, polystar, 0,       m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, totlvice, 0,       m2, m2, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, btltryst, 0,       m2, m2, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, heatof11, 0,       m2, m2, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, evilngt,  0,       m2, m2, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, hellngt,  evilngt, m2, m2, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, polystar, 0,        m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvice, 0,        m2, m2, m2, ROT0, "Konami", "Total Vice (ver UAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvicj, totlvice, m2, m2, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
+//GAME( 1997, totlvica, totlvice, m2, m2, m2, ROT0, "Konami", "Total Vice (ver AAB)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, btltryst, 0,        m2, m2, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, heatof11, 0,        m2, m2, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, evilngt,  0,        m2, m2, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, hellngt,  evilngt,  m2, m2, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
