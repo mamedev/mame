@@ -225,6 +225,10 @@ static const char *const g_cpcc[64] =
 	  "?",   "?",   "?",   "?",   "?",   "?",   "?",   "?"  /* 111 */
 };
 
+static const char *const g_mmuregs[8] =
+{
+	"tc", "drp", "srp", "crp", "cal", "val", "sccr", "acr"
+};
 
 /* ======================================================================== */
 /* =========================== UTILITY FUNCTIONS ========================== */
@@ -3015,6 +3019,59 @@ static void d68020_unpk_mm(void)
 }
 
 
+static void d68030_pmove(void)
+{
+	char* str;
+	UINT16 modes = read_imm_16();
+
+	// do this after fetching the second PMOVE word so we properly get the 3rd if necessary
+	str = get_ea_mode_str_32(g_cpu_ir);
+
+	switch ((modes>>13) & 0x7)
+	{
+		case 0:	// MC68030/040 form with FD bit
+		case 2:	// MC68881 form, FD never set
+			if (modes & 0x0100)
+			{
+				if (modes & 0x0200)
+				{
+			 		sprintf(g_dasm_str, "pmovefd  %s, %s", g_mmuregs[(modes>>10)&7], str);
+				}
+				else
+				{
+			 		sprintf(g_dasm_str, "pmovefd  %s, %s", str, g_mmuregs[(modes>>10)&7]);
+				}
+			}
+			else
+			{
+				if (modes & 0x0200)
+				{
+			 		sprintf(g_dasm_str, "pmove  %s, %s", g_mmuregs[(modes>>10)&7], str);
+				}
+				else
+				{
+			 		sprintf(g_dasm_str, "pmove  %s, %s", str, g_mmuregs[(modes>>10)&7]);
+				}
+			}
+			break;
+
+		case 3:	// MC68030 to/from status reg
+			if (modes & 0x0200)
+			{
+		 		sprintf(g_dasm_str, "pmove  mmusr, %s", str);
+			}
+			else
+			{
+		 		sprintf(g_dasm_str, "pmove  %s, mmusr", str);
+			}
+			break;
+
+		default:
+			sprintf(g_dasm_str, "pmove [unknown form] %s", str);
+			break;
+	}
+}
+
 
 /* ======================================================================== */
 /* ======================= INSTRUCTION TABLE BUILDER ====================== */
@@ -3037,7 +3094,7 @@ static void d68020_unpk_mm(void)
 
 static const opcode_struct g_opcode_info[] =
 {
-/*  opcode handler    mask    match   ea mask */
+/*  opcode handler             mask    match   ea mask */
 	{d68000_1010         , 0xf000, 0xa000, 0x000},
 	{d68000_1111         , 0xf000, 0xf000, 0x000},
 	{d68000_abcd_rr      , 0xf1f8, 0xc100, 0x000},
@@ -3338,6 +3395,7 @@ static const opcode_struct g_opcode_info[] =
 	{d68000_unlk         , 0xfff8, 0x4e58, 0x000},
 	{d68020_unpk_rr      , 0xf1f8, 0x8180, 0x000},
 	{d68020_unpk_mm      , 0xf1f8, 0x8188, 0x000},
+	{d68030_pmove        , 0xffc0, 0xf000, 0x278},
 	{0, 0, 0, 0}
 };
 
