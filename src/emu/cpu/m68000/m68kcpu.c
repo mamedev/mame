@@ -5,7 +5,7 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.00 (2008-11-17)\n"
+"Version 4.10 (2009-09-27)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -17,7 +17,7 @@ static const char copyright_notice[] =
 "(Karl Stenerud).\n"
 "\n"
 "The latest version of this code can be obtained at:\n"
-"http://kstenerud.cjb.net\n"
+"http://kstenerud.cjb.net or http://mamedev.org\n"
 ;
 #endif
 
@@ -85,7 +85,7 @@ const UINT32 m68ki_shift_32_table[65] =
 /* Number of clock cycles to use for exception processing.
  * I used 4 for any vectors that are undocumented for processing times.
  */
-const UINT8 m68ki_exception_cycle_table[4][256] =
+const UINT8 m68ki_exception_cycle_table[5][256] =
 {
 	{ /* 000 */
 		 40, /*  0: Reset - Initial Stack Pointer                      */
@@ -306,6 +306,79 @@ const UINT8 m68ki_exception_cycle_table[4][256] =
 		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
+	{ /* 030 - not correct */
+		  4, /*  0: Reset - Initial Stack Pointer                      */
+		  4, /*  1: Reset - Initial Program Counter                    */
+		 50, /*  2: Bus Error                             (unemulated) */
+		 50, /*  3: Address Error                         (unemulated) */
+		 20, /*  4: Illegal Instruction                                */
+		 38, /*  5: Divide by Zero                                     */
+		 40, /*  6: CHK                                                */
+		 20, /*  7: TRAPV                                              */
+		 34, /*  8: Privilege Violation                                */
+		 25, /*  9: Trace                                              */
+		 20, /* 10: 1010                                               */
+		 20, /* 11: 1111                                               */
+		  4, /* 12: RESERVED                                           */
+		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+		  4, /* 14: Format Error                                       */
+		 30, /* 15: Uninitialized Interrupt                            */
+		  4, /* 16: RESERVED                                           */
+		  4, /* 17: RESERVED                                           */
+		  4, /* 18: RESERVED                                           */
+		  4, /* 19: RESERVED                                           */
+		  4, /* 20: RESERVED                                           */
+		  4, /* 21: RESERVED                                           */
+		  4, /* 22: RESERVED                                           */
+		  4, /* 23: RESERVED                                           */
+		 30, /* 24: Spurious Interrupt                                 */
+		 30, /* 25: Level 1 Interrupt Autovector                       */
+		 30, /* 26: Level 2 Interrupt Autovector                       */
+		 30, /* 27: Level 3 Interrupt Autovector                       */
+		 30, /* 28: Level 4 Interrupt Autovector                       */
+		 30, /* 29: Level 5 Interrupt Autovector                       */
+		 30, /* 30: Level 6 Interrupt Autovector                       */
+		 30, /* 31: Level 7 Interrupt Autovector                       */
+		 20, /* 32: TRAP #0                                            */
+		 20, /* 33: TRAP #1                                            */
+		 20, /* 34: TRAP #2                                            */
+		 20, /* 35: TRAP #3                                            */
+		 20, /* 36: TRAP #4                                            */
+		 20, /* 37: TRAP #5                                            */
+		 20, /* 38: TRAP #6                                            */
+		 20, /* 39: TRAP #7                                            */
+		 20, /* 40: TRAP #8                                            */
+		 20, /* 41: TRAP #9                                            */
+		 20, /* 42: TRAP #10                                           */
+		 20, /* 43: TRAP #11                                           */
+		 20, /* 44: TRAP #12                                           */
+		 20, /* 45: TRAP #13                                           */
+		 20, /* 46: TRAP #14                                           */
+		 20, /* 47: TRAP #15                                           */
+		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+		  4, /* 49: FP Inexact Result                     (unemulated) */
+		  4, /* 50: FP Divide by Zero                     (unemulated) */
+		  4, /* 51: FP Underflow                          (unemulated) */
+		  4, /* 52: FP Operand Error                      (unemulated) */
+		  4, /* 53: FP Overflow                           (unemulated) */
+		  4, /* 54: FP Signaling NAN                      (unemulated) */
+		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
+		  4, /* 56: MMU Configuration Error               (unemulated) */
+		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
+		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
+		  4, /* 59: RESERVED                                           */
+		  4, /* 60: RESERVED                                           */
+		  4, /* 61: RESERVED                                           */
+		  4, /* 62: RESERVED                                           */
+		  4, /* 63: RESERVED                                           */
+		     /* 64-255: User Defined                                   */
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+	},
 	{ /* 040 */ // TODO: these values are not correct
 		  4, /*  0: Reset - Initial Stack Pointer                      */
 		  4, /*  1: Reset - Initial Program Counter                    */
@@ -407,12 +480,13 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define MASK_ALL 					(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
+#define MASK_ALL 				(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040)
 #define MASK_24BIT_SPACE			(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
-#define MASK_32BIT_SPACE			(CPU_TYPE_020 | CPU_TYPE_040)
-#define MASK_010_OR_LATER			(CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
-#define MASK_020_OR_LATER			(CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
-#define MASK_040_OR_LATER			(CPU_TYPE_040)
+#define MASK_32BIT_SPACE			(CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040)
+#define MASK_010_OR_LATER			(CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
+#define MASK_020_OR_LATER			(CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040)
+#define MASK_030_OR_LATER			(CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
+#define MASK_040_OR_LATER			(CPU_TYPE_040 | CPU_TYPE_EC040)
 
 #define M68K_STATE_ENTRY(_name, _format, _member, _datamask, _flags, _mask) \
 	CPU_STATE_ENTRY(M68K_##_name, #_name, _format, m68ki_cpu_core, _member, _datamask, _mask, _flags)
@@ -484,6 +558,9 @@ INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
 		   cpu_get_type(device) == CPU_M68010 ||
 		   cpu_get_type(device) == CPU_M68EC020 ||
 		   cpu_get_type(device) == CPU_M68020 ||
+		   cpu_get_type(device) == CPU_M68EC030 ||
+		   cpu_get_type(device) == CPU_M68030 ||
+		   cpu_get_type(device) == CPU_M68EC040 ||
 		   cpu_get_type(device) == CPU_M68040 ||
 		   cpu_get_type(device) == CPU_SCC68070);
 	return (m68ki_cpu_core *)device->token;
@@ -1039,6 +1116,7 @@ static CPU_INIT( m68000 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68000 )
@@ -1082,6 +1160,7 @@ static CPU_INIT( m68008 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68008 )
@@ -1129,6 +1208,7 @@ static CPU_INIT( m68010 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 130;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68010 )
@@ -1172,6 +1252,7 @@ static CPU_INIT( m68020 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68020 )
@@ -1247,6 +1328,7 @@ static CPU_INIT( m68ec020 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68ec020 )
@@ -1267,6 +1349,125 @@ CPU_GET_INFO( m68ec020 )
 }
 
 /****************************************************************************
+ * M68030 section
+ ****************************************************************************/
+
+static CPU_INIT( m68030 )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68k);
+
+	m68k->cpu_type         = CPU_TYPE_030;
+	m68k->state.subtypemask = m68k->cpu_type;
+	m68k->dasm_type        = M68K_CPU_TYPE_68030;
+	m68k->memory           = interface_d32;
+	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->cyc_instruction  = m68ki_cycles[3];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
+	m68k->cyc_bcc_notake_b = -2;
+	m68k->cyc_bcc_notake_w = 0;
+	m68k->cyc_dbcc_f_noexp = 0;
+	m68k->cyc_dbcc_f_exp   = 4;
+	m68k->cyc_scc_r_true   = 0;
+	m68k->cyc_movem_w      = 2;
+	m68k->cyc_movem_l      = 2;
+	m68k->cyc_shift        = 0;
+	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 1;
+}
+
+CPU_GET_INFO( m68030 )
+{
+	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	int sr;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68030);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68030");				break;
+
+		case CPUINFO_STR_FLAGS:
+			sr = m68ki_get_sr(m68k);
+			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				sr & 0x8000 ? 'T':'.',
+				sr & 0x4000 ? 't':'.',
+				sr & 0x2000 ? 'S':'.',
+				sr & 0x1000 ? 'M':'.',
+				sr & 0x0800 ? '?':'.',
+				sr & 0x0400 ? 'I':'.',
+				sr & 0x0200 ? 'I':'.',
+				sr & 0x0100 ? 'I':'.',
+				sr & 0x0080 ? '?':'.',
+				sr & 0x0040 ? '?':'.',
+				sr & 0x0020 ? '?':'.',
+				sr & 0x0010 ? 'X':'.',
+				sr & 0x0008 ? 'N':'.',
+				sr & 0x0004 ? 'Z':'.',
+				sr & 0x0002 ? 'V':'.',
+				sr & 0x0001 ? 'C':'.');
+			break;
+
+		default:										CPU_GET_INFO_CALL(m68k);				break;
+	}
+}
+
+
+/****************************************************************************
+ * M680EC30 section
+ ****************************************************************************/
+
+static CPU_INIT( m68ec030 )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68k);
+
+	m68k->cpu_type         = CPU_TYPE_EC030;
+	m68k->state.subtypemask = m68k->cpu_type;
+	m68k->dasm_type        = M68K_CPU_TYPE_68EC030;
+	m68k->memory           = interface_d32;
+	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->cyc_instruction  = m68ki_cycles[3];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
+	m68k->cyc_bcc_notake_b = -2;
+	m68k->cyc_bcc_notake_w = 0;
+	m68k->cyc_dbcc_f_noexp = 0;
+	m68k->cyc_dbcc_f_exp   = 4;
+	m68k->cyc_scc_r_true   = 0;
+	m68k->cyc_movem_w      = 2;
+	m68k->cyc_movem_l      = 2;
+	m68k->cyc_shift        = 0;
+	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 0;		/* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
+}
+
+CPU_GET_INFO( m68ec030 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec030);					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC030");				break;
+
+		default:										CPU_GET_INFO_CALL(m68030);				break;
+	}
+}
+
+/****************************************************************************
  * M68040 section
  ****************************************************************************/
 
@@ -1281,8 +1482,8 @@ static CPU_INIT( m68040 )
 	m68k->dasm_type        = M68K_CPU_TYPE_68040;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-	m68k->cyc_instruction  = m68ki_cycles[2];
-	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
+	m68k->cyc_instruction  = m68ki_cycles[4];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
 	m68k->cyc_bcc_notake_b = -2;
 	m68k->cyc_bcc_notake_w = 0;
 	m68k->cyc_dbcc_f_noexp = 0;
@@ -1292,6 +1493,7 @@ static CPU_INIT( m68040 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 1;
 }
 
 CPU_GET_INFO( m68040 )
@@ -1340,6 +1542,48 @@ CPU_GET_INFO( m68040 )
 	}
 }
 
+/****************************************************************************
+ * M680EC30 section
+ ****************************************************************************/
+
+static CPU_INIT( m68ec040 )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68k);
+
+	m68k->cpu_type         = CPU_TYPE_EC040;
+	m68k->state.subtypemask = m68k->cpu_type;
+	m68k->dasm_type        = M68K_CPU_TYPE_68EC040;
+	m68k->memory           = interface_d32;
+	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m68k->cyc_instruction  = m68ki_cycles[4];
+	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
+	m68k->cyc_bcc_notake_b = -2;
+	m68k->cyc_bcc_notake_w = 0;
+	m68k->cyc_dbcc_f_noexp = 0;
+	m68k->cyc_dbcc_f_exp   = 4;
+	m68k->cyc_scc_r_true   = 0;
+	m68k->cyc_movem_w      = 2;
+	m68k->cyc_movem_l      = 2;
+	m68k->cyc_shift        = 0;
+	m68k->cyc_reset        = 518;
+	m68k->has_pmmu	       = 1;
+}
+
+CPU_GET_INFO( m68ec040 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec040);					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC040");				break;
+
+		default:										CPU_GET_INFO_CALL(m68040);				break;
+	}
+}
 
 /****************************************************************************
  * SCC-68070 section
@@ -1370,3 +1614,4 @@ CPU_GET_INFO( scc68070 )
 		default: 										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
+

@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.32
+ *                                Version 4.10
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
@@ -16,12 +16,15 @@
  * (Karl Stenerud).
  *
  * The latest version of this code can be obtained at:
- * http://kstenerud.cjb.net
+ * http://kstenerud.cjb.net or http://mamedev.org/
  */
 
 /*
  * Modified For OpenVMS By:  Robert Alan Byer
  *                           byer@mail.ourservers.net
+ *
+ * 68030 and PMMU by R. Belmont
+ * 68040 and FPU by Ville Linde
  */
 
 
@@ -52,7 +55,7 @@
  */
 
 
-static const char g_version[] = "3.32";
+static const char g_version[] = "4.10";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
@@ -132,6 +135,7 @@ enum
 	CPU_TYPE_000 = 0,
 	CPU_TYPE_010,
 	CPU_TYPE_020,
+	CPU_TYPE_030,
 	CPU_TYPE_040,
 	NUM_CPUS
 };
@@ -182,7 +186,7 @@ typedef struct
 	char ea_allowed[EA_ALLOWED_LENGTH];   /* Effective addressing modes allowed */
 	char cpu_mode[NUM_CPUS];              /* User or supervisor mode */
 	char cpus[NUM_CPUS+1];                /* Allowed CPUs */
-	unsigned char cycles[NUM_CPUS];       /* cycles for 000, 010, 020 */
+	unsigned char cycles[NUM_CPUS];       /* cycles for 000, 010, 020, 030, 040 */
 } opcode_struct;
 
 
@@ -313,22 +317,22 @@ static const int g_size_select_table[33] =
 };
 
 /* Extra cycles required for certain EA modes */
-/* TODO: correct timings for 040 */
+/* TODO: correct timings for 030, 040 */
 static const int g_ea_cycle_table[13][NUM_CPUS][3] =
-{/*       000           010           020           040  */
-	{{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}}, /* EA_MODE_NONE */
-	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AI   */
-	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_PI   */
-	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_PI7  */
-	{{ 0,  6, 10}, { 0,  6, 10}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PD   */
-	{{ 0,  6, 10}, { 0,  6, 10}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PD7  */
-	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_DI   */
-	{{ 0, 10, 14}, { 0, 10, 14}, { 0,  7,  7}, { 0,  7,  7}}, /* EA_MODE_IX   */
-	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AW   */
-	{{ 0, 12, 16}, { 0, 12, 16}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AL   */
-	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PCDI */
-	{{ 0, 10, 14}, { 0, 10, 14}, { 0,  7,  7}, { 0,  7,  7}}, /* EA_MODE_PCIX */
-	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  2,  4}, { 0,  2,  4}}, /* EA_MODE_I    */
+{/*       000           010           020           030           040  */
+	{{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}}, /* EA_MODE_NONE */
+	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AI   */
+	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_PI   */
+	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_PI7  */
+	{{ 0,  6, 10}, { 0,  6, 10}, { 0,  5,  5}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PD   */
+	{{ 0,  6, 10}, { 0,  6, 10}, { 0,  5,  5}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PD7  */
+	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  5,  5}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_DI   */
+	{{ 0, 10, 14}, { 0, 10, 14}, { 0,  7,  7}, { 0,  7,  7}, { 0,  7,  7}}, /* EA_MODE_IX   */
+	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AW   */
+	{{ 0, 12, 16}, { 0, 12, 16}, { 0,  4,  4}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AL   */
+	{{ 0,  8, 12}, { 0,  8, 12}, { 0,  5,  5}, { 0,  5,  5}, { 0,  5,  5}}, /* EA_MODE_PCDI */
+	{{ 0, 10, 14}, { 0, 10, 14}, { 0,  7,  7}, { 0,  7,  7}, { 0,  7,  7}}, /* EA_MODE_PCIX */
+	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  2,  4}, { 0,  2,  4}, { 0,  2,  4}}, /* EA_MODE_I    */
 };
 
 /* Extra cycles for JMP instruction (000, 010) */
@@ -1073,13 +1077,13 @@ static void populate_table(void)
 	/* Find the start of the table */
 	while(strcmp(buff, ID_TABLE_START) != 0)
 		if(fgetline(buff, MAX_LINE_LENGTH, g_input_file) < 0)
-			error_exit("Premature EOF while reading table");
+			error_exit("(table_start) Premature EOF while reading table");
 
 	/* Process the entire table */
 	for(op = g_opcode_input_table;;op++)
 	{
 		if(fgetline(buff, MAX_LINE_LENGTH, g_input_file) < 0)
-			error_exit("Premature EOF while reading table");
+			error_exit("(inline) Premature EOF while reading table");
 		if(strlen(buff) == 0)
 			continue;
 		/* We finish when we find an input separator */
@@ -1237,7 +1241,7 @@ int main(int argc, char *argv[])
 	int table_body_read = 0;
 	int ophandler_body_read = 0;
 
-	printf("\n\tMusashi v%s 68000, 68008, 68010, 68EC020, 68020, 68040 emulator\n", g_version);
+	printf("\n\tMusashi v%s 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, 68040 emulator\n", g_version);
 	printf("\tCopyright Karl Stenerud\n\n");
 
 	/* Check if output path and source for the input file are given */
