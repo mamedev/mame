@@ -114,6 +114,8 @@ struct dsd_566_context
 	double		threshold_low;		/* falling threshold */
 	double		threshold_high;		/* rising threshold */
 	double		triangle_ac_offset;	/* used to shift a triangle to AC */
+	double		v_osc_stable;
+	double		v_osc_stop;
 };
 
 struct dsd_ls624_context
@@ -1386,8 +1388,8 @@ static DISCRETE_RESET(dsd_555_vco1)
  * The 566 is a constant current based VCO.  If you change R, that affects
  * the charge/discharge rate.  A constant current source will charge the
  * cap linearly.  Of course due to the transistors there will be some
- * non-linear areas at the ends of the Vmod range.  I do not currently
- * simulate these.  They are beyond the spec of the IC anyways.
+ * non-linear areas at the ends of the Vmod range.  As the Vmod voltage
+ * drops from Vcharge, the frequency generated increases.
  *
  * The Triangle (pin 4) output is just a buffered version of the cap
  * charge.  It is about 1.35 higher then the cap voltage.
@@ -1409,6 +1411,19 @@ static DISCRETE_RESET(dsd_555_vco1)
  * and Vmod.  Due to transistor action, it is not 100%, but this formula
  * gives a good approximation:
  * I = ((B+ - Vmod - 0.1) * 0.95) / R
+ * You can test the current VS modulation function by using 10k for R
+ * and replace C with a 10k resistor.  Then you can monitor the voltage
+ * on pin 7 to work out the current.  I=V/R.  It will start to oscillate
+ * when in the cap threshold range.
+ *
+ * When Vmod drops below the stable range, the current source no longer
+ * functions properly.  Technically this is out of the range specified
+ * for the IC.  Of course old games used this range anyways, so we need
+ * to know how the real IC behaves.  When Vmod drops below the stable range,
+ * the charge current is stops dropping instead of increasing, while the
+ * discharge current still functions.  This means the frequency generated
+ * starts to drop as the voltage lowers, instead of the normal increase
+ * in frequency.
  *
  ************************************************************************/
 #define DSD_566__VMOD		DISCRETE_INPUT(0)
@@ -1433,30 +1448,49 @@ static const struct
 	{3.364, /*3.784,*/ 4.259, /*4.552,*/ 4.888, 5.384, 5.896, 6.416},		/* c_high */
 	{1.940, /*2.100,*/ 2.276, /*2.404,*/ 2.580, 2.880, 3.180, 3.488},		/* c_low */
 	{4.352, /*4.144,*/ 4.080, /*4.260,*/ 4.500, 4.960, 5.456, 5.940},		/* sqr_low */
-	/* osc_stable and stop may not be 100% accurate.  Had the scope on the wrong setting. */
-	/* They may be 0.02V too high.  I will retest these before implementing */
-	{5.100, /*5.380,*/ 5.800, /*6.116,*/ 6.360, 6.992, 7.284, 7.840},		/* osc_stable */
-	{4.420, /*4.820,*/ 5.296, /*5.616,*/ 5.920, 6.448, 6.920, 7.480}		/* osc_stop */
+	{4.885, /*5.316,*/ 5.772, /*6.075,*/ 6.335, 6.912, 7.492, 7.945},		/* osc_stable */
+	{4.495, /*4.895,*/ 5.343, /*5.703,*/ 5.997, 6.507, 7.016, 7.518}		/* osc_stop */
 };
 
 static DISCRETE_STEP(dsd_566)
 {
 	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
 
-	double	i;				/* Charging current created by vIn */
+	double	i = 0;			/* Charging current created by vIn */
+	double	i_rise;			/* non-linear rise charge current */
 	double	dt;				/* change in time */
+	double	x_time = 0;
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
+	int		count_f = 0, count_r = 0;
 	int		options = (int)DSD_566__OPTIONS;
 
 	dt    = node->info->sample_time;	/* Change in time */
 	v_cap = context->cap_voltage;	/* Set to voltage before change */
 
 
-	/* Calculate charging current */
-	i = ((DSD_566__VCHARGE - DSD_566__VMOD - 0.1) * .95) / DSD_566__R;
+	/* Calculate charging current if it is in range */
+	if (DSD_566__VMOD > context->v_osc_stop)
+	{
+		double v_charge = DSD_566__VCHARGE - DSD_566__VMOD - 0.1;
+		if (v_charge > 0)
+		{
+			i = (v_charge * .95) / DSD_566__R;
+			if (DSD_566__VMOD < context->v_osc_stable)
+			{
+				/* no where near correct calculation of non linear range */
+				i_rise = ((DSD_566__VCHARGE - context->v_osc_stable - 0.1) * .95) / DSD_566__R;
+				i_rise *= 1.0 - (context->v_osc_stable - DSD_566__VMOD) / (context->v_osc_stable - context->v_osc_stop);
+			}
+			else
+				i_rise = i;
+		}
+		else
+			return;
+	}
+	else return;
 
-	/* Keep looping until all toggling in time sample is used up. */
+	/* Keep looping until all toggling in this time sample is used up. */
 	do
 	{
 		if (context->flip_flop)
@@ -1475,13 +1509,15 @@ static DISCRETE_STEP(dsd_566)
 				}
 				v_cap = context->threshold_low;
 				context->flip_flop = 0;
+				count_f++;
+				x_time = dt;
 			}
 		}
 		else
 		{
 			/* Charging */
 			/* iC=C*dv/dt  works out to dv=iC*dt/C */
-			v_cap_next = v_cap + (i * dt / DSD_566__C);
+			v_cap_next = v_cap + (i_rise * dt / DSD_566__C);
 			dt         = 0;
 			/* Yes, if the cap voltage has reached the max voltage it can,
              * and the 566 threshold has not been reached, then oscillation stops.
@@ -1500,6 +1536,8 @@ static DISCRETE_STEP(dsd_566)
 				}
 				v_cap = context->threshold_high;
 				context->flip_flop = 1;
+				count_r++;
+				x_time = dt;
 			}
 		}
 	} while(dt);
@@ -1520,6 +1558,18 @@ static DISCRETE_STEP(dsd_566)
 			node->output[0] = v_cap_next + 1.35;
 			if (options & DISC_566_OUT_AC)
 				node->output[0] -= context->triangle_ac_offset;
+			break;
+		case DISC_566_OUT_COUNT_F_X:
+			node->output[0] = count_f ? count_f + x_time : count_f;
+			break;
+		case DISC_566_OUT_COUNT_R_X:
+			node->output[0] =  count_r ? count_r + x_time : count_r;
+			break;
+		case DISC_566_OUT_COUNT_F:
+			node->output[0] = count_f;
+			break;
+		case DISC_566_OUT_COUNT_R:
+			node->output[0] = count_r;
 			break;
 	}
 }
@@ -1551,6 +1601,8 @@ static DISCRETE_RESET(dsd_566)
 	context->threshold_low  = ne566.c_low[v_int] + DSD_566__VNEG;
 	context->v_sqr_high     = DSD_566__VPOS - 1;
 	context->v_sqr_low      = ne566.sqr_low[v_int] + DSD_566__VNEG;
+	context->v_osc_stable	= ne566.osc_stable[v_int] + DSD_566__VNEG;
+	context->v_osc_stop		= ne566.osc_stop[v_int] + DSD_566__VNEG;
 
 	if ((int)DSD_566__OPTIONS & DISC_566_OUT_AC)
 	{

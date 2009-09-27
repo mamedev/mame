@@ -3192,6 +3192,10 @@
  *     DISC_566_OUT_SQUARE   - Pin 3 Square Wave Output (DEFAULT)
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
+ *     DISC_566_COUNT_F      - # of falling edges
+ *     DISC_566_COUNT_R      - # of rising edges
+ *     DISC_566_COUNT_F_X    - # of falling edges with x-time
+ *     DISC_566_COUNT_R_X    - # of rising edges with x-time
  *
  * EXAMPLES: see Starship 1
  *
@@ -3584,8 +3588,11 @@ enum
 #define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
 #define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
 #define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
-
-#define DISC_566_OUT_MASK					0x30	/* Bits that define output type.
+#define DISC_566_OUT_COUNT_F				0x30
+#define DISC_566_OUT_COUNT_R				0x40
+#define DISC_566_OUT_COUNT_F_X				0x50
+#define DISC_566_OUT_COUNT_R_X				0x60
+#define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
                                                      * Used only internally in module. */
 
 /* LS624 output flags */
