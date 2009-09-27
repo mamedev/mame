@@ -1167,7 +1167,7 @@ static DISCRETE_STEP(dst_mixer)
 			bit_mask = bit_mask << 1;
 			}
 		}
-		else
+		else if (c_bit_flag != 0)
 		{
 			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
@@ -1181,6 +1181,20 @@ static DISCRETE_STEP(dst_mixer)
 					vTemp -= context->v_cap[bit];
 				}
 				i += ((type == DISC_MIXER_IS_OP_AMP) ? v_ref - vTemp : vTemp) / info->r[bit];
+			}
+		}
+		else
+		{
+			/* no r_nodes or c_nodes, mixing only */
+			if (type == DISC_MIXER_IS_OP_AMP)
+			{
+				for (bit = 0; bit < context->size; bit++)
+					i += ( v_ref - DST_MIXER__IN(bit) ) / info->r[bit];
+			}
+			else
+			{
+				for (bit = 0; bit < context->size; bit++)
+					i += DST_MIXER__IN(bit) / info->r[bit];
 			}
 		}
 
@@ -1221,6 +1235,7 @@ static DISCRETE_STEP(dst_mixer)
 		node->output[0] = 0;
 	}
 }
+
 
 static DISCRETE_RESET(dst_mixer)
 {

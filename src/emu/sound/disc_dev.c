@@ -1597,7 +1597,11 @@ static DISCRETE_RESET(dsd_566)
  #define LS624_F(_C, _VI, _VR)  pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
                   - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
 */
-#define LS624_F(_VI)	pow(10, context->k1 + 0.243264328 * (_VI) + context->k2 * (_VI))
+
+/* pow(10, x) = exp(ln(10)*x) */
+#define pow10(x) exp(2.30258509299404568401*(x))
+
+#define LS624_F(_VI)	pow10(context->k1 + 0.243264328 * (_VI) + context->k2 * (_VI))
 
 static DISCRETE_STEP(dsd_ls624)
 {
