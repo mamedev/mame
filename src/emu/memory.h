@@ -40,8 +40,8 @@ enum
 {
 	STATIC_INVALID = 0,									/* invalid - should never be used */
 	STATIC_BANK1 = 1,									/* first memory bank */
-	/* entries 1-64 are for fixed banks 1-64 specified by the driver */
-	/* entries 65-122 are for dynamically allocated internal banks */
+	/* entries 1-96 are for fixed banks 1-96 specified by the driver */
+	/* entries 97-122 are for dynamically allocated internal banks */
 	STATIC_BANKMAX = 122,								/* last memory bank */
 	STATIC_RAM,											/* RAM - reads/writes map to dynamic banks */
 	STATIC_ROM,											/* ROM - reads = RAM; writes = UNMAP */

@@ -136,7 +136,7 @@
 /* banking constants */
 #define MAX_BANKS				(STATIC_BANKMAX - STATIC_BANK1) /* maximum number of banks */
 #define MAX_BANK_ENTRIES		4096					/* maximum number of possible bank values */
-#define MAX_EXPLICIT_BANKS		64						/* maximum number of explicitly-defined banks */
+#define MAX_EXPLICIT_BANKS		96						/* maximum number of explicitly-defined banks */
 
 /* address map lookup table definitions */
 #define LEVEL1_BITS				18						/* number of address bits in the level 1 table */
@@ -3427,15 +3427,29 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 		"bank 20",		"bank 21",		"bank 22",		"bank 23",
 		"bank 24",		"bank 25",		"bank 26",		"bank 27",
 		"bank 28",		"bank 29",		"bank 30",		"bank 31",
-		"bank 32",		"ram[33]",		"ram[34]",		"ram[35]",
-		"ram[36]",		"ram[37]",		"ram[38]",		"ram[39]",
-		"ram[40]",		"ram[41]",		"ram[42]",		"ram[43]",
-		"ram[44]",		"ram[45]",		"ram[46]",		"ram[47]",
-		"ram[48]",		"ram[49]",		"ram[50]",		"ram[51]",
-		"ram[52]",		"ram[53]",		"ram[54]",		"ram[55]",
-		"ram[56]",		"ram[57]",		"ram[58]",		"ram[59]",
-		"ram[60]",		"ram[61]",		"ram[62]",		"ram[63]",
-		"ram[64]",		"ram[65]",		"ram[66]",		"ram",
+		"bank 32",		"bank 33",		"bank 34",		"bank 35",
+		"bank 36",		"bank 37",		"bank 38",		"bank 39",
+		"bank 40",		"bank 41",		"bank 42",		"bank 43",
+		"bank 44",		"bank 45",		"bank 46",		"bank 47",
+		"bank 48",		"bank 49",		"bank 50",		"bank 51",
+		"bank 52",		"bank 53",		"bank 54",		"bank 55",
+		"bank 56",		"bank 57",		"bank 58",		"bank 59",
+		"bank 60",		"bank 61",		"bank 62",		"bank 63",
+		"bank 64",		"bank 65",		"bank 66",		"bank 67",
+		"bank 68",		"bank 69",		"bank 70",		"bank 71",
+		"bank 72",		"bank 73",		"bank 74",		"bank 75",
+		"bank 76",		"bank 77",		"bank 78",		"bank 79",
+		"bank 80",		"bank 81",		"bank 82",		"bank 83",
+		"bank 84",		"bank 85",		"bank 86",		"bank 87",
+		"bank 88",		"bank 89",		"bank 90",		"bank 91",
+		"bank 92",		"bank 93",		"bank 94",		"bank 95",
+		"bank 96",		"ram[97]",		"ram[98]",		"ram[99]",
+		"ram[100]",		"ram[101]",		"ram[102]",		"ram[103]",
+		"ram[104]",		"ram[105]",		"ram[106]",		"ram[107]",
+		"ram[108]",		"ram[109]",		"ram[110]",		"ram[111]",
+		"ram[112]",		"ram[113]",		"ram[114]",		"ram[115]",
+		"ram[116]",		"ram[117]",		"ram[118]",		"ram[119]",
+		"ram[120]",		"ram[121]",		"ram[122]",		"ram",
 		"rom",			"nop",			"unmapped",     "watchpoint"
 	};
 
@@ -3443,7 +3457,7 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 	if (entry < STATIC_COUNT)
 		return strings[entry];
 	else
-		return table->handlers[entry]->name ? table->handlers[entry]->name : "???";
+		return (table->handlers[entry]->name != NULL) ? table->handlers[entry]->name : "???";
 }
 
 
