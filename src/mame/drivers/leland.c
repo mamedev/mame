@@ -621,6 +621,16 @@ static INPUT_PORTS_START( offroad )		/* complete, verified from code */
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( offrdtp2 )
+	PORT_INCLUDE( offroad )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( pigout )		/* complete, verified from code */
 	PORT_START("IN0")	/* 0x40 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1747,6 +1757,48 @@ ROM_START( offroadt )
 ROM_END
 
 
+ROM_START( offrdtp2 )
+	ROM_REGION( 0x040000, "master", 0 )
+	ROM_LOAD( "ortp2u58.bin", 0x00000, 0x10000, CRC(8a785b66) SHA1(a9e369d446eec658294c81223399acc99e4198c2) )
+	ROM_LOAD( "ortp2u59.bin", 0x10000, 0x10000, CRC(ff553895) SHA1(8d91b46306fa680ea96ebbb76418d7a82ed19568) )
+	ROM_LOAD( "ortpu57.bin",  0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
+	ROM_LOAD( "ortpu56.bin",  0x30000, 0x10000, CRC(2c1a22b3) SHA1(fb18af5ec873968beab47d163d9ef23532c40771) )
+
+	ROM_REGION( 0x90000, "slave", 0 )
+	ROM_LOAD( "ortpu3b.bin", 0x00000, 0x02000, CRC(95abb9f1) SHA1(98e9e8f388047d6992a664ae87c50ca65a5db0b1) )
+	ROM_LOAD( "ortpu2.bin",  0x10000, 0x10000, CRC(c46c1627) SHA1(1e911bc774cbc0a66b2feb68b600aa5ad272daa6) )
+	ROM_LOAD( "ortpu3.bin",  0x20000, 0x10000, CRC(2276546f) SHA1(d19335504a71ccf74864c8e9896347709bf794e4) )
+	ROM_LOAD( "ortpu4.bin",  0x30000, 0x10000, CRC(aa4b5975) SHA1(7d695957c283aae4c7e6fb90dab117add65571b4) )
+	ROM_LOAD( "ortpu5.bin",  0x40000, 0x10000, CRC(69100b06) SHA1(c25d1273d08fd20651d1873ce412bb1e18eff06f) )
+	ROM_LOAD( "ortpu6.bin",  0x50000, 0x10000, CRC(b75015b8) SHA1(2bb6b4422e087502cfeb9bce0d3e3ffe18192fe0) )
+	ROM_LOAD( "ortpu7.bin",  0x60000, 0x10000, CRC(a5af5b4f) SHA1(e4992bfbf628d034a879bf9317377348ee4c24e9) )
+	ROM_LOAD( "ortpu8.bin",  0x70000, 0x10000, CRC(0f735078) SHA1(cb59b11fbed672cb372759384e5916418e6c3dc7) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "ortpu25.bin", 0x040001, 0x10000, CRC(f952f800) SHA1(0f1fc837b0b5f5495a666b0a42adb6068e58a57a) )
+	ROM_LOAD16_BYTE( "ortpu13.bin", 0x040000, 0x10000, CRC(7beec9fc) SHA1(b03b4a28217a8c7c02dc0314db97fef1d4ab6f20) )
+	ROM_LOAD16_BYTE( "ortpu26.bin", 0x060001, 0x10000, CRC(6227ea94) SHA1(26384af82f73452b7be8a0eeac9f8a3b464068f6) )
+	ROM_LOAD16_BYTE( "ortpu14.bin", 0x060000, 0x10000, CRC(0a44331d) SHA1(1a52da64c44bc91c2fc9499d1c41191725f9f2be) )
+	ROM_LOAD16_BYTE( "ortpu27.bin", 0x0e0001, 0x10000, CRC(b80c5f99) SHA1(6b0657db870fb4e14e20cbd955655d0990dd7bda) )
+	ROM_LOAD16_BYTE( "ortpu15.bin", 0x0e0000, 0x10000, CRC(2a1a1c3c) SHA1(990328240a2dba7264bb5add5ea8cae2752327d9) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "ortpu93b.bin", 0x00000, 0x08000, CRC(f0c1d8b0) SHA1(aa6e53b56474fa97b17b60ef1123a28442482b80) )
+	ROM_LOAD( "ortpu94b.bin", 0x08000, 0x08000, CRC(7460d8c0) SHA1(9e3560056da89108c58b320125deeed0e009d0a8) )
+	ROM_LOAD( "ortpu95b.bin", 0x10000, 0x08000, CRC(081ee7a8) SHA1(2b884a8ed4173b64f7890edf9a6954c62b5ba012) )
+
+	ROM_REGION( 0x20000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
+	/* 70 = empty */
+	ROM_LOAD( "ortpu92b.bin",  0x04000, 0x4000, CRC(f9988e28) SHA1(250071f4a26782266303331ddbef5479cc241220) )
+	ROM_LOAD( "ortpu69b.bin",  0x08000, 0x4000, CRC(fe5f8d8f) SHA1(5e520da33f30a594c8f37e8e214d0d257ba5c801) )
+	/* 91 = empty */
+	/* 68 = empty */
+	ROM_LOAD( "ortpu90b.bin",  0x14000, 0x4000, CRC(bda2ecb1) SHA1(c7a70ed794cf1655aebdf4538ab25f74be38cda3) )
+	ROM_LOAD( "ortpu67b.bin",  0x18000, 0x4000, CRC(38c9bf29) SHA1(aa681f0a3eb5d31f2b01116939162d296e113428) )
+	/* 89 = empty */
+ROM_END
+
+
 ROM_START( pigout )
 	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "poutu58t.bin",  0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) )
@@ -2473,5 +2525,6 @@ GAME( 1989, aafbb,    aafb,    lelandi,  teamqb,   aafbb,    ROT270, "Leland Cor
 /* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,  0,       lelandi,  offroad,  offroad,  ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road", 0 )
 GAME( 1989, offroadt, 0,       lelandi,  offroad,  offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offrdtp2, offroadt,lelandi,  offrdtp2, offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak (2 Players)", 0 )
 GAME( 1990, pigout,   0,       lelandi,  pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 1)", 0 )
 GAME( 1990, pigouta,  pigout,  lelandi,  pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 2)", 0 )
