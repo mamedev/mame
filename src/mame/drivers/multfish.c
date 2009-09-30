@@ -18,10 +18,17 @@
   Turn Service Mode OFF (press 'F2')
   Reset the game (press 'F3')
 
+  To Init Roll Fruit 
+
+  Turn Service Mode ON (press 'F2')
+  Press and hold Service 1 ('9')
+  Reset the game (press 'F3')
+  Use Service 2 ('0') to move pointer to INIT
+  Hold Service 1 ('9') for 5 seconds
+  Turn Service Mode OFF (press 'F2')
 
   Todo:
   -------------------------------------------------------------------------
-  Payout doesn't currently work and causes 'Call Attendant' to be displayed
   Hook up Lamps
   Emulate the RTC (real time clock)
 
@@ -210,6 +217,26 @@ static READ8_HANDLER( ray_r )
 	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
+static UINT8 multfish_hopper_motor = 0;
+static UINT8 multfish_hopper = 0;
+
+static CUSTOM_INPUT( multfish_hopper_r )
+{
+	if ( multfish_hopper_motor != 0 ) 
+	{
+			multfish_hopper++;
+			return multfish_hopper>>4;
+	}
+	else
+	{
+			return 0;
+	}
+}
+
+static WRITE8_HANDLER( multfish_port33_w )
+{
+	multfish_hopper_motor = data & 0x10; //0x10 Hopper Motor (33B)
+}
 
 
 static ADDRESS_MAP_START( multfish_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -239,9 +266,7 @@ static INPUT_PORTS_START( multfish )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
 	PORT_START("IN1")
-	PORT_DIPNAME(     0x01, 0x01, "Hopper SW (22 B)" )
-	PORT_DIPSETTING(  0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM ( multfish_hopper_r, NULL )// Hopper SW (22 B)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -335,6 +360,45 @@ static INPUT_PORTS_START( multfish )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rollfr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) // COIN B (18 B)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM ( multfish_hopper_r, NULL )// Hopper SW (22 B)
+	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
+	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_DIPNAME(     0x08, 0x08, "Hopper Inhibit (08 B)" )
+	PORT_DIPSETTING(  0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) //Service SW (20 B)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) //Statistic SW (20 A)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x02, IP_ACTIVE_LOW ) // Fr Door (16 A)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static WRITE8_HANDLER( multfish_f3_w )
 {
@@ -363,7 +427,7 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x30, 0x30) AM_WRITE(multfish_port30_w)
 //  AM_RANGE(0x31, 0x31) AM_WRITE(multfish_port31_w)
 //  AM_RANGE(0x32, 0x32) AM_WRITE(multfish_port32_w)
-//  AM_RANGE(0x33, 0x33) AM_WRITE(multfish_port33_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE(multfish_port33_w) //0x10 Hopper Motor (33B)
 //  AM_RANGE(0x34, 0x34) AM_WRITE(multfish_port34_w)
 //  AM_RANGE(0x35, 0x35) AM_WRITE(multfish_port35_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
@@ -639,6 +703,7 @@ ROM_START( mfish_11 ) // 031124
 	ROM_LOAD( "mf031124.rom", 0x00000, 0x40000, MD5(9cd800719c6e4a2267e3c140467238d3) SHA1(c0d1b541c4b076bbc810ad637acb4a2663a919ba) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "2", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
 	ROM_LOAD( "3", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
 	ROM_LOAD( "4", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
@@ -654,6 +719,7 @@ ROM_START( mfish_12 ) // 040308
 	ROM_LOAD( "mf040308.rom", 0x00000, 0x40000, CRC(adb9c1d9) SHA1(88c69f48766dc7c98a6f03c1a0a4aa63b76560b6) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "2", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
 	ROM_LOAD( "3", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
 	ROM_LOAD( "4", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
@@ -668,6 +734,7 @@ ROM_START( mfish_12a ) // 040308
 	ROM_LOAD( "mf040308a.rom", 0x00000, 0x40000, CRC(44537648) SHA1(7bce6085778ff0b21c052ae91703de3b78b8eed0) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "2", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
 	ROM_LOAD( "3", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
 	ROM_LOAD( "4", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
@@ -683,6 +750,7 @@ ROM_START( mfish_13 ) // 040316
 	ROM_LOAD( "mf040316.rom", 0x00000, 0x40000, MD5(66019927201954518261652147b05e43) SHA1(c1f4d1c51632a45b533d19c8b6f63d337d84d9cd) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "2", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
 	ROM_LOAD( "3", 0x200000, 0x80000, CRC(33759c2a) SHA1(6afcee2e00a27542fc9751702abcc84cd7d3a2a8) )
 	ROM_LOAD( "4", 0x300000, 0x80000, CRC(d0053546) SHA1(01c69be0c594947d57648f491904a3b6938a5570) )
@@ -1782,9 +1850,9 @@ GAME( 2003, lhaunt_3,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lu
 #endif
 
 #if ALL_REVISIONS
-GAME( 2003, rollfr,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Roll Fruit (030821)",  0 )
+GAME( 2003, rollfr,      0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (030821)",  0 )
 #endif
-GAME( 2003, rollfr_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
+GAME( 2003, rollfr_2,    0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
 
 GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 1)",  0 )
 GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 2)",  0 )
