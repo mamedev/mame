@@ -47,13 +47,18 @@
 #define EXPRERR_MISSING_MEMORY_NAME			(19)
 
 /* values for the address space passed to external_read/write_memory */
-#define EXPSPACE_PROGRAM					(0)
-#define EXPSPACE_DATA						(1)
-#define EXPSPACE_IO							(2)
-#define EXPSPACE_OPCODE						(3)
-#define EXPSPACE_RAMWRITE					(4)
-#define EXPSPACE_EEPROM						(5)
-#define EXPSPACE_REGION						(6)
+#define EXPSPACE_PROGRAM_LOGICAL			(0)
+#define EXPSPACE_DATA_LOGICAL				(1)
+#define EXPSPACE_IO_LOGICAL					(2)
+#define EXPSPACE_SPACE3_LOGICAL				(3)
+#define EXPSPACE_PROGRAM_PHYSICAL			(4)
+#define EXPSPACE_DATA_PHYSICAL				(5)
+#define EXPSPACE_IO_PHYSICAL				(6)
+#define EXPSPACE_SPACE3_PHYSICAL			(7)
+#define EXPSPACE_OPCODE						(8)
+#define EXPSPACE_RAMWRITE					(9)
+#define EXPSPACE_EEPROM						(10)
+#define EXPSPACE_REGION						(11)
 
 
 

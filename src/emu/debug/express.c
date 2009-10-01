@@ -81,13 +81,18 @@ enum
 
 	TIN_MEMORY_SPACE_SHIFT	= 12,
 	TIN_MEMORY_SPACE_MASK	= (0xf << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_PROGRAM		= (EXPSPACE_PROGRAM   << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_DATA			= (EXPSPACE_DATA      << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_IO			= (EXPSPACE_IO        << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE    << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE  << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	  << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_REGION		= (EXPSPACE_REGION    << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_PROGRAM_LOG	= (EXPSPACE_PROGRAM_LOGICAL  << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_DATA_LOG		= (EXPSPACE_DATA_LOGICAL     << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_IO_LOG		= (EXPSPACE_IO_LOGICAL       << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_SPACE3_LOG	= (EXPSPACE_SPACE3_LOGICAL   << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_PROGRAM_PHYS	= (EXPSPACE_PROGRAM_PHYSICAL << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_DATA_PHYS	= (EXPSPACE_DATA_PHYSICAL    << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_IO_PHYS		= (EXPSPACE_IO_PHYSICAL      << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_SPACE3_PHYS	= (EXPSPACE_SPACE3_PHYSICAL  << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE           << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE         << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	         << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_REGION		= (EXPSPACE_REGION           << TIN_MEMORY_SPACE_SHIFT),
 
 	TIN_MEMORY_INDEX_SHIFT	= 16,
 	TIN_MEMORY_INDEX_MASK	= (0xffff << TIN_MEMORY_INDEX_SHIFT)
@@ -525,6 +530,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 	const char *startbuffer = buffer;
 	const char *namestring = NULL;
 	int space = 'p', size;
+	int physical = FALSE;
 	const char *dot;
 	int length;
 
@@ -543,9 +549,21 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 		buffer = dot + 1;
 	}
 
-	/* length 2 means space then size */
+	/* length 3 means logical/physical, then space, then size */
 	length = (int)strlen(buffer);
-	if (length == 2)
+	if (length == 3)
+	{
+		if (buffer[0] != 'l' && buffer[0] != 'p')
+			return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
+		if (buffer[1] != 'p' && buffer[1] != 'd' && buffer[1] != 'i' && buffer[1] != '3')
+			return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
+		physical = (buffer[0] == 'p');
+		space = buffer[1];
+		size = buffer[2];
+	}
+
+	/* length 2 means space then size */
+	else if (length == 2)
 	{
 		space = buffer[0];
 		size = buffer[1];
@@ -562,13 +580,14 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 	/* convert the space to flags */
 	switch (space)
 	{
-		case 'p':	*flags |= TIN_MEMORY_PROGRAM;	break;
-		case 'd':	*flags |= TIN_MEMORY_DATA;		break;
-		case 'i':	*flags |= TIN_MEMORY_IO;		break;
-		case 'o':	*flags |= TIN_MEMORY_OPCODE;	break;
-		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;	break;
-		case 'e':	*flags |= TIN_MEMORY_EEPROM;	break;
-		case 'm':	*flags |= TIN_MEMORY_REGION;	break;
+		case 'p':	*flags |= physical ? TIN_MEMORY_PROGRAM_PHYS : TIN_MEMORY_PROGRAM_LOG;	break;
+		case 'd':	*flags |= physical ? TIN_MEMORY_DATA_PHYS    : TIN_MEMORY_DATA_LOG;		break;
+		case 'i':	*flags |= physical ? TIN_MEMORY_IO_PHYS      : TIN_MEMORY_IO_LOG;		break;
+		case '3':	*flags |= physical ? TIN_MEMORY_SPACE3_PHYS  : TIN_MEMORY_SPACE3_LOG;	break;
+		case 'o':	*flags |= TIN_MEMORY_OPCODE;											break;
+		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;											break;
+		case 'e':	*flags |= TIN_MEMORY_EEPROM;											break;
+		case 'm':	*flags |= TIN_MEMORY_REGION;											break;
 		default:	return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
 	}
 
