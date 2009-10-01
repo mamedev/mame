@@ -1468,6 +1468,12 @@ static MACHINE_START(39in1)
 	for (i = 0; i < 0x80000; i += 2)
 	{
 		ROM[i] = BITSWAP8(ROM[i],7,2,5,6,0,3,1,4) ^ BITSWAP8((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+
+// 60-in-1 decrypt
+//	        if ((i%2)==0)
+//	        {
+//	            ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
+//	        }
 	}
 
 	pxa255_start(machine);
@@ -1539,15 +1545,34 @@ ROM_START( 39in1 )
 	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, CRC(a423a969) SHA1(4c68654c81e70367209b9f6c712564aae89a3122) )
 ROM_END
 
-/*ROM_START( arm4in1 )
-    // main program, encrypted
-    ROM_REGION( 0x80000, "maincpu", 0 )
-        ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
+ROM_START( 48in1 )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+        ROM_LOAD( "hph_ver309",   0x000000, 0x080000, CRC(27023186) SHA1(a2b3770c4b03d6026c6a0ff2e62ab17c3b359b12) )
 
-    // data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-    ROM_REGION32_LE( 0x200000, "data", 0 )
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
-ROM_END*/
 
-GAME(2004, 39in1, 0, 39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
-//GAME(2004, arm4in1, 0, 39in1, 39in1, 0, ROT0, "<unknown>", "4 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_NO_SOUND)
+	// EEPROM - contains security data
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+ROM_START( 48in1a )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+        ROM_LOAD( "ver302.u2",    0x000000, 0x080000, CRC(5ea25870) SHA1(66edc59a3d355bc3462e98d2062ada721c371af6) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+        ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+
+	// EEPROM - contains security data
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+GAME(2004, 39in1,  0,     39in1, 39in1, 39in1, ROT270, "<unknown>", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, 39in1, 39in1, 39in1, ROT270, "<unknown>", "48 in 1 MAME bootleg (ver 3.09)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, 39in1, 39in1, 39in1, ROT270, "<unknown>", "48 in 1 MAME bootleg (ver 3.02)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)

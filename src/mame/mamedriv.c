@@ -4532,6 +4532,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( clubkrte )	/* 2002.?? Club Kart: European Session */
 						/* 2002.06 WCCF SERIE A 2001-2002 */
 						/* 2002.07 Soul Surfer */
+	DRIVER( vf4evoct )	/* 2002.08 Virtua Fighter 4 Evolution (cartridge) */
 	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
 						/* 2002.11 WCCF SERIE A 2001-2002 ver.1.2 */
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
@@ -9084,6 +9085,8 @@ Other Sun games
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */
+	DRIVER( 48in1 )		/* MAME based bootleg */
+	DRIVER( 48in1a )    	/* MAME based bootleg */
 	DRIVER( kingpin )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( kingpinm )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */
