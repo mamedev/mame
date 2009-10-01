@@ -1,3 +1,5 @@
+#include "sound/discrete.h"
+
 /*----------- defined in drivers/sprint8.c -----------*/
 
 void sprint8_set_collision(running_machine *machine, int n);
@@ -17,3 +19,13 @@ VIDEO_START( sprint8 );
 VIDEO_UPDATE( sprint8 );
 
 WRITE8_HANDLER( sprint8_video_ram_w );
+
+
+/*----------- defined in audio/sprint8.c -----------*/
+
+DISCRETE_SOUND_EXTERN( sprint8 );
+
+WRITE8_DEVICE_HANDLER( sprint8_crash_w );
+WRITE8_DEVICE_HANDLER( sprint8_screech_w );
+WRITE8_DEVICE_HANDLER( sprint8_attract_w );
+WRITE8_DEVICE_HANDLER( sprint8_motor_w );

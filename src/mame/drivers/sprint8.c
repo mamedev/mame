@@ -103,16 +103,6 @@ static WRITE8_HANDLER( sprint8_int_reset_w )
 }
 
 
-/* names of sound effects taken from Tank 8, might differ for Sprint 8 */
-
-static WRITE8_HANDLER( sprint8_crash_w ) {}
-static WRITE8_HANDLER( sprint8_explosion_w ) {}
-static WRITE8_HANDLER( sprint8_bugle_w ) {}
-static WRITE8_HANDLER( sprint8_bug_w ) {}
-static WRITE8_HANDLER( sprint8_attract_w ) {}
-static WRITE8_HANDLER( sprint8_motor_w ) {}
-
-
 static ADDRESS_MAP_START( sprint8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_BASE(&sprint8_video_ram)
@@ -126,13 +116,13 @@ static ADDRESS_MAP_START( sprint8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE(&sprint8_pos_d_ram)
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(sprint8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(sprint8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(sprint8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(sprint8_explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(sprint8_bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(sprint8_bug_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE("discrete", sprint8_crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE("discrete", sprint8_screech_w)
+	AM_RANGE(0x1d03, 0x1d03) AM_WRITENOP
+	AM_RANGE(0x1d04, 0x1d04) AM_WRITENOP
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_BASE(&sprint8_team)
-	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(sprint8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(sprint8_motor_w)
+	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE("discrete", sprint8_attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("discrete", sprint8_motor_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -479,7 +469,30 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_VIDEO_UPDATE(sprint8)
 	MDRV_VIDEO_EOF(sprint8)
 
+
 	/* sound hardware */
+#if 0
+	/* the proper way is to hook up 4 speakers, but they are not really
+	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front.
+	 * For now I just output 1-2 as mono. */
+	MDRV_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
+	MDRV_SPEAKER_ADD("speaker_3_7",  0.0, 0.0, -0.5)	/* back */
+	MDRV_SPEAKER_ADD("speaker_5_6", -0.2, 0.0, 1.0)		/* left */
+	MDRV_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
+	MDRV_SOUND_ROUTE(0, "speaker_1_2", 1.0)
+	MDRV_SOUND_ROUTE(1, "speaker_3_7", 1.0)
+	MDRV_SOUND_ROUTE(3, "speaker_5_6", 1.0)
+	MDRV_SOUND_ROUTE(4, "speaker_4_8", 1.0)
+#else
+	MDRV_SPEAKER_STANDARD_MONO("speaker")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
+	MDRV_SOUND_ROUTE(0, "speaker", 1.0)
+#endif
 MACHINE_DRIVER_END
 
 
@@ -516,5 +529,5 @@ ROM_START( sprint8a )
 ROM_END
 
 
-GAME( 1977, sprint8,  0,       sprint8, sprint8,  0, ROT0, "Atari", "Sprint 8",             GAME_NO_SOUND )
-GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", GAME_NO_SOUND )
+GAME( 1977, sprint8,  0,       sprint8, sprint8,  0, ROT0, "Atari", "Sprint 8",             GAME_IMPERFECT_SOUND )
+GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", GAME_IMPERFECT_SOUND )

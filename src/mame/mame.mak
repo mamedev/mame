@@ -433,7 +433,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/skyraid.o $(AUDIO)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
 	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o $(AUDIO)/sprint4.o \
-	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \
+	$(DRIVERS)/sprint8.o $(AUDIO)/sprint8.o $(VIDEO)/sprint8.o \
 	$(DRIVERS)/starshp1.o $(AUDIO)/starshp1.o $(VIDEO)/starshp1.o \
 	$(DRIVERS)/starwars.o $(MACHINE)/starwars.o $(AUDIO)/starwars.o \
 	$(DRIVERS)/subs.o $(MACHINE)/subs.o $(AUDIO)/subs.o $(VIDEO)/subs.o \

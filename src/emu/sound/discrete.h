@@ -2893,7 +2893,7 @@
  *        options,        - bit mapped options
  *        v_pos,          - B+ voltage of 555
  *        v_charge,       - voltage (or node) to charge circuit  (Defaults to v_pos)
- *        v_out_high,     - High output voltage of 555 (Defaults to v_pos - 1.2V)
+ *        v_out_high     - High output voltage of 555 (Defaults to v_pos - 1.2V)
  *    }
  *
  * The last 2 options of discrete_555_desc can use the following defaults:
@@ -2993,6 +2993,9 @@
  *     DISC_555_TRIGGER_IS_VOLTAGE - Input is actual voltage.
  *                                   Voltage must drop below
  *                                   trigger to activate.
+ *     DISC_555_TRIGGER_IS_COUNT   - 1 when trigger, allows passing of x_time.
+ *                                   Mainly connected with other module using
+ *                                   a xxx_COUNT_F_X type.
  *     DISC_555_TRIGGER_DISCHARGES_CAP - some circuits connect an external
  *                                       device (transistor) to the cap to
  *                                       discharge it when the trigger is
@@ -3006,8 +3009,9 @@
  *  Waveform Types: (ORed with trigger types)
  *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v_out_high. (DEFAULT)
  *     DISC_555_OUT_CAP     - Output is Timing Capacitor 'C' voltage.
+ *     DISC_555_OUT_ENERGY  - see DISCRETE_555_MSTABLE.
  *
- * EXAMPLES: see Frogs
+ * EXAMPLES: see Frogs, Sprint 8
  *
  ***********************************************************************
  *
@@ -3555,14 +3559,16 @@ enum
 #define DISC_SCHMITT_OSC_ENAB_IS_NOR		0x06
 
 #define DISC_SCHMITT_OSC_ENAB_MASK			0x06	/* Bits that define output enable type.
-                                                     * Used only internally in module. */
+													 * Used only internally in module. */
 
 /* 555 Common output flags */
 #define DISC_555_OUT_DC						0x00
 #define DISC_555_OUT_AC						0x10
 
 #define DISC_555_TRIGGER_IS_LOGIC			0x00
-#define DISC_555_TRIGGER_IS_VOLTAGE			0x40
+#define DISC_555_TRIGGER_IS_VOLTAGE			0x20
+#define DISC_555_TRIGGER_IS_COUNT			0x40
+#define DSD_555_TRIGGER_TYPE_MASK			0x60
 #define DISC_555_TRIGGER_DISCHARGES_CAP		0x80
 
 #define DISC_555_OUT_SQW					0x00	/* Squarewave */
@@ -3575,7 +3581,7 @@ enum
 #define DISC_555_OUT_COUNT_R_X				0x07
 
 #define DISC_555_OUT_MASK					0x07	/* Bits that define output type.
-                                                 * Used only internally in module. */
+												 * Used only internally in module. */
 
 #define DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE		0x80
 #define DISCRETE_555_CC_TO_DISCHARGE_PIN			0x00
@@ -3593,7 +3599,7 @@ enum
 #define DISC_566_OUT_COUNT_F_X				0x50
 #define DISC_566_OUT_COUNT_R_X				0x60
 #define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
-                                                     * Used only internally in module. */
+													 * Used only internally in module. */
 
 /* LS624 output flags */
 #define DISC_LS624_OUT_ENERGY				0x01

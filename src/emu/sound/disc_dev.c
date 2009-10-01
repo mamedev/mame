@@ -58,6 +58,8 @@ struct dsd_555_mstbl_context
 	int		output_is_ac;
 	double	ac_shift;				/* DC shift needed to make waveform ac */
 	int		flip_flop;				/* 555 flip/flop output state */
+	int		has_rc_nodes;
+	double	exp_charge;
 	double	cap_voltage;			/* voltage on cap */
 	double	threshold;
 	double	trigger;
@@ -457,6 +459,9 @@ static DISCRETE_RESET(dsd_555_astbl)
 #define DSD_555_MSTBL__R		DISCRETE_INPUT(2)
 #define DSD_555_MSTBL__C		DISCRETE_INPUT(3)
 
+/* bit mask of the above RC inputs */
+#define DSD_555_MSTBL_RC_MASK	0x0c
+
 static DISCRETE_STEP(dsd_555_mstbl)
 {
 	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
@@ -464,6 +469,11 @@ static DISCRETE_STEP(dsd_555_mstbl)
 
 	double v_cap;			/* Current voltage on capacitor, before dt */
 	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
+	double x_time  = 0;		/* time since change happened */
+	double dt, exponent;
+	int trigger = 0;
+	int trigger_type;
+	int update_exponent = 0;
 
 	if(DSD_555_MSTBL__RESET)
 	{
@@ -471,74 +481,104 @@ static DISCRETE_STEP(dsd_555_mstbl)
 		node->output[0]     = 0;
 		context->flip_flop  = 0;
 		context->cap_voltage = 0;
+		return;
 	}
-	else
+
+	trigger_type = info->options;
+	dt = node->info->sample_time;
+
+	switch (trigger_type & DSD_555_TRIGGER_TYPE_MASK)
 	{
-		int trigger;
-
-		if (context->trig_is_logic)
-			trigger = !DSD_555_MSTBL__TRIGGER;
-		else
-			trigger = DSD_555_MSTBL__TRIGGER < context->trigger;
-
-		if (context->trig_discharges_cap && trigger)
-			context->cap_voltage = 0;
-
-		if (!context->flip_flop)
-		{
-			/* Wait for trigger */
-			if (trigger)
-				context->flip_flop = 1;
-		}
-		else
-		{
-			v_cap = context->cap_voltage;
-
-			/* Sometimes a switching network is used to setup the capacitance.
-             * These may select 'no' capacitor, causing oscillation to stop.
-             */
-			if (DSD_555_MSTBL__C == 0)
+		case DISC_555_TRIGGER_IS_LOGIC:
+			trigger = (int)!DSD_555_MSTBL__TRIGGER;
+			break;
+		case DISC_555_TRIGGER_IS_VOLTAGE:
+			trigger = (int)(DSD_555_MSTBL__TRIGGER < context->trigger);
+			break;
+		case DISC_555_TRIGGER_IS_COUNT:
+			trigger = (int)DSD_555_MSTBL__TRIGGER;
+			if (trigger && !context->flip_flop)
 			{
-				context->flip_flop = 0;
-				/* The voltage goes high because the cap circuit is open. */
-				v_cap_next = info->v_pos;
-				v_cap      = info->v_pos;
-				context->cap_voltage = 0;
-			}
-			else
-			{
-				/* Charging */
-				v_cap_next = v_cap + ((info->v_pos - v_cap) * RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C));
-
-				/* Has it charged past upper limit? */
-				/* If trigger is still enabled, then we keep charging,
-                 * regardless of threshold. */
-				if ((v_cap_next >= context->threshold) && !trigger)
+				x_time = DSD_555_MSTBL__TRIGGER - trigger;
+				if (x_time != 0)
 				{
-					v_cap_next = 0;
-					v_cap      = context->threshold;
-					context->flip_flop = 0;
+					/* adjust sample to after trigger */
+					x_time = (1.0 - x_time);
+					update_exponent = 1;
+					dt = x_time * node->info->sample_time;
 				}
 			}
+			break;
+	}
 
-			context->cap_voltage = v_cap_next;
+	if ((trigger_type & DISC_555_TRIGGER_DISCHARGES_CAP) && trigger)
+		context->cap_voltage = 0;
 
-			switch (info->options & DISC_555_OUT_MASK)
+	/* Wait for trigger */
+	if (!context->flip_flop && trigger)
+		context->flip_flop = 1;
+
+	if (context->flip_flop)
+	{
+		v_cap = context->cap_voltage;
+
+		/* Sometimes a switching network is used to setup the capacitance.
+		 * These may select 'no' capacitor, causing oscillation to stop.
+		 */
+		if (DSD_555_MSTBL__C == 0)
+		{
+			context->flip_flop = 0;
+			/* The voltage goes high because the cap circuit is open. */
+			v_cap_next = info->v_pos;
+			v_cap      = info->v_pos;
+			context->cap_voltage = 0;
+		}
+		else
+		{
+			/* Charging */
+			update_exponent |= context->has_rc_nodes;
+			if (update_exponent)
+				exponent = RC_CHARGE_EXP_DT(DSD_555_MSTBL__R * DSD_555_MSTBL__C, dt);
+			else
+				exponent = context->exp_charge;
+			v_cap_next = v_cap + ((info->v_pos - v_cap) * exponent);
+
+			/* Has it charged past upper limit? */
+			/* If trigger is still enabled, then we keep charging,
+			 * regardless of threshold. */
+			if ((v_cap_next >= context->threshold) && !trigger)
 			{
-				case DISC_555_OUT_SQW:
-					node->output[0] = context->flip_flop * context->v_out_high;
-					/* Fake it to AC if needed */
-					if (context->output_is_ac)
-						node->output[0] -= context->v_out_high / 2.0;
-					break;
-				case DISC_555_OUT_CAP:
-					node->output[0] = v_cap_next;
-					/* Fake it to AC if needed */
-					if (context->output_is_ac)
-						node->output[0] -= context->threshold * 3.0 /4.0;
-					break;
+				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (context->v_charge - v_cap))));
+				x_time = dt / node->info->sample_time;
+				v_cap_next = 0;
+				v_cap      = context->threshold;
+				context->flip_flop = 0;
 			}
 		}
+
+		context->cap_voltage = v_cap_next;
+	}
+
+	switch (info->options & DISC_555_OUT_MASK)
+	{
+		case DISC_555_OUT_SQW:
+			node->output[0] = context->flip_flop * context->v_out_high;
+			/* Fake it to AC if needed */
+			if (context->output_is_ac)
+				node->output[0] -= context->v_out_high / 2.0;
+			break;
+		case DISC_555_OUT_CAP:
+			node->output[0] = v_cap_next;
+			/* Fake it to AC if needed */
+			if (context->output_is_ac)
+				node->output[0] -= context->threshold * 3.0 /4.0;
+			break;
+		case DISC_555_OUT_ENERGY:
+			if (x_time == 0) x_time = 1.0;
+			node->output[0] = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
+				if (context->output_is_ac)
+					node->output[0] -= context->v_out_high / 2.0;
+			break;
 	}
 }
 
@@ -571,6 +611,13 @@ static DISCRETE_RESET(dsd_555_mstbl)
 
 	context->flip_flop   = 0;
 	context->cap_voltage = 0;
+
+	/* optimization if none of the values are nodes */
+	context->has_rc_nodes = 0;
+	if (node->input_is_node & DSD_555_MSTBL_RC_MASK)
+		context->has_rc_nodes = 1;
+	else
+		context->exp_charge = RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
 
 	node->output[0] = 0;
 }

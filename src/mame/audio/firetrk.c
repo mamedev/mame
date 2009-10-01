@@ -68,7 +68,7 @@ popmessage("ASR");
 }
 
 
-#define FIRETRUCK_HSYNC	15750.0
+#define FIRETRUCK_HSYNC	15750.0		/* not checked */
 #define FIRETRUCK_1V	FIRETRUCK_HSYNC/2
 #define FIRETRUCK_2V	FIRETRUCK_1V/2
 #define FIRETRUCK_8V	FIRETRUCK_1V/8
