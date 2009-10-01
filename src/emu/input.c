@@ -1357,8 +1357,11 @@ astring *input_code_to_token(running_machine *machine, astring *string, input_co
 	if (item != NULL && item->token != NULL)
 		devcode = astring_c(item->token);
 	else
+	{
 		devcode = code_to_string(itemid_token_table, INPUT_CODE_ITEMID(code));
-	assert(devcode != NULL);
+		if (devcode == NULL)
+			devcode = "UNKNOWN";
+	}
 
 	/* determine the modifier part */
 	modifier = code_to_string(modifier_token_table, INPUT_CODE_MODIFIER(code));
