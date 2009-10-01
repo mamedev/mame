@@ -1,7 +1,11 @@
 /* Sega MegaPlay
 
   changelog:
-
+	
+  01 Oct  2009 - Converted to use the HazeMD SMS code so that old code
+                 can be removed, however this makes the text transparent,
+				 which IIRC is incorrect
+  
   22 Sept 2007 - Started updating this to use the new Megadrive code,
                  fixing issues with Mazin Wars + Grand Slam.
                  However I'm still not convinced that the handling of
@@ -37,6 +41,12 @@ this reason.
 
 Only a handful of games were released for this system.
 
+Bugs:
+ Most of this is guesswork and should be verified on real hw.  Sometims after inserting
+ a coin and pressing start the 'press start' message remains on screen and no credit is
+ deducted.  (timing?)
+
+
 */
 
 #include "driver.h"
@@ -46,6 +56,7 @@ Only a handful of games were released for this system.
 #include "deprecat.h"
 #include "genesis.h"
 #include "megadriv.h"
+#include "hazemd_s.h"
 
 #define MASTER_CLOCK		53693100
 
@@ -56,7 +67,9 @@ Only a handful of games were released for this system.
 static UINT32 bios_bank; // ROM bank selection
 static UINT16 game_banksel;  // Game bank selection
 static UINT32 bios_mode = MP_ROM;  // determines whether ROM banks or Game data
-                                  // is to read from 0x8000-0xffff
+								   // is to read from 0x8000-0xffff
+static UINT32 mp_bios_bank_addr;
+
 static UINT32 bios_width;  // determines the way the game info ROM is read
 UINT8 bios_ctrl[6];
 static UINT8 bios_6600;
@@ -71,12 +84,13 @@ UINT16 *ic36_ram;
 //static UINT8 ic36_ram[0x4000];
 
 
-static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
+//static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
 extern UINT8 segae_vintpending;
 extern UINT8 segae_hintpending;
 extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
 
 // Interrupt handler - from drivers/segasyse.c
+#if 0
 static INTERRUPT_GEN (megaplay_bios_irq)
 {
 	int sline;
@@ -116,7 +130,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 	}
 
 }
-
+#endif
 
 static UINT32 readpos = 1;  // serial bank selection position (9-bit)
 
@@ -564,51 +578,73 @@ static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(space->machine, "mpbios");
-	UINT8* game = memory_region(space->machine, "maincpu");
+	UINT32 fulladdress;
+	UINT8* bank = memory_region(space->machine, "mtbios");
 
-	if(game_banksel == 0x142) // Genesis I/O
-		return OLD_megaplay_genesis_io_r(space, (offset & 0x1f) / 2, 0xffff);
+	fulladdress = mp_bios_bank_addr + offset;
+	
 
-	if(bios_mode & MP_ROM)
+	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
 	{
-		int sel = (bios_bank >> 6) & 0x03;
+		if(bios_mode & MP_ROM)
+		{
+			int sel = (bios_bank >> 6) & 0x03;
 
-//      popmessage("Reading from Bank %i",sel);
-
-		if(sel == 0)
-			return 0xff;
+			if(sel == 0)
+				return 0xff;
+			else
+				return bank[0x10000 + (sel-1)*0x8000 + offset];
+		}
+		else if(bios_width & 0x08)
+		{
+			if(offset >= 0x2000)
+				return ic36_ram[offset - 0x2000];
+			else
+				return ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset];
+		}
 		else
-			return bank[0x10000 + (sel-1)*0x8000 + offset];
+		{
+			return memory_region(space->machine, "maincpu")[fulladdress^1];
+		}
+	}
+	else if(fulladdress>=0xa10000 && fulladdress<=0xa1001f) // IO Acess
+	{
+		return OLD_megaplay_genesis_io_r(space, (offset & 0x1f) / 2, 0xffff);
 	}
 	else
-	{
-		if(game_banksel == 0x60 || game_banksel == 0x61)  /* read game info ROM */
-			if(bios_width & 0x08)
-			{
-				if(offset >= 0x2000)
-					return ic36_ram[offset - 0x2000];
-				else
-					return ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset];
-			}
-			else
-				return game[((game_banksel)*0x8000 + offset)];
-		else
-			return game[(game_banksel*0x8000 + (offset ^ 0x01))];
+	{	
+		printf("bank_r fulladdress %08x\n",fulladdress);
+		return 0x00;
 	}
+
 }
 
 static WRITE8_HANDLER ( bank_w )
 {
-	if(game_banksel == 0x142) // Genesis I/O
+	UINT32 fulladdress;
+	fulladdress = mp_bios_bank_addr + offset;
+
+	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM / Megaplay Custom Addresses
+	{
+		if(offset <= 0x1fff && (bios_width & 0x08))
+		{
+			ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
+		}
+
+		if(offset >= 0x2000 && (bios_width & 0x08))
+		{
+	//      ic36_ram[offset] = data;
+			ic36_ram[offset - 0x2000] = data;
+		}
+	}
+	else if(fulladdress>=0xa10000 && fulladdress<=0xa1001f) // IO Access
+	{
 		OLD_megaplay_genesis_io_w(space, (offset & 0x1f) / 2, data, 0xffff);
-
-	if(offset <= 0x1fff && (bios_width & 0x08))
-		ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
-
-	if(offset >= 0x2000 && (bios_width & 0x08))
-//      ic36_ram[offset] = data;
-		ic36_ram[offset - 0x2000] = data;
+	}
+	else
+	{	
+		printf("bank_w fulladdress %08x\n",fulladdress);
+	}
 }
 
 
@@ -686,6 +722,10 @@ static WRITE8_HANDLER( megaplay_game_w )
 //      popmessage("Game bank selected: 0x%03x",game_banksel);
 		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",cpu_get_previouspc(space->cpu),game_banksel);
 	}
+	
+	mp_bios_bank_addr = ( ( mp_bios_bank_addr >> 1 ) | ( data << 23 ) ) & 0xff8000;
+
+	
 }
 
 static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -714,6 +754,7 @@ UINT8 segae_vdp_data_r ( UINT8 chip );
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
 void segae_vdp_data_w ( running_machine *machine, UINT8 chip, UINT8 data );
 
+#if 0
 static READ8_HANDLER (megaplay_bios_port_be_bf_r)
 {
 	UINT8 temp = 0;
@@ -738,38 +779,48 @@ static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 			segae_vdp_ctrl_w(0, data); break;
 	}
 }
-
+#endif
 
 static ADDRESS_MAP_START( megaplay_bios_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_w)	/* SN76489 */
-//  AM_RANGE(0xdc, 0xdc) AM_READ(megatech_bios_port_dc_r)  // player inputs
-//  AM_RANGE(0xdd, 0xdd) AM_READ(megatech_bios_port_dd_r)  // other player 2 inputs
-	AM_RANGE(0xbe, 0xbf) AM_READWRITE(megaplay_bios_port_be_bf_r, megaplay_bios_port_be_bf_w)	/* VDP */
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)	/* VDP */
 ADDRESS_MAP_END
 
-/* in video/segasyse.c */
-VIDEO_START( megaplay_normal );
-VIDEO_UPDATE( megaplay_normal );
+
+
 
 static VIDEO_START(megplay)
 {
 	//printf("megplay vs\n");
 	VIDEO_START_CALL(megadriv);
-	VIDEO_START_CALL(megaplay_normal);
+//	VIDEO_START_CALL(megaplay_normal);
 }
 
 static VIDEO_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
 	VIDEO_UPDATE_CALL(megadriv);
-	VIDEO_UPDATE_CALL(megaplay_normal);
+//	VIDEO_UPDATE_CALL(megaplay_normal);
+	VIDEO_UPDATE_CALL(megaplay_bios);
 	return 0;
 }
 
 
 //extern VIDEO_EOF(megadriv);
+static MACHINE_RESET( mpnew )
+{
+	mp_bios_bank_addr = 0;
+	MACHINE_RESET_CALL(megadriv);
+	MACHINE_RESET_CALL(megatech_bios);
+}
+
+static VIDEO_EOF( mpnew )
+{
+	VIDEO_EOF_CALL(megadriv);
+	VIDEO_EOF_CALL(megatech_bios);
+}
 
 static MACHINE_DRIVER_START( mpnew )
 
@@ -778,11 +829,14 @@ static MACHINE_DRIVER_START( mpnew )
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
        which includes an SN76496 for sound */
-	MDRV_CPU_ADD("mpbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megaplay_bios_map)
 	MDRV_CPU_IO_MAP(megaplay_bios_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
+	//MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
+	MDRV_MACHINE_RESET( mpnew )
+	MDRV_VIDEO_EOF( mpnew )
+	
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
@@ -811,9 +865,15 @@ ROM_START( megaplay )
 
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
+
+/* The system appears to access the instruction rom at
+    0x300000 in the 68k space (rom window from z80 side)
+	
+   This probably means the maximum 68k rom size is 0x2fffff for MegaPlay
+*/
 
 ROM_START( mp_sonic ) /* Sonic */
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -824,7 +884,7 @@ ROM_START( mp_sonic ) /* Sonic */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "ep15175-01.ic3", 0x000000, 0x08000, CRC(99246889) SHA1(184aa3b7fdedcf578c5e34edb7ed44f57f832258) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -840,7 +900,7 @@ ROM_START( mp_col3 ) /* Columns 3 */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "1.ic3", 0x000000, 0x08000,  CRC(dac9bf91) SHA1(0117972a7181f8aaf942a259cc8764b821031253) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -853,7 +913,7 @@ ROM_START( mp_gaxe2 ) /* Golden Axe 2 */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "ep15175-02b.ic3", 0x000000, 0x08000, CRC(3039b653) SHA1(b19874c74d0fc0cca1169f62e5e74f0e8ca83679) ) // 15175-02b.ic3
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -866,7 +926,7 @@ ROM_START( mp_gslam ) /* Grand Slam */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-03.ic3", 0x000000, 0x08000, CRC(70ea1aec) SHA1(0d9d82a1f8aa51d02707f7b343e7cfb6591efccd) ) // 15175-02b.ic3
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -880,7 +940,7 @@ ROM_START( mp_twc ) /* Tecmo World Cup */
  	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "ep15175-04.ic3", 0x000000, 0x08000, CRC(faf7c030) SHA1(16ef405335b4d3ecb0b7d97b088dafc4278d4726) )
 
- 	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+ 	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
  	MEGAPLAY_BIOS
 ROM_END
 
@@ -892,7 +952,7 @@ ROM_START( mp_sor2 ) /* Streets of Rage 2 */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-05.ic2", 0x000000, 0x08000, CRC(1df5347c) SHA1(faced2e875e1914392f61577b5256d006eebeef9) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -904,7 +964,7 @@ ROM_START( mp_bio ) /* Bio Hazard Battle */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-06.ic2", 0x000000, 0x08000, CRC(1ef64e41) SHA1(13984b714b014ea41963b70de74a5358ed223bc5) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -916,7 +976,7 @@ ROM_START( mp_soni2 ) /* Sonic The Hedgehog 2 */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-07.ic1", 0x000000, 0x08000, CRC(bb5f67f0) SHA1(33b7a5d14015a5fcf41976a8f648f8f48ce9bb03) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -928,7 +988,7 @@ ROM_START( mp_mazin ) /* Mazin Wars */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-11.ic2", 0x000000, 0x08000, CRC(bb651120) SHA1(81cb736f2732373e260dde162249c1d29a3489c3) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
@@ -940,14 +1000,14 @@ ROM_START( mp_shnb3 ) /* Shinobi 3 */
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "epr-15175-09.ic2", 0x000000, 0x08000, CRC(6254e45a) SHA1(8667922a6eade03c964ce224f7fa39ba871c60a4) )
 
-	ROM_REGION( 0x28000, "mpbios", 0 ) /* Bios */
+	ROM_REGION( 0x28000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 
 
 static void megplay_stat(running_machine *machine)
 {
-	UINT8 *src = memory_region(machine, "mpbios");
+	UINT8 *src = memory_region(machine, "mtbios");
 	UINT8 *instruction_rom = memory_region(machine, "user1");
 	UINT8 *game_rom = memory_region(machine, "maincpu");
 	int offs;
@@ -1010,6 +1070,9 @@ static DRIVER_INIT (megaplay)
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
+
+	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
+	
 }
 
 /*

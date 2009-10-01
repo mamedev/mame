@@ -91,7 +91,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "sound/sn76496.h"
 #include "rendlay.h"
 
-#include "segae.h"
+#include "hazemd_s.h"
 #include "genesis.h"
 #include "megadriv.h"
 
@@ -248,59 +248,6 @@ static READ8_HANDLER( megatech_cart_select_r )
 	return (mt_cart_select_reg);
 }
 
-static READ8_HANDLER( z80_unmapped_port_r )
-{
-	printf("unmapped z80 port read %04x\n",offset);
-	return 0;
-}
-
-static WRITE8_HANDLER( z80_unmapped_port_w )
-{
-	printf("unmapped z80 port write %04x\n",offset);
-}
-
-static READ8_HANDLER( z80_unmapped_r )
-{
-	printf("unmapped z80 read %04x\n",offset);
-	return 0;
-}
-
-static WRITE8_HANDLER( z80_unmapped_w )
-{
-	printf("unmapped z80 write %04x\n",offset);
-}
-
-static UINT8* sms_mainram;
-static UINT8* sms_rom;
-
-
-static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
-{
-	int bank = data&0x1f;
-	//logerror("bank w %02x %02x\n", offset, data);
-
-	sms_mainram[0x1ffc+offset] = data;
-	switch (offset)
-	{
-		case 0:
-			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
-
-			//printf("bank ram??\n");
-			break;
-		case 1:
-			memcpy(sms_rom+0x0000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
-			break;
-		case 2:
-			memcpy(sms_rom+0x4000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
-			break;
-		case 3:
-			memcpy(sms_rom+0x8000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
-			break;
-
-	}
-}
-
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( md_sms_ioport_dc_r )
 {
@@ -315,56 +262,6 @@ READ8_HANDLER( md_sms_ioport_dd_r )
 
 
 
-static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
-{
-	/* INIT THE PORTS *********************************************************************************************/
-
-	const address_space *io = cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_IO);
-	const device_config *sn = devtag_get_device(machine, "sn");
-
-	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
-
-	memory_install_read8_handler     (io, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r);
-	memory_install_write8_device_handler(io, sn, 0x7e, 0x7f, 0, 0, sn76496_w);
-	memory_install_readwrite8_handler(io, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
-	memory_install_readwrite8_handler(io, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
-
-	memory_install_read8_handler     (io, 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
-
-	memory_install_read8_handler     (io, 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
-	memory_install_read8_handler     (io, 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (io, 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (io, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
-}
-
-static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
-{
-	/* INIT THE MEMMAP / BANKING *********************************************************************************/
-
-	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
-
-	/* fixed rom bank area */
-	sms_rom = auto_alloc_array(machine, UINT8, 0x400000);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
-	memory_set_bankptr(machine,  5, sms_rom );
-
-	memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
-
-	/* main ram area */
-	sms_mainram = auto_alloc_array(machine, UINT8, 0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
-	memory_set_bankptr(machine,  6, sms_mainram );
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
-	memory_set_bankptr(machine,  7, sms_mainram );
-	memset(sms_mainram,0x00,0x2000);
-
-	memory_install_write8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
-
-	megatech_set_genz80_as_sms_standard_ports(machine);
-//  smsgg_backupram = NULL;
-
-}
 
 static void megatech_select_game(running_machine *machine, int gameno)
 {
@@ -402,7 +299,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		{
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
-			megatech_set_genz80_as_sms_standard_map(machine);
+			megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
 
@@ -412,7 +309,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		{
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
-			megatech_set_megadrive_z80_as_megadrive_z80(machine);
+			megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 		}

@@ -1775,23 +1775,6 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl)
 	return retdata;
 }
 
-/* the SMS inputs should be more complex, like the megadrive ones */
-READ8_HANDLER (megatech_sms_ioport_dc_r)
-{
-	running_machine *machine = space->machine;
-	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
-	/* bit 4: TL-A; bit 5: TR-A */
-	return (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
-}
-
-READ8_HANDLER (megatech_sms_ioport_dd_r)
-{
-	running_machine *machine = space->machine;
-	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
-	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0x10;
-}
-
 static UINT8 megadrive_io_read_ctrl_port(int portnum)
 {
 	UINT8 retdata;
@@ -6387,33 +6370,33 @@ static WRITE8_HANDLER( z80_unmapped_w )
 
 
 /* sets the megadrive z80 to it's normal ports / map */
-void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
+void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
 	const device_config *ym = devtag_get_device(machine, "ym");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 	memory_set_bankptr(machine,  1, genz80.z80_prgram );
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
 	memory_set_bankptr(machine,  6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
+//  memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 
-	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
-	memory_install_write8_handler    (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler    (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_read8_handler     (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
+	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
+	memory_install_write8_handler    (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler    (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_read8_handler     (cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things

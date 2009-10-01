@@ -12,9 +12,6 @@
 
 #include "genesis.h"
 
-/* in video/segasyse.c */
-VIDEO_START( megaplay_normal );
-VIDEO_UPDATE( megaplay_normal );
 
 static const device_config *genesis_screen;
 
@@ -279,6 +276,7 @@ VIDEO_UPDATE( segac2 )
 /* megaplay, draws either Genesis or SMS (single screen display) */
 
 /* core refresh: computes the final screen */
+#if 0
 VIDEO_UPDATE( megaplay )
 {
 	int y;
@@ -287,10 +285,11 @@ VIDEO_UPDATE( megaplay )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		drawline(BITMAP_ADDR16(bitmap, y, 0), y, 0);
 
-	VIDEO_UPDATE_CALL(megaplay_normal);
+	//VIDEO_UPDATE_CALL(megaplay_normal);
 
 	return 0;
 }
+#endif
 
 void system18_vdp_update( bitmap_t *bitmap, const rectangle *cliprect )
 {
