@@ -8725,6 +8725,7 @@ Other Sun games
 	DRIVER( dynadice )	/* ? */
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
+	DRIVER( othello )	/* (c) 1984 Success */
 	DRIVER( sothello )	/* (c) 1986 Success / Fujiwara */
 	DRIVER( quake )		/* (c) 19?? Lazer-Tron / iD Software  */
 

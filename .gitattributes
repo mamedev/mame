@@ -1884,6 +1884,7 @@ src/mame/drivers/oneshot.c svneol=native#text/plain
 src/mame/drivers/onetwo.c svneol=native#text/plain
 src/mame/drivers/opwolf.c svneol=native#text/plain
 src/mame/drivers/orbit.c svneol=native#text/plain
+src/mame/drivers/othello.c svneol=native#text/plain
 src/mame/drivers/othldrby.c svneol=native#text/plain
 src/mame/drivers/othunder.c svneol=native#text/plain
 src/mame/drivers/overdriv.c svneol=native#text/plain
