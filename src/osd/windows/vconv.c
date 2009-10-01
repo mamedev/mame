@@ -68,7 +68,7 @@ static const translation_info gcc_translate[] =
 	{ 0,		"-fno-strict-aliasing",		"/Oa" },
 	{ 0,		"-fno-omit-frame-pointer",	"" },
 	{ 0,		"-Werror",					"/WX" },
-	{ VS7,		"-Wall",					"/Wall /W3 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
+	{ VS7,		"-Wall",					"/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
 	{ 0,		"-Wall",					"/W0" },
 	{ VS7,		"-Wno-unused",				"/wd4100 /wd4101 /wd4102" },
 	{ 0,		"-W*",						"" },

@@ -257,7 +257,7 @@ static NVRAM_HANDLER(twinkle)
 		}
 	}
 
-	nvram_handler_i2cmem_0( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(i2cmem_0);
 }
 
 static UINT32 twinkle_unknown;

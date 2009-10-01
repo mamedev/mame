@@ -691,6 +691,7 @@ static VIDEO_UPDATE(sfbonus)
 	int globalyscroll = (sfbonus_vregs[2] | sfbonus_vregs[3]<<8);
 	int globalxscroll = (sfbonus_vregs[0] | sfbonus_vregs[1]<<8);
 	UINT8* front_rowscroll = &sfbonus_videoram[0x200];
+	const input_port_token *ipt;
 	int i;
 
 	// align to 0
@@ -744,7 +745,7 @@ static VIDEO_UPDATE(sfbonus)
 			}
 		}
 	}
-	/*
+#if 0
     popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
     sfbonus_3800_regs[0],
     sfbonus_3800_regs[1],
@@ -782,9 +783,7 @@ static VIDEO_UPDATE(sfbonus)
     sfbonus_vregs[30],
     sfbonus_vregs[31]
     );
-    */
 
-	/*
     popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
     sfbonus_1800_regs[0],
     sfbonus_1800_regs[1],
@@ -794,10 +793,11 @@ static VIDEO_UPDATE(sfbonus)
     sfbonus_1800_regs[5],
     sfbonus_1800_regs[6],
     sfbonus_1800_regs[7]);
-    */
+#endif
 
-	if ((screen->machine->gamedrv->ipt == ipt_amcoe2_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe2_reels4)
-		|| (screen->machine->gamedrv->ipt == ipt_amcoe2_poker))
+	ipt = screen->machine->gamedrv->ipt;
+	if ((ipt == INPUT_PORTS_NAME(amcoe2_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe2_reels4))
+		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
 		output_set_lamp_value(0, (sfbonus_1800_regs[6] & 0x1) >> 0);
@@ -807,8 +807,8 @@ static VIDEO_UPDATE(sfbonus)
 		output_set_lamp_value(4, (sfbonus_1800_regs[4] & 0x4) >> 2);
 		output_set_lamp_value(5, (sfbonus_1800_regs[4] & 0x1) >> 0);
 	}
-	else if ((screen->machine->gamedrv->ipt == ipt_amcoe1_reels3) || (screen->machine->gamedrv->ipt == ipt_amcoe1_reels4)
-		|| (screen->machine->gamedrv->ipt == ipt_amcoe1_poker))
+	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
+		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
 		output_set_lamp_value(0, (sfbonus_1800_regs[0] & 0x2) >> 1);
 		output_set_lamp_value(1, (sfbonus_1800_regs[4] & 0x2) >> 1);

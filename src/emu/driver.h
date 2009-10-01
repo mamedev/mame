@@ -21,55 +21,68 @@
 
 #include "devintrf.h"
 
-#define DRIVER_INIT(name)			void driver_init_##name(running_machine *machine)
-#define DRIVER_INIT_CALL(name)		driver_init_##name(machine)
+#define DRIVER_INIT_NAME(name)		driver_init_##name
+#define DRIVER_INIT(name)			void DRIVER_INIT_NAME(name)(running_machine *machine)
+#define DRIVER_INIT_CALL(name)		DRIVER_INIT_NAME(name)(machine)
 
-#define NVRAM_HANDLER(name)			void nvram_handler_##name(running_machine *machine, mame_file *file, int read_or_write)
-#define NVRAM_HANDLER_CALL(name)	nvram_handler_##name(machine, file, read_or_write)
+#define NVRAM_HANDLER_NAME(name)	nvram_handler_##name
+#define NVRAM_HANDLER(name)			void NVRAM_HANDLER_NAME(name)(running_machine *machine, mame_file *file, int read_or_write)
+#define NVRAM_HANDLER_CALL(name)	NVRAM_HANDLER_NAME(name)(machine, file, read_or_write)
 
-#define MEMCARD_HANDLER(name)		void memcard_handler_##name(running_machine *machine, mame_file *file, int action)
-#define MEMCARD_HANDLER_CALL(name)	memcard_handler_##name(machine, file, action)
+#define MEMCARD_HANDLER_NAME(name)	memcard_handler_##name
+#define MEMCARD_HANDLER(name)		void MEMCARD_HANDLER_NAME(name)(running_machine *machine, mame_file *file, int action)
+#define MEMCARD_HANDLER_CALL(name)	MEMCARD_HANDLER_NAME(name)(machine, file, action)
 
-#define MACHINE_START(name)			void machine_start_##name(running_machine *machine)
-#define MACHINE_START_CALL(name)	machine_start_##name(machine)
+#define MACHINE_START_NAME(name)	machine_start_##name
+#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine *machine)
+#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
 
-#define MACHINE_RESET(name)			void machine_reset_##name(running_machine *machine)
-#define MACHINE_RESET_CALL(name)	machine_reset_##name(machine)
+#define MACHINE_RESET_NAME(name)	machine_reset_##name
+#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine *machine)
+#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
 
-#define SOUND_START(name)			void sound_start_##name(running_machine *machine)
-#define SOUND_START_CALL(name)		sound_start_##name(machine)
+#define SOUND_START_NAME(name)		sound_start_##name
+#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine *machine)
+#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
 
-#define SOUND_RESET(name)			void sound_reset_##name(running_machine *machine)
-#define SOUND_RESET_CALL(name)		sound_reset_##name(machine)
+#define SOUND_RESET_NAME(name)		sound_reset_##name
+#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine *machine)
+#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
 
-#define VIDEO_START(name)			void video_start_##name(running_machine *machine)
-#define VIDEO_START_CALL(name)		video_start_##name(machine)
+#define VIDEO_START_NAME(name)		video_start_##name
+#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine *machine)
+#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
 
-#define VIDEO_RESET(name)			void video_reset_##name(running_machine *machine)
-#define VIDEO_RESET_CALL(name)		video_reset_##name(machine)
+#define VIDEO_RESET_NAME(name)		video_reset_##name
+#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine *machine)
+#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
 
-#define PALETTE_INIT(name)			void palette_init_##name(running_machine *machine, const UINT8 *color_prom)
-#define PALETTE_INIT_CALL(name)		palette_init_##name(machine, color_prom)
+#define PALETTE_INIT_NAME(name)		palette_init_##name
+#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine *machine, const UINT8 *color_prom)
+#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine, color_prom)
 
-#define VIDEO_EOF(name)				void video_eof_##name(running_machine *machine)
-#define VIDEO_EOF_CALL(name)		video_eof_##name(machine)
+#define VIDEO_EOF_NAME(name)		video_eof_##name
+#define VIDEO_EOF(name)				void VIDEO_EOF_NAME(name)(running_machine *machine)
+#define VIDEO_EOF_CALL(name)		VIDEO_EOF_NAME(name)(machine)
 
-#define VIDEO_UPDATE(name)			UINT32 video_update_##name(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
-#define VIDEO_UPDATE_CALL(name)		video_update_##name(screen, bitmap, cliprect)
+#define VIDEO_UPDATE_NAME(name)		video_update_##name
+#define VIDEO_UPDATE(name)			UINT32 VIDEO_UPDATE_NAME(name)(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define VIDEO_UPDATE_CALL(name)		VIDEO_UPDATE_NAME(name)(screen, bitmap, cliprect)
 
 
 /* NULL versions */
-#define nvram_handler_NULL 			NULL
-#define memcard_handler_NULL		NULL
-#define machine_start_NULL 			NULL
-#define machine_reset_NULL 			NULL
-#define sound_start_NULL 			NULL
-#define sound_reset_NULL 			NULL
-#define video_start_NULL 			NULL
-#define video_reset_NULL 			NULL
-#define palette_init_NULL			NULL
-#define video_eof_NULL 				NULL
-#define video_update_NULL 			NULL
+#define driver_init_0				NULL
+#define nvram_handler_0 			NULL
+#define memcard_handler_0			NULL
+#define machine_start_0 			NULL
+#define machine_reset_0 			NULL
+#define sound_start_0 				NULL
+#define sound_reset_0 				NULL
+#define video_start_0 				NULL
+#define video_reset_0 				NULL
+#define palette_init_0				NULL
+#define video_eof_0 				NULL
+#define video_update_0 				NULL
 
 
 typedef void   (*driver_init_func)(running_machine *machine);
@@ -185,12 +198,14 @@ struct _game_driver
     MACROS FOR BUILDING GAME DRIVERS
 ***************************************************************************/
 
+#define GAME_NAME(name) driver_##name
+#define GAME_EXTERN(name) extern const game_driver GAME_NAME(name)
+
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
 	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
 
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
-extern const game_driver driver_##NAME;		\
-const game_driver driver_##NAME =			\
+const game_driver GAME_NAME(NAME) =			\
 {											\
 	__FILE__,								\
 	#PARENT,								\
@@ -198,17 +213,13 @@ const game_driver driver_##NAME =			\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	machine_config_##MACHINE,				\
-	ipt_##INPUT,							\
-	driver_init_##INIT,						\
-	rom_##NAME,								\
+	MACHINE_DRIVER_NAME(MACHINE),				\
+	INPUT_PORTS_NAME(INPUT),							\
+	DRIVER_INIT_NAME(INIT),						\
+	ROM_NAME(NAME),								\
 	(MONITOR)|(FLAGS),						\
 	&LAYOUT[0]								\
 };
-
-/* this allows to leave the INIT field empty in the GAME() macro call */
-#define driver_init_0 0
-#define ipt_0 0
 
 
 
@@ -218,7 +229,7 @@ const game_driver driver_##NAME =			\
 
 extern const game_driver * const drivers[];
 
-extern const game_driver driver_empty;
+GAME_EXTERN(empty);
 
 
 

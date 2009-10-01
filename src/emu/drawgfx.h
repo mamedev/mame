@@ -82,8 +82,9 @@ enum
 
 
 /* these macros are used for declaring gfx_decode_entry_entry info arrays. */
-#define GFXDECODE_EXTERN( name ) extern const gfx_decode_entry gfxdecodeinfo_##name[]
-#define GFXDECODE_START( name ) const gfx_decode_entry gfxdecodeinfo_##name[] = {
+#define GFXDECODE_NAME( name ) gfxdecodeinfo_##name
+#define GFXDECODE_EXTERN( name ) extern const gfx_decode_entry GFXDECODE_NAME(name)[]
+#define GFXDECODE_START( name ) const gfx_decode_entry GFXDECODE_NAME(name)[] = {
 #define GFXDECODE_ENTRY(region,offset,layout,start,colors) { region, offset, &layout, start, colors, 0, 0 },
 #define GFXDECODE_SCALE(region,offset,layout,start,colors,xscale,yscale) { region, offset, &layout, start, colors, xscale, yscale },
 #define GFXDECODE_END { 0 } };

@@ -1523,10 +1523,10 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = nvram_handler_x76f041_0;
+				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f041_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = nvram_handler_x76f041_1;
+				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f041_1);
 				break;
 			}
 
@@ -1539,10 +1539,10 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = nvram_handler_x76f100_0;
+				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f100_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = nvram_handler_x76f100_1;
+				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f100_1);
 				break;
 			}
 
@@ -1555,10 +1555,10 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = nvram_handler_zs01_0;
+				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(zs01_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = nvram_handler_zs01_1;
+				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(zs01_1);
 				break;
 			}
 

@@ -919,7 +919,7 @@ static MACHINE_DRIVER_START( comad )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
-	MDRV_VIDEO_EOF(NULL)
+	MDRV_VIDEO_EOF(0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supmodel )
@@ -932,7 +932,7 @@ static MACHINE_DRIVER_START( supmodel )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
-	MDRV_VIDEO_EOF(NULL)
+	MDRV_VIDEO_EOF(0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("oki", OKIM6295, 1584000)
@@ -950,7 +950,7 @@ static MACHINE_DRIVER_START( fantsia2 )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
-	MDRV_VIDEO_EOF(NULL)
+	MDRV_VIDEO_EOF(0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galhustl )
@@ -963,7 +963,7 @@ static MACHINE_DRIVER_START( galhustl )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
-	MDRV_VIDEO_EOF(NULL)
+	MDRV_VIDEO_EOF(0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("oki", OKIM6295, 1056000)

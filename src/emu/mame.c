@@ -273,7 +273,7 @@ int mame_execute(core_options *options)
 		/* if no driver, use the internal empty driver */
 		if (driver == NULL)
 		{
-			driver = &driver_empty;
+			driver = &GAME_NAME(empty);
 			if (firstgame)
 				started_empty = TRUE;
 		}

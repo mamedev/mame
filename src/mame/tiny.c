@@ -24,12 +24,12 @@
 #define DRIVER_RECURSIVE
 
 /* step 1: declare all external references */
-#define DRIVER(NAME) extern game_driver driver_##NAME;
+#define DRIVER(NAME) GAME_EXTERN(NAME);
 #include "tiny.c"
 
 /* step 2: define the drivers[] array */
 #undef DRIVER
-#define DRIVER(NAME) &driver_##NAME,
+#define DRIVER(NAME) &GAME_NAME(NAME),
 const game_driver * const drivers[] =
 {
 #include "tiny.c"

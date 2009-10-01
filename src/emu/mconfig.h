@@ -191,13 +191,13 @@ union _machine_config_token
 
 /* use this to declare external references to a machine driver */
 #define MACHINE_DRIVER_EXTERN(_name) \
-	extern const machine_config_token machine_config_##_name[]
+	extern const machine_config_token MACHINE_DRIVER_NAME(_name)[]
 
 
 /* importing data from other machine drivers */
 #define MDRV_IMPORT_FROM(_name) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_INCLUDE, 8), \
-	TOKEN_PTR(tokenptr, machine_config_##_name),
+	TOKEN_PTR(tokenptr, MACHINE_DRIVER_NAME(_name)),
 
 
 /* core parameters */
@@ -223,19 +223,19 @@ union _machine_config_token
 /* core functions */
 #define MDRV_MACHINE_START(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MACHINE_START, 8), \
-	TOKEN_PTR(machine_start, machine_start_##_func),
+	TOKEN_PTR(machine_start, MACHINE_START_NAME(_func)),
 
 #define MDRV_MACHINE_RESET(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MACHINE_RESET, 8), \
-	TOKEN_PTR(machine_reset, machine_reset_##_func),
+	TOKEN_PTR(machine_reset, MACHINE_RESET_NAME(_func)),
 
 #define MDRV_NVRAM_HANDLER(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_NVRAM_HANDLER, 8), \
-	TOKEN_PTR(nvram_handler, nvram_handler_##_func),
+	TOKEN_PTR(nvram_handler, NVRAM_HANDLER_NAME(_func)),
 
 #define MDRV_MEMCARD_HANDLER(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MEMCARD_HANDLER, 8), \
-	TOKEN_PTR(memcard_handler, memcard_handler_##_func),
+	TOKEN_PTR(memcard_handler, MEMCARD_HANDLER_NAME(_func)),
 
 
 /* core video parameters */
@@ -244,7 +244,7 @@ union _machine_config_token
 
 #define MDRV_GFXDECODE(_gfx) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_GFXDECODE, 8), \
-	TOKEN_PTR(gfxdecode, gfxdecodeinfo_##_gfx),
+	TOKEN_PTR(gfxdecode, GFXDECODE_NAME(_gfx)),
 
 #define MDRV_PALETTE_LENGTH(_length) \
 	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_PALETTE_LENGTH, 8, _length, 24),
@@ -257,33 +257,33 @@ union _machine_config_token
 /* core video functions */
 #define MDRV_PALETTE_INIT(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_PALETTE_INIT, 8), \
-	TOKEN_PTR(palette_init, palette_init_##_func),
+	TOKEN_PTR(palette_init, PALETTE_INIT_NAME(_func)),
 
 #define MDRV_VIDEO_START(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_START, 8), \
-	TOKEN_PTR(video_start, video_start_##_func),
+	TOKEN_PTR(video_start, VIDEO_START_NAME(_func)),
 
 #define MDRV_VIDEO_RESET(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_RESET, 8), \
-	TOKEN_PTR(video_reset, video_reset_##_func),
+	TOKEN_PTR(video_reset, VIDEO_RESET_NAME(_func)),
 
 #define MDRV_VIDEO_EOF(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_EOF, 8), \
-	TOKEN_PTR(video_eof, video_eof_##_func),
+	TOKEN_PTR(video_eof, VIDEO_EOF_NAME(_func)),
 
 #define MDRV_VIDEO_UPDATE(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_UPDATE, 8), \
-	TOKEN_PTR(video_update, video_update_##_func),
+	TOKEN_PTR(video_update, VIDEO_UPDATE_NAME(_func)),
 
 
 /* core sound functions */
 #define MDRV_SOUND_START(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_START, 8), \
-	TOKEN_PTR(sound_start, sound_start_##_func),
+	TOKEN_PTR(sound_start, SOUND_START_NAME(_func)),
 
 #define MDRV_SOUND_RESET(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_RESET, 8), \
-	TOKEN_PTR(sound_start, sound_reset_##_func),
+	TOKEN_PTR(sound_start, SOUND_RESET_NAME(_func)),
 
 
 /* add/remove devices */

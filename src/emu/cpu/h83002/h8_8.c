@@ -747,7 +747,7 @@ CPU_GET_INFO( h8_3334 )
 	case CPUINFO_INT_ADDRBUS_SHIFT_IO:	info->i = 0;						break;
 
 		// Internal maps
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = address_map_h8_3334_internal_map; break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:    info->internal_map8 = NULL;	break;
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map16 = NULL;	break;
 

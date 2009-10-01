@@ -1654,6 +1654,8 @@ static UINT8 megadrive_io_tx_regs[3];
 
 static void megadrive_init_io(running_machine *machine)
 {
+	const input_port_token *ipt = machine->gamedrv->ipt;
+
 	megadrive_io_data_regs[0] = 0x7f;
 	megadrive_io_data_regs[1] = 0x7f;
 	megadrive_io_data_regs[2] = 0x7f;
@@ -1664,10 +1666,10 @@ static void megadrive_init_io(running_machine *machine)
 	megadrive_io_tx_regs[1] = 0xff;
 	megadrive_io_tx_regs[2] = 0xff;
 
-	if (machine->gamedrv->ipt == ipt_megadri6)
+	if (ipt == INPUT_PORTS_NAME(megadri6))
 		init_megadri6_io(machine);
 
-	if (machine->gamedrv->ipt == ipt_ssf2ghw)
+	if (ipt == INPUT_PORTS_NAME(ssf2ghw))
 		init_megadri6_io(machine);
 }
 
@@ -6212,6 +6214,8 @@ static int megadriv_tas_callback(const device_config *device)
 
 static void megadriv_init_common(running_machine *machine)
 {
+	const input_port_token *ipt = machine->gamedrv->ipt;
+
 	/* Look to see if this system has the standard Sound Z80 */
 	_genesis_snd_z80_cpu = cputag_get_cpu(machine, "genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
@@ -6266,7 +6270,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	m68k_set_tas_callback(cputag_get_cpu(machine, "maincpu"), megadriv_tas_callback);
 
-	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
+	if ((ipt == INPUT_PORTS_NAME(megadri6)) || (ipt == INPUT_PORTS_NAME(ssf2ghw)))
 	{
 		megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_6button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;

@@ -103,7 +103,7 @@ struct _laserdisc_config
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
 
 #define MDRV_LASERDISC_OVERLAY(_update, _width, _height, _format) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, video_update_##_update) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, VIDEO_UPDATE_NAME(_update)) \
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overwidth, _width) \
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overheight, _height) \
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overformat, _format)

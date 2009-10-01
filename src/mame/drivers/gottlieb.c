@@ -1987,7 +1987,7 @@ static MACHINE_DRIVER_START( reactor )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(reactor_map)
 
-	MDRV_NVRAM_HANDLER(NULL)
+	MDRV_NVRAM_HANDLER(0)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

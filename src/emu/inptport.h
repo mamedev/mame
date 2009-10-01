@@ -744,9 +744,15 @@ struct _inp_header
     MACROS FOR BUILDING INPUT PORTS
 ***************************************************************************/
 
+/* so that "0" can be used for unneeded input ports */
+#define ipt_0 NULL
+
+/* name of table */
+#define INPUT_PORTS_NAME(_name) ipt_##_name
+
 /* start of table */
 #define INPUT_PORTS_START(_name) \
-	const input_port_token ipt_##_name[] = {
+	const input_port_token INPUT_PORTS_NAME(_name)[] = {
 
 /* end of table */
 #define INPUT_PORTS_END \
@@ -754,12 +760,12 @@ struct _inp_header
 
 /* aliasing */
 #define INPUT_PORTS_EXTERN(_name) \
-	extern const input_port_token ipt_##_name[]
+	extern const input_port_token INPUT_PORTS_NAME(_name)[]
 
 /* including */
 #define PORT_INCLUDE(_name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_INCLUDE, 8), \
-	TOKEN_PTR(tokenptr, &ipt_##_name[0]),
+	TOKEN_PTR(tokenptr, &INPUT_PORTS_NAME(_name)[0]),
 
 /* start of a new input port (with included tag) */
 #define PORT_START(_tag) \

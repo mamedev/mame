@@ -653,7 +653,7 @@ CPU_GET_INFO( h8_3007 )
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = address_map_h8_3007_internal_map;  break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8_3007_internal_map);  break;
 		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
 		case DEVINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
 		default:

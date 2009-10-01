@@ -48,7 +48,7 @@ static int	ay_select=0;
 static int	ack_data=0;
 
 static UINT8 n7751_command;
-static UINT32 n7751_rom_address;
+//static UINT32 n7751_rom_address;
 
 static int tile_bank=0;
 

@@ -141,7 +141,7 @@ static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
 				if (cpustate->reset_state == TRUE)
-					cpu_reset_dsp56k(cpustate->device);
+					CPU_RESET_NAME(dsp56k)(cpustate->device);
 
 				cpustate->reset_state = FALSE;
 			}

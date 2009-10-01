@@ -64,6 +64,9 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 ***************************************************************************/
 
 
+#define DEVTEMPLATE_ID1(x) DEVTEMPLATE_ID(x,)
+#define DEVTEMPLATE_DERIVED_ID1(x) DEVTEMPLATE_DERIVED_ID(x,)
+
 /* flag bits for DEVTEMPLATE_FEATURES */
 #define DT_HAS_START			0x0001
 #define DT_HAS_RESET			0x0002
@@ -164,36 +167,36 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 
 		/* --- the following bits of info are returned as pointers --- */
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_ROM_REGION)
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_ID(rom_,);						break;
+		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_ID1(ROM_NAME());						break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_MACHINE_CONFIG)
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_ID(machine_config_,);		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_ID1(MACHINE_DRIVER_NAME());		break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_CONTRACT_LIST)
-		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_ID(device_contract_list_,);	break;
+		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_ID1(DEVICE_CONTRACT_LIST_NAME());	break;
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_START)
-		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_ID(device_start_,); 					break;
+		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_ID1(DEVICE_START_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_RESET)
-		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_ID(device_reset_,); 					break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_ID1(DEVICE_RESET_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_STOP)
-		case DEVINFO_FCT_STOP:					info->stop = DEVTEMPLATE_ID(device_stop_,); 					break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVTEMPLATE_ID1(DEVICE_STOP_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_EXECUTE)
-		case DEVINFO_FCT_EXECUTE:				info->execute = DEVTEMPLATE_ID(device_execute_,); 				break;
+		case DEVINFO_FCT_EXECUTE:				info->execute = DEVTEMPLATE_ID1(DEVICE_EXECUTE_NAME()); 				break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_NVRAM)
-		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_ID(device_nvram_,); 					break;
+		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_ID1(DEVICE_NVRAM_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_VALIDITY_CHECK)
-		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_ID(device_validity_check_,);	break;
+		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_ID1(DEVICE_VALIDITY_CHECK_NAME());	break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_CUSTOM_CONFIG)
-		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_ID(device_custom_config_,);	break;
+		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_ID1(DEVICE_CUSTOM_CONFIG_NAME());	break;
 #endif
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -239,36 +242,36 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 	{
 		/* --- the following bits of info are returned as pointers --- */
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_ROM_REGION)
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_DERIVED_ID(rom_,);						break;
+		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_DERIVED_ID1(ROM_NAME());						break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_MACHINE_CONFIG)
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_DERIVED_ID(machine_config_,); 		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_DERIVED_ID1(MACHINE_DRIVER_NAME()); 		break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_CONTRACT_LIST)
-		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_DERIVED_ID(contract_list_,); 			break;
+		case DEVINFO_PTR_CONTRACT_LIST:			info->contract_list = DEVTEMPLATE_DERIVED_ID1(DEVICE_CONTRACT_LIST_NAME()); 			break;
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_START)
-		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_DERIVED_ID(device_start_,); 					break;
+		case DEVINFO_FCT_START:					info->start = DEVTEMPLATE_DERIVED_ID1(DEVICE_START_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_RESET)
-		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_DERIVED_ID(device_reset_,); 					break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVTEMPLATE_DERIVED_ID1(DEVICE_RESET_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_STOP)
-		case DEVINFO_FCT_STOP:					info->stop = DEVTEMPLATE_DERIVED_ID(device_stop_,); 					break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVTEMPLATE_DERIVED_ID1(DEVICE_STORE_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_EXECUTE)
-		case DEVINFO_FCT_EXECUTE:				info->execute = DEVTEMPLATE_DERIVED_ID(device_execute_,); 				break;
+		case DEVINFO_FCT_EXECUTE:				info->execute = DEVTEMPLATE_DERIVED_ID1(DEVICE_EXECUTE_NAME()); 				break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_NVRAM)
-		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_DERIVED_ID(device_nvram_,); 					break;
+		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_DERIVED_ID1(DEVICE_NVRAM_NAME()); 					break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_VALIDITY_CHECK)
-		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_DERIVED_ID(device_validity_check_,); break;
+		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_DERIVED_ID1(DEVICE_VALIDITY_CHECK_NAME()); break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_CUSTOM_CONFIG)
-		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_DERIVED_ID(device_custom_config_,); 	break;
+		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_DERIVED_ID1(DEVICE_CUSTOM_CONFIG_NAME()); 	break;
 #endif
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
