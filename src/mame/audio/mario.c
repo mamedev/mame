@@ -132,6 +132,7 @@
 #define DISCRETE_LS123_INV(_N, _T, _R, _C) \
 	DISCRETE_ONESHOTR(_N, 0, _T, TTL_HIGH, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE | DISC_OUT_ACTIVE_LOW)
 
+/* speed optimization */
 /* pow(10, x) = exp(ln(10)*x) */
 #define pow10(x) exp(2.30258509299404568401*(x))
 
@@ -139,8 +140,9 @@
  * where calculated using least square approximation.
  * This approach gives a bit better results compared to the first approach.
  */
-#define LS624_F(_C, _VI, _VR)	pow10( -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
-		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
+//#define LS624_F(_C, _VI, _VR)	pow10( -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
+//		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
+#define LS624_F(_in, _num)	pow10(context->k1_##_num + 0.243264328 * (_in) + context->k2_##_num * (_in))
 
 /************************************************************************
  *
@@ -188,16 +190,34 @@ struct mario_custom_run_context
 	double  remain2;
 	double  vc3;
 	double  r1_c3;
+	double	k1_1;
+	double	k2_1;
+	double	k1_2;
+	double	k2_2;
+	double	exponent_c3;
+	double	dt_in1_at_0;
+	double	dt_in2_at_0;
 };
 
 static DISCRETE_STEP( mario_custom_run )
 {
 	struct mario_custom_run_context *context = (struct mario_custom_run_context *)node->context;
 
-	double	t1	= 0.5 / LS624_F(MARIO_CUSTOM_C1, MARIO_CUSTOM_IN1, RUN_VCO_VOLTAGE);
-	double	t2	= 0.5 / LS624_F(MARIO_CUSTOM_C2, MARIO_CUSTOM_IN2, RUN_VCO_VOLTAGE);
 	double  sample_t = node->info->sample_time;
-	double  vn, t;
+	double  vn, exponent, t = 0;
+	int		update_exponent = 0;
+	double	t1, t2;
+
+	if (MARIO_CUSTOM_IN1 > 0.001)
+		t1	= 0.5 / LS624_F(MARIO_CUSTOM_IN1, 1);
+	else
+		/* close enough to 0, so we can speed things up by no longer call pow() */
+		t1 = context->dt_in1_at_0;
+
+	if (MARIO_CUSTOM_IN2 > 0.001)
+		t2	= 0.5 / LS624_F(MARIO_CUSTOM_IN2, 2);
+	else
+		t2 = context->dt_in2_at_0;
 
 	//if (MARIO_CUSTOM_VOUT)
 	//  printf("%f %f %f %f\n", MARIO_CUSTOM_IN1, MARIO_CUSTOM_IN2, 0.5 / t1, 0.5 / t2);
@@ -211,6 +231,7 @@ static DISCRETE_STEP( mario_custom_run )
 			if (context->remain1 < sample_t)
 			{
 				t = context->remain1;
+				update_exponent = 1;
 				context->state1 ^= 1;
 				sample_t -= context->remain1;
 				context->remain2 -= context->remain1;
@@ -218,7 +239,6 @@ static DISCRETE_STEP( mario_custom_run )
 			}
 			else
 			{
-				t = sample_t;
 				context->remain1 -= sample_t;
 				context->remain2 -= sample_t;
 				sample_t = 0.0f;
@@ -229,6 +249,7 @@ static DISCRETE_STEP( mario_custom_run )
 			if (context->remain2 < sample_t)
 			{
 				t = context->remain2;
+				update_exponent = 1;
 				context->state2 ^= 1;
 				sample_t -= context->remain2;
 				context->remain1 -= context->remain2;
@@ -236,14 +257,17 @@ static DISCRETE_STEP( mario_custom_run )
 			}
 			else
 			{
-				t = sample_t;
 				context->remain1 -= sample_t;
 				context->remain2 -= sample_t;
 				sample_t = 0.0f;
 			}
 		}
 
-		context->vc3 += (vn - context->vc3) * (1.0 - exp(- t / context->r1_c3));
+		if (update_exponent)
+			exponent = RC_CHARGE_EXP_DT(context->r1_c3, t);
+		else
+			exponent = context->exponent_c3;
+		context->vc3 += (vn - context->vc3) * exponent;
 	}
 	node->output[0] = context->vc3;
 }
@@ -257,8 +281,18 @@ static DISCRETE_RESET( mario_custom_run )
 	context->state1 = 0;
 	context->state2 = 0;
 	context->vc3 = 0;
-	context->r1_c3 = (MARIO_CUSTOM_R1 * MARIO_CUSTOM_C3);
+	context->r1_c3 = MARIO_CUSTOM_R1 * MARIO_CUSTOM_C3;
 	node->output[0] = 0;
+
+	/* precalculate some parts of the formulas for speed */
+	context->k1_1 = -0.912029404 * log10(MARIO_CUSTOM_C1) -0.091695877 * (RUN_VCO_VOLTAGE) - 3.207072925;
+	context->k2_1 = -0.014110946 * (RUN_VCO_VOLTAGE);
+	context->k1_2 = -0.912029404 * log10(MARIO_CUSTOM_C2) -0.091695877 * (RUN_VCO_VOLTAGE) - 3.207072925;
+	context->k2_2 = -0.014110946 * (RUN_VCO_VOLTAGE);
+	context->exponent_c3 = RC_CHARGE_EXP(context->r1_c3);
+
+	context->dt_in1_at_0 = 0.5 / LS624_F(0, 1);
+	context->dt_in2_at_0 = 0.5 / LS624_F(0, 2);
 }
 
 static const discrete_custom_info mario_custom_run_info =

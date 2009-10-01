@@ -484,8 +484,8 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
 	MDRV_SOUND_ROUTE(0, "speaker_1_2", 1.0)
 	MDRV_SOUND_ROUTE(1, "speaker_3_7", 1.0)
-	MDRV_SOUND_ROUTE(3, "speaker_5_6", 1.0)
-	MDRV_SOUND_ROUTE(4, "speaker_4_8", 1.0)
+	MDRV_SOUND_ROUTE(2, "speaker_5_6", 1.0)
+	MDRV_SOUND_ROUTE(3, "speaker_4_8", 1.0)
 #else
 	MDRV_SPEAKER_STANDARD_MONO("speaker")
 

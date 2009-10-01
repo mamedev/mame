@@ -1715,7 +1715,7 @@ static DISCRETE_STEP(dsd_ls624)
 	sample_t = node->info->sample_time;	/* Change in time */
 	//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
 	if (DSD_LS624__VMOD > 0.001)
-		dt = 1.0f / (2.0f * LS624_F(DSD_LS624__VMOD));
+		dt = 0.5 / LS624_F(DSD_LS624__VMOD);
 	else
 		/* close enough to 0, so we can speed things up by no longer call pow() */
 		dt = context->dt_vmod_at_0;
@@ -1767,7 +1767,7 @@ static DISCRETE_RESET(dsd_ls624)
 	context->k1 = -0.912029404 * log10(DSD_LS624__C) -0.091695877 * (DSD_LS624__VRNG) - 3.207072925;
 	context->k2 = -0.014110946 * (DSD_LS624__VRNG);
 
-	context->dt_vmod_at_0 = 1.0f / (2.0f * LS624_F(0));
+	context->dt_vmod_at_0 = 0.5 / LS624_F(0);
 
 	/* Step the output */
 	DISCRETE_STEP_CALL(dsd_ls624);
