@@ -134,6 +134,10 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 		{ PROFILER_USER2,            "User 2" },
 		{ PROFILER_USER3,            "User 3" },
 		{ PROFILER_USER4,            "User 4" },
+		{ PROFILER_USER5,            "User 5" },
+		{ PROFILER_USER6,            "User 6" },
+		{ PROFILER_USER7,            "User 7" },
+		{ PROFILER_USER8,            "User 8" },
 		{ PROFILER_PROFILER,         "Profiler" },
 		{ PROFILER_IDLE,             "Idle" }
 	};
