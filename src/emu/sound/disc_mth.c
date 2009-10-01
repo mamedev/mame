@@ -1381,7 +1381,7 @@ static DISCRETE_RESET(dst_multiplex)
 {
 	struct dst_size_context *context = (struct dst_size_context *)node->context;
 
-	context->size = node->active_inputs - 2;
+	context->size = node->active_inputs - 1;
 
 	DISCRETE_STEP_CALL(dst_multiplex);
 }
