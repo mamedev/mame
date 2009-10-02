@@ -261,6 +261,10 @@ static INPUT_PORTS_START( sprint8 )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
+	/* this is actually a variable resistor */
+	PORT_START("R132")
+	PORT_ADJUSTER(65, "R132 - Crash & Screech Volume")
+
 INPUT_PORTS_END
 
 
@@ -385,6 +389,10 @@ static INPUT_PORTS_START( sprint8p )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
+	/* this is actually a variable resistor */
+	PORT_START("R132")
+	PORT_ADJUSTER(65, "R132 - Crash & Screech Volume")
+
 INPUT_PORTS_END
 
 
@@ -476,8 +484,8 @@ static MACHINE_DRIVER_START( sprint8 )
 	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front.
 	 * For now I just output 1-2 as mono. */
 	MDRV_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
-	MDRV_SPEAKER_ADD("speaker_3_7",  0.0, 0.0, -0.5)	/* back */
-	MDRV_SPEAKER_ADD("speaker_5_6", -0.2, 0.0, 1.0)		/* left */
+	MDRV_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
+	MDRV_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
 	MDRV_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -529,5 +537,5 @@ ROM_START( sprint8a )
 ROM_END
 
 
-GAME( 1977, sprint8,  0,       sprint8, sprint8,  0, ROT0, "Atari", "Sprint 8",             GAME_IMPERFECT_SOUND )
-GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", GAME_IMPERFECT_SOUND )
+GAME( 1977, sprint8,  0,       sprint8, sprint8,  0, ROT0, "Atari", "Sprint 8",  0 )
+GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", 0 )

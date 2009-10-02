@@ -1193,34 +1193,30 @@
  *
  *                        .------------.
  *                        |            |
- *    ENAB       -0------>|            |
+ *    INP0       -0------>|            |
  *                        |            |
- *    INP0       -1------>|            |
+ *    MIN        -1------>|   CLAMP    |---->   Netlist node
  *                        |            |
- *    MIN        -2------>|   CLAMP    |---->   Netlist node
- *                        |            |
- *    MAX        -3------>|            |
- *                        |            |
- *    CLAMP      -4------>|            |
+ *    MAX        -2------>|            |
  *                        |            |
  *                        '------------'
  *
  *  Declaration syntax
  *
  *        DISCRETE_CLAMP(name of node,
- *                       enable,
  *                       input node,
  *                       minimum node or static value,
- *                       maximum node or static value,
- *                       clamp node or static value when disabled)
+ *                       maximum node or static value),
  *
  *  Example config line
  *
- *     DISCRETE_CLAMP(NODE_9,NODE_10,NODE_11,2.0,10.0,5.0)
+ *     DISCRETE_CLAMP(NODE_9,NODE_10,2.0,10.0)
  *
- *  Node10 when not zero will allow clamp to operate forcing the value
- *  on the node output, to be within the MIN/MAX boundard. When enable
- *  is set to zero the node will output the clamp value
+ *  Force the value on the node output, to be within the MIN/MAX
+ *  boundary.  In this example the output is clamped to the range
+ *  of 2.0 to 10.0 inclusive.
+ *
+ * EXAMPLES: Sprint 8
  *
  ***********************************************************************
  *
@@ -4319,7 +4315,7 @@ enum
 #define DISCRETE_ADDER2(NODE,ENAB,INP0,INP1)                            { NODE, DST_ADDER       , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_ADDER2" },
 #define DISCRETE_ADDER3(NODE,ENAB,INP0,INP1,INP2)                       { NODE, DST_ADDER       , 4, { ENAB,INP0,INP1,INP2 }, { ENAB,INP0,INP1,INP2 }, NULL, "DISCRETE_ADDER3" },
 #define DISCRETE_ADDER4(NODE,ENAB,INP0,INP1,INP2,INP3)                  { NODE, DST_ADDER       , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_ADDER4" },
-#define DISCRETE_CLAMP(NODE,ENAB,INP0,MIN,MAX,CLAMP)                    { NODE, DST_CLAMP       , 5, { ENAB,INP0,MIN,MAX,CLAMP }, { ENAB,INP0,MIN,MAX,CLAMP }, NULL, "DISCRETE_CLAMP" },
+#define DISCRETE_CLAMP(NODE,INP0,MIN,MAX)                               { NODE, DST_CLAMP       , 3, { INP0,MIN,MAX }, { INP0,MIN,MAX }, NULL, "DISCRETE_CLAMP" },
 #define DISCRETE_DIVIDE(NODE,ENAB,INP0,INP1)                            { NODE, DST_DIVIDE      , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "DISCRETE_DIVIDE" },
 #define DISCRETE_GAIN(NODE,INP0,GAIN)                                   { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,GAIN,0 }, NULL, "DISCRETE_GAIN" },
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,-1,0 }, NULL, "DISCRETE_INVERT" },

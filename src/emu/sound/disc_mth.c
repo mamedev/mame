@@ -272,31 +272,20 @@ static DISCRETE_RESET(dst_comp_adder)
  *
  * DST_CLAMP - Simple signal clamping circuit
  *
- * input[0]    - Enable ramp
- * input[1]    - Input value
- * input[2]    - Minimum value
- * input[3]    - Maximum value
- * input[4]    - Clamp output when disabled
+ * input[0]    - Input value
+ * input[1]    - Minimum value
+ * input[2]    - Maximum value
  *
  ************************************************************************/
-#define DST_CLAMP__ENABLE	DISCRETE_INPUT(0)
-#define DST_CLAMP__IN		DISCRETE_INPUT(1)
-#define DST_CLAMP__MIN		DISCRETE_INPUT(2)
-#define DST_CLAMP__MAX		DISCRETE_INPUT(3)
-#define DST_CLAMP__CLAMP	DISCRETE_INPUT(4)
+#define DST_CLAMP__IN		DISCRETE_INPUT(0)
+#define DST_CLAMP__MIN		DISCRETE_INPUT(1)
+#define DST_CLAMP__MAX		DISCRETE_INPUT(2)
 
 static DISCRETE_STEP(dst_clamp)
 {
-	if(DST_CLAMP__ENABLE)
-	{
-		if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
-		else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
-		else node->output[0]= DST_CLAMP__IN;
-	}
-	else
-	{
-		node->output[0] = DST_CLAMP__CLAMP;
-	}
+	if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
+	else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
+	else node->output[0]= DST_CLAMP__IN;
 }
 
 

@@ -974,18 +974,16 @@ static DISCRETE_SOUND_START(checkmat)
 	DISCRETE_FILTER2(NODE_23,
 					1,							/* ENAB */
 					NODE_21,					/* INP0 */
-					35,						/* FREQ */
+					35,							/* FREQ */
 					1.0 / 8,					/* DAMP */
 					DISC_FILTER_BANDPASS)
 	DISCRETE_GAIN(NODE_24,
 					NODE_23,					/* IN0 */
 					15)							/* GAIN */
 	DISCRETE_CLAMP(CHECKMAT_BOOM_SND,			/* IC Q2/3, pin 10 */
-					1,							/* ENAB */
 					NODE_24,					/* IN0 */
 					0 - 6,						/* MIN */
-					12.0 - OP_AMP_NORTON_VBE -6,/* MAX */
-					0)							/* CLAMP */
+					12.0 - OP_AMP_NORTON_VBE -6)/* MAX */
 
 	/************************************************
      * Tone generator
@@ -2572,11 +2570,9 @@ static DISCRETE_SOUND_START(spcenctr)
 					NODE_31,							/* IN0 */
 					-0.5)								/* IN1 */
 	DISCRETE_CLAMP(NODE_33,
-					1,									/* ENAB */
 					NODE_32,							/* IN0 */
 					0,									/* MIN */
-					12,									/* MAX */
-					0)									/* CLAMP */
+					12)									/* MAX */
 	DISCRETE_CRFILTER(NODE_34,
 					1,									/* ENAB */
 					SPCENCTR_NOISE,						/* IN0 */
@@ -2640,11 +2636,9 @@ static DISCRETE_SOUND_START(spcenctr)
 					NODE_63,					/* IN0 */
 					6.8)						/* IN1 */
 	DISCRETE_CLAMP(SPCENCTR_CRASH_SND,			/* IC C2, pin 5 */
-					1,							/* ENAB */
 					NODE_64,					/* IN0 */
 					0,							/* MIN */
-					12.0 - OP_AMP_NORTON_VBE,	/* MAX */
-					0)							/* CLAMP */
+					12.0 - OP_AMP_NORTON_VBE)	/* MAX */
 
 
 	/************************************************
@@ -3599,11 +3593,9 @@ static const discrete_mixer_desc invaders_mixer =
 					INVADERS_NODE(71, _board),								/* IN0 */               \
 					-0.5)													/* IN1 */               \
 	DISCRETE_CLAMP(INVADERS_NODE(73, _board),           					                        \
-					1,														/* ENAB */              \
 					INVADERS_NODE(72, _board),								/* IN0 */               \
 					0,														/* MIN */               \
-					12,														/* MAX */               \
-					0)														/* CLAMP */             \
+					12)														/* MAX */               \
 	DISCRETE_CRFILTER(INVADERS_NODE(74, _board),        					                        \
 					1,														/* ENAB */              \
 					INVADERS_NOISE,											/* IN0 */               \

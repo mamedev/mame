@@ -36,6 +36,9 @@
 #define SPRINT8_AUDIO_5_6			NODE_24
 #define SPRINT8_AUDIO_4_8			NODE_25
 
+/* Adjusters */
+#define SPRINT8_R132_POT			NODE_29
+
 
 /* Parts List - Resistors */
 #define SPRINT8_R1		RES_K(47)
@@ -56,12 +59,16 @@
 #define SPRINT8_R97		RES_K(2.2)
 #define SPRINT8_R99		RES_K(27)
 #define SPRINT8_R100	RES_K(1)
+#define SPRINT8_R101	RES_K(2.2)
+#define SPRINT8_R132	RES_K(100)
 #define SPRINT8_R145	RES_K(3.3)
 #define SPRINT8_R146	RES_K(7.5)
 #define SPRINT8_R147	100
 #define SPRINT8_R148	RES_K(1)
+#define SPRINT8_R149	RES_K(22)
 
 /* Parts List - Capacitors */
+#define SPRINT8_C8		CAP_U(.01)
 #define SPRINT8_C17		CAP_U(.001)
 #define SPRINT8_C18		CAP_U(.047)
 #define SPRINT8_C19		CAP_U(.047)
@@ -69,6 +76,7 @@
 #define SPRINT8_C27		CAP_U(.22)
 #define SPRINT8_C28		CAP_U(.1)
 #define SPRINT8_C59		CAP_U(.1)
+#define SPRINT8_C63		CAP_U(.1)
 #define SPRINT8_C64		CAP_U(.1)
 #define SPRINT8_C89		CAP_U(.1)
 #define SPRINT8_C90		CAP_U(.1)
@@ -85,11 +93,11 @@ static const discrete_lfsr_desc sprint8_lfsr =
 	0,					/* Reset Value */
 	10,					/* Use Bit 10 as XOR input 0 */
 	15,					/* Use Bit 15 as XOR input 1 */
-	DISC_LFSR_XOR,		/* Feedback stage1 is XOR */
+	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
 	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
 	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
 	0x000001,			/* Everything is shifted into the first bit only */
-	DISC_LFSR_FLAG_RESET_TYPE_H,	/* Output is not inverted */
+	DISC_LFSR_FLAG_RESET_TYPE_L,	/* Output is not inverted */
 	12					/* Output bit */
 };
 
@@ -126,11 +134,19 @@ static const discrete_op_amp_filt_info sprint8_motor_filter =
 	5.0 * RES_VOLTAGE_DIVIDER(SPRINT8_R19, SPRINT8_R20), 5, 0		/* vRef, vP, vN */
 };
 
+static const discrete_mixer_desc sprint8_crash_screech_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{SPRINT8_R149, SPRINT8_R91},
+	{0, NODE_80},						/* R93 switched in/out of circuit */
+	{0}, 0, 0, SPRINT8_C64, 0, 0, 1		/* c, rI, rF, cF, cAmp, vRef, gain */
+};
+
 static const discrete_mixer_desc sprint8_mixer =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{SPRINT8_R1 + SPRINT8_R100, SPRINT8_R3, SPRINT8_R4},
-	{0}, {0}, 0, 0, 0, 0, 0, 1		/* no r_nodes, c, rI, rF, cF, cAmp, vRef, gain */
+	{0}, {0}, 0, 0, 0, SPRINT8_C8, 0, 1		/* r_nodes, c, rI, rF, cF, cAmp, vRef, gain */
 };
 
 
@@ -151,9 +167,9 @@ DISCRETE_OP_AMP_FILTER(NODE_RELATIVE(SPRINT8_MOTOR1_SND, _car - 1), 1, NODE_RELA
 
 DISCRETE_SOUND_START( sprint8 )
 	/************************************************
-     * Input register mapping
-     ************************************************/
-	DISCRETE_INPUT_NOT  (SPRINT8_CRASH_EN)
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(SPRINT8_CRASH_EN)
 	DISCRETE_INPUT_NOT  (SPRINT8_SCREECH_EN)
 	DISCRETE_INPUT_NOT  (SPRINT8_ATTRACT_EN)
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR1_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
@@ -164,85 +180,110 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR6_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR7_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR8_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
+	DISCRETE_ADJUSTMENT_TAG(SPRINT8_R132_POT, 0, SPRINT8_R132, DISC_LINADJ, "R132")
 
 	/************************************************
-     * Noise Generator, Crash, Screech
-     ************************************************/
+	 * Noise Generator, Crash, Screech
+	 ************************************************/
+	/* Address line A2 is used to XOR the feedback bits.
+	 * This can not easily be implemented, so I just set the
+	 * feedback as XNOR. */
 	DISCRETE_LFSR_NOISE(SPRINT8_NOISE,			/* IC F7, pin 13 */
 		1,										/* ENAB */
 		SPRINT8_ATTRACT_EN,						/* RESET */
 		SPRINT8_2V, 1, 0, 0.5, &sprint8_lfsr)	/* CLK,AMPL,FEED,BIAS,LFSRTB */
 
-	DISCRETE_CONSTANT(NODE_70, 0)
-//    DISCRETE_CUSTOM4(NODE_70, SPRINT8_NOISE, SPRINT8_R148, SPRINT8_R147, SPRINT8_C90, &sprint8_custom_screech_charge)
-	DISCRETE_555_ASTABLE_CV(NODE_71,
+	DISCRETE_GAIN(NODE_70, SPRINT8_NOISE, DEFAULT_TTL_V_LOGIC_1 * RES_VOLTAGE_DIVIDER(SPRINT8_R148, SPRINT8_R147))
+	DISCRETE_CRFILTER_VREF(NODE_71,
+		1,										/* ENAB */
+		NODE_70,								/* IN0 */
+		RES_2_PARALLEL(SPRINT8_R148, SPRINT8_R147) + RES_2_PARALLEL(RES_K(5), RES_K(10)),
+		SPRINT8_C90,
+		5.0 * RES_VOLTAGE_DIVIDER(RES_K(5), RES_K(10)))		/* ref to 555 CV pin */
+	DISCRETE_555_ASTABLE_CV(NODE_72,
 		SPRINT8_SCREECH_EN,						/* RESET */
 		SPRINT8_R145, SPRINT8_R146, SPRINT8_C89,
-		NODE_70,								/* CTRLV */
+		NODE_71,								/* CTRLV */
 		&sprint8_crash_555a_desc)
-	DISCRETE_INTEGRATE(NODE_72, SPRINT8_CRASH_EN, 0, &sprint8_crash_integrate)
-	DISCRETE_RCDISC2(NODE_73,
-		SPRINT8_NOISE,							/* SWITCH - inverted by Q20 */
-		NODE_72, SPRINT8_R93 + SPRINT8_R91,		/* INP0,RVAL0 */
-		0, SPRINT8_R91,							/* INP1,RVAL1 */
-		SPRINT8_C64)							/* CVAL */
+	DISCRETE_INTEGRATE(NODE_73, SPRINT8_CRASH_EN, 0, &sprint8_crash_integrate)
 
-	DISCRETE_CONSTANT(SPRINT8_CRASH_SCREECH_SND, 0)
+	DISCRETE_SWITCH(NODE_80,
+		1,										/* ENAB */
+		SPRINT8_NOISE,							/* SWITCH */
+		SPRINT8_R93, 1)							/* INP0,INP1*/
+	DISCRETE_SWITCH(NODE_74,					/* effect of Q20 */
+		1,										/* ENAB */
+		SPRINT8_NOISE,							/* SWITCH */
+		NODE_73, 0)								/* INP0,INP1*/
+	DISCRETE_MIXER2(NODE_75,
+		1,										/* ENAB */
+		NODE_72,
+		NODE_74,
+		&sprint8_crash_screech_mixer)
+
+	DISCRETE_CRFILTER_VREF(NODE_76,
+		1,										/* ENAB */
+		NODE_75,								/* IN0 */
+		SPRINT8_R93 + SPRINT8_R91, SPRINT8_C63,
+		5)										/* VREF */
+	/* IC E5, pin 14 gain.  Does not simulate minor DC offset caused by R93. */
+	DISCRETE_TRANSFORM5(NODE_77, NODE_76, 5, SPRINT8_R132_POT, SPRINT8_R101, 1, "01-23/4+*1+")
+	DISCRETE_CLAMP(SPRINT8_CRASH_SCREECH_SND, NODE_77, 0, 15.0 - 1.5)
 
 	/************************************************
-     * Car Motor
-     ************************************************/
+	 * Car Motor
+	 ************************************************/
 	DISCRETE_TASK_START()
 	SPRINT8_MOTOR_CIRCUIT(1)
 	SPRINT8_MOTOR_CIRCUIT(2)
+	DISCRETE_TASK_END()
+
+	DISCRETE_TASK_START()
+	SPRINT8_MOTOR_CIRCUIT(3)
+	SPRINT8_MOTOR_CIRCUIT(7)
+	DISCRETE_TASK_END()
+
+	DISCRETE_TASK_START()
+	SPRINT8_MOTOR_CIRCUIT(5)
+	SPRINT8_MOTOR_CIRCUIT(6)
+	DISCRETE_TASK_END()
+
+	DISCRETE_TASK_START()
+	SPRINT8_MOTOR_CIRCUIT(4)
+	SPRINT8_MOTOR_CIRCUIT(8)
+	DISCRETE_TASK_END()
+
+	/************************************************
+	 * Final Mix
+	 ************************************************/
 	DISCRETE_MIXER3(SPRINT8_AUDIO_1_2,
 		SPRINT8_ATTRACT_EN,				/* ENAB */
 		SPRINT8_CRASH_SCREECH_SND,
 		SPRINT8_MOTOR1_SND,
 		SPRINT8_MOTOR2_SND,
 		&sprint8_mixer)
-	DISCRETE_TASK_END()
-
-	DISCRETE_TASK_START()
-	SPRINT8_MOTOR_CIRCUIT(3)
-	SPRINT8_MOTOR_CIRCUIT(7)
 	DISCRETE_MIXER3(SPRINT8_AUDIO_3_7,
 		SPRINT8_ATTRACT_EN,				/* ENAB */
 		SPRINT8_CRASH_SCREECH_SND,
 		SPRINT8_MOTOR3_SND,
 		SPRINT8_MOTOR7_SND,
 		&sprint8_mixer)
-	DISCRETE_TASK_END()
-
-	DISCRETE_TASK_START()
-	SPRINT8_MOTOR_CIRCUIT(5)
-	SPRINT8_MOTOR_CIRCUIT(6)
 	DISCRETE_MIXER3(SPRINT8_AUDIO_5_6,
 		SPRINT8_ATTRACT_EN,				/* ENAB */
 		SPRINT8_CRASH_SCREECH_SND,
 		SPRINT8_MOTOR5_SND,
 		SPRINT8_MOTOR6_SND,
 		&sprint8_mixer)
-	DISCRETE_TASK_END()
-
-	DISCRETE_TASK_START()
-	SPRINT8_MOTOR_CIRCUIT(4)
-	SPRINT8_MOTOR_CIRCUIT(8)
 	DISCRETE_MIXER3(SPRINT8_AUDIO_4_8,
 		SPRINT8_ATTRACT_EN,				/* ENAB */
 		SPRINT8_CRASH_SCREECH_SND,
 		SPRINT8_MOTOR4_SND,
 		SPRINT8_MOTOR8_SND,
 		&sprint8_mixer)
-	DISCRETE_TASK_END()
-
-	/************************************************
-     * Final Mix
-     ************************************************/
-	DISCRETE_OUTPUT(SPRINT8_AUDIO_1_2, 32700.0/8)
-	DISCRETE_OUTPUT(SPRINT8_AUDIO_3_7, 32700.0/8)
-	DISCRETE_OUTPUT(SPRINT8_AUDIO_5_6, 32700.0/8)
-	DISCRETE_OUTPUT(SPRINT8_AUDIO_4_8, 32700.0/8)
+	DISCRETE_OUTPUT(SPRINT8_AUDIO_1_2, 65500.0/8)
+	DISCRETE_OUTPUT(SPRINT8_AUDIO_3_7, 65500.0/8)
+	DISCRETE_OUTPUT(SPRINT8_AUDIO_5_6, 65500.0/8)
+	DISCRETE_OUTPUT(SPRINT8_AUDIO_4_8, 65500.0/8)
 DISCRETE_SOUND_END
 
 

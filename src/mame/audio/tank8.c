@@ -252,7 +252,7 @@ DISCRETE_SOUND_START(tank8)
 				1.0 + 100.0/22,		// max gain of E5 = 1 + r132/r101
 				DISC_LINADJ, "CRASH")
 	DISCRETE_MULTIPLY(NODE_129, NODE_127, NODE_128 )
-	DISCRETE_CLAMP(TANK8_CRASHEXPL, 1, NODE_129, -(12.0 - OP_AMP_VP_RAIL_OFFSET)/2, (12.0 - OP_AMP_VP_RAIL_OFFSET)/2, 0)
+	DISCRETE_CLAMP(TANK8_CRASHEXPL, NODE_129, -(12.0 - OP_AMP_VP_RAIL_OFFSET)/2, (12.0 - OP_AMP_VP_RAIL_OFFSET)/2)
 
 	/************************************************/
 	/* Combine all 10 sound sources.                */

@@ -187,7 +187,7 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_TRANSFORM3(NODE_32, MADALIEN_8910_PSG_A, NODE_30, -RES_K(10)/RES_K(3.3), "01-2*1+")
 	// pin 1
 	DISCRETE_SWITCH(NODE_33, 1, MADALIEN_8910_PORTA_3, NODE_31, NODE_32)
-	DISCRETE_CLAMP(NODE_34, 1, NODE_33, -5, 5.0-1.5, 0)
+	DISCRETE_CLAMP(NODE_34, NODE_33, -5, 5.0-1.5)
 
 	// bottom op-amp
 	DISCRETE_ONOFF(NODE_40, MADALIEN_8910_PORTA_6, MADALIEN_8910_PSG_B)
@@ -230,7 +230,7 @@ DISCRETE_SOUND_START( madalien )
      ************************************************/
 	DISCRETE_CRFILTER(NODE_60, 1, MADALIEN_8910_PORTB_7, RES_K(100), CAP_U(4.7))
 	// 2 diodes clamp it positive.
-	DISCRETE_CLAMP(NODE_62, 1, NODE_60, 0, 12, 0)
+	DISCRETE_CLAMP(NODE_62, NODE_60, 0, 12)
 	// the 0.047uF cap to ground just removes real world spikes.
 	// it does not have to be simulated.
 	DISCRETE_MIXER2(NODE_64, 1, NODE_62, 5, &madalien_555_1c_cv)

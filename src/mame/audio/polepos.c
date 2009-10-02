@@ -336,11 +336,9 @@ DISCRETE_SOUND_START(polepos)
 					0.5			/* overall filter GAIN */)
 	/* clamp to the maximum of the op-amp shifted by vRef */
 	DISCRETE_CLAMP(POLEPOS_CHANL4_SND,
-					1,			/* ENAB */
 					NODE_54,	/* IN0 */
 					0,			/* MIN */
-					5.0 - OP_AMP_VP_RAIL_OFFSET - POLEPOS_VREF,	/* MAX */
-					0.0 - POLEPOS_VREF			/* disabled CLAMP value */)
+					5.0 - OP_AMP_VP_RAIL_OFFSET - POLEPOS_VREF)	/* MAX */
 
 	/************************************************
      * Output

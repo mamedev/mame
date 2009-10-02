@@ -361,7 +361,7 @@ DISCRETE_SOUND_START( fantasy )
 	/* This is not the perfect way to discharge, but it is good enough for now */
 	/* it does not take into acount that there is no discharge when noise is low */
 	DISCRETE_RCDISC2(NODE_10, FANTASY_BOMB_EN, 0, RES_K(10) + RES_K(33), DEFAULT_TTL_V_LOGIC_1 - 0.5, RES_K(1), CAP_U(1))
-	DISCRETE_CLAMP(FANTASY_NOISE_LOGIC, 1, FANTASY_NOISE_STREAM_IN, 0, 1, 0)
+	DISCRETE_CLAMP(FANTASY_NOISE_LOGIC, FANTASY_NOISE_STREAM_IN, 0, 1)
 	DISCRETE_SWITCH(NODE_11, 1, FANTASY_NOISE_LOGIC, 0, NODE_10)
 
 	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_11, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &fantasy_filter)
