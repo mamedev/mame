@@ -2673,7 +2673,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				cpu = expression_cpu_index(machine, name);
 			if (cpu == NULL)
 				cpu = debug_cpu_get_visible_cpu(machine);
-			space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 			if (space != NULL)
 				debug_write_memory(space, memory_address_to_byte(space, address), data, size, TRUE);
 			break;
