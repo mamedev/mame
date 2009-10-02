@@ -140,7 +140,7 @@
  * where calculated using least square approximation.
  * This approach gives a bit better results compared to the first approach.
  */
-//#define LS624_F(_C, _VI, _VR)	pow10( -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
+//#define LS624_F(_C, _VI, _VR)	pow10( -0.912029404 * log10(_C) + 0.243264328 * (_VI)
 //		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
 #define LS624_F(_in, _num)	pow10(context->k1_##_num + 0.243264328 * (_in) + context->k2_##_num * (_in))
 
