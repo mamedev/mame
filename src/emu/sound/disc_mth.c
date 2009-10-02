@@ -109,6 +109,7 @@ struct dst_oneshot_context
 	double	countdown;
 	int		state;
 	int		last_trig;
+	int		type;
 };
 
 struct dss_ramp_context
@@ -1418,19 +1419,19 @@ static DISCRETE_STEP(dst_oneshot)
 			context->last_trig = trigger;
 
 			/* Is it the proper edge trigger */
-			if ((DST_ONESHOT__TYPE & DISC_ONESHOT_REDGE) ? trigger : !trigger)
+			if ((context->type & DISC_ONESHOT_REDGE) ? trigger : !trigger)
 			{
 				if (!context->state)
 				{
 					/* We have first trigger */
 					context->state     = 1;
-					node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
+					node->output[0]    = (context->type & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
 					context->countdown = DST_ONESHOT__WIDTH;
 				}
 				else
 				{
 					/* See if we retrigger */
-					if (DST_ONESHOT__TYPE & DISC_ONESHOT_RETRIG)
+					if (context->type & DISC_ONESHOT_RETRIG)
 					{
 						/* Retrigger */
 						context->countdown = DST_ONESHOT__WIDTH;
@@ -1445,7 +1446,7 @@ static DISCRETE_STEP(dst_oneshot)
 			context->countdown -= node->info->sample_time;
 			if(context->countdown <= 0.0)
 			{
-				node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+				node->output[0]    = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 				context->countdown = 0;
 				context->state     = 0;
 			}
@@ -1462,7 +1463,9 @@ static DISCRETE_RESET(dst_oneshot)
 	context->state     = 0;
 
  	context->last_trig = 0;
- 	node->output[0] = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+ 	context->type = DST_ONESHOT__TYPE;
+ 	
+ 	node->output[0] = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 }
 
 
