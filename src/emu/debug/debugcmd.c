@@ -1730,6 +1730,8 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 	address_map_entry *entry;
 	cheat_region_map cheat_region[100];
 
+	memset(cheat_region, 0, sizeof(cheat_region));
+
 	/* validate parameters */
 	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ADDRESS_SPACE_PROGRAM, &space))
 		return;
