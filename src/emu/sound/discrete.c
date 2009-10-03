@@ -506,7 +506,7 @@ static DEVICE_START( discrete )
 	info->main_list = NULL;
 	info->output_list = NULL;
 	info->input_list = NULL;
-	info->source_list = NULL;
+	info->main_source_list = NULL;
 
 	/* allocate memory to hold pointers to nodes by index */
 	info->indexed_node = auto_alloc_array_clear(device->machine, node_description *, DISCRETE_MAX_NODES);
@@ -666,15 +666,31 @@ static DEVICE_RESET( discrete )
 static void *task_callback(void *param, int threadid)
 {
 	task_info *ti = (task_info *) param;
+	linked_list_entry *entry;
 	int samples, i;
 
 	/* set up task buffers */
 	for (i = 0; i < ti->task->numbuffered; i++)
 		ti->task->ptr[i] = ti->task->node_buf[i];
 
+	/* initialize sources */
+	for (entry = ti->task->source_list; entry != 0; entry = entry->next)
+	{
+		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
+		sn->ptr = sn->task->node_buf[sn->output_node];
+	}
+	
 	samples = ti->samples;
 	while (samples-- > 0)
 	{
+		/* update source node buffer */
+		for (entry = ti->task->source_list; entry != 0; entry = entry->next)
+		{
+			discrete_source_node *sn = (discrete_source_node *) entry->ptr;
+			sn->buffer = *sn->ptr++;
+		}
+		
+		/* step */
 		step_nodes_in_list(ti->task->list);
 	}
 
@@ -687,19 +703,16 @@ INLINE void update_main_nodes(discrete_info *info, int samples)
 	linked_list_entry *entry;
 
 	/* initialize sources */
-	for (entry = info->source_list; entry != 0; entry = entry->next)
+	for (entry = info->main_source_list; entry != 0; entry = entry->next)
 	{
 		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
 		sn->ptr = sn->task->node_buf[sn->output_node];
 	}
 
-	if (DISCRETE_PROFILING)
-		info->total_samples += samples;
-
 	while (samples-- > 0)
 	{
 		/* update source node buffer */
-		for (entry = info->source_list; entry != 0; entry = entry->next)
+		for (entry = info->main_source_list; entry != 0; entry = entry->next)
 		{
 			discrete_source_node *sn = (discrete_source_node *) entry->ptr;
 			sn->buffer = *sn->ptr++;
@@ -764,7 +777,10 @@ static STREAM_UPDATE( discrete_stream_update )
 	update_main_nodes(info, samples);
 
 	if (DISCRETE_PROFILING)
+	{
+		info->total_samples += samples;
 		info->total_stream_updates++;
+	}
 
 }
 
@@ -858,6 +874,8 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 					task = auto_alloc_clear(info->device->machine, discrete_task);
 					task->numbuffered = 0;
 					task->list = task_node_list;
+					task->task_group = 99; /* will be set later */
+					task->source_list = NULL;
 					linked_list_tail_add(info, &task_list_ptr, task);
 					node->context = task;
 					task = NULL;

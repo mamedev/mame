@@ -3740,12 +3740,15 @@ struct _discrete_task
 {
 	const linked_list_entry *list;
 
+	int					task_group;
 	int 				numbuffered;
 	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
-
+	
+	/* list of source nodes */
+	linked_list_entry	*source_list;		/* discrete_source_node */
 };
 
 typedef struct _discrete_source_node discrete_source_node;
@@ -3777,7 +3780,7 @@ struct _discrete_info
 
 	/* list of main source nodes */
 
-	linked_list_entry	*source_list;		/* discrete_source_node */
+	linked_list_entry	*main_source_list;		/* discrete_source_node */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */

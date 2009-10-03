@@ -36,14 +36,13 @@ struct dso_wavelog_context
  *
  *************************************/
 
-static DISCRETE_START( dso_task )
+static void task_check(discrete_task *task, discrete_task *dest_task)
 {
-	discrete_task *task =  (discrete_task *) node->context;
 	int inputnum;
 	const linked_list_entry *node_entry;
 	const linked_list_entry *step_entry;
 
-	/* Determine, which nodes in the task are referenced in the main task
+	/* Determine, which nodes in the task are referenced by nodes in dest_task
      * and add them to the list of nodes to be buffered for further processing
      */
 	for (node_entry = task->list; node_entry != NULL; node_entry = node_entry->next)
@@ -51,14 +50,14 @@ static DISCRETE_START( dso_task )
 		node_description *task_node = (node_description *) node_entry->ptr;
 		int found = 0;
 
-		for (step_entry = task_node->info->main_list; step_entry != NULL; step_entry = step_entry->next)
+		for (step_entry = dest_task->list; step_entry != NULL; step_entry = step_entry->next)
 		{
-			node_description *main_node = (node_description *) step_entry->ptr;
+			node_description *dest_node = (node_description *) step_entry->ptr;
 
 			/* loop over all active inputs */
-			for (inputnum = 0; inputnum < main_node->active_inputs; inputnum++)
+			for (inputnum = 0; inputnum < dest_node->active_inputs; inputnum++)
 			{
-				int inputnode = main_node->block->input_node[inputnum];
+				int inputnode = dest_node->block->input_node[inputnum];
 				if IS_VALUE_A_NODE(inputnode)
 				{
 					if (NODE_DEFAULT_NODE(task_node->block->node) == NODE_DEFAULT_NODE(inputnode))
@@ -75,21 +74,22 @@ static DISCRETE_START( dso_task )
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_BLOCKINDEX(main_node));
+							discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_BLOCKINDEX(dest_node));
 							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double, 2048);
-							task->source[task->numbuffered] = (double *) main_node->input[inputnum];
+							task->source[task->numbuffered] = (double *) dest_node->input[inputnum];
 							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
 							
 							/* register into source list */
-							source = auto_alloc(task_node->info->device->machine, discrete_source_node);
-							linked_list_add(task_node->info, 
-									(linked_list_entry **) &task_node->info->source_list, 
+							source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
+							linked_list_add(dest_node->info, 
+									(linked_list_entry **) &dest_task->source_list, 
 									source);
 							source->task = task;
 							source->output_node = task->numbuffered;
+
 							/* point the input to a buffered location */
-							main_node->input[inputnum] = &source->buffer;
-							
+							dest_node->input[inputnum] = &source->buffer;
+
 							task->numbuffered++;
 						}
 					}
@@ -97,6 +97,27 @@ static DISCRETE_START( dso_task )
 			}
 		}
 	}
+}
+
+static DISCRETE_START( dso_task )
+{
+	discrete_task *task =  (discrete_task *) node->context;
+	const linked_list_entry *task_entry;
+	/* dummy task for main */
+	discrete_task main_task;
+	
+	for (task_entry = node->info->task_list; task_entry != NULL; task_entry = task_entry->next)
+	{
+		discrete_task *dest_task = (discrete_task *) task_entry->ptr;
+	
+		if (task->task_group < dest_task->task_group)
+			task_check(task, dest_task);
+	}
+	
+	main_task.list = node->info->main_list;
+	main_task.source_list = node->info->main_source_list;
+	task_check(task, &main_task);
+	*((linked_list_entry **) &node->info->main_source_list) = main_task.source_list;
 }
 
 static DISCRETE_STEP( dso_task )
