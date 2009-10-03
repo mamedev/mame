@@ -27,6 +27,7 @@ P0-045-A (M6100429A)    89 DownTown                             Taito / RomStar
 ?        (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
 ?                       88 Caliber 50                           Taito / RomStar
 ?                       89 Arbalester                           Taito / RomStar
+PO-047A					?? Seta Roulette						Seta / Visco
 P1-036-A + P0-045-A +
 P1-049-A                89 Meta Fox                             Taito / RomStar
 P0-053-1                89 Castle of Dragon/Dragon Unit         Taito / RomStar / Athena
@@ -2153,6 +2154,16 @@ static ADDRESS_MAP_START( drgnunit_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 ADDRESS_MAP_END
 
+/***************************************************************************
+        Seta Roulette
+***************************************************************************/
+
+static ADDRESS_MAP_START( setaroul_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
+
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM
+	AM_RANGE(0xf00000, 0xf03fff) AM_RAM
+ADDRESS_MAP_END
 
 /***************************************************************************
                         Extreme Downhill / Sokonuke
@@ -3550,6 +3561,13 @@ static INPUT_PORTS_START( drgnunit )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
+
+/***************************************************************************
+                                Seta Roulette
+***************************************************************************/
+
+static INPUT_PORTS_START( setaroul )
+INPUT_PORTS_END
 
 
 /***************************************************************************
@@ -6448,6 +6466,18 @@ static const gfx_layout layout_planes_2roms_split =
 	16*16*2
 };
 
+static const gfx_layout layout_8bpp =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	8,
+	{ RGN_FRAC(0,4)+0,RGN_FRAC(0,4)+4, RGN_FRAC(1,4)+0,RGN_FRAC(1,4)+4,RGN_FRAC(2,4)+0,RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0,RGN_FRAC(3,4)+4},
+	{128+64,128+65,128+66,128+67, 128+0,128+1,128+2,128+3,
+	 8*8+0,8*8+1,8*8+2,8*8+3, 0,1,2,3},
+	{0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
+	 32*8,33*8,34*8,35*8,36*8,37*8,38*8,39*8},
+	16*16*2
+};
 
 
 
@@ -6506,6 +6536,15 @@ GFXDECODE_END
 static GFXDECODE_START( downtown )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*0, 32 ) // [1] Layer 1
+GFXDECODE_END
+
+/***************************************************************************
+                                Seta Roulette
+***************************************************************************/
+
+static GFXDECODE_START( setaroul )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp, 512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -7199,6 +7238,51 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	MDRV_VIDEO_START(seta_1_layer)
 	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
 	MDRV_VIDEO_UPDATE(seta)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_CONFIG(seta_sound_intf)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+/***************************************************************************
+                                Seta Roulette
+***************************************************************************/
+
+static VIDEO_START( dummy_start )
+{
+
+}
+
+static VIDEO_UPDATE( dummy_update )
+{
+	return 0;
+}
+
+static MACHINE_DRIVER_START( setaroul )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MDRV_CPU_PROGRAM_MAP(setaroul_map)
+	//MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+
+	MDRV_GFXDECODE(setaroul)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_VIDEO_START(dummy_start)
+	//MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MDRV_VIDEO_UPDATE(dummy_update)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -9474,7 +9558,50 @@ ROM_START( inttootea )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
 
+/*
+PCB PO-047A
 
+3x8 DSW
+SETA X1-004 (826100) (input)
+SETA X1-010 (811101) (sound)
+MC68B50P (timer?)
+M68000
+16Mhz OSC, near CPU
+SETA X1-002A (sprites? - near 005 - 008)
+SETA X1-001A (sprites? ^)
+SETA X1-007 (737100)
+SETA X1-011
+SETA X1-012
+*/
+
+ROM_START( setaroul )
+	ROM_REGION( 0x0c0000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "uf1002.u14", 0x000000, 0x010000, CRC(b3a622b0) SHA1(bc4a02167002579149c19640e65e679b7c19fa66) )
+	ROM_LOAD16_BYTE( "uf1003.u16", 0x000001, 0x010000, CRC(a6afd769) SHA1(82c54c8a2219f20d08faf9f7afcf821d83511660) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD16_BYTE( "uf0005.u3", 0x000000, 0x008000, CRC(383c2d57) SHA1(3bbf0464f80f657dfa275e885fbce064a0a08f4a) )
+	ROM_LOAD16_BYTE( "uf0006.u4", 0x000001, 0x008000, CRC(90c9dae6) SHA1(a226aab82f5b8174644281fa3efab4f8a8f8d827) )
+	ROM_LOAD16_BYTE( "uf0007.u5", 0x010000, 0x008000, CRC(e72c3dba) SHA1(aaebb484e76d8f3da0ecff26c3c1bad4f3f11ac0) )
+	ROM_LOAD16_BYTE( "uf0008.u6", 0x010001, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 1 - 8bpp? */
+	ROM_LOAD( "uf0010.u15",  0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD( "uf0009.u13",  0x080000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD( "uf0012.u29",  0x100000, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD( "uf0011.u22",  0x180000, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD( "uf0014.u38",  0x200000, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD( "uf0013.u37",  0x280000, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD( "uf0015.u40",  0x300000, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD( "uf0016.u48",  0x380000, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+
+	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_LOAD( "uf1004.u52", 0x000000, 0x020000, CRC(d63ea334) SHA1(93aaf58c90c4f704caae19b63785e471b2c1281a) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD16_BYTE( "uf-017", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD16_BYTE( "uf-018", 0x001, 0x200, NO_DUMP )
+ROM_END
 
 static READ16_HANDLER( twineagl_debug_r )
 {
@@ -9762,6 +9889,7 @@ GAME( 1989, arbalest, 0,        metafox,  arbalest, arbalest, ROT270, "Seta",   
 GAME( 1989, metafox,  0,        metafox,  metafox,  metafox,  ROT270, "Seta",                   "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
+GAME( 198?, setaroul, 0,        setaroul, setaroul, 0,        ROT270, "Seta / Visco",           "Seta Roulette?", 0 ) // I can't see a title in the GFX roms or program but it seems to have roulette GFX
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
