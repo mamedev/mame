@@ -982,13 +982,47 @@ ROM_END
 
 ROM_START( vulcana )
 	ROM_REGION( 0x40000, "maincpu", 0 )	// 68000 code (CPU A)
+	ROM_LOAD16_BYTE( "785_r05.6n",	0x00000, 0x10000, CRC(1777a57b) SHA1(9696fa9c6d53587972d213d5c12245e40fbc2bda) )
+	ROM_LOAD16_BYTE( "785_r04.4n",	0x00001, 0x10000, CRC(790cbdf3) SHA1(e247c2be00169490aea945518c1a68e94799f5f4) )
+	ROM_LOAD16_BYTE( "785_u09.6r",	0x20000, 0x10000, CRC(1aba7010) SHA1(bcf28640d5ba7864ed7112db23ff344434b2d944) )
+	ROM_LOAD16_BYTE( "785_k08.4r",	0x20001, 0x10000, CRC(36bb1be1) SHA1(ce9a98443a453b1c05dfb8d0f8ba0f94292b9d30) ) /* Same as 785_r08.4r */
+
+	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
+	ROM_LOAD16_BYTE( "785_p07.10n",	0x00000, 0x10000, CRC(686d549d) SHA1(9687be801c4fb963bf6b0199e2ae9f5051213f7a) )
+	ROM_LOAD16_BYTE( "785_p06.8n" ,	0x00001, 0x10000, CRC(70c94bee) SHA1(951e00ca4d3a47a21b4db05bcdc8ead45b42c3f1) )
+	ROM_LOAD16_BYTE( "785_p13.10s",	0x20000, 0x10000, CRC(478fdb0a) SHA1(2e285ad6dcfc67f3e24d231e0e1be19036ce64d2) )
+	ROM_LOAD16_BYTE( "785_p12.8s",	0x20001, 0x10000, CRC(38ea402a) SHA1(90ff2bd71435988cde967704ce3b1401de206683) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	// Z80 code (sound CPU)
+	ROM_LOAD( "785_g03.10a", 0x00000,  0x8000, CRC(67a3b50d) SHA1(3c83f3b0df73d9361ec3cda26a6c4c603a088419) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "785_h14.d8", 0x0000,	0x4000, CRC(02f4b16f) SHA1(45addc99f520770f38c6aa69aef9af59cfc410b5) ) /* Title screen graphics & characters */
+
+	ROM_REGION16_BE( 0x200000, "gfx2", 0 )	// gfx data used at runtime
+	ROM_LOAD16_WORD( "785f17.p16",	0x000000, 0x80000, CRC(8fbec1a4) SHA1(71cbdb25470b5a2ca7e80c92f12fc47e28085793) )
+	ROM_LOAD16_WORD( "785f18.p18",	0x080000, 0x80000, CRC(50d61e38) SHA1(051d332d93d435d19571e22d69ffc5395dbb16a4) )
+	ROM_LOAD16_WORD( "785f15.p13",	0x100000, 0x80000, CRC(af96aef3) SHA1(a58e26a8b134ab6e7938cd4fa342c04c236efd99) )
+	ROM_LOAD16_WORD( "785f16.p15",	0x180000, 0x80000, CRC(b858df1f) SHA1(c434da7ba54d59643fe6ca30bceccf16413904c3) )
+
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )	// tile data; mapped at 0x80000 on CPUB
+
+	ROM_REGION( 0x20000, "konami", 0 ) 	// samples
+	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) 	// samples
+	ROM_LOAD( "785_f02.7c", 0x00000, 0x20000, CRC(c39f5ca4) SHA1(92ebea11b7d3a72d0f58c456f16a6ff36d6b3062) )
+ROM_END
+
+ROM_START( vulcanb )
+	ROM_REGION( 0x40000, "maincpu", 0 )	// 68000 code (CPU A)
 	ROM_LOAD16_BYTE( "785_n05.6n",	0x00000, 0x10000, CRC(6371d475) SHA1(82e6adc38de8363c126cd073dbc95eeec576db98) )
 	ROM_LOAD16_BYTE( "785_n04.4n",	0x00001, 0x10000, CRC(b6f24b9e) SHA1(01685f89955385714062cc70316edce1a6a64e35) )
 	ROM_LOAD16_BYTE( "785_r09.6r",	0x20000, 0x10000, CRC(fbfd1543) SHA1(8ef41a0a9d3d1de9395bdd5288199841c61d7045) )
 	ROM_LOAD16_BYTE( "785_r08.4r",	0x20001, 0x10000, CRC(36bb1be1) SHA1(ce9a98443a453b1c05dfb8d0f8ba0f94292b9d30) )
 
 	ROM_REGION( 0x40000, "sub", 0 )	// 68000 code (CPU B)
-	ROM_LOAD16_BYTE( "785_g07.10n",	0x00000, 0x10000, CRC(ee09dd5d) SHA1(9b6fb12c2cb7930df12d9876810811540fd560ee) )
+	ROM_LOAD16_BYTE( "785_g07.10n",	0x00000, 0x10000, CRC(ee09dd5d) SHA1(9b6fb12c2cb7930df12d9876810811540fd560ee) ) /* requires older CPU B code compared to other sets */
 	ROM_LOAD16_BYTE( "785_g06.8n" ,	0x00001, 0x10000, CRC(85ab7af7) SHA1(5cb36918a5cdfd16611da76f07450ae1d115f2c7) )
 	ROM_LOAD16_BYTE( "785_g13.10s",	0x20000, 0x10000, CRC(274f325d) SHA1(1076efa204eff0fc8a8788706b17b9a128023d35) )
 	ROM_LOAD16_BYTE( "785_g12.8s",	0x20001, 0x10000, CRC(1625f933) SHA1(3f25d7396af46e75e3ae8456414e31935de43d34) )
@@ -1307,8 +1341,9 @@ static DRIVER_INIT( cuebrickj )
 GAME( 1987, devilw,   0,        devilw,		devilw,   twin16,   ROT0, "Konami", "Devil World", GAME_SUPPORTS_SAVE )
 GAME( 1987, majuu,    devilw,   devilw,		devilw,   twin16,   ROT0, "Konami", "Majuu no Ohkoku", GAME_SUPPORTS_SAVE )
 GAME( 1987, darkadv,  devilw,   devilw,		darkadv,  twin16,   ROT0, "Konami", "Dark Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1988, vulcan,   0,        twin16,		vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture", GAME_SUPPORTS_SAVE )
-GAME( 1988, vulcana,  vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Vulcan Venture (Older Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcan,   0,        twin16,		vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture (New)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcana,  vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Vulcan Venture (Old)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,  vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Vulcan Venture (Oldest)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gradius2, vulcan,   twin16,		gradius2, twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gradius2a,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gradius2b,vulcan,   twin16,		vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", GAME_SUPPORTS_SAVE )
