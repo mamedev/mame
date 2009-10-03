@@ -56,7 +56,7 @@ Bugs:
 #include "deprecat.h"
 #include "genesis.h"
 #include "megadriv.h"
-#include "hazemd_s.h"
+#include "segamsys.h"
 
 #define MASTER_CLOCK		53693100
 
