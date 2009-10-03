@@ -87,7 +87,7 @@ static void task_check(discrete_task *task, const discrete_task *dest_task)
 						/* register into source list */
 						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
 						linked_list_add(dest_node->info, 
-								(linked_list_entry **) &dest_task->source_list, 
+								(linked_list_entry **) (FPTR) &dest_task->source_list, 
 								source);
 						source->task = task;
 						source->output_node = i;

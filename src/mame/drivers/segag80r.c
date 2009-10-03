@@ -12,7 +12,8 @@
 
     Known bugs:
         * Pig Newton doesn't read cocktail controls (might be game bug)
-        * Astro Blaster v1 dies when you first start
+        * Astro Blaster v1 dies when you first start if you only
+		  have one credit at the time (bad dump?, protection?)
 
 ****************************************************************************
 
@@ -1066,7 +1067,7 @@ ROM_END
 
 ROM_START( astrob1 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "829.cpu-u25",    0x0000, 0x0800, CRC(5f66046e) SHA1(6aa7f94122db1a75a89c12ad9d087aec1a70d675) )
+	ROM_LOAD( "829.cpu-u25",    0x0000, 0x0800, CRC(5f66046e) SHA1(6aa7f94122db1a75a89c12ad9d087aec1a70d675) ) // verify that this isn't just a bad dump..
 	ROM_LOAD( "837.prom-u1",    0x0800, 0x0800, CRC(ce9c3763) SHA1(2cb4c3041905d38b040ef76f69f6197d699f9ec5) )
 	ROM_LOAD( "838.prom-u2",    0x1000, 0x0800, CRC(3557289e) SHA1(57258b149f0872c34f82fe3dc06bc1fc60d7393f) )
 	ROM_LOAD( "839.prom-u3",    0x1800, 0x0800, CRC(c88bda24) SHA1(9253306bd929e04a2136a0d9a9627dab8979baa1) )
@@ -1094,6 +1095,35 @@ ROM_START( astrob1 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 ROM_END
 
+ROM_START( astrode )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "829b.u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
+	ROM_LOAD( "834b.u01",   0x0800, 0x0800, CRC(82630950) SHA1(6e13cf5868d64835d9de823801cc4162b3c7b316) )
+	ROM_LOAD( "814a.u02",   0x1000, 0x0800, CRC(d70d7d5e) SHA1(3d663cb36579c91cdb0ea82fd0af3b0ade8246b7) )
+	ROM_LOAD( "815a.u03",   0x1800, 0x0800, CRC(0dbad477) SHA1(1fc6b3c628abd0d7a13b75eb2aeed7c04381f674) )
+	ROM_LOAD( "816a.u04",   0x2000, 0x0800, CRC(8fa809ab) SHA1(c1dcae3b825dc283526b5ba742ca6816e5722464) )
+	ROM_LOAD( "817a.u05",   0x2800, 0x0800, CRC(c7a3c014) SHA1(da25c2c2a116128e74df4de21727e2a4820c1045) )
+	ROM_LOAD( "818a.u06",   0x3000, 0x0800, CRC(f13e804c) SHA1(550a02a4d21915d1127ba1be587539a8e27aa7ef) )
+	ROM_LOAD( "819a.u07",   0x3800, 0x0800, CRC(2194a624) SHA1(a8a9baf202eb353b93dced71d74de713d54a5e5e) )
+	ROM_LOAD( "820a.u08",   0x4000, 0x0800, CRC(95d84829) SHA1(a1684a695de41270721da851bed887a0c379e8c1) )
+	ROM_LOAD( "821a.u09",   0x4800, 0x0800, CRC(1495059f) SHA1(d771274d5205421757076b9a5cfbd73fe2949901) )
+	ROM_LOAD( "822a.u10",   0x5000, 0x0800, CRC(d036a5c5) SHA1(5557795280c5e492b94d670b156024d67d51aa8b) )
+	ROM_LOAD( "823a.u11",   0x5800, 0x0800, CRC(788380dd) SHA1(6392386f9625c6fd609174e765a24e2c25fca957) )
+	ROM_LOAD( "824a.u12",   0x6000, 0x0800, CRC(a43686c4) SHA1(1a6eae526de1667a7aa3a995b2655950555461eb) )
+	ROM_LOAD( "825a.u13",   0x6800, 0x0800, CRC(43c8b973) SHA1(12ee379d24e2bcdd6b491262ac02f862a8a33aaf) )
+	ROM_LOAD( "826a.u14",   0x7000, 0x0800, CRC(9f26d132) SHA1(5323a61de883ed1f2dca776b9d7c53a484249c02) )
+	ROM_LOAD( "835.u15",    0x7800, 0x0800, CRC(6eeeb409) SHA1(1caf9b7ac08a4adcbf8c17f9e4b398373db706e1) )
+	ROM_LOAD( "836.u16",    0x8000, 0x0800, CRC(07ffe6dc) SHA1(70673e8266139034afa64bf980b1b9ddbf294e0f) )
+
+	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_LOAD( "808b_speech_de.u07", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
+
+	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_LOAD( "830_speech_de.u06", 0x0000, 0x0800, CRC(2d840552) SHA1(7a2a7b54378b6cc85b8ab5c26e42266aa747c635) )
+	ROM_LOAD( "831_speech_de.u05", 0x0800, 0x0800, CRC(46b30ee4) SHA1(c9e19a9b9ebc9b3b853e79f93ad74e4ec5dfd1ae) )
+	ROM_LOAD( "832_speech_de.u04", 0x1000, 0x0800, CRC(d05280b8) SHA1(8d30b23b83b32465a8a2decd2ce9bfed24394e7e) )
+	ROM_LOAD( "833_speech_de.u03", 0x1800, 0x0800, CRC(08f11459) SHA1(da6dc2bf30b95882f95c21739ec02fc89d286a66) )
+ROM_END
 
 ROM_START( 005 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
@@ -1541,8 +1571,10 @@ static DRIVER_INIT( sindbadm )
 GAME( 1981, astrob,   0,       astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 3)", GAME_IMPERFECT_SOUND )
 GAME( 1981, astrob2,  astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, astrob2a, astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", GAME_IMPERFECT_SOUND )
-GAME( 1981, astrob1,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 1)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1981, astrob1,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 1)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrode,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (German)", GAME_IMPERFECT_SOUND )
 GAME( 1981, 005,      0,       005,      005,      005,      ROT270, "Sega", "005", GAME_IMPERFECT_SOUND )
+
 
 /* basic G-80 system with individual background boards */
 GAME( 1981, spaceod,  0,       spaceod,  spaceod,  spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", GAME_IMPERFECT_SOUND )
