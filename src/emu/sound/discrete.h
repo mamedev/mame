@@ -811,6 +811,8 @@
  *     discrete_op_amp_osc_info = {type, r1, r2, r3, r4, r5, r6, r7, r8, c, vP}
  *
  * Note: Set all unused components to 0.
+ *       _OUT_SQW can also be replaced with
+ *                _OUT_ENERGY, _OUT_LOGIC_X, _OUT_COUNT_F_X, _OUT_COUNT_R_X
  *
  *  Types:
  *
@@ -854,7 +856,7 @@
  *       |    r2   | \   |
  *       +---ZZZZ--|- \  |
  *       |         |   >-+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
- *      ---        |+ /  |
+ *      --- c      |+ /  |
  *      ---    .---| /   |
  *       |     |   |/    |
  *      gnd    |         |
@@ -867,6 +869,8 @@
  *             |
  *             ^
  *             vP
+ *
+ * Note: All values are static.
  *
  * EXAMPLES: see Space Walk
  *
@@ -886,6 +890,8 @@
  *     discrete_op_amp_osc_info = {type, r1, r2, r3, r4, r5, r6, r7, r8, c, vP}
  *
  * Note: Set all unused components to 0.
+ *       _OUT_SQW can also be replaced with
+ *                _OUT_ENERGY, _OUT_LOGIC_X, _OUT_COUNT_F_X, _OUT_COUNT_R_X
  *
  *  Types:
  *
@@ -3538,7 +3544,7 @@ enum
 
 
 /* Common Op Amp Flags and values */
-#define DISC_OP_AMP_IS_NORTON				0x01
+#define DISC_OP_AMP_IS_NORTON				0x100
 #define OP_AMP_NORTON_VBE					0.5		// This is the norton junction voltage. Used only internally.
 #define OP_AMP_VP_RAIL_OFFSET				1.5		// This is how close an op-amp can get to the vP rail. Used only internally.
 
@@ -3566,14 +3572,20 @@ enum
 
 
 /* Op Amp Oscillator Flags */
-#define DISC_OP_AMP_OSCILLATOR_1			0x00
-#define DISC_OP_AMP_OSCILLATOR_VCO_1		0x80
-#define DISC_OP_AMP_OSCILLATOR_VCO_2		0x90
-#define DISC_OP_AMP_OSCILLATOR_VCO_3		0xa0
-#define DISC_OP_AMP_OSCILLATOR_OUT_CAP		0x00
-#define DISC_OP_AMP_OSCILLATOR_OUT_SQW		0x02
-
 #define DISC_OP_AMP_OSCILLATOR_TYPE_MASK	(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
+#define DISC_OP_AMP_OSCILLATOR_1			0x00
+#define DISC_OP_AMP_OSCILLATOR_2			0x10
+#define DISC_OP_AMP_OSCILLATOR_VCO_1		0x20
+#define DISC_OP_AMP_OSCILLATOR_VCO_2		0x30
+#define DISC_OP_AMP_OSCILLATOR_VCO_3		0x40
+
+#define DISC_OP_AMP_OSCILLATOR_OUT_MASK			0x07
+#define DISC_OP_AMP_OSCILLATOR_OUT_CAP			0x00
+#define DISC_OP_AMP_OSCILLATOR_OUT_SQW			0x01
+#define DISC_OP_AMP_OSCILLATOR_OUT_ENERGY		0x02
+#define DISC_OP_AMP_OSCILLATOR_OUT_LOGIC_X		0x03
+#define DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X	0x04
+#define DISC_OP_AMP_OSCILLATOR_OUT_COUNT_R_X	0x05
 
 /* Schmitt Oscillator Options */
 #define DISC_SCHMITT_OSC_IN_IS_LOGIC		0x00
@@ -3840,7 +3852,7 @@ struct _discrete_lfsr_desc
 typedef struct _discrete_op_amp_osc_info discrete_op_amp_osc_info;
 struct _discrete_op_amp_osc_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;
@@ -3896,7 +3908,7 @@ struct _discrete_dac_r1_ladder
 typedef struct _discrete_integrate_info discrete_integrate_info;
 struct _discrete_integrate_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;		// r1a + r1b
 	double	r2;		// r2a + r2b
 	double	r3;		// r3a + r3b
@@ -3929,7 +3941,7 @@ struct _discrete_mixer_desc
 typedef struct _discrete_op_amp_info discrete_op_amp_info;
 struct _discrete_op_amp_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;
@@ -3943,7 +3955,7 @@ struct _discrete_op_amp_info
 typedef struct _discrete_op_amp_1sht_info discrete_op_amp_1sht_info;
 struct _discrete_op_amp_1sht_info
 {
-	int		type;
+	UINT32	type;
 	double	r1;
 	double	r2;
 	double	r3;

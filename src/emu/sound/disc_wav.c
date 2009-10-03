@@ -100,7 +100,7 @@ struct dss_op_amp_osc_context
 	int		type;
 	UINT8	flip_flop;		/* flip/flop output state */
 	UINT8	flip_flop_xor;	/* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
-	UINT8	is_squarewave;
+	UINT8	output_type;
 	double	v_out_high;
 	double	threshold_low;	/* falling threshold */
 	double	threshold_high;	/* rising threshold */
@@ -110,6 +110,9 @@ struct dss_op_amp_osc_context
 	double	temp1;			/* Multi purpose */
 	double	temp2;			/* Multi purpose */
 	double	temp3;			/* Multi purpose */
+	double	is_linear_charge;
+	double	charge_rc;
+	double	charge_exp;
 };
 
 struct dss_sawtoothwave_context
@@ -745,27 +748,32 @@ static DISCRETE_STEP(dss_op_amp_osc)
 	struct dss_op_amp_osc_context   *context = (struct dss_op_amp_osc_context *)node->context;
 
 
-	double i;			/* Charging current created by vIn */
-	double v = 0;		/* all input voltages mixed */
-	double dt;			/* change in time */
-	double vC;			/* Current voltage on capacitor, before dt */
-	double vCnext = 0;	/* Voltage on capacitor, after dt */
-	double iCharge[2]  = {0};
+	double i;				/* Charging current created by vIn */
+	double v = 0;			/* all input voltages mixed */
+	double dt;				/* change in time */
+	double v_cap;			/* Current voltage on capacitor, before dt */
+	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
+	double charge[2]  = {0};
+	double x_time  = 0;		/* time since change happened */
+	double exponent;
 	UINT8 force_charge = 0;
 	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
+	UINT8 update_exponent = 0;
+	int count_f = 0;
+	int count_r = 0;
 
 	dt = node->info->sample_time;	/* Change in time */
-	vC = context->v_cap;	/* Set to voltage before change */
+	v_cap = context->v_cap;	/* Set to voltage before change */
 
-	/* work out the charge currents for the VCOs. */
+	/* work out the charge currents/voltages. */
 	switch (context->type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_VCO_1:
 			/* Work out the charge rates. */
 			/* i is not a current.  It is being used as a temp variable. */
 			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;
-			iCharge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
-			iCharge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
+			charge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
+			charge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
@@ -773,8 +781,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			/* resistors can be nodes, so everything needs updating */
 			double i1, i2;
 			/* Work out the charge rates. */
-			iCharge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1;
-			iCharge[1] = (context->v_out_high - OP_AMP_NORTON_VBE) / *context->r2 - iCharge[0];
+			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1;
+			charge[1] = (context->v_out_high - OP_AMP_NORTON_VBE) / *context->r2 - charge[0];
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r5;
 			i2 = (0.0 - OP_AMP_NORTON_VBE) / *context->r4;
@@ -803,8 +811,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 
 			/* Work out the charge rates. */
 			v -= OP_AMP_NORTON_VBE;
-			iCharge[0] = v / info->r1;
-			iCharge[1] = v / info->r2 - iCharge[0];
+			charge[0] = v / info->r1;
+			charge[1] = v / info->r2 - charge[0];
 
 			/* use the real enable circuit */
 			force_charge = !enable;
@@ -814,101 +822,163 @@ static DISCRETE_STEP(dss_op_amp_osc)
 		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
 			/* Work out the charge rates. */
 			i = DSS_OP_AMP_OSC__VMOD1 / info->r1;
-			iCharge[0] = i - context->temp1;
-			iCharge[1] = context->temp2 - i;
+			charge[0] = i - context->temp1;
+			charge[1] = context->temp2 - i;
 			/* if the negative pin current is less then the positive pin current, */
 			/* then the osc is disabled and the cap keeps charging */
-			if (iCharge[0] < 0)
+			if (charge[0] < 0)
 			{
 				force_charge =  1;
-				iCharge[0]  *= -1;
+				charge[0]  *= -1;
 			}
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
 			/* we need to mix any bias and all modulation voltages together. */
-			iCharge[0] = context->i_fixed;
+			charge[0] = context->i_fixed;
 			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
-			iCharge[0] += v / info->r1;
+			charge[0] += v / info->r1;
 			if (info->r6 != 0)
 			{
 				v = DSS_OP_AMP_OSC__VMOD2 - OP_AMP_NORTON_VBE;
-				iCharge[0] += v / info->r6;
+				charge[0] += v / info->r6;
 			}
-			iCharge[1] = context->temp1 - iCharge[0];
+			charge[1] = context->temp1 - charge[0];
 			break;
 	}
 
-	if (enable)
+	if (!enable)
 	{
-		int toggled = 0;
-		/* Keep looping until all toggling in time sample is used up. */
-		do
+		/* we will just output 0 for oscillators that have no real enable. */
+		node->output[0] = 0;
+		return;
+	}
+
+	/* Keep looping until all toggling in time sample is used up. */
+	do
+	{
+		if (context->is_linear_charge)
 		{
 			if ((context->flip_flop ^ context->flip_flop_xor) || force_charge)
 			{
 				/* Charging */
 				/* iC=C*dv/dt  works out to dv=iC*dt/C */
-				vCnext = vC + (iCharge[1] * dt / info->c);
+				v_cap_next = v_cap + (charge[1] * dt / info->c);
 				dt = 0;
 
 				/* has it charged past upper limit? */
-				if (vCnext > context->threshold_high)
+				if (v_cap_next > context->threshold_high)
 				{
 					context->flip_flop = context->flip_flop_xor;
-					toggled++;
+					if (context->flip_flop)
+						count_r++;
+					else
+						count_f++;
 					if (force_charge)
 					{
 						/* we need to keep charging the cap to the max thereby disabling the circuit */
-						if (vCnext > context->v_out_high)
-							vCnext = context->v_out_high;
+						if (v_cap_next > context->v_out_high)
+							v_cap_next = context->v_out_high;
 					}
 					else
 					{
 						/* calculate the overshoot time */
-						dt = info->c * (vCnext - context->threshold_high) / iCharge[1];
-						vC = context->threshold_high;
+						dt = info->c * (v_cap_next - context->threshold_high) / charge[1];
+						x_time = dt;
+						v_cap = context->threshold_high;
 					}
 				}
 			}
 			else
 			{
 				/* Discharging */
-				vCnext = vC - (iCharge[0] * dt / info->c);
+				v_cap_next = v_cap - (charge[0] * dt / info->c);
 				dt     = 0;
 
 				/* has it discharged past lower limit? */
-				if (vCnext < context->threshold_low)
+				if (v_cap_next < context->threshold_low)
 				{
 					context->flip_flop = !context->flip_flop_xor;
-					toggled++;
+					if (context->flip_flop)
+						count_r++;
+					else
+						count_f++;
 					/* calculate the overshoot time */
-					dt = info->c * (context->threshold_low - vCnext) / iCharge[0];
-					vC = context->threshold_low;
+					dt = info->c * (context->threshold_low - v_cap_next) / charge[0];
+					x_time = dt;
+					v_cap = context->threshold_low;
 				}
 			}
-		} while(dt);
-
-		context->v_cap = vCnext;
-
-		if (context->is_squarewave)
-		{
-			if (toggled == 2)
-				/* Some oscillators have rapid rise or fall times causing 1 part of the */
-				/* squarewave to happen in the sample time causing it to be missed. */
-				/* If we toggle 2 states we force the missed output for 1 sample. */
-				/* If more then 2 states happen, there is no hope, the sample rate is just too low. */
-				node->output[0] = context->v_out_high * (context->flip_flop ? 0 : 1);
-			else
-				node->output[0] = context->v_out_high * context->flip_flop;
 		}
-		else
-			node->output[0] = context->v_cap;
-	}
-	else
+		else	/* non-linear charge */
+		{
+			if (update_exponent)
+				exponent = RC_CHARGE_EXP_DT(context->charge_rc, dt);
+			else
+				exponent = context->charge_exp;
+
+			if (context->flip_flop)
+			{
+				/* Charging */
+				v_cap_next = v_cap + ((context->v_out_high - v_cap) * exponent);
+				dt = 0;
+
+				/* Has it charged past upper limit? */
+				if (v_cap_next > context->threshold_high)
+				{
+					dt = context->charge_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold_high) / (context->v_out_high - v_cap))));
+					x_time = dt;
+					v_cap_next = 0;
+					v_cap      = context->threshold_high;
+					context->flip_flop = 0;
+					count_f++;
+					update_exponent = 1;
+				}
+			}
+			else
+			{
+				/* Discharging */
+				v_cap_next = v_cap - (v_cap * exponent);
+				dt = 0;
+
+				/* has it discharged past lower limit? */
+				if (v_cap_next < context->threshold_low)
+				{
+					dt = context->charge_rc * log(1.0 / (1.0 - ((context->threshold_low - v_cap_next) / v_cap)));
+					x_time = dt;
+					v_cap  = context->threshold_low;
+					context->flip_flop = 1;
+					count_r++;
+					update_exponent = 1;
+				}
+			}
+		}
+		context->v_cap = v_cap_next;
+	} while(dt);
+
+	x_time = dt / node->info->sample_time;
+
+	switch (context->output_type)
 	{
-			/* we will just output 0 for oscillators that have no real enable. */
-			node->output[0] = 0;
+		case DISC_OP_AMP_OSCILLATOR_OUT_CAP:
+			node->output[0] = v_cap_next;
+			break;
+		case DISC_OP_AMP_OSCILLATOR_OUT_ENERGY:
+			if (x_time == 0) x_time = 1.0;
+			node->output[0]  = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
+			break;
+		case DISC_OP_AMP_OSCILLATOR_OUT_SQW:
+			node->output[0] = context->flip_flop * context->v_out_high ;
+			break;
+		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X:
+			node->output[0] = count_f ? count_f + x_time : count_f;
+			break;
+		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_R_X:
+			node->output[0] =  count_r ? count_r + x_time : count_r;
+			break;
+		case DISC_OP_AMP_OSCILLATOR_OUT_LOGIC_X:
+			node->output[0] = context->flip_flop + x_time;
+			break;
 	}
 }
 
@@ -940,8 +1010,9 @@ static DISCRETE_RESET(dss_op_amp_osc)
 		r_context_ptr++;
 	}
 
-	context->is_squarewave = info->type & DISC_OP_AMP_OSCILLATOR_OUT_SQW;
-	context->type          = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
+	context->is_linear_charge = 1;
+	context->output_type = info->type & DISC_OP_AMP_OSCILLATOR_OUT_MASK;
+	context->type        = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
 
 	switch (context->type)
 	{
@@ -962,6 +1033,16 @@ static DISCRETE_RESET(dss_op_amp_osc)
 			context->temp2 = info->r6 / (info->r1 + info->r6);			/* voltage ratio across r6 */
 			context->temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	/* input resistance when r6 switched in */
 			break;
+
+		case DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON:
+			context->is_linear_charge = 0;
+			context->charge_rc = info->r1 * info->c;
+			context->charge_exp = RC_CHARGE_EXP(context->charge_rc);
+			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
+			context->threshold_high = context->threshold_low + (info->vP - OP_AMP_VP_RAIL_OFFSET - OP_AMP_VP_RAIL_OFFSET) / info->r3;;
+			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
+			context->threshold_high = context->threshold_high * info->r2 + OP_AMP_NORTON_VBE;
+			/* fall through */
 
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop High */

@@ -2111,10 +2111,24 @@ static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
 };
 
+static const discrete_op_amp_osc_info spacwalk_spaceship_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON,
+	RES_K(75), RES_M(1), RES_M(6.8), RES_M(2.4), 0, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	CAP_U(2.2), 12												/* c, vP */
+};
+
+static const discrete_op_amp_osc_info spacwalk_spaceship_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_K(680), RES_K(300), RES_K(100), RES_K(150), RES_K(120), 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	CAP_U(0.0012), 12														/* c, vP */
+};
+
 static const discrete_mixer_desc spacwalk_mixer =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{SPACWALK_R422, SPACWALK_R422, RES_K(39), SPACWALK_R421, SPACWALK_R420, SPACWALK_R419},
+	{SPACWALK_R422, SPACWALK_R422, RES_K(39 + 10 + 1), SPACWALK_R421, SPACWALK_R420, SPACWALK_R419},
 	{0, 0, 0, 0, 0, SPACWALK_R507_POT},		/* r_nodes */
 	{0}, 0, 0, 0, SPACWALK_C602, 0, 1		/* c, rI, rF, cF, cAmp, vRef, gain */
 };
@@ -2145,7 +2159,7 @@ DISCRETE_OP_AMP_TRIG_VCA(NODE_RELATIVE(NODE_35, _num),				/* IC M2-3, pin 9 */  
 DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                              \
 	1,												/* ENAB */                              \
 	NODE_RELATIVE(NODE_35, _num),					/* INP0 */                              \
-	_num * 1000 + 2000, 1.0/.8,						/* FREQ, DAMP */                        \
+	2000.0 - _num * 500, 1.0/.8,					/* FREQ, DAMP */                        \
 	DISC_FILTER_LOWPASS)                                                                    \
 /* The filter has a gain of 0.5 */                                                          \
 DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),                       \
@@ -2211,7 +2225,21 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 	/************************************************
      * Space ship sound
      ************************************************/
-	DISCRETE_CONSTANT(SPACWALK_SPACE_SHIP_SND, 0)
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,			/* 2.2uF cap near IC JK-2 */
+		1,										/* ENAB */
+		&spacwalk_spaceship_osc)
+	DISCRETE_OP_AMP_VCO1(NODE_61,				/* IC JK-2, pin 5 */
+		SPACWALK_SPACE_SHIP_EN,					/* ENAB */
+		NODE_60,								/* VMOD1*/
+		&spacwalk_spaceship_vco)
+	DISCRETE_RCFILTER(NODE_62,
+		1,										/* ENAB */
+		NODE_61,								/* IN0 */
+		RES_K(1), CAP_U(0.15))
+	DISCRETE_RCFILTER(SPACWALK_SPACE_SHIP_SND,
+		1,										/* ENAB */
+		NODE_62,								/* IN0 */
+		RES_K(1) + RES_K(10), CAP_U(0.015))
 
 	/************************************************
      * Combine all sound sources.
