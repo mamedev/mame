@@ -33,10 +33,6 @@
 #define UI_MENU_POOL_SIZE		65536
 #define UI_MENU_ALLOC_ITEMS		256
 
-#define MENU_TEXTCOLOR			ARGB_WHITE
-#define MENU_SELECTCOLOR		MAKE_ARGB(0xff,0xff,0xff,0x00)
-#define MENU_UNAVAILABLECOLOR	MAKE_ARGB(0xff,0x40,0x40,0x40)
-
 #define VISIBLE_GAMES_IN_LIST	15
 
 #define MAX_PHYSICAL_DIPS		10
@@ -241,15 +237,6 @@ static render_texture *arrow_texture;
 static const char priortext[] = "Return to Prior Menu";
 static const char backtext[] = "Return to " CAPSTARTGAMENOUN;
 static const char exittext[] = "Exit";
-
-static const rgb_t text_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0xff);
-static const rgb_t text_bgcolor = MAKE_ARGB(0xe0,0x80,0x80,0x80);
-static const rgb_t sel_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0x00);
-static const rgb_t sel_bgcolor = MAKE_ARGB(0xe0,0x80,0x80,0x00);
-static const rgb_t mouseover_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0x80);
-static const rgb_t mouseover_bgcolor = MAKE_ARGB(0x70,0x40,0x40,0x00);
-static const rgb_t mousedown_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0x80);
-static const rgb_t mousedown_bgcolor = MAKE_ARGB(0xB0,0x60,0x60,0x00);
 
 
 
@@ -815,7 +802,7 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
 	y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	if (!customonly)
-		ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+		ui_draw_outlined_box(x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* determine the first visible line based on the current selection */
 	top_line = menu->selected - visible_lines / 2;
@@ -848,8 +835,10 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 			int itemnum = top_line + linenum;
 			const ui_menu_item *item = &menu->item[itemnum];
 			const char *itemtext = item->text;
-			rgb_t fgcolor = text_fgcolor;
-			rgb_t bgcolor = text_bgcolor;
+			rgb_t fgcolor = UI_TEXT_COLOR;
+			rgb_t bgcolor = UI_TEXT_BG_COLOR;
+			rgb_t fgcolor2 = UI_SUBITEM_COLOR;
+			rgb_t fgcolor3 = UI_CLONE_COLOR;
 			float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 			float line_y0 = line_y;
 			float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -862,19 +851,23 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 			/* if we're selected, draw with a different background */
 			if (itemnum == menu->selected)
 			{
-				fgcolor = sel_fgcolor;
-				bgcolor = sel_bgcolor;
+				fgcolor = UI_SELECTED_COLOR;
+				bgcolor = UI_SELECTED_BG_COLOR;
+				fgcolor2 = UI_SELECTED_COLOR;
+				fgcolor3 = UI_SELECTED_COLOR;
 			}
 
 			/* else if the mouse is over this item, draw with a different background */
 			else if (itemnum == menu->hover)
 			{
-				fgcolor = mouseover_fgcolor;
-				bgcolor = mouseover_bgcolor;
+				fgcolor = UI_MOUSEOVER_COLOR;
+				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				fgcolor2 = UI_MOUSEOVER_COLOR;
+				fgcolor3 = UI_MOUSEOVER_COLOR;
 			}
 
 			/* if we have some background hilighting to do, add a quad behind everything else */
-			if (bgcolor != text_bgcolor)
+			if (bgcolor != UI_TEXT_BG_COLOR)
 				render_ui_add_quad(line_x0, line_y0, line_x1, line_y1, bgcolor, hilight_texture,
 									PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
@@ -908,7 +901,7 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 
 			/* if we're just a divider, draw a line */
 			else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
-				render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			/* if we don't have a subitem, just draw the string centered */
 			else if (item->subtext == NULL)
@@ -939,7 +932,7 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 
 				/* draw the subitem right-justified */
 				ui_draw_text_full(subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, subitem_invert ? DRAW_OPAQUE : DRAW_NORMAL, fgcolor, bgcolor, &subitem_width, NULL);
+							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, NULL);
 
 				/* apply arrows */
 				if (itemnum == menu->selected && (item->flags & MENU_FLAG_LEFT_ARROW))
@@ -989,12 +982,12 @@ static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly
 		ui_draw_outlined_box(target_x - UI_BOX_LR_BORDER,
 						 target_y - UI_BOX_TB_BORDER,
 						 target_x + target_width + UI_BOX_LR_BORDER,
-						 target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? sel_bgcolor : UI_FILLCOLOR);
+						 target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		ui_draw_text_full(item->subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, sel_fgcolor, sel_bgcolor, NULL, NULL);
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
 
-	/* if there is somthing special to add, do it by calling the passed routine */
+	/* if there is something special to add, do it by calling the passed routine */
 	if (menu->custom != NULL)
 	{
 		void *selectedref = (menu->selected >= 0 && menu->selected < menu->numitems) ? menu->item[menu->selected].ref : NULL;
@@ -1051,20 +1044,20 @@ static void ui_menu_draw_text_box(ui_menu *menu)
 	ui_draw_outlined_box(target_x - UI_BOX_LR_BORDER - gutter_width,
 					 target_y - UI_BOX_TB_BORDER,
 					 target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-					 target_y + target_height + UI_BOX_TB_BORDER, (menu->item[0].flags & MENU_FLAG_REDTEXT) ?  UI_REDCOLOR : UI_FILLCOLOR);
+					 target_y + target_height + UI_BOX_TB_BORDER, (menu->item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	ui_draw_text_full(text, target_x, target_y, target_width,
-				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* draw the "return to prior menu" text with a hilight behind it */
 	render_ui_add_quad(	target_x + 0.5f * UI_LINE_WIDTH,
 						target_y + target_height - line_height,
 						target_x + target_width - 0.5f * UI_LINE_WIDTH,
 						target_y + target_height,
-						sel_bgcolor,
+						UI_SELECTED_BG_COLOR,
 						hilight_texture,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 	ui_draw_text_full(backtext, target_x, target_y + target_height - line_height, target_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, sel_fgcolor, sel_bgcolor, NULL, NULL);
+				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
 	/* artificially set the hover to the last item so a double-click exits */
 	menu->hover = menu->numitems - 1;
@@ -2108,7 +2101,7 @@ static void menu_settings_custom_render(running_machine *machine, ui_menu *menu,
 	y2 = y1 + bottom;
 
 	/* draw extra menu area */
-	ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+	ui_draw_outlined_box(x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	/* iterate over DIP switches */
@@ -2157,7 +2150,7 @@ static void menu_settings_custom_render_one(float x1, float y1, float x2, float 
 						JUSTIFY_RIGHT,
 						WRAP_NEVER,
 						DRAW_NORMAL,
-						ARGB_WHITE,
+						UI_TEXT_COLOR,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA),
 						NULL ,
 						NULL);
@@ -2173,7 +2166,7 @@ static void menu_settings_custom_render_one(float x1, float y1, float x2, float 
 		float innerx1;
 
 		/* first outline the switch */
-		ui_draw_outlined_box(x1, y1, x1 + switch_field_width, y2, UI_FILLCOLOR);
+		ui_draw_outlined_box(x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -2183,13 +2176,13 @@ static void menu_settings_custom_render_one(float x1, float y1, float x2, float 
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
 			render_ui_add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
-							   (selectedmask & (1 << toggle)) ? MENU_SELECTCOLOR : ARGB_WHITE,
+							   (selectedmask & (1 << toggle)) ? UI_DIPSW_COLOR : UI_TEXT_COLOR,
 							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
 			render_ui_add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
-							   MENU_UNAVAILABLECOLOR,
+							   UI_UNAVAILABLE_COLOR,
 							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 
@@ -2877,7 +2870,7 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		x2 = 1.0f - UI_BOX_LR_BORDER;
 
 		/* draw extra menu area */
-		ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+		ui_draw_outlined_box(x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		y1 += UI_BOX_TB_BORDER;
 
 		/* determine the text height */
@@ -2897,19 +2890,19 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		current_x = bar_left + bar_width * percentage;
 
 		/* fill in the percentage */
-		render_ui_add_rect(bar_left, bar_top, current_x, bar_bottom, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		render_ui_add_rect(bar_left, bar_top, current_x, bar_bottom, UI_SLIDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the top and bottom lines */
-		render_ui_add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		render_ui_add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		render_ui_add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		render_ui_add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw default marker */
-		render_ui_add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		render_ui_add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		render_ui_add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		render_ui_add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the actual text */
 		ui_draw_text_full(astring_c(tempstring), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
+					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, &text_height);
 
 		astring_free(tempstring);
 	}
@@ -3473,7 +3466,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 	if (menustate->error)
 		ui_draw_text_box("The selected game is missing one or more required ROM or CHD images. "
 		                 "Please select a different game.\n\nPress any key to continue.",
-		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_REDCOLOR);
+		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 }
 
 
@@ -3649,7 +3642,7 @@ static void menu_select_game_custom_render(running_machine *machine, ui_menu *me
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	/* draw a box */
-	ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+	ui_draw_outlined_box(x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* take off the borders */
 	x1 += UI_BOX_LR_BORDER;
@@ -3659,7 +3652,7 @@ static void menu_select_game_custom_render(running_machine *machine, ui_menu *me
 
 	/* draw the text within it */
 	ui_draw_text_full(&tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+					  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* determine the text to render below */
 	driver = ((FPTR)selectedref > 1) ? (const game_driver *)selectedref : NULL;
@@ -3738,11 +3731,13 @@ static void menu_select_game_custom_render(running_machine *machine, ui_menu *me
 	y2 = origy2 + bottom;
 
 	/* draw a box */
-	color = UI_FILLCOLOR;
+	color = UI_BACKGROUND_COLOR;
+	if (driver != NULL)
+		color = UI_GREEN_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND | GAME_IMPERFECT_SOUND)) != 0)
-		color = UI_YELLOWCOLOR;
+		color = UI_YELLOW_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
-		color = UI_REDCOLOR;
+		color = UI_RED_COLOR;
 	ui_draw_outlined_box(x1, y1, x2, y2, color);
 
 	/* take off the borders */
@@ -3755,7 +3750,7 @@ static void menu_select_game_custom_render(running_machine *machine, ui_menu *me
 	for (line = 0; line < 4; line++)
 	{
 		ui_draw_text_full(&tempbuf[line][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+						  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 		y1 += ui_get_line_height();
 	}
 }
