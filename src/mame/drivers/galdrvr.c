@@ -2918,6 +2918,27 @@ ROM_START( uniwars )
 	ROM_LOAD( "uniwars.clr",  0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 ROM_END
 
+ROM_START( spacempr )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "uw01",   0x0000, 0x0800, CRC(7c64fb92) SHA1(69f0923870cb8cbb7ae7a2a056c67a1da9b5588d) )
+	ROM_LOAD( "uw02",   0x0800, 0x0800, CRC(b2ed14c3) SHA1(7668df11f64b8e296eedfee53437777dc53a56d5) )
+	ROM_LOAD( "uw03",   0x1000, 0x0800, CRC(945f4160) SHA1(5fbe879f51e14c4c7ae551e5b3089f8e148770a4) )
+	ROM_LOAD( "uw04",   0x1800, 0x0800, CRC(84885060) SHA1(a6ea3e272b426e86ff87e95c765362b44506228e) )
+	ROM_LOAD( "uw05",   0x2000, 0x0800, CRC(e342371d) SHA1(f53caf7793df5788237d5e2f35242c0dd7a3085b) )
+	ROM_LOAD( "uw06",   0x2800, 0x0800, CRC(d915a389) SHA1(0e2ff6eec9453856a1276889946b463cfae58eba) )
+	ROM_LOAD( "uw07",   0x3000, 0x0800, CRC(c9245346) SHA1(239bad3fe64eaab2dfc3febd06d1124103a10504) )
+	ROM_LOAD( "uw08",   0x3800, 0x0800, CRC(a237c394) SHA1(66dfa2aa39bd19f1f6ddb267d8f8bdbdba750d46) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "uw10",   0x0000, 0x0800, CRC(af069cba) SHA1(12b7d0a57f43613c80afd51c417628090740aabe) )
+	ROM_LOAD( "uw12",   0x0800, 0x0800, CRC(c26132af) SHA1(7ae125a911dfd47aeca4f129f580762ce4d8d91a) )
+	ROM_LOAD( "uw09",   0x1000, 0x0800, CRC(ff2c20d5) SHA1(48668dc4f008f44f5c15bdcc331cfe133da99cd4) )
+	ROM_LOAD( "uw11",   0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331",  0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( gteikoku )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "f07_1a.bin",   0x0000, 0x0800, CRC(d975af10) SHA1(a2e2a36a75db8fd09441308b08b6ae073c68b8cf) )
@@ -5099,6 +5120,7 @@ GAME( 1980, gteikokb, uniwars,  galaxian, gteikokb, pisces,   ROT270, "bootleg",
 GAME( 1980, gteikob2, uniwars,  galaxian, gteikob2, pisces,   ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spacbatt, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg", "Sky Raiders", GAME_SUPPORTS_SAVE )
 
 /* similar to pisces, but with different video banking characteristics */

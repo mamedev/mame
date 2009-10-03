@@ -165,6 +165,7 @@ const game_driver * const drivers[] =
 	DRIVER( gteikob2 )	/* bootleg */
 	DRIVER( spacbatt )	/* bootleg */
 	DRIVER( spacbat2 )	/* bootleg */
+	DRIVER( spacempr )	/* bootleg */
 	DRIVER( skyraidr )	/* bootleg */
 	DRIVER( batman2 )	/* bootleg */
 	DRIVER( warofbug )	/* (c) 1981 Armenia */
