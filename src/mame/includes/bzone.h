@@ -22,7 +22,6 @@ MACHINE_DRIVER_EXTERN( bzone_audio );
 /*----------- defined in audio/redbaron.c -----------*/
 
 WRITE8_HANDLER( redbaron_sounds_w );
-WRITE8_DEVICE_HANDLER( redbaron_pokey_w );
 
 DEVICE_GET_INFO( redbaron_sound );
 #define SOUND_REDBARON DEVICE_GET_INFO_NAME(redbaron_sound)

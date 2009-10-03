@@ -69,22 +69,25 @@ INLINE void z180_mmu(z180_state *cpustate)
  * Read a byte from given memory location
  ***************************************************************/
 #define RM(cs,addr)	memory_read_byte_8le((cs)->program, MMU_REMAP_ADDR(cs,addr))
+#ifdef UNUSED_FUNCTION
 UINT8 z180_readmem(const device_config *device, offs_t offset)
 {
 	z180_state *cpustate = get_safe_token(device);
 	return RM(cpustate, offset);
 }
+#endif
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
 #define WM(cs,addr,value) memory_write_byte_8le((cs)->program, MMU_REMAP_ADDR(cs,addr),value)
+#ifdef UNUSED_FUNCTION
 void z180_writemem(const device_config *device, offs_t offset, UINT8 data)
 {
 	z180_state *cpustate = get_safe_token(device);
 	WM(cpustate, offset, data);
 }
-
+#endif
 
 /***************************************************************
  * Read a word from given memory location

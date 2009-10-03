@@ -1299,7 +1299,7 @@ static DEVICE_RESET( tms5220 )
 
 ***********************************************************************************************/
 
-TIMER_CALLBACK( io_ready_cb )
+static TIMER_CALLBACK( io_ready_cb )
 {
 	tms5220_state *tms = (tms5220_state *) ptr;
 	if (param)

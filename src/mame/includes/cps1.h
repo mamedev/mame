@@ -8,11 +8,6 @@ ADDRESS_MAP_EXTERN(qsound_sub_map, 8);
 READ16_HANDLER( qsound_sharedram1_r );
 WRITE16_HANDLER( qsound_sharedram1_w );
 
-READ16_HANDLER( cps1_eeprom_port_r );
-WRITE16_HANDLER( cps1_eeprom_port_w );
-
-INTERRUPT_GEN( cps1_qsound_interrupt );
-
 READ16_HANDLER( cps1_dsw_r );
 WRITE16_HANDLER( cps1_coinctrl_w );
 INTERRUPT_GEN( cps1_interrupt );

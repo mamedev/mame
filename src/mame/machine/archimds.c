@@ -37,7 +37,7 @@
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
-UINT32 *memc_physmem;
+UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
 static INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
@@ -175,7 +175,7 @@ void archimedes_init(running_machine *machine)
 	timer_adjust_oneshot(snd_timer, attotime_never, 0);
 }
 
-READ32_HANDLER(memc_logical_r)
+READ32_HANDLER(archimedes_memc_logical_r)
 {
 	UINT32 page, poffs;
 
@@ -198,7 +198,7 @@ READ32_HANDLER(memc_logical_r)
 
 		if (memc_pages[page] != -1)
 		{
-			return memc_physmem[((memc_pages[page] * page_sizes[memc_pagesize]) + poffs)>>2];
+			return archimedes_memc_physmem[((memc_pages[page] * page_sizes[memc_pagesize]) + poffs)>>2];
 		}
 		else
 		{
@@ -209,7 +209,7 @@ READ32_HANDLER(memc_logical_r)
 	return 0;
 }
 
-WRITE32_HANDLER(memc_logical_w)
+WRITE32_HANDLER(archimedes_memc_logical_w)
 {
 	UINT32 page, poffs;
 
@@ -228,7 +228,7 @@ WRITE32_HANDLER(memc_logical_w)
 
 		if (memc_pages[page] != -1)
 		{
-			COMBINE_DATA(&memc_physmem[((memc_pages[page] * page_sizes[memc_pagesize]) + poffs)>>2]);
+			COMBINE_DATA(&archimedes_memc_physmem[((memc_pages[page] * page_sizes[memc_pagesize]) + poffs)>>2]);
 		}
 		else
 		{
@@ -260,7 +260,7 @@ static DIRECT_UPDATE_HANDLER( a310_setopbase )
 		direct->bytemask = page_sizes[memc_pagesize]-1;
 		direct->bytestart = page * page_sizes[memc_pagesize];
 		direct->byteend = direct->bytestart + direct->bytemask;
-		direct->raw = direct->decrypted = (UINT8 *)&memc_physmem[(memc_pages[page] * page_sizes[memc_pagesize])>>2];
+		direct->raw = direct->decrypted = (UINT8 *)&archimedes_memc_physmem[(memc_pages[page] * page_sizes[memc_pagesize])>>2];
 	}
 
 	return ~0;
@@ -314,7 +314,7 @@ static void latch_timer_cnt(int tmr)
 	ioc_timerout[tmr] = ioc_timercnt[tmr] - (UINT32)time;
 }
 
-READ32_HANDLER(ioc_r)
+READ32_HANDLER(archimedes_ioc_r)
 {
 	#ifdef MESS
 	const device_config *fdc = (const device_config *)devtag_get_device(space->machine, "wd1772");
@@ -364,7 +364,7 @@ READ32_HANDLER(ioc_r)
 	return 0;
 }
 
-WRITE32_HANDLER(ioc_w)
+WRITE32_HANDLER(archimedes_ioc_w)
 {
 	#ifdef MESS
 	const device_config *fdc = (const device_config *)devtag_get_device(space->machine, "wd1772");
@@ -492,12 +492,12 @@ WRITE32_HANDLER(ioc_w)
 	}
 }
 
-READ32_HANDLER(vidc_r)
+READ32_HANDLER(archimedes_vidc_r)
 {
 	return 0;
 }
 
-WRITE32_HANDLER(vidc_w)
+WRITE32_HANDLER(archimedes_vidc_w)
 {
 	UINT32 reg = data>>24;
 	UINT32 val = data & 0xffffff;
@@ -557,12 +557,12 @@ WRITE32_HANDLER(vidc_w)
 	}
 }
 
-READ32_HANDLER(memc_r)
+READ32_HANDLER(archimedes_memc_r)
 {
 	return 0;
 }
 
-WRITE32_HANDLER(memc_w)
+WRITE32_HANDLER(archimedes_memc_w)
 {
 	// is it a register?
 	if ((data & 0x0fe00000) == 0x03600000)
@@ -638,7 +638,7 @@ The physical page is encoded differently depending on the page size :
             1 being bit 6
 */
 
-WRITE32_HANDLER(memc_page_w)
+WRITE32_HANDLER(archimedes_memc_page_w)
 {
 	UINT32 log, phys, memc, perms;
 

@@ -782,7 +782,7 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-unsigned DasmSH4(char *buffer, unsigned pc, UINT16 opcode)
+static unsigned DasmSH4(char *buffer, unsigned pc, UINT16 opcode)
 {
 	UINT32 flags;
 

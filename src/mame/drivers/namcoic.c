@@ -1343,6 +1343,7 @@ WRITE16_HANDLER( namco_rozcontrol16_w )
 	COMBINE_DATA( &rozcontrol16[offset] );
 } /* namco_rozcontrol16_w */
 
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( namco_rozbank16_r )
 {
 	return rozbank16[offset];
@@ -1361,6 +1362,7 @@ WRITE16_HANDLER( namco_rozbank16_w )
 		}
 	}
 } /* namco_rozbank16_w */
+#endif
 
 static void
 writerozvideo( int offset, UINT16 data )

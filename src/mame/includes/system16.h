@@ -56,12 +56,6 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 
 /*----------- defined in machine/system16.c -----------*/
 
-extern UINT16 *sys16_workingram;
-extern UINT16 *sys16_workingram2;
-extern UINT16 *sys16_extraram;
-extern UINT16 *sys16_extraram2;
-extern UINT16 *sys16_extraram3;
-
 /* sound */
 extern const upd7759_interface sys16_upd7759_interface;
 
@@ -116,7 +110,6 @@ extern int sys16_sh_shadowpal;
 extern int sys16_MaxShadowColors;
 
 /* video driver constants (vary with game) */
-extern int sys16_gr_bitmap_width;
 extern int sys16_sprxoffset;
 extern int sys16_bgxoffset;
 extern int sys16_fgxoffset;
@@ -152,13 +145,4 @@ extern UINT16 *sys18_splittab_bg_x;
 extern UINT16 *sys18_splittab_bg_y;
 extern UINT16 *sys18_splittab_fg_x;
 extern UINT16 *sys18_splittab_fg_y;
-
-extern UINT16 *sys16_gr_ver;
-extern UINT16 *sys16_gr_hor;
-extern UINT16 *sys16_gr_pal;
-extern UINT16 *sys16_gr_flip;
-extern int sys16_gr_palette;
-extern int sys16_gr_palette_default;
-extern UINT8 sys16_gr_colorflip[2][4];
-extern UINT16 *sys16_gr_second_road;
 

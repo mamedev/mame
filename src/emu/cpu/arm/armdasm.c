@@ -99,7 +99,7 @@ static char *WritePadding( char *pBuf, const char *pBuf0 )
 	return pBuf;
 }
 
-UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
+static UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 {
 	const char *pBuf0;
 

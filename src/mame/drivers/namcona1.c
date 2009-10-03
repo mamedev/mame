@@ -167,7 +167,7 @@ Notes:
 
 static UINT16 *mpBank0, *mpBank1;
 static int mEnableInterrupts;
-int namcona1_gametype;
+static int namcona1_gametype;
 
 /*************************************************************************/
 

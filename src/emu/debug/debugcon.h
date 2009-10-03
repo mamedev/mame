@@ -77,7 +77,6 @@ typedef UINT32 CMDERR;
 
 /* initialization */
 void				debug_console_init(running_machine *machine);
-void				debug_console_exit(running_machine *machine);
 
 /* command handling */
 CMDERR				debug_console_execute_command(running_machine *machine, const char *command, int echo);

@@ -141,7 +141,6 @@ WRITE8_HANDLER( dkong_palettebank_w );
 WRITE8_HANDLER( dkong_videoram_w );
 
 PALETTE_INIT( dkong2b );
-PALETTE_INIT( dkong4b );
 PALETTE_INIT( radarscp );
 PALETTE_INIT( radarsc1 );
 PALETTE_INIT( dkong3 );

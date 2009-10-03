@@ -77,8 +77,6 @@ READ32_HANDLER( sh2_internal_r );
 void sh2_set_ftcsr_read_callback(const device_config *device, void (*callback)(UINT32));
 void sh2_set_frt_input(const device_config *device, int state);
 
-extern unsigned DasmSH2( char *dst, unsigned pc, UINT16 opcode );
-
 /***************************************************************************
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/

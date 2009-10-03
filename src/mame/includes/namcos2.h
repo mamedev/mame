@@ -165,7 +165,6 @@ WRITE16_HANDLER( namcos2_68k_serial_comms_ram_w );
 READ16_HANDLER( namcos2_68k_serial_comms_ctrl_r );
 WRITE16_HANDLER( namcos2_68k_serial_comms_ctrl_w );
 
-extern UINT16  namcos2_68k_serial_comms_ctrl[];
 extern UINT16 *namcos2_68k_serial_comms_ram;
 
 /**************************************************************/
@@ -186,10 +185,6 @@ WRITE16_HANDLER( namcos2_68k_key_w );
 #define NAMCOS2_C148_POSIRQ 	5		/* 0x1ca000 */
 #define NAMCOS2_C148_SERIRQ 	6		/* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ	7		/* 0x1ce000 */
-
-extern UINT16 namcos2_68k_master_C148[];
-extern UINT16 namcos2_68k_slave_C148[];
-extern UINT16 namcos2_68k_gpu_C148[];
 
 WRITE16_HANDLER( namcos2_68k_master_C148_w );
 READ16_HANDLER( namcos2_68k_master_C148_r );

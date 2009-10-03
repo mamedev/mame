@@ -29,6 +29,7 @@
 
 
 static UINT8 *shared_ram;
+static WRITE8_HANDLER( kyugo_sub_cpu_control_w );
 
 
 /*************************************
@@ -37,7 +38,7 @@ static UINT8 *shared_ram;
  *
  *************************************/
 
-MACHINE_RESET( kyugo )
+static MACHINE_RESET( kyugo )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// must start with interrupts and sub CPU disabled
@@ -46,7 +47,7 @@ MACHINE_RESET( kyugo )
 }
 
 
-WRITE8_HANDLER( kyugo_sub_cpu_control_w )
+static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
 	cputag_set_input_line(space->machine, "sub", INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }

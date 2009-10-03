@@ -198,7 +198,7 @@ static char *WriteBranchAddress( char *pBuf, UINT32 pc, UINT32 opcode )
 	return pBuf;
 } /* WriteBranchAddress */
 
-UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
+static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 {
 	const char *pBuf0;
 
@@ -692,7 +692,7 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	return dasmflags | DASMFLAG_SUPPORTED;
 }
 
-UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
+static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 {
 	const char *pBuf0;
 	UINT32 dasmflags = 0;

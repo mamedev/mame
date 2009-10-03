@@ -486,12 +486,12 @@ static void st010_op_08( void ) {
 
 // init, reset & handlers
 
-UINT8 st010_read( UINT16 address )
+static UINT8 st010_read( UINT16 address )
 {
 	return st010_readb(address);
 }
 
-void st010_write( UINT16 address, UINT8 data )
+static void st010_write( UINT16 address, UINT8 data )
 {
 	st010_writeb(address, data);
 
@@ -514,12 +514,12 @@ void st010_write( UINT16 address, UINT8 data )
 }
 
 
-void st010_init( running_machine* machine )
+static void st010_init( running_machine* machine )
 {
 	snes_st010.ram = (UINT8*)auto_alloc_array(machine, UINT8, 0x1000);
 }
 
-void st010_reset( void )
+static void st010_reset( void )
 {
 	snes_st010.x1 = 0;
 	snes_st010.y1 = 0;

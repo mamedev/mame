@@ -27,8 +27,8 @@ Fixed-point math reminder:
 
 #include "snesdsp4.h"
 
-struct DSP4_t DSP4;
-struct DSP4_vars_t DSP4_vars;
+static struct DSP4_t DSP4;
+static struct DSP4_vars_t DSP4_vars;
 
 INLINE UINT16 READ_WORD(UINT8 *addr)
 {
@@ -142,7 +142,7 @@ static const UINT16 div_lut[64] = { 0x0000, 0x8000, 0x4000, 0x2aaa, 0x2000, 0x19
                                     0x0333, 0x031f, 0x030c, 0x02fa, 0x02e8, 0x02d8, 0x02c8, 0x02b9, 0x02aa, 0x029c,
                                     0x028f, 0x0282, 0x0276, 0x026a, 0x025e, 0x0253, 0x0249, 0x023e, 0x0234, 0x022b,
                                     0x0222, 0x0219, 0x0210, 0x0208,  };
-INT16 DSP4_Inverse(INT16 value)
+static INT16 DSP4_Inverse(INT16 value)
 {
   // saturate bounds
   if (value < 0)
@@ -160,12 +160,12 @@ INT16 DSP4_Inverse(INT16 value)
 //////////////////////////////////////////////////////////////
 
 // Prototype
-void DSP4_OP0B(UINT8 *draw, INT16 sp_x, INT16 sp_y, INT16 sp_attr, UINT8 size, UINT8 stop);
+static void DSP4_OP0B(UINT8 *draw, INT16 sp_x, INT16 sp_y, INT16 sp_attr, UINT8 size, UINT8 stop);
 
 //////////////////////////////////////////////////////////////
 
 // OP00
-void DSP4_Multiply(INT16 Multiplicand, INT16 Multiplier, INT32 *Product)
+static void DSP4_Multiply(INT16 Multiplicand, INT16 Multiplier, INT32 *Product)
 {
   *Product = (Multiplicand * Multiplier << 1) >> 1;
 }
@@ -173,7 +173,7 @@ void DSP4_Multiply(INT16 Multiplicand, INT16 Multiplier, INT32 *Product)
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP01( void )
+static void DSP4_OP01( void )
 {
   DSP4.waiting4command = 0;
 
@@ -388,7 +388,7 @@ void DSP4_OP01( void )
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP03( void )
+static void DSP4_OP03( void )
 {
   DSP4_vars.OAM_RowMax = 33;
   memset(DSP4_vars.OAM_Row, 0, 64);
@@ -398,7 +398,7 @@ void DSP4_OP03( void )
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP05( void )
+static void DSP4_OP05( void )
 {
   DSP4_vars.OAM_index = 0;
   DSP4_vars.OAM_bits = 0;
@@ -409,7 +409,7 @@ void DSP4_OP05( void )
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP06( void )
+static void DSP4_OP06( void )
 {
   DSP4_CLEAR_OUT();
   DSP4_WRITE_16_WORD(DSP4_vars.OAM_attr);
@@ -418,7 +418,7 @@ void DSP4_OP06( void )
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP07( void )
+static void DSP4_OP07( void )
 {
   DSP4.waiting4command = 0;
 
@@ -587,7 +587,7 @@ void DSP4_OP07( void )
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP08( void )
+static void DSP4_OP08( void )
 {
   INT16 win_left, win_right;
   INT16 view_x[2], view_y[2];
@@ -918,7 +918,7 @@ void DSP4_OP08( void )
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP09( void )
+static void DSP4_OP09( void )
 {
   DSP4.waiting4command = 0;
 
@@ -1181,10 +1181,10 @@ void DSP4_OP09( void )
 
 //////////////////////////////////////////////////////////////
 
-const UINT16 OP0A_Values[16] = { 0x0000, 0x0030, 0x0060, 0x0090, 0x00c0, 0x00f0, 0x0120, 0x0150, 0xfe80,
+static const UINT16 OP0A_Values[16] = { 0x0000, 0x0030, 0x0060, 0x0090, 0x00c0, 0x00f0, 0x0120, 0x0150, 0xfe80,
                                  0xfeb0, 0xfee0, 0xff10, 0xff40, 0xff70, 0xffa0, 0xffd0 };
 
-void DSP4_OP0A(INT16 n2, INT16 *o1, INT16 *o2, INT16 *o3, INT16 *o4)
+static void DSP4_OP0A(INT16 n2, INT16 *o1, INT16 *o2, INT16 *o3, INT16 *o4)
 {
   *o4 = OP0A_Values[(n2 & 0x000f)];
   *o3 = OP0A_Values[(n2 & 0x00f0) >> 4];
@@ -1194,7 +1194,7 @@ void DSP4_OP0A(INT16 n2, INT16 *o1, INT16 *o2, INT16 *o3, INT16 *o4)
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP0B(UINT8 *draw, INT16 sp_x, INT16 sp_y, INT16 sp_attr, UINT8 size, UINT8 stop)
+static void DSP4_OP0B(UINT8 *draw, INT16 sp_x, INT16 sp_y, INT16 sp_attr, UINT8 size, UINT8 stop)
 {
   INT16 Row1, Row2;
 
@@ -1279,7 +1279,7 @@ void DSP4_OP0B(UINT8 *draw, INT16 sp_x, INT16 sp_y, INT16 sp_attr, UINT8 size, U
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP0D( void )
+static void DSP4_OP0D( void )
 {
   DSP4.waiting4command = 0;
 
@@ -1467,7 +1467,7 @@ void DSP4_OP0D( void )
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP0E( void )
+static void DSP4_OP0E( void )
 {
   DSP4_vars.OAM_RowMax = 16;
   memset(DSP4_vars.OAM_Row, 0, 64);
@@ -1476,7 +1476,7 @@ void DSP4_OP0E( void )
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP0F( void )
+static void DSP4_OP0F( void )
 {
   DSP4.waiting4command = 0;
 
@@ -1727,7 +1727,7 @@ void DSP4_OP0F( void )
 //////////////////////////////////////////////////////////////
 
 
-void DSP4_OP10( void )
+static void DSP4_OP10( void )
 {
   DSP4.waiting4command = 0;
 
@@ -1935,7 +1935,7 @@ void DSP4_OP10( void )
 
 //////////////////////////////////////////////////////////////
 
-void DSP4_OP11(INT16 A, INT16 B, INT16 C, INT16 D, INT16 *M)
+static void DSP4_OP11(INT16 A, INT16 B, INT16 C, INT16 D, INT16 *M)
 {
   // 0x155 = 341 = Horizontal Width of the Screen
   *M = ((A * 0x0155 >> 2) & 0xf000) |
@@ -1952,13 +1952,13 @@ void DSP4_OP11(INT16 A, INT16 B, INT16 C, INT16 D, INT16 *M)
 //Processing Code
 /////////////////////////////////////////////////////////////
 
-void InitDSP4( void )
+static void InitDSP4( void )
 {
   memset(&DSP4, 0, sizeof(DSP4));
   DSP4.waiting4command = 1;
 }
 
-void DSP4_write( UINT8 dsp4_byte )
+static void DSP4_write( UINT8 dsp4_byte )
 {
   // clear pending read
   if (DSP4.out_index < DSP4.out_count)
@@ -2159,7 +2159,7 @@ void DSP4_write( UINT8 dsp4_byte )
   }
 }
 
-UINT8 DSP4_read( void )
+static UINT8 DSP4_read( void )
 {
   UINT8 value;
 

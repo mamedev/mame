@@ -70,7 +70,6 @@ VIDEO_START( pisces );
 VIDEO_START( batman2 );
 VIDEO_START( dkongjrm );
 VIDEO_START( scrambold );
-VIDEO_START( theend );
 VIDEO_START( darkplnt );
 VIDEO_START( rescue );
 VIDEO_START( minefld );
@@ -95,22 +94,10 @@ VIDEO_UPDATE( dambustr );
 WRITE8_HANDLER( galaxold_gfxbank_w );
 WRITE8_HANDLER( galaxold_flip_screen_x_w );
 WRITE8_HANDLER( galaxold_flip_screen_y_w );
-WRITE8_HANDLER( gteikob2_flip_screen_x_w );
-WRITE8_HANDLER( gteikob2_flip_screen_y_w );
 
 
 /*----------- defined in machine/galaxold.c -----------*/
 
-DRIVER_INIT( zigzag );
-DRIVER_INIT( pisces );
-DRIVER_INIT( checkmaj );
-DRIVER_INIT( dingo );
-DRIVER_INIT( dingoe );
-DRIVER_INIT( mooncrsu );
-DRIVER_INIT( mooncrst );
-DRIVER_INIT( mooncrgx );
-DRIVER_INIT( moonqsr );
-DRIVER_INIT( checkman );
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
 
@@ -132,8 +119,6 @@ READ8_HANDLER( scramblb_protection_2_r );
 WRITE8_HANDLER( _4in1_bank_w );
 CUSTOM_INPUT( _4in1_fake_port_r );
 
-WRITE8_HANDLER( zigzag_sillyprotection_w );
-
 INTERRUPT_GEN( hunchbks_vh_interrupt );
 
 
@@ -147,15 +132,10 @@ extern const ppi8255_interface mrkougar_ppi_1_intf;
 
 
 DRIVER_INIT( scramble_ppi );
-DRIVER_INIT( scobra );
-DRIVER_INIT( atlantis );
-DRIVER_INIT( scramble );
 DRIVER_INIT( stratgyx );
 DRIVER_INIT( tazmani2 );
 DRIVER_INIT( ckongs );
 DRIVER_INIT( mariner );
-DRIVER_INIT( frogger );
-DRIVER_INIT( froggers );
 DRIVER_INIT( devilfsh );
 DRIVER_INIT( mars );
 DRIVER_INIT( hotshock );
@@ -164,10 +144,8 @@ DRIVER_INIT( darkplnt );
 DRIVER_INIT( mimonkey );
 DRIVER_INIT( mimonsco );
 DRIVER_INIT( mimonscr );
-DRIVER_INIT( anteater );
 DRIVER_INIT( rescue );
 DRIVER_INIT( minefld );
-DRIVER_INIT( losttomb );
 DRIVER_INIT( hustler );
 DRIVER_INIT( billiard );
 DRIVER_INIT( mrkougar );
@@ -200,7 +178,6 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
-WRITE8_HANDLER( froggrmc_sh_irqtrigger_w );
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w );
 
 MACHINE_DRIVER_EXTERN( ad2083_audio );

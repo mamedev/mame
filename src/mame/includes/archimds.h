@@ -36,7 +36,7 @@
 
 /*----------- defined in machine/archimds.c -----------*/
 
-extern UINT32 *memc_physmem;
+extern UINT32 *archimedes_memc_physmem;
 
 void archimedes_init(running_machine *machine);			// call at MACHINE_INIT
 void archimedes_reset(running_machine *machine);		// call at MACHINE_RESET
@@ -49,14 +49,14 @@ void archimedes_clear_irq_a(running_machine *machine, int mask);
 void archimedes_clear_irq_b(running_machine *machine, int mask);
 void archimedes_clear_fiq(running_machine *machine, int mask);
 
-extern READ32_HANDLER(memc_logical_r);
-extern WRITE32_HANDLER(memc_logical_w);
-extern READ32_HANDLER(memc_r);
-extern WRITE32_HANDLER(memc_w);
-extern WRITE32_HANDLER(memc_page_w);
-extern READ32_HANDLER(ioc_r);
-extern WRITE32_HANDLER(ioc_w);
-extern READ32_HANDLER(vidc_r);
-extern WRITE32_HANDLER(vidc_w);
+extern READ32_HANDLER(archimedes_memc_logical_r);
+extern WRITE32_HANDLER(archimedes_memc_logical_w);
+extern READ32_HANDLER(archimedes_memc_r);
+extern WRITE32_HANDLER(archimedes_memc_w);
+extern WRITE32_HANDLER(archimedes_memc_page_w);
+extern READ32_HANDLER(archimedes_ioc_r);
+extern WRITE32_HANDLER(archimedes_ioc_w);
+extern READ32_HANDLER(archimedes_vidc_r);
+extern WRITE32_HANDLER(archimedes_vidc_w);
 
 #endif	// _ARCHIMEDES_H_

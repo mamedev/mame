@@ -10,13 +10,25 @@
 
 ***************************************************************************/
 
+#include "driver.h"
 #include "snescx4.h"
+
+static CX4 cx4;
+
+static UINT8 CX4_read(UINT32 addr);
+static UINT16 CX4_readw(UINT16 addr);
+static UINT32 CX4_readl(UINT16 addr);
+
+static void CX4_write(running_machine *machine, UINT32 addr, UINT8 data);
+static void CX4_writew(running_machine *machine, UINT16 addr, UINT16 data);
+//static void CX4_writel(running_machine *machine, UINT16 addr, UINT32 data);
+
+static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color);
+
 #include "cx4data.c"
 #include "cx4fn.c"
-#include "cx4oam.c"
-#include "cx4ops.c"
 
-UINT32 CX4_ldr(UINT8 r)
+static UINT32 CX4_ldr(UINT8 r)
 {
 	UINT16 addr = 0x0080 + (r * 3);
 	return (cx4.reg[addr + 0] <<  0)
@@ -24,7 +36,7 @@ UINT32 CX4_ldr(UINT8 r)
 	     | (cx4.reg[addr + 2] << 16);
 }
 
-void CX4_str(UINT8 r, UINT32 data)
+static void CX4_str(UINT8 r, UINT32 data)
 {
 	UINT16 addr = 0x0080 + (r * 3);
 	cx4.reg[addr + 0] = (data >>  0);
@@ -32,7 +44,7 @@ void CX4_str(UINT8 r, UINT32 data)
 	cx4.reg[addr + 2] = (data >> 16);
 }
 
-void CX4_mul(UINT32 x, UINT32 y, UINT32 *rl, UINT32 *rh)
+static void CX4_mul(UINT32 x, UINT32 y, UINT32 *rl, UINT32 *rh)
 {
 	INT64 rx = x & 0xffffff;
 	INT64 ry = y & 0xffffff;
@@ -45,7 +57,7 @@ void CX4_mul(UINT32 x, UINT32 y, UINT32 *rl, UINT32 *rh)
 	*rh = (rx >> 24) & 0xffffff;
 }
 
-UINT32 CX4_sin(UINT32 rx)
+static UINT32 CX4_sin(UINT32 rx)
 {
 	cx4.r0 = rx & 0x1ff;
 	if(cx4.r0 & 0x100)
@@ -66,12 +78,12 @@ UINT32 CX4_sin(UINT32 rx)
 	}
 }
 
-UINT32 CX4_cos(UINT32 rx)
+static UINT32 CX4_cos(UINT32 rx)
 {
 	return CX4_sin(rx + 0x080);
 }
 
-void CX4_immediate_reg(UINT32 start)
+static void CX4_immediate_reg(UINT32 start)
 {
 	UINT32 i = 0;
 	cx4.r0 = CX4_ldr(0);
@@ -86,7 +98,7 @@ void CX4_immediate_reg(UINT32 start)
 	CX4_str(0, cx4.r0);
 }
 
-void CX4_transfer_data(running_machine *machine)
+static void CX4_transfer_data(running_machine *machine)
 {
 	UINT32 src;
 	UINT16 dest, count;
@@ -102,7 +114,10 @@ void CX4_transfer_data(running_machine *machine)
 	}
 }
 
-void CX4_write(running_machine *machine, UINT32 addr, UINT8 data)
+#include "cx4oam.c"
+#include "cx4ops.c"
+
+static void CX4_write(running_machine *machine, UINT32 addr, UINT8 data)
 {
 	addr &= 0x1fff;
 
@@ -176,25 +191,29 @@ void CX4_write(running_machine *machine, UINT32 addr, UINT8 data)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 void CX4_writeb(running_machine *machine, UINT16 addr, UINT8 data)
 {
 	CX4_write(machine, addr,     data);
 }
+#endif
 
-void CX4_writew(running_machine *machine, UINT16 addr, UINT16 data)
+static void CX4_writew(running_machine *machine, UINT16 addr, UINT16 data)
 {
 	CX4_write(machine, addr + 0, data >> 0);
 	CX4_write(machine, addr + 1, data >> 8);
 }
 
+#ifdef UNUSED_FUNCTION
 void CX4_writel(running_machine *machine, UINT16 addr, UINT32 data)
 {
 	CX4_write(machine, addr + 0, data >>  0);
 	CX4_write(machine, addr + 1, data >>  8);
 	CX4_write(machine, addr + 2, data >> 16);
 }
+#endif
 
-UINT8 CX4_read(UINT32 addr)
+static UINT8 CX4_read(UINT32 addr)
 {
 	addr &= 0x1fff;
 
@@ -211,23 +230,28 @@ UINT8 CX4_read(UINT32 addr)
 	return 0xff;
 }
 
+#ifdef UNUSED_FUNCTION
 UINT8 CX4_readb(UINT16 addr)
 {
 	return CX4_read(addr);
 }
+#endif
 
-UINT16 CX4_readw(UINT16 addr)
+static UINT16 CX4_readw(UINT16 addr)
 {
 	return CX4_read(addr) | (CX4_read(addr + 1) << 8);
 }
 
-UINT32 CX4_readl(UINT16 addr)
+static UINT32 CX4_readl(UINT16 addr)
 {
 	return CX4_read(addr) | (CX4_read(addr + 1) << 8) | (CX4_read(addr + 2) << 16);
 }
 
+#ifdef UNUSED_FUNCTION
 void CX4_reset()
 {
 	memset(cx4.ram, 0, 0x0c00);
 	memset(cx4.reg, 0, 0x0100);
 }
+#endif
+

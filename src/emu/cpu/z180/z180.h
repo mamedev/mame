@@ -135,9 +135,11 @@ enum
 #define Z180_INT_ASCI0	8			/* Internal ASCI channel 0 */
 #define Z180_INT_ASCI1	9			/* Internal ASCI channel 1 */
 
+#ifdef UNUSED_DEFINITION
 /* MMU mapped memory lookup */
 extern UINT8 z180_readmem(const device_config *device, offs_t offset);
 extern void z180_writemem(const device_config *device, offs_t offset, UINT8 data);
+#endif
 
 extern CPU_GET_INFO( z180 );
 #define CPU_Z180 CPU_GET_INFO_NAME( z180 )

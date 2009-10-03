@@ -93,7 +93,7 @@ static UINT8 timer_adjusted;
 static void (*draw_stars)(running_machine *machine, bitmap_t *, const rectangle *);		/* function to call to draw the star layer */
 static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
        void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void scrambold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void start_stars_blink_timer(double ra, double rb, double c);
@@ -103,7 +103,7 @@ static void start_stars_scroll_timer(running_machine *machine);
 static UINT8 darkplnt_bullet_color;
 static void (*draw_bullets)(running_machine *,bitmap_t *,const rectangle *,int,int,int);	/* function to call to draw a bullet */
 static void galaxold_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y);
-static void scramble_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y);
+static void scrambold_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y);
 static void darkplnt_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y);
 static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y);
 
@@ -112,8 +112,8 @@ static UINT8 background_enable;
 static UINT8 background_red, background_green, background_blue;
 static void (*draw_background)(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);	/* function to call to draw the background */
 static void galaxold_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void  turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void scrambold_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void  ad2083_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void stratgyx_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void  minefld_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
@@ -575,11 +575,11 @@ VIDEO_START( scrambold )
      */
 	tilemap_set_scrolldx(bg_tilemap, 0, 0);
 
-	draw_stars = scramble_draw_stars;
+	draw_stars = scrambold_draw_stars;
 
-	draw_bullets = scramble_draw_bullets;
+	draw_bullets = scrambold_draw_bullets;
 
-	draw_background = scramble_draw_background;
+	draw_background = scrambold_draw_background;
 }
 
 VIDEO_START( darkplnt )
@@ -628,7 +628,7 @@ VIDEO_START( mariner )
 
 	draw_stars = mariner_draw_stars;
 
-	draw_bullets = scramble_draw_bullets;
+	draw_bullets = scrambold_draw_bullets;
 
 	draw_background = mariner_draw_background;
 
@@ -681,6 +681,7 @@ VIDEO_START( pisces )
 	modify_spritecode = pisces_modify_spritecode;
 }
 
+#ifdef UNUSED_FUNCTION
 static void theend_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
 {
 	int i;
@@ -702,6 +703,7 @@ VIDEO_START( theend )
 
 	draw_bullets = theend_draw_bullets;
 }
+#endif
 
 static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
 {
@@ -826,9 +828,9 @@ VIDEO_START( ad2083 )
 
 	mooncrst_gfxextend = 0;
 
-	draw_bullets = scramble_draw_bullets;
+	draw_bullets = scrambold_draw_bullets;
 
-	draw_background = turtles_draw_background;
+	draw_background = ad2083_draw_background;
 	background_enable = 0;
 	background_blue = 0;
 	background_red = 0;
@@ -1022,6 +1024,7 @@ WRITE8_HANDLER( galaxold_flip_screen_y_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( gteikob2_flip_screen_x_w )
 {
 	galaxold_flip_screen_x_w(space, offset, ~data);
@@ -1031,6 +1034,7 @@ WRITE8_HANDLER( gteikob2_flip_screen_y_w )
 {
 	galaxold_flip_screen_y_w(space, offset, ~data);
 }
+#endif
 
 
 WRITE8_HANDLER( hotshock_flip_screen_w )
@@ -1251,7 +1255,7 @@ static void galaxold_draw_bullets(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-static void scramble_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
+static void scrambold_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
 {
 	if (flipscreen_x)  x++;
 
@@ -1308,7 +1312,7 @@ static void galaxold_draw_background(running_machine *machine, bitmap_t *bitmap,
 	bitmap_fill(bitmap,cliprect,0);
 }
 
-static void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void scrambold_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
 		bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE);
@@ -1316,7 +1320,7 @@ static void scramble_draw_background(running_machine *machine, bitmap_t *bitmap,
 		bitmap_fill(bitmap,cliprect,0);
 }
 
-static void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void ad2083_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
@@ -1600,7 +1604,7 @@ void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void scrambold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

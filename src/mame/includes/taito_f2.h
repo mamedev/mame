@@ -43,6 +43,5 @@ VIDEO_UPDATE( taitof2_metalb );
 VIDEO_UPDATE( taitof2_yesnoj );
 
 WRITE16_HANDLER( taitof2_spritebank_w );
-READ16_HANDLER ( koshien_spritebank_r );
 WRITE16_HANDLER( koshien_spritebank_w );
 WRITE16_HANDLER( taitof2_sprite_extension_w );

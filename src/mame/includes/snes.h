@@ -544,8 +544,6 @@ extern READ8_HANDLER( spc_ipl_r );
 extern DEVICE_GET_INFO( snes_sound );
 #define SOUND_SNES DEVICE_GET_INFO_NAME( snes_sound )
 
-extern STREAM_UPDATE( snes_sh_update );
-
 /* Stuff from OpenSPC 0.3.99 by Brad Martin */
 
 /*========== TYPES ==========*/

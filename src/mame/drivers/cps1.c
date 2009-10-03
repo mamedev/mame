@@ -345,7 +345,7 @@ INTERRUPT_GEN( cps1_interrupt )
 
 static UINT8 *qsound_sharedram1,*qsound_sharedram2;
 
-INTERRUPT_GEN( cps1_qsound_interrupt )
+static INTERRUPT_GEN( cps1_qsound_interrupt )
 {
 	cpu_set_input_line(device, 2, HOLD_LINE);
 }
@@ -458,12 +458,12 @@ static NVRAM_HANDLER( pang3 )
 }
 #endif
 
-READ16_HANDLER( cps1_eeprom_port_r )
+static READ16_HANDLER( cps1_eeprom_port_r )
 {
 	return eeprom_read_bit();
 }
 
-WRITE16_HANDLER( cps1_eeprom_port_w )
+static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{

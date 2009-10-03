@@ -3,7 +3,7 @@
 #include "v60.h"
 
 // Register names
-const char *const v60_reg_names[69] = {
+static const char *const v60_reg_names[69] = {
 	"R0", "R1", "R2", "R3",
 	"R4", "R5", "R6", "R7",
 	"R8", "R9", "R10", "R11",

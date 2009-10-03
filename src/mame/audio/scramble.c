@@ -94,12 +94,14 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 	TTL7474_update(device->machine, 2);
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( froggrmc_sh_irqtrigger_w )
 {
 	/* the complement of bit 0 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x01);
 	TTL7474_update(space->machine, 2);
 }
+#endif
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {

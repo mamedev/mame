@@ -154,7 +154,7 @@ static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
 
 #define READ32(dis,offs) ((dis)->oprom[(offs) + 0] | ((dis)->oprom[(offs) + 1] << 8) | ((dis)->oprom[(offs) + 2] << 16) | ((dis)->oprom[(offs) + 3] << 24))
 
-char *i960_disassemble(disassemble_t *diss)
+static char *i960_disassemble(disassemble_t *diss)
 {
 	unsigned char op,op2;
 	unsigned char mode, modeh, model;

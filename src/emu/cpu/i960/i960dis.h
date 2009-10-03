@@ -11,6 +11,4 @@ struct _disassemble_t
 	UINT32 disflags;
 };
 
-char *i960_disassemble(disassemble_t *diss);
-
 #endif /* __I960DIS_H__ */

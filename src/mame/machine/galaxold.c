@@ -122,6 +122,7 @@ WRITE8_HANDLER( galaxold_leds_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( checkmaj_protection_r )
 {
 	switch (cpu_get_pc(space->cpu))
@@ -212,6 +213,7 @@ DRIVER_INIT( dingoe )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 }
+#endif
 
 
 READ8_HANDLER( scramblb_protection_1_r )
@@ -253,6 +255,7 @@ CUSTOM_INPUT( _4in1_fake_port_r )
 	return (input_port_read(field->port->machine, portnames[_4in1_bank]) & bit_mask) ? 0x01 : 0x00;
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( pisces )
 {
 	/* the coin lockout was replaced */
@@ -383,6 +386,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		rom[i] ^= data_xor;
 	}
 }
+#endif
 
 DRIVER_INIT( 4in1 )
 {

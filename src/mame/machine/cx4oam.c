@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 //Build OAM
-void CX4_op00_00(running_machine *machine)
+static void CX4_op00_00(running_machine *machine)
 {
 	INT32 i;
 
@@ -126,13 +126,13 @@ void CX4_op00_00(running_machine *machine)
 }
 
 //Scale and Rotate
-void CX4_op00_03()
+static void CX4_op00_03(void)
 {
 	CX4_C4DoScaleRotate(0);
 }
 
 //Transform Lines
-void CX4_op00_05(running_machine *machine)
+static void CX4_op00_05(running_machine *machine)
 {
 	INT32 i;
 	UINT32 ptr = 0, ptr2 = 0;
@@ -178,19 +178,19 @@ void CX4_op00_05(running_machine *machine)
 }
 
 //Scale and Rotate
-void CX4_op00_07()
+static void CX4_op00_07(void)
 {
 	CX4_C4DoScaleRotate(64);
 }
 
 //Draw Wireframe
-void CX4_op00_08(running_machine *machine)
+static void CX4_op00_08(running_machine *machine)
 {
 	CX4_C4DrawWireFrame(machine);
 }
 
 //Disintegrate
-void CX4_op00_0b(running_machine *machine)
+static void CX4_op00_0b(running_machine *machine)
 {
 	UINT8  width, height;
 	UINT32 startx, starty;
@@ -240,7 +240,7 @@ void CX4_op00_0b(running_machine *machine)
 }
 
 //Bitplane Wave
-void CX4_op00_0c(running_machine *machine)
+static void CX4_op00_0c(running_machine *machine)
 {
 	int i, j;
 	UINT32 destptr = 0;

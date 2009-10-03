@@ -1,8 +1,3 @@
-/*----------- defined in drivers/namcona1.c -----------*/
-
-extern int namcona1_gametype;
-
-
 /*----------- defined in video/namcona1.c -----------*/
 
 enum

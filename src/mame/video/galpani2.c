@@ -25,12 +25,13 @@
 
 UINT16 *galpani2_bg8_0,         *galpani2_bg8_1;
 UINT16 *galpani2_palette_0,     *galpani2_palette_1;
-UINT16 *galpani2_bg8_regs_0,    *galpani2_bg8_regs_1;
+//UINT16 *galpani2_bg8_regs_0,    *galpani2_bg8_regs_1;
 UINT16 *galpani2_bg8_0_scrollx, *galpani2_bg8_1_scrollx;
 UINT16 *galpani2_bg8_0_scrolly, *galpani2_bg8_1_scrolly;
 
 static bitmap_t *galpani2_bg8_bitmap_0, *galpani2_bg8_bitmap_1;
 
+#ifdef UNUSED_DEFINITION
 #define galpani2_BG8_REGS_R( _n_ ) \
 READ16_HANDLER( galpani2_bg8_regs_##_n_##_r ) \
 { \
@@ -55,6 +56,7 @@ WRITE16_HANDLER( galpani2_bg8_regs_##_n_##_w ) \
 { \
 	COMBINE_DATA(&galpani2_bg8_regs_##_n_[offset]); \
 }
+#endif
 
 #define galpani2_BG8_W( _n_ ) \
 WRITE16_HANDLER( galpani2_bg8_##_n_##_w ) \
@@ -74,11 +76,13 @@ WRITE16_HANDLER( galpani2_palette_##_n_##_w ) \
 	palette_set_color_rgb( space->machine, offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) ); \
 }
 
+#ifdef UNUSED_FUNCTION
 galpani2_BG8_REGS_R( 0 )
 galpani2_BG8_REGS_R( 1 )
 
 galpani2_BG8_REGS_W( 0 )
 galpani2_BG8_REGS_W( 1 )
+#endif
 
 galpani2_BG8_W( 0 )
 galpani2_BG8_W( 1 )

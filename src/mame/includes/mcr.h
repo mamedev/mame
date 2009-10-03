@@ -102,7 +102,6 @@ WRITE8_HANDLER( mcr3_videoram_w );
 WRITE8_HANDLER( spyhunt_videoram_w );
 WRITE8_HANDLER( spyhunt_alpharam_w );
 
-VIDEO_START( mcr3 );
 VIDEO_START( mcrmono );
 VIDEO_START( spyhunt );
 

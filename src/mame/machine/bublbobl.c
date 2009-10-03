@@ -119,17 +119,17 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	}
 }
 
-WRITE8_HANDLER(soundcpu_reset_w)
+WRITE8_HANDLER( bublbobl_soundcpu_reset_w )
 {
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_HANDLER( sound_status_r )
+READ8_HANDLER( bublbobl_sound_status_r )
 {
 	return sound_status;
 }
 
-WRITE8_HANDLER( sound_status_w )
+WRITE8_HANDLER( bublbobl_sound_status_w )
 {
 	sound_status = data;
 }

@@ -43,7 +43,6 @@ size_t f2_spriteext_size;
 static UINT16 spritebank[8];
 //static UINT16 spritebank_eof[8];
 static UINT16 spritebank_buffered[8];
-static UINT16 koshien_spritebank;
 
 static INT32 sprites_disabled,sprites_active_area,sprites_master_scrollx,sprites_master_scrolly;
 /* remember flip status over frames because driftout can fail to set it */
@@ -134,7 +133,6 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	state_save_register_global(machine, f2_hide_pixels);
 	state_save_register_global(machine, f2_sprite_type);
 	state_save_register_global_array(machine, spritebank);
-	state_save_register_global(machine, koshien_spritebank);
 	state_save_register_global(machine, sprites_disabled);
 	state_save_register_global(machine, sprites_active_area);
 	state_save_register_global_pointer(machine, spriteram_delayed, spriteram_size/2);
@@ -347,15 +345,8 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 
 }
 
-READ16_HANDLER( koshien_spritebank_r )
-{
-	return koshien_spritebank;
-}
-
 WRITE16_HANDLER( koshien_spritebank_w )
 {
-	koshien_spritebank = data;
-
 	spritebank_buffered[0]=0x0000;   /* never changes */
 	spritebank_buffered[1]=0x0400;
 

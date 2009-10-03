@@ -189,6 +189,8 @@ static int AdvanceEnvelope          /* Run envelope step & retn ENVX*/
     int                 v           /* Voice to process envelope for*/
     );
 
+static STREAM_UPDATE( snes_sh_update );
+
 /* Privately shared functions (for internal library use only) */
 
 /***** DSP_Reset *****/
@@ -1179,7 +1181,7 @@ DEVICE_GET_INFO( snes_sound )
 }
 
 
-STREAM_UPDATE( snes_sh_update )
+static STREAM_UPDATE( snes_sh_update )
 {
 	int i;
 	short mix[2];

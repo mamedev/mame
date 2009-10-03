@@ -675,11 +675,11 @@
 #include "lucky74.lh"
 
 /* from video hardware */
-extern UINT8 *fg_videoram, *fg_colorram, *bg_videoram, *bg_colorram;
-WRITE8_HANDLER( fg_videoram_w );
-WRITE8_HANDLER( fg_colorram_w );
-WRITE8_HANDLER( bg_videoram_w );
-WRITE8_HANDLER( bg_colorram_w );
+extern UINT8 *lucky74_fg_videoram, *lucky74_fg_colorram, *lucky74_bg_videoram, *lucky74_bg_colorram;
+WRITE8_HANDLER( lucky74_fg_videoram_w );
+WRITE8_HANDLER( lucky74_fg_colorram_w );
+WRITE8_HANDLER( lucky74_bg_videoram_w );
+WRITE8_HANDLER( lucky74_bg_colorram_w );
 PALETTE_INIT( lucky74 );
 VIDEO_START( lucky74 );
 VIDEO_UPDATE( lucky74 );
@@ -821,10 +821,10 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)				/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(fg_colorram_w) AM_BASE(&fg_colorram)				/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)				/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_colorram_w) AM_BASE(&bg_colorram)				/* VRAM2-2 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_BASE(&lucky74_fg_videoram)				/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_BASE(&lucky74_fg_colorram)				/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_BASE(&lucky74_bg_videoram)				/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_BASE(&lucky74_bg_colorram)				/* VRAM2-2 */
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */

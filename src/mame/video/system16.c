@@ -145,8 +145,6 @@ int sys16_sh_shadowpal;
 int sys16_MaxShadowColors;
 
 /* video driver constants (potentially different for each game) */
-int sys16_gr_bitmap_width;
-
 const int *sys16_obj_bank;
 int sys16_sprxoffset;
 int sys16_bgxoffset;
@@ -184,15 +182,6 @@ UINT16 *sys18_splittab_bg_x;
 UINT16 *sys18_splittab_bg_y;
 UINT16 *sys18_splittab_fg_x;
 UINT16 *sys18_splittab_fg_y;
-
-UINT16 *sys16_gr_ver;
-UINT16 *sys16_gr_hor;
-UINT16 *sys16_gr_pal;
-UINT16 *sys16_gr_flip;
-int sys16_gr_palette;
-int sys16_gr_palette_default;
-UINT8 sys16_gr_colorflip[2][4];
-UINT16 *sys16_gr_second_road;
 
 static tilemap *background, *foreground, *text_layer;
 static tilemap *background2, *foreground2;

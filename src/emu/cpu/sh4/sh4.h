@@ -97,8 +97,6 @@ extern CPU_GET_INFO( sh4 );
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );
 
-extern unsigned DasmSH4( char *dst, unsigned pc, UINT16 opcode );
-
 void sh4_set_frt_input(const device_config *device, int state);
 void sh4_set_irln_input(const device_config *device, int value);
 void sh4_set_ftcsr_callback(const device_config *device, sh4_ftcsr_callback callback);

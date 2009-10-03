@@ -1,6 +1,5 @@
 #include "debugger.h"
 #include "i960.h"
-#include "i960dis.h"
 #include <math.h>
 
 CPU_DISASSEMBLE( i960  );

@@ -7,6 +7,7 @@
    just made a copy & renamed them for now to avoid any conflicts
 */
 
+#ifdef UNUSED_FUNCTION
 UINT16 *system24temp_sys16_shared_ram;
 READ16_HANDLER( system24temp_sys16_shared_ram_r )
 {
@@ -17,6 +18,7 @@ WRITE16_HANDLER( system24temp_sys16_shared_ram_w )
 {
 	COMBINE_DATA(system24temp_sys16_shared_ram + offset);
 }
+#endif
 
 /* The 315-5296
      8 8bits I/O ports, 3 output-only pins, some protection, and

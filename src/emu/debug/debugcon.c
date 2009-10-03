@@ -65,6 +65,14 @@ static debug_command *commandlist;
 
 
 /***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static void debug_console_exit(running_machine *machine);
+
+
+
+/***************************************************************************
 
     Initialization and tear down
 
@@ -100,7 +108,7 @@ void debug_console_init(running_machine *machine)
     system
 -------------------------------------------------*/
 
-void debug_console_exit(running_machine *machine)
+static void debug_console_exit(running_machine *machine)
 {
 	/* free allocated memory */
 	if (console_textbuf)

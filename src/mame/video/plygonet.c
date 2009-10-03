@@ -78,7 +78,7 @@ static TILEMAP_MAPPER( plygonet_scan )
 	return row * num_cols + (col^1);
 }
 
-TILEMAP_MAPPER( plygonet_scan_cols )
+static TILEMAP_MAPPER( plygonet_scan_cols )
 {
 	return col * num_rows + (row^1);
 }

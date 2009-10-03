@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 //Sprite Functions
-void CX4_op00(running_machine* machine)
+static void CX4_op00(running_machine* machine)
 {
 	switch(cx4.reg[0x4d])
 	{
@@ -24,14 +24,14 @@ void CX4_op00(running_machine* machine)
 }
 
 //Draw Wireframe
-void CX4_op01(running_machine* machine)
+static void CX4_op01(running_machine* machine)
 {
 	memset(cx4.ram + 0x300, 0, 2304);
 	CX4_C4DrawWireFrame(machine);
 }
 
 //Propulsion
-void CX4_op05(running_machine *machine)
+static void CX4_op05(running_machine *machine)
 {
 	INT32 temp = 0x10000;
 	if(CX4_readw(0x1f83))
@@ -42,7 +42,7 @@ void CX4_op05(running_machine *machine)
 }
 
 //Set Vector length
-void CX4_op0d(running_machine *machine)
+static void CX4_op0d(running_machine *machine)
 {
 	cx4.C41FXVal    = CX4_readw(0x1f80);
 	cx4.C41FYVal    = CX4_readw(0x1f83);
@@ -56,7 +56,7 @@ void CX4_op0d(running_machine *machine)
 }
 
 //Triangle
-void CX4_op10()
+static void CX4_op10(void)
 {
 	cx4.r0 = CX4_ldr(0);
 	cx4.r1 = CX4_ldr(1);
@@ -84,7 +84,7 @@ void CX4_op10()
 }
 
 //Triangle
-void CX4_op13()
+static void CX4_op13(void)
 {
 	cx4.r0 = CX4_ldr(0);
 	cx4.r1 = CX4_ldr(1);
@@ -108,7 +108,7 @@ void CX4_op13()
 }
 
 //Pythagorean
-void CX4_op15(running_machine *machine)
+static void CX4_op15(running_machine *machine)
 {
 	double temp = 0.0;
 	cx4.C41FXVal = CX4_readw(0x1f80);
@@ -119,7 +119,7 @@ void CX4_op15(running_machine *machine)
 }
 
 //Calculate distance
-void CX4_op1f(running_machine *machine)
+static void CX4_op1f(running_machine *machine)
 {
 	cx4.C41FXVal = CX4_readw(0x1f80);
 	cx4.C41FYVal = CX4_readw(0x1f83);
@@ -142,7 +142,7 @@ void CX4_op1f(running_machine *machine)
 }
 
 //Trapezoid
-void CX4_op22()
+static void CX4_op22(void)
 {
 	INT16 angle1 = CX4_readw(0x1f8c) & 0x1ff;
 	INT16 angle2 = CX4_readw(0x1f8f) & 0x1ff;
@@ -198,7 +198,7 @@ void CX4_op22()
 }
 
 //Multiply
-void CX4_op25()
+static void CX4_op25(void)
 {
 	cx4.r0 = CX4_ldr(0);
 	cx4.r1 = CX4_ldr(1);
@@ -208,7 +208,7 @@ void CX4_op25()
 }
 
 //Transform Coords
-void CX4_op2d(running_machine *machine)
+static void CX4_op2d(running_machine *machine)
 {
 	cx4.C4WFXVal  = CX4_readw(0x1f81);
 	cx4.C4WFYVal  = CX4_readw(0x1f84);
@@ -223,7 +223,7 @@ void CX4_op2d(running_machine *machine)
 }
 
 //Sum
-void CX4_op40()
+static void CX4_op40(void)
 {
 	UINT32 i;
 	cx4.r0 = 0;
@@ -235,7 +235,7 @@ void CX4_op40()
 }
 
 //Square
-void CX4_op54()
+static void CX4_op54(void)
 {
 	cx4.r0 = CX4_ldr(0);
 	CX4_mul(cx4.r0, cx4.r0, &cx4.r1, &cx4.r2);
@@ -244,32 +244,32 @@ void CX4_op54()
 }
 
 //Immediate Register
-void CX4_op5c()
+static void CX4_op5c(void)
 {
 	CX4_str(0, 0x000000);
 	CX4_immediate_reg(0);
 }
 
 //Immediate Register (Multiple)
-void CX4_op5e() { CX4_immediate_reg( 0); }
-void CX4_op60() { CX4_immediate_reg( 3); }
-void CX4_op62() { CX4_immediate_reg( 6); }
-void CX4_op64() { CX4_immediate_reg( 9); }
-void CX4_op66() { CX4_immediate_reg(12); }
-void CX4_op68() { CX4_immediate_reg(15); }
-void CX4_op6a() { CX4_immediate_reg(18); }
-void CX4_op6c() { CX4_immediate_reg(21); }
-void CX4_op6e() { CX4_immediate_reg(24); }
-void CX4_op70() { CX4_immediate_reg(27); }
-void CX4_op72() { CX4_immediate_reg(30); }
-void CX4_op74() { CX4_immediate_reg(33); }
-void CX4_op76() { CX4_immediate_reg(36); }
-void CX4_op78() { CX4_immediate_reg(39); }
-void CX4_op7a() { CX4_immediate_reg(42); }
-void CX4_op7c() { CX4_immediate_reg(45); }
+static void CX4_op5e(void) { CX4_immediate_reg( 0); }
+static void CX4_op60(void) { CX4_immediate_reg( 3); }
+static void CX4_op62(void) { CX4_immediate_reg( 6); }
+static void CX4_op64(void) { CX4_immediate_reg( 9); }
+static void CX4_op66(void) { CX4_immediate_reg(12); }
+static void CX4_op68(void) { CX4_immediate_reg(15); }
+static void CX4_op6a(void) { CX4_immediate_reg(18); }
+static void CX4_op6c(void) { CX4_immediate_reg(21); }
+static void CX4_op6e(void) { CX4_immediate_reg(24); }
+static void CX4_op70(void) { CX4_immediate_reg(27); }
+static void CX4_op72(void) { CX4_immediate_reg(30); }
+static void CX4_op74(void) { CX4_immediate_reg(33); }
+static void CX4_op76(void) { CX4_immediate_reg(36); }
+static void CX4_op78(void) { CX4_immediate_reg(39); }
+static void CX4_op7a(void) { CX4_immediate_reg(42); }
+static void CX4_op7c(void) { CX4_immediate_reg(45); }
 
 //Immediate ROM
-void CX4_op89()
+static void CX4_op89(void)
 {
 	CX4_str(0, 0x054336);
 	CX4_str(1, 0xffffff);

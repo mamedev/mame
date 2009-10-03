@@ -24,8 +24,8 @@ static void update_grudge_steering(running_machine *machine);
 
 /* global data */
 UINT8 balsente_shooter;
-UINT8 balsente_shooter_x;
-UINT8 balsente_shooter_y;
+static UINT8 balsente_shooter_x;
+static UINT8 balsente_shooter_y;
 UINT8 balsente_adc_shift;
 UINT16 *shrike_shared;
 UINT16 *shrike_io;

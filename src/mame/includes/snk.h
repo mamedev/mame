@@ -4,15 +4,6 @@
 
 *************************************************************************/
 
-/*----------- defined in drivers/snk.c -----------*/
-
-extern READ8_HANDLER ( snk_cpuA_nmi_trigger_r );
-extern WRITE8_HANDLER( snk_cpuA_nmi_ack_w );
-
-extern READ8_HANDLER ( snk_cpuB_nmi_trigger_r );
-extern WRITE8_HANDLER( snk_cpuB_nmi_ack_w );
-
-
 /*----------- defined in video/snk.c -----------*/
 
 extern PALETTE_INIT( tnk3 );

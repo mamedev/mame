@@ -115,8 +115,8 @@ static const UINT8 *syncprom;
 static UINT8 irq_state;
 static emu_timer *irq_timer;
 
-int cloud9_vblank_start;
-int cloud9_vblank_end;
+static int cloud9_vblank_start;
+static int cloud9_vblank_end;
 
 
 

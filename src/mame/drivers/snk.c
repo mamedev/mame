@@ -277,24 +277,24 @@ static int sound_status;
 /*********************************************************************/
 // Interrupt handlers common to all SNK triple Z80 games
 
-READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
+static READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
-WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
+static WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 {
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
+static READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
 	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
-WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
+static WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 {
 	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }

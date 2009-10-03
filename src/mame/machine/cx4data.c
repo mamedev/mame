@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-const UINT8 CX4_immediate_data[48] =
+static const UINT8 CX4_immediate_data[48] =
 {
 	0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0xff, 0x00, 0x00, 0x00, 0xff,
 	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x80, 0xff, 0xff, 0x7f,
@@ -16,7 +16,7 @@ const UINT8 CX4_immediate_data[48] =
 	0x00, 0x00, 0x01, 0xff, 0xff, 0xfe, 0x00, 0x01, 0x00, 0xff, 0xfe, 0x00
 };
 
-const UINT16 CX4_wave_data[40] =
+static const UINT16 CX4_wave_data[40] =
 {
 	0x0000, 0x0002, 0x0004, 0x0006, 0x0008, 0x000a, 0x000c, 0x000e,
 	0x0200, 0x0202, 0x0204, 0x0206, 0x0208, 0x020a, 0x020c, 0x020e,
@@ -25,7 +25,7 @@ const UINT16 CX4_wave_data[40] =
 	0x0800, 0x0802, 0x0804, 0x0806, 0x0808, 0x080a, 0x080c, 0x080e
 };
 
-const UINT32 CX4_sin_table[256] =
+static const UINT32 CX4_sin_table[256] =
 {
 	0x000000, 0x000324, 0x000648, 0x00096c, 0x000c8f, 0x000fb2, 0x0012d5, 0x0015f6,
 	0x001917, 0x001c37, 0x001f56, 0x002273, 0x002590, 0x0028aa, 0x002bc4, 0x002edb,
@@ -61,7 +61,7 @@ const UINT32 CX4_sin_table[256] =
 	0xff013b, 0xff00f1, 0xff00b1, 0xff007b, 0xff004e, 0xff002c, 0xff0013, 0xff0004
 };
 
-const INT16 CX4_SinTable[512] =
+static const INT16 CX4_SinTable[512] =
 {
 		 0,   402,    804,   1206,	 1607,	 2009,	 2410,	 2811,
 	  3211,	 3611,	 4011,	 4409,	 4808,	 5205,	 5602,	 5997,
@@ -129,7 +129,7 @@ const INT16 CX4_SinTable[512] =
 	 -3211,	-2811,	-2410,	-2009,	-1607,	-1206,	 -804,	 -402
 };
 
-const INT16 CX4_CosTable[512] =
+static const INT16 CX4_CosTable[512] =
 {
 	 32767,	32765,	32758,	32745,	32728,	32706,	32679,	32647,
 	 32610,	32568,	32521,	32469,	32413,	32351,	32285,	32214,

@@ -78,7 +78,6 @@ enum
 	V60_REGMAX
 };
 
-extern const char *const v60_reg_names[];
 void v60_stall(const device_config *device);
 
 CPU_GET_INFO( v60 );

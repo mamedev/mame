@@ -29,10 +29,6 @@ extern enum namcos22_gametype
 
 #define NAMCOS22_PALETTE_SIZE 0x8000
 
-/*----------- defined in drivers/namcos22.c -----------*/
-
-extern const gfx_layout namcos22_cg_layout;
-
 /*----------- defined in video/namcos22.c -----------*/
 
 extern UINT32 *namcos22_cgram;

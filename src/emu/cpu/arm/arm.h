@@ -19,8 +19,6 @@
 extern CPU_GET_INFO( arm );
 #define CPU_ARM CPU_GET_INFO_NAME( arm )
 
-extern UINT32 arm_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
-
 enum
 {
 	ARM32_PC=0,

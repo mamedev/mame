@@ -1379,7 +1379,7 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 
 
 /* machine start (called only once) */
-MACHINE_START( mpu4_vid )
+static MACHINE_START( mpu4_vid )
 {
 	mpu4_config_common(machine);
 
@@ -2055,7 +2055,7 @@ ROM_START( mpu4met0 )
 	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
 ROM_END
 
-DRIVER_INIT (connect4)
+static DRIVER_INIT (connect4)
 {
 	led_extend=1;
 }

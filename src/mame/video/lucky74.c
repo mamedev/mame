@@ -97,31 +97,31 @@
 #include "video/resnet.h"
 
 
-UINT8 *fg_videoram, *fg_colorram, *bg_videoram, *bg_colorram;
+UINT8 *lucky74_fg_videoram, *lucky74_fg_colorram, *lucky74_bg_videoram, *lucky74_bg_colorram;
 static tilemap *fg_tilemap, *bg_tilemap;
 
 
-WRITE8_HANDLER( fg_videoram_w )
+WRITE8_HANDLER( lucky74_fg_videoram_w )
 {
-	fg_videoram[offset] = data;
+	lucky74_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( fg_colorram_w )
+WRITE8_HANDLER( lucky74_fg_colorram_w )
 {
-	fg_colorram[offset] = data;
+	lucky74_fg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( bg_videoram_w )
+WRITE8_HANDLER( lucky74_bg_videoram_w )
 {
-	bg_videoram[offset] = data;
+	lucky74_bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( bg_colorram_w )
+WRITE8_HANDLER( lucky74_bg_colorram_w )
 {
-	bg_colorram[offset] = data;
+	lucky74_bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -206,8 +206,8 @@ static TILE_GET_INFO( get_fg_tile_info )
     xxxx ----   tiles page offset.
 */
 	int bank = 0;
-	int attr = fg_colorram[tile_index];
-	int code = fg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = lucky74_fg_colorram[tile_index];
+	int code = lucky74_fg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -221,8 +221,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xxxx ----   tiles page offset.
 */
 	int bank = 1;
-	int attr = bg_colorram[tile_index];
-	int code = bg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = lucky74_bg_colorram[tile_index];
+	int code = lucky74_bg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO(bank, code, color, 0);

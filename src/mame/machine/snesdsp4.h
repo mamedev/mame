@@ -18,8 +18,6 @@ struct DSP4_t
   UINT8 output[512];
 };
 
-extern struct DSP4_t DSP4;
-
 struct DSP4_vars_t
 {
   // op control
@@ -98,7 +96,5 @@ struct DSP4_vars_t
   INT16 OAM_RowMax;           // maximum number of tiles per 8 aligned pixels (row)
   INT16 OAM_Row[32];          // current number of tiles per row
 };
-
-extern struct DSP4_vars_t DSP4_vars;
 
 #endif

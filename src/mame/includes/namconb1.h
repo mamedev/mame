@@ -1,6 +1,5 @@
 /*----------- defined in drivers/namconb1.c -----------*/
 
-extern UINT32 *namconb1_workram32;
 extern UINT32 *namconb1_spritebank32;
 extern UINT32 *namconb1_tilebank32;
 

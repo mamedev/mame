@@ -72,12 +72,12 @@ static const rgb_t spectrum_palette[16] = {
 };
 
 /* Initialise the palette */
-PALETTE_INIT( spectrum )
+static PALETTE_INIT( spectrum )
 {
 	palette_set_colors(machine, 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
-VIDEO_START( spectrum )
+static VIDEO_START( spectrum )
 {
 	spectrum_frame_number = 0;
 	spectrum_flash_invert = 0;
@@ -94,7 +94,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-VIDEO_EOF( spectrum )
+static VIDEO_EOF( spectrum )
 {
     spectrum_frame_number++;
     if (spectrum_frame_number >= 25)
@@ -109,7 +109,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-VIDEO_UPDATE( spectrum )
+static VIDEO_UPDATE( spectrum )
 {
     /* for now do a full-refresh */
     int x, y, b, scrx, scry;
@@ -296,7 +296,7 @@ static MACHINE_RESET( photon2 )
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 }
 
-MACHINE_DRIVER_START( photon2 )
+static MACHINE_DRIVER_START( photon2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem)

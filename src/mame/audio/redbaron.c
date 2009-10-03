@@ -55,11 +55,13 @@ WRITE8_HANDLER( redbaron_sounds_w )
     rb_input_select = data & 1;
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_DEVICE_HANDLER( redbaron_pokey_w )
 {
     if( latch & 0x20 )
         pokey_w(device, offset, data);
 }
+#endif
 
 static STREAM_UPDATE( redbaron_sound_update )
 {

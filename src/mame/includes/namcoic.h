@@ -146,8 +146,6 @@ void namco_roz_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 READ16_HANDLER( namco_rozcontrol16_r );
 WRITE16_HANDLER( namco_rozcontrol16_w );
-READ16_HANDLER( namco_rozbank16_r );
-WRITE16_HANDLER( namco_rozbank16_w );
 READ16_HANDLER( namco_rozvideoram16_r );
 WRITE16_HANDLER( namco_rozvideoram16_w );
 

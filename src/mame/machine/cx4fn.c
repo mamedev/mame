@@ -17,7 +17,7 @@
 #define PI 3.1415926535897932384626433832795
 
 //Wireframe Helpers
-void CX4_C4TransfWireFrame(void)
+static void CX4_C4TransfWireFrame(void)
 {
 	cx4.c4x = (double)cx4.C4WFXVal;
 	cx4.c4y = (double)cx4.C4WFYVal;
@@ -43,7 +43,7 @@ void CX4_C4TransfWireFrame(void)
 	cx4.C4WFYVal = (INT16)(cx4.c4y * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
 }
 
-void CX4_C4CalcWireFrame(void)
+static void CX4_C4CalcWireFrame(void)
 {
 	cx4.C4WFXVal = cx4.C4WFX2Val - cx4.C4WFXVal;
 	cx4.C4WFYVal = cx4.C4WFY2Val - cx4.C4WFYVal;
@@ -66,7 +66,7 @@ void CX4_C4CalcWireFrame(void)
 	}
 }
 
-void CX4_C4TransfWireFrame2(void)
+static void CX4_C4TransfWireFrame2(void)
 {
 	cx4.c4x = (double)cx4.C4WFXVal;
 	cx4.c4y = (double)cx4.C4WFYVal;
@@ -92,7 +92,7 @@ void CX4_C4TransfWireFrame2(void)
 	cx4.C4WFYVal = (INT16)(cx4.c4y * cx4.C4WFScale / 0x100);
 }
 
-void CX4_C4DrawWireFrame(running_machine *machine)
+static void CX4_C4DrawWireFrame(running_machine *machine)
 {
 	UINT32 line = CX4_readl(0x1f80);
 	UINT32 point1, point2;
@@ -144,7 +144,7 @@ void CX4_C4DrawWireFrame(running_machine *machine)
 	}
 }
 
-void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color)
+static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color)
 {
 	INT32 i;
 
@@ -199,7 +199,7 @@ void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, 
 	}
 }
 
-void CX4_C4DoScaleRotate(int row_padding)
+static void CX4_C4DoScaleRotate(int row_padding)
 {
 	INT16 A, B, C, D;
 	INT32 x, y;

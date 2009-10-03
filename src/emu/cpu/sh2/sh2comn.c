@@ -106,7 +106,7 @@ static void sh2_timer_activate(SH2 *sh2)
 	}
 }
 
-TIMER_CALLBACK( sh2_timer_callback )
+static TIMER_CALLBACK( sh2_timer_callback )
 {
 	SH2 *sh2 = (SH2 *)ptr;
 	UINT16 frc;
@@ -133,7 +133,7 @@ TIMER_CALLBACK( sh2_timer_callback )
 	sh2_timer_activate(sh2);
 }
 
-TIMER_CALLBACK( sh2_dmac_callback )
+static TIMER_CALLBACK( sh2_dmac_callback )
 {
 	int dma = param & 1;
 	SH2 *sh2 = (SH2 *)ptr;

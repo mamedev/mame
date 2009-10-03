@@ -42,6 +42,7 @@ static tilemap *alpha_tilemap;
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -49,6 +50,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 }
+#endif
 
 
 static TILE_GET_INFO( mcrmono_get_bg_tile_info )
@@ -105,11 +107,13 @@ PALETTE_INIT( spyhunt )
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 VIDEO_START( mcr3 )
 {
 	/* initialize the background tilemap */
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
 }
+#endif
 
 
 VIDEO_START( mcrmono )

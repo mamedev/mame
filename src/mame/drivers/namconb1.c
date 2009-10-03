@@ -281,7 +281,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #define NB1_NVMEM_SIZE (0x800)
 static UINT32 *nvmem32;
 
-UINT32 *namconb1_workram32;
 UINT32 *namconb1_spritebank32;
 UINT32 *namconb1_tilebank32;
 static UINT16 *namconb_shareram;

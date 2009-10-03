@@ -2007,7 +2007,7 @@ static const gfx_layout texture_tile_layout =
 #define XOR(a) WORD2_XOR_BE(a)
 
 /* text layer uses a set of 16x16x8bpp tiles defined in RAM */
-const gfx_layout namcos22_cg_layout =
+static const gfx_layout namcos22_cg_layout =
 {
 	16,16,
 	0x400, /* 0x3c0 */

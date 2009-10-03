@@ -4,12 +4,6 @@
 
 ***************************************************************************/
 
-/*----------- defined in drivers/kyugo.c -----------*/
-
-MACHINE_RESET( kyugo );
-
-WRITE8_HANDLER( kyugo_sub_cpu_control_w );
-
 /*----------- defined in video/kyugo.c -----------*/
 
 extern UINT8 *kyugo_fgvideoram;

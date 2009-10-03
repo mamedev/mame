@@ -492,9 +492,6 @@ extern write32_device_func arm7_coproc_rt_w_callback;
 extern void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 extern void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
-extern UINT32 arm7_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
-extern UINT32 thumb_disasm(char *pBuf, UINT32 pc, UINT16 opcode);
-
 #ifdef UNUSED_DEFINITION
 extern char *(*arm7_dasm_cop_dt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 extern char *(*arm7_dasm_cop_rt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);

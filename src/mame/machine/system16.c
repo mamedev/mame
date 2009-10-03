@@ -2,12 +2,6 @@
 #include "system16.h"
 #include "sound/upd7759.h"
 
-UINT16 *sys16_workingram;
-UINT16 *sys16_workingram2;
-UINT16 *sys16_extraram;
-UINT16 *sys16_extraram2;
-UINT16 *sys16_extraram3;
-
 static void patch_codeX( UINT16 *mem, offs_t offset, int data )
 {
 	int aligned_offset = offset&0xfffffe;

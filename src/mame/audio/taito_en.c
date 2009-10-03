@@ -17,7 +17,7 @@ static int es_tmp=1;
 
 enum { TIMER_SINGLESHOT, TIMER_PULSE };
 
-READ16_HANDLER(f3_68000_share_r)
+static READ16_HANDLER(f3_68000_share_r)
 {
 	if ((offset&3)==0) return (f3_shared_ram[offset/4]&0xff000000)>>16;
 	if ((offset&3)==1) return (f3_shared_ram[offset/4]&0x00ff0000)>>8;
@@ -25,7 +25,7 @@ READ16_HANDLER(f3_68000_share_r)
 	return (f3_shared_ram[offset/4]&0x000000ff)<<8;
 }
 
-WRITE16_HANDLER(f3_68000_share_w)
+static WRITE16_HANDLER(f3_68000_share_w)
 {
 	if ((offset&3)==0) f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0x00ffffff)|((data&0xff00)<<16);
 	else if ((offset&3)==1) f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0xff00ffff)|((data&0xff00)<<8);
@@ -33,7 +33,7 @@ WRITE16_HANDLER(f3_68000_share_w)
 	else f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0xffffff00)|((data&0xff00)>>8);
 }
 
-WRITE16_HANDLER( f3_es5505_bank_w )
+static WRITE16_HANDLER( f3_es5505_bank_w )
 {
 	UINT32 max_banks_this_game=(memory_region_length(space->machine, "ensoniq.0")/0x200000)-1;
 
@@ -50,7 +50,7 @@ WRITE16_HANDLER( f3_es5505_bank_w )
 	es5505_voice_bank_w(devtag_get_device(space->machine, "ensoniq"),offset,data<<20);
 }
 
-WRITE16_HANDLER( f3_volume_w )
+static WRITE16_HANDLER( f3_volume_w )
 {
 	static UINT16 channel[8],last_l,last_r;
 	static int latch;
@@ -84,7 +84,7 @@ void f3_68681_reset(running_machine *machine)
 	timer_68681 = timer_alloc(machine, taito_en_timer_callback, NULL);
 }
 
-READ16_HANDLER(f3_68681_r)
+static READ16_HANDLER(f3_68681_r)
 {
 	if (offset == 0x05)
 	{
@@ -106,7 +106,7 @@ READ16_HANDLER(f3_68681_r)
 	return 0xff;
 }
 
-WRITE16_HANDLER(f3_68681_w)
+static WRITE16_HANDLER(f3_68681_w)
 {
 	switch (offset) {
 		case 0x04: /* ACR */
@@ -166,7 +166,7 @@ WRITE16_HANDLER(f3_68681_w)
 	}
 }
 
-READ16_HANDLER(es5510_dsp_r)
+static READ16_HANDLER(es5510_dsp_r)
 {
 //  logerror("%06x: DSP read offset %04x (data is %04x)\n",cpu_get_pc(space->cpu),offset,es5510_dsp_ram[offset]);
 //  if (es_tmp) return es5510_dsp_ram[offset];
@@ -190,7 +190,7 @@ READ16_HANDLER(es5510_dsp_r)
 	return es5510_dsp_ram[offset];
 }
 
-WRITE16_HANDLER(es5510_dsp_w)
+static WRITE16_HANDLER(es5510_dsp_w)
 {
 	UINT8 *snd_mem = (UINT8 *)memory_region(space->machine, "ensoniq.0");
 

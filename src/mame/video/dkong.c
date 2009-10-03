@@ -228,6 +228,7 @@ PALETTE_INIT( dkong2b)
 	free(rgb);
 }
 
+#ifdef UNUSED_FUNCTION
 PALETTE_INIT( dkong4b )
 {
 	dkong_state *state = (dkong_state *)machine->driver_data;
@@ -265,6 +266,7 @@ PALETTE_INIT( dkong4b )
 	/* color_prom now points to the beginning of the character color codes */
 	state->color_codes = color_prom;	/* we'll need it later */
 }
+#endif
 
 PALETTE_INIT( radarscp )
 {

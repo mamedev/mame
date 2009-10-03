@@ -206,11 +206,12 @@ DRIVER_INIT( scramble_ppi )
 {
 }
 
-DRIVER_INIT( scobra )
+static DRIVER_INIT( scobra )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( atlantis )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
@@ -220,6 +221,7 @@ DRIVER_INIT( scramble )
 {
 	DRIVER_INIT_CALL(atlantis);
 }
+#endif
 
 DRIVER_INIT( stratgyx )
 {
@@ -250,6 +252,7 @@ DRIVER_INIT( mariner )
 	/*memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);*/
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( frogger )
 {
 	offs_t A;
@@ -276,6 +279,7 @@ DRIVER_INIT( froggers )
 	for (A = 0;A < 0x0800;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 }
+#endif
 
 DRIVER_INIT( devilfsh )
 {
@@ -396,6 +400,7 @@ static int bit(int i,int n)
 }
 
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( anteater )
 {
 	offs_t i, len;
@@ -432,6 +437,7 @@ DRIVER_INIT( anteater )
 
 		free(scratch);
 }
+#endif
 
 DRIVER_INIT( rescue )
 {
@@ -507,6 +513,7 @@ DRIVER_INIT( minefld )
 		free(scratch);
 }
 
+#ifdef UNUSED_FUNCTION
 DRIVER_INIT( losttomb )
 {
 	offs_t i, len;
@@ -543,7 +550,7 @@ DRIVER_INIT( losttomb )
 
 		free(scratch);
 }
-
+#endif
 
 DRIVER_INIT( hustler )
 {

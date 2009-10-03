@@ -12,59 +12,61 @@
 
 ************************************************************************/
 
-UINT16 DSP3_DataROM[1024];
+static UINT16 DSP3_DataROM[1024];
 
-void (*SetDSP3)( void );
-void DSP3_Command( void );
+static void(*SetDSP3)(void);
+static void DSP3_Command(void);
 
-UINT16 DSP3_DR;
-UINT16 DSP3_SR;
-UINT16 DSP3_MemoryIndex;
+static UINT16 DSP3_DR;
+static UINT16 DSP3_SR;
+static UINT16 DSP3_MemoryIndex;
 
-void DSP3_Reset( void )
+static void DSP3_Reset(void)
 {
 	DSP3_DR = 0x0080;
 	DSP3_SR = 0x0084;
 	SetDSP3 = &DSP3_Command;
 }
 
-void DSP3_MemorySize( void )
+#ifdef UNUSED_FUNCTION
+void DSP3_MemorySize(void)
 {
 	DSP3_DR = 0x0300;
 	SetDSP3 = &DSP3_Reset;
 }
+#endif
 
-void DSP3_TestMemory( void )
+static void DSP3_TestMemory(void)
 {
 	DSP3_DR = 0x0000;
 	SetDSP3 = &DSP3_Reset;
 }
 
-void DSP3_DumpDataROM( void )
+static void DSP3_DumpDataROM(void)
 {
 	DSP3_DR = DSP3_DataROM[DSP3_MemoryIndex++];
 	if (DSP3_MemoryIndex == 1024)
 		SetDSP3 = &DSP3_Reset;
 }
 
-void DSP3_MemoryDump( void )
+static void DSP3_MemoryDump(void)
 {
 	DSP3_MemoryIndex = 0;
 	SetDSP3 = &DSP3_DumpDataROM;
 	DSP3_DumpDataROM();
 }
 
-INT16 DSP3_WinLo;
-INT16 DSP3_WinHi;
+static INT16 DSP3_WinLo;
+static INT16 DSP3_WinHi;
 
-void DSP3_OP06( void )
+static void DSP3_OP06(void)
 {
 	DSP3_WinLo = (UINT8)(DSP3_DR);
 	DSP3_WinHi = (UINT8)(DSP3_DR >> 8);
 	DSP3_Reset();
 }
 
-void DSP3_OP03( void )
+static void DSP3_OP03(void)
 {
 	INT16 Lo = (UINT8)(DSP3_DR);
 	INT16 Hi = (UINT8)(DSP3_DR >> 8);
@@ -73,17 +75,17 @@ void DSP3_OP03( void )
 	SetDSP3 = &DSP3_Reset;
 }
 
-INT16 DSP3_AddLo;
-INT16 DSP3_AddHi;
+static INT16 DSP3_AddLo;
+static INT16 DSP3_AddHi;
 
-void DSP3_OP07_B( void )
+static void DSP3_OP07_B(void)
 {
 	INT16 Ofs = (DSP3_WinLo * DSP3_AddHi << 1) + (DSP3_AddLo << 1);
 	DSP3_DR = Ofs >> 1;
 	SetDSP3 = &DSP3_Reset;
 }
 
-void DSP3_OP07_A( void )
+static void DSP3_OP07_A(void)
 {
 	INT16 Lo = (UINT8)(DSP3_DR);
 	INT16 Hi = (UINT8)(DSP3_DR >> 8);
@@ -109,7 +111,7 @@ void DSP3_OP07_A( void )
 	SetDSP3 = &DSP3_OP07_B;
 }
 
-void DSP3_OP07( void )
+static void DSP3_OP07(void)
 {
 	UINT32 dataOfs = ((DSP3_DR << 1) + 0x03b2) & 0x03ff;
 
@@ -120,28 +122,28 @@ void DSP3_OP07( void )
 	DSP3_SR = 0x0080;
 }
 
-UINT16 DSP3_Codewords;
-UINT16 DSP3_Outwords;
-UINT16 DSP3_Symbol;
-UINT16 DSP3_BitCount;
-UINT16 DSP3_Index;
-UINT16 DSP3_Codes[512];
-UINT16 DSP3_BitsLeft;
-UINT16 DSP3_ReqBits;
-UINT16 DSP3_ReqData;
-UINT16 DSP3_BitCommand;
-UINT8  DSP3_BaseLength;
-UINT16 DSP3_BaseCodes;
-UINT16 DSP3_BaseCode;
-UINT8  DSP3_CodeLengths[8];
-UINT16 DSP3_CodeOffsets[8];
-UINT16 DSP3_LZCode;
-UINT8  DSP3_LZLength;
+static UINT16 DSP3_Codewords;
+static UINT16 DSP3_Outwords;
+static UINT16 DSP3_Symbol;
+static UINT16 DSP3_BitCount;
+static UINT16 DSP3_Index;
+static UINT16 DSP3_Codes[512];
+static UINT16 DSP3_BitsLeft;
+static UINT16 DSP3_ReqBits;
+static UINT16 DSP3_ReqData;
+static UINT16 DSP3_BitCommand;
+static UINT8  DSP3_BaseLength;
+static UINT16 DSP3_BaseCodes;
+static UINT16 DSP3_BaseCode;
+static UINT8  DSP3_CodeLengths[8];
+static UINT16 DSP3_CodeOffsets[8];
+static UINT16 DSP3_LZCode;
+static UINT8  DSP3_LZLength;
 
-UINT16 DSP3_X;
-UINT16 DSP3_Y;
+static UINT16 DSP3_X;
+static UINT16 DSP3_Y;
 
-void DSP3_Coordinate( void )
+static void DSP3_Coordinate(void)
 {
 	DSP3_Index++;
 
@@ -178,13 +180,13 @@ void DSP3_Coordinate( void )
 	}
 }
 
-UINT8  DSP3_Bitmap[8];
-UINT8  DSP3_Bitplane[8];
-UINT16 DSP3_BMIndex;
-UINT16 DSP3_BPIndex;
-UINT16 DSP3_Count;
+static UINT8  DSP3_Bitmap[8];
+static UINT8  DSP3_Bitplane[8];
+static UINT16 DSP3_BMIndex;
+static UINT16 DSP3_BPIndex;
+static UINT16 DSP3_Count;
 
-void DSP3_Convert_A( void )
+static void DSP3_Convert_A(void)
 {
 	if (DSP3_BMIndex < 8)
 	{
@@ -221,14 +223,14 @@ void DSP3_Convert_A( void )
 	}
 }
 
-void DSP3_Convert( void )
+static void DSP3_Convert(void)
 {
 	DSP3_Count = DSP3_DR;
 	DSP3_BMIndex = 0;
 	SetDSP3 = &DSP3_Convert_A;
 }
 
-UINT8 DSP3_GetBits(UINT8 Count)
+static UINT8 DSP3_GetBits(UINT8 Count)
 {
 	if (!DSP3_BitsLeft)
 	{
@@ -255,7 +257,7 @@ UINT8 DSP3_GetBits(UINT8 Count)
 	return 1;
 }
 
-void DSP3_Decode_Data( void )
+static void DSP3_Decode_Data(void)
 {
 	if (!DSP3_BitCount)
 	{
@@ -328,7 +330,7 @@ void DSP3_Decode_Data( void )
 	DSP3_DR = DSP3_Symbol;
 }
 
-void DSP3_Decode_Tree( void )
+static void DSP3_Decode_Tree(void)
 {
 	if (!DSP3_BitCount)
 	{
@@ -373,7 +375,7 @@ void DSP3_Decode_Tree( void )
 	if (DSP3_BitCount) DSP3_Decode_Data();
 }
 
-void DSP3_Decode_Symbols( void )
+static void DSP3_Decode_Symbols(void)
 {
 	DSP3_ReqData = DSP3_DR;
 	DSP3_BitCount += 16;
@@ -428,7 +430,7 @@ void DSP3_Decode_Symbols( void )
 	if (DSP3_BitCount) DSP3_Decode_Tree();
 }
 
-void DSP3_Decode_A( void )
+static void DSP3_Decode_A(void)
 {
 	DSP3_Outwords = DSP3_DR;
 	SetDSP3 = &DSP3_Decode_Symbols;
@@ -440,7 +442,7 @@ void DSP3_Decode_A( void )
 	DSP3_SR = 0xC0;
 }
 
-void DSP3_Decode( void )
+static void DSP3_Decode(void)
 {
 	DSP3_Codewords = DSP3_DR;
 	SetDSP3 = &DSP3_Decode_A;
@@ -450,31 +452,31 @@ void DSP3_Decode( void )
 // Opcodes 1E/3E bit-perfect to 'dsp3-intro' log
 // src: adapted from SD Gundam X/G-Next
 
-INT16 op3e_x;
-INT16 op3e_y;
+static INT16 op3e_x;
+static INT16 op3e_y;
 
-INT16 op1e_terrain[0x2000];
-INT16 op1e_cost[0x2000];
-INT16 op1e_weight[0x2000];
+static INT16 op1e_terrain[0x2000];
+static INT16 op1e_cost[0x2000];
+static INT16 op1e_weight[0x2000];
 
-INT16 op1e_cell;
-INT16 op1e_turn;
-INT16 op1e_search;
+static INT16 op1e_cell;
+static INT16 op1e_turn;
+static INT16 op1e_search;
 
-INT16 op1e_x;
-INT16 op1e_y;
+static INT16 op1e_x;
+static INT16 op1e_y;
 
-INT16 op1e_min_radius;
-INT16 op1e_max_radius;
+static INT16 op1e_min_radius;
+static INT16 op1e_max_radius;
 
-INT16 op1e_max_search_radius;
-INT16 op1e_max_path_radius;
+static INT16 op1e_max_search_radius;
+static INT16 op1e_max_path_radius;
 
-INT16 op1e_lcv_radius;
-INT16 op1e_lcv_steps;
-INT16 op1e_lcv_turns;
+static INT16 op1e_lcv_radius;
+static INT16 op1e_lcv_steps;
+static INT16 op1e_lcv_turns;
 
-void DSP3_OP3E( void )
+static void DSP3_OP3E(void)
 {
 	op3e_x = (UINT8)(DSP3_DR & 0x00ff);
 	op3e_y = (UINT8)((DSP3_DR & 0xff00)>>8);
@@ -489,23 +491,23 @@ void DSP3_OP3E( void )
 	op1e_max_path_radius = 0;
 }
 
-void DSP3_OP1E_A( void );
-void DSP3_OP1E_A1( void );
-void DSP3_OP1E_A2( void );
-void DSP3_OP1E_A3( void );
+static void DSP3_OP1E_A(void);
+static void DSP3_OP1E_A1(void);
+static void DSP3_OP1E_A2(void);
+static void DSP3_OP1E_A3(void);
 
-void DSP3_OP1E_B( void );
-void DSP3_OP1E_B1( void );
-void DSP3_OP1E_B2( void );
+static void DSP3_OP1E_B(void);
+static void DSP3_OP1E_B1(void);
+static void DSP3_OP1E_B2(void);
 
-void DSP3_OP1E_C( void );
-void DSP3_OP1E_C1( void );
-void DSP3_OP1E_C2( void );
+static void DSP3_OP1E_C(void);
+static void DSP3_OP1E_C1(void);
+static void DSP3_OP1E_C2(void);
 
-void DSP3_OP1E_D( INT16, INT16 *, INT16 * );
-void DSP3_OP1E_D1( INT16 move, INT16 *lo, INT16 *hi );
+static void DSP3_OP1E_D( INT16, INT16 *, INT16 * );
+static void DSP3_OP1E_D1( INT16 move, INT16 *lo, INT16 *hi );
 
-void DSP3_OP1E( void )
+static void DSP3_OP1E(void)
 {
 	int lcv;
 
@@ -536,7 +538,7 @@ void DSP3_OP1E( void )
 	DSP3_OP1E_A();
 }
 
-void DSP3_OP1E_A( void )
+static void DSP3_OP1E_A(void)
 {
 	int lcv;
 
@@ -582,13 +584,13 @@ void DSP3_OP1E_A( void )
 	SetDSP3 = &DSP3_OP1E_A1;
 }
 
-void DSP3_OP1E_A1( void )
+static void DSP3_OP1E_A1(void)
 {
 	DSP3_SR = 0x0084;
 	SetDSP3 = &DSP3_OP1E_A2;
 }
 
-void DSP3_OP1E_A2( void )
+static void DSP3_OP1E_A2(void)
 {
 	op1e_terrain[ op1e_cell ] = (UINT8)(DSP3_DR & 0x00ff);
 
@@ -596,7 +598,7 @@ void DSP3_OP1E_A2( void )
 	SetDSP3 = &DSP3_OP1E_A3;
 }
 
-void DSP3_OP1E_A3( void )
+static void DSP3_OP1E_A3(void)
 {
 	op1e_cost[ op1e_cell ] = (UINT8)(DSP3_DR & 0x00ff);
 
@@ -619,7 +621,7 @@ void DSP3_OP1E_A3( void )
 }
 
 
-void DSP3_OP1E_B( void )
+static void DSP3_OP1E_B(void)
 {
 	op1e_x = op3e_x;
 	op1e_y = op3e_y;
@@ -633,7 +635,7 @@ void DSP3_OP1E_B( void )
 }
 
 
-void DSP3_OP1E_B1( void )
+static void DSP3_OP1E_B1(void)
 {
 	while( op1e_lcv_radius < op1e_max_radius ) {
 		op1e_y--;
@@ -673,7 +675,7 @@ void DSP3_OP1E_B1( void )
 }
 
 
-void DSP3_OP1E_B2( void )
+static void DSP3_OP1E_B2(void)
 {
 	INT16 cell;
 	INT16 path;
@@ -713,7 +715,7 @@ void DSP3_OP1E_B2( void )
 }
 
 
-void DSP3_OP1E_C( void )
+static void DSP3_OP1E_C(void)
 {
 	int lcv;
 
@@ -745,7 +747,7 @@ void DSP3_OP1E_C( void )
 }
 
 
-void DSP3_OP1E_C1( void )
+static void DSP3_OP1E_C1(void)
 {
 	int lcv;
 
@@ -792,7 +794,7 @@ void DSP3_OP1E_C1( void )
 }
 
 
-void DSP3_OP1E_C2( void )
+static void DSP3_OP1E_C2(void)
 {
 	DSP3_DR = op1e_weight[ op1e_cell ];
 
@@ -804,7 +806,7 @@ void DSP3_OP1E_C2( void )
 }
 
 
-void DSP3_OP1E_D( INT16 move, INT16 *lo, INT16 *hi )
+static void DSP3_OP1E_D( INT16 move, INT16 *lo, INT16 *hi )
 {
 	UINT32 dataOfs = ((move << 1) + 0x03b2) & 0x03ff;
 	INT16 Lo;
@@ -838,7 +840,7 @@ void DSP3_OP1E_D( INT16 move, INT16 *lo, INT16 *hi )
 }
 
 
-void DSP3_OP1E_D1( INT16 move, INT16 *lo, INT16 *hi )
+static void DSP3_OP1E_D1( INT16 move, INT16 *lo, INT16 *hi )
 {
 	//UINT32 dataOfs = ((move << 1) + 0x03b2) & 0x03ff;
 	INT16 Lo;
@@ -871,7 +873,7 @@ void DSP3_OP1E_D1( INT16 move, INT16 *lo, INT16 *hi )
 }
 
 
-void DSP3_OP10( void )
+static void DSP3_OP10(void)
 {
 	if( DSP3_DR == 0xffff ) {
 		DSP3_Reset();
@@ -881,17 +883,17 @@ void DSP3_OP10( void )
 	}
 }
 
-
-void DSP3_OP0C_A( void )
+#ifdef UNUSED_FUNCTION
+static void DSP3_OP0C_A(void)
 {
 	// absorb 2 bytes
 
 	DSP3_DR = 0;
 	SetDSP3 = &DSP3_Reset;
 }
+#endif
 
-
-void DSP3_OP0C( void )
+static void DSP3_OP0C(void)
 {
 	// absorb 2 bytes
 
@@ -901,7 +903,7 @@ void DSP3_OP0C( void )
 }
 
 
-void DSP3_OP1C_C( void )
+static void DSP3_OP1C_C(void)
 {
 	// return 2 bytes
 	DSP3_DR = 0;
@@ -909,7 +911,7 @@ void DSP3_OP1C_C( void )
 }
 
 
-void DSP3_OP1C_B( void )
+static void DSP3_OP1C_B(void)
 {
 	// absorb 2 bytes
 
@@ -919,7 +921,7 @@ void DSP3_OP1C_B( void )
 }
 
 
-void DSP3_OP1C_A( void )
+static void DSP3_OP1C_A(void)
 {
 	// absorb 2 bytes
 
@@ -927,7 +929,7 @@ void DSP3_OP1C_A( void )
 }
 
 
-void DSP3_OP1C( void )
+static void DSP3_OP1C(void)
 {
 	// absorb 2 bytes
 
@@ -935,7 +937,7 @@ void DSP3_OP1C( void )
 }
 
 
-void DSP3_Command( void )
+static void DSP3_Command(void)
 {
 	if (DSP3_DR < 0x40)
 	{
@@ -963,7 +965,7 @@ void DSP3_Command( void )
 }
 
 
-void DSP3_write( UINT16 dsp3_address, UINT8 dsp3_byte )
+static void DSP3_write( UINT16 dsp3_address, UINT8 dsp3_byte )
 {
   if (dsp3_address < 0xC000)
   {
@@ -987,7 +989,7 @@ void DSP3_write( UINT16 dsp3_address, UINT8 dsp3_byte )
   }
 }
 
-UINT8 DSP3_read( UINT16 dsp3_address )
+static UINT8 DSP3_read( UINT16 dsp3_address )
 {
   UINT8 value;
   if (dsp3_address < 0xC000)
@@ -1019,7 +1021,7 @@ UINT8 DSP3_read( UINT16 dsp3_address )
   return value;
 }
 
-void InitDSP3( running_machine *machine )
+static void InitDSP3( running_machine *machine )
 {
 	UINT32 i;
 	UINT8 *dspin = memory_region(machine, "addons");

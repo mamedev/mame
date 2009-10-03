@@ -17,6 +17,8 @@ Namco System II
 extern void namcos21_kickstart(running_machine *, int);
 
 static TIMER_CALLBACK( namcos2_posirq_tick );
+static void InitC148(void);
+
 static emu_timer *namcos2_posirq_timer;
 
 int namcos2_gametype;
@@ -110,7 +112,6 @@ MACHINE_START( namcos2 )
 MACHINE_RESET( namcos2 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int loop;
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl = 0;
 	namcos2_mcu_analog_data = 0xaa;
@@ -126,12 +127,7 @@ MACHINE_RESET( namcos2 )
 	ResetAllSubCPUs( machine, ASSERT_LINE );
 
 	/* Initialise interrupt handlers */
-	for(loop = 0; loop < 0x20; loop++)
-	{
-		namcos2_68k_master_C148[loop] = 0;
-		namcos2_68k_slave_C148[loop] = 0;
-		namcos2_68k_gpu_C148[loop] = 0;
-	}
+	InitC148();
 
 	/* reset POSIRQ timer */
 	timer_adjust_oneshot(namcos2_posirq_timer, attotime_never, 0);
@@ -190,7 +186,7 @@ READ16_HANDLER( namcos2_68k_data_rom_r ){
 /* 68000 Shared serial communications processor (CPU5?)       */
 /**************************************************************/
 
-UINT16  namcos2_68k_serial_comms_ctrl[0x8];
+static UINT16  namcos2_68k_serial_comms_ctrl[0x8];
 UINT16 *namcos2_68k_serial_comms_ram;
 
 READ16_HANDLER( namcos2_68k_serial_comms_ram_r ){
@@ -458,9 +454,9 @@ WRITE16_HANDLER( namcos2_68k_key_w )
 #define FRAME_TIME		(1.0/60.0)
 #define LINE_LENGTH 	(FRAME_TIME/NO_OF_LINES)
 
-UINT16  namcos2_68k_master_C148[0x20];
-UINT16  namcos2_68k_slave_C148[0x20];
-UINT16  namcos2_68k_gpu_C148[0x20];
+static UINT16  namcos2_68k_master_C148[0x20];
+static UINT16  namcos2_68k_slave_C148[0x20];
+static UINT16  namcos2_68k_gpu_C148[0x20];
 
 
 static int IsSystem21( void )
@@ -476,6 +472,18 @@ static int IsSystem21( void )
 		return 1;
 	default:
 		return 0;
+	}
+}
+
+static void InitC148(void)
+{
+	int loop;
+
+	for(loop = 0; loop < 0x20; loop++)
+	{
+		namcos2_68k_master_C148[loop] = 0;
+		namcos2_68k_slave_C148[loop] = 0;
+		namcos2_68k_gpu_C148[loop] = 0;
 	}
 }
 
