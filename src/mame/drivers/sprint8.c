@@ -479,28 +479,22 @@ static MACHINE_DRIVER_START( sprint8 )
 
 
 	/* sound hardware */
-#if 0
 	/* the proper way is to hook up 4 speakers, but they are not really
-	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front.
-	 * For now I just output 1-2 as mono. */
+	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
 	MDRV_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
-	MDRV_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
 	MDRV_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
+	MDRV_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
 	MDRV_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
 	MDRV_SOUND_ROUTE(0, "speaker_1_2", 1.0)
-	MDRV_SOUND_ROUTE(1, "speaker_3_7", 1.0)
-	MDRV_SOUND_ROUTE(2, "speaker_5_6", 1.0)
-	MDRV_SOUND_ROUTE(3, "speaker_4_8", 1.0)
-#else
-	MDRV_SPEAKER_STANDARD_MONO("speaker")
-
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
-	MDRV_SOUND_ROUTE(0, "speaker", 1.0)
-#endif
+	/* volumes on other channels defaulted to off, */
+	/* user can turn them up if needed. */
+	/* The game does not sound good with all channels mixed to stereo. */
+	MDRV_SOUND_ROUTE(1, "speaker_3_7", 0.0)
+	MDRV_SOUND_ROUTE(2, "speaker_5_6", 0.0)
+	MDRV_SOUND_ROUTE(3, "speaker_4_8", 0.0)
 MACHINE_DRIVER_END
 
 

@@ -1773,8 +1773,8 @@ static INPUT_PORTS_START( clowns )
 	PORT_START(CLOWNS_CONTROLLER_P2_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
-	PORT_START("MUSIC_ADJ")  /* 3 */
-	PORT_ADJUSTER( 40, "Music Volume" )
+	PORT_START("R507")
+	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
 
@@ -1820,8 +1820,8 @@ static INPUT_PORTS_START( clowns1 )
 	PORT_START(CLOWNS_CONTROLLER_P2_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
-	PORT_START("MUSIC_ADJ")  /* 3 */
-	PORT_ADJUSTER( 40, "Music Volume" )
+	PORT_START("R507")
+	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
 
@@ -1857,8 +1857,11 @@ static ADDRESS_MAP_START( spacwalk_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(spacwalk_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", spacwalk_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", spacwalk_audio_2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spacwalk )
@@ -1909,6 +1912,9 @@ static INPUT_PORTS_START( spacwalk )
 
 	PORT_START(CLOWNS_CONTROLLER_P2_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+
+	PORT_START("R507")
+	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( spacwalk )
@@ -1921,7 +1927,7 @@ static MACHINE_DRIVER_START( spacwalk )
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
-	// MDRV_IMPORT_FROM(spacwalk_audio)
+	MDRV_IMPORT_FROM(spacwalk_audio)
 
 MACHINE_DRIVER_END
 
@@ -3175,7 +3181,7 @@ ROM_END
 /* 626 */ GAME( 1977, m4,       0,        m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns,   clowns,   clowns1,  0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
-/* 640 */ GAMEL(1978, spacwalk, 0,        spacwalk, spacwalk, 0, ROT0,   "Midway", "Space Walk", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_spacwalk )
+/* 640 */ GAMEL(1978, spacwalk, 0,        spacwalk, spacwalk, 0, ROT0,   "Midway", "Space Walk", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacwalk )
 /* 642 */ GAME( 1978, einning,  0,        dplay,    einning,  0, ROT0,   "Midway", "Extra Inning", GAME_SUPPORTS_SAVE  )
 /* 643 */ GAME( 1978, shuffle,  0,        shuffle,  shuffle,  0, ROT90,  "Midway", "Shuffleboard", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 644 */ GAME( 1977, dogpatch, 0,        dogpatch, dogpatch, 0, ROT0,   "Midway", "Dog Patch", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
