@@ -3129,6 +3129,33 @@ ROM_START( pacmanbl ) /* Galaxian bootleg hardware known as Artic Multi-System *
 	ROM_LOAD( "blpaccp",      0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
 ROM_END
 
+/* content is the same as the above bootleg, but arranged differently in the roms */
+ROM_START( pacmanbla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom1.bin",      0x0000, 0x0800, CRC(75e4f967) SHA1(8bdb5ab2b3f978c578f1498b64bb16d2cb292ef2) )
+	ROM_CONTINUE(0x2000,0x800)	
+	ROM_LOAD( "rom2.bin",      0x0800, 0x0800, CRC(5b2e4293) SHA1(bb925491e315d2e6bb9e756bdf664d173f83cd58) )
+	ROM_CONTINUE(0x2800,0x800)
+	ROM_LOAD( "rom3.bin",      0x1000, 0x0800, CRC(c06e30a4) SHA1(00d8d114bd4e0b689e75e312c93f6c7b8492426e) )
+	ROM_CONTINUE(0x3000,0x800)	
+	ROM_LOAD( "rom4.bin",      0x1800, 0x0800, CRC(592b4ba8) SHA1(52a559344f70cd8a3a87de71de2bae57c885641a) )
+	ROM_CONTINUE(0x3800,0x800)	
+
+	ROM_REGION( 0x2000, "tempgfx", 0 )
+	ROM_LOAD( "rom5.bin",      0x0000, 0x1000, CRC(f2d8c01e) SHA1(d4a5789476fa7859bb936df10590775e97e87578) )
+	ROM_LOAD( "rom6.bin",      0x1000, 0x1000, CRC(346a1720) SHA1(e152c9161f4e8ef53153b9c4a8ecef9fdbbe2463) )
+	
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_COPY( "tempgfx", 0x0800, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx", 0x1800, 0x0800, 0x0800 )
+	
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_COPY( "tempgfx", 0x0000, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx", 0x1000, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "blpaccp",      0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
+ROM_END
 
 ROM_START( devilfsg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5128,7 +5155,8 @@ GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg",
 
 /* separate tile/sprite ROMs */
 GAME( 1981, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
