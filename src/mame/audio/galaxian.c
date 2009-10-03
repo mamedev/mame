@@ -268,8 +268,22 @@ static DISCRETE_SOUND_START(galaxian)
 	/* Pitch */
 	DISCRETE_INPUT_DATA(GAL_INP_PITCH)
 
+	DISCRETE_TASK_START(0)
+
+	    /************************************************/
+		/* NOISE                                        */
+		/************************************************/
+	
+	    /* since only a sample of the LFSR is latched @V2 we let the lfsr
+	     * run at a lower speed
+	     */
+	    DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
+		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
+		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
+	DISCRETE_TASK_END()
+	
 	/* Group Background and pitch */
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 
 		/************************************************/
 		/* Background                                   */
@@ -310,28 +324,19 @@ static DISCRETE_SOUND_START(galaxian)
     /* End of this task */
     DISCRETE_TASK_END()
 
-    /* Group Hit and Fire */
-
-    DISCRETE_TASK_START()
+    DISCRETE_TASK_START(1)
 
 	    /************************************************/
 		/* HIT                                          */
 		/************************************************/
 
-	    /* NOISE */
-	    /* since only a sample of the LFSR is latched @V2 we let the lfsr
-         * run at a lower speed
-         */
-	    DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
-		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
-		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
-
-
 		/* Not 100% correct - switching causes high impedance input for node_157
          * this is not emulated */
 		DISCRETE_RCDISC5(NODE_155, NODE_152, GAL_INP_HIT, (GAL_R35 + GAL_R36), GAL_C21)
 		DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
+	DISCRETE_TASK_END()
 
+	DISCRETE_TASK_START(1)
 		/************************************************/
 		/* FIRE                                         */
 		/************************************************/
@@ -361,9 +366,11 @@ static DISCRETE_SOUND_START(galaxian)
 	/* FINAL MIX                                    */
 	/************************************************/
 
-	DISCRETE_MIXER5(NODE_279, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, &galaxian_mixerpre_desc)
-	DISCRETE_MIXER3(NODE_280, 1, NODE_279, NODE_157, NODE_182, &galaxian_mixer_desc)
-	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
+	DISCRETE_TASK_START(2)
+		DISCRETE_MIXER5(NODE_279, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, &galaxian_mixerpre_desc)
+		DISCRETE_MIXER3(NODE_280, 1, NODE_279, NODE_157, NODE_182, &galaxian_mixer_desc)
+		DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
+	DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
 

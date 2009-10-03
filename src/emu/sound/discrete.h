@@ -16,6 +16,7 @@
  *  Coding started in November 2000
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Discrete parallel tasks 2009 - Couriersud
  *
  ***********************************************************************
  *
@@ -3446,6 +3447,7 @@
 #define DISCRETE_MAX_INPUTS					10
 #define DISCRETE_MAX_OUTPUTS			 	8
 #define DISCRETE_MAX_TASK_OUTPUTS			8
+#define DISCRETE_MAX_TASK_GROUPS			8
 
 
 /*************************************
@@ -3526,7 +3528,7 @@
 /* Mixer types */
 #define DISC_MIXER_IS_RESISTOR				0
 #define DISC_MIXER_IS_OP_AMP				1
-#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	// Used only internally.  Use DISC_MIXER_IS_OP_AMP
+#define DISC_MIXER_IS_OP_AMP_WITH_RI	 	2	/* Used only internally.  Use DISC_MIXER_IS_OP_AMP */
 
 /* Triggered Op Amp Functions */
 enum
@@ -3786,13 +3788,6 @@ struct _discrete_info
 
 	/* list of all nodes */
 	linked_list_entry	 *node_list;		/* node_description * */
-
-	/* list of "main" task nodes */
-	linked_list_entry	 *main_list;		/* node_description * */
-
-	/* list of main source nodes */
-
-	linked_list_entry	*main_source_list;		/* discrete_source_node */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */
@@ -4499,7 +4494,7 @@ enum
 
 /* parallel tasks */
 
-#define DISCRETE_TASK_START()                                           { NODE_SPECIAL, DSO_TASK_START,0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_START" },
+#define DISCRETE_TASK_START(TASK_GROUP)                                 { NODE_SPECIAL, DSO_TASK_START,1, { NODE_NC, NODE_NC }, { TASK_GROUP, 0 }, NULL, "DISCRETE_TASK_START" },
 #define DISCRETE_TASK_END()                                             { NODE_SPECIAL, DSO_TASK_END , 1, { 0 }, { 0 }, NULL, "DISCRETE_TASK_END" },
 //#define DISCRETE_TASK_SYNC()                                          { NODE_SPECIAL, DSO_TASK_SYNC, 0, { 0 }, { 0 }, NULL, "DISCRETE_TASK_SYNC" },
 

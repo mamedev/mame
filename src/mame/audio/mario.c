@@ -304,15 +304,14 @@ static DISCRETE_SOUND_START(mario)
 	/************************************************/
 
 	/* DISCRETE_INPUT_DATA */
-    DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
-    DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
     DISCRETE_INPUT_NOT(DS_SOUND7_INV)
 
 	/************************************************/
 	/* SOUND0                                       */
 	/************************************************/
 
-    DISCRETE_TASK_START()
+    DISCRETE_TASK_START(1)
+    DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
 	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, MR_C14)
 	DISCRETE_RCFILTER(NODE_11, 1, NODE_10, MR_R6, MR_C3 )
 	DISCRETE_CUSTOM7(NODE_12, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
@@ -324,7 +323,8 @@ static DISCRETE_SOUND_START(mario)
 	/* SOUND1                                       */
 	/************************************************/
 
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
+	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
 	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, MR_C15)
 	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, MR_R7, MR_C4 )
 	DISCRETE_CUSTOM7(NODE_22, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
@@ -336,7 +336,7 @@ static DISCRETE_SOUND_START(mario)
 	/* SOUND7                                       */
 	/************************************************/
 
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
 
 	DISCRETE_BIT_DECODE(NODE_102, NODE_100, 3, 1) 	//LS157 2B
@@ -365,7 +365,7 @@ static DISCRETE_SOUND_START(mario)
      * is a filter circuit. Simulation in LTSPICE shows, that the following is equivalent:
      */
 
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	DISCRETE_MULTIPLY(NODE_170, DS_DAC, TTL_HIGH/256.0)
 	DISCRETE_RCFILTER(NODE_171, 1, NODE_170, RES_K(750), CAP_P(200))
@@ -379,6 +379,7 @@ static DISCRETE_SOUND_START(mario)
 	/* MIXER                                        */
 	/************************************************/
 
+	DISCRETE_TASK_START(2)
 	DISCRETE_ADDER4(NODE_295, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND7, DS_OUT_DAC)
 
 	/* Amplifier: internal amplifier
@@ -390,6 +391,7 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_OUTPUT(NODE_297, 32767.0/5.0 * 10)
 	//DISCRETE_WAVELOG1(DS_OUT_SOUND0, 32767/5.0)
 	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND7_INV, 10000)
+	DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
 

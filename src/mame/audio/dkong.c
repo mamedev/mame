@@ -361,14 +361,11 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_INPUT_NOT(DS_DISCHARGE_INV)
 	//DISCRETE_INPUT_DATA(DS_DAC)
 
-	/* Mixing - DAC */
-	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
-
 	/************************************************/
 	/* Stomp                                        */
 	/************************************************/
 	/* Noise */
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF, 1.0, 0, 0.5, &dkong_lfsr)
 	DISCRETE_COUNTER(NODE_12, 1, 0, NODE_11, 7, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)	/* LS161, IC 3J */
 	DISCRETE_TRANSFORM3(NODE_13,NODE_12,3,DK_SUP_V,"01>2*")
@@ -391,7 +388,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 	/*  tt */
 	/* 4049B Inverter Oscillator build from 3 inverters */
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	DISCRETE_INVERTER_OSC(NODE_25,1,0,DK_R38,DK_R39,DK_C26,0,&dkong_inverter_osc_desc_jump)
 
 #if DK_USE_CUSTOM
@@ -423,7 +420,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 	/* Walk                                         */
 	/************************************************/
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	DISCRETE_INVERTER_OSC(NODE_51,1,0,DK_R47,DK_R48,DK_C30,0,&dkong_inverter_osc_desc_walk)
 
 #if DK_USE_CUSTOM
@@ -450,7 +447,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/* DAC                                          */
 	/************************************************/
 
-	DISCRETE_TASK_START()
+	DISCRETE_TASK_START(1)
 	/* Buffer DAC first to input stream 0 */
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	//DISCRETE_INPUT_DATA(DS_DAC)
@@ -480,6 +477,10 @@ static DISCRETE_SOUND_START(dkong2b)
 	/* Amplifier                                    */
 	/************************************************/
 
+	DISCRETE_TASK_START(2)
+	/* Mixing - DAC */
+	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
+
 	DISCRETE_MIXER4(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_DAC, DS_OUT_SOUND2, &dkong_mixer_desc)
 
 	/* Amplifier: internal amplifier */
@@ -497,6 +498,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	//DISCRETE_CSVLOG2(NODE_296, NODE_288)
 	//DISCRETE_WAVELOG1(NODE_296, 32767.0/5.0 * 3.41)
 #endif
+	DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
 
@@ -876,7 +878,7 @@ static DISCRETE_SOUND_START(dkongjr)
 	/* SOUND0 / SOUND7                              */
 	/************************************************/
 
-DISCRETE_TASK_START()
+DISCRETE_TASK_START(1)
 	DISCRETE_LOGIC_INVERT(DS_SOUND7,DS_SOUND7_INV)
 	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
 
@@ -909,7 +911,7 @@ DISCRETE_TASK_END()
 	/* SOUND1                                       */
 	/************************************************/
 
-DISCRETE_TASK_START()
+DISCRETE_TASK_START(1)
 	DISCRETE_LS123(NODE_10, DS_SOUND1_INV, JR_R9, JR_C15)
 	DISCRETE_TRANSFORM2(NODE_11,NODE_104,TTL_HIGH,"0!1*")
 	DISCRETE_LOGIC_INVERT(NODE_12,NODE_10)
@@ -927,7 +929,7 @@ DISCRETE_TASK_END()
 	/* SOUND2                                       */
 	/************************************************/
 
-DISCRETE_TASK_START()
+DISCRETE_TASK_START(1)
 	DISCRETE_74LS624(NODE_20, 0, 0.98*DK_SUP_V, JR_C20, DISC_LS624_OUT_COUNT_F)
 	DISCRETE_LFSR_NOISE(NODE_21, 1, 1, NODE_20, 1.0, 0, 0.5, &dkongjr_lfsr)
 	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)
@@ -943,7 +945,7 @@ DISCRETE_TASK_END()
 	/* SOUND9                                       */
 	/************************************************/
 
-DISCRETE_TASK_START()
+DISCRETE_TASK_START(1)
 	DISCRETE_LOGIC_INVERT(DS_SOUND9,DS_SOUND9_INV)
 	DISCRETE_RCFILTER(NODE_90, 1, DS_SOUND9_INV, JR_R14, JR_C26)
 	DISCRETE_MULTIPLY(NODE_91, NODE_90, TTL_HIGH)
@@ -956,7 +958,7 @@ DISCRETE_TASK_END()
 	/* DAC                                          */
 	/************************************************/
 
-DISCRETE_TASK_START()
+DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	/* Signal decay circuit Q7, R20, C32 */
 	DISCRETE_RCDISC(NODE_170, DS_DISCHARGE_INV, 1, JR_R20, JR_C32)
@@ -978,6 +980,7 @@ DISCRETE_TASK_END()
 	/* Amplifier                                    */
 	/************************************************/
 
+DISCRETE_TASK_START(2)
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND9, DS_OUT_SOUND0, DS_OUT_SOUND2, DS_OUT_SOUND1, DS_OUT_DAC, &dkongjr_mixer_desc)
 
 	/* Amplifier: internal amplifier
@@ -985,6 +988,7 @@ DISCRETE_TASK_END()
      */
 	DISCRETE_CRFILTER(NODE_295,1,NODE_288, 1000, JR_C13)
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 10)
+DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
 
