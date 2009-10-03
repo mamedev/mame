@@ -840,6 +840,36 @@
  *
  * EXAMPLES: see Polaris, Amazing Maze
  *
+ *          --------------------------------------------------
+ *
+ *     DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON
+ *          Basic Norton Op Amp Oscillator circuit.
+ *
+ *       .-------------------------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *       |
+ *       |       r1
+ *       +------ZZZZ-----.
+ *       |               |
+ *       |         |\    |
+ *       |    r2   | \   |
+ *       +---ZZZZ--|- \  |
+ *       |         |   >-+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *      ---        |+ /  |
+ *      ---    .---| /   |
+ *       |     |   |/    |
+ *      gnd    |         |
+ *             |   r3    |
+ *             +--ZZZZ---'
+ *             |
+ *             Z
+ *             Z r4
+ *             Z
+ *             |
+ *             ^
+ *             vP
+ *
+ * EXAMPLES: see Space Walk
+ *
  ***********************************************************************
  *
  * DISCRETE_OP_AMP_VCOn - Various single power supply op-amp VCO circuits

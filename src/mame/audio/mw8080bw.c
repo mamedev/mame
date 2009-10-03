@@ -2141,7 +2141,7 @@ DISCRETE_OP_AMP_TRIG_VCA(NODE_RELATIVE(NODE_35, _num),				/* IC M2-3, pin 9 */  
 	NODE_RELATIVE(NODE_33, _num), 0,								/* IN0, IN1 */          \
 	&spacwalk_sb_hit_tvca_info)                                                             \
 /* Wrong values.  Untested */                                                               \
-/* The rest of the circuit is a filter.                                                     \
+/* The rest of the circuit is a filter. */                                                  \
 DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                              \
 	1,												/* ENAB */                              \
 	NODE_RELATIVE(NODE_35, _num),					/* INP0 */                              \
