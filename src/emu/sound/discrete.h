@@ -3714,15 +3714,17 @@ struct _discrete_task
 	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				*dest[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
 
 };
 
 typedef struct _discrete_source_node discrete_source_node;
 struct _discrete_source_node
 {
-	discrete_task		*task;
+	const discrete_task	*task;
 	int					output_node;
+	double				buffer;
+	double				*ptr;
 };
 
 struct _discrete_info

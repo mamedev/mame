@@ -67,7 +67,7 @@
 typedef struct _task_info task_info;
 struct _task_info
 {
-	discrete_task *context;
+	discrete_task *task;
 	int samples;
 };
 
@@ -669,38 +669,45 @@ static void *task_callback(void *param, int threadid)
 	int samples, i;
 
 	/* set up task buffers */
-	for (i = 0; i < ti->context->numbuffered; i++)
-		ti->context->ptr[i] = &ti->context->node_buf[i][0];
+	for (i = 0; i < ti->task->numbuffered; i++)
+		ti->task->ptr[i] = ti->task->node_buf[i];
 
 	samples = ti->samples;
 	while (samples-- > 0)
 	{
-		step_nodes_in_list(ti->context->list);
+		step_nodes_in_list(ti->task->list);
 	}
-	/* reset ptr */
-	for (i = 0; i < ti->context->numbuffered; i++)
-		ti->context->ptr[i] = &ti->context->node_buf[i][0];
 
 	free(param);
 	return NULL;
 }
 
-INLINE void update_main_nodes(discrete_info *info)
+INLINE void update_main_nodes(discrete_info *info, int samples)
 {
 	linked_list_entry *entry;
 
-	if (DISCRETE_PROFILING)
-		info->total_samples++;
-
-	/* update task nodes */
+	/* initialize sources */
 	for (entry = info->source_list; entry != 0; entry = entry->next)
 	{
 		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
-		*sn->task->dest[sn->output_node] = *sn->task->ptr[sn->output_node]++;
+		sn->ptr = sn->task->node_buf[sn->output_node];
 	}
 
-	/* loop over all nodes */
-	step_nodes_in_list(info->main_list);
+	while (samples-- > 0)
+	{
+		if (DISCRETE_PROFILING)
+			info->total_samples++;
+
+		/* update source node buffer */
+		for (entry = info->source_list; entry != 0; entry = entry->next)
+		{
+			discrete_source_node *sn = (discrete_source_node *) entry->ptr;
+			sn->buffer = *sn->ptr++;
+		}
+
+		/* loop over all nodes */
+		step_nodes_in_list(info->main_list);
+	}
 }
 
 static STREAM_UPDATE( buffer_stream_update )
@@ -720,7 +727,7 @@ static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
 	linked_list_entry *entry;
-	int samplenum, outputnum;
+	int outputnum;
 
 	if (samples == 0)
 		return;
@@ -745,7 +752,7 @@ static STREAM_UPDATE( discrete_stream_update )
 		discrete_task *task = (discrete_task *) entry->ptr;
 
 		/* Fire task */
-		ti->context = task;
+		ti->task = task;
 		ti->samples = samples;
 		osd_work_item_queue(info->queue, task_callback, (void *) ti, WORK_ITEM_FLAG_AUTO_RELEASE);
 	}
@@ -754,8 +761,7 @@ static STREAM_UPDATE( discrete_stream_update )
 	osd_work_queue_wait(info->queue, osd_ticks_per_second()*10);
 
 	/* Now we must do samples iterations of the node list, one output for each step */
-	for (samplenum = 0; samplenum < samples; samplenum++)
-		update_main_nodes(info);
+	update_main_nodes(info, samples);
 
 	if (DISCRETE_PROFILING)
 		info->total_stream_updates++;

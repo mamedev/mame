@@ -77,7 +77,7 @@ static DISCRETE_START( dso_task )
 
 							discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p referenced by %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, NODE_BLOCKINDEX(main_node));
 							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double, 2048);
-							task->dest[task->numbuffered] = (double *) main_node->input[inputnum];
+							task->source[task->numbuffered] = (double *) main_node->input[inputnum];
 							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
 							
 							/* register into source list */
@@ -87,6 +87,8 @@ static DISCRETE_START( dso_task )
 									source);
 							source->task = task;
 							source->output_node = task->numbuffered;
+							/* point the input to a buffered location */
+							main_node->input[inputnum] = &source->buffer;
 							
 							task->numbuffered++;
 						}
@@ -103,7 +105,7 @@ static DISCRETE_STEP( dso_task )
 	int i;
 
 	for (i = 0; i < task->numbuffered; i++)
-		*(task->ptr[i]++) = *task->dest[i]; //DISCRETE_INPUT(i);
+		*(task->ptr[i]++) = *task->source[i]; //DISCRETE_INPUT(i);
 }
 
 static DISCRETE_RESET( dso_task )
