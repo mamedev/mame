@@ -3744,9 +3744,9 @@ struct _discrete_info
 
 	/* list of "main" task nodes */
 	linked_list_entry	 *main_list;		/* node_description * */
-	
+
 	/* list of main source nodes */
-	
+
 	linked_list_entry	*source_list;		/* discrete_source_node */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */

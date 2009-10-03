@@ -693,11 +693,11 @@ INLINE void update_main_nodes(discrete_info *info, int samples)
 		sn->ptr = sn->task->node_buf[sn->output_node];
 	}
 
+	if (DISCRETE_PROFILING)
+		info->total_samples += samples;
+
 	while (samples-- > 0)
 	{
-		if (DISCRETE_PROFILING)
-			info->total_samples++;
-
 		/* update source node buffer */
 		for (entry = info->source_list; entry != 0; entry = entry->next)
 		{

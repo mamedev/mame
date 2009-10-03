@@ -2051,7 +2051,7 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_R304		RES_M(1)
 #define SPACWALK_R305		RES_K(3680)
 #define SPACWALK_R307		RES_K(20)
-#define SPACWALK_R308		RES_K(20)	/* not labeled but beside R307 */
+#define SPACWALK_R308		RES_K(20)	/* not labeled but it's beside R307 */
 #define SPACWALK_R419		RES_K(2.7)
 #define SPACWALK_R420		RES_K(20)
 #define SPACWALK_R421		RES_K(11)
@@ -2068,7 +2068,7 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_C301		CAP_U(2.2)
 #define SPACWALK_C302		CAP_U(2.2)
 #define SPACWALK_C303		CAP_U(0.0047)
-#define SPACWALK_C304		CAP_U(0.0047)	/* not labeled but beside C303 */
+#define SPACWALK_C304		CAP_U(0.0047)	/* not labeled but it's beside C303 */
 #define SPACWALK_C602		CAP_U(1)
 
 
@@ -2142,7 +2142,6 @@ DISCRETE_OP_AMP_TRIG_VCA(NODE_RELATIVE(NODE_35, _num),				/* IC M2-3, pin 9 */  
 	&spacwalk_sb_hit_tvca_info)                                                             \
 /* Wrong values.  Untested */                                                               \
 /* The rest of the circuit is a filter.                                                     \
- *The frequency response was calculated with SPICE. */                                      \
 DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                              \
 	1,												/* ENAB */                              \
 	NODE_RELATIVE(NODE_35, _num),					/* INP0 */                              \
