@@ -6775,6 +6775,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( totcarn )	/* (c) 1992 Midway */
 	DRIVER( totcarnp )	/* (c) 1992 Midway */
 	DRIVER( mk2 )		/* (c) 1993 Midway */
+	DRIVER( mk2r31e )	/* (c) 1993 Midway */
 	DRIVER( mk2r32 )	/* (c) 1993 Midway */
 	DRIVER( mk2r30 )	/* (c) 1993 Midway */
 	DRIVER( mk2r21 )	/* (c) 1993 Midway */
