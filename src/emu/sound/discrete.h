@@ -3705,8 +3705,8 @@ struct _linked_list_entry
 	linked_list_entry 	*next;
 };
 
-typedef struct _discrete_task_context discrete_task_context;
-struct _discrete_task_context
+typedef struct _discrete_task discrete_task;
+struct _discrete_task
 {
 	const linked_list_entry *list;
 
@@ -3714,8 +3714,15 @@ struct _discrete_task_context
 	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				**dest[DISCRETE_MAX_TASK_OUTPUTS];
+	double 				*dest[DISCRETE_MAX_TASK_OUTPUTS];
 
+};
+
+typedef struct _discrete_source_node discrete_source_node;
+struct _discrete_source_node
+{
+	discrete_task		*task;
+	int					output_node;
 };
 
 struct _discrete_info
@@ -3733,8 +3740,12 @@ struct _discrete_info
 	/* list of all nodes */
 	linked_list_entry	 *node_list;		/* node_description * */
 
-	/* list of nodes which step */
-	linked_list_entry	 *step_list;		/* node_description * */
+	/* list of "main" task nodes */
+	linked_list_entry	 *main_list;		/* node_description * */
+	
+	/* list of main source nodes */
+	
+	linked_list_entry	*source_list;		/* discrete_source_node */
 
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *block_list;		/* discrete_sound_block * */

@@ -67,7 +67,7 @@
 typedef struct _task_info task_info;
 struct _task_info
 {
-	discrete_task_context *context;
+	discrete_task *context;
 	int samples;
 };
 
@@ -132,7 +132,7 @@ INLINE int node_module_index(const node_description *node)
 	return -1;
 }
 
-INLINE void linked_list_add(const discrete_info *info, linked_list_entry ***list_tail_ptr, const void *ptr)
+INLINE void linked_list_tail_add(const discrete_info *info, linked_list_entry ***list_tail_ptr, const void *ptr)
 {
 	**list_tail_ptr = auto_alloc(info->device->machine, linked_list_entry);
 	(**list_tail_ptr)->ptr = ptr;
@@ -150,6 +150,27 @@ INLINE int linked_list_count(const linked_list_entry *list)
 
 	return cnt;
 }
+
+INLINE void linked_list_add(const discrete_info *info, linked_list_entry **list, const void *ptr)
+{
+	linked_list_entry *entry;
+
+	if (*list == NULL)
+	{
+		*list = auto_alloc(info->device->machine, linked_list_entry);
+		(*list)->ptr = ptr;
+		(*list)->next = NULL;
+	}
+	else
+	{
+		for (entry = *list; entry != NULL && entry->next != NULL; entry = entry->next)
+			;
+		entry->next = auto_alloc(info->device->machine, linked_list_entry);
+		entry->next->ptr = ptr;
+		entry->next->next = NULL;
+	}
+}
+
 /*************************************
  *
  *  Included simulation objects
@@ -395,7 +416,7 @@ static void discrete_build_list(discrete_info *info, const discrete_sound_block 
 		else
 		{
 			discrete_log(info, "discrete_build_list() - adding node %d (*current %p)\n", node_count, *current);
-			linked_list_add(info, current, &intf[node_count]);
+			linked_list_tail_add(info, current, &intf[node_count]);
 		}
 
 		node_count++;
@@ -482,9 +503,10 @@ static DEVICE_START( discrete )
 
 	/* Start with empty lists */
 	info->node_list = NULL;
-	info->step_list = NULL;
+	info->main_list = NULL;
 	info->output_list = NULL;
 	info->input_list = NULL;
+	info->source_list = NULL;
 
 	/* allocate memory to hold pointers to nodes by index */
 	info->indexed_node = auto_alloc_array_clear(device->machine, node_description *, DISCRETE_MAX_NODES);
@@ -562,12 +584,12 @@ static void display_profiling(const discrete_info *info)
 	/* Task information */
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
-		discrete_task_context *task = (discrete_task_context *) entry->ptr;
+		discrete_task *task = (discrete_task *) entry->ptr;
 		tt =  list_run_time(task->list);
 
 		printf("Task: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
 	}
-	tt =  list_run_time(info->step_list);
+	tt =  list_run_time(info->main_list);
 
 	printf("Main: %8.2f %15.2f\n", tt / (double) total * 100.0, tt / (double) info->total_samples);
 
@@ -663,7 +685,7 @@ static void *task_callback(void *param, int threadid)
 	return NULL;
 }
 
-INLINE void discrete_stream_update_nodes(discrete_info *info)
+INLINE void update_main_nodes(discrete_info *info)
 {
 	linked_list_entry *entry;
 
@@ -671,17 +693,14 @@ INLINE void discrete_stream_update_nodes(discrete_info *info)
 		info->total_samples++;
 
 	/* update task nodes */
-	for (entry = info->task_list; entry != 0; entry = entry->next)
+	for (entry = info->source_list; entry != 0; entry = entry->next)
 	{
-		discrete_task_context *task = (discrete_task_context *) entry->ptr;
-		int i;
-
-		for (i = task->numbuffered - 1; i >= 0 ; i--)
-			**task->dest[i] = *task->ptr[i]++;
+		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
+		*sn->task->dest[sn->output_node] = *sn->task->ptr[sn->output_node]++;
 	}
 
 	/* loop over all nodes */
-	step_nodes_in_list(info->step_list);
+	step_nodes_in_list(info->main_list);
 }
 
 static STREAM_UPDATE( buffer_stream_update )
@@ -723,7 +742,7 @@ static STREAM_UPDATE( discrete_stream_update )
 	for (entry = info->task_list; entry != 0; entry = entry->next)
 	{
 		task_info *ti = (task_info *)malloc(sizeof(task_info));
-		discrete_task_context *task = (discrete_task_context *) entry->ptr;
+		discrete_task *task = (discrete_task *) entry->ptr;
 
 		/* Fire task */
 		ti->context = task;
@@ -736,7 +755,7 @@ static STREAM_UPDATE( discrete_stream_update )
 
 	/* Now we must do samples iterations of the node list, one output for each step */
 	for (samplenum = 0; samplenum < samples; samplenum++)
-		discrete_stream_update_nodes(info);
+		update_main_nodes(info);
 
 	if (DISCRETE_PROFILING)
 		info->total_stream_updates++;
@@ -757,9 +776,9 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 	linked_list_entry	**task_node_list_ptr = NULL;
 	linked_list_entry	*entry;
 	linked_list_entry	*task_node_list = NULL;
-	discrete_task_context *task = NULL;
+	discrete_task *task = NULL;
 	/* list tail pointers */
-	linked_list_entry	**step_list_ptr = &info->step_list;
+	linked_list_entry	**main_list_ptr = &info->main_list;
 	linked_list_entry	**node_list_ptr = &info->node_list;
 	linked_list_entry	**task_list_ptr = &info->task_list;
 	linked_list_entry	**output_list_ptr = &info->output_list;
@@ -808,7 +827,7 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 			{
 				/* Output Node */
 				case DSO_OUTPUT:
-					linked_list_add(info, &output_list_ptr, node);
+					linked_list_tail_add(info, &output_list_ptr, node);
 					break;
 
 				/* CSVlog Node for debugging */
@@ -830,10 +849,10 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 				case DSO_TASK_END:
 					if (task_node_list_ptr == NULL)
 						fatalerror("init_nodes() - NO DISCRETE_START_TASK.");
-					task = auto_alloc_clear(info->device->machine, discrete_task_context);
+					task = auto_alloc_clear(info->device->machine, discrete_task);
 					task->numbuffered = 0;
 					task->list = task_node_list;
-					linked_list_add(info, &task_list_ptr, task);
+					linked_list_tail_add(info, &task_list_ptr, task);
 					node->context = task;
 					task = NULL;
 					task_node_list = NULL;
@@ -855,15 +874,15 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		/* if we are an stream input node, track that */
 		if (block->type == DSS_INPUT_STREAM)
 		{
-			linked_list_add(info, &input_list_ptr, node);
+			linked_list_tail_add(info, &input_list_ptr, node);
 		}
 		else if (block->type == DSS_INPUT_BUFFER)
 		{
-			linked_list_add(info, &input_list_ptr, node);
+			linked_list_tail_add(info, &input_list_ptr, node);
 		}
 
 		/* add to node list */
-		linked_list_add(info, &node_list_ptr, node);
+		linked_list_tail_add(info, &node_list_ptr, node);
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
@@ -871,9 +890,9 @@ static void init_nodes(discrete_info *info, linked_list_entry *block_list, const
 		{
 			/* do we belong to a task? */
 			if (task_node_list_ptr == NULL)
-				linked_list_add(info, &step_list_ptr, node);
+				linked_list_tail_add(info, &main_list_ptr, node);
 			else
-				linked_list_add(info, &task_node_list_ptr, node);
+				linked_list_tail_add(info, &task_node_list_ptr, node);
 		}
 
 		if (block->type == DSO_TASK_END)
