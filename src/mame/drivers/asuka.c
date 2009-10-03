@@ -1314,6 +1314,27 @@ ROM_START( cadashf )
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
+ROM_START( cadashg )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c21-23-1.12",  0x00000, 0x20000, CRC(30ddbabe) SHA1(f48ea6fe36c4d9fe291232fd7adddb8f3547270f) )
+	ROM_LOAD16_BYTE( "c21-25-1.16",  0x00001, 0x20000, CRC(24e10611) SHA1(6f406267777dd693a3869ccb34fe3f2f8dea857d) )
+	ROM_LOAD16_BYTE( "c21-22-1.11",  0x40000, 0x20000, CRC(daf58b2d) SHA1(7a64df848f46f27bb6f9757ce0cc81311c2f172f) )
+	ROM_LOAD16_BYTE( "c21-24-1.15",  0x40001, 0x20000, CRC(2359b93e) SHA1(9a5ce34dd8667a987ab8b6e6246f0ad032af868f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
+	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+
+	ROM_REGION( 0x08000, "user1", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
+ROM_END
+
 ROM_START( galmedes )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "gm-prg1.bin",  0x00000, 0x20000, CRC(32a70753) SHA1(3bd094b7ae600dbc87ba74e8b2d6b86a68346f4f) )
@@ -1383,6 +1404,7 @@ GAME( 1989, cadashj,  cadash,   cadash,   cadashj,  0, ROT0,   "Taito Corporatio
 GAME( 1989, cadashu,  cadash,   cadash,   cadashu,  0, ROT0,   "Taito America Corporation", "Cadash (US)", 0 )
 GAME( 1989, cadashi,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (Italy)", 0 )
 GAME( 1989, cadashf,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (France)", 0 )
+GAME( 1989, cadashg,  cadash,   cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (Germany)", 0 )
 GAME( 1992, galmedes, 0,        galmedes, galmedes, 0, ROT270, "Visco", "Galmedes (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1993, earthjkr, 0,        galmedes, earthjkr, 0, ROT270, "Visco", "U.N. Defense Force: Earth Joker", GAME_SUPPORTS_SAVE )
 GAME( 1994, eto,      0,        eto,      eto,      0, ROT0,   "Visco", "Kokontouzai Eto Monogatari (Japan)", GAME_SUPPORTS_SAVE )

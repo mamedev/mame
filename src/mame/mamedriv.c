@@ -1789,6 +1789,7 @@ const game_driver * const drivers[] =
 	DRIVER( cadashu )	/* C21 (c) 1989 Taito America Corporation */
 	DRIVER( cadashi )	/* C21 (c) 1989 Taito Corporation Japan */
 	DRIVER( cadashf )	/* C21 (c) 1989 Taito Corporation Japan */
+	DRIVER( cadashg )	/* C21 (c) 1989 Taito Corporation Japan */
 	DRIVER( parentj )	/* C42 (c) 199? Taito */
 	DRIVER( galmedes )	/* (c) 1992 Visco (Japan) */
 	DRIVER( earthjkr )	/* (c) 1993 Visco (Japan) */
