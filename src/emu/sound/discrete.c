@@ -676,7 +676,7 @@ static void *task_callback(void *param, int threadid)
 		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
 		sn->ptr = sn->task->node_buf[sn->output_node];
 	}
-	
+
 	samples = ti->samples;
 	while (samples-- > 0)
 	{
@@ -782,14 +782,14 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 		if (block->type == DSO_TASK_START)
 			has_tasks = 1;
 	}
-	
+
 	if (!has_tasks)
 	{
 		/* set up a main task */
 		task_node_list = NULL;
 		task_node_list_ptr = &task_node_list;
 	}
-	
+
 	/* loop over all nodes */
 	for (entry = block_list; entry != NULL; entry = entry->next)
 	{
@@ -916,9 +916,9 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 
 	if (!has_tasks)
 	{
-		/* make sure we have one simple task 
-		 * No need to create a node since there are no dependencies.
-		 */
+		/* make sure we have one simple task
+         * No need to create a node since there are no dependencies.
+         */
 		task = auto_alloc_clear(info->device->machine, discrete_task);
 		task->numbuffered = 0;
 		task->list = task_node_list;
@@ -926,7 +926,7 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 		task->source_list = NULL;
 		linked_list_tail_add(info, &task_list_ptr, task);
 	}
-	
+
 	/* if no outputs, give an error */
 	if (linked_list_count(info->output_list) == 0)
 		fatalerror("init_nodes() - Couldn't find an output node");

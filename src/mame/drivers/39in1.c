@@ -1470,10 +1470,10 @@ static MACHINE_START(39in1)
 		ROM[i] = BITSWAP8(ROM[i],7,2,5,6,0,3,1,4) ^ BITSWAP8((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
 
 // 60-in-1 decrypt
-//	        if ((i%2)==0)
-//	        {
-//	            ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
-//	        }
+//          if ((i%2)==0)
+//          {
+//              ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
+//          }
 	}
 
 	pxa255_start(machine);

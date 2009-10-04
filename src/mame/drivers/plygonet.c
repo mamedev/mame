@@ -248,11 +248,6 @@ static WRITE32_HANDLER( shared_ram_write )
 	COMBINE_DATA(&shared_ram[offset]) ;
 
 	logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
-																			 (shared_ram[offset] & 0x0000ffff),
-																			  0xc000 + (offset<<1),
-																			  0xc000 +((offset<<1)+1),
-																			  mem_mask,
-																			  cpu_get_pc(space->cpu));
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
@@ -274,12 +269,12 @@ static WRITE32_HANDLER( dsp_w_lines )
 	/* 0x01000000 is the reset line - 0 is high, 1 is low */
 	if ((data >> 24) & 0x01)
 	{
-//		logerror("RESET CLEARED\n");
+//      logerror("RESET CLEARED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
-//		logerror("RESET ASSERTED\n");
+//      logerror("RESET ASSERTED\n");
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
@@ -527,7 +522,7 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl) 
+	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)

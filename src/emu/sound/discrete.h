@@ -3599,7 +3599,7 @@ enum
 #define DISC_SCHMITT_OSC_ENAB_IS_NOR		0x06
 
 #define DISC_SCHMITT_OSC_ENAB_MASK			0x06	/* Bits that define output enable type.
-													 * Used only internally in module. */
+                                                     * Used only internally in module. */
 
 /* 555 Common output flags */
 #define DISC_555_OUT_DC						0x00
@@ -3621,7 +3621,7 @@ enum
 #define DISC_555_OUT_COUNT_R_X				0x07
 
 #define DISC_555_OUT_MASK					0x07	/* Bits that define output type.
-												 * Used only internally in module. */
+                                                 * Used only internally in module. */
 
 #define DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE		0x80
 #define DISCRETE_555_CC_TO_DISCHARGE_PIN			0x00
@@ -3639,7 +3639,7 @@ enum
 #define DISC_566_OUT_COUNT_F_X				0x50
 #define DISC_566_OUT_COUNT_R_X				0x60
 #define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
-													 * Used only internally in module. */
+                                                     * Used only internally in module. */
 
 /* LS624 output flags */
 #define DISC_LS624_OUT_ENERGY				0x01
@@ -3760,7 +3760,7 @@ struct _discrete_task
 	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
 	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
-	
+
 	/* list of source nodes */
 	linked_list_entry	*source_list;		/* discrete_source_node */
 };

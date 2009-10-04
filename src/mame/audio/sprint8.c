@@ -167,8 +167,8 @@ DISCRETE_OP_AMP_FILTER(NODE_RELATIVE(SPRINT8_MOTOR1_SND, _car - 1), 1, NODE_RELA
 
 DISCRETE_SOUND_START( sprint8 )
 	/************************************************
-	 * Input register mapping
-	 ************************************************/
+     * Input register mapping
+     ************************************************/
 	DISCRETE_INPUT_LOGIC(SPRINT8_CRASH_EN)
 	DISCRETE_INPUT_NOT  (SPRINT8_SCREECH_EN)
 	DISCRETE_INPUT_NOT  (SPRINT8_ATTRACT_EN)
@@ -180,16 +180,16 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR6_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR7_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
 	DISCRETE_INPUTX_LOGIC(SPRINT8_MOTOR8_EN, DEFAULT_TTL_V_LOGIC_1, 0, 0)
-	
+
 	DISCRETE_TASK_START(0)
 	DISCRETE_ADJUSTMENT_TAG(SPRINT8_R132_POT, 0, SPRINT8_R132, DISC_LINADJ, "R132")
 
 	/************************************************
-	 * Noise Generator, Crash, Screech
-	 ************************************************/
+     * Noise Generator, Crash, Screech
+     ************************************************/
 	/* Address line A2 is used to XOR the feedback bits.
-	 * This can not easily be implemented, so I just set the
-	 * feedback as XNOR. */
+     * This can not easily be implemented, so I just set the
+     * feedback as XNOR. */
 	DISCRETE_LFSR_NOISE(SPRINT8_NOISE,			/* IC F7, pin 13 */
 		1,										/* ENAB */
 		SPRINT8_ATTRACT_EN,						/* RESET */
@@ -237,8 +237,8 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_TASK_END()
 
 	/************************************************
-	 * Car Motor
-	 ************************************************/
+     * Car Motor
+     ************************************************/
 	DISCRETE_TASK_START(1)
 	SPRINT8_MOTOR_CIRCUIT(1)
 	SPRINT8_MOTOR_CIRCUIT(2)
@@ -260,8 +260,8 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_TASK_END()
 
 	/************************************************
-	 * Final Mix
-	 ************************************************/
+     * Final Mix
+     ************************************************/
 	DISCRETE_TASK_START(2)
 	DISCRETE_MIXER3(SPRINT8_AUDIO_1_2,
 		SPRINT8_ATTRACT_EN,				/* ENAB */

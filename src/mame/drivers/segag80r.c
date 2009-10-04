@@ -13,7 +13,7 @@
     Known bugs:
         * Pig Newton doesn't read cocktail controls (might be game bug)
         * Astro Blaster v1 dies when you first start if you only
-		  have one credit at the time (bad dump?, protection?)
+          have one credit at the time (bad dump?, protection?)
 
 ****************************************************************************
 

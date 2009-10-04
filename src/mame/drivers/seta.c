@@ -27,7 +27,7 @@ P0-045-A (M6100429A)    89 DownTown                             Taito / RomStar
 ?        (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
 ?                       88 Caliber 50                           Taito / RomStar
 ?                       89 Arbalester                           Taito / RomStar
-PO-047A					?? Seta Roulette						Seta / Visco
+PO-047A                 ?? Seta Roulette                        Seta / Visco
 P1-036-A + P0-045-A +
 P1-049-A                89 Meta Fox                             Taito / RomStar
 P0-053-1                89 Castle of Dragon/Dragon Unit         Taito / RomStar / Athena
@@ -7281,7 +7281,7 @@ static MACHINE_DRIVER_START( setaroul )
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(dummy_start)
-	//MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	//MDRV_VIDEO_EOF(seta_buffer_sprites)   /* qzkklogy uses sprite buffering */
 	MDRV_VIDEO_UPDATE(dummy_update)
 
 	/* sound hardware */

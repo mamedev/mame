@@ -302,10 +302,10 @@ covert megatech / megaplay drivers to use new code etc. etc.
 
 /****************************************************************************************
  Memory Maps
- 
+
  most of the memory map / IO maps are filled in at run time - this is due to the SMS
  code that this is based on being designed that way due to weird features of the MD.
- 
+
 ****************************************************************************************/
 
 static UINT8 f7_bank_value;

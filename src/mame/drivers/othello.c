@@ -1,5 +1,5 @@
 /*
-	
+
 Othello (version 3.0) - Success 1984
 -------------------------------------
 
@@ -12,9 +12,9 @@ CPU Board:
  AY-3-8910 x2   - Sound
  D7751C         - ADPCM "Speech processor"
  D8243          - I/O Expander for D7751C (8048 based)
- 
+
 Video Board:
- almost empty - 3/4 sodlering pins not populated 
+ almost empty - 3/4 sodlering pins not populated
 
 
 
@@ -62,12 +62,12 @@ static MC6845_UPDATE_ROW( update_row )
 	int cx,x;
 	UINT32 data_address;
 	UINT32 tmp;
-	
+
 	const UINT8 *gfx = memory_region(device->machine, "gfx");
 
 	for(cx=0;cx<x_count;++cx)
 	{
-		data_address=((videoram[ma+cx]+tile_bank)<<4)|ra;	
+		data_address=((videoram[ma+cx]+tile_bank)<<4)|ra;
 		tmp=gfx[data_address]|(gfx[data_address+0x2000]<<8)|(gfx[data_address+0x4000]<<16);
 
 		for(x=0;x<TILE_WIDTH;++x)
@@ -85,7 +85,7 @@ static PALETTE_INIT( othello )
     {
         palette_set_color(machine,i,MAKE_RGB(0xff,0x00,0xff));
     }
-    
+
     /* only colors  2,3,7,9,c,d,f are used */
     palette_set_color(machine,0x02,MAKE_RGB(0x00,0xff,0x00));
     palette_set_color(machine,0x03,MAKE_RGB(0xff,0x7f,0x00));
@@ -119,12 +119,12 @@ static READ8_HANDLER( unk_87_r )
 static WRITE8_HANDLER(unk_8a_w)
 {
 	/*
-	n7751_command = (data & 0x07);
-	cputag_set_input_line(space->machine, "n7751", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	//cputag_set_input_line(device->machine, "n7751", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	*/
-	
+    n7751_command = (data & 0x07);
+    cputag_set_input_line(space->machine, "n7751", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+    //cputag_set_input_line(device->machine, "n7751", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+    cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+    */
+
 	logerror("8a -> %x\n",data);
 }
 
@@ -201,7 +201,7 @@ static WRITE8_HANDLER(ay_data_w)
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM 
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_portmap, ADDRESS_SPACE_IO, 8 )
@@ -236,7 +236,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 		case 3:
 			sound_addr &= 0xfff;
 			{
-				
+
 				if (!(data & 0x01) ) sound_addr |= 0x0000;
 				if (!(data & 0x02) ) sound_addr |= 0x1000;
 				if (!(data & 0x04) ) sound_addr |= 0x2000;
@@ -294,7 +294,7 @@ static INPUT_PORTS_START( othello )
 	PORT_DIPNAME( 0x08, 0x00, "Limit for Matta" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )		PORT_DIPLOCATION("SW1:5") /* stored at $fd1e */	
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )		PORT_DIPLOCATION("SW1:5") /* stored at $fd1e */
 	PORT_DIPNAME( 0x60, 0x60, "Timer (seconds)" )	PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x20, "6" )
@@ -303,27 +303,27 @@ static INPUT_PORTS_START( othello )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
-	
+
 	PORT_START("INP")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )  PORT_PLAYER(2)
-	
+
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) 
-	
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )	
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 INPUT_PORTS_END
 
@@ -352,7 +352,7 @@ static MACHINE_DRIVER_START( othello )
 	MDRV_CPU_ADD("audiocpu",Z80,XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 	MDRV_CPU_IO_MAP(audio_portmap)
-	
+
 	MDRV_CPU_ADD("n7751", N7751, XTAL_6MHz)
 	MDRV_CPU_IO_MAP(n7751_portmap)
 
@@ -366,12 +366,12 @@ static MACHINE_DRIVER_START( othello )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*6, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*6-1, 0*8, 64*8-1)
-	
+
 	MDRV_PALETTE_LENGTH(0x10)
 	MDRV_PALETTE_INIT(othello)
 
 	MDRV_VIDEO_UPDATE(othello)
-	
+
 	MDRV_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)	/* H46505 @ CPU clock */
 
 	/* sound hardware */
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( othello )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	
+
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
@@ -390,10 +390,10 @@ MACHINE_DRIVER_END
 ROM_START( othello )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.ic59",   0x0000, 0x2000, CRC(9f82fe14) SHA1(59600264ccce787383827fc5aa0f2c23728f6946))
-	
+
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.ic32",   0x0000, 0x2000, CRC(2bb4f75d) SHA1(29a659031acf0d50f374f440b8d353bcf98145a0))
-	
+
 	ROM_REGION( 0x1000, "n7751", 0 )      /* 4k for 7751 onboard ROM */
 	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) )
 

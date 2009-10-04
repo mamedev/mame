@@ -10,4 +10,4 @@
 ***************************************************************************/
 
 extern const char build_version[];
-const char build_version[] = "0.134u1 ("__DATE__")";
+const char build_version[] = "0.134u2 ("__DATE__")";

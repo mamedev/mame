@@ -523,8 +523,8 @@ static DISCRETE_STEP(dsd_555_mstbl)
 		v_cap = context->cap_voltage;
 
 		/* Sometimes a switching network is used to setup the capacitance.
-		 * These may select 'no' capacitor, causing oscillation to stop.
-		 */
+         * These may select 'no' capacitor, causing oscillation to stop.
+         */
 		if (DSD_555_MSTBL__C == 0)
 		{
 			context->flip_flop = 0;
@@ -545,7 +545,7 @@ static DISCRETE_STEP(dsd_555_mstbl)
 
 			/* Has it charged past upper limit? */
 			/* If trigger is still enabled, then we keep charging,
-			 * regardless of threshold. */
+             * regardless of threshold. */
 			if ((v_cap_next >= context->threshold) && !trigger)
 			{
 				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (context->v_charge - v_cap))));
@@ -1491,7 +1491,7 @@ static const struct
 	double	osc_stop[6];
 } ne566 =
 {
-	/* 10      10.5      11      11.5      12     13     14     15			   B+ */
+	/* 10      10.5      11      11.5      12     13     14     15             B+ */
 	{3.364, /*3.784,*/ 4.259, /*4.552,*/ 4.888, 5.384, 5.896, 6.416},		/* c_high */
 	{1.940, /*2.100,*/ 2.276, /*2.404,*/ 2.580, 2.880, 3.180, 3.488},		/* c_low */
 	{4.352, /*4.144,*/ 4.080, /*4.260,*/ 4.500, 4.960, 5.456, 5.940},		/* sqr_low */

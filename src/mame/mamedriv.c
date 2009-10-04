@@ -7527,7 +7527,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( calibr50 )	/* UH   (c) 1989 + Romstar or Taito license (DSW) */
 	DRIVER( arbalest )	/* UK   (c) 1989 + Jordan, Romstar or Taito license (DSW) */
 	DRIVER( metafox )	/* UP   (c) 1989 + Jordan, Romstar or Taito license (DSW) */
-	DRIVER( setaroul )	/* UF	(c) 19?? Seta / Visco */
+	DRIVER( setaroul )	/* UF   (c) 19?? Seta / Visco */
 	DRIVER( drgnunit )	/* (c) 1989 Athena / Seta + Romstar or Taito license (DSW) */
 	DRIVER( wits )		/* (c) 1989 Athena (Visco license) */
 	DRIVER( thunderl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) */

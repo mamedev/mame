@@ -5294,18 +5294,18 @@ ROM_START( vf4cart )
         ROM_LOAD( "mpr-23784.ic11", 0xa800000, 0x1000000, CRC(f74f2fee) SHA1(84b07baa6d116727e66ef27e24ba6484c3393891) )
 ROM_END
 
-/* 
-	This is the same nonsense layout rom board as gram2000, and just like
-	that it tests IC1 which doesn't exist - is it a mirror, or protection
-	related?  There is no physical rom for it, also note, the roms are 
-	interleaved, so each test is testing 2 roms and the labeling / ic
-	positions on the cart don't relate to the display in test mode.
+/*
+    This is the same nonsense layout rom board as gram2000, and just like
+    that it tests IC1 which doesn't exist - is it a mirror, or protection
+    related?  There is no physical rom for it, also note, the roms are
+    interleaved, so each test is testing 2 roms and the labeling / ic
+    positions on the cart don't relate to the display in test mode.
 
-	Desired IC1 @ 0x800000 sums from the header = 9f39 fdc4
+    Desired IC1 @ 0x800000 sums from the header = 9f39 fdc4
 
-	We need a USB dump of this from 0x800000 to 0x1000000.
+    We need a USB dump of this from 0x800000 to 0x1000000.
 */
-ROM_START( vf4evoct )                                                                                                    
+ROM_START( vf4evoct )
 	NAOMI2_BIOS
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)

@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( sprint8 )
 
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really
-	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
+     * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
 	MDRV_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
 	MDRV_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
 	MDRV_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */

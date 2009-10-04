@@ -1,11 +1,11 @@
 /* Sega MegaPlay
 
   changelog:
-	
+
   01 Oct  2009 - Converted to use the HazeMD SMS code so that old code
                  can be removed, however this makes the text transparent,
-				 which IIRC is incorrect
-  
+                 which IIRC is incorrect
+
   22 Sept 2007 - Started updating this to use the new Megadrive code,
                  fixing issues with Mazin Wars + Grand Slam.
                  However I'm still not convinced that the handling of
@@ -84,7 +84,7 @@ UINT16 *ic36_ram;
 //static UINT8 ic36_ram[0x4000];
 
 
-//static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
+//static UINT8 hintcount;           /* line interrupt counter, decreased each scanline */
 extern UINT8 segae_vintpending;
 extern UINT8 segae_hintpending;
 extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
@@ -582,7 +582,7 @@ static READ8_HANDLER( bank_r )
 	UINT8* bank = memory_region(space->machine, "mtbios");
 
 	fulladdress = mp_bios_bank_addr + offset;
-	
+
 
 	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
 	{
@@ -612,7 +612,7 @@ static READ8_HANDLER( bank_r )
 		return OLD_megaplay_genesis_io_r(space, (offset & 0x1f) / 2, 0xffff);
 	}
 	else
-	{	
+	{
 		printf("bank_r fulladdress %08x\n",fulladdress);
 		return 0x00;
 	}
@@ -642,7 +642,7 @@ static WRITE8_HANDLER ( bank_w )
 		OLD_megaplay_genesis_io_w(space, (offset & 0x1f) / 2, data, 0xffff);
 	}
 	else
-	{	
+	{
 		printf("bank_w fulladdress %08x\n",fulladdress);
 	}
 }
@@ -722,10 +722,10 @@ static WRITE8_HANDLER( megaplay_game_w )
 //      popmessage("Game bank selected: 0x%03x",game_banksel);
 		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",cpu_get_previouspc(space->cpu),game_banksel);
 	}
-	
+
 	mp_bios_bank_addr = ( ( mp_bios_bank_addr >> 1 ) | ( data << 23 ) ) & 0xff8000;
 
-	
+
 }
 
 static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -795,14 +795,14 @@ static VIDEO_START(megplay)
 {
 	//printf("megplay vs\n");
 	VIDEO_START_CALL(megadriv);
-//	VIDEO_START_CALL(megaplay_normal);
+//  VIDEO_START_CALL(megaplay_normal);
 }
 
 static VIDEO_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
 	VIDEO_UPDATE_CALL(megadriv);
-//	VIDEO_UPDATE_CALL(megaplay_normal);
+//  VIDEO_UPDATE_CALL(megaplay_normal);
 	VIDEO_UPDATE_CALL(megaplay_bios);
 	return 0;
 }
@@ -836,7 +836,7 @@ static MACHINE_DRIVER_START( mpnew )
 
 	MDRV_MACHINE_RESET( mpnew )
 	MDRV_VIDEO_EOF( mpnew )
-	
+
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
@@ -871,7 +871,7 @@ ROM_END
 
 /* The system appears to access the instruction rom at
     0x300000 in the 68k space (rom window from z80 side)
-	
+
    This probably means the maximum 68k rom size is 0x2fffff for MegaPlay
 */
 
@@ -1072,7 +1072,7 @@ static DRIVER_INIT (megaplay)
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
 
 	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
-	
+
 }
 
 /*

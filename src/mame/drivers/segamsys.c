@@ -1,11 +1,11 @@
 /*
-	SMS code from HazeMD
-	 - used by Syetem E
-	 - Megatech / Megaplay
-	 
-	this contains common code to support those systems
-	 
-	(not currently very good / accurate, should be rewritten)
+    SMS code from HazeMD
+     - used by Syetem E
+     - Megatech / Megaplay
+
+    this contains common code to support those systems
+
+    (not currently very good / accurate, should be rewritten)
 
 */
 
@@ -1165,7 +1165,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 		visarea.max_x = (256-160)/2+160-1;
 		visarea.min_y = (192-144)/2;
 		visarea.max_y = (192-144)/2+144-1;
-		
+
 		video_screen_configure(machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 	}
 
@@ -1186,7 +1186,7 @@ VIDEO_EOF(sms)
 	// the SMS has a 'RESET' button on the machine, it generates an NMI
 	if (input_port_read_safe(machine,"PAUSE",0x00))
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	
+
 }
 
 
@@ -1314,8 +1314,8 @@ VIDEO_UPDATE(megaplay_bios)
 		for (x=0;x<256;x++)
 		{
 			UINT16 src = srcptr[x]&0x7fff;
-			
-			if (src) 
+
+			if (src)
 				lineptr[x]=srcptr[x]&0x7fff;
 		}
 	}
@@ -1402,7 +1402,7 @@ DRIVER_INIT( megatech_bios )
 
 	vdp1_vram_bank0 = vdp1->vram;
 	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
-	
+
 	smsgg_backupram = 0;
 }
 
@@ -1416,10 +1416,10 @@ DRIVER_INIT( smscm )
 	md_sms_vdp->sms_total_scanlines = 313;
 	md_sms_vdp->sms_framerate = 50;
 	md_sms_vdp->chip_id = 3;
-	
+
 	vdp1_vram_bank0 = md_sms_vdp->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);	
-	
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
+
 	smsgg_backupram = 0;
 }
 
@@ -1433,9 +1433,9 @@ DRIVER_INIT( smspal )
 	md_sms_vdp->sms_total_scanlines = 313;
 	md_sms_vdp->sms_framerate = 50;
 	md_sms_vdp->chip_id = 3;
-	
+
 	vdp1_vram_bank0 = md_sms_vdp->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);	
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 
 	smsgg_backupram = 0;
 }
@@ -1495,7 +1495,7 @@ DRIVER_INIT( smsgg )
 	md_sms_vdp->sms_total_scanlines = 262;
 	md_sms_vdp->sms_framerate = 60;
 	md_sms_vdp->chip_id = 3;
-	
+
 	smsgg_backupram = 0;
 }
 
@@ -1528,7 +1528,7 @@ DRIVER_INIT( hazemd_segasyse )
 
  -- these are needed because on a Genesis the Sound Z80 becomes the SMS Z80 in comptibility mode
     so we need to be able to dynamically change the mapping
-	
+
 */
 
 static READ8_HANDLER( z80_unmapped_port_r )
@@ -1592,7 +1592,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 
 	sms_mainram[0x1ffc+offset] = data;
 	switch (offset)
-	{		
+	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
 			if ((data & 0x08) && smsgg_backupram)
@@ -1603,7 +1603,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			{
 				memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
 			}
-			
+
 			//printf("bank ram??\n");
 			break;
 		case 1:
@@ -1663,7 +1663,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const char* tag, int mapper)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
-	
+
 	/* catch any addresses that don't get mapped */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
@@ -1698,7 +1698,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 		memory_set_bankptr(machine,  5, sms_rom );
 
 		memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
-	
+
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0000, 0, 0, codemasters_rom_bank_0000_w);
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, codemasters_rom_bank_4000_w);
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, codemasters_rom_bank_8000_w);
@@ -1736,7 +1736,7 @@ MACHINE_DRIVER_START( sms )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 	MDRV_PALETTE_LENGTH(0x200)
 
@@ -1745,7 +1745,7 @@ MACHINE_DRIVER_START( sms )
 	MDRV_VIDEO_EOF(sms) /* Used to Sync the timing */
 
 	MDRV_NVRAM_HANDLER( sms )
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

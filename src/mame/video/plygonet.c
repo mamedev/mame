@@ -32,7 +32,7 @@ static TILE_GET_INFO( ttl_get_tile_info )
 static TILE_GET_INFO( roz_get_tile_info )
 {
 	int attr, code;
-	
+
 	attr = (roz_vram[tile_index] >> 12) + 16;	// roz base palette is palette 16
 	code = roz_vram[tile_index] & 0x3ff;
 
@@ -114,7 +114,7 @@ VIDEO_START( polygonet )
 	state_save_register_global_array(machine, ttl_vram);
 
 	// set up the roz t-map too
-	roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64); 
+	roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64);
 	tilemap_set_transparent_pen(roz_tilemap, 0);
 }
 

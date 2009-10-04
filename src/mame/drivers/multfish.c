@@ -18,7 +18,7 @@
   Turn Service Mode OFF (press 'F2')
   Reset the game (press 'F3')
 
-  To Init Roll Fruit 
+  To Init Roll Fruit
 
   Turn Service Mode ON (press 'F2')
   Press and hold Service 1 ('9')
@@ -222,7 +222,7 @@ static UINT8 multfish_hopper = 0;
 
 static CUSTOM_INPUT( multfish_hopper_r )
 {
-	if ( multfish_hopper_motor != 0 ) 
+	if ( multfish_hopper_motor != 0 )
 	{
 			multfish_hopper++;
 			return multfish_hopper>>4;

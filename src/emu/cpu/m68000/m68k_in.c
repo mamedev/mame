@@ -7997,7 +7997,7 @@ M68KMAKE_OP(pea, 32, ., .)
 
 M68KMAKE_OP(pflush, 32, ., .)
 {
-	if ((CPU_TYPE_IS_040_PLUS(m68k->cpu_type)) && (m68k->has_pmmu)) 
+	if ((CPU_TYPE_IS_040_PLUS(m68k->cpu_type)) && (m68k->has_pmmu))
 	{
 		// Nothing to do, unless address translation cache is emulated
 		logerror("680x0: unhandled PFLUSH\n");
@@ -8010,8 +8010,8 @@ M68KMAKE_OP(pmove, 32, ., .)
 {
 	UINT16 modes;
 	UINT32 ea;
-	
-	modes = m68ki_read_imm_16(m68k); 
+
+	modes = m68ki_read_imm_16(m68k);
 	ea = M68KMAKE_GET_EA_AY_32;
 
 	if ((CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type)) && (m68k->has_pmmu))

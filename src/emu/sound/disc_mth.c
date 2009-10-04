@@ -1464,7 +1464,7 @@ static DISCRETE_RESET(dst_oneshot)
 
  	context->last_trig = 0;
  	context->type = DST_ONESHOT__TYPE;
- 	
+
  	node->output[0] = (context->type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 }
 

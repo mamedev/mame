@@ -70,7 +70,7 @@ static void task_check(discrete_task *task, const discrete_task *dest_task)
 								found = i;
 								break;
 							}
-						
+
 						if (found<0)
 						{
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
@@ -86,8 +86,8 @@ static void task_check(discrete_task *task, const discrete_task *dest_task)
 
 						/* register into source list */
 						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
-						linked_list_add(dest_node->info, 
-								(linked_list_entry **) (FPTR) &dest_task->source_list, 
+						linked_list_add(dest_node->info,
+								(linked_list_entry **) (FPTR) &dest_task->source_list,
 								source);
 						source->task = task;
 						source->output_node = i;
@@ -106,20 +106,20 @@ static DISCRETE_START( dso_task_start )
 {
 	discrete_task *task =  (discrete_task *) node->context;
 	const linked_list_entry *task_entry;
-	
+
 	task->task_group = (int) DISCRETE_INPUT(0);
-	
+
 	if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 		fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
-	
+
 	for (task_entry = node->info->task_list; task_entry != NULL; task_entry = task_entry->next)
 	{
 		discrete_task *dest_task = (discrete_task *) task_entry->ptr;
-	
+
 		if (task->task_group > dest_task->task_group)
 			task_check(dest_task, task);
 	}
-	
+
 }
 
 static DISCRETE_STEP( dso_task_end )
