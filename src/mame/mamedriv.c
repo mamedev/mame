@@ -9662,9 +9662,12 @@ Other Sun games
 	DRIVER( islanda )	/* (c) 2005 */
 
 	/* Pirate */
-	//DRIVER( pirate )  /* (c) 2005 */
-	DRIVER( pirate_1 )	/* (c) 2005 */
-	//DRIVER( pirate_2 )/* (c) 2005 */
+	//DRIVER( pirate )	/* (c) 2005 */
+	DRIVER( pirate_2 )	/* (c) 2005 */
+	DRIVER( pirate_3 )	/* (c) 2005 */
+
+	/* Pirate 2 */
+	DRIVER( pirate2 )	/* (c) 2006 */
 
 	/* Island 2 */
 	DRIVER( island2 )	/* (c) 2006 */

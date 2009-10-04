@@ -7,6 +7,7 @@
   the sound is PSG - AY3-8910 analog (http://pt.wikipedia.org/wiki/KC89C72)
   z80 CPU is complete with indexed registers
   video - VGA
+  RTC+NVRAM - M48T35Y Timekeeper
 
   To Init the games
 
@@ -18,7 +19,7 @@
   Turn Service Mode OFF (press 'F2')
   Reset the game (press 'F3')
 
-  To Init Roll Fruit
+  To Init Roll Fruit 
 
   Turn Service Mode ON (press 'F2')
   Press and hold Service 1 ('9')
@@ -30,7 +31,6 @@
   Todo:
   -------------------------------------------------------------------------
   Hook up Lamps
-  Emulate the RTC (real time clock)
 
 
   NOTE:
@@ -40,6 +40,30 @@
   For sets where the program rom hasn't been verified, the MD5 hash is given
   but not the CRC32 hash. These sets are excluded using the 'ALL_REVISIONS'
   "#if" statements but listed in the driver below.
+
+Banking addresses are likely controlled via a GAL/PAL and was added at some
+point to try and prevent rom swaps and conversions. Many of the hacked sets
+below are simply made to the banking address to run on other boards.
+
+  Bank addresses
+  ---------------------
+  Island 2           E1
+  Gnome              E5
+  Sweet Life 2       E8
+  Fruit Coctail 2    EA
+  Multi Fish         F8
+  Crazy Monkey       F9
+  Fruit Coctail      F9
+  Garage             F9
+  Resident           F9
+  Lucky Hunter       F9
+  Rock Climber       F9
+  Roll Fruit         F9
+  Pirate             FA
+  Sweet Life         FA
+  Island             FB
+  Keks               FC
+  Pirate 2           FD
 
 */
 
@@ -88,7 +112,6 @@ static TILE_GET_INFO( get_multfish_reel_tile_info )
 			0);
 }
 
-
 static VIDEO_START(multfish)
 {
 	multfish_vid = auto_alloc_array(machine, UINT8, multfish_VIDRAM_SIZE);
@@ -106,10 +129,6 @@ static VIDEO_START(multfish)
 	tilemap_set_transparent_pen(multfish_reel_tilemap,255);
 	tilemap_set_scroll_cols(multfish_reel_tilemap, 64);
 }
-
-
-
-
 
 static VIDEO_UPDATE(multfish)
 {
@@ -209,7 +228,6 @@ static WRITE8_HANDLER( multfish_rambank_w )
 	otherrambk = data & 0xf0;
 }
 
-
 static READ8_HANDLER( ray_r )
 {
 	// the games read the raster beam position as part of the hardware checks..
@@ -222,7 +240,7 @@ static UINT8 multfish_hopper = 0;
 
 static CUSTOM_INPUT( multfish_hopper_r )
 {
-	if ( multfish_hopper_motor != 0 )
+	if ( multfish_hopper_motor != 0 ) 
 	{
 			multfish_hopper++;
 			return multfish_hopper>>4;
@@ -238,11 +256,50 @@ static WRITE8_HANDLER( multfish_port33_w )
 	multfish_hopper_motor = data & 0x10; //0x10 Hopper Motor (33B)
 }
 
+INLINE UINT8 make_bcd(UINT8 data)
+{
+	return ((data / 10) << 4) | (data % 10);
+}
+
+static READ8_HANDLER(multfish_rtc_r)
+{
+	mame_system_time systime;
+
+	mame_get_current_datetime(space->machine, &systime);
+	switch (offset)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return make_bcd(systime.local_time.second);
+		case 2:
+			return make_bcd(systime.local_time.minute);
+		case 3:
+			return make_bcd(systime.local_time.hour);
+		case 4:
+			return make_bcd(systime.local_time.weekday);
+		case 5:
+			return make_bcd(systime.local_time.mday);
+		case 6:
+			return make_bcd(systime.local_time.month+1);
+		case 7:
+                        return make_bcd(systime.local_time.year % 100);
+		default:
+			return 0;
+	}
+}
+
+static WRITE8_HANDLER(multfish_rtc_w)
+{
+
+}
+
 
 static ADDRESS_MAP_START( multfish_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_ROM, multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM )
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xdff7) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xdff8, 0xdfff) AM_READWRITE(multfish_rtc_r, multfish_rtc_w)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
 ADDRESS_MAP_END
 
@@ -405,7 +462,6 @@ static WRITE8_HANDLER( multfish_f3_w )
 	//popmessage("multfish_f3_w %02x",data);
 }
 
-
 static WRITE8_HANDLER( multfish_f4_w )
 {
 	//popmessage("multfish_f4_w %02x",data); // display enable?
@@ -452,8 +508,6 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-
-
 static const gfx_layout tiles16x16_layout =
 {
 	16,16,
@@ -471,7 +525,6 @@ static const gfx_layout tiles16x16_layout =
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	8*64
 };
-
 
 
 static GFXDECODE_START( multfish )
@@ -523,7 +576,6 @@ static MACHINE_DRIVER_START( multfish )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
-
 
 
 /*********************************************************
@@ -1689,6 +1741,41 @@ ROM_START( pirate_1 ) // 060210
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(cc2edac2) SHA1(24bacd9e092a83945a8def3a254ec66758d71ff5) )
 ROM_END
 
+ROM_START( pirate_3 ) // 060803
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr060803.rom", 0x00000, 0x40000, CRC(1de68707) SHA1(99dd3c5186ed8ba6c17e9f5479df93173da527e0) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(d2199619) SHA1(8c67ef7d0e305ae0783302ba9a1cb56cdcf4bc09) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(ce5c6548) SHA1(ef1cd6ae36cc1abcf010762dc89a255cd817d016) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(d6a8338d) SHA1(6a0e41309dc909decf8bd49cf13cbeca95f0314a) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(590b8cf6) SHA1(b2778f6e1b7bcf7f33ced43f999eff983e5a6af4) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(bf9f1267) SHA1(b0947bd7d31301ffbe80cbaf1e96c3476f6f9ca3) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(b0cdf7eb) SHA1(cf6bd20fb40cf0d87eeb6f1502fb73d9760c9140) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(6c4a9510) SHA1(e10bf8475ff7c73ba90b904b9214b285a5b2669f) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(cc2edac2) SHA1(24bacd9e092a83945a8def3a254ec66758d71ff5) )
+ROM_END
+
+
+/*********************************************************
+   Pirate 2
+**********************************************************/
+
+ROM_START( pirate2 ) // 061005
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005.rom", 0x00000, 0x40000, CRC(4ad0a29a) SHA1(72950da5f201a393a4761a8696cfc210725df23f) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
 /*********************************************************
    Keks
 
@@ -1778,8 +1865,19 @@ Note:
 
    Only the first set of a given revision is listed in Igrosoft's official hashes list.
 
-   It is not known if the alternate sets are hacks or were intended for different regions.
-   It looks like the difference are in the payout percentage / odds
+   The sets which differs from the originals by 5-6 bytes are bootlegs that simply change 
+     the banking address. Usually to convert a Crazy Monkey PCB which use the address "F9".
+     Software exists to automatic modify any program rom's banking address for any PCB.
+     This has resulted in dozens of different bootleg versions floating around the net.
+
+   Sets marked as "backdoor" are identical to originals, but have added code.  This code is
+     activated by a secret sequence of actions that leads to a guaranteed win, or dramatically
+     increases odds for winning. These backdoor version were commonly used by administrators
+     or PCB sellers to steal money from the slots owners.
+   Software does exist to automatically add the backdoor code and allows for custom key
+     sequences.  As a result of this, there is also software to dectect the backdoor code
+     in program roms.
+
 
 Most games had a revision in early 2007 to meet the standards of the "Government gambling control"
    law of The Russian Federation No 244-03 of Dec 29, 2006
@@ -1809,11 +1907,11 @@ GAME( 2002, mfish_11,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi 
 GAME( 2002, mfish_13,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040316)",  0 )
 #endif
 
-GAME( 2003, crzmon_7,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 1)",  0 )
-GAME( 2003, crzmon_7a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 2)",  0 )
-GAME( 2003, crzmon_7b,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, set 3)",  0 )
+GAME( 2003, crzmon_7,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110)",  0 )
+GAME( 2003, crzmon_7a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 1)",  0 )
+GAME( 2003, crzmon_7b,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 2)",  0 )
 GAME( 2003, crzmon_8,    crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 1)",  0 )
-GAME( 2003, crzmon_8a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 2)",  0 )
+GAME( 2003, crzmon_8a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, backdoor)",  0 )
 #if ALL_REVISIONS
 GAME( 2003, crzmon,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030217)",  0 )
 GAME( 2003, crzmon_2,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030225)",  0 )
@@ -1823,11 +1921,11 @@ GAME( 2003, crzmon_5,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Cr
 GAME( 2003, crzmon_6,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031016)",  0 )
 #endif
 
-GAME( 2003, fcockt_6,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 1)",  0 )
-GAME( 2003, fcockt_6a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 2)",  0 )
-GAME( 2003, fcockt_6b,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, set 3)",  0 )
-GAME( 2003, fcockt_7,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 1)",  0 )
-GAME( 2003, fcockt_7a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, set 2)",  0 )
+GAME( 2003, fcockt_6,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216)",  0 )
+GAME( 2003, fcockt_6a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, banking address hack)",  0 )
+GAME( 2003, fcockt_6b,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, backdoor)",  0 )
+GAME( 2003, fcockt_7,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118)",  0 )
+GAME( 2003, fcockt_7a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, backdoor)",  0 )
 GAME( 2003, fcockt_8,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (060111)",  0 )
 #if ALL_REVISIONS
 GAME( 2003, fcockt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030505)",  0 )
@@ -1837,12 +1935,12 @@ GAME( 2003, fcockt_4,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fr
 GAME( 2003, fcockt_5,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031111)",  0 )
 #endif
 
-GAME( 2003, lhaunt_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 1)",  0 )
-GAME( 2003, lhaunt_4a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, set 2)",  0 )
-GAME( 2003, lhaunt_5,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216. set 1)",  0 )
-GAME( 2003, lhaunt_5a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, set 2)",  0 )
-GAME( 2003, lhaunt_6,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 1)",  0 )
-GAME( 2003, lhaunt_6a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, set 2)",  0 )
+GAME( 2003, lhaunt_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111)",  0 )
+GAME( 2003, lhaunt_4a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, backdoor)",  0 )
+GAME( 2003, lhaunt_5,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216)",  0 )
+GAME( 2003, lhaunt_5a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, backdoor)",  0 )
+GAME( 2003, lhaunt_6,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825)",  0 )
+GAME( 2003, lhaunt_6a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, backdoor)",  0 )
 #if ALL_REVISIONS
 GAME( 2003, lhaunt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030707)",  0 )
 GAME( 2003, lhaunt_2,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030804)",  0 )
@@ -1854,47 +1952,49 @@ GAME( 2003, rollfr,      0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Ro
 #endif
 GAME( 2003, rollfr_2,    0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
 
-GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 1)",  0 )
-GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, set 2)",  0 )
-GAME( 2004, garage_5,    garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 1)",  0 )
-GAME( 2004, garage_5a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, set 2)",  0 )
+GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219)",  0 )
+GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, backdoor)",  0 )
+GAME( 2004, garage_5,    garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311)",  0 )
+GAME( 2004, garage_5a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, backdoor)",  0 )
 #if ALL_REVISIONS
 GAME( 2004, garage,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040122)",  0 )
 GAME( 2004, garage_2,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040123)",  0 )
 GAME( 2004, garage_3,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040216)",  0 )
 #endif
 
-GAME( 2004, rclimb_3,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 1)", 0 )
-GAME( 2004, rclimb_3a,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 2)", 0 )
-GAME( 2004, rclimb_3b,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, set 3)", 0 ) // new service menu
+GAME( 2004, rclimb_3,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827)", 0 )
+GAME( 2004, rclimb_3a,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, backdoor)", 0 )
+GAME( 2004, rclimb_3b,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, bootleg)", 0 ) // new service menu
 #if ALL_REVISIONS
 GAME( 2004, rclimb,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040815)", 0 )
 GAME( 2004, rclimb_2,    rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040823)", 0 )
 #endif
 
-GAME( 2004, sweetl,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, set 1)",  0 )
-GAME( 2004, sweetla,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, set 2)",  0 )
+GAME( 2004, sweetl,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220)",  0 )
+GAME( 2004, sweetla,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, backdoor)",  0 )
 
 #if ALL_REVISIONS
 GAME( 2004, resdnt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040415)",  0 )
 #endif
-GAME( 2004, resdnt_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 1)",  0 )
-GAME( 2004, resdnt_2a,   resdnt_2, multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, set 2)",  0 )
+GAME( 2004, resdnt_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513)",  0 )
+GAME( 2004, resdnt_2a,   resdnt_2, multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, backdoor)",  0 )
 
 GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 1)",  0 )
 GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 2)",  0 )
 
-GAME( 2005, pirate_1,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060210)",  0 )
+GAME( 2005, pirate_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060210)",  0 )
+GAME( 2005, pirate_3,    pirate_2, multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060803)",  0 )
 #if ALL_REVISIONS
 GAME( 2005, pirate,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (051229)",  0 )
-GAME( 2005, pirate_2,    pirate,   multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060803)",  0 )
 #endif
 
-GAME( 2006, island2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, set 1)",  0 )
-GAME( 2006, island2a,    island2,  multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, set 2)",  0 )
+GAME( 2006, pirate2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005)",  0 )
 
-GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 1)",  0 )
-GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 2)",  0 )
-GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, set 3)",  0 )
-GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403. set 1)",  0 )
-GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, set 2)",  0 )
+GAME( 2006, island2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529)",  0 )
+GAME( 2006, island2a,    island2,  multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, banking address hack)",  0 )
+
+GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328)",  0 )
+GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, banking address hack)",  0 )
+GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, backdoor)",  0 )
+GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403)",  0 )
+GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, banking address hack)",  0 )
