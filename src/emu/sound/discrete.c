@@ -345,7 +345,7 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
  *
  *************************************/
 
-static node_description *discrete_find_node(const discrete_info *info, int node)
+static node_description *discrete_find_node(const discrete_info *info, const int node)
 {
 	if (node < NODE_START || node > NODE_END) return NULL;
 	return info->indexed_node[NODE_INDEX(node)];
