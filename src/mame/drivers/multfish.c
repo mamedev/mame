@@ -1979,8 +1979,8 @@ GAME( 2004, resdnt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Re
 GAME( 2004, resdnt_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513)",  0 )
 GAME( 2004, resdnt_2a,   resdnt_2, multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, backdoor)",  0 )
 
-GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 1)",  0 )
-GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, set 2)",  0 )
+GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713)",  0 )
+GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, backdoor)",  0 )
 
 GAME( 2005, pirate_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060210)",  0 )
 GAME( 2005, pirate_3,    pirate_2, multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060803)",  0 )
