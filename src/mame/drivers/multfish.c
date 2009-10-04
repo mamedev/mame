@@ -1726,7 +1726,7 @@ ROM_START( pirate ) // 051229
 ROM_END
 #endif
 
-ROM_START( pirate_1 ) // 060210
+ROM_START( pirate_2 ) // 060210
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "pr060210.rom", 0x00000, 0x40000, CRC(5684d67d) SHA1(4cbd103bcd071df26830d56760ef477b9a652857) )
 
