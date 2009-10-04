@@ -3528,6 +3528,7 @@ V-V                           TP-027
 
 	/* Sega "Zaxxon hardware" games */
 	DRIVER( zaxxon )	/* (c) 1982 */
+	DRIVER( zaxxonj )	/* (c) 1982 */
 	DRIVER( zaxxon2 )	/* (c) 1982 */
 	DRIVER( zaxxonb )	/* bootleg */
 	DRIVER( szaxxon )	/* (c) 1982 */

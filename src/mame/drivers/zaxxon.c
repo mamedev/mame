@@ -1142,6 +1142,37 @@ ROM_START( zaxxon2 )
 	ROM_LOAD( "j214a2.72",    0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
 ROM_END
 
+ROM_START( zaxxonj )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "zaxxon_rom3.u13",  0x0000, 0x2000, CRC(925168c7) SHA1(0f14b5072b5be252955ffb3a30fa6c76b3e6a6c4) )
+	ROM_LOAD( "zaxxon_rom2.u12",  0x2000, 0x2000, CRC(c088df92) SHA1(c0c6cd8dcf6db65129980331fa9ecc3800b63436) )
+	ROM_LOAD( "zaxxon_rom1.u11",  0x4000, 0x1000, CRC(f832dd79) SHA1(1d626f22630eaa53603637991a06aeb7401e9769) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "zaxxon_rom14.u54", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon_rom15.u55", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "zaxxon_rom6.u70",  0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon_rom5.u69",  0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon_rom4.u68",  0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+
+	ROM_REGION( 0x6000, "gfx3", 0 )
+	ROM_LOAD( "zaxxon_rom11.u59", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon_rom12.u60", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon_rom13.u61", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+
+	ROM_REGION( 0x8000, "gfx4", 0 )
+	ROM_LOAD( "zaxxon_rom8.u58",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon_rom7.u57",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon_rom10.u60", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon_rom9.u59",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mro_16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
+	ROM_LOAD( "mro_17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
+ROM_END
+
 ROM_START( zaxxonb )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "zaxxonb3.u27", 0x0000, 0x2000, CRC(125bca1c) SHA1(f4160966d42e5282736cde8a276204ba8910ca61) )
@@ -1388,7 +1419,7 @@ ROM_END
  *
  *************************************/
 
-static void zaxxonb_decode(running_machine *machine, const char *cputag)
+static void zaxxonj_decode(running_machine *machine, const char *cputag)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1473,9 +1504,9 @@ static void zaxxonb_decode(running_machine *machine, const char *cputag)
  *
  *************************************/
 
-static DRIVER_INIT( zaxxonb )
+static DRIVER_INIT( zaxxonj )
 {
-	zaxxonb_decode(machine, "maincpu");
+	zaxxonj_decode(machine, "maincpu");
 }
 
 
@@ -1531,7 +1562,8 @@ static DRIVER_INIT( ixion )
 /* these games run on standard Zaxxon hardware */
 GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonb,  ROT90,  "bootleg", "Jackson",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonj,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "bootleg", "Jackson",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, futspy,   0,      futspy,   futspy,   futspy,   ROT90,  "Sega",    "Future Spy (315-5061)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
