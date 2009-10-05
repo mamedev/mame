@@ -3715,6 +3715,8 @@ struct _discrete_module
 
 struct _node_description
 {
+	const discrete_module *module;							/* Node's module info */
+
 	double				output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
 	int					active_inputs;						/* Number of active inputs on this node type */
@@ -3724,9 +3726,8 @@ struct _node_description
 	void *				context;							/* Contextual information specific to this node type */
 	const void *		custom;								/* Custom function specific initialisation data */
 
-	const discrete_module *module;							/* Node's module info */
-	const discrete_sound_block *block;						/* Points to the node's setup block. */
 	const discrete_info *info;								/* Points to the parent */
+	const discrete_sound_block *block;						/* Points to the node's setup block. */
 
 	osd_ticks_t			run_time;
 };
@@ -3745,8 +3746,8 @@ struct _node_description
 typedef struct _linked_list_entry	linked_list_entry;
 struct _linked_list_entry
 {
-	const void 			*ptr;
 	linked_list_entry 	*next;
+	const void 			*ptr;
 };
 
 typedef struct _discrete_task discrete_task;
@@ -3754,24 +3755,24 @@ struct _discrete_task
 {
 	const linked_list_entry *list;
 
-	int					task_group;
-	int 				numbuffered;
-	double 				*ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
-	double 				*source[DISCRETE_MAX_TASK_OUTPUTS];
+	int						task_group;
+	int 					numbuffered;
+	double					*ptr[DISCRETE_MAX_TASK_OUTPUTS];
+	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	const node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
+	const double 			*source[DISCRETE_MAX_TASK_OUTPUTS];
 
 	/* list of source nodes */
-	linked_list_entry	*source_list;		/* discrete_source_node */
+	linked_list_entry		*source_list;		/* discrete_source_node */
 };
 
 typedef struct _discrete_source_node discrete_source_node;
 struct _discrete_source_node
 {
 	const discrete_task	*task;
+	const double		*ptr;
 	int					output_node;
 	double				buffer;
-	double				*ptr;
 };
 
 struct _discrete_info
@@ -4436,8 +4437,8 @@ enum
 #define DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)                 { NODE, DST_FILTER2     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,FREQ,DAMP,TYPE }, NULL, "DISCRETE_FILTER2" },
 /* Component specific */
 #define DISCRETE_SALLEN_KEY_FILTER(NODE,ENAB,INP0,TYPE,INFO)            { NODE, DST_SALLEN_KEY  , 3, { ENAB,INP0,NODE_NC }, { ENAB,INP0,TYPE }, INFO, "DISCRETE_SALLEN_KEY_FILTER" },
-#define DISCRETE_CRFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_CRFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
-#define DISCRETE_CRFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_CRFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
+#define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_CRFILTER    , 4, { INP0,NODE_NC,NODE_NC }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
+#define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_CRFILTER    , 5, { INP0,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
@@ -4445,9 +4446,9 @@ enum
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "DISCRETE_RCDISC4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
-#define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
+#define DISCRETE_RCFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_RCFILTER    , 3, { INP0,NODE_NC,NODE_NC }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
+#define DISCRETE_RCFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_RCFILTER    , 4, { INP0,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
 #define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "DISCRETE_RCFILTER_SW" },
-#define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
 #define DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)  { NODE, DST_RCINTEGRATE , 7, { INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "DISCRETE_RCINTEGRATE" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
 #define DISCRETE_RCDISCN(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISCN     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISCN" },

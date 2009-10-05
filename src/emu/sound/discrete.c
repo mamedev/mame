@@ -80,7 +80,7 @@ struct _task_info
 
 static void init_nodes(discrete_info *info, const linked_list_entry *block_list, const device_config *device);
 static void find_input_nodes(const discrete_info *info);
-static node_description *discrete_find_node(const discrete_info *info, const int node);
+static node_description *discrete_find_node(const discrete_info *info, int node);
 static DEVICE_RESET( discrete );
 static STREAM_UPDATE( discrete_stream_update );
 static STREAM_UPDATE( buffer_stream_update );
@@ -345,7 +345,7 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
  *
  *************************************/
 
-static node_description *discrete_find_node(const discrete_info *info, const int node)
+static node_description *discrete_find_node(const discrete_info *info,int node)
 {
 	if (node < NODE_START || node > NODE_END) return NULL;
 	return info->indexed_node[NODE_INDEX(node)];
@@ -939,6 +939,29 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
  *
  *************************************/
 
+/* attempt to group all static node parameters together.
+ * Has a negative impact on performance - but it should
+ * reduce memory bandwidth - this is weird. */
+#if 0
+static double dbuf[10240];
+static int dbufptr = 0;
+
+static double *getDoublePtr(double val)
+{
+	int i;
+	for (i=0; i<dbufptr; i+=1)
+	{
+		if (dbuf[i] == val)
+		{
+			return &dbuf[i];
+		}
+	}
+	dbuf[dbufptr] = val;
+	dbufptr+=1;
+	return &dbuf[dbufptr-1];
+}
+#endif
+
 static void find_input_nodes(const discrete_info *info)
 {
 	const linked_list_entry *entry;
@@ -979,7 +1002,8 @@ static void find_input_nodes(const discrete_info *info)
 				}
 				else
 				{
-					node->input[inputnum] = &(block->initial[inputnum]);
+					node->input[inputnum] = &(node->block->initial[inputnum]);
+					//node->input[inputnum] = getDoublePtr(node->block->initial[inputnum]);
 				}
 			}
 		}

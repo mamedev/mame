@@ -691,7 +691,7 @@ static DISCRETE_STEP(dsd_555_cc)
 	UINT8	flip_flop = context->flip_flop;
 
 
-	if (DSD_555_CC__RESET)
+	if (UNEXPECTED(DSD_555_CC__RESET))
 	{
 		/* We are in RESET */
 		node->output[0]      = 0;
@@ -1723,14 +1723,14 @@ static DISCRETE_STEP(dsd_ls624)
 
 	sample_t = node->info->sample_time;	/* Change in time */
 	//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
-	if (DSD_LS624__VMOD > 0.001)
+	if (EXPECTED(DSD_LS624__VMOD > 0.001))
 		dt = 0.5 / LS624_F(DSD_LS624__VMOD);
 	else
 		/* close enough to 0, so we can speed things up by no longer call pow() */
 		dt = context->dt_vmod_at_0;
 	t   = context->remain;
 	en += (double) context->state * t;
-	while (t + dt <= sample_t)
+	while (EXPECTED(t + dt <= sample_t))
 	{
 		en += (double) context->state * dt;
 		context->state = (1 - context->state);
@@ -1750,7 +1750,7 @@ static DISCRETE_STEP(dsd_ls624)
 			break;
 		case DISC_LS624_OUT_LOGIC:
 			/* filter out randomness */
-			if (cntf + cntr > 1)
+			if (UNEXPECTED(cntf + cntr > 1))
 				node->output[0] = 1;
 			else
 				node->output[0] = context->state;

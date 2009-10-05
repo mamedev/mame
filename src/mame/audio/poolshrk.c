@@ -74,7 +74,7 @@ DISCRETE_SOUND_START(poolshrk)
 	/* Bump is just a triggered 128V signal         */
 	/************************************************/
 	DISCRETE_SQUAREWFIX(NODE_20, POOLSHRK_BUMP_EN, 15750.0/2.0/128.0, 3.4, 50.0, 3.4/2, 0.0)	// 128V signal 3.4V
-	DISCRETE_RCFILTER(POOLSHRK_BUMP_SND, 1, NODE_20, 470, 4.7e-6)	// Filtered by R53/C14
+	DISCRETE_RCFILTER(POOLSHRK_BUMP_SND, NODE_20, 470, 4.7e-6)	// Filtered by R53/C14
 
 	/************************************************/
 	/* Score is a triggered 0-15 count of the       */

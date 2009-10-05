@@ -117,7 +117,7 @@ DISCRETE_SOUND_START(avalnche)
 	/************************************************/
 	DISCRETE_LFSR_NOISE(AVALNCHE_NOISE, AVALNCHE_ATTRACT_EN, AVALNCHE_ATTRACT_EN, 15750.0, AVALNCHE_SOUNDLVL_DATA, 0, 0, &avalnche_lfsr)
 	DISCRETE_ADDER2(NODE_30, 1, NODE_20, AVALNCHE_NOISE)
-	DISCRETE_RCFILTER(AVALNCHE_SOUNDLVL_AUD0_SND, 1, NODE_30, 556.7, 1e-7)
+	DISCRETE_RCFILTER(AVALNCHE_SOUNDLVL_AUD0_SND, NODE_30, 556.7, 1e-7)
 
 	/************************************************/
 	/* Final mix and output.                        */

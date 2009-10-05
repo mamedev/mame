@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 
@@ -203,16 +202,16 @@ static DISCRETE_STEP( mario_custom_run )
 
 	double  sample_t = node->info->sample_time;
 	double  vn, exponent, t = 0;
-	int		update_exponent = 0;
+	int		update_exponent;
 	double	t1, t2;
 
-	if (MARIO_CUSTOM_IN1 > 0.001)
+	if (EXPECTED(MARIO_CUSTOM_IN1 > 0.001))
 		t1	= 0.5 / LS624_F(MARIO_CUSTOM_IN1, 1);
 	else
 		/* close enough to 0, so we can speed things up by no longer call pow() */
 		t1 = context->dt_in1_at_0;
 
-	if (MARIO_CUSTOM_IN2 > 0.001)
+	if (EXPECTED(MARIO_CUSTOM_IN2 > 0.001))
 		t2	= 0.5 / LS624_F(MARIO_CUSTOM_IN2, 2);
 	else
 		t2 = context->dt_in2_at_0;
@@ -222,9 +221,10 @@ static DISCRETE_STEP( mario_custom_run )
 		/* state before time advance */
 		vn = (double) (context->state1 ^ context->state2);
 		vn *= MARIO_CUSTOM_VOUT;
+		update_exponent = 0;
 		if (context->remain1 < context->remain2)
 		{
-			if (context->remain1 < sample_t)
+			if (EXPECTED(context->remain1 < sample_t))
 			{
 				t = context->remain1;
 				update_exponent = 1;
@@ -242,7 +242,7 @@ static DISCRETE_STEP( mario_custom_run )
 		}
 		else
 		{
-			if (context->remain2 < sample_t)
+			if (EXPECTED(context->remain2 < sample_t))
 			{
 				t = context->remain2;
 				update_exponent = 1;
@@ -259,7 +259,7 @@ static DISCRETE_STEP( mario_custom_run )
 			}
 		}
 
-		if (update_exponent)
+		if (EXPECTED(update_exponent))
 			exponent = RC_CHARGE_EXP_DT(context->r1_c3, t);
 		else
 			exponent = context->exponent_c3;
@@ -313,7 +313,7 @@ static DISCRETE_SOUND_START(mario)
     DISCRETE_TASK_START(1)
     DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
 	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, MR_C14)
-	DISCRETE_RCFILTER(NODE_11, 1, NODE_10, MR_R6, MR_C3 )
+	DISCRETE_RCFILTER(NODE_11, NODE_10, MR_R6, MR_C3 )
 	DISCRETE_CUSTOM7(NODE_12, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
 			MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0, NODE_12, MR_MIXER_RPAR / MR_R20)
@@ -326,7 +326,7 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
 	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, MR_C15)
-	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, MR_R7, MR_C4 )
+	DISCRETE_RCFILTER(NODE_21, NODE_20, MR_R7, MR_C4 )
 	DISCRETE_CUSTOM7(NODE_22, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
 		MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1, NODE_22, MR_MIXER_RPAR / MR_R19)
@@ -344,17 +344,17 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LS123(NODE_110, DS_SOUND7_INV, MR_R61, MR_C41)
 	DISCRETE_TRANSFORM2(NODE_111, NODE_110, TTL_HIGH, "0!1*")
-	DISCRETE_RCFILTER(NODE_112, 1, NODE_111, MR_R65, MR_C44)
+	DISCRETE_RCFILTER(NODE_112, NODE_111, MR_R65, MR_C44)
 	DISCRETE_74LS624(NODE_113, NODE_112, RUN_VCO_VOLTAGE /*VSS*/, MR_C40, DISC_LS624_OUT_LOGIC)
 
 	DISCRETE_LOGIC_XOR(NODE_115, NODE_102, NODE_113)
 
-	DISCRETE_RCFILTER(NODE_117, 1, NODE_104, MR_R64, MR_C43)
+	DISCRETE_RCFILTER(NODE_117, NODE_104, MR_R64, MR_C43)
 	DISCRETE_74LS624(NODE_118, NODE_117, RUN_VCO_VOLTAGE /*VSS*/, MR_C39, DISC_LS624_OUT_COUNT_F)
 
 	DISCRETE_LOGIC_AND(NODE_120, NODE_115, NODE_110)
 	DISCRETE_MULTIPLY(NODE_121, NODE_120, TTL_HIGH * MR_MIXER_RPAR / MR_R41)
-	DISCRETE_RCFILTER(DS_OUT_SOUND7, 1, NODE_121, MR_MIXER_RPAR, MR_C31)
+	DISCRETE_RCFILTER(DS_OUT_SOUND7, NODE_121, MR_MIXER_RPAR, MR_C31)
 	DISCRETE_TASK_END()
 
 	/************************************************/
@@ -368,10 +368,10 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	DISCRETE_MULTIPLY(NODE_170, DS_DAC, TTL_HIGH/256.0)
-	DISCRETE_RCFILTER(NODE_171, 1, NODE_170, RES_K(750), CAP_P(200))
+	DISCRETE_RCFILTER(NODE_171, NODE_170, RES_K(750), CAP_P(200))
 
 	DISCRETE_MULTIPLY(NODE_172, NODE_171, MR_MIXER_RPAR / MR_R40)
-	DISCRETE_RCFILTER(DS_OUT_DAC, 1, NODE_172, MR_MIXER_RPAR, MR_C31)
+	DISCRETE_RCFILTER(DS_OUT_DAC, NODE_172, MR_MIXER_RPAR, MR_C31)
 	DISCRETE_TASK_END()
 
 
@@ -385,9 +385,9 @@ static DISCRETE_SOUND_START(mario)
 	/* Amplifier: internal amplifier
      * Just a 1:n amplifier without filters and no output capacitor
      */
-	DISCRETE_CRFILTER(NODE_296, 1, NODE_295, RES_2_PARALLEL(MR_R42, MR_R43), MR_C32)
+	DISCRETE_CRFILTER(NODE_296, NODE_295, RES_2_PARALLEL(MR_R42, MR_R43), MR_C32)
 	/* EZV20 (Monitor) ouput capacitor / Speaker */
-	DISCRETE_CRFILTER(NODE_297, 1, NODE_296, 6, CAP_U(22))
+	DISCRETE_CRFILTER(NODE_297, NODE_296, 6, CAP_U(22))
 	DISCRETE_OUTPUT(NODE_297, 32767.0/5.0 * 10)
 	//DISCRETE_WAVELOG1(DS_OUT_SOUND0, 32767/5.0)
 	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND7_INV, 10000)

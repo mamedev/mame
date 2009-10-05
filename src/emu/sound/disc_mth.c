@@ -1404,7 +1404,7 @@ static DISCRETE_STEP(dst_oneshot)
 	/* If the state is triggered we will need to countdown later */
 	int do_count = context->state;
 
-	if (DST_ONESHOT__RESET)
+	if (UNEXPECTED(DST_ONESHOT__RESET))
 	{
 		/* Hold in Reset */
 		node->output[0] = 0;
@@ -1413,7 +1413,7 @@ static DISCRETE_STEP(dst_oneshot)
 	else
 	{
 		/* are we at an edge? */
-		if (trigger != context->last_trig)
+		if (UNEXPECTED(trigger != context->last_trig))
 		{
 			/* There has been a trigger edge */
 			context->last_trig = trigger;
@@ -1441,7 +1441,7 @@ static DISCRETE_STEP(dst_oneshot)
 			}
 		}
 
-		if (do_count)
+		if (UNEXPECTED(do_count))
 		{
 			context->countdown -= node->info->sample_time;
 			if(context->countdown <= 0.0)

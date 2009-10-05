@@ -341,7 +341,6 @@ DISCRETE_SOUND_START( skyraid )
      * Jet, Plane sound
      ************************************************/
 	DISCRETE_RCFILTER(NODE_30,				/* IC J6, pin 5 */
-		1,									/* ENAB */
 		SKYRAID_PLANE_SWEEP_EN,				/* IN0 */
 		RES_2_PARALLEL(SKYRAID_R25, SKYRAID_R24), SKYRAID_C49)
 	DISCRETE_566(NODE_31,					/* IC J6, pin 3 */
@@ -391,7 +390,6 @@ DISCRETE_SOUND_START( skyraid )
 		SKYRAID_PLANE_SND,
 		&skyraid_mixer)
 	DISCRETE_CRFILTER(NODE_93,
-		1,						/* ENAB */
 		NODE_92,				/* IN0 */
 		SKYRAID_R122 + RES_6_PARALLEL(SKYRAID_R120, SKYRAID_R32, SKYRAID_R29, SKYRAID_R30, SKYRAID_R31, RES_2_PARALLEL(SKYRAID_R27, SKYRAID_R28)),
 		SKYRAID_C93)

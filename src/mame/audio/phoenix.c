@@ -370,7 +370,6 @@ DISCRETE_SOUND_START(phoenix)
 					  NODE_22,
 					  NODE_23)
 	DISCRETE_RCFILTER(NODE_25,
-					  1,
 					  NODE_24,
 					  1.0/(1.0/RES_K(10) + 1.0/RES_K(100)),	/* R19, R20 */
 					  CAP_U(.047))							/* C5 */
@@ -429,7 +428,6 @@ DISCRETE_SOUND_START(phoenix)
 					&phoenix_effect2_mixer2)
 	/* C22 charging is R45 in parallel with R46, R42 and the 555 CV internal resistance */
 	DISCRETE_RCFILTER(NODE_37,
-					  1,						/* ENAB */
 					  NODE_36,
 					  1.0/ (1.0/RES_K(5.1) + (1.0/(RES_K(5.1) + 1.0/(1.0/RES_K(10) + 1.0/RES_K(5) + 1.0/RES_K(10)) ))),
 					  CAP_U(100))	/* R45, R46, R42, internal 555 Rs, C22 */

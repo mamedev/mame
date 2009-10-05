@@ -79,7 +79,7 @@ DISCRETE_SOUND_START(circus)
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
 	/************************************************/
-	DISCRETE_CRFILTER(CIRCUS_MUSIC_SND, 1, CIRCUS_MUSIC_BIT, RES_K(50), CAP_U(.1))	/* 50K is just an average value */
+	DISCRETE_CRFILTER(CIRCUS_MUSIC_SND, CIRCUS_MUSIC_BIT, RES_K(50), CAP_U(.1))	/* 50K is just an average value */
 
 	DISCRETE_OUTPUT(CIRCUS_MUSIC_SND, 1)
 DISCRETE_SOUND_END
@@ -161,8 +161,8 @@ DISCRETE_SOUND_START(robotbwl)
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
 	/************************************************/
-	DISCRETE_RCFILTER(NODE_20, 1, ROBOTBWL_MUSIC_BIT, RES_K(10), CAP_U(.47))
-	DISCRETE_CRFILTER(ROBOTBWL_MUSIC_SND, 1, NODE_20, RES_K(10) + RES_K(22), CAP_U(.1))
+	DISCRETE_RCFILTER(NODE_20, ROBOTBWL_MUSIC_BIT, RES_K(10), CAP_U(.47))
+	DISCRETE_CRFILTER(ROBOTBWL_MUSIC_SND, NODE_20, RES_K(10) + RES_K(22), CAP_U(.1))
 
 	DISCRETE_OUTPUT(ROBOTBWL_MUSIC_SND, 1)
 DISCRETE_SOUND_END

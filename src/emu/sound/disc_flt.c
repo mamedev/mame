@@ -96,8 +96,9 @@ struct dst_rcdisc4_context
 
 struct dst_rcfilter_context
 {
-	double	exponent;
 	double	vCap;
+	double	vRef;
+	double	exponent;
 };
 
 struct dst_rcfilter_sw_context
@@ -137,25 +138,18 @@ struct dst_rcintegrate_context
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_CRFILTER__ENABLE	DISCRETE_INPUT(0)
-#define DST_CRFILTER__IN		DISCRETE_INPUT(1)
-#define DST_CRFILTER__R			DISCRETE_INPUT(2)
-#define DST_CRFILTER__C			DISCRETE_INPUT(3)
-#define DST_CRFILTER__VREF		DISCRETE_INPUT(4)
+#define DST_CRFILTER__IN		DISCRETE_INPUT(0)
+#define DST_CRFILTER__R			DISCRETE_INPUT(1)
+#define DST_CRFILTER__C			DISCRETE_INPUT(2)
+#define DST_CRFILTER__VREF		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_crfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
-	if(DST_CRFILTER__ENABLE)
-	{
-		node->output[0] = DST_CRFILTER__IN - context->vCap;
-		context->vCap += ((DST_CRFILTER__IN - DST_CRFILTER__VREF) - context->vCap) * context->exponent;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = DST_CRFILTER__IN - context->vCap;
+	//context->vCap += ((DST_CRFILTER__IN - context->vRef) - context->vCap) * context->exponent;
+	context->vCap += (node->output[0] - context->vRef) * context->exponent;
 }
 
 static DISCRETE_RESET(dst_crfilter)
@@ -164,6 +158,7 @@ static DISCRETE_RESET(dst_crfilter)
 
 	context->exponent = RC_CHARGE_EXP(DST_CRFILTER__R * DST_CRFILTER__C);
 	context->vCap   = 0;
+	context->vRef   = DST_CRFILTER__VREF;
 	node->output[0] = DST_CRFILTER__IN;
 }
 
@@ -1017,11 +1012,10 @@ static DISCRETE_RESET(dst_rcdisc_mod)
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_RCFILTER__ENABLE		DISCRETE_INPUT(0)
-#define DST_RCFILTER__VIN		DISCRETE_INPUT(1)
-#define DST_RCFILTER__R			DISCRETE_INPUT(2)
-#define DST_RCFILTER__C			DISCRETE_INPUT(3)
-#define DST_RCFILTER__VREF		DISCRETE_INPUT(4)
+#define DST_RCFILTER__VIN		DISCRETE_INPUT(0)
+#define DST_RCFILTER__R			DISCRETE_INPUT(1)
+#define DST_RCFILTER__C			DISCRETE_INPUT(2)
+#define DST_RCFILTER__VREF		DISCRETE_INPUT(3)
 
 static DISCRETE_STEP(dst_rcfilter)
 {
@@ -1031,15 +1025,8 @@ static DISCRETE_STEP(dst_rcfilter)
 	/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
 	/************************************************************************/
 
-	if(DST_RCFILTER__ENABLE)
-	{
-		context->vCap += ((DST_RCFILTER__VIN - DST_RCFILTER__VREF - context->vCap) * context->exponent);
-		node->output[0] = context->vCap + DST_RCFILTER__VREF;
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	context->vCap += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
+	node->output[0] = context->vCap + context->vRef;
 }
 
 static DISCRETE_RESET(dst_rcfilter)
@@ -1047,6 +1034,7 @@ static DISCRETE_RESET(dst_rcfilter)
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
 	context->exponent = RC_CHARGE_EXP(DST_RCFILTER__R * DST_RCFILTER__C);
+	context->vRef = DST_RCFILTER__VREF;
 	context->vCap   = 0;
 	node->output[0] = 0;
 }

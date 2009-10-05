@@ -222,13 +222,13 @@ DISCRETE_SOUND_START( madalien )
 		15, 1, 0, DISC_CLK_BY_COUNT)	// 4-bit binary up counter
 	DISCRETE_DAC_R1(NODE_55, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1a_dac)
 	DISCRETE_DAC_R1(NODE_56, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1b_dac)
-	DISCRETE_RCFILTER(NODE_57, 1, NODE_56, RES_K(22)/2 + RES_K(22), CAP_U(.033))
+	DISCRETE_RCFILTER(NODE_57, NODE_56, RES_K(22)/2 + RES_K(22), CAP_U(.033))
 	DISCRETE_COMP_ADDER(NODE_59, MADALIEN_8910_PORTB_23, &madalien_effect_1b_vol_r)
 
 	/************************************************
      * Enemy motor
      ************************************************/
-	DISCRETE_CRFILTER(NODE_60, 1, MADALIEN_8910_PORTB_7, RES_K(100), CAP_U(4.7))
+	DISCRETE_CRFILTER(NODE_60, MADALIEN_8910_PORTB_7, RES_K(100), CAP_U(4.7))
 	// 2 diodes clamp it positive.
 	DISCRETE_CLAMP(NODE_62, NODE_60, 0, 12)
 	// the 0.047uF cap to ground just removes real world spikes.

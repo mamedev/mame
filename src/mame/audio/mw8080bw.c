@@ -327,7 +327,7 @@ static DISCRETE_SOUND_START(tornbase)
 	/* 47K resistor (R601) and 0.047uF capacitor (C601)
        There is also a 50K pot acting as a volume control, but we output at
        the maximum volume as MAME has its own volume adjustment */
-	DISCRETE_CRFILTER(TORNBASE_TONE_SND_FILT, 1, TORNBASE_TONE_SND, RES_K(47), CAP_U(0.047))
+	DISCRETE_CRFILTER(TORNBASE_TONE_SND_FILT, TORNBASE_TONE_SND, RES_K(47), CAP_U(0.047))
 
 	/* amplify for output */
 	DISCRETE_OUTPUT(TORNBASE_TONE_SND_FILT, 32767)
@@ -554,7 +554,6 @@ static DISCRETE_SOUND_START(maze)
 
 	/* The following circuits remove DC poping noises when the tone is switched in/out. */
 	DISCRETE_CRFILTER_VREF(NODE_40,
-					1,							/* ENAB */
 					NODE_36,					/* IN0 */
 					RES_K(250),					/* R311, R312, R402, R403 in parallel */
 					CAP_U(0.1),					/* c301 */
@@ -565,12 +564,10 @@ static DISCRETE_SOUND_START(maze)
 					2.5,						/* INP0 - center voltage of R402, R403 */
 					NODE_40)					/* INP1 */
 	DISCRETE_CRFILTER(NODE_42,
-					1,							/* ENAB */
 					NODE_41,					/* IN0 */
 					RES_K(56 + 390),			/* R404 + R405 */
 					CAP_P(0.01)	)				/* C401 */
 	DISCRETE_RCFILTER(NODE_43,
-					1,							/* ENAB */
 					NODE_42,					/* IN0 */
 					RES_K(56),					/* R404 */
 					CAP_P(4700)	)				/* C400 */
@@ -788,23 +785,23 @@ static DISCRETE_SOUND_START(boothill)
 	DISCRETE_LFSR_NOISE(BOOTHILL_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_35, BOOTHILL_RIGHT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_36, 1, NODE_35, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, 1, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
+	DISCRETE_RCFILTER(NODE_36, NODE_35, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
 
 	/************************************************
      * Hit sounds
      ************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_40, BOOTHILL_LEFT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_41, 1, NODE_40, RES_K(12), CAP_U(.033))
-	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, 1, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
+	DISCRETE_RCFILTER(NODE_41, NODE_40, RES_K(12), CAP_U(.033))
+	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_45, BOOTHILL_RIGHT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_46, 1, NODE_45, RES_K(12), CAP_U(.0033))
-	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, 1, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_46, NODE_45, RES_K(12), CAP_U(.0033))
+	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
 
 	/************************************************
      * Combine all sound sources.
@@ -1030,7 +1027,6 @@ static DISCRETE_SOUND_START(checkmat)
 
 	/* The following circuits remove DC poping noises when the tone is switched in/out. */
 	DISCRETE_CRFILTER_VREF(NODE_31,
-					1,							/* ENAB */
 					NODE_30,					/* IN0 */
 					RES_K(250),					/* R409, R415, R414, R413 in parallel */
 					CAP_U(0.1),					/* c401 */
@@ -1041,12 +1037,10 @@ static DISCRETE_SOUND_START(checkmat)
 					2.5,						/* INP0 - center voltage of R413, R414 */
 					NODE_31)					/* INP1 */
 	DISCRETE_CRFILTER(NODE_33,
-					1,							/* ENAB */
 					NODE_32,					/* IN0 */
 					RES_K(56 + 47 + 200),		/* R412 + R408 + part of R411 */
 					CAP_P(0.01)	)				/* C404 */
 	DISCRETE_RCFILTER(CHECKMAT_TONE_SND,
-					1,							/* ENAB */
 					NODE_33,					/* IN0 */
 					RES_K(56),					/* R412 */
 					CAP_P(4700)	)				/* C403 */
@@ -1236,8 +1230,8 @@ static DISCRETE_SOUND_START(desertgu)
 	DISCRETE_LFSR_NOISE(DESERTGU_NOISE, 1, 1, 7515, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DESERTGU_RIFLE_SHOT_EN, 0, 0, DESERTGU_NOISE, 0, &desertgu_rifle_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
 
 	/************************************************
      * Bottle hit sound
@@ -1909,8 +1903,8 @@ static DISCRETE_SOUND_START(clowns)
 	DISCRETE_LFSR_NOISE(CLOWNS_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, CLOWNS_POP_TOP_EN, CLOWNS_POP_MIDDLE_EN, CLOWNS_POP_BOTTOM_EN, CLOWNS_NOISE, 0, &clowns_pop_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(15), CAP_U(.01))
-	DISCRETE_CRFILTER(NODE_32, 1, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(15), CAP_U(.01))
+	DISCRETE_CRFILTER(NODE_32, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
 	DISCRETE_GAIN(CLOWNS_POP_SND, NODE_32, RES_K(39)/(RES_K(15) + RES_K(39)))
 
 	/************************************************
@@ -2190,11 +2184,9 @@ static const discrete_mixer_desc spacwalk_mixer =
  ************************************************/
 #define SPACWALK_SPRINGBOARD_HIT_CIRCUIT(_num)                                              \
 DISCRETE_RCFILTER(NODE_RELATIVE(NODE_29, _num),                                             \
-	1,												/* ENAB */                              \
 	SPACWALK_NOISE,									/* IN0 */                               \
 	RES_K(330), CAP_U(.1))                                                                  \
 DISCRETE_RCFILTER(NODE_RELATIVE(NODE_31, _num),                                             \
-	1,												/* ENAB */                              \
 	NODE_RELATIVE(NODE_29, _num),					/* IN0 */                               \
 	RES_K(330) + RES_K(150), CAP_U(.1))                                                     \
 DISCRETE_OP_AMP_VCO1(NODE_RELATIVE(NODE_33, _num),	/* IC M2-3, pin 5 */                    \
@@ -2253,11 +2245,9 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 		SPACWALK_NOISE, 0,						/* IN0, IN1 */
 		&spacwalk_hit_tvca_info)
 	DISCRETE_RCFILTER(NODE_21,
-		1,										/* ENAB */
 		NODE_20,								/* IN0 */
 		SPACWALK_R307, SPACWALK_C303)
 	DISCRETE_RCFILTER(SPACWALK_TARGET_HIT_SND,
-		1,										/* ENAB */
 		NODE_21,								/* IN0 */
 		SPACWALK_R307 + SPACWALK_R308, SPACWALK_C304)
 
@@ -2284,7 +2274,6 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 		NODE_50,								/* VMOD1 */
 		&spacwalk_sb_miss_vco)
 	DISCRETE_CRFILTER(NODE_53,
-		1,										/* ENAB */
 		NODE_52,								/* IN0 */
 		SPACWALK_R417, SPACWALK_C453)
 	/* this filter type probably does not work right. I need to test it. */
@@ -2308,11 +2297,9 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 		NODE_60,								/* VMOD1*/
 		&spacwalk_spaceship_vco)
 	DISCRETE_RCFILTER(NODE_62,
-		1,										/* ENAB */
 		NODE_61,								/* IN0 */
 		RES_K(1), CAP_U(0.15))
 	DISCRETE_RCFILTER(SPACWALK_SPACE_SHIP_SND,
-		1,										/* ENAB */
 		NODE_62,								/* IN0 */
 		RES_K(1) + RES_K(10), CAP_U(0.015))
 
@@ -2427,7 +2414,7 @@ static DISCRETE_SOUND_START(dogpatch)
 	/************************************************
      * Filter it to be AC.
      ************************************************/
-	DISCRETE_CRFILTER(NODE_91, 1, MIDWAY_TONE_SND, RES_K(100), CAP_U(0.1))
+	DISCRETE_CRFILTER(NODE_91, MIDWAY_TONE_SND, RES_K(100), CAP_U(0.1))
 
 	DISCRETE_OUTPUT(NODE_91, 5000)
 
@@ -2806,7 +2793,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
 					&spcenctr_enemy_ship_shot_filt)
 	DISCRETE_CRFILTER(SPCENCTR_ENEMY_SHIP_SHOT_SND,
-					1,									/* ENAB */
 					NODE_23,							/* IN0 */
 					RES_K(1.8),							/* R116 */
 					CAP_U(0.1) )						/* C104 */
@@ -2833,7 +2819,6 @@ static DISCRETE_SOUND_START(spcenctr)
 					0,									/* MIN */
 					12)									/* MAX */
 	DISCRETE_CRFILTER(NODE_34,
-					1,									/* ENAB */
 					SPCENCTR_NOISE,						/* IN0 */
 					RES_M(1) + RES_K(330),				/* R507, R509 */
 					CAP_U(0.1) )						/* C503 */
@@ -2911,12 +2896,10 @@ static DISCRETE_SOUND_START(spcenctr)
 					0,							/* no IN1 */
 					&spcenctr_explosion_tvca)
 	DISCRETE_RCFILTER(NODE_71,
-					1,							/* ENAB */
 					NODE_70,					/* IN0 */
 					RES_K(1.8),					/* R405 */
 					CAP_U(0.22) )				/* C401 */
 	DISCRETE_RCFILTER(SPCENCTR_EXPLOSION_SND,
-					1,							/* ENAB */
 					NODE_71,					/* IN0 */
 					RES_K(1.8) + RES_K(3.6),	/* R405 + R406 */
 					CAP_U(0.22) )				/* C402 */
@@ -3177,7 +3160,6 @@ static DISCRETE_SOUND_START(bowler)
 					0,							/* no IN1 */
 					&bowler_fowl_tvca)
 	DISCRETE_CRFILTER(BOWLER_FOWL_SND,
-					1,							/* ENAB */
 					NODE_21,					/* IN0 */
 					RES_K(68),					/* R1120 */
 					CAP_U(0.1) )				/* C1048 */
@@ -3741,12 +3723,10 @@ static const discrete_mixer_desc invaders_mixer =
 					CAP_U(0.1),										/* C29 */           \
 					&invaders_thump_555)                                                \
 	DISCRETE_RCFILTER(INVADERS_NODE(32, _board),                                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(31, _board),						/* IN0 */           \
 					100,											/* R132 */          \
 					CAP_U(4.7) )									/* C31 */           \
 	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_FLEET_SND, _board),                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(32, _board),						/* IN0 */           \
 					100 + 100,										/* R132 + R133 */   \
 					CAP_U(10) )										/* C32 */
@@ -3822,12 +3802,10 @@ static const discrete_mixer_desc invaders_mixer =
 					0,												/* no IN1 */        \
 					&invaders_explosion_tvca)                                           \
 	DISCRETE_RCFILTER(INVADERS_NODE(62, _board),                                        \
-					1,												/* ENAB */          \
 					INVADERS_NODE(61, _board),						/* IN0 */           \
 					RES_K(5.6),										/* R84 */           \
 					CAP_U(0.1) )									/* C27 */           \
 	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),                    \
-					1,												/* ENAB */          \
 					INVADERS_NODE(62, _board),						/* IN0 */           \
 					RES_K(5.6) + RES_K(6.8),						/* R84 + R85 */     \
 					CAP_U(0.1) )									/* C28 */
@@ -3856,7 +3834,6 @@ static const discrete_mixer_desc invaders_mixer =
 					0,														/* MIN */               \
 					12)														/* MAX */               \
 	DISCRETE_CRFILTER(INVADERS_NODE(74, _board),        					                        \
-					1,														/* ENAB */              \
 					INVADERS_NOISE,											/* IN0 */               \
 					RES_M(1) + RES_K(330),									/* R29, R11 */          \
 					CAP_U(0.1) )											/* C57 */               \

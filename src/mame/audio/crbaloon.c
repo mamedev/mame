@@ -105,14 +105,14 @@ static DISCRETE_SOUND_START(crbaloon)
     * square wave.
     ************************************************/
 	DISCRETE_555_ASTABLE(NODE_10, 1, RES_K(10), RES_K(100), CAP_U(1), &desc_crbaloon_laugh_osc)
-	DISCRETE_CRFILTER_VREF(NODE_11, 1, NODE_10,
+	DISCRETE_CRFILTER_VREF(NODE_11, NODE_10,
 		1.0/(1.0/RES_K(5) + 1.0/RES_K(10) + 1.0/RES_K(100)), // 5k & 10k are 555 internal
 		CAP_U(10),
 		/* The following will calculate the reference control voltage with no signal applied to the cap. */
 		5.0* (1.0/(1.0/RES_K(10) + 1.0/RES_K(100))) / (RES_K(5)+(1.0/(1.0/RES_K(10) + 1.0/RES_K(100)))) )
 	DISCRETE_555_ASTABLE_CV(NODE_12, CRBALOON_LAUGH_EN, RES_K(1), RES_K(22), CAP_U(.1), NODE_11, &desc_crbaloon_laugh_osc)
 	DISCRETE_MULTIPLY(NODE_13, NODE_12, CRBALOON_VR2)
-	DISCRETE_CRFILTER(CRBALOON_LAUGH_SND, 1, NODE_13, RES_K(20), CAP_U(1))
+	DISCRETE_CRFILTER(CRBALOON_LAUGH_SND, NODE_13, RES_K(20), CAP_U(1))
 
 	/************************************************
     * Music Generator is amplitude modulated by a
@@ -124,13 +124,13 @@ static DISCRETE_SOUND_START(crbaloon)
 	DISCRETE_ONOFF(NODE_22, CRBALOON_MUSIC_EN, NODE_21)
 //  DISCRETE_RAMP(NODE_21, 1, RAMP, GRAD, MIN, MAX, CLAMP)
 	DISCRETE_MULTIPLY(NODE_23, NODE_22, CRBALOON_VR3)
-	DISCRETE_CRFILTER(CRBALOON_MUSIC_SND, 1, NODE_23, RES_K(50), CAP_U(1))
+	DISCRETE_CRFILTER(CRBALOON_MUSIC_SND, NODE_23, RES_K(50), CAP_U(1))
 
 	/************************************************
     * Final mix and output.
     ************************************************/
 	DISCRETE_ADDER2(NODE_90, 1, CRBALOON_LAUGH_SND, CRBALOON_MUSIC_SND)
-	DISCRETE_CRFILTER(NODE_91, 1, NODE_90, RES_K(100), CAP_U(1))
+	DISCRETE_CRFILTER(NODE_91, NODE_90, RES_K(100), CAP_U(1))
 
 	DISCRETE_OUTPUT(NODE_91, 65000.0/12)
 

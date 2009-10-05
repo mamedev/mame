@@ -158,7 +158,7 @@ static const discrete_mixer_desc sprint8_mixer =
  * we will just tell the monostable it was triggered once and ignore C17/R40.
  */
 #define SPRINT8_MOTOR_CIRCUIT(_car)                                                         	\
-DISCRETE_RCFILTER(NODE_RELATIVE(NODE_30, _car - 1), 1, NODE_RELATIVE(SPRINT8_MOTOR1_EN, _car - 1), SPRINT8_R89, SPRINT8_C26) 	\
+DISCRETE_RCFILTER(NODE_RELATIVE(NODE_30, _car - 1), NODE_RELATIVE(SPRINT8_MOTOR1_EN, _car - 1), SPRINT8_R89, SPRINT8_C26) 	\
 DISCRETE_ADDER2(NODE_RELATIVE(NODE_40, _car - 1), 1, NODE_RELATIVE(NODE_30, _car - 1), 0.7)	/* add Q21 shift */ 				\
 DISCRETE_555_ASTABLE_CV(NODE_RELATIVE(NODE_50, _car - 1), 1, SPRINT8_R39, 0, SPRINT8_C27, NODE_RELATIVE(NODE_40, _car - 1), &sprint8_motor_555a_desc) \
 DISCRETE_555_MSTABLE(NODE_RELATIVE(NODE_60, _car - 1), 1, NODE_RELATIVE(NODE_50, _car - 1), SPRINT8_R41, SPRINT8_C28, &sprint8_motor_555m_desc)       \
@@ -200,7 +200,6 @@ DISCRETE_SOUND_START( sprint8 )
 	DISCRETE_TASK_START(1)
 	DISCRETE_GAIN(NODE_70, SPRINT8_NOISE, DEFAULT_TTL_V_LOGIC_1 * RES_VOLTAGE_DIVIDER(SPRINT8_R148, SPRINT8_R147))
 	DISCRETE_CRFILTER_VREF(NODE_71,
-		1,										/* ENAB */
 		NODE_70,								/* IN0 */
 		RES_2_PARALLEL(SPRINT8_R148, SPRINT8_R147) + RES_2_PARALLEL(RES_K(5), RES_K(10)),
 		SPRINT8_C90,
@@ -227,7 +226,6 @@ DISCRETE_SOUND_START( sprint8 )
 		&sprint8_crash_screech_mixer)
 
 	DISCRETE_CRFILTER_VREF(NODE_76,
-		1,										/* ENAB */
 		NODE_75,								/* IN0 */
 		SPRINT8_R93 + SPRINT8_R91, SPRINT8_C63,
 		5)										/* VREF */

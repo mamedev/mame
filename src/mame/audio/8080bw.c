@@ -263,7 +263,7 @@ DISCRETE_SOUND_START(indianbt)
  * Final Mixing and Output
  *
  ******************************************************************************/
-	DISCRETE_CRFILTER(NODE_90, 1, NODE_22, RES_K(10), CAP_U(0.1))
+	DISCRETE_CRFILTER(NODE_90, NODE_22, RES_K(10), CAP_U(0.1))
 
 	DISCRETE_OUTPUT(NODE_90, 21000)
 
@@ -574,8 +574,8 @@ DISCRETE_SOUND_START(polaris)
  ******************************************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_70, POLARIS_SX3_EN, 0, 0, POLARIS_NOISE_LO, 0, &polaris_exp_tvca_info)
 
-	DISCRETE_RCFILTER(NODE_71, 1, NODE_70, 560.0, CAP_U(.22))
-	DISCRETE_RCFILTER(POLARIS_EXPLOSIONSND, 1, NODE_71, RES_K(6.8), CAP_U(.22))
+	DISCRETE_RCFILTER(NODE_71, NODE_70, 560.0, CAP_U(.22))
+	DISCRETE_RCFILTER(POLARIS_EXPLOSIONSND, NODE_71, RES_K(6.8), CAP_U(.22))
 
 /******************************************************************************
  *
@@ -759,22 +759,22 @@ DISCRETE_SOUND_START(schaser)
 	DISCRETE_SQUAREWFIX(NODE_20, 1, SCHASER_4V, DEFAULT_TTL_V_LOGIC_1, 50, 0, 0)
 	DISCRETE_SQUAREWFIX(NODE_21, 1, SCHASER_8V, DEFAULT_TTL_V_LOGIC_1, 50, 0, 0)
 	DISCRETE_SWITCH(NODE_22, SCHASER_DOT_EN, SCHASER_DOT_SEL, NODE_20, NODE_21)
-	DISCRETE_RCFILTER(NODE_23, 1, NODE_22, 560, CAP_U(.1))
-	DISCRETE_RCFILTER(NODE_24, 1, NODE_23, RES_K(6.8) + 560, CAP_U(.1))
+	DISCRETE_RCFILTER(NODE_23, NODE_22, 560, CAP_U(.1))
+	DISCRETE_RCFILTER(NODE_24, NODE_23, RES_K(6.8) + 560, CAP_U(.1))
 	DISCRETE_MULTIPLY(SCHASER_DOT_SND, NODE_24, SCHASER_VR3)
 
 	/************************************************/
 	/* Explosion/Effect filtering                   */
 	/************************************************/
-	DISCRETE_RCFILTER(NODE_30, 1, SCHASER_EXP_STREAM, 560, CAP_U(.1))
-	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(6.8) + 560, CAP_U(.1))
-	DISCRETE_CRFILTER(NODE_32, 1, NODE_31, RES_K(6.8) + 560 + RES_K(2) + RES_K(50), CAP_U(1))
+	DISCRETE_RCFILTER(NODE_30, SCHASER_EXP_STREAM, 560, CAP_U(.1))
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(6.8) + 560, CAP_U(.1))
+	DISCRETE_CRFILTER(NODE_32, NODE_31, RES_K(6.8) + 560 + RES_K(2) + RES_K(50), CAP_U(1))
 	DISCRETE_MULTIPLY(SCHASER_EXP_SND, NODE_32, SCHASER_VR2)
 
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
 	/************************************************/
-	DISCRETE_CRFILTER(NODE_40, 1, SCHASER_MUSIC_BIT, RES_K(470) + RES_K(50), CAP_U(.01))
+	DISCRETE_CRFILTER(NODE_40, SCHASER_MUSIC_BIT, RES_K(470) + RES_K(50), CAP_U(.01))
 	DISCRETE_MULTIPLY(SCHASER_MUSIC_SND, NODE_40, SCHASER_VR1)
 
 	/************************************************/

@@ -1709,7 +1709,7 @@ static DISCRETE_SOUND_START( konami_sound )
 	/* belongs here.                                   */
 
 	/* Input impedance of a M51516L is typically 30k (datasheet) */
-	DISCRETE_CRFILTER(NODE_40,1,NODE_30,RES_K(30),CAP_U(0.15))
+	DISCRETE_CRFILTER(NODE_40,NODE_30,RES_K(30),CAP_U(0.15))
 
 	DISCRETE_OUTPUT(NODE_40, 10.0 )
 

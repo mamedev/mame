@@ -155,7 +155,7 @@ static DISCRETE_STEP(dss_adjustment)
 	INT32  rawportval = input_port_read_direct(context->port);
 
 	/* only recompute if the value changed from last time */
-	if (rawportval != context->lastpval)
+	if (UNEXPECTED(rawportval != context->lastpval))
 	{
 		double portval   = (double)(rawportval - context->pmin) * context->pscale;
 		double scaledval = portval * context->scale + context->min;
@@ -288,7 +288,7 @@ static DISCRETE_STEP(dss_input_stream)
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
-	if (context->ptr)
+	if (EXPECTED(context->ptr))
 	{
 		node->output[0] = (*context->ptr) * context->gain + context->offset;
 		context->ptr++;
