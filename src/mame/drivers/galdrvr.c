@@ -549,6 +549,61 @@ static INPUT_PORTS_START( streakng )
 INPUT_PORTS_END
 
 
+
+
+static INPUT_PORTS_START( articms )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ))  // probably unused
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+ 
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) // probably unused
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( pacmanbl )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -588,6 +643,20 @@ static INPUT_PORTS_START( pacmanbl )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( phoenxp2 )
+	PORT_INCLUDE(articms)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( atlantib )
+	PORT_INCLUDE(articms)
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
 
@@ -3092,76 +3161,6 @@ ROM_START( batman2 )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-
-ROM_START( streakng )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sk1",          0x0000, 0x1000, CRC(c8866ccb) SHA1(1fc8bc643ecbfa86a50448d79b299f5a3dd586c5) )
-	ROM_LOAD( "sk2",          0x1000, 0x1000, CRC(7caea29b) SHA1(5b3946ee914b1637db9046abf92d66ceaeb4fc5f) )
-	ROM_LOAD( "sk3",          0x2000, 0x1000, CRC(7b4bfa76) SHA1(9223bec0c1cc39bc84670869b2a4fab0d0167c6e) )
-	ROM_LOAD( "sk4",          0x3000, 0x1000, CRC(056fc921) SHA1(de8525571e5a82ddf74dd57b1a6c5bc9f2d2c0fe) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "sk5",          0x0000, 0x1000, CRC(d27f1e0c) SHA1(c3b4ae55a93516b034a16c9f943b360b24c933d6) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "sk6",          0x0000, 0x1000, CRC(a7089588) SHA1(e76242b043b1d8f060f669da3ddeee3d10122cdb) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "sk.bpr",       0x0000, 0x0020, CRC(bce79607) SHA1(49d60fde149240bcd025f721b0fbbbdbc549a42f) )
-ROM_END
-
-ROM_START( pacmanbl ) /* Galaxian bootleg hardware known as Artic Multi-System */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "blpac1b",      0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
-	ROM_LOAD( "blpac2b",      0x0800, 0x0800, CRC(33be3648) SHA1(50175889cf37fe8a81c931e009b55d10f8d0444a) )
-	ROM_LOAD( "blpac3b",      0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
-	ROM_LOAD( "blpac4b",      0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) )
-	ROM_LOAD( "blpac5b",      0x2000, 0x0800, CRC(6d475afc) SHA1(4fe6bde352c7dd9572fefaae4b59640b4f4eb8ba) )
-	ROM_LOAD( "blpac6b",      0x2800, 0x0800, CRC(cbe863d3) SHA1(97a2ffa6ab33e6061c664dcd1ee57c86a456782f) )
-	ROM_LOAD( "blpac7b",      0x3000, 0x0800, CRC(7daef758) SHA1(4dc8ec0ea8fc04d5bffc1c1335407729309c17f0) )
-
-	/* note from f205v: on the PCB I have, 10b and 11b have been joined into one single 2732 EPROM labeled "pmc31"
-    The same goes for 9b and 12b, joined into one single 2732 EPROM labeled "pmc42" */
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "blpac12b",     0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
-	ROM_LOAD( "blpac11b",     0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "blpac10b",     0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
-	ROM_LOAD( "blpac9b",      0x0800, 0x0800, CRC(fa84659f) SHA1(20c212723f9062f052539190dfe3fc41577543eb) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "blpaccp",      0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
-ROM_END
-
-/* content is the same as the above bootleg, but arranged differently in the roms */
-ROM_START( pacmanbla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom1.bin",      0x0000, 0x0800, CRC(75e4f967) SHA1(8bdb5ab2b3f978c578f1498b64bb16d2cb292ef2) )
-	ROM_CONTINUE(0x2000,0x800)
-	ROM_LOAD( "rom2.bin",      0x0800, 0x0800, CRC(5b2e4293) SHA1(bb925491e315d2e6bb9e756bdf664d173f83cd58) )
-	ROM_CONTINUE(0x2800,0x800)
-	ROM_LOAD( "rom3.bin",      0x1000, 0x0800, CRC(c06e30a4) SHA1(00d8d114bd4e0b689e75e312c93f6c7b8492426e) )
-	ROM_CONTINUE(0x3000,0x800)
-	ROM_LOAD( "rom4.bin",      0x1800, 0x0800, CRC(592b4ba8) SHA1(52a559344f70cd8a3a87de71de2bae57c885641a) )
-	ROM_CONTINUE(0x3800,0x800)
-
-	ROM_REGION( 0x2000, "tempgfx", 0 )
-	ROM_LOAD( "rom5.bin",      0x0000, 0x1000, CRC(f2d8c01e) SHA1(d4a5789476fa7859bb936df10590775e97e87578) )
-	ROM_LOAD( "rom6.bin",      0x1000, 0x1000, CRC(346a1720) SHA1(e152c9161f4e8ef53153b9c4a8ecef9fdbbe2463) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_COPY( "tempgfx", 0x0800, 0x0000, 0x0800 )
-	ROM_COPY( "tempgfx", 0x1800, 0x0800, 0x0800 )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_COPY( "tempgfx", 0x0000, 0x0000, 0x0800 )
-	ROM_COPY( "tempgfx", 0x1000, 0x0800, 0x0800 )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "blpaccp",      0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
-ROM_END
-
 ROM_START( devilfsg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dfish1.7f",    0x2000, 0x0800, CRC(2ab19698) SHA1(8450981d3cf3fa8abf2fb5487aa98b03a4cf03a1) )
@@ -3262,6 +3261,130 @@ ROM_START( gmgalax )
 	ROM_LOAD( "l06_prom.bin", 0x0020, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+
+/*************************************
+ *
+ *  ROM definitions
+ *  Artic Multi-System (Galaxian bootleg hardware)
+ *  About 20 games were available on this system, some unique!
+ *
+ *************************************/
+
+ROM_START( streakng )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sk1",          0x0000, 0x1000, CRC(c8866ccb) SHA1(1fc8bc643ecbfa86a50448d79b299f5a3dd586c5) )
+	ROM_LOAD( "sk2",          0x1000, 0x1000, CRC(7caea29b) SHA1(5b3946ee914b1637db9046abf92d66ceaeb4fc5f) )
+	ROM_LOAD( "sk3",          0x2000, 0x1000, CRC(7b4bfa76) SHA1(9223bec0c1cc39bc84670869b2a4fab0d0167c6e) )
+	ROM_LOAD( "sk4",          0x3000, 0x1000, CRC(056fc921) SHA1(de8525571e5a82ddf74dd57b1a6c5bc9f2d2c0fe) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "sk5",          0x0000, 0x1000, CRC(d27f1e0c) SHA1(c3b4ae55a93516b034a16c9f943b360b24c933d6) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "sk6",          0x0000, 0x1000, CRC(a7089588) SHA1(e76242b043b1d8f060f669da3ddeee3d10122cdb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sk.bpr",       0x0000, 0x0020, CRC(bce79607) SHA1(49d60fde149240bcd025f721b0fbbbdbc549a42f) )
+ROM_END
+
+ROM_START( pacmanbl ) /* Artic Multi-System */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
+	ROM_LOAD( "2",  0x0800, 0x0800, CRC(33be3648) SHA1(50175889cf37fe8a81c931e009b55d10f8d0444a) )
+	ROM_LOAD( "3",  0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
+	ROM_LOAD( "4",  0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) )
+	ROM_LOAD( "5",  0x2000, 0x0800, CRC(6d475afc) SHA1(4fe6bde352c7dd9572fefaae4b59640b4f4eb8ba) )
+	ROM_LOAD( "6",  0x2800, 0x0800, CRC(cbe863d3) SHA1(97a2ffa6ab33e6061c664dcd1ee57c86a456782f) )
+	ROM_LOAD( "7",  0x3000, 0x0800, CRC(7daef758) SHA1(4dc8ec0ea8fc04d5bffc1c1335407729309c17f0) )
+	/*              0x3800, 0x0800 not populated */
+
+	/* note from f205v: on the PCB I have, 10b and 11b have been joined into one single 2732 EPROM labeled "pmc31"
+    The same goes for 9b and 12b, joined into one single 2732 EPROM labeled "pmc42" */
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "12",  0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
+	ROM_LOAD( "11",  0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "10",  0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
+	ROM_LOAD( "9",   0x0800, 0x0800, CRC(fa84659f) SHA1(20c212723f9062f052539190dfe3fc41577543eb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
+ROM_END
+
+ROM_START( pacmanbla ) /* content is the same as the above bootleg, but arranged differently in the roms */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom1.bin",      0x0000, 0x0800, CRC(75e4f967) SHA1(8bdb5ab2b3f978c578f1498b64bb16d2cb292ef2) )
+	ROM_CONTINUE(0x2000,0x800)
+	ROM_LOAD( "rom2.bin",      0x0800, 0x0800, CRC(5b2e4293) SHA1(bb925491e315d2e6bb9e756bdf664d173f83cd58) )
+	ROM_CONTINUE(0x2800,0x800)
+	ROM_LOAD( "rom3.bin",      0x1000, 0x0800, CRC(c06e30a4) SHA1(00d8d114bd4e0b689e75e312c93f6c7b8492426e) )
+	ROM_CONTINUE(0x3000,0x800)
+	ROM_LOAD( "rom4.bin",      0x1800, 0x0800, CRC(592b4ba8) SHA1(52a559344f70cd8a3a87de71de2bae57c885641a) )
+	ROM_CONTINUE(0x3800,0x800)
+
+	ROM_REGION( 0x2000, "tempgfx", 0 )
+	ROM_LOAD( "rom5.bin",      0x0000, 0x1000, CRC(f2d8c01e) SHA1(d4a5789476fa7859bb936df10590775e97e87578) )
+	ROM_LOAD( "rom6.bin",      0x1000, 0x1000, CRC(346a1720) SHA1(e152c9161f4e8ef53153b9c4a8ecef9fdbbe2463) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_COPY( "tempgfx", 0x0800, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx", 0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_COPY( "tempgfx", 0x0000, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx", 0x1000, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
+ROM_END
+
+ROM_START( phoenxp2 ) /* Artic Multi-System */
+	/* Large birds never appeared 'whole' even when they were displayed correctly on real hardware, this may be a rom error, or something else. */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x0000, 0x0800, CRC(f6dcfd51) SHA1(8475726dbbf0dd13581f457a5379956424dc2862) )
+	ROM_LOAD( "2",  0x0800, 0x0800, CRC(de951936) SHA1(657d2c595a5864d8c9a51926ab7bfa0a7068e2b2) )
+	ROM_LOAD( "3",  0x1000, 0x0800, CRC(7a3af2da) SHA1(49e9ad7115e71839d1d027552d08c7831a617b4a) )
+	ROM_LOAD( "4",  0x1800, 0x0800, CRC(c820ad32) SHA1(b5286d49f6578dfeffdf429e7d52321f4813e03c) )
+	ROM_LOAD( "5",  0x2000, 0x0800, CRC(08e83233) SHA1(44159e0f3fb717b726b6b5c77da32391c1cdd04d) )
+	ROM_LOAD( "6",  0x2800, 0x0800, CRC(f31fb9d6) SHA1(bdfb5427869940ed6b8e2667a6c1f410a9a41b87) )
+	ROM_LOAD( "7",  0x3000, 0x0800, CRC(d3a480c1) SHA1(d1e4fe83b49f918285009f09df38c6555a686823) )
+	ROM_LOAD( "8",  0x3800, 0x0800, CRC(edf9779e) SHA1(c1e7307c59f15bebac3e29b41135fe9f18fc9a06) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "10",  0x0000, 0x0800, CRC(9b570016) SHA1(44fd2b1caeecdc5200d63c35636f0a605943d30c) )
+	ROM_LOAD( "9",   0x0800, 0x0800, CRC(1a657b1f) SHA1(42149dafdde7d9104f0bddda2223bfc211d0154a) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "12",  0x0000, 0x0800, CRC(73956244) SHA1(e464b587b5ed636816cc9688593f5b6005cb5216) ) /* possible bad_dump... seems to be missing graphics */
+	ROM_LOAD( "11",  0x0800, 0x0800, CRC(7a2b48e5) SHA1(f559799c685dd2cb9de06a356bee95b7d6ffadfc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* same as 'Omega' */
+ROM_END
+
+ROM_START( atlantisb ) /* Artic Multi-System */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x0000, 0x0800, CRC(2b612351) SHA1(cfd244946190c062146716c0417c35be216943e4) ) /* aka "subfury" */
+	ROM_LOAD( "2",  0x0800, 0x0800, CRC(b1c970e9) SHA1(1e12a1d34453b01ff5ef4d9530a90f476fc34631) )
+	/*              0x1000, 0x0800 not populated */
+	ROM_LOAD( "3",  0x1800, 0x0800, CRC(63c3783e) SHA1(e3a7a8bb2c108d3e1e1403017c72963afcd23813) )
+	ROM_LOAD( "4",  0x2000, 0x0800, CRC(45f7cf34) SHA1(d1e0e0be6dec377b684625bdfdc5a3a8af847492) )
+	ROM_LOAD( "5",  0x2800, 0x0800, CRC(f335b96b) SHA1(17daa6d9bc916081f3c6cbdfe5b4960177dc7c9b) )
+	ROM_LOAD( "6",  0x3000, 0x0800, CRC(a50bf8d5) SHA1(5bca98e1c0838d27ec66bf4b906877977b212b6d) )
+	/*              0x3800, 0x0800 not populated */
+ 
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "8",  0x0000, 0x0800, CRC(55cd5acd) SHA1(b3e2ce71d4e48255d44cd451ee015a7234a108c8) )
+	ROM_LOAD( "7",  0x0800, 0x0800, CRC(72e773b8) SHA1(6ce178df3bd6a4177c68761572a13a56d222c48f) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	/* 0x000, 0x0800 not populated */
+	/* 0x000, 0x0800 not populated */
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
 
 
 /*************************************
@@ -5158,10 +5281,12 @@ GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg",
 /* similar to pisces, but with different video banking characteristics */
 GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE )
 
-/* separate tile/sprite ROMs */
+/* Artic Multi-System games - separate tile/sprite ROMs */
 GAME( 1981, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenxp2, 0,        pacmanbl, phoenxp2, galaxian, ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )

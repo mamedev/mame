@@ -174,6 +174,8 @@ const game_driver * const drivers[] =
 	DRIVER( streakng )	/* [1980] Shoei */
 	DRIVER( pacmanbl )	/* bootleg */
 	DRIVER( pacmanbla )	/* bootleg */
+	DRIVER( phoenxp2 )	/* bootleg */
+	DRIVER( atlantisb )	/* bootleg */
 	DRIVER( devilfsg )	/* (c) 1984 Vision / Artic (bootleg?) */
 	DRIVER( zigzag )	/* (c) 1982 LAX */
 	DRIVER( zigzag2 )	/* (c) 1982 LAX */
