@@ -1759,6 +1759,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkbloc2 )	/* bootleg */
 	DRIVER( arkgcbl )	/* bootleg */
 	DRIVER( paddle2 )	/* bootleg */
+	DRIVER( block2 )	/* bootleg */
 	DRIVER( arkatayt )	/* bootleg */
 	DRIVER( arktayt2 )	/* bootleg */
 	DRIVER( arkatour )	/* ??? (c) 1987 Taito America Corporation + Romstar license (US) */

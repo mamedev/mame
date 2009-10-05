@@ -6,7 +6,8 @@ enum {
 	ARKBLOCK,
 	ARKBLOC2,
 	ARKGCBL,
-	PADDLE2
+	PADDLE2,
+	BLOCK2
 };
 
 
@@ -50,4 +51,5 @@ extern CUSTOM_INPUT( arkanoid_input_mux );
 extern READ8_HANDLER( arkanoid_bootleg_f002_r );
 extern WRITE8_HANDLER( arkanoid_bootleg_d018_w );
 extern READ8_HANDLER( arkanoid_bootleg_d008_r );
+extern READ8_HANDLER( block2_bootleg_f000_r );
 

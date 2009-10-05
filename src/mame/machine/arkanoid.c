@@ -507,10 +507,25 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			}
 			LOG_D018_W
 			break;
+		case BLOCK2:
+			switch (data)
+			{
+				default:
+					arkanoid_bootleg_cmd = data;
+					break;		
+			}
+			LOG_D018_W
+			break;
+			
 		default:
 			logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - unknown bootleg !\n",cpu_get_pc(space->cpu),data);
 			break;
 	}
+}
+
+READ8_HANDLER( block2_bootleg_f000_r )
+{
+	return arkanoid_bootleg_cmd;
 }
 
 /* Kludge for some bootlegs that read this address */
