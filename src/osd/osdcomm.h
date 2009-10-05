@@ -50,7 +50,8 @@
 #define ATTR_CONST				__attribute__((const))
 #define ATTR_FORCE_INLINE		__attribute__((always_inline))
 #define ATTR_NONNULL(...)		__attribute__((nonnull(__VA_ARGS__)))
-#define UNEXPECTED(exp)			__builtin_expect((exp), 0)
+#define UNEXPECTED(exp)			__builtin_expect(!!(exp), 0)
+#define EXPECTED(exp)			__builtin_expect(!!(exp), 1)
 #define RESTRICT				__restrict__
 #define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
 #ifndef TYPES_COMPATIBLE
@@ -66,6 +67,7 @@
 #define ATTR_FORCE_INLINE
 #define ATTR_NONNULL(...)
 #define UNEXPECTED(exp)			(exp)
+#define EXPECTED(exp)			(exp)
 #define RESTRICT
 #define SETJMP_GNUC_PROTECT()	do {} while (0)
 #ifndef TYPES_COMPATIBLE
