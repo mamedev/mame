@@ -503,7 +503,10 @@ static DISCRETE_RESET(dst_op_amp_filt)
 			context->exponentC2 = RC_CHARGE_EXP(context->rTotal * info->c2);
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
-			context->rTotal = 1.0 / (1.0 / info->r1 + 1.0 / info->r2);
+			if (info->r2 == 0)
+				context->rTotal = info->r1;
+			else
+				context->rTotal = RES_2_PARALLEL(info->r1, info->r2);
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 		{
 			double fc = 1.0 / (2 * M_PI * sqrt(context->rTotal * info->rF * info->c1 * info->c2));

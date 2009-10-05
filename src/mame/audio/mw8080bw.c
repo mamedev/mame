@@ -2052,6 +2052,20 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_R305		RES_K(3680)
 #define SPACWALK_R307		RES_K(20)
 #define SPACWALK_R308		RES_K(20)	/* not labeled but it's beside R307 */
+#define SPACWALK_R400		RES_K(1)
+#define SPACWALK_R401		RES_K(200)
+#define SPACWALK_R403		RES_K(51)
+#define SPACWALK_R404		RES_K(220)
+#define SPACWALK_R406		RES_M(1)
+#define SPACWALK_R407		RES_K(820)
+#define SPACWALK_R410		RES_K(47)
+#define SPACWALK_R411		RES_K(300)
+#define SPACWALK_R412		RES_K(330)
+#define SPACWALK_R413		RES_M(1)
+#define SPACWALK_R414		RES_M(1)
+#define SPACWALK_R416		RES_M(4.7)
+#define SPACWALK_R417		RES_K(10)
+#define SPACWALK_R418		RES_K(100)
 #define SPACWALK_R419		RES_K(2.7)
 #define SPACWALK_R420		RES_K(20)
 #define SPACWALK_R421		RES_K(11)
@@ -2069,6 +2083,12 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 #define SPACWALK_C302		CAP_U(2.2)
 #define SPACWALK_C303		CAP_U(0.0047)
 #define SPACWALK_C304		CAP_U(0.0047)	/* not labeled but it's beside C303 */
+#define SPACWALK_C401		CAP_U(1)
+#define SPACWALK_C402		CAP_U(0.68)
+#define SPACWALK_C403		CAP_U(0.0022)
+#define SPACWALK_C451		CAP_U(0.001)
+#define SPACWALK_C452		CAP_U(0.001)
+#define SPACWALK_C453		CAP_U(0.001)
 #define SPACWALK_C602		CAP_U(1)
 
 
@@ -2111,9 +2131,40 @@ static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
 };
 
+static const discrete_integrate_info spacwalk_sb_miss_integrate =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R406, SPACWALK_R401, 0, SPACWALK_C402,	/* r1, r2, r3, c */
+	12, 12,	/* v1, vP */
+	0, 0, 0	/* f0, f1, f2 */
+};
+
+static const discrete_op_amp_osc_info spacwalk_sb_miss_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	SPACWALK_R407, SPACWALK_R412, SPACWALK_R410, SPACWALK_R411, SPACWALK_R413, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	SPACWALK_C403, 12												/* c, vP */
+};
+
+static const discrete_op_amp_filt_info spacwalk_sb_miss_filter =
+{
+	/* we use r1, not r2 because vref is taken into acount by the CRFILTER */
+	SPACWALK_R417, 0, SPACWALK_R414, 0, SPACWALK_R416,	/* r1, r2, r3, r4, rF */
+	SPACWALK_C451, SPACWALK_C452, 0,					/* c1, c2, c3 */
+	0, 12, 0											/* vRef, vP, vN */
+};
+
+static const discrete_op_amp_info spacwalk_sb_miss_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R418, SPACWALK_R404, 0, SPACWALK_R403,	/* r1, r2, r3, r4 */
+	0,	/* c */
+	0, 12,	/* vN, vP */
+};
+
 static const discrete_op_amp_osc_info spacwalk_spaceship_osc =
 {
-	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON,
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
 	RES_K(75), RES_M(1), RES_M(6.8), RES_M(2.4), 0, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
 	CAP_U(2.2), 12												/* c, vP */
 };
@@ -2220,12 +2271,36 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 	/************************************************
      * Springboard miss sound
      ************************************************/
-	DISCRETE_CONSTANT(SPACWALK_SPRINGBOARD_MISS_SND, 0)
+	DISCRETE_RCDISC2(NODE_50,					/* voltage on C401 */
+		SPACWALK_SPRINGBOARD_MISS_EN,			/* SWITCH */
+		OP_AMP_NORTON_VBE, RES_2_PARALLEL(SPACWALK_R401, SPACWALK_R407),	/* INP0,RVAL0 */
+		12.0 - .5, SPACWALK_R400,				/* INP1,RVAL1 */
+		SPACWALK_C401)
+	DISCRETE_INTEGRATE(NODE_51,					/* IC K4, pin 9 */
+		NODE_50, 0,								/* TRG0,TRG1*/
+		&spacwalk_sb_miss_integrate)
+	DISCRETE_OP_AMP_VCO1(NODE_52,				/* IC K4, pin 5 */
+		1,										/* ENAB */
+		NODE_50,								/* VMOD1 */
+		&spacwalk_sb_miss_vco)
+	DISCRETE_CRFILTER(NODE_53,
+		1,										/* ENAB */
+		NODE_52,								/* IN0 */
+		SPACWALK_R417, SPACWALK_C453)
+	/* this filter type probably does not work right. I need to test it. */
+	DISCRETE_OP_AMP_FILTER(NODE_54,				/* IC K3, pin 5 */
+		1,										/* ENAB */
+		NODE_53, 0,								/* INP0,INP1 */
+		DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON, &spacwalk_sb_miss_filter)
+	DISCRETE_OP_AMP(SPACWALK_SPRINGBOARD_MISS_SND,	/* IC K4, pin 10 */
+		1,										/* ENAB */
+		NODE_54, NODE_51,						/* IN0,IN1 */
+		&spacwalk_sb_miss_amp)
 
 	/************************************************
      * Space ship sound
      ************************************************/
-	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,			/* 2.2uF cap near IC JK-2 */
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,			/* voltage on 2.2uF cap near IC JK-2 */
 		1,										/* ENAB */
 		&spacwalk_spaceship_osc)
 	DISCRETE_OP_AMP_VCO1(NODE_61,				/* IC JK-2, pin 5 */
