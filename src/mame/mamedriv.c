@@ -3517,6 +3517,7 @@ V-V                           TP-027
 	DRIVER( astrob2 )	/* (c) 1981 */
 	DRIVER( astrob2a )	/* (c) 1981 */
 	DRIVER( astrob1 )	/* (c) 1981 */
+	DRIVER( astrode )	/* (c) 1981 */
 	DRIVER( 005 )		/* (c) 1981 */
 	DRIVER( monsterb )	/* (c) 1982 */
 	DRIVER( monsterb2 )	/* (c) 1982 */
