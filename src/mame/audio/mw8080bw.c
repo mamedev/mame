@@ -2358,34 +2358,148 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w )
  *
  *  Shuffleboard
  *
+ *  Discrete sound emulation: Oct 2009, D.R.
+ *
  *************************************/
 
-/* Noise clock was breadboarded and measured at 1210Hz */
+ /* Discrete Sound Input Nodes */
+#define SHUFFLE_ROLLING_1_EN		NODE_01
+#define SHUFFLE_ROLLING_2_EN		NODE_02
+#define SHUFFLE_ROLLING_3_EN		NODE_03
+#define SHUFFLE_FOUL_EN				NODE_04
+#define SHUFFLE_ROLLOVER_EN			NODE_05
+#define SHUFFLE_CLICK_EN			NODE_06
+
+/* Discrete Sound Output Nodes */
+#define SHUFFLE_NOISE				NODE_10
+#define SHUFFLE_ROLLING_SND			NODE_11
+#define SHUFFLE_FOUL_SND			NODE_12
+#define SHUFFLE_ROLLOVER_SND		NODE_13
+#define SHUFFLE_CLICK_SND			NODE_14
+
+/* Parts List - Resistors */
+#define SHUFFLE_R300	RES_K(33)
+#define SHUFFLE_R400	RES_K(200)
+#define SHUFFLE_R401	RES_K(3)
+#define SHUFFLE_R402	RES_K(5.6)
+#define SHUFFLE_R403	RES_K(5.6)
+#define SHUFFLE_R406	RES_K(300)
+#define SHUFFLE_R408	RES_K(680)
+#define SHUFFLE_R411	RES_K(680)
+#define SHUFFLE_R412	RES_M(2.7)
+#define SHUFFLE_R500	RES_K(300)
+
+/* Parts List - Capacitors */
+#define SHUFFLE_C300	CAP_U(0.1)
+#define SHUFFLE_C400	CAP_U(0.1)
+#define SHUFFLE_C401	CAP_U(1)
+#define SHUFFLE_C404	CAP_U(0.1)
+#define SHUFFLE_C500	CAP_U(0.1)
+
+#define SHUFFLE_HSYNC	15750	/* unmeasured */
+#define SHUFFLE_1V		SHUFFLE_HSYNC / 2
+#define SHUFFLE_32V		SHUFFLE_1V / 32
+
+
+static const discrete_op_amp_tvca_info shuffle_foul_tvca =
+{
+	SHUFFLE_R412, SHUFFLE_R411, 0, SHUFFLE_R408,		/* r1, r2, r3, r4 */
+	RES_K(1), 0, SHUFFLE_R406,							/* r5, r6, r7 */
+	0, 0, 0, 0,											/* r8, r9, r10, r11 */
+	SHUFFLE_C404, 0, 0,									/* c1, c2, c3 */
+	5, 0, 0, 12,										/* v1, v2, v3, vP */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
+};
+
+static const discrete_mixer_desc shuffle_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{SHUFFLE_R500, SHUFFLE_R400, SHUFFLE_R403 + SHUFFLE_R402 + SHUFFLE_R401, SHUFFLE_R300},
+	{0},		/* r_nodes */
+	{SHUFFLE_C500, SHUFFLE_C400, SHUFFLE_C401, SHUFFLE_C300},
+	0, 0, 0, 0, 0 ,1		/* rI, rF, cF, cAmp, vRef, gain */
+};
+
+static DISCRETE_SOUND_START(shuffle)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_1_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_2_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_3_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_FOUL_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLOVER_EN)
+	DISCRETE_INPUT_LOGIC(SHUFFLE_CLICK_EN)
+
+	/* Noise clock was breadboarded and measured at 1210Hz */
+	DISCRETE_LFSR_NOISE(SHUFFLE_NOISE,			/* IC N5, pin 10 */
+		1, 1,									/* ENAB, RESET */
+		1210, 12.0, 0, 12.0 / 2, &midway_lfsr)	/* CLK,AMPL,FEED,BIAS,LFSRTB */
+
+	/************************************************
+     * Shuffle rolling
+     ************************************************/
+	DISCRETE_CONSTANT(SHUFFLE_ROLLING_SND, 0)
+
+	/************************************************
+     * Foul
+     ************************************************/
+	DISCRETE_SQUAREWFIX(NODE_30,				/* 32V is a guess, scan of schematic is missing actual tone value used */
+		1, SHUFFLE_32V, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1 / 2, 0)	/* ENAB,FREQ,AMP,DUTY,BIAS,PHASE */
+	DISCRETE_OP_AMP_TRIG_VCA(SHUFFLE_FOUL_SND,	/* IC M3-4, pin 5 */
+		SHUFFLE_FOUL_EN, 0, 0,					/* TRG0,TRG1,TRG2 */
+		NODE_30, 0,								/*IN0,IN1 */
+		&shuffle_foul_tvca)
+
+	/************************************************
+     * Shuffle rollover
+     ************************************************/
+	DISCRETE_CONSTANT(SHUFFLE_ROLLOVER_SND, 0)
+
+	/************************************************
+     * Click
+     ************************************************/
+	DISCRETE_CONSTANT(SHUFFLE_CLICK_SND, 0)
+
+	/************************************************
+     * Combine all sound sources.
+     ************************************************/
+	DISCRETE_MIXER4(NODE_90,
+		1,										/* ENAB */
+		SHUFFLE_ROLLING_SND,
+		SHUFFLE_FOUL_SND,
+		SHUFFLE_ROLLOVER_SND,
+		SHUFFLE_CLICK_SND,
+		&shuffle_mixer)
+	DISCRETE_OUTPUT(NODE_90, 11000)
+DISCRETE_SOUND_END
 
 
 MACHINE_DRIVER_START( shuffle_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(shuffle)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( shuffle_audio_1_w )
+WRITE8_DEVICE_HANDLER( shuffle_audio_1_w )
 {
-	/* if (data & 0x01)  enable CLICK (balls collide) sound */
+	discrete_sound_w(device, SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
 
-	/* if (data & 0x02)  enable SHUFFLE ROLLOVER sound */
+	discrete_sound_w(device, SHUFFLE_ROLLOVER_EN, (data >> 1) & 0x01);
 
-	sound_global_enable(space->machine, (data >> 2) & 0x01);
+	sound_global_enable(device->machine, (data >> 2) & 0x01);
 
-	/* set SHUFFLE ROLLING sound((data >> 3) & 0x07)  0, if not rolling,
-                                                      faster rolling = higher number */
+	discrete_sound_w(device, SHUFFLE_ROLLING_1_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, SHUFFLE_ROLLING_2_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, SHUFFLE_ROLLING_3_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
 
 
-WRITE8_HANDLER( shuffle_audio_2_w )
+WRITE8_DEVICE_HANDLER( shuffle_audio_2_w )
 {
-	/* if (data & 0x01)  enable FOUL sound */
+	discrete_sound_w(device, SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
 	coin_counter_w(0, (data >> 1) & 0x01);
 

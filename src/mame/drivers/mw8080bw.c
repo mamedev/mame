@@ -1951,8 +1951,8 @@ static ADDRESS_MAP_START( shuffle_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x08) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_WRITE(shuffle_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x08) AM_WRITE(shuffle_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_DEVWRITE("discrete", shuffle_audio_1_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0x08) AM_DEVWRITE("discrete", shuffle_audio_2_w)
 ADDRESS_MAP_END
 
 
@@ -2005,7 +2005,7 @@ static MACHINE_DRIVER_START( shuffle )
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* audio hardware */
-	/* MDRV_IMPORT_FROM(shuffle_audio) */
+	MDRV_IMPORT_FROM(shuffle_audio)
 
 MACHINE_DRIVER_END
 

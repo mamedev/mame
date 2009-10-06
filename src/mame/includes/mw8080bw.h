@@ -147,8 +147,8 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w );
 WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( shuffle_audio );
-WRITE8_HANDLER( shuffle_audio_1_w );
-WRITE8_HANDLER( shuffle_audio_2_w );
+WRITE8_DEVICE_HANDLER( shuffle_audio_1_w );
+WRITE8_DEVICE_HANDLER( shuffle_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( dogpatch_audio );
 WRITE8_HANDLER( dogpatch_audio_w );
