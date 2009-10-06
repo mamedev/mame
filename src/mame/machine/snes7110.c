@@ -1,3 +1,20 @@
+/***************************************************************************
+
+  snes7110.c
+
+  File to handle emulation of the SNES "SPC7110" add-on chip.
+
+  Based on C++ implementation by Byuu in BSNES.
+
+  Byuu's code is released under GNU General Public License
+  version 2 as published by the Free Software Foundation.
+  The implementation below is released under the MAME license 
+  for use in MAME, MESS and derivatives by permission of the 
+  author
+
+***************************************************************************/
+
+
 static const UINT32 spc7110_decomp_buffer_size = 64;
 
 static const UINT8 spc7110_evolution_table[53][4] =

@@ -4,9 +4,12 @@
 
   File to handle emulation of the SNES "DSP-2" add-on chip.
 
-  Original C++ code by byuu, based on research by Overload
-
-  MAME/MESS C conversion by etabeta
+  Original C++ code by byuu, based on research by Overload.
+  Byuu's code is released under GNU General Public License
+  version 2 as published by the Free Software Foundation.
+  The implementation below is released under the MAME license 
+  for use in MAME, MESS and derivatives by permission of the 
+  author
 
 ***************************************************************************/
 
