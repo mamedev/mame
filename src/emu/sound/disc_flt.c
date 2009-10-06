@@ -97,7 +97,7 @@ struct dst_rcdisc4_context
 struct dst_rcfilter_context
 {
 	double	vCap;
-	double	vRef;
+	double	rc;
 	double	exponent;
 };
 
@@ -147,18 +147,26 @@ static DISCRETE_STEP(dst_crfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
+	double rc = DST_CRFILTER__R * DST_CRFILTER__C;
+
+	if (rc != context->rc)
+	{
+		context->rc = rc;
+		context->exponent = RC_CHARGE_EXP(rc);
+	}
+
 	node->output[0] = DST_CRFILTER__IN - context->vCap;
 	//context->vCap += ((DST_CRFILTER__IN - context->vRef) - context->vCap) * context->exponent;
-	context->vCap += (node->output[0] - context->vRef) * context->exponent;
+	context->vCap += (node->output[0] - DST_CRFILTER__VREF) * context->exponent;
 }
 
 static DISCRETE_RESET(dst_crfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
-	context->exponent = RC_CHARGE_EXP(DST_CRFILTER__R * DST_CRFILTER__C);
-	context->vCap   = 0;
-	context->vRef   = DST_CRFILTER__VREF;
+	context->rc = DST_CRFILTER__R * DST_CRFILTER__C;
+	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->vCap = 0;
 	node->output[0] = DST_CRFILTER__IN;
 }
 
@@ -1021,20 +1029,28 @@ static DISCRETE_STEP(dst_rcfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
+	double rc = DST_RCFILTER__R * DST_RCFILTER__C;
+
+	if (rc != context->rc)
+	{
+		context->rc = rc;
+		context->exponent = RC_CHARGE_EXP(rc);
+	}
+
 	/************************************************************************/
 	/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
 	/************************************************************************/
 
 	context->vCap += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
-	node->output[0] = context->vCap + context->vRef;
+	node->output[0] = context->vCap + DST_RCFILTER__VREF;
 }
 
 static DISCRETE_RESET(dst_rcfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
-	context->exponent = RC_CHARGE_EXP(DST_RCFILTER__R * DST_RCFILTER__C);
-	context->vRef = DST_RCFILTER__VREF;
+	context->rc = DST_RCFILTER__R * DST_RCFILTER__C;
+	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap   = 0;
 	node->output[0] = 0;
 }

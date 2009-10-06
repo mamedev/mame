@@ -133,7 +133,7 @@ static const discrete_mixer_desc starshp1_final_mix =
 	DISC_MIXER_IS_RESISTOR,
 	{STARSHP1_R66, STARSHP1_R126, STARSHP1_R59 + STARSHP1_R60, STARSHP1_R74, STARSHP1_R75},
 	{0},	/* no resistor nodes */
-	{0, STARSHP1_C78, STARSHP1_C36, 0, 0},
+	{0, STARSHP1_C78, 0, 0, 0},
 	0,
 	STARSHP1_R76,
 	0,		/* no cF */
@@ -157,12 +157,8 @@ DISCRETE_SOUND_START( starshp1 )
 	DISCRETE_INPUT_LOGIC(STARSHP1_SL1)
 	DISCRETE_INPUT_LOGIC(STARSHP1_KICKER)
 	DISCRETE_INPUT_LOGIC(STARSHP1_PHASOR_ON)
+	DISCRETE_INPUT_NOT  (STARSHP1_MOLVL)
 	DISCRETE_INPUT_NOT  (STARSHP1_ATTRACT)		/* Inverted by Q9 */
-	/* when MOLVL is high, R58 is grounded, reducing the gain by 50% */
-	/* we will cheat and calculate that now */
-#define STARSHP1_MOLVL_GAIN			STARSHP1_MOLVL
-#define STARSHP1_MOLVL_GAIN_VAL		RES_VOLTAGE_DIVIDER(STARSHP1_R59, STARSHP1_R58)
-	DISCRETE_INPUTX_LOGIC(STARSHP1_MOLVL_GAIN, -STARSHP1_MOLVL_GAIN_VAL, STARSHP1_MOLVL_GAIN_VAL, 1)
 
 	/************************************************
      * Noise
@@ -244,9 +240,22 @@ DISCRETE_SOUND_START( starshp1 )
 						STARSHP1_C34,
 						5, -10, NODE_41,			/* VPOS,VNEG,VCHARGE */
 						DISC_566_OUT_TRIANGLE)
+	DISCRETE_SWITCH(NODE_43,
+						1,							/* ENAB */
+						STARSHP1_MOLVL,				/* SWITCH */
+						STARSHP1_R59 + RES_2_PARALLEL(STARSHP1_R58, STARSHP1_R60 + STARSHP1_R76),
+						STARSHP1_R59 + STARSHP1_R60 + STARSHP1_R76)
+	DISCRETE_CRFILTER(NODE_44,
+						NODE_42,					/* IN0 */
+						NODE_43,					/* RVAL*/
+						STARSHP1_C36)
+	DISCRETE_SWITCH(NODE_45,						/* gain affect of voltage divider */
+						1,							/* ENAB */
+						STARSHP1_MOLVL,				/* SWITCH */
+						RES_VOLTAGE_DIVIDER(STARSHP1_R59, STARSHP1_R58), 1)
 	DISCRETE_MULTIPLY(	STARSHP1_MOTOR_SND,
-						NODE_42,
-						STARSHP1_MOLVL_GAIN)
+						NODE_44,
+						NODE_45)
 
 	/************************************************
      * SL1, SL2
@@ -264,16 +273,10 @@ DISCRETE_SOUND_START( starshp1 )
 						&starshp1_555_b10)
 	/* use switch instead of logic AND, so we can switch between
      * 0V and the anti-aliased TTL level out that we set NODE_51 to. */
-	DISCRETE_SWITCH(	STARSHP1_SL1_SND,			/* IC A10, pin 11 */
-						1,							/* ENAB */
-						STARSHP1_SL1,
-						0,
-						NODE_51)
-	DISCRETE_SWITCH(	STARSHP1_SL2_SND,			/* IC A10, pin 8 */
-						1,							/* ENAB */
-						STARSHP1_SL2,
-						0,
-						NODE_51)
+	DISCRETE_ONOFF(		STARSHP1_SL1_SND,			/* IC A10, pin 11 */
+						STARSHP1_SL1, NODE_51)
+	DISCRETE_ONOFF(		STARSHP1_SL2_SND,			/* IC A10, pin 8 */
+						STARSHP1_SL2, NODE_51)
 
 	/************************************************
      * Mixing and output
