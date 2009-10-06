@@ -99,6 +99,7 @@ struct dst_rcfilter_context
 	double	vCap;
 	double	rc;
 	double	exponent;
+	UINT8	has_rc_nodes;
 };
 
 struct dst_rcfilter_sw_context
@@ -147,12 +148,14 @@ static DISCRETE_STEP(dst_crfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
-	double rc = DST_CRFILTER__R * DST_CRFILTER__C;
-
-	if (rc != context->rc)
+	if (context->has_rc_nodes)
 	{
-		context->rc = rc;
-		context->exponent = RC_CHARGE_EXP(rc);
+		double rc = DST_CRFILTER__R * DST_CRFILTER__C;
+		if (rc != context->rc)
+		{
+			context->rc = rc;
+			context->exponent = RC_CHARGE_EXP(rc);
+		}
 	}
 
 	node->output[0] = DST_CRFILTER__IN - context->vCap;
@@ -164,6 +167,7 @@ static DISCRETE_RESET(dst_crfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
+	context->has_rc_nodes = node->input_is_node & 0x6;
 	context->rc = DST_CRFILTER__R * DST_CRFILTER__C;
 	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap = 0;
@@ -1029,12 +1033,14 @@ static DISCRETE_STEP(dst_rcfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
-	double rc = DST_RCFILTER__R * DST_RCFILTER__C;
-
-	if (rc != context->rc)
+	if (context->has_rc_nodes)
 	{
-		context->rc = rc;
-		context->exponent = RC_CHARGE_EXP(rc);
+		double rc = DST_RCFILTER__R * DST_RCFILTER__C;
+		if (rc != context->rc)
+		{
+			context->rc = rc;
+			context->exponent = RC_CHARGE_EXP(rc);
+		}
 	}
 
 	/************************************************************************/
@@ -1049,6 +1055,7 @@ static DISCRETE_RESET(dst_rcfilter)
 {
 	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
 
+	context->has_rc_nodes = node->input_is_node & 0x6;
 	context->rc = DST_RCFILTER__R * DST_RCFILTER__C;
 	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap   = 0;
