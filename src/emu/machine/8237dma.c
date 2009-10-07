@@ -547,7 +547,7 @@ WRITE8_DEVICE_HANDLER( dma8237_w )
 
 	case 15:
 		/* DMA write mask register */
-		dma8237->mask |= data;
+		dma8237->mask = data & 0x0f;
 		break;
 	}
 }
