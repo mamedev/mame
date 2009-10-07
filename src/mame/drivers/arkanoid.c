@@ -236,7 +236,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * You are told be to able to select your starting level from level 1 to level 32
         (ingame bug - check code at 0x3425)
 
-2a) 'arkangc2'
+2b) 'arkangc2'
 
   - "(c)  Game Corporation 1986".
   - Displays the "Arkanoid" title but routine to display "BLOCK" with bricks exists.
@@ -265,12 +265,41 @@ Stephh's notes (based on the games Z80 code and some tests) :
         (ingame bug - check unused code at 0x2f00 instead of standard text)
         But you can still press the buttons and test the paddle and the Dip Switches.
 
-2c) 'arkblock'
+2c) 'block2'
+
+  - "       S.  P.  A.  CO.    ".
+  - Displays "BLOCK II" with "bricks".
+  - Colored bricks have been replaced with aliens (ripped from "Space Invaders" ?)
+  - No standard hardware test and no "NOTICE" screen.
+  - Specific hardware test which reads back at 0xf000 values written to 0xd018
+    (check code at 0x035e); the game enters a loop until good values are returned.
+  - No reads from 0xf002.
+  - Reads bit 1 from 0xd008.
+  - "Continue" Dip Switch has been replaced by sort of "Debug" Dip Switch as in 'arkangc';
+    however, this has no effect due to newly patched code at 0x06e9 !
+  - You can select your starting level (between 1 and 30)
+    but they aren't displayed like in the original Japanese set we have ('arknoidj').
+  - Levels 1, 2, 3, 4, 6, 7, 11, 14, 30, 31 and 32 differ from original Japanese version;
+    level 1 starts at a different offset (0x90a8 instead of 0xbf15).
+  - Complerely different initials on high-scores table, but scores and rounds
+    are the same as in the original Japanese set we have ('arknoidj').
+  - There seems to be code to edit levels (check code at 0x8082), but the routines
+    don't seem to be called anymore.
+  - Known bugs :
+      * The paddle isn't centered when starting a new life and / or level;
+        it doesn't "backup" the paddle position when a life is lost as well
+        (I can't tell at the moment if it's an ingame bug or not)
+        So the paddle can sometimes appear in the left wall !
+      * The "test mode" display is completely corrupted
+        (ingame bug - check unused code at 0x2f00 instead of standard text)
+        But you can still press the buttons and test the paddle and the Dip Switches.
+
+2d) 'arkblock'
 
   - Same as 'arkangc', the only difference is that it displays "BLOCK" with bricks
     instead of displaying the "Arkanoid" title :
 
-      Z:\MAME\dasm>diff arkangc.asm arkbloc2.asm
+      Z:\MAME\dasm>diff arkangc.asm arkblock.asm
       8421,8422c8421,8424
       < 32EF: 21 80 03      ld   hl,$0380
       < 32F2: CD D1 20      call $20D1
@@ -280,7 +309,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       > 32F3: C9            ret
       > 32F4: 14            inc  d
 
-2d) 'arkbloc2'
+2e) 'arkbloc2'
 
   - "(c)  Game Corporation 1986".
   - Displays "BLOCK" with bricks.
@@ -301,7 +330,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * You are told be to able to select your starting level from level 1 to level 32
         (ingame bug - check code at 0x3425)
 
-2e) 'arkgcbl'
+2f) 'arkgcbl'
 
   - "1986    ARKANOID    1986".
   - Displays the "Arkanoid" title but routine to display "BLOCK" with bricks exists.
@@ -326,7 +355,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * Sound in "Demo Mode" if 1 coin is inserted (ingame bug - check code at 0x0283)
       * Red square on upper middle left "led" when it is supposed to be yellow (ingame bug)
 
-2f) 'paddle2'
+2g) 'paddle2'
 
   - Different title, year, and inside texts but routine to display "BLOCK" with bricks exists.
   - No hardware test and no "NOTICE" screen.
@@ -431,6 +460,12 @@ Stephh's log (2006.09.12) :
   - Removed flags from the following sets :
       * 'arkmcubl'
     This way, even if emulation isn't perfect, people can try them and report bugs.
+
+
+Stephh's log (2009.10.07) :
+
+  - Added set :
+      * 'block2'
 
 ***************************************************************************
 
@@ -611,7 +646,7 @@ static INPUT_PORTS_START( arkatayt )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )		/* Some bootlegs need it to be 1 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* Some bootlegs need it to be 0 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arkangc )
@@ -630,6 +665,13 @@ static INPUT_PORTS_START( arkangc2 )
 	PORT_DIPNAME( 0x01, 0x01, "Ball Speed" )			PORT_DIPLOCATION("SW1:8") /* Speed at 0xc462 (code at 0x18aa) - Also affects level 2 (code at 0x7b82) */
 	PORT_DIPSETTING(    0x01, "Slower" )                /* 0xc462 = 0x04 - Normal level 2 */
 	PORT_DIPSETTING(    0x00, DEF_STR ( Normal ) )      /* 0xc462 = 0x06 - Level 2 same as level 30 */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( block2 )
+	PORT_INCLUDE( arkatayt )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )        /* Speed at 0xc462 (code at 0x06fc) : always = 0x06 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arkgcbl )
@@ -985,8 +1027,10 @@ ROM_START( block2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",         0x00000, 0x8000, CRC(2b026cae) SHA1(73d1d5d3e6d65fbe378ce85ff501610573ae5e95) )
 	ROM_LOAD( "2.bin",         0x08000, 0x8000, CRC(e3843fea) SHA1(8c654dcf78d9e4f4c6a7a7d384fdf622536234c1) )
-	ROM_LOAD( "3.bin",         0x10000, 0x8000, CRC(e336c219) SHA1(e1dce37727e7084a83e73f15a138312ab6224061) ) // ?? is it more data or something else like sound or palette?
 	
+	ROM_REGION( 0x8000, "unknown", 0 )	/* is it more data or something else like sound or palette ? not Z80 code nor levels anyway */
+	ROM_LOAD( "3.bin",         0x00000, 0x8000, CRC(e336c219) SHA1(e1dce37727e7084a83e73f15a138312ab6224061) )
+
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "4.bin",   0x00000, 0x8000, CRC(6d2c6123) SHA1(26f32099d363ab2c8505722513638b827e49a8fc) )
 	ROM_LOAD( "5.bin",   0x08000, 0x8000, CRC(09a1f9d9) SHA1(c7e21aba6efb51c5501aa1428f6d9a817cb86555) )
@@ -1143,6 +1187,7 @@ ROM_END
 
 static void arkanoid_bootleg_init( running_machine *machine )
 {
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xf000, 0, 0, arkanoid_bootleg_f000_r );
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
@@ -1157,6 +1202,39 @@ static DRIVER_INIT( arkangc )
 static DRIVER_INIT( arkangc2 )
 {
 	arkanoid_bootleg_id = ARKANGC2;
+	arkanoid_bootleg_init(machine);
+}
+
+static DRIVER_INIT( block2 )
+{
+	// the graphics on this bootleg have the data scrambled
+	int tile;
+	UINT8* srcgfx = memory_region(machine,"gfx1");
+	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
+	
+	for (tile=0;tile<0x3000;tile++)
+	{
+		int srctile;
+		
+		// combine these into a single swap..
+		srctile = BITSWAP16(tile,15,14,13,12,
+		             11,10,9,8,
+		             7,5,6,3,
+	                 1,2,4,0);
+		
+		srctile = BITSWAP16(srctile,15,14,13,12,
+		             11,9,10,5,
+					 7,6,8,4,
+	                 3,2,1,0);					 
+		
+		srctile = srctile^0xd4;
+		
+		memcpy(&buffer[tile*8], &srcgfx[srctile*8], 8);
+	}
+	
+	memcpy(srcgfx,buffer,0x18000);
+
+	arkanoid_bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);
 }
 
@@ -1198,59 +1276,23 @@ static DRIVER_INIT( tetrsark )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd008, 0xd008, 0, 0, tetrsark_d008_w );
 }
 
-static DRIVER_INIT( block2 )
-{
-	// the graphics on this bootleg have the data scrambled
-	int tile;
-	UINT8* srcgfx = memory_region(machine,"gfx1");
-	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
-	
-	for (tile=0;tile<0x3000;tile++)
-	{
-		int srctile;
-		
-		// combine these into a single swap..
-		srctile = BITSWAP16(tile,15,14,13,12,
-		             11,10,9,8,
-		             7,5,6,3,
-	                 1,2,4,0);
-		
-		srctile = BITSWAP16(srctile,15,14,13,12,
-		             11,9,10,5,
-					 7,6,8,4,
-	                 3,2,1,0);					 
-					 
-		srctile = srctile^0xd4;
-		
-		
-		
-		memcpy(&buffer[tile*8], &srcgfx[srctile*8], 8);
-	}
-	
-	memcpy(srcgfx,buffer,0x18000);
-
-	arkanoid_bootleg_id = BLOCK2;
-	arkanoid_bootleg_init(machine);
-	
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xf000, 0, 0, block2_bootleg_f000_r );
-}
 
 /* Game Drivers */
 
-GAME( 1986, arkanoid,  0,        arkanoid, arkanoid, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidu, arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoiduo,arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidj, arkanoid, arkanoid, arknoidj, 0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkmcubl, arkanoid, arkanoid, arknoidj, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ark1ball, arkanoid, arkanoid, ark1ball, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkangc,  arkanoid, bootleg,  arkangc,  arkangc,  ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkangc2, arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkblock, arkanoid, bootleg,  arkangc,  arkblock, ROT90, "bootleg", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkbloc2, arkanoid, bootleg,  arkangc,  arkbloc2, ROT90, "bootleg", "Block (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkgcbl,  arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1988, paddle2,  arkanoid, bootleg,  paddle2,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1986, block2,   arkanoid, bootleg,  arkangc,  block2,   ROT90, "bootleg", "Block 2 (bootleg of Arkanoid)", GAME_NOT_WORKING ) // 'autoplays'
-GAME( 1986, arkatayt, arkanoid, bootleg,  arkatayt, 0,        ROT90, "bootleg", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arktayt2, arkanoid, bootleg,  arktayt2, 0,        ROT90, "bootleg", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
-GAME( 1987, arkatour, arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
-GAME( 19??, tetrsark, 0,        bootleg,  tetrsark, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidj,  arkanoid, arkanoid, arknoidj, 0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkmcubl,   arkanoid, arkanoid, arknoidj, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc,  arkangc,  ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkangc2, ROT90, "bootleg", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, block2,     arkanoid, bootleg,  block2,   block2,   ROT90, "bootleg", "Block 2 (S.P.A. CO. bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc,  arkblock, ROT90, "bootleg", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkbloc2,   arkanoid, bootleg,  arkangc,  arkbloc2, ROT90, "bootleg", "Block (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, 0,        ROT90, "bootleg", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, 0,        ROT90, "bootleg", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1987, arkatour,   arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
+GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )

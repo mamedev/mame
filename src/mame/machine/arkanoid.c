@@ -141,8 +141,9 @@ CUSTOM_INPUT( arkanoid_input_mux )
 Bootlegs stuff
 
 The bootlegs simulate the missing MCU behaviour with writes to 0xd018 and reads value back from 0xf002.
-Fortunately, 'arkangc', 'arkbloc2' and 'arkblock' has patched code not to bother with that.
+Fortunately, 'arkangc', 'arkangc2', 'block2', 'arkbloc2' and 'arkblock' has patched code not to bother with that.
 So I've fixed 'arkbl3' and 'paddle2' to return the expected values (code is strongly similar).
+However, 'block2' is the only bootleg that writes some values to 0xd018 and reads them back from 0xf000.
 
 Some bootlegs also test some bits from 0xd008 after reading the paddle value at 0xd018.
 Their effect is completely unknown but I need to set some bits to 1 so the games are playable :
@@ -151,6 +152,12 @@ Their effect is completely unknown but I need to set some bits to 1 so the games
   - 'arkangc2' :
        * bit 1 must be set to 1 or you enter sort of endless "demo mode" when you start :
            . you can't select your starting level (it always starts at level 1)
+           . you can't control the paddle (it automoves by following the ball)
+           . you can use the "fire" button (the game never shoots)
+           . you are awarded points as in a normal game
+           . sounds are played
+  - 'block2' :
+       * bit 1 must be set to 1 or you enter sort of endless "demo mode" when you start :
            . you can't control the paddle (it automoves by following the ball)
            . you can use the "fire" button (the game never shoots)
            . you are awarded points as in a normal game
@@ -183,12 +190,55 @@ TO DO (2006.09.12) :
 */
 
 
+#define LOG_F000_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - val = %02x\n",cpu_get_pc(space->cpu),arkanoid_bootleg_cmd,arkanoid_bootleg_val);
 #define LOG_F002_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n",cpu_get_pc(space->cpu),arkanoid_bootleg_cmd,arkanoid_bootleg_val);
 #define LOG_D018_W if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n",cpu_get_pc(space->cpu),data,arkanoid_bootleg_cmd);
 #define LOG_D008_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d008_r - val = %02x\n",cpu_get_pc(space->cpu),arkanoid_bootleg_d008_val);
 
 
 static UINT8 arkanoid_bootleg_cmd;
+
+/* Kludge for some bootlegs that read this address */
+READ8_HANDLER( arkanoid_bootleg_f000_r )
+{
+	UINT8 arkanoid_bootleg_val = 0x00;
+
+	switch (arkanoid_bootleg_id)
+	{
+		case ARKANGC:	/* There are no reads from 0xf000 in these bootlegs */
+		case ARKBLOCK:
+		case ARKANGC2:
+		case ARKBLOC2:
+		case ARKGCBL:
+		case PADDLE2:
+			switch (arkanoid_bootleg_cmd)
+			{
+				default:
+					break;
+			}
+			LOG_F000_R
+			break;
+		case BLOCK2:
+			switch (arkanoid_bootleg_cmd)
+			{
+				case 0x05:  /* Check 1 */
+					arkanoid_bootleg_val = 0x05;
+					break;
+				case 0x0a:  /* Check 2 */
+					arkanoid_bootleg_val = 0x0a;
+					break;
+				default:
+					break;
+			}
+			LOG_F000_R
+			break;
+		default:
+			logerror("%04x: arkanoid_bootleg_f000_r - cmd = %02x - unknown bootleg !\n",cpu_get_pc(space->cpu),arkanoid_bootleg_cmd);
+			break;
+	}
+
+	return arkanoid_bootleg_val;
+}
 
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_f002_r )
@@ -206,7 +256,8 @@ READ8_HANDLER( arkanoid_bootleg_f002_r )
 			}
 			LOG_F002_R
 			break;
-		case ARKANGC2:  /* There are no reads from 0xf002 in this bootleg */
+		case ARKANGC2:  /* There are no reads from 0xf002 in these bootlegs */
+		case BLOCK2:
 			switch (arkanoid_bootleg_cmd)
 			{
 				default:
@@ -360,6 +411,23 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			}
 			LOG_D018_W
 			break;
+		case BLOCK2:
+			switch (data)
+			{
+				case 0x05:  /* Check 1 */
+					if (cpu_get_pc(space->cpu) == 0x0363)
+						arkanoid_bootleg_cmd = 0x05;
+					break;
+				case 0x0a:  /* Check 2 */
+					if (cpu_get_pc(space->cpu) == 0x0372)
+						arkanoid_bootleg_cmd = 0x0a;
+					break;
+				default:
+					arkanoid_bootleg_cmd = 0x00;
+					break;		
+			}
+			LOG_D018_W
+			break;
 		case ARKBLOC2:
 			switch (data)
 			{
@@ -507,15 +575,6 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			}
 			LOG_D018_W
 			break;
-		case BLOCK2:
-			switch (data)
-			{
-				default:
-					arkanoid_bootleg_cmd = data;
-					break;		
-			}
-			LOG_D018_W
-			break;
 			
 		default:
 			logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - unknown bootleg !\n",cpu_get_pc(space->cpu),data);
@@ -549,6 +608,7 @@ READ8_HANDLER( arkanoid_bootleg_d008_r )
 			arkanoid_bootleg_d008_bit[5] = 0;  /* untested bit */
 			break;
 		case ARKANGC2:
+		case BLOCK2:
 			arkanoid_bootleg_d008_bit[0] = 0;  /* untested bit */
 			arkanoid_bootleg_d008_bit[1] = 1;  /* check code at 0x0cad */
 			arkanoid_bootleg_d008_bit[2] = 0;  /* untested bit */
