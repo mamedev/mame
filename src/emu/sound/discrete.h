@@ -2115,7 +2115,7 @@
  *                              input 1 node or static value,
  *                              address of discrete_op_amp_tvca_info structure)
  *
- *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, v1, v2, v3, vP, f0, f1, f2, f3, f4, f5}
+ *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, c4, v1, v2, v3, vP, f0, f1, f2, f3, f4, f5}
  *
  * Note: Set all unused components to 0.
  *       Set all unused functions to DISC_OP_AMP_TRIGGER_FUNCTION_NONE
@@ -2125,11 +2125,11 @@
  *       vP is the op-amp B+.
  *
  *             r2a
- *   IN0 >----ZZZZ-----.               r1
- *           .----.    |     vP >------ZZZZ---.
- *           | F0 |----+                      |
- *           '----'    |                r2b   |    r4
- *             r3a     '---------------ZZZZ---+---ZZZZ--.
+ *   IN0 >----ZZZZ-----.               r1         c4
+ *           .----.    |     vP >------ZZZZ---+---||----.
+ *           | F0 |----+                      |         |
+ *           '----'    |                r2b   |    r4   |
+ *             r3a     '---------------ZZZZ---+---ZZZZ--+
  *   IN1 >----ZZZZ---.                        |         |
  *           .----.  |                  r3b   |  |\     |
  *           | F1 |--+-----------------ZZZZ---+  | \    |
@@ -3984,6 +3984,7 @@ struct _discrete_op_amp_tvca_info
 	double	c1;
 	double	c2;
 	double	c3;
+	double	c4;
 	double	v1;
 	double	v2;
 	double	v3;

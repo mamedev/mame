@@ -80,7 +80,7 @@ static const discrete_op_amp_tvca_info midway_music_tvca_info =
 	0,
 	CAP_U(.001),			/* c500 */
 	0,
-	0,
+	0, 0,
 	12,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -650,7 +650,7 @@ static const discrete_op_amp_tvca_info boothill_tone_tvca_info =
 	0,
 	CAP_U(.001),
 	0,
-	0,
+	0, 0,
 	12,
 	0,
 	0,
@@ -679,7 +679,7 @@ static const discrete_op_amp_tvca_info boothill_shot_tvca_info =
 	0,
 	CAP_U(0.22),
 	0,
-	0,
+	0, 0,
 	12,
 	0,
 	0,
@@ -705,7 +705,7 @@ static const discrete_op_amp_tvca_info boothill_hit_tvca_info =
 	0,
 	0,
 	0,
-	0,
+	0, 0,
 	CAP_U(1),
 	0,
 	0,
@@ -930,7 +930,7 @@ static const discrete_op_amp_tvca_info checkmat_op_amp_tvca =
 	0,			/* r11 - not used */
 	CAP_U(1),	/* C300 */
 	0,			/* c2 - not used */
-	0,			/* c3 - not used */
+	0, 0,		/* c3, c4 - not used */
 	5,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -1126,7 +1126,7 @@ static const discrete_op_amp_tvca_info desertgu_rifle_shot_tvca_info =
 	0,
 	CAP_U(0.47),
 	0,
-	0,
+	0, 0,
 	12,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -1795,6 +1795,7 @@ static const discrete_op_amp_tvca_info clowns_pop_tvca_info =
 	CAP_U(.015),	/* c300 */
 	CAP_U(.1),		/* c301 */
 	CAP_U(.082),	/* c302 */
+	0,				/* no c4 */
 	5,			/* v1 */
 	5,			/* v2 */
 	5,			/* v3 */
@@ -1836,7 +1837,7 @@ static const discrete_op_amp_tvca_info clowns_sb_hit_tvca_info =
 	0,0,0,0,
 	CAP_U(1),		/* c201 */
 	0,
-	0,
+	0, 0,
 	5,			/* v1 */
 	0,			/* v2 */
 	0,			/* v3 */
@@ -2092,7 +2093,7 @@ static const discrete_op_amp_tvca_info spacwalk_hit_tvca_info =
 	SPACWALK_RJ3, 0, SPACWALK_R300,						/* r5, r6, r7 */
 	SPACWALK_RJ3, SPACWALK_R301,						/* r8, r9 */
 	SPACWALK_RJ3, SPACWALK_R302,						/* r10, r11 */
-	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302,		/* c1, c2, c3 */
+	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302, 0,		/* c1, c2, c3, c4 */
 	5, 5, 5, 12,										/* v1, v2, v3, vP */
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
@@ -2115,7 +2116,7 @@ static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
 	SPACWALK_R207,	SPACWALK_R205, 0, SPACWALK_R208,	/* r1, r2, r3, r4 */
 	SPACWALK_RJ3, 0, SPACWALK_R206,						/* r5, r6, r7 */
 	0, 0, 0, 0					,						/* r8, r9, r10, r11 */
-	SPACWALK_C201, 0, 0,								/* c1, c2, c3 */
+	SPACWALK_C201, 0, 0, 0,								/* c1, c2, c3, c4 */
 	5, 0, 0, 12,										/* v1, v2, v3, vP */
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
@@ -2383,32 +2384,89 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w )
 #define SHUFFLE_R401	RES_K(3)
 #define SHUFFLE_R402	RES_K(5.6)
 #define SHUFFLE_R403	RES_K(5.6)
+#define SHUFFLE_R404	RES_M(1)
 #define SHUFFLE_R406	RES_K(300)
+#define SHUFFLE_R407	RES_K(680)
 #define SHUFFLE_R408	RES_K(680)
+#define SHUFFLE_R409	RES_K(680)
+#define SHUFFLE_R410	RES_K(680)
 #define SHUFFLE_R411	RES_K(680)
 #define SHUFFLE_R412	RES_M(2.7)
 #define SHUFFLE_R500	RES_K(300)
+#define SHUFFLE_R503	RES_M(2.7)
+#define SHUFFLE_R504	RES_K(680)
+#define SHUFFLE_R505	RES_K(680)
+#define SHUFFLE_R506	RES_K(100)
+#define SHUFFLE_R507	RES_K(47)
+#define SHUFFLE_R508	RES_K(47)
+#define SHUFFLE_R509	RES_K(100)
+#define SHUFFLE_R511	RES_M(2)
+#define SHUFFLE_R512	RES_M(5.6)
+#define SHUFFLE_R513	RES_K(680)
+#define SHUFFLE_R514	RES_M(1.5)
+#define SHUFFLE_R515	RES_M(1)
+#define SHUFFLE_R516	RES_K(510)
 
 /* Parts List - Capacitors */
 #define SHUFFLE_C300	CAP_U(0.1)
 #define SHUFFLE_C400	CAP_U(0.1)
 #define SHUFFLE_C401	CAP_U(1)
+#define SHUFFLE_C402	CAP_U(1)
+#define SHUFFLE_C403	CAP_U(1)
 #define SHUFFLE_C404	CAP_U(0.1)
+#define SHUFFLE_C405	CAP_U(0.1)
 #define SHUFFLE_C500	CAP_U(0.1)
+#define SHUFFLE_C503	CAP_U(0.0022)
+#define SHUFFLE_C504	CAP_U(0.0022)
+#define SHUFFLE_C505	CAP_U(0.33)
+#define SHUFFLE_C506	CAP_U(1)
+#define SHUFFLE_C507	CAP_U(1)
+#define SHUFFLE_C508	CAP_U(1)
 
 #define SHUFFLE_HSYNC	15750	/* unmeasured */
 #define SHUFFLE_1V		SHUFFLE_HSYNC / 2
 #define SHUFFLE_32V		SHUFFLE_1V / 32
 
 
+static const discrete_op_amp_tvca_info shuffle_rolling_tvca =
+{
+	SHUFFLE_R512, 0, 0, SHUFFLE_R511,					/* r1, r2, r3, r4 */
+	RES_K(10), 0, SHUFFLE_R516,							/* r5, r6, r7 */
+	RES_K(10), SHUFFLE_R515,							/* r8, r9 */
+	RES_K(10), SHUFFLE_R514,							/* r10, r11 */
+	SHUFFLE_C508, SHUFFLE_C507, SHUFFLE_C506, SHUFFLE_C505,		/* c1, c2, c3, c4 */
+	12, 12, 12, 12,										/* v1, v2, v3, vP */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0,			/* f0, f1, f2, f3 */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,					/* f4 */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2					/* f5 */
+};
+
+static const discrete_op_amp_info shuffle_rolling_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	SHUFFLE_R513, SHUFFLE_R505, SHUFFLE_R503, SHUFFLE_R504,	/* r1, r2, r3, r4 */
+	0,						/* c */
+	0, 12,					/* vN, vP */
+};
+
 static const discrete_op_amp_tvca_info shuffle_foul_tvca =
 {
 	SHUFFLE_R412, SHUFFLE_R411, 0, SHUFFLE_R408,		/* r1, r2, r3, r4 */
 	RES_K(1), 0, SHUFFLE_R406,							/* r5, r6, r7 */
 	0, 0, 0, 0,											/* r8, r9, r10, r11 */
-	SHUFFLE_C404, 0, 0,									/* c1, c2, c3 */
+	SHUFFLE_C404, 0, 0,	0,								/* c1, c2, c3, c4 */
 	5, 0, 0, 12,										/* v1, v2, v3, vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
+};
+
+static const discrete_op_amp_tvca_info shuffle_rollover_tvca =
+{
+	SHUFFLE_R404, SHUFFLE_R410, 0, SHUFFLE_R407,		/* r1, r2, r3, r4 */
+	RES_K(10), 0, SHUFFLE_R409,							/* r5, r6, r7 */
+	0, 0, 0, 0,											/* r8, r9, r10, r11 */
+	SHUFFLE_C405, 0, 0,	0,								/* c1, c2, c3, c4 */
+	12, 0, 0, 12,										/* v1, v2, v3, vP */
+	0, 0, DISC_OP_AMP_TRIGGER_FUNCTION_TRG0, 0, 0, 0	/* f0, f1, f2, f3, f4, f5 */
 };
 
 static const discrete_mixer_desc shuffle_mixer =
@@ -2420,13 +2478,14 @@ static const discrete_mixer_desc shuffle_mixer =
 	0, 0, 0, 0, 0 ,1		/* rI, rF, cF, cAmp, vRef, gain */
 };
 
+
 static DISCRETE_SOUND_START(shuffle)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_1_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_2_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_3_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_FOUL_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLOVER_EN)
-	DISCRETE_INPUT_LOGIC(SHUFFLE_CLICK_EN)
+	DISCRETE_INPUTX_LOGIC(SHUFFLE_CLICK_EN, 11.5, 0, 0)
 
 	/* Noise clock was breadboarded and measured at 1210Hz */
 	DISCRETE_LFSR_NOISE(SHUFFLE_NOISE,			/* IC N5, pin 10 */
@@ -2436,7 +2495,17 @@ static DISCRETE_SOUND_START(shuffle)
 	/************************************************
      * Shuffle rolling
      ************************************************/
-	DISCRETE_CONSTANT(SHUFFLE_ROLLING_SND, 0)
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_20,			/* IC P3-4, pin 5 */
+		SHUFFLE_ROLLING_1_EN, SHUFFLE_ROLLING_2_EN, SHUFFLE_ROLLING_3_EN,	/* TRG0,TRG1,TRG2 */
+		0, 0,									/*IN0,IN1 */
+		&shuffle_rolling_tvca)
+	DISCRETE_OP_AMP(NODE_21,					/* IC P3-4, pin 4 */
+		1,										/* ENAB */
+		SHUFFLE_NOISE, NODE_20,					/* IN0,IN1 */
+		&shuffle_rolling_amp)
+	/* filter not accurate */
+	DISCRETE_FILTER1(NODE_22, 1, NODE_21, 800, DISC_FILTER_LOWPASS)
+	DISCRETE_GAIN(SHUFFLE_ROLLING_SND, NODE_22, .2)
 
 	/************************************************
      * Foul
@@ -2451,12 +2520,23 @@ static DISCRETE_SOUND_START(shuffle)
 	/************************************************
      * Shuffle rollover
      ************************************************/
-	DISCRETE_CONSTANT(SHUFFLE_ROLLOVER_SND, 0)
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_40,			/* IC M3-4, pin 4 */
+		SHUFFLE_ROLLOVER_EN, 0, 0,				/* TRG0,TRG1,TRG2 */
+		SHUFFLE_NOISE, 0,						/*IN0,IN1 */
+		&shuffle_rollover_tvca)
+	DISCRETE_RCFILTER(NODE_41,
+		NODE_40,								/* IN0 */
+		SHUFFLE_R403, SHUFFLE_C403)
+	DISCRETE_RCFILTER(SHUFFLE_ROLLOVER_SND,
+		NODE_41,								/* IN0 */
+		SHUFFLE_R403 + SHUFFLE_R402, SHUFFLE_C402)
 
 	/************************************************
      * Click
      ************************************************/
-	DISCRETE_CONSTANT(SHUFFLE_CLICK_SND, 0)
+	/* filter not accurate */
+	DISCRETE_FILTER1(NODE_50, 1, SHUFFLE_CLICK_EN, 300, DISC_FILTER_LOWPASS)
+	DISCRETE_GAIN(SHUFFLE_CLICK_SND, NODE_50, .3)
 
 	/************************************************
      * Combine all sound sources.
@@ -2468,7 +2548,7 @@ static DISCRETE_SOUND_START(shuffle)
 		SHUFFLE_ROLLOVER_SND,
 		SHUFFLE_CLICK_SND,
 		&shuffle_mixer)
-	DISCRETE_OUTPUT(NODE_90, 11000)
+	DISCRETE_OUTPUT(NODE_90, 59200)
 DISCRETE_SOUND_END
 
 
@@ -2489,9 +2569,11 @@ WRITE8_DEVICE_HANDLER( shuffle_audio_1_w )
 
 	sound_global_enable(device->machine, (data >> 2) & 0x01);
 
-	discrete_sound_w(device, SHUFFLE_ROLLING_1_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, NODE_29, (data >> 3) & 0x07);
+
+	discrete_sound_w(device, SHUFFLE_ROLLING_3_EN, (data >> 3) & 0x01);
 	discrete_sound_w(device, SHUFFLE_ROLLING_2_EN, (data >> 4) & 0x01);
-	discrete_sound_w(device, SHUFFLE_ROLLING_3_EN, (data >> 5) & 0x01);
+	discrete_sound_w(device, SHUFFLE_ROLLING_1_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
@@ -2748,7 +2830,7 @@ static const discrete_op_amp_tvca_info spcenctr_player_shot_tvca =
 	0,									/* no r11 */
 	CAP_U(1),							/* C506 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -2777,7 +2859,7 @@ static const discrete_op_amp_tvca_info spcenctr_crash_tvca =
 	0,									/* no r11 */
 	CAP_U(2.2),							/* C304 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -2806,7 +2888,7 @@ static const discrete_op_amp_tvca_info spcenctr_explosion_tvca =
 	0,									/* no r11 */
 	CAP_U(2.2),							/* C400 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3234,7 +3316,7 @@ static const discrete_op_amp_tvca_info bowler_fowl_tvca =
 	0,									/* no r11 */
 	CAP_U(0.1),							/* C1050 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3655,7 +3737,7 @@ static const discrete_op_amp_tvca_info invaders_explosion_tvca =
 	0,									/* no r11 */
 	CAP_U(1),							/* C26 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	12.0 - OP_AMP_NORTON_VBE,			/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
@@ -3741,7 +3823,7 @@ static const discrete_op_amp_tvca_info invaders_missle_tvca =
 	0,									/* no r11 */
 	CAP_U(0.1),							/* C14 */
 	0,									/* no c2 */
-	0,									/* no c3 */
+	0, 0,								/* no c3, c4 */
 	5,									/* v1 */
 	0,									/* no v2 */
 	0,									/* no v3 */
