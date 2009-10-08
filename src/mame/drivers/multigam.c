@@ -435,7 +435,7 @@ static void multigam_init_smb3(running_machine *machine)
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
 
-	memory_set_bankptr(machine, 1, multigmc_mmc3_6000_ram);
+	memory_set_bankptr(machine, 10, multigmc_mmc3_6000_ram);
 
 	multigam3_mmc3_banks[0] = 0x1e;
 	multigam3_mmc3_banks[1] = 0x1f;
@@ -450,12 +450,19 @@ static WRITE8_HANDLER(multigm3_mapper2_w)
 {
 	if (multigam_game_gfx_bank & 0x80)
 	{
-		set_videorom_bank(space->machine, 0, 8, (multigam_game_gfx_bank & 0xfc)  + (data & 0x3), 8);
+		set_videorom_bank(space->machine, 0, 8, (multigam_game_gfx_bank & 0x3c)  + (data & 0x3), 8);
 	}
 	else
 	{
 		logerror("Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data);
 	}
+};
+
+static WRITE8_HANDLER(multigm3_switch_gfx_rom)
+{
+	set_videorom_bank(space->machine, 0, 8, data & 0x3f, 8);
+	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	multigam_game_gfx_bank = data;
 };
 
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
@@ -472,7 +479,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 	else
 	{
 		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x6000);
+		memory_set_bankptr(space->machine, 10, memory_region(space->machine, "maincpu") + 0x6000);
 	}
 
 	if (data & 0x80)
@@ -507,10 +514,10 @@ static ADDRESS_MAP_START( multigm3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigam_switch_gfx_rom)
+	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigm3_switch_gfx_rom)
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(10)
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITENOP /* 0x00 in attract mode, 0xff during play */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigm3_mapper2_w)
 ADDRESS_MAP_END
