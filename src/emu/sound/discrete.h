@@ -3412,6 +3412,8 @@
 #define RC_DISCHARGE_EXP_DT(rc, dt)				(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)			(exp((dt) / (rc)))
 
+#define FREQ_OF_555(_r1, _r2, _c)	(1.49 / ((_r1 + 2 * _r2) * _c))
+
 /*************************************
  *
  *  Interface & Naming

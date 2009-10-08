@@ -4156,14 +4156,93 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 #define BLUESHRK_SHARK_SND		NODE_15
 #define BLUESHRK_SHOT_SND		NODE_16
 
+/* Parts List - Resistors */
+#define BLUESHRK_R300	RES_M(1)
+#define BLUESHRK_R301	RES_K(100)
+#define BLUESHRK_R302	RES_M(1)
+#define BLUESHRK_R303	RES_K(33)
+#define BLUESHRK_R304	RES_K(120)
+#define BLUESHRK_R305	RES_M(1)
+#define BLUESHRK_R306	RES_K(470)
+#define BLUESHRK_R307	RES_K(680)
+#define BLUESHRK_R308	RES_M(1)
+#define BLUESHRK_R309	RES_M(1)
+#define BLUESHRK_R310	RES_K(680)
+#define BLUESHRK_R311	RES_K(1)
+#define BLUESHRK_R312	RES_K(100)
+#define BLUESHRK_R313	RES_M(1)
+#define BLUESHRK_R314	RES_M(1)
+#define BLUESHRK_R315	RES_M(4.7)
+#define BLUESHRK_R316	RES_M(2.2)
+#define BLUESHRK_R317	RES_K(10)
+#define BLUESHRK_R318	RES_M(1)
+#define BLUESHRK_R319	RES_K(680)
+#define BLUESHRK_R320	RES_M(2.7)
+#define BLUESHRK_R321	RES_K(680)
+#define BLUESHRK_R324	RES_K(750)
+#define BLUESHRK_R520	RES_K(510)
+#define BLUESHRK_R521	RES_K(22)
+#define BLUESHRK_R529	RES_K(33)
+#define BLUESHRK_R601	RES_K(47)
+#define BLUESHRK_R602	RES_K(22)
+#define BLUESHRK_R603	RES_K(39)
+#define BLUESHRK_R604	RES_K(1)
+#define BLUESHRK_R605	RES_M(1)
+#define BLUESHRK_R730	RES_K(56)
 
-static const discrete_555_desc blueshrk_555_H1A =
+/* Parts List - Capacitors */
+#define BLUESHRK_C300	CAP_U(0.1)
+#define BLUESHRK_C301	CAP_P(470)
+#define BLUESHRK_C302	CAP_P(470)
+#define BLUESHRK_C303	CAP_U(0.47)
+#define BLUESHRK_C304	CAP_U(1)
+#define BLUESHRK_C305	CAP_U(1)
+#define BLUESHRK_C508	CAP_U(1)
+#define BLUESHRK_C600	CAP_U(2.2)
+#define BLUESHRK_C602	CAP_U(0.022)
+#define BLUESHRK_C603	CAP_U(0.01)
+#define BLUESHRK_C604	CAP_U(0.015)
+#define BLUESHRK_C606	CAP_U(1)
+#define BLUESHRK_C704	CAP_U(1)
+#define BLUESHRK_C900	CAP_U(10)
+
+
+static const discrete_op_amp_osc_info blueshark_octopus_osc =
 {
-	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
-	5,				/* B+ voltage of 555 */
-	DEFAULT_555_VALUES
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	BLUESHRK_R300, BLUESHRK_R303, BLUESHRK_R301, BLUESHRK_R304, BLUESHRK_R302, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C300, 12				/*c, vP */
 };
 
+static const discrete_op_amp_osc_info blueshark_octopus_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	BLUESHRK_R305, BLUESHRK_R306, BLUESHRK_R307, BLUESHRK_R309, BLUESHRK_R308, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C301, 12				/*c, vP */
+};
+
+static const discrete_op_amp_1sht_info blueshark_octopus_oneshot =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R315, BLUESHRK_R312, BLUESHRK_R314, BLUESHRK_R313, BLUESHRK_R316,	/* r1, r2, r3, r4, r5 */
+	BLUESHRK_C303, BLUESHRK_C302,												/* c1, c2 */
+	0, 12																		/* vN, vP */
+};
+
+static const discrete_integrate_info blueshark_octopus_integrate =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R318, BLUESHRK_R317, 0, BLUESHRK_C304,		/* r1, r2, r3, c */
+	12, 12,												/* v1, vP */
+	0, 0, 0												/* f0, f1, f2 */
+};
+
+static const discrete_op_amp_info blueshark_octopus_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R310, BLUESHRK_R319, BLUESHRK_R320, BLUESHRK_R321,	/* r1, r2, r3, r4 */
+	0, 0, 12														/* c, vN, vP */
+};
 
 static const discrete_555_desc blueshrk_555_H1B =
 {
@@ -4176,31 +4255,19 @@ static const discrete_555_desc blueshrk_555_H1B =
 
 static const discrete_mixer_desc blueshrk_mixer =
 {
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(750),
-	  1.0/(1.0/RES_K(510) + 1.0/RES_K(22)),
-	  RES_M(1),
-	  RES_K(56) },
-	{ 0 },
-	{ CAP_U(1),
-	  CAP_U(1),
-	  CAP_U(1),
-	  CAP_U(1) },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,		/* Vref */
-	700		/* final gain */
+	DISC_MIXER_IS_RESISTOR,
+	{BLUESHRK_R324, RES_2_PARALLEL(BLUESHRK_R520, BLUESHRK_R521) + BLUESHRK_R529, BLUESHRK_R604 + BLUESHRK_R605, BLUESHRK_R730},
+	{0},	/* r_node */
+	{BLUESHRK_C305, BLUESHRK_C508, BLUESHRK_C606, BLUESHRK_C704},
+	0, 0, 0, BLUESHRK_C900, 0, 1	/* rI, rF, cF, cAmp, vRef, gain */
 };
-
 
 static DISCRETE_SOUND_START(blueshrk)
 
 	/************************************************
      * Input register mapping
      ************************************************/
-	DISCRETE_INPUT_LOGIC(BLUESHRK_OCTOPUS_EN)
+	DISCRETE_INPUTX_LOGIC(BLUESHRK_OCTOPUS_EN, 12, 0, 0)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_HIT_EN)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_SHARK_EN)
 	DISCRETE_INPUT_LOGIC(BLUESHRK_SHOT_EN)
@@ -4209,25 +4276,22 @@ static DISCRETE_SOUND_START(blueshrk)
 	/************************************************
      * Octopus sound
      ************************************************/
-	DISCRETE_CONSTANT(BLUESHRK_OCTOPUS_SND, 0)	/* placeholder for incomplete sound */
-
-	/************************************************
-     * Hit sound
-     ************************************************/
-	/* the 555 trigger is connected to the cap, so when reset goes high, the 555 is triggered */
-	/* but the 555_MSTABLE does not currently allow connection of the trigger to the cap */
-	/* so we will cheat and add a pulse 1 sample wide to trigger it */
-	DISCRETE_ONESHOT(NODE_30, BLUESHRK_HIT_EN, 1, /* 1 sample wide */ 0, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_LOW)
-	DISCRETE_555_MSTABLE(NODE_31, BLUESHRK_HIT_EN, NODE_30, RES_K(47), CAP_U(2.2), &blueshrk_555_H1A)
-	DISCRETE_LOGIC_INVERT(NODE_32, BLUESHRK_HIT_EN)
-	DISCRETE_COUNTER(NODE_33, 1, /*RST*/ NODE_32, /*CLK*/ NODE_31, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_F_EDGE)
-	DISCRETE_SWITCH(NODE_34, 1, NODE_33, CAP_U(0.015) + CAP_U(0.01), CAP_U(0.022))
-	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND, BLUESHRK_HIT_EN, RES_K(22), RES_K(39), NODE_34, &blueshrk_555_H1B)
-
-	/************************************************
-     * Shark sound
-     ************************************************/
-	DISCRETE_CONSTANT(BLUESHRK_SHARK_SND, 0)	/* paceholder for incomplete sound */
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_20,			/* IC M5, pin 5 */
+		1,										/* ENAB */
+		&blueshark_octopus_osc)
+	DISCRETE_OP_AMP_VCO1(NODE_21,				/* IC M5, pin 10 */
+		1,										/* ENAB */
+		NODE_20,								/* VMOD1 */
+		&blueshark_octopus_vco)
+	DISCRETE_OP_AMP_ONESHOT(NODE_22,			/* IC J5, pin 10 */
+		BLUESHRK_OCTOPUS_EN, &blueshark_octopus_oneshot)
+	DISCRETE_INTEGRATE(NODE_23,					/* IC J5, pin 5 */
+		NODE_22, 0,								/* TRG0,TRG1 */
+		&blueshark_octopus_integrate)
+	DISCRETE_OP_AMP(BLUESHRK_OCTOPUS_SND,		/* IC J5, pin 4 */
+		1,										/* ENAB */
+		NODE_21, NODE_23,						/* IN0,IN1 */
+		&blueshark_octopus_amp)
 
 	/************************************************
      * Shot sound
@@ -4235,11 +4299,40 @@ static DISCRETE_SOUND_START(blueshrk)
 	DISCRETE_CONSTANT(BLUESHRK_SHOT_SND, 0)		/* placeholder for incomplete sound */
 
 	/************************************************
+     * Hit sound
+     ************************************************/
+	DISCRETE_COUNTER(NODE_40,							/* IC H3, pin 5 */
+		1, BLUESHRK_HIT_EN,								/* ENAB,RESET */
+		FREQ_OF_555(BLUESHRK_R601, 0, BLUESHRK_C600),	/* CLK */
+		1, DISC_COUNT_UP, 0,							/* MAX,DIR,INIT0 */
+		DISC_CLK_IS_FREQ)
+	DISCRETE_SWITCH(NODE_41,					/* value of toggled caps */
+		1,										/* ENAB */
+		NODE_40,								/* SWITCH */
+		BLUESHRK_C602 + BLUESHRK_C603,			/* INP0 - IC H3, pin 5 low */
+		BLUESHRK_C604)							/* INP1 - IC H3, pin 6 low  */
+	DISCRETE_555_ASTABLE(BLUESHRK_HIT_SND,		/* IC H2, pin 2 */
+		BLUESHRK_HIT_EN,						/* RESET */
+		BLUESHRK_R602, BLUESHRK_R603, NODE_41,	/* R1,R2,C */
+		&blueshrk_555_H1B)
+
+	/************************************************
+     * Shark sound
+     ************************************************/
+	DISCRETE_CONSTANT(BLUESHRK_SHARK_SND, 0)	/* paceholder for incomplete sound */
+
+	/************************************************
      * Combine all sound sources.
      ************************************************/
-	DISCRETE_MIXER4(NODE_91, BLUESHRK_GAME_ON_EN, BLUESHRK_OCTOPUS_SND, BLUESHRK_HIT_SND, BLUESHRK_SHARK_SND, BLUESHRK_SHOT_SND, &blueshrk_mixer)
+	DISCRETE_MIXER4(NODE_91,
+		BLUESHRK_GAME_ON_EN,
+		BLUESHRK_OCTOPUS_SND,
+		BLUESHRK_SHOT_SND,
+		BLUESHRK_HIT_SND,
+		BLUESHRK_SHARK_SND,
+		&blueshrk_mixer)
 
-	DISCRETE_OUTPUT(NODE_91, 1)
+	DISCRETE_OUTPUT(NODE_91, 240000)
 DISCRETE_SOUND_END
 
 
@@ -4255,16 +4348,16 @@ WRITE8_DEVICE_HANDLER( blueshrk_audio_w )
 {
 	discrete_sound_w(device, BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 
-	/* discrete_sound_w(device, BLUESHRK_SHOT_EN, (data >> 1) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_SHOT_EN, (data >> 1) & 0x01);
 
 	discrete_sound_w(device, BLUESHRK_HIT_EN, (data >> 2) & 0x01);
 
-	/* discrete_sound_w(device, BLUESHRK_SHARK_EN, (data >> 3) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_SHARK_EN, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable KILLED DIVER sound, this circuit
        doesn't appear to be on the schematics */
 
-	/* discrete_sound_w(device, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01); */
+	discrete_sound_w(device, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
