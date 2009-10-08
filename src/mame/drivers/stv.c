@@ -3823,7 +3823,7 @@ GAME( 1997, cotton2,   stvbios, stv, stv,  		cotton2,   	ROT0,   "Success",  			
 GAME( 1998, cottonbm,  stvbios, stv, stv,  		cottonbm,  	ROT0,   "Success",  				  	"Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, critcrsh,  stvbios, stv, critcrsh,	stv,   		ROT0,   "Sega", 	     			  	"Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, danchih,   stvbios, stv, stvmp,		danchih,   	ROT0,   "Altron (Tecmo license)",     	"Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv, stvmp,		danchih,   	ROT0,   "Altron (Tecmo license)",     	"Danchi de Quiz (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv, stvmp,		danchih,   	ROT0,   "Altron",     					"Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv, stv,  		diehard,   	ROT0,   "Sega", 	 				  	"Die Hard Arcade (UET 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv, stv, 		dnmtdeka,  	ROT0,   "Sega", 	 				  	"Dynamite Deka (J 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv, stv,  		stv,       	ROT0,   "Sega", 	 				  	"Ejihon Tantei Jimusyo (J 950613 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

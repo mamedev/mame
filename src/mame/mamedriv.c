@@ -4078,7 +4078,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( sanjeon )	/* 1999.04 Sanjun Sujun (Sega / Deniam) */
 	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
 	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
-						/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
+	DRIVER( danchiq )	/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
 
 	/* Sega Model 2 Games */
 
